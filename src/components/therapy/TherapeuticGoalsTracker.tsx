@@ -11,6 +11,10 @@ import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'
 import type { TherapeuticGoal } from '@/lib/ai/types/TherapeuticGoals'
 
+// ⚡ Bolt: Cache Object.values for enums to avoid repeated creation during renders
+const GOAL_CATEGORIES = Object.values(GoalCategory)
+const GOAL_STATUSES = Object.values(GoalStatus)
+
 interface TherapeuticGoalsTrackerProps {
   patientModel: CognitiveModel
   currentSession: TherapySession
@@ -245,15 +249,15 @@ export function TherapeuticGoalsTracker({
     setForm({})
   }
 
-  // Handle form changes
-  function handleFormChange(
+  // ⚡ Bolt: Memoize form change handler to prevent unnecessary re-renders of input fields
+  const handleFormChange = useCallback((
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >,
-  ) {
+  ) => {
     const { name, value } = e.target
     setForm((prev) => ({ ...prev, [name]: value }))
-  }
+  }, [])
 
   // Handle form submit
   async function handleFormSubmit(e: React.FormEvent) {
@@ -326,7 +330,7 @@ export function TherapeuticGoalsTracker({
         >
           All
         </Button>
-        {Object.values(GoalCategory).map((category) => (
+        {GOAL_CATEGORIES.map((category) => (
           <Button
             key={category}
             size='sm'
@@ -413,7 +417,7 @@ export function TherapeuticGoalsTracker({
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >
-                {Object.values(GoalCategory).map((cat) => (
+                {GOAL_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
                     {(() => {
                       switch (cat) {
@@ -446,7 +450,7 @@ export function TherapeuticGoalsTracker({
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >
-                {Object.values(GoalStatus).map((stat) => (
+                {GOAL_STATUSES.map((stat) => (
                   <option key={stat} value={stat}>
                     {stat.replace('_', ' ')}
                   </option>

@@ -937,7 +937,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Update processed data
-      let updatedData = stixObject
+      const updatedData = stixObject
       if (this.config.encryption.enabled && obj.encrypted_data) {
         const encryptedData = await encrypt(
           JSON.stringify(updatedData),

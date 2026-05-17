@@ -1,6 +1,18 @@
-import type { SessionData } from '@/lib/auth/types'
+import type { AuthUser, SessionData } from '@/lib/auth/types'
 
 import { verifyToken as auth0VerifyToken } from '../services/auth0.service'
+
+/** Legacy sessions may expose MongoDB-style `_id` instead of `id`. */
+type SessionUserWithLegacyId = AuthUser & {
+  _id?: string | { toString(): string }
+}
+
+function userIdFromSessionUser(user: SessionUserWithLegacyId): string | null {
+  if (user.id) return user.id
+  const legacyId = user._id
+  if (legacyId == null) return null
+  return typeof legacyId === 'string' ? legacyId : legacyId.toString()
+}
 
 /**
  * Utility to verify auth tokens using Auth0 service.
@@ -53,9 +65,41 @@ export async function getSessionFromRequest(
 }
 
 /**
+ * Resolve the authenticated user ID from session, Authorization header, or auth cookie.
+ */
+export async function resolveUserIdFromRequest(
+  request: Request,
+): Promise<string | null> {
+  const session = await getSessionFromRequest(request)
+  if (session?.user) {
+    return userIdFromSessionUser(session.user as SessionUserWithLegacyId)
+  }
+
+  const authHeader = request.headers.get('Authorization')
+  if (authHeader) {
+    const { userId } = await verifyAuthToken(authHeader)
+    return userId
+  }
+
+  const cookieToken = request.headers
+    .get('cookie')
+    ?.split(';')
+    .find((c) => c.trim().startsWith('auth-token='))
+    ?.split('=')[1]
+
+  if (cookieToken) {
+    const { userId } = await verifyAuthToken(cookieToken)
+    return userId
+  }
+
+  return null
+}
+
+/**
  * Auth object for catch-all route compatibility.
  */
 export const auth = {
   verifyAuthToken,
   getSessionFromRequest,
+  resolveUserIdFromRequest,
 }

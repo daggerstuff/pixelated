@@ -51,7 +51,7 @@ describe('sentimentAnalysisService', () => {
     it('should analyze sentiment correctly for positive text', async () => {
       // Mock the AI service response
       ;(
-        mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
+        mockAIService.createChatCompletion
       ).mockResolvedValue({
         content: JSON.stringify({
           sentiment: 'positive',
@@ -97,7 +97,7 @@ describe('sentimentAnalysisService', () => {
     it('should analyze sentiment correctly for negative text', async () => {
       // Mock the AI service response
       ;(
-        mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
+        mockAIService.createChatCompletion
       ).mockResolvedValue({
         content: JSON.stringify({
           sentiment: 'negative',
@@ -129,7 +129,7 @@ describe('sentimentAnalysisService', () => {
     it('should analyze sentiment correctly for neutral text', async () => {
       // Mock the AI service response
       ;(
-        mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
+        mockAIService.createChatCompletion
       ).mockResolvedValue({
         content: JSON.stringify({
           sentiment: 'neutral',
@@ -161,7 +161,7 @@ describe('sentimentAnalysisService', () => {
     it('should handle invalid JSON responses', async () => {
       // Mock the AI service response with invalid JSON
       ;(
-        mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
+        mockAIService.createChatCompletion
       ).mockResolvedValue({
         content: 'Not a valid JSON response',
         model: 'test-model',
@@ -187,7 +187,7 @@ describe('sentimentAnalysisService', () => {
     it('should handle AI service errors', async () => {
       // Mock the AI service to throw an error
       ;(
-        mockAIService.createChatCompletion as ReturnType<typeof vi.fn>
+        mockAIService.createChatCompletion
       ).mockRejectedValue(new Error('AI service error'))
 
       await expect(

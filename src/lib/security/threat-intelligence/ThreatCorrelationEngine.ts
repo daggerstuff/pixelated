@@ -1345,8 +1345,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
   private groupBy<T>(array: T[], key: string): Record<string, T[]> {
     return array.reduce< Record<string, T[]>>(
       (groups, item) => {
-        const value = this.getNestedValue(item, key) || 'unknown'
-        groups[value] = groups[value] || []
+        const value = this.getNestedValue(item, key) ?? 'unknown'
+        groups[value] = groups[value] ?? []
         groups[value].push(item)
         return groups
       },

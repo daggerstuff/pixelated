@@ -11,27 +11,33 @@ Tests cover:
 - JSONL output format
 """
 
+import importlib.util
 import json
-import sys
+import re
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-# Add scripts directory to path
-scripts_path = str(Path(__file__).parent.parent.parent.parent / "scripts" / "data")
-if scripts_path not in sys.path:
-    sys.path.insert(0, scripts_path)
 
-# Import after path modification
-from extract_books import (
-    CHAPTER_PATTERNS,
-    THERAPEUTIC_KEYWORDS,
-    BookSegment,
-    BooksExtractionConfig,
-    BooksExtractor,
-)
+def _load_extract_books_module():
+    module_path = Path(__file__).parent.parent.parent.parent / "scripts" / "data" / "extract_books.py"
+    spec = importlib.util.spec_from_file_location("extract_books_module", module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load extract_books module from {module_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+extract_books = _load_extract_books_module()
+CHAPTER_PATTERNS = extract_books.CHAPTER_PATTERNS
+THERAPEUTIC_KEYWORDS = extract_books.THERAPEUTIC_KEYWORDS
+BookSegment = extract_books.BookSegment
+BooksExtractionConfig = extract_books.BooksExtractionConfig
+BooksExtractor = extract_books.BooksExtractor
 
 
 @pytest.fixture
@@ -45,8 +51,17 @@ def config():
 
 
 @pytest.fixture
-def extractor(config):
+def extractor(config, monkeypatch):
     """Create extractor instance."""
+    for key in [
+        "HETZNER_S3_ACCESS_KEY",
+        "HETZNER_S3_SECRET_KEY",
+        "HETZNER_S3_ENDPOINT",
+        "HETZNER_S3_REGION",
+        "HETZNER_S3_BUCKET",
+    ]:
+        monkeypatch.delenv(key, raising=False)
+
     return BooksExtractor(config)
 
 
@@ -54,7 +69,7 @@ def extractor(config):
 def sample_pdf():
     """Create a sample PDF file for testing."""
     # We'll mock PDF reading since pypdf2 requires actual PDF structure
-    return None
+    return
 
 
 @pytest.fixture
@@ -167,7 +182,7 @@ class TestBooksExtractor:
 
     def test_initialization_without_pipeline_components(self):
         """Test initialization when pipeline components are not available."""
-        with patch("extract_books.PIPELINE_COMPONENTS_AVAILABLE", False):
+        with patch.object(extract_books, "PIPELINE_COMPONENTS_AVAILABLE", False):
             config = BooksExtractionConfig()
             extractor = BooksExtractor(config)
 
@@ -237,7 +252,8 @@ Final content about recovery.
         assert len(chapters) >= 3
 
         # Each chapter should have content
-        for name, content in chapters:
+        for chapter_name, content in chapters:
+            assert len(chapter_name) > 0
             assert len(content) > 0
 
     def test_html_to_text(self, extractor):
@@ -274,7 +290,7 @@ Final content about recovery.
             ("Complex-Title_with/chars!", "complextitlewith"),
         ]
 
-        for title, expected_prefix in test_cases:
+        for title, _expected_prefix in test_cases:
             source_id = extractor._create_source_id(title)
             # Source ID should be normalized (lowercase, no special chars)
             assert source_id.islower() or source_id.replace("_", "").islower()
@@ -403,8 +419,10 @@ class TestProcessSegment:
     """Test segment processing."""
 
     @pytest.mark.skipif(
-        not pytest.importorskip("ai.safety.crisis_detection.production_crisis_detector", reason="Pipeline components not available"),
-        reason="Pipeline components not available"
+        not pytest.importorskip(
+            "ai.safety.crisis_detection.production_crisis_detector", reason="Pipeline components not available"
+        ),
+        reason="Pipeline components not available",
     )
     def test_process_therapeutic_segment(self, extractor):
         """Test processing a therapeutic segment."""
@@ -475,7 +493,7 @@ class TestJSONLOutput:
         assert output_path.exists()
 
         # Verify content
-        with open(output_path, "r") as f:
+        with open(output_path) as f:
             lines = f.readlines()
 
         assert len(lines) == 2
@@ -506,28 +524,30 @@ class TestS3Upload:
 
         file_path.unlink()
 
-    @pytest.mark.skipif(
-        not pytest.importorskip("boto3", reason="boto3 not available"),
-        reason="boto3 not available"
-    )
+    @pytest.mark.skipif(not pytest.importorskip("boto3", reason="boto3 not available"), reason="boto3 not available")
     def test_upload_to_s3_with_mocked_client(self, extractor):
         """Test S3 upload with mocked client."""
         with tempfile.NamedTemporaryFile(suffix=".jsonl", delete=False) as f:
             f.write(b'{"test": "data"}\n')
             file_path = Path(f.name)
 
-        with patch.dict("os.environ", {
-            "HETZNER_S3_ACCESS_KEY": "test_key",
-            "HETZNER_S3_SECRET_KEY": "test_secret",
-        }):
-            with patch("boto3.client") as mock_client:
-                mock_s3 = MagicMock()
-                mock_client.return_value = mock_s3
+        with (
+            patch.dict(
+                "os.environ",
+                {
+                    "HETZNER_S3_ACCESS_KEY": "test_key",
+                    "HETZNER_S3_SECRET_KEY": "test_secret",
+                },
+            ),
+            patch("boto3.client") as mock_client,
+        ):
+            mock_s3 = MagicMock()
+            mock_client.return_value = mock_s3
 
-                result = extractor.upload_to_s3(file_path, "test/file.jsonl")
+            extractor.upload_to_s3(file_path, "test/file.jsonl")
 
-                # Verify client was created
-                mock_client.assert_called_once()
+            # Verify client was created
+            mock_client.assert_called_once()
 
         file_path.unlink()
 
@@ -563,14 +583,17 @@ class TestTherapeuticKeywords:
             "chapter 1",
             "CHAPTER V",
             "Part I",
+            "Part 2",
             "Section 1",
+            "1. Overview",
+            "UNIT 2",
         ]
 
         for pattern in CHAPTER_PATTERNS:
-            import re
             compiled = re.compile(pattern, re.IGNORECASE)
-            # At least one test pattern should match each compiled pattern
-            matched = any(compiled.search(p) for p in test_patterns)
+            assert any(compiled.search(p) for p in test_patterns), (
+                f"Pattern should match at least one test value: {pattern}"
+            )
             # This is a loose check - not all patterns need to match
 
 
@@ -579,17 +602,96 @@ class TestTherapeuticKeywords:
 class TestIntegration:
     """Integration tests with actual file processing."""
 
-    @pytest.mark.skip(reason="Requires PDF library and sample file")
-    def test_pdf_extraction_integration(self, extractor):
-        """Test actual PDF extraction (requires sample PDF)."""
-        # This would require a real PDF file
-        pass
+    def test_pdf_extraction_integration(self):
+        """Test PDF extraction path with a mocked PDF parser."""
+        class _FakePage:
+            def __init__(self, text: str) -> None:
+                self._text = text
 
-    @pytest.mark.skip(reason="Requires EPUB library and sample file")
-    def test_epub_extraction_integration(self, extractor):
-        """Test actual EPUB extraction (requires sample EPUB)."""
-        # This would require a real EPUB file
-        pass
+            def extract_text(self) -> str:
+                return self._text
+
+        class _FakePdfReader:
+            def __init__(self, _path: str) -> None:
+                self.pages = [
+                    _FakePage("Chapter 1: Integration Tests\n" + " therapy "*10),
+                    _FakePage("This chapter continues the therapeutic discussion on healing and recovery.\n" * 10),
+                ]
+
+        with (
+            patch.object(extract_books, "PDF_AVAILABLE", True, create=True),
+            patch.object(extract_books, "PdfReader", _FakePdfReader, create=True),
+        ):
+            config = BooksExtractionConfig(min_content_length=50, apply_safety_filter=True, apply_classification=True)
+            extractor_instance = BooksExtractor(config)
+
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+                f.write(b"%PDF-1.4 mock")
+                sample_path = Path(f.name)
+
+            try:
+                segments = extractor_instance.extract_from_pdf(sample_path)
+            finally:
+                sample_path.unlink(missing_ok=True)
+
+        assert len(segments) >= 1
+        assert segments[0].file_format == "pdf"
+        assert "therapy" in segments[0].content_text.lower()
+
+    def test_epub_extraction_integration(self):
+        """Test EPUB extraction path with a mocked EPUB parser."""
+        class _FakeDocumentItem:
+            def __init__(self, content: str) -> None:
+                self._content = content
+
+            def get_type(self) -> int:
+                return 9
+
+            def get_content(self) -> bytes:
+                return self._content.encode("utf-8")
+
+        class _FakeBook:
+            def get_metadata(self, namespace: str, name: str):
+                if namespace == "DC" and name == "title":
+                    return [("Integration Therapy Manual",)]
+                if namespace == "DC" and name == "creator":
+                    return [("Test Author",)]
+                return []
+
+            def get_items(self):
+                return [
+                    _FakeDocumentItem("<h1>Chapter 1</h1> therapy and recovery through mindfulness."),
+                    _FakeDocumentItem("<h2>Chapter 2</h2> emotional regulation in practice."),
+                ]
+
+        class _FakeEpubModule:
+            ITEM_DOCUMENT = 9
+
+            def read_epub(self, _path: str):
+                return _FakeBook()
+
+        with (
+            patch.object(extract_books, "EPUB_AVAILABLE", True, create=True),
+            patch.object(extract_books, "epub", _FakeEpubModule(), create=True),
+        ):
+            config = BooksExtractionConfig(min_content_length=30, apply_safety_filter=True, apply_classification=True)
+            extractor_instance = BooksExtractor(config)
+
+            with tempfile.NamedTemporaryFile(suffix=".epub", delete=False) as f:
+                f.write(b"PK\x03\x04 mock")
+                sample_path = Path(f.name)
+
+            try:
+                segments = extractor_instance.extract_from_epub(sample_path)
+            finally:
+                sample_path.unlink(missing_ok=True)
+
+        assert len(segments) >= 2
+        assert all(segment.file_format == "epub" for segment in segments)
+        normalized_segments = [segment.content_text.lower() for segment in segments]
+        assert any(
+            "recovery" in text or "mindfulness" in text or "emotional" in text for text in normalized_segments
+        )
 
 
 if __name__ == "__main__":
