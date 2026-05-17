@@ -1,4 +1,6 @@
-## 2026-04-11 - Fix XSS in ChatMessage
+<!-- markdownlint-disable MD013 MD026 -->
+
+## 2026-04-11 - Fix XSS in ChatMessage | Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML | Learning: Custom markdown parsers can have edge cases that bypass XSS protections | Prevention: Always use isomorphic-dompurify or dompurify when setting inner HTML, even after custom markdown parsing
 
 Vulnerability: Unsanitized markdown-to-html rendered via dangerouslySetInnerHTML
 
@@ -93,10 +95,4 @@ sanitized to prevent XSS
 Prevention: Always sanitize HTML strings with DOMPurify before using set:html in
 Astro components
 
-## 2026-05-11 - Fix XSS in GithubItem
-
-Vulnerability: Unsanitized set:html for GitHub release/PR descriptions.
-
-Learning: External data sources like the GitHub API can contain malicious payloads and must be sanitized before rendering.
-
-Prevention: Always use DOMPurify with an explicit allowlist when setting HTML from external sources.
+## 2026-05-11 - Fix XSS in GithubItem | Vulnerability: Unsanitized set:html for GitHub release/PR descriptions | Learning: External data sources like GitHub API can contain a malicious payload and must be sanitized before rendering | Prevention: Always use DOMPurify when setting HTML from external sources
