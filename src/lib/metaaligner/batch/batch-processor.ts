@@ -79,7 +79,7 @@ export class BatchProcessor implements IBatchProcessor {
       void this.flush()
     }
 
-    this.timeoutId ??= setTimeout( async () => this.flush(), this.config.timeout);
+    this.timeoutId ??= setTimeout(() => this.flush(), this.config.timeout);
 
     // This is a simplified implementation. In a real-world scenario, you would
     // need to return a promise that resolves with the response for this specific request.

@@ -60,7 +60,7 @@ export function Select({
 
   // Initialize with controlled value or defaultValue
   const [internalValue, setInternalValue] = useState<string>(
-    value ?? (defaultValue ?? ''),
+    value ?? (defaultValue || ''),
   )
 
   // Dropdown state

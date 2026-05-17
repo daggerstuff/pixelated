@@ -259,7 +259,7 @@ export class MentalLLaMAAdapter {
           mentalHealthCategory: "crisis",
           confidence: route.confidence,
           explanation:
-            (route.insights?.llmReasoning) ??
+            (route.insights?.llmReasoning!) ||
             "Crisis detected by routing rules or preliminary analysis.",
           supportingEvidence: route.insights?.matchedKeyword ? [route.insights.matchedKeyword] : [],
           isCrisis: true,
