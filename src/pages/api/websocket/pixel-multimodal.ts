@@ -110,45 +110,10 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
-            const text = ((message.text as string) || state.text) ?? ''
-            const contextType =
-              ((message.contextType as string) || state.contextType) ??
-              'therapeutic'
-=======
-=======
-=======
-<<<<<<< HEAD
-            const text = ((message.text as string) || state.text) ?? ''
-            const contextType =
-<<<<<<< HEAD
-              ((message.contextType as string) ||
-              state.contextType) ??
-=======
-              ((message.contextType as string) || state.contextType) ??
->>>>>>> origin/staging
-              'therapeutic'
-=======
->>>>>>> origin/staging
->>>>>>> origin/staging
->>>>>>> origin/staging
             const text = (message.text as string) || (state.text ?? '')
             const contextType =
               (message.contextType as string) ||
               (state.contextType ?? 'therapeutic')
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-=======
->>>>>>> origin/staging
->>>>>>> origin/staging
->>>>>>> origin/staging
->>>>>>> origin/staging
             const sessionId = (message.sessionId as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
             break
@@ -165,9 +130,7 @@ function ensureServer(): WebSocketServer {
       } catch (error: unknown) {
         const message =
           error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
+            ? error.message
             : 'Invalid message'
         ws.send(JSON.stringify({ type: 'error', message }))
       }
