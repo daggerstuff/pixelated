@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { FC } from 'react'
 
 const getEmotionColor = (emotion: string): string => {
@@ -87,14 +87,15 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     }, 1000)
   }, [userId])
 
-  const handleDimensionToggle = (
+  // Performance optimization: Memoize toggle handler to provide stable reference to child inputs
+  const handleDimensionToggle = useCallback((
     dimension: keyof typeof selectedDimensions,
   ) => {
     setSelectedDimensions((prev) => ({
       ...prev,
       [dimension]: !prev[dimension],
     }))
-  }
+  }, [])
 
   // Memoize the calculation of averages to avoid O(N) recalculations on checkbox toggles
   const averages = useMemo(() => {

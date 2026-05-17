@@ -28,6 +28,9 @@ export function getOS(userAgent: string): string {
   if (userAgent.includes('Windows')) {
     return 'Windows'
   }
+  if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+    return 'iOS'
+  }
   if (userAgent.includes('Mac')) {
     return 'macOS'
   }
@@ -36,9 +39,6 @@ export function getOS(userAgent: string): string {
   }
   if (userAgent.includes('Android')) {
     return 'Android'
-  }
-  if (userAgent.includes('iOS')) {
-    return 'iOS'
   }
   return 'Other'
 }

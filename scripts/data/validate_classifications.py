@@ -130,7 +130,7 @@ def validate_classification(
     }
 
 
-def run_validation(use_llm: bool = True) -> None:  # noqa: PLR0915
+def run_validation(use_llm: bool = True) -> None:
     """Run full validation suite."""
 
     logger.info("=" * 80)

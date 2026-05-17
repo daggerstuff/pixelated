@@ -13,13 +13,14 @@ import type {
 
 // Loading skeleton component
 const LoadingSkeleton: FC = () => (
-  <div className='animate-pulse'>
+  <div className='animate-pulse' role='status'>
     <div className='bg-gray-200 mb-4 h-4 w-3/4 rounded'></div>
     <div className='space-y-2'>
       <div className='bg-gray-200 h-3 rounded'></div>
       <div className='bg-gray-200 h-3 w-5/6 rounded'></div>
       <div className='bg-gray-200 h-3 w-4/6 rounded'></div>
     </div>
+    <span className='sr-only'>Loading data...</span>
   </div>
 )
 
@@ -30,19 +31,25 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div className='bg-red-50 border-red-200 rounded-lg border p-4'>
+  <div className='bg-red-50 border-red-200 rounded-lg border p-4' role='alert' aria-live='assertive'>
     <div className='flex items-center justify-between'>
       <div>
-        <h4 className='text-red-800 font-medium'>
+        <h4 className="text-red-800 font-medium">
           Unable to load analytics data
         </h4>
-        <p className='text-red-600 mt-1 text-sm'>
-          {error instanceof Error ? error.message : String(error)}
+        <p className="text-red-600 mt-1 text-sm">
+          {error instanceof Error
+            ? error.message
+            : typeof error === 'object' && error !== null && 'message' in error
+              ? error.message
+              : typeof error === 'object'
+                ? 'An unknown error occurred.'
+                : String(error)}
         </p>
       </div>
       <button
         onClick={onRetry}
-        className='bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors'
+        className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors"
       >
         Retry
       </button>
@@ -71,15 +78,15 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
   ({ value, onChange }) => {
     return (
       <div
-        className='flex space-x-2'
-        role='radiogroup'
-        aria-label='Select time range'
+        className="flex space-x-2"
+        role="radiogroup"
+        aria-label="Select time range"
       >
         {TIME_RANGE_OPTIONS.map((option) => (
           <button
             key={option.value}
-            type='button'
-            role='radio'
+            type="button"
+            role="radio"
             onClick={() => onChange(option.value)}
             aria-checked={value === option.value}
             className={`rounded px-3 py-1 text-sm transition-colors ${
@@ -113,25 +120,29 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className='bg-white rounded-lg p-6 shadow'>
-      <h3 className='mb-4 text-lg font-semibold'>Session Activity</h3>
-      <div className='flex h-48 items-end space-x-2'>
+    <div className="bg-white rounded-lg p-6 shadow">
+      <h3 className="mb-4 text-lg font-semibold">Session Activity</h3>
+      <div className="flex h-48 items-end space-x-2">
         {data.map((day) => (
-          <div key={day.date} className='flex flex-1 flex-col items-center'>
+          <div key={day.date} className="flex flex-1 flex-col items-center">
             <div
-              className='bg-blue-500 hover:bg-blue-600 w-full rounded-t transition-all duration-300'
+              role='img'
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex={0}
+              aria-label={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
+              className='bg-blue-500 hover:bg-blue-600 focus:ring-blue-400 w-full rounded-t transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1'
               style={{
                 height: `${(day.sessions / maxSessions) * 100}%`,
                 minHeight: '4px',
               }}
               title={`${day.sessions} sessions on ${new Date(day.date).toLocaleDateString()}`}
             />
-            <span className='text-gray-600 mt-2 text-xs'>
+            <span className="text-gray-600 mt-2 text-xs">
               {new Date(day.date).toLocaleDateString('en-US', {
                 weekday: 'short',
               })}
             </span>
-            <span className='text-gray-500 text-xs'>{day.sessions}</span>
+            <span className="text-gray-500 text-xs">{day.sessions}</span>
           </div>
         ))}
       </div>
@@ -175,23 +186,35 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className='bg-white rounded-lg p-6 shadow'>
-      <h3 className='mb-4 text-lg font-semibold'>Skill Progress</h3>
-      <div className='space-y-4'>
+    <div className="bg-white rounded-lg p-6 shadow">
+      <h3 className="mb-4 text-lg font-semibold">Skill Progress</h3>
+      <div className="space-y-4">
         {data.map((skill) => (
           <div key={skill.skill}>
             <div className='mb-2 flex items-center justify-between'>
               <div className='flex items-center space-x-2'>
                 <span className='text-sm font-medium'>{skill.skill}</span>
-                <span className={`text-sm ${getTrendColor(skill.trend)}`}>
+                <span
+                  className={`text-sm ${getTrendColor(skill.trend)}`}
+                  aria-hidden='true'
+                  title={`Trend: ${skill.trend}`}
+                >
                   {getTrendIcon(skill.trend)}
                 </span>
+                <span className='sr-only'>Trend: {skill.trend}</span>
               </div>
-              <span className='text-gray-600 text-sm'>{skill.score}%</span>
+              <span className="text-gray-600 text-sm">{skill.score}%</span>
             </div>
-            <div className='bg-gray-200 h-2 w-full rounded-full'>
+            <div
+              className='bg-gray-200 h-2 w-full rounded-full'
+              role='progressbar'
+              aria-label={`${skill.skill} progress`}
+              aria-valuenow={skill.score}
+              aria-valuemin={0}
+              aria-valuemax={100}
+            >
               <div
-                className='bg-green-500 h-2 rounded-full transition-all duration-500'
+                className="bg-green-500 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${skill.score}%` }}
               />
             </div>
@@ -211,9 +234,9 @@ interface SummaryStatsProps {
 const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return (
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {[1, 2, 3].map((i) => (
-          <div key={i} className='bg-white rounded-lg p-4 shadow'>
+          <div key={i} className="bg-white rounded-lg p-4 shadow">
             <LoadingSkeleton />
           </div>
         ))}
@@ -240,20 +263,20 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   }
 
   return (
-    <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
       {data.map((stat) => (
         <div
           key={stat.label}
-          className='bg-white rounded-lg p-4 text-center shadow'
+          className="bg-white rounded-lg p-4 text-center shadow"
         >
           <div className={`text-2xl font-bold ${getColorClasses(stat.color)}`}>
             {typeof stat.value === 'number'
               ? stat.value.toLocaleString()
               : stat.value}
           </div>
-          <div className='text-gray-600 text-sm'>{stat.label}</div>
+          <div className="text-gray-600 text-sm">{stat.label}</div>
           {stat.trend && (
-            <div className='text-gray-500 mt-1 text-xs'>
+            <div className="text-gray-500 mt-1 text-xs">
               <span
                 className={
                   stat.trend.direction === 'up'
@@ -270,7 +293,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
                     : '→'}{' '}
                 {stat.trend.value}%
               </span>
-              <span className='ml-1'>{stat.trend.period}</span>
+              <span className="ml-1">{stat.trend.period}</span>
             </div>
           )}
         </div>
@@ -306,9 +329,9 @@ export const AnalyticsCharts: FC = () => {
   // Render error state
   if (error && !isLoading) {
     return (
-      <div className='analytics-charts space-y-6'>
-        <div className='flex items-center justify-between'>
-          <h2 className='text-2xl font-bold'>Analytics Overview</h2>
+      <div className="analytics-charts space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">Analytics Overview</h2>
           <TimeRangeSelector
             value={filters.timeRange}
             onChange={handleTimeRangeChange}
@@ -320,10 +343,10 @@ export const AnalyticsCharts: FC = () => {
   }
 
   return (
-    <div className='analytics-charts space-y-6'>
+    <div className="analytics-charts space-y-6">
       {/* Header */}
-      <div className='flex items-center justify-between'>
-        <h2 className='text-2xl font-bold'>Analytics Overview</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold">Analytics Overview</h2>
         <TimeRangeSelector
           value={filters.timeRange}
           onChange={handleTimeRangeChange}
@@ -341,7 +364,7 @@ export const AnalyticsCharts: FC = () => {
 
       {/* Data freshness indicator */}
       {data && !isLoading && (
-        <div className='text-gray-500 text-center text-xs'>
+        <div className="text-gray-500 text-center text-xs">
           Data updated {new Date().toLocaleTimeString()}
         </div>
       )}
