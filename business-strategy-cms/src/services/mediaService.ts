@@ -57,19 +57,13 @@ export interface MediaUpload {
 class StorageClientFactory {
   private s3Client: S3Client | null = null
 
-  constructor(
-    private readonly endpoint: string = process.env['HETZNER_ENDPOINT'] ??
-      'https://hel1.your-objectstorage.com',
-    private readonly bucketName: string = process.env['HETZNER_BUCKET_NAME'] ??
-      'business-strategy-cms-uploads',
-    private readonly region: string = process.env['HETZNER_REGION'] ?? 'hel1',
-    private readonly accessKeyId: string = process.env[
-      'HETZNER_ACCESS_KEY_ID'
-    ] ?? '',
-    private readonly secretAccessKey: string = process.env[
-      'HETZNER_SECRET_ACCESS_KEY'
-    ] ?? '',
-  ) {}
+   constructor(
+     private readonly endpoint: string = (process.env['HETZNER_ENDPOINT'] || '').length > 0 ? process.env['HETZNER_ENDPOINT'] : 'https://hel1.your-objectstorage.com',
+     private readonly bucketName: string = (process.env['HETZNER_BUCKET_NAME'] || '').length > 0 ? process.env['HETZNER_BUCKET_NAME'] : 'business-strategy-cms-uploads',
+     private readonly region: string = (process.env['HETZNER_REGION'] || '').length > 0 ? process.env['HETZNER_REGION'] : 'hel1',
+     private readonly accessKeyId: string = process.env['HETZNER_ACCESS_KEY_ID'] ?? '',
+     private readonly secretAccessKey: string = process.env['HETZNER_SECRET_ACCESS_KEY'] ?? '',
+   ) {}
 
   getS3Client(): S3Client {
     this.s3Client ??= new S3Client({
