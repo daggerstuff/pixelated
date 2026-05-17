@@ -75,7 +75,7 @@ export async function getDeveloperCorsHeaders(
   request: Request,
 ): Promise<Headers> {
   const headers = new Headers()
-  const origin = request.headers.get('Origin') || request.headers.get('origin')
+  const origin = request.headers.get('Origin') ?? request.headers.get('origin')
 
   if (!origin) {
     return headers
@@ -100,7 +100,7 @@ export async function getDeveloperCorsHeadersWithApiKeyValidation(
   request: Request,
 ): Promise<Headers> {
   const headers = new Headers()
-  const origin = request.headers.get('Origin') || request.headers.get('origin')
+  const origin = request.headers.get('Origin') ?? request.headers.get('origin')
 
   if (!origin) {
     return headers

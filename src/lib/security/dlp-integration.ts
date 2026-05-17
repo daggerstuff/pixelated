@@ -70,7 +70,7 @@ export function withDLPProtection(
     context: Record<string, any>,
   ): Promise<Response | undefined> => {
     try {
-      const userId = context.user?.id || 'unknown'
+      const userId = context.user?.id ?? 'unknown'
 
       // Check request body if enabled
       if (
@@ -89,7 +89,7 @@ export function withDLPProtection(
           return new Response(
             JSON.stringify({
               error: 'Blocked by DLP policy',
-              reason: dlpResult.reason || 'Policy Violation',
+              reason: dlpResult.reason ?? 'Policy Violation',
               code: 'DLP_POLICY_VIOLATION',
             }),
             {
@@ -123,7 +123,7 @@ export function withDLPProtection(
 export function astroWithDLPProtection() {
   return async (ctx: AstroGlobal, next: () => Promise<void>) => {
     try {
-      const userId = ctx.locals?.user?.id || 'unknown'
+      const userId = ctx.locals?.user?.id ?? 'unknown'
 
       // For endpoints that handle file exports
       if (
@@ -138,7 +138,7 @@ export function astroWithDLPProtection() {
         }
 
         // For text-based responses like JSON or HTML
-        const contentType = response.headers.get('content-type') || ''
+        const contentType = response.headers.get('content-type') ?? ''
         if (
           contentType.includes('application/json') ||
           contentType.includes('text/')
@@ -160,7 +160,7 @@ export function astroWithDLPProtection() {
               return new Response(
                 JSON.stringify({
                   error: 'Export blocked by DLP policy',
-                  reason: dlpResult.reason || 'Policy Violation',
+                  reason: dlpResult.reason ?? 'Policy Violation',
                 }),
                 {
                   status: 403,
@@ -172,7 +172,7 @@ export function astroWithDLPProtection() {
             }
 
             // Return redacted content or original content
-            return new Response(dlpResult.redactedContent || text, {
+            return new Response(dlpResult.redactedContent ?? text, {
               status: response.status,
               statusText: response.statusText,
               headers: response.headers,
@@ -226,7 +226,7 @@ export function clientSideDLP() {
       context: { action: string; metadata?: Record<string, unknown> },
     ): DLPResult => {
       try {
-        const userId = localStorage.getItem('userId') || 'unknown'
+        const userId = localStorage.getItem('userId') ?? 'unknown'
 
         // Call DLP service
         return dlpService.scanContent(content, {
@@ -258,12 +258,12 @@ export function clientSideDLP() {
         if (!result.allowed) {
           console.warn(
             'Clipboard copy blocked by DLP policy:',
-            result.reason || 'Policy Violation',
+            result.reason ?? 'Policy Violation',
           )
           return false
         }
 
-        const contentToCopy = result.redactedContent || text
+        const contentToCopy = result.redactedContent ?? text
         await navigator.clipboard.writeText(contentToCopy)
         return true
       } catch (e) {
@@ -285,12 +285,12 @@ export function clientSideDLP() {
         if (!result.allowed) {
           console.warn(
             'File download blocked by DLP policy:',
-            result.reason || 'Policy Violation',
+            result.reason ?? 'Policy Violation',
           )
           return false
         }
 
-        const contentToDownload = result.redactedContent || content
+        const contentToDownload = result.redactedContent ?? content
 
         // Create download
         const element = document.createElement('a')

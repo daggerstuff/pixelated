@@ -17,9 +17,9 @@ interface WebSocketMessage {
 }
 
 class TherapyChatWebSocketServer {
-  private wss: WebSocketServer
-  private clients: Map<string, WebSocket>
-  private sessions: Map<string, Set<string>>
+  private readonly wss: WebSocketServer
+  private readonly clients: Map<string, WebSocket>
+  private readonly sessions: Map<string, Set<string>>
 
   constructor(server: Server) {
     this.wss = new WebSocketServer({ server })
@@ -48,6 +48,7 @@ class TherapyChatWebSocketServer {
           case 'status':
             this.handleStatusUpdate(clientId, message)
             break
+          case "error": { throw new Error('Not implemented yet: "error" case') }
           default:
             logger.warn(`Unknown message type: ${message.type}`)
         }

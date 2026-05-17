@@ -22,7 +22,7 @@ import {
 
 // Simulated bias detector (would use real BiasDetectionEngine in integration tests)
 class MockBiasDetector {
-  private CRITICAL_BIAS_PATTERNS = [
+  private readonly CRITICAL_BIAS_PATTERNS = [
     /inherent (cultural|racial) (patterns|behaviors|tendencies)/i,
     /people from your (ethnicity|race).*struggle/i,
     /community's tendency toward/i,
@@ -30,7 +30,7 @@ class MockBiasDetector {
     /can't expect.*given your/i,
   ]
 
-  private STRONG_BIAS_PATTERNS = [
+  private readonly STRONG_BIAS_PATTERNS = [
     /biologically designed/i,
     /women are naturally/i,
     /given your (race|ethnicity|cultural background|disability)/i,
@@ -42,7 +42,7 @@ class MockBiasDetector {
     /you're (so articulate|well-spoken).*(for|considering|given)/i,
   ]
 
-  private MEDIUM_BIAS_PATTERNS = [
+  private readonly MEDIUM_BIAS_PATTERNS = [
     /(?:naturally|traditionally) (?:male|female)/i,
     /(credit to your race|impressive for)/i,
     /evidence-based western/i,
@@ -60,7 +60,7 @@ class MockBiasDetector {
     /typical for your generation/i,
   ]
 
-  private SUBTLE_BIAS_KEYWORDS = [
+  private readonly SUBTLE_BIAS_KEYWORDS = [
     'traditional field',
     'typical for',
     'cultural practice',
@@ -472,7 +472,7 @@ describe('Phase 4.2: Bias Detection Accuracy Tests', () => {
       const testCases = ALL_BIAS_TEST_CASES.slice(0, batchSize)
 
       const start = performance.now()
-      await Promise.all(testCases.map((tc) => detector.detectBias(tc.session)))
+      await Promise.all(testCases.map( async (tc) => detector.detectBias(tc.session)))
       const duration = performance.now() - start
 
       const avgPerSession = duration / batchSize

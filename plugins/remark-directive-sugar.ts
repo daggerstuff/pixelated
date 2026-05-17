@@ -180,7 +180,7 @@ function remarkDirectiveSugar() {
 
         // check label
         const firstChild = children[0]
-        if (firstChild && firstChild.type === 'text') {
+        if (firstChild?.type === 'text') {
           resolvedText = firstChild.value
         } else if (!id) {
           file.fail(

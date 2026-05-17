@@ -38,8 +38,8 @@ function Alert(props: AlertProps = {}) {
   const title = props.title
   const description = props.description
 
-  const iconHtml = props.icon ? props.icon : ''
-  const actionsHtml = props.actions ? props.actions : ''
+  const iconHtml = props.icon ?? ''
+  const actionsHtml = props.actions ?? ''
   const dismissButton = props.dismissible
     ? '<button aria-label="Dismiss">×</button>'
     : ''

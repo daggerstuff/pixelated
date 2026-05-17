@@ -96,11 +96,11 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
   private db!: Db
   private threatsCollection!: Collection<ThreatIntelligence>
   private sharingCollection!: Collection<any>
-  private config: GlobalThreatNetworkConfig
+  private readonly config: GlobalThreatNetworkConfig
   private isInitialized = false
   private propagationInterval: NodeJS.Timeout | null = null
   private healthCheckInterval: NodeJS.Timeout | null = null
-  private region: string
+  private readonly region: string
 
   constructor(config: GlobalThreatNetworkConfig, region: string = 'us-east-1') {
     super()
@@ -444,9 +444,9 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
 
       // Determine sharing scope
       const sharingLevel =
-        options?.sharingLevel || this.config.sharing.sharing_level
+        options?.sharingLevel ?? this.config.sharing.sharing_level
       const targetRegions =
-        options?.regions || this.getTargetRegions(sharingLevel)
+        options?.regions ?? this.getTargetRegions(sharingLevel)
       const shouldEncrypt = options?.encrypt ?? this.config.encryption.enabled
 
       // Prepare threat data for sharing
@@ -518,7 +518,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
           'eu-west-1': ['eu-west-1', 'eu-central-1'],
           'ap-southeast-1': ['ap-southeast-1', 'ap-northeast-1'],
         }
-        return regionalGroups[this.region] || [this.region]
+        return regionalGroups[this.region] ?? [this.region]
       }
 
       case 'global':
@@ -749,7 +749,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       return await this.threatsCollection
         .find(filter)
         .sort({ timestamp: -1 })
-        .limit(query.limit || 100)
+        .limit(query.limit ?? 100)
         .toArray()
     } catch (error: unknown) {
       logger.error('Failed to search threats', {

@@ -15,7 +15,7 @@
 import { test, expect, type Page } from '@playwright/test'
 
 const CHAT_PAGE_URL = '/chat' // Adjust to your actual route
-const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:5173'
+const API_BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:5173'
 
 test.describe('Pixel Multimodal Chat - E2E Integration', () => {
   test.beforeEach(async ({ page }) => {
@@ -287,9 +287,9 @@ test.describe('Pixel Multimodal Chat - E2E Integration', () => {
       await expect(assistantMessage).toBeVisible({ timeout: 5000 })
 
       // Verify message content grows over time
-      const initialLength = (await assistantMessage.textContent())?.length || 0
+      const initialLength = (await assistantMessage.textContent())?.length ?? 0
       await page.waitForTimeout(2000)
-      const finalLength = (await assistantMessage.textContent())?.length || 0
+      const finalLength = (await assistantMessage.textContent())?.length ?? 0
 
       expect(finalLength).toBeGreaterThan(initialLength)
     })
@@ -344,7 +344,7 @@ test.describe('Pixel Multimodal Chat - E2E Integration', () => {
       // Verify values are in 0-1 range
       const valenceText = await valenceMetric.textContent()
       const valenceValue = parseFloat(
-        valenceText?.replace(/[^\d.]/g, '') || '0',
+        valenceText?.replace(/[^\d.]/g, '') ?? '0',
       )
       expect(valenceValue).toBeGreaterThanOrEqual(0)
       expect(valenceValue).toBeLessThanOrEqual(1)

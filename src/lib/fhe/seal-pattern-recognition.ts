@@ -27,8 +27,8 @@ const logger = createBuildSafeLogger('seal-pattern-recognition')
  * Implementation of pattern recognition using SEAL for FHE
  */
 export class SealPatternRecognitionService implements FHEService {
-  private sealService: SealService
-  private enhancedService: ReturnType<typeof createEnhancedFHEService>
+  private readonly sealService: SealService
+  private readonly enhancedService: ReturnType<typeof createEnhancedFHEService>
 
   constructor() {
     this.sealService = SealService.getInstance()
@@ -75,7 +75,7 @@ export class SealPatternRecognitionService implements FHEService {
   /**
    * Encrypt data using SEAL
    */
-  async encrypt<T>(value: T, options?: unknown): Promise<EncryptedData> {
+  async encrypt(value: unknown, options?: unknown): Promise<EncryptedData> {
     return this.enhancedService.encrypt(value, options)
   }
 
@@ -185,10 +185,10 @@ export class SealPatternRecognitionService implements FHEService {
         const decodedPatterns: TrendPattern[] = []
 
         // Use the results info from the encrypted data if available
-        const resultCount = (data.results as any[] | undefined)?.length || 2
+        const resultCount = (data.results as any[] | undefined)?.length ?? 2
 
         for (let i = 0; i < resultCount; i++) {
-          const basePattern = (data.results as any[] | undefined)?.[i] || {
+          const basePattern = (data.results as any[] | undefined)?.[i] ?? {
             type: patternTypes[Math.floor(Math.random() * patternTypes.length)],
             confidence: 0.7 + Math.random() * 0.25,
           }
@@ -555,15 +555,15 @@ export class SealPatternRecognitionService implements FHEService {
       if ((analysis.emotions || []).length > 0) {
         // Find valence-related emotion
         const valenceEmotion = analysis.emotions.find(
-          (e) => String(e.type) === 'valence' || String(e.type) === 'happiness',
+          (e) => e.type === 'valence' || e.type === 'happiness',
         )
         // Find arousal-related emotion
         const arousalEmotion = analysis.emotions.find(
-          (e) => String(e.type) === 'arousal' || String(e.type) === 'anxiety',
+          (e) => e.type === 'arousal' || e.type === 'anxiety',
         )
         // Find dominance-related emotion
         const dominanceEmotion = analysis.emotions.find(
-          (e) => String(e.type) === 'dominance' || String(e.type) === 'control',
+          (e) => e.type === 'dominance' || e.type === 'control',
         )
 
         // Extract values or use defaults
@@ -571,7 +571,7 @@ export class SealPatternRecognitionService implements FHEService {
           valenceEmotion ? 1 - (valenceEmotion.confidence || 0.5) : 0.5,
         )
         factorVector.push(
-          arousalEmotion ? arousalEmotion.intensity || 0.5 : 0.5,
+          arousalEmotion ? arousalEmotion.intensity ?? 0.5 : 0.5,
         )
         factorVector.push(
           dominanceEmotion ? 1 - (dominanceEmotion.confidence || 0.5) : 0.5,

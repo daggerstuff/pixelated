@@ -82,10 +82,10 @@ export function UserMenu({ className = '' }: UserMenuProps) {
         <div className='bg-white divide-gray-100 dark:bg-gray-700 dark:divide-gray-600 absolute right-0 z-50 mt-2 w-56 list-none divide-y rounded-lg text-base shadow'>
           <div className='px-4 py-3'>
             <span className='text-gray-900 dark:text-white block text-sm'>
-              {user.user_metadata?.full_name || user.email}
+              {user.user_metadata?.full_name ?? user.email}
             </span>
             <span className='text-gray-500 dark:text-gray-400 block truncate text-sm'>
-              {user.email?.toString() || ''}
+              {user.email?.toString() ?? ''}
             </span>
           </div>
           <ul className='py-2' role='none'>

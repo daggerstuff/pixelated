@@ -61,9 +61,7 @@ let aiRepositoryInstance: AIRepository | null = null
 let refCount = 0
 
 const getAIRepositoryInstance = (): AIRepository => {
-  if (!aiRepositoryInstance) {
-    aiRepositoryInstance = new AIRepository()
-  }
+  aiRepositoryInstance ??= new AIRepository();
   return aiRepositoryInstance
 }
 
@@ -75,9 +73,9 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    process.env['LLM_BASE_URL'] ||
-    process.env['LLM_API_URL'] ||
-    process.env['OPENAI_BASE_URL'] ||
+    (process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL']) ||
+    process.env['OPENAI_BASE_URL'] ??
     ''
 
   if (isOpenRouterBaseUrl(baseUrl)) {
@@ -91,7 +89,7 @@ const getDocumentationSystemInstance =
   async (): Promise<DocumentationSystem> => {
     if (!documentationSystemInstance) {
       const llmService = createLLMService({
-        apiKey: process.env['LLM_API_KEY'] || '',
+        apiKey: process.env['LLM_API_KEY'] ?? '',
         baseUrl: resolveSafeLlmBaseUrl(),
       })
 
@@ -395,7 +393,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
       try {
         validateSessionId(sessionId)
 
-        if (!options || !options.providerId || !options.format) {
+        if (!options?.providerId || !options.format) {
           throw new Error('Valid export options are required')
         }
 

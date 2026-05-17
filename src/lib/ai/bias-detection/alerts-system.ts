@@ -129,11 +129,11 @@ function alertDataToInstance(a: AlertLike): AlertInstance {
 // --- REMOVE any duplicate AlertLike type or alertDataToInstance function from inside BiasAlertSystem class below this line ---
 
 export class BiasAlertSystem {
-  private monitoringCallbacks: Array<(data: MonitoringCallbackData) => void> =
+  private readonly monitoringCallbacks: Array<(data: MonitoringCallbackData) => void> =
     []
-  private pythonBridge: PythonBiasDetectionBridge
+  private readonly pythonBridge: PythonBiasDetectionBridge
   public alertQueue: AlertInstance[] = []
-  private notificationChannels: Map<string, NotificationChannelConfig> =
+  private readonly notificationChannels: Map<string, NotificationChannelConfig> =
     new Map()
   private alertRules: Array<{
     id: string
@@ -150,10 +150,10 @@ export class BiasAlertSystem {
     pythonBridge?: PythonBiasDetectionBridge,
   ) {
     this.pythonBridge =
-      pythonBridge ||
+      pythonBridge ??
       new PythonBiasDetectionBridge(
-        config.pythonServiceUrl || 'http://localhost:5000',
-        config.timeout || 30000,
+        config.pythonServiceUrl ?? 'http://localhost:5000',
+        config.timeout ?? 30000,
       )
 
     // Initialize collections
@@ -244,18 +244,18 @@ export class BiasAlertSystem {
   private initializeNotificationChannels() {
     // Initialize notification channels (email, Slack, webhook, etc.)
     this.notificationChannels.set('email', {
-      enabled: this.config.notifications?.email?.enabled || false,
-      config: this.config.notifications?.email || {},
+      enabled: this.config.notifications?.email?.enabled ?? false,
+      config: this.config.notifications?.email ?? {},
     })
 
     this.notificationChannels.set('slack', {
-      enabled: this.config.notifications?.slack?.enabled || false,
-      config: this.config.notifications?.slack || {},
+      enabled: this.config.notifications?.slack?.enabled ?? false,
+      config: this.config.notifications?.slack ?? {},
     })
 
     this.notificationChannels.set('webhook', {
-      enabled: this.config.notifications?.webhook?.enabled || false,
-      config: this.config.notifications?.webhook || {},
+      enabled: this.config.notifications?.webhook?.enabled ?? false,
+      config: this.config.notifications?.webhook ?? {},
     })
   }
 
@@ -282,10 +282,10 @@ export class BiasAlertSystem {
 
       // 2. Analyze layer-specific bias scores for demographic concerns
       const layerBiasScores = [
-        result.layerResults.preprocessing?.biasScore || 0,
-        result.layerResults.modelLevel?.biasScore || 0,
-        result.layerResults.interactive?.biasScore || 0,
-        result.layerResults.evaluation?.biasScore || 0,
+        result.layerResults.preprocessing?.biasScore ?? 0,
+        result.layerResults.modelLevel?.biasScore ?? 0,
+        result.layerResults.interactive?.biasScore ?? 0,
+        result.layerResults.evaluation?.biasScore ?? 0,
       ]
 
       // Check for high individual layer bias scores
@@ -620,7 +620,7 @@ export class BiasAlertSystem {
       }
 
       const serverAlerts =
-        (serverAlertsResponse as { alerts?: AlertInstance[] })?.alerts || []
+        (serverAlertsResponse as { alerts?: AlertInstance[] })?.alerts ?? []
 
       // Process local alert rules
       const localAlerts: AlertInstance[] = this.evaluateAnalysisAlerts(result)
@@ -793,7 +793,7 @@ export class BiasAlertSystem {
       await this.pythonBridge.escalateAlert({
         alert_id: alert.id,
         escalation_level: 1,
-        escalated_to: alert.recipients || [],
+        escalated_to: alert.recipients ?? [],
         reason: 'Unacknowledged alert escalation',
       })
     } catch (error: unknown) {
@@ -881,7 +881,7 @@ export class BiasAlertSystem {
     try {
       await this.pythonBridge.sendNotification({
         message: alert.message,
-        recipients: alert.recipients || [],
+        recipients: alert.recipients ?? [],
         severity: alert.level,
         metadata: {
           channel,
@@ -943,7 +943,7 @@ export class BiasAlertSystem {
       const serverAlerts = await this.pythonBridge.getActiveAlerts()
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const serverInstances: AlertInstance[] = (serverAlerts || []).map(
+      const serverInstances: AlertInstance[] = (serverAlerts ?? []).map(
         alertDataToInstance,
       )
 
@@ -1015,7 +1015,7 @@ export class BiasAlertSystem {
       })
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const recentInstances: AlertInstance[] = (response || []).map(
+      const recentInstances: AlertInstance[] = (response ?? []).map(
         alertDataToInstance,
       )
 

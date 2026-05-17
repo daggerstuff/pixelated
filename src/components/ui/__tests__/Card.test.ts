@@ -10,7 +10,7 @@ type CardProps = { class?: string; 'data-slot'?: string; children?: string }
 
 function getSlotContent(props: CardProps = {}, options?: MockAstroOptions): string {
   if (props.children) return props.children
-  return options?.default?.render() || ''
+  return options?.default?.render() ?? ''
 }
 
 function Card(props: CardProps = {}, options?: MockAstroOptions) {

@@ -54,12 +54,12 @@ export interface SystemHealth {
  * Advanced Performance Monitoring System
  */
 class PerformanceMonitor {
-  private config: PerformanceConfig
+  private readonly config: PerformanceConfig
   private metrics: PerformanceMetrics[] = []
-  private alerts: PerformanceAlert[] = []
-  private optimizationHistory: OptimizationRecommendation[] = []
+  private readonly alerts: PerformanceAlert[] = []
+  private readonly optimizationHistory: OptimizationRecommendation[] = []
   private monitoringInterval: NodeJS.Timeout | null = null
-  private alertCallbacks = new Map<string, Function[]>()
+  private readonly alertCallbacks = new Map<string, Function[]>()
 
   constructor() {
     this.config = {
@@ -155,7 +155,7 @@ class PerformanceMonitor {
     if (recentMetrics.length === 0) return 0
 
     const totalErrors = recentMetrics.reduce(
-      (sum, m) => sum + (m.errorCount || 0),
+      (sum, m) => sum + (m.errorCount ?? 0),
       0,
     )
     const totalRequests = recentMetrics.reduce(
@@ -369,7 +369,7 @@ class PerformanceMonitor {
     this.alerts.push(alert)
 
     // Notify listeners
-    const callbacks = this.alertCallbacks.get(type) || []
+    const callbacks = this.alertCallbacks.get(type) ?? []
     callbacks.forEach((callback) => callback(alert))
 
     console.log(`Performance alert [${type.toUpperCase()}]: ${message}`)
@@ -390,7 +390,7 @@ class PerformanceMonitor {
 
     // Return unsubscribe function
     return () => {
-      const callbacks = this.alertCallbacks.get(type) || []
+      const callbacks = this.alertCallbacks.get(type) ?? []
       const index = callbacks.indexOf(callback)
       if (index > -1) {
         callbacks.splice(index, 1)

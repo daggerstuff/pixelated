@@ -31,15 +31,15 @@ export async function createSalesOpportunity(data: {
     _id: opportunityId,
     title: data.title,
     slug: opportunitySlug,
-    description: data.description || '',
+    description: data.description ?? '',
     owner: data.ownerId,
     status: 'active',
-    accountName: data.accountName || '',
-    amount: data.amount || 0,
-    probability: data.probability || 0.5,
-    stage: data.stage || 'qualification',
+    accountName: data.accountName ?? '',
+    amount: data.amount ?? 0,
+    probability: data.probability ?? 0.5,
+    stage: data.stage ?? 'qualification',
     closeDate:
-      data.closeDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+      data.closeDate ?? new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
     activity: [],
     contacts: [],
     competitors: [],
@@ -63,7 +63,7 @@ export async function createSalesOpportunity(data: {
       data.title,
       opportunitySlug,
       data.ownerId,
-      data.stage || 'qualification',
+      data.stage ?? 'qualification',
       'active',
     ],
   )
@@ -260,7 +260,7 @@ export async function addActivity(
     _id: activityId,
     type: activity.type,
     description: activity.description,
-    metadata: activity.metadata || {},
+    metadata: activity.metadata ?? {},
     createdBy: userId,
     createdAt: new Date(),
   })
@@ -305,9 +305,9 @@ export async function addContact(
   opportunity.contacts.push({
     _id: contactId,
     name: contact.name,
-    email: contact.email || '',
-    phone: contact.phone || '',
-    role: contact.role || '',
+    email: contact.email ?? '',
+    phone: contact.phone ?? '',
+    role: contact.role ?? '',
     createdAt: new Date(),
   })
 
@@ -330,8 +330,8 @@ export async function listSalesOpportunities(
   } = {},
 ) {
   const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
-  const page = options.page || 1
-  const limit = options.limit || 50
+  const page = options.page ?? 1
+  const limit = options.limit ?? 50
 
   let query: any = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
@@ -375,8 +375,8 @@ export async function calculateForecast(userId: string) {
   opportunities.forEach((opp: any) => {
     if (opp.status === 'active') {
       opportunityCount++
-      totalForecast += opp.amount || 0
-      weightedForecast += (opp.amount || 0) * (opp.probability || 0.5)
+      totalForecast += opp.amount ?? 0
+      weightedForecast += (opp.amount ?? 0) * (opp.probability ?? 0.5)
     }
   })
 

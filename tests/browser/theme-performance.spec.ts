@@ -43,9 +43,9 @@ test.describe('Theme Performance Tests', () => {
             navigation.domContentLoadedEventStart,
           loadComplete: navigation.loadEventEnd - navigation.loadEventStart,
           firstPaint:
-            paint.find((p) => p.name === 'first-paint')?.startTime || 0,
+            paint.find((p) => p.name === 'first-paint')?.startTime ?? 0,
           firstContentfulPaint:
-            paint.find((p) => p.name === 'first-contentful-paint')?.startTime ||
+            paint.find((p) => p.name === 'first-contentful-paint')?.startTime ??
             0,
         }
       })
@@ -83,7 +83,7 @@ test.describe('Theme Performance Tests', () => {
 
     test('should have minimal layout shifts', async () => {
       // Measure cumulative layout shift
-      const cls = await page.evaluate(() => {
+      const cls = await page.evaluate( async () => {
         return new Promise((resolve) => {
           let clsValue = 0
           let clsEntries = 0
@@ -114,7 +114,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Measure theme switch performance
-      await page.evaluate(() => {
+      await page.evaluate( async () => {
         return new Promise((resolve) => {
           const marks = []
 
@@ -149,7 +149,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Measure layout performance during theme switch
-      const layoutMetrics = await page.evaluate(() => {
+      const layoutMetrics = await page.evaluate( async () => {
         return new Promise((resolve) => {
           let layoutCount = 0
           let styleCount = 0
@@ -181,7 +181,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Check for efficient DOM batching
-      const domBatches = await page.evaluate(() => {
+      const domBatches = await page.evaluate( async () => {
         return new Promise((resolve) => {
           let mutationCount = 0
           let batchCount = 0
@@ -223,7 +223,7 @@ test.describe('Theme Performance Tests', () => {
   test.describe('Animation Performance', () => {
     test('should maintain smooth animations at 60fps', async () => {
       // Measure animation frame rate
-      const frameMetrics = await page.evaluate(() => {
+      const frameMetrics = await page.evaluate( async () => {
         return new Promise((resolve) => {
           let frames = 0
           let lastTime = performance.now()
@@ -368,7 +368,7 @@ test.describe('Theme Performance Tests', () => {
         return {
           totalSelectors: selectors.length,
           complexSelectors: selectors.filter(
-            (s) => s.includes('>') || s.includes('+') || s.includes('~'),
+            (s) => (s.includes('>') ?? s.includes('+')) ?? s.includes('~'),
           ).length,
           universalSelectors: selectors.filter((s) => s.includes('*')).length,
         }
@@ -411,7 +411,7 @@ test.describe('Theme Performance Tests', () => {
       )
 
       if (containment.length > 0) {
-        expect(hasLayoutContainment || hasPaintContainment).toBe(true)
+        expect(hasLayoutContainment ?? hasPaintContainment).toBe(true)
       }
     })
   })
@@ -424,7 +424,7 @@ test.describe('Theme Performance Tests', () => {
           .getEntriesByType('resource')
           .filter(
             (entry: any) =>
-              entry.name.includes('.css') || entry.name.includes('theme'),
+              entry.name.includes('.css') ?? entry.name.includes('theme'),
           )
           .map((entry: any) => ({
             name: entry.name,

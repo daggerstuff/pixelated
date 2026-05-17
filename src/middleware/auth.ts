@@ -135,14 +135,14 @@ async function validateApiKey(
     return null
   }
 
-  if (!validation || !validation.valid || !validation.api_key) {
+  if (!validation?.valid || !validation.api_key) {
     return null
   }
 
   const keyRecord = validation.api_key
 
   if (requiredScopes?.length) {
-    const keyScopes: string[] = keyRecord.scopes || []
+    const keyScopes: string[] = keyRecord.scopes ?? []
     if (!requiredScopes.every((scope) => keyScopes.includes(scope))) {
       return null
     }
@@ -154,7 +154,7 @@ async function validateApiKey(
       role: keyRecord.scopes.includes('admin') ? 'admin' : 'developer',
     },
     expires:
-      keyRecord.expires_at?.toISOString() ||
+      keyRecord.expires_at?.toISOString() ??
       new Date(Date.now() + DEFAULT_SESSION_TTL_MS).toISOString(),
     authType: 'api-key',
     scopes: keyRecord.scopes,

@@ -37,12 +37,12 @@ export const PixelatedAuthProvider = ({
   children: React.ReactNode
 }) => {
   const domain =
-    import.meta.env['PUBLIC_AUTH0_DOMAIN'] ||
-    import.meta.env['AUTH0_DOMAIN'] ||
+    (import.meta.env['PUBLIC_AUTH0_DOMAIN'] ??
+    import.meta.env['AUTH0_DOMAIN']) ??
     import.meta.env['VITE_AUTH0_DOMAIN']
   const clientId =
-    import.meta.env['PUBLIC_AUTH0_CLIENT_ID'] ||
-    import.meta.env['AUTH0_CLIENT_ID'] ||
+    (import.meta.env['PUBLIC_AUTH0_CLIENT_ID'] ??
+    import.meta.env['AUTH0_CLIENT_ID']) ??
     import.meta.env['VITE_AUTH0_CLIENT_ID']
   const audience = import.meta.env['PUBLIC_AUTH0_AUDIENCE']
   const redirectUri =
@@ -52,7 +52,7 @@ export const PixelatedAuthProvider = ({
 
   const onRedirectCallback = (appState: RedirectState | undefined) => {
     const returnTo = sanitizeReturnTo(
-      appState?.returnTo ? appState.returnTo : window.location.pathname,
+      appState?.returnTo ?? window.location.pathname,
     )
     window.history.replaceState({}, document.title, returnTo)
   }

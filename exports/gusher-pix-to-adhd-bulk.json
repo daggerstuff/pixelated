@@ -1,0 +1,4780 @@
+{
+  "issues": [
+    {
+      "summary": "[Epic] Foresight Memory Architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-211.\n\nSource type: Epic\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-211"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Checkmate",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-240.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-240"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] AutoReview Workflow Improvements",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-278.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-278"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Discovery & Backlog",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-279.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-279"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Churnmeon Reliability",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-280.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-280"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Training Pipeline Improvements",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-281.\n\nSource type: Epic\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-281"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Memory May-Hem Expansion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-372.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-372"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Privacy-Preserving Intelligence & FHE",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-73.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "epic",
+        "fhe",
+        "migrated-from-pix",
+        "privacy",
+        "source-epic",
+        "source-pix-73"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Data Pipeline Recovery & External Integrations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-74.\n\nSource type: Epic\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "data-pipeline",
+        "epic",
+        "integration",
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-74"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Platform Foundations & Operations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-75.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "epic",
+        "migrated-from-pix",
+        "operations",
+        "platform",
+        "source-epic",
+        "source-pix-75"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] CI Federation & Release Readiness",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-76.\n\nSource type: Epic\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "epic",
+        "migrated-from-pix",
+        "release-readiness",
+        "source-epic",
+        "source-pix-76"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Product Discovery & Backlog Hygiene",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-77.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "epic",
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-77"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Hybrid App Architecture Migration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-78.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "epic",
+        "migrated-from-pix",
+        "migration",
+        "source-epic",
+        "source-pix-78"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Test Coverage & Security Baseline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-79.\n\nSource type: Epic\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "coverage",
+        "epic",
+        "migrated-from-pix",
+        "security",
+        "source-epic",
+        "source-pix-79",
+        "testing"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Modern Dataset Project",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-80.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "dataset",
+        "epic",
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-80"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Epic] Data Governance & Compliance",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-81.\n\nSource type: Epic\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "compliance",
+        "epic",
+        "governance",
+        "migrated-from-pix",
+        "source-epic",
+        "source-pix-81"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 2A: Route Migration Sprint 2",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-1.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-1"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Coverage Audit",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-10.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "source-pix-10",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-00: Source Inventory and Licensing Matrix",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-100.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-100"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-03: Bright Data Public-Web Pilot",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-101.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-101"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-02: Trusted Source Pull v1",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-102.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-102"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-01: Acquisition Rubric and Acceptance Gates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-103.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-103"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream B/D: Implement stage-based dataset slicing",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-104.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-104"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream B: Normalize and deduplicate ingested data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-105.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-105"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream C: Define privacy and content handling gates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-106.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-106"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream B/C: Formalize human review for borderline data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-107.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-107"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Home Directory Backup System Redesign - implementation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-108.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-108"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "FHE Emotional Intelligence Integration - execution backlog",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-109.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-109"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Fix Import Errors",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-11.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "source-pix-11",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Hybrid Two-App Architecture Migration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-110.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-110"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 2A: Route Migration Sprint 2",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-111.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-111"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 2B: Route Migration Sprint 3",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-112.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-112"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 1: Foundation (Sprint 1)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-113.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-113"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wire MTGC training tracker sync to live Asana project",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-114.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-114"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 5: Cleanup & Optimization (Sprint 6)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-115.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-115"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 3: Auth Consolidation (Sprint 4)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-116.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-116"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 4: API Extraction (Sprint 5)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-117.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-117"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Coverage Audit",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-118.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-118"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Fix Import Errors",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-119.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-119"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - HIPAA Tests (Python)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-12.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "security",
+        "source-pix-12",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - HIPAA Tests (TypeScript)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-120.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-120"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline (Plan 02)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-121.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-121"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.2: Core policy engine",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-122.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-122"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.3: MongoDB policy storage with versioning",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-123.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-123"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.4: Hot-reload capability tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-124.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-124"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Configure Thresholds",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-125.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-125"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - HIPAA Tests (Python)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-126.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-126"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Security Tests (Python)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-127.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-127"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Security Tests (TypeScript)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-128.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-128"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.1: Governance directory structure and types",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-129.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-129"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline (Plan 02)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-13.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "security",
+        "source-pix-13",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.1: Pre-flight HIPAA++ compliance checks",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-130.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-130"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.2: FHE integration tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-131.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-131"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.3: Audit integration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-132.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-132"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 3.1: Unified event aggregation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-133.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-133"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 4.2: Crypto-shred secure deletion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-134.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-134"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Kickoff: CI Federation Initiative",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-135.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-135"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Approval checkpoint: ownership and RFC",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-136.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-136"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create pipeline inventory across providers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-137.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-137"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 3.2: Slack webhook notifications",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-138.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-138"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 4.1: Retention policies",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-139.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-139"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - HIPAA Tests (TypeScript)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-14.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "security",
+        "source-pix-14",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define duplication removal list",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-140.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-140"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Map capability ownership matrix",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-141.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-141"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Standardize command contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-142.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-142"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Add branch and path trigger policy",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-143.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-143"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate Bitbucket AI validation lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-144.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-144"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate GitHub security lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-145.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-145"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate GitLab MR quality lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-146.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-146"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Design release-readiness schema",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-147.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-147"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement readiness aggregator endpoint/script",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-148.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-148"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wire readiness check into Azure pre-deploy stage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-149.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-149"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Security Tests (Python)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-15.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "security",
+        "source-pix-15",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build CI operations dashboard",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-150.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-150"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define weekly operating review",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-151.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-151"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Disable duplicate non-owner jobs",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-152.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-152"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Final acceptance review",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-153.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-153"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Publish CI operating model RFC",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-154.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-154"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Run dry-run promotion tests (staging)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-155.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-155"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Write runbook and escalation map",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-156.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-156"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "CI Federation & Release Readiness",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-157.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-157"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create CI failure auto-ticketing rules",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-158.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-158"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance & Compliance",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-159.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-159"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Security Tests (TypeScript)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-16.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "security",
+        "source-pix-16",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream D: Define training-ready packaging and automation plan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-160.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-160"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Hybrid App Architecture Migration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-161.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-161"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Privacy-Preserving Intelligence & FHE",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-162.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-162"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Product Discovery & Backlog Hygiene",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-163.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-163"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AI package Ruff cleanup pass",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-164.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-164"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Blocking gaps remediation: training pipeline blockers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-165.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-165"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Blocking gaps remediation: training pipeline blockers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-166.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-166"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Pipeline Recovery & External Integrations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-167.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-167"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Platform Foundations & Operations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-168.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-168"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Promote recovered feeders into live pixel-data source config",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-169.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-169"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Tri-sync bootstrap sentinel (completed)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-17.\n\nSource type: Task\nSource status: Done\nSource priority: Low\n",
+      "label": [
+        "historical",
+        "migrated-from-pix",
+        "platform",
+        "source-pix-17"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Run controlled pixel-data reconciliation build",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-170.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-170"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement context optimization architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-171.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-171"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AI package Ruff cleanup pass",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-172.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-172"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define the canonical public memory API contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-173.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-173"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Introduce explicit account and workspace memory scoping",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-174.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-174"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Prepare the developer API and SDK rollout after gateway stabilization",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-175.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-175"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Public Memory Product Transition Program",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-176.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-176"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Remove browser-direct internal memory service usage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-177.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-177"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: assess VR travel feature opportunity",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-178.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-178"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define express checkout scope and rollout path",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-179.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-179"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate GitLab MR quality lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-18.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-18"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define rewards program concept and rollout criteria",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-180.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-180"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define waiting list experience improvements",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-181.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-181"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Document idea archival policy and backlog cleanup workflow",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-182.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-182"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Explore VR travel features",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-183.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-183"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-184.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-184"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Rewrite public memory docs and onboarding around the real product contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-185.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-185"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement ConvApparel-style user-simulator realism evaluation pipeline for Pixelated Empathy",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-186.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-186"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 1: Fix the Bleeding \u2014 Auto-rebase, fast-path, commit messages, error recovery",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-187.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-187"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 2: Scale Up \u2014 Parallel processing, conflict resolution, test validation, LLM fallback",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-188.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-188"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 3: Automate \u2014 Daemon, multi-repo, smart filtering, rate limiting",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-189.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-189"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build CI operations dashboard",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-19.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-19"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 4: Enhance \u2014 Human escalation, PR reporting, learning loop, dashboard",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-190.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-190"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 5: Expand \u2014 Autonomous PR creation, rule engine, external integrations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-191.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-191"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AutoReview AI \u2014 Workflow Expansion & Improvement",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-192.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-192"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "A1: Auto-rebase PRs before processing",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-193.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-193"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "A3: Fast-path for clean PRs (no actionable comments \u2192 immediate merge)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-194.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-194"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "A5: Use LLM reasoning blocks as commit messages",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-195.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-195"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "D3: Checkpoint state for crash recovery",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-196.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-196"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "A2: Parallel PR processing (3-5 concurrent)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-197.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-197"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "B4: Smart conflict resolution strategy per PR type",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-198.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-198"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "B1: Test suite validation in E2B sandbox before merge",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-199.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-199"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AI package Ruff cleanup pass",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-2.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "AI",
+        "ai-tooling",
+        "maintenance",
+        "migrated-from-pix",
+        "source-pix-2"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Blocking gaps remediation: training pipeline blockers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-20.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "blocking-gap",
+        "data-pipeline",
+        "migrated-from-pix",
+        "source-pix-20"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "B2: LLM timeout handling and fallback for large files",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-200.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-200"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "A4: Fix comment resolution \u2014 track processed comments locally",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-201.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-201"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "B3: Smart bot comment filtering (pattern-based, not hardcoded)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-202.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-202"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C1: Multi-repository orchestration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-203.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-203"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "D1: Run workflow as a daemon/scheduled service",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-204.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-204"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "D2: Rate limiting and cost control",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-205.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-205"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C3: Human-in-the-loop escalation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-206.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-206"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C2: Post processing summary comment on each PR",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-207.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-207"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C5: Learning loop \u2014 improve decisions from historical outcomes",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-208.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-208"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C6: Dashboard integration \u2014 live workflow status",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-209.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-209"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Add branch and path trigger policy",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-21.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-21"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "C4: Autonomous PR creation from issues",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-210.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-210"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Refactor crisis detection to domain-agnostic anomaly detection",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-212.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "source-pix-212"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement composable memory block schemas",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-213.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "Feature",
+        "migrated-from-pix",
+        "source-pix-213"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build event bus for memory operations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-214.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "source-pix-214"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement hook system for memory operations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-215.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "Feature",
+        "migrated-from-pix",
+        "source-pix-215"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create TypeScript SDK with complete type safety",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-216.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-216"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build CLI for memory operations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-217.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-217"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create VS Code extension for Foresight",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-218.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-218"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build documentation site with Docusaurus",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-219.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-219"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate GitHub security lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-22.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-22"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build audit trail projections for compliance",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-220.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "migrated-from-pix",
+        "source-pix-220"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement memory versioning with rollback",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-221.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "Feature",
+        "migrated-from-pix",
+        "source-pix-221"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement multi-tenant isolation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-222.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-222"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Integrate with Kafka/Kinesis for stream processing",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-223.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-223"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement WebSocket subscriptions for real-time updates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-224.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-224"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement CRDT-based conflict resolution",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-225.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-225"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build compliance exporters for HIPAA, SOC2",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-226.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "migrated-from-pix",
+        "source-pix-226"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build offline-first synchronization",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-227.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-227"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Checkmate: establish a current-truth baseline and launch-ready execution path",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-228.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-228"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Checkmate: align README with the current multi-chain architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-229.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-229"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Consolidate Bitbucket AI validation lane",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-23.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-23"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Checkmate: restore clean backend and frontend builds from the current workspace state",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-230.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-230"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Checkmate: validate devnet deployment path and replace placeholder Solana program IDs",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-231.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-231"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Churnmeon: consolidate current truth and execute the reliability-first finish-up plan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-232.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-232"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Churnmeon: stabilize the pytest baseline by fixing shared fixtures and concentrated failure clusters",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-233.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-233"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Churnmeon: align README and packaging narrative with the current workflow and plugin architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-234.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-234"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Churnmeon: convert workflow pain points into explicit hardening work for rebasing, large files, and merge validation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-235.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-235"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] CM-002: Restore clean backend build",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-236.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-236"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] CM-001: Establish current-truth baseline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-237.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-237"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] CM-003: Restore clean frontend build",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-238.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-238"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Review and validate staged CMS/market data/auth updates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-239.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-239"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Approval checkpoint: ownership and RFC",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-24.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-24"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "BURN IT DOWN: Foresight MCP Critical Remediation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-241.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-241"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-2] Fix SQL LIKE injection in query_memories",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-242.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-242"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-3] Fix asyncio.run() crashes in 7 sync MCP tools",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-243.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-243"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-6] Fix delete_memory tenant isolation inconsistency",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-244.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-244"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-8] Add transaction boundary to batch_update_decay",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-245.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-245"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-1] Replace init_db() DROP TABLE with proper schema migrations",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-246.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-246"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-4] Fix LIKE injection in graph_store.find_entities_by_name",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-247.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-247"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-5] Add user_id to memory_entity_links for tenant isolation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-248.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-248"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-9] Add user/tenant isolation to memory_versions queries",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-249.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-249"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement context optimization architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-25.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "migrated-from-pix",
+        "platform",
+        "source-pix-25"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-10] Remove duplicate @mcp.tool() decorator on rollback_memory",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-250.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-250"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[CRIT-7] Enforce WAL mode consistently across all DB modules",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-251.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-251"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-1] Add connection pooling for SQLite",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-252.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-252"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-4] Add thread-safe locking to all singleton getters",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-253.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-253"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-3] Replace toy entity extraction with real NER or wire up LLM extractor",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-254.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-254"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-5] Break circular import via shared config module for DB_PATH",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-255.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-255"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-6] Add tenant_id filter to synthesize_memories query",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-256.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-256"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-7] Fix topic clustering \u2014 substring matching matches wrong words",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-257.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-257"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-8] Slim down __init__.py and remove broken stub classes",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-258.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-258"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-1] Implement vector search with embeddings",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-259.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-259"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create pipeline inventory across providers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-26.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-26"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-2] Wire transcript processing to automatic memory extraction",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-260.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-260"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-3] Implement in-context memory injection",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-261.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-261"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-5] Implement real semantic contradiction detection in synthesizer",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-262.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-262"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-6] Upgrade reflection engine from statistical summaries to real insights",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-263.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-263"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-4] Fix entity extraction quality \u2014 graph store filled with garbage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-264.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-264"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-8] Enforce rate limiting in MCP tool execution",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-265.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-265"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[GAP-7] Implement memory deduplication",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-266.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-266"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[MEH] Replace __import__('threading') with normal import in reflection_engine",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-267.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-267"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[SERIOUS-2] Add LIMIT/pagination to synthesize_memories query",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-268.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-268"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "(deleted) Bulletproof Pixelated Strategy v6 trackable project",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-269.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-269"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-00: Source Inventory and Licensing Matrix",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-27.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-27"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Bulletproof Scaling: Phase 0 Foundation & Concurrency",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-270.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-270"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Bulletproof Scaling: Phase 3 Validation & Portal",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-271.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-271"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wave-5 Promotion Offshoot from Bulletproof Strategy",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-272.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-272"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Bulletproof Scaling: Phase 4 Production Cutover",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-273.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-273"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Link Strategy Artifact: Master Strategy + Canonical Plan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-274.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-274"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Bulletproof Scaling: Phase 2 Training Infrastructure",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-275.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-275"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Risk Register: Bulletproof Strategy v6",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-276.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-276"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Bulletproof Scaling: Phase 1 Ingestion & High-Quality Promotion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-277.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-277"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream A: Define acquisition rubric and acceptance gates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-28.\n\nSource type: Task\nSource status: Done\nSource priority: High\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-28"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "1.0 Create shared training infrastructure",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-282.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-282"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*1.1 Property test \u2014 token length stats correctness (Prop 6)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-283.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-283",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*1.2 Property test \u2014 truncation warning (Prop 7)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-284.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-284",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*1.3 Unit tests for shared_config.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-285.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-285",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "2.0 Create MultilingualSafetyChecker",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-286.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-286"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*2.1 Property test \u2014 multilingual crisis detection (Prop 8)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-287.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-287",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*2.2 Property test \u2014 multilingual negation suppression (Prop 9)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-288.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "safety-critical",
+        "source-pix-288",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*2.3 Unit tests for MultilingualSafetyChecker",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-289.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-289",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create CI failure auto-ticketing rules",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-29.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-29"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "3.0 Extend production SFT script",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-290.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-290"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*3.1 Unit tests for SFT script improvements",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-291.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-291",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "4.0 Update Colab notebook for TRL API parity",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-292.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-292"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u20206.0 Delete broken pipeline files and garbage data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-293.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-293",
+        "type:cleanup"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "5.0 Checkpoint \u2014 Phase 1 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-294.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-1-infra",
+        "source-pix-294",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u20207.0 Verify compiled corpus not contaminated by garbage book data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-295.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "safety-critical",
+        "source-pix-295",
+        "type:cleanup"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "8.0 Implement YouTube transcript ingestion pipeline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-296.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-296"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*8.1 Property test \u2014 YouTube language tagging (Prop 15)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-297.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-297",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*8.2 Property test \u2014 YouTube safety filtering (Prop 16)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-298.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "safety-critical",
+        "source-pix-298",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*8.3 Property test \u2014 YouTube dedup (Prop 17)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-299.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-299",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 2B: Route Migration Sprint 3",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-3.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-3"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-02: Trusted Source Pull v1",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-30.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-30"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*8.4 Unit tests for youtube_ingestion.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-300.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-300",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u20219.0 Execute YouTube ingestion \u2014 Tier 1 channels",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-301.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-301",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202110.0 Execute YouTube ingestion \u2014 Tier 2 channels",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-302.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-302",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202111.0 Execute YouTube ingestion \u2014 Tier 3 channels",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-303.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-303",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "12.0 Implement book and PDF conversion pipeline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-304.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-304"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*12.1 Property test \u2014 book conversion metadata (Prop 18)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-305.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-305",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*12.2 Property test \u2014 book conversion safety filtering (Prop 19)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-306.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "safety-critical",
+        "source-pix-306",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*12.3 Unit tests for book_pdf_converter.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-307.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-307",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202114.0 Execute book conversion \u2014 remaining titles",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-308.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-308",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202113.0 Execute book conversion \u2014 priority titles",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-309.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-309",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream A: Run public-web acquisition pilot",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-31.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-31"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "15.0 Implement deduplication and ChatML normalization pipeline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-310.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-310"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*15.1 Property test \u2014 near-duplicate removal (Prop 20)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-311.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-311",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*15.2 Property test \u2014 ChatML boundary verification (Prop 21)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-312.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-312",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*15.3 Property test \u2014 edge case preservation (Prop 22)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-313.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "safety-critical",
+        "source-pix-313",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*15.4 Unit tests for dedup_normalize.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-314.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-314",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "16.0 Implement data audit script",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-315.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-315"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*16.1 Unit tests for data_audit.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-316.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-316",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "17.0 Checkpoint \u2014 Phase 2 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-317.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-317",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "18.0 Implement SDG pipeline",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-318.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-318"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*18.1 Property test \u2014 DPO output field completeness (Prop 10)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-319.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-319",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-04: Normalize and Deduplicate Ingested Data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-32.\n\nSource type: Task\nSource status: Done\nSource priority: High\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-32"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*18.2 Property test \u2014 nightmare fuel tagging (Prop 11)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-320.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "safety-critical",
+        "source-pix-320",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*18.3 Property test \u2014 non-nightmare safety filtering (Prop 12)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-321.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "safety-critical",
+        "source-pix-321",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*18.4 Unit tests for sdg_pipeline.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-322.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-322",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202119.0 Generate DPO preference pairs (10,000)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-323.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-323",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202120.0 Generate niche category data (500 \u00d7 10 categories)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-324.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-324",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202121.0 Generate nightmare fuel data (5,000)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-325.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "safety-critical",
+        "source-pix-325",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "24.0 Implement DPO trainer",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-326.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-4-dpo",
+        "safety-critical",
+        "source-pix-326"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "\u202122.0 Run dedup + normalize on full corpus",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-327.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-327",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*24.1 Property test \u2014 DPO safety filter (Prop 1)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-328.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-4-dpo",
+        "safety-critical",
+        "source-pix-328",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "23.0 Checkpoint \u2014 Phase 3 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-329.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-3-sdg",
+        "source-pix-329",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-05: PII and Safety Screening",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-33.\n\nSource type: Task\nSource status: Done\nSource priority: High\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-33"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*24.2 Unit tests for dpo_trainer.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-330.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-4-dpo",
+        "source-pix-330",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "25.0 Integration test \u2014 DPO end-to-end",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-331.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-4-dpo",
+        "source-pix-331",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "26.0 Checkpoint \u2014 Phase 4 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-332.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-4-dpo",
+        "source-pix-332",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "27.0 Implement GRPO trainer and reward function",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-333.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-333"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*27.1 Property test \u2014 reward score range (Prop 2)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-334.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-334",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*27.2 Property test \u2014 unsafe response safety score (Prop 3)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-335.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-335",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*27.3 Property test \u2014 crisis resource score (Prop 4)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-336.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-336",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*27.4 Property test \u2014 low-reward exclusion (Prop 5)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-337.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-337",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*27.5 Unit tests for reward function \u2014 100% coverage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-338.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "safety-critical",
+        "source-pix-338",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "28.0 Integration test \u2014 GRPO end-to-end",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-339.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "source-pix-339",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-08: Freeze v1 Training Slice",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-34.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-34"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "29.0 Checkpoint \u2014 Phase 5 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-340.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-5-grpo",
+        "source-pix-340",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "30.0 Implement mental health evaluation suite",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-341.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "source-pix-341"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-342.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "source-pix-342",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-343.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "safety-critical",
+        "source-pix-343",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "*30.3 Unit tests for mental_health_eval.py",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-344.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "source-pix-344",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "31.0 Integration test \u2014 eval suite end-to-end",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-345.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "source-pix-345",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "32.0 Checkpoint \u2014 Phase 6 complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-346.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-6-eval",
+        "source-pix-346",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "33.0 Full pipeline dry run",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-347.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-7-integration",
+        "source-pix-347",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "34.0 Full pipeline production run",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-348.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-7-integration",
+        "source-pix-348",
+        "type:execution"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "35.0 Final checkpoint \u2014 All complete",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-349.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-7-integration",
+        "source-pix-349",
+        "type:checkpoint"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-06: Stage-Based Dataset Slicing",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-35.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-35"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Set up Sentry for error tracking",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-350.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-350"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Solana devnet smoke tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-351.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-351"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Write Solana integration tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-352.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-352"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Verify EVM contract on Etherscan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-353.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-353"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] EVM smoke tests on Sepolia",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-354.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-354"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Set up Sentry error tracking",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-355.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-355"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Verify EVM contract on Etherscan/Basescan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-356.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-356"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Write Solana integration tests on devnet",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-357.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-357"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Smoke test EVM contract on Sepolia",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-358.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-358"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Submit audit package to security auditor",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-359.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-359"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "DACT-07: Human Review and Borderline Decisions",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-36.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-36"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "[Checkmate] Make Phase D feature decisions (CM-016/017/018)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-360.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-360"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "8.5 Implement YouTube transcript fetcher (yt-dlp acquisition step)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-361.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "phase-2-data",
+        "source-pix-361"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Setup blockchain API keys and testnet funds for contract verification",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-362.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-362"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AI Catalyst research",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-363.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-363"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Claude Code connectivity sanity check",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-364.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-364"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Claude Code linear path hardening validation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-365.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-365"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Linear resilience hardening verification",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-366.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-366"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Research & Apply: Alibaba Cloud AI Catalyst Program",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-367.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-367"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream D: Define training-readiness validation gates",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-368.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-368"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream D: Add pipeline observability for failures",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-369.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-369"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.1: Governance directory structure and types",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-37.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-37"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream E: Build evaluation-to-data feedback loop",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-370.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-370"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Systematic TypeScript Error Resolution - Phase 5 & 6",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-371.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-371"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Sprint 1: Memory Schema & Unification (May 12 \u2013 May 25)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-373.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-373"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Sprint 2: Gating & Ingestion (May 26 \u2013 June 8)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-374.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-374"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Design Unified Memory Schema",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-375.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-375"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Update AI Repository Memory",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-376.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-376"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Update Pixelated Memory Service",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-377.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-377"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Sprint 3: Dreaming & Consolidation (June 9 \u2013 June 22)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-378.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-378"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Design Cross\u2011Language Memory API",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-379.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-379"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream A: Consolidate acquisition report and next backlog",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-38.\n\nSource type: Task\nSource status: In Progress\nSource priority: Low\n",
+      "label": [
+        "acquisition",
+        "curation",
+        "migrated-from-pix",
+        "source-pix-38"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Sprint 4: Reflection & Learning (June 23 \u2013 July 6)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-380.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-380"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Sprint 5: Fine-Tuning, Evaluation & Deployment (July 7 \u2013 July 27)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-381.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-381"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement Socratic Gate",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-382.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-382"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Integrate Gate into AI Ingestion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-383.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-383"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Integrate Gate into AI Ingestion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-384.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-384"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Integrate Gate into Pixelated Ingestion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-385.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-385"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Write Unit Tests for the Gate",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-386.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-386"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Develop Dream Scheduler Service",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-387.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-387"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Create Dream Manager Module",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-388.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-388"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wire Dream Manager into AI Memory",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-389.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-389"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.2: Core policy engine",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-39.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-39"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Extend Pixelated Context Blocks",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-390.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-390"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement Reflection Tasks",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-391.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-391"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Integrate Reflection with Dream Cycles",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-392.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-392"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Prepare Fine\u2011Tuning Dataset",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-393.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-393"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Fine\u2011Tune the Model",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-394.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-394"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Evaluate Memory Performance",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-395.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-395"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Iterate & Refine",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-396.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-396"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream E: Implement performance-gap-to-backlog conversion rules",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-397.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-397"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream E: Build evidence-based reprioritization engine",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-398.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-398"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Workstream E: Integrate steering with upstream workstreams",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-399.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-399"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Hybrid Two-App Architecture Migration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-4.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-4"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.3: MongoDB policy storage with versioning",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-40.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-40"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 1.4: Hot-reload capability tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-41.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-41"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.3: Audit integration",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-42.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-42"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.1: Pre-flight HIPAA++ compliance checks",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-43.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-43"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 2.2: FHE integration tests",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-44.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-44"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 3.2: Slack webhook notifications",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-45.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-45"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 3.1: Unified event aggregation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-46.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-46"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 4.2: Crypto-shred secure deletion",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-47.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-47"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Data Governance - Task 4.1: Retention policies",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-48.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "compliance",
+        "governance",
+        "migrated-from-pix",
+        "source-pix-48"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define duplication removal list",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-49.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-49"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 5: Cleanup & Optimization (Sprint 6)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-5.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-5"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define weekly operating review",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-50.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-50"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Design release-readiness schema",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-51.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-51"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: assess VR travel feature opportunity",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-52.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "migrated-from-pix",
+        "source-pix-52"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Disable duplicate non-owner jobs",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-53.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-53"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Final acceptance review",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-54.\n\nSource type: Task\nSource status: To Do\nSource priority: Low\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-54"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define express checkout scope and rollout path",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-55.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "migrated-from-pix",
+        "source-pix-55"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "FHE Emotional Intelligence Integration - execution backlog",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-56.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "fhe",
+        "migrated-from-pix",
+        "privacy",
+        "source-pix-56"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Home Directory Backup System Redesign - implementation",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-57.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "platform",
+        "source-pix-57"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Kickoff: CI Federation Initiative",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-58.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-58"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement readiness aggregator endpoint/script",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-59.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-59"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 1: Foundation (Sprint 1)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-6.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-6"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define rewards program concept and rollout criteria",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-60.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "migrated-from-pix",
+        "source-pix-60"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Discovery: define waiting list experience improvements",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-61.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "migrated-from-pix",
+        "source-pix-61"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Map capability ownership matrix",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-62.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-62"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Promote recovered feeders into live pixel-data source config",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-63.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "data-pipeline",
+        "migrated-from-pix",
+        "source-pix-63"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Publish CI operating model RFC",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-64.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-64"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Refactor user profile data model and migration plan",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-65.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "migrated-from-pix",
+        "platform",
+        "source-pix-65"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Run controlled pixel-data reconciliation build",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-66.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "data-pipeline",
+        "migrated-from-pix",
+        "source-pix-66"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Run dry-run promotion tests (staging)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-67.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-67"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Standardize command contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-68.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-68"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Document idea archival policy and backlog cleanup workflow",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-69.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "backlog-hygiene",
+        "discovery",
+        "migrated-from-pix",
+        "source-pix-69"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 4: API Extraction (Sprint 5)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-7.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-7"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wire MTGC training tracker sync to live Asana project",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-70.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "data-pipeline",
+        "migrated-from-pix",
+        "source-pix-70"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Wire readiness check into Azure pre-deploy stage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-71.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release-readiness",
+        "source-pix-71"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Write runbook and escalation map",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-72.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "ci-federation",
+        "migrated-from-pix",
+        "release",
+        "release-readiness",
+        "source-pix-72"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Phase 3: Auth Consolidation (Sprint 4)",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-8.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "architecture",
+        "migrated-from-pix",
+        "migration",
+        "source-pix-8"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Public Memory Product Transition Program",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-82.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-82"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Remove browser-direct internal memory service usage",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-83.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-83"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Build the product memory gateway over the shared service",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-84.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-84"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Prepare the developer API and SDK rollout after gateway stabilization",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-85.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-85"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Rewrite public memory docs and onboarding around the real product contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-86.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-86"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Introduce explicit account and workspace memory scoping",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-87.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-87"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Define the canonical public memory API contract",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-88.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-88"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-89.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-89"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Test Coverage Baseline - Configure Thresholds",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-9.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
+      "label": [
+        "coverage",
+        "migrated-from-pix",
+        "source-pix-9",
+        "testing",
+        "type:test"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Blocking gaps remediation: training pipeline blockers",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-90.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-90"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "AI package Ruff cleanup pass",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-91.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-91"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Implement context optimization architecture",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-92.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-92"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Explore VR travel features",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-93.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-93"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Express checkout",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-94.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-94"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Improve waiting list experience",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-95.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-95"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "New rewards program",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-96.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-96"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Refactor user profile data",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-97.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-97"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "Tri-sync bootstrap sentinel",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-98.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-98"
+      ],
+      "assignee": "chad@pixelated.love"
+    },
+    {
+      "summary": "What are archived ideas?",
+      "projectKey": "ADHD",
+      "issueType": "Task",
+      "description": "Migrated from slimshadyme PIX-99.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
+      "label": [
+        "migrated-from-pix",
+        "source-pix-99"
+      ],
+      "assignee": "chad@pixelated.love"
+    }
+  ]
+}

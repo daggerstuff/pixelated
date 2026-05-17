@@ -83,13 +83,13 @@ export class EventEmitter {
   }
 
   emit(event, ...args) {
-    const listeners = this.events.get(event) || []
+    const listeners = this.events.get(event) ?? []
     listeners.forEach((listener) => listener(...args))
     return listeners.length > 0
   }
 
   removeListener(event, listener) {
-    const listeners = this.events.get(event) || []
+    const listeners = this.events.get(event) ?? []
     const index = listeners.indexOf(listener)
     if (index > -1) {
       listeners.splice(index, 1)
@@ -178,13 +178,13 @@ export const path = {
   join: (...paths) => paths.filter(Boolean).join('/').replace(/\/+/g, '/'),
   resolve: (...paths) =>
     '/' + paths.filter(Boolean).join('/').replace(/\/+/g, '/'),
-  dirname: (p) => p.split('/').slice(0, -1).join('/') || '/',
+  dirname: (p) => p.split('/').slice(0, -1).join('/') ?? '/',
   basename: (p, ext) => {
-    const name = p.split('/').pop() || ''
+    const name = p.split('/').pop() ?? ''
     return ext && name.endsWith(ext) ? name.slice(0, -ext.length) : name
   },
   extname: (p) => {
-    const name = p.split('/').pop() || ''
+    const name = p.split('/').pop() ?? ''
     const dotIndex = name.lastIndexOf('.')
     return dotIndex > 0 ? name.slice(dotIndex) : ''
   },
@@ -194,8 +194,8 @@ export const path = {
   delimiter: ':',
   parse: (p) => ({
     root: p.startsWith('/') ? '/' : '',
-    dir: p.split('/').slice(0, -1).join('/') || '/',
-    base: p.split('/').pop() || '',
+    dir: p.split('/').slice(0, -1).join('/') ?? '/',
+    base: p.split('/').pop() ?? '',
     ext: '',
     name: '',
   }),
@@ -203,17 +203,17 @@ export const path = {
 
 // File system polyfill
 export const fs = {
-  readFile: () => Promise.resolve(''),
+  readFile:  async () => Promise.resolve(''),
   readFileSync: () => '',
-  writeFile: () => Promise.resolve(),
+  writeFile:  async () => Promise.resolve(),
   writeFileSync: () => {},
   existsSync: () => false,
   statSync: () => ({ isDirectory: () => false, isFile: () => false }),
-  stat: () =>
+  stat:  async () =>
     Promise.resolve({ isDirectory: () => false, isFile: () => false }),
-  mkdir: () => Promise.resolve(),
+  mkdir:  async () => Promise.resolve(),
   mkdirSync: () => {},
-  readdir: () => Promise.resolve([]),
+  readdir:  async () => Promise.resolve([]),
   readdirSync: () => [],
 }
 
@@ -221,7 +221,7 @@ export const fs = {
 export const util = {
   promisify:
     (fn) =>
-    (...args) =>
+     async (...args) =>
       Promise.resolve(fn(...args)),
   inspect: (obj) => JSON.stringify(obj),
   format: (f, ...args) => f.replace(/%[sdj%]/g, (_x) => args.shift()),

@@ -46,7 +46,7 @@ export function secureRandomString(
  */
 export function secureUUID(): string {
   // Use the existing secure UUID generation from utils
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+  if (crypto?.randomUUID) {
     return crypto.randomUUID()
   }
 

@@ -62,7 +62,7 @@ export const GET = async ({ request }: { request: Request }) => {
       evidenceLevel: technique.data.evidenceLevel,
       duration: technique.data.duration,
       difficulty: technique.data.difficulty,
-      tags: technique.data.tags || [],
+      tags: technique.data.tags ?? [],
     }))
 
     return new Response(

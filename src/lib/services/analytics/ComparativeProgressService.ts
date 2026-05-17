@@ -15,7 +15,7 @@ interface Logger {
  * Provides comparative insights while maintaining privacy and security.
  */
 export class ComparativeProgressService {
-  private logger: Logger
+  private readonly logger: Logger
 
   constructor(logger: Logger) {
     this.logger = logger

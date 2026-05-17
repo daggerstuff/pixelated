@@ -133,8 +133,8 @@ export class MockFHEService implements FHEService {
    * Mock encrypt data
    * Implements the encrypt method from FHEService interface
    */
-  public async encrypt<T>(
-    value: T,
+  public async encrypt(
+    value: unknown,
     _options?: unknown,
   ): Promise<EncryptedData> {
     this.checkInitialized()
@@ -153,7 +153,7 @@ export class MockFHEService implements FHEService {
     }
 
     // Create mock encrypted data
-    const encrypted: MockEncryptedData<T> = {
+    const encrypted: MockEncryptedData<unknown> = {
       id: nanoid(),
       mockId: nanoid(6),
       data: value,
@@ -184,9 +184,9 @@ export class MockFHEService implements FHEService {
     // Handle both MockEncryptedData and standard EncryptedData
     const mockData = encryptedData as unknown as MockEncryptedData<T>
 
-    if (!mockData || !mockData.originalValue) {
+    if (!mockData?.originalValue) {
       // Try to extract data from standard EncryptedData
-      if (encryptedData && encryptedData.data) {
+      if (encryptedData?.data) {
         try {
           return encryptedData.data as T
         } catch {

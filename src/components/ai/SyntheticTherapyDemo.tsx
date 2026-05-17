@@ -167,7 +167,7 @@ export default function SyntheticTherapyDemo() {
               severity: symptom.severity / 10, // Convert 1-10 to 0-1
               duration: symptom.duration,
               manifestations: symptom.indicators,
-              cognitions: symptom.cognitivePatterns || [],
+              cognitions: symptom.cognitivePatterns ?? [],
             }),
           ),
           decodedSymptoms: scenarioResult.analysis.identifiedSymptoms.map(
@@ -239,7 +239,7 @@ export default function SyntheticTherapyDemo() {
     }
   }
 
-  const selectedConversation = conversations[selectedConversationIndex] || null
+  const selectedConversation = conversations[selectedConversationIndex] ?? null
 
   // ⚡ Bolt: Memoize expensive O(n*m) nested array filtering operations for symptom accuracy to prevent recalculating on every render
   const { correctlyIdentified, missedSymptoms, incorrectlyIdentified } = useMemo(() => {
@@ -640,7 +640,7 @@ export default function SyntheticTherapyDemo() {
                           }
                         >
                           {(
-                            (selectedConversation.accuracyScore || 0) * 100
+                            (selectedConversation.accuracyScore ?? 0) * 100
                           ).toFixed(0)}
                           % Accuracy
                         </Badge>

@@ -140,7 +140,7 @@ export class AdminService {
   /**
    * Lock a therapy session
    */
-  lockSession(sessionId: string): Promise<void> {
+   async lockSession(sessionId: string): Promise<void> {
     console.debug('lockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -148,7 +148,7 @@ export class AdminService {
   /**
    * Unlock a therapy session
    */
-  unlockSession(sessionId: string): Promise<void> {
+   async unlockSession(sessionId: string): Promise<void> {
     console.debug('unlockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -156,7 +156,7 @@ export class AdminService {
   /**
    * Archive a therapy session
    */
-  archiveSession(sessionId: string): Promise<void> {
+   async archiveSession(sessionId: string): Promise<void> {
     console.debug('archiveSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -206,7 +206,7 @@ export class AdminService {
       }
 
       // Check custom permissions first if they exist
-      if (user.permissions && user.permissions.includes(permission)) {
+      if (user.permissions?.includes(permission)) {
         return true
       }
 
@@ -228,7 +228,7 @@ export class AdminService {
   ): Promise<{ userId: string; role: AdminRole } | null> {
     try {
       const payload = (await verifyToken(token)) as { userId: string }
-      if (!payload || !payload.userId) {
+      if (!payload?.userId) {
         return null
       }
 
@@ -364,16 +364,13 @@ export class AdminService {
       }
 
       // Fallback to direct header access with case-insensitive lookup
-      if (!authHeader) {
-        authHeader =
-          context.request.headers.get('authorization') ||
-          context.request.headers.get('Authorization')
-      }
+      authHeader ??= context.request.headers.get('authorization') ||
+          context.request.headers.get('Authorization');
 
       const tokenFromHeader = authHeader?.replace(/^Bearer\s+/i, '')
 
       // Use token from cookie or header
-      const token = tokenFromCookie || tokenFromHeader
+      const token = tokenFromCookie ?? tokenFromHeader
       if (!token) {
         return false
       }

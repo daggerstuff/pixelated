@@ -79,9 +79,9 @@ export class RealFHEService implements FHEService {
     }
     // Future: Delegate to homomorphicOps for real key generation
     return {
-      keyId: (config as any)?.keyId?.toString() || 'default-' + Date.now(),
+      keyId: (config as any)?.keyId?.toString() ?? 'default-' + Date.now(),
       createdAt: new Date(),
-      scheme: (config as any)?.scheme || 'BFV',
+      scheme: (config as any)?.scheme ?? 'BFV',
       status: 'active',
     } as FHEKeys
   }
@@ -89,7 +89,7 @@ export class RealFHEService implements FHEService {
   /**
    * Encrypt data
    */
-  public async encrypt<T>(value: T, options?: any): Promise<EncryptedData> {
+  public async encrypt(value: unknown, options?: any): Promise<EncryptedData> {
     await this.ensureInitialized()
 
     // Create a memory scope for safe resource tracking
@@ -201,7 +201,7 @@ export class RealFHEService implements FHEService {
       } else {
         return {
           success: false,
-          error: result.error || 'Unknown error in homomorphic processing',
+          error: result.error ?? 'Unknown error in homomorphic processing',
           operation: op,
           timestamp: result.timestamp || Date.now(),
           metadata: result.metadata,
@@ -309,32 +309,32 @@ export class RealFHEService implements FHEService {
   /**
    * Helper to decode a number array back to the original type
    */
-  private decodeValue<T>(data: number[], dataType: string): T {
+  private decodeValue(data: number[], dataType: string): unknown {
     if (dataType === 'number') {
-      return data[0] as unknown as T
+      return data[0] as unknown as unknown
     }
 
     if (dataType === 'boolean') {
-      return (data[0] !== 0) as unknown as T
+      return (data[0] !== 0) as unknown as unknown
     }
 
     if (dataType === 'string') {
-      return String.fromCharCode(...data) as unknown as T
+      return String.fromCharCode(...data) as unknown as unknown
     }
 
     if (dataType === 'object' || dataType === 'array') {
       try {
         const json = String.fromCharCode(...data)
-        return JSON.parse(json) as T
+        return JSON.parse(json) as unknown
       } catch (err) {
         logger.warn('Failed to parse decrypted JSON, returning as char codes', {
           err,
         })
-        return data as unknown as T
+        return data as unknown as unknown
       }
     }
 
-    return data as unknown as T
+    return data as unknown as unknown
   }
 
   /**

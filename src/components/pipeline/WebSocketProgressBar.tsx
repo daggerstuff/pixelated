@@ -60,9 +60,7 @@ export function WebSocketProgressBar(props: {
         if (msg.executionId && msg.executionId !== executionId) return
         if (msg.type === 'progress_update') {
           const data = msg.data as Record<string, unknown> | undefined
-          const p = Number(
-            (data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0),
-          )
+          const p = ((data?.['progress'] as number) ?? Number(data?.['progress'] ?? 0))
           const st = (data?.['stage'] as string) ?? ''
           setProgress(p)
           setStage(st)
@@ -180,7 +178,7 @@ export function WebSocketMessageLogger(props: {
   maxMessages?: number
   autoScroll?: boolean
 }) {
-  const { messages = [], maxMessages = 100 } = props
+  const { messages, maxMessages = 100 } = props
   const shown = messages.slice(0, maxMessages)
 
   if (messages.length === 0) {

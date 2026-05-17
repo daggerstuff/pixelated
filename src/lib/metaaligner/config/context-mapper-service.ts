@@ -42,10 +42,10 @@ export interface ContextConflict {
  */
 export class ContextMapperService {
   private config: MappingConfiguration
-  private mappingCache: Map<ContextType, MappingResolutionResult>
+  private readonly mappingCache: Map<ContextType, MappingResolutionResult>
 
   constructor(config?: MappingConfiguration) {
-    this.config = config || DEFAULT_MAPPING_CONFIG
+    this.config = config ?? DEFAULT_MAPPING_CONFIG
     this.mappingCache = new Map()
 
     // Validate configuration on initialization - fail fast
@@ -286,7 +286,7 @@ export class ContextMapperService {
   private normalizeWeights(
     weights: ObjectiveWeightConfig,
   ): ObjectiveWeightConfig {
-    const sum = Object.values(weights).reduce((acc, w) => acc + (w || 0), 0)
+    const sum = Object.values(weights).reduce((acc, w) => acc + (w ?? 0), 0)
 
     if (sum === 0) {
       // Equal weights if all are zero
@@ -340,9 +340,7 @@ let defaultMapperService: ContextMapperService | null = null
  * Get or create the default mapper service
  */
 export function getContextMapperService(): ContextMapperService {
-  if (!defaultMapperService) {
-    defaultMapperService = new ContextMapperService()
-  }
+  defaultMapperService ??= new ContextMapperService();
   return defaultMapperService
 }
 

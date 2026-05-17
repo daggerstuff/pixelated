@@ -30,7 +30,7 @@ export default function LoginForm() {
 
     const result = schema.safeParse(user)
     if (!result.success) {
-      setError(result.error.issues?.[0]?.message || 'Validation failed')
+      setError(result.error.issues?.[0]?.message ?? 'Validation failed')
       setIsLoading(false)
       return
     }
@@ -47,7 +47,7 @@ export default function LoginForm() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'Sign in failed')
+        setError(data.error ?? 'Sign in failed')
         setIsLoading(false)
         return
       }

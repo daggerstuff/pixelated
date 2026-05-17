@@ -96,7 +96,7 @@ const sealFHEService: FHEService = {
 
   isInitialized(): boolean {
     // Check if service has been initialized by checking if the singleton has expected properties
-    return Boolean(sealService && sealService.getContext)
+    return Boolean(sealService?.getContext)
   },
 
   supportsOperation(operation: FHEOperation): boolean {
@@ -118,7 +118,7 @@ const sealFHEService: FHEService = {
     }
   },
 
-  async encrypt<T>(data: T, _options?: unknown): Promise<EncryptedData> {
+  async encrypt(data: unknown, _options?: unknown): Promise<EncryptedData> {
     try {
       if (
         !Array.isArray(data) ||
@@ -141,7 +141,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        encryptedData.metadata?.serializedCiphertext ||
+        encryptedData.metadata?.serializedCiphertext ??
         (encryptedData.data as string)
 
       if (!ciphertext) {
@@ -166,8 +166,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
+      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -179,7 +179,7 @@ const sealFHEService: FHEService = {
       )
 
       if (!result.success) {
-        throw new Error(result.error || 'Addition operation failed')
+        throw new Error(result.error ?? 'Addition operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -200,8 +200,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
+      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -213,7 +213,7 @@ const sealFHEService: FHEService = {
       )
 
       if (!result.success) {
-        throw new Error(result.error || 'Subtraction operation failed')
+        throw new Error(result.error ?? 'Subtraction operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -234,8 +234,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext || (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext || (b.data as string)
+      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
+      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -247,7 +247,7 @@ const sealFHEService: FHEService = {
       )
 
       if (!result.success) {
-        throw new Error(result.error || 'Multiplication operation failed')
+        throw new Error(result.error ?? 'Multiplication operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -261,7 +261,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        value.metadata?.serializedCiphertext || (value.data as string)
+        value.metadata?.serializedCiphertext ?? (value.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -270,7 +270,7 @@ const sealFHEService: FHEService = {
       const result = await sealOperations.negate(ciphertext)
 
       if (!result.success) {
-        throw new Error(result.error || 'Negation operation failed')
+        throw new Error(result.error ?? 'Negation operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -287,7 +287,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        value.metadata?.serializedCiphertext || (value.data as string)
+        value.metadata?.serializedCiphertext ?? (value.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -296,7 +296,7 @@ const sealFHEService: FHEService = {
       const result = await sealOperations.polynomial(ciphertext, coefficients)
 
       if (!result.success) {
-        throw new Error(result.error || 'Polynomial operation failed')
+        throw new Error(result.error ?? 'Polynomial operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -310,7 +310,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        vector.metadata?.serializedCiphertext || (vector.data as string)
+        vector.metadata?.serializedCiphertext ?? (vector.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -319,7 +319,7 @@ const sealFHEService: FHEService = {
       const result = await sealOperations.rotate(ciphertext, steps)
 
       if (!result.success) {
-        throw new Error(result.error || 'Rotation operation failed')
+        throw new Error(result.error ?? 'Rotation operation failed')
       }
 
       return createEncryptedData(result.result)
@@ -385,8 +385,7 @@ export async function getFHEService(
   // For non-tenant specific requests, use the standard logic
   const isDevelopment =
     typeof window !== 'undefined' ||
-    (typeof process !== 'undefined' &&
-      (process.env as unknown as { NODE_ENV?: string })?.['NODE_ENV'] ===
+    ((process.env as unknown as { NODE_ENV?: string })?.['NODE_ENV'] ===
         'development')
 
   // Determine which implementation to use
@@ -478,7 +477,7 @@ export async function getTenantFHEService(
   }
 
   // For "dedicated" isolation, we need to create a unique service instance
-  if (tenant && tenant.isolationLevel === 'dedicated') {
+  if (tenant?.isolationLevel === 'dedicated') {
     logger.info(`Creating dedicated FHE service for tenant ${tenantId}`)
 
     // Create a dedicated service instance
@@ -525,7 +524,7 @@ export async function getTenantFHEService(
     ...baseService,
 
     // Override encrypt to use tenant-specific context
-    encrypt: async <T>(data: T, options?: unknown): Promise<EncryptedData> => {
+    encrypt: async (data: unknown, options?: unknown): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
         throw new Error(`Rate limit exceeded for tenant ${tenantId}`)
@@ -577,9 +576,7 @@ export async function getTenantFHEService(
  * Get the default FHE service for the current environment
  */
 export async function getDefaultFHEService(): Promise<FHEService> {
-  if (!defaultServiceInstance) {
-    defaultServiceInstance = await getFHEService()
-  }
+  defaultServiceInstance ??= await getFHEService();
   return defaultServiceInstance
 }
 

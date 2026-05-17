@@ -93,7 +93,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
               const contrastData = node.any.find(
                 (check: any) => check.id === 'color-contrast',
               )
-              if (contrastData && contrastData.data) {
+              if (contrastData?.data) {
                 console.warn(`     Foreground: ${contrastData.data.fgColor}`)
                 console.warn(`     Background: ${contrastData.data.bgColor}`)
                 console.warn(
@@ -141,7 +141,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
               const rgbMatch = colorString.match(
                 /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i,
               )
-              if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
+              if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
                 return [
                   parseInt(rgbMatch[1], 10),
                   parseInt(rgbMatch[2], 10),
@@ -153,7 +153,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
               const rgbaMatch = colorString.match(
                 /rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([0-9.]+)\s*\)/i,
               )
-              if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
+              if (rgbaMatch?.[1] && rgbaMatch[2] && rgbaMatch[3]) {
                 return [
                   parseInt(rgbaMatch[1], 10),
                   parseInt(rgbaMatch[2], 10),
@@ -310,7 +310,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
       const hoverContrast = await page.evaluate((el) => {
         function parseRgb(colorString: string) {
           const rgbMatch = colorString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i)
-          if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
+          if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
             return [
               parseInt(rgbMatch[1], 10),
               parseInt(rgbMatch[2], 10),
@@ -321,7 +321,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           const rgbaMatch = colorString.match(
             /rgba\((\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\)/i,
           )
-          if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
+          if (rgbaMatch?.[1] && rgbaMatch[2] && rgbaMatch[3]) {
             return [
               parseInt(rgbaMatch[1], 10),
               parseInt(rgbaMatch[2], 10),
@@ -452,7 +452,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
       const focusContrast = await page.evaluate((el) => {
         function parseRgb(colorString: string) {
           const rgbMatch = colorString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/i)
-          if (rgbMatch && rgbMatch[1] && rgbMatch[2] && rgbMatch[3]) {
+          if (rgbMatch?.[1] && rgbMatch[2] && rgbMatch[3]) {
             return [
               parseInt(rgbMatch[1], 10),
               parseInt(rgbMatch[2], 10),
@@ -463,7 +463,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
           const rgbaMatch = colorString.match(
             /rgba\((\d+),\s*(\d+),\s*(\d+),\s*([0-9.]+)\)/i,
           )
-          if (rgbaMatch && rgbaMatch[1] && rgbaMatch[2] && rgbaMatch[3]) {
+          if (rgbaMatch?.[1] && rgbaMatch[2] && rgbaMatch[3]) {
             return [
               parseInt(rgbaMatch[1], 10),
               parseInt(rgbaMatch[2], 10),
@@ -659,7 +659,7 @@ test.describe('Color Contrast Accessibility Tests', () => {
             const contrastData = node.any.find(
               (check: any) => check.id === 'color-contrast',
             )
-            if (contrastData && contrastData.data) {
+            if (contrastData?.data) {
               console.warn(`     Foreground: ${contrastData.data.fgColor}`)
               console.warn(`     Background: ${contrastData.data.bgColor}`)
               console.warn(

@@ -609,7 +609,7 @@ describe('SupportContextIdentifier', () => {
 
     it('should handle network timeouts gracefully', async () => {
       mockAIService.generateText.mockImplementation(
-        () =>
+         async () =>
           new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), 100),
           ),

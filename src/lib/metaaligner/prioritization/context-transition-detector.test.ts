@@ -517,7 +517,7 @@ describe('ContextTransitionDetector', () => {
       const transitions: ReturnType<typeof detector.addEvent>[] = []
       events.forEach((event) => {
         const transition = detector.addEvent(event)
-        if (transition && transition.detected) {
+        if (transition?.detected) {
           transitions.push(transition)
         }
       })
@@ -560,7 +560,7 @@ describe('ContextTransitionDetector', () => {
           }
 
           const transition = detector.addEvent(event)
-          if (transition && transition.transitionType === 'crisis_elevation') {
+          if (transition?.transitionType === 'crisis_elevation') {
             crisisTransitions.push(transition)
           }
           return transition
@@ -617,7 +617,7 @@ describe('ContextTransitionDetector', () => {
         }
 
         const transition = detector.addEvent(event)
-        if (transition && transition.detected) {
+        if (transition?.detected) {
           transitions.push(transition)
         }
       })

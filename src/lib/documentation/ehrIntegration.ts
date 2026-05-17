@@ -12,8 +12,8 @@ const logger = createBuildSafeLogger('ehr-integration')
  * Class that handles integration between our documentation system and EHR systems
  */
 export class EHRIntegration {
-  private fhirClient: unknown
-  private auditLog: boolean
+  private readonly fhirClient: unknown
+  private readonly auditLog: boolean
 
   /**
    * Create a new EHR integration

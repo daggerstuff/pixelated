@@ -361,7 +361,7 @@ export const generateScenarioBatch = async (
       averageQualityScore,
       averageBalanceScore,
       processingTime,
-      balanceAchieved: averageBalanceScore >= (options?.qualityThreshold || 80),
+      balanceAchieved: averageBalanceScore >= (options?.qualityThreshold ?? 80),
     },
   }
 }

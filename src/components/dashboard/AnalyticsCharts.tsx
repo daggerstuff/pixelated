@@ -233,6 +233,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
         return 'text-orange-600'
       case 'red':
         return 'text-red-600'
+      case undefined: { throw new Error('Not implemented yet: undefined case') }
       default:
         return 'text-gray-600'
     }

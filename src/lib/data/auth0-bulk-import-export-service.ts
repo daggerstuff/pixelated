@@ -17,9 +17,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN || '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID || '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET || '',
+  domain: process.env.AUTH0_DOMAIN ?? '',
+  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
+  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
 }
 
 // Initialize Auth0 management client
@@ -39,15 +39,13 @@ function initializeAuth0Management() {
     )
   }
 
-  if (!auth0Management) {
-    auth0Management = new ManagementClient({
+  auth0Management ??= new ManagementClient({
       domain: AUTH0_CONFIG.domain,
       clientId: AUTH0_CONFIG.managementClientId,
       clientSecret: AUTH0_CONFIG.managementClientSecret,
       audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
       scope: 'read:users create:users update:users create:user_tickets',
-    })
-  }
+    });
 }
 
 // Initialize the management client
@@ -138,9 +136,7 @@ export class Auth0BulkImportExportService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    if (!this.db) {
-      this.db = await mongodb.connect()
-    }
+    this.db ??= await mongodb.connect();
     return this.db
   }
 
@@ -185,8 +181,8 @@ export class Auth0BulkImportExportService {
               user_metadata: user.user_metadata,
               password: user.password,
               connection:
-                user.connection ||
-                options.connection ||
+                (user.connection ??
+                options.connection) ??
                 'Username-Password-Authentication',
               verify_email: options.verifyEmail !== false, // Default to true
             })
@@ -419,7 +415,7 @@ export class Auth0BulkImportExportService {
         }))
 
         allUsers.push(...users)
-        total = response.total || 0
+        total = response.total ?? 0
         page++
       } while (allUsers.length < total)
 
@@ -534,7 +530,7 @@ export class Auth0BulkImportExportService {
         }))
 
         allUsers.push(...users)
-        total = response.total || 0
+        total = response.total ?? 0
         page++
       } while (allUsers.length < total)
 

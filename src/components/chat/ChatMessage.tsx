@@ -53,7 +53,7 @@ export function ChatMessage({
       suicidality: 'bg-red-700',
       none: 'bg-gray-500',
     }
-    return colors[category] || 'bg-gray-500'
+    return colors[category] ?? 'bg-gray-500'
   }
 
   const hasAnalysis =

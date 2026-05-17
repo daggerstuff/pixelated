@@ -80,17 +80,17 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       let result: number
       switch (operation.operation) {
         case 'add':
-          result = operation.input1 + (operation.input2 || 0)
+          result = operation.input1 + (operation.input2 ?? 0)
           break
         case 'multiply':
-          result = operation.input1 * (operation.input2 || 1)
+          result = operation.input1 * (operation.input2 ?? 1)
           break
         case 'compare':
-          result = operation.input1 > (operation.input2 || 0) ? 1 : 0
+          result = operation.input1 > (operation.input2 ?? 0) ? 1 : 0
           break
         case 'aggregate':
           // Simulate aggregating multiple values
-          result = Math.round((operation.input1 + (operation.input2 || 0)) / 2)
+          result = Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
           break
         default:
           result = 0
@@ -119,7 +119,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     const operation: FHEOperation = {
       id: `op-${Date.now()}`,
       operation: currentOperation.operation,
-      input1: currentOperation.input1 || 0,
+      input1: currentOperation.input1 ?? 0,
       input2: currentOperation.input2,
       status: 'executing',
     }
@@ -153,16 +153,16 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     let _result: number
     switch (operation.operation) {
       case 'add':
-        _result = operation.input1 + (operation.input2 || 0)
+        _result = operation.input1 + (operation.input2 ?? 0)
         break
       case 'multiply':
-        _result = operation.input1 * (operation.input2 || 1)
+        _result = operation.input1 * (operation.input2 ?? 1)
         break
       case 'compare':
-        _result = operation.input1 > (operation.input2 || 0) ? 1 : 0
+        _result = operation.input1 > (operation.input2 ?? 0) ? 1 : 0
         break
       case 'aggregate':
-        _result = Math.round((operation.input1 + (operation.input2 || 0)) / 2)
+        _result = Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
         break
       default:
         _result = 0
@@ -173,7 +173,7 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     const plaintextTime = plaintextEnd - plaintextStart
 
     const fheOperation = operations.find((op) => op.id === operation.id)
-    const fheTime = fheOperation?.executionTime || 0
+    const fheTime = fheOperation?.executionTime ?? 0
 
     const overhead = fheTime / plaintextTime
 

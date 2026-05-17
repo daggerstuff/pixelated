@@ -33,13 +33,13 @@ export async function recordAgentActivity(
     phase: context.phase,
     decision: activity.decision,
     confidence: activity.confidence,
-    assumptions: activity.assumptions || [
+    assumptions: activity.assumptions ?? [
       'Default operational assumptions apply.',
     ],
-    openQuestions: activity.openQuestions || [],
-    evidence: activity.evidence || [],
+    openQuestions: activity.openQuestions ?? [],
+    evidence: activity.evidence ?? [],
     requestedAction:
-      activity.suggestedAction ||
+      activity.suggestedAction ??
       (context.phase === 'Handoff' ? 'commit' : 'handoff'),
   }
 

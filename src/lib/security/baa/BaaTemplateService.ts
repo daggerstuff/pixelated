@@ -15,7 +15,7 @@ const logger = createBuildSafeLogger('phi-audit')
  * Service for managing Business Associate Agreement (BAA) templates
  */
 export class BaaTemplateService {
-  private templates: Map<string, BaaTemplate> = new Map()
+  private readonly templates: Map<string, BaaTemplate> = new Map()
 
   constructor() {
     // Log initialization for audit trail

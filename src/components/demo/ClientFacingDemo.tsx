@@ -262,7 +262,7 @@ const ClientFacingDemo: FC = () => {
       </div>
 
       {/* Demo Content */}
-      <Tabs value={demoSteps[currentStep]?.id || 'upload'} className='w-full'>
+      <Tabs value={demoSteps[currentStep]?.id ?? 'upload'} className='w-full'>
         <TabsList className='bg-slate-800 grid w-full grid-cols-4'>
           {demoSteps.map((step, index) => {
             // Map step IDs to test IDs expected by tests

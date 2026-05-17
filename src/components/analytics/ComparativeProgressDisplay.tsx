@@ -68,18 +68,18 @@ const availableMetricsForDisplay = [
 
 function getMetricConfig(metricId: string) {
   const config = availableMetricsForDisplay.find((m) => m.id === metricId)
-  return config || { label: metricId, color: '#6366f1' } // Default
+  return config ?? { label: metricId, color: '#6366f1' } // Default
 }
 
 // Helper functions to get default date ranges
 function getDefaultStartDate(): string {
   const date = new Date()
   date.setMonth(date.getMonth() - 3)
-  return date.toISOString().split('T')[0] || ''
+  return date.toISOString().split('T')[0] ?? ''
 }
 
 function getDefaultEndDate(): string {
-  return new Date().toISOString().split('T')[0] || ''
+  return new Date().toISOString().split('T')[0] ?? ''
 }
 
 // Prepares chart data from the API response
@@ -202,7 +202,7 @@ export function ComparativeProgressDisplay({
               color={chartColor}
               title={`${metricLabel} Progress`}
               benchmarkLabel={
-                data.benchmarkData?.benchmarkDescription || 'Average'
+                data.benchmarkData?.benchmarkDescription ?? 'Average'
               }
             />
             {data.comparisonInsights?.narrativeSummary && (

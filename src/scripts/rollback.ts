@@ -174,7 +174,7 @@ async function performRollback(options: RollbackOptions): void {
 
     // Get version to roll back to
     const version =
-      options.version ||
+      options.version ??
       (await getLastStableVersion(options.environment, options))
     console.log(`Target rollback version: ${version}`)
 

@@ -435,7 +435,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
           </label>
           <textarea
             id='therapist-notes'
-            value={formData.therapistNotes || ''}
+            value={formData.therapistNotes ?? ''}
             onChange={(e) =>
               setFormData((prev) => ({
                 ...prev,

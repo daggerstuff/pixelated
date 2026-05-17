@@ -97,7 +97,7 @@ class MemoryStorageProvider implements StorageProvider {
  * Redis-based storage implementation for production
  */
 class RedisStorageProvider implements StorageProvider {
-  private client: RedisClientType
+  private readonly client: RedisClientType
   private connected = false
 
   constructor(redisUrl: string) {
@@ -179,7 +179,7 @@ class SecureStorageProvider implements StorageProvider {
     fallbackProvider?: StorageProvider,
   ) {
     this.kmsClient = new KMSClient({ region })
-    this.fallbackProvider = fallbackProvider || new MemoryStorageProvider()
+    this.fallbackProvider = fallbackProvider ?? new MemoryStorageProvider()
   }
 
   async get(key: string): Promise<string | null> {
@@ -462,7 +462,7 @@ export class KeyStorage {
     }
 
     const timestamp = Date.now()
-    const newKeyId = `${existingKey.purpose || 'key'}-${timestamp}`
+    const newKeyId = `${existingKey.purpose ?? 'key'}-${timestamp}`
 
     const newKeyData: KeyData = {
       key: generateSecureKey(),

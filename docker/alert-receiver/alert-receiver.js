@@ -8,7 +8,7 @@ const config = {
   rateLimitWindow: parseInt(process.env.RATE_LIMIT_WINDOW) || 60000, // 1 minute
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX) || 10, // 10 requests per window
   axiosTimeout: parseInt(process.env.AXIOS_TIMEOUT) || 5000, // 5 seconds
-  logLevel: process.env.LOG_LEVEL || 'info',
+  logLevel: process.env.LOG_LEVEL ?? 'info',
 }
 
 // Validate required environment variables
@@ -25,9 +25,9 @@ app.use(express.json())
 
 // Rate limiting middleware
 function rateLimit(req, res, next) {
-  const ip = req.ip || req.connection.remoteAddress
+  const ip = req.ip ?? req.connection.remoteAddress
   const now = Date.now()
-  const requests = ipRequests.get(ip) || []
+  const requests = ipRequests.get(ip) ?? []
 
   // Filter out requests outside the window
   const recentRequests = requests.filter(
@@ -148,13 +148,13 @@ app.post('/webhook', async (req, res) => {
       const sanitizedAlert = sanitizeAlertData(alert)
 
       const message = {
-        text: `🚨 Alert: ${sanitizedAlert.annotations?.summary || sanitizedAlert.labels?.alertname}`,
+        text: `🚨 Alert: ${sanitizedAlert.annotations?.summary ?? sanitizedAlert.labels?.alertname}`,
         blocks: [
           {
             type: 'section',
             text: {
               type: 'mrkdwn',
-              text: `*${sanitizedAlert.status === 'firing' ? '🚨 FIRING' : '✅ RESOLVED'}*: ${sanitizedAlert.annotations?.summary || sanitizedAlert.labels?.alertname}\n\n*Description:* ${sanitizedAlert.annotations?.description || 'No description'}\n*Instance:* ${sanitizedAlert.labels?.instance || 'Unknown'}\n*Job:* ${sanitizedAlert.labels?.job || 'Unknown'}\n*Severity:* ${sanitizedAlert.labels?.severity || 'Unknown'}`,
+              text: `*${sanitizedAlert.status === 'firing' ? '🚨 FIRING' : '✅ RESOLVED'}*: ${sanitizedAlert.annotations?.summary ?? sanitizedAlert.labels?.alertname}\n\n*Description:* ${sanitizedAlert.annotations?.description ?? 'No description'}\n*Instance:* ${sanitizedAlert.labels?.instance ?? 'Unknown'}\n*Job:* ${sanitizedAlert.labels?.job ?? 'Unknown'}\n*Severity:* ${sanitizedAlert.labels?.severity ?? 'Unknown'}`,
             },
           },
         ],

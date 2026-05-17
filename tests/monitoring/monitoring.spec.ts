@@ -223,7 +223,7 @@ test.describe('Health Check Monitoring', () => {
       ) {
         mainNavLinks.push({
           href: href,
-          text: (await link.textContent()) || '',
+          text: (await link.textContent()) ?? '',
         })
       }
     }
@@ -281,7 +281,7 @@ test.describe('Health Check Monitoring', () => {
     // Listen for failed resources
     page.on('requestfailed', (request) => {
       const url = request.url()
-      const failure = request.failure()?.errorText || 'unknown error'
+      const failure = request.failure()?.errorText ?? 'unknown error'
 
       // Ignore non-critical resources like analytics, fonts, etc.
       if (

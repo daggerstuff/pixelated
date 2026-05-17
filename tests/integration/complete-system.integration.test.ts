@@ -150,7 +150,7 @@ test.describe('Complete System Integration Tests', () => {
     })
 
     test('Health endpoints handle concurrent requests', async () => {
-      const requests = Array.from({ length: 5 }, () =>
+      const requests = Array.from({ length: 5 },  async () =>
         request.get('/api/health/simple'),
       )
 
@@ -207,7 +207,7 @@ test.describe('Complete System Integration Tests', () => {
       const biasScore = await page
         .locator('[data-testid="bias-score"]')
         .textContent()
-      expect(parseFloat(biasScore || '0')).toBeGreaterThan(0)
+      expect(parseFloat(biasScore ?? '0')).toBeGreaterThan(0)
 
       const alertLevel = await page
         .locator('[data-testid="alert-level"]')
@@ -301,7 +301,7 @@ test.describe('Complete System Integration Tests', () => {
       expect(dashboardData.data?.summary.totalSessions).toBeGreaterThan(0)
 
       // Verify recent analyses include our session
-      const recentAnalyses = dashboardData.data?.recentAnalyses || []
+      const recentAnalyses = dashboardData.data?.recentAnalyses ?? []
       const foundSession = recentAnalyses.find(
         (analysis: any) => analysis.sessionId === sessionId,
       )
@@ -456,7 +456,7 @@ test.describe('Complete System Integration Tests', () => {
     })
 
     test('Concurrent requests are handled efficiently', async () => {
-      const concurrentRequests = Array.from({ length: 10 }, (_, i) =>
+      const concurrentRequests = Array.from({ length: 10 },  async (_, i) =>
         request.post('/api/bias-analysis/analyze', {
           data: {
             text: `Concurrent test ${i}`,
@@ -495,7 +495,7 @@ test.describe('Complete System Integration Tests', () => {
 
     test('Rate limiting prevents abuse', async () => {
       // Make many rapid requests to trigger rate limiting
-      const requests = Array.from({ length: 70 }, () =>
+      const requests = Array.from({ length: 70 },  async () =>
         request.get('/api/health/simple'),
       )
 
@@ -588,7 +588,7 @@ test.describe('Complete System Integration Tests', () => {
       const initialResponse = await request.get('/api/bias-analysis/dashboard')
       expect(initialResponse.status()).toBe(200)
       const initialData = await initialResponse.json()
-      const initialCount = initialData.data?.summary.totalSessions || 0
+      const initialCount = initialData.data?.summary.totalSessions ?? 0
 
       // Perform multiple new analyses
       const newSessions = Array.from({ length: 3 }, (_, i) => ({
