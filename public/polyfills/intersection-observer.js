@@ -636,9 +636,9 @@ IntersectionObserver.prototype._hasCrossedThreshold =
     // To make comparing easier, an entry that has a ratio of 0
     // but does not actually intersect is given a value of -1
     const oldRatio = oldEntry?.isIntersecting ?
-      oldEntry.intersectionRatio ?? 0 : -1;
+      oldEntry.intersectionRatio || 0 : -1;
     const newRatio = newEntry.isIntersecting ?
-      newEntry.intersectionRatio ?? 0 : -1;
+      newEntry.intersectionRatio || 0 : -1;
 
     // Ignore unchanged ratios
     if (oldRatio === newRatio) {

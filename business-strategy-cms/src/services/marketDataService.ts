@@ -89,8 +89,8 @@ export class MarketDataService {
         netIncome: alphaFundamentals?.netIncome ?? 0,
         dividendYield: alphaFundamentals?.dividendYield ?? 0,
         beta: alphaFundamentals?.beta ?? 0,
-        sector: alphaFundamentals?.sector ?? 'Unknown',
-        industry: alphaFundamentals?.industry ?? 'Unknown',
+        sector: alphaFundamentals?.sector === '' || alphaFundamentals?.sector == null ? 'Unknown' : alphaFundamentals?.sector,
+        industry: alphaFundamentals?.industry === '' || alphaFundamentals?.industry == null ? 'Unknown' : alphaFundamentals?.industry,
         timestamp: new Date(),
       }
 
@@ -147,12 +147,12 @@ export class MarketDataService {
         return null
       }
 
-      // Get the latest values
-      const latestRSI = rsiData[rsiData.length - 1]?.value ?? 0
-      const latestMACD = macdData[macdData.length - 1]?.value ?? 0
-      const latestMACDSignal = macdData[macdData.length - 1]?.value ?? 0
-      const latestSMA20 = sma20Data[sma20Data.length - 1]?.value ?? 0
-      const latestSMA50 = sma50Data[sma50Data.length - 1]?.value ?? 0
+       // Get the latest values
+       const latestRSI = rsiData[rsiData.length - 1]?.value ?? 0
+       const latestMACD = macdData[macdData.length - 1]?.MACD ?? 0
+       const latestMACDSignal = macdData[macdData.length - 1]?.MACD_Signal ?? 0
+       const latestSMA20 = sma20Data[sma20Data.length - 1]?.value ?? 0
+       const latestSMA50 = sma50Data[sma50Data.length - 1]?.value ?? 0
 
       // Calculate support/resistance levels (simplified)
       const support = Math.min(latestSMA20, latestSMA50) * 0.95

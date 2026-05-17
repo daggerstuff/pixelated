@@ -209,14 +209,12 @@ export function notFoundHandler(
  * Wrap async route handlers to catch errors
  * Usage: router.get('/path', asyncHandler(async (req, res) => { ... }))
  */
-export function asyncHandler(
-  fn: (
-    req: ErrorRequest,
-    res: ErrorResponse,
-    next: NextFunction,
-  ) => Promise<any>,
+
+
+export function asyncHandler<TReq = any, TRes = any>(
+  fn: (req: TReq, res: TRes, next: NextFunction) => Promise<any>,
 ) {
-  return (req: ErrorRequest, res: ErrorResponse, next: NextFunction) => {
+  return (req: any, res: any, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next)
   }
 }

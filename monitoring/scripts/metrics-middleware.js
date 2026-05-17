@@ -109,7 +109,12 @@ const metricsMiddleware = (req, res, next) => {
   res.end = function (...args) {
     const duration = (Date.now() - start) / 1000
     // Derive route safely: prefer route.path when available, else use req.path
-    const rawRoute = req?.route?.path ?? req?.path ?? 'unknown'
+    const rawRoute =
+      req?.route?.path
+        ? req.route.path
+        : req?.path
+          ? req.path
+          : 'unknown'
     const route = sanitizeLabel(rawRoute)
     const method = sanitizeLabel(
       req?.method ? req.method.toUpperCase() : 'UNKNOWN',
