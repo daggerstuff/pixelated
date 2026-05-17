@@ -22,7 +22,32 @@ const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
   return { userId, message }
 }
 
+import { verifyAuthToken } from '../../utils/auth'
+
 export async function POST(request: NextRequest) {
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: 'Authorization header required' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
+
+  try {
+    await verifyAuthToken(authHeader)
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ error: 'Invalid or expired token' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
+
   const requestBody = toMessageRequestBody(await request.json())
   if (!requestBody) {
     return new Response(
