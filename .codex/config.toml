@@ -1,0 +1,20 @@
+[mcp_servers.context7]
+url = "https://mcp.context7.com/mcp"
+
+[mcp_servers.context7.http_headers]
+CONTEXT7_API_KEY = "ctx7sk-19ded139-49e7-478d-a54b-ab31929c7323"
+
+[mcp_servers.idearalph]
+args = [
+    "dlx",
+    "/home/vivi/.idearalph/mcp-server/dist/index.js",
+]
+command = "pnpm"
+
+[mcp_servers.mcp-supermemory-ai]
+args = [
+    "dlx",
+    "mcp-remote@latest",
+    "https://mcp.supermemory.ai/mcp",
+]
+command = "/home/vivi/.local/share/pnpm/pnpm"
