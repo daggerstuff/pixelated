@@ -9,7 +9,7 @@ from fastapi.responses import Response
 
 try:
     from prometheus_client import generate_latest
-except Exception:  # pragma: no cover - optional dependency/environment issue
+except Exception:
     def generate_latest() -> bytes:
         return b""
 

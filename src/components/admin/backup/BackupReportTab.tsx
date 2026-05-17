@@ -110,7 +110,7 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
   // Count backups by type
   const backupsByType = backups.reduce< Record<string, number>>(
     (counts, backup) => {
-      counts[backup.type] = (counts[backup.type] || 0) + 1
+      counts[backup.type] = (counts[backup.type] ?? 0) + 1
       return counts
     },
     {},

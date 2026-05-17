@@ -1,4 +1,5 @@
 ---
+import DOMPurify from 'isomorphic-dompurify'
 import Link from '~/components/base/Link.astro'
 import { formatDate } from '~/utils/datetime'
 import { VERSION_COLOR } from '~/utils/data'
@@ -39,6 +40,44 @@ const secondLinkText = collectionType === 'prs' ? item.repository?.nameWithOwner
 // Time and content handling
 const time = collectionType === 'releases' ? item.publishedAt : item.createdAt
 const content = collectionType === 'releases' ? item.desc : item.bodyHTML
+
+const sanitizedContent = content
+  ? DOMPurify.sanitize(content, {
+      ALLOWED_TAGS: [
+        'a',
+        'b',
+        'strong',
+        'i',
+        'em',
+        'u',
+        's',
+        'code',
+        'pre',
+        'p',
+        'br',
+        'hr',
+        'ul',
+        'ol',
+        'li',
+        'blockquote',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'img'
+      ],
+      ALLOWED_ATTR: [
+        'href',
+        'title',
+        'rel',
+        'target',
+        'src',
+        'alt'
+      ]
+    })
+  : undefined
 ---
 
 <details
@@ -122,5 +161,5 @@ const content = collectionType === 'releases' ? item.desc : item.bodyHTML
       </div>
     </div>
   </summary>
-  <div class="prose github-item-prose" set:html={content} />
+  <div class="prose github-item-prose" set:html={sanitizedContent || ''} />
 </details>

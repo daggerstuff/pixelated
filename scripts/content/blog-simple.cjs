@@ -84,8 +84,8 @@ function runBlogCommand(command) {
 
     return {
       success: false,
-      error: proc.stderr || 'Unknown error',
-      output: proc.stdout || '',
+      error: proc.stderr ?? 'Unknown error',
+      output: proc.stdout ?? '',
     }
   } catch (err) {
     return { success: false, error: err.message }

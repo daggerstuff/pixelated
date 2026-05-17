@@ -6,8 +6,8 @@ import json
 from typing import Any
 
 try:
-    import asyncpg  # type: ignore
-except ModuleNotFoundError:  # pragma: no cover - optional dependency
+    import asyncpg
+except ModuleNotFoundError:
     asyncpg = None
 import structlog
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
@@ -295,8 +295,8 @@ class DatabaseService:
                     json.dumps(analysis.sentiment_analysis or {}),
                     json.dumps(analysis.keyword_analysis or {}),
                     json.dumps(analysis.contextual_analysis or {}),
-                    json.dumps([rec.dict() for rec in analysis.recommendations]),
-                    json.dumps([cf.dict() for cf in analysis.counterfactual_scenarios]),
+                    json.dumps([rec.model_dump() for rec in analysis.recommendations]),
+                    json.dumps([cf.model_dump() for cf in analysis.counterfactual_scenarios]),
                     analysis.processing_time_ms,
                     analysis.model_version,
                     analysis.language_detected,
