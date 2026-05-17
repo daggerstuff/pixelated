@@ -64,7 +64,7 @@ importers:
         version: 12.31.0
       '@cloudflare/workers-types':
         specifier: latest
-        version: 4.20260515.1
+        version: 4.20260516.1
       '@composio/core':
         specifier: latest
         version: 0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3)
@@ -271,7 +271,7 @@ importers:
         version: 3.4.3
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@cloudflare/workers-types@4.20260515.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9)
+        version: 0.45.2(@cloudflare/workers-types@4.20260516.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9)
       es-module-lexer:
         specifier: latest
         version: 2.1.0
@@ -1372,8 +1372,8 @@ packages:
     resolution: {integrity: sha512-GgcWwRCs/xPtaqlMy8qRhPnZf9vlWcWZNHAitnVQ3yk7JmSralSiq5q07yaffYE8SogtDm7zFeKccx1QNVARpw==}
     engines: {node: '>= 20.12.0'}
 
-  '@cloudflare/workers-types@4.20260515.1':
-    resolution: {integrity: sha512-ruz+9tcG2iIKq5mXU2F00lL6KF5d4QfbAk7fNgvvqf5BelxDXaieyZmSnvA4sQBuemUstt4AEDN9CmJKmfCsDw==}
+  '@cloudflare/workers-types@4.20260516.1':
+    resolution: {integrity: sha512-aPckyZSPQXhOo+nSIvGLtXVl9M2qmf2GwFZYmvut9z47F1XTjHYcaYpI9/BvxrI+Q5l99UtXZU4bmQtX10JG+w==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -2261,8 +2261,8 @@ packages:
   '@kwsites/promise-deferred@1.1.1':
     resolution: {integrity: sha512-GaHYm+c0O9MjZRu0ongGBRbinu8gVAMd2UZjji6jVmqKtZluZnptXGWhz1E8j8D2HJ3f/yMxKAUC0b+57wncIw==}
 
-  '@letta-ai/letta-client@1.10.3':
-    resolution: {integrity: sha512-E0nDGWZ00nkn43iIM1vlFuL84FhefstJnGqNuMamI3e0NzAtnpF5Z/BVxUnIPd1kVBRyId+QWSqVp8p66aztzQ==}
+  '@letta-ai/letta-client@1.11.0':
+    resolution: {integrity: sha512-LdWnBHdknkmYYri40KdkOyw8JKZCi0deufHyBm352tiLtPddQej7Nu34FPhFheX+jEUlPhxj3RvzJdvgJbkkkg==}
 
   '@letta-ai/letta-code-sdk@0.1.14':
     resolution: {integrity: sha512-rSMp7kYwRZ4PAe3jET+PETFesuYCbeodEp6Qf7a5rLu97epqs+zNegSR+UUgq6c9+c5eqbuo+BsRThTKiSNJkA==}
@@ -2437,10 +2437,6 @@ packages:
   '@opentelemetry/api-logs@0.57.2':
     resolution: {integrity: sha512-uIX52NnTM0iBh84MShlpouI7UKqkZ7MrUszTmaypHBu4r7NofznSnQRfJ+uUeDtQDj6w8eFGg5KBLDAwAPz1+A==}
     engines: {node: '>=14'}
-
-  '@opentelemetry/api@1.9.0':
-    resolution: {integrity: sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==}
-    engines: {node: '>=8.0.0'}
 
   '@opentelemetry/api@1.9.1':
     resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
@@ -5632,8 +5628,8 @@ packages:
     resolution: {integrity: sha512-KunSNx+TVpkAw/6ULfhnx+HWRecjqZGTOyquAoWHYLRSdK1tB5Ihce1ZW+UY3fj33bYAFWPu7W/GRSmmrCGuxA==}
     engines: {node: '>=4'}
 
-  axios@1.16.0:
-    resolution: {integrity: sha512-6hp5CwvTPlN2A31g5dxnwAX0orzM7pmCRDLnZSX772mv8WDqICwFjowHuPs04Mc8deIld1+ejhtaMn5vp6b+1w==}
+  axios@1.16.1:
+    resolution: {integrity: sha512-caYkukvroVPO8KrzuJEb50Hm07KwfBZPEC3VeFHTsqWHvKTsy54hjJz9BS/cdaypROE2rH6xvm9mHX4fgWkr3A==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -6415,9 +6411,6 @@ packages:
   domhandler@5.0.3:
     resolution: {integrity: sha512-cgwlv/1iFQiFnU96XXgROh8xTeetsnJiDsTc7TYCLFd9+/WNkIqPTxiM/8pSd8VIrhXGTf1Ny1q1hquVqDJB5w==}
     engines: {node: '>= 4'}
-
-  dompurify@3.4.3:
-    resolution: {integrity: sha512-VVwJidIJcp1hpg2OMXML3ZVRPYSZiq4aX7qBh83BSIpOaRDqI+qxhXjjIWnpzkOXhmp0L81lnoME1mnCc9H48A==}
 
   dompurify@3.4.3:
     resolution: {integrity: sha512-VVwJidIJcp1hpg2OMXML3ZVRPYSZiq4aX7qBh83BSIpOaRDqI+qxhXjjIWnpzkOXhmp0L81lnoME1mnCc9H48A==}
@@ -12040,7 +12033,7 @@ snapshots:
       fast-wrap-ansi: 0.2.0
       sisteransi: 1.0.5
 
-  '@cloudflare/workers-types@4.20260515.1': {}
+  '@cloudflare/workers-types@4.20260516.1': {}
 
   '@colors/colors@1.5.0':
     optional: true
@@ -12744,7 +12737,7 @@ snapshots:
 
   '@kwsites/promise-deferred@1.1.1': {}
 
-  '@letta-ai/letta-client@1.10.3': {}
+  '@letta-ai/letta-client@1.11.0': {}
 
   '@letta-ai/letta-code-sdk@0.1.14(ink@7.0.1(@types/react@19.2.14)(react@19.2.6)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
     dependencies:
@@ -12756,7 +12749,7 @@ snapshots:
 
   '@letta-ai/letta-code@0.19.5(ink@7.0.1(@types/react@19.2.14)(react@19.2.6)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
     dependencies:
-      '@letta-ai/letta-client': 1.10.3
+      '@letta-ai/letta-client': 1.11.0
       glob: 13.0.6
       highlight.js: 11.11.1
       ink-link: 5.0.0(ink@7.0.1(@types/react@19.2.14)(react@19.2.6)(utf-8-validate@6.0.6))
@@ -12973,8 +12966,6 @@ snapshots:
   '@opentelemetry/api-logs@0.57.2':
     dependencies:
       '@opentelemetry/api': 1.9.1
-
-  '@opentelemetry/api@1.9.0': {}
 
   '@opentelemetry/api@1.9.1': {}
 
@@ -15953,7 +15944,7 @@ snapshots:
       '@ai-sdk/gateway': 3.0.115(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.27(zod@4.4.3)
-      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/api': 1.9.1
       zod: 4.4.3
 
   ajv-draft-04@1.0.0(ajv@8.20.0):
@@ -16267,13 +16258,15 @@ snapshots:
 
   axe-core@4.11.4: {}
 
-  axios@1.16.0:
+  axios@1.16.1:
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.5
+      https-proxy-agent: 5.0.1
       proxy-from-env: 2.1.0
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   axobject-query@4.1.0: {}
 
@@ -17015,10 +17008,6 @@ snapshots:
     optionalDependencies:
       '@types/trusted-types': 2.0.7
 
-  dompurify@3.4.3:
-    optionalDependencies:
-      '@types/trusted-types': 2.0.7
-
   domutils@3.2.2:
     dependencies:
       dom-serializer: 2.0.0
@@ -17031,9 +17020,9 @@ snapshots:
 
   dpop@2.1.1: {}
 
-  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260515.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9):
+  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260516.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9):
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20260515.1
+      '@cloudflare/workers-types': 4.20260516.1
       '@opentelemetry/api': 1.9.1
       '@types/pg': 8.20.0
       '@upstash/redis': 1.38.0
@@ -18339,7 +18328,7 @@ snapshots:
       type-fest: 5.6.0
       widest-line: 6.0.0
       wrap-ansi: 10.0.0
-      ws: 8.20.0(utf-8-validate@6.0.6)
+      ws: 8.20.1(utf-8-validate@6.0.6)
       yoga-layout: 3.2.1
     optionalDependencies:
       '@types/react': 19.2.14
@@ -21684,7 +21673,7 @@ snapshots:
 
   twilio@6.0.2:
     dependencies:
-      axios: 1.16.0
+      axios: 1.16.1
       dayjs: 1.11.20
       https-proxy-agent: 5.0.1
       jsonwebtoken: 9.0.3
@@ -22242,13 +22231,14 @@ snapshots:
 
   wait-on@9.0.10:
     dependencies:
-      axios: 1.16.0
+      axios: 1.16.1
       joi: 18.2.1
       lodash: 4.18.1
       minimist: 1.2.8
       rxjs: 7.8.2
     transitivePeerDependencies:
       - debug
+      - supports-color
 
   web-namespaces@2.0.1: {}
 
