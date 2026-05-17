@@ -75,8 +75,8 @@ export class AnonymizationPipelineService {
     },
   }
 
-  private privacyBudgetUsed: Map<string, number> = new Map()
-  private kAnonymityGroups: Map<string, any[]> = new Map()
+  private readonly privacyBudgetUsed: Map<string, number> = new Map()
+  private readonly kAnonymityGroups: Map<string, any[]> = new Map()
 
   /**
    * Anonymize therapeutic session data for research use
@@ -221,7 +221,7 @@ export class AnonymizationPipelineService {
     const { epsilon, delta, sensitivity } = dpConfig
 
     // Check privacy budget
-    const budgetUsed = this.privacyBudgetUsed.get(purpose) || 0
+    const budgetUsed = this.privacyBudgetUsed.get(purpose) ?? 0
     if (budgetUsed + epsilon > 1.0) {
       throw new Error(`Privacy budget exceeded for purpose: ${purpose}`)
     }
@@ -327,7 +327,7 @@ export class AnonymizationPipelineService {
     return data.map((record) => {
       // Generate new anonymized ID
       const anonymizedId = this.generateAnonymizedId(
-        record.original_id || record.id,
+        record.original_id ?? record.id,
       )
 
       // Hash session identifiers
@@ -350,7 +350,7 @@ export class AnonymizationPipelineService {
       }
 
       return {
-        originalId: record.original_id || record.id,
+        originalId: record.original_id ?? record.id,
         anonymizedId,
         anonymizationLevel: 'enhanced',
         timestamp: new Date().toISOString(),
@@ -361,8 +361,8 @@ export class AnonymizationPipelineService {
             record,
             processedRecord,
           ),
-          kAnonymityLevel: record.k_anonymity_level || 0,
-          privacyBudgetUsed: record.differential_privacy?.epsilon_used || 0,
+          kAnonymityLevel: record.k_anonymity_level ?? 0,
+          privacyBudgetUsed: record.differential_privacy?.epsilon_used ?? 0,
         },
       } as AnonymizedRecord
     })
@@ -417,11 +417,11 @@ export class AnonymizationPipelineService {
 
   // Helper methods for anonymization techniques
 
-  private preprocessData(rawData: any[]): Promise<any[]> {
+  private  async preprocessData(rawData: any[]): Promise<any[]> {
     return Promise.resolve(
       rawData.map((record) => ({
         ...record,
-        original_id: record.id || this.generateId(),
+        original_id: record.id ?? this.generateId(),
         processed_timestamp: new Date().toISOString(),
       })),
     )
@@ -440,14 +440,14 @@ export class AnonymizationPipelineService {
         return typeof value === 'string' ? value.split(',')[0] : 'unknown'
 
       case 'gender':
-        return value || 'not_specified'
+        return value ?? 'not_specified'
 
       case 'occupation_category':
         // Generalize to broad categories
         return this.generalizeOccupation(value)
 
       default:
-        return String(value || 'unknown')
+        return String(value ?? 'unknown')
     }
   }
 
@@ -620,7 +620,7 @@ export class AnonymizationPipelineService {
     // Simplified information loss calculation
     const originalFields = Object.keys(original).length
     const anonymizedFields = Object.keys(
-      anonymized.dataFields || anonymized,
+      anonymized.dataFields ?? anonymized,
     ).length
 
     return Math.max(0, 1 - anonymizedFields / originalFields)

@@ -40,7 +40,7 @@ export function composeProviders(
         </Accumulated>
       )
 
-      NextProvider.displayName = `ComposedProvider(${Current.displayName || 'Component'})`
+      NextProvider.displayName = `ComposedProvider(${Current.displayName ?? 'Component'})`
       return NextProvider
     },
     BaseProvider,
@@ -72,7 +72,7 @@ export function createProviderComposition(
   return (
     ...providers: ProviderType[]
   ): ComponentType<ProviderComponentProps> => {
-    const ProviderComposition = ({
+    const ProviderComposition =  async ({
       children,
       ...props
     }: ProviderComponentProps) =>
@@ -120,14 +120,12 @@ export type ExtractProviderProps<T> =
  * </TypedProviders>
  * ```
  */
-export function createTypedProviderComposition<
-  T extends ComponentType<{ children: ReactNode } & Record<string, unknown>>,
-  Props extends Record<string, unknown> = Record<string, unknown>,
->(...providers: T[]) {
-  return <P extends Props>() => {
-    type TypedProviderProps = { children: ReactNode } & P
+export function createTypedProviderComposition<Props extends Record<string, unknown> = Record<string, unknown>,
+>(...providers: ComponentType<{ children: ReactNode } & Record<string, unknown>>[]) {
+  return () => {
+    type TypedProviderProps = { children: ReactNode } & Props
     // Create a wrapper function that uses createElement instead of JSX
-    const TypedProviderComposition = ({
+    const TypedProviderComposition =  async ({
       children,
       ...props
     }: TypedProviderProps) => {

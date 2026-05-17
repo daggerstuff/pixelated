@@ -215,7 +215,7 @@ function computeTrend(
 // ─── Public API ────────────────────────────────────────────────────────────────
 
 export class EmotionClassifier {
-  private mode: 'lexicon' | 'model' = 'lexicon'
+  private readonly mode: 'lexicon' | 'model' = 'lexicon'
 
   constructor(mode: 'lexicon' | 'model' = 'lexicon') {
     this.mode = mode

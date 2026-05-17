@@ -112,7 +112,7 @@ export default function PsychologyFrameworksDemo() {
 
       // Auto-select first framework if available
       if (result.frameworks.length > 0) {
-        setSelectedFramework(result.frameworks[0] || null)
+        setSelectedFramework(result.frameworks[0] ?? null)
       }
     } catch (error: unknown) {
       console.error('Failed to load frameworks:', error)
@@ -226,7 +226,7 @@ export default function PsychologyFrameworksDemo() {
         'Humanistic',
       ])
       if (demoFrameworks.length > 0) {
-        setSelectedFramework(demoFrameworks[0] || null)
+        setSelectedFramework(demoFrameworks[0] ?? null)
       }
     } finally {
       setLoading(false)

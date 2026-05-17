@@ -86,6 +86,8 @@ const renderStatusBadge = (status: RecoveryTestStatus) => {
           In Progress
         </Badge>
       )
+    case RecoveryTestStatus.NOT_STARTED: { throw new Error('Not implemented yet: RecoveryTestStatus.NOT_STARTED case') }
+    case RecoveryTestStatus.SKIPPED: { throw new Error('Not implemented yet: RecoveryTestStatus.SKIPPED case') }
     default:
       return <Badge variant='secondary'>{status}</Badge>
   }
@@ -135,7 +137,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to run recovery test.')
+        throw new Error(data.error ?? 'Failed to run recovery test.')
       }
 
       setLatestTestResult(data)
@@ -375,7 +377,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
                                   <div className='divide-y rounded-md border'>
                                     {test.verificationResults.map((vr, idx) => (
                                       <div
-                                        key={`vr-${vr.testCase}-${vr.id || idx}`}
+                                        key={`vr-${vr.testCase}-${vr.id ?? idx}`}
                                         className='flex items-center justify-between p-2'
                                       >
                                         <div>

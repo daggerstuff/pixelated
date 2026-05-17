@@ -221,7 +221,7 @@ export function TherapeuticGoalsTracker({
 
   // Open modal for new or edit
   function openModal(goal?: TherapeuticGoal) {
-    setEditGoal(goal || null)
+    setEditGoal(goal ?? null)
     setForm(
       goal
         ? { ...goal }
@@ -368,8 +368,8 @@ export function TherapeuticGoalsTracker({
       </div>
 
       {/* Error and loading states */}
-      {(error || actionError) && (
-        <div className='text-red-600 mb-2'>{error || actionError}</div>
+      {(error ?? actionError) && (
+        <div className='text-red-600 mb-2'>{error ?? actionError}</div>
       )}
       {(loading || actionLoading) && (
         <div className='text-gray-500 mb-2'>Loading...</div>
@@ -392,7 +392,7 @@ export function TherapeuticGoalsTracker({
             <form onSubmit={handleFormSubmit} className='space-y-4'>
               <Input
                 name='title'
-                value={form.title || ''}
+                value={form.title ?? ''}
                 onChange={handleFormChange}
                 placeholder='Goal Title'
                 required
@@ -401,7 +401,7 @@ export function TherapeuticGoalsTracker({
 
               <Textarea
                 name='description'
-                value={form.description || ''}
+                value={form.description ?? ''}
                 onChange={handleFormChange}
                 placeholder='Description'
                 maxLength={1024}
@@ -409,7 +409,7 @@ export function TherapeuticGoalsTracker({
 
               <select
                 name='category'
-                value={form.category || GoalCategory.EMOTIONAL_REGULATION}
+                value={form.category ?? GoalCategory.EMOTIONAL_REGULATION}
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >
@@ -442,7 +442,7 @@ export function TherapeuticGoalsTracker({
               </select>
               <select
                 name='status'
-                value={form.status || GoalStatus.NOT_STARTED}
+                value={form.status ?? GoalStatus.NOT_STARTED}
                 onChange={handleFormChange}
                 className='w-full rounded border p-2'
               >

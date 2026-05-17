@@ -28,15 +28,15 @@ if (typeof window.process === 'undefined') {
 window.Buffer = window.Buffer || Buffer
 
 // Expose stream to the window object
-window.stream = window.stream || streamBrowserify
+window.stream = window.stream ?? streamBrowserify
 
 // Expose path to the window object
-window.path = window.path || path
+window.path = window.path ?? path
 
 // Expose util to the window object
-window.util = window.util || util
+window.util = window.util ?? util
 
 // Expose events to the window object
-window.events = window.events || events
+window.events = window.events ?? events
 
 console.log('Node.js polyfills loaded in browser environment')

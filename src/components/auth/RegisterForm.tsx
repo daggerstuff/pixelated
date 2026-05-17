@@ -127,7 +127,7 @@ export function RegisterForm({
 
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: redirectTo || '/dashboard',
+        callbackURL: redirectTo ?? '/dashboard',
       })
       // OAuth redirects automatically, so no need to handle redirect here
     } catch (error: unknown) {

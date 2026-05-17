@@ -24,7 +24,7 @@ const SECURITY_CONFIG = {
   },
   STORAGE: {
     SECRETS_DIR: validatePath(
-      process.env.SECRETS_DIR || './config/secrets',
+      process.env.SECRETS_DIR ?? './config/secrets',
       ALLOWED_DIRECTORIES.PROJECT_ROOT,
     ),
     PERMISSIONS: 0o600, // Read/write for owner only
@@ -52,7 +52,7 @@ function generateRandomBytes(length: number): Uint8Array {
   // Prefer Web Crypto when available (browsers, modern Node)
   if (
     typeof globalThis !== 'undefined' &&
-    (globalThis as any).crypto?.getRandomValues
+    (globalThis as any)?.crypto?.getRandomValues
   ) {
     ;(globalThis as any).crypto.getRandomValues(bytes)
     return bytes
@@ -64,8 +64,8 @@ function generateRandomBytes(length: number): Uint8Array {
 
 export class SecretsManager {
   private static instance: SecretsManager
-  private secrets: Map<string, SecretConfig> = new Map()
-  private encryptionKey: Uint8Array
+  private readonly secrets: Map<string, SecretConfig> = new Map()
+  private readonly encryptionKey: Uint8Array
 
   private constructor() {
     this.encryptionKey = this.loadEncryptionKey()
@@ -290,10 +290,10 @@ export class SecretsManager {
    */
   getDatabaseConfig() {
     return {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'pixelated',
-      user: process.env.DB_USER || 'postgres',
+      host: process.env.DB_HOST ?? 'localhost',
+      port: parseInt(process.env.DB_PORT ?? '5432'),
+      database: process.env.DB_NAME ?? 'pixelated',
+      user: process.env.DB_USER ?? 'postgres',
       password: this.getSecret('DB_PASSWORD'),
       ssl:
         process.env.NODE_ENV === 'production'
@@ -313,9 +313,9 @@ export class SecretsManager {
   getJWTConfig() {
     return {
       secret: this.getSecret('JWT_SECRET'),
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
-      issuer: process.env.JWT_ISSUER || 'pixelated-empathy',
-      audience: process.env.JWT_AUDIENCE || 'pixelated-users',
+      expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
+      issuer: process.env.JWT_ISSUER ?? 'pixelated-empathy',
+      audience: process.env.JWT_AUDIENCE ?? 'pixelated-users',
     }
   }
 
@@ -326,9 +326,9 @@ export class SecretsManager {
     return {
       url: process.env.REDIS_URL,
       password: this.getSecret('REDIS_PASSWORD'),
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379'),
-      db: parseInt(process.env.REDIS_DB || '0'),
+      host: process.env.REDIS_HOST ?? 'localhost',
+      port: parseInt(process.env.REDIS_PORT ?? '6379'),
+      db: parseInt(process.env.REDIS_DB ?? '0'),
     }
   }
 
@@ -363,7 +363,7 @@ export class SecretsManager {
     return Array.from(this.secrets.entries()).map(([key, secret]) => ({
       key,
       timestamp: new Date(),
-      encrypted: secret.encrypted || false,
+      encrypted: secret.encrypted ?? false,
     }))
   }
 
@@ -385,9 +385,7 @@ export class SecretsManager {
 let secretsManager: SecretsManager | null = null
 
 export function getSecretsManager(): SecretsManager {
-  if (!secretsManager) {
-    secretsManager = SecretsManager.getInstance()
-  }
+  secretsManager ??= SecretsManager.getInstance();
   return secretsManager
 }
 

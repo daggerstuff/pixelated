@@ -45,7 +45,7 @@ const DEFAULT_RATE_LIMIT = 1000
 const RATE_LIMIT_WINDOW_MS = 60 * 1000
 
 export class DeveloperApiKeyManager {
-  private failedAttempts = new Map<string, number>()
+  private readonly failedAttempts = new Map<string, number>()
 
   async createApiKey(
     input: CreateApiKeyInput,
@@ -54,7 +54,7 @@ export class DeveloperApiKeyManager {
     const keyHash = this.hashKey(rawKey)
     const keyPrefix = rawKey.substring(0, 8)
     const validatedScopes = this.validateScopes(input.scopes)
-    const rateLimit = input.rate_limit || DEFAULT_RATE_LIMIT
+    const rateLimit = input.rate_limit ?? DEFAULT_RATE_LIMIT
     const expiresAt = input.expires_in_days
       ? new Date(Date.now() + input.expires_in_days * 24 * 60 * 60 * 1000)
       : null
@@ -173,7 +173,7 @@ export class DeveloperApiKeyManager {
         [apiKeyId],
       )
 
-      await logSecurityEvent(
+       logSecurityEvent(
         SecurityEventType.AUTHENTICATION_FAILED,
         apiKeyId,
         {
@@ -206,7 +206,7 @@ export class DeveloperApiKeyManager {
       [apiKeyId, windowStart],
     )
 
-    const currentCount = parseInt(countResult.rows[0]?.count || '0', 10)
+    const currentCount = parseInt(countResult.rows[0]?.count ?? '0', 10)
 
     if (currentCount >= maxRequests) {
       return { allowed: false, remaining: 0, resetTimeMs }
@@ -268,7 +268,7 @@ export class DeveloperApiKeyManager {
        WHERE id = $1 AND user_id = $2`,
       [apiKeyId, userId],
     )
-    return result.rows[0] || null
+    return result.rows[0] ?? null
   }
 
   async updateApiKeyScopes(
@@ -312,14 +312,14 @@ export class DeveloperApiKeyManager {
     apiKeyId: string,
     reason: string,
   ): Promise<void> {
-    const attempts = this.failedAttempts.get(apiKeyId) || 0
+    const attempts = this.failedAttempts.get(apiKeyId) ?? 0
     const newAttempts = attempts + 1
     this.failedAttempts.set(apiKeyId, newAttempts)
 
     if (newAttempts >= MAX_FAILED_ATTEMPTS) {
       await this.revokeApiKeySystem(apiKeyId)
       this.failedAttempts.delete(apiKeyId)
-      await logSecurityEvent(
+       logSecurityEvent(
         SecurityEventType.AUTHENTICATION_FAILED,
         apiKeyId,
         {

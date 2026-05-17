@@ -58,7 +58,7 @@ const mockWssInstance = {
   }),
   close: vi.fn(),
   emit: vi.fn((event: string, ...args: any[]) => {
-    const handlers = mockWssEventHandlers.get(event) || []
+    const handlers = mockWssEventHandlers.get(event) ?? []
     handlers.forEach((handler) => handler(...args))
   }),
   // Add other methods if used by worker

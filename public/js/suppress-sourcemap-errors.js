@@ -2,7 +2,7 @@
 window.addEventListener(
   'error',
   function (event) {
-    if (event && event.filename && event.filename.includes('.map')) {
+    if (event?.filename?.includes('.map')) {
       // Suppress source map loading errors
       event.preventDefault()
       return false

@@ -17,8 +17,8 @@ function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
 
 function resolveSafeLlmBaseUrl(envVars: Record<string, string | undefined>): string | undefined {
   const llmBaseUrl =
-    envVars['LLM_BASE_URL'] ||
-    envVars['LLM_API_URL'] ||
+    (envVars['LLM_BASE_URL'] ??
+    envVars['LLM_API_URL']) ??
     envVars['OPENAI_BASE_URL']
 
   if (isOpenRouterBaseUrl(llmBaseUrl)) {
@@ -68,7 +68,7 @@ export const POST = async ({ request }) => {
 
     // Create LLM service
     const envVars = import.meta.env as Record<string, string | undefined>
-    const llmApiKey = envVars['LLM_API_KEY'] || ''
+    const llmApiKey = envVars['LLM_API_KEY'] ?? ''
     const llmBaseUrl = resolveSafeLlmBaseUrl(envVars)
 
     const aiService = createLLMService({
@@ -77,7 +77,7 @@ export const POST = async ({ request }) => {
     })
 
     // Use the model from the request or the default model
-    const modelId = model || 'minimaxai/minimax-m2.7'
+    const modelId = model ?? 'minimaxai/minimax-m2.7'
 
     // Create intervention analysis service
     const interventionService = new InterventionAnalysisService({
@@ -210,7 +210,7 @@ export const POST = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.intervention.error',
-      session?.user?.id || 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'intervention-analysis',
       {
         error: error instanceof Error ? String(error) : String(error),

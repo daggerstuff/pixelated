@@ -108,12 +108,12 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
     totalBackups > 0 ? totalStorageUsed / totalBackups : 0
 
   // Count backups by type
-  const backupsByType = backups.reduce(
+  const backupsByType = backups.reduce< Record<string, number>>(
     (counts, backup) => {
       counts[backup.type] = (counts[backup.type] || 0) + 1
       return counts
     },
-    {} as Record<string, number>,
+    {},
   )
 
   return (
@@ -193,19 +193,19 @@ const BackupReportTab: FC<BackupReportTabProps> = ({
               <div className='flex justify-between'>
                 <dt>Full Backups:</dt>
                 <dd className='font-medium'>
-                  {backupsByType[BackupType.FULL] || 0}
+                  {backupsByType[BackupType.FULL] ?? 0}
                 </dd>
               </div>
               <div className='flex justify-between'>
                 <dt>Differential Backups:</dt>
                 <dd className='font-medium'>
-                  {backupsByType[BackupType.DIFFERENTIAL] || 0}
+                  {backupsByType[BackupType.DIFFERENTIAL] ?? 0}
                 </dd>
               </div>
               <div className='flex justify-between'>
                 <dt>Transaction Backups:</dt>
                 <dd className='font-medium'>
-                  {backupsByType[BackupType.TRANSACTION] || 0}
+                  {backupsByType[BackupType.TRANSACTION] ?? 0}
                 </dd>
               </div>
             </dl>

@@ -174,7 +174,7 @@ export async function getTherapistSessionData(
     }
 
     const data = await response.json()
-    return data.sessions || []
+    return data.sessions ?? []
   } catch (error: unknown) {
     console.error('Error fetching therapist session data:', error)
     return []
@@ -199,7 +199,7 @@ export async function getTherapistSkillProgress(
     }
 
     const data = await response.json()
-    return data.skills || []
+    return data.skills ?? []
   } catch (error: unknown) {
     console.error('Error fetching therapist skill data:', error)
     return []

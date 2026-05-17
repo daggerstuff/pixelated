@@ -80,7 +80,7 @@ function toStoredBreach(
       ? breach.affectedUsers
       : [],
     data_types: Array.isArray(breach.dataTypes) ? breach.dataTypes : [],
-    attack_vector: breach.attackVector || null,
+    attack_vector: breach.attackVector ?? null,
     detection_time: detectionTime.toISOString(),
     response_time: responseTime.toISOString(),
     remediation_status: remediationStatus,
@@ -103,7 +103,7 @@ function fromStoredBreach(stored: StoredBreach): SecurityBreach {
     dataTypes: stored.data_types || [],
     type: 'unknown',
     description: stored.description,
-    attackVector: stored.attack_vector || undefined,
+    attackVector: stored.attack_vector ?? undefined,
     detectionTime: detected,
     responseTime: responded,
     remediationStatus: stored.remediation_status ?? 'pending',

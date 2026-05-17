@@ -18,19 +18,19 @@ export function createInflate() {
   throw new Error('zlib not supported in browser')
 }
 
-export function gzip() {
+export async function gzip() {
   return Promise.resolve(new Uint8Array())
 }
 
-export function gunzip() {
+export async function gunzip() {
   return Promise.resolve(new Uint8Array())
 }
 
-export function deflate() {
+export async function deflate() {
   return Promise.resolve(new Uint8Array())
 }
 
-export function inflate() {
+export async function inflate() {
   return Promise.resolve(new Uint8Array())
 }
 

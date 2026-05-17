@@ -51,7 +51,7 @@ type SentryShim = {
 function getSentry(): SentryShim | null {
   try {
     // Prefer global Sentry if present (initialized via public scripts)
-    if (typeof window !== 'undefined' && (window as any).Sentry) {
+    if ((window as any)?.Sentry) {
       return (window as any).Sentry as SentryShim
     }
   } catch (error: unknown) {

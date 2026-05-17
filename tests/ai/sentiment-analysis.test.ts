@@ -278,7 +278,7 @@ describe('sentimentAnalysisService', () => {
             // Ensure all messages have the required name property
             const messagesWithName = messages.map((msg) => ({
               ...msg,
-              name: msg.name || '', // Add default empty name if missing
+              name: msg.name ?? '', // Add default empty name if missing
             }))
             return {
               ...(await mockAIService.createChatCompletion(
@@ -305,7 +305,7 @@ describe('sentimentAnalysisService', () => {
           createChatCompletion: async (messages, options) => {
             const messagesWithName = messages.map((msg) => ({
               ...msg,
-              name: msg.name || '',
+              name: msg.name ?? '',
             }))
             return {
               ...(await mockAIService.createChatCompletion(

@@ -130,7 +130,7 @@ export class FHEParameterOptimizer {
   private static instance: FHEParameterOptimizer | null = null
 
   // Performance history for auto-adaptation
-  private performanceHistory: FHEPerformanceMetrics[] = []
+  private readonly performanceHistory: FHEPerformanceMetrics[] = []
 
   // Maximum entries to keep in performance history
   private readonly MAX_HISTORY_ENTRIES = 100

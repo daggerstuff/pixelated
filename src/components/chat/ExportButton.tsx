@@ -73,7 +73,7 @@ export default function ExportButton({
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Export failed')
+        throw new Error(errorData.error ?? 'Export failed')
       }
 
       const result = await response.json()
@@ -116,7 +116,7 @@ export default function ExportButton({
     <div className='relative'>
       <div className='flex'>
         <button
-          onClick={() => handleExport(exportFormat)}
+          onClick={ async () => handleExport(exportFormat)}
           disabled={disabled || isExporting}
           className={`inline-flex items-center rounded-l-md px-3 py-2 text-sm font-medium ${
             disabled || isExporting
@@ -149,7 +149,7 @@ export default function ExportButton({
           <div className='py-1' role='menu' aria-orientation='vertical'>
             <button
               className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
-              onClick={() => handleExport('json')}
+              onClick={ async () => handleExport('json')}
               role='menuitem'
             >
               {renderFormatIcon('json')}
@@ -162,7 +162,7 @@ export default function ExportButton({
 
             <button
               className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
-              onClick={() => handleExport('pdf')}
+              onClick={ async () => handleExport('pdf')}
               role='menuitem'
             >
               {renderFormatIcon('pdf')}
@@ -175,7 +175,7 @@ export default function ExportButton({
 
             <button
               className='text-white hover:bg-gray-700 flex w-full items-center px-4 py-2 text-left text-sm'
-              onClick={() => handleExport('encrypted_archive')}
+              onClick={ async () => handleExport('encrypted_archive')}
               role='menuitem'
             >
               {renderFormatIcon('encrypted_archive')}

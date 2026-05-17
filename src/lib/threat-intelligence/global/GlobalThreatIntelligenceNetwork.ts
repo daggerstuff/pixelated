@@ -99,17 +99,17 @@ export class GlobalThreatIntelligenceNetworkCore
   private feedIntegration!: ExternalThreatFeedIntegration
   private validationSystem!: ThreatValidationSystem
 
-  private existingResponseOrchestrator?: AdvancedResponseOrchestrator
-  private existingIntelligenceService?: ExternalThreatIntelligenceService
-  private existingPredictiveService?: AdvancedPredictiveThreatIntelligence
+  private readonly existingResponseOrchestrator?: AdvancedResponseOrchestrator
+  private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
+  private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
 
   private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
-  private threatProcessingQueue: string[] = []
-  private regionStatus: Map<string, RegionStatus> = new Map()
+  private readonly threatProcessingQueue: string[] = []
+  private readonly regionStatus: Map<string, RegionStatus> = new Map()
 
   constructor(
-    private config: GlobalThreatIntelligenceNetworkConfig,
+    private readonly config: GlobalThreatIntelligenceNetworkConfig,
     existingServices?: {
       responseOrchestrator: AdvancedResponseOrchestrator
       intelligenceService: ExternalThreatIntelligenceService
@@ -429,7 +429,7 @@ export class GlobalThreatIntelligenceNetworkCore
             sourceRegion: newThreatData.region,
             firstSeen: indicator.firstSeen,
             lastSeen: indicator.lastSeen,
-            metadata: indicator.metadata || {},
+            metadata: indicator.metadata ?? {},
           })
         } else {
           // Update existing indicator
@@ -478,7 +478,7 @@ export class GlobalThreatIntelligenceNetworkCore
         sourceRegion: threatData.region,
         firstSeen: indicator.firstSeen,
         lastSeen: indicator.lastSeen,
-        metadata: indicator.metadata || {},
+        metadata: indicator.metadata ?? {},
       })),
       attribution: await this.generateAttribution(threatData),
       impactAssessment: await this.assessGlobalImpact(
@@ -728,7 +728,7 @@ export class GlobalThreatIntelligenceNetworkCore
       })
 
       const threats = await Promise.all(
-        threatIds.map((id) => this.intelligenceDatabase.getThreatById(id)),
+        threatIds.map( async (id) => this.intelligenceDatabase.getThreatById(id)),
       )
 
       const validThreats = threats.filter((t) => t !== null)

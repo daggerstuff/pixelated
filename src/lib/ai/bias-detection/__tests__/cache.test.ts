@@ -817,14 +817,14 @@ describe('CacheManager', () => {
       const manager = getCacheManager()
 
       // This should not throw
-      expect(() => manager.clearAll()).not.toThrow()
+      expect( async () => manager.clearAll()).not.toThrow()
     })
 
     it('should destroy cache manager', () => {
       const manager = getCacheManager()
 
       // This should not throw
-      expect(() => manager.destroy()).not.toThrow()
+      expect( async () => manager.destroy()).not.toThrow()
     })
   })
 })

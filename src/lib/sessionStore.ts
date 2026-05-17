@@ -4,7 +4,7 @@ let sessionStore: Record<string, unknown> = {}
 
 export async function getSession(sessionId: string) {
   // Return stored session if exists
-  return sessionStore[sessionId] || null
+  return sessionStore[sessionId] ?? null
 }
 
 export async function saveSession(sessionData: Record<string, unknown>) {

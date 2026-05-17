@@ -3,7 +3,7 @@ import { createClient } from 'redis'
 import type { StorageAPI } from '../types'
 
 export class RedisStorageAPI implements StorageAPI {
-  private client: ReturnType<typeof createClient>
+  private readonly client: ReturnType<typeof createClient>
   private connected = false
 
   constructor(redisUrl: string) {
@@ -41,7 +41,7 @@ export class RedisStorageAPI implements StorageAPI {
     if (value === null) {
       throw new Error(`Key not found: ${key}`)
     }
-    const stringValue = String(value)
+    const stringValue = value
     return JSON.parse(stringValue) as T
   }
 

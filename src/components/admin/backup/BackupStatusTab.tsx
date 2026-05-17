@@ -89,6 +89,7 @@ const renderStatusBadge = (status: BackupStatus) => {
         </Badge>
       )
 
+    case BackupStatus.DELETED: { throw new Error('Not implemented yet: BackupStatus.DELETED case') }
     default:
       return null
   }
@@ -127,6 +128,7 @@ const renderTypeBadge = (type: BackupType) => {
         </Badge>
       )
 
+    case BackupType.INCREMENTAL: { throw new Error('Not implemented yet: BackupType.INCREMENTAL case') }
     default:
       return null
   }

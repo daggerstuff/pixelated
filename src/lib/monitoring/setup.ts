@@ -24,11 +24,11 @@ interface Metric {
 }
 
 export class MonitoringService extends EventEmitter {
-  private redis: RedisService
-  private analytics: AnalyticsService
-  private config: MonitoringConfig
+  private readonly redis: RedisService
+  private readonly analytics: AnalyticsService
+  private readonly config: MonitoringConfig
   private initialized: boolean = false
-  private metrics: Metric[] = []
+  private readonly metrics: Metric[] = []
 
   constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}) {
     super()

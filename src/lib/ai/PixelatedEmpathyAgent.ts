@@ -146,14 +146,14 @@ export class PixelatedEmpathyAgent {
         const data = await response.json()
         const result = {
           success: true,
-          response: data.response || data.message,
-          metadata: data.metadata || {},
+          response: data.response ?? data.message,
+          metadata: data.metadata ?? {},
           conversation_id: data.conversation_id,
         }
 
         span.setAttributes({
-          'agent.response': result.response || '',
-          'agent.conversation_id': result.conversation_id || '',
+          'agent.response': result.response ?? '',
+          'agent.conversation_id': result.conversation_id ?? '',
         })
 
         return result
@@ -284,9 +284,9 @@ export class PixelatedEmpathyAgent {
 // Environment configuration
 export const createPixelatedEmpathyAgent = () => {
   const config = {
-    agentEndpoint: process.env['AZURE_AI_AGENT_ENDPOINT'] || '',
-    apiKey: process.env['AZURE_AI_AGENT_KEY'] || '',
-    agentId: process.env['AZURE_AI_AGENT_ID'] || '',
+    agentEndpoint: process.env['AZURE_AI_AGENT_ENDPOINT'] ?? '',
+    apiKey: process.env['AZURE_AI_AGENT_KEY'] ?? '',
+    agentId: process.env['AZURE_AI_AGENT_ID'] ?? '',
   }
 
   if (!config.agentEndpoint || !config.apiKey || !config.agentId) {

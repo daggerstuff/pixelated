@@ -4,7 +4,7 @@ function getGlobalThisRef(): typeof globalThis {
   if (typeof globalThis !== 'undefined') return globalThis
   if (typeof self !== 'undefined') return self as typeof globalThis
   if (typeof window !== 'undefined') return window as typeof globalThis
-  if (typeof global !== 'undefined') return global as typeof globalThis
+  if (typeof global !== 'undefined') return global
   throw new Error('unable to locate global object')
 }
 
@@ -21,7 +21,7 @@ function withGlobalActEnvironment(
     callback: () => void | Promise<void>,
   ) => Promise<void> | void,
 ) {
-  return (callback: () => void | Promise<void>) => {
+  return  async (callback: () => void | Promise<void>) => {
     const previousActEnvironment = getIsReactActEnvironment()
     setReactActEnvironment(true)
     try {

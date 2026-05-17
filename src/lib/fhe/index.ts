@@ -38,9 +38,9 @@ interface FHEOptions {
 }
 
 export function createFHESystem(options: FHEOptions = {}): FHESystem {
-  const keyId = options.keyId || 'default'
-  const version = options.version || '1.0'
-  const namespace = options.namespace || 'default'
+  const keyId = options.keyId ?? 'default'
+  const version = options.version ?? '1.0'
+  const namespace = options.namespace ?? 'default'
 
   logger.info(`Creating FHE system with namespace: ${namespace}`)
 

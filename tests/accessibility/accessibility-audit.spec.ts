@@ -220,9 +220,9 @@ test.describe('Accessibility Audit and Compliance', () => {
 
             // Element should have some form of accessible name
             const hasAccessibleName =
-              ariaLabel ||
-              ariaLabelledby ||
-              title ||
+              (ariaLabel ??
+              ariaLabelledby) ||
+              title ??
               (textContent && textContent.trim().length > 0)
 
             if (!hasAccessibleName) {
@@ -426,10 +426,10 @@ test.describe('Accessibility Audit and Compliance', () => {
           // Content images should have descriptive alt text
           const isDecorative = alt === '' || role === 'presentation'
           const hasDescription = alt && alt.length > 0
-          const hasAriaLabel = ariaLabel || ariaLabelledby
+          const hasAriaLabel = ariaLabel ?? ariaLabelledby
 
           // Image should either be marked as decorative or have description
-          expect(isDecorative || hasDescription || hasAriaLabel).toBe(true)
+          expect(isDecorative || hasDescription ?? hasAriaLabel).toBe(true)
         }
       }
     })
@@ -507,7 +507,7 @@ test.describe('Accessibility Audit and Compliance', () => {
           const title = await element.getAttribute('title')
 
           // Should provide keyboard instructions
-          const hasKeyboardInstructions = ariaDescribedby || ariaLabel || title
+          const hasKeyboardInstructions = (ariaDescribedby ?? ariaLabel) ?? title
           expect(hasKeyboardInstructions).toBe(true)
         }
       }
@@ -582,7 +582,7 @@ test.describe('Accessibility Audit and Compliance', () => {
       const ariaValueNow = await progressBar.getAttribute('aria-valuenow')
       const ariaValueMax = await progressBar.getAttribute('aria-valuemax')
 
-      expect(ariaLabel || ariaValueNow).toBeTruthy()
+      expect(ariaLabel ?? ariaValueNow).toBeTruthy()
       expect(ariaValueMax).toBeTruthy()
     })
   })

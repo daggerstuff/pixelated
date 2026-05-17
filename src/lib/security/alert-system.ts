@@ -93,8 +93,8 @@ const DEFAULT_CONFIG: AlertConfig = {
 export class RiskAlertSystem {
   private static instance: RiskAlertSystem
   private config: AlertConfig
-  private lastAlerts: Map<string, number> = new Map()
-  private repository: AIRepository
+  private readonly lastAlerts: Map<string, number> = new Map()
+  private readonly repository: AIRepository
 
   /**
    * Private constructor to enforce singleton pattern
@@ -150,10 +150,10 @@ export class RiskAlertSystem {
 
     // Check cooldown period
     const userKey = `${userId}:${level}`
-    const lastAlertTime = this.lastAlerts.get(userKey) || 0
+    const lastAlertTime = this.lastAlerts.get(userKey) ?? 0
     const now = Date.now()
 
-    if (now - lastAlertTime < (this.config.cooldownPeriod || 0)) {
+    if (now - lastAlertTime < (this.config.cooldownPeriod ?? 0)) {
       logger.info('Alert suppressed due to cooldown period', {
         userId,
         level,
@@ -305,7 +305,7 @@ export class RiskAlertSystem {
    * Send email alert
    */
   private async sendEmailAlert(alert: AlertDetails) {
-    const recipients = this.config.recipients?.email || []
+    const recipients = this.config.recipients?.email ?? []
     if (recipients.length === 0) {
       logger.warn('No email recipients configured for alerts')
       return
@@ -325,7 +325,7 @@ export class RiskAlertSystem {
    * Send SMS alert
    */
   private async sendSmsAlert(alert: AlertDetails) {
-    const recipients = this.config.recipients?.sms || []
+    const recipients = this.config.recipients?.sms ?? []
     if (recipients.length === 0) {
       logger.warn('No SMS recipients configured for alerts')
       return
@@ -345,7 +345,7 @@ export class RiskAlertSystem {
    * Send webhook alert
    */
   private async sendWebhookAlert(alert: AlertDetails) {
-    const endpoints = this.config.recipients?.webhook || []
+    const endpoints = this.config.recipients?.webhook ?? []
     if (endpoints.length === 0) {
       logger.warn('No webhook endpoints configured for alerts')
       return

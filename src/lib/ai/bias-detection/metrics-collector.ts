@@ -25,8 +25,8 @@ const logger = getBiasDetectionLogger('metrics-collector')
  * Handles real-time metrics aggregation and storage
  */
 export class BiasMetricsCollector {
-  private pythonBridge: PythonBiasDetectionBridge
-  private localCache: Map<string, MetricData> = new Map()
+  private readonly pythonBridge: PythonBiasDetectionBridge
+  private readonly localCache: Map<string, MetricData> = new Map()
   private aggregationInterval?: NodeJS.Timeout
 
   constructor(
@@ -34,10 +34,10 @@ export class BiasMetricsCollector {
     pythonBridge?: PythonBiasDetectionBridge,
   ) {
     this.pythonBridge =
-      pythonBridge ||
+      pythonBridge ??
       new PythonBiasDetectionBridge(
-        config.pythonServiceUrl || 'http://localhost:5000',
-        config.pythonServiceTimeout || 30000,
+        config.pythonServiceUrl ?? 'http://localhost:5000',
+        config.pythonServiceTimeout ?? 30000,
       )
 
     // Initialize local cache with size limit
@@ -110,7 +110,7 @@ export class BiasMetricsCollector {
       confidence: result.confidence,
       layer_scores: result.layerResults,
       demographic_groups: demographicGroups,
-      processing_time_ms: processingTimeMs || 0,
+      processing_time_ms: processingTimeMs ?? 0,
     }
 
     // Store locally for immediate aggregation and batch sending
@@ -168,17 +168,17 @@ export class BiasMetricsCollector {
   async getMetrics(options?: DashboardOptions): Promise<DashboardMetrics> {
     try {
       const response = await this.pythonBridge.getDashboardMetrics({
-        time_range: options?.time_range || '24h',
-        include_details: options?.include_details || false,
-        aggregation_type: options?.aggregation_type || 'hourly',
+        time_range: options?.time_range ?? '24h',
+        include_details: options?.include_details ?? false,
+        aggregation_type: options?.aggregation_type ?? 'hourly',
       })
 
       // Map Python service response to expected TypeScript structure
       return {
         overall_stats: {
-          total_sessions: response.summary?.total_sessions_analyzed || 0,
-          average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || {
+          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
+          average_bias_score: response.summary?.average_bias_score ?? 0,
+          alert_distribution: response.summary?.alert_distribution ?? {
             low: 0,
             medium: 0,
             high: 0,
@@ -188,26 +188,26 @@ export class BiasMetricsCollector {
         trend_data: [],
         recent_alerts: [],
         summary: {
-          total_sessions: response.summary?.total_sessions_analyzed || 0,
-          average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || {
+          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
+          average_bias_score: response.summary?.average_bias_score ?? 0,
+          alert_distribution: response.summary?.alert_distribution ?? {
             low: 0,
             medium: 0,
             high: 0,
             critical: 0,
           },
           total_sessions_analyzed:
-            response.summary?.total_sessions_analyzed || 0,
-          high_risk_sessions: response.summary?.high_risk_sessions || 0,
-          critical_alerts: response.summary?.critical_alerts || 0,
+            response.summary?.total_sessions_analyzed ?? 0,
+          high_risk_sessions: response.summary?.high_risk_sessions ?? 0,
+          critical_alerts: response.summary?.critical_alerts ?? 0,
         },
         trends: {
-          daily_bias_scores: response.trends?.daily_bias_scores || [],
-          alert_counts: response.trends?.alert_counts || [],
+          daily_bias_scores: response.trends?.daily_bias_scores ?? [],
+          alert_counts: response.trends?.alert_counts ?? [],
         },
         demographics: {
-          bias_by_age_group: response.demographics?.bias_by_age_group || {},
-          bias_by_gender: response.demographics?.bias_by_gender || {},
+          bias_by_age_group: response.demographics?.bias_by_age_group ?? {},
+          bias_by_gender: response.demographics?.bias_by_gender ?? {},
         },
         system_metrics: {
           cpu_usage: 0,
@@ -295,7 +295,7 @@ export class BiasMetricsCollector {
         confidence: 1,
         layer_scores: {},
         demographic_groups: [],
-        processing_time_ms: report.metadata?.executionTimeMs || 0,
+        processing_time_ms: report.metadata?.executionTimeMs ?? 0,
       })
     } catch (error: unknown) {
       logger.warn('Failed to record report generation metric', { error })
@@ -312,9 +312,9 @@ export class BiasMetricsCollector {
       // Map Python service response to expected TypeScript structure
       return {
         overall_stats: {
-          total_sessions: response.summary?.total_sessions_analyzed || 0,
-          average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || {
+          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
+          average_bias_score: response.summary?.average_bias_score ?? 0,
+          alert_distribution: response.summary?.alert_distribution ?? {
             low: 0,
             medium: 0,
             high: 0,
@@ -327,26 +327,26 @@ export class BiasMetricsCollector {
         alerts: [],
         recommendations: [],
         summary: {
-          total_sessions: response.summary?.total_sessions_analyzed || 0,
-          average_bias_score: response.summary?.average_bias_score || 0,
-          alert_distribution: response.summary?.alert_distribution || {
+          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
+          average_bias_score: response.summary?.average_bias_score ?? 0,
+          alert_distribution: response.summary?.alert_distribution ?? {
             low: 0,
             medium: 0,
             high: 0,
             critical: 0,
           },
           total_sessions_analyzed:
-            response.summary?.total_sessions_analyzed || 0,
-          high_risk_sessions: response.summary?.high_risk_sessions || 0,
-          critical_alerts: response.summary?.critical_alerts || 0,
+            response.summary?.total_sessions_analyzed ?? 0,
+          high_risk_sessions: response.summary?.high_risk_sessions ?? 0,
+          critical_alerts: response.summary?.critical_alerts ?? 0,
         },
         trends: {
-          daily_bias_scores: response.trends?.daily_bias_scores || [],
-          alert_counts: response.trends?.alert_counts || [],
+          daily_bias_scores: response.trends?.daily_bias_scores ?? [],
+          alert_counts: response.trends?.alert_counts ?? [],
         },
         demographics: {
-          bias_by_age_group: response.demographics?.bias_by_age_group || {},
-          bias_by_gender: response.demographics?.bias_by_gender || {},
+          bias_by_age_group: response.demographics?.bias_by_age_group ?? {},
+          bias_by_gender: response.demographics?.bias_by_gender ?? {},
         },
         system_metrics: {
           cpu_usage: 0,
@@ -446,11 +446,11 @@ export class BiasMetricsCollector {
     try {
       const response = await this.pythonBridge.getPerformanceMetrics()
       return {
-        responseTime: response.average_response_time || 0,
-        throughput: response.requests_per_second || 0,
-        errorRate: response.error_rate || 0,
-        uptime: response.uptime_seconds || 0,
-        systemHealth: response.health_status || 'unknown',
+        responseTime: response.average_response_time ?? 0,
+        throughput: response.requests_per_second ?? 0,
+        errorRate: response.error_rate ?? 0,
+        uptime: response.uptime_seconds ?? 0,
+        systemHealth: response.health_status ?? 'unknown',
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch performance metrics', { error })
@@ -513,7 +513,7 @@ export class BiasMetricsCollector {
         demographic_groups: result.demographics
           ? this.extractDemographicGroups(result.demographics)
           : [],
-        processing_time_ms: processingTimeMs || 0,
+        processing_time_ms: processingTimeMs ?? 0,
       })
 
       // Record metrics including processing time
@@ -534,7 +534,7 @@ export class BiasMetricsCollector {
             demographic_groups: result.demographics
               ? this.extractDemographicGroups(result.demographics)
               : [],
-            processing_time_ms: processingTimeMs || 0,
+            processing_time_ms: processingTimeMs ?? 0,
           },
         ])
       } catch (error: unknown) {
@@ -549,7 +549,7 @@ export class BiasMetricsCollector {
 
       logger.debug('Analysis result stored', {
         sessionId: result.sessionId,
-        processingTimeMs: processingTimeMs || 0,
+        processingTimeMs: processingTimeMs ?? 0,
       })
     } catch (error: unknown) {
       logger.error('Failed to store analysis result', {

@@ -1,4 +1,4 @@
-import type { NextFunction } from 'express'
+import type { Request, Response, NextFunction } from 'express'
 
 import { authenticateRequest } from '../../lib/auth/auth0-middleware'
 
@@ -20,27 +20,14 @@ export type AuthenticatedUser = {
   [key: string]: unknown
 }
 
-export type AuthRequest = {
-  protocol: string
-  originalUrl?: string
-  url?: string
-  method: string
-  headers: Record<string, string | undefined>
-  get: (name: string) => string | undefined
-  user?: AuthenticatedUser
-}
 
-export type AuthResponse = {
-  status: (statusCode: number) => AuthResponse
-  json: (body: unknown) => AuthResponse
-}
-
-export async function authMiddleware(
-  req: AuthRequest,
-  res: AuthResponse,
+export function authMiddleware(
+  req: Request,
+  res: Response,
   next: NextFunction,
-): Promise<void> {
-  try {
+): void {
+  // Run the async authentication flow and forward any errors to Express error handling
+  (async () => {
     // Adapt the Express Request into a standard Web API Request object to support
     // the shared `authenticateRequest` function used by both Express and Astro middleware.
     const headers = Object.entries(req.headers).reduce<Record<string, string>>(
@@ -48,7 +35,6 @@ export async function authMiddleware(
         if (value !== undefined) {
           acc[key] = value
         }
-
         return acc
       },
       {},
@@ -61,7 +47,6 @@ export async function authMiddleware(
       },
     )
 
-    // Use the existing Auth0 authentication logic
     const authResult = await authenticateRequest(webApiRequest)
 
     if (!authResult.success) {
@@ -72,7 +57,6 @@ export async function authMiddleware(
       return
     }
 
-    // Attach user to request object for downstream middleware
     if (authResult.request?.user) {
       req.user = {
         ...authResult.request.user,
@@ -81,14 +65,13 @@ export async function authMiddleware(
     }
 
     next()
-  } catch (error: unknown) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Authentication failed'
+  })().catch((error: unknown) => {
+    const errorMessage = error instanceof Error ? error.message : 'Authentication failed'
     res.status(401).json({
       error: errorMessage,
       code: 'AUTH_ERROR',
     })
-  }
+  })
 }
 
 /**
@@ -96,7 +79,7 @@ export async function authMiddleware(
  * @param allowedRoles - Array of role names that are allowed to access the route
  */
 export function requireRoles(allowedRoles: string[]) {
-  return (req: AuthRequest, res: AuthResponse, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const user = req.user
 
     if (!user) {
@@ -130,7 +113,7 @@ export function requireRoles(allowedRoles: string[]) {
  * @param requiredPermissions - Array of permission strings required
  */
 export function requirePermissions(requiredPermissions: string[]) {
-  return (req: AuthRequest, res: AuthResponse, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const user = req.user
 
     if (!user) {

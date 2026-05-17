@@ -123,7 +123,7 @@ export const POST: APIRoute = async ({ request }) => {
     text = validatedBody.text.trim().substring(0, 2000) // Limit to 2000 chars
     const useExpertGuidance = validatedBody.useExpertGuidance !== false // Default to true
     // Sanitize routingContext to ensure it matches the expected RoutingContext interface
-    const rawRoutingContext = validatedBody.routingContext || {}
+    const rawRoutingContext = validatedBody.routingContext ?? {}
     const routingContext: RoutingContext = {}
 
     // Only include properties that have actual string values

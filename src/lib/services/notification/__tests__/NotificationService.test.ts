@@ -38,7 +38,7 @@ interface NotificationServiceTestInterface {
 // Mock dependencies
 vi.mock('@/lib/redis', () => ({
   redis: {
-    lpush: vi.fn((key, _value) => {
+    lpush: vi.fn( async (key, _value) => {
       if (key === 'notification_queue') {
         return Promise.resolve(1)
       }
@@ -166,7 +166,7 @@ describe('notificationService', () => {
         alias: mockTemplate.id,
         subject: mockTemplate.title,
         htmlBody: mockTemplate.body,
-        from: config.email?.from?.() || 'noreply@example.com',
+        from: config.email?.from?.() ?? 'noreply@example.com',
       })
     })
 

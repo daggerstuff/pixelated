@@ -114,8 +114,8 @@ export function requireSecretKey(): string {
 
   // Fall back to environment variable if in Node environment
   const key =
-    typeof process !== 'undefined' && process.env
-      ? process.env['SECRET_KEY'] || process.env['JWT_SECRET']
+    process?.env
+      ? process.env['SECRET_KEY'] ?? process.env['JWT_SECRET']
       : undefined
 
   if (!key) {
@@ -206,7 +206,7 @@ export function createSecureToken(
 /**
  * Verify and decode a secure token.
  */
-export function verifySecureToken<T = any>(token: string): T | null {
+export function verifySecureToken(token: string): unknown | null {
   try {
     const parts = token.split('.')
     if (parts.length !== 2) return null
@@ -231,7 +231,7 @@ export function verifySecureToken<T = any>(token: string): T | null {
       return null
     }
 
-    return payload as T
+    return payload as unknown
   } catch {
     return null
   }

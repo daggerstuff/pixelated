@@ -93,18 +93,18 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 
     // Parse query parameters
     const url = new URL(request.url)
-    const emotion = url.searchParams.get('emotion') || 'neutral'
+    const emotion = url.searchParams.get('emotion') ?? 'neutral'
     const particleCount = Math.min(
-      parseInt(url.searchParams.get('particleCount') || '50', 10),
+      parseInt(url.searchParams.get('particleCount') ?? '50', 10),
       200,
     )
     const intensity = Math.max(
       0,
-      Math.min(1, parseFloat(url.searchParams.get('intensity') || '0.5')),
+      Math.min(1, parseFloat(url.searchParams.get('intensity') ?? '0.5')),
     )
     const sessionId = url.searchParams.get('sessionId')
     const useSessionData = url.searchParams.get('useSessionData') === 'true'
-    const complexity = url.searchParams.get('complexity') || 'medium'
+    const complexity = url.searchParams.get('complexity') ?? 'medium'
 
     let emotionProfile = {
       dominantEmotion: emotion,
@@ -242,7 +242,7 @@ export const POST: APIRoute = protectRoute()(async (
         emotion,
         intensity: Math.max(0, Math.min(1, intensity)),
         sessionId,
-        particleCount: particleUpdates?.length || 0,
+        particleCount: particleUpdates?.length ?? 0,
       },
       recommendations: generateEmotionRecommendations(emotion, intensity),
     }
@@ -293,10 +293,10 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
   let intensityValues: number[] = []
 
   sessionEmotions.forEach((emotion) => {
-    const emotionName = emotion.primaryEmotion || emotion.emotion || 'neutral'
-    const intensity = emotion.confidence || emotion.intensity || 0.5
+    const emotionName = (emotion.primaryEmotion ?? emotion.emotion) ?? 'neutral'
+    const intensity = (emotion.confidence ?? emotion.intensity) ?? 0.5
 
-    const current = emotionCounts.get(emotionName) || {
+    const current = emotionCounts.get(emotionName) ?? {
       count: 0,
       totalIntensity: 0,
     }
@@ -315,7 +315,7 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
 
   const emotionMix: Record<string, number> = {}
   emotionCounts.forEach((stats, emotion) => {
-    const percentage = (stats.count as number) / sessionEmotions.length
+    const percentage = (stats.count) / sessionEmotions.length
     emotionMix[emotion] = percentage
 
     if (stats.count > maxCount) {

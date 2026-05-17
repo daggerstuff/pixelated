@@ -439,7 +439,7 @@ export function MemoryDashboard({
                           </TableCell>
                           <TableCell>
                             <Badge variant='secondary'>
-                              {mem.metadata?.category || 'general'}
+                              {mem.metadata?.category ?? 'general'}
                             </Badge>
                           </TableCell>
                           <TableCell className='text-muted-foreground whitespace-nowrap text-xs'>
@@ -537,7 +537,7 @@ export function MemoryDashboard({
                                       Cancel
                                     </AlertDialogCancel>
                                     <AlertDialogAction
-                                      onClick={() =>
+                                      onClick={ async () =>
                                         mem.id && handleDeleteMemory(mem.id)
                                       }
                                       className='bg-destructive hover:bg-destructive/90'
@@ -662,7 +662,7 @@ export function MemoryDashboard({
                             <div
                               className='bg-primary h-2 rounded-full'
                               style={{
-                                width: `${(count / (memory.stats?.totalMemories || 1)) * 100}%`,
+                                width: `${(count / (memory.stats?.totalMemories ?? 1)) * 100}%`,
                               }}
                             />
                           </div>
@@ -699,7 +699,7 @@ export function MemoryDashboard({
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={() =>
+                        onClick={ async () =>
                           pref.id && userPrefs.deleteMemory(pref.id)
                         }
                       >
