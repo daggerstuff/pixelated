@@ -339,8 +339,8 @@ export function createLLMService(config: LLMClientConfig): LLMService {
         (errorData.error?.message ??
         (errorData as { message?: unknown }).message?.toString()) ||
         errorData.error?.reason?.toString() ||
-        errorData.reason?.toString() ??
-        'Unknown error'
+        (errorData.reason?.toString() ??
+        'Unknown error')
       errorMessage = `LLM API error: ${fallbackMessage}`
       errorCode = (errorData.error?.code ?? errorData.code) ?? errorCode
       extractedMessage = fallbackMessage

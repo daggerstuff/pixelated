@@ -23,8 +23,8 @@ function resolveSafeLlmBaseUrl(): string | undefined {
   const baseUrl =
     (process.env['LLM_BASE_URL'] ??
     process.env['LLM_API_URL']) ||
-    process.env['OPENAI_BASE_URL'] ??
-    'https://api.openai.com/v1'
+    (process.env['OPENAI_BASE_URL'] ??
+    'https://api.openai.com/v1')
 
   if (isOpenRouterBaseUrl(baseUrl)) {
     console.warn(
