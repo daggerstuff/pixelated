@@ -28,3 +28,5 @@ Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for filter 
 
 - Learning: Inline arrow functions passed as props to child components cause unnecessary re-renders. When using useCallback to memoize state updater callbacks, use the functional update pattern to avoid adding state variables to the dependency array.
 - Action: Wrapped inline patient selection handler in useCallback using a functional state update.
+
+## 2024-05-18 - Avoid O(N) filtering on every render | Learning: Array methods like .filter() and .find() in component body without memoization lead to O(N) operations per render. | Action: Wrapped filteredGoals and activeGoal derivations in useMemo hooks.

@@ -78,16 +78,21 @@ export function TherapeuticGoalsTracker({
       .finally(() => setLoading(false))
   }, [patientModel, activeGoalId])
 
-  // Filter goals by category
-  const filteredGoals =
-    activeTab === 'all'
-      ? goals
-      : goals.filter((goal) => goal.category === activeTab)
+  // ⚡ Bolt: Memoize filtered goals to prevent unnecessary recalculations on re-renders
+  const filteredGoals = useMemo(
+    () =>
+      activeTab === 'all'
+        ? goals
+        : goals.filter((goal) => goal.category === activeTab),
+    [activeTab, goals],
+  )
 
-  // Get the active goal
-  const activeGoal = activeGoalId
-    ? goals.find((goal) => goal.id === activeGoalId)
-    : null
+  // ⚡ Bolt: Memoize active goal to prevent unnecessary recalculations on re-renders
+  const activeGoal = useMemo(
+    () =>
+      activeGoalId ? goals.find((goal) => goal.id === activeGoalId) : null,
+    [activeGoalId, goals],
+  )
 
   // Calculate overall progress
   const overallProgress =
