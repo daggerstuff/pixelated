@@ -39,3 +39,7 @@
 
 - Learning: Real-time search inputs need aria-live regions to announce result counts.
 - Action: Added an sr-only aria-live polite region to announce the number of search results found.
+## 2026-05-21 - Offline Indicator Accessibility
+
+- Learning: Floating connection indicators require `role="status"` and `aria-live="polite"` to be perceivable by screen readers.
+- Action: Added `role="status"`, `aria-live="polite"` to `OfflineIndicator`, and `aria-hidden="true"` to decorative icons.
