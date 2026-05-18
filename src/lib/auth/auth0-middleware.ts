@@ -76,21 +76,21 @@ export function getClientIp(req: Request): string {
   const xForwardedFor =
     (req.headers.get?.('x-forwarded-for') ??
     req.headers.get?.('X-Forwarded-For')) ||
-    (req.headers as any)['x-forwarded-for'] ??
-    (req.headers as any)['X-Forwarded-For']
+    ((req.headers as any)['x-forwarded-for'] ??
+    (req.headers as any)['X-Forwarded-For'])
 
   const xRealIp =
     (req.headers.get?.('x-real-ip') ??
     req.headers.get?.('X-Real-Ip')) ||
-    (req.headers as any)['x-real-ip'] ??
-    (req.headers as any)['X-Real-Ip']
+    ((req.headers as any)['x-real-ip'] ??
+    (req.headers as any)['X-Real-Ip'])
 
   return (
-    ((req as any).ip ??
+    (((req as any).ip ??
     (typeof xForwardedFor === 'string'
       ? xForwardedFor.split(',')[0].trim()
       : null)) ||
-    (typeof xRealIp === 'string' ? xRealIp : null) ??
+    (typeof xRealIp === 'string' ? xRealIp : null)) ??
     'unknown'
   )
 }
@@ -105,8 +105,8 @@ export function getClientInfo(req: Request): { ip: string; userAgent: string } {
     (req.headers.get?.('user-agent') ??
     req.headers.get?.('User-Agent')) ||
     (req.headers as any)['user-agent'] ||
-    (req.headers as any)['User-Agent'] ??
-    'unknown'
+    ((req.headers as any)['User-Agent'] ??
+    'unknown')
 
   return { ip, userAgent }
 }
@@ -280,8 +280,8 @@ export async function csrfProtection(request: Request): Promise<{
   const csrfToken =
     (request.headers?.get?.('X-CSRF-Token') ??
     request.headers?.get?.('x-csrf-token')) ||
-    (request.headers as any)['X-CSRF-Token'] ??
-    (request.headers as any)['x-csrf-token']
+    ((request.headers as any)['X-CSRF-Token'] ??
+    (request.headers as any)['x-csrf-token'])
 
   if (!csrfToken) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
@@ -442,8 +442,8 @@ export async function securityHeaders(
   const origin =
     (request.headers?.get?.('Origin') ??
     request.headers?.get?.('origin')) ||
-    (request.headers as any).Origin ??
-    (request.headers as any).origin
+    ((request.headers as any).Origin ??
+    (request.headers as any).origin)
 
   // Allow CORS if origin is explicitly allowed OR if API key is valid
   let corsAllowed = false
@@ -614,8 +614,8 @@ export async function authenticateRequest(
       (request.headers?.get?.('Authorization') ??
       request.headers?.get?.('authorization')) ||
       (request.headers as any)?.Authorization ||
-      (request.headers as any)?.authorization ??
-      (request.headers as any)?.get?.('Authorization')
+      ((request.headers as any)?.authorization ??
+      (request.headers as any)?.get?.('Authorization'))
 
     if (!authHeader) {
       const { logSecurityEvent, SecurityEventType } =

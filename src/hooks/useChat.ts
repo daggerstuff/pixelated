@@ -115,8 +115,8 @@ export function useChat(options: ChatOptions): UseChatReturn {
         responseContent =
           (responseData.text ??
           responseData.content) ||
-          responseData.message ??
-          'No response content'
+          (responseData.message ??
+          'No response content')
       }
 
       // Add assistant message from response
