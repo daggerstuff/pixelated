@@ -196,7 +196,7 @@ describe('WebSocketServer', () => {
       const connectionHandler = wsInstance.on.mock.calls.find(
         (call: unknown): call is [string, WSEventHandler] =>
           Array.isArray(call) && call.length === 2 && call[0] === 'connection',
-      )?.[1]!
+      )?.[1]
 
       if (!connectionHandler) {
         throw new Error('Connection handler not found')

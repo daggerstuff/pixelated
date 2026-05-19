@@ -1888,7 +1888,7 @@ class GenericFeedProcessor implements FeedProcessor {
         for (const item of data) {
           if (item.indicator || item.value || item.ioc) {
             items.push({
-              itemId: (item.id ?? item.indicator) || item.value ?? item.ioc,
+              itemId: ((item.id ?? item.indicator) ?? item.value) ?? item.ioc,
               indicator: (item.indicator ?? item.value) ?? item.ioc,
               indicatorType: (item.type ?? item.indicator_type) ?? 'unknown',
               severity: (item.severity ?? item.threat_level) ?? 'medium',

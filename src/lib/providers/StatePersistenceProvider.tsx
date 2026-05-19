@@ -422,7 +422,7 @@ export function StatePersistenceDebugger() {
         />
         <button
           onClick={() =>
-            (document.getElementById('import-input')!)?.click()
+            (document.getElementById('import-input'))?.click()
           }
         >
           Import
