@@ -2,6 +2,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { streamText } from 'ai'
 import type { ModelMessage } from 'ai'
 import { NextRequest } from 'next/server'
+import { verifyAuthToken } from '../../utils/auth'
 
 type MessageRequestBody = {
   userId: string
@@ -22,8 +23,6 @@ const toMessageRequestBody = (value: unknown): MessageRequestBody | null => {
   return { userId, message }
 }
 
-import { verifyAuthToken } from '../../utils/auth'
-
 export async function POST(request: NextRequest) {
   const authHeader = request.headers.get('Authorization')
   if (!authHeader) {
@@ -36,8 +35,13 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Extract Bearer token from Authorization header
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : authHeader
+
   try {
-    await verifyAuthToken(authHeader)
+    await verifyAuthToken(token)
   } catch (error) {
     return new Response(
       JSON.stringify({ error: 'Invalid or expired token' }),
