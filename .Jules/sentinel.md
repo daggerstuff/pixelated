@@ -35,3 +35,9 @@
 - Vulnerability: Unsanitized `set:html` for GitHub release/PR descriptions.
 - Learning: External data sources like the GitHub API can contain malicious payloads and must be sanitized before rendering.
 - Prevention: Always use DOMPurify when setting HTML from external sources.
+
+## 2024-05-17 - Missing Auth on Chat API Endpoint
+
+- Vulnerability: Unauthenticated POST requests were accepted at `/api/chat`, allowing anyone to submit messages by supplying an arbitrary `userId` in the payload without a valid session or token.
+- Learning: Global middleware (e.g. `src/middleware.ts`) may have explicit route patterns that do not cover all API endpoints. When an endpoint is intentionally left out of standard JWT patterns or the middleware configuration misses it, we must fall back to explicit checks in the endpoint handler.
+- Prevention: Always verify authentication either through the central middleware or explicitly within the route handler (e.g., using `verifyAuthToken(authHeader)`), and enforce proper error handling for missing/invalid tokens.

@@ -8,7 +8,7 @@ import csv
 import json
 from pathlib import Path
 
-DEFAULT_SRC_JSON = Path("exports/gusher-pix-issues-20260517.json")
+DEFAULT_SRC_JSON = Path("gusher-pix.json")
 DEFAULT_SRC_CSV = Path("exports/gusher-pix-issues-20260517.csv")
 DEFAULT_OUT = Path("exports/gusher-pix-to-adhd-bulk.json")
 

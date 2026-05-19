@@ -9,24 +9,13 @@ import { createLLMService } from '../../../lib/ai/services/llm-provider'
 import { createAuditLog, AuditEventType } from '../../../lib/audit'
 import { getSession } from '../../../lib/auth/session.js'
 
-const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
-
-function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
-  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
-}
+// Removed OPENROUTER_HOST_PATTERN and isOpenRouterBaseUrl
 
 function resolveSafeLlmBaseUrl(envVars: Record<string, string | undefined>): string | undefined {
   const llmBaseUrl =
     (envVars['LLM_BASE_URL'] ??
     envVars['LLM_API_URL']) ??
     envVars['OPENAI_BASE_URL']
-
-  if (isOpenRouterBaseUrl(llmBaseUrl)) {
-    console.warn(
-      'Ignoring LLM base URL from OpenRouter because Hermes is configured to not use OpenRouter',
-    )
-    return undefined
-  }
 
   return llmBaseUrl
 }
@@ -115,7 +104,7 @@ export const POST = async ({ request }) => {
         await aiRepository.storeInterventionAnalysis({
           userId: session?.user?.id,
           modelId,
-      modelProvider: 'llm',
+          modelProvider: 'llm',
           requestTokens: 0, // No usage information available
           responseTokens: 0, // No usage information available
           totalTokens: 0, // No usage information available
@@ -156,7 +145,7 @@ export const POST = async ({ request }) => {
       await aiRepository.storeInterventionAnalysis({
         userId: session?.user?.id || 'anonymous',
         modelId,
-      modelProvider: 'llm',
+        modelProvider: 'llm',
         requestTokens: 0, // No usage information available
         responseTokens: 0, // No usage information available
         totalTokens: 0, // No usage information available
