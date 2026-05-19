@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { createLogger, LogLevel, setLogLevel, logger } from './logger';
 
 describe('logger utilities', () => {
@@ -7,6 +7,10 @@ describe('logger utilities', () => {
     vi.spyOn(console, 'info').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    setLogLevel(LogLevel.DEBUG);
   });
 
   describe('createLogger', () => {
