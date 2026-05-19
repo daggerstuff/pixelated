@@ -30,7 +30,7 @@ export const GET: APIRoute = async ({ request }) => {
     const userKey =
       authResult['authenticated'] && authResult['user']?.['id']
         ? `user:${authResult['user']['id']}`
-        : `ip:${((request.headers.get('x-forwarded-for') ?? request.headers.get('cf-connecting-ip')) ?? request.headers.get('x-real-ip')) ?? 'unknown'}`
+        : `ip:${request.headers.get('x-forwarded-for') ?? request.headers.get('cf-connecting-ip') ?? request.headers.get('x-real-ip') ?? 'unknown'}`
     const now = Date.now()
     let entry = rateLimitMap.get(userKey)
     if (!entry || now - entry.start > RATE_LIMIT_WINDOW_MS) {

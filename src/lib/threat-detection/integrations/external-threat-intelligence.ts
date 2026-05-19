@@ -180,7 +180,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     client: AxiosInstance,
     feed: ThreatIntelligenceFeed,
   ): void {
-    const requestQueue: (() => Promise<void>)[] = []
+    let requestQueue: (() => Promise<void>)[] = []
     let processing = false
 
     const processQueue = async () => {

@@ -15,7 +15,7 @@ if (SENTRY_DSN && window.Sentry) {
         (window.__ENV?.PUBLIC_SENTRY_PROFILES_SAMPLE_RATE) ??
           (location.hostname === 'localhost' ? 0.2 : 0.05),
       ),
-      debug: (window.__ENV?.PUBLIC_SENTRY_DEBUG === '1'),
+      debug: Boolean(window.__ENV?.PUBLIC_SENTRY_DEBUG === '1'),
     })
     console.log('Sentry initialized successfully')
   } catch (err) {

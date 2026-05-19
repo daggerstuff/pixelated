@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 
-import { type AuthRequest, type AuthResponse } from '../auth'
+import type { Request, Response } from 'express'
 
 export type MockAuthUser = {
   id: string
@@ -10,7 +10,7 @@ export type MockAuthUser = {
   permissions?: string[]
 }
 
-export type MockAuthRequest = Omit<AuthRequest, 'user'> & {
+export type MockAuthRequest = Omit<Request, 'user'> & {
   protocol: string
   originalUrl: string
   method: string
@@ -19,7 +19,7 @@ export type MockAuthRequest = Omit<AuthRequest, 'user'> & {
   user?: MockAuthUser
 }
 
-export type MockAuthResponse = Pick<AuthResponse, 'status' | 'json'>
+export type MockAuthResponse = Pick<Response, 'status' | 'json'>
 
 export function createMockAuthUser(
   overrides: Partial<MockAuthUser> = {},
