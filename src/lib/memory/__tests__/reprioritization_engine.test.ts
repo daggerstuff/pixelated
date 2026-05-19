@@ -18,3 +18,4 @@ describe('ReprioritizationEngine TS', () => {
     const newOrder = engine.computeNewOrder([]);
     expect(newOrder).toEqual(['t1', 't2']);
   });
+});

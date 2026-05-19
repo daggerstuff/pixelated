@@ -71,7 +71,7 @@ const getClientIp = (req: RateLimiterRequest): string => {
   const forwardIp =
     (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0])?.trim()
 
-  return ((forwardIp ?? req.ip) || req.socket?.remoteAddress) ?? '127.0.0.1'
+  return ((forwardIp ?? req.ip) ?? req.socket?.remoteAddress) ?? '127.0.0.1'
 }
 
 /**
@@ -113,9 +113,9 @@ export async function incrementRedisCounter(
 
     if (hasTransactionMethods) {
       const redisTx = tx as any
-      ;(redisTx as any).incr(key)
-      ;(redisTx as any).expire(key, windowSeconds)
-      const txResults = await (redisTx as any).exec()
+      ;(redisTx).incr(key)
+      ;(redisTx).expire(key, windowSeconds)
+      const txResults = await (redisTx).exec()
       if (
         !Array.isArray(txResults) ||
         txResults.length === 0 ||

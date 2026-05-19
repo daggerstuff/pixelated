@@ -179,7 +179,7 @@ class RateLimiter {
     const realIp = request.headers.get('x-real-ip')
     const clientIp = request.headers.get('x-client-ip')
 
-    const ip = (forwardedFor?.split(',')[0] ?? realIp) || clientIp ?? 'unknown'
+    const ip = ((forwardedFor?.split(',')[0] ?? realIp) ?? clientIp) ?? 'unknown'
 
     // Include user agent for more granular limiting
     const userAgent = request.headers.get('user-agent') ?? 'unknown'

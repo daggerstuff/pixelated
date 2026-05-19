@@ -311,15 +311,15 @@ export class RealFHEService implements FHEService {
    */
   private decodeValue(data: number[], dataType: string): unknown {
     if (dataType === 'number') {
-      return data[0] as unknown as unknown
+      return data[0] as unknown
     }
 
     if (dataType === 'boolean') {
-      return (data[0] !== 0) as unknown as unknown
+      return (data[0] !== 0) as unknown
     }
 
     if (dataType === 'string') {
-      return String.fromCharCode(...data) as unknown as unknown
+      return String.fromCharCode(...data) as unknown
     }
 
     if (dataType === 'object' || dataType === 'array') {
@@ -330,11 +330,11 @@ export class RealFHEService implements FHEService {
         logger.warn('Failed to parse decrypted JSON, returning as char codes', {
           err,
         })
-        return data as unknown as unknown
+        return data as unknown
       }
     }
 
-    return data as unknown as unknown
+    return data as unknown
   }
 
   /**

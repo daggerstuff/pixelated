@@ -42,8 +42,8 @@ const GATE_NAME = 'gate3_consent';
 const DEFAULT_CONSENT_SCOPE = 'memory_ingestion';
 
 export class ConsentGate {
-  private _consentStore: Map<string, ConsentRecord> = new Map();
-  private _auditLog: ConsentAuditEntry[] = [];
+  private readonly _consentStore: Map<string, ConsentRecord> = new Map();
+  private readonly _auditLog: ConsentAuditEntry[] = [];
 
   grantConsent(
     userId: string,

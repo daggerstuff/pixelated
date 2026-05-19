@@ -220,9 +220,9 @@ test.describe('Accessibility Audit and Compliance', () => {
 
             // Element should have some form of accessible name
             const hasAccessibleName =
-              (ariaLabel ??
-              ariaLabelledby) ||
-              title ??
+              ((ariaLabel ??
+              ariaLabelledby) ??
+              title) ??
               (textContent && textContent.trim().length > 0)
 
             if (!hasAccessibleName) {
