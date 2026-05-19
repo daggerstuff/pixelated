@@ -449,7 +449,7 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
                       variant='outline'
-                      className={getStatusColor(systemHealth?.database.status || '')}
+                      className={getStatusColor(systemHealth?.database.status ?? '')}
                     >
                       {getStatusIcon(systemHealth?.database.status ?? '')}
                       <span className='ml-1 capitalize'>
@@ -495,7 +495,7 @@ export default function EnterpriseMonitoringDashboard() {
                     <span className='text-gray-600 text-sm'>Status</span>
                     <Badge
                       variant='outline'
-                      className={getStatusColor(systemHealth?.cache.status || '')}
+                      className={getStatusColor(systemHealth?.cache.status ?? '')}
                     >
                       {getStatusIcon(systemHealth?.cache.status ?? '')}
                       <span className='ml-1 capitalize'>

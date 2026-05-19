@@ -278,7 +278,7 @@ function isRateLimitError(
   }
 
   const normalizedMessage = message.toLowerCase()
-  const normalizedCode = (code || '').toLowerCase()
+  const normalizedCode = (code ?? '').toLowerCase()
 
   return (
     normalizedMessage.includes('rate limit') ||

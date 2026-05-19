@@ -100,7 +100,7 @@ const runProbe = async (request: Request): Promise<Response> => {
   const body = await readProbeBody(request)
   const url = new URL(request.url)
   const mode =
-    ((body.mode as ProbeMode) || url.searchParams.get('mode')) as ProbeMode
+    ((body.mode as ProbeMode) || url.searchParams.get('mode'))
   const eventMessage =
     ((body.message as string) || url.searchParams.get('message')) ?? 'Sentry server probe event'
 

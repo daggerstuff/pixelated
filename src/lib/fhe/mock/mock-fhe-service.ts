@@ -153,7 +153,7 @@ export class MockFHEService implements FHEService {
     }
 
     // Create mock encrypted data
-    const encrypted: MockEncryptedData<unknown> = {
+    const encrypted: MockEncryptedData = {
       id: nanoid(),
       mockId: nanoid(6),
       data: value,
