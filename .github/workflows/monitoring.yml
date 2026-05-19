@@ -21,7 +21,7 @@ jobs:
       HAS_SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh

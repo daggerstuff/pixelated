@@ -364,7 +364,7 @@ export class AdminService {
       }
 
       // Fallback to direct header access with case-insensitive lookup
-      authHeader ??= context.request.headers.get('authorization') ||
+      authHeader ??= context.request.headers.get('authorization') ??
           context.request.headers.get('Authorization');
 
       const tokenFromHeader = authHeader?.replace(/^Bearer\s+/i, '')

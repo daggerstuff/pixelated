@@ -26,16 +26,6 @@ export interface AIProviderConfig {
 const providers = new Map<AIProviderType, AIProviderConfig>()
 const serviceCache = new Map<AIProviderType, AIService>()
 
-const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
-
-function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
-  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
-}
-
-function isOpenRouterKey(apiKey: string | undefined): boolean {
-  return !!apiKey && apiKey.startsWith('sk-or-')
-}
-
 /**
  * Helper to fetch environment variables from either process.env (SSR)
  * or import.meta.env (Vite/Build time). This avoids bracket access
@@ -116,21 +106,13 @@ export function initializeProviders() {
   try {
     // Primary LLM provider key
     const providerApiKey = resolveProviderConfigValue(LLM_PROVIDER_API_KEYS)
-    const isOpenRouterPrimaryProvider =
-      isOpenRouterBaseUrl(
-        resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS),
-      ) || isOpenRouterKey(providerApiKey)
     const providerBaseUrl = resolveProviderConfigValue(LLM_PROVIDER_BASE_URLS)
-    if (providerApiKey && providerBaseUrl && !isOpenRouterPrimaryProvider) {
+    if (providerApiKey && providerBaseUrl) {
       providers.set('llm', {
         ...defaultConfigs.llm,
         apiKey: providerApiKey,
         ...(providerBaseUrl ? { baseUrl: providerBaseUrl } : {}),
       } as AIProviderConfig)
-    } else if (providerApiKey && isOpenRouterPrimaryProvider) {
-      appLogger.warn(
-        'Skipping LLM provider initialization because OpenRouter configuration is disabled for this environment',
-      )
     }
 
     // OpenAI
