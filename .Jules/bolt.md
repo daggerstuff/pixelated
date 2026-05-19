@@ -28,3 +28,7 @@ Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for filter 
 
 - Learning: Inline arrow functions passed as props to child components cause unnecessary re-renders. When using useCallback to memoize state updater callbacks, use the functional update pattern to avoid adding state variables to the dependency array.
 - Action: Wrapped inline patient selection handler in useCallback using a functional state update.
+## 2025-03-20 - Expensive Date formatting in map loops
+
+Learning: Repeated Date instantiation and toLocaleDateString() calls inside React map loops are an expensive performance bottleneck.
+Action: Memoized derived chart data in SessionChart to compute strings once per data change.
