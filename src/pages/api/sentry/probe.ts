@@ -6,19 +6,19 @@ type ProbeMode = 'message' | 'error'
 
 const resolveSentryDsn = () =>
   (process.env.SENTRY_DSN ??
-  process.env.PUBLIC_SENTRY_DSN) ||
+  process.env.PUBLIC_SENTRY_DSN) ??
   process.env.SENTRY_PUBLIC_DSN ??
   process.env.VITE_SENTRY_DSN
 
 const resolveSentryRelease = () =>
   (process.env.SENTRY_RELEASE ??
-  process.env.PUBLIC_SENTRY_RELEASE) ||
-  process.env.PUBLIC_APP_VERSION ||
-  process.env.VERCEL_GIT_COMMIT_SHA ||
-  process.env.RENDER_GIT_COMMIT ||
-  process.env.NETLIFY_COMMIT_REF ||
-  process.env.RAILWAY_GIT_COMMIT_SHA ||
-  process.env.GITHUB_SHA ||
+  process.env.PUBLIC_SENTRY_RELEASE) ??
+  process.env.PUBLIC_APP_VERSION ??
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  process.env.RENDER_GIT_COMMIT ??
+  process.env.NETLIFY_COMMIT_REF ??
+  process.env.RAILWAY_GIT_COMMIT_SHA ??
+  process.env.GITHUB_SHA ??
   process.env.CI_COMMIT_SHA ??
   process.env['npm_package_version']
 
@@ -100,11 +100,9 @@ const runProbe = async (request: Request): Promise<Response> => {
   const body = await readProbeBody(request)
   const url = new URL(request.url)
   const mode =
-    (body.mode as ProbeMode) || (url.searchParams.get('mode') as ProbeMode)
+    ((body.mode as ProbeMode) || url.searchParams.get('mode')) as ProbeMode
   const eventMessage =
-    (body.message as string) ||
-    url.searchParams.get('message') ??
-    'Sentry server probe event'
+    ((body.message as string) || url.searchParams.get('message')) ?? 'Sentry server probe event'
 
   const eventId = emitProbeEvent(
     mode === 'error' ? 'error' : 'message',
