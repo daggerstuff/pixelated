@@ -17,8 +17,7 @@ describe('isValidDate', () => {
     expect(isValidDate('')).toBe(false);
     expect(isValidDate('   ')).toBe(false);
     expect(isValidDate('not-a-date')).toBe(false);
-    // @ts-expect-error Testing invalid runtime input
-    expect(isValidDate(null)).toBe(false);
+    expect(isValidDate(null as unknown as string)).toBe(false);
   });
 });
 
