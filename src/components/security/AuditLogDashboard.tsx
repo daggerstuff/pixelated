@@ -132,7 +132,8 @@ export function AuditLogDashboard() {
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
             ((log.resource.type?.toLowerCase().includes(searchLower)) ??
-            (log.resource.id?.toLowerCase().includes(searchLower))) ||
+            (log.resource.id &&
+              log.resource.id.toLowerCase().includes(searchLower))) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }

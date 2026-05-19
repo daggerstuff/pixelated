@@ -368,7 +368,7 @@ export function MobileFormValidation({
                     e.preventDefault()
                     const element = document.querySelector(
                       `[name="${field}"]`,
-                    ) as HTMLElement
+                    )!
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({
@@ -415,7 +415,7 @@ export const ValidationRules = {
     test: (value) => {
       const matchField = document.querySelector(
         `[name="${fieldName}"]`,
-      ) as HTMLInputElement
+      )!
       return matchField?.value === value
     },
     message,

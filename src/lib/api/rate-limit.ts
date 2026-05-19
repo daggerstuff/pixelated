@@ -33,9 +33,9 @@ export async function applyRateLimit(
   const url = new URL(request.url)
   const path = url.pathname
   const clientIp =
-    ((request.headers.get('x-forwarded-for') ??
-    request.headers.get('cf-connecting-ip')) ??
-    request.headers.get('x-real-ip')) ??
+    request.headers.get('x-forwarded-for') ??
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-real-ip') ??
     'unknown'
   const userAgent = request.headers.get('user-agent') ?? 'unknown'
   const referer = request.headers.get('referer') ?? 'direct'

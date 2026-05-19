@@ -112,10 +112,10 @@ export async function incrementRedisCounter(
         'function'
 
     if (hasTransactionMethods) {
-      const redisTx = tx as RedisTransaction
-      tx.incr(key)
-      tx.expire(key, windowSeconds)
-      const txResults = await redisTx.exec()
+      const redisTx = tx as any
+      ;(redisTx).incr(key)
+      ;(redisTx).expire(key, windowSeconds)
+      const txResults = await (redisTx).exec()
       if (
         !Array.isArray(txResults) ||
         txResults.length === 0 ||

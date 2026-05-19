@@ -86,7 +86,7 @@ const techniques = defineCollection({
 })
 
 const pagesSchema = () => pageSchema
-const i18nSchema = () => z.record(z.string())
+const i18nSchema = () => z.record(z.string(), z.string())
 
 // Content collection schema setup (using local content-store data).
 const pages = defineCollection({

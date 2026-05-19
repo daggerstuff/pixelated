@@ -136,9 +136,9 @@ export async function healthCheck(): Promise<{
       status: 'healthy',
       latency,
       connections: {
-        total: poolState.totalCount,
-        idle: poolState.idleCount,
-        waiting: poolState.waitingCount,
+        total: (poolState as any).totalCount,
+        idle: (poolState as any).idleCount,
+        waiting: (poolState as any).waitingCount,
       },
     }
   } catch {
