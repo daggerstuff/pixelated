@@ -78,7 +78,7 @@ jobs:
         github.event.inputs.baselinePath || vars.REALISM_BASELINE_PATH || '' }}"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6
 
       - name: Setup Python
         uses: actions/setup-python@v6.2.0
