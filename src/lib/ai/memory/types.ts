@@ -102,4 +102,15 @@ export interface GateResult {
   reason: string;
   suggested_tags: string[];
   crisis_detected: boolean;
+  gating?: {
+    piiRedacted: boolean;
+    piiTypes: string[];
+    crisisTier: string;
+    crisisFlag: boolean;
+    traumaIndicators: string[];
+    traumaSeverity: string;
+    consentTier: string;
+    consentAllowed: boolean;
+    scrubbedContent: string;
+  };
 }
