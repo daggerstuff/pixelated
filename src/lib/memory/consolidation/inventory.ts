@@ -21,8 +21,8 @@ export interface InventoryItem {
  *   engine.removeItem(item.id);
  */
 export class InventoryEngine {
-  private items: Map<string, InventoryItem> = new Map();
-  private storagePath?: string;
+  private readonly items: Map<string, InventoryItem> = new Map();
+  private readonly storagePath?: string;
 
   constructor(storagePath?: string) {
     this.storagePath = storagePath;

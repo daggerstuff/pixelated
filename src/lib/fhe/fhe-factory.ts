@@ -126,8 +126,8 @@ const sealFHEService: FHEService = {
       ) {
         throw new Error('SEAL encryption requires a number array input')
       }
-      const encrypted = await sealService.encrypt(data as number[])
-      return createEncryptedData(encrypted, data as number[])
+      const encrypted = await sealService.encrypt(data)
+      return createEncryptedData(encrypted, data)
     } catch (error: unknown) {
       logger.error('SEAL encryption failed', { error })
       throw error

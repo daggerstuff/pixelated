@@ -64,13 +64,13 @@ importers:
         version: 12.31.0
       '@cloudflare/workers-types':
         specifier: latest
-        version: 4.20260517.1
+        version: 4.20260516.1
       '@composio/core':
         specifier: latest
         version: 0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3)
       '@composio/vercel':
         specifier: latest
-        version: 0.9.2(@composio/core@0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.185(zod@4.4.3))
+        version: 0.9.2(@composio/core@0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.184(zod@4.4.3))
       '@heroicons/react':
         specifier: latest
         version: 2.2.0(react@19.2.6)
@@ -208,7 +208,7 @@ importers:
         version: 2.0.0(react@19.2.6)(vue@3.5.34(typescript@5.9.3))
       ai:
         specifier: latest
-        version: 6.0.185(zod@4.4.3)
+        version: 6.0.184(zod@4.4.3)
       archiver:
         specifier: latest
         version: 8.0.0
@@ -271,7 +271,7 @@ importers:
         version: 3.4.3
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@cloudflare/workers-types@4.20260517.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9)
+        version: 0.45.2(@cloudflare/workers-types@4.20260516.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9)
       es-module-lexer:
         specifier: latest
         version: 2.1.0
@@ -1373,8 +1373,8 @@ packages:
     resolution: {integrity: sha512-GgcWwRCs/xPtaqlMy8qRhPnZf9vlWcWZNHAitnVQ3yk7JmSralSiq5q07yaffYE8SogtDm7zFeKccx1QNVARpw==}
     engines: {node: '>= 20.12.0'}
 
-  '@cloudflare/workers-types@4.20260517.1':
-    resolution: {integrity: sha512-OjavgX6VpYoWlKg2xPgLKIhBeiJvNdwFVK8E1P6hF02wh1oEt1sZpTzbp9kdohprqjXo6UVqs7/AuIH0wxIcbw==}
+  '@cloudflare/workers-types@4.20260516.1':
+    resolution: {integrity: sha512-aPckyZSPQXhOo+nSIvGLtXVl9M2qmf2GwFZYmvut9z47F1XTjHYcaYpI9/BvxrI+Q5l99UtXZU4bmQtX10JG+w==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -5446,8 +5446,8 @@ packages:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
 
-  ai@6.0.185:
-    resolution: {integrity: sha512-oGsqscREaTlo75KHZLtwZxRyI+ZBwHV2wRX9B8smHjgOs13WwoCvUyr5aPUWpIBRz406wmIKy1RzoUEq0/WKJw==}
+  ai@6.0.184:
+    resolution: {integrity: sha512-j//zHkKvj5ra27l8izHco8cj1g1Pr7vx1ZK+hrzrkHvndgIRmdfZKOb6+RAPpvbk42qGIsuYvlYbGlVAu3erNQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -12040,7 +12040,7 @@ snapshots:
       fast-wrap-ansi: 0.2.0
       sisteransi: 1.0.5
 
-  '@cloudflare/workers-types@4.20260517.1': {}
+  '@cloudflare/workers-types@4.20260516.1': {}
 
   '@colors/colors@1.5.0':
     optional: true
@@ -12065,10 +12065,10 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  '@composio/vercel@0.9.2(@composio/core@0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.185(zod@4.4.3))':
+  '@composio/vercel@0.9.2(@composio/core@0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.184(zod@4.4.3))':
     dependencies:
       '@composio/core': 0.10.0(ws@8.20.1(utf-8-validate@6.0.6))(zod@4.4.3)
-      ai: 6.0.185(zod@4.4.3)
+      ai: 6.0.184(zod@4.4.3)
 
   '@csstools/color-helpers@6.0.2': {}
 
@@ -15948,7 +15948,7 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@6.0.185(zod@4.4.3):
+  ai@6.0.184(zod@4.4.3):
     dependencies:
       '@ai-sdk/gateway': 3.0.116(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
@@ -17037,9 +17037,9 @@ snapshots:
 
   dpop@2.1.1: {}
 
-  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260517.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9):
+  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260516.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.20.0)(postgres@3.4.9):
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20260517.1
+      '@cloudflare/workers-types': 4.20260516.1
       '@opentelemetry/api': 1.9.1
       '@types/pg': 8.20.0
       '@upstash/redis': 1.38.0

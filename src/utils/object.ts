@@ -157,7 +157,7 @@ function mergeArrayElements(
     result.push(item)
   }
 
-  return result as unknown as unknown
+  return result as unknown
 }
 
 /**
