@@ -533,7 +533,7 @@ export class BackgroundJobQueue {
       throw new Error('Job queue is full')
     }
 
-    const job: BackgroundJob<unknown> = {
+    const job: BackgroundJob = {
       id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       data,

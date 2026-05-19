@@ -563,7 +563,7 @@ export class IntelligentCache {
   }
 
   private getFromMemory(key: string): unknown | null {
-    const entry = this.memoryCache.get(key) as CacheEntry<unknown> | undefined
+    const entry = this.memoryCache.get(key)
     if (!entry) {
       return null
     }
@@ -650,14 +650,14 @@ export class IntelligentCache {
         const serialized = JSON.stringify(value)
         if (serialized.length > this.config.compressionThreshold) {
           const compressedData = zlib.gzipSync(Buffer.from(serialized))
-          serializedValue = compressedData.toString('base64') as unknown as unknown
+          serializedValue = compressedData.toString('base64') as unknown
           compressed = true
         }
       }
 
       const entry: CacheEntry<unknown> = {
         key,
-        value: serializedValue as unknown as unknown,
+        value: serializedValue as unknown,
         tier: 'redis',
         size: this.estimateSize(serializedValue),
         compressed,
