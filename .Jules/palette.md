@@ -39,3 +39,7 @@
 
 - Learning: Real-time search inputs need aria-live regions to announce result counts.
 - Action: Added an sr-only aria-live polite region to announce the number of search results found.
+
+## 2026-05-17 - Redundant Announcements in Branding and Icons
+- Learning: Decorative SVG icons inside links with `aria-label`s, and brand logos immediately next to brand text, cause redundant and annoying screen reader announcements if not explicitly hidden.
+- Action: Added `aria-hidden="true"` to decorative SVGs inside links and an empty `alt=""` with `aria-hidden="true"` to the decorative brand logo image.
