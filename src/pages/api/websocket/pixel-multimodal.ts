@@ -110,14 +110,12 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
-            const text = (message.text as string) || (state.text ?? '')
+            const text = ((message.text as string) || state.text) ?? '';
             const contextType =
-              (message.contextType as string) ||
-              (state.contextType ??
-              'therapeutic')
-            const sessionId = (message.sessionId as string) || state.sessionId
-            await handleComplete(ws, state, { text, contextType, sessionId })
-            break
+              ((message.contextType as string) || state.contextType) ?? 'therapeutic';
+            const sessionId = (message.sessionId as string) || state.sessionId;
+            await handleComplete(ws, state, { text, contextType, sessionId });
+            break;
           }
           default: {
             ws.send(

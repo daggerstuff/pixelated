@@ -74,24 +74,23 @@ export function extractTokenFromRequest(req: Request): string | null {
  */
 export function getClientIp(req: Request): string {
   const xForwardedFor =
-    (req.headers.get?.('x-forwarded-for') ??
-    req.headers.get?.('X-Forwarded-For')) ||
-    ((req.headers as any)['x-forwarded-for'] ??
-    (req.headers as any)['X-Forwarded-For'])
+    req.headers.get?.('x-forwarded-for') ?? 
+    req.headers.get?.('X-Forwarded-For') ?? 
+    (req.headers as any)['x-forwarded-for'] ?? 
+    (req.headers as any)['X-Forwarded-For']
 
   const xRealIp =
-    (req.headers.get?.('x-real-ip') ??
-    req.headers.get?.('X-Real-Ip')) ||
-    ((req.headers as any)['x-real-ip'] ??
-    (req.headers as any)['X-Real-Ip'])
+    req.headers.get?.('x-real-ip') ?? 
+    req.headers.get?.('X-Real-Ip') ?? 
+    (req.headers as any)['x-real-ip'] ?? 
+    (req.headers as any)['X-Real-Ip']
 
   return (
-    (((req as any).ip ??
+    ((req as any).ip ??
     (typeof xForwardedFor === 'string'
       ? xForwardedFor.split(',')[0].trim()
-      : null)) ||
-    (typeof xRealIp === 'string' ? xRealIp : null)) ??
-    'unknown'
+      : null)) ??
+    ((typeof xRealIp === 'string' ? xRealIp : null) ?? 'unknown')
   )
 }
 
@@ -102,11 +101,10 @@ export function getClientInfo(req: Request): { ip: string; userAgent: string } {
   const ip = getClientIp(req)
 
   const userAgent =
-    (req.headers.get?.('user-agent') ??
-    req.headers.get?.('User-Agent')) ||
-    (req.headers as any)['user-agent'] ||
-    ((req.headers as any)['User-Agent'] ??
-    'unknown')
+    (req.headers.get?.('user-agent') ?? 
+    req.headers.get?.('User-Agent') ?? 
+    (req.headers as any)['user-agent'] ?? 
+    (req.headers as any)['User-Agent']) ?? 'unknown'
 
   return { ip, userAgent }
 }
@@ -279,8 +277,8 @@ export async function csrfProtection(request: Request): Promise<{
   // For other methods, check for CSRF token
   const csrfToken =
     (request.headers?.get?.('X-CSRF-Token') ??
-    request.headers?.get?.('x-csrf-token')) ||
-    ((request.headers as any)['X-CSRF-Token'] ??
+    request.headers?.get?.('x-csrf-token') ??
+    (request.headers as any)['X-CSRF-Token'] ??
     (request.headers as any)['x-csrf-token'])
 
   if (!csrfToken) {
@@ -440,9 +438,8 @@ export async function securityHeaders(
 
   // Add CORS headers for API requests
   const origin =
-    (request.headers?.get?.('Origin') ??
-    request.headers?.get?.('origin')) ||
-    ((request.headers as any).Origin ??
+    ((request.headers?.get?.('Origin') ?? request.headers?.get?.('origin')) ??
+    (request.headers as any).Origin ?? 
     (request.headers as any).origin)
 
   // Allow CORS if origin is explicitly allowed OR if API key is valid
@@ -611,11 +608,11 @@ export async function authenticateRequest(
   if (strategy === 'jwtOnly' || strategy === 'either') {
     // Extract authorization header - use comprehensive extraction
     const authHeader =
-      (request.headers?.get?.('Authorization') ??
-      request.headers?.get?.('authorization')) ||
-      (request.headers as any)?.Authorization ||
-      ((request.headers as any)?.authorization ??
-      (request.headers as any)?.get?.('Authorization'))
+      request.headers?.get?.('Authorization') ??
+      request.headers?.get?.('authorization') ??
+      (request.headers as any)?.Authorization ??
+      (request.headers as any)?.authorization ??
+      (request.headers as any)?.get?.('Authorization')
 
     if (!authHeader) {
       const { logSecurityEvent, SecurityEventType } =

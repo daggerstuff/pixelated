@@ -113,10 +113,8 @@ export function useChat(options: ChatOptions): UseChatReturn {
       } else {
         // Standard chat API format
         responseContent =
-          (responseData.text ??
-          responseData.content) ||
-          (responseData.message ??
-          'No response content')
+          ((responseData.text ?? responseData.content) ?? responseData.message) ??
+          'No response content'
       }
 
       // Add assistant message from response
