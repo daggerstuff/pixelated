@@ -1,7 +1,5 @@
 // Google Analytics initialization
-if (window.dataLayer === null || window.dataLayer === undefined) {
-  window.dataLayer = []
-}
+window.dataLayer ??= [];
 function gtag() {
   dataLayer.push(arguments)
 }
