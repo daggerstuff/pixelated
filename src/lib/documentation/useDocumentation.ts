@@ -65,22 +65,12 @@ const getAIRepositoryInstance = (): AIRepository => {
   return aiRepositoryInstance
 }
 
-const OPENROUTER_HOST_PATTERN = /openrouter\.ai/i
-
-function isOpenRouterBaseUrl(baseUrl: string | undefined): boolean {
-  return !!baseUrl && OPENROUTER_HOST_PATTERN.test(baseUrl)
-}
-
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    (process.env['LLM_BASE_URL'] ??
-    process.env['LLM_API_URL']) ||
-    process.env['OPENAI_BASE_URL'] ??
+    ((process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL']) ??
+    process.env['OPENAI_BASE_URL']) ??
     ''
-
-  if (isOpenRouterBaseUrl(baseUrl)) {
-    return ''
-  }
 
   return baseUrl
 }
