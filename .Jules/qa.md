@@ -59,3 +59,7 @@
 
 - Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
 - Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
+
+## 2026-05-18 - logger tests
+- Pattern: Creating an isolated test file for a standalone utility.
+- Action: Mock out console methods using `vi.spyOn` in `beforeEach` to capture output reliably.
