@@ -59,3 +59,5 @@
 
 - Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
 - Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
+
+## 2026-05-18 - isValidDate testing edge case | Pattern: Adding tests to previously untested pure functions that validate calendar-based date strings and checking logic around invalid month/day configurations and leap years. | Action: Write localized edge case tests focusing on edge-cases specifically, use `npx vitest run src/utils/formatDate.test.ts` to execute locally since tests and linters failed globally.

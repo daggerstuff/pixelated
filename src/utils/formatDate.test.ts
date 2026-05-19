@@ -1,6 +1,26 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest';
-import { formatDate } from './formatDate';
+import { formatDate, isValidDate } from './formatDate';
+
+describe('isValidDate', () => {
+  it('validates edge cases like leap years, out-of-bounds, and empty inputs', () => {
+    // Valid dates
+    expect(isValidDate('2023-05-15')).toBe(true);
+    expect(isValidDate('2024-02-29')).toBe(true); // Leap year
+
+    // Invalid calendar dates
+    expect(isValidDate('2023-02-29')).toBe(false); // Not a leap year
+    expect(isValidDate('2023-13-01')).toBe(false); // Invalid month
+    expect(isValidDate('2023-04-31')).toBe(false); // Invalid day for month
+
+    // Empty or malformed inputs
+    expect(isValidDate('')).toBe(false);
+    expect(isValidDate('   ')).toBe(false);
+    expect(isValidDate('not-a-date')).toBe(false);
+    // @ts-expect-error Testing invalid runtime input
+    expect(isValidDate(null)).toBe(false);
+  });
+});
 
 describe('formatDate', () => {
   describe('relative formatting', () => {
