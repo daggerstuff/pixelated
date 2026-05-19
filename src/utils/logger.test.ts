@@ -1,16 +1,15 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach, afterAll } from 'vitest';
 import { createLogger, LogLevel, setLogLevel, logger } from './logger';
 
 describe('logger utilities', () => {
+  let originalLogLevel: LogLevel;
+
   beforeEach(() => {
+    originalLogLevel = logger.getLevel();
     vi.spyOn(console, 'debug').mockImplementation(() => {});
     vi.spyOn(console, 'info').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
-  });
-
-  afterEach(() => {
-    setLogLevel(LogLevel.DEBUG);
   });
 
   describe('createLogger', () => {
@@ -62,5 +61,10 @@ describe('logger utilities', () => {
       setLogLevel(LogLevel.ERROR);
       expect(logger.getLevel()).toBe(LogLevel.ERROR);
     });
+  });
+
+  afterEach(() => {
+    // Reset global logger level
+    setLogLevel(originalLogLevel);
   });
 });
