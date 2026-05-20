@@ -3,7 +3,7 @@
 
 # Core ML/AI
 torch==2.12.0
-torchvision==0.26.0
+torchvision==0.27.0
 torchaudio==2.12.0
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
@@ -15,7 +15,7 @@ fairlearn==0.13.0
 # Data processing
 pandas==3.0.3
 numpy==2.4.5
-scipy==1.15.3
+scipy==1.17.1
 pymongo==4.17.0
 dnspython==2.8.0
 
