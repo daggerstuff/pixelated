@@ -204,5 +204,8 @@ deployment-backup
 .omo/
 .cm/
 
+# Session / workflow journal artifacts
+.workflow-journal.md
+
 # Backups
 deployment-backup*/
