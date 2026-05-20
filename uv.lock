@@ -5096,7 +5096,6 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.44.0" },
     { name = "virtualenv", specifier = ">=21.2.0" },
     { name = "voyageai", specifier = ">=0.3.7" },
-    { name = "wandb", specifier = ">=0.16.0" },
     { name = "wandb", specifier = ">=0.21.1" },
     { name = "watchdog", specifier = ">=5.0.3" },
     { name = "webdriver-manager", specifier = ">=4.0.2" },
