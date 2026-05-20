@@ -199,6 +199,10 @@ deployment-backup
 .cline/
 .goose/
 .tinyb
+.sisyphus/
+.gemini/
+.omo/
+.cm/
 
 # Backups
 deployment-backup*/
