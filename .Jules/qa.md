@@ -63,3 +63,7 @@
 ## 2026-05-18 - logger tests
 - Pattern: Creating an isolated test file for a standalone utility.
 - Action: Mock out console methods using `vi.spyOn` in `beforeEach` to capture output reliably.
+## 2026-06-25 - processRecognizedSpeech edge cases
+
+- Pattern: Writing edge case tests for utility functions with text manipulation.
+- Action: Verify regex behavior matches expected text outputs, as sometimes chained replaces don't remove multiple distinct occurrences.
