@@ -33,7 +33,6 @@ print()
 if not linear_issues:
     sys.exit(0)
 
-# Use issueSearch which is the correct Linear GraphQL query (as used in the codebase)
 headers = {
     'Content-Type': 'application/json',
     'Authorization': api_key
@@ -45,22 +44,20 @@ total = len(linear_issues)
 
 for i, item in enumerate(linear_issues, 1):
     key = item['linear_key']
-    query = '''query SearchByKey($q: String!) {
-  issueSearch(query: $q, first: 1) {
-    nodes {
-      id
-      identifier
-      title
-      state { id name type }
-      updatedAt
-    }
+    # Use issue(id:) which is the non-deprecated Linear GraphQL query for fetching by identifier
+    query = '''query($id: String!) {
+  issue(id: $id) {
+    id
+    identifier
+    title
+    state { id name type }
+    updatedAt
   }
 }'''
-    variables = {"q": key}
-    
+
     req = Request(
         'https://api.linear.app/graphql',
-        data=json.dumps({'query': query, 'variables': variables}).encode(),
+        data=json.dumps({'query': query, 'variables': {'id': key}}).encode(),
         headers=headers,
         method='POST'
     )
@@ -71,19 +68,17 @@ for i, item in enumerate(linear_issues, 1):
         if errors:
             not_found.append({'key': key, 'errors': errors})
             if i % 25 == 0 or i == total:
-                print(f"  Progress: {i}/{total} (errors: {len(not_found)})", file=sys.stderr)
+                print(f"  Progress: {i}/{total} (not found: {len(not_found)})", file=sys.stderr)
             continue
-            
-        nodes = data.get('data', {}).get('issueSearch', {}).get('nodes', [])
-        
+
+        linear_issue = data.get('data', {}).get('issue')
         beads_status = item['beads_status']
-        
-        if nodes and len(nodes) > 0:
-            linear_issue = nodes[0]
+
+        if linear_issue:
             linear_state = linear_issue.get('state', {})
             linear_state_name = linear_state.get('name', 'unknown')
             linear_state_type = linear_state.get('type', 'unknown')
-            
+
             # Map Linear state type to beads status convention
             if linear_state_type == 'started':
                 expected_beads = 'in_progress'
@@ -93,7 +88,7 @@ for i, item in enumerate(linear_issues, 1):
                 expected_beads = 'closed'
             else:
                 expected_beads = 'unknown'
-            
+
             if beads_status != expected_beads:
                 discrepancies.append({
                     'key': key,
@@ -104,10 +99,10 @@ for i, item in enumerate(linear_issues, 1):
                     'expected_beads': expected_beads
                 })
         else:
-            not_found.append({'key': key, 'errors': [{'message': 'Not found in search'}]})
+            not_found.append({'key': key, 'errors': [{'message': 'Issue not found'}]})
     except Exception as e:
         not_found.append({'key': key, 'error': str(e)})
-    
+
     if i % 25 == 0 or i == total:
         print(f"  Progress: {i}/{total}", file=sys.stderr)
 
