@@ -320,7 +320,7 @@
     "zustand": "latest"
   },
   "devDependencies": {
-    "@aaif/goose": "^0.19.1",
+    "@aaif/goose": "^0.20.1",
     "@astrojs/check": "latest",
     "@astrojs/markdoc": "latest",
     "@astrojs/rss": "latest",
@@ -365,7 +365,7 @@
     "axe-core": "latest",
     "chalk": "latest",
     "class-transformer": "latest",
-    "class-validator": "^0.14.4",
+    "class-validator": "^0.15.1",
     "concurrently": "latest",
     "cross-env": "latest",
     "del-cli": "latest",
@@ -423,7 +423,7 @@
     "satori": "latest",
     "satori-html": "latest",
     "scheduler": "latest",
-    "sharp": "^0.32.6",
+    "sharp": "^0.34.5",
     "shiki": "latest",
     "supertest": "latest",
     "terser": "latest",
