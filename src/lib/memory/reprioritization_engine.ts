@@ -149,7 +149,7 @@ export interface ReprioritizationReport {
 
 // ─── Severity weight helper ──────────────────────────────────────────────────
 
-const SEVERITY_WEIGHTS: Record<EvidenceSeverity, number> = {
+const SEVERITY_WEIGHTS: Record<string, number | undefined> = {
   [EvidenceSeverity.CRITICAL]: 4.0,
   [EvidenceSeverity.HIGH]: 3.0,
   [EvidenceSeverity.MEDIUM]: 2.0,
@@ -157,9 +157,6 @@ const SEVERITY_WEIGHTS: Record<EvidenceSeverity, number> = {
 }
 
 export function severityWeight(severity: EvidenceSeverity | string): number {
-  if (typeof severity === 'string') {
-    return SEVERITY_WEIGHTS[severity as EvidenceSeverity] ?? 1.0
-  }
   return SEVERITY_WEIGHTS[severity] ?? 1.0
 }
 
@@ -169,16 +166,21 @@ async function generateItemId(
   patternId: string,
   domain: UpstreamDomain,
 ): Promise<string> {
-  const raw = `${domain}:${patternId}`
-  const hash = await crypto.subtle.digest(
-    'SHA-256',
-    new TextEncoder().encode(raw),
-  )
-  const hex = Array.from(new Uint8Array(hash))
-    .slice(0, 6)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
-  return `reprio-${hex}`
+  const raw = `${domain}:${patternId}`;
+  let hex = crypto.randomUUID().replace(/-/g, '').slice(0, 6);
+  const encoder = new TextEncoder();
+  const data = encoder.encode(raw);
+  let hashHex = '';
+  try {
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    hashHex = Array.from(new Uint8Array(hashBuffer))
+      .slice(0, 6)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  } catch {
+    // fallback path uses random hex above
+  }
+  return `reprio-${hashHex || hex}`;
 }
 
 function generateRunId(): string {
@@ -233,7 +235,7 @@ function generateValidationCriteria(
     `Severity: ${point.severity}`,
     `Frequency: ${(point.frequency * 100).toFixed(1)}%`,
   ]
-  const typeCriteria: Record<InterventionType, string[]> = {
+  const typeCriteria: Record<InterventionType, string[] | undefined> = {
     [InterventionType.SOURCE_INTAKE]: [
       'New source qualified per acquisition rubric',
       'Pilot acquisition completed with metadata',
@@ -290,11 +292,21 @@ function generateChangeReason(
   )
 }
 
+// ─── Type Guards ─────────────────────────────────────────────────────────────
+
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && val !== null
+}
+
+function isRecordArray(val: unknown): val is Record<string, unknown>[] {
+  return Array.isArray(val) && val.every(isRecord)
+}
+
 // ─── EvidenceAccumulator ─────────────────────────────────────────────────────
 
 export class EvidenceAccumulator {
-  private accumulations: Map<string, EvidenceAccumulation> = new Map()
-  private config: ReprioritizationConfig
+  private readonly accumulations: Map<string, EvidenceAccumulation> = new Map()
+  private readonly config: ReprioritizationConfig
 
   constructor(config?: ReprioritizationConfig) {
     this.config = config ?? defaultConfig()
@@ -312,66 +324,95 @@ export class EvidenceAccumulator {
     report: Record<string, unknown>,
   ): EvidencePoint[] {
     const evidencePoints: EvidencePoint[] = []
-    const failurePatterns = (report['failure_patterns'] ?? []) as Array<
-      Record<string, unknown>
-    >
-    const upstreamMappings = (report['upstream_mappings'] ?? []) as Array<
-      Record<string, unknown>
-    >
+    
+    const rawFailurePatterns = report['failure_patterns']
+    const failurePatterns = isRecordArray(rawFailurePatterns) ? rawFailurePatterns : []
+
+    const rawUpstreamMappings = report['upstream_mappings']
+    const upstreamMappings = isRecordArray(rawUpstreamMappings) ? rawUpstreamMappings : []
 
     const mappingLookup: Record<string, Record<string, unknown>> = {}
     for (const mapping of upstreamMappings) {
-      const fp = mapping['failure_pattern'] as
-        | Record<string, unknown>
-        | undefined
-      const patternId = (fp?.['pattern_id'] ?? '') as string
-      if (patternId) {
-        mappingLookup[patternId] = mapping
+      const fp = mapping['failure_pattern']
+      if (isRecord(fp)) {
+        const patternId = fp['pattern_id']
+        if (typeof patternId === 'string' && patternId) {
+          mappingLookup[patternId] = mapping
+        }
       }
     }
 
     for (const pattern of failurePatterns) {
-      const patternId = (pattern['pattern_id'] ?? '') as string
+      const patternIdRaw = pattern['pattern_id']
+      const patternId = typeof patternIdRaw === 'string' ? patternIdRaw : ''
       const mapping = mappingLookup[patternId] ?? {}
 
-      const upstreamDomain = (mapping['upstream_domain'] ??
-        'curation') as string
-      let domain: UpstreamDomain
-      try {
-        domain =
-          UpstreamDomain[
-            upstreamDomain.toUpperCase() as keyof typeof UpstreamDomain
-          ]
-      } catch {
-        domain = UpstreamDomain.CURATION
+      const upstreamDomainRaw = mapping['upstream_domain']
+      const upstreamDomain = typeof upstreamDomainRaw === 'string' ? upstreamDomainRaw : 'curation'
+      
+      let domain = UpstreamDomain.CURATION
+      const normalizedDomain = upstreamDomain.toLowerCase()
+      for (const val of Object.values(UpstreamDomain)) {
+        if ((val as string) === normalizedDomain) {
+          domain = val
+          break
+        }
       }
 
-      const severityStr = (pattern['severity'] ?? 'medium') as string
-      let severity: EvidenceSeverity
-      try {
-        severity =
-          EvidenceSeverity[
-            severityStr.toUpperCase() as keyof typeof EvidenceSeverity
-          ]
-      } catch {
-        severity = EvidenceSeverity.MEDIUM
+      const severityStrRaw = pattern['severity']
+      const severityStr = typeof severityStrRaw === 'string' ? severityStrRaw : 'medium'
+      
+      let severity = EvidenceSeverity.MEDIUM
+      const normalizedSeverity = severityStr.toLowerCase()
+      for (const val of Object.values(EvidenceSeverity)) {
+        if ((val as string) === normalizedSeverity) {
+          severity = val
+          break
+        }
       }
 
-      const confidence = (mapping['confidence'] ?? 0.5) as number
-      const rootCause = (mapping['root_cause_hypothesis'] ??
-        pattern['description'] ??
-        '') as string
+      const confidenceRaw = mapping['confidence']
+      const confidence = typeof confidenceRaw === 'number' ? confidenceRaw : 0.5
+
+      const rootCauseHypothesisRaw = mapping['root_cause_hypothesis']
+      const patternDescriptionRaw = pattern['description']
+      
+      let rootCause = ''
+      if (typeof rootCauseHypothesisRaw === 'string' && rootCauseHypothesisRaw) {
+        rootCause = rootCauseHypothesisRaw
+      } else if (typeof patternDescriptionRaw === 'string') {
+        rootCause = patternDescriptionRaw
+      }
+
+      const patternTypeRaw = pattern['pattern_type']
+      const patternType = typeof patternTypeRaw === 'string' ? patternTypeRaw : 'unknown'
+
+      const descriptionRaw = pattern['description']
+      const description = typeof descriptionRaw === 'string' ? descriptionRaw : ''
+
+      const frequencyRaw = pattern['frequency']
+      const frequency = typeof frequencyRaw === 'number' ? frequencyRaw : 0.0
+
+      const metricsImpactedRaw = pattern['metrics_impacted']
+      const metricsImpacted: string[] = []
+      if (Array.isArray(metricsImpactedRaw)) {
+        for (const m of metricsImpactedRaw) {
+          if (typeof m === 'string') {
+            metricsImpacted.push(m)
+          }
+        }
+      }
 
       const point: EvidencePoint = {
         patternId,
-        patternType: (pattern['pattern_type'] ?? 'unknown') as string,
-        description: (pattern['description'] ?? '') as string,
+        patternType,
+        description,
         domain,
         severity,
-        frequency: (pattern['frequency'] ?? 0.0) as number,
+        frequency,
         confidence,
         rootCauseHypothesis: rootCause,
-        metricsImpacted: (pattern['metrics_impacted'] ?? []) as string[],
+        metricsImpacted,
         timestamp: new Date().toISOString(),
       }
       evidencePoints.push(point)
@@ -497,7 +538,7 @@ export class EvidenceAccumulator {
 // ─── PriorityCalculator ──────────────────────────────────────────────────────
 
 export class PriorityCalculator {
-  private static readonly DOMAIN_URGENCY: Record<UpstreamDomain, number> = {
+  private static readonly DOMAIN_URGENCY: Record<UpstreamDomain, number | undefined> = {
     [UpstreamDomain.PRIVACY]: 1.5,
     [UpstreamDomain.ACQUISITION]: 1.2,
     [UpstreamDomain.CURATION]: 1.0,
@@ -505,7 +546,7 @@ export class PriorityCalculator {
     [UpstreamDomain.PACKAGING]: 0.9,
   }
 
-  private config: ReprioritizationConfig
+  private readonly config: ReprioritizationConfig
 
   constructor(config?: ReprioritizationConfig) {
     this.config = config ?? defaultConfig()
@@ -574,11 +615,11 @@ export class PriorityCalculator {
 // ─── ReprioritizationEngine ──────────────────────────────────────────────────
 
 export class ReprioritizationEngine {
-  private config: ReprioritizationConfig
+  private readonly config: ReprioritizationConfig
   accumulator: EvidenceAccumulator
   calculator: PriorityCalculator
-  private backlog: Map<string, BacklogItem> = new Map()
-  private priorityChanges: PriorityChange[] = []
+  private readonly backlog: Map<string, BacklogItem> = new Map()
+  private readonly priorityChanges: PriorityChange[] = []
 
   constructor(config?: ReprioritizationConfig) {
     this.config = config ?? defaultConfig()
@@ -757,20 +798,20 @@ export class ReprioritizationEngine {
         }
         byDomain[item.domain] = d
       }
-      const rec = d as Record<string, number>
-      rec['totalItems']! += 1
-      if (newItems.includes(item)) rec['newItems']! += 1
-      else if (reprioritized.includes(item)) rec['reprioritizedItems']! += 1
-      else rec['unchangedItems']! += 1
+      const rec = d
+      rec['totalItems'] = (rec['totalItems'] ?? 0) + 1
+      if (newItems.includes(item)) rec['newItems'] = (rec['newItems'] ?? 0) + 1
+      else if (reprioritized.includes(item)) rec['reprioritizedItems'] = (rec['reprioritizedItems'] ?? 0) + 1
+      else rec['unchangedItems'] = (rec['unchangedItems'] ?? 0) + 1;
 
       const tierKey = `${item.priorityTier}Count`
-      (rec as any)[tierKey] = ((rec as any)[tierKey] ?? 0) + 1
+      rec[tierKey] = (rec[tierKey] ?? 0) + 1
     }
 
     for (const acc of Array.from(accumulations.values())) {
-      if (acc.domain in byDomain) {
-        const rec = byDomain[acc.domain] as Record<string, number>
-        if (acc.isActionable) rec['actionableEvidenceCount']! += 1
+      const rec = byDomain[acc.domain]
+      if (rec && acc.isActionable) {
+        rec['actionableEvidenceCount'] = (rec['actionableEvidenceCount'] ?? 0) + 1
       }
     }
 

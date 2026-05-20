@@ -1,5 +1,6 @@
 // Session Consolidation — Sprint 4, Task 2 (TypeScript mirror)
 import { MemoryBlock } from '../../../types/memory';
+export type { MemoryBlock };
 
 export interface EmotionalArc {
   startValence: number;
@@ -29,7 +30,7 @@ export type SummarizerFn = (
 ) => string;
 
 export class SessionConsolidator {
-  private summarizer: SummarizerFn;
+  private readonly summarizer: SummarizerFn;
 
   constructor(summarizer?: SummarizerFn) {
     this.summarizer = summarizer ?? SessionConsolidator.defaultSummarizer;
@@ -38,8 +39,9 @@ export class SessionConsolidator {
   consolidate(memories: MemoryBlock[]): SessionSummary {
     if (memories.length === 0) throw new Error('Cannot consolidate empty memory list');
 
-    const tenantId = memories[0].tenantId;
-    const sessionId = memories[0].sessionId;
+    const first = memories[0]!;
+    const tenantId = first.tenantId;
+    const sessionId = first.sessionId;
     const themes = this.extractThemes(memories);
     const emotionalArc = this.computeEmotionalArc(memories);
     const unresolved = this.identifyUnresolved(memories);
@@ -62,7 +64,7 @@ export class SessionConsolidator {
     for (const m of memories) {
       const cats = m.emotions.categories.length > 0 ? m.emotions.categories : ['general'];
       for (const cat of cats) {
-        counter[cat] = (counter[cat] || 0) + 1;
+        counter[cat] = (counter[cat] ?? 0) + 1;
       }
     }
     return Object.entries(counter)
@@ -79,8 +81,8 @@ export class SessionConsolidator {
       return { startValence: 0, endValence: 0, minValence: 0, maxValence: 0, avgValence: 0, trend: 'stable', volatility: 0 };
     }
 
-    const start = valences[0];
-    const end = valences[valences.length - 1];
+    const start = valences[0]!;
+    const end = valences[valences.length - 1]!;
     const avg = valences.reduce((s, v) => s + v, 0) / valences.length;
     const minV = Math.min(...valences);
     const maxV = Math.max(...valences);
@@ -132,6 +134,7 @@ export class SessionConsolidator {
   }
 
   private static defaultSummarizer(
+    this: void,
     memories: MemoryBlock[],
     themes: string[],
     arc: EmotionalArc,

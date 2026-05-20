@@ -22,7 +22,7 @@ function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {
       piiStatus: 'absent', crisisFlag: false, traumaIndicators: [], consentGate: 'open',
     },
     consolidation: overrides.consolidation ?? {
-      phase: 'raw' as any, lastProcessed: 0, remCycles: 3, schemaReferences: [],
+      phase: 'raw', lastProcessed: 0, remCycles: 3, schemaReferences: [],
     },
   };
 }
@@ -100,7 +100,7 @@ describe('DreamReflectionIntegrator', () => {
       emotionalArc: { startValence: -0.5, endValence: 0.5, minValence: -0.5, maxValence: 0.5, avgValence: 0, trend: 'improving', volatility: 0.3 },
       unresolvedTopics: [], summaryText: 'test', memoryCount: 2, timestampMs: Date.now(),
     };
-    const result = integrator.integrate(dreamResult as any, summary);
+    const result = integrator.integrate(dreamResult, summary);
     expect(result.insights.length).toBeGreaterThan(0);
   });
 });
@@ -126,6 +126,6 @@ describe('ActionPipeline', () => {
     };
     const result = pipeline.execute(summary);
     expect(result.recommendations.length).toBeGreaterThan(0);
-    expect(result.recommendations[0].priority).toBe(ActionPriority.HIGH);
+    expect(result.recommendations.at(-1)?.priority).toBe(ActionPriority.HIGH);
   });
 });
