@@ -12,7 +12,7 @@ See `README.md` for the full description.
 ### Runtime versions
 
 - **Node.js**: 24.14.1 (see `.nvmrc`)
-- **pnpm**: 11.1.1 (see `packageManager` in `package.json`)
+- **pnpm**: 11.1.2 (see `packageManager` in `package.json`)
 - **Python**: 3.13 (see `.python-version`, `pyproject.toml`)
 - **uv**: used for Python dependency management
 

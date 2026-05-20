@@ -110,9 +110,8 @@ dependencies = [
   "peft>=0.10.0",
   "accelerate>=0.28.0",
   "bitsandbytes>=0.43.0",
-  "lightning>=2.1.0",
-  "wandb>=0.16.0",
-  "lightning-sdk>=2025.12.2",
+   "lightning>=2.1.0",
+   "lightning-sdk>=2025.12.2",
   "watchdog>=5.0.3",
   "schedule>=1.2.2",
   "gitpython>=3.1.43",
@@ -239,11 +238,11 @@ combine-as-imports = true
 force-single-line = false
 [tool.black]
 target-version = ["py313"]
-line-length = 100
+line-length = 120
 skip-string-normalization = false
 [tool.isort]
 profile = "black"
-line_length = 100
+line_length = 120
 known_first_party = ["ai", "src"]
 combine_as_imports = true
 force_single_line = false
