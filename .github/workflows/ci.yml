@@ -13,9 +13,15 @@ on:
       - 'docker/**'
       - 'k8s/**'
       - 'terraform/**'
-      - 'scripts/render-k8s-secrets.sh'
+      - 'scripts/**'
+      - 'config/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+      - 'pyproject.toml'
+      - '.editorconfig'
+      - '.dockerignore'
+      - '.vscode/**'
       - '.github/workflows/ci.yml'
       - '.github/workflows/deploy-kubernetes.yml'
   pull_request:
@@ -24,7 +30,6 @@ on:
 
 jobs:
   build-test:
-    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -83,7 +88,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true
