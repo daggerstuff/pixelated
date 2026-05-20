@@ -1,60 +1,38 @@
-# Dependabot Alerts Script
+# Scripts Directory
 
-This script checks terminal session snapshots for context window usage signals and
-outputs a concise risk summary.
+Operational utilities, deployment helpers, and developer workflows for Pixelated Empathy.
 
-## Usage
+## Organization
 
-```bash
-pnpm ts-node scripts/utils/list-dependabot-alerts.ts
-```
+| Subdirectory | Purpose |
+|---|---|
+| `ci/` | CI/CD pipeline helpers — linting, building, changed-file detection |
+| `testing/` | Test runners (Playwright docker setup, local vitest wrapper) |
+| `devops/` | Security scans, git hooks, Copilot-safe-run, NIM setup |
+| `memory/` | Foresight MCP server launcher and config |
+| `auth0/` | Auth0 integration helpers |
+| `backup/` | Database backup and restore utilities |
+| `deploy/` | Release and rollback scripts |
+| `training/` | Model training orchestration |
+| `research/` | Dataset sourcing and academic pull automation |
+| `content/` | Blog publishing and post scheduling |
+| `migration/` | Database migration helpers |
+| `infrastructure/` | Deploy targets (staging/production), K8s secret rendering |
+| `qa/` | Quality assurance scripts |
+| `governance/` | Compliance and audit tooling |
+| `utils/` | General-purpose helpers (no-fail wrapper, credential scanner) |
 
-Or if ts-node is globally available:
+## Notable Top-Level Scripts
 
-```bash
-./scripts/utils/list-dependabot-alerts.ts
-```
+| Script | What it does |
+|---|---|
+| `setup-dev.sh` | **One-command local setup** — installs deps, starts Docker databases, copies `.env` |
+| `redis.sh` | Redis service management — start, ping, health, switch local/remote |
+| `check-redis-hardening.sh` | Security audit for Redis configuration |
+| `consolidated-test.js` | Multi-suite test runner (HIPAA, crypto, backup, security) |
 
-## Context Window Guard
+## Adding New Scripts
 
-Run this before long interactive sessions to get a quick status check:
-
-```bash
-./scripts/context-window-check.sh
-```
-
-Use `--enforce` to force a hard stop when risky patterns are detected:
-
-```bash
-./scripts/context-window-check.sh --enforce
-```
-
-This now also flags high-risk edit churn patterns in recent terminal logs (`Update(...)`, `Error editing file`, repeated
-  `Read ... file` output bursts) and tells you when compaction should happen now.
-
-To enforce a hard stop warning (kill-switch), pass:
-
-```bash
-./scripts/context-window-check.sh --enforce
-```
-
-If risky context growth is detected, the script exits with code `2` and instructs you
-to run `/compact` immediately.
-
-Notes:
-
-- The guard checks only local terminal snapshot signals (`Context XX%` lines) for signs of
-  Claude session pressure.
-- There is no user-editable Claude configuration in this repo that sets `model_auto_compact_token_limit`.
-  That setting belongs to other tooling and is intentionally not used by this script.
-
-## Requirements
-
-- GitHub CLI (`gh`) installed and authenticated
-- Repository with Dependabot alerts
-- `ts-node` (available as dev dependency in this project)
-
-## Output
-
-The script will create or overwrite `alerts.json` in the repository root, with
-the Dependabot alerts data.
+1. Place category-specific scripts in the matching subdirectory
+2. Expose via `package.json` scripts if used regularly by developers
+3. Keep shell scripts POSIX-compatible; Node/TS scripts should use `tsx` or `node`
