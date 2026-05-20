@@ -43,8 +43,8 @@ export interface PatternReport {
 }
 
 export class PatternDetector {
-  private minFreq: number;
-  private minConfidence: number;
+  private readonly minFreq: number;
+  private readonly minConfidence: number;
 
   constructor(minFreq = 2, minConfidence = 0.6) {
     this.minFreq = minFreq;
@@ -76,15 +76,15 @@ export class PatternDetector {
           themeSessions[theme] = [];
           themeValences[theme] = [];
         }
-        themeSessions[theme].push(s.sessionId);
-        themeValences[theme].push(s.emotionalArc.avgValence);
+        themeSessions[theme]!.push(s.sessionId);
+        themeValences[theme]!.push(s.emotionalArc.avgValence);
       }
     }
 
     const results: RecurringTheme[] = [];
     for (const [theme, sessionList] of Object.entries(themeSessions)) {
       if (sessionList.length < this.minFreq) continue;
-      const valences = themeValences[theme];
+      const valences = themeValences[theme]!;
       let trend: 'improving' | 'declining' | 'stable' = 'stable';
       if (valences.length >= 2) {
         const mid = Math.floor(valences.length / 2);
@@ -143,16 +143,16 @@ export class PatternDetector {
 
     for (const s of sessions) {
       for (const theme of s.themes) {
-        themeCounts[theme] = (themeCounts[theme] || 0) + 1;
+        themeCounts[theme] = (themeCounts[theme] ?? 0) + 1;
         if (crisisSessions.has(s.sessionId)) {
-          themeCrisis[theme] = (themeCrisis[theme] || 0) + 1;
+          themeCrisis[theme] = (themeCrisis[theme] ?? 0) + 1;
         }
       }
     }
 
     const patterns: TriggerPattern[] = [];
     for (const [theme, count] of Object.entries(themeCounts)) {
-      const crisisCount = themeCrisis[theme] || 0;
+      const crisisCount = themeCrisis[theme] ?? 0;
       if (crisisCount >= this.minFreq) {
         const confidence = crisisCount / count;
         if (confidence >= this.minConfidence) {

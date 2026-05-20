@@ -6,7 +6,7 @@
  * crisis detection, session trajectory tracking.
  */
 
-import type { MemoryEmotions } from '@/types/memory'
+
 
 // ─── Plutchik wheel categories ────────────────────────────────────────────────
 
@@ -147,7 +147,7 @@ const CRISIS_CATEGORIES = new Set(['suicide', 'self-harm', 'panic', 'psychosis']
 
 function classifyLexicon(
   text: string,
-  multiLabel: boolean,
+  _multiLabel: boolean,
 ): EmotionClassificationResult {
   const textLower = text.toLowerCase()
   const categoryScores: Record<string, number> = {}
@@ -164,7 +164,8 @@ function classifyLexicon(
 
   const { valence, arousal, dominance } = vadScore(text)
 
-  if (!Object.keys(categoryScores).length) {
+  const entries = Object.entries(categoryScores)
+  if (!entries.length) {
     return {
       categories: [],
       categoryScores: {},
@@ -177,10 +178,9 @@ function classifyLexicon(
     }
   }
 
-  const topCategory = Object.keys(categoryScores).reduce((a, b) =>
-    categoryScores[a] >= categoryScores[b] ? a : b,
+  const [topCategory, topScore] = entries.reduce((a, b) =>
+    a[1] >= b[1] ? a : b,
   )
-  const topScore = categoryScores[topCategory]
 
   return {
     categories: Object.keys(categoryScores),
@@ -204,8 +204,8 @@ function computeTrend(
   const variance = valences.reduce((s, v) => s + (v - mean) ** 2, 0) / valences.length
   if (variance > 0.04) return 'volatile'
 
-  const valenceTrend = valences[valences.length - 1] - valences[0]
-  const dominanceTrend = dominances[dominances.length - 1] - dominances[0]
+  const valenceTrend = valences[0]! - valences[valences.length - 1]!
+  const dominanceTrend = dominances[0]! - dominances[dominances.length - 1]!
 
   if (valenceTrend < -0.1 && dominanceTrend < -0.1) return 'escalating'
   if (valenceTrend > 0.1 && dominanceTrend > 0.1) return 'de-escalating'
@@ -215,14 +215,8 @@ function computeTrend(
 // ─── Public API ────────────────────────────────────────────────────────────────
 
 export class EmotionClassifier {
-  private readonly mode: 'lexicon' | 'model' = 'lexicon'
-
-  constructor(mode: 'lexicon' | 'model' = 'lexicon') {
-    this.mode = mode
-  }
-
-  classify(text: string, multiLabel = true): EmotionClassificationResult {
-    if (!text?.trim()) {
+  classify(text: string, _multiLabel = true): EmotionClassificationResult {
+    if (!text.trim()) {
       return {
         categories: [],
         categoryScores: {},
@@ -234,11 +228,11 @@ export class EmotionClassifier {
         multiplier: 1.0,
       }
     }
-    return classifyLexicon(text, multiLabel)
+    return classifyLexicon(text, _multiLabel)
   }
 
-  classifyBatch(texts: string[], multiLabel = true): EmotionClassificationResult[] {
-    return texts.map((t) => this.classify(t, multiLabel))
+  classifyBatch(texts: string[], _multiLabel = true): EmotionClassificationResult[] {
+    return texts.map((t) => this.classify(t, _multiLabel))
   }
 
   sessionTrajectory(results: EmotionClassificationResult[]): EmotionTrajectory {
@@ -254,8 +248,8 @@ export class EmotionClassifier {
       }
     }
 
-    const first = results[0]
-    const last = results[results.length - 1]
+    const first = results[0]!
+    const last = results[results.length - 1]!
     const valences = results.map((r) => r.valence)
     const dominances = results.map((r) => r.dominance)
 
@@ -266,7 +260,7 @@ export class EmotionClassifier {
     let maxIntensity = 0
     for (const r of results) {
       if (r.topCategory !== null && (r.categoryScores[r.topCategory] ?? 0) > maxIntensity) {
-        maxIntensity = r.categoryScores[r.topCategory]
+        maxIntensity = r.categoryScores[r.topCategory] ?? 0
       }
     }
 

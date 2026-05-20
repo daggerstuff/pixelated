@@ -1,5 +1,4 @@
 // Reflexion Framework — Sprint 4, Task 1 (TypeScript mirror)
-import { MemoryBlock } from '../../../types/memory';
 
 export enum FeedbackType {
   SUCCESS = 'success',
@@ -35,12 +34,12 @@ export interface ReflexionResult {
 export type ReflectionGeneratorFn = (pairs: ActionFeedbackPair[]) => string;
 
 export class ReflexionEngine {
-  private generator: ReflectionGeneratorFn;
-  private minPairs: number;
-  private trajectories: Map<string, ActionFeedbackPair[]> = new Map();
+  private readonly generator: ReflectionGeneratorFn;
+  private readonly minPairs: number;
+  private readonly trajectories: Map<string, ActionFeedbackPair[]> = new Map();
 
   constructor(generator?: ReflectionGeneratorFn, minPairs = 3) {
-    this.generator = generator ?? ReflexionEngine.defaultGenerator;
+    this.generator = generator ?? ((pairs) => ReflexionEngine.defaultGenerator(pairs));
     this.minPairs = minPairs;
   }
 
@@ -64,7 +63,7 @@ export class ReflexionEngine {
   }
 
   reflect(sessionId: string): ReflexionResult | null {
-    const pairs = this.trajectories.get(sessionId) || [];
+    const pairs = this.trajectories.get(sessionId) ?? [];
     if (pairs.length < this.minPairs) return null;
 
     const rawReflection = this.generator(pairs);
@@ -90,7 +89,7 @@ export class ReflexionEngine {
   }
 
   getTrajectory(sessionId: string): ActionFeedbackPair[] {
-    return [...(this.trajectories.get(sessionId) || [])];
+    return [...(this.trajectories.get(sessionId) ?? [])];
   }
 
   clearSession(sessionId: string): void {

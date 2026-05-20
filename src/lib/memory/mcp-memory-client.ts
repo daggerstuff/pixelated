@@ -1,11 +1,12 @@
 import type {
   AddMemoryInput,
   MemoryEntry,
+  MemoryMetadata,
   MemoryStats,
   SearchOptions,
 } from './memory-client'
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_ORIGIN ?? ''
+const BASE_URL = process.env['NEXT_PUBLIC_APP_ORIGIN'] ?? ''
 
 export const mcpMemoryManager = {
   async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
@@ -24,8 +25,9 @@ export const mcpMemoryManager = {
       throw new Error(`Failed to add memory: ${response.statusText}`)
     }
 
-    const data = await response.json()
-    const memoryId = data.memory_id
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+    const memoryId = typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined
     if (!memoryId) {
       throw new Error('Memory add response did not include memory_id')
     }
@@ -90,8 +92,9 @@ export const mcpMemoryManager = {
       throw new Error(`Failed to search memories: ${response.statusText}`)
     }
 
-    const data = await response.json()
-    return mapMemoryEntries(data.memories)
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+    return mapMemoryEntries(data['memories'])
   },
 
   async getMemoryStats(userId?: string): Promise<MemoryStats> {
@@ -104,11 +107,23 @@ export const mcpMemoryManager = {
       throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
     }
 
-    const data = await response.json()
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+
+    const totalMemories = typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
+    
+    let categoryCounts: Record<string, number> = {}
+    if (isRecord(data['categoryCounts'])) {
+      for (const [key, value] of Object.entries(data['categoryCounts'])) {
+        if (typeof value === 'number') {
+          categoryCounts[key] = value
+        }
+      }
+    }
 
     return {
-      totalMemories: data.totalMemories ?? 0,
-      categoryCounts: data.categoryCounts ?? {},
+      totalMemories,
+      categoryCounts,
       recentActivity: [],
     }
   },
@@ -222,8 +237,9 @@ async function fetchMappedMemories(
   if (!response.ok) {
     throw new Error(`Failed to fetch memories: ${response.statusText}`)
   }
-  const data = await response.json()
-  return mapMemoryEntries(data.memories)
+  const rawData = (await response.json()) as unknown
+  const data = isRecord(rawData) ? rawData : {}
+  return mapMemoryEntries(data['memories'])
 }
 
 function mapMemoryEntries(memories: unknown): MemoryEntry[] {
@@ -231,9 +247,20 @@ function mapMemoryEntries(memories: unknown): MemoryEntry[] {
     return []
   }
 
-  return memories.map((memory: any) => ({
-    id: memory.id ?? 'unknown',
-    content: (memory.memory ?? memory.content) ?? '',
-    metadata: memory.metadata ?? {},
-  }))
+  return memories.map((item: unknown) => {
+    const memory = isRecord(item) ? item : {}
+    return {
+      id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
+      content: typeof memory['content'] === 'string' ? memory['content'] : (typeof memory['memory'] === 'string' ? memory['memory'] : ''),
+      metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
+    }
+  })
+}
+
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && val !== null
+}
+
+function isMetadata(val: unknown): val is MemoryMetadata {
+  return typeof val === 'object' && val !== null
 }

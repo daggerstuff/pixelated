@@ -73,7 +73,21 @@ export class LettaCrisisClient {
       )
     }
 
-    return response.json() as Promise<CrisisResult>
+    const data: unknown = await response.json()
+    if (this.isCrisisResult(data)) {
+      return data
+    }
+
+    throw new Error('Invalid crisis detection result')
+  }
+
+  private isCrisisResult(obj: unknown): obj is CrisisResult {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'severity' in obj &&
+      'indicators' in obj
+    )
   }
 
   /**
@@ -120,10 +134,20 @@ export class LettaCrisisClient {
       throw new Error('Failed to get crisis resources')
     }
 
-    const data = (await response.json()) as
-      | CrisisResources
-      | { resources: string[] }
-    return data.resources
+    const data: unknown = await response.json()
+    if (this.isCrisisResources(data)) {
+      return data.resources
+    }
+    throw new Error('Invalid crisis resources response')
+  }
+
+  private isCrisisResources(obj: unknown): obj is CrisisResources {
+    return (
+      typeof obj === 'object' &&
+      obj !== null &&
+      'resources' in obj &&
+      Array.isArray((obj as { resources: unknown }).resources)
+    )
   }
 
   /**
