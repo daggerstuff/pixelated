@@ -10,10 +10,7 @@
 
 import type {
   MemoryBlock,
-  MemoryEmotions,
-  MemoryGating,
   MemoryImportance,
-  MemorySearchFilters,
   MemoryWriteInput,
 } from '@/types/memory'
 
@@ -94,8 +91,10 @@ async function handleResponse<T>(res: Response): Promise<T> {
       body,
     )
   }
-  if (res.status === 204) return undefined as T
-  return res.json() as Promise<T>
+  // oxlint-disable-next-line
+  if (res.status === 204) return undefined as unknown as T
+  // oxlint-disable-next-line
+  return (await res.json()) as T
 }
 
 // ─── Client ────────────────────────────────────────────────────────────────────
@@ -115,7 +114,7 @@ export class MemoryApiClient {
     const res = await this.fetch(`${this.baseUrl}/health`)
     const data = await handleResponse<Record<string, unknown>>(res)
     return {
-      status: String(data['status'] ?? 'ok'),
+      status: typeof data['status'] === 'string' ? data['status'] : 'ok',
       memoryCount: Number(data['memory_count'] ?? 0),
       scorerLatencyMs: Number(data['scorer_latency_ms'] ?? 0),
       classifierLatencyMs: Number(data['classifier_latency_ms'] ?? 0),
@@ -131,10 +130,10 @@ export class MemoryApiClient {
       content: input.content,
     }
     if (input.emotions) {
-      (body).emotions = input.emotions
+      body['emotions'] = input.emotions
     }
     if (input.gating) {
-      (body).gating = input.gating
+      body['gating'] = input.gating
     }
     const res = await this.fetch(`${this.baseUrl}/memories`, {
       method: 'POST',
@@ -223,7 +222,19 @@ export class MemoryApiClient {
   async trajectory(sessionId: string, tenantId: string, limit = 50): Promise<TrajectoryResponse> {
     const qs = new URLSearchParams({ tenant_id: tenantId, limit: String(limit) })
     const res = await this.fetch(`${this.baseUrl}/memories/trajectory/${encodeURIComponent(sessionId)}?${qs}`)
-    const data = await handleResponse<Record<string, unknown>>(res)
-    return data as TrajectoryResponse
+    const data = await handleResponse<unknown>(res)
+    if (this.isTrajectoryResponse(data)) {
+      return data
+    }
+    throw new Error('Invalid trajectory response')
+  }
+
+  private isTrajectoryResponse(data: unknown): data is TrajectoryResponse {
+    return (
+      typeof data === 'object' &&
+      data !== null &&
+      'sessionId' in data &&
+      'trajectory' in data
+    )
   }
 }

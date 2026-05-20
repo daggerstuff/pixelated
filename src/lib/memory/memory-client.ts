@@ -120,9 +120,7 @@ export const memoryManager = {
       const updatedMemory: MemoryEntry = {
         ...existingMemory,
         content,
-        metadata: existingMemory.metadata
-          ? { ...existingMemory.metadata, timestamp: now }
-          : { timestamp: now },
+        metadata: { ...existingMemory.metadata, timestamp: now },
         updatedAt: now,
       }
 
@@ -137,9 +135,7 @@ export const memoryManager = {
       // We manually spread because these are simple objects, ensuring compatibility
       const deepCopiedResult: MemoryEntry = {
         ...updatedMemory,
-        metadata: updatedMemory.metadata
-          ? { ...updatedMemory.metadata }
-          : undefined,
+        metadata: { ...updatedMemory.metadata },
       }
       return deepCopiedResult
     }
@@ -178,13 +174,13 @@ export const memoryManager = {
 
     if (category) {
       results = results.filter(
-        (m) => (m.metadata?.category ?? 'general') === category,
+        (m) => (m.metadata.category ?? 'general') === category,
       )
     }
 
     if (tags.length) {
       results = results.filter((m) =>
-        tags.every((t) => m.metadata?.tags?.includes(t)),
+        tags.every((t) => m.metadata.tags.includes(t)),
       )
     }
 
@@ -198,7 +194,7 @@ export const memoryManager = {
     ensureUser(userId)
     return store
       .get(userId)!
-      .filter((m) => (m.metadata?.category ?? 'general') === category)
+      .filter((m) => (m.metadata.category ?? 'general') === category)
   },
 
   async searchByTags(
@@ -208,7 +204,7 @@ export const memoryManager = {
     ensureUser(userId)
     return store
       .get(userId)!
-      .filter((m) => tags.every((t) => m.metadata?.tags?.includes(t)))
+      .filter((m) => tags.every((t) => m.metadata.tags.includes(t)))
   },
 
   async getMemoryStats(userId = 'default'): Promise<MemoryStats> {
@@ -216,8 +212,8 @@ export const memoryManager = {
     const list = store.get(userId)!
     const categoryCounts: Record<string, number> = {}
     for (const m of list) {
-      const cat = m.metadata?.category ?? 'general'
-      categoryCounts[cat] = (categoryCounts[cat] || 0) + 1
+      const cat = m.metadata.category ?? 'general'
+      categoryCounts[cat] = (categoryCounts[cat] ?? 0) + 1
     }
     return {
       totalMemories: list.length,

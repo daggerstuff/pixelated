@@ -3,6 +3,7 @@ import { fetchWithAuthToken } from '../auth/auth0-protected-fetch'
 import type {
   AddMemoryInput,
   MemoryEntry,
+  MemoryMetadata,
   MemoryStats,
   SearchOptions,
 } from './memory-client'
@@ -51,16 +52,18 @@ export class ProductMemoryClient {
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}))
+      const rawError = (await response.json().catch(() => ({}))) as unknown
+      const error = isRecord(rawError) ? rawError : {}
+      const errorMessage = typeof error['message'] === 'string' ? error['message'] : undefined
       throw new Error(
-        (error instanceof Error ? error.message : 'Unknown error') ||
-          `Failed to add memory: ${response.statusText}`,
+        errorMessage ?? `Failed to add memory: ${response.statusText}`,
       )
     }
 
-    const data = await response.json()
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
     // Support both legacy memory_id and new id format
-    const memoryId = data.id ?? data.memory_id
+    const memoryId = typeof data['id'] === 'string' ? data['id'] : (typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined)
     if (!memoryId) {
       throw new Error('Memory add response did not include an ID')
     }
@@ -91,8 +94,9 @@ export class ProductMemoryClient {
       throw new Error(`Failed to list memories: ${response.statusText}`)
     }
 
-    const data = await response.json()
-    return mapMemoryEntries(data.memories)
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+    return mapMemoryEntries(data['memories'])
   }
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
@@ -113,8 +117,9 @@ export class ProductMemoryClient {
       throw new Error(`Failed to search memories: ${response.statusText}`)
     }
 
-    const data = await response.json()
-    return mapMemoryEntries(data.memories)
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+    return mapMemoryEntries(data['memories'])
   }
 
   async updateMemory(
@@ -164,11 +169,37 @@ export class ProductMemoryClient {
       throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
     }
 
-    const data = await response.json()
+    const rawData = (await response.json()) as unknown
+    const data = isRecord(rawData) ? rawData : {}
+    const totalMemories = typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
+    
+    let categoryCounts: Record<string, number> = {}
+    if (isRecord(data['categoryCounts'])) {
+      categoryCounts = {}
+      for (const [key, value] of Object.entries(data['categoryCounts'])) {
+        if (typeof value === 'number') {
+          categoryCounts[key] = value
+        }
+      }
+    }
+
+    let recentActivity: MemoryStats['recentActivity'] = []
+    if (Array.isArray(data['recentActivity'])) {
+      recentActivity = data['recentActivity'].map((item: unknown) => {
+        const act = isRecord(item) ? item : {}
+        return {
+          id: typeof act['id'] === 'string' ? act['id'] : 'unknown',
+          timestamp: typeof act['timestamp'] === 'string' ? act['timestamp'] : new Date().toISOString(),
+          operation: typeof act['operation'] === 'string' ? act['operation'] : 'unknown',
+          memoryId: typeof act['memoryId'] === 'string' ? act['memoryId'] : undefined,
+        }
+      })
+    }
+
     return {
-      totalMemories: data.totalMemories ?? 0,
-      categoryCounts: data.categoryCounts ?? {},
-      recentActivity: data.recentActivity ?? [],
+      totalMemories,
+      categoryCounts,
+      recentActivity,
     }
   }
 
@@ -202,16 +233,27 @@ function requireUserId(userId?: string): string {
   return userId
 }
 
-function mapMemoryEntries(memories: any[]): MemoryEntry[] {
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === 'object' && val !== null
+}
+
+function isMetadata(val: unknown): val is MemoryMetadata {
+  return typeof val === 'object' && val !== null
+}
+
+function mapMemoryEntries(memories: unknown): MemoryEntry[] {
   if (!Array.isArray(memories)) {
     return []
   }
 
-  return memories.map((memory: any) => ({
-    id: memory.id ?? 'unknown',
-    content: (memory.content ?? memory.memory) ?? '',
-    metadata: memory.metadata ?? {},
-    createdAt: memory.createdAt ?? memory.created_at,
-    updatedAt: memory.updatedAt ?? memory.updated_at,
-  }))
+  return memories.map((item: unknown) => {
+    const memory = isRecord(item) ? item : {}
+    return {
+      id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
+      content: typeof memory['content'] === 'string' ? memory['content'] : (typeof memory['memory'] === 'string' ? memory['memory'] : ''),
+      metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
+      createdAt: typeof memory['createdAt'] === 'string' ? memory['createdAt'] : (typeof memory['created_at'] === 'string' ? memory['created_at'] : undefined),
+      updatedAt: typeof memory['updatedAt'] === 'string' ? memory['updatedAt'] : (typeof memory['updated_at'] === 'string' ? memory['updated_at'] : undefined),
+    }
+  })
 }

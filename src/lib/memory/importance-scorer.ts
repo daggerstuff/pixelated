@@ -9,13 +9,6 @@
 import type {
   MemoryBlock,
   ScoringWeights,
-  MemoryImportance,
-  MemoryEmotions,
-  MemoryGating,
-  MemoryConsolidation,
-  PIIStatus,
-  ConsentGate,
-  ConsolidationPhase,
 } from '@/types/memory'
 
 // ─── Cosine similarity ────────────────────────────────────────────────────────
