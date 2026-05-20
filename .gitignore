@@ -9,15 +9,16 @@
 .pnpm-store/
 .qwen/
 .serena/
-.sonarlint
+.sonarlint/
 .vscode/
-AGENTS.md
+.vercel/
 .kiro/
-.claude-octopus
-.geminiignore
-.kiro_tmp
-.oxlintignore
-.superpowers
+.omo/
+.claude-octopus/
+.geminiignore/
+.kiro_tmp/
+.oxlintignore/
+.superpowers/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -206,7 +207,6 @@ security-scan-artifacts
 .sdd/
 .temp
 .tmp
-.trunk
 .webassets-cache
 templates/
 tmp/
@@ -219,7 +219,6 @@ tmp/
 .notes/
 .scrapy
 .sisyphus/
-.trunk
 .windsurf
 /*.DS_Store*
 /.astro
@@ -304,8 +303,6 @@ gha-creds-*.json
 # Playwright
 /blob-report/
 /playwright/.auth/
-/playwright-report/
-/playwright-report-browser-compat
 
 # === COPILOT CLI ===
 .copilot/
@@ -333,8 +330,6 @@ __mocks__
 .squad/sessions/
 # Squad: SubSquad activation file (local to this machine)
 .squad-workstream
-.ai/internal/plans
-.goose/
 ai/.moderne
 
 .mcp.json
