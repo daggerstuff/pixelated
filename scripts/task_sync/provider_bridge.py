@@ -157,6 +157,11 @@ def _dedupe_project_ids(project_ids: list[str]) -> tuple[str, ...]:
 def _resolve_default_asana_project_id(asana: Mapping[str, Any]) -> str:
     all_projects = asana.get("all_projects")
     if isinstance(all_projects, Mapping):
+        mtgc_value = all_projects.get("master_training_gap_closure")
+        mtgc_project_id = _normalize_project_id(mtgc_value)
+        if mtgc_project_id:
+            return mtgc_project_id
+
         active_sprint_value = all_projects.get("active_sprint")
         active_sprint_project_id = _normalize_project_id(active_sprint_value)
         if active_sprint_project_id:
