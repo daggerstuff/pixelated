@@ -268,6 +268,12 @@ const OverviewTab: FC<{
   selectedPatients: string[]
   timeRange: 'week' | 'month' | 'quarter' | 'year'
 }> = ({ patients, metrics, onPatientSelect, selectedPatients, timeRange }) => {
+  // ⚡ Bolt: Use O(1) Set lookup instead of O(N) Array.includes inside map loop
+  const selectedPatientsSet = React.useMemo(
+    () => new Set(selectedPatients),
+    [selectedPatients],
+  )
+
   const urgentPatients = patients.filter(
     (p) => p.riskLevel === 'high' || p.riskLevel === 'critical',
   )
@@ -379,7 +385,7 @@ const OverviewTab: FC<{
                     <input
                       type='checkbox'
                       aria-label={`Select ${patient.name}`}
-                      checked={selectedPatients.includes(patient.id)}
+                      checked={selectedPatientsSet.has(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
                       className='text-red-600 h-4 w-4 rounded'
                     />
@@ -419,7 +425,7 @@ const OverviewTab: FC<{
                     <input
                       type='checkbox'
                       aria-label={`Select ${patient.name}`}
-                      checked={selectedPatients.includes(patient.id)}
+                      checked={selectedPatientsSet.has(patient.id)}
                       onChange={() => onPatientSelect(patient.id)}
                       className='text-yellow-600 h-4 w-4 rounded'
                     />
@@ -454,7 +460,7 @@ const OverviewTab: FC<{
                 <input
                   type='checkbox'
                   aria-label={`Select ${patient.name}`}
-                  checked={selectedPatients.includes(patient.id)}
+                  checked={selectedPatientsSet.has(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
                   className='text-blue-600 h-4 w-4 rounded'
                 />
@@ -506,6 +512,12 @@ const PatientsTab: FC<{
   onPatientSelect: (patientId: string) => void
   selectedPatients: string[]
 }> = ({ patients, onPatientSelect, selectedPatients }) => {
+  // ⚡ Bolt: Use O(1) Set lookup instead of O(N) Array.includes inside map loop
+  const selectedPatientsSet = React.useMemo(
+    () => new Set(selectedPatients),
+    [selectedPatients],
+  )
+
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
@@ -556,7 +568,7 @@ const PatientsTab: FC<{
                 <input
                   type='checkbox'
                   aria-label={`Select ${patient.name}`}
-                  checked={selectedPatients.includes(patient.id)}
+                  checked={selectedPatientsSet.has(patient.id)}
                   onChange={() => onPatientSelect(patient.id)}
                   className='text-blue-600 h-4 w-4 rounded'
                 />
