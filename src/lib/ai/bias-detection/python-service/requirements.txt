@@ -156,7 +156,7 @@ huggingface-hub==0.36.1
     #   evaluate
     #   tokenizers
     #   transformers
-idna==3.11
+idna==3.15
     # via
     #   anyio
     #   httpx
