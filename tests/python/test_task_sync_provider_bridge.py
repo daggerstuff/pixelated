@@ -237,6 +237,28 @@ def test_read_default_asana_project_id_prefers_active_sprint(tmp_path) -> None:
     assert read_default_asana_project_id(config_path) == "active-project"
 
 
+def test_read_default_asana_project_id_prefers_mtgc_over_active_sprint(tmp_path) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        json.dumps(
+            {
+                "integration": {
+                    "asana": {
+                        "project_id": "old-project",
+                        "all_projects": {
+                            "master_training_gap_closure": "mtgc-project",
+                            "active_sprint": "active-project",
+                        },
+                    }
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert read_default_asana_project_id(config_path) == "mtgc-project"
+
+
 def test_read_default_asana_project_ids_prefers_task_sync_projects(tmp_path) -> None:
     config_path = tmp_path / "config.json"
     config_path.write_text(
