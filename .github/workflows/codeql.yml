@@ -110,17 +110,7 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Ensure `uv` shim is available
-        if: matrix.language == 'python'
-        run: |
-          if ! command -v uv >/dev/null 2>&1; then
-            echo "uv not found - installing via pip"
-            python -m pip install --upgrade 'pip>=25.3'
-            python -m pip install 'uv>=0.9.6'
-          else
-            echo "uv already installed - verifying version"
-            python -m pip install --upgrade 'pip>=25.3' 'uv>=0.9.6' || true
-          fi
+      # uv shim installation is handled inside ./.github/actions/prepare-uv-venv
 
       - name: Prepare uv venv
         if: matrix.language == 'python'
@@ -131,6 +121,10 @@ jobs:
 
       - name: Install Python dependencies
         if: matrix.language == 'python'
+        env:
+          # Point uv at the venv that prepare-uv-venv created so it doesn't
+          # fall back to the system interpreter when USE_SYSTEM is empty.
+          VIRTUAL_ENV: ${{ github.workspace }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           # Install Python dependencies for CodeQL analysis
           # Check if bias-detection service exists
@@ -142,13 +136,29 @@ jobs:
             cd - > /dev/null
           fi
 
-          # Install other Python dependencies if they exist
-          find . -name "requirements.txt" -not -path "*/node_modules/*" -not -path "*/.venv/*" -not -path "*/site-packages/*" | head -5 | while read req; do
+          # Install other Python dependencies if they exist.
+          # Exclude: python-service (handled above), its parent bias-detection dir
+          # (no standalone venv; overlaps with python-service deps), and
+          # ai/data scratch dirs. Use --system for any remaining dirs without a
+          # local .venv so uv doesn't error out.
+          find . -name "requirements.txt" \
+            -not -path "*/node_modules/*" \
+            -not -path "*/.venv/*" \
+            -not -path "*/site-packages/*" \
+            -not -path "*/src/lib/ai/bias-detection/*" \
+            -not -path "*/ai/data/*" \
+            | head -5 | while read req; do
             dir=$(dirname "$req")
             echo "Installing dependencies from $dir"
             cd "$dir"
-            USE_SYSTEM="${{ steps.prepare-uv.outputs.use-system }}"
-            uv pip install ${USE_SYSTEM} -r requirements.txt || true
+            if [ -d ".venv" ]; then
+              DIR_USE_SYSTEM=""
+              DIR_VIRTUAL_ENV="${PWD}/.venv"
+            else
+              DIR_USE_SYSTEM="--system"
+              DIR_VIRTUAL_ENV=""
+            fi
+            VIRTUAL_ENV="${DIR_VIRTUAL_ENV}" uv pip install ${DIR_USE_SYSTEM} -r requirements.txt || true
             cd - > /dev/null
           done || true
 

@@ -2,6 +2,7 @@ import path from 'node:path'
 import process from 'node:process'
 
 import node from '@astrojs/node'
+import vercel from '@astrojs/vercel'
 import react from '@astrojs/react'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -17,6 +18,8 @@ const isHerokuDeploy =
   process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO
 const isFlyioDeploy =
   process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME
+const isVercelDeploy =
+  process.env.DEPLOY_TARGET === 'vercel' || !!process.env.VERCEL
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -296,6 +299,12 @@ const adapter = (() => {
     return node({
       mode: 'standalone',
     })
+  }
+
+  // Vercel deployment (backup)
+  if (isVercelDeploy) {
+    console.log('▲ Using Vercel adapter for Vercel deployment')
+    return vercel()
   }
 
   // Default: Node adapter for Kubernetes/standard deployments
