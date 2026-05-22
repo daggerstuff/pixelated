@@ -785,7 +785,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -835,7 +835,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -850,7 +850,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -874,7 +874,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -910,7 +910,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer invalid-token',
+          'Authorization': 'Bearer invalid-token',
         },
         body: JSON.stringify(requestBody),
       })
@@ -928,7 +928,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'text/plain',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -946,7 +946,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -970,7 +970,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -986,7 +986,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: '{ invalid json }',
       })
@@ -1008,7 +1008,7 @@ describe('Bias Detection API Integration Tests', () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: authToken,
+              'Authorization': authToken,
             },
             body: JSON.stringify({
               ...requestBody,
@@ -1042,7 +1042,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify(requestBody),
       })
@@ -1064,7 +1064,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify({ session: testSession }),
       })
@@ -1511,7 +1511,7 @@ describe('Bias Detection API Integration Tests', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: authToken,
+            'Authorization': authToken,
           },
           body: JSON.stringify({ session: testSession }),
         },
@@ -1559,7 +1559,7 @@ describe('Bias Detection API Integration Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: authToken,
+          'Authorization': authToken,
         },
         body: JSON.stringify({ session: testSession }),
       })
@@ -1629,7 +1629,7 @@ describe('Bias Detection API Integration Tests', () => {
           method: endpoint.method,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: 'Bearer invalid-token',
+            'Authorization': 'Bearer invalid-token',
           },
           body: endpoint.body ? JSON.stringify(endpoint.body) : null,
         })
@@ -1641,7 +1641,7 @@ describe('Bias Detection API Integration Tests', () => {
           method: endpoint.method,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: authToken,
+            'Authorization': authToken,
           },
           body: endpoint.body ? JSON.stringify(endpoint.body) : null,
         })
@@ -1660,7 +1660,7 @@ describe('Bias Detection API Integration Tests', () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: authToken,
+              'Authorization': authToken,
             },
             body: JSON.stringify({
               session: {
@@ -1741,7 +1741,7 @@ describe('Bias Detection API Integration Tests', () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: authToken,
+            'Authorization': authToken,
           },
           body: JSON.stringify({ session: testSession }),
         },
@@ -1782,7 +1782,7 @@ describe('Bias Detection API Integration Tests', () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: authToken,
+              'Authorization': authToken,
             },
             body: request.body,
           },

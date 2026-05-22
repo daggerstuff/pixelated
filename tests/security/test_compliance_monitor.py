@@ -32,13 +32,14 @@ def compliance_module(request):
 
     return module
 
+
 @pytest.fixture
 def monitor(compliance_module):
     """Provides a fresh instance of ComplianceMonitor for each test."""
     return compliance_module.ComplianceMonitor()
 
-class TestComplianceMonitor:
 
+class TestComplianceMonitor:
     def test_check_access_controls_compliant(self, monitor):
         """Should return True when both JWT_SECRET and ENCRYPTION_KEY are set."""
         with patch.dict("os.environ", {"JWT_SECRET": "secret", "ENCRYPTION_KEY": "key"}, clear=True):

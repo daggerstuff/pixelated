@@ -152,7 +152,7 @@ function processSkillProgress(
   }
 
   return Object.entries(metrics).map(([skillName, skillMetrics]) => {
-    const currentScore = skillMetrics[skillMetrics.length - 1]?.value || 0
+    const currentScore = skillMetrics[skillMetrics.length - 1]?.value ?? 0
     const previousScore =
       skillMetrics.length > 1
         ? skillMetrics[skillMetrics.length - 2]?.value

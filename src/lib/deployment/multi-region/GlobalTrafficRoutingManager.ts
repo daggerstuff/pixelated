@@ -530,7 +530,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     // Apply weights to targets
     const weightedTargets = eligibleTargets.map((target) => ({
       target,
-      weight: this.config.weights[target.regionId] || 1,
+      weight: this.config.weights[target.regionId] ?? 1,
       latency: 0, // Will be calculated for selected target
     }))
 
@@ -675,7 +675,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
         'apac-tokyo': { latitude: 35.6762, longitude: 139.6503 },
       }
 
-    return coordinates[location] || { latitude: 0, longitude: 0 }
+    return coordinates[location] ?? { latitude: 0, longitude: 0 }
   }
 
   /**
@@ -745,14 +745,14 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
   private updateMetrics(decision: RoutingDecision): void {
     this.metrics.totalRequests++
     this.metrics.requestsByRegion[decision.target.regionId] =
-      (this.metrics.requestsByRegion[decision.target.regionId] || 0) + 1
+      (this.metrics.requestsByRegion[decision.target.regionId] ?? 0) + 1
 
     if (decision.target.healthScore >= 80) {
       this.metrics.successfulRequests++
     } else {
       this.metrics.failedRequests++
       this.metrics.errorRateByRegion[decision.target.regionId] =
-        (this.metrics.errorRateByRegion[decision.target.regionId] || 0) + 1
+        (this.metrics.errorRateByRegion[decision.target.regionId] ?? 0) + 1
     }
 
     // Update latency metrics
@@ -800,7 +800,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     try {
       // Calculate error rates
       for (const region in this.metrics.errorRateByRegion) {
-        const requests = this.metrics.requestsByRegion[region] || 0
+        const requests = this.metrics.requestsByRegion[region] ?? 0
         const errors = this.metrics.errorRateByRegion[region]
         this.metrics.errorRateByRegion[region] =
           requests > 0 ? errors / requests : 0

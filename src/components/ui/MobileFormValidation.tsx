@@ -311,7 +311,7 @@ export function MobileFormValidation({
   }
 
   // Clone the form element and inject our handlers
-  const enhancedForm = React.Children.map(children,  async (child) => {
+  const enhancedForm = React.Children.map(children, async (child) => {
     if (React.isValidElement(child) && child.type === 'form') {
       const specificChild = child as React.ReactElement<
         React.FormHTMLAttributes<HTMLFormElement>
@@ -350,14 +350,14 @@ export function MobileFormValidation({
 
       {/* Hidden element for screen reader announcements */}
       <div
-        id='validation-error-summary'
-        className='sr-only'
-        aria-live='assertive'
+        id="validation-error-summary"
+        className="sr-only"
+        aria-live="assertive"
       ></div>
 
       {/* Error summary for accessibility and mobile UX */}
       {showErrorSummary && submitted && Object.keys(errors).length > 0 && (
-        <div className='validation-error-summary' role='alert'>
+        <div className="validation-error-summary" role="alert">
           <h3>Please correct the following errors:</h3>
           <ul>
             {Object.entries(errors).map(([field, error]) => (
@@ -366,9 +366,7 @@ export function MobileFormValidation({
                   href={`#${field}`}
                   onClick={(e) => {
                     e.preventDefault()
-                    const element = document.querySelector(
-                      `[name="${field}"]`,
-                    )!
+                    const element = document.querySelector(`[name="${field}"]`)!
                     if (element instanceof HTMLElement) {
                       element.focus()
                       element.scrollIntoView({
@@ -413,9 +411,7 @@ export const ValidationRules = {
   }),
   match: (fieldName: string, message: string): ValidationRule => ({
     test: (value) => {
-      const matchField = document.querySelector(
-        `[name="${fieldName}"]`,
-      )!
+      const matchField = document.querySelector(`[name="${fieldName}"]`)!
       return matchField?.value === value
     },
     message,

@@ -250,8 +250,8 @@ const jobsWorker = {
 }
 
 // Graceful shutdown
-process.on('SIGTERM',  async () => jobsWorker.stop())
-process.on('SIGINT',  async () => jobsWorker.stop())
+process.on('SIGTERM', async () => jobsWorker.stop())
+process.on('SIGINT', async () => jobsWorker.stop())
 
 // Start worker
 jobsWorker.start().catch((error) => {

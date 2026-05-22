@@ -20,8 +20,7 @@ import pytest
 
 # Skip tests if NVIDIA_API_KEY not available
 requires_nvidia_api_key = pytest.mark.skipif(
-    not os.environ.get("NVIDIA_API_KEY"),
-    reason="NVIDIA_API_KEY not found in environment"
+    not os.environ.get("NVIDIA_API_KEY"), reason="NVIDIA_API_KEY not found in environment"
 )
 
 
@@ -54,7 +53,7 @@ class TestNemotronRAGConfig:
             retrieval_top_k=50,
             reranking_top_n=10,
             index_type=IndexType.HNSW,
-            generation_temperature=0.5
+            generation_temperature=0.5,
         )
 
         assert config.retrieval_top_k == 50
@@ -86,7 +85,7 @@ class TestDocumentMetadata:
             category=KnowledgeCategory.TREATMENT_PROTOCOLS,
             source="APA Guidelines",
             title="Test Protocol",
-            tags=["anxiety", "cbt"]
+            tags=["anxiety", "cbt"],
         )
 
         assert metadata.doc_id == "test-001"
@@ -102,11 +101,7 @@ class TestDocumentMetadata:
             KnowledgeCategory,
         )
 
-        metadata = DocumentMetadata(
-            doc_id="test-002",
-            category=KnowledgeCategory.PSYCHOEDUCATION,
-            source="Test Source"
-        )
+        metadata = DocumentMetadata(doc_id="test-002", category=KnowledgeCategory.PSYCHOEDUCATION, source="Test Source")
 
         assert metadata.created_at is not None
         assert metadata.updated_at is not None
@@ -125,7 +120,7 @@ class TestRAGResponse:
             model="nemotron-super-49b",
             retrieved_count=5,
             latency_ms=150.5,
-            citations=["APA Guidelines"]
+            citations=["APA Guidelines"],
         )
 
         assert response.response == "Test response content"
@@ -145,7 +140,7 @@ class TestTherapeuticRAGPipeline:
 
         return NemotronRAGConfig(
             api_key="test-key",
-            index_type="flat"  # Use flat for simpler testing
+            index_type="flat",  # Use flat for simpler testing
         )
 
     @pytest.fixture
@@ -184,11 +179,7 @@ class TestTherapeuticRAGPipeline:
             pipeline = TherapeuticRAGPipeline(mock_config)
 
             doc_id = await pipeline.ingest_document(
-                document="Test document content",
-                metadata={
-                    "category": "psychoeducation",
-                    "source": "Test Source"
-                }
+                document="Test document content", metadata={"category": "psychoeducation", "source": "Test Source"}
             )
 
             assert doc_id is not None
@@ -208,18 +199,9 @@ class TestTherapeuticRAGPipeline:
             pipeline = TherapeuticRAGPipeline(mock_config)
 
             documents = [
-                {
-                    "document": "Document 1",
-                    "metadata": {"category": "psychoeducation", "source": "Source 1"}
-                },
-                {
-                    "document": "Document 2",
-                    "metadata": {"category": "treatment_protocols", "source": "Source 2"}
-                },
-                {
-                    "document": "Document 3",
-                    "metadata": {"category": "crisis_protocols", "source": "Source 3"}
-                }
+                {"document": "Document 1", "metadata": {"category": "psychoeducation", "source": "Source 1"}},
+                {"document": "Document 2", "metadata": {"category": "treatment_protocols", "source": "Source 2"}},
+                {"document": "Document 3", "metadata": {"category": "crisis_protocols", "source": "Source 3"}},
             ]
 
             doc_ids = await pipeline.batch_ingest(documents)
@@ -257,16 +239,12 @@ class TestVectorStore:
         store = DocumentStore()
 
         # Create test document
-        metadata = DocumentMetadata(
-            doc_id="test-001",
-            category=KnowledgeCategory.PSYCHOEDUCATION,
-            source="Test"
-        )
+        metadata = DocumentMetadata(doc_id="test-001", category=KnowledgeCategory.PSYCHOEDUCATION, source="Test")
         doc = Document(
             doc_id="test-001",
             content="Test content",
             metadata=metadata,
-            embedding=np.random.rand(1, 2048).astype(np.float32)
+            embedding=np.random.rand(1, 2048).astype(np.float32),
         )
 
         # Add document
@@ -282,8 +260,6 @@ class TestVectorStore:
         assert store.get("non-existent") is None
 
 
-
-
 class TestQueryComplexity:
     """Tests for query complexity classification."""
 
@@ -292,10 +268,7 @@ class TestQueryComplexity:
         """Create mock config for testing."""
         from ai.rag.nemotron_rag import NemotronRAGConfig
 
-        return NemotronRAGConfig(
-            api_key="test-key",
-            index_type="flat"
-        )
+        return NemotronRAGConfig(api_key="test-key", index_type="flat")
 
     def test_simple_query_classification(self, mock_config):
         """Test simple query detection."""
@@ -305,6 +278,7 @@ class TestQueryComplexity:
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
+
             pipeline = TherapeuticRAGPipeline(mock_config)
 
         # Simple factual queries
@@ -320,11 +294,15 @@ class TestQueryComplexity:
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
+
             pipeline = TherapeuticRAGPipeline(mock_config)
 
         # Multi-concept queries ("compare" triggers MODERATE)
         assert pipeline._classify_query_complexity("How does CBT compare to DBT?") == QueryComplexity.MODERATE
-        assert pipeline._classify_query_complexity("What are the differences between therapy types?") == QueryComplexity.MODERATE
+        assert (
+            pipeline._classify_query_complexity("What are the differences between therapy types?")
+            == QueryComplexity.MODERATE
+        )
 
     def test_complex_query_classification(self, mock_config):
         """Test complex query detection."""
@@ -334,11 +312,18 @@ class TestQueryComplexity:
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
+
             pipeline = TherapeuticRAGPipeline(mock_config)
 
         # Nuanced reasoning queries
-        assert pipeline._classify_query_complexity("Why do I feel anxious in social situations?") == QueryComplexity.COMPLEX
-        assert pipeline._classify_query_complexity("What is the underlying pattern in my thoughts?") == QueryComplexity.COMPLEX
+        assert (
+            pipeline._classify_query_complexity("Why do I feel anxious in social situations?")
+            == QueryComplexity.COMPLEX
+        )
+        assert (
+            pipeline._classify_query_complexity("What is the underlying pattern in my thoughts?")
+            == QueryComplexity.COMPLEX
+        )
         # " vs " triggers COMPLEX for treatment comparisons
         assert pipeline._classify_query_complexity("CBT vs DBT for anxiety treatment") == QueryComplexity.COMPLEX
 
@@ -350,6 +335,7 @@ class TestQueryComplexity:
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
+
             pipeline = TherapeuticRAGPipeline(mock_config)
 
         # Crisis indicators
@@ -366,11 +352,13 @@ class TestQueryComplexity:
 
         with patch("ai.rag.nemotron_rag.AsyncOpenAI"):
             from ai.rag.nemotron_rag import TherapeuticRAGPipeline
+
             pipeline = TherapeuticRAGPipeline(mock_config)
 
         # Verify model mapping
         assert pipeline.config.complexity_model_mapping[QueryComplexity.SIMPLE.value] == pipeline.config.fast_model
         assert pipeline.config.complexity_model_mapping[QueryComplexity.CRISIS.value] == pipeline.config.safety_model
+
 
 class TestKnowledgeCategories:
     """Tests for knowledge categories."""
@@ -420,11 +408,7 @@ class TestFactoryFunctions:
         """Test pipeline factory with custom config."""
         from ai.rag.nemotron_rag import create_rag_pipeline
 
-        pipeline = create_rag_pipeline(
-            api_key="custom-key",
-            retrieval_top_k=100,
-            reranking_top_n=20
-        )
+        pipeline = create_rag_pipeline(api_key="custom-key", retrieval_top_k=100, reranking_top_n=20)
 
         assert pipeline.config.api_key == "custom-key"
         assert pipeline.config.retrieval_top_k == 100
@@ -470,10 +454,7 @@ class TestSystemPrompt:
         """Create mock config for testing."""
         from ai.rag.nemotron_rag import NemotronRAGConfig
 
-        return NemotronRAGConfig(
-            api_key="test-key",
-            index_type="flat"
-        )
+        return NemotronRAGConfig(api_key="test-key", index_type="flat")
 
     def test_rag_system_prompt(self, mock_config):
         """Test RAG system prompt content."""
@@ -500,10 +481,7 @@ class TestRAGPipelineIntegration:
         """Create config with live API key."""
         from ai.rag.nemotron_rag import NemotronRAGConfig
 
-        return NemotronRAGConfig(
-            api_key=os.environ.get("NVIDIA_API_KEY"),
-            index_type="flat"
-        )
+        return NemotronRAGConfig(api_key=os.environ.get("NVIDIA_API_KEY"), index_type="flat")
 
     @pytest.mark.asyncio
     async def test_live_ingestion_and_retrieval(self, live_config):
@@ -523,8 +501,8 @@ class TestRAGPipelineIntegration:
             metadata={
                 "category": KnowledgeCategory.TREATMENT_PROTOCOLS,
                 "source": "APA Guidelines",
-                "title": "CBT for Anxiety"
-            }
+                "title": "CBT for Anxiety",
+            },
         )
 
         assert doc_id is not None
@@ -540,21 +518,21 @@ class TestRAGPipelineIntegration:
         pipeline = TherapeuticRAGPipeline(live_config)
 
         # Ingest documents
-        await pipeline.batch_ingest([
-            {
-                "document": "CBT helps identify negative thought patterns.",
-                "metadata": {"category": "treatment_protocols", "source": "Guide"}
-            },
-            {
-                "document": "Deep breathing exercises can help with anxiety.",
-                "metadata": {"category": "psychoeducation", "source": "Resources"}
-            }
-        ])
+        await pipeline.batch_ingest(
+            [
+                {
+                    "document": "CBT helps identify negative thought patterns.",
+                    "metadata": {"category": "treatment_protocols", "source": "Guide"},
+                },
+                {
+                    "document": "Deep breathing exercises can help with anxiety.",
+                    "metadata": {"category": "psychoeducation", "source": "Resources"},
+                },
+            ]
+        )
 
         # Query
-        response = await pipeline.query(
-            "What techniques help with anxiety?"
-        )
+        response = await pipeline.query("What techniques help with anxiety?")
 
         assert response.response is not None
         assert len(response.response) > 0

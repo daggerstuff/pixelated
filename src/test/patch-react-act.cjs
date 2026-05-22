@@ -1,6 +1,7 @@
 async function act(callback) {
   const { flushSync } = require('react-dom')
-  const invoke = () => (typeof flushSync === 'function' ? flushSync(callback) : callback())
+  const invoke = () =>
+    typeof flushSync === 'function' ? flushSync(callback) : callback()
   const result = invoke()
   if (result && typeof result.then === 'function') {
     await result

@@ -120,9 +120,7 @@ def main():
 
     # Gaps command
     gaps_parser = subparsers.add_parser("gaps", help="Show gap report")
-    gaps_parser.add_argument(
-        "--show-missing", action="store_true", help="Only show stages with gaps"
-    )
+    gaps_parser.add_argument("--show-missing", action="store_true", help="Only show stages with gaps")
     gaps_parser.add_argument("--plan", help="MTGC plan path")
     gaps_parser.add_argument("-v", "--verbose", action="store_true")
     gaps_parser.set_defaults(func=cmd_gaps)
@@ -130,18 +128,14 @@ def main():
     # Source command
     source_parser = subparsers.add_parser("source", help="Source datasets")
     source_parser.add_argument("--gap", required=True, help='Gap to fill (stage name or "all")')
-    source_parser.add_argument(
-        "--strategy", help="Sourcing strategy (edge_case_generator, voice, journal)"
-    )
+    source_parser.add_argument("--strategy", help="Sourcing strategy (edge_case_generator, voice, journal)")
     source_parser.add_argument("--plan", help="MTGC plan path")
     source_parser.set_defaults(func=cmd_source)
 
     # Sync command
     sync_parser = subparsers.add_parser("sync", help="Sync from external")
     sync_parser.add_argument("--from-gdrive", action="store_true", help="Sync from Google Drive")
-    sync_parser.add_argument(
-        "--from-huggingface", action="store_true", help="Sync from Hugging Face"
-    )
+    sync_parser.add_argument("--from-huggingface", action="store_true", help="Sync from Hugging Face")
     sync_parser.add_argument("--query", help="Search query for HF")
     sync_parser.set_defaults(func=cmd_sync)
 

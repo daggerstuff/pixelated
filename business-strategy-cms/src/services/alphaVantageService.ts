@@ -155,7 +155,8 @@ export class AlphaVantageService {
   private readonly logger: Logger
   private readonly client: AxiosInstance
   private readonly API_KEY: string
-  private readonly cache: Map<string, { data: unknown; timestamp: number }> = new Map()
+  private readonly cache: Map<string, { data: unknown; timestamp: number }> =
+    new Map()
   private readonly CACHE_TTL = 15 * 60 * 1000 // 15 minutes
 
   constructor() {
@@ -532,9 +533,11 @@ export class AlphaVantageService {
     news: Record<string, NewsSentiment[]>
   }> {
     try {
-      const quotes = await Promise.all(symbols.map( async (s) => this.getQuote(s)))
+      const quotes = await Promise.all(
+        symbols.map(async (s) => this.getQuote(s)),
+      )
       const fundamentals = await Promise.all(
-        symbols.map( async (s) => this.getFundamentals(s)),
+        symbols.map(async (s) => this.getFundamentals(s)),
       )
 
       const technical: Record<string, TechnicalIndicator[]> = {}

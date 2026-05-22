@@ -680,7 +680,7 @@ export class EnhancedTechniqueClassificationService {
       [TherapeuticTechnique.MINDFULNESS]: 0.81,
       [TherapeuticTechnique.GROUNDING_TECHNIQUES]: 0.88,
     }
-    return effectivenessMap[technique] || 0.7
+    return effectivenessMap[technique] ?? 0.7
   }
 
   private getContextualEffectiveness(

@@ -88,28 +88,19 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
 
   // Attempt to use global LiveRegionSystem if available (created by LiveRegionSystem.astro)
   useEffect(() => {
-    if (
-      window?.LiveRegionSystem &&
-      statusMessage
-    ) {
+    if (window?.LiveRegionSystem && statusMessage) {
       window.LiveRegionSystem.announceStatus(statusMessage)
     }
   }, [statusMessage])
 
   useEffect(() => {
-    if (
-      window?.LiveRegionSystem &&
-      alertMessage
-    ) {
+    if (window?.LiveRegionSystem && alertMessage) {
       window.LiveRegionSystem.announceAlert(alertMessage)
     }
   }, [alertMessage])
 
   useEffect(() => {
-    if (
-      window?.LiveRegionSystem &&
-      logMessages.length > 0
-    ) {
+    if (window?.LiveRegionSystem && logMessages.length > 0) {
       const latestMessage = logMessages[logMessages.length - 1]
       if (latestMessage) {
         window.LiveRegionSystem.log(latestMessage)
@@ -118,10 +109,7 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
   }, [logMessages])
 
   useEffect(() => {
-    if (
-      window?.LiveRegionSystem &&
-      progressData
-    ) {
+    if (window?.LiveRegionSystem && progressData) {
       window.LiveRegionSystem.announceProgress(
         progressData.value,
         progressData.max,
@@ -141,36 +129,36 @@ export function LiveRegionProvider({ children }: LiveRegionProviderProps) {
   return (
     <LiveRegionContext.Provider value={contextValue}>
       {/* Fallback live regions in case LiveRegionSystem.astro isn't in the page */}
-      <div className='live-region-system' aria-hidden='false'>
+      <div className="live-region-system" aria-hidden="false">
         {/* Status announcements (polite) */}
         <div
-          aria-live='polite'
-          aria-atomic='true'
-          className='sr-only'
-          role='status'
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          role="status"
         >
           {statusMessage}
         </div>
 
         {/* Alert announcements (assertive) */}
         <div
-          aria-live='assertive'
-          aria-atomic='true'
-          className='sr-only'
-          role='alert'
+          aria-live="assertive"
+          aria-atomic="true"
+          className="sr-only"
+          role="alert"
         >
           {alertMessage}
         </div>
 
         {/* Log announcements (polite, not atomic) */}
-        <div aria-live='polite' aria-atomic='false' className='sr-only'>
+        <div aria-live="polite" aria-atomic="false" className="sr-only">
           {logMessages.map((msg, index) => (
             <div key={`log-${index}-${msg.slice(0, 10)}`}>{msg}</div>
           ))}
         </div>
 
         {/* Progress announcements (polite) */}
-        <div aria-live='polite' aria-atomic='true' className='sr-only'>
+        <div aria-live="polite" aria-atomic="true" className="sr-only">
           {progressMessage}
         </div>
       </div>

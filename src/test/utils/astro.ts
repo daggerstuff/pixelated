@@ -1,5 +1,10 @@
 type AstroSlotRenderer = { render: () => string }
-type AstroRenderResult = string | { html: string; setup?: (container: HTMLDivElement) => void | Promise<void> }
+type AstroRenderResult =
+  | string
+  | {
+      html: string
+      setup?: (container: HTMLDivElement) => void | Promise<void>
+    }
 type AstroRenderOptions = { default?: AstroSlotRenderer }
 type AstroRenderFunction = (
   props: Record<string, unknown>,
@@ -39,9 +44,9 @@ async function applyRenderSetup(result: unknown, container: HTMLDivElement) {
     'setup' in result &&
     typeof (result as { setup?: unknown }).setup === 'function'
   ) {
-    await (result as { setup: (container: HTMLDivElement) => void | Promise<void> }).setup(
-      container,
-    )
+    await (
+      result as { setup: (container: HTMLDivElement) => void | Promise<void> }
+    ).setup(container)
   }
 }
 
@@ -63,7 +68,8 @@ export async function renderAstro(
   querySelector: (selector: string) => Element | null
   querySelectorAll: (selector: string) => NodeListOf<Element>
 }> {
-  const resolvedComponent = (Component as { default?: unknown }).default ?? Component
+  const resolvedComponent =
+    (Component as { default?: unknown }).default ?? Component
   const renderProps = props ?? {}
   const renderSlots = slotContent
     ? {
@@ -133,6 +139,6 @@ export type AstroMockProps<T> = T & {
   'client:visible'?: boolean
   'client:media'?: string
   'client:only'?: boolean
-  class?: string
-  className?: string
+  'class'?: string
+  'className'?: string
 }

@@ -30,7 +30,7 @@ function SecurityConsumer() {
   return (
     <div>
       <div data-testid="security-level">{level}</div>
-      <button onClick={ async () => setSecurityLevel('hipaa')}>Set HIPAA</button>
+      <button onClick={async () => setSecurityLevel('hipaa')}>Set HIPAA</button>
     </div>
   )
 }

@@ -28,10 +28,11 @@ import threading
 import time
 import uuid
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 import schedule
 
@@ -102,26 +103,22 @@ class MemoryConflictResolver:
         self.strategy = strategy
         self.half_life_days = 7.0  # Time required for a memory's weight to halve
 
-    def resolve_conflict(
-        self, existing_memory: MemoryEntry, new_memory: MemoryEntry
-    ) -> MemoryEntry:
+    def resolve_conflict(self, existing_memory: MemoryEntry, new_memory: MemoryEntry) -> MemoryEntry:
         """Resolve conflict between existing and new memory using decay weights."""
 
         if self.strategy == "replace":
             return new_memory
 
-        elif self.strategy in ("merge", "decay_weighted_merge"):
+        if self.strategy in ("merge", "decay_weighted_merge"):
             return self._merge_memories(existing_memory, new_memory)
 
-        else:  # manual
-            # Flag for manual review
-            new_memory.metadata["conflict_flagged"] = True
-            new_memory.metadata["conflict_with"] = existing_memory.memory_id
-            return new_memory
+        # manual
+        # Flag for manual review
+        new_memory.metadata["conflict_flagged"] = True
+        new_memory.metadata["conflict_with"] = existing_memory.memory_id
+        return new_memory
 
-    def _merge_memories(
-        self, existing_memory: MemoryEntry, new_memory: MemoryEntry
-    ) -> MemoryEntry:
+    def _merge_memories(self, existing_memory: MemoryEntry, new_memory: MemoryEntry) -> MemoryEntry:
         """Merge memory entries using decay weights."""
         now = datetime.now(timezone.utc)
 
@@ -142,10 +139,7 @@ class MemoryConflictResolver:
         effective_new_weight = (new_weight * 0.7) + (new_intensity * 0.3)
 
         merged_content = self._decay_weighted_merge(
-            existing_memory.content, 
-            new_memory.content, 
-            effective_existing_weight, 
-            effective_new_weight
+            existing_memory.content, new_memory.content, effective_existing_weight, effective_new_weight
         )
 
         # Merge tags intelligently
@@ -160,8 +154,8 @@ class MemoryConflictResolver:
             "conflict_resolution": "decay_weighted",
             "weights": {
                 "existing_effective": round(effective_existing_weight, 4),
-                "new_effective": round(effective_new_weight, 4)
-            }
+                "new_effective": round(effective_new_weight, 4),
+            },
         }
 
         return MemoryEntry(
@@ -182,7 +176,7 @@ class MemoryConflictResolver:
 
     def _decay_weighted_merge(self, existing: str, new: str, existing_w: float, new_w: float) -> str:
         """Intelligently merge content based on decay weights.
-        Prioritizes high-weight relevance as the current state and preserves the lower-weight 
+        Prioritizes high-weight relevance as the current state and preserves the lower-weight
         information as historical context.
         """
         if existing == new:
@@ -200,10 +194,7 @@ class MemoryConflictResolver:
             primary_label = "Preserved High-Relevance Context"
             secondary_label = "Secondary Recent Context"
 
-        return (
-            f"=== [ {primary_label} ] ===\n{primary_content}\n\n"
-            f"--- [ {secondary_label} ] ---\n{secondary_content}"
-        )
+        return f"=== [ {primary_label} ] ===\n{primary_content}\n\n--- [ {secondary_label} ] ---\n{secondary_content}"
 
     def _calculate_hash(self, content: str) -> str:
         """Calculate content hash"""
@@ -283,9 +274,7 @@ class GitWebhookHandler:
         has_significant_keyword = any(keyword in message_lower for keyword in significant_keywords)
 
         # Check for important file changes
-        important_files = any(
-            any(pattern in file for pattern in ["src/", "lib/", "core/", "main."]) for file in files
-        )
+        important_files = any(any(pattern in file for pattern in ["src/", "lib/", "core/", "main."]) for file in files)
 
         return has_significant_keyword and important_files
 
@@ -391,9 +380,7 @@ class FileChangeHandler(FileSystemEventHandler):
                 data={
                     "file_path": event.src_path,
                     "event_type": "modified",
-                    "file_size": os.path.getsize(event.src_path)
-                    if os.path.exists(event.src_path)
-                    else 0,
+                    "file_size": os.path.getsize(event.src_path) if os.path.exists(event.src_path) else 0,
                 },
                 priority=3,
             )
@@ -425,9 +412,7 @@ class FileChangeHandler(FileSystemEventHandler):
 class TrainingOutcomeProcessor:
     """Processes training outcomes for memory updates"""
 
-    async def process_training_completion(
-        self, training_data: dict[str, Any]
-    ) -> list[MemoryUpdateEvent]:
+    async def process_training_completion(self, training_data: dict[str, Any]) -> list[MemoryUpdateEvent]:
         """Process completed training session"""
 
         # Extract training insights
@@ -464,9 +449,7 @@ class TrainingOutcomeProcessor:
         if strengths := training_data.get("final_assessment", {}).get("strengths", []):
             content += f"Strengths demonstrated: {', '.join(strengths)}\n"
 
-        if improvements := training_data.get("final_assessment", {}).get(
-            "areas_for_improvement", []
-        ):
+        if improvements := training_data.get("final_assessment", {}).get("areas_for_improvement", []):
             content += f"Areas for improvement: {', '.join(improvements)}\n"
 
         return content
@@ -519,9 +502,7 @@ class BiasDetectionProcessor:
 class ResearchDiscoveryProcessor:
     """Processes research discoveries for memory updates"""
 
-    async def process_research_discovery(
-        self, research_data: dict[str, Any]
-    ) -> list[MemoryUpdateEvent]:
+    async def process_research_discovery(self, research_data: dict[str, Any]) -> list[MemoryUpdateEvent]:
         """Process new research discovery"""
 
         # Extract research insights
@@ -553,9 +534,7 @@ class ResearchDiscoveryProcessor:
     def _generate_research_content(self, research_data: dict[str, Any]) -> str:
         """Generate research discovery content"""
 
-        content = (
-            f"New research paper discovered: {research_data.get('metadata', {}).get('title', '')}\n"
-        )
+        content = f"New research paper discovered: {research_data.get('metadata', {}).get('title', '')}\n"
         content += f"Relevance score: {research_data.get('quality_score', 0):.2f}\n"
         content += f"Bias relevance: {research_data.get('bias_analysis', {}).get('relevance_score', 0):.2f}\n"
         content += f"Source: {research_data.get('source', 'unknown')}\n"
@@ -642,9 +621,7 @@ class AutomatedMemoryUpdater:
             lambda: asyncio.create_task(self._scheduled_sync())
         )
 
-        logger.info(
-            f"Scheduled sync started (interval: {self.config.update_interval_minutes} minutes)"
-        )
+        logger.info(f"Scheduled sync started (interval: {self.config.update_interval_minutes} minutes)")
 
     async def _scheduled_sync(self) -> None:
         """Perform scheduled memory synchronization"""
@@ -664,9 +641,7 @@ class AutomatedMemoryUpdater:
     def _start_background_worker(self) -> None:
         """Start dedicated background worker for memory events"""
         self._worker_stop_event.clear()
-        self._worker_thread = threading.Thread(
-            target=self._worker_loop, name="MemoryUpdateWorker", daemon=True
-        )
+        self._worker_thread = threading.Thread(target=self._worker_loop, name="MemoryUpdateWorker", daemon=True)
         self._worker_thread.start()
         logger.info("Memory update background worker started")
 
@@ -727,9 +702,7 @@ class AutomatedMemoryUpdater:
                 training_data["_is_processed"] = True
 
                 # Expand raw training data into formatted memory events
-                expanded_events = await self.training_processor.process_training_completion(
-                    training_data
-                )
+                expanded_events = await self.training_processor.process_training_completion(training_data)
 
                 # Inherit some fields from parent
                 for expanded_event in expanded_events:
@@ -795,9 +768,7 @@ class AutomatedMemoryUpdater:
         )
         self.process_event(event)
 
-    async def push_training_outcome_async(
-        self, execution_id: str, outcome_data: dict[str, Any], source: str
-    ):
+    async def push_training_outcome_async(self, execution_id: str, outcome_data: dict[str, Any], source: str):
         """Unified async method to push training outcomes to memory"""
         event = MemoryUpdateEvent(
             event_id=f"train_async_{execution_id}_{uuid.uuid4().hex[:8]}",
@@ -895,9 +866,7 @@ class AutomatedMemoryUpdater:
 
             if existing_memory:
                 # Resolve conflict
-                resolved_memory = self.conflict_resolver.resolve_conflict(
-                    existing_memory, memory_entry
-                )
+                resolved_memory = self.conflict_resolver.resolve_conflict(existing_memory, memory_entry)
                 await self._update_memory(resolved_memory)
             else:
                 # Create new memory
@@ -911,9 +880,7 @@ class AutomatedMemoryUpdater:
         except Exception as e:
             logger.error(f"Error processing memory event {event.event_id}: {e}")
 
-    def _create_memory_entry(
-        self, memory_data: dict[str, Any], event: MemoryUpdateEvent
-    ) -> MemoryEntry:
+    def _create_memory_entry(self, memory_data: dict[str, Any], event: MemoryUpdateEvent) -> MemoryEntry:
         """Create memory entry from event data"""
 
         memory_id = f"auto_{event.event_id}"
@@ -954,11 +921,7 @@ class AutomatedMemoryUpdater:
 
         # For now, check cache
         return next(
-            (
-                existing
-                for existing in self.memory_cache.values()
-                if existing.title == memory_entry.title
-            ),
+            (existing for existing in self.memory_cache.values() if existing.title == memory_entry.title),
             None,
         )
 
@@ -996,15 +959,11 @@ class AutomatedMemoryUpdater:
         if not self.config.cleanup_threshold_days:
             return
 
-        cutoff_date = datetime.now(timezone.utc).timestamp() - (
-            self.config.cleanup_threshold_days * 24 * 3600
-        )
+        cutoff_date = datetime.now(timezone.utc).timestamp() - (self.config.cleanup_threshold_days * 24 * 3600)
 
         # Remove old memories from cache
         old_memories = [
-            memory_id
-            for memory_id, memory in self.memory_cache.items()
-            if memory.created_at.timestamp() < cutoff_date
+            memory_id for memory_id, memory in self.memory_cache.items() if memory.created_at.timestamp() < cutoff_date
         ]
 
         for memory_id in old_memories:

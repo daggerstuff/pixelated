@@ -324,7 +324,7 @@ export class AdvancedCacheStrategy {
     // Use shorter TTL for high-bias results to ensure freshness
     const ttl = options.highBias
       ? (options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE) / 2
-      : options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE
+      : (options.ttl ?? CACHE_CONFIG.TTL.L2_CACHE)
 
     await this.set(key, result, {
       ttl,
@@ -422,7 +422,7 @@ export class AdvancedCacheStrategy {
     const batchSize = CACHE_CONFIG.PERFORMANCE.BATCH_SIZE
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize)
-      const batchPromises = batch.map( async (item) =>
+      const batchPromises = batch.map(async (item) =>
         this.set(item.key, item.value, {
           ttl: item.ttl,
           tags: item.tags,
@@ -592,7 +592,7 @@ export class CacheWarmingService {
       { key: 'monthly_summary', days: 30 },
     ]
 
-    const warmupPromises = analyticsKeys.map( async ({ key, days }) =>
+    const warmupPromises = analyticsKeys.map(async ({ key, days }) =>
       this.cache.getAnalytics(key, days),
     )
 

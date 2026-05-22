@@ -37,7 +37,7 @@ export function EvaluationDetail({
   if (isLoading) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Loading evaluation...</p>
+        <p className="text-muted-foreground">Loading evaluation...</p>
       </div>
     )
   }
@@ -45,7 +45,7 @@ export function EvaluationDetail({
   if (!evaluation) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Evaluation not found</p>
+        <p className="text-muted-foreground">Evaluation not found</p>
       </div>
     )
   }
@@ -53,17 +53,17 @@ export function EvaluationDetail({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Evaluation Details</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">Evaluation Details</h1>
+          <p className="text-muted-foreground mt-1">
             Evaluated {format(evaluation.evaluationDate, 'MMM d, yyyy')} by{' '}
             {evaluation.evaluator}
           </p>
         </div>
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className='border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium'
+          className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
         >
           {isEditing ? 'Cancel' : 'Edit'}
         </button>
@@ -106,70 +106,70 @@ export function EvaluationDetail({
           <CardTitle>Evaluation Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='grid gap-4 md:grid-cols-2'>
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Evaluation ID
               </p>
-              <p className='mt-1'>{evaluation.evaluationId}</p>
+              <p className="mt-1">{evaluation.evaluationId}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Source ID
               </p>
-              <p className='mt-1'>{evaluation.sourceId}</p>
+              <p className="mt-1">{evaluation.sourceId}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Overall Score
               </p>
-              <p className='mt-1 text-lg font-semibold'>
+              <p className="mt-1 text-lg font-semibold">
                 {evaluation.overallScore.toFixed(1)} / 10
               </p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Priority Tier
               </p>
-              <p className='mt-1 capitalize'>{evaluation.priorityTier}</p>
+              <p className="mt-1 capitalize">{evaluation.priorityTier}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Therapeutic Relevance
               </p>
-              <p className='mt-1'>{evaluation.therapeuticRelevance} / 10</p>
+              <p className="mt-1">{evaluation.therapeuticRelevance} / 10</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Data Structure Quality
               </p>
-              <p className='mt-1'>{evaluation.dataStructureQuality} / 10</p>
+              <p className="mt-1">{evaluation.dataStructureQuality} / 10</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Training Integration
               </p>
-              <p className='mt-1'>{evaluation.trainingIntegration} / 10</p>
+              <p className="mt-1">{evaluation.trainingIntegration} / 10</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Ethical Accessibility
               </p>
-              <p className='mt-1'>{evaluation.ethicalAccessibility} / 10</p>
+              <p className="mt-1">{evaluation.ethicalAccessibility} / 10</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Evaluation Date
               </p>
-              <p className='mt-1'>
+              <p className="mt-1">
                 {format(evaluation.evaluationDate, 'PPpp')}
               </p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Evaluator
               </p>
-              <p className='mt-1'>{evaluation.evaluator}</p>
+              <p className="mt-1">{evaluation.evaluator}</p>
             </div>
           </div>
         </CardContent>

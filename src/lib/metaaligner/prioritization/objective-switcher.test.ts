@@ -369,7 +369,9 @@ describe('ObjectiveSwitcher', () => {
       ]
 
       // Fire both transitions simultaneously
-      await Promise.all(transitions.map( async (t) => switcher.onContextTransition(t)))
+      await Promise.all(
+        transitions.map(async (t) => switcher.onContextTransition(t)),
+      )
 
       // Should have valid state (last transition should win)
       const currentContext = switcher.getCurrentContext()
@@ -409,7 +411,9 @@ describe('ObjectiveSwitcher', () => {
       }
 
       // Fire all transitions rapidly
-      await Promise.all(transitions.map( async (t) => switcher.onContextTransition(t)))
+      await Promise.all(
+        transitions.map(async (t) => switcher.onContextTransition(t)),
+      )
 
       // All should be processed (check telemetry)
       const telemetry = switcher.getTelemetry()

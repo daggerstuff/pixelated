@@ -300,7 +300,7 @@ export class CDNEdgeOptimizer {
     for (let i = 0; i < assets.length; i += batchSize) {
       const batch = assets.slice(i, i + batchSize)
 
-      const batchPromises = batch.map( async (asset) =>
+      const batchPromises = batch.map(async (asset) =>
         this.optimizeImage(asset.path, asset.options),
       )
 
@@ -586,7 +586,7 @@ let cdnOptimizer: CDNEdgeOptimizer | null = null
  * Get global CDN optimizer instance
  */
 export function getCDNOptimizer(): CDNEdgeOptimizer {
-  cdnOptimizer ??= new CDNEdgeOptimizer();
+  cdnOptimizer ??= new CDNEdgeOptimizer()
   return cdnOptimizer
 }
 
@@ -621,14 +621,14 @@ export const cdnUtils = {
   /**
    * Invalidate CDN cache for specific patterns
    */
-  invalidateCache:  async (patterns: string[]) => {
+  invalidateCache: async (patterns: string[]) => {
     return getCDNOptimizer().invalidateCDNCache(patterns)
   },
 
   /**
    * Get CDN performance metrics
    */
-  getMetrics:  async () => {
+  getMetrics: async () => {
     return getCDNOptimizer().getCDNMetrics()
   },
 }

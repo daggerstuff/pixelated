@@ -1,6 +1,7 @@
 ---
 name: foresight-bootstrap
-description: Run Foresight continuity bootstrap before substantial pixelated work
+description:
+  Run Foresight continuity bootstrap before substantial pixelated work
 tools:
   - open_files
   - expand_code_chunks
@@ -15,7 +16,8 @@ At session start or before non-trivial implementation work:
 1. Use Foresight MCP tools (when available):
    - `manage_subconscious` with `action: get`, label `project_context`
    - `inject_context` with the current task prompt
-   - `manage_subconscious` with `action: get`, label `pending_items` only if referenced
+   - `manage_subconscious` with `action: get`, label `pending_items` only if
+     referenced
 2. Summarize blocking items, active arc, and the smallest next action.
 3. If Foresight is unavailable, read these local fallbacks in order:
    - `.agent/internal/current/SESSION-SNAPSHOT.md`

@@ -217,12 +217,12 @@ export default function EmpathyMeter({
         ref={canvasRef}
         width={width}
         height={height}
-        className='h-auto w-full'
+        className="h-auto w-full"
         aria-label={`Empathy level: ${Math.round(normalizedValue * 100)}%`}
       />
 
       {showValue && (
-        <div className='text-gray-600 absolute bottom-2 left-0 right-0 text-center text-xs'>
+        <div className="text-gray-600 absolute bottom-2 left-0 right-0 text-center text-xs">
           Empathy Level
         </div>
       )}

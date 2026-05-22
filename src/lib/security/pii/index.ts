@@ -555,7 +555,7 @@ class PIIDetectionService {
         } catch (e) {
           throw new Error(
             'Failed to parse FHE operation result: ' +
-              (result.result).substring(0, 100),
+              result.result.substring(0, 100),
           )
         }
       } else if (result.result && typeof result.result === 'object') {
@@ -664,7 +664,9 @@ class PIIDetectionService {
         return '[PATIENT ID REDACTED]'
       case PIIType.INSURANCE_ID:
         return '[INSURANCE ID REDACTED]'
-      case PIIType.OTHER: { throw new Error('Not implemented yet: PIIType.OTHER case') }
+      case PIIType.OTHER: {
+        throw new Error('Not implemented yet: PIIType.OTHER case')
+      }
       default:
         return '[PII REDACTED]'
     }

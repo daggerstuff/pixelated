@@ -411,7 +411,8 @@ export class SupportContextIdentifier {
               fallback.isSupport = true
             }
             // Ensure isSupport is always defined for batch processing
-            fallback.isSupport ??= fallback.confidence > 0 || fallback.emotionalIntensity > 0.3;
+            fallback.isSupport ??=
+              fallback.confidence > 0 || fallback.emotionalIntensity > 0.3
             return fallback
           }
         },
@@ -462,14 +463,10 @@ export class SupportContextIdentifier {
       result.metadata.crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
-    const urgCheck = (result.urgency || '')
-      .toLowerCase()
-      .trim()
+    const urgCheck = (result.urgency || '').toLowerCase().trim()
     if (
       (urgCheck === 'high' ||
-        (result.recommendedApproach || '')
-          .toLowerCase()
-          .includes('crisis') ||
+        (result.recommendedApproach || '').toLowerCase().includes('crisis') ||
         (Array.isArray(result.supportNeeds) &&
           result.supportNeeds.some((n) =>
             n.toLowerCase().includes('safety'),

@@ -177,7 +177,5 @@ def filter_by_decision(
                 logger.warning(f"Error processing line: {e}")
                 continue
 
-    logger.info(
-        f"Filtered {count} items with decision '{decision}', output written to {output_path}"
-    )
+    logger.info(f"Filtered {count} items with decision '{decision}', output written to {output_path}")
     return count

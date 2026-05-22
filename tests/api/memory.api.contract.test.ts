@@ -9,7 +9,7 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   // In a real test, we would get a valid JWT or API key
   // For now, we'll use a placeholder that should be replaced in actual test setup
   return {
-    Authorization: `Bearer test-jwt-token`,
+    'Authorization': `Bearer test-jwt-token`,
     'X-API-Key': 'test-api-key',
   }
 }

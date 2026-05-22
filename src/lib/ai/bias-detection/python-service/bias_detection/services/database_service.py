@@ -100,9 +100,7 @@ class DatabaseService:
                 pool_recycle=3600,
             )
 
-            self.async_session = sessionmaker(
-                self.async_engine, class_=AsyncSession, expire_on_commit=False
-            )
+            self.async_session = sessionmaker(self.async_engine, class_=AsyncSession, expire_on_commit=False)
 
             logger.info("PostgreSQL connection established")
             return True
@@ -250,9 +248,7 @@ class DatabaseService:
             # Re-raise to ensure initialization failure is known
             raise
 
-    @retry(
-        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
-    )
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
     async def store_analysis(self, analysis: BiasAnalysisResponse) -> bool:
         """Store bias analysis result"""
         if not self.pg_pool:
@@ -325,9 +321,7 @@ class DatabaseService:
                         bias_score.explanation,
                     )
 
-            logger.info(
-                "Analysis result stored successfully", analysis_id=str(analysis.id)
-            )
+            logger.info("Analysis result stored successfully", analysis_id=str(analysis.id))
             return True
 
         except Exception as e:
@@ -338,9 +332,7 @@ class DatabaseService:
             )
             return False
 
-    async def store_analysis_result(
-        self, session_id: str, _result: dict[str, Any]
-    ) -> bool:
+    async def store_analysis_result(self, session_id: str, _result: dict[str, Any]) -> bool:
         """Store an orchestrated analysis result (placeholder for high-level storage)."""
         logger.info("Orchestrated analysis result received", session_id=session_id)
         # In a real scenario, this might store to a different table or MongoDB
@@ -354,9 +346,7 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow(
-                    "SELECT * FROM bias_analyses WHERE id = $1", analysis_id
-                )
+                row = await conn.fetchrow("SELECT * FROM bias_analyses WHERE id = $1", analysis_id)
 
                 if row:
                     return dict(row)
@@ -371,9 +361,7 @@ class DatabaseService:
             )
             return None
 
-    async def get_analysis_by_request_id(
-        self, request_id: str
-    ) -> dict[str, Any] | None:
+    async def get_analysis_by_request_id(self, request_id: str) -> dict[str, Any] | None:
         """Get analysis by request ID"""
         if not self.pg_pool:
             logger.error("PostgreSQL pool not available")
@@ -381,9 +369,7 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow(
-                    "SELECT * FROM bias_analyses WHERE request_id = $1", request_id
-                )
+                row = await conn.fetchrow("SELECT * FROM bias_analyses WHERE request_id = $1", request_id)
 
                 if row:
                     return dict(row)
@@ -398,9 +384,7 @@ class DatabaseService:
             )
             return None
 
-    async def get_user_analyses(
-        self, user_id: str, limit: int = 100, offset: int = 0
-    ) -> list[dict[str, Any]]:
+    async def get_user_analyses(self, user_id: str, limit: int = 100, offset: int = 0) -> list[dict[str, Any]]:
         """Get analyses for a user"""
         if not self.pg_pool:
             logger.error("PostgreSQL pool not available")
@@ -423,9 +407,7 @@ class DatabaseService:
                 return [dict(row) for row in rows]
 
         except Exception as e:
-            logger.error(
-                f"Failed to get user analyses: {e!s}", user_id=user_id, error=str(e)
-            )
+            logger.error(f"Failed to get user analyses: {e!s}", user_id=user_id, error=str(e))
             return []
 
     async def get_analytics_summary(self, days: int = 30) -> dict[str, Any]:
@@ -484,19 +466,14 @@ class DatabaseService:
                     "total_analyses": total_analyses or 0,
                     "avg_bias_score": float(avg_bias_score or 0),
                     "bias_distribution": [
-                        {"bias_type": row["bias_type"], "count": row["count"]}
-                        for row in bias_distribution
+                        {"bias_type": row["bias_type"], "count": row["count"]} for row in bias_distribution
                     ],
-                    "processing_stats": (
-                        dict(processing_stats) if processing_stats else {}
-                    ),
+                    "processing_stats": (dict(processing_stats) if processing_stats else {}),
                     "time_period_days": days,
                 }
 
         except Exception as e:
-            logger.error(
-                f"Failed to get analytics summary: {e!s}", days=days, error=str(e)
-            )
+            logger.error(f"Failed to get analytics summary: {e!s}", days=days, error=str(e))
             return {}
 
     async def track_api_usage(
@@ -569,37 +546,24 @@ class DatabaseService:
 
             async with self.pg_pool.acquire() as conn:
                 # Get current metrics
-                current_metrics = await conn.fetchrow(
-                    "SELECT * FROM model_metrics WHERE model_name = $1", model_name
-                )
+                current_metrics = await conn.fetchrow("SELECT * FROM model_metrics WHERE model_name = $1", model_name)
 
                 if current_metrics:
                     # Update existing metrics
-                    new_prediction_count = (
-                        current_metrics["prediction_count"] + prediction_count
-                    )
+                    new_prediction_count = current_metrics["prediction_count"] + prediction_count
                     new_error_count = current_metrics["error_count"] + error_count
 
                     # Calculate new average processing time
                     if processing_time_ms and current_metrics["avg_processing_time_ms"]:
-                        total_time = (
-                            current_metrics["avg_processing_time_ms"]
-                            * current_metrics["prediction_count"]
-                        )
-                        new_avg_time = (
-                            total_time + processing_time_ms
-                        ) / new_prediction_count
+                        total_time = current_metrics["avg_processing_time_ms"] * current_metrics["prediction_count"]
+                        new_avg_time = (total_time + processing_time_ms) / new_prediction_count
                     elif processing_time_ms:
                         new_avg_time = processing_time_ms
                     else:
                         new_avg_time = current_metrics["avg_processing_time_ms"]
 
                     # Update accuracy if provided
-                    new_accuracy = (
-                        accuracy_score
-                        if accuracy_score is not None
-                        else current_metrics["accuracy_score"]
-                    )
+                    new_accuracy = accuracy_score if accuracy_score is not None else current_metrics["accuracy_score"]
 
                     await conn.execute(
                         """
@@ -654,9 +618,7 @@ class DatabaseService:
 
         try:
             async with self.pg_pool.acquire() as conn:
-                row = await conn.fetchrow(
-                    "SELECT * FROM model_metrics WHERE model_name = $1", model_name
-                )
+                row = await conn.fetchrow("SELECT * FROM model_metrics WHERE model_name = $1", model_name)
 
                 if row:
                     return dict(row)

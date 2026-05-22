@@ -114,9 +114,7 @@ def calculate_confidence(signals: list[CrisisSignal]) -> float:
     return min(0.95, 0.7 + (len(signals) * 0.1))
 
 
-def generate_escalation_protocol(
-    risk_level: CrisisRiskLevel, _signals: list[CrisisSignal]
-) -> list[str]:
+def generate_escalation_protocol(risk_level: CrisisRiskLevel, _signals: list[CrisisSignal]) -> list[str]:
     """Generate escalation protocol based on risk level
 
     Args:

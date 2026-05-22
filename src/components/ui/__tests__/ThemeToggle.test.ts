@@ -34,7 +34,8 @@ function ThemeToggle(props: ThemeToggleProps = {}) {
   }
   const currentTheme = resolvedTheme()
   const extraClass = props.class ?? ''
-  const mediaMatches = global.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
+  const mediaMatches =
+    global.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
 
   const [systemHidden, sunHidden, moonHidden] =
     currentTheme === 'system'
@@ -66,15 +67,15 @@ function ThemeToggle(props: ThemeToggleProps = {}) {
         current = nextTheme
         const root = document.documentElement
         root.classList.remove('dark', 'light')
-      if (nextTheme === 'system') {
-        if (mediaMatches) {
+        if (nextTheme === 'system') {
+          if (mediaMatches) {
+            root.classList.add('dark')
+          }
+        } else if (nextTheme === 'dark') {
           root.classList.add('dark')
+        } else if (nextTheme === 'light') {
+          root.classList.add('light')
         }
-      } else if (nextTheme === 'dark') {
-        root.classList.add('dark')
-      } else if (nextTheme === 'light') {
-        root.classList.add('light')
-      }
 
         if (systemIcon && sunIcon && moonIcon) {
           if (nextTheme === 'system') {

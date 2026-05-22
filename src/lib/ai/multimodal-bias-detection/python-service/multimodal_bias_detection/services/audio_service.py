@@ -6,13 +6,12 @@ import base64
 import tempfile
 import time
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import librosa
 import numpy as np
 import soundfile as sf
 import structlog
-from ..utils.torch_proxy import torch
 from transformers import (
     Wav2Vec2ForSequenceClassification,
     Wav2Vec2Processor,
@@ -23,6 +22,7 @@ from transformers import (
 
 from ..config import settings
 from ..models import AudioBiasScore, AudioSegment, BiasType, ConfidenceLevel
+from ..utils.torch_proxy import torch
 
 logger = structlog.get_logger(__name__)
 
@@ -60,39 +60,33 @@ class AudioBiasDetector:
             self.speaker_diarization = pipeline(
                 "speaker-diarization",
                 model="pyannote/speaker-diarization",
-                device=0 if torch.cuda.is_available() else -1
+                device=0 if torch.cuda.is_available() else -1,
             )
 
             # Load emotion classification pipeline
             self.emotion_classifier = pipeline(
                 "audio-classification",
                 model="ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition",
-                device=0 if torch.cuda.is_available() else -1
+                device=0 if torch.cuda.is_available() else -1,
             )
 
             self.is_loaded = True
             self.load_time = time.time() - start_time
 
-            logger.info(
-                f"Audio models loaded successfully in {self.load_time:.2f}s",
-                device=str(self.device)
-            )
+            logger.info(f"Audio models loaded successfully in {self.load_time:.2f}s", device=str(self.device))
             return True
 
         except Exception as e:
-            logger.error(
-                f"Failed to load audio models: {str(e)}",
-                error=str(e)
-            )
+            logger.error(f"Failed to load audio models: {e!s}", error=str(e))
             return False
 
     async def analyze_audio(
         self,
-        audio_data: Union[str, bytes],
+        audio_data: str | bytes,
         analysis_type: str = "comprehensive",
         language: str = "auto",
         bias_types: list[BiasType] | None = None,
-        sensitivity: str = "medium"
+        sensitivity: str = "medium",
     ) -> dict[str, Any]:
         """Analyze audio for bias"""
         if not self.is_loaded:
@@ -113,29 +107,19 @@ class AudioBiasDetector:
             results = {}
 
             if analysis_type in ["speech", "comprehensive"]:
-                results["speech_analysis"] = await self._analyze_speech(
-                    audio_array, sample_rate, language
-                )
+                results["speech_analysis"] = await self._analyze_speech(audio_array, sample_rate, language)
 
             if analysis_type in ["music", "comprehensive"]:
-                results["music_analysis"] = await self._analyze_music(
-                    audio_array, sample_rate
-                )
+                results["music_analysis"] = await self._analyze_music(audio_array, sample_rate)
 
             # Speaker diarization
-            results["speaker_analysis"] = await self._analyze_speakers(
-                audio_array, sample_rate
-            )
+            results["speaker_analysis"] = await self._analyze_speakers(audio_array, sample_rate)
 
             # Emotion analysis
-            results["emotion_analysis"] = await self._analyze_emotions(
-                audio_array, sample_rate
-            )
+            results["emotion_analysis"] = await self._analyze_emotions(audio_array, sample_rate)
 
             # Generate bias scores
-            bias_scores = await self._generate_bias_scores(
-                results, bias_types, sensitivity
-            )
+            bias_scores = await self._generate_bias_scores(results, bias_types, sensitivity)
 
             processing_time = int((time.time() - start_time) * 1000)
 
@@ -144,7 +128,7 @@ class AudioBiasDetector:
                 processing_time_ms=processing_time,
                 bias_scores_count=len(bias_scores),
                 analysis_type=analysis_type,
-                duration=duration
+                duration=duration,
             )
 
             return {
@@ -158,18 +142,15 @@ class AudioBiasDetector:
                 "audio_metadata": {
                     "duration": duration,
                     "sample_rate": sample_rate,
-                    "channels": 1 if len(audio_array.shape) == 1 else audio_array.shape[1]
-                }
+                    "channels": 1 if len(audio_array.shape) == 1 else audio_array.shape[1],
+                },
             }
 
         except Exception as e:
-            logger.error(
-                f"Audio analysis failed: {str(e)}",
-                error=str(e)
-            )
+            logger.error(f"Audio analysis failed: {e!s}", error=str(e))
             raise
 
-    async def _load_audio(self, audio_data: Union[str, bytes]) -> tuple:
+    async def _load_audio(self, audio_data: str | bytes) -> tuple:
         """Load audio from various input formats"""
         if isinstance(audio_data, str):
             # Base64 encoded audio
@@ -192,7 +173,7 @@ class AudioBiasDetector:
 
             return audio_array, sample_rate
 
-        elif isinstance(audio_data, bytes):
+        if isinstance(audio_data, bytes):
             # Direct audio bytes
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
                 tmp_file.write(audio_data)
@@ -203,15 +184,9 @@ class AudioBiasDetector:
 
             return audio_array, sample_rate
 
-        else:
-            raise ValueError(f"Unsupported audio data type: {type(audio_data)}")
+        raise ValueError(f"Unsupported audio data type: {type(audio_data)}")
 
-    async def _analyze_speech(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int,
-        language: str
-    ) -> dict[str, Any]:
+    async def _analyze_speech(self, audio_array: np.ndarray, sample_rate: int, language: str) -> dict[str, Any]:
         """Analyze speech content for bias"""
         try:
             # Check if models are loaded
@@ -219,20 +194,15 @@ class AudioBiasDetector:
                 raise ValueError("Speech-to-text models not loaded")
 
             # Prepare audio for Whisper
-            inputs = self.speech_to_text_processor(
-                audio_array,
-                sampling_rate=sample_rate,
-                return_tensors="pt"
-            ).to(self.device)
+            inputs = self.speech_to_text_processor(audio_array, sampling_rate=sample_rate, return_tensors="pt").to(
+                self.device
+            )
 
             # Generate transcript
             with torch.no_grad():
                 generated_ids = self.speech_to_text_model.generate(inputs["input_features"])
 
-            transcript = self.speech_to_text_processor.batch_decode(
-                generated_ids,
-                skip_special_tokens=True
-            )[0]
+            transcript = self.speech_to_text_processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
             # Detect language for speaker diarization
             if language != "auto":
@@ -253,23 +223,15 @@ class AudioBiasDetector:
                 "transcript": transcript,
                 "segments": speaker_segments,
                 "bias_indicators": bias_indicators,
-                "language_detected": language if language != "auto" else self._detect_language(transcript)
+                "language_detected": language if language != "auto" else self._detect_language(transcript),
             }
 
         except Exception as e:
-            logger.warning(f"Speech analysis failed: {str(e)}", error=str(e))
-            return {
-                "transcript": "",
-                "segments": [],
-                "bias_indicators": [],
-                "language_detected": "unknown"
-            }
+            logger.warning(f"Speech analysis failed: {e!s}", error=str(e))
+            return {"transcript": "", "segments": [], "bias_indicators": [], "language_detected": "unknown"}
 
     async def _perform_speaker_diarization(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int,
-        language: str = "en"
+        self, audio_array: np.ndarray, sample_rate: int, language: str = "en"
     ) -> list[AudioSegment]:
         """Perform speaker diarization on audio"""
         try:
@@ -293,7 +255,7 @@ class AudioBiasDetector:
                     transcript="",  # Will be filled later
                     confidence=0.8,  # Placeholder
                     speaker_id=speaker,
-                    language=language
+                    language=language,
                 )
                 segments.append(segment)
 
@@ -303,21 +265,30 @@ class AudioBiasDetector:
             return segments
 
         except Exception as e:
-            logger.warning(f"Speaker diarization failed: {str(e)}", error=str(e))
+            logger.warning(f"Speaker diarization failed: {e!s}", error=str(e))
             return []
 
-    async def _analyze_transcript(
-        self,
-        transcript: str,
-        segments: list[AudioSegment]
-    ) -> list[str]:
+    async def _analyze_transcript(self, transcript: str, segments: list[AudioSegment]) -> list[str]:
         """Analyze transcript for bias indicators"""
         bias_indicators = []
 
         # Check for gender bias in language
         gender_keywords = {
-            "he", "she", "man", "woman", "male", "female", "gentleman", "lady",
-            "guys", "gals", "dude", "chick", "handsome", "beautiful", "pretty"
+            "he",
+            "she",
+            "man",
+            "woman",
+            "male",
+            "female",
+            "gentleman",
+            "lady",
+            "guys",
+            "gals",
+            "dude",
+            "chick",
+            "handsome",
+            "beautiful",
+            "pretty",
         }
 
         words = transcript.lower().split()
@@ -334,7 +305,7 @@ class AudioBiasDetector:
             "teacher": "female_stereotype",
             "ceo": "male_stereotype",
             "cleaner": "female_stereotype",
-            "programmer": "male_stereotype"
+            "programmer": "male_stereotype",
         }
 
         for word in words:
@@ -349,11 +320,7 @@ class AudioBiasDetector:
 
         return bias_indicators
 
-    async def _analyze_music(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int
-    ) -> dict[str, Any]:
+    async def _analyze_music(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Analyze music/audio characteristics for bias"""
         try:
             # Extract audio features
@@ -362,7 +329,7 @@ class AudioBiasDetector:
                 "energy": np.mean(librosa.feature.rms(y=audio_array)),
                 "spectral_centroid": np.mean(librosa.feature.spectral_centroid(y=audio_array, sr=sample_rate)),
                 "zero_crossing_rate": np.mean(librosa.feature.zero_crossing_rate(y=audio_array)),
-                "mfcc": np.mean(librosa.feature.mfcc(y=audio_array, sr=sample_rate), axis=1)
+                "mfcc": np.mean(librosa.feature.mfcc(y=audio_array, sr=sample_rate), axis=1),
             }
 
             # Classify music genre/style
@@ -378,41 +345,22 @@ class AudioBiasDetector:
                     elif genre in ["reggae", "salsa", "afrobeat"]:
                         bias_indicators.append(f"Cultural bias: Specific ethnic music ({genre})")
 
-            return {
-                "features": features,
-                "genre_predictions": genre_predictions,
-                "bias_indicators": bias_indicators
-            }
+            return {"features": features, "genre_predictions": genre_predictions, "bias_indicators": bias_indicators}
 
         except Exception as e:
-            logger.warning(f"Music analysis failed: {str(e)}", error=str(e))
-            return {
-                "features": {},
-                "genre_predictions": [],
-                "bias_indicators": []
-            }
+            logger.warning(f"Music analysis failed: {e!s}", error=str(e))
+            return {"features": {}, "genre_predictions": [], "bias_indicators": []}
 
     def _classify_music_genre(self, features: dict[str, Any]) -> list[tuple[str, float]]:
         """Classify music genre based on features"""
         # Simplified genre classification
         # In production, this would use a trained classifier
 
-        genres = [
-            ("classical", 0.3),
-            ("jazz", 0.2),
-            ("pop", 0.2),
-            ("rock", 0.1),
-            ("electronic", 0.1),
-            ("world", 0.1)
-        ]
+        genres = [("classical", 0.3), ("jazz", 0.2), ("pop", 0.2), ("rock", 0.1), ("electronic", 0.1), ("world", 0.1)]
 
         return genres
 
-    async def _analyze_speakers(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int
-    ) -> dict[str, Any]:
+    async def _analyze_speakers(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Analyze speaker characteristics"""
         try:
             # Save audio to temporary file
@@ -435,8 +383,8 @@ class AudioBiasDetector:
                     "characteristics": {
                         "pitch": np.random.normal(200, 50),  # Placeholder
                         "speaking_rate": np.random.normal(150, 30),  # Placeholder
-                        "energy": np.random.normal(0.5, 0.2)  # Placeholder
-                    }
+                        "energy": np.random.normal(0.5, 0.2),  # Placeholder
+                    },
                 }
                 speakers.append(speaker)
 
@@ -446,16 +394,12 @@ class AudioBiasDetector:
             return {
                 "speakers": speakers,
                 "total_speakers": len(speakers),
-                "speaker_diversity_score": self._calculate_speaker_diversity(speakers)
+                "speaker_diversity_score": self._calculate_speaker_diversity(speakers),
             }
 
         except Exception as e:
-            logger.warning(f"Speaker analysis failed: {str(e)}", error=str(e))
-            return {
-                "speakers": [],
-                "total_speakers": 0,
-                "speaker_diversity_score": 0.0
-            }
+            logger.warning(f"Speaker analysis failed: {e!s}", error=str(e))
+            return {"speakers": [], "total_speakers": 0, "speaker_diversity_score": 0.0}
 
     def _calculate_speaker_diversity(self, speakers: list[dict[str, Any]]) -> float:
         """Calculate speaker diversity score"""
@@ -482,11 +426,7 @@ class AudioBiasDetector:
 
         return min(diversity_score, 1.0)
 
-    async def _analyze_emotions(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int
-    ) -> dict[str, Any]:
+    async def _analyze_emotions(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Analyze emotions in audio"""
         try:
             # Check if emotion classifier is loaded
@@ -514,7 +454,7 @@ class AudioBiasDetector:
                     "start_time": i * segment_duration,
                     "end_time": (i + 1) * segment_duration,
                     "emotion": dominant_emotion["label"],
-                    "confidence": dominant_emotion["score"]
+                    "confidence": dominant_emotion["score"],
                 }
                 emotions.append(emotion_data)
 
@@ -530,17 +470,12 @@ class AudioBiasDetector:
                 "emotions": emotions,
                 "emotion_counts": emotion_counts,
                 "dominant_emotion": dominant_emotion,
-                "total_segments": len(emotions)
+                "total_segments": len(emotions),
             }
 
         except Exception as e:
-            logger.warning(f"Emotion analysis failed: {str(e)}", error=str(e))
-            return {
-                "emotions": [],
-                "emotion_counts": {},
-                "dominant_emotion": "neutral",
-                "total_segments": 0
-            }
+            logger.warning(f"Emotion analysis failed: {e!s}", error=str(e))
+            return {"emotions": [], "emotion_counts": {}, "dominant_emotion": "neutral", "total_segments": 0}
 
     def _get_language_indicators(self) -> dict[str, list[str]]:
         """Get language indicator words"""
@@ -548,7 +483,7 @@ class AudioBiasDetector:
             "en": ["the", "and", "is", "are"],
             "es": ["el", "la", "es", "son"],
             "fr": ["le", "la", "est", "sont"],
-            "de": ["der", "die", "das", "ist"]
+            "de": ["der", "die", "das", "ist"],
         }
 
     def _detect_language(self, transcript: str) -> str:
@@ -571,7 +506,7 @@ class AudioBiasDetector:
         evidence: list[str],
         explanation: str,
         segments_involved: list | None = None,
-        keywords_detected: list[str] | None = None
+        keywords_detected: list[str] | None = None,
     ) -> AudioBiasScore:
         """Create an AudioBiasScore object"""
         confidence_level = self._get_confidence_level(confidence)
@@ -583,15 +518,11 @@ class AudioBiasDetector:
             evidence=evidence,
             explanation=explanation,
             segments_involved=segments_involved or [],
-            keywords_detected=keywords_detected or []
+            keywords_detected=keywords_detected or [],
         )
 
     def _process_speech_bias_indicators(
-        self,
-        bias_indicators: list[str],
-        segments: list,
-        bias_types: list[BiasType] | None,
-        sensitivity: str
+        self, bias_indicators: list[str], segments: list, bias_types: list[BiasType] | None, sensitivity: str
     ) -> list[AudioBiasScore]:
         """Process speech bias indicators"""
         bias_scores = []
@@ -608,16 +539,13 @@ class AudioBiasDetector:
                 evidence=[bias_indicator],
                 explanation=explanation,
                 segments_involved=segments,
-                keywords_detected=self._extract_keywords(bias_indicator)
+                keywords_detected=self._extract_keywords(bias_indicator),
             )
             bias_scores.append(bias_score)
         return bias_scores
 
     def _process_speaker_diversity(
-        self,
-        speakers: list,
-        diversity_score: float,
-        bias_types: list[BiasType] | None
+        self, speakers: list, diversity_score: float, bias_types: list[BiasType] | None
     ) -> AudioBiasScore | None:
         """Process speaker diversity analysis"""
         if diversity_score >= 0.5 or len(speakers) <= 1:
@@ -633,14 +561,10 @@ class AudioBiasDetector:
             bias_type=bias_type,
             confidence=confidence,
             evidence=["Low speaker diversity detected"],
-            explanation=explanation
+            explanation=explanation,
         )
 
-    def _process_emotion_bias(
-        self,
-        dominant_emotion: str,
-        bias_types: list[BiasType] | None
-    ) -> AudioBiasScore | None:
+    def _process_emotion_bias(self, dominant_emotion: str, bias_types: list[BiasType] | None) -> AudioBiasScore | None:
         """Process emotion bias analysis"""
         negative_emotions = ["angry", "sad", "fearful"]
         if dominant_emotion not in negative_emotions:
@@ -654,17 +578,11 @@ class AudioBiasDetector:
         evidence = [f"Negative emotion detected: {dominant_emotion}"]
         explanation = f"Dominant negative emotion ({dominant_emotion}) may indicate emotional manipulation"
         return self._create_audio_bias_score(
-            bias_type=bias_type,
-            confidence=confidence,
-            evidence=evidence,
-            explanation=explanation
+            bias_type=bias_type, confidence=confidence, evidence=evidence, explanation=explanation
         )
 
     async def _generate_bias_scores(
-        self,
-        analysis_results: dict[str, Any],
-        bias_types: list[BiasType] | None,
-        sensitivity: str
+        self, analysis_results: dict[str, Any], bias_types: list[BiasType] | None, sensitivity: str
     ) -> list[AudioBiasScore]:
         """Generate bias scores from audio analysis results"""
         bias_scores = []
@@ -673,9 +591,7 @@ class AudioBiasDetector:
         if "speech_analysis" in analysis_results:
             bias_indicators = analysis_results["speech_analysis"].get("bias_indicators", [])
             segments = analysis_results["speech_analysis"].get("segments", [])
-            speech_scores = self._process_speech_bias_indicators(
-                bias_indicators, segments, bias_types, sensitivity
-            )
+            speech_scores = self._process_speech_bias_indicators(bias_indicators, segments, bias_types, sensitivity)
             bias_scores.extend(speech_scores)
 
         # Process speaker analysis results
@@ -701,7 +617,7 @@ class AudioBiasDetector:
             BiasType.GENDER_STEREOTYPES: ["gender", "male", "female"],
             BiasType.AGE_DISCRIMINATION: ["age", "young", "old"],
             BiasType.PROFESSIONAL_STEREOTYPES: ["professional", "stereotype"],
-            BiasType.CULTURAL_STEREOTYPES: ["cultural", "ethnic"]
+            BiasType.CULTURAL_STEREOTYPES: ["cultural", "ethnic"],
         }
 
     def _map_text_bias(self, text: str) -> BiasType:
@@ -720,11 +636,7 @@ class AudioBiasDetector:
         base_confidence = 0.6
 
         # Adjust based on sensitivity
-        sensitivity_multiplier = {
-            "low": 0.7,
-            "medium": 0.8,
-            "high": 0.9
-        }
+        sensitivity_multiplier = {"low": 0.7, "medium": 0.8, "high": 0.9}
 
         confidence = base_confidence * sensitivity_multiplier.get(sensitivity, 0.8)
 
@@ -740,12 +652,11 @@ class AudioBiasDetector:
         """Convert confidence score to confidence level"""
         if confidence >= 0.8:
             return ConfidenceLevel.VERY_HIGH
-        elif confidence >= 0.6:
+        if confidence >= 0.6:
             return ConfidenceLevel.HIGH
-        elif confidence >= 0.4:
+        if confidence >= 0.4:
             return ConfidenceLevel.MEDIUM
-        else:
-            return ConfidenceLevel.LOW
+        return ConfidenceLevel.LOW
 
     def _extract_keywords(self, text: str) -> list[str]:
         """Extract keywords from text"""
@@ -771,12 +682,12 @@ class AudioBiasDetector:
                 "speech_to_text": "openai/whisper-base",
                 "audio_classification": "facebook/wav2vec2-base",
                 "speaker_diarization": "pyannote/speaker-diarization",
-                "emotion_classification": "ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition"
+                "emotion_classification": "ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition",
             },
             "loaded": self.is_loaded,
             "load_time_ms": int(self.load_time * 1000),
             "device": str(self.device),
             "max_audio_duration": settings.max_audio_duration,
             "sample_rate": settings.sample_rate,
-            "supported_formats": settings.allowed_audio_formats
+            "supported_formats": settings.allowed_audio_formats,
         }

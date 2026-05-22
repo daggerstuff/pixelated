@@ -518,8 +518,8 @@ export class RecommendationService {
     return {
       primaryConcerns: this.identifyPrimaryConcerns(context),
       riskLevel:
-        latestAnalysis?.riskLevel ||
-        context.clientProfile.currentStatus.riskLevel ||
+        (latestAnalysis?.riskLevel ??
+        context.clientProfile.currentStatus.riskLevel) ||
         'moderate',
       functionalImpairment: this.assessFunctionalImpairment(context),
       readinessForChange:
@@ -1233,7 +1233,7 @@ export class RecommendationService {
     }
 
     return (
-      outcomeMap[category] || [
+      outcomeMap[category] ?? [
         'Symptom improvement',
         'Better functioning',
         'Enhanced well-being',
@@ -1254,7 +1254,7 @@ export class RecommendationService {
       ],
     }
 
-    return riskMap[category] || ['Requires professional monitoring']
+    return riskMap[category] ?? ['Requires professional monitoring']
   }
 
   private getAssessmentToolsForCategory(category: string): string[] {
@@ -1273,7 +1273,7 @@ export class RecommendationService {
     }
 
     return (
-      toolMap[category] || [
+      toolMap[category] ?? [
         'Standardized assessment scales',
         'Clinical interview',
       ]

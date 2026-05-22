@@ -16,7 +16,7 @@ describe('SlackAlerter', () => {
 
   it('should send alert to Slack webhook', async () => {
     global.fetch = vi.fn(
-       async () =>
+      async () =>
         Promise.resolve({
           ok: true,
           status: 200,
@@ -36,7 +36,7 @@ describe('SlackAlerter', () => {
 
   it('should return success false on webhook failure', async () => {
     global.fetch = vi.fn(
-       async () =>
+      async () =>
         Promise.resolve({
           ok: false,
           status: 400,
@@ -50,7 +50,7 @@ describe('SlackAlerter', () => {
   })
 
   it('should handle network errors gracefully', async () => {
-    global.fetch = vi.fn( async () => Promise.reject(new Error('Network error')))
+    global.fetch = vi.fn(async () => Promise.reject(new Error('Network error')))
 
     const alerter = new SlackAlerter(mockWebhookUrl)
     const result = await alerter.send(mockMessage)

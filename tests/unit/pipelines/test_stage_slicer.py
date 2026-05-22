@@ -714,9 +714,7 @@ class TestDatasetSlicer:
         result = slicer.slice([jsonl_path])
 
         # Verify we have records in multiple stages
-        non_zero_stages = [
-            stage for stage, count in result.manifest.stage_counts.items() if count > 0
-        ]
+        non_zero_stages = [stage for stage, count in result.manifest.stage_counts.items() if count > 0]
         assert len(non_zero_stages) >= 3, "Expected records in at least 3 different stages"
 
     def test_slice_confidence_tracking(self, temp_jsonl_file, temp_output_dir):

@@ -128,9 +128,7 @@ export class UniversalDemoAnalytics {
     const config = this.pageConfig.abTestVariants
 
     // Update headline
-    const headlineElement = document.getElementById(
-      'headline-text',
-    )!
+    const headlineElement = document.getElementById('headline-text')!
     if (headlineElement && config.headline[variant]) {
       headlineElement.textContent = config.headline[variant]
     }
@@ -142,9 +140,7 @@ export class UniversalDemoAnalytics {
     }
 
     // Update urgency badge
-    const urgencyElement = document.getElementById(
-      'urgency-text',
-    )!
+    const urgencyElement = document.getElementById('urgency-text')!
     if (urgencyElement && config.urgency[variant]) {
       urgencyElement.textContent = config.urgency[variant]
     }
@@ -406,7 +402,7 @@ export class UniversalDemoAnalytics {
   }
 
   private async sendEvents(events: AnalyticsEventData[]): Promise<void> {
-    const promises = events.map( async (event) => this.sendSingleEvent(event))
+    const promises = events.map(async (event) => this.sendSingleEvent(event))
     await Promise.allSettled(promises)
   }
 
@@ -488,7 +484,9 @@ export function initializeDemoAnalytics(
   const analytics = new UniversalDemoAnalytics(pageName)
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded',  async () => analytics.initialize())
+    document.addEventListener('DOMContentLoaded', async () =>
+      analytics.initialize(),
+    )
   } else {
     void analytics.initialize()
   }

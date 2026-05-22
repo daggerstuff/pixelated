@@ -87,7 +87,7 @@ export class PatternDiscoveryService {
       const processingTime = Date.now() - startTime
 
       // Return the first pattern type or default to correlation
-      const primaryPatternType = request.patternTypes[0] || 'correlation'
+      const primaryPatternType = request.patternTypes[0] ?? 'correlation'
 
       const result: PatternDiscoveryResult = {
         patternType: primaryPatternType,

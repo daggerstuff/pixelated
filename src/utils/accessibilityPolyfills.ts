@@ -128,9 +128,7 @@ export function checkAccessibility() {
     document.querySelectorAll('input, select, textarea').forEach((input) => {
       const id = input.getAttribute('id')
       if (id) {
-        const hasLabel = document.querySelector(
-          `label[for="${id}"]`,
-        )!
+        const hasLabel = document.querySelector(`label[for="${id}"]`)!
         const hasAriaLabel =
           input.hasAttribute('aria-label') ||
           input.hasAttribute('aria-labelledby')

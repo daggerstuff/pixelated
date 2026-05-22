@@ -25,11 +25,11 @@ import {
   type EdgeThreatDetectionSystem,
   EdgeThreatDetectionSystemCore,
 } from '../edge/EdgeThreatDetectionSystem'
-import type { EdgeDetectionResult } from '../global/types'
 import {
   type ExternalThreatFeedIntegration,
   ExternalThreatFeedIntegrationCore,
 } from '../feeds/ExternalThreatFeedIntegration'
+import type { EdgeDetectionResult } from '../global/types'
 import {
   type ThreatHuntingSystem,
   ThreatHuntingSystemCore,
@@ -206,7 +206,9 @@ export class GlobalThreatIntelligenceNetworkCore
       await this.responseOrchestrator.initialize()
 
       // Initialize Threat Hunting System
-      this.huntingSystem = new ThreatHuntingSystemCore(this.createDefaultHuntingConfig())
+      this.huntingSystem = new ThreatHuntingSystemCore(
+        this.createDefaultHuntingConfig(),
+      )
       await this.huntingSystem.initialize()
 
       // Initialize External Threat Feed Integration
@@ -728,7 +730,9 @@ export class GlobalThreatIntelligenceNetworkCore
       })
 
       const threats = await Promise.all(
-        threatIds.map( async (id) => this.intelligenceDatabase.getThreatById(id)),
+        threatIds.map(async (id) =>
+          this.intelligenceDatabase.getThreatById(id),
+        ),
       )
 
       const validThreats = threats.filter((t) => t !== null)

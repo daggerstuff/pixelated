@@ -576,7 +576,7 @@ let connectionPool: OptimizedConnectionPool | null = null
  * Get the global connection pool
  */
 export function getConnectionPool(): OptimizedConnectionPool {
-  connectionPool ??= new OptimizedConnectionPool();
+  connectionPool ??= new OptimizedConnectionPool()
   return connectionPool
 }
 

@@ -30,36 +30,23 @@ class TestIEEEIntegrationIntegration:
     @pytest.fixture
     def ieee_client(self):
         """Create IEEEClient instance"""
-        return IEEEClient(
-            api_key="test_api_key",
-            base_url="https://ieeexploreapi.ieee.org/api/v1",
-            rate_limit=10
-        )
+        return IEEEClient(api_key="test_api_key", base_url="https://ieeexploreapi.ieee.org/api/v1", rate_limit=10)
 
     @pytest.fixture
     def research_pipeline(self, ieee_client):
         """Create ResearchPipeline instance"""
-        return ResearchPipeline(
-            ieee_client=ieee_client,
-            batch_size=50,
-            max_retries=3
-        )
+        return ResearchPipeline(ieee_client=ieee_client, batch_size=50, max_retries=3)
 
     @pytest.fixture
     def data_processor(self):
         """Create DataProcessor instance"""
-        return DataProcessor(
-            max_workers=4,
-            cache_ttl=3600
-        )
+        return DataProcessor(max_workers=4, cache_ttl=3600)
 
     @pytest.fixture
     def integration_manager(self, research_pipeline, data_processor):
         """Create IntegrationManager instance"""
         return IntegrationManager(
-            research_pipeline=research_pipeline,
-            data_processor=data_processor,
-            update_interval=300
+            research_pipeline=research_pipeline, data_processor=data_processor, update_interval=300
         )
 
     @pytest.mark.asyncio
@@ -74,7 +61,7 @@ class TestIEEEIntegrationIntegration:
                     "abstract": "This paper discusses bias detection methods...",
                     "keywords": ["bias detection", "machine learning", "fairness"],
                     "publication_year": 2023,
-                    "doi": "10.1109/TEST.2023.123456"
+                    "doi": "10.1109/TEST.2023.123456",
                 },
                 {
                     "title": "Fairness in AI Systems: A Comprehensive Review",
@@ -82,18 +69,16 @@ class TestIEEEIntegrationIntegration:
                     "abstract": "A comprehensive review of fairness in AI systems...",
                     "keywords": ["fairness", "AI ethics", "bias mitigation"],
                     "publication_year": 2023,
-                    "doi": "10.1109/TEST.2023.654321"
-                }
+                    "doi": "10.1109/TEST.2023.654321",
+                },
             ],
             "total_records": 2,
-            "total_pages": 1
+            "total_pages": 1,
         }
 
         with patch.object(ieee_client, "search_articles", return_value=mock_response):
             results = await ieee_client.search_articles(
-                query="bias detection machine learning",
-                max_results=10,
-                publication_year=2023
+                query="bias detection machine learning", max_results=10, publication_year=2023
             )
 
             assert results is not None
@@ -115,23 +100,25 @@ class TestIEEEIntegrationIntegration:
             "bias detection algorithms",
             "fairness in AI",
             "ethical AI systems",
-            "algorithmic accountability"
+            "algorithmic accountability",
         ]
 
         # Mock pipeline responses
         mock_results = []
         for query in search_queries:
-            mock_results.append({
-                "query": query,
-                "articles": [
-                    {
-                        "title": f"Article about {query}",
-                        "relevance_score": 0.9,
-                        "publication_date": datetime.now().isoformat()
-                    }
-                ],
-                "processing_time": 0.5
-            })
+            mock_results.append(
+                {
+                    "query": query,
+                    "articles": [
+                        {
+                            "title": f"Article about {query}",
+                            "relevance_score": 0.9,
+                            "publication_date": datetime.now().isoformat(),
+                        }
+                    ],
+                    "processing_time": 0.5,
+                }
+            )
 
         with patch.object(research_pipeline, "process_queries", return_value=mock_results):
             results = await research_pipeline.process_queries(search_queries)
@@ -154,13 +141,10 @@ class TestIEEEIntegrationIntegration:
                     "abstract": "This paper examines bias in AI systems...",
                     "keywords": ["bias", "AI", "ethics"],
                     "citations": 45,
-                    "publication_date": "2023-06-15"
+                    "publication_date": "2023-06-15",
                 }
             ],
-            "metadata": {
-                "source": "ieee_xplore",
-                "retrieval_date": datetime.now().isoformat()
-            }
+            "metadata": {"source": "ieee_xplore", "retrieval_date": datetime.now().isoformat()},
         }
 
         # Process and enrich data
@@ -189,16 +173,10 @@ class TestIEEEIntegrationIntegration:
                 "articles_processed": 150,
                 "new_insights": 25,
                 "bias_patterns": ["gender", "racial", "age"],
-                "recommendations": ["implement fairness metrics", "regular bias audits"]
+                "recommendations": ["implement fairness metrics", "regular bias audits"],
             },
-            "training_updates": {
-                "scenarios_added": 10,
-                "assessments_updated": 5
-            },
-            "memory_updates": {
-                "patterns_stored": 15,
-                "recommendations_applied": 8
-            }
+            "training_updates": {"scenarios_added": 10, "assessments_updated": 5},
+            "memory_updates": {"patterns_stored": 15, "recommendations_applied": 8},
         }
 
         with patch.object(integration_manager, "execute_research_workflow", return_value=mock_workflow_results):
@@ -221,26 +199,11 @@ class TestIEEEIntegrationIntegration:
         # Mock research findings
         research_findings = {
             "bias_patterns": {
-                "gender_bias": {
-                    "frequency": 0.15,
-                    "contexts": ["hiring", "promotion"],
-                    "severity": "medium"
-                },
-                "racial_bias": {
-                    "frequency": 0.08,
-                    "contexts": ["performance_review"],
-                    "severity": "high"
-                }
+                "gender_bias": {"frequency": 0.15, "contexts": ["hiring", "promotion"], "severity": "medium"},
+                "racial_bias": {"frequency": 0.08, "contexts": ["performance_review"], "severity": "high"},
             },
-            "recommendations": [
-                "Implement blind review processes",
-                "Diversify training data",
-                "Regular bias audits"
-            ],
-            "confidence_scores": {
-                "gender_bias": 0.85,
-                "racial_bias": 0.92
-            }
+            "recommendations": ["Implement blind review processes", "Diversify training data", "Regular bias audits"],
+            "confidence_scores": {"gender_bias": 0.85, "racial_bias": 0.92},
         }
 
         # Process findings and update memory
@@ -259,34 +222,22 @@ class TestAdvancedTrainingIntegration:
     @pytest.fixture
     def cultural_trainer(self):
         """Create CulturalCompetencyTrainer instance"""
-        return CulturalCompetencyTrainer(
-            scenario_count=50,
-            difficulty_levels=["beginner", "intermediate", "advanced"]
-        )
+        return CulturalCompetencyTrainer(scenario_count=50, difficulty_levels=["beginner", "intermediate", "advanced"])
 
     @pytest.fixture
     def trauma_trainer(self):
         """Create TraumaInformedCareTrainer instance"""
-        return TraumaInformedCareTrainer(
-            trauma_types=["acute", "chronic", "complex"],
-            sensitivity_level="high"
-        )
+        return TraumaInformedCareTrainer(trauma_types=["acute", "chronic", "complex"], sensitivity_level="high")
 
     @pytest.fixture
     def scenario_generator(self):
         """Create ScenarioGenerator instance"""
-        return ScenarioGenerator(
-            templates_path="src/lib/ai/training/templates",
-            customization_level="high"
-        )
+        return ScenarioGenerator(templates_path="src/lib/ai/training/templates", customization_level="high")
 
     @pytest.fixture
     def assessment_engine(self):
         """Create AssessmentEngine instance"""
-        return AssessmentEngine(
-            assessment_types=["knowledge", "skill", "behavior"],
-            scoring_method="comprehensive"
-        )
+        return AssessmentEngine(assessment_types=["knowledge", "skill", "behavior"], scoring_method="comprehensive")
 
     @pytest.mark.asyncio
     async def test_cultural_competency_scenario_generation(self, cultural_trainer, scenario_generator):
@@ -296,7 +247,7 @@ class TestAdvancedTrainingIntegration:
             "cultural_contexts": ["asian", "hispanic", "african", "middle_eastern"],
             "communication_styles": ["direct", "indirect", "high_context", "low_context"],
             "power_distance": ["high", "low"],
-            "uncertainty_avoidance": ["high", "low"]
+            "uncertainty_avoidance": ["high", "low"],
         }
 
         # Generate scenarios
@@ -326,7 +277,7 @@ class TestAdvancedTrainingIntegration:
             "peer_support": True,
             "collaboration": True,
             "empowerment": True,
-            "cultural_humility": True
+            "cultural_humility": True,
         }
 
         # Generate trauma-informed scenarios
@@ -353,8 +304,8 @@ class TestAdvancedTrainingIntegration:
             "parameters": {
                 "cultural_background": "japanese",
                 "communication_issue": "indirect_vs_direct",
-                "context": "workplace_feedback"
-            }
+                "context": "workplace_feedback",
+            },
         }
 
         # Customize scenario
@@ -364,8 +315,8 @@ class TestAdvancedTrainingIntegration:
             learner_profile={
                 "experience_level": "intermediate",
                 "cultural_exposure": "moderate",
-                "learning_style": "visual"
-            }
+                "learning_style": "visual",
+            },
         )
 
         assert customized_scenarios is not None
@@ -382,21 +333,19 @@ class TestAdvancedTrainingIntegration:
     async def test_comprehensive_assessment_engine(self, assessment_engine, cultural_trainer, trauma_trainer):
         """Test comprehensive assessment engine"""
         # Generate test scenarios
-        cultural_scenarios = await cultural_trainer.generate_scenarios({
-            "cultural_contexts": ["hispanic"],
-            "communication_styles": ["high_context"]
-        })
+        cultural_scenarios = await cultural_trainer.generate_scenarios(
+            {"cultural_contexts": ["hispanic"], "communication_styles": ["high_context"]}
+        )
 
-        trauma_scenarios = await trauma_trainer.generate_trauma_scenarios({
-            "trauma_awareness": True,
-            "safety_focus": True
-        })
+        trauma_scenarios = await trauma_trainer.generate_trauma_scenarios(
+            {"trauma_awareness": True, "safety_focus": True}
+        )
 
         # Create comprehensive assessment
         assessment = await assessment_engine.create_comprehensive_assessment(
             scenarios=cultural_scenarios + trauma_scenarios,
             assessment_type="combined",
-            time_limit=3600  # 1 hour
+            time_limit=3600,  # 1 hour
         )
 
         assert assessment is not None
@@ -415,20 +364,17 @@ class TestAdvancedTrainingIntegration:
         """Test training integration with memory system"""
         # Generate training data
         training_data = {
-            "cultural_scenarios": await cultural_trainer.generate_scenarios({
-                "cultural_contexts": ["asian", "hispanic"],
-                "communication_styles": ["indirect", "high_context"]
-            }),
-            "trauma_scenarios": await trauma_trainer.generate_trauma_scenarios({
-                "trauma_awareness": True,
-                "safety_focus": True,
-                "empowerment": True
-            }),
+            "cultural_scenarios": await cultural_trainer.generate_scenarios(
+                {"cultural_contexts": ["asian", "hispanic"], "communication_styles": ["indirect", "high_context"]}
+            ),
+            "trauma_scenarios": await trauma_trainer.generate_trauma_scenarios(
+                {"trauma_awareness": True, "safety_focus": True, "empowerment": True}
+            ),
             "learner_progress": {
                 "cultural_competency_score": 0.75,
                 "trauma_informed_score": 0.82,
-                "completion_rate": 0.90
-            }
+                "completion_rate": 0.90,
+            },
         }
 
         # Process training and update memory
@@ -459,8 +405,8 @@ class TestEndToEndIntegration:
             "memory_handler": MemoryUpdateHandler(),
             "integration_manager": IntegrationManager(
                 research_pipeline=ResearchPipeline(ieee_client=IEEEClient(api_key="test_key")),
-                data_processor=DataProcessor()
-            )
+                data_processor=DataProcessor(),
+            ),
         }
 
     @pytest.mark.asyncio
@@ -474,33 +420,33 @@ class TestEndToEndIntegration:
             "research_findings": {
                 "bias_patterns": ["gender", "racial", "cultural"],
                 "mitigation_strategies": ["blind review", "diverse training", "cultural awareness"],
-                "effectiveness_metrics": {"accuracy": 0.85, "fairness": 0.78}
+                "effectiveness_metrics": {"accuracy": 0.85, "fairness": 0.78},
             },
             "cultural_insights": {
                 "communication_styles": ["direct", "indirect", "high_context"],
                 "cultural_dimensions": ["power_distance", "uncertainty_avoidance"],
-                "best_practices": ["active_listening", "cultural_humility"]
+                "best_practices": ["active_listening", "cultural_humility"],
             },
             "trauma_insights": {
                 "safety_principles": ["physical", "emotional", "cultural"],
                 "empowerment_strategies": ["choice", "collaboration", "voice"],
-                "trust_building": ["transparency", "consistency", "respect"]
-            }
+                "trust_building": ["transparency", "consistency", "respect"],
+            },
         }
 
-        with patch.object(complete_system["integration_manager"], "execute_research_workflow", return_value=mock_research_results):
+        with patch.object(
+            complete_system["integration_manager"], "execute_research_workflow", return_value=mock_research_results
+        ):
             research_results = await complete_system["integration_manager"].execute_research_workflow(research_topics)
 
             # Step 2: Generate training scenarios based on research
-            cultural_scenarios = await complete_system["cultural_trainer"].generate_scenarios({
-                "research_based": True,
-                "cultural_insights": research_results["cultural_insights"]
-            })
+            cultural_scenarios = await complete_system["cultural_trainer"].generate_scenarios(
+                {"research_based": True, "cultural_insights": research_results["cultural_insights"]}
+            )
 
-            trauma_scenarios = await complete_system["trauma_trainer"].generate_trauma_scenarios({
-                "research_based": True,
-                "trauma_insights": research_results["trauma_insights"]
-            })
+            trauma_scenarios = await complete_system["trauma_trainer"].generate_trauma_scenarios(
+                {"research_based": True, "trauma_insights": research_results["trauma_insights"]}
+            )
 
             # Step 3: Create comprehensive training program
             training_program = {
@@ -510,8 +456,8 @@ class TestEndToEndIntegration:
                 "learning_objectives": [
                     "Understand cultural communication differences",
                     "Apply trauma-informed principles",
-                    "Recognize and mitigate bias"
-                ]
+                    "Recognize and mitigate bias",
+                ],
             }
 
             # Verify complete pipeline
@@ -528,18 +474,18 @@ class TestEndToEndIntegration:
             {
                 "type": "research_finding",
                 "data": {"bias_pattern": "gender", "confidence": 0.9, "context": "hiring"},
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             },
             {
                 "type": "training_completion",
                 "data": {"scenario_type": "cultural", "score": 0.85, "learner_id": "learner_123"},
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             },
             {
                 "type": "bias_detection",
                 "data": {"bias_type": "racial", "confidence": 0.78, "mitigation_applied": True},
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         ]
 
         # Process all interactions
@@ -565,12 +511,14 @@ class TestEndToEndIntegration:
         # Simulate high-load scenario
         load_test_data = []
         for i in range(100):  # 100 concurrent operations
-            load_test_data.append({
-                "operation_id": f"op_{i}",
-                "type": "research_query" if i % 3 == 0 else "training_scenario" if i % 3 == 1 else "bias_detection",
-                "data": {"test_data": f"load_test_{i}"},
-                "priority": "high" if i < 10 else "medium"
-            })
+            load_test_data.append(
+                {
+                    "operation_id": f"op_{i}",
+                    "type": "research_query" if i % 3 == 0 else "training_scenario" if i % 3 == 1 else "bias_detection",
+                    "data": {"test_data": f"load_test_{i}"},
+                    "priority": "high" if i < 10 else "medium",
+                }
+            )
 
         start_time = time.time()
 

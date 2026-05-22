@@ -28,20 +28,20 @@ const demographicTargets = {
     '65+': 10,
   },
   gender: {
-    female: 45,
-    male: 40,
+    'female': 45,
+    'male': 40,
     'non-binary': 10,
     'prefer not to say': 5,
   },
   occupation: {
-    Healthcare: 12,
-    Education: 15,
-    Technology: 18,
+    'Healthcare': 12,
+    'Education': 15,
+    'Technology': 18,
     'Business/Finance': 20,
     'Service Industry': 15,
-    Student: 10,
-    Retired: 5,
-    Other: 5,
+    'Student': 10,
+    'Retired': 5,
+    'Other': 5,
   },
   background: {
     Urban: 60,
@@ -60,20 +60,20 @@ const currentStats = {
     '65+': 13,
   },
   gender: {
-    female: 52,
-    male: 35,
+    'female': 52,
+    'male': 35,
     'non-binary': 8,
     'prefer not to say': 5,
   },
   occupation: {
-    Healthcare: 15,
-    Education: 18,
-    Technology: 22,
+    'Healthcare': 15,
+    'Education': 18,
+    'Technology': 22,
     'Business/Finance': 18,
     'Service Industry': 12,
-    Student: 8,
-    Retired: 4,
-    Other: 3,
+    'Student': 8,
+    'Retired': 4,
+    'Other': 3,
   },
   background: {
     Urban: 65,
@@ -108,13 +108,13 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
   }
 
   const OCCUPATION_CATEGORIES: Record<string, readonly string[]> = {
-    Healthcare: ['doctor', 'nurse', 'therapist', 'medical'],
-    Education: ['teacher', 'professor', 'education'],
-    Technology: ['engineer', 'developer', 'tech', 'software'],
+    'Healthcare': ['doctor', 'nurse', 'therapist', 'medical'],
+    'Education': ['teacher', 'professor', 'education'],
+    'Technology': ['engineer', 'developer', 'tech', 'software'],
     'Business/Finance': ['manager', 'analyst', 'finance', 'business'],
     'Service Industry': ['service', 'retail', 'restaurant'],
-    Student: ['student'],
-    Retired: ['retired'],
+    'Student': ['student'],
+    'Retired': ['retired'],
   } as const
 
   const getOccupationCategory = (occupation: string): string => {
@@ -253,24 +253,23 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
     return categoryMap[category] === subcategory
   }
 
-  const groupedStats = demographicStats.reduce< Record<string, DemographicData[]>>(
-    (acc, stat) => {
-      const { category } = stat
-      acc[category] ??= [];
-      acc[category].push(stat)
-      return acc
-    },
-    {},
-  )
+  const groupedStats = demographicStats.reduce<
+    Record<string, DemographicData[]>
+  >((acc, stat) => {
+    const { category } = stat
+    acc[category] ??= []
+    acc[category].push(stat)
+    return acc
+  }, {})
 
   return (
-    <div className='bg-gray-100 rounded-lg p-4'>
-      <div className='mb-4 flex items-center justify-between'>
-        <h4 className='text-gray-800 text-xl font-bold'>
+    <div className="bg-gray-100 rounded-lg p-4">
+      <div className="mb-4 flex items-center justify-between">
+        <h4 className="text-gray-800 text-xl font-bold">
           Dataset Demographic Balance
         </h4>
-        <div className='flex items-center gap-2'>
-          <span className='text-gray-600 text-sm font-medium'>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-600 text-sm font-medium">
             Overall Balance:
           </span>
           <span
@@ -287,11 +286,11 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
         </div>
       </div>
 
-      <div className='bg-blue-50 border-blue-400 mb-6 rounded-lg border-l-4 p-4'>
-        <h5 className='text-blue-800 mb-2 font-medium'>
+      <div className="bg-blue-50 border-blue-400 mb-6 rounded-lg border-l-4 p-4">
+        <h5 className="text-blue-800 mb-2 font-medium">
           Current Profile Classification
         </h5>
-        <div className='text-blue-700 grid grid-cols-2 gap-4 text-sm'>
+        <div className="text-blue-700 grid grid-cols-2 gap-4 text-sm">
           <div>
             <strong>Age Group:</strong> {getAgeCategory(currentProfile.age)}
           </div>
@@ -310,13 +309,13 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       </div>
 
       {/* Demographic Categories */}
-      <div className='space-y-6'>
+      <div className="space-y-6">
         {Object.entries(groupedStats).map(([category, stats]) => (
-          <div key={category} className='rounded-lg border p-4'>
-            <h5 className='text-gray-700 mb-3 font-medium'>
+          <div key={category} className="rounded-lg border p-4">
+            <h5 className="text-gray-700 mb-3 font-medium">
               {category} Distribution
             </h5>
-            <div className='space-y-3'>
+            <div className="space-y-3">
               {stats.map((stat) => {
                 const isCurrentProfile = getCurrentProfileHighlight(
                   category,
@@ -327,24 +326,24 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
                     key={stat.subcategory}
                     className={`flex items-center justify-between rounded p-2 ${isCurrentProfile ? 'bg-blue-100 border-blue-300 border' : 'bg-gray-50'} `}
                   >
-                    <div className='flex items-center gap-3'>
+                    <div className="flex items-center gap-3">
                       <span
                         className={`text-sm font-medium ${isCurrentProfile ? 'text-blue-800' : 'text-gray-700'}`}
                       >
                         {stat.subcategory}
                         {isCurrentProfile && (
-                          <span className='ml-1 text-xs'>(Current)</span>
+                          <span className="ml-1 text-xs">(Current)</span>
                         )}
                       </span>
                     </div>
 
-                    <div className='flex items-center gap-3'>
-                      <div className='text-gray-600 text-xs'>
+                    <div className="flex items-center gap-3">
+                      <div className="text-gray-600 text-xs">
                         {stat.current}% / {stat.target}%
                       </div>
 
                       {/* Progress Bar */}
-                      <div className='bg-gray-200 h-2 w-20 overflow-hidden rounded-full'>
+                      <div className="bg-gray-200 h-2 w-20 overflow-hidden rounded-full">
                         <div
                           className={`h-full transition-all duration-300 ${getProgressBarColor(stat.percentage)}`}
                           style={{
@@ -368,20 +367,20 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       </div>
 
       {/* Balance Recommendations */}
-      <div className='bg-indigo-50 mt-6 rounded-lg p-4'>
-        <h5 className='text-indigo-800 mb-3 font-medium'>
+      <div className="bg-indigo-50 mt-6 rounded-lg p-4">
+        <h5 className="text-indigo-800 mb-3 font-medium">
           Balance Recommendations
         </h5>
-        <div className='text-indigo-700 space-y-2 text-sm'>
+        <div className="text-indigo-700 space-y-2 text-sm">
           {demographicStats
             .filter((stat) => stat.percentage < 75 || stat.percentage > 125)
             .slice(0, 3)
             .map((stat) => (
               <div
                 key={`${stat.category}-${stat.subcategory}`}
-                className='flex items-start gap-2'
+                className="flex items-start gap-2"
               >
-                <span className='text-indigo-500'>•</span>
+                <span className="text-indigo-500">•</span>
                 <span>
                   <strong>
                     {stat.category} - {stat.subcategory}:
@@ -395,7 +394,7 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
           {demographicStats.filter(
             (stat) => stat.percentage < 75 || stat.percentage > 125,
           ).length === 0 && (
-            <p className='text-indigo-600'>
+            <p className="text-indigo-600">
               ✓ All demographic categories are well-balanced
             </p>
           )}
@@ -403,21 +402,21 @@ const DemographicBalancingDisplay: FC<DemographicBalancingDisplayProps> = ({
       </div>
 
       {/* Legend */}
-      <div className='bg-gray-50 mt-4 rounded-lg p-3'>
-        <h6 className='text-gray-700 mb-2 text-sm font-medium'>
+      <div className="bg-gray-50 mt-4 rounded-lg p-3">
+        <h6 className="text-gray-700 mb-2 text-sm font-medium">
           Balance Indicators
         </h6>
-        <div className='flex items-center gap-6 text-xs'>
-          <div className='flex items-center gap-1'>
-            <div className='bg-green-500 h-3 w-3 rounded'></div>
+        <div className="flex items-center gap-6 text-xs">
+          <div className="flex items-center gap-1">
+            <div className="bg-green-500 h-3 w-3 rounded"></div>
             <span>Well Balanced (90-110%)</span>
           </div>
-          <div className='flex items-center gap-1'>
-            <div className='bg-yellow-500 h-3 w-3 rounded'></div>
+          <div className="flex items-center gap-1">
+            <div className="bg-yellow-500 h-3 w-3 rounded"></div>
             <span>Acceptable (75-125%)</span>
           </div>
-          <div className='flex items-center gap-1'>
-            <div className='bg-red-500 h-3 w-3 rounded'></div>
+          <div className="flex items-center gap-1">
+            <div className="bg-red-500 h-3 w-3 rounded"></div>
             <span>Needs Attention (&lt;75% or &gt;125%)</span>
           </div>
         </div>

@@ -48,7 +48,6 @@ const {
   title,
   description,
   keywords,
-  themeMode,
   ogImage,
   bgType,
   pubDate,
@@ -60,11 +59,6 @@ const {
   fullWidthMain = false,
   centered = false,
   contentClass = '',
-  transitionMode = 'fade',
-  isLoginPage = false,
-  showSettingsPanel = false,
-  showAnalysisPanel = false,
-  initialTab = 'chat',
 } = Astro.props
 
 // Use provided pathname for prerendered pages, fall back to Astro.url.pathname for server-rendered
@@ -86,7 +80,7 @@ const hasCustomCursor =
   newTab && cursorType.length > 0 && cursorType !== 'pointer'
 if (hasCustomCursor) style['--external-link-cursor'] = cursorType
 
-const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
@@ -114,7 +108,7 @@ const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
     <script src="/js/background-loader.js" defer is:inline></script>
     {
       (nprogress || mediumZoom) && (
-        <script src="/js/nprogress-and-zoom.js" type="module" />
+        <script src="/js/nprogress-and-zoom.js" type="module" is:inline />
       )
     }
   </head>
@@ -178,7 +172,13 @@ const shouldRenderAnalytics = process.env.NODE_ENV !== 'test'
     <Backdrop />
 
     <!-- Vercel Speed Insights and Analytics -->
-    {shouldRenderAnalytics && <SpeedInsights />}
-    {shouldRenderAnalytics && <Analytics />}
+    {
+      shouldRenderAnalytics && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )
+    }
   </body>
 </html>

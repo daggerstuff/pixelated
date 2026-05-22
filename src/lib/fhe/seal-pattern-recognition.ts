@@ -474,9 +474,9 @@ export class SealPatternRecognitionService implements FHEService {
           item.emotionValues
         ) {
           const emotions = item.emotionValues as Record<string, number>
-          featureVector.push(emotions['valence'] || 0)
-          featureVector.push(emotions['arousal'] || 0)
-          featureVector.push(emotions['dominance'] || 0)
+          featureVector.push(emotions['valence'] ?? 0)
+          featureVector.push(emotions['arousal'] ?? 0)
+          featureVector.push(emotions['dominance'] ?? 0)
         }
 
         // Handle intensity if available
@@ -571,7 +571,7 @@ export class SealPatternRecognitionService implements FHEService {
           valenceEmotion ? 1 - (valenceEmotion.confidence || 0.5) : 0.5,
         )
         factorVector.push(
-          arousalEmotion ? arousalEmotion.intensity ?? 0.5 : 0.5,
+          arousalEmotion ? (arousalEmotion.intensity ?? 0.5) : 0.5,
         )
         factorVector.push(
           dominanceEmotion ? 1 - (dominanceEmotion.confidence || 0.5) : 0.5,

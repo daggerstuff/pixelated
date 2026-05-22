@@ -41,24 +41,16 @@ class LinguisticAnalyzer:
 
         try:
             # Check if text_content is a string or a doc
-            doc = (
-                self.nlp(text_content)
-                if isinstance(text_content, str)
-                else text_content
-            )
+            doc = self.nlp(text_content) if isinstance(text_content, str) else text_content
 
             # Single-pass detection
-            gender_bias, racial_bias, age_bias, cultural_bias = (
-                self.detect_all_biases_single_pass(doc)
-            )
+            gender_bias, racial_bias, age_bias, cultural_bias = self.detect_all_biases_single_pass(doc)
 
             # Sentiment and biased terms
             sentiment = self.analyze_sentiment(str(text_content))
             biased_terms = self.detect_biased_terms(doc)
 
-            overall_bias_score = np.mean(
-                [gender_bias, racial_bias, age_bias, cultural_bias]
-            )
+            overall_bias_score = np.mean([gender_bias, racial_bias, age_bias, cultural_bias])
 
             return {
                 "overall_bias_score": float(overall_bias_score),
@@ -75,9 +67,7 @@ class LinguisticAnalyzer:
             logger.error("Linguistic bias detection failed: %s", e, exc_info=True)
             return {"overall_bias_score": 0.0, "error": str(e)}
 
-    def detect_all_biases_single_pass(
-        self, doc: Any
-    ) -> tuple[float, float, float, float]:
+    def detect_all_biases_single_pass(self, doc: Any) -> tuple[float, float, float, float]:
         """Detect all bias types in a single pass over the document."""
         male_count = 0
         female_count = 0
@@ -111,15 +101,9 @@ class LinguisticAnalyzer:
             gender_bias = min(abs(male_count - female_count) / total_gender_terms, 1.0)
 
         # Calculate other biases (normalized frequency)
-        racial_bias = (
-            0.0 if total_tokens == 0 else min((racial_count / total_tokens) * 10, 1.0)
-        )
-        age_bias = (
-            0.0 if total_tokens == 0 else min((age_count / total_tokens) * 15, 1.0)
-        )
-        cultural_bias = (
-            0.0 if total_tokens == 0 else min((cultural_count / total_tokens) * 12, 1.0)
-        )
+        racial_bias = 0.0 if total_tokens == 0 else min((racial_count / total_tokens) * 10, 1.0)
+        age_bias = 0.0 if total_tokens == 0 else min((age_count / total_tokens) * 15, 1.0)
+        cultural_bias = 0.0 if total_tokens == 0 else min((cultural_count / total_tokens) * 12, 1.0)
 
         return (gender_bias, racial_bias, age_bias, cultural_bias)
 
@@ -160,9 +144,7 @@ class LinguisticAnalyzer:
                             "category": category,
                             "position": token.idx,
                             "context": self._extract_context(doc, target_idx=token.i),
-                            "suggestion": BIASED_TERM_ALTERNATIVES.get(
-                                token_lower, "consider alternative phrasing"
-                            ),
+                            "suggestion": BIASED_TERM_ALTERNATIVES.get(token_lower, "consider alternative phrasing"),
                         }
                     )
         return detected_terms

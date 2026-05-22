@@ -36,11 +36,11 @@ export function DashboardWidget({
   return (
     <Card
       className={`dashboard-widget ${className}`}
-      role='region'
+      role="region"
       aria-labelledby={titleId}
     >
       <CardHeader className={variant === 'compact' ? 'pb-2' : 'pb-4'}>
-        <div className='flex items-start justify-between'>
+        <div className="flex items-start justify-between">
           <div>
             <CardTitle
               id={titleId}
@@ -49,17 +49,17 @@ export function DashboardWidget({
               {title}
             </CardTitle>
             {description && (
-              <CardDescription className='mt-1'>{description}</CardDescription>
+              <CardDescription className="mt-1">{description}</CardDescription>
             )}
           </div>
-          <div className='flex items-center space-x-2'>
+          <div className="flex items-center space-x-2">
             {onRefresh && (
               <button
                 onClick={onRefresh}
-                className='hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 transition-colors'
-                aria-label='Refresh data'
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-1 transition-colors"
+                aria-label="Refresh data"
               >
-                <RefreshCw className='text-gray-500 h-4 w-4' />
+                <RefreshCw className="text-gray-500 h-4 w-4" />
               </button>
             )}
             {actions}
@@ -68,12 +68,12 @@ export function DashboardWidget({
       </CardHeader>
       <CardContent>
         {isLoading ? (
-          <div className='space-y-3'>
-            <Skeleton className='h-[20px] w-[80%] rounded-md' />
+          <div className="space-y-3">
+            <Skeleton className="h-[20px] w-[80%] rounded-md" />
 
-            <Skeleton className='h-[20px] w-[60%] rounded-md' />
+            <Skeleton className="h-[20px] w-[60%] rounded-md" />
 
-            <Skeleton className='h-[20px] w-[70%] rounded-md' />
+            <Skeleton className="h-[20px] w-[70%] rounded-md" />
           </div>
         ) : (
           children

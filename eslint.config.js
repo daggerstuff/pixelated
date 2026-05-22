@@ -168,7 +168,7 @@ export default tseslint.config(
       // Disabled complexity rules (matching OXC)
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
       'no-await-in-loop': 'off',
@@ -221,7 +221,7 @@ export default tseslint.config(
   {
     files: ['**/*.{test,spec}.{js,jsx,ts,tsx}'],
     plugins: {
-      vitest: pluginVitest,
+      'vitest': pluginVitest,
       'vitest-globals': pluginVitestGlobals,
     },
     languageOptions: {
@@ -256,7 +256,7 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
       'max-lines-per-function': 'off',
       'max-depth': 'off',
-      complexity: 'off',
+      'complexity': 'off',
       'max-params': 'off',
       'max-statements': 'off',
     },

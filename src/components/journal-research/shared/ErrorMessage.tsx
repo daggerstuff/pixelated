@@ -51,8 +51,8 @@ export function ErrorMessage({
     return (
       <div className={cn('space-y-2', className)}>
         {Object.entries(fieldErrs).map(([field, errorMessage]) => (
-          <Alert key={field} variant='error' className='text-sm'>
-            <strong className='font-medium capitalize'>{field}:</strong>{' '}
+          <Alert key={field} variant="error" className="text-sm">
+            <strong className="font-medium capitalize">{field}:</strong>{' '}
             {errorMessage}
           </Alert>
         ))}
@@ -65,12 +65,12 @@ export function ErrorMessage({
   }
 
   return (
-    <Alert variant='error' className={className}>
+    <Alert variant="error" className={className}>
       {displayMessage}
       {showDetails && normalizedError && (
-        <details className='mt-2 text-xs'>
-          <summary className='cursor-pointer'>Technical details</summary>
-          <pre className='bg-muted mt-2 overflow-auto rounded p-2'>
+        <details className="mt-2 text-xs">
+          <summary className="cursor-pointer">Technical details</summary>
+          <pre className="bg-muted mt-2 overflow-auto rounded p-2">
             {normalizedError.message}
             {normalizedError.code && `\nCode: ${normalizedError.code}`}
           </pre>
@@ -91,7 +91,7 @@ export function FieldError({ error, className }: FieldErrorProps) {
   }
 
   return (
-    <p className={cn('text-sm text-red-500 mt-1', className)} role='alert'>
+    <p className={cn('text-sm text-red-500 mt-1', className)} role="alert">
       {error}
     </p>
   )

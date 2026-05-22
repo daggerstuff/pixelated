@@ -411,7 +411,7 @@ import { TherapistProgressTracker } from '@/components/dashboard/TherapistProgre
 
 function ProgressView({ session }: { session: TherapistSession }) {
   return (
-    <div className='p-4'>
+    <div className="p-4">
       <h2>Session Progress Tracking</h2>
       <TherapistProgressTracker session={session} />
     </div>
@@ -426,7 +426,7 @@ import { TherapyProgressCharts } from '@/components/dashboard/TherapyProgressCha
 
 function AnalyticsView({ data }: { data: TherapistAnalyticsChartData }) {
   return (
-    <div className='p-4'>
+    <div className="p-4">
       <h2>Therapy Analytics</h2>
       <TherapyProgressCharts data={data} />
     </div>

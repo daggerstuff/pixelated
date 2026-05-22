@@ -143,25 +143,25 @@ export function ImprovedBiasInterface({
     <div className={`improved-bias-interface ${className}`}>
       {/* Analysis progress indicator */}
       {currentStep === 'analyzing' && (
-        <div className='analysis-progress'>
+        <div className="analysis-progress">
           <div
-            className='progress-bar'
+            className="progress-bar"
             style={{ width: `${analysisProgress}%` }}
           />
-          <p className='progress-text'>{analysisSteps[analysisStepIndex]}</p>
+          <p className="progress-text">{analysisSteps[analysisStepIndex]}</p>
         </div>
       )}
 
       {/* Results display */}
       {currentStep === 'results' && analysisResults && (
-        <div className='analysis-results'>
+        <div className="analysis-results">
           <h3>Analysis Complete</h3>
           <p>
             Overall Bias Score: {Math.round(analysisResults.overallBiasScore)}
             /100
           </p>
           <p>Alert Level: {analysisResults.alertLevel}</p>
-          <div className='recommendations'>
+          <div className="recommendations">
             <h4>Recommendations:</h4>
             <ul>
               {analysisResults.recommendations.map((rec, i) => (
@@ -177,16 +177,16 @@ export function ImprovedBiasInterface({
 
       {/* Input form */}
       {currentStep === 'input' && (
-        <div className='analysis-input'>
+        <div className="analysis-input">
           <h2>Bias Analysis</h2>
           <p>Enter content to analyze for potential biases</p>
           <textarea
-            placeholder='Enter text to analyze...'
+            placeholder="Enter text to analyze..."
             rows={5}
-            className='w-full rounded border p-2'
+            className="w-full rounded border p-2"
           />
           <button
-            onClick={ async () =>
+            onClick={async () =>
               startAnalysis({
                 scenario: 'general',
                 demographics: {
@@ -198,7 +198,7 @@ export function ImprovedBiasInterface({
                 content: 'Sample content for analysis',
               })
             }
-            className='bg-blue-500 text-white mt-4 rounded px-4 py-2'
+            className="bg-blue-500 text-white mt-4 rounded px-4 py-2"
             disabled={isAnalyzing}
           >
             Start Analysis

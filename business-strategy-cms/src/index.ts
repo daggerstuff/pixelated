@@ -169,8 +169,8 @@ const gracefulShutdown = async (signal: string) => {
 }
 
 // Handle shutdown signals
-process.on('SIGTERM',  async () => gracefulShutdown('SIGTERM'))
-process.on('SIGINT',  async () => gracefulShutdown('SIGINT'))
+process.on('SIGTERM', async () => gracefulShutdown('SIGTERM'))
+process.on('SIGINT', async () => gracefulShutdown('SIGINT'))
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {

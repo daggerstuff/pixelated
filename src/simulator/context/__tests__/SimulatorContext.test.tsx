@@ -1,5 +1,5 @@
-import { Component, type ReactNode } from 'react'
 import { renderHook, act } from '@testing-library/react'
+import { Component, type ReactNode } from 'react'
 
 import type {
   EmotionState,
@@ -30,7 +30,7 @@ class UseSimulatorErrorBoundary extends Component<{
     this.props.onError(error)
   }
 
-   async render() {
+  async render() {
     if (this.state.hasError) {
       return null
     }

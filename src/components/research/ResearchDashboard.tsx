@@ -183,17 +183,17 @@ export const ResearchDashboard: FC = () => {
   )
 
   return (
-    <ResponsiveContainer size='full'>
-      <div className='bg-gray-50 dark:bg-gray-900 min-h-screen'>
+    <ResponsiveContainer size="full">
+      <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         {/* Header */}
-        <header className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm'>
-          <div className='px-6 py-4'>
-            <div className='flex items-center justify-between'>
+        <header className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 border-b shadow-sm">
+          <div className="px-6 py-4">
+            <div className="flex items-center justify-between">
               <div>
-                <h1 className='text-gray-900 dark:text-white text-2xl font-bold'>
+                <h1 className="text-gray-900 dark:text-white text-2xl font-bold">
                   Research Portal
                 </h1>
-                <p className='text-gray-600 dark:text-gray-400 mt-1 text-sm'>
+                <p className="text-gray-600 dark:text-gray-400 mt-1 text-sm">
                   Evidence-Based Mental Health Research •{' '}
                   {researchMetrics.totalStudies} studies •{' '}
                   {researchMetrics.totalParticipants.toLocaleString()}{' '}
@@ -201,8 +201,8 @@ export const ResearchDashboard: FC = () => {
                 </p>
               </div>
 
-              <div className='flex items-center gap-4'>
-                <OfflineIndicator position='inline' />
+              <div className="flex items-center gap-4">
+                <OfflineIndicator position="inline" />
                 <select
                   value={timeRange}
                   onChange={(e) => {
@@ -216,20 +216,20 @@ export const ResearchDashboard: FC = () => {
                       setTimeRange(nextValue)
                     }
                   }}
-                  className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm'
+                  className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2 text-sm"
                 >
-                  <option value='month'>This Month</option>
-                  <option value='quarter'>This Quarter</option>
-                  <option value='year'>This Year</option>
-                  <option value='all'>All Time</option>
+                  <option value="month">This Month</option>
+                  <option value="quarter">This Quarter</option>
+                  <option value="year">This Year</option>
+                  <option value="all">All Time</option>
                 </select>
               </div>
             </div>
           </div>
 
           {/* Navigation Tabs */}
-          <div className='px-6'>
-            <nav className='flex space-x-8'>
+          <div className="px-6">
+            <nav className="flex space-x-8">
               {dashboardTabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -249,16 +249,16 @@ export const ResearchDashboard: FC = () => {
         </header>
 
         {/* Main Content */}
-        <main className='p-6'>
+        <main className="p-6">
           {dashboardView === 'overview' && (
-            <div className='space-y-6'>
+            <div className="space-y-6">
               <MetricsGrid metrics={researchMetrics} />
               <ActiveStudiesList
                 studies={studies}
                 selectedStudies={selectedStudies}
                 onStudySelect={handleStudySelect}
               />
-              <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+              <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <InsightsPanel />
                 <UpcomingMilestones />
               </div>
@@ -266,39 +266,39 @@ export const ResearchDashboard: FC = () => {
           )}
 
           {dashboardView === 'studies' && (
-            <div className='space-y-6'>
-              <div className='flex items-center justify-between'>
-                <h2 className='text-xl font-semibold'>
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">
                   Research Studies Management
                 </h2>
-                <div className='flex items-center gap-2'>
-                  <span className='text-gray-600 dark:text-gray-400 text-sm'>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 dark:text-gray-400 text-sm">
                     {selectedStudies.length} selected
                   </span>
-                  <button className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors'>
+                  <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 text-sm transition-colors">
                     New Study
                   </button>
                 </div>
               </div>
-              <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border'>
-                <div className='divide-gray-200 dark:divide-gray-700 divide-y'>
+              <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 overflow-hidden rounded-lg border">
+                <div className="divide-gray-200 dark:divide-gray-700 divide-y">
                   {studies.map((study) => (
                     <div
                       key={study.id}
-                      className='hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors'
+                      className="hover:bg-gray-50 dark:hover:bg-gray-800/50 p-4 transition-colors"
                     >
-                      <div className='flex items-center gap-4'>
+                      <div className="flex items-center gap-4">
                         <input
-                          type='checkbox'
+                          type="checkbox"
                           checked={selectedStudies.includes(study.id)}
                           onChange={() => handleStudySelect(study.id)}
-                          className='text-blue-600 h-4 w-4 rounded'
+                          className="text-blue-600 h-4 w-4 rounded"
                         />
-                        <div className='flex-1'>
-                          <h3 className='text-gray-900 dark:text-white font-medium'>
+                        <div className="flex-1">
+                          <h3 className="text-gray-900 dark:text-white font-medium">
                             {study.title}
                           </h3>
-                          <p className='text-gray-600 dark:text-gray-400 text-sm'>
+                          <p className="text-gray-600 dark:text-gray-400 text-sm">
                             {study.description}
                           </p>
                         </div>
@@ -325,11 +325,11 @@ export const ResearchDashboard: FC = () => {
 
 // Internal components preserved/simplified for clarity within 200 line constraint
 const DatasetsTab: FC<{ datasets: DatasetInfo[] }> = memo(({ datasets }) => (
-  <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
     {datasets.map((dataset) => (
-      <Card key={dataset.id} className='p-6'>
-        <h3 className='text-lg font-semibold'>{dataset.name}</h3>
-        <p className='text-gray-500 text-sm'>{dataset.description}</p>
+      <Card key={dataset.id} className="p-6">
+        <h3 className="text-lg font-semibold">{dataset.name}</h3>
+        <p className="text-gray-500 text-sm">{dataset.description}</p>
       </Card>
     ))}
   </div>
@@ -360,7 +360,7 @@ const AnalyticsTab: FC<{ data: any[] }> = memo(({ data }) => (
 ))
 
 const PublicationsTab: FC = memo(() => (
-  <div className='text-gray-500 py-12 text-center'>
+  <div className="text-gray-500 py-12 text-center">
     Publications management coming soon...
   </div>
 ))

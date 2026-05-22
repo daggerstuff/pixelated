@@ -261,13 +261,13 @@ export class BackupVerificationService extends EventEmitter {
       >
 
       // Verify backup structure
-      if (!(backup).data || !backup.metadata) {
+      if (!backup.data || !backup.metadata) {
         throw new Error('Invalid backup structure')
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity((backup).data)
+        this.verifyDataIntegrity(backup.data)
       }
 
       // Verify restoration capability

@@ -76,7 +76,9 @@ export class HealthMonitor {
             status: 'unhealthy' as const,
             message:
               error instanceof Error
-                ? (error instanceof Error ? error.message : 'Unknown error')
+                ? error instanceof Error
+                  ? error.message
+                  : 'Unknown error'
                 : 'Unknown error',
             responseTime: performance.now() - startTime,
           }
@@ -246,7 +248,7 @@ export class HealthMonitor {
         cpu: {
           cores: cpus.length,
           loadAverage: os.loadavg(),
-          model: cpus[0]?.model || 'Unknown',
+          model: cpus[0]?.model ?? 'Unknown',
         },
         platform: os.platform(),
         nodeVersion: process.version,

@@ -2,7 +2,12 @@ import { Brain, Activity, Zap } from 'lucide-react'
 import React, { FC, useEffect, useRef, useMemo, useCallback } from 'react'
 
 import { Badge } from '@/components/ui/badge/index.ts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index.ts'
 
 interface BrainRegion {
   id: string
@@ -252,27 +257,27 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
   return (
     <Card className={`border-0 shadow-lg ${className}`}>
       <CardHeader>
-        <CardTitle className='flex items-center space-x-2'>
-          <Brain className='text-purple-600 h-5 w-5' />
+        <CardTitle className="flex items-center space-x-2">
+          <Brain className="text-purple-600 h-5 w-5" />
           <span>Neural Activity Map</span>
           {archetype && (
-            <Badge variant='outline' className='ml-auto'>
+            <Badge variant="outline" className="ml-auto">
               {archetype}
             </Badge>
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className='space-y-4'>
+      <CardContent className="space-y-4">
         {/* 3D Brain Visualization */}
-        <div className='from-slate-900 to-purple-900 relative rounded-lg bg-gradient-to-br p-4'>
+        <div className="from-slate-900 to-purple-900 relative rounded-lg bg-gradient-to-br p-4">
           <canvas
             ref={canvasRef}
-            className='h-auto w-full rounded'
+            className="h-auto w-full rounded"
             style={{ maxHeight: '200px' }}
           />
-          <div className='absolute right-2 top-2'>
-            <Badge variant='secondary' className='bg-white/20 text-white'>
-              <Activity className='mr-1 h-3 w-3' />
+          <div className="absolute right-2 top-2">
+            <Badge variant="secondary" className="bg-white/20 text-white">
+              <Activity className="mr-1 h-3 w-3" />
               Live
             </Badge>
           </div>
@@ -280,19 +285,19 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
 
         {/* Region Activity Indicators */}
         {moodVector && (
-          <div className='grid grid-cols-2 gap-2 text-xs'>
+          <div className="grid grid-cols-2 gap-2 text-xs">
             {brainRegions.slice(0, 4).map((region) => {
               const activityInfo = getActivityLevel(region.activity)
               return (
-                <div key={region.id} className='flex items-center space-x-2'>
+                <div key={region.id} className="flex items-center space-x-2">
                   <div
                     className={`h-2 w-2 rounded-full ${activityInfo.color}`}
                     style={{ backgroundColor: region.color }}
                   />
-                  <span className='text-gray-600 truncate'>{region.name}</span>
+                  <span className="text-gray-600 truncate">{region.name}</span>
                   <Badge
-                    variant='outline'
-                    className='ml-auto px-1 py-0 text-xs'
+                    variant="outline"
+                    className="ml-auto px-1 py-0 text-xs"
                   >
                     {Math.round(region.activity * 100)}%
                   </Badge>
@@ -304,12 +309,12 @@ export const BrainVisualization: FC<BrainVisualizationProps> = ({
 
         {/* Neural Activity Summary */}
         {moodVector && (
-          <div className='border-t pt-2'>
-            <div className='flex items-center justify-between text-sm'>
-              <span className='text-gray-600'>Overall Neural Activity</span>
-              <div className='flex items-center space-x-2'>
-                <Zap className='text-yellow-500 h-4 w-4' />
-                <span className='font-medium'>
+          <div className="border-t pt-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">Overall Neural Activity</span>
+              <div className="flex items-center space-x-2">
+                <Zap className="text-yellow-500 h-4 w-4" />
+                <span className="font-medium">
                   {Math.round(
                     (Object.values(moodVector as Record<string, number>).reduce(
                       (a: number, b: number) => a + b,

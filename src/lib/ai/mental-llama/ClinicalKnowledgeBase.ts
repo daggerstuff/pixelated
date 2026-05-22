@@ -79,7 +79,7 @@ export class ClinicalKnowledgeBase {
       ],
     }
 
-    return guidelinesMap[category] || guidelinesMap['general_mental_health']
+    return guidelinesMap[category] ?? guidelinesMap['general_mental_health']
   }
 
   /**
@@ -326,7 +326,7 @@ export class ClinicalKnowledgeBase {
       ],
     }
 
-    return interventions.concat(categoryInterventions[category] || [])
+    return interventions.concat(categoryInterventions[category] ?? [])
   }
 
   /**
@@ -387,7 +387,7 @@ export class ClinicalKnowledgeBase {
     }
 
     // Get base context for the category
-    const baseContext = contextMap[category] || {}
+    const baseContext = contextMap[category] ?? {}
 
     // Enhance context based on analysis results
     return this.enhanceContextWithAnalysis(baseContext, baseAnalysis, category)
@@ -582,7 +582,7 @@ export class ClinicalKnowledgeBase {
       ],
     }
 
-    return evidenceMap[category] || []
+    return evidenceMap[category] ?? []
   }
 
   /**

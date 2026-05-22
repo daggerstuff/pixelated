@@ -402,7 +402,7 @@ class IntegrationTestRunner {
     console.log('✅ Cleanup completed')
   }
 
-  private  async delay(ms: number): Promise<void> {
+  private async delay(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms))
   }
 }

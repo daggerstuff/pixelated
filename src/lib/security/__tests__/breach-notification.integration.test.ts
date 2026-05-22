@@ -52,7 +52,6 @@ vi.mock('crypto', () => ({
   randomUUID: mockRandomUUID,
 }))
 
-
 import { fheService } from '../../fhe' // Corrected import
 import { logger } from '../../logger'
 import { redis } from '../../redis'
@@ -180,8 +179,10 @@ describe('breachNotificationSystem Integration Tests', () => {
         .mockResolvedValueOnce(userOne)
         .mockResolvedValueOnce(userTwo)
       mockSendEmail
-        .mockImplementationOnce( async () => Promise.reject(new Error('Email error')))
-        .mockImplementationOnce( async () => Promise.resolve())
+        .mockImplementationOnce(async () =>
+          Promise.reject(new Error('Email error')),
+        )
+        .mockImplementationOnce(async () => Promise.resolve())
 
       const breachWithMultipleUsers = {
         ...mockBreach,

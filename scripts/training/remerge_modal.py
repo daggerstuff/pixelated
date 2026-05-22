@@ -45,7 +45,7 @@ def remerge_with_scale(scale: float = 0.5):
 
     print(f"🚀 Re-merging with scale factor: {scale}")
     print(f"Base: {base_model_name}")
-    print(f"Adapter: /root/adapter")
+    print("Adapter: /root/adapter")
     print(f"Output: {output_name}")
 
     # Load base model
@@ -110,5 +110,5 @@ def main(scale: float = 0.5):
     print(f"📡 Triggering Modal re-merge with scale={scale}...")
     result = remerge_with_scale.remote(scale)
     print(f"🎉 Complete: {result}")
-    print(f"\nTo use the new model, update modal_app.py:")
+    print("\nTo use the new model, update modal_app.py:")
     print(f'  model_path = "/models/{result.split("/")[-1]}"')

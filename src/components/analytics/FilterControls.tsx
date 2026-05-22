@@ -70,25 +70,25 @@ export function FilterControls({
 
   return (
     <div
-      className='filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4'
-      role='region'
-      aria-label='Filter options'
+      className="filter-controls bg-gray-50 dark:bg-gray-900 mb-4 space-y-4 rounded-md border p-4"
+      role="region"
+      aria-label="Filter options"
     >
-      <div className='mb-2 flex items-center justify-between'>
-        <h4 className='text-sm font-medium'>Filter Options</h4>
-        <div className='space-x-2'>
+      <div className="mb-2 flex items-center justify-between">
+        <h4 className="text-sm font-medium">Filter Options</h4>
+        <div className="space-x-2">
           <Button
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
             onClick={onReset}
-            aria-label='Reset all filters'
+            aria-label="Reset all filters"
           >
             Reset
           </Button>
           <Button
-            size='sm'
+            size="sm"
             onClick={onApply}
-            aria-label='Apply current filters'
+            aria-label="Apply current filters"
           >
             Apply Filters
           </Button>
@@ -96,12 +96,12 @@ export function FilterControls({
       </div>
 
       {activeTab === 'trends' && (
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-          <div className='space-y-2'>
-            <Label htmlFor='startDate'>Start Date</Label>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="startDate">Start Date</Label>
             <Input
-              id='startDate'
-              type='date'
+              id="startDate"
+              type="date"
               value={
                 options.startDate ? format(options.startDate, 'yyyy-MM-dd') : ''
               }
@@ -113,11 +113,11 @@ export function FilterControls({
             />
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='endDate'>End Date</Label>
+          <div className="space-y-2">
+            <Label htmlFor="endDate">End Date</Label>
             <Input
-              id='endDate'
-              type='date'
+              id="endDate"
+              type="date"
               value={
                 options.endDate ? format(options.endDate, 'yyyy-MM-dd') : ''
               }
@@ -132,24 +132,24 @@ export function FilterControls({
       )}
 
       {dateError && (
-        <div id='date-error' className='text-red-500 mb-2 text-xs' role='alert'>
+        <div id="date-error" className="text-red-500 mb-2 text-xs" role="alert">
           {dateError}
         </div>
       )}
 
       {activeTab === 'patterns' && (
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-          <div className='space-y-2'>
-            <Label htmlFor='patternType'>Pattern Type</Label>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="patternType">Pattern Type</Label>
             <Select
               value={options.patternType ?? ''}
               onValueChange={(value) => handleChange('patternType', value)}
             >
-              <SelectTrigger id='patternType' aria-label='Select pattern type'>
+              <SelectTrigger id="patternType" aria-label="Select pattern type">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=''>All Types</SelectItem>
+                <SelectItem value="">All Types</SelectItem>
                 {patternTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -159,11 +159,11 @@ export function FilterControls({
             </Select>
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='minFrequency'>Min Frequency</Label>
+          <div className="space-y-2">
+            <Label htmlFor="minFrequency">Min Frequency</Label>
             <Input
-              id='minFrequency'
-              type='number'
+              id="minFrequency"
+              type="number"
               min={0}
               value={options.minFrequency ?? ''}
               onChange={(e) =>
@@ -172,19 +172,19 @@ export function FilterControls({
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
-              placeholder='Minimum frequency'
+              placeholder="Minimum frequency"
             />
           </div>
         </div>
       )}
 
       {activeTab === 'risks' && (
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-          <div className='space-y-2'>
-            <Label htmlFor='minConfidence'>Min Confidence</Label>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="minConfidence">Min Confidence</Label>
             <Input
-              id='minConfidence'
-              type='number'
+              id="minConfidence"
+              type="number"
               min={0}
               max={1}
               step={0.1}
@@ -195,12 +195,12 @@ export function FilterControls({
                   e.target.value ? Number(e.target.value) : undefined,
                 )
               }
-              placeholder='0.0 - 1.0'
+              placeholder="0.0 - 1.0"
             />
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='riskFactor'>Risk Factor</Label>
+          <div className="space-y-2">
+            <Label htmlFor="riskFactor">Risk Factor</Label>
             <Select
               value={options.riskFactor ?? ''}
               onValueChange={(value) => handleChange('riskFactor', value)}
@@ -209,7 +209,7 @@ export function FilterControls({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=''>All Factors</SelectItem>
+                <SelectItem value="">All Factors</SelectItem>
                 {riskFactors.map((factor) => (
                   <SelectItem key={factor} value={factor}>
                     {factor}

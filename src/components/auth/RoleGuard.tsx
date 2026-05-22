@@ -46,7 +46,7 @@ export function RoleGuard({
   // Not authenticated
   if (!session) {
     return showError ? (
-      <div className='text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm'>
+      <div className="text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm">
         Authentication required
       </div>
     ) : (
@@ -57,7 +57,7 @@ export function RoleGuard({
   // Check role
   if (!hasRole(requiredRole)) {
     return showError ? (
-      <div className='text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm'>
+      <div className="text-red-500 bg-red-500/10 border-red-500/20 rounded-lg border p-4 text-sm">
         Insufficient permissions
       </div>
     ) : (

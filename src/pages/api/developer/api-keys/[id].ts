@@ -13,7 +13,7 @@ const PatchApiKeySchema = z.object({
 function extractIdFromPath(request: Request): string {
   const url = new URL(request.url)
   const segments = url.pathname.split('/').filter(Boolean)
-  return segments[segments.length - 1] || ''
+  return segments[segments.length - 1] ?? ''
 }
 
 export const GET = withAuth(async (request, session) => {
@@ -45,14 +45,10 @@ export const DELETE = withAuth(async (request, session) => {
     return jsonError(404, 'Not Found', 'API key not found or already revoked')
   }
 
-   logSecurityEvent(
-    SecurityEventType.AUTHENTICATION_SUCCESS,
-    session.user.id,
-    {
-      action: 'api_key_revoked',
-      key_id: id,
-    },
-  )
+  logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, session.user.id, {
+    action: 'api_key_revoked',
+    key_id: id,
+  })
 
   return jsonResponse({ success: true, message: 'API key revoked' })
 })
@@ -88,15 +84,11 @@ export const PATCH = withAuth(async (request, session) => {
     return jsonError(404, 'Not Found', 'API key not found or not active')
   }
 
-   logSecurityEvent(
-    SecurityEventType.AUTHENTICATION_SUCCESS,
-    session.user.id,
-    {
-      action: 'api_key_scopes_updated',
-      key_id: id,
-      new_scopes: scopes,
-    },
-  )
+  logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, session.user.id, {
+    action: 'api_key_scopes_updated',
+    key_id: id,
+    new_scopes: scopes,
+  })
 
   return jsonResponse({ success: true, message: 'API key scopes updated' })
 })

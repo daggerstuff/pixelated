@@ -174,8 +174,8 @@ const ChartComponent: React.FC<ChartComponentProps> = ({
   if (isLoading) {
     return (
       <div className={`flex h-64 items-center justify-center ${className}`}>
-        <div className='border-blue-500 h-8 w-8 animate-spin rounded-full border-b-2'></div>
-        <span className='text-gray-600 ml-2'>Loading chart...</span>
+        <div className="border-blue-500 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+        <span className="text-gray-600 ml-2">Loading chart...</span>
       </div>
     )
   }

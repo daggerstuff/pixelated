@@ -22,17 +22,17 @@ export interface RouteConfig {
 }
 
 export const SCOPES: Record<string, ScopeDefinition> = {
-  read: {
+  'read': {
     name: 'read',
     description: 'Read access to resources',
     routes: ['GET /api/v1/*', 'GET /api/developer/*'],
   },
-  write: {
+  'write': {
     name: 'write',
     description: 'Write access to resources',
     routes: ['POST /api/v1/*', 'PUT /api/v1/*', 'PATCH /api/v1/*'],
   },
-  admin: {
+  'admin': {
     name: 'admin',
     description: 'Administrative access',
     routes: ['* /api/admin/*'],

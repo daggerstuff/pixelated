@@ -49,6 +49,7 @@ def _get_sentry_sdk() -> Any | None:
 
     return _sentry_sdk
 
+
 logger = logging.getLogger(__name__)
 
 # ============================================
@@ -57,13 +58,9 @@ logger = logging.getLogger(__name__)
 
 # DSN must be set via SENTRY_DSN environment variable. No hardcoded fallback.
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
-SENTRY_ENVIRONMENT = os.environ.get(
-    "SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production")
-)
+SENTRY_ENVIRONMENT = os.environ.get("SENTRY_ENVIRONMENT", os.environ.get("NODE_ENV", "production"))
 SENTRY_RELEASE = os.environ.get("SENTRY_RELEASE", "1.0.0")
-SENTRY_ENABLE_METRICS = (
-    os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
-)
+SENTRY_ENABLE_METRICS = os.environ.get("SENTRY_ENABLE_METRICS", "true").lower() != "false"
 
 
 @dataclass
@@ -535,9 +532,7 @@ def track_latency[T: Callable[..., Any]](
             try:
                 result = await func(*args, **kwargs)
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(
-                    metric_name, duration_ms, attributes, unit="millisecond"
-                )
+                distribution_metric(metric_name, duration_ms, attributes, unit="millisecond")
                 return result
             except Exception as e:
                 duration_ms = (time.perf_counter() - start_time) * 1000
@@ -558,9 +553,7 @@ def track_latency[T: Callable[..., Any]](
             try:
                 result = func(*args, **kwargs)
                 duration_ms = (time.perf_counter() - start_time) * 1000
-                distribution_metric(
-                    metric_name, duration_ms, attributes, unit="millisecond"
-                )
+                distribution_metric(metric_name, duration_ms, attributes, unit="millisecond")
                 return result
             except Exception as e:
                 duration_ms = (time.perf_counter() - start_time) * 1000

@@ -5,16 +5,9 @@ url = "https://mcp.context7.com/mcp"
 CONTEXT7_API_KEY = "${CONTEXT7_API_KEY}"
 
 [mcp_servers.idearalph]
-args = [
-    "dlx",
-    "/home/vivi/.idearalph/mcp-server/dist/index.js",
-]
+args = ["dlx", "/home/vivi/.idearalph/mcp-server/dist/index.js"]
 command = "pnpm"
 
 [mcp_servers.mcp-supermemory-ai]
-args = [
-    "dlx",
-    "mcp-remote@latest",
-    "https://mcp.supermemory.ai/mcp",
-]
+args = ["dlx", "mcp-remote@latest", "https://mcp.supermemory.ai/mcp"]
 command = "/home/vivi/.local/share/pnpm/pnpm"

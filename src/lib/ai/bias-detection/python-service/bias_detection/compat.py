@@ -13,11 +13,11 @@ from typing import Any
 import numpy as np
 
 from .services.bias_detection_service import BiasDetectionService
+from .services.diagnostic_service import DiagnosticService
 from .services.fairness_analyzer import FairnessAnalyzer
+from .services.linguistic_service import LinguisticAnalyzer
 from .services.placeholder_service import placeholder_service
 from .services.security_service import AuditLogger as _ServiceAuditLogger, SecurityManager
-from .services.linguistic_service import LinguisticAnalyzer
-from .services.diagnostic_service import DiagnosticService
 
 
 @dataclass
@@ -56,9 +56,7 @@ class SessionData:
 class _LegacyAuditLogger:
     """Adapter for the legacy AuditLogger API expected by older tests."""
 
-    def __init__(
-        self, security_manager: SecurityManager, audit_file: str | None = None
-    ) -> None:
+    def __init__(self, security_manager: SecurityManager, audit_file: str | None = None) -> None:
         self._legacy = _ServiceAuditLogger(security_manager, audit_file)
 
     @property
@@ -98,12 +96,8 @@ class LegacyBiasDetectionService(BiasDetectionService):
         self.config = config or BiasDetectionConfig()
         self.security_manager = SecurityManager()
         self.audit_logger = _LegacyAuditLogger(self.security_manager)
-        self.fairness_analyzer = FairnessAnalyzer(
-            warning_threshold=self.config.warning_threshold
-        )
-        self.diagnostic_service = DiagnosticService(
-            warning_threshold=self.config.warning_threshold
-        )
+        self.fairness_analyzer = FairnessAnalyzer(warning_threshold=self.config.warning_threshold)
+        self.diagnostic_service = DiagnosticService(warning_threshold=self.config.warning_threshold)
         self.linguistic_analyzer = LinguisticAnalyzer()
         self.sentiment_analyzer = None
 
@@ -170,9 +164,7 @@ class LegacyBiasDetectionService(BiasDetectionService):
         return await self.linguistic_analyzer.detect_bias(text)
 
     async def _run_interpretability_analysis(self, session_data: object) -> dict[str, Any]:
-        return await self.diagnostic_service.run_interpretability_analysis(
-            self._coerce_session_data(session_data)
-        )
+        return await self.diagnostic_service.run_interpretability_analysis(self._coerce_session_data(session_data))
 
     def _analyze_outcome_fairness(self, session_data: object) -> dict[str, Any]:
         return placeholder_service.outcome_fairness_placeholder()
@@ -191,9 +183,7 @@ class LegacyBiasDetectionService(BiasDetectionService):
             return session_data
         return {
             "session_id": getattr(session_data, "session_id", "unknown"),
-            "participant_demographics": getattr(
-                session_data, "participant_demographics", {}
-            ),
+            "participant_demographics": getattr(session_data, "participant_demographics", {}),
             "training_scenario": getattr(session_data, "training_scenario", {}),
             "content": getattr(session_data, "content", {}),
             "ai_responses": getattr(session_data, "ai_responses", []),
@@ -202,6 +192,7 @@ class LegacyBiasDetectionService(BiasDetectionService):
             "metadata": getattr(session_data, "metadata", {}),
             "timestamp": getattr(session_data, "timestamp", None),
         }
+
 
 __all__ = [
     "AuditLogger",

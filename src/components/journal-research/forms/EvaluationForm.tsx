@@ -121,23 +121,23 @@ export function EvaluationForm({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className='space-y-6'>
+        <form onSubmit={handleSubmit} className="space-y-6">
           {metrics.map((metric) => (
-            <div key={metric.key} className='space-y-2'>
-              <div className='flex items-center justify-between'>
+            <div key={metric.key} className="space-y-2">
+              <div className="flex items-center justify-between">
                 <div>
                   <Label htmlFor={metric.key}>{metric.label}</Label>
-                  <p className='text-muted-foreground text-xs'>
+                  <p className="text-muted-foreground text-xs">
                     {metric.description}
                   </p>
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className="flex items-center gap-2">
                   <input
                     id={metric.key}
-                    type='number'
-                    min='1'
-                    max='10'
-                    step='0.1'
+                    type="number"
+                    min="1"
+                    max="10"
+                    step="0.1"
                     value={formData[metric.key]?.toString() ?? ''}
                     onChange={(e) => {
                       handleScoreChange(metric.key, e.target.value)
@@ -165,14 +165,14 @@ export function EvaluationForm({
                         : undefined
                     }
                   />
-                  <span className='text-muted-foreground text-sm'>/ 10</span>
+                  <span className="text-muted-foreground text-sm">/ 10</span>
                 </div>
               </div>
               <input
-                type='range'
-                min='1'
-                max='10'
-                step='0.1'
+                type="range"
+                min="1"
+                max="10"
+                step="0.1"
                 value={formData[metric.key] ?? 5}
                 onChange={(e) => {
                   handleScoreChange(metric.key, e.target.value)
@@ -187,7 +187,7 @@ export function EvaluationForm({
                 onBlur={() => {
                   setTouched((prev) => ({ ...prev, [metric.key]: true }))
                 }}
-                className='w-full'
+                className="w-full"
               />
               <FieldError
                 error={
@@ -199,17 +199,17 @@ export function EvaluationForm({
             </div>
           ))}
 
-          <div className='space-y-2'>
-            <Label htmlFor='priorityTier'>Priority Tier</Label>
+          <div className="space-y-2">
+            <Label htmlFor="priorityTier">Priority Tier</Label>
             <select
-              id='priorityTier'
+              id="priorityTier"
               value={formData.priorityTier ?? ''}
               onChange={(e) =>
                 setFormData({ ...formData, priorityTier: e.target.value })
               }
-              className='border-input w-full rounded-md border bg-background px-3 py-2 text-sm'
+              className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
             >
-              <option value=''>Select priority tier</option>
+              <option value="">Select priority tier</option>
               {priorityTiers.map((tier) => (
                 <option key={tier} value={tier}>
                   {tier.charAt(0).toUpperCase() + tier.slice(1)}
@@ -221,13 +221,13 @@ export function EvaluationForm({
 
           <ErrorMessage error={submitError} fieldErrors={errors} />
 
-          <div className='flex justify-end gap-2'>
+          <div className="flex justify-end gap-2">
             {onCancel && (
-              <Button type='button' variant='outline' onClick={onCancel}>
+              <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type='submit' disabled={isLoading}>
+            <Button type="submit" disabled={isLoading}>
               {isLoading
                 ? 'Saving...'
                 : evaluation

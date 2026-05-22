@@ -147,9 +147,7 @@ class TestLLMClassifier:
                 logger.info(f"  Confidence: {result.confidence:.2%}")
 
         logger.info("\n" + "=" * 80)
-        logger.info(
-            f"📊 RESULTS: {passed}/{len(self.test_cases)} passed ({passed / len(self.test_cases) * 100:.1f}%)"
-        )
+        logger.info(f"📊 RESULTS: {passed}/{len(self.test_cases)} passed ({passed / len(self.test_cases) * 100:.1f}%)")
         logger.info("=" * 80)
 
         return passed == len(self.test_cases)
@@ -197,9 +195,7 @@ class TestHybridClassifier:
         }
 
         # Create classifier with LLM disabled to avoid API calls
-        classifier_no_llm = HybridTaxonomyClassifier(
-            keyword_confidence_threshold=0.80, enable_llm=False
-        )
+        classifier_no_llm = HybridTaxonomyClassifier(keyword_confidence_threshold=0.80, enable_llm=False)
 
         result = classifier_no_llm.classify_record(high_conf_record)
         # With multiple crisis keywords, confidence should be high

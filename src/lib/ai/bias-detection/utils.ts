@@ -227,7 +227,7 @@ export function calculateDemographicRepresentation(
       return
     }
     counts[key] ||= {}
-    counts[key][val] = (counts[key][val] || 0) + 1
+    counts[key][val] = (counts[key][val] ?? 0) + 1
   }
   for (const s of sessions) {
     const d = s.participantDemographics
@@ -612,9 +612,9 @@ export function generateAnalysisSummary(results: BiasAnalysisResult[]): {
   const alertDistribution: Record<string, number> = {}
   const recCounts: Record<string, number> = {}
   for (const r of results) {
-    alertDistribution[r.alertLevel] = (alertDistribution[r.alertLevel] || 0) + 1
+    alertDistribution[r.alertLevel] = (alertDistribution[r.alertLevel] ?? 0) + 1
     for (const rec of r.recommendations || []) {
-      recCounts[rec] = (recCounts[rec] || 0) + 1
+      recCounts[rec] = (recCounts[rec] ?? 0) + 1
     }
   }
   const topRecommendations = Object.entries(recCounts)

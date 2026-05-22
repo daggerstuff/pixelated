@@ -173,8 +173,8 @@ export function useConversationMemory(initialState?: Partial<MemoryState>) {
       }))
 
       const prevMetrics = progressMetrics
-      const prevResponses = (prevMetrics.responsesCount ?? 0)
-      const prevAvg = (prevMetrics.responseTime ?? 0)
+      const prevResponses = prevMetrics.responsesCount ?? 0
+      const prevAvg = prevMetrics.responseTime ?? 0
 
       const updatedMetrics = {
         ...prevMetrics,
