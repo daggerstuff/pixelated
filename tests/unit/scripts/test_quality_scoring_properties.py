@@ -28,6 +28,7 @@ UNSAFE_TOKENS = ("kill", "suicide", "harm yourself", "hate")
 TEXT = st.text(max_size=400)
 SCORE = st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False)
 WEIGHT = st.floats(min_value=0.0, max_value=5.0, allow_nan=False, allow_infinity=False)
+HARM_MONOTONIC_CASE = st.tuples(SCORE, SCORE, SCORE, SCORE, SCORE, WEIGHT, WEIGHT, WEIGHT, WEIGHT)
 
 
 def _unsafe_response_safety_score(text: str) -> float:
@@ -62,28 +63,19 @@ def test_detected_unsafe_response_is_rejected_by_default_thresholds(text: str, u
 
 
 @settings(deadline=None)
-@given(
-    empathy=SCORE,
-    fidelity=SCORE,
-    domain=SCORE,
-    lower_harm=SCORE,
-    harm_delta=SCORE,
-    empathy_weight=WEIGHT,
-    fidelity_weight=WEIGHT,
-    domain_weight=WEIGHT,
-    harm_weight=WEIGHT,
-)
-def test_higher_harm_cannot_increase_composite_score(
-    empathy: float,
-    fidelity: float,
-    domain: float,
-    lower_harm: float,
-    harm_delta: float,
-    empathy_weight: float,
-    fidelity_weight: float,
-    domain_weight: float,
-    harm_weight: float,
-) -> None:
+@given(HARM_MONOTONIC_CASE)
+def test_higher_harm_cannot_increase_composite_score(case: tuple[float, ...]) -> None:
+    (
+        empathy,
+        fidelity,
+        domain,
+        lower_harm,
+        harm_delta,
+        empathy_weight,
+        fidelity_weight,
+        domain_weight,
+        harm_weight,
+    ) = case
     higher_harm = min(1.0, lower_harm + harm_delta)
     weights = {
         "empathy": empathy_weight,
