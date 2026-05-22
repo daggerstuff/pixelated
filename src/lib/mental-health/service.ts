@@ -12,7 +12,8 @@ export class MentalHealthService {
   private readonly therapist: TherapeuticResponseGenerator
   private config: AnalysisConfig
   private readonly conversationHistory: Map<string, ChatMessage[]> = new Map()
-  private readonly analysisHistory: Map<string, MentalHealthAnalysis[]> = new Map()
+  private readonly analysisHistory: Map<string, MentalHealthAnalysis[]> =
+    new Map()
 
   constructor(config: Partial<AnalysisConfig> = {}) {
     this.analyzer = new MentalHealthAnalyzer()
@@ -101,8 +102,7 @@ export class MentalHealthService {
 
     return recentAnalyses.some(
       (analysis) =>
-        (analysis.requiresIntervention ??
-        analysis.riskLevel === 'critical') ||
+        (analysis.requiresIntervention ?? analysis.riskLevel === 'critical') ||
         (analysis.riskLevel === 'high' &&
           analysis.confidence >= this.config.interventionThreshold),
     )

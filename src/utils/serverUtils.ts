@@ -48,11 +48,7 @@ export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
   )
   // Only try to access headers in SSR context and not during static build
   const isBuild = import.meta.env.COMMAND === 'build'
-  if (
-    import.meta.env.SSR &&
-    astro.request?.headers &&
-    !isBuild
-  ) {
+  if (import.meta.env.SSR && astro.request?.headers && !isBuild) {
     const headers: Record<string, string> = {}
 
     // Convert headers to a plain object

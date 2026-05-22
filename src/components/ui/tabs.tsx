@@ -163,7 +163,7 @@ export function TabsList({ children, className = '' }: TabsListProps) {
   return (
     <div
       className={`tabs-list ${className}`}
-      role='tablist'
+      role="tablist"
       onKeyDown={handleKeyDown}
     >
       {children}
@@ -200,8 +200,8 @@ export function TabsTrigger({
 
   return (
     <button
-      role='tab'
-      type='button'
+      role="tab"
+      type="button"
       aria-selected={isActive}
       aria-controls={`tabpanel-${value}`}
       id={`tab-${value}`}
@@ -239,7 +239,7 @@ export function TabsContent({
 
   return (
     <div
-      role='tabpanel'
+      role="tabpanel"
       aria-labelledby={`tab-${value}`}
       id={`tabpanel-${value}`}
       hidden={activeValue !== value}

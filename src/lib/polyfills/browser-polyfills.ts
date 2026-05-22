@@ -68,9 +68,7 @@ export const { ObjectId } = mongodb
 export const crypto = {
   randomUUID: () => {
     // Use the Web Crypto API if available
-    if (
-      window.crypto?.randomUUID
-    ) {
+    if (window.crypto?.randomUUID) {
       return window.crypto.randomUUID()
     }
 
@@ -96,17 +94,16 @@ export const crypto = {
   },
 
   // Add subtle crypto API for modern browsers
-  subtle:
-    window?.crypto
-      ? window.crypto.subtle
-      : {
-          digest: async (_algorithm: string, _data: BufferSource) => {
-            console.warn(
-              'crypto.subtle.digest fallback used - limited functionality',
-            )
-            return new Uint8Array(32) // Return dummy hash
-          },
+  subtle: window?.crypto
+    ? window.crypto.subtle
+    : {
+        digest: async (_algorithm: string, _data: BufferSource) => {
+          console.warn(
+            'crypto.subtle.digest fallback used - limited functionality',
+          )
+          return new Uint8Array(32) // Return dummy hash
         },
+      },
 
   // Add randomBytes implementation
   randomBytes: (size: number) => {
@@ -176,7 +173,7 @@ export const path = {
   },
   format: (pathObject: Record<string, string | undefined>) => {
     const { dir, root, base, name, ext } = pathObject
-    const rootPath = (dir ?? root) ?? ''
+    const rootPath = dir ?? root ?? ''
     const fileName = base ?? name + (ext ?? '')
     return rootPath ? `${rootPath}/${fileName}` : fileName
   },
@@ -330,9 +327,7 @@ export const events = {
     private listeners: Record<string, ((...args: unknown[]) => void)[]> = {}
 
     on(event: string, listener: (...args: unknown[]) => void) {
-      if (!this.listeners[event]) {
-        this.listeners[event] = []
-      }
+      this.listeners[event] ??= []
       this.listeners[event].push(listener)
       return this
     }
@@ -368,7 +363,7 @@ export const events = {
 // Util polyfill
 export const util = {
   promisify: (fn: (...args: unknown[]) => unknown) => {
-    return  async (...args: unknown[]) => {
+    return async (...args: unknown[]) => {
       return new Promise((resolve, reject) => {
         fn(...args, (err: Error | null, ...results: unknown[]) => {
           if (err) {

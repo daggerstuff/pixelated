@@ -104,15 +104,15 @@ export function NotificationCenter({
   return (
     <div className={cn('relative', className)}>
       <button
-        type='button'
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className='text-muted-foreground hover:bg-muted relative rounded-lg p-2 transition-colors'
+        className="text-muted-foreground hover:bg-muted relative rounded-lg p-2 transition-colors"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         aria-expanded={isOpen}
       >
-        <Bell className='h-5 w-5' />
+        <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
-          <span className='bg-red-500 text-white absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full text-xs font-bold'>
+          <span className="bg-red-500 text-white absolute right-0 top-0 flex h-4 w-4 items-center justify-center rounded-full text-xs font-bold">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -121,23 +121,23 @@ export function NotificationCenter({
       {isOpen && (
         <>
           <div
-            className='fixed inset-0 z-40'
+            className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
-            aria-hidden='true'
+            aria-hidden="true"
           />
-          <Card className='absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden shadow-lg'>
-            <CardHeader className='border-b'>
-              <div className='flex items-center justify-between'>
-                <CardTitle className='text-lg font-semibold'>
+          <Card className="absolute right-0 top-12 z-50 max-h-[600px] w-96 overflow-hidden shadow-lg">
+            <CardHeader className="border-b">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-lg font-semibold">
                   Notifications
                 </CardTitle>
                 <button
-                  type='button'
+                  type="button"
                   onClick={() => setIsOpen(false)}
-                  className='text-muted-foreground hover:bg-muted rounded p-1'
-                  aria-label='Close notifications'
+                  className="text-muted-foreground hover:bg-muted rounded p-1"
+                  aria-label="Close notifications"
                 >
-                  <X className='h-4 w-4' />
+                  <X className="h-4 w-4" />
                 </button>
               </div>
               {unreadCount > 0 && (
@@ -147,19 +147,19 @@ export function NotificationCenter({
                 </CardDescription>
               )}
               {visibleNotifications.length > 0 && (
-                <div className='mt-2 flex gap-2'>
+                <div className="mt-2 flex gap-2">
                   <button
-                    type='button'
+                    type="button"
                     onClick={handleMarkAllAsRead}
-                    className='text-primary text-xs hover:underline'
+                    className="text-primary text-xs hover:underline"
                   >
                     Mark all as read
                   </button>
-                  <span className='text-muted-foreground text-xs'>•</span>
+                  <span className="text-muted-foreground text-xs">•</span>
                   <button
-                    type='button'
+                    type="button"
                     onClick={handleDismissAll}
-                    className='text-destructive text-xs hover:underline'
+                    className="text-destructive text-xs hover:underline"
                   >
                     Dismiss all
                   </button>
@@ -167,16 +167,16 @@ export function NotificationCenter({
               )}
             </CardHeader>
 
-            <CardContent className='p-0'>
+            <CardContent className="p-0">
               {visibleNotifications.length === 0 ? (
-                <div className='flex flex-col items-center justify-center py-12 text-center'>
-                  <Bell className='text-muted-foreground mb-4 h-12 w-12' />
-                  <p className='text-muted-foreground text-sm'>
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <Bell className="text-muted-foreground mb-4 h-12 w-12" />
+                  <p className="text-muted-foreground text-sm">
                     No notifications
                   </p>
                 </div>
               ) : (
-                <div className='max-h-[500px] overflow-y-auto'>
+                <div className="max-h-[500px] overflow-y-auto">
                   {visibleNotifications.map((notification) => {
                     const notificationType = mapNotificationLevelToType(
                       notification.level,
@@ -194,16 +194,16 @@ export function NotificationCenter({
                         )}
                         onClick={() => handleClick(notification)}
                       >
-                        <div className='flex items-start gap-3'>
+                        <div className="flex items-start gap-3">
                           <Icon
                             className={cn(
                               'mt-0.5 h-5 w-5 flex-shrink-0',
                               typeColors[notificationType],
                             )}
                           />
-                          <div className='min-w-0 flex-1'>
-                            <div className='flex items-start justify-between gap-2'>
-                              <div className='flex-1'>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
                                 <p
                                   className={cn('text-sm font-medium', {
                                     'font-semibold': !notification.read,
@@ -212,30 +212,30 @@ export function NotificationCenter({
                                   {notification.title}
                                 </p>
                                 {notification.message && (
-                                  <p className='text-muted-foreground mt-1 line-clamp-2 text-sm'>
+                                  <p className="text-muted-foreground mt-1 line-clamp-2 text-sm">
                                     {notification.message}
                                   </p>
                                 )}
-                                <p className='text-muted-foreground mt-1 text-xs'>
+                                <p className="text-muted-foreground mt-1 text-xs">
                                   {notification.timestamp.toLocaleTimeString()}
                                 </p>
                               </div>
                               <button
-                                type='button'
+                                type="button"
                                 onClick={(e) =>
                                   handleDismiss(notification.id, e)
                                 }
-                                className='text-muted-foreground hover:bg-muted mt-0.5 rounded p-1'
-                                aria-label='Dismiss notification'
+                                className="text-muted-foreground hover:bg-muted mt-0.5 rounded p-1"
+                                aria-label="Dismiss notification"
                               >
-                                <X className='h-4 w-4' />
+                                <X className="h-4 w-4" />
                               </button>
                             </div>
                             {notification.actionUrl && (
                               <a
                                 href={notification.actionUrl}
                                 onClick={(e) => e.stopPropagation()}
-                                className='text-primary mt-2 inline-block text-sm font-medium hover:underline'
+                                className="text-primary mt-2 inline-block text-sm font-medium hover:underline"
                               >
                                 View details
                               </a>

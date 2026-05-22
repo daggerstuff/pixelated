@@ -47,7 +47,9 @@ jobs:
             --output triage-results.json
 
       - name: Ralph — Apply triage decisions
-        if: steps.check-script.outputs.has_script == 'true' && hashFiles('triage-results.json') != ''
+        if:
+          steps.check-script.outputs.has_script == 'true' &&
+          hashFiles('triage-results.json') != ''
         uses: actions/github-script@v9
         with:
           script: |
@@ -57,13 +59,13 @@ jobs:
               core.info('No triage results — board is clear');
               return;
             }
-            
+
             const results = JSON.parse(fs.readFileSync(path, 'utf8'));
             if (results.length === 0) {
               core.info('📋 Board is clear — Ralph found no untriaged issues');
               return;
             }
-            
+
             for (const decision of results) {
               try {
                 await github.rest.issues.addLabels({
@@ -94,7 +96,7 @@ jobs:
                 core.warning(`Failed to triage #${decision.issueNumber}: ${e.message}`);
               }
             }
-            
+
             core.info(`🔄 Ralph triaged ${results.length} issue(s)`);
 
       # Copilot auto-assign step (uses PAT if available)
@@ -102,7 +104,8 @@ jobs:
         if: success()
         uses: actions/github-script@v9
         with:
-          github-token: ${{ secrets.COPILOT_ASSIGN_TOKEN || secrets.GITHUB_TOKEN }}
+          github-token:
+            ${{ secrets.COPILOT_ASSIGN_TOKEN || secrets.GITHUB_TOKEN }}
           script: |
             const fs = require('fs');
 

@@ -110,7 +110,7 @@ export const GET: APIRoute = async ({ request }) => {
       filteredUsers = filteredUsers.filter(
         (u) =>
           u.email.toLowerCase().includes(searchTerm) ||
-          (u.fullName?.toLowerCase().includes(searchTerm)),
+          u.fullName?.toLowerCase().includes(searchTerm),
       )
     }
 

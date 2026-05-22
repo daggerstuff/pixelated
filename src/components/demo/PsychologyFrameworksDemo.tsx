@@ -10,9 +10,19 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 
 import { Badge } from '@/components/ui/badge/index.ts'
 import { Button } from '@/components/ui/button/index.ts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index.ts'
 import { Input } from '@/components/ui/input.tsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs.tsx'
 
 interface Framework {
   id: string
@@ -252,14 +262,14 @@ export default function PsychologyFrameworksDemo() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-7xl space-y-6 p-6'>
+    <div className="mx-auto w-full max-w-7xl space-y-6 p-6">
       {/* Header */}
-      <div className='space-y-4 text-center'>
-        <h1 className='text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold'>
-          <BookOpen className='text-blue-600 h-8 w-8' />
+      <div className="space-y-4 text-center">
+        <h1 className="text-gray-900 flex items-center justify-center gap-3 text-3xl font-bold">
+          <BookOpen className="text-blue-600 h-8 w-8" />
           Psychology Frameworks Browser
         </h1>
-        <p className='text-gray-600 mx-auto max-w-2xl'>
+        <p className="text-gray-600 mx-auto max-w-2xl">
           Explore evidence-based therapeutic frameworks with detailed
           information about techniques, applications, and clinical evidence.
           Perfect for training, research, and clinical practice.
@@ -267,17 +277,17 @@ export default function PsychologyFrameworksDemo() {
       </div>
 
       {/* Search and Filters */}
-      <Card className='border-gray-200'>
-        <CardContent className='p-6'>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-4'>
+      <Card className="border-gray-200">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             {/* Search */}
-            <div className='relative md:col-span-2'>
-              <Search className='text-gray-400 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform' />
+            <div className="relative md:col-span-2">
+              <Search className="text-gray-400 absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform" />
               <Input
-                placeholder='Search frameworks, techniques, conditions...'
+                placeholder="Search frameworks, techniques, conditions..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className='pl-10'
+                className="pl-10"
               />
             </div>
 
@@ -285,9 +295,9 @@ export default function PsychologyFrameworksDemo() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className='border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2'
+              className="border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2"
             >
-              <option value='all'>All Categories</option>
+              <option value="all">All Categories</option>
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -299,9 +309,9 @@ export default function PsychologyFrameworksDemo() {
             <select
               value={selectedCondition}
               onChange={(e) => setSelectedCondition(e.target.value)}
-              className='border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2'
+              className="border-gray-300 focus:ring-blue-500 focus:border-transparent rounded-md border px-3 py-2 focus:ring-2"
             >
-              <option value='all'>All Conditions</option>
+              <option value="all">All Conditions</option>
               {getUniqueConditions().map((condition) => (
                 <option key={condition} value={condition}>
                   {condition}
@@ -310,7 +320,7 @@ export default function PsychologyFrameworksDemo() {
             </select>
           </div>
 
-          <div className='text-gray-600 mt-4 text-sm'>
+          <div className="text-gray-600 mt-4 text-sm">
             Showing {filteredFrameworks.length} of {frameworks.length}{' '}
             frameworks
           </div>
@@ -318,20 +328,20 @@ export default function PsychologyFrameworksDemo() {
       </Card>
 
       {loading ? (
-        <div className='flex items-center justify-center py-12'>
-          <div className='border-blue-600 border-t-transparent h-8 w-8 animate-spin rounded-full border-4'></div>
-          <span className='text-gray-600 ml-3'>Loading frameworks...</span>
+        <div className="flex items-center justify-center py-12">
+          <div className="border-blue-600 border-t-transparent h-8 w-8 animate-spin rounded-full border-4"></div>
+          <span className="text-gray-600 ml-3">Loading frameworks...</span>
         </div>
       ) : (
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Frameworks List */}
-          <div className='space-y-3 lg:col-span-1'>
-            <h2 className='text-gray-900 flex items-center gap-2 text-lg font-semibold'>
-              <Brain className='h-5 w-5' />
+          <div className="space-y-3 lg:col-span-1">
+            <h2 className="text-gray-900 flex items-center gap-2 text-lg font-semibold">
+              <Brain className="h-5 w-5" />
               Frameworks ({filteredFrameworks.length})
             </h2>
 
-            <div className='max-h-96 space-y-2 overflow-y-auto'>
+            <div className="max-h-96 space-y-2 overflow-y-auto">
               {filteredFrameworks.map((framework) => (
                 <Card
                   key={framework.id}
@@ -342,27 +352,27 @@ export default function PsychologyFrameworksDemo() {
                   }`}
                   onClick={() => setSelectedFramework(framework)}
                 >
-                  <CardContent className='p-4'>
-                    <div className='flex items-start justify-between'>
-                      <div className='flex-1'>
-                        <h3 className='text-gray-900 text-sm font-medium'>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-gray-900 text-sm font-medium">
                           {framework.name}
                         </h3>
-                        <p className='text-gray-600 mt-1 text-xs'>
+                        <p className="text-gray-600 mt-1 text-xs">
                           {framework.category}
                         </p>
                       </div>
-                      <div className='flex flex-col items-end gap-1'>
+                      <div className="flex flex-col items-end gap-1">
                         <Badge
-                          variant='outline'
+                          variant="outline"
                           className={`text-xs ${getEvidenceBadgeColor(framework.evidenceLevel)}`}
                         >
                           {framework.evidenceLevel}
                         </Badge>
-                        <ChevronRight className='text-gray-400 h-4 w-4' />
+                        <ChevronRight className="text-gray-400 h-4 w-4" />
                       </div>
                     </div>
-                    <p className='text-gray-600 mt-2 line-clamp-2 text-xs'>
+                    <p className="text-gray-600 mt-2 line-clamp-2 text-xs">
                       {framework.description}
                     </p>
                   </CardContent>
@@ -372,21 +382,21 @@ export default function PsychologyFrameworksDemo() {
           </div>
 
           {/* Framework Details */}
-          <div className='lg:col-span-2'>
+          <div className="lg:col-span-2">
             {selectedFramework ? (
-              <Card className='h-full'>
+              <Card className="h-full">
                 <CardHeader>
-                  <div className='flex items-start justify-between'>
+                  <div className="flex items-start justify-between">
                     <div>
-                      <CardTitle className='text-gray-900 text-xl'>
+                      <CardTitle className="text-gray-900 text-xl">
                         {selectedFramework.name}
                       </CardTitle>
-                      <p className='text-gray-600 mt-1'>
+                      <p className="text-gray-600 mt-1">
                         {selectedFramework.category}
                       </p>
                     </div>
                     <Badge
-                      variant='outline'
+                      variant="outline"
                       className={getEvidenceBadgeColor(
                         selectedFramework.evidenceLevel,
                       )}
@@ -396,38 +406,38 @@ export default function PsychologyFrameworksDemo() {
                   </div>
                 </CardHeader>
 
-                <CardContent className='space-y-6'>
-                  <Tabs defaultValue='overview' className='w-full'>
-                    <TabsList className='grid w-full grid-cols-4'>
-                      <TabsTrigger value='overview'>Overview</TabsTrigger>
-                      <TabsTrigger value='techniques'>Techniques</TabsTrigger>
-                      <TabsTrigger value='applications'>
+                <CardContent className="space-y-6">
+                  <Tabs defaultValue="overview" className="w-full">
+                    <TabsList className="grid w-full grid-cols-4">
+                      <TabsTrigger value="overview">Overview</TabsTrigger>
+                      <TabsTrigger value="techniques">Techniques</TabsTrigger>
+                      <TabsTrigger value="applications">
                         Applications
                       </TabsTrigger>
-                      <TabsTrigger value='details'>Details</TabsTrigger>
+                      <TabsTrigger value="details">Details</TabsTrigger>
                     </TabsList>
 
-                    <TabsContent value='overview' className='mt-6 space-y-4'>
+                    <TabsContent value="overview" className="mt-6 space-y-4">
                       <div>
-                        <h4 className='text-gray-900 mb-2 font-medium'>
+                        <h4 className="text-gray-900 mb-2 font-medium">
                           Description
                         </h4>
-                        <p className='text-gray-700'>
+                        <p className="text-gray-700">
                           {selectedFramework.description}
                         </p>
                       </div>
 
                       <div>
-                        <h4 className='text-gray-900 mb-2 font-medium'>
+                        <h4 className="text-gray-900 mb-2 font-medium">
                           Key Principles
                         </h4>
-                        <ul className='space-y-1'>
+                        <ul className="space-y-1">
                           {selectedFramework.keyPrinciples.map((principle) => (
                             <li
                               key={principle}
-                              className='text-gray-700 flex items-start gap-2'
+                              className="text-gray-700 flex items-start gap-2"
                             >
-                              <Target className='text-blue-600 mt-0.5 h-4 w-4 flex-shrink-0' />
+                              <Target className="text-blue-600 mt-0.5 h-4 w-4 flex-shrink-0" />
                               {principle}
                             </li>
                           ))}
@@ -435,15 +445,15 @@ export default function PsychologyFrameworksDemo() {
                       </div>
 
                       <div>
-                        <h4 className='text-gray-900 mb-2 font-medium'>
+                        <h4 className="text-gray-900 mb-2 font-medium">
                           Primary Conditions
                         </h4>
-                        <div className='flex flex-wrap gap-2'>
+                        <div className="flex flex-wrap gap-2">
                           {selectedFramework.conditions.map((condition) => (
                             <Badge
                               key={condition}
-                              variant='outline'
-                              className='text-xs'
+                              variant="outline"
+                              className="text-xs"
                             >
                               {condition}
                             </Badge>
@@ -452,18 +462,18 @@ export default function PsychologyFrameworksDemo() {
                       </div>
                     </TabsContent>
 
-                    <TabsContent value='techniques' className='mt-6 space-y-4'>
+                    <TabsContent value="techniques" className="mt-6 space-y-4">
                       <div>
-                        <h4 className='text-gray-900 mb-3 font-medium'>
+                        <h4 className="text-gray-900 mb-3 font-medium">
                           Core Techniques
                         </h4>
-                        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           {selectedFramework.techniques.map((technique) => (
                             <div
                               key={technique}
-                              className='bg-gray-50 rounded-lg border p-3'
+                              className="bg-gray-50 rounded-lg border p-3"
                             >
-                              <div className='text-gray-900 text-sm font-medium'>
+                              <div className="text-gray-900 text-sm font-medium">
                                 {technique}
                               </div>
                             </div>
@@ -473,22 +483,22 @@ export default function PsychologyFrameworksDemo() {
                     </TabsContent>
 
                     <TabsContent
-                      value='applications'
-                      className='mt-6 space-y-4'
+                      value="applications"
+                      className="mt-6 space-y-4"
                     >
                       <div>
-                        <h4 className='text-gray-900 mb-3 font-medium'>
+                        <h4 className="text-gray-900 mb-3 font-medium">
                           Clinical Applications
                         </h4>
-                        <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                           {selectedFramework.applications.map((application) => (
                             <div
                               key={application}
-                              className='bg-blue-50 border-blue-200 rounded-lg border p-3'
+                              className="bg-blue-50 border-blue-200 rounded-lg border p-3"
                             >
-                              <div className='flex items-center gap-2'>
-                                <Users className='text-blue-600 h-4 w-4' />
-                                <span className='text-blue-900 text-sm font-medium'>
+                              <div className="flex items-center gap-2">
+                                <Users className="text-blue-600 h-4 w-4" />
+                                <span className="text-blue-900 text-sm font-medium">
                                   {application}
                                 </span>
                               </div>
@@ -498,13 +508,13 @@ export default function PsychologyFrameworksDemo() {
                       </div>
                     </TabsContent>
 
-                    <TabsContent value='details' className='mt-6 space-y-4'>
+                    <TabsContent value="details" className="mt-6 space-y-4">
                       {selectedFramework.developers && (
                         <div>
-                          <h4 className='text-gray-900 mb-2 font-medium'>
+                          <h4 className="text-gray-900 mb-2 font-medium">
                             Developers
                           </h4>
-                          <p className='text-gray-700'>
+                          <p className="text-gray-700">
                             {selectedFramework.developers.join(', ')}
                           </p>
                         </div>
@@ -512,21 +522,21 @@ export default function PsychologyFrameworksDemo() {
 
                       {selectedFramework.yearDeveloped && (
                         <div>
-                          <h4 className='text-gray-900 mb-2 font-medium'>
+                          <h4 className="text-gray-900 mb-2 font-medium">
                             Year Developed
                           </h4>
-                          <p className='text-gray-700'>
+                          <p className="text-gray-700">
                             {selectedFramework.yearDeveloped}
                           </p>
                         </div>
                       )}
 
                       <div>
-                        <h4 className='text-gray-900 mb-2 font-medium'>
+                        <h4 className="text-gray-900 mb-2 font-medium">
                           Evidence Level
                         </h4>
                         <Badge
-                          variant='outline'
+                          variant="outline"
                           className={`${getEvidenceBadgeColor(selectedFramework.evidenceLevel)} text-sm`}
                         >
                           {selectedFramework.evidenceLevel} Evidence Base
@@ -537,13 +547,13 @@ export default function PsychologyFrameworksDemo() {
                 </CardContent>
               </Card>
             ) : (
-              <Card className='flex h-full items-center justify-center'>
-                <CardContent className='text-center'>
-                  <BookOpen className='text-gray-400 mx-auto mb-4 h-16 w-16' />
-                  <h3 className='text-gray-900 mb-2 text-lg font-medium'>
+              <Card className="flex h-full items-center justify-center">
+                <CardContent className="text-center">
+                  <BookOpen className="text-gray-400 mx-auto mb-4 h-16 w-16" />
+                  <h3 className="text-gray-900 mb-2 text-lg font-medium">
                     Select a Framework
                   </h3>
-                  <p className='text-gray-600'>
+                  <p className="text-gray-600">
                     Choose a therapeutic framework from the list to view
                     detailed information
                   </p>
@@ -555,26 +565,26 @@ export default function PsychologyFrameworksDemo() {
       )}
 
       {/* Quick Actions */}
-      <Card className='border-gray-200'>
-        <CardContent className='p-6'>
-          <div className='flex flex-wrap justify-center gap-4'>
+      <Card className="border-gray-200">
+        <CardContent className="p-6">
+          <div className="flex flex-wrap justify-center gap-4">
             <Button
-              variant='outline'
+              variant="outline"
               onClick={loadFrameworks}
               disabled={loading}
-              className='flex items-center gap-2'
+              className="flex items-center gap-2"
             >
-              <Brain className='h-4 w-4' />
+              <Brain className="h-4 w-4" />
               Refresh Frameworks
             </Button>
             <Button
-              variant='outline'
+              variant="outline"
               onClick={() => {
                 setSearchTerm('')
                 setSelectedCategory('all')
                 setSelectedCondition('all')
               }}
-              className='flex items-center gap-2'
+              className="flex items-center gap-2"
             >
               Clear Filters
             </Button>

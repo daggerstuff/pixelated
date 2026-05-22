@@ -208,7 +208,7 @@ export class SealService {
    * Get the singleton instance of SealService
    */
   public static getInstance(): SealService {
-    SealService.instance ??= new SealService();
+    SealService.instance ??= new SealService()
     return SealService.instance
   }
 
@@ -534,8 +534,7 @@ export class SealService {
 
       if (this.schemeType === SealSchemeType.CKKS) {
         const ckksEncoder = this.getCKKSEncoder()
-        const effectiveScale =
-          scale ?? (BigInt(1) << BigInt(40))
+        const effectiveScale = scale ?? BigInt(1) << BigInt(40)
 
         plaintext = seal.PlainText()
         ckksEncoder.encode(data, effectiveScale, plaintext)

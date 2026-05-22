@@ -4,7 +4,7 @@ import json
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
-import scripts.task_sync.tri_sync as tri_sync
+from scripts.task_sync import tri_sync
 from scripts.task_sync.tri_sync import (
     SyncAction,
     SyncExecutionResult,
@@ -21,9 +21,9 @@ from scripts.task_sync.tri_sync import (
     find_beads_duplicate_groups,
     merge_body_with_sync_metadata,
     normalize_asana_payload,
-    normalize_linear_payload,
     normalize_github_payload,
     normalize_jira_payload,
+    normalize_linear_payload,
     normalize_status,
     parse_sync_metadata,
     plan_from_sources,
@@ -88,15 +88,9 @@ def test_sync_block_round_trip_preserves_task_body() -> None:
 
 
 def test_select_canonical_record_prefers_latest_record_and_beads_on_tie() -> None:
-    earlier = make_record(
-        "asana", "A-1", "Tri-sync", "Body", "open", minutes_ago=30, sync_key="tri-sync"
-    )
-    later = make_record(
-        "jira", "PIX-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync"
-    )
-    tie_beads = make_record(
-        "beads", "bd-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync"
-    )
+    earlier = make_record("asana", "A-1", "Tri-sync", "Body", "open", minutes_ago=30, sync_key="tri-sync")
+    later = make_record("jira", "PIX-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync")
+    tie_beads = make_record("beads", "bd-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync")
 
     assert select_canonical_record([earlier, later, tie_beads]).provider == "beads"
 
@@ -752,7 +746,7 @@ def test_main_apply_persists_sync_state(tmp_path, monkeypatch, capsys) -> None:
     )
     monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", lambda: {"asana": ["cat"]})
     monkeypatch.setattr(tri_sync, "apply_sync_plan", lambda actions, provider_commands: results)
-    monkeypatch.setattr(tri_sync, "beads_export", lambda: [])
+    monkeypatch.setattr(tri_sync, "beads_export", list)
     monkeypatch.setattr(tri_sync, "cleanup_beads_duplicates", lambda records: [])
 
     exit_code = tri_sync.main(["apply"])
@@ -811,10 +805,10 @@ def test_execute_apply_mode_reconciles_until_plan_is_stable(monkeypatch, tmp_pat
         return results
 
     monkeypatch.setattr(tri_sync, "SYNC_STATE_PATH", state_path)
-    monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", lambda: {})
+    monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", dict)
     monkeypatch.setattr(tri_sync, "resolve_enabled_providers_from_env", lambda: tri_sync.DEFAULT_PROVIDER_ORDER)
     monkeypatch.setattr(tri_sync, "apply_sync_plan", fake_apply_sync_plan)
-    monkeypatch.setattr(tri_sync, "beads_export", lambda: [])
+    monkeypatch.setattr(tri_sync, "beads_export", list)
     monkeypatch.setattr(tri_sync, "cleanup_beads_duplicates", lambda records: [])
 
     payload, exit_code = execute_apply_mode(first_plan)

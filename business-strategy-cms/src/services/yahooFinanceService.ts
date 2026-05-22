@@ -50,24 +50,27 @@ export interface MarketSector {
 export class YahooFinanceService {
   private readonly logger: Logger
   private readonly client: AxiosInstance
-  private readonly cache: Map<string, { data: any; timestamp: number }> = new Map()
-   private readonly CACHE_TTL =
-     (process.env['CACHE_TTL_SECONDS'] && process.env['CACHE_TTL_SECONDS'].length > 0 
-       ? parseInt(process.env['CACHE_TTL_SECONDS'], 10) 
-       : 300) * 1000
+  private readonly cache: Map<string, { data: any; timestamp: number }> =
+    new Map()
+  private readonly CACHE_TTL =
+    (process.env['CACHE_TTL_SECONDS'] &&
+    process.env['CACHE_TTL_SECONDS'].length > 0
+      ? parseInt(process.env['CACHE_TTL_SECONDS'], 10)
+      : 300) * 1000
 
   constructor() {
     this.logger = new Logger('YahooFinanceService')
-     this.client = axios.create({
-       baseURL:
-         (process.env['YAHOO_FINANCE_API_URL'] && process.env['YAHOO_FINANCE_API_URL'].length > 0
-           ? process.env['YAHOO_FINANCE_API_URL']
-           : 'https://query1.finance.yahoo.com/v8/finance'),
-       timeout: 10000,
-       headers: {
-         'User-Agent': 'BusinessStrategyCMS/1.0',
-       },
-     })
+    this.client = axios.create({
+      baseURL:
+        process.env['YAHOO_FINANCE_API_URL'] &&
+        process.env['YAHOO_FINANCE_API_URL'].length > 0
+          ? process.env['YAHOO_FINANCE_API_URL']
+          : 'https://query1.finance.yahoo.com/v8/finance',
+      timeout: 10000,
+      headers: {
+        'User-Agent': 'BusinessStrategyCMS/1.0',
+      },
+    })
   }
 
   /**
@@ -164,8 +167,8 @@ export class YahooFinanceService {
           close: quote.close?.[index] ?? 0,
           volume: quote.volume?.[index] ?? 0,
           adjustedClose:
-            (indicators.adjclose?.[0]?.adjclose?.[index] ??
-            quote.close?.[index]) ??
+            indicators.adjclose?.[0]?.adjclose?.[index] ??
+            quote.close?.[index] ??
             0,
         }),
       )
@@ -201,7 +204,7 @@ export class YahooFinanceService {
 
       const profile: CompanyProfile = {
         symbol: result.symbol,
-        companyName: (result.longName ?? result.shortName) ?? result.symbol,
+        companyName: result.longName ?? result.shortName ?? result.symbol,
         industry: result.industry ?? 'Unknown',
         sector: result.sector ?? 'Unknown',
         marketCap: result.marketCap ?? 0,
@@ -230,7 +233,7 @@ export class YahooFinanceService {
   async getMarketIndices(): Promise<YahooFinanceQuote[]> {
     const indices = ['^GSPC', '^DJI', '^IXIC', '^RUT', '^VIX']
     const results = await Promise.all(
-      indices.map( async (symbol) => this.getQuote(symbol)),
+      indices.map(async (symbol) => this.getQuote(symbol)),
     )
     return results.filter(
       (result): result is YahooFinanceQuote => result !== null,

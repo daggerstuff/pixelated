@@ -334,7 +334,7 @@ export function useMultidimensionalEmotions(
           {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: 'Bearer demo-token',
+              'Authorization': 'Bearer demo-token',
             },
             // pass external abort controller; helper composes signals and adds per-attempt timeout
             signal: abortControllerRef.current.signal,

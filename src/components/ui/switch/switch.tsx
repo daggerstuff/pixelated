@@ -9,7 +9,7 @@ export interface SwitchProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(
   ({ label, ...props }, ref) => (
-    <button ref={ref} {...props} type='button'>
+    <button ref={ref} {...props} type="button">
       {label}
     </button>
   ),

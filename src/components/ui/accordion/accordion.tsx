@@ -144,7 +144,7 @@ const AccordionContent = React.forwardRef<
     <div
       ref={ref}
       id={contentId}
-      role='region'
+      role="region"
       aria-labelledby={triggerId}
       className={cn(
         'overflow-hidden text-sm transition-all duration-200',

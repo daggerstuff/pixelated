@@ -671,7 +671,7 @@ export class AnalyticsService {
   /**
    * Force flush the event buffer
    */
-  public  async forceFlush(): Promise<void> {
+  public async forceFlush(): Promise<void> {
     return this.flush()
   }
 }

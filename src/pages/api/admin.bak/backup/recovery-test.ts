@@ -166,7 +166,7 @@ import type { APIContext } from 'astro'
 export const POST = async (context: APIContext) => {
   const { request, locals } = context
   // Apply admin middleware to check for admin status and required permission
-  const next =  async () =>
+  const next = async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )

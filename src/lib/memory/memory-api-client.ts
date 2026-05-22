@@ -84,7 +84,11 @@ export class MemoryApiError extends Error {
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
     let body: unknown
-    try { body = await res.json() } catch { body = undefined }
+    try {
+      body = await res.json()
+    } catch {
+      body = undefined
+    }
     throw new MemoryApiError(
       `Memory API error ${res.status}: ${res.statusText}`,
       res.status,
@@ -149,13 +153,16 @@ export class MemoryApiClient {
     const qs = new URLSearchParams()
     qs.set('tenant_id', params.tenantId)
     if (params.sessionId) qs.set('session_id', params.sessionId)
-    if (params.minImportance !== undefined) qs.set('min_importance', String(params.minImportance))
-    if (params.maxImportance !== undefined) qs.set('max_importance', String(params.maxImportance))
+    if (params.minImportance !== undefined)
+      qs.set('min_importance', String(params.minImportance))
+    if (params.maxImportance !== undefined)
+      qs.set('max_importance', String(params.maxImportance))
     if (params.emotions?.length) qs.set('emotions', params.emotions.join(','))
     if (params.crisisOnly) qs.set('crisis_only', 'true')
     if (params.dateFrom) qs.set('date_from', String(params.dateFrom))
     if (params.dateTo) qs.set('date_to', String(params.dateTo))
-    if (params.consolidationPhases?.length) qs.set('consolidation_phases', params.consolidationPhases.join(','))
+    if (params.consolidationPhases?.length)
+      qs.set('consolidation_phases', params.consolidationPhases.join(','))
     qs.set('limit', String(params.limit ?? 50))
     qs.set('offset', String(params.offset ?? 0))
 
@@ -167,18 +174,25 @@ export class MemoryApiClient {
 
   async get(memoryId: string, tenantId: string): Promise<MemoryBlock> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
-    const res = await this.fetch(`${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`)
+    const res = await this.fetch(
+      `${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`,
+    )
     return handleResponse<MemoryBlock>(res)
   }
 
   // ── Update ────────────────────────────────────────────────────────────────
 
-  async update(memoryId: string, tenantId: string, params: UpdateParams): Promise<MemoryBlock> {
+  async update(
+    memoryId: string,
+    tenantId: string,
+    params: UpdateParams,
+  ): Promise<MemoryBlock> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
     const body: Record<string, unknown> = {}
     if (params.content !== undefined) body['content'] = params.content
     if (params.importance !== undefined) body['importance'] = params.importance
-    if (params.consolidationPhase !== undefined) body['consolidation_phase'] = params.consolidationPhase
+    if (params.consolidationPhase !== undefined)
+      body['consolidation_phase'] = params.consolidationPhase
 
     const res = await this.fetch(
       `${this.baseUrl}/memories/${encodeURIComponent(memoryId)}?${qs}`,
@@ -206,7 +220,11 @@ export class MemoryApiClient {
 
   // ── Score ────────────────────────────────────────────────────────────────
 
-  async score(memoryId: string, tenantId: string, context = ''): Promise<ScoreResponse> {
+  async score(
+    memoryId: string,
+    tenantId: string,
+    context = '',
+  ): Promise<ScoreResponse> {
     const qs = new URLSearchParams({ tenant_id: tenantId })
     if (context) qs.set('context', context)
     const res = await this.fetch(`${this.baseUrl}/memories/score?${qs}`, {
@@ -219,9 +237,18 @@ export class MemoryApiClient {
 
   // ── Trajectory ───────────────────────────────────────────────────────────
 
-  async trajectory(sessionId: string, tenantId: string, limit = 50): Promise<TrajectoryResponse> {
-    const qs = new URLSearchParams({ tenant_id: tenantId, limit: String(limit) })
-    const res = await this.fetch(`${this.baseUrl}/memories/trajectory/${encodeURIComponent(sessionId)}?${qs}`)
+  async trajectory(
+    sessionId: string,
+    tenantId: string,
+    limit = 50,
+  ): Promise<TrajectoryResponse> {
+    const qs = new URLSearchParams({
+      tenant_id: tenantId,
+      limit: String(limit),
+    })
+    const res = await this.fetch(
+      `${this.baseUrl}/memories/trajectory/${encodeURIComponent(sessionId)}?${qs}`,
+    )
     const data = await handleResponse<unknown>(res)
     if (this.isTrajectoryResponse(data)) {
       return data

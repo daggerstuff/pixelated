@@ -30,6 +30,7 @@ from ai.memory.letta_tool_permissions import (
 
 # ==================== Configuration Tests ====================
 
+
 class TestLettaCodeConfig:
     """Tests for Letta Code configuration."""
 
@@ -73,6 +74,7 @@ class TestLettaCodeConfig:
 
 
 # ==================== Client Tests ====================
+
 
 class TestLettaCodeClient:
     """Tests for Letta Code client."""
@@ -203,6 +205,7 @@ class TestLettaCodeClient:
 
 # ==================== Session Tests ====================
 
+
 class TestLettaSession:
     """Tests for Letta session."""
 
@@ -281,6 +284,7 @@ class TestLettaSession:
 
 # ==================== Tool Permission Tests ====================
 
+
 class TestLettaToolRegistry:
     """Tests for tool registry."""
 
@@ -294,9 +298,7 @@ class TestLettaToolRegistry:
 
     def test_registry_by_permission_level(self):
         """Test tools filtered by permission level."""
-        readonly_registry = LettaToolRegistry(
-            permission_level=PermissionLevel.READ_ONLY
-        )
+        readonly_registry = LettaToolRegistry(permission_level=PermissionLevel.READ_ONLY)
 
         allowed = readonly_registry.get_allowed_tools()
 
@@ -360,9 +362,7 @@ class TestLettaPermissionHandler:
     @pytest.mark.asyncio
     async def test_tool_blocked_by_permission(self):
         """Test tool blocked by permission level."""
-        readonly_registry = LettaToolRegistry(
-            permission_level=PermissionLevel.READ_ONLY
-        )
+        readonly_registry = LettaToolRegistry(permission_level=PermissionLevel.READ_ONLY)
         handler = LettaPermissionHandler(readonly_registry)
 
         result = await handler.can_use_tool(
@@ -458,6 +458,7 @@ class TestLettaPermissionHandler:
 
 # ==================== Integration Tests ====================
 
+
 class TestLettaCodeIntegration:
     """Integration tests for Letta Code SDK."""
 
@@ -537,6 +538,7 @@ class TestLettaCodeIntegration:
 
 
 # ==================== Error Handling Tests ====================
+
 
 class TestErrorHandling:
     """Tests for error handling."""

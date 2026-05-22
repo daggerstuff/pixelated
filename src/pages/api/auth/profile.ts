@@ -43,7 +43,8 @@ export const GET = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+      userId =
+        (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (!authHeader) {
@@ -65,7 +66,7 @@ export const GET = async ({
     }
 
     if (!userId) {
-       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
+      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, null, {
         action: 'get_profile',
         reason: 'No user ID found in session or token',
         clientInfo,
@@ -80,7 +81,7 @@ export const GET = async ({
     const user = await auth0UserService.getUserById(userId)
 
     if (!user) {
-       logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
+      logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, userId, {
         action: 'get_profile',
         reason: 'User not found in database',
         clientInfo,
@@ -118,7 +119,7 @@ export const GET = async ({
   } catch (error: any) {
     console.error('Get profile error:', error)
 
-     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+    logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'get_profile',
       error: detectAndRedactPHI(
         error instanceof Error ? error.message : 'Unknown error',
@@ -172,7 +173,8 @@ export const PUT = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = (session.user.id || (session.user as any)._id?.toString()) ?? null
+      userId =
+        (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
@@ -223,7 +225,7 @@ export const PUT = async ({
       })
     }
 
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, userId, {
       updates: Object.keys(auth0Updates),
       clientInfo,
     })
@@ -256,7 +258,7 @@ export const PUT = async ({
   } catch (error: unknown) {
     console.error('Update profile error:', error)
 
-     logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
+    logSecurityEvent(SecurityEventType.CONFIG_CHANGE, null, {
       action: 'update_profile',
       success: false,
       error: detectAndRedactPHI(

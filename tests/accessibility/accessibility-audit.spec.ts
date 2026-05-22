@@ -220,9 +220,9 @@ test.describe('Accessibility Audit and Compliance', () => {
 
             // Element should have some form of accessible name
             const hasAccessibleName =
-              ((ariaLabel ??
-              ariaLabelledby) ??
-              title) ??
+              ariaLabel ??
+              ariaLabelledby ??
+              title ??
               (textContent && textContent.trim().length > 0)
 
             if (!hasAccessibleName) {
@@ -429,7 +429,7 @@ test.describe('Accessibility Audit and Compliance', () => {
           const hasAriaLabel = ariaLabel ?? ariaLabelledby
 
           // Image should either be marked as decorative or have description
-          expect(isDecorative || hasDescription ?? hasAriaLabel).toBe(true)
+          expect(isDecorative || (hasDescription ?? hasAriaLabel)).toBe(true)
         }
       }
     })
@@ -507,7 +507,7 @@ test.describe('Accessibility Audit and Compliance', () => {
           const title = await element.getAttribute('title')
 
           // Should provide keyboard instructions
-          const hasKeyboardInstructions = (ariaDescribedby ?? ariaLabel) ?? title
+          const hasKeyboardInstructions = ariaDescribedby ?? ariaLabel ?? title
           expect(hasKeyboardInstructions).toBe(true)
         }
       }

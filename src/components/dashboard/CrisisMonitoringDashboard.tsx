@@ -15,9 +15,19 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react'
 import Alert from '@/components/ui/alert.tsx'
 import { Badge } from '@/components/ui/badge/index.ts'
 import { Button } from '@/components/ui/button/index.ts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index.ts'
 import { Progress } from '@/components/ui/progress.tsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs.tsx'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 
 export interface PatientRiskData {
@@ -195,70 +205,70 @@ export const CrisisMonitoringDashboard: React.FC<
   }
 
   return (
-    <div className='space-y-6 p-6'>
+    <div className="space-y-6 p-6">
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-gray-900 text-3xl font-bold'>
+          <h1 className="text-gray-900 text-3xl font-bold">
             Crisis Monitoring Dashboard
           </h1>
-          <p className='text-gray-600'>
+          <p className="text-gray-600">
             Real-time crisis risk monitoring and escalation management
           </p>
         </div>
 
-        <div className='flex items-center space-x-4'>
+        <div className="flex items-center space-x-4">
           <Button
             variant={autoRefresh ? 'default' : 'outline'}
             onClick={() => setAutoRefresh(!autoRefresh)}
           >
-            <Activity className='mr-2 h-4 w-4' />
+            <Activity className="mr-2 h-4 w-4" />
             Auto-refresh {autoRefresh ? 'ON' : 'OFF'}
           </Button>
 
           <Button onClick={fetchDashboardData} disabled={loading}>
-            <Clock className='mr-2 h-4 w-4' />
+            <Clock className="mr-2 h-4 w-4" />
             Refresh
           </Button>
 
-          <div className='text-gray-500 text-sm'>
+          <div className="text-gray-500 text-sm">
             Last updated: {lastUpdated.toLocaleTimeString()}
           </div>
         </div>
       </div>
 
       {/* Metrics Overview */}
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-4'>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
         <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-gray-600 text-sm font-medium'>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-gray-600 text-sm font-medium">
               Total Patients
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='flex items-center justify-between'>
-              <span className='text-2xl font-bold'>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">
                 {metrics.totalPatients}
               </span>
-              <Users className='text-gray-400 h-5 w-5' />
+              <Users className="text-gray-400 h-5 w-5" />
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-gray-600 text-sm font-medium'>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-gray-600 text-sm font-medium">
               High Risk
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='flex items-center justify-between'>
-              <span className='text-red-600 text-2xl font-bold'>
+            <div className="flex items-center justify-between">
+              <span className="text-red-600 text-2xl font-bold">
                 {metrics.highRiskPatients}
               </span>
-              <AlertTriangle className='text-red-400 h-5 w-5' />
+              <AlertTriangle className="text-red-400 h-5 w-5" />
             </div>
-            <div className='text-gray-500 mt-1 text-xs'>
+            <div className="text-gray-500 mt-1 text-xs">
               {metrics.totalPatients > 0
                 ? `${Math.round((metrics.highRiskPatients / metrics.totalPatients) * 100)}% of total`
                 : '0% of total'}
@@ -267,38 +277,38 @@ export const CrisisMonitoringDashboard: React.FC<
         </Card>
 
         <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-gray-600 text-sm font-medium'>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-gray-600 text-sm font-medium">
               Active Escalations
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='flex items-center justify-between'>
-              <span className='text-orange-600 text-2xl font-bold'>
+            <div className="flex items-center justify-between">
+              <span className="text-orange-600 text-2xl font-bold">
                 {metrics.activeEscalations}
               </span>
-              <Bell className='text-orange-400 h-5 w-5' />
+              <Bell className="text-orange-400 h-5 w-5" />
             </div>
-            <div className='text-gray-500 mt-1 text-xs'>
+            <div className="text-gray-500 mt-1 text-xs">
               Avg response: {metrics.averageResponseTime}
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-gray-600 text-sm font-medium'>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-gray-600 text-sm font-medium">
               Today's Assessments
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='flex items-center justify-between'>
-              <span className='text-2xl font-bold'>
+            <div className="flex items-center justify-between">
+              <span className="text-2xl font-bold">
                 {metrics.todayAssessments}
               </span>
-              <BarChart3 className='text-gray-400 h-5 w-5' />
+              <BarChart3 className="text-gray-400 h-5 w-5" />
             </div>
-            <div className='text-gray-500 mt-1 text-xs'>
+            <div className="text-gray-500 mt-1 text-xs">
               {metrics.escalationRate.toFixed(1)}% escalation rate
             </div>
           </CardContent>
@@ -307,26 +317,26 @@ export const CrisisMonitoringDashboard: React.FC<
 
       {/* Main Dashboard Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className='grid w-full grid-cols-4'>
-          <TabsTrigger value='overview'>Overview</TabsTrigger>
-          <TabsTrigger value='alerts'>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="alerts">
             Alerts ({unacknowledgedAlertsCount})
           </TabsTrigger>
-          <TabsTrigger value='patients'>Patients</TabsTrigger>
-          <TabsTrigger value='analytics'>Analytics</TabsTrigger>
+          <TabsTrigger value="patients">Patients</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value='overview' className='space-y-6'>
+        <TabsContent value="overview" className="space-y-6">
           {/* Critical Alerts Section */}
           {criticalUnacknowledgedAlerts.length > 0 && (
-            <Alert variant='error'>
-              <AlertTriangle className='h-4 w-4' />
+            <Alert variant="error">
+              <AlertTriangle className="h-4 w-4" />
               <div>
                 <strong>Critical Alerts Requiring Immediate Attention</strong>
-                <div className='mt-2 space-y-1'>
+                <div className="mt-2 space-y-1">
                   {criticalUnacknowledgedAlerts.slice(0, 3).map((alert) => (
-                    <div key={alert.id} className='text-sm'>
+                    <div key={alert.id} className="text-sm">
                       {alert.message}
                     </div>
                   ))}
@@ -338,19 +348,19 @@ export const CrisisMonitoringDashboard: React.FC<
           {/* High Risk Patients Quick View */}
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center'>
-                <AlertTriangle className='text-red-500 mr-2 h-5 w-5' />
+              <CardTitle className="flex items-center">
+                <AlertTriangle className="text-red-500 mr-2 h-5 w-5" />
                 High Risk Patients
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='space-y-4'>
+              <div className="space-y-4">
                 {highRiskPatients.slice(0, 5).map((patient) => (
                   <div
                     key={patient.id}
-                    className='flex items-center justify-between rounded-lg border p-3'
+                    className="flex items-center justify-between rounded-lg border p-3"
                   >
-                    <div className='flex items-center space-x-3'>
+                    <div className="flex items-center space-x-3">
                       <div
                         className={`h-3 w-3 rounded-full ${
                           patient.currentRisk === 'imminent'
@@ -359,26 +369,28 @@ export const CrisisMonitoringDashboard: React.FC<
                         }`}
                       />
                       <div>
-                        <div className='font-medium'>{patient.name}</div>
-                        <div className='text-gray-500 text-sm'>
+                        <div className="font-medium">{patient.name}</div>
+                        <div className="text-gray-500 text-sm">
                           Last contact:{' '}
                           {new Date(patient.lastContact).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
 
-                    <div className='flex items-center space-x-2'>
+                    <div className="flex items-center space-x-2">
                       <Badge className={getRiskColor(patient.currentRisk)}>
                         {patient.currentRisk.toUpperCase()}
                       </Badge>
 
                       {showEmergencyControls && (
                         <Button
-                          size='sm'
-                          variant='outline'
-                          onClick={ async () => triggerManualEscalation(patient.id)}
+                          size="sm"
+                          variant="outline"
+                          onClick={async () =>
+                            triggerManualEscalation(patient.id)
+                          }
                         >
-                          <Phone className='mr-1 h-4 w-4' />
+                          <Phone className="mr-1 h-4 w-4" />
                           Escalate
                         </Button>
                       )}
@@ -387,8 +399,8 @@ export const CrisisMonitoringDashboard: React.FC<
                 ))}
 
                 {highRiskPatients.length === 0 && (
-                  <div className='text-gray-500 py-8 text-center'>
-                    <CheckCircle className='text-green-500 mx-auto mb-2 h-12 w-12' />
+                  <div className="text-gray-500 py-8 text-center">
+                    <CheckCircle className="text-green-500 mx-auto mb-2 h-12 w-12" />
                     No high-risk patients at this time
                   </div>
                 )}
@@ -399,18 +411,18 @@ export const CrisisMonitoringDashboard: React.FC<
           {/* Risk Trend Chart */}
           <Card>
             <CardHeader>
-              <CardTitle className='flex items-center'>
-                <TrendingUp className='mr-2 h-5 w-5' />
+              <CardTitle className="flex items-center">
+                <TrendingUp className="mr-2 h-5 w-5" />
                 Risk Trends (Last 7 Days)
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className='text-gray-500 flex h-64 items-center justify-center'>
+              <div className="text-gray-500 flex h-64 items-center justify-center">
                 {/* Placeholder for chart component */}
-                <div className='text-center'>
-                  <BarChart3 className='mx-auto mb-2 h-12 w-12' />
+                <div className="text-center">
+                  <BarChart3 className="mx-auto mb-2 h-12 w-12" />
                   Risk trend visualization would go here
-                  <div className='mt-2 text-sm'>
+                  <div className="mt-2 text-sm">
                     Integration with charting library needed
                   </div>
                 </div>
@@ -420,16 +432,16 @@ export const CrisisMonitoringDashboard: React.FC<
         </TabsContent>
 
         {/* Alerts Tab */}
-        <TabsContent value='alerts' className='space-y-4'>
+        <TabsContent value="alerts" className="space-y-4">
           {alerts.map((alert) => (
             <Card
               key={alert.id}
               className={`border-l-4 ${getSeverityColor(alert.severity)}`}
             >
-              <CardContent className='pt-4'>
-                <div className='flex items-start justify-between'>
-                  <div className='flex-1'>
-                    <div className='mb-2 flex items-center space-x-2'>
+              <CardContent className="pt-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="mb-2 flex items-center space-x-2">
                       <Badge
                         variant={
                           alert.severity === 'critical'
@@ -439,23 +451,23 @@ export const CrisisMonitoringDashboard: React.FC<
                       >
                         {alert.severity.toUpperCase()}
                       </Badge>
-                      <span className='text-gray-500 text-sm'>
+                      <span className="text-gray-500 text-sm">
                         {new Date(alert.timestamp).toLocaleString()}
                       </span>
                       {alert.acknowledged && (
-                        <Badge variant='outline' className='text-green-600'>
-                          <CheckCircle className='mr-1 h-3 w-3' />
+                        <Badge variant="outline" className="text-green-600">
+                          <CheckCircle className="mr-1 h-3 w-3" />
                           Acknowledged
                         </Badge>
                       )}
                     </div>
 
-                    <p className='text-gray-900 mb-2'>{alert.message}</p>
+                    <p className="text-gray-900 mb-2">{alert.message}</p>
 
                     {alert.actions.length > 0 && (
-                      <div className='text-gray-600 text-sm'>
+                      <div className="text-gray-600 text-sm">
                         <strong>Recommended actions:</strong>
-                        <ul className='mt-1 list-inside list-disc'>
+                        <ul className="mt-1 list-inside list-disc">
                           {alert.actions.map((action, index) => (
                             <li key={index}>{action}</li>
                           ))}
@@ -464,19 +476,19 @@ export const CrisisMonitoringDashboard: React.FC<
                     )}
                   </div>
 
-                  <div className='ml-4 flex items-center space-x-2'>
+                  <div className="ml-4 flex items-center space-x-2">
                     {!alert.acknowledged && (
                       <Button
-                        size='sm'
-                        onClick={ async () => acknowledgeAlert(alert.id)}
+                        size="sm"
+                        onClick={async () => acknowledgeAlert(alert.id)}
                       >
-                        <CheckCircle className='mr-1 h-4 w-4' />
+                        <CheckCircle className="mr-1 h-4 w-4" />
                         Acknowledge
                       </Button>
                     )}
 
-                    <Button size='sm' variant='outline'>
-                      <Eye className='mr-1 h-4 w-4' />
+                    <Button size="sm" variant="outline">
+                      <Eye className="mr-1 h-4 w-4" />
                       Details
                     </Button>
                   </div>
@@ -486,21 +498,21 @@ export const CrisisMonitoringDashboard: React.FC<
           ))}
 
           {alerts.length === 0 && (
-            <div className='text-gray-500 py-12 text-center'>
-              <Bell className='mx-auto mb-2 h-12 w-12' />
+            <div className="text-gray-500 py-12 text-center">
+              <Bell className="mx-auto mb-2 h-12 w-12" />
               No alerts at this time
             </div>
           )}
         </TabsContent>
 
         {/* Patients Tab */}
-        <TabsContent value='patients' className='space-y-4'>
-          <div className='grid gap-4'>
+        <TabsContent value="patients" className="space-y-4">
+          <div className="grid gap-4">
             {patients.map((patient) => (
               <Card key={patient.id}>
-                <CardContent className='pt-4'>
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center space-x-4'>
+                <CardContent className="pt-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
                       <div
                         className={`h-4 w-4 rounded-full ${
                           patient.currentRisk === 'imminent'
@@ -516,27 +528,27 @@ export const CrisisMonitoringDashboard: React.FC<
                       />
 
                       <div>
-                        <h3 className='text-gray-900 font-medium'>
+                        <h3 className="text-gray-900 font-medium">
                           {patient.name}
                         </h3>
-                        <p className='text-gray-500 text-sm'>
+                        <p className="text-gray-500 text-sm">
                           ID: {patient.id}
                         </p>
                       </div>
                     </div>
 
-                    <div className='flex items-center space-x-4'>
-                      <div className='text-right'>
+                    <div className="flex items-center space-x-4">
+                      <div className="text-right">
                         <Badge className={getRiskColor(patient.currentRisk)}>
                           {patient.currentRisk.toUpperCase()}
                         </Badge>
-                        <div className='text-gray-500 mt-1 text-sm'>
+                        <div className="text-gray-500 mt-1 text-sm">
                           Confidence:{' '}
                           {Math.round(patient.prediction.confidence * 100)}%
                         </div>
                       </div>
 
-                      <div className='text-gray-500 text-right text-sm'>
+                      <div className="text-gray-500 text-right text-sm">
                         <div>Last assessment:</div>
                         <div>
                           {new Date(
@@ -545,7 +557,7 @@ export const CrisisMonitoringDashboard: React.FC<
                         </div>
                       </div>
 
-                      <div className='text-gray-500 text-right text-sm'>
+                      <div className="text-gray-500 text-right text-sm">
                         <div>Last contact:</div>
                         <div>
                           {new Date(patient.lastContact).toLocaleDateString()}
@@ -569,12 +581,12 @@ export const CrisisMonitoringDashboard: React.FC<
                   </div>
 
                   {patient.prediction.primaryRiskFactors.length > 0 && (
-                    <div className='mt-3 border-t pt-3'>
-                      <div className='text-gray-600 text-sm'>
+                    <div className="mt-3 border-t pt-3">
+                      <div className="text-gray-600 text-sm">
                         <strong>Primary risk factors:</strong>{' '}
                         {patient.prediction.primaryRiskFactors.join(', ')}
                       </div>
-                      <div className='text-gray-600 mt-1 text-sm'>
+                      <div className="text-gray-600 mt-1 text-sm">
                         <strong>Intervention window:</strong>{' '}
                         {patient.prediction.interventionWindow.optimal}
                       </div>
@@ -587,35 +599,35 @@ export const CrisisMonitoringDashboard: React.FC<
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value='analytics' className='space-y-6'>
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <Card>
               <CardHeader>
                 <CardTitle>System Performance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='space-y-4'>
+                <div className="space-y-4">
                   <div>
-                    <div className='flex justify-between text-sm'>
+                    <div className="flex justify-between text-sm">
                       <span>Prediction Accuracy</span>
                       <span>87%</span>
                     </div>
-                    <Progress value={87} className='mt-1' />
+                    <Progress value={87} className="mt-1" />
                   </div>
 
                   <div>
-                    <div className='flex justify-between text-sm'>
+                    <div className="flex justify-between text-sm">
                       <span>False Positive Rate</span>
                       <span>{metrics.falsePositiveRate.toFixed(1)}%</span>
                     </div>
                     <Progress
                       value={metrics.falsePositiveRate}
-                      className='mt-1'
+                      className="mt-1"
                     />
                   </div>
 
                   <div>
-                    <div className='flex justify-between text-sm'>
+                    <div className="flex justify-between text-sm">
                       <span>Average Response Time</span>
                       <span>{metrics.averageResponseTime}</span>
                     </div>
@@ -629,7 +641,7 @@ export const CrisisMonitoringDashboard: React.FC<
                 <CardTitle>Risk Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className='space-y-3'>
+                <div className="space-y-3">
                   {['imminent', 'high', 'moderate', 'low', 'minimal'].map(
                     (risk) => {
                       const count =
@@ -642,16 +654,16 @@ export const CrisisMonitoringDashboard: React.FC<
                       return (
                         <div
                           key={risk}
-                          className='flex items-center justify-between'
+                          className="flex items-center justify-between"
                         >
-                          <span className='text-sm capitalize'>
+                          <span className="text-sm capitalize">
                             {risk} Risk
                           </span>
-                          <div className='flex items-center space-x-2'>
-                            <div className='w-20 text-right text-sm'>
+                          <div className="flex items-center space-x-2">
+                            <div className="w-20 text-right text-sm">
                               {count} patients
                             </div>
-                            <div className='text-gray-500 w-12 text-right text-sm'>
+                            <div className="text-gray-500 w-12 text-right text-sm">
                               {percentage.toFixed(0)}%
                             </div>
                           </div>

@@ -35,7 +35,7 @@ describeFn('RedisService Performance', () => {
       expect(initialStats.totalConnections).toBeLessThanOrEqual(20)
 
       // Generate load
-      const operations = Array.from({ length: 1000 },  async (_, i) => {
+      const operations = Array.from({ length: 1000 }, async (_, i) => {
         const key = generateTestKey(`pool-${i}`)
         return redis.set(key, 'test')
       })
@@ -53,7 +53,7 @@ describeFn('RedisService Performance', () => {
       const start = Date.now()
 
       // Generate sudden load
-      const operations = Array.from({ length: 500 },  async (_, i) => {
+      const operations = Array.from({ length: 500 }, async (_, i) => {
         const key = generateTestKey(`scale-${i}`)
         return redis.set(key, 'test')
       })
@@ -71,7 +71,9 @@ describeFn('RedisService Performance', () => {
       await redis.set(key, 'test')
 
       const start = Date.now()
-      const operations = Array.from({ length: 10000 },  async () => redis.get(key))
+      const operations = Array.from({ length: 10000 }, async () =>
+        redis.get(key),
+      )
       await Promise.all(operations)
       const duration = Date.now() - start
 
@@ -81,7 +83,7 @@ describeFn('RedisService Performance', () => {
 
     it('should handle high-throughput set operations', async () => {
       const start = Date.now()
-      const operations = Array.from({ length: 8000 },  async (_, i) => {
+      const operations = Array.from({ length: 8000 }, async (_, i) => {
         const key = generateTestKey(`set-${i}`)
         return redis.set(key, 'test')
       })
@@ -97,10 +99,10 @@ describeFn('RedisService Performance', () => {
       const keys = Array.from({ length: 9000 }, (_, i) =>
         generateTestKey(`del-${i}`),
       )
-      await Promise.all(keys.map( async (key) => redis.set(key, 'test')))
+      await Promise.all(keys.map(async (key) => redis.set(key, 'test')))
 
       const start = Date.now()
-      const operations = keys.map( async (key) => redis.del(key))
+      const operations = keys.map(async (key) => redis.del(key))
       await Promise.all(operations)
       const duration = Date.now() - start
 
@@ -112,7 +114,9 @@ describeFn('RedisService Performance', () => {
       const key = generateTestKey('incr')
 
       const start = Date.now()
-      const operations = Array.from({ length: 12000 },  async () => redis.incr(key))
+      const operations = Array.from({ length: 12000 }, async () =>
+        redis.incr(key),
+      )
       await Promise.all(operations)
       const duration = Date.now() - start
 
@@ -130,8 +134,10 @@ describeFn('RedisService Performance', () => {
         const key = generateTestKey(`size-${size}`)
         const data = generateData(size)
 
-        const writeTime = await measureOperation( async () => redis.set(key, data))
-        const readTime = await measureOperation( async () => redis.get(key))
+        const writeTime = await measureOperation(async () =>
+          redis.set(key, data),
+        )
+        const readTime = await measureOperation(async () => redis.get(key))
 
         results[size] = { write: writeTime, read: readTime }
 
@@ -160,7 +166,7 @@ describeFn('RedisService Performance', () => {
       await redis.getPoolStats()
 
       // Generate significant load with varied data sizes
-      const operations = Array.from({ length: 1000 },  async (_, i) => {
+      const operations = Array.from({ length: 1000 }, async (_, i) => {
         const key = generateTestKey(`mem-${i}`)
         const data = 'x'.repeat(Math.min(100 + i, 1000)) // Varied sizes up to 1KB
         return redis.set(key, data)
@@ -178,7 +184,7 @@ describeFn('RedisService Performance', () => {
 
     it('should handle concurrent large data operations', async () => {
       const data = 'x'.repeat(100000) // 100KB
-      const operations = Array.from({ length: 100 },  async (_, i) => {
+      const operations = Array.from({ length: 100 }, async (_, i) => {
         const key = generateTestKey(`large-${i}`)
         return redis.set(key, data)
       })

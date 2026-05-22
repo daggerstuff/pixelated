@@ -8,7 +8,11 @@
 
 export type PIIStatus = 'absent' | 'redacted' | 'present'
 export type ConsentGate = 'open' | 'restricted' | 'blocked'
-export type ConsolidationPhase = 'raw' | 'consolidated' | 'archived' | 'forgotten'
+export type ConsolidationPhase =
+  | 'raw'
+  | 'consolidated'
+  | 'archived'
+  | 'forgotten'
 
 /** Importance scoring breakdown */
 export interface MemoryImportance {
@@ -58,11 +62,11 @@ export interface MemoryBlock {
 
 /** Lightweight memory reference for search results / listings */
 export interface MemoryRef {
-  id: string
-  tenantId: string
-  sessionId: string
-  content: string // Truncated / redacted
-  timestamp: number
+  'id': string
+  'tenantId': string
+  'sessionId': string
+  'content': string // Truncated / redacted
+  'timestamp': number
   'importance.raw': number
   'emotions.valence': number
   'gating.crisisFlag': boolean

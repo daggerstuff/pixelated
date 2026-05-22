@@ -506,7 +506,7 @@ export function createLLMService(config: LLMClientConfig): LLMService {
               },
               provider: 'llm',
               content:
-                data.choices?.[0]?.message?.content ||
+                data.choices?.[0]?.message?.content ??
                 (Array.isArray(data.choices?.[0]?.message?.tool_calls)
                   ? data.choices[0]?.message.tool_calls
                       ?.map((toolCall) => extractToolCallSummary(toolCall))

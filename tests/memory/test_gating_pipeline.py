@@ -1,10 +1,8 @@
-import pytest
-
 from ai.memory.gates import GateDecision, GateResult, GatingReport
-from ai.memory.gates.pii_redactor import PiiRedactor
-from ai.memory.gates.crisis_detector import CrisisDetector, CrisisTier
-from ai.memory.gates.trauma_filter import TraumaFilter
 from ai.memory.gates.consent_gate import ConsentGateChecker
+from ai.memory.gates.crisis_detector import CrisisDetector, CrisisTier
+from ai.memory.gates.pii_redactor import PiiRedactor
+from ai.memory.gates.trauma_filter import TraumaFilter
 from ai.memory.schema import ConsentGate
 
 

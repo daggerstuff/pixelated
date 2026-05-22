@@ -1,6 +1,9 @@
 import { subtle } from 'crypto'
 
-import { base64ToUint8Array, uint8ArrayToBase64 } from '../../../lib/utils/encoding'
+import {
+  base64ToUint8Array,
+  uint8ArrayToBase64,
+} from '../../../lib/utils/encoding'
 
 export interface PushSubscription {
   endpoint: string
@@ -86,8 +89,8 @@ export async function sendNotification(
     headers: {
       'Content-Type': 'application/octet-stream',
       'Content-Encoding': 'aes128gcm',
-      Authorization: `vapid t=${jwt}, k=${vapidKeys.publicKey}`,
-      TTL: '43200', // 12 hours in seconds
+      'Authorization': `vapid t=${jwt}, k=${vapidKeys.publicKey}`,
+      'TTL': '43200', // 12 hours in seconds
     },
     body: encodedPayload,
   })

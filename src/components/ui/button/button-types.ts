@@ -14,19 +14,19 @@ export type ButtonSize = 'default' | 'sm' | 'lg' | 'icon'
 
 export interface ButtonBaseProps {
   /** Additional class names to apply to the button */
-  className?: string
+  'className'?: string
   /** Whether the button is in a loading state */
-  loading?: boolean
+  'loading'?: boolean
   /** Loading text to display when in loading state */
-  loadingText?: string
+  'loadingText'?: string
   /** Whether to show the loading spinner */
-  showSpinner?: boolean
+  'showSpinner'?: boolean
   /** Whether the button is disabled */
-  disabled?: boolean
+  'disabled'?: boolean
   /** Whether the button should take up the full width of its container */
-  fullWidth?: boolean
+  'fullWidth'?: boolean
   /** Whether the button should be rendered as a different element */
-  asChild?: boolean
+  'asChild'?: boolean
   /** ARIA label for accessibility */
   'aria-label'?: string
   /** ARIA description for accessibility */

@@ -162,22 +162,22 @@ export async function getAlertStatistics(
     }
 
     return {
-      total: parseInt(stats.total || '0', 10),
-      active: parseInt(stats.active || '0', 10),
-      resolved: parseInt(stats.resolved || '0', 10),
+      total: parseInt(stats.total ?? '0', 10),
+      active: parseInt(stats.active ?? '0', 10),
+      resolved: parseInt(stats.resolved ?? '0', 10),
       bySeverity: {
-        critical: parseInt(stats.critical || '0', 10),
-        high: parseInt(stats.high || '0', 10),
-        medium: parseInt(stats.medium || '0', 10),
-        low: parseInt(stats.low || '0', 10),
+        critical: parseInt(stats.critical ?? '0', 10),
+        high: parseInt(stats.high ?? '0', 10),
+        medium: parseInt(stats.medium ?? '0', 10),
+        low: parseInt(stats.low ?? '0', 10),
       },
       bySource: {
-        rate_limiting: parseInt(stats.rate_limiting || '0', 10),
-        behavioral_analysis: parseInt(stats.behavioral_analysis || '0', 10),
-        threat_intelligence: parseInt(stats.threat_intelligence || '0', 10),
-        system_monitoring: parseInt(stats.system_monitoring || '0', 10),
+        rate_limiting: parseInt(stats.rate_limiting ?? '0', 10),
+        behavioral_analysis: parseInt(stats.behavioral_analysis ?? '0', 10),
+        threat_intelligence: parseInt(stats.threat_intelligence ?? '0', 10),
+        system_monitoring: parseInt(stats.system_monitoring ?? '0', 10),
       },
-      avgResolutionTime: parseInt(stats.avgResolutionTime || '0', 10),
+      avgResolutionTime: parseInt(stats.avgResolutionTime ?? '0', 10),
     }
   } catch (error: unknown) {
     console.error('Error getting alert statistics:', error)
@@ -228,7 +228,7 @@ export async function generateAlertReport(
   // Calculate bySource statistics
   const sourceCounts: Record<string, number> = {}
   alerts.forEach((alert) => {
-    sourceCounts[alert.source] = (sourceCounts[alert.source] || 0) + 1
+    sourceCounts[alert.source] = (sourceCounts[alert.source] ?? 0) + 1
   })
   report.metrics.bySource = sourceCounts
 

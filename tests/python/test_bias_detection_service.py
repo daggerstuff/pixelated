@@ -12,9 +12,7 @@ os.environ.setdefault("ENCRYPTION_SALT", "test-salt")
 
 # Import after env setup
 sys.path.append(
-    os.path.join(
-        os.path.dirname(__file__), "..", "..", "src", "lib", "ai", "bias-detection", "python-service"
-    )
+    os.path.join(os.path.dirname(__file__), "..", "..", "src", "lib", "ai", "bias-detection", "python-service")
 )
 from bias_detection_service import BiasDetectionConfig, BiasDetectionService
 

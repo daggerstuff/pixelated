@@ -7,28 +7,19 @@ from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlsplit
 
 from scripts.task_sync.provider_bridge import (
+    apply_github_action,
+    apply_linear_action,
     asana_create_payload,
     asana_update_payload,
     build_asana_headers,
     build_github_headers,
-    build_linear_headers,
     build_jira_auth_header,
+    build_linear_headers,
     create_jira_project,
-    apply_github_action,
-    apply_linear_action,
-    extract_provider_target_id,
     export_asana_tasks,
     export_github_issues,
     export_linear_issues,
-    resolve_linear_api_url,
-    resolve_linear_parent_issue_id,
-    resolve_linear_project_id,
-    resolve_linear_team_id,
-    resolve_linear_token,
-    resolve_github_api_url,
-    resolve_github_repo,
-    resolve_github_repo_owner,
-    resolve_github_token,
+    extract_provider_target_id,
     jira_adf_document,
     jira_create_payload,
     jira_project_exists,
@@ -43,9 +34,18 @@ from scripts.task_sync.provider_bridge import (
     resolve_asana_completed_since,
     resolve_configured_jira_project_key,
     resolve_discovered_jira_project_key,
+    resolve_github_api_url,
+    resolve_github_repo,
+    resolve_github_repo_owner,
+    resolve_github_token,
     resolve_jira_issue_type,
     resolve_jira_project_key,
     resolve_jira_site_url,
+    resolve_linear_api_url,
+    resolve_linear_parent_issue_id,
+    resolve_linear_project_id,
+    resolve_linear_team_id,
+    resolve_linear_token,
 )
 
 
@@ -332,6 +332,7 @@ def test_create_jira_project_bootstraps_first_valid_candidate(monkeypatch) -> No
         if url.endswith("/rest/api/3/myself"):
             return {"accountId": "acct-1"}
         if url.endswith("/rest/api/3/project"):
+            assert payload is not None
             attempts.append((payload["key"], payload["projectTemplateKey"]))
             if payload["key"] == "PIXELATEDE":
                 raise RuntimeError("key rejected")
@@ -406,8 +407,7 @@ def test_export_github_issues_filters_pull_requests_and_supports_pagination(monk
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     calls: list[str] = []
     first_page: list[dict[str, object]] = [
-        {"number": i, "title": "Issue", "body": "Body", "state": "open"}
-        for i in range(1, 101)
+        {"number": i, "title": "Issue", "body": "Body", "state": "open"} for i in range(1, 101)
     ]
     first_page.append(
         {
@@ -517,7 +517,7 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
         assert variables is not None
         input_payload = variables.get("input")
         assert isinstance(input_payload, dict)
-        assert input_payload["id"] == "lin-existing"
+        assert variables.get("id") == "lin-existing"
         return {"data": {"issueUpdate": {"success": True, "issue": {"id": "lin-existing"}}}}
 
     monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
@@ -552,6 +552,7 @@ def test_apply_github_action_updates_and_creates_issues(monkeypatch) -> None:
     calls: list[tuple[str, str]] = []
 
     def fake_json_request(method, url, *, headers, payload=None):
+        assert payload is not None
         calls.append((method, url))
         if method == "POST":
             return {"number": 101, "title": payload["title"], "body": payload["body"]}
@@ -725,24 +726,28 @@ def test_resolve_discovered_jira_project_key_persists_discovery(monkeypatch, tmp
 
 
 def test_jira_project_exists_returns_false_on_request_failure(monkeypatch) -> None:
+    from email.message import Message
+
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge.request.urlopen",
-        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 404, "Not Found", {}, None)),
+        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 404, "Not Found", Message(), None)),
     )
 
     assert jira_project_exists("MISSING") is False
 
 
 def test_jira_project_exists_returns_none_on_transient_failure(monkeypatch) -> None:
+    from email.message import Message
+
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge.request.urlopen",
-        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 503, "Unavailable", {}, None)),
+        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 503, "Unavailable", Message(), None)),
     )
 
     assert jira_project_exists("FLAKY") is None

@@ -46,15 +46,15 @@ export const Popover: FC<PopoverProps> = ({
     return (
       <div className={`relative ${className}`}>
         <button
-          type='button'
+          type="button"
           onClick={handleToggle}
-          className=''
-          aria-label='Toggle popover'
+          className=""
+          aria-label="Toggle popover"
         >
           {trigger}
         </button>
         {isOpen && (
-          <div className='bg-popover text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border p-2 shadow-md'>
+          <div className="bg-popover text-popover-foreground animate-in data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 absolute z-50 min-w-32 overflow-hidden rounded-md border p-2 shadow-md">
             {children}
           </div>
         )}

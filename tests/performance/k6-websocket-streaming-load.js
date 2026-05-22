@@ -184,7 +184,7 @@ export default function () {
 export function handleSummary(data) {
   return {
     'test-results/k6-websocket-summary.json': JSON.stringify(data),
-    stdout: textSummary(data),
+    'stdout': textSummary(data),
   }
 }
 

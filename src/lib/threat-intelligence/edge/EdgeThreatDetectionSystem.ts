@@ -65,7 +65,8 @@ export class EdgeThreatDetectionSystemCore
   implements EdgeThreatDetectionSystem
 {
   private redis!: Redis
-  private readonly models: Map<string, tf.GraphModel | tf.Sequential> = new Map()
+  private readonly models: Map<string, tf.GraphModel | tf.Sequential> =
+    new Map()
   private readonly nodeStatus: Map<string, EdgeNodeStatus> = new Map()
   private detectionThresholds: DetectionThresholds
   private readonly modelPerformance: Map<string, ModelPerformance> = new Map()
@@ -135,8 +136,12 @@ export class EdgeThreatDetectionSystemCore
         case 'tensorflow':
           model = await this.loadTensorFlowModel(modelConfig)
           break
-        case "pytorch": { throw new Error('Not implemented yet: "pytorch" case') }
-        case "sklearn": { throw new Error('Not implemented yet: "sklearn" case') }
+        case 'pytorch': {
+          throw new Error('Not implemented yet: "pytorch" case')
+        }
+        case 'sklearn': {
+          throw new Error('Not implemented yet: "sklearn" case')
+        }
         default:
           throw new Error(`Unsupported framework: ${modelConfig.framework}`)
       }

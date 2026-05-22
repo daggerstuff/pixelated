@@ -929,7 +929,7 @@ export class MentalArenaAdapter {
       '2 years',
     ]
     const randomIndex = Math.floor(Math.random() * durations.length)
-    return durations[randomIndex] || '1 month' // Fallback value
+    return durations[randomIndex] ?? '1 month' // Fallback value
   }
 
   private calculateAverage(numbers: number[]): number {

@@ -39,10 +39,15 @@ describe('scenarios utility functions', () => {
         .map((s) => s.id)
 
       // Ensure we have at least one non-intermediate scenario available to test the fallback
-      const hasNonIntermediate = allScenarios.some((s) => s.difficulty !== ScenarioDifficulty.INTERMEDIATE)
+      const hasNonIntermediate = allScenarios.some(
+        (s) => s.difficulty !== ScenarioDifficulty.INTERMEDIATE,
+      )
       expect(hasNonIntermediate).toBe(true)
 
-      const result = await getRecommendedScenario(intermediateIds, 'intermediate')
+      const result = await getRecommendedScenario(
+        intermediateIds,
+        'intermediate',
+      )
 
       expect(result).not.toBeNull()
       expect(result?.difficulty).not.toBe(ScenarioDifficulty.INTERMEDIATE)

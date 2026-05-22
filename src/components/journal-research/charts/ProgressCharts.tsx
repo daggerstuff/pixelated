@@ -149,9 +149,9 @@ export function ProgressCharts({
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type='bar'
+            type="bar"
             data={overallProgressData}
-            title='Overall Progress'
+            title="Overall Progress"
             options={{
               scales: {
                 y: {
@@ -174,9 +174,9 @@ export function ProgressCharts({
           </CardHeader>
           <CardContent>
             <ChartComponent
-              type='bar'
+              type="bar"
               data={metricsData}
-              title='Metrics Overview'
+              title="Metrics Overview"
               options={{
                 scales: {
                   y: {
@@ -189,15 +189,15 @@ export function ProgressCharts({
         </Card>
       )}
 
-      <Card className='md:col-span-2'>
+      <Card className="md:col-span-2">
         <CardHeader>
           <CardTitle>Phase Progress</CardTitle>
         </CardHeader>
         <CardContent>
           <ChartComponent
-            type='bar'
+            type="bar"
             data={progressData}
-            title='Progress by Phase'
+            title="Progress by Phase"
             options={{
               scales: {
                 y: {

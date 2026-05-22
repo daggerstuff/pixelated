@@ -385,8 +385,8 @@ export async function getFHEService(
   // For non-tenant specific requests, use the standard logic
   const isDevelopment =
     typeof window !== 'undefined' ||
-    ((process.env as unknown as { NODE_ENV?: string })?.['NODE_ENV'] ===
-        'development')
+    (process.env as unknown as { NODE_ENV?: string })?.['NODE_ENV'] ===
+      'development'
 
   // Determine which implementation to use
   let selectedImplementation: FHEImplementation
@@ -524,7 +524,10 @@ export async function getTenantFHEService(
     ...baseService,
 
     // Override encrypt to use tenant-specific context
-    encrypt: async (data: unknown, options?: unknown): Promise<EncryptedData> => {
+    encrypt: async (
+      data: unknown,
+      options?: unknown,
+    ): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
         throw new Error(`Rate limit exceeded for tenant ${tenantId}`)
@@ -576,7 +579,7 @@ export async function getTenantFHEService(
  * Get the default FHE service for the current environment
  */
 export async function getDefaultFHEService(): Promise<FHEService> {
-  defaultServiceInstance ??= await getFHEService();
+  defaultServiceInstance ??= await getFHEService()
   return defaultServiceInstance
 }
 

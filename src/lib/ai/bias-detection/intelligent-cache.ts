@@ -657,7 +657,7 @@ export class IntelligentCache {
 
       const entry: CacheEntry<unknown> = {
         key,
-        value: serializedValue as unknown,
+        value: serializedValue,
         tier: 'redis',
         size: this.estimateSize(serializedValue),
         compressed,

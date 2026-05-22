@@ -19,13 +19,14 @@ class TestWorker(unittest.TestCase):
 
     def test_log_event(self):
         worker.log_event("evt_123", "test message")
-        with open(self.temp_path, "r") as f:
+        with open(self.temp_path) as f:
             lines = f.readlines()
         self.assertEqual(len(lines), 1)
         data = json.loads(lines[0])
         self.assertEqual(data["event_id"], "evt_123")
         self.assertEqual(data["message"], "test message")
         self.assertIn("timestamp", data)
+
 
 if __name__ == "__main__":
     unittest.main()

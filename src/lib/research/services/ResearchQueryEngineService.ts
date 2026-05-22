@@ -76,10 +76,13 @@ export interface QueryPerformanceMetrics {
 }
 
 export class ResearchQueryEngineService {
-  private readonly queryCache: Map<string, { result: QueryResult; expiry: number }> =
-    new Map()
+  private readonly queryCache: Map<
+    string,
+    { result: QueryResult; expiry: number }
+  > = new Map()
   private readonly queryHistory: Map<string, ResearchQuery[]> = new Map()
-  private readonly pendingApprovals: Map<string, QueryApprovalRequest> = new Map()
+  private readonly pendingApprovals: Map<string, QueryApprovalRequest> =
+    new Map()
   private readonly performanceMetrics: QueryPerformanceMetrics = {
     averageExecutionTime: 2.5, // seconds
     cacheHitRate: 0.75,

@@ -58,8 +58,10 @@ export class HIPAADataService {
   private readonly config: HIPAAConfig
   private readonly encryptionKeys: Map<string, Buffer> = new Map()
   private auditLog: AuditLog[] = []
-  private readonly activeSessions: Map<string, { userId: string; expiration: Date }> =
-    new Map()
+  private readonly activeSessions: Map<
+    string,
+    { userId: string; expiration: Date }
+  > = new Map()
 
   constructor(
     config: HIPAAConfig = {
@@ -173,8 +175,7 @@ export class HIPAADataService {
   }> {
     try {
       const key =
-        this.encryptionKeys.get(dataType) ??
-        this.encryptionKeys.get('master')
+        this.encryptionKeys.get(dataType) ?? this.encryptionKeys.get('master')
       if (!key) {
         throw new Error(`Missing encryption key for dataType: ${dataType}`)
       }
@@ -671,7 +672,9 @@ export class HIPAADataService {
     const roles = this.config.accessControlMatrix.roles
     const requiredRoles = ['researcher', 'data-scientist', 'therapist', 'admin']
 
-    return requiredRoles.every((role) => this.getRolePermissions(role)?.permissions)
+    return requiredRoles.every(
+      (role) => this.getRolePermissions(role)?.permissions,
+    )
   }
 
   /**

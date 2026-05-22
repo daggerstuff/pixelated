@@ -81,10 +81,10 @@ export default function EmotionTrackingChart({
   // Loading state
   if (isLoading) {
     return (
-      <div className='bg-gray-50 flex items-center justify-center rounded-lg p-6'>
-        <div className='flex w-full animate-pulse flex-col'>
-          <div className='bg-gray-200 mb-2.5 h-4 w-3/4 rounded'></div>
-          <div className='bg-gray-200 h-40 w-full rounded'></div>
+      <div className="bg-gray-50 flex items-center justify-center rounded-lg p-6">
+        <div className="flex w-full animate-pulse flex-col">
+          <div className="bg-gray-200 mb-2.5 h-4 w-3/4 rounded"></div>
+          <div className="bg-gray-200 h-40 w-full rounded"></div>
         </div>
       </div>
     )
@@ -93,11 +93,11 @@ export default function EmotionTrackingChart({
   // Empty state
   if (data.length === 0) {
     return (
-      <div className='bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6'>
-        <p className='text-gray-500 mb-2'>
+      <div className="bg-gray-50 flex flex-col items-center justify-center rounded-lg p-6">
+        <p className="text-gray-500 mb-2">
           No emotion data available for this session
         </p>
-        <p className='text-gray-400 text-sm'>
+        <p className="text-gray-400 text-sm">
           Data will appear as the session progresses
         </p>
       </div>
@@ -106,29 +106,29 @@ export default function EmotionTrackingChart({
 
   return (
     <div className={cn('p-4 bg-white rounded-lg shadow-sm', className)}>
-      <div className='mb-4 flex items-center justify-between'>
-        <h3 className='text-gray-900 text-lg font-medium'>
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-gray-900 text-lg font-medium">
           Emotional Dimensions
         </h3>
 
-        <div className='flex space-x-2'>
+        <div className="flex space-x-2">
           <select
-            className='rounded border px-2 py-1 text-sm'
+            className="rounded border px-2 py-1 text-sm"
             value={timeRange}
             onChange={(e) =>
               setTimeRange(e.target.value as 'full' | '5min' | '10min')
             }
-            aria-label='Select time range'
+            aria-label="Select time range"
           >
-            <option value='full'>Full Session</option>
-            <option value='10min'>Last 10 Minutes</option>
-            <option value='5min'>Last 5 Minutes</option>
+            <option value="full">Full Session</option>
+            <option value="10min">Last 10 Minutes</option>
+            <option value="5min">Last 5 Minutes</option>
           </select>
         </div>
       </div>
 
       {/* Dimension toggles */}
-      <div className='mb-4 flex flex-wrap gap-2'>
+      <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={() => toggleDimension('valence')}
           className={`rounded-full px-3 py-1 text-xs transition-colors ${
@@ -165,14 +165,14 @@ export default function EmotionTrackingChart({
       </div>
 
       {/* Chart */}
-      <ResponsiveContainer width='100%' height={height}>
+      <ResponsiveContainer width="100%" height={height}>
         <LineChart
           data={processedData}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray='3 3' />
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis
-            dataKey='timestamp'
+            dataKey="timestamp"
             tickFormatter={(tick) =>
               new Date(tick).toLocaleTimeString([], {
                 hour: '2-digit',
@@ -198,10 +198,10 @@ export default function EmotionTrackingChart({
 
           {dimensions.includes('valence') && (
             <Line
-              type='monotone'
-              dataKey='valence'
-              name='valence'
-              stroke='#3b82f6'
+              type="monotone"
+              dataKey="valence"
+              name="valence"
+              stroke="#3b82f6"
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -209,10 +209,10 @@ export default function EmotionTrackingChart({
 
           {dimensions.includes('arousal') && (
             <Line
-              type='monotone'
-              dataKey='arousal'
-              name='arousal'
-              stroke='#ef4444'
+              type="monotone"
+              dataKey="arousal"
+              name="arousal"
+              stroke="#ef4444"
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -220,10 +220,10 @@ export default function EmotionTrackingChart({
 
           {dimensions.includes('dominance') && (
             <Line
-              type='monotone'
-              dataKey='dominance'
-              name='dominance'
-              stroke='#22c55e'
+              type="monotone"
+              dataKey="dominance"
+              name="dominance"
+              stroke="#22c55e"
               activeDot={{ r: 8 }}
               connectNulls
             />
@@ -232,7 +232,7 @@ export default function EmotionTrackingChart({
       </ResponsiveContainer>
 
       {/* Legend explanation */}
-      <div className='border-gray-100 text-gray-500 mt-4 border-t pt-2 text-xs'>
+      <div className="border-gray-100 text-gray-500 mt-4 border-t pt-2 text-xs">
         <p>
           <strong>Valence:</strong> How positive or negative the emotional state
           (0-10)

@@ -5092,7 +5092,7 @@ requires-dist = [
     { name = "types-requests", marker = "extra == 'dev'" },
     { name = "types-requests", marker = "extra == 'test'" },
     { name = "undetected-chromedriver", specifier = ">=3.5.5" },
-    { name = "urllib3", specifier = ">=2.6.2" },
+    { name = "urllib3", specifier = ">=2.7.0" },
     { name = "uvicorn", specifier = ">=0.44.0" },
     { name = "virtualenv", specifier = ">=21.2.0" },
     { name = "voyageai", specifier = ">=0.3.7" },

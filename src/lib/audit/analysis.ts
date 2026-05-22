@@ -49,9 +49,7 @@ export function detectHighFrequency(
   )
   const userFrequency = recentLogs.reduce<Record<string, AccessFrequency>>(
     (acc, log) => {
-      if (!acc[log.userId]) {
-        acc[log.userId] = { userId: log.userId, count: 0, logs: [] }
-      }
+      acc[log.userId] ??= { userId: log.userId, count: 0, logs: [] }
       acc[log.userId].count++
       acc[log.userId].logs.push(log)
       return acc
@@ -101,9 +99,7 @@ export function detectOddHours(logs: AuditLog[]): UnusualPattern[] {
   // Group by user
   const userOddHours = oddHourLogs.reduce<Record<string, AuditLog[]>>(
     (acc, log) => {
-      if (!acc[log.userId]) {
-        acc[log.userId] = []
-      }
+      acc[log.userId] ??= []
       acc[log.userId].push(log)
       return acc
     },
@@ -146,9 +142,7 @@ export function detectSensitiveAccess(logs: AuditLog[]): UnusualPattern[] {
   // Group by user
   const userSensitiveAccess = sensitiveLogs.reduce<Record<string, AuditLog[]>>(
     (acc, log) => {
-      if (!acc[log.userId]) {
-        acc[log.userId] = []
-      }
+      acc[log.userId] ??= []
       acc[log.userId].push(log)
       return acc
     },

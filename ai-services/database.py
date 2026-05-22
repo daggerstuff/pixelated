@@ -29,9 +29,7 @@ class DatabaseService:
         if not self._encryption_key and os.environ.get("NODE_ENV") == "production":
             logger.error("CRITICAL: PHI_ENCRYPTION_KEY not set in production!")
         elif not self._encryption_key:
-            logger.warning(
-                "PHI_ENCRYPTION_KEY not set. Using insecure placeholder for development."
-            )
+            logger.warning("PHI_ENCRYPTION_KEY not set. Using insecure placeholder for development.")
 
     def connect(self) -> bool:
         """Establish connection to MongoDB Atlas"""
@@ -111,9 +109,7 @@ class DatabaseService:
             logger.error(f"Decryption failed: {e}")
             return {"error": "decryption_failed", "_original": encrypted_doc.get("ciphertext")}
 
-    def _log_audit_event(
-        self, event_type: str, session_id: str, user_id: str | None = None
-    ) -> None:
+    def _log_audit_event(self, event_type: str, session_id: str, user_id: str | None = None) -> None:
         """Log audit events for HIPAA compliance"""
         if self.db is None:
             return
@@ -174,9 +170,7 @@ class DatabaseService:
             logger.error(f"Error saving analysis result: {e}")
             return None
 
-    def get_session_history(
-        self, session_id: str, limit: int = 10, user_id: str | None = None
-    ) -> list[dict[str, Any]]:
+    def get_session_history(self, session_id: str, limit: int = 10, user_id: str | None = None) -> list[dict[str, Any]]:
         """Retrieve analysis history for a session with HIPAA compliance"""
         if self.db is None:
             return []

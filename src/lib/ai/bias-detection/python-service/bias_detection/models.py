@@ -52,36 +52,18 @@ class ConfidenceLevel(str, Enum):
 class BiasAnalysisRequest(BaseModel):
     """Request model for bias analysis"""
 
-    content: str = Field(
-        description="Text content to analyze for bias", min_length=1, max_length=10000
-    )
-    content_type: str = Field(
-        default="text", description="Type of content: text, email, document, etc."
-    )
-    language: str = Field(
-        default="en", description="Language of the content (ISO 639-1 code)"
-    )
-    context: str | None = Field(
-        default=None, description="Additional context about the content"
-    )
-    bias_types: list[BiasType] | None = Field(
-        default=None, description="Specific bias types to check for"
-    )
-    sensitivity: str = Field(
-        default="medium", description="Analysis sensitivity: low, medium, high"
-    )
+    content: str = Field(description="Text content to analyze for bias", min_length=1, max_length=10000)
+    content_type: str = Field(default="text", description="Type of content: text, email, document, etc.")
+    language: str = Field(default="en", description="Language of the content (ISO 639-1 code)")
+    context: str | None = Field(default=None, description="Additional context about the content")
+    bias_types: list[BiasType] | None = Field(default=None, description="Specific bias types to check for")
+    sensitivity: str = Field(default="medium", description="Analysis sensitivity: low, medium, high")
     include_recommendations: bool = Field(
         default=True, description="Whether to include bias mitigation recommendations"
     )
-    include_counterfactuals: bool = Field(
-        default=True, description="Whether to include counterfactual scenarios"
-    )
-    user_id: str | None = Field(
-        default=None, description="User ID for tracking and personalization"
-    )
-    session_id: str | None = Field(
-        default=None, description="Session ID for request correlation"
-    )
+    include_counterfactuals: bool = Field(default=True, description="Whether to include counterfactual scenarios")
+    user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
+    session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @field_validator("content")
     @classmethod
@@ -120,13 +102,9 @@ class BiasScore(BaseModel):
         le=1.0,
         description="Bias score from 0.0 (no bias) to 1.0 (maximum bias)",
     )
-    confidence: float = Field(
-        ge=0.0, le=1.0, description="Confidence in the bias detection"
-    )
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence in the bias detection")
     confidence_level: ConfidenceLevel
-    evidence: list[str] = Field(
-        description="Text snippets that support the bias detection"
-    )
+    evidence: list[str] = Field(description="Text snippets that support the bias detection")
     explanation: str = Field(description="Explanation of why this bias was detected")
 
     model_config = ConfigDict(use_enum_values=True)
@@ -140,9 +118,7 @@ class Recommendation(BaseModel):
     priority: str = Field(description="Priority: high, medium, low")
     implementation_difficulty: str = Field(description="Difficulty: easy, medium, hard")
     estimated_impact: str = Field(description="Expected impact: low, medium, high")
-    examples: list[str] = Field(
-        default_factory=list, description="Example implementations"
-    )
+    examples: list[str] = Field(default_factory=list, description="Example implementations")
 
     @field_validator("priority", "implementation_difficulty", "estimated_impact")
     @classmethod
@@ -160,9 +136,7 @@ class CounterfactualScenario(BaseModel):
     original_text: str = Field(description="Original biased text")
     alternative_text: str = Field(description="Bias-neutral alternative text")
     bias_type: BiasType
-    explanation: str = Field(
-        description="Explanation of how the alternative reduces bias"
-    )
+    explanation: str = Field(description="Explanation of how the alternative reduces bias")
     impact_assessment: str = Field(description="Assessment of the impact of the change")
 
 
@@ -175,29 +149,17 @@ class BiasAnalysisResponse(BaseModel):
     content_hash: str = Field(description="SHA256 hash of the analyzed content")
 
     # Analysis results
-    overall_bias_score: float = Field(
-        ge=0.0, le=1.0, description="Overall bias score across all detected biases"
-    )
+    overall_bias_score: float = Field(ge=0.0, le=1.0, description="Overall bias score across all detected biases")
     bias_scores: list[BiasScore] = Field(description="Individual bias scores by type")
-    dominant_bias_types: list[BiasType] = Field(
-        description="Most significant bias types detected"
-    )
+    dominant_bias_types: list[BiasType] = Field(description="Most significant bias types detected")
 
     # Additional analysis
-    sentiment_analysis: dict[str, Any] | None = Field(
-        default=None, description="Sentiment analysis results"
-    )
-    keyword_analysis: dict[str, Any] | None = Field(
-        default=None, description="Keyword-based analysis results"
-    )
-    contextual_analysis: dict[str, Any] | None = Field(
-        default=None, description="Contextual analysis results"
-    )
+    sentiment_analysis: dict[str, Any] | None = Field(default=None, description="Sentiment analysis results")
+    keyword_analysis: dict[str, Any] | None = Field(default=None, description="Keyword-based analysis results")
+    contextual_analysis: dict[str, Any] | None = Field(default=None, description="Contextual analysis results")
 
     # Recommendations and insights
-    recommendations: list[Recommendation] = Field(
-        default_factory=list, description="Bias mitigation recommendations"
-    )
+    recommendations: list[Recommendation] = Field(default_factory=list, description="Bias mitigation recommendations")
     counterfactual_scenarios: list[CounterfactualScenario] = Field(
         default_factory=list, description="Counterfactual scenarios"
     )
@@ -221,9 +183,7 @@ class HealthResponse(BaseModel):
     status: str = Field(description="Service status: healthy, degraded, unhealthy")
     version: str = Field(description="Service version")
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-    dependencies: dict[str, str] = Field(
-        default_factory=dict, description="Status of external dependencies"
-    )
+    dependencies: dict[str, str] = Field(default_factory=dict, description="Status of external dependencies")
     metrics: dict[str, Any] = Field(default_factory=dict, description="Service metrics")
 
 

@@ -8,7 +8,6 @@ These tests validate the benchmark components:
 - Result aggregation
 """
 
-import asyncio
 import os
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, MagicMock
@@ -124,11 +123,7 @@ class TestNemotronBenchmark:
         """Test successful request handling."""
         mock_response = MagicMock()
         mock_response.status = 200
-        mock_response.json = AsyncMock(
-            return_value={
-                "choices": [{"message": {"content": "Test response"}}]
-            }
-        )
+        mock_response.json = AsyncMock(return_value={"choices": [{"message": {"content": "Test response"}}]})
 
         # Create proper async context manager
         mock_cm = AsyncMock()
@@ -153,7 +148,7 @@ class TestNemotronBenchmark:
     async def test_make_request_timeout(self, benchmark):
         """Test timeout handling."""
         mock_cm = AsyncMock()
-        mock_cm.__aenter__.side_effect = asyncio.TimeoutError()
+        mock_cm.__aenter__.side_effect = TimeoutError()
         mock_cm.__aexit__.return_value = None
 
         mock_session = MagicMock()

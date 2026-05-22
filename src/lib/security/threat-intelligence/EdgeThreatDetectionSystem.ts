@@ -541,7 +541,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   private normalizeFeatures(features: number[]): number[] {
     const maxValues = [1000, 1000000, 100, 3600, 10, 65535, 100, 1] // Example max values
     return features.map((value, index) => {
-      const max = maxValues[index] || 100
+      const max = maxValues[index] ?? 100
       return Math.min(value / max, 1)
     })
   }
@@ -812,7 +812,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     for (const [modelName, result] of Object.entries(modelResults)) {
       const weight = weights[modelName as keyof typeof weights] || 0
       const confidence = result.confidence || 0
-      const anomalyScore = result.predictions?.[0] || 0
+      const anomalyScore = result.predictions?.[0] ?? 0
 
       weightedConfidence += confidence * weight
       weightedAnomalyScore += anomalyScore * weight
@@ -846,7 +846,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         'ai_bias',
         'privacy_violation',
       ]
-      return threatTypes[maxIndex] || 'unknown'
+      return threatTypes[maxIndex] ?? 'unknown'
     }
 
     // Fallback to input type

@@ -34,22 +34,22 @@ const MILESTONES: Milestone[] = [
 const UpcomingMilestones: FC = memo(() => {
   return (
     <SlideUp>
-      <div className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full rounded-lg border p-6'>
-        <h3 className='mb-4 flex items-center gap-2 text-lg font-semibold'>
+      <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 h-full rounded-lg border p-6">
+        <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold">
           <span>📋</span>
           Upcoming Milestones
         </h3>
-        <div className='space-y-3'>
+        <div className="space-y-3">
           {MILESTONES.map((milestone, index) => (
             <div
               key={index}
-              className='bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3'
+              className="bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3"
             >
               <div>
-                <p className='text-gray-900 dark:text-white font-medium'>
+                <p className="text-gray-900 dark:text-white font-medium">
                   {milestone.title}
                 </p>
-                <p className='text-gray-600 dark:text-gray-400 text-sm'>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">
                   {milestone.date}
                 </p>
               </div>

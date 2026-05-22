@@ -1,6 +1,6 @@
+import { PatternReport } from './pattern-detection'
 // Action Pipeline — Sprint 4, Task 5 (TypeScript mirror)
-import { SessionSummary } from './session-consolidation';
-import { PatternReport } from './pattern-detection';
+import { SessionSummary } from './session-consolidation'
 
 export enum ActionPriority {
   CRITICAL = 'critical',
@@ -10,57 +10,57 @@ export enum ActionPriority {
 }
 
 export interface ActionRecommendation {
-  recommendationId: string;
-  title: string;
-  description: string;
-  priority: ActionPriority;
-  measurable: boolean;
-  relatedTopics: string[];
-  source: string;
+  recommendationId: string
+  title: string
+  description: string
+  priority: ActionPriority
+  measurable: boolean
+  relatedTopics: string[]
+  source: string
 }
 
 export interface TherapistNotification {
-  notificationId: string;
-  severity: string;
-  message: string;
-  sessionId: string;
-  tenantId: string;
-  timestampMs: number;
-  requiresResponse: boolean;
+  notificationId: string
+  severity: string
+  message: string
+  sessionId: string
+  tenantId: string
+  timestampMs: number
+  requiresResponse: boolean
 }
 
 export interface UserReflectionSummary {
-  sessionId: string;
-  summaryText: string;
-  keyInsights: string[];
-  suggestedActions: string[];
-  therapistApproved: boolean;
+  sessionId: string
+  summaryText: string
+  keyInsights: string[]
+  suggestedActions: string[]
+  therapistApproved: boolean
 }
 
 export interface UserFeedback {
-  summaryId: string;
-  usefulnessRating: number;
-  helpfulAspects: string[];
-  unhelpfulAspects: string[];
-  timestampMs: number;
+  summaryId: string
+  usefulnessRating: number
+  helpfulAspects: string[]
+  unhelpfulAspects: string[]
+  timestampMs: number
 }
 
 export interface ActionResult {
-  recommendations: ActionRecommendation[];
-  notifications: TherapistNotification[];
-  userSummary: UserReflectionSummary;
-  elapsedMs: number;
+  recommendations: ActionRecommendation[]
+  notifications: TherapistNotification[]
+  userSummary: UserReflectionSummary
+  elapsedMs: number
 }
 
 export class ActionPipeline {
-  private notificationThreshold: number;
-  private minConfidence: number;
-  private feedbackStore: Map<string, UserFeedback> = new Map();
-  private counter = 0;
+  private readonly notificationThreshold: number
+  private readonly minConfidence: number
+  private readonly feedbackStore: Map<string, UserFeedback> = new Map()
+  private counter = 0
 
   constructor(notificationThreshold = 0.8, minConfidence = 0.6) {
-    this.notificationThreshold = notificationThreshold;
-    this.minConfidence = minConfidence;
+    this.notificationThreshold = notificationThreshold
+    this.minConfidence = minConfidence
   }
 
   execute(
@@ -70,35 +70,34 @@ export class ActionPipeline {
     const recommendations = this.generateRecommendations(
       sessionSummary,
       patternReport,
-    );
-    const notifications = this.generateNotifications(sessionSummary);
+    )
+    const notifications = this.generateNotifications(sessionSummary)
     const userSummary = this.generateUserSummary(
       sessionSummary,
       recommendations,
-    );
+    )
 
     return {
       recommendations,
       notifications,
       userSummary,
       elapsedMs: 0,
-    };
+    }
   }
 
   private generateRecommendations(
     summary: SessionSummary,
     patternReport?: PatternReport,
   ): ActionRecommendation[] {
-    const recommendations: ActionRecommendation[] = [];
+    const recommendations: ActionRecommendation[] = []
 
     for (const topic of summary.unresolvedTopics) {
-      this.counter++;
-      const priority =
-        topic.includes('crisis')
-          ? ActionPriority.CRITICAL
-          : topic.includes('high_arousal')
-            ? ActionPriority.HIGH
-            : ActionPriority.MEDIUM;
+      this.counter++
+      const priority = topic.includes('crisis')
+        ? ActionPriority.CRITICAL
+        : topic.includes('high_arousal')
+          ? ActionPriority.HIGH
+          : ActionPriority.MEDIUM
 
       recommendations.push({
         recommendationId: `rec_${this.counter}`,
@@ -108,13 +107,13 @@ export class ActionPipeline {
         measurable: true,
         relatedTopics: [topic],
         source: 'session_consolidation',
-      });
+      })
     }
 
     if (patternReport) {
       for (const trend of patternReport.progressTrends) {
         if (trend.direction === 'declining') {
-          this.counter++;
+          this.counter++
           recommendations.push({
             recommendationId: `rec_${this.counter}`,
             title: `Address declining trend: ${trend.metric}`,
@@ -123,13 +122,13 @@ export class ActionPipeline {
             measurable: true,
             relatedTopics: [trend.metric],
             source: 'pattern_detection',
-          });
+          })
         }
       }
 
       for (const trigger of patternReport.triggerPatterns) {
         if (trigger.confidence >= this.notificationThreshold) {
-          this.counter++;
+          this.counter++
           recommendations.push({
             recommendationId: `rec_${this.counter}`,
             title: `Monitor trigger: ${trigger.trigger}`,
@@ -138,13 +137,13 @@ export class ActionPipeline {
             measurable: true,
             relatedTopics: [trigger.trigger],
             source: 'pattern_detection',
-          });
+          })
         }
       }
     }
 
     if (summary.emotionalArc.trend === 'declining') {
-      this.counter++;
+      this.counter++
       recommendations.push({
         recommendationId: `rec_${this.counter}`,
         title: 'Address declining emotional trajectory',
@@ -153,22 +152,22 @@ export class ActionPipeline {
         measurable: true,
         relatedTopics: ['emotional_trajectory'],
         source: 'emotional_arc',
-      });
+      })
     }
 
-    return recommendations;
+    return recommendations
   }
 
   private generateNotifications(
     summary: SessionSummary,
   ): TherapistNotification[] {
-    const notifications: TherapistNotification[] = [];
+    const notifications: TherapistNotification[] = []
 
     if (
       summary.emotionalArc.trend === 'declining' &&
       summary.emotionalArc.endValence < -0.3
     ) {
-      this.counter++;
+      this.counter++
       notifications.push({
         notificationId: `notif_${this.counter}`,
         severity: 'high',
@@ -177,14 +176,14 @@ export class ActionPipeline {
         tenantId: summary.tenantId,
         timestampMs: Date.now(),
         requiresResponse: true,
-      });
+      })
     }
 
     const crisisTopics = summary.unresolvedTopics.filter((t) =>
       t.includes('crisis'),
-    );
+    )
     if (crisisTopics.length > 0) {
-      this.counter++;
+      this.counter++
       notifications.push({
         notificationId: `notif_${this.counter}`,
         severity: 'critical',
@@ -193,24 +192,26 @@ export class ActionPipeline {
         tenantId: summary.tenantId,
         timestampMs: Date.now(),
         requiresResponse: true,
-      });
+      })
     }
 
-    return notifications;
+    return notifications
   }
 
   private generateUserSummary(
     summary: SessionSummary,
     recommendations: ActionRecommendation[],
   ): UserReflectionSummary {
-    const keyInsights: string[] = summary.themes.slice(0, 3).map((t) => `Theme: ${t}`);
+    const keyInsights: string[] = summary.themes
+      .slice(0, 3)
+      .map((t) => `Theme: ${t}`)
     if (summary.emotionalArc.trend !== 'stable') {
-      keyInsights.push(`Emotional trend: ${summary.emotionalArc.trend}`);
+      keyInsights.push(`Emotional trend: ${summary.emotionalArc.trend}`)
     }
 
     const suggestedActions = recommendations
       .filter((r) => r.priority !== ActionPriority.LOW)
-      .map((r) => r.title);
+      .map((r) => r.title)
 
     return {
       sessionId: summary.sessionId,
@@ -218,18 +219,18 @@ export class ActionPipeline {
       keyInsights,
       suggestedActions,
       therapistApproved: false,
-    };
+    }
   }
 
   recordFeedback(feedback: UserFeedback): void {
-    this.feedbackStore.set(feedback.summaryId, feedback);
+    this.feedbackStore.set(feedback.summaryId, feedback)
   }
 
   getFeedback(summaryId: string): UserFeedback | undefined {
-    return this.feedbackStore.get(summaryId);
+    return this.feedbackStore.get(summaryId)
   }
 
   get feedbackCount(): number {
-    return this.feedbackStore.size;
+    return this.feedbackStore.size
   }
 }

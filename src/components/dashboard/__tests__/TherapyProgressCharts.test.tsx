@@ -14,7 +14,7 @@ vi.mock('recharts', () => {
   }: {
     children?: React.ReactNode
   }) => (
-    <div data-testid='mock-chart' {...props}>
+    <div data-testid="mock-chart" {...props}>
       {children}
     </div>
   )
@@ -27,22 +27,22 @@ vi.mock('recharts', () => {
     RadarChart: MockChart,
     ScatterChart: MockChart,
     ComposedChart: MockChart,
-    Line: () => <div data-testid='mock-line' />,
-    Bar: () => <div data-testid='mock-bar' />,
-    Area: () => <div data-testid='mock-area' />,
-    Pie: () => <div data-testid='mock-pie' />,
-    Radar: () => <div data-testid='mock-radar' />,
-    Scatter: () => <div data-testid='mock-scatter' />,
-    XAxis: () => <div data-testid='mock-xaxis' />,
-    YAxis: () => <div data-testid='mock-yaxis' />,
-    ZAxis: () => <div data-testid='mock-zaxis' />,
-    CartesianGrid: () => <div data-testid='mock-grid' />,
-    Tooltip: () => <div data-testid='mock-tooltip' />,
-    Legend: () => <div data-testid='mock-legend' />,
-    Cell: () => <div data-testid='mock-cell' />,
-    ReferenceLine: () => <div data-testid='mock-refline' />,
-    ReferenceArea: () => <div data-testid='mock-refarea' />,
-    LabelList: () => <div data-testid='mock-labellist' />,
+    Line: () => <div data-testid="mock-line" />,
+    Bar: () => <div data-testid="mock-bar" />,
+    Area: () => <div data-testid="mock-area" />,
+    Pie: () => <div data-testid="mock-pie" />,
+    Radar: () => <div data-testid="mock-radar" />,
+    Scatter: () => <div data-testid="mock-scatter" />,
+    XAxis: () => <div data-testid="mock-xaxis" />,
+    YAxis: () => <div data-testid="mock-yaxis" />,
+    ZAxis: () => <div data-testid="mock-zaxis" />,
+    CartesianGrid: () => <div data-testid="mock-grid" />,
+    Tooltip: () => <div data-testid="mock-tooltip" />,
+    Legend: () => <div data-testid="mock-legend" />,
+    Cell: () => <div data-testid="mock-cell" />,
+    ReferenceLine: () => <div data-testid="mock-refline" />,
+    ReferenceArea: () => <div data-testid="mock-refarea" />,
+    LabelList: () => <div data-testid="mock-labellist" />,
   }
 })
 

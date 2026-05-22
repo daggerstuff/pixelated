@@ -32,11 +32,12 @@ type MockWebSocket = WebSocket & {
   readyState: number
 }
 
-const createMockWebSocket = (): MockWebSocket => ({
-  send: vi.fn(),
-  on: vi.fn(),
-  readyState: 1,
-}) as MockWebSocket
+const createMockWebSocket = (): MockWebSocket =>
+  ({
+    send: vi.fn(),
+    on: vi.fn(),
+    readyState: 1,
+  }) as MockWebSocket
 
 // Helper function to type-check mock calls
 const findMockCall = (calls: unknown[], type: string): MockCall | undefined => {
@@ -100,7 +101,6 @@ describe('therapyChatWebSocketServer', () => {
 
     // Store reference to internal clients map (optional, if needed for assertions)
     mockClients = (wss as unknown).clients
-
   })
 
   afterEach(() => {
@@ -144,7 +144,7 @@ describe('therapyChatWebSocketServer', () => {
         sessionId: '123',
       }
 
-       messageHandler(JSON.stringify(chatMessage))
+      messageHandler(JSON.stringify(chatMessage))
       expect(mockWebSocket.send).toHaveBeenCalled()
     })
 
@@ -174,7 +174,7 @@ describe('therapyChatWebSocketServer', () => {
         mockProcessedData,
       )
 
-       messageHandler(JSON.stringify(encryptedMessage))
+      messageHandler(JSON.stringify(encryptedMessage))
 
       expect(mockedFHEService.initialize).toHaveBeenCalled()
       expect(mockedFHEService.processEncrypted).toHaveBeenCalledWith(
@@ -203,7 +203,7 @@ describe('therapyChatWebSocketServer', () => {
         sessionId: '123',
       }
 
-       messageHandler(JSON.stringify(statusMessage))
+      messageHandler(JSON.stringify(statusMessage))
       expect(mockWebSocket.send).toHaveBeenCalled()
     })
 
@@ -238,7 +238,7 @@ describe('therapyChatWebSocketServer', () => {
         throw new Error('Message handler not found')
       }
 
-       messageHandler('invalid json')
+      messageHandler('invalid json')
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Failed to process message'),
       )
@@ -304,7 +304,7 @@ describe('therapyChatWebSocketServer', () => {
         encrypted: true,
       }
 
-       messageHandler(JSON.stringify(encryptedMessage))
+      messageHandler(JSON.stringify(encryptedMessage))
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Encryption error'),
       )
@@ -328,7 +328,7 @@ describe('therapyChatWebSocketServer', () => {
         data: { content: 'test' },
       }
 
-       messageHandler(JSON.stringify(message))
+      messageHandler(JSON.stringify(message))
       expect(mockWebSocket.send).toHaveBeenCalledWith(
         expect.stringContaining('Session ID required'),
       )

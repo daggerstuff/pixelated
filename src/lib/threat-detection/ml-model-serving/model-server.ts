@@ -264,7 +264,7 @@ export class ModelServingServer extends EventEmitter {
     try {
       // Get individual predictions
       const individualPredictions = await Promise.all(
-        modelIds.map( async (modelId) => this.predict(modelId, input)),
+        modelIds.map(async (modelId) => this.predict(modelId, input)),
       )
 
       // Aggregate predictions
@@ -377,7 +377,9 @@ export class ModelServingServer extends EventEmitter {
         return this.zScoreNormalize(data, config?.parameters)
       case 'robust':
         return this.robustNormalize(data, config?.parameters)
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         return data
     }
@@ -456,7 +458,7 @@ export class ModelServingServer extends EventEmitter {
         (sum: number[], pred: ModelPrediction, index: number) => {
           const w = weights[index]
           ;(pred.output as number[]).forEach((val: number, i: number) => {
-            sum[i] = (sum[i] || 0) + val * w
+            sum[i] = (sum[i] ?? 0) + val * w
           })
           return sum
         },

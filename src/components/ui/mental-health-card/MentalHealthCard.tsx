@@ -31,35 +31,35 @@ export const MentalHealthCard: React.FC<MentalHealthCardProps> = ({
   glowColor = 'blue',
 }) => {
   return (
-    <GlowCard glowColor={glowColor} className='w-full max-w-md'>
-      <div className='relative z-10 flex h-full flex-col p-6'>
-        <div className='mb-4 flex items-start justify-between'>
+    <GlowCard glowColor={glowColor} className="w-full max-w-md">
+      <div className="relative z-10 flex h-full flex-col p-6">
+        <div className="mb-4 flex items-start justify-between">
           {icon && (
-            <div className='bg-white/5 border-white/10 rounded-xl border p-3 backdrop-blur-sm'>
+            <div className="bg-white/5 border-white/10 rounded-xl border p-3 backdrop-blur-sm">
               {icon}
             </div>
           )}
           <Badge
-            variant='outline'
+            variant="outline"
             className={`${statusColors[status]} text-xs font-medium uppercase tracking-wider backdrop-blur-sm`}
           >
             {status}
           </Badge>
         </div>
 
-        <div className='flex-1 space-y-3'>
-          <h3 className='text-white text-2xl font-semibold leading-tight tracking-tight'>
+        <div className="flex-1 space-y-3">
+          <h3 className="text-white text-2xl font-semibold leading-tight tracking-tight">
             {title}
           </h3>
-          <p className='text-gray-400 text-sm leading-relaxed'>{description}</p>
+          <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
         </div>
 
-        <div className='border-white/10 mt-6 border-t pt-4'>
-          <div className='flex items-center justify-between'>
-            <span className='text-gray-500 text-xs font-medium uppercase tracking-wider'>
+        <div className="border-white/10 mt-6 border-t pt-4">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-500 text-xs font-medium uppercase tracking-wider">
               {metric}
             </span>
-            <span className='text-white text-2xl font-bold tabular-nums'>
+            <span className="text-white text-2xl font-bold tabular-nums">
               {metricValue}
             </span>
           </div>

@@ -51,7 +51,7 @@ class IndexedDBRequestQueue {
 
     if (this.options.enablePersistence) {
       this.initDB()
-        .then( async () => this.loadFromStorage())
+        .then(async () => this.loadFromStorage())
         .catch((err) => {
           console.warn('Failed to initialize IndexedDB for request queue:', err)
           // Continue with empty queue

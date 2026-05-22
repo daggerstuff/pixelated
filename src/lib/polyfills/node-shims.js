@@ -203,17 +203,17 @@ export const path = {
 
 // File system polyfill
 export const fs = {
-  readFile:  async () => Promise.resolve(''),
+  readFile: async () => Promise.resolve(''),
   readFileSync: () => '',
-  writeFile:  async () => Promise.resolve(),
+  writeFile: async () => Promise.resolve(),
   writeFileSync: () => {},
   existsSync: () => false,
   statSync: () => ({ isDirectory: () => false, isFile: () => false }),
-  stat:  async () =>
+  stat: async () =>
     Promise.resolve({ isDirectory: () => false, isFile: () => false }),
-  mkdir:  async () => Promise.resolve(),
+  mkdir: async () => Promise.resolve(),
   mkdirSync: () => {},
-  readdir:  async () => Promise.resolve([]),
+  readdir: async () => Promise.resolve([]),
   readdirSync: () => [],
 }
 
@@ -221,7 +221,7 @@ export const fs = {
 export const util = {
   promisify:
     (fn) =>
-     async (...args) =>
+    async (...args) =>
       Promise.resolve(fn(...args)),
   inspect: (obj) => JSON.stringify(obj),
   format: (f, ...args) => f.replace(/%[sdj%]/g, (_x) => args.shift()),

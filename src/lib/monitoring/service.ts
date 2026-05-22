@@ -17,9 +17,9 @@ interface ExtendedPerformance extends Performance {
 function formatError(error: unknown): Record<string, unknown> {
   if (error instanceof Error) {
     return {
-      name: (error)?.name,
+      name: error?.name,
       message: String(error),
-      stack: (error)?.stack,
+      stack: error?.stack,
     }
   }
   return { unknownError: error }

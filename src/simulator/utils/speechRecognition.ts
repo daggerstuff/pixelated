@@ -81,10 +81,8 @@ export function createSpeechRecognition(
 
   // Apply configuration
   recognition.lang = config.language ?? 'en-US'
-  recognition.continuous =
-    config.continuous ?? true
-  recognition.interimResults =
-    config.interimResults ?? true
+  recognition.continuous = config.continuous ?? true
+  recognition.interimResults = config.interimResults ?? true
   recognition.maxAlternatives = config.maxAlternatives ?? 1
 
   // Add grammar list if specified and supported
@@ -227,7 +225,7 @@ export function getKeywordPatterns(domain: string): RegExp[] {
     ],
   }
 
-  return patterns[domain] || patterns['general'] || []
+  return (patterns[domain] ?? patterns['general']) || []
 }
 
 /**
@@ -390,7 +388,7 @@ export function getTherapeuticPrompts(
       ],
     }
 
-    const domainPrompts = generalPrompts[domain] || generalPrompts.general
+    const domainPrompts = generalPrompts[domain] ?? generalPrompts.general
     if (domainPrompts) {
       const selectedPrompt =
         domainPrompts[Math.floor(Math.random() * domainPrompts.length)]

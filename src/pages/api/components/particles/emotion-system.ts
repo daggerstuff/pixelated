@@ -293,8 +293,8 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
   let intensityValues: number[] = []
 
   sessionEmotions.forEach((emotion) => {
-    const emotionName = (emotion.primaryEmotion ?? emotion.emotion) ?? 'neutral'
-    const intensity = (emotion.confidence ?? emotion.intensity) ?? 0.5
+    const emotionName = emotion.primaryEmotion ?? emotion.emotion ?? 'neutral'
+    const intensity = emotion.confidence ?? emotion.intensity ?? 0.5
 
     const current = emotionCounts.get(emotionName) ?? {
       count: 0,
@@ -315,7 +315,7 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
 
   const emotionMix: Record<string, number> = {}
   emotionCounts.forEach((stats, emotion) => {
-    const percentage = (stats.count) / sessionEmotions.length
+    const percentage = stats.count / sessionEmotions.length
     emotionMix[emotion] = percentage
 
     if (stats.count > maxCount) {
@@ -433,9 +433,7 @@ function generateEmotionParticles(
     const rand = Math.random()
     let cumulative = 0
 
-    for (const [emo, percentage] of Object.entries(
-      emotionProfile.emotionMix,
-    ) as [string, number][]) {
+    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix)) {
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

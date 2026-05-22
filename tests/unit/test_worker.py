@@ -29,6 +29,7 @@ def worker_module(request):
 
     return module
 
+
 def test_log_event(worker_module, tmp_path):
     """
     Verifies that log_event correctly appends a JSON entry to the log file.
@@ -55,6 +56,7 @@ def test_log_event(worker_module, tmp_path):
             datetime.fromisoformat(data["timestamp"])
         except ValueError:
             pytest.fail("Timestamp is not in valid ISO format")
+
 
 def test_log_event_multiple_entries(worker_module, tmp_path):
     """Verifies that multiple calls to log_event append to the same file."""

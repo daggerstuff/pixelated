@@ -58,8 +58,7 @@ def max_consecutive_word_repeat(words: list[str]) -> int:
     for idx in range(1, len(words)):
         if words[idx] == words[idx - 1]:
             current += 1
-            if current > best:
-                best = current
+            best = max(best, current)
         else:
             current = 1
 

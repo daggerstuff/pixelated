@@ -9,11 +9,11 @@ from typing import Any
 
 import redis.asyncio as redis
 import structlog
-from redis.asyncio import ConnectionError as RedisConnectionError
 from redis.asyncio import (
+    ConnectionError as RedisConnectionError,
     RedisError,
+    TimeoutError as RedisTimeoutError,
 )
-from redis.asyncio import TimeoutError as RedisTimeoutError
 
 from bias_detection.config import settings
 
@@ -81,11 +81,7 @@ class CacheService:
 
     async def get(self, key: str) -> Any | None:
         """Get value from cache"""
-        if (
-            not self.is_connected
-            or not settings.enable_caching
-            or self.redis_client is None
-        ):
+        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
             return None
 
         try:
@@ -103,15 +99,9 @@ class CacheService:
             logger.warning(f"Redis get error for key {key}: {e!s}")
             return None
 
-    async def set(
-        self, key: str, value: Any, ttl: int | None = None, serialize: bool = True
-    ) -> bool:
+    async def set(self, key: str, value: Any, ttl: int | None = None, serialize: bool = True) -> bool:
         """Set value in cache"""
-        if (
-            not self.is_connected
-            or not settings.enable_caching
-            or self.redis_client is None
-        ):
+        if not self.is_connected or not settings.enable_caching or self.redis_client is None:
             return False
 
         try:
@@ -156,9 +146,7 @@ class CacheService:
             logger.warning(f"Redis exists error for key {key}: {e!s}")
             return False
 
-    async def cache_analysis_result(
-        self, content_hash: str, result: dict[str, Any], ttl: int | None = None
-    ) -> bool:
+    async def cache_analysis_result(self, content_hash: str, result: dict[str, Any], ttl: int | None = None) -> bool:
         """Cache bias analysis result"""
         key = f"bias:analysis:{content_hash}"
         ttl = ttl or settings.cache_ttl_seconds
@@ -183,16 +171,12 @@ class CacheService:
 
         return await self.set(key, prediction, ttl)
 
-    async def get_model_prediction(
-        self, model_name: str, text_hash: str
-    ) -> dict[str, Any] | None:
+    async def get_model_prediction(self, model_name: str, text_hash: str) -> dict[str, Any] | None:
         """Get cached model prediction"""
         key = f"model:{model_name}:prediction:{text_hash}"
         return await self.get(key)
 
-    async def cache_user_session(
-        self, user_id: str, session_data: dict[str, Any], ttl: int | None = None
-    ) -> bool:
+    async def cache_user_session(self, user_id: str, session_data: dict[str, Any], ttl: int | None = None) -> bool:
         """Cache user session data"""
         key = f"user:session:{user_id}"
         ttl = ttl or 3600  # 1 hour default for sessions
@@ -204,9 +188,7 @@ class CacheService:
         key = f"user:session:{user_id}"
         return await self.get(key)
 
-    async def increment_rate_limit_counter(
-        self, identifier: str, window_seconds: int = 60
-    ) -> int:
+    async def increment_rate_limit_counter(self, identifier: str, window_seconds: int = 60) -> int:
         """Increment rate limit counter"""
         if not self.is_connected or self.redis_client is None:
             return 0
@@ -239,9 +221,7 @@ class CacheService:
             logger.warning(f"Redis rate limit get error: {e!s}")
             return 0
 
-    async def cache_dashboard_metrics(
-        self, metrics: dict[str, Any], ttl: int | None = None
-    ) -> bool:
+    async def cache_dashboard_metrics(self, metrics: dict[str, Any], ttl: int | None = None) -> bool:
         """Cache dashboard metrics"""
         key = "dashboard:metrics"
         ttl = ttl or 300  # 5 minutes default for metrics
@@ -253,9 +233,7 @@ class CacheService:
         key = "dashboard:metrics"
         return await self.get(key)
 
-    async def cache_model_info(
-        self, model_name: str, model_info: dict[str, Any], ttl: int | None = None
-    ) -> bool:
+    async def cache_model_info(self, model_name: str, model_info: dict[str, Any], ttl: int | None = None) -> bool:
         """Cache model information"""
         key = f"model:info:{model_name}"
         ttl = ttl or 3600  # 1 hour default for model info
@@ -278,9 +256,7 @@ class CacheService:
             cursor = 0
 
             while True:
-                cursor, batch_keys = await self.redis_client.scan(
-                    cursor, match=pattern, count=100
-                )
+                cursor, batch_keys = await self.redis_client.scan(cursor, match=pattern, count=100)
                 keys.extend(batch_keys)
 
                 if cursor == 0:

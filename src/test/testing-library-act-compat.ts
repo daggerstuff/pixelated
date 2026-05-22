@@ -21,7 +21,7 @@ function withGlobalActEnvironment(
     callback: () => void | Promise<void>,
   ) => Promise<void> | void,
 ) {
-  return  async (callback: () => void | Promise<void>) => {
+  return async (callback: () => void | Promise<void>) => {
     const previousActEnvironment = getIsReactActEnvironment()
     setReactActEnvironment(true)
     try {

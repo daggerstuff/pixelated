@@ -16,10 +16,13 @@ const rateLimiter = createEnhancedRateLimiter(30, 60 * 1000) // 30 requests per 
 
 // Helper function to get client IP
 function getClientIP(request: Request): string {
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  const real = request.headers.get('x-real-ip');
-  const cf = request.headers.get('cf-connecting-ip');
-  return forwarded ?? real ?? cf ?? 'unknown';
+  const forwarded = request.headers
+    .get('x-forwarded-for')
+    ?.split(',')[0]
+    ?.trim()
+  const real = request.headers.get('x-real-ip')
+  const cf = request.headers.get('cf-connecting-ip')
+  return forwarded ?? real ?? cf ?? 'unknown'
 }
 
 export const GET: APIRoute = async ({ request, cookies }) => {

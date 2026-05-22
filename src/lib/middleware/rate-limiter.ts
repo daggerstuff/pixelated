@@ -17,8 +17,8 @@ export async function rateLimiter(
 ): Promise<Response | undefined> {
   // Get client IP from headers
   const ip =
-    (request.headers.get('x-forwarded-for') ??
-    request.headers.get('x-real-ip')) ??
+    request.headers.get('x-forwarded-for') ??
+    request.headers.get('x-real-ip') ??
     'unknown'
 
   // Use the first IP if x-forwarded-for returns a comma-separated list
