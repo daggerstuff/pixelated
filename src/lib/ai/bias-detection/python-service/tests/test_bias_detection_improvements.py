@@ -16,6 +16,7 @@ from unittest.mock import AsyncMock, patch
 import numpy as np
 import pandas as pd
 import pytest
+from fastapi.testclient import TestClient
 
 # Import the service and related classes
 from bias_detection.app import app
@@ -31,7 +32,6 @@ from bias_utils import (
     create_synthetic_dataset,
     create_test_session_data,
 )
-from fastapi.testclient import TestClient
 from placeholder_adapters import PlaceholderAdapters
 
 # Create instance for testing
@@ -45,18 +45,24 @@ class TestAnalysisAdapters(unittest.TestCase):
         """Test Fairlearn-based predictions fallback behavior."""
         # Create test data
         y_true = np.array([0, 1, 0, 1, 1, 0])
-        sensitive_features_df = pd.DataFrame({"gender": [0, 1, 0, 1, 0, 1], "age": [1, 0, 1, 0, 1, 0]})
+        sensitive_features_df = pd.DataFrame(
+            {"gender": [0, 1, 0, 1, 0, 1], "age": [1, 0, 1, 0, 1, 0]}
+        )
         sensitive_features = sensitive_features_df.to_numpy()
 
         # Test deterministic predictions
-        predictions = analysis_adapters.fairlearn_placeholder_predictions(y_true, sensitive_features)
+        predictions = analysis_adapters.fairlearn_placeholder_predictions(
+            y_true, sensitive_features
+        )
 
         # Should return predictions of same length as y_true
         assert len(predictions) == len(y_true)
         # Should be binary predictions
         assert all(pred in [0, 1] for pred in predictions)
         # Should be deterministic (same input should produce same output)
-        predictions2 = analysis_adapters.fairlearn_placeholder_predictions(y_true, sensitive_features)
+        predictions2 = analysis_adapters.fairlearn_placeholder_predictions(
+            y_true, sensitive_features
+        )
         assert np.array_equal(predictions, predictions2)
 
     def test_interpretability_analysis_output_shape(self):
@@ -171,7 +177,9 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         session_data = create_test_session_data()
 
         # Mock the audit logger to avoid file operations
-        with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
+        with patch.object(
+            self.service.audit_logger, "log_event", new_callable=AsyncMock
+        ):
             # Test that Fairlearn analysis uses real implementation
             result = asyncio.run(self.service._run_fairlearn_analysis(session_data))
 
@@ -188,9 +196,13 @@ class TestBiasDetectionEnhancements(unittest.TestCase):
         session_data = create_test_session_data()
 
         # Mock the audit logger to avoid file operations
-        with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
+        with patch.object(
+            self.service.audit_logger, "log_event", new_callable=AsyncMock
+        ):
             # Test that interpretability analysis uses real implementation
-            result = asyncio.run(self.service._run_interpretability_analysis(session_data))
+            result = asyncio.run(
+                self.service._run_interpretability_analysis(session_data)
+            )
 
             # Should return structured result
             self._assert_bias_score_valid(result)
@@ -348,9 +360,13 @@ class TestErrorHandlingAndLogging(unittest.TestCase):
         session_data = create_minimal_test_session_data()
 
         # Mock the audit logger to avoid file operations
-        with patch.object(self.service.audit_logger, "log_event", new_callable=AsyncMock):
+        with patch.object(
+            self.service.audit_logger, "log_event", new_callable=AsyncMock
+        ):
             # Should handle empty session data gracefully
-            result = asyncio.run(self.service.analyze_session(session_data, "test_user"))
+            result = asyncio.run(
+                self.service.analyze_session(session_data, "test_user")
+            )
 
             # Should return structured result even with minimal data
             assert "session_id" in result

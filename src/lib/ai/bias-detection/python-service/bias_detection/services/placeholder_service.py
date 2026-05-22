@@ -11,10 +11,14 @@ class PlaceholderService:
     """Centralized placeholder service for testing and fallback."""
 
     @staticmethod
-    def fairlearn_placeholder_predictions(y_true: np.ndarray, sensitive_features: np.ndarray) -> np.ndarray:
+    def fairlearn_placeholder_predictions(
+        y_true: np.ndarray, sensitive_features: np.ndarray
+    ) -> np.ndarray:
         """Deterministic placeholder for Fairlearn predictions."""
         feature_sum = np.sum(sensitive_features) if len(sensitive_features) > 0 else 0
-        return np.array([1 if (i + int(feature_sum)) % 2 == 0 else 0 for i in range(len(y_true))])
+        return np.array(
+            [1 if (i + int(feature_sum)) % 2 == 0 else 0 for i in range(len(y_true))]
+        )
 
     @staticmethod
     def interpretability_placeholder_analysis() -> dict[str, Any]:

@@ -63,7 +63,9 @@ async def get_analysis(
 
     analysis = await db.get_analysis_by_id(analysis_id)
     if not analysis:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Analysis not found"
+        )
 
     # Authorization check: user must own the analysis
     analysis_user_id = analysis.get("user_id")

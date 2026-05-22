@@ -34,7 +34,9 @@ _torch_module: Any | None = None
 
 def _transformer_available() -> bool:
     _load_transformers()
-    return TRANSFORMERS_AVAILABLE and AutoTokenizer is not None and BertModel is not None
+    return (
+        TRANSFORMERS_AVAILABLE and AutoTokenizer is not None and BertModel is not None
+    )
 
 
 def _load_transformers() -> None:
@@ -50,7 +52,11 @@ def _load_transformers() -> None:
     TRANSFORMER_IMPORT_ATTEMPTED = True
 
     try:
-        from transformers import AutoTokenizer, BertModel, TFBertForSequenceClassification
+        from transformers import (
+            AutoTokenizer,
+            BertModel,
+            TFBertForSequenceClassification,
+        )
 
         TRANSFORMERS_AVAILABLE = True
     except Exception:
@@ -154,8 +160,12 @@ class TensorFlowModelService(ModelService):
     def __init__(self, model_path: str | None = None):
         self._tf = _load_tensorflow()
         if self._tf is None:
-            raise ImportError("TensorFlow is not available. Install it with: pip install tensorflow")
-        super().__init__(model_path or settings.tensorflow_model_path, "tensorflow_bias_detector")
+            raise ImportError(
+                "TensorFlow is not available. Install it with: pip install tensorflow"
+            )
+        super().__init__(
+            model_path or settings.tensorflow_model_path, "tensorflow_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
 
@@ -226,7 +236,9 @@ class TensorFlowModelService(ModelService):
             tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
             tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
         else:
-            logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model.")
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
@@ -234,7 +246,9 @@ class TensorFlowModelService(ModelService):
         """Create a basic bias detection model"""
         _load_transformers()
         if TFBertForSequenceClassification is None:
-            raise ImportError("TFBertForSequenceClassification is not available in the installed transformers version.")
+            raise ImportError(
+                "TFBertForSequenceClassification is not available in the installed transformers version."
+            )
         return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
         )
@@ -248,7 +262,9 @@ class TensorFlowModelService(ModelService):
                 self.vocab = {}
                 self.word_index = 1
 
-            def encode_plus(self, text: str, max_length: int = 512, **_kwargs) -> dict[str, Any]:
+            def encode_plus(
+                self, text: str, max_length: int = 512, **_kwargs
+            ) -> dict[str, Any]:
                 words = text.lower().split()
                 tokens = []
                 for word in words:
@@ -328,10 +344,14 @@ class TensorFlowModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: Any, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
-        probs = probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        probs = (
+            probabilities.numpy() if hasattr(probabilities, "numpy") else probabilities
+        )
 
         # Handle different output shapes
         if len(probs.shape) == 2:
@@ -421,7 +441,9 @@ class PyTorchModelService(ModelService):
                 "transformers is not available. Install a working transformers build or "
                 "disable PyTorch-backed inference."
             )
-        super().__init__(model_path or settings.pytorch_model_path, "pytorch_bias_detector")
+        super().__init__(
+            model_path or settings.pytorch_model_path, "pytorch_bias_detector"
+        )
         self.max_length = settings.max_sequence_length
         self.batch_size = settings.batch_size
         torch = self._torch
@@ -504,7 +526,9 @@ class PyTorchModelService(ModelService):
             tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
             tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
         else:
-            logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model.")
+            logger.warning(
+                "AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model."
+            )
 
         logger.info("Pretrained model downloaded and saved")
 
@@ -515,13 +539,17 @@ class PyTorchModelService(ModelService):
         torch = self._torch
         _load_transformers()
         if BertModel is None:
-            raise ImportError("transformers BertModel is not available for PyTorch model creation.")
+            raise ImportError(
+                "transformers BertModel is not available for PyTorch model creation."
+            )
 
         class BiasDetectionModel(torch.nn.Module):
             def __init__(self, num_labels: int = len(BiasType.__members__)):
                 super().__init__()
                 self.bert = BertModel.from_pretrained("bert-base-uncased")
-                self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
+                self.classifier = torch.nn.Linear(
+                    self.bert.config.hidden_size, num_labels
+                )
                 self.dropout = torch.nn.Dropout(0.1)
 
             def forward(self, input_ids, attention_mask):
@@ -587,7 +615,9 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(
+        self, probabilities: torch.Tensor, text: str
+    ) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -698,7 +728,9 @@ class ModelEnsembleService:
                 except Exception as e:
                     logger.debug(f"PyTorch service not available: {e}")
             else:
-                logger.info("PyTorch service skipped because transformers is not available.")
+                logger.info(
+                    "PyTorch service skipped because transformers is not available."
+                )
                 self.pt_service = None
         else:
             self.pt_service = None
@@ -737,7 +769,9 @@ class ModelEnsembleService:
                 result = await service.predict(text)
                 results.append(result)
             except Exception as e:
-                logger.warning(f"Model {service.model_name} failed: {str(e)!s}", error=str(e))
+                logger.warning(
+                    f"Model {service.model_name} failed: {str(e)!s}", error=str(e)
+                )
 
         if not results:
             raise RuntimeError("All models failed to predict")
@@ -772,11 +806,15 @@ class ModelEnsembleService:
         combined_results = []
         for bias_type, results_list in bias_groups.items():
             avg_score = sum(r["score"] for r in results_list) / len(results_list)
-            avg_confidence = sum(r["confidence"] for r in results_list) / len(results_list)
+            avg_confidence = sum(r["confidence"] for r in results_list) / len(
+                results_list
+            )
 
             # Use highest confidence level
             confidence_levels = [r["confidence_level"] for r in results_list]
-            highest_confidence = max(confidence_levels, key=self._confidence_level_value)
+            highest_confidence = max(
+                confidence_levels, key=self._confidence_level_value
+            )
 
             # Combine evidence
             all_evidence = []
