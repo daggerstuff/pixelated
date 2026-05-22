@@ -12,6 +12,42 @@ vi.mock('../../logging/build-safe-logger', () => ({
     debug: vi.fn(),
   }),
 }));
+vi.mock('@/lib/memory/gates/consent-gate', () => ({
+  consentGate: {
+    checkConsent: vi.fn().mockReturnValue({
+      allowed: true,
+      consentTier: 'open' as const,
+      reason: 'Mock consent',
+      expired: false,
+      auditEntry: { timestamp: '', userId: '', action: 'check' as const, memoryId: null, result: 'pass', details: '' },
+    }),
+  },
+}));
+vi.mock('@/lib/memory/gates/pii-redactor', () => ({
+  piiRedactor: {
+    redact: (content: string) => ({
+      wasRedacted: false,
+      piiTypesFound: [],
+      scrubbedText: content,
+    }),
+  },
+}));
+vi.mock('@/lib/memory/gates/crisis-detector', () => ({
+  crisisDetector: {
+    detect: () => ({
+      tier: 'none' as const,
+      crisisFlag: false,
+    }),
+  },
+}));
+vi.mock('@/lib/memory/gates/trauma-filter', () => ({
+  traumaFilter: {
+    filter: () => ({
+      indicators: [],
+      severity: 'none' as const,
+    }),
+  },
+}));
 
 describe('MemorySystem', () => {
   let memorySystem: MemorySystem;

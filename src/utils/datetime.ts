@@ -56,9 +56,12 @@ export function getCurrentFormattedTime() {
  * Check if the current time is in the same month as the previous time
  */
 export function isDiffMonth(currentTime: string, preTime?: string): boolean {
-  return preTime
-    ? new Date(currentTime).getMonth() !== new Date(preTime).getMonth()
-    : false
+  if (!preTime) {
+    return false
+  }
+  const current = new Date(currentTime)
+  const previous = new Date(preTime)
+  return current.getMonth() !== previous.getMonth() || current.getFullYear() !== previous.getFullYear()
 }
 
 export function isValidDate(date: unknown): date is Date {

@@ -44,11 +44,17 @@ class Settings(BaseSettings):
 
     # Model settings
     model_cache_dir: str = Field(default="./models", validation_alias="MODEL_CACHE_DIR")
-    tensorflow_model_path: str = Field(default="./models/bias_detection_tf", validation_alias="TENSORFLOW_MODEL_PATH")
-    pytorch_model_path: str = Field(default="./models/bias_detection_pt", validation_alias="PYTORCH_MODEL_PATH")
+    tensorflow_model_path: str = Field(
+        default="./models/bias_detection_tf", validation_alias="TENSORFLOW_MODEL_PATH"
+    )
+    pytorch_model_path: str = Field(
+        default="./models/bias_detection_pt", validation_alias="PYTORCH_MODEL_PATH"
+    )
 
     # ML settings
-    max_sequence_length: int = Field(default=512, validation_alias="MAX_SEQUENCE_LENGTH")
+    max_sequence_length: int = Field(
+        default=512, validation_alias="MAX_SEQUENCE_LENGTH"
+    )
     batch_size: int = Field(default=32, validation_alias="BATCH_SIZE")
     model_timeout: int = Field(default=30, validation_alias="MODEL_TIMEOUT")
 
@@ -66,7 +72,9 @@ class Settings(BaseSettings):
         validation_alias="CORS_ALLOWED_ORIGINS",
         description="Comma-separated list of allowed CORS origins (required when credentials=True)",
     )
-    rate_limit_per_minute: int = Field(default=60, validation_alias="RATE_LIMIT_PER_MINUTE")
+    rate_limit_per_minute: int = Field(
+        default=60, validation_alias="RATE_LIMIT_PER_MINUTE"
+    )
 
     # Logging settings
     log_level: str = Field(default="INFO", validation_alias="LOG_LEVEL")
@@ -78,8 +86,12 @@ class Settings(BaseSettings):
 
     # Performance settings
     enable_caching: bool = Field(default=True, validation_alias="ENABLE_CACHING")
-    cache_ttl_seconds: int = Field(default=900, validation_alias="CACHE_TTL_SECONDS")  # 15 minutes
-    enable_async_processing: bool = Field(default=True, validation_alias="ENABLE_ASYNC_PROCESSING")
+    cache_ttl_seconds: int = Field(
+        default=900, validation_alias="CACHE_TTL_SECONDS"
+    )  # 15 minutes
+    enable_async_processing: bool = Field(
+        default=True, validation_alias="ENABLE_ASYNC_PROCESSING"
+    )
 
     @field_validator("cors_allowed_origins", mode="before")
     @classmethod

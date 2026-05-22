@@ -27,7 +27,8 @@ from .diagnostic_service import DiagnosticService
 from .fairness_analyzer import FairnessAnalyzer
 from .model_service import ModelEnsembleService
 from .placeholder_service import placeholder_service
-from .security_service import AuditLogger as _ServiceAuditLogger, SecurityManager
+from .security_service import AuditLogger as _ServiceAuditLogger
+from .security_service import SecurityManager
 
 logger = structlog.get_logger(__name__)
 
@@ -35,7 +36,9 @@ logger = structlog.get_logger(__name__)
 class _CompatibilityAuditLogger:
     """Compatibility wrapper that keeps legacy audit logger call signatures."""
 
-    def __init__(self, security_manager: SecurityManager, audit_file: str | None = None):
+    def __init__(
+        self, security_manager: SecurityManager, audit_file: str | None = None
+    ):
         self._legacy = _ServiceAuditLogger(security_manager, audit_file)
 
     @property
@@ -85,7 +88,9 @@ class BiasDetectionService:
             return session_data
         return {
             "session_id": getattr(session_data, "session_id", "unknown"),
-            "participant_demographics": getattr(session_data, "participant_demographics", {}),
+            "participant_demographics": getattr(
+                session_data, "participant_demographics", {}
+            ),
             "training_scenario": getattr(session_data, "training_scenario", {}),
             "content": getattr(session_data, "content", {}),
             "ai_responses": getattr(session_data, "ai_responses", []),
@@ -95,7 +100,9 @@ class BiasDetectionService:
             "timestamp": getattr(session_data, "timestamp", None),
         }
 
-    async def analyze_session(self, session_data: object, user_id: str) -> dict[str, Any]:
+    async def analyze_session(
+        self, session_data: object, user_id: str
+    ) -> dict[str, Any]:
         data = self._coerce_session_data(session_data)
         fairlearn = await self._run_fairlearn_analysis(data)
         interpretability = await self._run_interpretability_analysis(data)
@@ -112,7 +119,11 @@ class BiasDetectionService:
             "engagement_levels": engagement_levels,
             "interaction_patterns": interaction_patterns,
         }
-        layer_scores = [item.get("bias_score", 0.0) for item in layer_results.values() if isinstance(item, dict)]
+        layer_scores = [
+            item.get("bias_score", 0.0)
+            for item in layer_results.values()
+            if isinstance(item, dict)
+        ]
         overall = float(sum(layer_scores) / len(layer_scores)) if layer_scores else 0.0
 
         await self.audit_logger.log_event(
@@ -133,7 +144,9 @@ class BiasDetectionService:
         outcomes = data.get("expected_outcomes", [])
         demographics = data.get("participant_demographics", {})
 
-        y_true = np.array([int(o) if isinstance(o, (int, float, bool)) else 0 for o in outcomes])
+        y_true = np.array(
+            [int(o) if isinstance(o, (int, float, bool)) else 0 for o in outcomes]
+        )
         if not y_true.size:
             y_true = np.array([0, 1, 0, 1, 1, 0])
 
@@ -150,8 +163,12 @@ class BiasDetectionService:
         result["predictions"] = predictions.tolist()
         return result
 
-    async def _run_interpretability_analysis(self, session_data: object) -> dict[str, Any]:
-        return await self.diagnostic_service.run_interpretability_analysis(self._coerce_session_data(session_data))
+    async def _run_interpretability_analysis(
+        self, session_data: object
+    ) -> dict[str, Any]:
+        return await self.diagnostic_service.run_interpretability_analysis(
+            self._coerce_session_data(session_data)
+        )
 
     def _analyze_outcome_fairness(self, session_data: object) -> dict[str, Any]:
         return placeholder_service.outcome_fairness_placeholder()
@@ -173,12 +190,16 @@ class BiasDetectionService:
             # Initialize cache
             cache_initialized = await cache_service.connect()
             if not cache_initialized:
-                logger.warning("Cache service initialization failed, continuing without cache")
+                logger.warning(
+                    "Cache service initialization failed, continuing without cache"
+                )
 
             # Initialize database
             db_initialized = await self.database_service.connect()
             if not db_initialized:
-                logger.warning("Database service initialization failed, continuing without database")
+                logger.warning(
+                    "Database service initialization failed, continuing without database"
+                )
 
             # Load models
             models_loaded = await self.model_service.load_all_models()
@@ -191,7 +212,9 @@ class BiasDetectionService:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to initialize bias detection service: {e!s}", error=str(e))
+            logger.error(
+                f"Failed to initialize bias detection service: {e!s}", error=str(e)
+            )
             return False
 
     async def shutdown(self) -> None:
@@ -211,7 +234,9 @@ class BiasDetectionService:
         except Exception as e:
             logger.error(f"Error during service shutdown: {e!s}", error=str(e))
 
-    async def analyze_bias(self, request: BiasAnalysisRequest, request_id: str) -> BiasAnalysisResponse:
+    async def analyze_bias(
+        self, request: BiasAnalysisRequest, request_id: str
+    ) -> BiasAnalysisResponse:
         """Analyze text for bias"""
         start_time = time.time()
 
@@ -233,7 +258,9 @@ class BiasDetectionService:
                 return cached_result
 
             # Perform analysis
-            analysis_result = await self._perform_analysis(request, request_id, content_hash)
+            analysis_result = await self._perform_analysis(
+                request, request_id, content_hash
+            )
 
             # Cache result
             await self._cache_analysis_result(content_hash, analysis_result)
@@ -254,7 +281,9 @@ class BiasDetectionService:
             return analysis_result
 
         except Exception as e:
-            logger.error(f"Bias analysis failed: {e!s}", request_id=request_id, error=str(e))
+            logger.error(
+                f"Bias analysis failed: {e!s}", request_id=request_id, error=str(e)
+            )
             raise
 
     async def _perform_analysis(
@@ -275,12 +304,16 @@ class BiasDetectionService:
         recommendations = await self._generate_recommendations(bias_scores, request)
 
         # Generate counterfactual scenarios
-        counterfactuals = await self._generate_counterfactuals(request.content, bias_scores)
+        counterfactuals = await self._generate_counterfactuals(
+            request.content, bias_scores
+        )
 
         # Perform additional analyses
         sentiment_analysis = await self._perform_sentiment_analysis(request.content)
         keyword_analysis = await self._perform_keyword_analysis(request.content)
-        contextual_analysis = await self._perform_contextual_analysis(request.content, request.context)
+        contextual_analysis = await self._perform_contextual_analysis(
+            request.content, request.context
+        )
 
         # Determine dominant bias types
         dominant_bias_types = self._get_dominant_bias_types(bias_scores)
@@ -305,7 +338,9 @@ class BiasDetectionService:
             completed_at=datetime.now(timezone.utc),
         )
 
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
+    @retry(
+        stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10)
+    )
     async def _get_model_predictions(self, text: str) -> dict[str, Any]:
         """Get predictions from ML models"""
         try:
@@ -316,7 +351,9 @@ class BiasDetectionService:
             logger.error(f"Model prediction failed: {e!s}", error=str(e))
             raise
 
-    def _process_model_results(self, model_results: dict[str, Any], request: BiasAnalysisRequest) -> list[BiasScore]:
+    def _process_model_results(
+        self, model_results: dict[str, Any], request: BiasAnalysisRequest
+    ) -> list[BiasScore]:
         """Process model results into bias scores"""
         bias_scores = []
 
@@ -388,7 +425,9 @@ class BiasDetectionService:
 
         return recommendations[:5]  # Limit to top 5 recommendations
 
-    def _get_bias_specific_recommendations(self, bias_score: BiasScore) -> list[Recommendation]:
+    def _get_bias_specific_recommendations(
+        self, bias_score: BiasScore
+    ) -> list[Recommendation]:
         """Get recommendations specific to bias type"""
         recommendations = []
 
@@ -420,7 +459,9 @@ class BiasDetectionService:
                     priority="high" if score > 0.7 else "medium",
                     implementation_difficulty="medium",
                     estimated_impact="high",
-                    examples=["Focus on individual qualities rather than group characteristics"],
+                    examples=[
+                        "Focus on individual qualities rather than group characteristics"
+                    ],
                 )
             )
 
@@ -468,7 +509,9 @@ class BiasDetectionService:
 
         return counterfactuals
 
-    def _create_counterfactual(self, content: str, bias_score: BiasScore) -> CounterfactualScenario | None:
+    def _create_counterfactual(
+        self, content: str, bias_score: BiasScore
+    ) -> CounterfactualScenario | None:
         """Create counterfactual scenario for specific bias"""
         # Simplified counterfactual generation
         # In production, this would use more sophisticated NLP techniques
@@ -552,10 +595,14 @@ class BiasDetectionService:
         return {
             "total_words": len(words),
             "unique_words": len(word_freq),
-            "top_keywords": [{"word": word, "frequency": freq} for word, freq in top_keywords],
+            "top_keywords": [
+                {"word": word, "frequency": freq} for word, freq in top_keywords
+            ],
         }
 
-    async def _perform_contextual_analysis(self, text: str, context: str | None) -> dict[str, Any]:
+    async def _perform_contextual_analysis(
+        self, text: str, context: str | None
+    ) -> dict[str, Any]:
         """Perform contextual analysis"""
         analysis = {
             "has_context": bool(context),
@@ -571,7 +618,9 @@ class BiasDetectionService:
             if text_words and context_words:
                 intersection = len(text_words.intersection(context_words))
                 union = len(text_words.union(context_words))
-                analysis["text_context_similarity"] = intersection / union if union > 0 else 0.0
+                analysis["text_context_similarity"] = (
+                    intersection / union if union > 0 else 0.0
+                )
 
         return analysis
 
@@ -579,7 +628,9 @@ class BiasDetectionService:
         """Generate SHA256 hash of content"""
         return hashlib.sha256(content.encode()).hexdigest()
 
-    async def _get_cached_analysis(self, content_hash: str) -> BiasAnalysisResponse | None:
+    async def _get_cached_analysis(
+        self, content_hash: str
+    ) -> BiasAnalysisResponse | None:
         """Get cached analysis result"""
         if not settings.enable_caching:
             return None
@@ -590,7 +641,9 @@ class BiasDetectionService:
 
         return None
 
-    async def _cache_analysis_result(self, content_hash: str, result: BiasAnalysisResponse) -> None:
+    async def _cache_analysis_result(
+        self, content_hash: str, result: BiasAnalysisResponse
+    ) -> None:
         """Cache analysis result"""
         if settings.enable_caching:
             await cache_service.cache_analysis_result(content_hash, result.model_dump())
@@ -642,7 +695,9 @@ class BiasDetectionService:
         """Get model service health status"""
         try:
             ensemble_info = self.model_service.get_ensemble_info()
-            models_loaded = all(model.get("loaded", False) for model in ensemble_info.get("models", []))
+            models_loaded = all(
+                model.get("loaded", False) for model in ensemble_info.get("models", [])
+            )
 
             return {
                 "status": "healthy" if models_loaded else "unhealthy",

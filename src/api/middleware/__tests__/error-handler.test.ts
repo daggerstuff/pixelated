@@ -293,7 +293,9 @@ describe('error-handler middleware', () => {
       const wrappedFn = asyncHandler(failingAsyncFn)
       wrappedFn(req, res, next)
 
-      expect(next).toHaveBeenCalledWith(error)
+      await vi.waitFor(() => {
+        expect(next).toHaveBeenCalledWith(error)
+      })
     })
 
     it('should call next on success if wrapped function returns correctly', async () => {
@@ -304,7 +306,9 @@ describe('error-handler middleware', () => {
       const wrappedFn = asyncHandler(successAsyncFn)
       wrappedFn(req, res, next)
 
-      expect(next).not.toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(next).not.toHaveBeenCalled()
+      })
     })
   })
 })

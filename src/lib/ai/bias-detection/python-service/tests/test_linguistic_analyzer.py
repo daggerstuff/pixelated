@@ -14,7 +14,9 @@ class TestLinguisticAnalyzer(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.mock_nlp = MagicMock()
         self.mock_sentiment = MagicMock()
-        self.analyzer = LinguisticAnalyzer(nlp=self.mock_nlp, sentiment_analyzer=self.mock_sentiment)
+        self.analyzer = LinguisticAnalyzer(
+            nlp=self.mock_nlp, sentiment_analyzer=self.mock_sentiment
+        )
 
     async def test_detect_bias_integration(self):
         """Integration-style test for detect_bias async method"""

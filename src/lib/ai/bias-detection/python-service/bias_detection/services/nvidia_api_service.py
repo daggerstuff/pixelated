@@ -38,7 +38,9 @@ class NvidiaAPIService:
                 # Find NVIDIA provider configuration
                 for provider in config.get("Providers", []):
                     if provider.get("name") == self.provider_name:
-                        self.api_base_url = provider.get("api_base_url", self.api_base_url)
+                        self.api_base_url = provider.get(
+                            "api_base_url", self.api_base_url
+                        )
                         self.api_key = provider.get("api_key")
 
                         # Verify model is available
@@ -50,14 +52,18 @@ class NvidiaAPIService:
                             )
                         break
                 else:
-                    logger.warning(f"Provider {self.provider_name} not found in configuration")
+                    logger.warning(
+                        f"Provider {self.provider_name} not found in configuration"
+                    )
 
             # Fallback to environment variable if not found in config
             if not self.api_key:
                 self.api_key = os.getenv("NVIDIA_API_KEY")
 
             if not self.api_key:
-                raise ValueError("NVIDIA API key not found in configuration or environment")
+                raise ValueError(
+                    "NVIDIA API key not found in configuration or environment"
+                )
 
         except Exception as e:
             logger.error(f"Failed to load NVIDIA API configuration: {e!s}")
@@ -137,7 +143,9 @@ class NvidiaAPIService:
                     model=self.model_name,
                     processing_time_ms=int(processing_time * 1000),
                     prompt_tokens=result.get("usage", {}).get("prompt_tokens", 0),
-                    completion_tokens=result.get("usage", {}).get("completion_tokens", 0),
+                    completion_tokens=result.get("usage", {}).get(
+                        "completion_tokens", 0
+                    ),
                 )
                 return result
 
@@ -150,7 +158,9 @@ class NvidiaAPIService:
             )
             raise
         except httpx.RequestError as e:
-            logger.error("NVIDIA API request error", error=str(e), model=self.model_name)
+            logger.error(
+                "NVIDIA API request error", error=str(e), model=self.model_name
+            )
             raise
         except Exception as e:
             logger.error(
