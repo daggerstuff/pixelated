@@ -731,9 +731,13 @@ def test_jira_project_exists_returns_false_on_request_failure(monkeypatch) -> No
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
+
+    def mock_urlopen(req):
+        raise HTTPError(req.full_url, 404, "Not Found", Message(), None)
+
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge.request.urlopen",
-        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 404, "Not Found", Message(), None)),
+        mock_urlopen,
     )
 
     assert jira_project_exists("MISSING") is False
@@ -745,9 +749,13 @@ def test_jira_project_exists_returns_none_on_transient_failure(monkeypatch) -> N
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
+
+    def mock_urlopen(req):
+        raise HTTPError(req.full_url, 503, "Unavailable", Message(), None)
+
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge.request.urlopen",
-        lambda req: (_ for _ in ()).throw(HTTPError(req.full_url, 503, "Unavailable", Message(), None)),
+        mock_urlopen,
     )
 
     assert jira_project_exists("FLAKY") is None

@@ -45,7 +45,9 @@ async def streaming_example():
 
     service = NvidiaAPIService()
 
-    messages = [{"role": "user", "content": "Write a short poem about artificial intelligence."}]
+    messages = [
+        {"role": "user", "content": "Write a short poem about artificial intelligence."}
+    ]
 
     print("Streaming response from Kimi-k2.5:")
     print("-" * 40)
@@ -100,7 +102,9 @@ async def conversation_example():
         conversation_history.append({"role": "assistant", "content": assistant_message})
 
         # Second user message
-        conversation_history.append({"role": "user", "content": "That's helpful! Can you give me an example?"})
+        conversation_history.append(
+            {"role": "user", "content": "That's helpful! Can you give me an example?"}
+        )
 
         # Second response
         response = await service.chat_completion(conversation_history)

@@ -13,7 +13,9 @@ from .services.analysis_orchestrator import AnalysisOrchestrator
 # Populated in create_app()
 bias_detection_service: BiasDetectionService = BiasDetectionService()
 database_service_instance: DatabaseService = cast(DatabaseService, database_service)
-analysis_orchestrator: AnalysisOrchestrator = AnalysisOrchestrator(bias_detection_service, database_service_instance)
+analysis_orchestrator: AnalysisOrchestrator = AnalysisOrchestrator(
+    bias_detection_service, database_service_instance
+)
 
 
 def get_bias_service() -> BiasDetectionService:
@@ -46,11 +48,15 @@ async def require_authenticated_user(user: dict = Depends(get_current_user)) -> 
     Returns user dict if authenticated.
     """
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required"
+        )
 
     user_id = user.get("user_id")
     if not user_id:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user credentials")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid user credentials"
+        )
 
     return user
 

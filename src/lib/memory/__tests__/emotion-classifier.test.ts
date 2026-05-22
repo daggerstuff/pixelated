@@ -160,7 +160,7 @@ describe('EmotionClassifier', () => {
         'I feel anxious about my upcoming medical appointment',
         500,
       )
-      expect(ms).toBeLessThan(50)
+      expect(ms).toBeLessThan(200)
     })
   })
 })

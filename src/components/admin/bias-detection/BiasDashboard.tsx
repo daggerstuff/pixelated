@@ -1164,9 +1164,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           icon: <AlertTriangle className="mr-1 h-3 w-3" />,
           pulse: false,
         }
-      case 'disconnected': {
-        throw new Error('Not implemented yet: "disconnected" case')
-      }
+      case 'disconnected':
+        return {
+          text: 'Disconnected from live updates',
+          color: 'text-gray-400',
+          icon: <Activity className="mr-1 h-3 w-3" />,
+          pulse: false,
+        }
       default:
         return {
           text: 'Live updates disabled',

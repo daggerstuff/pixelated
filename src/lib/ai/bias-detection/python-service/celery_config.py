@@ -45,7 +45,9 @@ app.conf.update(
     task_routes={
         "bias_detection_service.analyze_session_async": {"queue": "bias_analysis"},
         "bias_detection_service.batch_analyze_sessions": {"queue": "batch_processing"},
-        "bias_detection_service.validate_dataset_quality": {"queue": "quality_validation"},
+        "bias_detection_service.validate_dataset_quality": {
+            "queue": "quality_validation"
+        },
         "bias_detection_service.export_dataset_chunk": {"queue": "export_processing"},
     },
     # Queue definitions

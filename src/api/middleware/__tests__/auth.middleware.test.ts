@@ -55,12 +55,14 @@ describe('Authentication Middleware', () => {
 
       authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled()
-      expect(mockRequest.user).toEqual({
-        sub: 'user123',
-        email: 'test@example.com',
-        roles: ['user'],
-        emailVerified: false,
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+        expect(mockRequest.user).toEqual({
+          sub: 'user123',
+          email: 'test@example.com',
+          roles: ['user'],
+          emailVerified: false,
+        })
       })
     })
 
@@ -72,10 +74,12 @@ describe('Authentication Middleware', () => {
 
       authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(statusSpy).toHaveBeenCalledWith(401)
-      expect(jsonSpy).toHaveBeenCalledWith({
-        error: 'Invalid token',
-        code: 'UNAUTHORIZED',
+      await vi.waitFor(() => {
+        expect(statusSpy).toHaveBeenCalledWith(401)
+        expect(jsonSpy).toHaveBeenCalledWith({
+          error: 'Invalid token',
+          code: 'UNAUTHORIZED',
+        })
       })
     })
 
@@ -84,10 +88,12 @@ describe('Authentication Middleware', () => {
 
       authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(statusSpy).toHaveBeenCalledWith(401)
-      expect(jsonSpy).toHaveBeenCalledWith({
-        error: 'Auth service error',
-        code: 'AUTH_ERROR',
+      await vi.waitFor(() => {
+        expect(statusSpy).toHaveBeenCalledWith(401)
+        expect(jsonSpy).toHaveBeenCalledWith({
+          error: 'Auth service error',
+          code: 'AUTH_ERROR',
+        })
       })
     })
   })

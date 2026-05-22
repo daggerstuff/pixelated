@@ -7,6 +7,10 @@ This Flask service now delegates to the 'bias_detection' package for logic.
 import logging
 import traceback
 
+from dotenv import load_dotenv
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 from bias_detection.compat import (
     AuditLogger,
     BiasDetectionConfig,
@@ -19,9 +23,6 @@ from bias_detection.compat import (
 from bias_detection.config import settings
 from bias_detection.services.analysis_orchestrator import AnalysisOrchestrator
 from bias_detection.services.database_service import DatabaseService
-from dotenv import load_dotenv
-from flask import Flask, jsonify, request
-from flask_cors import CORS
 
 # Logging configuration
 logging.basicConfig(

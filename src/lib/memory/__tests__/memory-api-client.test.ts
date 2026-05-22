@@ -9,7 +9,7 @@ import { MemoryApiClient, MemoryApiError } from '../memory-api-client'
 
 // ─── Mock fetch factory ───────────────────────────────────────────────────────
 
-type MockFetch = jest.Mock<Promise<Response>, [RequestInfo, RequestInit?]>
+type MockFetch = ReturnType<typeof vi.fn<Promise<Response>, [RequestInfo, RequestInit?]>>
 
 function createMockClient(mockFetch: MockFetch) {
   return new MemoryApiClient({
@@ -44,7 +44,7 @@ function mockError(status: number, body: unknown = {}) {
 
 describe('health()', () => {
   it('returns health status', async () => {
-    const mockFetch = jest.fn().mockResolvedValue(
+    const mockFetch = vi.fn().mockResolvedValue(
       mockJsonResponse({
         status: 'ok',
         memory_count: 42,
@@ -91,7 +91,7 @@ describe('create()', () => {
         schemaReferences: [],
       },
     }
-    const mockFetch = jest
+    const mockFetch = vi
       .fn()
       .mockResolvedValue(mockJsonResponse(mockBlock, 201))
     const client = createMockClient(mockFetch)
@@ -114,7 +114,7 @@ describe('create()', () => {
 
 describe('search()', () => {
   it('builds correct query params', async () => {
-    const mockFetch = jest.fn().mockResolvedValue(mockJsonResponse([]))
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse([]))
     const client = createMockClient(mockFetch)
 
     await client.search({
@@ -135,7 +135,7 @@ describe('search()', () => {
   })
 
   it('returns empty array for unknown tenant', async () => {
-    const mockFetch = jest.fn().mockResolvedValue(mockJsonResponse([]))
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse([]))
     const client = createMockClient(mockFetch)
     const result = await client.search({ tenantId: 'unknown' })
     expect(result).toHaveLength(0)
@@ -173,7 +173,7 @@ describe('get()', () => {
         schemaReferences: [],
       },
     }
-    const mockFetch = jest.fn().mockResolvedValue(mockJsonResponse(mockBlock))
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockBlock))
     const client = createMockClient(mockFetch)
 
     const result = await client.get('mem_123', 't1')
@@ -190,7 +190,7 @@ describe('get()', () => {
 
 describe('delete()', () => {
   it('sends DELETE request', async () => {
-    const mockFetch = jest.fn().mockResolvedValue(mockNoContent())
+    const mockFetch = vi.fn().mockResolvedValue(mockNoContent())
     const client = createMockClient(mockFetch)
 
     await client.delete('mem_123', 't1')
@@ -200,7 +200,7 @@ describe('delete()', () => {
   })
 
   it('throws MemoryApiError on 404', async () => {
-    const mockFetch = jest
+    const mockFetch = vi
       .fn()
       .mockResolvedValue(mockError(404, { detail: 'Not found' }))
     const client = createMockClient(mockFetch)
@@ -231,7 +231,7 @@ describe('score()', () => {
         actionability: 0.5,
       },
     }
-    const mockFetch = jest.fn().mockResolvedValue(mockJsonResponse(mockScore))
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockScore))
     const client = createMockClient(mockFetch)
 
     const result = await client.score('mem_123', 't1')
@@ -257,7 +257,7 @@ describe('trajectory()', () => {
         { memoryId: 'm3', valence: 0.4, arousal: 0.8, dominance: 0.4 },
       ],
     }
-    const mockFetch = jest.fn().mockResolvedValue(mockJsonResponse(mockTraj))
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockTraj))
     const client = createMockClient(mockFetch)
 
     const result = await client.trajectory('s1', 't1')
