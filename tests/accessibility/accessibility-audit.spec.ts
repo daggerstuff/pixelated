@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import type { Result, NodeResult } from 'axe-core'
 
 test.describe('Accessibility Audit and Compliance', () => {
   let page: Page
@@ -20,9 +21,9 @@ test.describe('Accessibility Audit and Compliance', () => {
       // Log any violations for debugging
       if (accessibilityScanResults.violations.length > 0) {
         console.log('Accessibility violations found:')
-        accessibilityScanResults.violations.forEach((violation) => {
+        accessibilityScanResults.violations.forEach((violation: Result) => {
           console.log(`- ${violation.id}: ${violation.description}`)
-          violation.nodes.forEach((node) => {
+          violation.nodes.forEach((node: NodeResult) => {
             console.log(`  Target: ${node.target}`)
             console.log(`  HTML: ${node.html}`)
           })

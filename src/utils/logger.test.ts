@@ -35,6 +35,7 @@ describe('logger utilities', () => {
         context: 'TestContext',
         level: LogLevel.INFO,
       })
+      customLogger.setLevel(LogLevel.DEBUG)
       customLogger.info('test message')
       expect(console.info).toHaveBeenCalledWith(
         expect.stringContaining('[TestContext]:'),

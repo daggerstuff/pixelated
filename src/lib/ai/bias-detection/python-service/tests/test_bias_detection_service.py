@@ -12,6 +12,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import jwt
 import pytest
+from fastapi.testclient import TestClient
+
 from bias_detection import deps
 from bias_detection.app import app
 from bias_detection.compat import BiasDetectionConfig, SessionData
@@ -26,7 +28,6 @@ from bias_detection.models import (
 from bias_detection.services.bias_detection_service import BiasDetectionService
 from bias_detection.services.cache_service import cache_service
 from bias_detection.services.security_service import AuditLogger, SecurityManager
-from fastapi.testclient import TestClient
 
 
 class TestBiasDetectionConfig(unittest.TestCase):
@@ -80,7 +81,9 @@ class TestSessionData(unittest.TestCase):
             content={"session_notes": "Test session"},
             ai_responses=[{"content": "How are you feeling?", "response_time": 1.2}],
             expected_outcomes=[{"outcome": "improved_mood"}],
-            transcripts=[{"text": "I feel better today", "timestamp": "2024-01-01T10:00:00Z"}],
+            transcripts=[
+                {"text": "I feel better today", "timestamp": "2024-01-01T10:00:00Z"}
+            ],
             metadata={"version": "1.0"},
         )
 
@@ -152,10 +155,14 @@ class TestAuditLogger(unittest.TestCase):
         self.security_manager = MagicMock()
         self.security_manager.hash_session_id.return_value = "hashed_session_id"
         self.security_manager.encrypt_data.return_value = "encrypted_data"
-        self.audit_logger = AuditLogger(self.security_manager, audit_log_path=tempfile.mktemp(suffix=".log"))
+        self.audit_logger = AuditLogger(
+            self.security_manager, audit_log_path=tempfile.mktemp(suffix=".log")
+        )
 
     def tearDown(self):
-        if self.audit_logger.audit_log_path and os.path.exists(self.audit_logger.audit_log_path):
+        if self.audit_logger.audit_log_path and os.path.exists(
+            self.audit_logger.audit_log_path
+        ):
             os.remove(self.audit_logger.audit_log_path)
 
     def _read_log_line(self) -> dict[str, Any]:
@@ -247,7 +254,9 @@ class TestBiasDetectionService(unittest.TestCase):
     def test_initialize_uses_async_paths(self):
         async def run():
             with (
-                patch.object(cache_service, "connect", new_callable=AsyncMock, return_value=True),
+                patch.object(
+                    cache_service, "connect", new_callable=AsyncMock, return_value=True
+                ),
                 patch.object(
                     self.service.database_service,
                     "connect",
@@ -322,7 +331,11 @@ class TestBiasDetectionService(unittest.TestCase):
                 status = await self.service.get_health_status()
                 assert status["status"] == "unhealthy"
                 assert status["initialized"] is False
-                assert status["model_service"]["status"] in {"healthy", "degraded", "unhealthy"}
+                assert status["model_service"]["status"] in {
+                    "healthy",
+                    "degraded",
+                    "unhealthy",
+                }
 
         asyncio.run(run())
 

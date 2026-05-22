@@ -6,7 +6,13 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 import { GlobalThreatIntelligenceNetworkCore } from '../global/GlobalThreatIntelligenceNetwork'
-import type { RealTimeThreatData } from '../global/types'
+import type {
+  RealTimeThreatData,
+  EdgeDetectionResult,
+  CorrelationData,
+  ThreatValidation,
+} from '../global/types'
+import type { ValidationMetrics } from '../validation/ThreatValidationSystem'
 
 // Mock dependencies
 vi.mock('../../logging/build-safe-logger', () => ({
@@ -28,6 +34,35 @@ vi.mock('../../logging/build-safe-logger', () => ({
 const redisMockState = {
   failPing: false,
 }
+
+vi.mock('@tensorflow/tfjs', () => {
+  const mockModel = {
+    add: vi.fn(),
+    compile: vi.fn(),
+    predict: vi.fn(() => ({
+      dataSync: () => [0.1],
+      dispose: vi.fn(),
+    })),
+  }
+
+  return {
+    sequential: vi.fn(() => mockModel),
+    layers: {
+      dense: vi.fn(),
+      dropout: vi.fn(),
+    },
+    train: {
+      adam: vi.fn(),
+    },
+    tidy: vi.fn((fn: unknown) => {
+      if (typeof fn === 'function') return fn()
+    }),
+    tensor2d: vi.fn(),
+    mean: vi.fn(() => ({ dataSync: () => [0.1] })),
+    abs: vi.fn(),
+    sub: vi.fn(),
+  }
+})
 
 vi.mock('ioredis', () => {
   const createMockRedis = function () {
@@ -55,6 +90,7 @@ vi.mock('ioredis', () => {
   }
 
   return {
+    default: vi.fn(createMockRedis),
     Redis: vi.fn(createMockRedis),
   }
 })
@@ -105,11 +141,17 @@ vi.mock('mongodb', () => {
 const mockEdgeDetectionSystem = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   detectThreat: vi.fn<() => Promise<unknown>>().mockResolvedValue({
-    threatDetected: false,
-    severity: 'low',
+    detectionId: 'det-1',
+    edgeNodeId: 'edge-us-east-1-a',
+    region: 'us-east-1',
+    threatType: 'malware',
+    severity: 0.5,
     confidence: 0.5,
-    details: {},
-  }),
+    indicators: [],
+    aiModel: 'threat-model-v1',
+    processingTime: 50,
+    timestamp: new Date(),
+  } as EdgeDetectionResult),
   getEdgeNodeStatus: vi.fn<() => Promise<unknown>>().mockResolvedValue({
     healthy: true,
     statusMessage: 'ok',
@@ -147,7 +189,7 @@ const mockThreatCorrelationEngine = vi.hoisted(() => ({
     confidence: 0.85,
     analysisMethod: 'unit-test',
     timestamp: new Date(),
-  }),
+  } as CorrelationData),
   correlateThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
   findSimilarThreats: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
   getCorrelationPatterns: vi.fn<() => Promise<any[]>>().mockResolvedValue([]),
@@ -165,7 +207,7 @@ const mockThreatCorrelationEngine = vi.hoisted(() => ({
 }))
 
 vi.mock('../correlation/ThreatCorrelationEngine', () => ({
-  ThreatCorrelationEngine: vi.fn(function () {
+  ThreatCorrelationEngineCore: vi.fn(function () {
     return mockThreatCorrelationEngine
   }),
 }))
@@ -233,7 +275,7 @@ const mockThreatIntelligenceDatabase = vi.hoisted(() => ({
 }))
 
 vi.mock('../database/ThreatIntelligenceDatabase', () => ({
-  ThreatIntelligenceDatabase: vi.fn(function () {
+  ThreatIntelligenceDatabaseCore: vi.fn(function () {
     return mockThreatIntelligenceDatabase
   }),
 }))
@@ -252,7 +294,7 @@ const mockResponseOrchestrator = vi.hoisted(() => ({
 }))
 
 vi.mock('../orchestration/AutomatedThreatResponseOrchestrator', () => ({
-  AutomatedThreatResponseOrchestrator: vi.fn(function () {
+  AutomatedThreatResponseOrchestratorCore: vi.fn(function () {
     return mockResponseOrchestrator
   }),
 }))
@@ -267,7 +309,7 @@ const mockHuntingSystem = vi.hoisted(() => ({
 }))
 
 vi.mock('../hunting/ThreatHuntingSystem', () => ({
-  ThreatHuntingSystem: vi.fn(function () {
+  ThreatHuntingSystemCore: vi.fn(function () {
     return mockHuntingSystem
   }),
 }))
@@ -285,32 +327,47 @@ const mockFeedIntegration = vi.hoisted(() => ({
 }))
 
 vi.mock('../feeds/ExternalThreatFeedIntegration', () => ({
-  ExternalThreatFeedIntegration: vi.fn(function () {
+  ExternalThreatFeedIntegrationCore: vi.fn(function () {
     return mockFeedIntegration
   }),
 }))
 
 const mockValidationSystem = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-  validateThreat: vi.fn<(threat: unknown) => Promise<any>>().mockResolvedValue({
-    validationId: 'validation-1',
-    status: 'validated',
-    accuracy: 0.99,
-    completeness: 0.97,
-    consistency: 0.96,
-    timeliness: 0.98,
-    relevance: 0.99,
-    validator: 'mock',
-    validationDate: new Date(),
-    feedback: [],
+  validateThreat: vi.fn<(threat: unknown) => Promise<any>>().mockImplementation(async (threat: any) => {
+    return {
+      validationId: `validation-${threat.threatId || 'unknown'}`,
+      threatId: threat.threatId || 'unknown',
+      threatType: threat.threatType || 'malware',
+      severity: threat.severity || 'high',
+      confidence: threat.confidence ?? 0.9,
+      status: 'valid',
+      overallScore: 85,
+      isValid: true,
+      results: [
+        {
+          ruleId: 'structure_validation',
+          ruleName: 'Structure Validation',
+          passed: true,
+          score: 100,
+          issues: [],
+          details: {},
+        },
+      ],
+      createdAt: new Date(),
+      completedAt: new Date(),
+    } as ThreatValidation
   }),
   getValidationMetrics: vi.fn<() => Promise<any>>().mockResolvedValue({
-    totalValidated: 1,
-    accuracy: 0.97,
-    completeness: 0.97,
-    consistency: 0.96,
-    averageProcessingTime: 5,
-  }),
+    totalValidations: 1,
+    validThreats: 1,
+    invalidThreats: 0,
+    validationBySeverity: { high: 1 },
+    validationByType: { malware: 1 },
+    averageValidationTime: 5,
+    falsePositives: 0,
+    falseNegatives: 0,
+  } as ValidationMetrics),
   getHealthStatus: vi.fn<() => Promise<any>>().mockResolvedValue({
     healthy: true,
     message: 'healthy',
@@ -320,7 +377,7 @@ const mockValidationSystem = vi.hoisted(() => ({
 }))
 
 vi.mock('../validation/ThreatValidationSystem', () => ({
-  ThreatValidationSystem: vi.fn(function () {
+  ThreatValidationSystemCore: vi.fn(function () {
     return mockValidationSystem
   }),
 }))
