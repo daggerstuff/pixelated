@@ -158,8 +158,7 @@ function setupReducedDataDetection() {
     connection?: { saveData?: boolean }
   }
   const saveData =
-    (connection?.saveData ??
-    document.cookie.includes('save-data=on')) ||
+    (connection?.saveData ?? document.cookie.includes('save-data=on')) ||
     navigator.userAgent.includes('save-data=on')
 
   if (saveData) {

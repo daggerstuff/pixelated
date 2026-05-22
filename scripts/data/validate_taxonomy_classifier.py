@@ -186,9 +186,7 @@ class TaxonomyValidation:
                     pred_cat, confidence, reasoning = predictions.get(str(i), ("unknown", 0.0, ""))
 
                     outfile.write(f"## Record {i}\n\n")
-                    outfile.write(
-                        f"**Predicted Category:** {pred_cat} (confidence: {confidence:.2f})\n"
-                    )
+                    outfile.write(f"**Predicted Category:** {pred_cat} (confidence: {confidence:.2f})\n")
                     outfile.write(f"**Reasoning:** {reasoning}\n\n")
                     outfile.write("**Conversation:**\n```\n")
 
@@ -302,9 +300,7 @@ def main():
         default=Path("ai/training/ready_packages/datasets/cache"),
         help="Directory with processed JSONL files",
     )
-    parser.add_argument(
-        "--sample-size", type=int, default=200, help="Number of samples for validation"
-    )
+    parser.add_argument("--sample-size", type=int, default=200, help="Number of samples for validation")
     parser.add_argument(
         "--samples-file",
         type=Path,

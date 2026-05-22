@@ -246,7 +246,9 @@ export class ThreatDetectionService {
         }
         break
 
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         analysis.confidence = this.analyzeGenericThreat(threatData)
         analysis.patterns = this.detectGenericPatterns(threatData)
@@ -361,7 +363,9 @@ export class ThreatDetectionService {
         return 0.5
       case 'low':
         return 0.3
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         return 0.5
     }
@@ -430,7 +434,9 @@ export class ThreatDetectionService {
       case 'low':
         recommendations.push('continue_monitoring', 'update_baseline')
         break
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
     }
 
     return recommendations

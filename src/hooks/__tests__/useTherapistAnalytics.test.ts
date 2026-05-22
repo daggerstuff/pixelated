@@ -28,7 +28,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 3000,
         skillScores: {
           'Active Listening': 85,
-          Empathy: 78,
+          'Empathy': 78,
         },
         responseTime: 2.5,
         conversationFlow: 88,
@@ -51,7 +51,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 1500,
         skillScores: {
           'Active Listening': 90,
-          Empathy: 82,
+          'Empathy': 82,
         },
         responseTime: 2.1,
         conversationFlow: 92,
@@ -260,7 +260,7 @@ describe('useTherapistAnalytics', () => {
         activeTime: 1800,
         skillScores: {
           'Active Listening': 95,
-          Empathy: 88,
+          'Empathy': 88,
         },
         responseTime: 1.8,
         conversationFlow: 95,

@@ -12,16 +12,13 @@ if str(ROOT) not in sys.path:
 
 from scripts.quality_scoring.scoring_interface import compose_score, compute_signals
 
+
 def main(args: list[str] | None = None) -> int:
 
     parser = argparse.ArgumentParser(description="Quality scoring stub CLI")
     parser.add_argument("--in", dest="inp", required=True, help="Input JSONL with fields: id, text")
-    parser.add_argument(
-        "--out", dest="out", required=True, help="Output JSONL with signals, composite, decision"
-    )
-    parser.add_argument(
-        "--config", dest="config", default=str(ROOT / "scripts/quality_scoring/config.example.json")
-    )
+    parser.add_argument("--out", dest="out", required=True, help="Output JSONL with signals, composite, decision")
+    parser.add_argument("--config", dest="config", default=str(ROOT / "scripts/quality_scoring/config.example.json"))
     ns = parser.parse_args(args or [])
 
     cfg = json.loads(Path(ns.config).read_text(encoding="utf-8"))

@@ -472,7 +472,9 @@ describe('Phase 4.2: Bias Detection Accuracy Tests', () => {
       const testCases = ALL_BIAS_TEST_CASES.slice(0, batchSize)
 
       const start = performance.now()
-      await Promise.all(testCases.map( async (tc) => detector.detectBias(tc.session)))
+      await Promise.all(
+        testCases.map(async (tc) => detector.detectBias(tc.session)),
+      )
       const duration = performance.now() - start
 
       const avgPerSession = duration / batchSize

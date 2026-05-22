@@ -8,7 +8,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from bias_detection.compat import SessionData
 
 
@@ -76,9 +75,7 @@ def create_synthetic_dataset(session_data: SessionData) -> dict[str, Any]:
     if row_count == 0:
         row_count = 3
 
-    responses_array = np.array(
-        [int(bool(r.get("score", 0.5) > 0.5)) for r in responses]
-    )
+    responses_array = np.array([int(bool(r.get("score", 0.5) > 0.5)) for r in responses])
     if responses_array.size == 0:
         responses_array = np.array([0, 1, 0])
 
@@ -99,9 +96,7 @@ def create_synthetic_dataset(session_data: SessionData) -> dict[str, Any]:
             "gender": list(genders)[:row_count]
             if len(genders) >= row_count
             else list(genders) + ["unknown"] * (row_count - len(genders)),
-            "age": list(ages)[:row_count]
-            if len(ages) >= row_count
-            else list(ages) + [None] * (row_count - len(ages)),
+            "age": list(ages)[:row_count] if len(ages) >= row_count else list(ages) + [None] * (row_count - len(ages)),
         }
     )
 

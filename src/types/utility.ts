@@ -190,8 +190,8 @@ export type Opaque<T, K> = T & { readonly __opaque: K }
 
 /** Enhanced component props with strict children typing */
 export type StrictComponentProps<T = Record<string, unknown>> = T & {
-  children?: React.ReactNode
-  className?: string
+  'children'?: React.ReactNode
+  'className'?: string
   'data-testid'?: string
 }
 

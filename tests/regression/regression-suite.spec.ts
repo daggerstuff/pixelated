@@ -254,7 +254,7 @@ test.describe('Regression Test Suite', () => {
       await page.fill('[data-testid="message-input"]', message)
 
       // Simulate network interruption
-      await page.route('**/api/**',  async (route) => route.abort())
+      await page.route('**/api/**', async (route) => route.abort())
 
       // Try to send message
       await page.click('[data-testid="send-button"]')

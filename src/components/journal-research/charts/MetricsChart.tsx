@@ -97,7 +97,7 @@ export function MetricsChart({
   return (
     <Card className={cn('w-full', className)}>
       <CardHeader>
-        <div className='flex items-center justify-between'>
+        <div className="flex items-center justify-between">
           <CardTitle>Metrics Over Time</CardTitle>
           <select
             value={timeRange}
@@ -105,20 +105,20 @@ export function MetricsChart({
               // This would need to be handled by parent component
               // For now, just a visual indicator
             }}
-            className='border-input rounded-md border bg-background px-2 py-1 text-sm'
+            className="border-input rounded-md border bg-background px-2 py-1 text-sm"
             disabled
           >
-            <option value='week'>Last Week</option>
-            <option value='month'>Last Month</option>
-            <option value='all'>All Time</option>
+            <option value="week">Last Week</option>
+            <option value="month">Last Month</option>
+            <option value="all">All Time</option>
           </select>
         </div>
       </CardHeader>
       <CardContent>
         <ChartComponent
-          type='line'
+          type="line"
           data={chartData}
-          title='Metrics Over Time'
+          title="Metrics Over Time"
           options={{
             responsive: true,
             maintainAspectRatio: false,

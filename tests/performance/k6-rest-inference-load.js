@@ -128,7 +128,7 @@ export default function () {
   const params = {
     headers: {
       'Content-Type': 'application/json',
-      Accept: 'application/json',
+      'Accept': 'application/json',
     },
     timeout: '30s',
   }
@@ -204,7 +204,7 @@ export function teardown(data) {
 export function handleSummary(data) {
   return {
     'test-results/k6-rest-summary.json': JSON.stringify(data),
-    stdout: textSummary(data, { indent: ' ', enableColors: true }),
+    'stdout': textSummary(data, { indent: ' ', enableColors: true }),
   }
 }
 

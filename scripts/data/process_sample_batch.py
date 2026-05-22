@@ -22,9 +22,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from ai.pipelines.design.hybrid_classifier import HybridTaxonomyClassifier
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
-)
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)
 
 
@@ -129,15 +127,9 @@ def main():
         default="ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl",
         help="Input JSONL file",
     )
-    parser.add_argument(
-        "--sample-size", type=int, default=100, help="Number of records to process (default: 100)"
-    )
-    parser.add_argument(
-        "--use-llm", action="store_true", help="Enable LLM for low-confidence cases"
-    )
-    parser.add_argument(
-        "--output", type=str, default=None, help="Output JSON file for detailed results"
-    )
+    parser.add_argument("--sample-size", type=int, default=100, help="Number of records to process (default: 100)")
+    parser.add_argument("--use-llm", action="store_true", help="Enable LLM for low-confidence cases")
+    parser.add_argument("--output", type=str, default=None, help="Output JSON file for detailed results")
 
     args = parser.parse_args()
 

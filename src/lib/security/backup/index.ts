@@ -215,7 +215,8 @@ export class BackupSecurityManager {
   private config: BackupConfig
   private encryptionKey!: Uint8Array // MODIFIED: Definite assignment assertion
   private isInitialized = false
-  private readonly storageProviders: Map<StorageLocation, StorageProvider> = new Map()
+  private readonly storageProviders: Map<StorageLocation, StorageProvider> =
+    new Map()
 
   constructor(config?: Partial<BackupConfig>) {
     // Default configuration

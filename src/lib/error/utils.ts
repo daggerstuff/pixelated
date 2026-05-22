@@ -151,9 +151,15 @@ export function formatErrorForUser(error: AppError): string {
         (error instanceof Error ? error.message : 'Unknown error') ||
         'Please check your input and try again.'
       )
-    case ErrorCategory.API: { throw new Error('Not implemented yet: ErrorCategory.API case') }
-    case ErrorCategory.UI: { throw new Error('Not implemented yet: ErrorCategory.UI case') }
-    case ErrorCategory.UNKNOWN: { throw new Error('Not implemented yet: ErrorCategory.UNKNOWN case') }
+    case ErrorCategory.API: {
+      throw new Error('Not implemented yet: ErrorCategory.API case')
+    }
+    case ErrorCategory.UI: {
+      throw new Error('Not implemented yet: ErrorCategory.UI case')
+    }
+    case ErrorCategory.UNKNOWN: {
+      throw new Error('Not implemented yet: ErrorCategory.UNKNOWN case')
+    }
     default:
       return 'Something went wrong. Please try again later.'
   }

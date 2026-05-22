@@ -167,9 +167,9 @@ export class Logger {
     patterns?: RegExp[],
     sensitiveKeys?: string[],
   ): LogMetadataValue {
-    const currentPatterns = (patterns ?? this.options.phiPatterns) ?? []
+    const currentPatterns = patterns ?? this.options.phiPatterns ?? []
     const currentSensitiveKeys =
-      (sensitiveKeys ?? this.options.sanitizeFields) ?? []
+      sensitiveKeys ?? this.options.sanitizeFields ?? []
 
     if (typeof data === 'string') {
       return this.sanitizeString(data, currentPatterns)
@@ -224,7 +224,7 @@ export class Logger {
       return str === undefined ? '' : String(str) // Handle undefined or non-string types gracefully
     }
     let sanitizedStr = str
-    const currentPatterns = (patterns ?? this.options.phiPatterns) ?? []
+    const currentPatterns = patterns ?? this.options.phiPatterns ?? []
     for (const pattern of currentPatterns) {
       // Ensure the pattern has the global flag for multiple replacements
       const globalPattern = new RegExp(

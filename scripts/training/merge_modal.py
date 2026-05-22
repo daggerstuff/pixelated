@@ -8,32 +8,23 @@ app = modal.App("pixelated-lora-merge")
 # Use a standard image with necessary LoRA/Merge dependencies
 image = (
     modal.Image.debian_slim(python_version="3.13")
-    .pip_install(
-        "torch",
-        "transformers",
-        "peft",
-        "accelerate",
-        "safetensors",
-        "huggingface_hub"
-    )
+    .pip_install("torch", "transformers", "peft", "accelerate", "safetensors", "huggingface_hub")
     # Add the local adapter directory directly to the image
-    .add_local_dir(
-        "./checkpoints/final_model", 
-        remote_path="/root/adapter"
-    )
+    .add_local_dir("./checkpoints/final_model", remote_path="/root/adapter")
 )
 
 # Persistent volume to store the merged model
 volume = modal.Volume.from_name("pixel-merged-models", create_if_missing=True)
 
+
 @app.function(
     image=image,
-    gpu="A100",           # High RAM (80GB) to handle 12B model merge comfortably
-    timeout=3600,         # 1 hour timeout
+    gpu="A100",  # High RAM (80GB) to handle 12B model merge comfortably
+    timeout=3600,  # 1 hour timeout
     volumes={"/root/models": volume},
-    secrets=[
-        modal.Secret.from_dict({"HF_TOKEN": os.environ.get("HF_TOKEN", "")})
-    ] if os.environ.get("HF_TOKEN") else []
+    secrets=[modal.Secret.from_dict({"HF_TOKEN": os.environ.get("HF_TOKEN", "")})]
+    if os.environ.get("HF_TOKEN")
+    else [],
 )
 def merge_lora_task(base_model_name: str, output_dir_name: str):
     from pathlib import Path
@@ -52,10 +43,7 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
     print(f"📥 Loading base model '{base_model_name}' into VRAM...")
     # Loading in float16 to match the training/inference setup
     base_model = AutoModelForCausalLM.from_pretrained(
-        base_model_name,
-        torch_dtype=torch.float16,
-        device_map="auto",
-        trust_remote_code=True
+        base_model_name, torch_dtype=torch.float16, device_map="auto", trust_remote_code=True
     )
 
     print("✅ Base model loaded.")
@@ -64,20 +52,13 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=True)
 
     print("📥 Applying LoRA adapter from /root/adapter...")
-    model = PeftModel.from_pretrained(
-        base_model,
-        "/root/adapter",
-        is_trainable=False
-    )
+    model = PeftModel.from_pretrained(base_model, "/root/adapter", is_trainable=False)
 
     print("🔄 Merging LoRA weights into base model...")
     merged_model = model.merge_and_unload()
 
     print(f"💾 Saving merged model to {output_path}...")
-    merged_model.save_pretrained(
-        str(output_path),
-        safe_serialization=True
-    )
+    merged_model.save_pretrained(str(output_path), safe_serialization=True)
     tokenizer.save_pretrained(str(output_path))
 
     # Commit changes to Volume to ensure persistence and visibility for download
@@ -85,6 +66,7 @@ def merge_lora_task(base_model_name: str, output_dir_name: str):
 
     print(f"✅ Merge complete! Merged model is available in Modal Volume at: {output_path}")
     return str(output_path)
+
 
 @app.local_entrypoint()
 def main(base_model: str = "LatitudeGames/Wayfarer-2-12B", output_dir: str = "merged-pixel-merged"):

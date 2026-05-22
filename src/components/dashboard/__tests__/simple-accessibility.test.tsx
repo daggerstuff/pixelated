@@ -29,7 +29,7 @@ describe('Simple Accessibility Tests', () => {
         activeTime: 3000,
         skillScores: {
           'Active Listening': 85,
-          Empathy: 78,
+          'Empathy': 78,
         },
         responseTime: 2.5,
         conversationFlow: 88,
@@ -123,7 +123,7 @@ describe('Simple Accessibility Tests', () => {
   })
 
   it('renders progress bar with ARIA attributes', () => {
-    render(<ProgressBar value={75} label='Test Progress' />)
+    render(<ProgressBar value={75} label="Test Progress" />)
 
     const progressBar = screen.getByLabelText('Test Progress')
     expect(progressBar).toHaveAttribute('role', 'progressbar')
@@ -426,7 +426,9 @@ describe('Simple Accessibility Tests', () => {
 
     // Verify first button can receive focus via keyboard
     await userEvent.tab()
-    expect(document.activeElement).toBe(buttons.find((button) => !button.disabled))
+    expect(document.activeElement).toBe(
+      buttons.find((button) => !button.disabled),
+    )
   })
 
   it('provides clear instructions and error identification', () => {
@@ -613,7 +615,7 @@ describe('Simple Accessibility Tests', () => {
   })
 
   it('provides ARIA roles for rich widgets', () => {
-    render(<ProgressBar value={75} label='Test Progress' />)
+    render(<ProgressBar value={75} label="Test Progress" />)
 
     expect(screen.getByLabelText('Test Progress')).toBeInTheDocument()
   })

@@ -65,7 +65,9 @@ export class ConflictResolver {
         }
         return remoteValue
 
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         return remoteValue
     }

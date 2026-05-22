@@ -58,7 +58,7 @@ export function mapRoleToOpenAI(role: string): "user" | "assistant" {
     therapist: "assistant",
     assistant: "assistant",
   };
-  return roleMap[role.toLowerCase()] || "user";
+  return roleMap[role.toLowerCase()] ?? "user";
 }
 
 export function mapRoleToHuggingFace(role: string): string {
@@ -68,7 +68,7 @@ export function mapRoleToHuggingFace(role: string): string {
     therapist: "gpt",
     assistant: "gpt",
   };
-  return roleMap[role.toLowerCase()] || "human";
+  return roleMap[role.toLowerCase()] ?? "human";
 }
 
 async function* findNormalizedFiles(baseDir: string): AsyncGenerator<string> {

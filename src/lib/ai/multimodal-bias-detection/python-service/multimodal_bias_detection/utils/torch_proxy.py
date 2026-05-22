@@ -9,7 +9,6 @@ from importlib import import_module
 from types import ModuleType
 from typing import Any
 
-
 _torch_module: ModuleType | None = None
 _torch_import_error: Exception | None = None
 

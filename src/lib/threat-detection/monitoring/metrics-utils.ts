@@ -200,19 +200,19 @@ export async function getPerformanceMetrics(
 
     return {
       system: {
-        cpu: parseFloat(metricsData.cpu || '0'),
-        memory: parseFloat(metricsData.memory || '0'),
-        disk: parseFloat(metricsData.disk || '0'),
+        cpu: parseFloat(metricsData.cpu ?? '0'),
+        memory: parseFloat(metricsData.memory ?? '0'),
+        disk: parseFloat(metricsData.disk ?? '0'),
       },
       application: {
-        responseTime: parseFloat(metricsData.responseTime || '0'),
-        throughput: parseFloat(metricsData.throughput || '0'),
-        errorRate: parseFloat(metricsData.errorRate || '0'),
+        responseTime: parseFloat(metricsData.responseTime ?? '0'),
+        throughput: parseFloat(metricsData.throughput ?? '0'),
+        errorRate: parseFloat(metricsData.errorRate ?? '0'),
       },
       database: {
-        connections: parseInt(metricsData.connections || '0', 10),
-        queryTime: parseFloat(metricsData.queryTime || '0'),
-        cacheHitRate: parseFloat(metricsData.cacheHitRate || '0'),
+        connections: parseInt(metricsData.connections ?? '0', 10),
+        queryTime: parseFloat(metricsData.queryTime ?? '0'),
+        cacheHitRate: parseFloat(metricsData.cacheHitRate ?? '0'),
       },
     }
   } catch (error: unknown) {

@@ -7,12 +7,12 @@ import * as React from 'react'
 
 // In React 19, act has been moved. We need to create a polyfill
 // that works with React Testing Library
-const act =  async (callback: () => void | Promise<void>): Promise<void> => {
+const act = async (callback: () => void | Promise<void>): Promise<void> => {
   const result = callback()
 
   // If the callback returns a promise, wait for it
   if (result && typeof result === 'object' && 'then' in result) {
-    return Promise.resolve(result).then( async () => {
+    return Promise.resolve(result).then(async () => {
       // Flush any pending updates
       if (typeof queueMicrotask !== 'undefined') {
         return new Promise<void>((resolve) => {

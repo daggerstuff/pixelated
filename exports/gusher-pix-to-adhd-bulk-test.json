@@ -5,11 +5,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-211.\n\nSource type: Epic\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-211"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-211"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -17,11 +13,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-240.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-240"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-240"],
       "assignee": "chad@pixelated.love"
     }
   ]

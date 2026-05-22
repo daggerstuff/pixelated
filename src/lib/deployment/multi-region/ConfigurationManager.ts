@@ -520,7 +520,7 @@ export class ConfigurationManager extends EventEmitter {
         },
       }
 
-      return envOverrides[environment] || null
+      return envOverrides[environment] ?? null
     } catch (error: unknown) {
       logger.error('Failed to load environment overrides', { error })
       return null
@@ -818,7 +818,7 @@ export class ConfigurationManager extends EventEmitter {
     const sortedRegions = [...this.config.deployment.regions].sort(
       (a, b) => a.priority - b.priority,
     )
-    return sortedRegions[0]?.id || ''
+    return sortedRegions[0]?.id ?? ''
   }
 
   /**

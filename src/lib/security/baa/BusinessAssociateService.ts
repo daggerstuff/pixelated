@@ -11,7 +11,8 @@ import { ComplianceLevel } from './types'
  * and their HIPAA compliance verification
  */
 export class BusinessAssociateService {
-  private readonly businessAssociates: Map<string, BusinessAssociate> = new Map()
+  private readonly businessAssociates: Map<string, BusinessAssociate> =
+    new Map()
 
   /**
    * Create a new business associate record

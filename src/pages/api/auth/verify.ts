@@ -64,7 +64,7 @@ export const GET = async ({
     if (result.error) {
       logger.error('Verification failed', { error: result.error })
 
-       logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+      logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
         action: 'verify_token',
         type,
         error: result.error,
@@ -89,15 +89,11 @@ export const GET = async ({
     if (result.data.user) {
       const user = result.data.user as any
 
-       logSecurityEvent(
-        SecurityEventType.AUTHENTICATION_SUCCESS,
-        user.id,
-        {
-          action: 'user_verified',
-          type,
-          clientInfo,
-        },
-      )
+      logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, user.id, {
+        action: 'user_verified',
+        type,
+        clientInfo,
+      })
 
       await createAuditLog(
         AuditEventType.SECURITY,
@@ -123,7 +119,7 @@ export const GET = async ({
   } catch (error: any) {
     logger.error('Verification error:', error)
 
-     logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
+    logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, null, {
       action: 'verify_token_error',
       error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,

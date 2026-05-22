@@ -41,7 +41,7 @@ export const convertToMindMirrorAnalysis = (
     critical: 'wounded_healer',
   }
 
-  let archetype = severityToArchetype[analysis.category] || 'visionary'
+  let archetype = severityToArchetype[analysis.category] ?? 'visionary'
 
   // Determine energy and social connection based on explanation content
   const explanationLower = (analysis.explanation || '').toLowerCase()
@@ -124,36 +124,36 @@ export const getInitialMessages = (): ChatMessage[] => [
 
 How are you feeling today? I'm here to listen and help.`,
     displayContent: (
-      <div className='space-y-3'>
+      <div className="space-y-3">
         <p>
           Welcome to our Mental Health Chat powered by MentalLLaMA. I'm here to
           provide thoughtful, evidence-based support.
         </p>
-        <div className='space-y-2 py-1'>
-          <div className='flex items-center gap-2'>
-            <Brain className='text-purple-600 h-4 w-4 shrink-0' />
-            <p className='text-sm'>
+        <div className="space-y-2 py-1">
+          <div className="flex items-center gap-2">
+            <Brain className="text-purple-600 h-4 w-4 shrink-0" />
+            <p className="text-sm">
               <strong>Clinical-Grade Analysis</strong>: Advanced AI analyzes
               your messages for mental health indicators
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <Shield className='text-blue-600 h-4 w-4 shrink-0' />
-            <p className='text-sm'>
+          <div className="flex items-center gap-2">
+            <Shield className="text-blue-600 h-4 w-4 shrink-0" />
+            <p className="text-sm">
               <strong>Privacy-First</strong>: All analysis uses encrypted
               processing - your data stays secure
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <ChartBar className='text-indigo-600 h-4 w-4 shrink-0' />
-            <p className='text-sm'>
+          <div className="flex items-center gap-2">
+            <ChartBar className="text-indigo-600 h-4 w-4 shrink-0" />
+            <p className="text-sm">
               <strong>Real-Time Insights</strong>: Get immediate feedback on
               emotional patterns and trends
             </p>
           </div>
-          <div className='flex items-center gap-2'>
-            <AlertTriangle className='text-red-600 h-4 w-4 shrink-0' />
-            <p className='text-sm'>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="text-red-600 h-4 w-4 shrink-0" />
+            <p className="text-sm">
               <strong>Crisis Detection</strong>: Automatic identification of
               urgent situations with immediate resources
             </p>
@@ -177,12 +177,12 @@ export const createInterventionMessage = (
   role: 'assistant',
   content: `**Therapeutic Intervention**\n\n${intervention}`,
   displayContent: (
-    <div className='space-y-2'>
-      <div className='text-amber-600 flex items-center gap-2'>
-        <Lightbulb className='h-4 w-4' />
-        <span className='font-bold'>Therapeutic Intervention</span>
+    <div className="space-y-2">
+      <div className="text-amber-600 flex items-center gap-2">
+        <Lightbulb className="h-4 w-4" />
+        <span className="font-bold">Therapeutic Intervention</span>
       </div>
-      <div className='mt-2'>
+      <div className="mt-2">
         {intervention.split('\n\n').map((para, i) => (
           <p key={i} className={i > 0 ? 'mt-2' : ''}>
             {para}

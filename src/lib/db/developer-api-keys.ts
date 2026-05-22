@@ -173,14 +173,10 @@ export class DeveloperApiKeyManager {
         [apiKeyId],
       )
 
-       logSecurityEvent(
-        SecurityEventType.AUTHENTICATION_FAILED,
-        apiKeyId,
-        {
-          reason,
-          api_key_id: apiKeyId,
-        },
-      )
+      logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, apiKeyId, {
+        reason,
+        api_key_id: apiKeyId,
+      })
 
       await this.handleFailedAttempt(apiKeyId, reason)
     } catch {
@@ -319,14 +315,10 @@ export class DeveloperApiKeyManager {
     if (newAttempts >= MAX_FAILED_ATTEMPTS) {
       await this.revokeApiKeySystem(apiKeyId)
       this.failedAttempts.delete(apiKeyId)
-       logSecurityEvent(
-        SecurityEventType.AUTHENTICATION_FAILED,
-        apiKeyId,
-        {
-          reason: 'auto_revoked_exceeded_failed_attempts',
-          attempts: newAttempts,
-        },
-      )
+      logSecurityEvent(SecurityEventType.AUTHENTICATION_FAILED, apiKeyId, {
+        reason: 'auto_revoked_exceeded_failed_attempts',
+        attempts: newAttempts,
+      })
     }
   }
 

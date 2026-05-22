@@ -189,8 +189,12 @@ export class JobQueueService {
         await redis.hset(this.failedKey, jobId, JSON.stringify(job)) // Store cancelled in failed for review
         logger.info('Job cancelled', { jobId, type: job.type })
         break
-      case JobStatus.PENDING: { throw new Error('Not implemented yet: JobStatus.PENDING case') }
-      case JobStatus.IN_PROGRESS: { throw new Error('Not implemented yet: JobStatus.IN_PROGRESS case') }
+      case JobStatus.PENDING: {
+        throw new Error('Not implemented yet: JobStatus.PENDING case')
+      }
+      case JobStatus.IN_PROGRESS: {
+        throw new Error('Not implemented yet: JobStatus.IN_PROGRESS case')
+      }
       default:
         // For PENDING and IN_PROGRESS, it remains in the status hash and potentially processing list
         break

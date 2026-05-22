@@ -105,7 +105,9 @@ export class ObjectiveSwitcher {
     failed_switches: 0,
     observer_notifications: 0,
   }
-  private readonly config: Required<Omit<ObjectiveSwitcherConfig, 'initialContext'>>
+  private readonly config: Required<
+    Omit<ObjectiveSwitcherConfig, 'initialContext'>
+  >
   private switchInProgress = false
   private pendingSwitch: ContextTransition | null = null
 

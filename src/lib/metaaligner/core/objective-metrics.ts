@@ -274,7 +274,7 @@ export class ObjectiveMetricsEngine {
     context: AlignmentContext,
   ): CriteriaMetrics[] {
     return criteria.map((criterion) => {
-      const score = criteriaScores[criterion.criterion] || 0
+      const score = criteriaScores[criterion.criterion] ?? 0
       const contribution = score * criterion.weight
       const confidence = this.calculateCriterionConfidence(
         criterion,
@@ -321,7 +321,7 @@ export class ObjectiveMetricsEngine {
     }
 
     const scores = recentEvaluations.map(
-      (e) => e.evaluation.objectiveResults[objectiveId]?.score || 0,
+      (e) => e.evaluation.objectiveResults[objectiveId]?.score ?? 0,
     )
 
     // Calculate reliability as inverse of normalized standard deviation
@@ -346,7 +346,7 @@ export class ObjectiveMetricsEngine {
     }
 
     const scores = recentEvaluations.map(
-      (e) => e.evaluation.objectiveResults[objectiveId]?.score || 0,
+      (e) => e.evaluation.objectiveResults[objectiveId]?.score ?? 0,
     )
 
     // Calculate consistency as inverse of normalized variance
@@ -406,7 +406,7 @@ export class ObjectiveMetricsEngine {
 
     const scores = recentEvaluations.map((e) => {
       const objectiveResult = e.evaluation.objectiveResults[objectiveId]
-      return objectiveResult?.score || 0
+      return objectiveResult?.score ?? 0
     })
 
     // Simple linear regression to detect trend
@@ -414,7 +414,7 @@ export class ObjectiveMetricsEngine {
     const x = Array.from({ length: n }, (_, i) => i)
     const sumX = x.reduce((sum, val) => sum + val, 0)
     const sumY = scores.reduce((sum, val) => sum + val, 0)
-    const sumXY = x.reduce((sum, val, i) => sum + val * (scores[i] || 0), 0)
+    const sumXY = x.reduce((sum, val, i) => sum + val * (scores[i] ?? 0), 0)
     const sumX2 = x.reduce((sum, val) => sum + val * val, 0)
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX)
@@ -479,12 +479,46 @@ export class ObjectiveMetricsEngine {
           fit += 0.4
         }
         break
-      case ContextType.CRISIS: { throw new Error('Not implemented yet: ContextType.CRISIS case') }
-      case ContextType.EDUCATIONAL: { throw new Error('Not implemented yet: ContextType.EDUCATIONAL case') }
-      case ContextType.SUPPORT: { throw new Error('Not implemented yet: ContextType.SUPPORT case') }
-      case ContextType.CLINICAL_ASSESSMENT: { throw new Error('Not implemented yet: ContextType.CLINICAL_ASSESSMENT case') }
-      case ContextType.INFORMATIONAL: { throw new Error('Not implemented yet: ContextType.INFORMATIONAL case') }
-      case ContextType.GENERAL: { throw new Error('Not implemented yet: ContextType.GENERAL case') }
+      case ContextType.CRISIS: {
+        throw new Error('Not implemented yet: ContextType.CRISIS case')
+      }
+      case ContextType.EDUCATIONAL: {
+        throw new Error('Not implemented yet: ContextType.EDUCATIONAL case')
+      }
+      case ContextType.SUPPORT: {
+        throw new Error('Not implemented yet: ContextType.SUPPORT case')
+      }
+      case ContextType.CLINICAL_ASSESSMENT: {
+        throw new Error(
+          'Not implemented yet: ContextType.CLINICAL_ASSESSMENT case',
+        )
+      }
+      case ContextType.INFORMATIONAL: {
+        throw new Error('Not implemented yet: ContextType.INFORMATIONAL case')
+      }
+      case ContextType.GENERAL: {
+        throw new Error('Not implemented yet: ContextType.GENERAL case')
+      }
+      case ContextType.CRISIS: {
+        throw new Error('Not implemented yet: ContextType.CRISIS case')
+      }
+      case ContextType.EDUCATIONAL: {
+        throw new Error('Not implemented yet: ContextType.EDUCATIONAL case')
+      }
+      case ContextType.SUPPORT: {
+        throw new Error('Not implemented yet: ContextType.SUPPORT case')
+      }
+      case ContextType.CLINICAL_ASSESSMENT: {
+        throw new Error(
+          'Not implemented yet: ContextType.CLINICAL_ASSESSMENT case',
+        )
+      }
+      case ContextType.INFORMATIONAL: {
+        throw new Error('Not implemented yet: ContextType.INFORMATIONAL case')
+      }
+      case ContextType.GENERAL: {
+        throw new Error('Not implemented yet: ContextType.GENERAL case')
+      }
     }
 
     return Math.max(0, Math.min(1, fit))
@@ -726,7 +760,7 @@ export class ObjectiveMetricsEngine {
     }
 
     const confidenceScores = recentEvaluations.map(
-      (e) => e.evaluation.objectiveResults[objectiveId]?.confidence || 0.5,
+      (e) => e.evaluation.objectiveResults[objectiveId]?.confidence ?? 0.5,
     )
 
     return (
@@ -760,7 +794,7 @@ export class ObjectiveMetricsEngine {
       this.evaluationHistory.evaluations[
         this.evaluationHistory.evaluations.length - 1
       ]
-    return latest?.evaluation.overallScore || 0
+    return latest?.evaluation.overallScore ?? 0
   }
 
   private getLatestConsistencyScore(): number {
@@ -768,7 +802,7 @@ export class ObjectiveMetricsEngine {
       this.evaluationHistory.evaluations[
         this.evaluationHistory.evaluations.length - 1
       ]
-    return latest?.metrics.consistencyScore || 0
+    return latest?.metrics.consistencyScore ?? 0
   }
 
   private calculateAchievementRate(threshold: number): number {

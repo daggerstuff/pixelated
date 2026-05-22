@@ -10,9 +10,7 @@ router = APIRouter(prefix="/api/errors", tags=["errors"])
 @router.get("/400")
 async def test_400_error():
     """Test 400 error."""
-    raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request test"
-    )
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request test")
 
 
 @router.get("/404")

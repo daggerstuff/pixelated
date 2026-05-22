@@ -27,12 +27,12 @@ import os
 import re
 import subprocess
 import sys
+from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Iterable
+from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
-
 
 ISSUE_KEY_RE = re.compile(r"\b[A-Z]{2,5}-\d+\b")
 LINEAR_API_URL = "https://api.linear.app/graphql"
@@ -276,4 +276,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

@@ -31,10 +31,7 @@ ZENODO_API = "https://zenodo.org/api/records"
 ACCEPTED_LICENSES = {"cc-by-4.0", "cc-by-3.0", "cc-by-sa-4.0", "cc0-1.0", "mit"}
 
 SEARCH_QUERY = (
-    "q=mental+health+OR+psychotherapy+OR+clinical+psychology+OR+therapy"
-    "&access_status=open"
-    "&sort=mostviewed"
-    "&size=25"
+    "q=mental+health+OR+psychotherapy+OR+clinical+psychology+OR+therapy&access_status=open&sort=mostviewed&size=25"
 )
 
 

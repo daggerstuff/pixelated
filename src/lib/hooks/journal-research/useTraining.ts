@@ -81,7 +81,7 @@ export function useIntegrateAllDatasets(sessionId: string) {
 export function useTrainingStatus(sessionId: string, enabled: boolean = true) {
   return useQuery({
     queryKey: journalResearchQueryKeys.training.status(sessionId),
-    queryFn:  async () => getTrainingStatus(sessionId),
+    queryFn: async () => getTrainingStatus(sessionId),
     enabled: enabled && !!sessionId,
     staleTime: 10000, // 10 seconds
     refetchInterval: 30000, // Refetch every 30 seconds
@@ -94,7 +94,7 @@ export function useTrainingStatus(sessionId: string, enabled: boolean = true) {
 export function usePipelineStatus(enabled: boolean = true) {
   return useQuery({
     queryKey: journalResearchQueryKeys.training.pipelineStatus(),
-    queryFn:  async () => getPipelineStatus(),
+    queryFn: async () => getPipelineStatus(),
     enabled,
     staleTime: 10000, // 10 seconds
     refetchInterval: 30000, // Refetch every 30 seconds

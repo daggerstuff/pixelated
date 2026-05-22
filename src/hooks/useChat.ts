@@ -107,13 +107,15 @@ export function useChat(options: ChatOptions): UseChatReturn {
       if (api.includes('mental-health')) {
         // Mental health API returns { response: { content: "..." } }
         responseContent =
-          (responseData.response?.content ??
-          responseData.response?.message) ??
+          responseData.response?.content ??
+          responseData.response?.message ??
           'No response from therapeutic AI'
       } else {
         // Standard chat API format
         responseContent =
-          ((responseData.text ?? responseData.content) ?? responseData.message) ??
+          responseData.text ??
+          responseData.content ??
+          responseData.message ??
           'No response content'
       }
 

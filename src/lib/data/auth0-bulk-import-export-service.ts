@@ -40,12 +40,12 @@ function initializeAuth0Management() {
   }
 
   auth0Management ??= new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users create:users update:users create:user_tickets',
-    });
+    domain: AUTH0_CONFIG.domain,
+    clientId: AUTH0_CONFIG.managementClientId,
+    clientSecret: AUTH0_CONFIG.managementClientSecret,
+    audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+    scope: 'read:users create:users update:users create:user_tickets',
+  })
 }
 
 // Initialize the management client
@@ -136,7 +136,7 @@ export class Auth0BulkImportExportService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    this.db ??= await mongodb.connect();
+    this.db ??= await mongodb.connect()
     return this.db
   }
 
@@ -181,8 +181,8 @@ export class Auth0BulkImportExportService {
               user_metadata: user.user_metadata,
               password: user.password,
               connection:
-                (user.connection ??
-                options.connection) ??
+                user.connection ??
+                options.connection ??
                 'Username-Password-Authentication',
               verify_email: options.verifyEmail !== false, // Default to true
             })

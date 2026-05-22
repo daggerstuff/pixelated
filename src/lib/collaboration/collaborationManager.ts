@@ -171,7 +171,7 @@ class CollaborationManager {
       admin: ['read', 'write', 'comment', 'upload', 'manage_users', 'delete'],
     }
 
-    return permissions[role] || permissions.viewer
+    return permissions[role] ?? permissions.viewer
   }
 
   /**

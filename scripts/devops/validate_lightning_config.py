@@ -7,7 +7,7 @@ def validate_config(config_path):
     try:
         config = json.loads(Path(config_path).read_text())
     except Exception as e:
-        print(f"FAIL::config_read::{str(e)}")
+        print(f"FAIL::config_read::{e!s}")
         return
 
     required_keys = [
@@ -32,6 +32,7 @@ def validate_config(config_path):
         print(f"VALUE::dataloader_num_workers::{config['dataloader_num_workers']}")
     if "precision" in config:
         print(f"VALUE::precision::{config['precision']}")
+
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

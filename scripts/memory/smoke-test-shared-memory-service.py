@@ -265,7 +265,7 @@ def main() -> int:
     if status not in (200, 201):
         print(f"  ✗ Memory retention failed: HTTP {status}", file=sys.stderr)
         return 1
-    print(f"  ✓ Memory retained successfully")
+    print("  ✓ Memory retained successfully")
 
     document_id = None
     if isinstance(response, dict):
@@ -277,7 +277,7 @@ def main() -> int:
             document_id = response["items"][0].get("id")
 
     if not document_id:
-        print(f"  ✗ Failed to extract document ID from retention response", file=sys.stderr)
+        print("  ✗ Failed to extract document ID from retention response", file=sys.stderr)
         return 1
 
     print("\n[3/4] Testing memory recall...")
@@ -290,7 +290,7 @@ def main() -> int:
     if status != 200:
         print(f"  ✗ Memory recall failed: HTTP {status}", file=sys.stderr)
         return 1
-    print(f"  ✓ Memory recall successful")
+    print("  ✓ Memory recall successful")
     if isinstance(response, dict) and "items" in response:
         print(f"  Found {len(response['items'])} matching memories")
 
@@ -300,7 +300,7 @@ def main() -> int:
         if status not in (200, 204):
             print(f"  ✗ Document deletion failed: HTTP {status}", file=sys.stderr)
             return 1
-        print(f"  ✓ Document deleted successfully")
+        print("  ✓ Document deleted successfully")
     else:
         print("\n[4/4] Skipping deletion (no document ID received)")
 

@@ -65,11 +65,11 @@ const ACTION_PHASE_RULES: Record<TurnPhase, readonly RequestedAction[]> = {
 }
 
 const ROLES: Record<AgentRole, true> = {
-  scribe: true,
-  critic: true,
-  synthesizer: true,
+  'scribe': true,
+  'critic': true,
+  'synthesizer': true,
   'human-reviser': true,
-  router: true,
+  'router': true,
   'implementation-engine': true,
 }
 

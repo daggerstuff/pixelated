@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { isValidDate, isDiffMonth, isSameYear } from './datetime'
 
 describe('datetime utils', () => {
@@ -26,25 +27,35 @@ describe('datetime utils', () => {
     })
 
     it('returns false if months are the same', () => {
-      expect(isDiffMonth('2024-03-15T12:00:00Z', '2024-03-01T12:00:00Z')).toBe(false)
+      expect(isDiffMonth('2024-03-15T12:00:00Z', '2024-03-01T12:00:00Z')).toBe(
+        false,
+      )
     })
 
     it('returns true if months are different', () => {
-      expect(isDiffMonth('2024-04-15T12:00:00Z', '2024-03-15T12:00:00Z')).toBe(true)
+      expect(isDiffMonth('2024-04-15T12:00:00Z', '2024-03-15T12:00:00Z')).toBe(
+        true,
+      )
     })
 
     it('returns true if years are different even in the same month', () => {
-      expect(isDiffMonth('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(true)
+      expect(isDiffMonth('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(
+        true,
+      )
     })
   })
 
   describe('isSameYear', () => {
     it('returns true if years are the same', () => {
-      expect(isSameYear('2024-03-15T12:00:00Z', '2024-11-01T12:00:00Z')).toBe(true)
+      expect(isSameYear('2024-03-15T12:00:00Z', '2024-11-01T12:00:00Z')).toBe(
+        true,
+      )
     })
 
     it('returns false if years are different', () => {
-      expect(isSameYear('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(false)
+      expect(isSameYear('2024-03-15T12:00:00Z', '2023-03-15T12:00:00Z')).toBe(
+        false,
+      )
     })
 
     it('returns undefined if either argument is missing', () => {

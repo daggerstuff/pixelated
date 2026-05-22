@@ -417,7 +417,7 @@ export class AnonymizationPipelineService {
 
   // Helper methods for anonymization techniques
 
-  private  async preprocessData(rawData: any[]): Promise<any[]> {
+  private async preprocessData(rawData: any[]): Promise<any[]> {
     return Promise.resolve(
       rawData.map((record) => ({
         ...record,

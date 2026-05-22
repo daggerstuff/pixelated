@@ -287,9 +287,12 @@ export class FHEAnalyticsService {
     } catch (error: unknown) {
       logger.error('Failed to analyze sentiment trend', { error })
       const errorRecord = toErrorRecord(error)
-      throw new Error(`Sentiment analysis error: ${String(errorRecord.message)}`, {
-        cause: error,
-      })
+      throw new Error(
+        `Sentiment analysis error: ${String(errorRecord.message)}`,
+        {
+          cause: error,
+        },
+      )
     }
   }
 
@@ -391,10 +394,7 @@ export class FHEAnalyticsService {
 
       return finalResult
     } catch (error: unknown) {
-      logger.error(
-        'Failed to analyze topic clusters',
-        toErrorRecord(error),
-      )
+      logger.error('Failed to analyze topic clusters', toErrorRecord(error))
       throw error
     }
   }
@@ -500,10 +500,7 @@ export class FHEAnalyticsService {
 
       return finalResult
     } catch (error: unknown) {
-      logger.error(
-        'Failed to perform risk assessment',
-        toErrorRecord(error),
-      )
+      logger.error('Failed to perform risk assessment', toErrorRecord(error))
       throw error
     }
   }
@@ -584,7 +581,10 @@ export class FHEAnalyticsService {
               timestamp: exchange.client.timestamp ?? Date.now(),
             }
           } catch (error: unknown) {
-            logger.error(`Failed to analyze exchange ${index}`, toErrorRecord(error))
+            logger.error(
+              `Failed to analyze exchange ${index}`,
+              toErrorRecord(error),
+            )
             return {
               exchangeIndex: index,
               error: true,
@@ -773,10 +773,7 @@ export class FHEAnalyticsService {
 
       return finalResult
     } catch (error: unknown) {
-      logger.error(
-        'Failed to analyze emotional patterns',
-        toErrorRecord(error),
-      )
+      logger.error('Failed to analyze emotional patterns', toErrorRecord(error))
       throw error
     }
   }

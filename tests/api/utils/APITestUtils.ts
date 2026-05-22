@@ -120,7 +120,7 @@ export class APITestUtils {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${authToken}`,
+        'Authorization': `Bearer ${authToken}`,
       },
       body: JSON.stringify({
         title: `Test Conversation ${Date.now()}`,
@@ -383,7 +383,7 @@ export class APITestUtils {
 
     for (let i = 0; i < requests.length; i += concurrency) {
       const batch = requests.slice(i, i + concurrency)
-      const batchResults = await Promise.all(batch.map( async (req) => req()))
+      const batchResults = await Promise.all(batch.map(async (req) => req()))
       results.push(...(batchResults as any))
     }
 

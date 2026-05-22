@@ -227,7 +227,7 @@ describe('Dashboard', () => {
 
   it('applies custom className', () => {
     const { container } = renderWithProviders(
-      <Dashboard className='custom-class' />,
+      <Dashboard className="custom-class" />,
     )
 
     const dashboard = container.querySelector('.custom-class')

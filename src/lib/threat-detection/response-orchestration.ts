@@ -501,36 +501,36 @@ export class AdvancedResponseOrchestrator
           timeout: 60000,
         }
 
-       case "alert": {
-         return {
-           actionId: this.generateActionId(),
-           actionType: 'user_notification',
-           target: 'notification_system',
-           parameters: {
-             threatId: analysis.threatId,
-             message: `Low severity threat detected: ${analysis.threatId}`,
-             severity: analysis.severity,
-           },
-           priority: 3,
-           timeout: 5000,
-         }
-       }
-       case "escalate": {
-         return {
-           actionId: this.generateActionId(),
-           actionType: 'escalation_notification',
-           target: 'escalation_system',
-           parameters: {
-             threatId: analysis.threatId,
-             reason: `Threat requires escalation: ${analysis.threatId}`,
-             severity: analysis.severity,
-             estimatedImpact: analysis.estimatedImpact,
-           },
-           priority: 9,
-           timeout: 10000,
-           rollbackStrategy: 'cancel_escalation',
-         }
-       }
+      case 'alert': {
+        return {
+          actionId: this.generateActionId(),
+          actionType: 'user_notification',
+          target: 'notification_system',
+          parameters: {
+            threatId: analysis.threatId,
+            message: `Low severity threat detected: ${analysis.threatId}`,
+            severity: analysis.severity,
+          },
+          priority: 3,
+          timeout: 5000,
+        }
+      }
+      case 'escalate': {
+        return {
+          actionId: this.generateActionId(),
+          actionType: 'escalation_notification',
+          target: 'escalation_system',
+          parameters: {
+            threatId: analysis.threatId,
+            reason: `Threat requires escalation: ${analysis.threatId}`,
+            severity: analysis.severity,
+            estimatedImpact: analysis.estimatedImpact,
+          },
+          priority: 9,
+          timeout: 10000,
+          rollbackStrategy: 'cancel_escalation',
+        }
+      }
       default:
         return null
     }
@@ -603,7 +603,7 @@ export class AdvancedResponseOrchestrator
   ): Promise<void> {
     // Pre-execution validation
     const validationResults = await Promise.all(
-      response.actions.map( async (action) => this.validateAction(action)),
+      response.actions.map(async (action) => this.validateAction(action)),
     )
 
     if (validationResults.some((result) => !result)) {
@@ -901,7 +901,7 @@ class ConcurrentResponseExecutor extends ResponseExecutor {
 
     for (const priorityGroup of priorityGroups) {
       const groupResults = await Promise.all(
-        priorityGroup.map( async (action) => this.executeSingleAction(action)),
+        priorityGroup.map(async (action) => this.executeSingleAction(action)),
       )
       results.push(...groupResults)
     }
@@ -914,7 +914,7 @@ class ConcurrentResponseExecutor extends ResponseExecutor {
     const reversedActions = [...actions].reverse()
 
     return await Promise.all(
-      reversedActions.map( async (action) => this.rollbackSingleAction(action)),
+      reversedActions.map(async (action) => this.rollbackSingleAction(action)),
     )
   }
 

@@ -119,9 +119,7 @@ def test_make_entry_preserves_synthesis_metadata() -> None:
                     "state_id": "state_autonomy_guilt_split",
                     "label": "Autonomy-Guilt Split",
                 },
-                "therapist_move_inventory": [
-                    {"move_id": "move_boundary_reframing", "label": "Boundary Reframing"}
-                ],
+                "therapist_move_inventory": [{"move_id": "move_boundary_reframing", "label": "Boundary Reframing"}],
                 "hidden_driver": "autonomy_guilt_split",
                 "difficulty": "very_high",
                 "repair_opportunities": ["name grief", "separate care from control"],
@@ -200,9 +198,7 @@ def test_build_synthesis_attributes_returns_canonical_shape() -> None:
             "state_id": "state_autonomy_guilt_split",
             "label": "Autonomy-Guilt Split",
         },
-        therapist_moves=[
-            {"move_id": "move_boundary_reframing", "label": "Boundary Reframing"}
-        ],
+        therapist_moves=[{"move_id": "move_boundary_reframing", "label": "Boundary Reframing"}],
         benchmark_spec={
             "benchmark_slice": "benchmark_supervisor_rubrics",
             "must_detect": ["self-blame"],
@@ -1223,14 +1219,10 @@ def test_corpus_builder_writes_fresh_artifacts(tmp_path: Path) -> None:
     assert len(result.sources) == 1
     split_manifest = json.loads((destination / "split_manifest.json").read_text(encoding="utf-8"))
     assert split_manifest["split_seed"] == "pixelated-corpus-v1"
-    transformation_log = json.loads(
-        (destination / "transformation_log.json").read_text(encoding="utf-8")
-    )
+    transformation_log = json.loads((destination / "transformation_log.json").read_text(encoding="utf-8"))
     assert transformation_log["row_processing"]["raw_rows"] == 2
     assert transformation_log["row_processing"]["accepted_rows"] == 1
-    reproducibility_report = json.loads(
-        (destination / "reproducibility_report.json").read_text(encoding="utf-8")
-    )
+    reproducibility_report = json.loads((destination / "reproducibility_report.json").read_text(encoding="utf-8"))
     assert reproducibility_report["enabled"] is True
     assert reproducibility_report["verified"] is True
     data_card = json.loads((destination / "data_card.json").read_text(encoding="utf-8"))
@@ -1381,15 +1373,11 @@ def test_corpus_builder_routes_policy_and_evaluator_lanes(tmp_path: Path) -> Non
         "policy",
         "evaluator",
     }
-    rubric_summary = json.loads(
-        (destination / "rubric_coverage_summary.json").read_text(encoding="utf-8")
-    )
+    rubric_summary = json.loads((destination / "rubric_coverage_summary.json").read_text(encoding="utf-8"))
     assert rubric_summary["entries_with_rubrics"] == 1
     assert rubric_summary["rubric_items"] == 2
     assert rubric_summary["by_lane"]["evaluator"]["entries_with_rubrics"] == 1
-    clinician_review_summary = json.loads(
-        (destination / "clinician_review_summary.json").read_text(encoding="utf-8")
-    )
+    clinician_review_summary = json.loads((destination / "clinician_review_summary.json").read_text(encoding="utf-8"))
     assert clinician_review_summary["entries_with_hooks"] == 1
     assert clinician_review_summary["by_lane"]["evaluator"]["entries_with_hooks"] == 1
 
@@ -1477,7 +1465,7 @@ def test_corpus_builder_emits_benchmark_slices(tmp_path: Path) -> None:
                             "legacy_paths": [],
                         }
                     }
-                }
+                },
             }
         ),
         encoding="utf-8",
@@ -1505,9 +1493,7 @@ def test_corpus_builder_emits_benchmark_slices(tmp_path: Path) -> None:
     benchmark_package = json.loads((destination / "benchmark_package.json").read_text(encoding="utf-8"))
     assert benchmark_package["benchmark_entries"] == 3
     assert "benchmark_crisis" in benchmark_package["slices"]
-    release_checklist = json.loads(
-        (destination / "release_checklist.json").read_text(encoding="utf-8")
-    )
+    release_checklist = json.loads((destination / "release_checklist.json").read_text(encoding="utf-8"))
     assert release_checklist["passed"] is True
     continuity_report = json.loads((destination / "continuity_report.json").read_text(encoding="utf-8"))
     assert continuity_report["passed"] is True

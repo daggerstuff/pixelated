@@ -85,7 +85,7 @@ def merge_with_custom_weight(
         trust_remote_code=True,
         low_cpu_mem_usage=True,
     )
-    print(f"✅ Base model loaded")
+    print("✅ Base model loaded")
 
     # Load tokenizer
     print("\n[2/5] Loading tokenizer...")
@@ -131,7 +131,7 @@ def merge_with_custom_weight(
     print("MERGE COMPLETE")
     print("=" * 60)
     print(f"Output directory: {output_path}")
-    print(f"Model files:")
+    print("Model files:")
     for file in sorted(output_path.glob("*")):
         if file.is_file():
             size_gb = file.stat().st_size / (1024**3)
@@ -141,18 +141,10 @@ def merge_with_custom_weight(
 
 def main():
     parser = argparse.ArgumentParser(description="Re-merge LoRA with custom weight")
-    parser.add_argument(
-        "--base", type=str, default="LatitudeGames/Wayfarer-2-12B", help="Base model name or path"
-    )
-    parser.add_argument(
-        "--adapter", type=str, default="checkpoints/final_model/", help="Path to LoRA adapter"
-    )
-    parser.add_argument(
-        "--output", type=str, default="checkpoints/merged_reduced/", help="Output directory"
-    )
-    parser.add_argument(
-        "--scale", type=float, default=0.5, help="Weight scaling factor (0.5 = half strength)"
-    )
+    parser.add_argument("--base", type=str, default="LatitudeGames/Wayfarer-2-12B", help="Base model name or path")
+    parser.add_argument("--adapter", type=str, default="checkpoints/final_model/", help="Path to LoRA adapter")
+    parser.add_argument("--output", type=str, default="checkpoints/merged_reduced/", help="Output directory")
+    parser.add_argument("--scale", type=float, default=0.5, help="Weight scaling factor (0.5 = half strength)")
     parser.add_argument("--torch-dtype", type=str, default="float16", help="Torch dtype")
     parser.add_argument("--device", type=str, default="auto", help="Device map")
 

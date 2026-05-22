@@ -448,7 +448,7 @@ export class KeyStorage {
     return keys
       .map((key) => {
         const parts = key.split(':')
-        return parts[parts.length - 1] || ''
+        return parts[parts.length - 1] ?? ''
       })
       .filter(Boolean)
   }

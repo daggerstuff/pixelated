@@ -3,6 +3,8 @@
  * Mirrors ai/memory/test_importance_scorer.py exactly.
  */
 
+import type { MemoryBlock } from '@/types/memory'
+
 import {
   exponentialDecay,
   cosineSimilarity as cosSim,
@@ -10,7 +12,6 @@ import {
   ImportanceScorer,
   DEFAULT_WEIGHTS,
 } from '../importance-scorer'
-import type { MemoryBlock } from '@/types/memory'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -112,7 +113,15 @@ describe('exponentialDecay', () => {
 
 describe('emotionalWeight', () => {
   const CRISIS = ['suicide', 'self-harm', 'overdose', 'panic', 'psychosis']
-  const HIGH = ['grief', 'trauma', 'anxiety', 'fear', 'anger', 'despair', 'hopelessness']
+  const HIGH = [
+    'grief',
+    'trauma',
+    'anxiety',
+    'fear',
+    'anger',
+    'despair',
+    'hopelessness',
+  ]
   const NORMAL = ['joy', 'trust', 'anticipation', 'surprise', 'disgust']
 
   it('crisis categories → 5.0', () => {
@@ -218,8 +227,8 @@ describe('DEFAULT_WEIGHTS', () => {
   it('has all required weight fields', () => {
     expect(DEFAULT_WEIGHTS.alpha).toBe(0.25)
     expect(DEFAULT_WEIGHTS.beta).toBe(0.25)
-    expect(DEFAULT_WEIGHTS.gamma).toBe(0.30)
-    expect(DEFAULT_WEIGHTS.delta).toBe(0.20)
+    expect(DEFAULT_WEIGHTS.gamma).toBe(0.3)
+    expect(DEFAULT_WEIGHTS.delta).toBe(0.2)
     expect(DEFAULT_WEIGHTS.decayTauDays).toBe(7)
   })
 })

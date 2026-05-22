@@ -532,9 +532,7 @@ describe("Session Analysis API Endpoint", () => {
       ): MockRequest => {
         const url = new URL("http://localhost:3000/api/bias-detection/analyze");
         // API requires therapistId
-        if (!searchParams.therapistId) {
-          searchParams.therapistId = "test-therapist-123";
-        }
+        searchParams.therapistId ??= "test-therapist-123";
         Object.entries(searchParams).forEach(([key, value]) => {
           url.searchParams.set(key, value);
         });

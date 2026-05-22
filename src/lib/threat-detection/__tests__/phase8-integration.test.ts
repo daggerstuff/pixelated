@@ -7,7 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createCompleteThreatDetectionSystem } from '../integrations'
 
-type ThreatDetectionSystem = ReturnType<typeof createCompleteThreatDetectionSystem>
+type ThreatDetectionSystem = ReturnType<
+  typeof createCompleteThreatDetectionSystem
+>
 type RateLimiterMock = {
   checkLimit: ReturnType<typeof vi.fn>
   consume: ReturnType<typeof vi.fn>
@@ -15,9 +17,8 @@ type RateLimiterMock = {
 }
 
 const setMockFetchResponse = (payload: unknown): void => {
-  const fetchMock = vi.fn<
-    (input: URL | RequestInfo, init?: RequestInit) => Promise<Response>
-  >()
+  const fetchMock =
+    vi.fn<(input: URL | RequestInfo, init?: RequestInit) => Promise<Response>>()
   const response = new Response(
     typeof payload === 'string' ? payload : JSON.stringify(payload),
     {
@@ -460,9 +461,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify sensitive operations require proper authorization
       const sensitiveOperations = [
-         async () => monitoringService.clearMetrics(),
-         async () => monitoringService.getSystemConfig(),
-         async () => monitoringService.exportData(),
+        async () => monitoringService.clearMetrics(),
+        async () => monitoringService.getSystemConfig(),
+        async () => monitoringService.exportData(),
       ]
 
       for (const operation of sensitiveOperations) {

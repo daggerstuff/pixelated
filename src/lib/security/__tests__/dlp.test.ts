@@ -32,7 +32,7 @@ vi.mock('../../audit/log', () => {
     logAuditEvent: vi.fn().mockResolvedValue(undefined),
     createResourceAuditLog: vi
       .fn()
-      .mockImplementation( async (action, userId, resource, metadata) => {
+      .mockImplementation(async (action, userId, resource, metadata) => {
         return Promise.resolve({
           id: 'mock-uuid-1234567890',
           timestamp: new Date(),

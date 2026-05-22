@@ -7,15 +7,15 @@ const isBuildTime =
   process.env['NODE_ENV'] === 'production' &&
   (process.env['CI'] === 'true' ||
     process.env['GITHUB_ACTIONS'] === 'true' ||
-    process.env['SYSTEM_TEAMFOUNDATIONCOLLECTIONURI'] ??
-    process.env['BUILD_BUILDID'])
+    (process.env['SYSTEM_TEAMFOUNDATIONCOLLECTIONURI'] ??
+      process.env['BUILD_BUILDID']))
 
 // Only import Azure config if not in build environment
 let azureConfig: unknown = null
 if (!isBuildTime) {
-  ;void (async () => {
+  void (async () => {
     try {
-      const module = await import('../../config/azure.config')
+      const module = await import('@/config/azure.config')
       azureConfig = module.azureConfig
     } catch (error: unknown) {
       logger.warn('Failed to load Azure configuration', {

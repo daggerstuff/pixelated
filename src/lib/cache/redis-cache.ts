@@ -234,7 +234,11 @@ export class RedisCache {
     return this.get<T>(cacheKey)
   }
 
-  async setAnalyticsData(key: string, days: number, data: unknown): Promise<void> {
+  async setAnalyticsData(
+    key: string,
+    days: number,
+    data: unknown,
+  ): Promise<void> {
     const cacheKey = `analytics:${key}:${days}`
     // Analytics data can be cached for 15 minutes
     await this.set(cacheKey, data, 900)
@@ -263,7 +267,7 @@ export class RedisCache {
 let cacheInstance: RedisCache | null = null
 
 export function getCache(): RedisCache {
-  cacheInstance ??= new RedisCache();
+  cacheInstance ??= new RedisCache()
   return cacheInstance
 }
 

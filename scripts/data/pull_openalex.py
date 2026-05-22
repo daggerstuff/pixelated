@@ -82,9 +82,7 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
             if not work_id:
                 continue
 
-            authors = [
-                a.get("author", {}).get("display_name", "") for a in work.get("authorships", [])
-            ]
+            authors = [a.get("author", {}).get("display_name", "") for a in work.get("authorships", [])]
 
             keywords = [kw.get("display_name", "") for kw in work.get("keywords_concepts", [])[:10]]
 
@@ -97,9 +95,7 @@ def pull_metadata(output_dir: Path, limit: int) -> int:
                     "title": work.get("title", ""),
                     "abstract": "",
                     "authors": authors,
-                    "doi": work.get("doi", "").replace("https://doi.org/", "")
-                    if work.get("doi")
-                    else "",
+                    "doi": work.get("doi", "").replace("https://doi.org/", "") if work.get("doi") else "",
                     "publication_date": work.get("publication_date", ""),
                     "journal": (
                         work.get("primary_location", {}).get("source", {}).get("display_name", "")

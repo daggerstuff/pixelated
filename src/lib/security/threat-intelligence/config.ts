@@ -159,7 +159,7 @@ export const edgeThreatDetectionConfig: EdgeThreatDetectionSystemConfig = {
     region:
       baseConfig.regions.secondary[
         index % baseConfig.regions.secondary.length
-      ] || baseConfig.regions.primary,
+      ] ?? baseConfig.regions.primary,
     endpoint: `https://edge-${index + 1}.pixelated.com`,
     capabilities: ['detection', 'filtering', 'caching'],
     max_capacity: 1000,

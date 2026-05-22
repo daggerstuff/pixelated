@@ -24,15 +24,19 @@ const sizeClassMap = {
   lg: 'h-11 px-8',
 }
 
-function Button(props: ButtonProps = {}, options?: { default?: { render: () => string } }) {
+function Button(
+  props: ButtonProps = {},
+  options?: { default?: { render: () => string } },
+) {
   const variant = props.variant ?? 'default'
   const size = props.size ?? 'default'
   const loading = props.loading === true
   const text = loading
     ? (props.loadingText ?? options?.default?.render?.() ?? '')
-    : options?.default?.render?.() ?? ''
+    : (options?.default?.render?.() ?? '')
   const attrs = Object.entries(props).reduce<string[]>((acc, [key, value]) => {
-    if (['href', 'variant', 'size', 'loading', 'loadingText'].includes(key)) return acc
+    if (['href', 'variant', 'size', 'loading', 'loadingText'].includes(key))
+      return acc
     if (value === undefined) return acc
     acc.push(`${key}="${String(value)}"`)
     return acc
@@ -186,7 +190,7 @@ describe('Button.astro', () => {
     const { container } = await renderAstro(
       Button,
       {
-        id: 'custom-button',
+        'id': 'custom-button',
         'aria-label': 'Custom Action',
         'data-testid': 'action-button',
       },

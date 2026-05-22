@@ -546,7 +546,7 @@ export function escapeHtml(str: string): string {
     '"': '&quot;',
     "'": '&#39;',
   }
-  return str.replace(/[&<>"']/g, (s) => entityMap[s] || s)
+  return str.replace(/[&<>"']/g, (s) => entityMap[s] ?? s)
 }
 
 /**

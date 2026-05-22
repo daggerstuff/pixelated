@@ -10,8 +10,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
   try {
     // Get client IP for rate limiting
     const clientIp =
-      (request.headers.get('x-forwarded-for') ??
-      request.headers.get('cf-connecting-ip')) ??
+      request.headers.get('x-forwarded-for') ??
+      request.headers.get('cf-connecting-ip') ??
       'anonymous'
 
     // Check rate limit

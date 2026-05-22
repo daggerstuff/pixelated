@@ -383,7 +383,7 @@ export function requiresMFA(permission: string): boolean {
  */
 export function requiresAudit(permission: string): boolean {
   const permDef = PERMISSION_DEFINITIONS[permission]
-  return permDef?.auditRequired || false
+  return permDef?.auditRequired ?? false
 }
 
 /**

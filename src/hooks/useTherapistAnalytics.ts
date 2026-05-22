@@ -155,9 +155,7 @@ export function useTherapistAnalytics(
           return
         }
         Object.entries(scores).forEach(([skill, score]) => {
-          if (!perSkill[skill]) {
-            perSkill[skill] = { scores: [], sessions: 0 }
-          }
+          perSkill[skill] ??= { scores: [], sessions: 0 }
           perSkill[skill].scores.push(score)
           perSkill[skill].sessions += 1
         })

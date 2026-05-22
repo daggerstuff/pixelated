@@ -399,7 +399,9 @@ export class PlatformStatusMonitor {
 
   async checkAllComponents(): Promise<ComponentStatus[]> {
     const componentNames = Array.from(this.components.keys())
-    const promises = componentNames.map( async (name) => this.checkComponent(name))
+    const promises = componentNames.map(async (name) =>
+      this.checkComponent(name),
+    )
 
     return Promise.all(promises)
   }
@@ -464,7 +466,7 @@ export class PlatformStatusMonitor {
 let statusMonitor: PlatformStatusMonitor | null = null
 
 export function getPlatformStatusMonitor(): PlatformStatusMonitor {
-  statusMonitor ??= new PlatformStatusMonitor();
+  statusMonitor ??= new PlatformStatusMonitor()
   return statusMonitor
 }
 

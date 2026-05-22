@@ -21,6 +21,7 @@ from ai.memory.unified_memory import (
     MemoryProvider,
 )
 
+
 class TestMemoryCategory:
     """Test MemoryCategory enum."""
 

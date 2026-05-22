@@ -1,6 +1,5 @@
-import { vi } from 'vitest'
-
 import type { Request, Response } from 'express'
+import { vi } from 'vitest'
 
 export type MockAuthUser = {
   id: string

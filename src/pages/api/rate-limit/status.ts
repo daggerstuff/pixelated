@@ -203,7 +203,7 @@ export const POST: APIRoute = async ({ request }) => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                Authorization: `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
+                'Authorization': `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
               },
               body: JSON.stringify({
                 to: adminEmail,

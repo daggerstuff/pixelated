@@ -45,7 +45,7 @@ const Slider: FC<SliderProps> = ({
       className={`relative ${isVertical ? 'h-32 w-6' : 'h-6 w-full'} ${className}`}
     >
       <input
-        type='range'
+        type="range"
         min={min}
         max={max}
         step={step}
