@@ -252,7 +252,7 @@
     "date-fns": "latest",
     "dayjs": "latest",
     "devalue": "^5.8.1",
-    "dompurify": "^3.4.3",
+    "dompurify": "^3.4.5",
     "drizzle-orm": "^0.45.2",
     "es-module-lexer": "latest",
     "events": "latest",
