@@ -371,7 +371,7 @@ export class OptimizedBiasDetectionService {
     contentHash: string
     processingTimeMs: number
   }): Promise<void> {
-     initializeDatabase()
+    initializeDatabase()
     const pool = getPool()
     const client = await pool.connect()
     let timeoutHandle: NodeJS.Timeout | undefined

@@ -86,9 +86,7 @@ def validate_emotion_result(emotion_data: EmotionData) -> EmotionValidationResul
         issues.append("Low emotion detection confidence")
 
     # Check for valid emotion categories
-    if not any(
-        valid_emotion in emotion_data.detected_emotion.lower() for valid_emotion in VALID_EMOTIONS
-    ):
+    if not any(valid_emotion in emotion_data.detected_emotion.lower() for valid_emotion in VALID_EMOTIONS):
         issues.append("Unrecognized emotion category")
 
     # Calculate authenticity score
@@ -119,9 +117,7 @@ def validate_emotion_result(emotion_data: EmotionData) -> EmotionValidationResul
     # Calculate bias score (simplified)
     bias_score = 0.0
     if emotion_data.participant_demographics and emotion_data.response_text:
-        bias_score = detect_bias_patterns(
-            emotion_data.response_text, emotion_data.participant_demographics
-        )
+        bias_score = detect_bias_patterns(emotion_data.response_text, emotion_data.participant_demographics)
 
     # Generate recommendations
     if emotion_data.confidence < 0.5:

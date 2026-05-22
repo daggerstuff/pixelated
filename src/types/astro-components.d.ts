@@ -1,12 +1,6 @@
 // Astro component type declarations
-declare module '*.astro' {
-  export type AstroComponentFactory = (options: {
-    props: Record<string, unknown>
-    slots: Record<string, () => Promise<unknown>>
-  }) => Promise<unknown>
-  const component: AstroComponentFactory
-  export default component
-}
+// Note: The generic 'declare module "*.astro"' lives in .astro-env.d.ts
+// Do NOT duplicate it here — conflicting ambient declarations cause "no default export" errors.
 
 // Type module declarations for missing local modules
 declare module '@/types/patient' {
@@ -26,6 +20,24 @@ declare module '@/lib/analytics/service' {
 }
 
 declare module '../../config/azure.config' {
+  export interface AzureConfig {
+    clientId: string
+    tenantId: string
+    clientSecret: string
+  }
+  export const azureConfig: AzureConfig
+}
+
+declare module '../config/azure.config' {
+  export interface AzureConfig {
+    clientId: string
+    tenantId: string
+    clientSecret: string
+  }
+  export const azureConfig: AzureConfig
+}
+
+declare module '@/config/azure.config' {
   export interface AzureConfig {
     clientId: string
     tenantId: string

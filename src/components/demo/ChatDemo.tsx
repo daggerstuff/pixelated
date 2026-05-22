@@ -158,11 +158,11 @@ export function ChatDemo({
       <div
         className={`bg-gray-50 border-gray-300 flex h-64 items-center justify-center rounded-lg border-2 border-dashed ${className}`}
       >
-        <div className='text-center'>
-          <h3 className='text-gray-900 mb-2 text-lg font-medium'>
+        <div className="text-center">
+          <h3 className="text-gray-900 mb-2 text-lg font-medium">
             Authentication Required
           </h3>
-          <p className='text-gray-600'>
+          <p className="text-gray-600">
             Please sign in to access the chat interface.
           </p>
         </div>
@@ -176,27 +176,27 @@ export function ChatDemo({
     >
       {/* Crisis Alert Banner */}
       {crisisAlertShown && crisisResult?.isCrisis && (
-        <div className='bg-red-50 border-red-400 mb-4 border-l-4 p-4'>
-          <div className='flex items-center justify-between'>
-            <div className='flex'>
-              <div className='flex-shrink-0'>
+        <div className="bg-red-50 border-red-400 mb-4 border-l-4 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex">
+              <div className="flex-shrink-0">
                 <svg
-                  className='text-red-400 h-5 w-5'
-                  viewBox='0 0 20 20'
-                  fill='currentColor'
+                  className="text-red-400 h-5 w-5"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
                 >
                   <path
-                    fillRule='evenodd'
-                    d='M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z'
-                    clipRule='evenodd'
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
                   />
                 </svg>
               </div>
-              <div className='ml-3'>
-                <h3 className='text-red-800 text-sm font-medium'>
+              <div className="ml-3">
+                <h3 className="text-red-800 text-sm font-medium">
                   Crisis Detected
                 </h3>
-                <p className='text-red-700 text-sm'>
+                <p className="text-red-700 text-sm">
                   Risk Level: {crisisResult.riskLevel} | Confidence:{' '}
                   {(crisisResult.confidence * 100).toFixed(0)}%
                 </p>
@@ -204,13 +204,13 @@ export function ChatDemo({
             </div>
             <button
               onClick={() => setCrisisAlertShown(false)}
-              className='text-red-400 hover:text-red-600'
+              className="text-red-400 hover:text-red-600"
             >
-              <svg className='h-5 w-5' viewBox='0 0 20 20' fill='currentColor'>
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path
-                  fillRule='evenodd'
-                  d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
-                  clipRule='evenodd'
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
                 />
               </svg>
             </button>
@@ -220,15 +220,15 @@ export function ChatDemo({
 
       {/* Rate Limit Warning */}
       {rateLimitExceeded && (
-        <div className='bg-yellow-50 border-yellow-400 mb-4 border-l-4 p-4'>
-          <p className='text-yellow-700 text-sm'>
+        <div className="bg-yellow-50 border-yellow-400 mb-4 border-l-4 p-4">
+          <p className="text-yellow-700 text-sm">
             Please wait before sending another message.
           </p>
         </div>
       )}
 
       {/* Chat Interface */}
-      <div className='min-h-0 flex-1'>
+      <div className="min-h-0 flex-1">
         <ChatContainer
           messages={messages
             .filter((m) => m.role !== 'system' && m.content !== undefined)
@@ -250,77 +250,77 @@ export function ChatDemo({
       </div>
 
       {/* Analysis Panel */}
-      <div className='border-gray-200 bg-gray-50 border-t'>
-        <div className='p-4'>
-          <div className='mb-3 flex items-center justify-between'>
+      <div className="border-gray-200 bg-gray-50 border-t">
+        <div className="p-4">
+          <div className="mb-3 flex items-center justify-between">
             <button
               onClick={() => setShowAnalysis(!showAnalysis)}
-              className='text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-blue-500 flex items-center rounded-md border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2'
+              className="text-gray-700 bg-white border-gray-300 hover:bg-gray-50 focus:ring-blue-500 flex items-center rounded-md border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
             >
               <svg
                 className={`mr-2 h-4 w-4 transform transition-transform ${showAnalysis ? 'rotate-180' : ''}`}
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='currentColor'
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
                 <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   strokeWidth={2}
-                  d='M19 9l-7 7-7-7'
+                  d="M19 9l-7 7-7-7"
                 />
               </svg>
               {showAnalysis ? 'Hide Analysis' : 'Show Analysis'}
             </button>
-            <div className='text-gray-500 text-xs'>
+            <div className="text-gray-500 text-xs">
               Messages: {messageCount}/{MAX_MESSAGES_PER_HOUR}
             </div>
           </div>
 
           {showAnalysis && (
-            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Sentiment Analysis */}
-              <div className='bg-white border-gray-200 rounded-lg border p-4'>
-                <div className='mb-3 flex items-center justify-between'>
-                  <h3 className='text-gray-900 text-sm font-semibold'>
+              <div className="bg-white border-gray-200 rounded-lg border p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-gray-900 text-sm font-semibold">
                     Sentiment Analysis
                   </h3>
                   {sentimentLoading && (
-                    <div className='border-blue-600 h-4 w-4 animate-spin rounded-full border-b-2'></div>
+                    <div className="border-blue-600 h-4 w-4 animate-spin rounded-full border-b-2"></div>
                   )}
                 </div>
                 {sentimentResult ? (
-                  <div className='space-y-2'>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600 text-sm'>Sentiment:</span>
-                      <span className='text-sm font-medium'>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Sentiment:</span>
+                      <span className="text-sm font-medium">
                         {sentimentResult.sentiment}
                       </span>
                     </div>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600 text-sm'>Confidence:</span>
-                      <span className='text-sm font-medium'>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Confidence:</span>
+                      <span className="text-sm font-medium">
                         {(sentimentResult.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
                     {sentimentResult.emotions && (
-                      <div className='mt-3'>
-                        <p className='text-gray-900 mb-2 text-sm font-medium'>
+                      <div className="mt-3">
+                        <p className="text-gray-900 mb-2 text-sm font-medium">
                           Emotions:
                         </p>
-                        <div className='space-y-1'>
+                        <div className="space-y-1">
                           {Object.entries(sentimentResult.emotions)
                             .sort(([, a], [, b]) => b - a)
                             .slice(0, 3)
                             .map(([emotion, score]) => (
                               <div
                                 key={emotion}
-                                className='flex justify-between text-xs'
+                                className="flex justify-between text-xs"
                               >
-                                <span className='text-gray-600 capitalize'>
+                                <span className="text-gray-600 capitalize">
                                   {emotion}:
                                 </span>
-                                <span className='font-medium'>
+                                <span className="font-medium">
                                   {Math.floor(score * 100)}%
                                 </span>
                               </div>
@@ -330,24 +330,24 @@ export function ChatDemo({
                     )}
                   </div>
                 ) : (
-                  <p className='text-gray-500 text-sm'>No analysis available</p>
+                  <p className="text-gray-500 text-sm">No analysis available</p>
                 )}
               </div>
 
               {/* Crisis Detection */}
-              <div className='bg-white border-gray-200 rounded-lg border p-4'>
-                <div className='mb-3 flex items-center justify-between'>
-                  <h3 className='text-gray-900 text-sm font-semibold'>
+              <div className="bg-white border-gray-200 rounded-lg border p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-gray-900 text-sm font-semibold">
                     Crisis Detection
                   </h3>
                   {crisisLoading && (
-                    <div className='border-red-600 h-4 w-4 animate-spin rounded-full border-b-2'></div>
+                    <div className="border-red-600 h-4 w-4 animate-spin rounded-full border-b-2"></div>
                   )}
                 </div>
                 {crisisResult ? (
-                  <div className='space-y-2'>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600 text-sm'>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">
                         Crisis Detected:
                       </span>
                       <span
@@ -356,22 +356,22 @@ export function ChatDemo({
                         {crisisResult.isCrisis ? 'Yes' : 'No'}
                       </span>
                     </div>
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600 text-sm'>Confidence:</span>
-                      <span className='text-sm font-medium'>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Confidence:</span>
+                      <span className="text-sm font-medium">
                         {(crisisResult.confidence * 100).toFixed(0)}%
                       </span>
                     </div>
                     {crisisResult.category && (
-                      <div className='flex justify-between'>
-                        <span className='text-gray-600 text-sm'>Type:</span>
-                        <span className='text-sm font-medium'>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 text-sm">Type:</span>
+                        <span className="text-sm font-medium">
                           {crisisResult.category}
                         </span>
                       </div>
                     )}
-                    <div className='flex justify-between'>
-                      <span className='text-gray-600 text-sm'>Risk Level:</span>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 text-sm">Risk Level:</span>
                       <span
                         className={`text-sm font-medium ${
                           crisisResult.riskLevel === 'critical'
@@ -388,16 +388,16 @@ export function ChatDemo({
                     </div>
                     {crisisResult.suggestedActions &&
                       crisisResult.suggestedActions.length > 0 && (
-                        <div className='mt-3'>
-                          <p className='text-gray-900 mb-1 text-sm font-medium'>
+                        <div className="mt-3">
+                          <p className="text-gray-900 mb-1 text-sm font-medium">
                             Suggested Actions:
                           </p>
-                          <ul className='text-gray-600 space-y-1 text-xs'>
+                          <ul className="text-gray-600 space-y-1 text-xs">
                             {crisisResult.suggestedActions
                               .slice(0, 2)
                               .map((action: string) => (
-                                <li key={action} className='flex items-start'>
-                                  <span className='mr-1'>•</span>
+                                <li key={action} className="flex items-start">
+                                  <span className="mr-1">•</span>
                                   <span>{action}</span>
                                 </li>
                               ))}
@@ -406,7 +406,7 @@ export function ChatDemo({
                       )}
                   </div>
                 ) : (
-                  <p className='text-gray-500 text-sm'>No analysis available</p>
+                  <p className="text-gray-500 text-sm">No analysis available</p>
                 )}
               </div>
             </div>
@@ -439,23 +439,23 @@ export class ChatDemoErrorBoundary extends React.Component<
     // Log to monitoring service in production
   }
 
-  override  async render() {
+  override async render() {
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div className='bg-red-50 border-red-200 flex h-64 items-center justify-center rounded-lg border'>
-            <div className='text-center'>
-              <h3 className='text-red-900 mb-2 text-lg font-medium'>
+          <div className="bg-red-50 border-red-200 flex h-64 items-center justify-center rounded-lg border">
+            <div className="text-center">
+              <h3 className="text-red-900 mb-2 text-lg font-medium">
                 Something went wrong
               </h3>
-              <p className='text-red-700 mb-4'>
+              <p className="text-red-700 mb-4">
                 The chat interface encountered an error.
               </p>
               <button
                 onClick={() =>
                   this.setState({ hasError: false, error: undefined })
                 }
-                className='bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 rounded-md px-4 py-2 focus:outline-none focus:ring-2'
+                className="bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 rounded-md px-4 py-2 focus:outline-none focus:ring-2"
               >
                 Try Again
               </button>

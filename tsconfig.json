@@ -49,10 +49,7 @@
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
     "types": ["node", "react", "react-dom"],
-    "typeRoots": [
-      "./node_modules/@types",
-      "./src/types"
-    ],
+    "typeRoots": ["./node_modules/@types", "./src/types"],
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"

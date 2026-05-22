@@ -2206,7 +2206,7 @@ export class EdgeComputingManager extends EventEmitter {
         totalLocations: this.config.locations.length,
       })
 
-      const deploymentPromises = this.config.locations.map( async (location) =>
+      const deploymentPromises = this.config.locations.map(async (location) =>
         this.deployEdgeNode(location),
       )
 
@@ -3043,7 +3043,8 @@ async function processRequest(req, threatCheck, biasCheck) {
   private async performHealthChecks(): Promise<void> {
     try {
       const healthCheckPromises = Array.from(this.edgeNodes.entries()).map(
-         async ([locationId, status]) => this.performHealthCheck(locationId, status),
+        async ([locationId, status]) =>
+          this.performHealthCheck(locationId, status),
       )
 
       await Promise.allSettled(healthCheckPromises)

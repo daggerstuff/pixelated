@@ -82,10 +82,7 @@ export class MentalLLaMAPythonBridge {
             try {
               const response: PythonBridgeResponse & { id?: string } =
                 JSON.parse(line) as unknown
-              if (
-                response?.id &&
-                this.requestQueue.has(response.id)
-              ) {
+              if (response?.id && this.requestQueue.has(response.id)) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
                 clearTimeout(timeout)
                 this.requestQueue.delete(response.id)
@@ -225,7 +222,7 @@ export class MentalLLaMAPythonBridge {
    * @param payload Payload object
    * @returns {Promise<unknown>} The response from the Python process.
    */
-  private  async sendRequest(
+  private async sendRequest(
     command: string,
     payload: Record<string, unknown>,
   ): Promise<unknown> {

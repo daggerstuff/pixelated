@@ -64,6 +64,7 @@ BUCKET = os.getenv("HETZNER_S3_BUCKET", "pixel-data")
 KEY = "final_dataset/shards/curriculum/stage2/synthetic_persona_batch_10000.jsonl"
 S3_PATH = f"s3://{BUCKET}/{KEY}"
 
+
 @dataclass
 class _StreamResult:
     total: int
@@ -139,9 +140,7 @@ def _stream_and_collect(loader: S3DatasetLoader) -> _StreamResult | str:
             valid += 1
             if len(sample_records) < 3:
                 sample_records.append((idx + 1, record))
-            _update_quality_counts(
-                record, counts, persona_counts, last_assistant_hashes
-            )
+            _update_quality_counts(record, counts, persona_counts, last_assistant_hashes)
     except Exception as e:
         return str(e)
 

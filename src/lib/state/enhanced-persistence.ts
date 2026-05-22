@@ -493,7 +493,7 @@ class EnhancedStatePersistence {
     if (!stats.featureUsage || typeof stats.featureUsage !== 'object') {
       stats.featureUsage = {}
     }
-    stats.featureUsage[featureName] = (stats.featureUsage[featureName] || 0) + 1
+    stats.featureUsage[featureName] = (stats.featureUsage[featureName] ?? 0) + 1
     this.setStoredValue('usage_stats', stats)
   }
 

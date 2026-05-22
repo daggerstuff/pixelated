@@ -13,11 +13,13 @@ from flask import jsonify, request
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass(frozen=True)
 class UserContext:
     context_type: Literal["user"] = "user"
     user_id: str
     tier: str = "standard"
+
 
 @dataclass(frozen=True)
 class DeveloperContext:
@@ -26,10 +28,13 @@ class DeveloperContext:
     api_key: str
     scopes: tuple[str, ...] = ()
 
+
 AuthContext = Union[UserContext, DeveloperContext]
+
 
 class JWKSCache:
     """Cache for JSON Web Key Sets with 401-triggered invalidation."""
+
     def __init__(self):
         self._keys = {}
         self._last_updated = 0
@@ -50,8 +55,10 @@ class JWKSCache:
         logger.warning("JWKS cache invalidated by 401 response.")
         self._keys = {}
 
+
 # Global cache instance
 jwks_cache = JWKSCache()
+
 
 def authenticate(f):
     @wraps(f)
@@ -62,7 +69,7 @@ def authenticate(f):
 
         # MANDATE: Standardize X-Pixelated-Client and X-API-Key
         if not client_id:
-             return jsonify({"error": "Missing X-Pixelated-Client header"}), 401
+            return jsonify({"error": "Missing X-Pixelated-Client header"}), 401
 
         context: AuthContext | None = None
 

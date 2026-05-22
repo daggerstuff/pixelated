@@ -20,6 +20,7 @@ sys.path.insert(0, str(project_root / "ai"))
 
 from test_empathy_style_validation import EmpathyStyleValidator
 
+
 def get_changed_files():
     """Get list of changed files in current commit/PR"""
     try:
@@ -80,9 +81,7 @@ def check_empathy_guidelines():
     crisis_related_patterns = ["crisis", "intervention", "support", "response"]
 
     for file_path in changed_files:
-        if not file_path or not any(
-            pattern in file_path.lower() for pattern in crisis_related_patterns
-        ):
+        if not file_path or not any(pattern in file_path.lower() for pattern in crisis_related_patterns):
             continue
 
         full_path = project_root / file_path
@@ -133,9 +132,7 @@ def check_empathy_guidelines():
             logger.info(f"   Issues: {len(violation['violations'])} institutional references found")
 
         logger.info("\n💥 BLOCKING MERGE - Empathy guidelines violated!")
-        logger.info(
-            "Please revise the text to use collaborative support language instead of institutional referrals."
-        )
+        logger.info("Please revise the text to use collaborative support language instead of institutional referrals.")
         return False
 
     if not crisis_test_results["all_passed"]:

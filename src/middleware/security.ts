@@ -36,7 +36,7 @@ const SECURITY_HEADERS = {
   'Cross-Origin-Opener-Policy': 'same-origin',
   'Cross-Origin-Resource-Policy': 'same-origin',
 
-  Server: undefined,
+  'Server': undefined,
   'X-Powered-By': undefined,
 
   'X-Download-Options': 'noopen',

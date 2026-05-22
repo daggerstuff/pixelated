@@ -16,7 +16,7 @@ export function inspect(obj) {
 }
 
 export function promisify(_fn) {
-  return  async (..._args) => Promise.resolve()
+  return async (..._args) => Promise.resolve()
 }
 
 export function deprecate(fn, _message) {

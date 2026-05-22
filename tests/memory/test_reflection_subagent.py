@@ -2,9 +2,9 @@
 Tests for reflection subagent, prompts, and consolidation rules.
 """
 
-import pytest
-
 from unittest.mock import Mock
+
+import pytest
 
 from ai.memory.consolidation_rules import (
     ConsolidationConfig,
@@ -248,9 +248,8 @@ class TestReflectionSubagent:
             if call_count[0] == 1:
                 # Crisis detection response
                 return '{"severity": "critical", "indicators": ["suicide", "self-harm"], "action_required": true}'
-            else:
-                # Analysis response
-                return """{
+            # Analysis response
+            return """{
                     "crisis_detected": true,
                     "crisis_indicators": ["suicide", "self-harm"],
                     "preserve_individual": ["mem-1", "mem-2"],

@@ -54,7 +54,7 @@ export function AcquisitionDetail({
   if (isLoading) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Loading acquisition...</p>
+        <p className="text-muted-foreground">Loading acquisition...</p>
       </div>
     )
   }
@@ -62,28 +62,28 @@ export function AcquisitionDetail({
   if (!acquisition) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Acquisition not found</p>
+        <p className="text-muted-foreground">Acquisition not found</p>
       </div>
     )
   }
 
   const statusIcons = {
-    pending: Clock,
-    approved: CheckCircle,
+    'pending': Clock,
+    'approved': CheckCircle,
     'in-progress': Download,
-    completed: CheckCircle,
-    failed: XCircle,
+    'completed': CheckCircle,
+    'failed': XCircle,
   }
 
   const StatusIcon =
     statusIcons[acquisition.status as keyof typeof statusIcons] ?? Clock
 
   const statusColors = {
-    pending: 'text-yellow-600',
-    approved: 'text-blue-600',
+    'pending': 'text-yellow-600',
+    'approved': 'text-blue-600',
     'in-progress': 'text-blue-600',
-    completed: 'text-green-600',
-    failed: 'text-red-600',
+    'completed': 'text-green-600',
+    'failed': 'text-red-600',
   }
 
   const statusColor =
@@ -93,34 +93,34 @@ export function AcquisitionDetail({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Acquisition Details</h1>
-          <p className='text-muted-foreground mt-1'>
-            <span className='capitalize'>{acquisition.status}</span>
+          <h1 className="text-3xl font-bold">Acquisition Details</h1>
+          <p className="text-muted-foreground mt-1">
+            <span className="capitalize">{acquisition.status}</span>
             {acquisition.acquiredDate &&
               ` • Acquired ${format(acquisition.acquiredDate, 'MMM d, yyyy')}`}
           </p>
         </div>
-        <div className='flex items-center gap-4'>
-          <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <StatusIcon className={cn('h-5 w-5', statusColor)} />
-            <span className='font-medium capitalize'>{acquisition.status}</span>
+            <span className="font-medium capitalize">{acquisition.status}</span>
           </div>
 
           {/* Training Pipeline Integration */}
           {acquisition.status === 'completed' && (
-            <div className='flex items-center gap-2'>
+            <div className="flex items-center gap-2">
               {isIntegrated ? (
-                <div className='bg-green-50 dark:bg-green-900/20 flex items-center gap-2 rounded-md px-3 py-1.5'>
-                  <CheckCircle2 className='text-green-600 dark:text-green-400 h-4 w-4' />
-                  <span className='text-green-600 dark:text-green-400 text-sm font-medium'>
+                <div className="bg-green-50 dark:bg-green-900/20 flex items-center gap-2 rounded-md px-3 py-1.5">
+                  <CheckCircle2 className="text-green-600 dark:text-green-400 h-4 w-4" />
+                  <span className="text-green-600 dark:text-green-400 text-sm font-medium">
                     Integrated
                   </span>
                 </div>
               ) : (
                 <Button
-                  size='sm'
+                  size="sm"
                   onClick={() => {
                     if (acquisition.sourceId) {
                       integrateMutation.mutate({
@@ -132,12 +132,12 @@ export function AcquisitionDetail({
                 >
                   {integrateMutation.isPending ? (
                     <>
-                      <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Integrating...
                     </>
                   ) : (
                     <>
-                      <Play className='mr-2 h-4 w-4' />
+                      <Play className="mr-2 h-4 w-4" />
                       Integrate with Training Pipeline
                     </>
                   )}
@@ -154,48 +154,48 @@ export function AcquisitionDetail({
           <CardTitle>Acquisition Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='grid gap-4 md:grid-cols-2'>
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Acquisition ID
               </p>
-              <p className='mt-1'>{acquisition.acquisitionId}</p>
+              <p className="mt-1">{acquisition.acquisitionId}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Source ID
               </p>
-              <p className='mt-1'>{acquisition.sourceId}</p>
+              <p className="mt-1">{acquisition.sourceId}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Status
               </p>
-              <p className='mt-1 capitalize'>{acquisition.status}</p>
+              <p className="mt-1 capitalize">{acquisition.status}</p>
             </div>
             {acquisition.acquiredDate && (
               <div>
-                <p className='text-muted-foreground text-sm font-medium'>
+                <p className="text-muted-foreground text-sm font-medium">
                   Acquired Date
                 </p>
-                <p className='mt-1'>
+                <p className="mt-1">
                   {format(acquisition.acquiredDate, 'PPpp')}
                 </p>
               </div>
             )}
             {acquisition.downloadProgress !== null && (
               <div>
-                <p className='text-muted-foreground text-sm font-medium'>
+                <p className="text-muted-foreground text-sm font-medium">
                   Download Progress
                 </p>
-                <div className='mt-2'>
-                  <div className='bg-muted h-2 w-full overflow-hidden rounded-full'>
+                <div className="mt-2">
+                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
                     <div
-                      className='bg-primary h-full transition-all'
+                      className="bg-primary h-full transition-all"
                       style={{ width: `${acquisition.downloadProgress}%` }}
                     />
                   </div>
-                  <p className='mt-1 text-sm'>
+                  <p className="mt-1 text-sm">
                     {acquisition.downloadProgress}%
                   </p>
                 </div>
@@ -203,18 +203,18 @@ export function AcquisitionDetail({
             )}
             {acquisition.filePath && (
               <div>
-                <p className='text-muted-foreground text-sm font-medium'>
+                <p className="text-muted-foreground text-sm font-medium">
                   File Path
                 </p>
-                <p className='mt-1 font-mono text-sm'>{acquisition.filePath}</p>
+                <p className="mt-1 font-mono text-sm">{acquisition.filePath}</p>
               </div>
             )}
             {acquisition.fileSizeMb !== null && (
               <div>
-                <p className='text-muted-foreground text-sm font-medium'>
+                <p className="text-muted-foreground text-sm font-medium">
                   File Size
                 </p>
-                <p className='mt-1'>{acquisition.fileSizeMb.toFixed(2)} MB</p>
+                <p className="mt-1">{acquisition.fileSizeMb.toFixed(2)} MB</p>
               </div>
             )}
           </div>
@@ -227,7 +227,7 @@ export function AcquisitionDetail({
           <CardTitle>Status Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='flex flex-wrap gap-2'>
+          <div className="flex flex-wrap gap-2">
             {acquisition.status === 'pending' && (
               <>
                 <button
@@ -237,7 +237,7 @@ export function AcquisitionDetail({
                       payload: { status: 'approved' },
                     })
                   }}
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
                 >
                   Approve
                 </button>
@@ -248,7 +248,7 @@ export function AcquisitionDetail({
                       payload: { status: 'failed' },
                     })
                   }}
-                  className='bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium'
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium"
                 >
                   Reject
                 </button>
@@ -262,7 +262,7 @@ export function AcquisitionDetail({
                     payload: { status: 'in-progress' },
                   })
                 }}
-                className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
               >
                 Start Download
               </button>
@@ -275,7 +275,7 @@ export function AcquisitionDetail({
                     payload: { status: 'completed' },
                   })
                 }}
-                className='bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 text-sm font-medium'
+                className="bg-green-600 text-white hover:bg-green-700 rounded-md px-4 py-2 text-sm font-medium"
               >
                 Mark Complete
               </button>

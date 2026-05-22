@@ -28,9 +28,7 @@ async def add_process_time_and_metrics(request: Request, call_next):
         endpoint=request.url.path,
         status=response.status_code,
     ).inc()
-    metrics.request_duration.labels(
-        method=request.method, endpoint=request.url.path
-    ).observe(process_time)
+    metrics.request_duration.labels(method=request.method, endpoint=request.url.path).observe(process_time)
     return response
 
 

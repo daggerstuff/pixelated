@@ -64,34 +64,34 @@ export default function PasswordResetRequestForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className='space-y-4'>
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor='email' className='mb-1 block text-sm font-medium'>
+        <label htmlFor="email" className="mb-1 block text-sm font-medium">
           Email
         </label>
         <input
-          type='email'
-          id='email'
+          type="email"
+          id="email"
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setEmail(e.target.value)
           }
           required
           disabled={isLoading}
-          className='border-gray-300 focus:ring-primary w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2'
-          placeholder='Enter your email'
+          className="border-gray-300 focus:ring-primary w-full rounded-md border px-3 py-2 focus:outline-none focus:ring-2"
+          placeholder="Enter your email"
         />
       </div>
 
       <div>
         <button
-          type='submit'
+          type="submit"
           disabled={isLoading}
-          className='bg-primary text-white hover:bg-primary/90 focus:ring-primary w-full rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-offset-2'
+          className="bg-primary text-white hover:bg-primary/90 focus:ring-primary w-full rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-offset-2"
         >
           {isLoading ? (
-            <span className='flex items-center justify-center gap-2'>
-              <span className='loading-spinner'></span>
+            <span className="flex items-center justify-center gap-2">
+              <span className="loading-spinner"></span>
               <span>Sending...</span>
             </span>
           ) : (
@@ -100,8 +100,8 @@ export default function PasswordResetRequestForm() {
         </button>
       </div>
 
-      <div className='mt-4 text-center'>
-        <a href='/login' className='text-primary text-sm hover:underline'>
+      <div className="mt-4 text-center">
+        <a href="/login" className="text-primary text-sm hover:underline">
           Back to login
         </a>
       </div>

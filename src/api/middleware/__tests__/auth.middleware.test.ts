@@ -53,7 +53,7 @@ describe('Authentication Middleware', () => {
         },
       })
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(mockNext).toHaveBeenCalled()
       expect(mockRequest.user).toEqual({
@@ -70,7 +70,7 @@ describe('Authentication Middleware', () => {
         error: 'Invalid token',
       })
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(401)
       expect(jsonSpy).toHaveBeenCalledWith({
@@ -82,7 +82,7 @@ describe('Authentication Middleware', () => {
     it('should handle authentication error gracefully', async () => {
       mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
       expect(statusSpy).toHaveBeenCalledWith(401)
       expect(jsonSpy).toHaveBeenCalledWith({

@@ -40,15 +40,11 @@ export const POST = withAuth(async (request, session) => {
 
   const existingKeys = await developerApiKeyManager.listApiKeys(session.user.id)
   if (existingKeys.length >= MAX_KEYS_PER_USER) {
-     logSecurityEvent(
-      SecurityEventType.AUTHORIZATION_FAILED,
-      session.user.id,
-      {
-        reason: 'api_key_limit_exceeded',
-        current_count: existingKeys.length,
-        max_allowed: MAX_KEYS_PER_USER,
-      },
-    )
+    logSecurityEvent(SecurityEventType.AUTHORIZATION_FAILED, session.user.id, {
+      reason: 'api_key_limit_exceeded',
+      current_count: existingKeys.length,
+      max_allowed: MAX_KEYS_PER_USER,
+    })
     return jsonError(
       429,
       'Too Many Requests',
@@ -64,16 +60,12 @@ export const POST = withAuth(async (request, session) => {
     expires_in_days,
   })
 
-   logSecurityEvent(
-    SecurityEventType.AUTHENTICATION_SUCCESS,
-    session.user.id,
-    {
-      action: 'api_key_created',
-      key_id: result.api_key.id,
-      key_prefix: result.api_key.key_prefix,
-      scopes,
-    },
-  )
+  logSecurityEvent(SecurityEventType.AUTHENTICATION_SUCCESS, session.user.id, {
+    action: 'api_key_created',
+    key_id: result.api_key.id,
+    key_prefix: result.api_key.key_prefix,
+    scopes,
+  })
 
   return jsonResponse(
     {

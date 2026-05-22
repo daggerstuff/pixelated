@@ -30,12 +30,8 @@ class AnalysisOrchestrator:
         self.config = config
 
         # Initialize sub-services (default values as fallback)
-        self.fairness_analyzer = FairnessAnalyzer(
-            warning_threshold=getattr(config, "warning_threshold", 0.3)
-        )
-        self.diagnostic_service = DiagnosticService(
-            warning_threshold=getattr(config, "warning_threshold", 0.3)
-        )
+        self.fairness_analyzer = FairnessAnalyzer(warning_threshold=getattr(config, "warning_threshold", 0.3))
+        self.diagnostic_service = DiagnosticService(warning_threshold=getattr(config, "warning_threshold", 0.3))
         self.linguistic_analyzer = LinguisticAnalyzer()
 
         # Security managers
@@ -53,9 +49,7 @@ class AnalysisOrchestrator:
         user_id = session_data.get("user_id", "anonymous")
         start_time = time.time()
 
-        logger.info(
-            "Starting comprehensive bias analysis for session", session_id=session_id
-        )
+        logger.info("Starting comprehensive bias analysis for session", session_id=session_id)
 
         # 1. Run all analysis layers in parallel
         tasks = [
@@ -97,9 +91,7 @@ class AnalysisOrchestrator:
         )
         return final_result
 
-    async def _run_layer_analysis(
-        self, layer_type: str, session_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _run_layer_analysis(self, layer_type: str, session_data: dict[str, Any]) -> dict[str, Any]:
         """Execute a specific analysis layer based on its type."""
         session_id = session_data.get("session_id", "unknown")
         try:
@@ -111,9 +103,7 @@ class AnalysisOrchestrator:
                     user_id=session_data.get("user_id", "anonymous"),
                     context=session_data.get("context", ""),
                 )
-                response = await self.bias_service.analyze_bias(
-                    bias_request, request_id=session_id
-                )
+                response = await self.bias_service.analyze_bias(bias_request, request_id=session_id)
 
                 # Extract dictionary representation
                 res = {}
@@ -126,14 +116,10 @@ class AnalysisOrchestrator:
                 return res
 
             if layer_type == "fairness":
-                return await self.fairness_analyzer.run_preprocessing_analysis(
-                    session_data
-                )
+                return await self.fairness_analyzer.run_preprocessing_analysis(session_data)
 
             if layer_type == "diagnostic":
-                return await self.diagnostic_service.run_interactive_analysis(
-                    session_data
-                )
+                return await self.diagnostic_service.run_interactive_analysis(session_data)
 
             if layer_type == "linguistic":
                 text_content = self._extract_text(session_data)
@@ -144,9 +130,7 @@ class AnalysisOrchestrator:
             logger.error("Layer analysis failed", layer_type=layer_type, error=str(e))
             return {"layer": layer_type, "error": str(e), "bias_score": 0.0}
 
-    def _consolidate_results(
-        self, layer_results: list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    def _consolidate_results(self, layer_results: list[dict[str, Any]]) -> dict[str, Any]:
         """Consolidate multiple layer results into a single final report."""
         scores = []
         recommendations = []
@@ -190,23 +174,11 @@ class AnalysisOrchestrator:
 
         # AI Responses
         if "ai_responses" in session_data:
-            parts.extend(
-                [
-                    r.get("content", "")
-                    for r in session_data["ai_responses"]
-                    if isinstance(r, dict)
-                ]
-            )
+            parts.extend([r.get("content", "") for r in session_data["ai_responses"] if isinstance(r, dict)])
 
         # Transcripts
         if "transcripts" in session_data:
-            parts.extend(
-                [
-                    t.get("text", "")
-                    for t in session_data["transcripts"]
-                    if isinstance(t, dict)
-                ]
-            )
+            parts.extend([t.get("text", "") for t in session_data["transcripts"] if isinstance(t, dict)])
 
         # Raw text
         if "text" in session_data:

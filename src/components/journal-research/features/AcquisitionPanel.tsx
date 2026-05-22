@@ -42,7 +42,7 @@ export function AcquisitionPanel({
   if (!sessionId) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>
+        <p className="text-muted-foreground">
           Please select a session to view acquisitions
         </p>
       </div>
@@ -52,36 +52,36 @@ export function AcquisitionPanel({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Acquisition</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">Acquisition</h1>
+          <p className="text-muted-foreground mt-1">
             Acquire and download evaluated datasets
           </p>
           {pipelineStatus?.available && (
-            <p className='text-muted-foreground mt-1 text-xs'>
+            <p className="text-muted-foreground mt-1 text-xs">
               Pipeline: {pipelineStatus.total_datasets ?? 0} datasets,{' '}
               {pipelineStatus.total_conversations ?? 0} conversations
             </p>
           )}
         </div>
-        <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-2">
           {acquisitions &&
             acquisitions.items.length > 0 &&
             acquisitions.items.some((a) => a.status === 'completed') && (
               <Button
                 onClick={() => integrateAllMutation.mutate(true)}
                 disabled={integrateAllMutation.isPending}
-                variant='outline'
+                variant="outline"
               >
                 {integrateAllMutation.isPending ? (
                   <>
-                    <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Integrating All...
                   </>
                 ) : (
                   <>
-                    <Play className='mr-2 h-4 w-4' />
+                    <Play className="mr-2 h-4 w-4" />
                     Integrate All to Pipeline
                   </>
                 )}
@@ -89,7 +89,7 @@ export function AcquisitionPanel({
             )}
           <button
             onClick={() => setIsInitiating(true)}
-            className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
             disabled={initiateMutation.isPending}
           >
             {initiateMutation.isPending ? 'Acquiring...' : 'Start Acquisition'}
@@ -104,12 +104,12 @@ export function AcquisitionPanel({
             <CardTitle>Configure Acquisition</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='space-y-4'>
-              <p className='text-muted-foreground text-sm'>
+            <div className="space-y-4">
+              <p className="text-muted-foreground text-sm">
                 Select sources to acquire. Leave empty to acquire all approved
                 sources.
               </p>
-              <div className='flex gap-2'>
+              <div className="flex gap-2">
                 <button
                   onClick={() => {
                     initiateMutation.mutate(
@@ -121,13 +121,13 @@ export function AcquisitionPanel({
                       },
                     )
                   }}
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
                 >
                   Acquire All Approved
                 </button>
                 <button
                   onClick={() => setIsInitiating(false)}
-                  className='border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium'
+                  className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -144,7 +144,7 @@ export function AcquisitionPanel({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               Loading acquisitions...
             </div>
           ) : (

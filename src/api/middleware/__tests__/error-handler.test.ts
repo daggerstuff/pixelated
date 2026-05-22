@@ -291,7 +291,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(failingAsyncFn)
-       wrappedFn(req, res, next)
+      wrappedFn(req, res, next)
 
       expect(next).toHaveBeenCalledWith(error)
     })
@@ -302,7 +302,7 @@ describe('error-handler middleware', () => {
       }
 
       const wrappedFn = asyncHandler(successAsyncFn)
-       wrappedFn(req, res, next)
+      wrappedFn(req, res, next)
 
       expect(next).not.toHaveBeenCalled()
     })

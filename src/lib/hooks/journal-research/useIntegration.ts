@@ -73,7 +73,8 @@ export const useIntegrationPlanListQuery = (
       sessionId ?? 'unknown',
       { page, pageSize, filters },
     ),
-    queryFn:  async () => listIntegrationPlans(sessionId ?? '', { page, pageSize }),
+    queryFn: async () =>
+      listIntegrationPlans(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data) => filterPlans(data, filters),
   })
@@ -91,7 +92,7 @@ export const useIntegrationPlanQuery = (
       sessionId ?? 'unknown',
       planId ?? 'unknown',
     ),
-    queryFn:  async () => getIntegrationPlan(sessionId ?? '', planId ?? ''),
+    queryFn: async () => getIntegrationPlan(sessionId ?? '', planId ?? ''),
     enabled: Boolean(sessionId && planId) && enabled,
   })
 }
@@ -101,7 +102,7 @@ export const useIntegrationInitiateMutation = (sessionId: string | null) => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.integration.initiate(),
-    mutationFn:  async (payload: IntegrationInitiatePayload) =>
+    mutationFn: async (payload: IntegrationInitiatePayload) =>
       initiateIntegration(sessionId ?? '', payload),
     onSuccess: (plan: IntegrationPlan) => {
       void queryClient.invalidateQueries({

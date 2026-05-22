@@ -26,11 +26,11 @@ self.addEventListener('activate', (event) => {
     Promise.all([
       self.clients.claim(),
       // Clean up old caches
-      caches.keys().then( async (keys) => {
+      caches.keys().then(async (keys) => {
         return Promise.all(
           keys
             .filter((key) => key !== CACHE_NAME)
-            .map( async (key) => caches.delete(key)),
+            .map(async (key) => caches.delete(key)),
         )
       }),
     ]),

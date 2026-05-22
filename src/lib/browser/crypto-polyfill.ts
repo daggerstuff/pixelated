@@ -130,7 +130,7 @@ export async function createHash(algorithm: string): Promise<HashInterface> {
     }
 
     const webCryptoAlgorithm =
-      algorithmMap[algorithm.toLowerCase()] || 'SHA-256'
+      algorithmMap[algorithm.toLowerCase()] ?? 'SHA-256'
 
     let data: Uint8Array | null = null
 

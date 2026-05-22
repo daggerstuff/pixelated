@@ -24,33 +24,20 @@ class Settings(BaseSettings):
 
     # Database settings
     database_url: PostgresDsn = Field(
-        default="postgresql://user:password@localhost:5432/multimodal_bias_detection",
-        env="DATABASE_URL"
+        default="postgresql://user:password@localhost:5432/multimodal_bias_detection", env="DATABASE_URL"
     )
 
     # Redis settings
     redis_url: RedisDsn = Field(
         default="redis://localhost:6379/1",  # Different Redis DB
-        env="REDIS_URL"
+        env="REDIS_URL",
     )
 
     # Model settings for different modalities
-    vision_model_path: str = Field(
-        default="./models/vision",
-        env="VISION_MODEL_PATH"
-    )
-    audio_model_path: str = Field(
-        default="./models/audio",
-        env="AUDIO_MODEL_PATH"
-    )
-    video_model_path: str = Field(
-        default="./models/video",
-        env="VIDEO_MODEL_PATH"
-    )
-    multimodal_model_path: str = Field(
-        default="./models/multimodal",
-        env="MULTIMODAL_MODEL_PATH"
-    )
+    vision_model_path: str = Field(default="./models/vision", env="VISION_MODEL_PATH")
+    audio_model_path: str = Field(default="./models/audio", env="AUDIO_MODEL_PATH")
+    video_model_path: str = Field(default="./models/video", env="VIDEO_MODEL_PATH")
+    multimodal_model_path: str = Field(default="./models/multimodal", env="MULTIMODAL_MODEL_PATH")
 
     # Processing settings
     max_image_size: int = Field(default=10 * 1024 * 1024, env="MAX_IMAGE_SIZE")  # 10MB
@@ -88,17 +75,15 @@ class Settings(BaseSettings):
     # File storage
     upload_dir: str = Field(default="./uploads", env="UPLOAD_DIR")
     temp_cleanup_interval: int = Field(default=3600, env="TEMP_CLEANUP_INTERVAL")  # 1 hour
-    allowed_image_formats: list = Field(default=["jpg", "jpeg", "png", "gif", "bmp", "webp"], env="ALLOWED_IMAGE_FORMATS")
+    allowed_image_formats: list = Field(
+        default=["jpg", "jpeg", "png", "gif", "bmp", "webp"], env="ALLOWED_IMAGE_FORMATS"
+    )
     allowed_audio_formats: list = Field(default=["mp3", "wav", "flac", "m4a", "ogg"], env="ALLOWED_AUDIO_FORMATS")
     allowed_video_formats: list = Field(default=["mp4", "avi", "mov", "mkv", "webm"], env="ALLOWED_VIDEO_FORMATS")
 
     # Logging settings
     log_level: str = Field(default="INFO", env="LOG_LEVEL")
-    log_format: str = Field(
-        default="json",
-        env="LOG_FORMAT",
-        description="Log format: json, text"
-    )
+    log_format: str = Field(default="json", env="LOG_FORMAT", description="Log format: json, text")
 
     # Performance settings
     enable_caching: bool = Field(default=True, env="ENABLE_CACHING")
@@ -136,7 +121,7 @@ class Settings(BaseSettings):
         case_sensitive = False
 
 
-@lru_cache()
+@lru_cache
 def get_settings() -> Settings:
     """Get cached settings instance"""
     return Settings()

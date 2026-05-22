@@ -263,7 +263,7 @@ export class CrisisProtocol {
     }
 
     try {
-      const channels = this.config.staffChannels[event.alertLevel] || []
+      const channels = this.config.staffChannels[event.alertLevel] ?? []
 
       for (const channel of channels) {
         if (

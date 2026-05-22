@@ -1,4 +1,3 @@
-import type { EncryptedData } from '@/lib/fhe/types'
 import * as BreachAnalytics from '@/lib/analytics/breach-analytics'
 /// <reference types="vitest/globals" />
 import * as ComplianceMetrics from '@/lib/analytics/compliance'
@@ -8,6 +7,7 @@ import * as RiskScoring from '@/lib/analytics/risk'
 import { StatisticalAnalysis } from '@/lib/analytics/statistics'
 import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
+import type { EncryptedData } from '@/lib/fhe/types'
 import { redis } from '@/lib/redis'
 import type { BreachDetails } from '@/lib/security/breach-notification'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
@@ -70,23 +70,23 @@ describe('breachAnalytics', () => {
     to: new Date('2025-03-07'),
   }
 
-const mockedListRecentBreaches = vi.mocked(listRecentBreaches)
-const mockedRedisGet = vi.mocked(redis.get)
-const mockedCalculateOverallRisk = vi.mocked(RiskScoring.calculateOverallRisk)
-const mockedCalculateDailyRisk = vi.mocked(RiskScoring.calculateDailyRisk)
-const mockedCalculateScore = vi.mocked(ComplianceMetrics.calculateScore)
-const mockedCalculateNotificationEffectiveness = vi.mocked(
-  NotificationEffectiveness.calculate,
-)
-const mockedCalculateDailyNotification = vi.mocked(
-  NotificationEffectiveness.calculateDaily,
-)
-const mockedDetectAnomalies = vi.mocked(MachineLearning.detectAnomalies)
-const mockedPredictBreaches = vi.mocked(MachineLearning.predictBreaches)
-const mockedGetFactors = vi.mocked(RiskScoring.getFactors)
-const mockedAnalyzeTrends = vi.mocked(SecurityTrends.analyze)
-const mockedCalculateTrend = vi.spyOn(StatisticalAnalysis, 'calculateTrend')
-const mockedFheEncrypt = vi.spyOn(fheService, 'encrypt')
+  const mockedListRecentBreaches = vi.mocked(listRecentBreaches)
+  const mockedRedisGet = vi.mocked(redis.get)
+  const mockedCalculateOverallRisk = vi.mocked(RiskScoring.calculateOverallRisk)
+  const mockedCalculateDailyRisk = vi.mocked(RiskScoring.calculateDailyRisk)
+  const mockedCalculateScore = vi.mocked(ComplianceMetrics.calculateScore)
+  const mockedCalculateNotificationEffectiveness = vi.mocked(
+    NotificationEffectiveness.calculate,
+  )
+  const mockedCalculateDailyNotification = vi.mocked(
+    NotificationEffectiveness.calculateDaily,
+  )
+  const mockedDetectAnomalies = vi.mocked(MachineLearning.detectAnomalies)
+  const mockedPredictBreaches = vi.mocked(MachineLearning.predictBreaches)
+  const mockedGetFactors = vi.mocked(RiskScoring.getFactors)
+  const mockedAnalyzeTrends = vi.mocked(SecurityTrends.analyze)
+  const mockedCalculateTrend = vi.spyOn(StatisticalAnalysis, 'calculateTrend')
+  const mockedFheEncrypt = vi.spyOn(fheService, 'encrypt')
 
   const mockBreaches: BreachDetails[] = [
     {
@@ -202,10 +202,7 @@ const mockedFheEncrypt = vi.spyOn(fheService, 'encrypt')
         calculateScore: async () => 0.7,
       },
     ])
-    mockedAnalyzeTrends.mockResolvedValue([
-      'increasing',
-      'stable',
-    ])
+    mockedAnalyzeTrends.mockResolvedValue(['increasing', 'stable'])
     mockedCalculateTrend.mockReturnValue(0.15)
     mockedFheEncrypt.mockResolvedValue(mockEncryptedData)
   })

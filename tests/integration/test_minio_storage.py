@@ -19,14 +19,15 @@ import contextlib
 import os
 import tempfile
 import uuid
-from urllib.parse import urlparse
+from collections.abc import Generator
 from datetime import timedelta
 from io import BytesIO
-from typing import Generator
+from urllib.parse import urlparse
 
 import pytest
 from minio import Minio
 from minio.error import S3Error
+
 
 # Test configuration
 def _normalize_minio_endpoint(endpoint: str) -> str:
@@ -71,7 +72,7 @@ def _upload_multiple_objects(
 
 
 @pytest.fixture(scope="module")
-def minio_client() -> Generator[Minio, None, None]:
+def minio_client() -> Generator[Minio]:
     """
     Create a MinIO client for testing.
 
@@ -95,11 +96,11 @@ def minio_client() -> Generator[Minio, None, None]:
     except Exception as e:
         pytest.skip(f"MinIO not available at {MINIO_ENDPOINT}: {e}")
 
-    yield client
+    return client
 
 
 @pytest.fixture
-def test_bucket(minio_client: Minio) -> Generator[str, None, None]:
+def test_bucket(minio_client: Minio) -> Generator[str]:
     """
     Create a temporary test bucket and clean it up after tests.
 
@@ -271,9 +272,7 @@ class TestMinIOObjectOperations:
         )
 
         # List only prefix1 objects
-        listed_objects = list(
-            minio_client.list_objects(test_bucket, prefix="prefix1/", recursive=True)
-        )
+        listed_objects = list(minio_client.list_objects(test_bucket, prefix="prefix1/", recursive=True))
         listed_names = [obj.object_name for obj in listed_objects]
 
         assert "prefix1/file1.txt" in listed_names
@@ -344,9 +343,7 @@ class TestMinIOPresignedURLs:
         )
 
         # Generate presigned URL (valid for 1 hour)
-        url = minio_client.presigned_get_object(
-            test_bucket, object_name, expires=timedelta(seconds=3600)
-        )
+        url = minio_client.presigned_get_object(test_bucket, object_name, expires=timedelta(seconds=3600))
 
         # Verify URL is generated
         self._verify_presigned_url(url, test_bucket, object_name)
@@ -356,9 +353,7 @@ class TestMinIOPresignedURLs:
         object_name = "presigned-put-test.txt"
 
         # Generate presigned PUT URL
-        url = minio_client.presigned_put_object(
-            test_bucket, object_name, expires=timedelta(seconds=3600)
-        )
+        url = minio_client.presigned_put_object(test_bucket, object_name, expires=timedelta(seconds=3600))
 
         # Verify URL is generated
         self._verify_presigned_url(url, test_bucket, object_name)
@@ -378,9 +373,7 @@ class TestMinIOPresignedURLs:
 
         # Generate URL with short expiration (1 second for testing)
         # Note: In real scenarios, use longer expiration times
-        url = minio_client.presigned_get_object(
-            test_bucket, object_name, expires=timedelta(seconds=1)
-        )
+        url = minio_client.presigned_get_object(test_bucket, object_name, expires=timedelta(seconds=1))
         assert url is not None
 
 

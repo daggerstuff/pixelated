@@ -252,10 +252,9 @@ export function useSyncedState<T>({
   const instanceId = useRef<string | null>(null)
   if (instanceId.current === undefined) {
     // Use crypto.randomUUID() for unique, collision-resistant instance IDs
-    instanceId.current =
-      crypto?.randomUUID
-        ? crypto.randomUUID()
-        : Math.random().toString(36).substring(2, 11)
+    instanceId.current = crypto?.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2, 11)
   }
 
   const handleStateChange = useCallback((value: T) => {

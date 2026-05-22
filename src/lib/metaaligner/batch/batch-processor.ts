@@ -79,7 +79,7 @@ export class BatchProcessor implements IBatchProcessor {
       void this.flush()
     }
 
-    this.timeoutId ??= setTimeout( async () => this.flush(), this.config.timeout);
+    this.timeoutId ??= setTimeout(async () => this.flush(), this.config.timeout)
 
     // This is a simplified implementation. In a real-world scenario, you would
     // need to return a promise that resolves with the response for this specific request.
@@ -107,7 +107,7 @@ export class BatchProcessor implements IBatchProcessor {
       this.metrics.requestsProcessed / this.metrics.batchesProcessed
 
     try {
-      await this.circuitBreaker.fire( async () => {
+      await this.circuitBreaker.fire(async () => {
         // In a real-world scenario, you would call the API to process the batch.
         // return this.api.processBatch(optimizedBatch);
         return Promise.resolve()

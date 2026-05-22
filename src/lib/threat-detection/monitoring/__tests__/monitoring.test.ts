@@ -907,7 +907,7 @@ describe('Enhanced Monitoring Service', () => {
       mockRedis.incr.mockResolvedValue(1)
       mockRedis.set.mockResolvedValue('OK')
 
-      const alerts = Array.from({ length: 10 },  async (_, i) =>
+      const alerts = Array.from({ length: 10 }, async (_, i) =>
         service.createAlert({ ...alertData, title: `Alert ${i}` }),
       )
 

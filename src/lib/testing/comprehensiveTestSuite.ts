@@ -296,7 +296,9 @@ class TestSuiteManager {
 
     for (const testFile of securityTests) {
       const passed = Math.random() > 0.05 // 95% pass rate for security
-      const failure = passed ? undefined : new Error('Security vulnerability detected')
+      const failure = passed
+        ? undefined
+        : new Error('Security vulnerability detected')
 
       results.push({
         id: `security_${testFile}`,
@@ -404,7 +406,8 @@ class TestSuiteManager {
 
   private async generateReport(metrics: TestMetrics): Promise<void> {
     const meetsRequirements =
-      metrics.coverage.statements.percentage >= this.config.coverage.statements &&
+      metrics.coverage.statements.percentage >=
+        this.config.coverage.statements &&
       metrics.coverage.branches.percentage >= this.config.coverage.branches &&
       metrics.coverage.functions.percentage >= this.config.coverage.functions &&
       metrics.coverage.lines.percentage >= this.config.coverage.lines

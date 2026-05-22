@@ -14,16 +14,12 @@ logger = logging.getLogger("long_session_gen")
 
 
 class LongSessionGenerator:
-    def __init__(
-        self, output_path: str = "ai/training/ready_packages/datasets/synthetic/long_sessions.jsonl"
-    ):
+    def __init__(self, output_path: str = "ai/training/ready_packages/datasets/synthetic/long_sessions.jsonl"):
         self.output_path = Path(output_path)
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
 
     def generate_sessions(self, count: int = 20, min_turns: int = 25, max_turns: int = 50):
-        logger.info(
-            f"Generating {count} long therapy sessions with {min_turns}-{max_turns} turns (Realistic Depth)..."
-        )
+        logger.info(f"Generating {count} long therapy sessions with {min_turns}-{max_turns} turns (Realistic Depth)...")
 
         sessions_generated = 0
         with open(self.output_path, "w", encoding="utf-8") as f:

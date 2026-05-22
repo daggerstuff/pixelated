@@ -41,28 +41,28 @@ export function UnusualPatterns({ patterns }: UnusualPatternsProps) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ScrollArea className='h-[400px] pr-4'>
-          <div className='space-y-4'>
+        <ScrollArea className="h-[400px] pr-4">
+          <div className="space-y-4">
             {patterns.map((pattern) => (
               <div
                 key={`${pattern.type}-${pattern.severity}-${pattern.description.slice(0, 16)}`}
-                className='rounded-lg border p-4'
+                className="rounded-lg border p-4"
               >
-                <div className='mb-2 flex items-center justify-between'>
-                  <h3 className='text-lg font-semibold capitalize'>
+                <div className="mb-2 flex items-center justify-between">
+                  <h3 className="text-lg font-semibold capitalize">
                     {pattern.type.replace('_', ' ')}
                   </h3>
                   <Badge
-                    variant='outline'
+                    variant="outline"
                     className={severityColors[pattern.severity]}
                   >
                     {pattern.severity}
                   </Badge>
                 </div>
-                <p className='text-gray-600 mb-3 text-sm'>
+                <p className="text-gray-600 mb-3 text-sm">
                   {pattern.description}
                 </p>
-                <div className='text-gray-500 text-xs'>
+                <div className="text-gray-500 text-xs">
                   {pattern.relatedLogs.length} related log entries
                 </div>
               </div>

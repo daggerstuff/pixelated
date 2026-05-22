@@ -12,7 +12,7 @@ export const MindMirrorDemo: FC<MindMirrorDemoProps> = ({ className = '' }) => {
       <MentalHealthChatDemoReact
         showAnalysisPanel={true}
         showSettingsPanel={false}
-        initialTab='analysis'
+        initialTab="analysis"
       />
     </div>
   )

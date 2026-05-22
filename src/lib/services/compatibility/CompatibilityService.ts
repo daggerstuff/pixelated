@@ -96,10 +96,10 @@ export class CompatibilityService {
    */
   public async registerIssue(issue: CompatibilityIssue): Promise<void> {
     // Generate unique ID if not provided
-    issue.id ??= Date.now();
+    issue.id ??= Date.now()
 
     // Add timestamp if not provided
-    issue.timestamp ??= new Date().toISOString();
+    issue.timestamp ??= new Date().toISOString()
 
     // Add to registry
     const { browser } = issue
@@ -240,7 +240,7 @@ export class CompatibilityService {
     }
 
     // Send email to all recipients
-    const emailPromises = this.options.recipients.map( async (recipient) =>
+    const emailPromises = this.options.recipients.map(async (recipient) =>
       this.emailService.queueEmail({
         to: recipient,
         templateAlias: 'browser-compatibility-alert',

@@ -44,7 +44,7 @@ export function EvaluationPanel({
   if (!sessionId) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>
+        <p className="text-muted-foreground">
           Please select a session to view evaluations
         </p>
       </div>
@@ -54,17 +54,17 @@ export function EvaluationPanel({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Evaluation</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">Evaluation</h1>
+          <p className="text-muted-foreground mt-1">
             Evaluate discovered sources for relevance and quality
           </p>
         </div>
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <button
             onClick={() => setIsInitiating(true)}
-            className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
             disabled={initiateMutation.isPending}
           >
             {initiateMutation.isPending ? 'Evaluating...' : 'Start Evaluation'}
@@ -133,7 +133,7 @@ export function EvaluationPanel({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               Loading evaluations...
             </div>
           ) : (

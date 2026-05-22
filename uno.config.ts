@@ -63,7 +63,8 @@ export default defineConfig({
         ]),
   ],
   shortcuts: {
-    btn: 'px-4 py-2 rounded inline-block bg-primary-500 text-white cursor-pointer hover:bg-primary-600',
+    'btn':
+      'px-4 py-2 rounded inline-block bg-primary-500 text-white cursor-pointer hover:bg-primary-600',
     'btn-primary': 'btn bg-primary-600 hover:bg-primary-700',
     'btn-secondary': 'btn bg-secondary-700 hover:bg-secondary-800',
   },

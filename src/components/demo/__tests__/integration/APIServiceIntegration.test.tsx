@@ -29,8 +29,7 @@ const safeFetch = async (
     const hostnameMatch = url.match(
       /^(?:https?:\/\/)?(?:[^@\n]+@)?(?:www\.)?([^:/\n?]+)/im,
     )
-    const domain =
-      hostnameMatch?.[1] ? hostnameMatch[1].toLowerCase() : ''
+    const domain = hostnameMatch?.[1] ? hostnameMatch[1].toLowerCase() : ''
     if (!domain || !ALLOWED_DOMAINS.some((d) => domain.endsWith(d))) {
       throw new Error(
         `${url} is not allowed. Only whitelisted domains are permitted to prevent SSRF attacks.`,
@@ -73,7 +72,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders({ 'content-length': '500' }),
-        json:  async () => Promise.resolve(mockResponse),
+        json: async () => Promise.resolve(mockResponse),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -119,7 +118,8 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () => Promise.resolve({ success: true, syncId: 'sync-123' }),
+        json: async () =>
+          Promise.resolve({ success: true, syncId: 'sync-123' }),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -167,7 +167,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 201,
           headers: createMockHeaders(),
-          json:  async () =>
+          json: async () =>
             Promise.resolve({
               id: 'dataset-123',
               url: 'https://huggingface.co/datasets/psychology-training-dataset',
@@ -179,7 +179,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'POST',
             headers: {
-              Authorization: 'Bearer hf_token',
+              'Authorization': 'Bearer hf_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(datasetData),
@@ -198,7 +198,7 @@ describe('APIService Integration Tests', () => {
           ok: false,
           status: 401,
           headers: createMockHeaders(),
-          json:  async () => Promise.resolve({ error: 'Invalid token' }),
+          json: async () => Promise.resolve({ error: 'Invalid token' }),
         })
 
         const response = await safeFetch(
@@ -206,7 +206,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'POST',
             headers: {
-              Authorization: 'Bearer invalid_token',
+              'Authorization': 'Bearer invalid_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({}),
@@ -231,7 +231,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: createMockHeaders(),
-          json:  async () => Promise.resolve({ experiment_id: 'exp-123' }),
+          json: async () => Promise.resolve({ experiment_id: 'exp-123' }),
         })
 
         const response = await safeFetch(
@@ -261,7 +261,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: createMockHeaders(),
-          json:  async () => Promise.resolve({}),
+          json: async () => Promise.resolve({}),
         })
 
         const response = await safeFetch(
@@ -292,7 +292,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: createMockHeaders(),
-          json:  async () =>
+          json: async () =>
             Promise.resolve({
               run: { id: 'wandb-run-123', url: 'https://wandb.ai/run/123' },
             }),
@@ -301,7 +301,7 @@ describe('APIService Integration Tests', () => {
         const response = await safeFetch('https://api.wandb.ai/graphql', {
           method: 'POST',
           headers: {
-            Authorization: 'Bearer wandb_token',
+            'Authorization': 'Bearer wandb_token',
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -328,7 +328,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 201,
           headers: createMockHeaders(),
-          json:  async () =>
+          json: async () =>
             Promise.resolve({
               id: 'azureml-dataset-123',
               name: 'psychology-training-data',
@@ -341,7 +341,7 @@ describe('APIService Integration Tests', () => {
           {
             method: 'PUT',
             headers: {
-              Authorization: 'Bearer azure_token',
+              'Authorization': 'Bearer azure_token',
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(datasetData),
@@ -367,7 +367,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 202,
         headers: createMockHeaders(),
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             jobId: 'export-job-123',
             status: 'processing',
@@ -391,7 +391,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             jobId: 'export-job-123',
             status: 'completed',
@@ -476,7 +476,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: createMockHeaders(),
-          json:  async () => Promise.resolve({ success: true }),
+          json: async () => Promise.resolve({ success: true }),
         })
 
       const retryFetch = async (
@@ -514,7 +514,7 @@ describe('APIService Integration Tests', () => {
         ok: false,
         status: 429,
         headers: createMockHeaders({ 'Retry-After': '60' }),
-        json:  async () => Promise.resolve({ error: 'Rate limit exceeded' }),
+        json: async () => Promise.resolve({ error: 'Rate limit exceeded' }),
       })
 
       const response = await safeFetch('/api/training-pipeline/submit')
@@ -529,7 +529,7 @@ describe('APIService Integration Tests', () => {
         ok: false,
         status: 503,
         headers: createMockHeaders(),
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             error: 'Service temporarily unavailable',
             retryAfter: 300,
@@ -574,7 +574,7 @@ describe('APIService Integration Tests', () => {
           ok: true,
           status: 200,
           headers: createMockHeaders(),
-          json:  async () => Promise.resolve({ success: true }),
+          json: async () => Promise.resolve({ success: true }),
           body: new ReadableStream({
             start(controller) {
               controller.enqueue(
@@ -597,7 +597,8 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () => Promise.resolve({ authorized: true, user: 'test-user' }),
+        json: async () =>
+          Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -625,7 +626,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () => Promise.resolve({ success: true }),
+        json: async () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -649,7 +650,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             access_token: 'new-access-token',
             refresh_token: 'new-refresh-token',
@@ -691,7 +692,8 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () => Promise.resolve({ authorized: true, user: 'test-user' }),
+        json: async () =>
+          Promise.resolve({ authorized: true, user: 'test-user' }),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -719,7 +721,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () => Promise.resolve({ success: true }),
+        json: async () => Promise.resolve({ success: true }),
         body: new ReadableStream({
           start(controller) {
             controller.enqueue(
@@ -743,7 +745,7 @@ describe('APIService Integration Tests', () => {
         ok: true,
         status: 200,
         headers: createMockHeaders(),
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             access_token: 'new-access-token',
             refresh_token: 'new-refresh-token',

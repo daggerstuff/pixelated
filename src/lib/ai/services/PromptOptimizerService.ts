@@ -769,7 +769,7 @@ export class PromptOptimizerService {
     }
 
     const techniquePrompt =
-      techniqueMap[primaryConcern] ||
+      techniqueMap[primaryConcern] ??
       'What strategies have worked for you before?'
     return `${prompt} ${techniquePrompt}`
   }

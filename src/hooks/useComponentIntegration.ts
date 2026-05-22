@@ -51,8 +51,8 @@ export function useChartData(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  const loadChartData = useCallback( async () => {
-    return execute( async () => componentIntegrationService.getChartData(params))
+  const loadChartData = useCallback(async () => {
+    return execute(async () => componentIntegrationService.getChartData(params))
   }, [execute, params])
 
   useEffect(() => {
@@ -90,8 +90,10 @@ export function use3DEmotionData(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const [realTimeData, setRealTimeData] = useState<any[]>([])
 
-  const load3DEmotionData = useCallback( async () => {
-    return execute( async () => componentIntegrationService.get3DEmotionData(params))
+  const load3DEmotionData = useCallback(async () => {
+    return execute(async () =>
+      componentIntegrationService.get3DEmotionData(params),
+    )
   }, [execute, params])
 
   const addEmotionPoint = useCallback(
@@ -153,8 +155,10 @@ export function useTreatmentPlans(params: {
   const { data, loading, error, execute } = useAsyncOperation<any[]>()
   const [isDirty, setIsDirty] = useState(false)
 
-  const loadTreatmentPlans = useCallback( async () => {
-    return execute( async () => componentIntegrationService.getTreatmentPlans(params))
+  const loadTreatmentPlans = useCallback(async () => {
+    return execute(async () =>
+      componentIntegrationService.getTreatmentPlans(params),
+    )
   }, [execute, params])
 
   const saveTreatmentPlan = useCallback(
@@ -251,8 +255,8 @@ export function useParticleSystem(params: {
     params.intensity ?? 0.5,
   )
 
-  const loadParticleSystem = useCallback( async () => {
-    return execute( async () =>
+  const loadParticleSystem = useCallback(async () => {
+    return execute(async () =>
       componentIntegrationService.getParticleSystem({
         ...params,
         emotion: currentEmotion,
@@ -274,8 +278,7 @@ export function useParticleSystem(params: {
 
         const result = await componentIntegrationService.updateParticleSystem({
           emotion: updates.emotion ?? currentEmotion,
-          intensity:
-            updates.intensity ?? currentIntensity,
+          intensity: updates.intensity ?? currentIntensity,
           sessionId: params.sessionId,
           particleUpdates: updates.particleUpdates,
         })
@@ -316,8 +319,10 @@ export function useCarouselContent(params: {
 }) {
   const { data, loading, error, execute } = useAsyncOperation<any>()
 
-  const loadCarouselContent = useCallback( async () => {
-    return execute( async () => componentIntegrationService.getCarouselContent(params))
+  const loadCarouselContent = useCallback(async () => {
+    return execute(async () =>
+      componentIntegrationService.getCarouselContent(params),
+    )
   }, [execute, params])
 
   const saveCarouselConfiguration = useCallback(
@@ -369,8 +374,8 @@ export function useIntegratedDashboard(params: {
   const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
-  const loadDashboardData = useCallback( async () => {
-    return execute( async () =>
+  const loadDashboardData = useCallback(async () => {
+    return execute(async () =>
       componentIntegrationService.getIntegratedDashboardData(params),
     )
   }, [execute, params])

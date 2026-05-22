@@ -138,7 +138,7 @@ export async function createSession(
   )
 
   // Log security event
-   logSecurityEvent('SESSION_CREATED', userId, {
+  logSecurityEvent('SESSION_CREATED', userId, {
     sessionId,
     deviceId: deviceInfo.deviceId,
     ipAddress,
@@ -221,7 +221,7 @@ export async function validateSession(
     )
 
     // Log security event
-     logSecurityEvent('SESSION_VALIDATED', session.userId, {
+    logSecurityEvent('SESSION_VALIDATED', session.userId, {
       sessionId,
       deviceId: deviceInfo.deviceId,
     })
@@ -253,7 +253,7 @@ export async function invalidateSession(sessionId: string): Promise<void> {
     await setInCache(`user:sessions:${session.userId}`, updatedSessions)
 
     // Log security event
-     logSecurityEvent('SESSION_INVALIDATED', session.userId, {
+    logSecurityEvent('SESSION_INVALIDATED', session.userId, {
       sessionId,
       reason: 'manual_invalidation',
     })

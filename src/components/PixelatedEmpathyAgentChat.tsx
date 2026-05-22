@@ -200,7 +200,9 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           experience: extractExperience(userInput),
           specializations: extractSpecializations(userInput),
         })
-      case "general": { throw new Error('Not implemented yet: "general" case') }
+      case 'general': {
+        throw new Error('Not implemented yet: "general" case')
+      }
       default:
         return await agent.current.sendMessage(userInput, currentContext)
     }
@@ -314,12 +316,12 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       className={`bg-white border-gray-200 mx-auto flex h-full max-w-4xl flex-col rounded-lg border shadow-lg ${className}`}
     >
       {/* Header */}
-      <div className='border-gray-200 bg-blue-50 flex items-center justify-between border-b p-4'>
-        <div className='flex items-center space-x-3'>
+      <div className="border-gray-200 bg-blue-50 flex items-center justify-between border-b p-4">
+        <div className="flex items-center space-x-3">
           <div
             className={`h-3 w-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
           />
-          <h3 className='text-gray-800 text-lg font-semibold'>
+          <h3 className="text-gray-800 text-lg font-semibold">
             Pixelated Empathy AI Assistant
           </h3>
         </div>
@@ -330,20 +332,20 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
               setContext(e.target.value)
             }
           }}
-          className='border-gray-300 focus:ring-blue-500 rounded border px-3 py-1 text-sm focus:outline-none focus:ring-2'
+          className="border-gray-300 focus:ring-blue-500 rounded border px-3 py-1 text-sm focus:outline-none focus:ring-2"
         >
-          <option value='general'>General</option>
-          <option value='scenario_generation'>Scenario Generation</option>
-          <option value='bias_detection'>Bias Detection</option>
-          <option value='training_recommendation'>
+          <option value="general">General</option>
+          <option value="scenario_generation">Scenario Generation</option>
+          <option value="bias_detection">Bias Detection</option>
+          <option value="training_recommendation">
             Training Recommendation
           </option>
         </select>
       </div>
 
       {/* Quick Actions */}
-      <div className='border-gray-100 bg-gray-50 border-b p-3'>
-        <div className='flex flex-wrap gap-2'>
+      <div className="border-gray-100 bg-gray-50 border-b p-3">
+        <div className="flex flex-wrap gap-2">
           {quickActions.map((action) => (
             <button
               key={action.label}
@@ -351,7 +353,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
                 setContext(action.context)
                 action.action()
               }}
-              className='bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full px-3 py-1 text-xs transition-colors'
+              className="bg-blue-100 text-blue-700 hover:bg-blue-200 rounded-full px-3 py-1 text-xs transition-colors"
             >
               {action.label}
             </button>
@@ -360,7 +362,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Messages */}
-      <div className='flex-1 space-y-4 overflow-y-auto p-4'>
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((message) => (
           <div
             key={message.id}
@@ -375,7 +377,7 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
                     : 'bg-gray-100 text-gray-800'
               }`}
             >
-              <div className='whitespace-pre-wrap'>{message.content}</div>
+              <div className="whitespace-pre-wrap">{message.content}</div>
               <div
                 className={`mt-2 text-xs ${
                   message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
@@ -388,10 +390,10 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
           </div>
         ))}
         {isLoading && (
-          <div className='flex justify-start'>
-            <div className='bg-gray-100 text-gray-800 rounded-lg p-3'>
-              <div className='flex items-center space-x-2'>
-                <div className='border-blue-600 border-t-transparent h-4 w-4 animate-spin rounded-full border-2' />
+          <div className="flex justify-start">
+            <div className="bg-gray-100 text-gray-800 rounded-lg p-3">
+              <div className="flex items-center space-x-2">
+                <div className="border-blue-600 border-t-transparent h-4 w-4 animate-spin rounded-full border-2" />
                 <span>AI Assistant is thinking...</span>
               </div>
             </div>
@@ -401,10 +403,10 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
       </div>
 
       {/* Input */}
-      <div className='border-gray-200 border-t p-4'>
-        <div className='flex space-x-3'>
+      <div className="border-gray-200 border-t p-4">
+        <div className="flex space-x-3">
           <input
-            type='text'
+            type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -413,13 +415,13 @@ export const PixelatedEmpathyAgentChat: FC<AgentChatProps> = ({
               }
             }}
             placeholder={`Ask about ${context.replace('_', ' ')}...`}
-            className='border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2'
+            className="border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
             disabled={!isConnected || isLoading}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || !isConnected || isLoading}
-            className='bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 rounded-lg px-6 py-2 transition-colors disabled:cursor-not-allowed'
+            className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 rounded-lg px-6 py-2 transition-colors disabled:cursor-not-allowed"
           >
             Send
           </button>

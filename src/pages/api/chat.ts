@@ -2,6 +2,7 @@ import { anthropic } from '@ai-sdk/anthropic'
 import { streamText } from 'ai'
 import type { ModelMessage } from 'ai'
 import { NextRequest } from 'next/server'
+
 import { verifyAuthToken } from '../../utils/auth'
 
 type MessageRequestBody = {
@@ -43,13 +44,10 @@ export async function POST(request: NextRequest) {
   try {
     await verifyAuthToken(token)
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: 'Invalid or expired token' }),
-      {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
+    return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   const requestBody = toMessageRequestBody(await request.json())

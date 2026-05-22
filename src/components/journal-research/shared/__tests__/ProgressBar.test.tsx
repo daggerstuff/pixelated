@@ -43,7 +43,7 @@ describe('ProgressBar', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <ProgressBar value={50} className='custom-class' />,
+      <ProgressBar value={50} className="custom-class" />,
     )
 
     const progressBar = container.querySelector('.custom-class')
@@ -51,7 +51,7 @@ describe('ProgressBar', () => {
   })
 
   it('displays label when provided', () => {
-    render(<ProgressBar value={50} label='Test Progress' />)
+    render(<ProgressBar value={50} label="Test Progress" />)
 
     expect(screen.getByText('Test Progress')).toBeInTheDocument()
   })

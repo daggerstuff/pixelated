@@ -63,11 +63,11 @@ export const POST: APIRoute = async ({ request }) => {
           'score' in (scoreOrObj as Record<string, unknown>)
         ) {
           const obj = scoreOrObj as Record<string, unknown>
-          score = ((obj.score as number) ?? (obj.score as string) ?? 0)
+          score = (obj.score as number) ?? (obj.score as string) ?? 0
           explicitCategory =
             typeof obj.category === 'string' ? obj.category : undefined
         } else {
-          score = ((scoreOrObj as number) || 0)
+          score = (scoreOrObj as number) || 0
         }
 
         // Determine category using helper mapping (allows expansion without changing this file)

@@ -489,7 +489,7 @@ Provide a comprehensive clinical analysis in JSON format:
       ],
     }
 
-    const baseRecommendations = categoryMap[category] || []
+    const baseRecommendations = categoryMap[category] ?? []
 
     // Apply risk level adjustments to priority and timeframe
     if (riskLevel && baseRecommendations.length > 0) {

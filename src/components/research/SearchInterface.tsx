@@ -105,52 +105,52 @@ export default function SearchInterface() {
   )
 
   return (
-    <motion.div className='mx-auto w-full max-w-6xl p-4'>
-      <div className='flex flex-col items-center gap-6'>
+    <motion.div className="mx-auto w-full max-w-6xl p-4">
+      <div className="flex flex-col items-center gap-6">
         {/* Search Bar Container */}
-        <div className='relative z-20 w-full max-w-2xl'>
-          <form onSubmit={handleSearch} className='relative w-full'>
+        <div className="relative z-20 w-full max-w-2xl">
+          <form onSubmit={handleSearch} className="relative w-full">
             <input
-              type='text'
-              className='search-bar w-full pe-24 ps-4'
-              placeholder='Search for books, papers, articles...'
+              type="text"
+              className="search-bar w-full pe-24 ps-4"
+              placeholder="Search for books, papers, articles..."
               aria-label={t('research.searchInterface.searchInputAriaLabel')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
-            <div className='absolute right-2 top-1/2 flex -translate-y-1/2 transform items-center gap-2'>
+            <div className="absolute right-2 top-1/2 flex -translate-y-1/2 transform items-center gap-2">
               <button
-                type='button'
+                type="button"
                 onClick={() => setShowFilters(!showFilters)}
                 className={`hover:bg-slate-700 rounded-md p-2 transition-colors ${
                   showFilters ? 'text-pink-400 bg-slate-700' : 'text-slate-400'
                 }`}
-                title='Advanced Filters'
-                aria-label='Toggle advanced filters'
+                title="Advanced Filters"
+                aria-label="Toggle advanced filters"
                 aria-expanded={showFilters}
-                aria-controls='search-filters-panel'
+                aria-controls="search-filters-panel"
               >
                 <svg
-                  className='h-5 w-5'
-                  fill='none'
-                  stroke='currentColor'
-                  viewBox='0 0 24 24'
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4'
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
                   ></path>
                 </svg>
               </button>
               <button
-                type='submit'
+                type="submit"
                 disabled={loading}
-                className='bg-pink-600 hover:bg-pink-700 disabled:bg-pink-800 text-white flex items-center gap-2 rounded-lg px-4 py-2 transition-colors'
+                className="bg-pink-600 hover:bg-pink-700 disabled:bg-pink-800 text-white flex items-center gap-2 rounded-lg px-4 py-2 transition-colors"
               >
                 {loading ? (
-                  <span className='border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2'></span>
+                  <span className="border-white border-t-transparent h-4 w-4 animate-spin rounded-full border-2"></span>
                 ) : (
                   <span>Search</span>
                 )}
@@ -161,8 +161,8 @@ export default function SearchInterface() {
           {/* Filters Dropdown */}
           {showFilters && (
             <div
-              id='search-filters-panel'
-              className='animate-fade-in-down absolute left-0 right-0 top-full z-30 mt-2'
+              id="search-filters-panel"
+              className="animate-fade-in-down absolute left-0 right-0 top-full z-30 mt-2"
             >
               <SearchFilters
                 filters={filters}
@@ -174,7 +174,7 @@ export default function SearchInterface() {
         </div>
 
         {/* Source Selector */}
-        <div className='relative z-10 w-full overflow-x-auto pb-2'>
+        <div className="relative z-10 w-full overflow-x-auto pb-2">
           <SourceSelector
             selectedSources={selectedSources}
             onChange={setSelectedSources}
@@ -182,42 +182,42 @@ export default function SearchInterface() {
         </div>
 
         {/* Results Area */}
-        <div className='relative z-0 mt-8 w-full'>
+        <div className="relative z-0 mt-8 w-full">
           {error && (
-            <div className='bg-red-900/20 border-red-800 text-red-200 mb-6 rounded-lg border p-4 text-center'>
+            <div className="bg-red-900/20 border-red-800 text-red-200 mb-6 rounded-lg border p-4 text-center">
               {error}
             </div>
           )}
 
           {!hasSearched && !loading && (
-            <div className='py-12 text-center'>
-              <div className='mb-4 text-6xl opacity-20'>🔬</div>
-              <p className='text-slate-400 text-lg'>
+            <div className="py-12 text-center">
+              <div className="mb-4 text-6xl opacity-20">🔬</div>
+              <p className="text-slate-400 text-lg">
                 Enter a query to explore the academic literature.
               </p>
             </div>
           )}
 
           {hasSearched && !loading && results.length > 0 && (
-            <div className='mb-4 flex items-center justify-between px-2'>
-              <div className='text-slate-400 text-sm'>
+            <div className="mb-4 flex items-center justify-between px-2">
+              <div className="text-slate-400 text-sm">
                 Found {results.length} results
               </div>
               <button
                 onClick={() => setShowExport(true)}
-                className='text-pink-400 hover:text-pink-300 flex items-center gap-2 text-sm transition-colors'
+                className="text-pink-400 hover:text-pink-300 flex items-center gap-2 text-sm transition-colors"
               >
                 <svg
-                  className='h-4 w-4'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
                   <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                     strokeWidth={2}
-                    d='M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4'
+                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                   />
                 </svg>
                 Export Results
@@ -230,7 +230,7 @@ export default function SearchInterface() {
           )}
 
           {hasSearched && !loading && results.length === 0 && !error && (
-            <div className='text-slate-400 py-12 text-center'>
+            <div className="text-slate-400 py-12 text-center">
               <p>
                 No results found for "{query}". Try broadening your search
                 terms.

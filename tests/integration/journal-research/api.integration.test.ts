@@ -262,7 +262,7 @@ describe('Journal Research API Integration', () => {
           'list',
           { page: 1, pageSize: 10 },
         ],
-        queryFn:  async () => listSessions({ page: 1, pageSize: 10 }),
+        queryFn: async () => listSessions({ page: 1, pageSize: 10 }),
       })
 
       expect(sessions).toBeDefined()

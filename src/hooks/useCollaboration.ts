@@ -189,13 +189,16 @@ export function useCollaboration({
 }
 
 // Helper function to apply document changes
-function applyChange(content: string, change: LocalDocumentChangeEvent): string {
+function applyChange(
+  content: string,
+  change: LocalDocumentChangeEvent,
+): string {
   const lines = content.split('\n')
 
   switch (change.type) {
     case 'insert':
       if (change.content) {
-        const line = lines[change.position.line] || ''
+        const line = lines[change.position.line] ?? ''
         const before = line.substring(0, change.position.column)
         const after = line.substring(change.position.column)
         lines[change.position.line] = before + change.content + after

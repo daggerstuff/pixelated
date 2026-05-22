@@ -184,10 +184,10 @@ async function calculateBasicMetrics(
 
   for (const breach of breaches) {
     // Count by severity
-    bySeverity[breach.severity] = (bySeverity[breach.severity] || 0) + 1
+    bySeverity[breach.severity] = (bySeverity[breach.severity] ?? 0) + 1
 
     // Count by type
-    byType[breach.type] = (byType[breach.type] || 0) + 1
+    byType[breach.type] = (byType[breach.type] ?? 0) + 1
 
     // Calculate response time
     const responseTime = await calculateResponseTime(breach)
@@ -236,7 +236,7 @@ export async function analyzeTrends(
     // Merge anomaly scores into trends
     return trends.map((point, index) => ({
       ...point,
-      anomalyScore: anomalies[index] || 0,
+      anomalyScore: anomalies[index] ?? 0,
     }))
   } catch (error: unknown) {
     logger.error('Failed to analyze breach trends:', error)
@@ -282,7 +282,7 @@ async function calculateAverageResponseTime(
   }
 
   const responseTimes = await Promise.all(
-    breaches.map( async (breach) => calculateResponseTime(breach)),
+    breaches.map(async (breach) => calculateResponseTime(breach)),
   )
 
   return responseTimes.reduce((sum, time) => sum + time, 0) / breaches.length
@@ -333,7 +333,7 @@ export async function analyzeRiskFactors(): Promise<RiskFactor[]> {
         name: factor.name,
         weight: factor.weight,
         score: factor.score,
-        trend: trends[index] || 'stable',
+        trend: trends[index] ?? 'stable',
       }),
     )
   } catch (error: unknown) {
@@ -373,7 +373,7 @@ export async function generateInsights(): Promise<SecurityInsight[]> {
     }
 
     // Analyze severity distribution
-    const criticalBreaches = metrics.bySeverity['critical'] || 0
+    const criticalBreaches = metrics.bySeverity['critical'] ?? 0
     if (criticalBreaches > 0) {
       insights.push({
         type: 'critical_breaches',

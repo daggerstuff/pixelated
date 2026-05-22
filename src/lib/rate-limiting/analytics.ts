@@ -242,7 +242,7 @@ export class RateLimitAnalyticsService {
         attackDetections += attacks
         errors += errorCount
 
-        ruleStats[ruleName] = (ruleStats[ruleName] || 0) + requests
+        ruleStats[ruleName] = (ruleStats[ruleName] ?? 0) + requests
       }
 
       const errorRate = totalRequests > 0 ? (errors / totalRequests) * 100 : 0

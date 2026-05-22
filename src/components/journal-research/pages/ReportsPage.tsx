@@ -25,7 +25,7 @@ export function ReportsPage({ sessionId, reportId }: ReportsPageProps) {
             {sessionId ? (
               <ReportViewer reportId={reportId} sessionId={sessionId} />
             ) : (
-              <div className='text-muted-foreground py-4 text-center'>
+              <div className="text-muted-foreground py-4 text-center">
                 Select a session to view the report.
               </div>
             )}

@@ -58,21 +58,14 @@ def compute_signals(text: str) -> Signals:
     return Signals(empathy=empathy, fidelity=fidelity, domain=domain, harm=harm)
 
 
-def compose_score(
-    signals: Signals, weights: dict[str, float], thresholds: dict[str, float]
-) -> ScoreResult:
+def compose_score(signals: Signals, weights: dict[str, float], thresholds: dict[str, float]) -> ScoreResult:
     # Normalize missing weights
     w_e = float(weights.get("empathy", 0.25))
     w_f = float(weights.get("fidelity", 0.25))
     w_d = float(weights.get("domain", 0.25))
     w_h = float(weights.get("harm", 0.25))
     # Harm is inverted for composite (lower harm is better)
-    composite = (
-        w_e * signals.empathy
-        + w_f * signals.fidelity
-        + w_d * signals.domain
-        + w_h * (1.0 - signals.harm)
-    )
+    composite = w_e * signals.empathy + w_f * signals.fidelity + w_d * signals.domain + w_h * (1.0 - signals.harm)
     # Decision policy
     harm_max = float(thresholds.get("harm_max", 0.05))
     accept_min = float(thresholds.get("accept_min", 0.60))

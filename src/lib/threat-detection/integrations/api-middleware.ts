@@ -227,7 +227,7 @@ export class ThreatDetectionMiddleware {
         .filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase()))
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(',') : value ?? '',
+          Array.isArray(value) ? value.join(',') : (value ?? ''),
         ]),
     )
 

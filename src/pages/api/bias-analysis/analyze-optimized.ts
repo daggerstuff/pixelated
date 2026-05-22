@@ -36,8 +36,8 @@ const AnalyzeBiasRequestSchema = z.object({
 const CACHE_HEADERS = {
   'Content-Type': 'application/json',
   'Cache-Control': 'no-cache, no-store, must-revalidate',
-  Pragma: 'no-cache',
-  Expires: '0',
+  'Pragma': 'no-cache',
+  'Expires': '0',
   'X-Content-Type-Options': 'nosniff',
   'X-Frame-Options': 'DENY',
   'X-XSS-Protection': '1; mode=block',
@@ -503,7 +503,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Process all items in parallel with per-item timeouts
     const perItemTimeoutMs = 30000 // 30s per item
-    const analysisPromises = body.items.map( async (item) =>
+    const analysisPromises = body.items.map(async (item) =>
       Promise.race([
         biasService.analyzeBias({
           text: item.text,

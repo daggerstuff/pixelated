@@ -10,7 +10,7 @@ export const useProgressQuery = (
   const { enabled = true } = options
   return useQuery({
     queryKey: journalResearchQueryKeys.progress.detail(sessionId ?? 'unknown'),
-    queryFn:  async () => getProgress(sessionId ?? ''),
+    queryFn: async () => getProgress(sessionId ?? ''),
     enabled: Boolean(sessionId) && enabled,
   })
 }
@@ -22,7 +22,7 @@ export const useProgressMetricsQuery = (
   const { enabled = true, refetchInterval } = options
   return useQuery({
     queryKey: journalResearchQueryKeys.progress.metrics(sessionId ?? 'unknown'),
-    queryFn:  async () => getProgressMetrics(sessionId ?? ''),
+    queryFn: async () => getProgressMetrics(sessionId ?? ''),
     enabled: Boolean(sessionId) && enabled,
     refetchInterval,
   })

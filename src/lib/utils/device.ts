@@ -28,7 +28,11 @@ export function getOS(userAgent: string): string {
   if (userAgent.includes('Windows')) {
     return 'Windows'
   }
-  if (userAgent.includes('iOS') || userAgent.includes('iPhone') || userAgent.includes('iPad')) {
+  if (
+    userAgent.includes('iOS') ||
+    userAgent.includes('iPhone') ||
+    userAgent.includes('iPad')
+  ) {
     return 'iOS'
   }
   if (userAgent.includes('Mac')) {

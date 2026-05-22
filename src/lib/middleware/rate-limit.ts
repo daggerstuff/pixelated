@@ -85,7 +85,7 @@ export class RateLimiter {
     remaining: number
     reset: number
   } {
-    const limit = limits[role] || limits.anonymous || 10
+    const limit = (limits[role] ?? limits.anonymous) || 10
     const now = Date.now()
     const resetTime = now + windowMs
 
@@ -132,8 +132,8 @@ export const rateLimitMiddleware = defineMiddleware(
     try {
       // Get client IP for rate limiting
       const clientIp =
-        (request.headers.get('x-forwarded-for') ??
-        request.headers.get('cf-connecting-ip')) ??
+        request.headers.get('x-forwarded-for') ??
+        request.headers.get('cf-connecting-ip') ??
         'anonymous'
 
       // Get user role from session

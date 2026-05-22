@@ -540,7 +540,7 @@ export function validateObjectiveWeights(): boolean {
 }
 
 export function getDefaultObjectiveWeights(): Record<string, number> {
-  return CORE_MENTAL_HEALTH_OBJECTIVES.reduce< Record<string, number>>(
+  return CORE_MENTAL_HEALTH_OBJECTIVES.reduce<Record<string, number>>(
     (weights, obj) => {
       weights[obj.id] = obj.weight
       return weights

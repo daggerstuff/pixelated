@@ -187,9 +187,7 @@ class PIX8Orchestrator:
                 # Try to extract statistics from output
                 if stats := self._parse_output_stats(output_lines):
                     result.details = stats
-                    result.records_generated = stats.get("total_generated", 0) or stats.get(
-                        "total_records", 0
-                    )
+                    result.records_generated = stats.get("total_generated", 0) or stats.get("total_records", 0)
             else:
                 result.status = TaskStatus.FAILED
                 result.error = f"Script exited with code {return_code}"
@@ -320,16 +318,10 @@ class PIX8Orchestrator:
                 "tasks": {name: result.to_dict() for name, result in self.results.items()},
                 "summary": {
                     "total_tasks": len(self.results),
-                    "completed": sum(
-                        r.status == TaskStatus.COMPLETED for r in self.results.values()
-                    ),
+                    "completed": sum(r.status == TaskStatus.COMPLETED for r in self.results.values()),
                     "failed": sum(r.status == TaskStatus.FAILED for r in self.results.values()),
-                    "total_records_generated": sum(
-                        r.records_generated for r in self.results.values()
-                    ),
-                    "total_duration_seconds": sum(
-                        r.duration_seconds for r in self.results.values()
-                    ),
+                    "total_records_generated": sum(r.records_generated for r in self.results.values()),
+                    "total_duration_seconds": sum(r.duration_seconds for r in self.results.values()),
                 },
             }
         }
@@ -418,9 +410,7 @@ def main():
     args = parser.parse_args()
 
     # Configure logging
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     # Initialize orchestrator
     orchestrator = PIX8Orchestrator(test_mode=args.test, output_dir=args.output_dir)

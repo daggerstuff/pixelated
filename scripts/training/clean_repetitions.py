@@ -56,9 +56,7 @@ def detect_ngram_repetitions(text: str, n: int = 3, threshold: int = 3) -> tuple
     return len(repeated_phrases) > 0, list(repeated_phrases)
 
 
-def detect_char_repetitions(
-    text: str, min_len: int = 4, threshold: int = 5
-) -> tuple[bool, list[str]]:
+def detect_char_repetitions(text: str, min_len: int = 4, threshold: int = 5) -> tuple[bool, list[str]]:
     """
     Detect repeated character sequences (e.g., "aaaaaa", "!!!!!!").
 
@@ -210,7 +208,7 @@ def clean_jsonl_file(
     removed = []
     removed_samples = []
 
-    with open(input_file, "r") as f:
+    with open(input_file) as f:
         lines = f.readlines()
 
     total = len(lines)
@@ -230,9 +228,7 @@ def clean_jsonl_file(
 
         if analysis["has_repetitions"]:
             removed.append(sample)
-            removed_samples.append(
-                {"line": i + 1, "preview": analysis["sample_preview"], "issues": analysis["issues"]}
-            )
+            removed_samples.append({"line": i + 1, "preview": analysis["sample_preview"], "issues": analysis["issues"]})
             if verbose:
                 print(f"  [Removed] Line {i + 1}: {analysis['issues']}")
         else:
@@ -262,20 +258,12 @@ def clean_jsonl_file(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Clean training data by removing repetitive samples"
-    )
+    parser = argparse.ArgumentParser(description="Clean training data by removing repetitive samples")
     parser.add_argument("--input", "-i", required=True, help="Input JSONL file path")
-    parser.add_argument(
-        "--output", "-o", default="cleaned_output.jsonl", help="Output JSONL file path"
-    )
+    parser.add_argument("--output", "-o", default="cleaned_output.jsonl", help="Output JSONL file path")
     parser.add_argument("--verbose", "-v", action="store_true", help="Print detailed progress")
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Don't write output, just report statistics"
-    )
-    parser.add_argument(
-        "--analyze-only", action="store_true", help="Only analyze and report, don't clean"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Don't write output, just report statistics")
+    parser.add_argument("--analyze-only", action="store_true", help="Only analyze and report, don't clean")
 
     args = parser.parse_args()
 
@@ -294,7 +282,7 @@ def main():
             print(f"Error: Input file not found: {args.input}")
             sys.exit(1)
 
-        with open(input_file, "r") as f:
+        with open(input_file) as f:
             lines = f.readlines()
 
         print(f"\nAnalyzing {len(lines)} samples...")
@@ -323,10 +311,8 @@ def main():
         return
 
     # Clean the file
-    print(f"\nProcessing...")
-    kept, removed_count, removed = clean_jsonl_file(
-        args.input, args.output, verbose=args.verbose, dry_run=args.dry_run
-    )
+    print("\nProcessing...")
+    kept, removed_count, removed = clean_jsonl_file(args.input, args.output, verbose=args.verbose, dry_run=args.dry_run)
 
     print(f"\n{'=' * 60}")
     print("RESULTS")
@@ -341,7 +327,7 @@ def main():
         print(f"Removed report: {Path(args.output).with_suffix('.removed.json')}")
 
     if removed and args.verbose:
-        print(f"\nRemoved samples preview:")
+        print("\nRemoved samples preview:")
         for r in removed[:5]:
             print(f"  - Line {r['line']}: {r['issues']}")
 

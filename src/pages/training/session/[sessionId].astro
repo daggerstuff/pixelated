@@ -29,9 +29,11 @@ const isTrainingSessionResponse = (
   const clientProfile = maybeValue['clientProfile']
 
   return (
-    typeof maybeValue['difficultyLevel'] === 'string' ||
-    typeof maybeValue['difficultyLevel'] === 'number'
-  ) && typeof clientProfile === 'object' && clientProfile !== null
+    (typeof maybeValue['difficultyLevel'] === 'string' ||
+      typeof maybeValue['difficultyLevel'] === 'number') &&
+    typeof clientProfile === 'object' &&
+    clientProfile !== null
+  )
 }
 
 const { sessionId } = Astro.params

@@ -636,7 +636,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      await (this.s3Client!).send(
+      await this.s3Client!.send(
         new PutObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -677,7 +677,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      const response = await (this.s3Client!).send(
+      const response = await this.s3Client!.send(
         new GetObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -729,7 +729,7 @@ export class AWSS3StorageProvider implements StorageProvider {
           ContinuationToken: continuationToken,
         })
 
-        const response = await (this.s3Client!).send(listCommand)
+        const response = await this.s3Client!.send(listCommand)
         const typedResponse = response as {
           Contents?: Array<{ Key?: string }>
           NextContinuationToken?: string
@@ -783,7 +783,7 @@ export class AWSS3StorageProvider implements StorageProvider {
         })
       }
 
-      await (this.s3Client!).send(
+      await this.s3Client!.send(
         new DeleteObjectCommand({
           Bucket: this.config.bucket,
           Key: fullKey,
@@ -932,7 +932,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async storeFile(key: string, data: Uint8Array): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket!).file(fullKey)
+      const file = this.bucket!.file(fullKey)
 
       await file.save(data, {
         contentType: 'application/octet-stream',
@@ -956,7 +956,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async getFile(key: string): Promise<Uint8Array> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket!).file(fullKey)
+      const file = this.bucket!.file(fullKey)
 
       const [contents] = await file.download()
       return new Uint8Array(contents)
@@ -975,7 +975,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         options['prefix'] = this.config.prefix
       }
 
-      const [files] = await (this.bucket!).getFiles(options)
+      const [files] = await this.bucket!.getFiles(options)
 
       const results: string[] = []
       for (const file of files) {
@@ -1006,7 +1006,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   async deleteFile(key: string): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const file = (this.bucket!).file(fullKey)
+      const file = this.bucket!.file(fullKey)
 
       await file.delete()
       logger.debug(
@@ -1164,9 +1164,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
   async storeFile(key: string, data: Uint8Array): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const blockBlobClient = (
-        this.containerClient!
-      ).getBlockBlobClient(fullKey)
+      const blockBlobClient = this.containerClient!.getBlockBlobClient(fullKey)
 
       await blockBlobClient.upload(data, data.length, {
         blobHTTPHeaders: {
@@ -1191,9 +1189,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
   async getFile(key: string): Promise<Uint8Array> {
     try {
       const fullKey = this.getFullKey(key)
-      const blockBlobClient = (
-        this.containerClient!
-      ).getBlockBlobClient(fullKey)
+      const blockBlobClient = this.containerClient!.getBlockBlobClient(fullKey)
 
       const downloadResponse = await blockBlobClient.download(0)
       const chunks: Uint8Array[] = []
@@ -1227,9 +1223,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
       const options = { prefix: this.config.prefix }
 
       // List all blobs in the container
-      for await (const blob of (
-        this.containerClient!
-      ).listBlobsFlat(options)) {
+      for await (const blob of this.containerClient!.listBlobsFlat(options)) {
         // Remove the prefix to get the relative path
         const key = blob.name
         const relativePath = this.config.prefix
@@ -1257,9 +1251,7 @@ export class AzureBlobStorageProvider implements StorageProvider {
   async deleteFile(key: string): Promise<void> {
     try {
       const fullKey = this.getFullKey(key)
-      const blockBlobClient = (
-        this.containerClient!
-      ).getBlockBlobClient(fullKey)
+      const blockBlobClient = this.containerClient!.getBlockBlobClient(fullKey)
 
       await blockBlobClient.delete()
       logger.debug(

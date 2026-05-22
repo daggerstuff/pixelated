@@ -250,8 +250,8 @@ export const auditLoggingMiddleware = defineMiddleware(
       userAgent: request.headers.get('user-agent') ?? 'unknown',
       referer: request.headers.get('referer') ?? 'direct',
       ipAddress:
-        (request.headers.get('x-forwarded-for') ??
-        request.headers.get('cf-connecting-ip')) ??
+        request.headers.get('x-forwarded-for') ??
+        request.headers.get('cf-connecting-ip') ??
         'unknown',
     }
 

@@ -6,7 +6,8 @@ therapeutic data — quality and security matter.
 ## Getting Started
 
 1. Fork and clone the repository
-2. Run `./scripts/setup-dev.sh` to install dependencies and start local databases
+2. Run `./scripts/setup-dev.sh` to install dependencies and start local
+   databases
 3. Verify: `pnpm dev` should start the app on http://localhost:5173
 
 See [WALKTHROUGH.md](WALKTHROUGH.md) for the full developer guide.
@@ -67,7 +68,8 @@ uv run ruff format .    # format Python code
 
 - **Never** commit credentials, API keys, or patient data
 - **Never** use `@ts-ignore`, `# noqa`, or `# type: ignore` to suppress issues
-- Report vulnerabilities to [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
+- Report vulnerabilities to
+  [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
 
 ## AI Assistant Instructions
 

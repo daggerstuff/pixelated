@@ -1414,7 +1414,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
             .toArray(),
           this.responsesCollection
             .find({
-              status: 'completed',
+              'status': 'completed',
               'result.success': true,
             })
             .toArray(),
@@ -1434,7 +1434,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
             ) / completedResponses.length
           : 0
 
-      const byStatusMap = byStatus.reduce< Record<string, number>>(
+      const byStatusMap = byStatus.reduce<Record<string, number>>(
         (acc, item) => {
           acc[item['_id']] = item.count
           return acc
@@ -1442,13 +1442,10 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
         {},
       )
 
-      const byTypeMap = byType.reduce< Record<string, number>>(
-        (acc, item) => {
-          acc[item['_id']] = item.count
-          return acc
-        },
-        {},
-      )
+      const byTypeMap = byType.reduce<Record<string, number>>((acc, item) => {
+        acc[item['_id']] = item.count
+        return acc
+      }, {})
 
       return {
         total_responses: totalResponses,
