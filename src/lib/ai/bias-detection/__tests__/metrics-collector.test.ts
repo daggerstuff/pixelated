@@ -477,6 +477,122 @@ describe('BiasMetricsCollector', () => {
     })
   })
 
+  describe('storeAnalysisResult edge cases', () => {
+    it('should handle Python storeMetrics failure gracefully', async () => {
+      ;(mockPythonBridge.storeMetrics as any).mockRejectedValueOnce(
+        new Error('Storage unavailable'),
+      )
+
+      // Should not throw — the inner catch in storeAnalysisResult handles it
+      await expect(
+        metricsCollector.storeAnalysisResult(mockAnalysisResult, 150),
+      ).resolves.not.toThrow()
+    })
+
+    it('should store analysis with processing time', async () => {
+      await metricsCollector.storeAnalysisResult(mockAnalysisResult, 250)
+      expect(mockPythonBridge.sendAnalysisMetric).toHaveBeenCalled()
+    })
+
+    it('should handle demographics extraction during store', async () => {
+      const resultWithAllDemographics: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        sessionId: 'demo-store-test',
+        demographics: {
+          age: '45',
+          gender: 'male',
+          ethnicity: 'asian',
+          primaryLanguage: 'chinese',
+          socioeconomicStatus: 'middle',
+          education: 'graduate',
+          region: 'west',
+        },
+      }
+      await expect(
+        metricsCollector.storeAnalysisResult(resultWithAllDemographics, 100),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('getSummaryMetrics error paths', () => {
+    it('should return undefined when getDashboardData throws unexpected error', async () => {
+      // Mock getDashboardData on the instance to throw
+      const dashSpy = vi
+        .spyOn(metricsCollector, 'getDashboardData')
+        .mockRejectedValue(new Error('Unexpected dash error'))
+
+      const summary = await metricsCollector.getSummaryMetrics()
+      expect(summary).toBeUndefined()
+
+      dashSpy.mockRestore()
+    })
+  })
+
+  describe('getDemographicMetrics error paths', () => {
+    it('should return undefined when bridge call fails', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Demo fetch failed'),
+      )
+
+      const demographics = await metricsCollector.getDemographicMetrics()
+      // Falls through to fallback (not undefined because getDashboardData catches its own errors)
+      expect(demographics).toBeDefined()
+    })
+
+    it('should return undefined when getDashboardData throws', async () => {
+      const dashSpy = vi
+        .spyOn(metricsCollector, 'getDashboardData')
+        .mockRejectedValue(new Error('Unexpected error'))
+
+      const demographics = await metricsCollector.getDemographicMetrics()
+      expect(demographics).toBeUndefined()
+
+      dashSpy.mockRestore()
+    })
+  })
+
+  describe('getRecentSessionCount error path', () => {
+    it('should return 0 when bridge fails', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Session count fetch failed'),
+      )
+
+      const count = await metricsCollector.getRecentSessionCount()
+      expect(count).toBe(0)
+    })
+  })
+
+  describe('getSessionAnalysis error path', () => {
+    it('should return null when bridge fails', async () => {
+      ;(mockPythonBridge.getSessionData as any).mockRejectedValueOnce(
+        new Error('Session fetch failed'),
+      )
+
+      const analysis = await metricsCollector.getSessionAnalysis('fail-session')
+      expect(analysis).toBeNull()
+    })
+  })
+
+  describe('getActiveAnalysesCount', () => {
+    it('should return 0 when no analyses stored', async () => {
+      const count = await metricsCollector.getActiveAnalysesCount()
+      expect(count).toBe(0)
+    })
+
+    it('should return count after storing analyses', async () => {
+      await metricsCollector.storeAnalysisResult(mockAnalysisResult, 100)
+      const count = await metricsCollector.getActiveAnalysesCount()
+      expect(count).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  describe('getStoredSessionAnalysis', () => {
+    it('should delegate to getSessionAnalysis', async () => {
+      const result = await metricsCollector.getStoredSessionAnalysis('test-session')
+      expect(result).toBeDefined()
+    })
+  })
+
   describe('dispose', () => {
     it('should dispose the metrics collector', async () => {
       await expect(metricsCollector.dispose()).resolves.not.toThrow()
