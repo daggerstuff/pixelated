@@ -269,13 +269,9 @@ export default defineConfig({
       },
     ],
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: !!process.env['CI'],
-        maxThreads: process.env['CI'] ? 4 : 8,
-        minThreads: process.env['CI'] ? 1 : 2,
-      },
-    },
+    singleThread: !!process.env['CI'],
+    maxThreads: process.env['CI'] ? 4 : 8,
+    minThreads: process.env['CI'] ? 1 : 2,
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
@@ -293,11 +289,11 @@ export default defineConfig({
       thresholds: {
         // PIX-223+: Thresholds raised after boosting BiasDetectionEngine (57%→88%),
         // performance-optimizer (81%→91%), connection-pool (27%→97%), python-bridge 85%,
-        // alerts-system 83%, metrics-collector 70%. Overall project ~58% stmts.
-        lines: 40,
-        functions: 35,
-        branches: 30,
-        statements: 40,
+        // alerts-system ~84%, metrics-collector ~80%. Overall project ~58% stmts.
+        lines: 45,
+        functions: 40,
+        branches: 32,
+        statements: 45,
       },
       exclude: [
         'node_modules/**',
