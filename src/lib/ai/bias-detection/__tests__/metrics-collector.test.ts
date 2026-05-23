@@ -4,11 +4,41 @@ import { BiasMetricsCollector } from '../metrics-collector'
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import type { BiasDetectionConfig, BiasAnalysisResult } from '../types'
 
-// Mock the Python bridge
+// Mock the Python bridge with all metrics-collector methods
 vi.mock('../python-bridge', () => ({
   PythonBiasDetectionBridge: class {
     initialize = vi.fn().mockResolvedValue(undefined)
     checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
+    sendMetricsBatch = vi.fn().mockResolvedValue({ success: true })
+    sendAnalysisMetric = vi.fn().mockResolvedValue({ success: true })
+    getDashboardMetrics = vi.fn().mockResolvedValue({
+      summary: {
+        total_sessions_analyzed: 42,
+        average_bias_score: 0.35,
+        alert_distribution: { low: 10, medium: 15, high: 12, critical: 5 },
+        high_risk_sessions: 5,
+        critical_alerts: 5,
+      },
+      trends: {
+        daily_bias_scores: [0.2, 0.25, 0.18],
+        alert_counts: [2, 3, 1],
+      },
+      demographics: {
+        bias_by_age_group: { '18-24': 20, '25-34': 35 },
+        bias_by_gender: { male: 45, female: 50, other: 5 },
+      },
+    })
+    getPerformanceMetrics = vi.fn().mockResolvedValue({
+      average_response_time: 150,
+      requests_per_second: 10,
+      error_rate: 0.02,
+      uptime_seconds: 3600,
+      health_status: 'healthy',
+    })
+    getSessionData = vi.fn().mockResolvedValue({ session_id: 'test', data: {} })
+    storeMetrics = vi.fn().mockResolvedValue({ success: true })
+    recordReportMetric = vi.fn().mockResolvedValue({ success: true })
+    dispose = vi.fn().mockResolvedValue(undefined)
   },
 }))
 
@@ -292,4 +322,166 @@ describe('BiasMetricsCollector', () => {
       storeSpy.mockRestore()
     })
   })
+
+  describe('extractDemographicGroups', () => {
+    it('should extract core demographic groups', () => {
+      const groups = (metricsCollector as any)['extractDemographicGroups']({
+        age: '30',
+        gender: 'female',
+        ethnicity: 'caucasian',
+        primaryLanguage: 'english',
+      })
+      expect(groups).toContain('age:30')
+      expect(groups).toContain('gender:female')
+      expect(groups).toContain('ethnicity:caucasian')
+      expect(groups).toContain('language:english')
+    })
+
+    it('should extract optional demographic fields', () => {
+      const groups = (metricsCollector as any)['extractDemographicGroups']({
+        age: '25',
+        gender: 'male',
+        ethnicity: 'asian',
+        primaryLanguage: 'chinese',
+        socioeconomicStatus: 'middle',
+        education: 'bachelor',
+        region: 'northeast',
+      })
+      expect(groups).toContain('socioeconomic:middle')
+      expect(groups).toContain('education:bachelor')
+      expect(groups).toContain('region:northeast')
+    })
+
+    it('should handle partial demographic data', () => {
+      const groups = (metricsCollector as any)['extractDemographicGroups']({
+        age: '40',
+      })
+      expect(groups).toEqual(['age:40'])
+    })
+
+    it('should return empty array for empty demographics', () => {
+      const groups = (metricsCollector as any)['extractDemographicGroups']({})
+      expect(groups).toEqual([])
+    })
+  })
+
+  describe('initialize error handling', () => {
+    it('should fallback to local-only mode when bridge init fails without strictMode', async () => {
+      const nonStrictConfig = { ...mockConfig, strictMode: false }
+      const nonStrictCollector = new BiasMetricsCollector(
+        nonStrictConfig,
+        mockPythonBridge,
+      )
+
+      ;(mockPythonBridge.initialize as any).mockRejectedValueOnce(
+        new Error('Service unreachable'),
+      )
+
+      // Should not throw — falls back to local-only mode
+      await expect(nonStrictCollector.initialize()).resolves.not.toThrow()
+    })
+  })
+
+  describe('getSummaryMetrics and getDemographicMetrics', () => {
+    it('should get summary metrics', async () => {
+      const summary = await metricsCollector.getSummaryMetrics()
+      expect(summary).toBeDefined()
+      expect(summary).toHaveProperty('total_sessions')
+      expect(summary).toHaveProperty('average_bias_score')
+    })
+
+    it('should get demographic metrics', async () => {
+      const demographics = await metricsCollector.getDemographicMetrics()
+      expect(demographics).toBeDefined()
+      expect(demographics).toHaveProperty('bias_by_age_group')
+      expect(demographics).toHaveProperty('bias_by_gender')
+    })
+
+    it('should return fallback summary when bridge fails', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const summary = await metricsCollector.getSummaryMetrics()
+      // getDashboardData catches its own errors and returns fallback data
+      expect(summary).toBeDefined()
+      expect(summary).toHaveProperty('total_sessions')
+    })
+
+    it('should return fallback demographics when bridge fails', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const demographics = await metricsCollector.getDemographicMetrics()
+      // getDashboardData catches its own errors and returns fallback data
+      expect(demographics).toBeDefined()
+      expect(demographics).toHaveProperty('bias_by_age_group')
+    })
+  })
+
+  describe('getPerformanceMetrics', () => {
+    it('should return performance metrics from bridge', async () => {
+      const perf = await metricsCollector.getPerformanceMetrics()
+      expect(perf).toHaveProperty('responseTime', 150)
+      expect(perf).toHaveProperty('throughput', 10)
+      expect(perf).toHaveProperty('errorRate', 0.02)
+      expect(perf).toHaveProperty('systemHealth', 'healthy')
+    })
+
+    it('should return fallback metrics when bridge fails', async () => {
+      ;(mockPythonBridge.getPerformanceMetrics as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const perf = await metricsCollector.getPerformanceMetrics()
+      expect(perf).toHaveProperty('systemHealth', 'error')
+      expect(perf).toHaveProperty('errorRate', 1.0)
+    })
+  })
+
+  describe('recordReportGeneration', () => {
+    it('should record report generation metric', async () => {
+      await expect(
+        metricsCollector.recordReportGeneration({ metadata: { executionTimeMs: 150 } }),
+      ).resolves.not.toThrow()
+      expect(mockPythonBridge.recordReportMetric).toHaveBeenCalled()
+    })
+
+    it('should handle report recording failure', async () => {
+      ;(mockPythonBridge.recordReportMetric as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      // Should not throw — error is caught internally
+      await expect(
+        metricsCollector.recordReportGeneration({ metadata: {} }),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('session counts', () => {
+    it('should get recent session count', async () => {
+      const count = await metricsCollector.getRecentSessionCount()
+      expect(typeof count).toBe('number')
+    })
+
+    it('should get active analyses count', async () => {
+      const count = await metricsCollector.getActiveAnalysesCount()
+      expect(typeof count).toBe('number')
+    })
+
+    it('should get session analysis by ID', async () => {
+      const analysis = await metricsCollector.getSessionAnalysis('session-123')
+      expect(analysis).toBeDefined()
+    })
+  })
+
+  describe('dispose', () => {
+    it('should dispose the metrics collector', async () => {
+      await expect(metricsCollector.dispose()).resolves.not.toThrow()
+      expect(mockPythonBridge.dispose).toHaveBeenCalled()
+    })
+  })
+
 })
