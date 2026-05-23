@@ -68,6 +68,31 @@ export interface CrisisMonitoringDashboardProps {
   showEmergencyControls?: boolean
 }
 
+// Performance optimization: Extracted these mapping dictionaries to the module level
+// to prevent O(N) object allocations on every render cycle during .map() iterations.
+const RISK_COLORS = {
+  minimal: 'text-green-600 bg-green-50',
+  low: 'text-blue-600 bg-blue-50',
+  moderate: 'text-yellow-600 bg-yellow-50',
+  high: 'text-orange-600 bg-orange-50',
+  imminent: 'text-red-600 bg-red-50',
+} as const
+
+const SEVERITY_COLORS = {
+  low: 'border-blue-200 bg-blue-50',
+  medium: 'border-yellow-200 bg-yellow-50',
+  high: 'border-orange-200 bg-orange-50',
+  critical: 'border-red-200 bg-red-50',
+} as const
+
+const RISK_DOT_COLORS = {
+  imminent: 'bg-red-500',
+  high: 'bg-orange-500',
+  moderate: 'bg-yellow-500',
+  low: 'bg-blue-500',
+  minimal: 'bg-green-500',
+} as const
+
 export const CrisisMonitoringDashboard: React.FC<
   CrisisMonitoringDashboardProps
 > = ({
@@ -159,25 +184,12 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Get risk color for styling
   const getRiskColor = (risk: string): string => {
-    const colors = {
-      minimal: 'text-green-600 bg-green-50',
-      low: 'text-blue-600 bg-blue-50',
-      moderate: 'text-yellow-600 bg-yellow-50',
-      high: 'text-orange-600 bg-orange-50',
-      imminent: 'text-red-600 bg-red-50',
-    }
-    return colors[risk as keyof typeof colors] || colors.minimal
+    return RISK_COLORS[risk as keyof typeof RISK_COLORS] || RISK_COLORS.minimal
   }
 
   // Get severity color for alerts
   const getSeverityColor = (severity: string): string => {
-    const colors = {
-      low: 'border-blue-200 bg-blue-50',
-      medium: 'border-yellow-200 bg-yellow-50',
-      high: 'border-orange-200 bg-orange-50',
-      critical: 'border-red-200 bg-red-50',
-    }
-    return colors[severity as keyof typeof colors] || colors.low
+    return SEVERITY_COLORS[severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low
   }
 
   // Handle alert acknowledgment
@@ -514,17 +526,7 @@ export const CrisisMonitoringDashboard: React.FC<
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
-                        className={`h-4 w-4 rounded-full ${
-                          patient.currentRisk === 'imminent'
-                            ? 'bg-red-500'
-                            : patient.currentRisk === 'high'
-                              ? 'bg-orange-500'
-                              : patient.currentRisk === 'moderate'
-                                ? 'bg-yellow-500'
-                                : patient.currentRisk === 'low'
-                                  ? 'bg-blue-500'
-                                  : 'bg-green-500'
-                        }`}
+                        className={`h-4 w-4 rounded-full ${RISK_DOT_COLORS[patient.currentRisk as keyof typeof RISK_DOT_COLORS] || RISK_DOT_COLORS.minimal}`}
                       />
 
                       <div>
