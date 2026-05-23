@@ -65,3 +65,9 @@
   or explicitly within the route handler (e.g., using
   `verifyAuthToken(authHeader)`), and enforce proper error handling for
   missing/invalid tokens.
+
+## 2025-05-23 - Missing Authentication on Mental Health Chat Endpoint
+
+- Vulnerability: Unauthenticated POST requests were accepted at `/api/mental-health/chat`, allowing anyone to submit messages.
+- Learning: Global middleware may have explicit route patterns that do not cover all API endpoints. When an endpoint is left out of standard patterns, we must fall back to explicit checks.
+- Prevention: Always verify authentication either through the central middleware or explicitly within the route handler (e.g., using `verifyAuthToken(authHeader)`), and enforce proper error handling for missing/invalid tokens.
