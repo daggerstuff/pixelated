@@ -907,6 +907,177 @@ describe('BiasAlertSystem', () => {
     })
   })
 
+  describe('getHighestSeverity', () => {
+    it('should return low for empty alerts', () => {
+      const severity = (alertSystem as any)['getHighestSeverity']([])
+      expect(severity).toBe('low')
+    })
+
+    it('should return the highest severity from alert levels', () => {
+      const alerts = [
+        { level: 'low' },
+        { level: 'medium' },
+        { level: 'high' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('high')
+    })
+
+    it('should return critical when present', () => {
+      const alerts = [
+        { level: 'low' },
+        { level: 'critical' },
+        { level: 'high' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('critical')
+    })
+
+    it('should handle unknown severity levels gracefully', () => {
+      const alerts = [
+        { level: 'unknown' },
+        { level: 'low' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('low')
+    })
+  })
+
+  describe('processAlert with notification channels', () => {
+    it('should send notifications when channels are enabled', async () => {
+      const enabledConfig = {
+        ...mockConfig,
+        notifications: {
+          email: { enabled: true },
+          slack: { enabled: true },
+          webhook: { enabled: true },
+        },
+      }
+
+      const enabledAlertSystem = new BiasAlertSystem(
+        enabledConfig,
+        mockPythonBridge,
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        alertLevel: 'high' as const,
+      }
+
+      await expect(
+        enabledAlertSystem.processAlert({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
+
+      // sendNotification should be called per channel (email, slack, webhook)
+      expect(mockPythonBridge.sendNotification).toHaveBeenCalled()
+    })
+
+    it('should handle notification channel failure gracefully', async () => {
+      ;(mockPythonBridge.sendNotification as any).mockRejectedValueOnce(
+        new Error('Notification service down'),
+      )
+
+      const enabledConfig = {
+        ...mockConfig,
+        notifications: {
+          email: { enabled: true },
+          slack: { enabled: false },
+          webhook: { enabled: false },
+        },
+      }
+
+      const enabledAlertSystem = new BiasAlertSystem(
+        enabledConfig,
+        mockPythonBridge,
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        alertLevel: 'high' as const,
+      }
+
+      // Should not throw despite notification failure (caught in sendNotificationToChannel)
+      await expect(
+        enabledAlertSystem.processAlert({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('checkAlerts with storeAlerts failure', () => {
+    it('should handle storeAlerts failure gracefully', async () => {
+      ;(mockPythonBridge.storeAlerts as any).mockRejectedValueOnce(
+        new Error('Store not available'),
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.85,
+        alertLevel: 'high',
+        sessionId: 'store-fail-test',
+      }
+
+      await expect(
+        alertSystem.checkAlerts(result),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('evaluateAnalysisAlerts with error in condition', () => {
+    it('should handle condition evaluation error gracefully', async () => {
+      // Add a rule with a condition that throws
+      ;(alertSystem as any).alertRules.push({
+        id: 'throwing-rule',
+        condition: () => {
+          throw new Error('Condition evaluation error')
+        },
+        severity: 'high',
+        message: 'This rule always throws',
+        escalationDelay: 0,
+        recipients: ['test'],
+      })
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.75,
+        sessionId: 'throwing-condition',
+      }
+
+      await alertSystem.checkAlerts(result)
+      // Should still generate alerts from non-throwing rules
+      expect(alertSystem.alertQueue.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  describe('processAlert error path', () => {
+    it('should throw when sendNotifications fails and error propagates', async () => {
+      // Spy on sendNotifications to make it throw
+      const notifySpy = vi
+        .spyOn(alertSystem as any, 'sendNotifications')
+        .mockRejectedValue(new Error('Send failed'))
+
+      await expect(
+        alertSystem.processAlert({
+          sessionId: 'process-error',
+          level: 'high' as AlertLevel,
+          biasScore: 0.8,
+          analysisResult: mockAnalysisResult,
+        }),
+      ).rejects.toThrow('Send failed')
+
+      notifySpy.mockRestore()
+    })
+  })
+
   describe('dispose', () => {
     it('should dispose the alert system', async () => {
       await alertSystem.dispose()
