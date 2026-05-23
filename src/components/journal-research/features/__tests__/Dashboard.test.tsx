@@ -21,6 +21,13 @@ vi.mock('@/lib/hooks/journal-research', () => ({
   useProgressMetricsQuery: vi.fn(),
 }))
 
+// Mock lazy-loaded ProgressCharts — avoids lazy() dynamic import failures in jsdom
+vi.mock('@/components/journal-research/lazy', () => ({
+  LazyProgressCharts: ({ progress, metrics }: any) => (
+    <div data-testid="progress-charts" data-progress={JSON.stringify(progress)} data-metrics={JSON.stringify(metrics)} />
+  ),
+}))
+
 // Mock store
 vi.mock('@/lib/stores/journal-research', () => ({
   useJournalSessionStore: vi.fn<() => unknown>(),

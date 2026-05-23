@@ -27,7 +27,6 @@ const baseNodeTestGlobs = [
 const ciNodeTestGlobs = process.env['CI']
   ? [
       'tests/integration/auth0/**/*.test.ts',
-      'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
       'tests/integration/patient-psi-crisis.test.ts',
       'src/lib/ai/services/PatientResponseService.test.ts',
       'src/lib/services/redis/__tests__/RedisService.integration.test.ts',
@@ -36,6 +35,13 @@ const ciNodeTestGlobs = process.env['CI']
       'tests/integration/bias-detection-api.integration.test.ts',
     ]
   : []
+
+// CPU-bound load/performance tests excluded from default runs
+// Run them explicitly with: VITEST_TARGET_TESTS="<path>" pnpm vitest run -c config/vitest.config.ts
+const cpuBoundNodeTestExcludes = [
+  'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.load.test.ts',
+  'src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.performance.test.ts',
+]
 
 const nodeTestGlobs: string[] = [...baseNodeTestGlobs, ...ciNodeTestGlobs]
 const coverageEnabled =
@@ -255,6 +261,9 @@ export default defineConfig({
                   'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
                   'src/tests/auth.test.ts',
                 ],
+          exclude: [
+            ...cpuBoundNodeTestExcludes,
+          ],
           environment: 'node',
         },
       },
@@ -275,12 +284,11 @@ export default defineConfig({
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
       thresholds: {
-        // PIX-79: Baseline thresholds matching current coverage (Jan 2026)
-        // Target: Increase gradually as coverage improves
-        lines: 20,
-        functions: 15,
-        branches: 17,
-        statements: 20,
+        // PIX-223: Raised thresholds after adding utils tests & fixing infra
+        lines: 30,
+        functions: 25,
+        branches: 22,
+        statements: 30,
       },
       exclude: [
         'node_modules/**',
@@ -296,6 +304,10 @@ export default defineConfig({
         'worktrees/**',
       ],
     },
+    // PIX-223: Timeout guard — force-kill hanging tests after 2× timeout
+    teardownTimeout: 60_000,
+    fileParallelism: !process.env['CI'],
+    maxConcurrency: process.env['CI'] ? 2 : 8,
     isolate: !process.env['CI'],
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
