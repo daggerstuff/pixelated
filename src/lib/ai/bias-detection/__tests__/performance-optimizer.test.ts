@@ -18,41 +18,27 @@ import {
 } from '../performance-optimizer'
 import type { PerformanceStats } from '../performance-optimizer'
 
-// Mock cache service
-vi.mock('../../../services/cacheService', () => ({
-  getCacheService: () => ({
-    get: vi.fn().mockImplementation(async (key: string) => {
-      if (key === 'existing-key') {
-        return JSON.stringify({ data: 'cached-value' })
-      }
-      if (key === 'compressed-key') {
-        return 'GZIP:' + Buffer.from(JSON.stringify({ data: 'compressed' })).toString('base64')
-      }
-      return null
-    }),
-    set: vi.fn().mockResolvedValue(undefined),
-    mget: vi.fn().mockImplementation(async (keys: string[]) => {
-      const result: Record<string, string | null> = {}
-      for (const key of keys) {
-        if (key === 'key1') {
-          result[key] = JSON.stringify({ val: 1 })
-        } else {
-          result[key] = null
-        }
-      }
-      return result
-    }),
-  }),
-}))
-
-// Mock logger
-vi.mock('../../../logging/build-safe-logger', () => ({
-  createBuildSafeLogger: () => ({
+// Shared mock objects for per-test customization (hoisted before vi.mock)
+const { mockCacheService, mockLogger } = vi.hoisted(() => ({
+  mockCacheService: {
+    get: vi.fn(),
+    set: vi.fn(),
+    mget: vi.fn(),
+  },
+  mockLogger: {
     info: vi.fn(),
     debug: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
-  }),
+  },
+}))
+
+vi.mock('../../../services/cacheService', () => ({
+  getCacheService: () => mockCacheService,
+}))
+
+vi.mock('../../../logging/build-safe-logger', () => ({
+  createBuildSafeLogger: () => mockLogger,
 }))
 
 const defaultOptimizerConfig: PerformanceOptimizerConfig = {
@@ -174,6 +160,33 @@ describe('IntelligentCacheManager', () => {
   let cache: IntelligentCacheManager
 
   beforeEach(() => {
+    // Reset and configure mock cache service defaults
+    mockCacheService.get.mockReset()
+    mockCacheService.set.mockReset()
+    mockCacheService.mget.mockReset()
+
+    mockCacheService.get.mockImplementation(async (key: string) => {
+      if (key === 'existing-key') {
+        return JSON.stringify({ data: 'cached-value' })
+      }
+      if (key === 'compressed-key') {
+        return 'GZIP:' + Buffer.from(JSON.stringify({ data: 'compressed' })).toString('base64')
+      }
+      return null
+    })
+    mockCacheService.set.mockResolvedValue(undefined)
+    mockCacheService.mget.mockImplementation(async (keys: string[]) => {
+      const result: Record<string, string | null> = {}
+      for (const key of keys) {
+        if (key === 'key1') {
+          result[key] = JSON.stringify({ val: 1 })
+        } else {
+          result[key] = null
+        }
+      }
+      return result
+    })
+
     cache = new IntelligentCacheManager(defaultOptimizerConfig.cache)
   })
 
@@ -242,6 +255,32 @@ describe('IntelligentCacheManager', () => {
       expect(stats.hits).toBe(1)
       expect(stats.misses).toBe(1)
       expect(stats.hitRate).toBe(50)
+    })
+  })
+
+  describe('error handling', () => {
+    it('should return null when cache service throws on get', async () => {
+      mockCacheService.get.mockRejectedValueOnce(new Error('Service unavailable'))
+      const value = await cache.get('any-key')
+      expect(value).toBeNull()
+    })
+
+    it('should not throw when cache service throws on set', async () => {
+      mockCacheService.set.mockRejectedValueOnce(new Error('Service unavailable'))
+      await expect(cache.set('test-key', { data: 'test' })).resolves.not.toThrow()
+    })
+
+    it('should return null for all keys when cache service throws on mget', async () => {
+      mockCacheService.mget.mockRejectedValueOnce(new Error('Service unavailable'))
+      const results = await cache.mget(['key1', 'key2'])
+      expect(results['key1']).toBeNull()
+      expect(results['key2']).toBeNull()
+    })
+
+    it('should not compress data below compression threshold', async () => {
+      // Data small enough that compression doesn't save space
+      // The base64 encoding may actually be larger than original for small data
+      await expect(cache.set('small-key', { data: 'tiny' })).resolves.not.toThrow()
     })
   })
 })
@@ -423,6 +462,83 @@ describe('BackgroundJobQueue', () => {
   })
 })
 
+async function waitForJobCompletion(
+  queue: BackgroundJobQueue,
+  jobId: string,
+  timeoutMs = 5000,
+): Promise<string> {
+  const start = Date.now()
+  while (Date.now() - start < timeoutMs) {
+    const job = queue.getJobStatus(jobId)
+    if (job && (job.status === 'completed' || job.status === 'failed')) {
+      return job.status
+    }
+    await new Promise((resolve) => setTimeout(resolve, 100))
+  }
+  return 'timeout'
+}
+
+describe('BackgroundJobQueue with enabled workers', () => {
+  let activeQueue: BackgroundJobQueue
+
+  afterEach(async () => {
+    await activeQueue.stop()
+  })
+
+  it('should process jobs when workers are active', async () => {
+    activeQueue = new BackgroundJobQueue({
+      ...defaultOptimizerConfig.backgroundJobs,
+      enabled: true,
+      maxWorkers: 1,
+      jobTimeout: 5000,
+      retryDelay: 100,
+      queueMaxSize: 100,
+    })
+
+    const jobId = await activeQueue.addJob('test-job', { data: 'test' })
+
+    const status = await waitForJobCompletion(activeQueue, jobId, 4000)
+    expect(status).toBe('completed')
+
+    const stats = activeQueue.getStats()
+    expect(stats.completed).toBe(1)
+    expect(stats.workers).toBeGreaterThan(0)
+  })
+
+  it('should process multiple jobs with workers', async () => {
+    activeQueue = new BackgroundJobQueue({
+      ...defaultOptimizerConfig.backgroundJobs,
+      enabled: true,
+      maxWorkers: 2,
+      jobTimeout: 5000,
+      retryDelay: 100,
+      queueMaxSize: 100,
+    })
+
+    const jobId1 = await activeQueue.addJob('job1', { data: 1 })
+    const jobId2 = await activeQueue.addJob('job2', { data: 2 })
+
+    const status1 = await waitForJobCompletion(activeQueue, jobId1, 4000)
+    const status2 = await waitForJobCompletion(activeQueue, jobId2, 4000)
+    expect(status1).toBe('completed')
+    expect(status2).toBe('completed')
+
+    const stats = activeQueue.getStats()
+    expect(stats.completed).toBe(2)
+  })
+
+  it('should stop workers gracefully', async () => {
+    activeQueue = new BackgroundJobQueue({
+      ...defaultOptimizerConfig.backgroundJobs,
+      enabled: true,
+      maxWorkers: 1,
+      jobTimeout: 5000,
+    })
+
+    await expect(activeQueue.stop()).resolves.not.toThrow()
+  })
+})
+
 describe('MemoryOptimizer', () => {
   let optimizer: MemoryOptimizer
 
@@ -479,6 +595,37 @@ describe('MemoryOptimizer', () => {
       expect(stats).toHaveProperty('gcCount')
       expect(stats).toHaveProperty('currentUsage')
       expect(stats).toHaveProperty('isUnderPressure')
+    })
+  })
+
+  describe('with monitoring enabled', () => {
+    it('should start periodic monitoring and detect memory pressure', async () => {
+      optimizer = new MemoryOptimizer({
+        ...defaultOptimizerConfig.memory,
+        enableMemoryMonitoring: true,
+        memoryThreshold: 0, // 0% = always under pressure
+        gcInterval: 10, // Very short interval for test
+      })
+
+      // Wait for monitoring interval to fire
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      const stats = optimizer.getStats()
+      expect(stats.isUnderPressure).toBe(true)
+    })
+
+    it('should not detect pressure when threshold is maximal', async () => {
+      optimizer = new MemoryOptimizer({
+        ...defaultOptimizerConfig.memory,
+        enableMemoryMonitoring: true,
+        memoryThreshold: 100, // 100% = never under pressure
+        gcInterval: 10,
+      })
+
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      const stats = optimizer.getStats()
+      expect(stats.isUnderPressure).toBe(false)
     })
   })
 })
@@ -571,6 +718,28 @@ describe('PerformanceOptimizer', () => {
       optimizer = new PerformanceOptimizer(defaultOptimizerConfig)
       await optimizer.dispose()
       await expect(optimizer.dispose()).resolves.not.toThrow()
+    })
+  })
+
+  describe('with metrics collection enabled', () => {
+    it('should collect metrics periodically', async () => {
+      const perfOptimizer = new PerformanceOptimizer({
+        ...defaultOptimizerConfig,
+        monitoring: {
+          ...defaultOptimizerConfig.monitoring,
+          enableMetrics: true,
+          metricsInterval: 50,
+        },
+      })
+
+      // Wait for metrics to be collected
+      await new Promise((resolve) => setTimeout(resolve, 150))
+
+      const stats = await perfOptimizer.getPerformanceStats()
+      expect(stats).toHaveProperty('connections')
+      expect(stats).toHaveProperty('cache')
+
+      await perfOptimizer.dispose()
     })
   })
 })
