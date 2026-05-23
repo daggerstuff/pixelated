@@ -34,14 +34,33 @@ export class DatasetPreparator {
   private readonly trainRatio: number
   private readonly valRatio: number
   private readonly seed: number
+  private prngState: number
 
   constructor(trainRatio = 0.7, valRatio = 0.15, seed = 42) {
     this.trainRatio = trainRatio
     this.valRatio = valRatio
     this.seed = seed
+    this.prngState = seed
+  }
+
+  private nextRandom(): number {
+    let t = (this.prngState += 0x6d2b79f5)
+    t = Math.imul(t ^ (t >>> 15), t | 1)
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+
+  private shuffle<T>(array: T[]): T[] {
+    const result = [...array]
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(this.nextRandom() * (i + 1))
+      ;[result[i], result[j]] = [result[j], result[i]]
+    }
+    return result
   }
 
   prepare(memories: MemoryBlock[]): [DatasetSplit, DatasetStats] {
+    this.prngState = this.seed
     const examples = this.extractExamples(memories)
     const balanced = this.balanceValence(examples)
     const piiLeak = this.checkPii(balanced)
@@ -110,7 +129,7 @@ export class DatasetPreparator {
         balanced.push(...repeats.slice(0, maxSize - bucket.length))
       }
     }
-    return balanced.sort(() => Math.random() - 0.5)
+    return this.shuffle(balanced)
   }
 
   private checkPii(examples: TrainingExample[]): boolean {
@@ -123,7 +142,7 @@ export class DatasetPreparator {
   }
 
   private split(examples: TrainingExample[]): DatasetSplit {
-    const shuffled = [...examples].sort(() => Math.random() - 0.5)
+    const shuffled = this.shuffle(examples)
     const n = shuffled.length
     const trainEnd = Math.floor(n * this.trainRatio)
     const valEnd = trainEnd + Math.floor(n * this.valRatio)
