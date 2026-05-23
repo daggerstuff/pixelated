@@ -1,56 +1,49 @@
 /**
- * Unit tests for HTTP Connection Pool for Python Bias Detection Service
+ * Unit tests for ConnectionPool
+ *
+ * Covers: acquireConnection, releaseConnection, getStats, isHealthy, dispose
  */
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
-import { ConnectionPool, type ConnectionPoolConfig } from '../connection-pool'
+import { ConnectionPool } from '../connection-pool'
+import type { ConnectionPoolConfig } from '../connection-pool'
+
+// Mock logger
+vi.mock('../../../logging/standardized-logger', () => ({
+  getBiasDetectionLogger: () => ({
+    info: vi.fn(),
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+  }),
+}))
+
+const defaultPoolConfig: Partial<ConnectionPoolConfig> = {
+  maxConnections: 3,
+  connectionTimeout: 5000,
+  idleTimeout: 30000,
+  retryAttempts: 2,
+  retryDelay: 100,
+}
 
 describe('ConnectionPool', () => {
   let pool: ConnectionPool
-  let config: Partial<ConnectionPoolConfig>
 
   beforeEach(() => {
-    vi.useFakeTimers()
-    config = {
-      maxConnections: 3,
-      connectionTimeout: 1000,
-      idleTimeout: 5000,
-      retryAttempts: 2,
-      retryDelay: 100,
-    }
-    pool = new ConnectionPool(config)
+    pool = new ConnectionPool(defaultPoolConfig)
   })
 
   afterEach(async () => {
-    vi.useRealTimers()
     await pool.dispose()
   })
 
-  describe('initialization', () => {
-    it('should create pool with default config when no config provided', () => {
-      const defaultPool = new ConnectionPool()
-      const stats = defaultPool.getStats()
-      expect(stats.maxConnections).toBe(10)
-      expect(stats.totalConnections).toBe(0)
-      defaultPool.dispose()
-    })
-
-    it('should create pool with custom config', () => {
-      const stats = pool.getStats()
-      expect(stats.maxConnections).toBe(3)
-      expect(stats.totalConnections).toBe(0)
-    })
-  })
-
   describe('acquireConnection', () => {
-    it('should return a valid connection', async () => {
+    it('should return a connection when pool is not full', async () => {
       const conn = await pool.acquireConnection()
-      expect(conn).toHaveProperty('id')
-      expect(conn).toHaveProperty('inUse')
-      expect(conn).toHaveProperty('lastUsed')
-      expect(conn).toHaveProperty('requests')
-      expect(conn).toHaveProperty('controller')
+      expect(conn).toBeDefined()
+      expect(conn.id).toBeTruthy()
       expect(conn.inUse).toBe(true)
+      expect(conn.requests).toBe(1)
     })
 
     it('should reuse idle connections', async () => {
@@ -58,65 +51,63 @@ describe('ConnectionPool', () => {
       pool.releaseConnection(conn1)
 
       const conn2 = await pool.acquireConnection()
+      // Should be the same underlying connection
       expect(conn2.id).toBe(conn1.id)
+      expect(conn2.inUse).toBe(true)
+      expect(conn2.requests).toBe(2) // Incremented on reuse
     })
 
-    it('should create new connections up to max', async () => {
+    it('should create multiple connections up to maxConnections', async () => {
       const conn1 = await pool.acquireConnection()
       const conn2 = await pool.acquireConnection()
       const conn3 = await pool.acquireConnection()
 
-      const stats = pool.getStats()
-      expect(stats.totalConnections).toBe(3)
       expect(conn1.id).not.toBe(conn2.id)
       expect(conn2.id).not.toBe(conn3.id)
     })
 
-    it('should queue requests when at max capacity', async () => {
-      // Acquire all connections
+    it('should queue requests when pool is full', async () => {
+      // Exhaust all connections
       const conn1 = await pool.acquireConnection()
       const conn2 = await pool.acquireConnection()
       const conn3 = await pool.acquireConnection()
 
-      // Queue length should be 0 initially
-      expect(pool.getStats().queueLength).toBe(0)
-
-      // This acquire should be queued
+      // Try to acquire a 4th - should queue
       const acquirePromise = pool.acquireConnection()
 
-      // Queue length should now be 1
-      expect(pool.getStats().queueLength).toBe(1)
+      // Verify it's queued by checking stats
+      const stats = pool.getStats()
+      expect(stats.queueLength).toBe(1)
 
-      // Release one connection
+      // Release one connection to unblock
       pool.releaseConnection(conn1)
 
-      // The queued request should resolve
       const conn4 = await acquirePromise
       expect(conn4).toBeDefined()
+      expect(conn4.inUse).toBe(true)
     })
 
-    it('should timeout queued requests', async () => {
-      // Fill all connections
-      await pool.acquireConnection()
-      await pool.acquireConnection()
-      await pool.acquireConnection()
+    it('should reject with timeout when queue times out', async () => {
+      // Create pool with very short timeout
+      const fastTimeoutPool = new ConnectionPool({
+        ...defaultPoolConfig,
+        connectionTimeout: 10, // 10ms timeout
+      })
 
-      // Start an acquire that will be queued — with fake timers the
-      // internal setTimeout won't fire unless we advance time
-      const acquirePromise = pool.acquireConnection()
+      // Exhaust all connections
+      const conn1 = await fastTimeoutPool.acquireConnection()
+      const conn2 = await fastTimeoutPool.acquireConnection()
+      const conn3 = await fastTimeoutPool.acquireConnection()
 
-      // Advance past the connection timeout (1000ms)
-      vi.advanceTimersByTime(2000)
+      // 4th should timeout
+      await expect(fastTimeoutPool.acquireConnection()).rejects.toThrow('Connection pool timeout')
 
-      // The promise should now reject with timeout
-      await expect(acquirePromise).rejects.toThrow('Connection pool timeout')
+      await fastTimeoutPool.dispose()
     })
 
     it('should throw when pool is disposed', async () => {
       await pool.dispose()
-      await expect(pool.acquireConnection()).rejects.toThrow(
-        'Connection pool disposed',
-      )
+      await expect(pool.acquireConnection()).rejects.toThrow('Connection pool disposed')
     })
   })
 
@@ -126,10 +117,11 @@ describe('ConnectionPool', () => {
       expect(conn.inUse).toBe(true)
 
       pool.releaseConnection(conn)
+      // After release, the connection is available for reuse
       expect(conn.inUse).toBe(false)
     })
 
-    it('should not process when pool is disposed', async () => {
+    it('should not throw when pool is disposed', async () => {
       const conn = await pool.acquireConnection()
       await pool.dispose()
 
@@ -137,75 +129,104 @@ describe('ConnectionPool', () => {
       expect(() => pool.releaseConnection(conn)).not.toThrow()
     })
 
-    it('should immediately hand off to queued waiters', async () => {
+    it('should process queued requests on release', async () => {
       const conn1 = await pool.acquireConnection()
-      await pool.acquireConnection()
-      await pool.acquireConnection()
+      const conn2 = await pool.acquireConnection()
+      await pool.acquireConnection() // conn3 - exhaust pool
 
       // Queue a request
-      const queuedPromise = pool.acquireConnection()
+      const acquirePromise = pool.acquireConnection()
 
-      // Release conn1 — queued request should get it
+      // Release conn1 - should be handed to queued request
       pool.releaseConnection(conn1)
-      const conn = await queuedPromise
-      expect(conn).toBeDefined()
-      expect(conn.inUse).toBe(true)
-    })
-  })
 
-  describe('cleanupIdleConnections', () => {
-    it('should clean up idle connections after idle timeout', async () => {
-      const conn = await pool.acquireConnection()
-      pool.releaseConnection(conn)
-
-      // Advance time past idle timeout
-      vi.advanceTimersByTime(6000)
-
-      // Trigger cleanup via the interval
-      // The cleanup interval runs every 60000ms by default, but with fake timers
-      // we can test the internal behavior by releasing and checking
-      // Since we use fake timers, the cleanup interval won't run automatically
-      // Let's check that stats still track correctly
-      const stats = pool.getStats()
-      expect(stats.idleTimeout).toBe(5000)
+      const conn4 = await acquirePromise
+      expect(conn4).toBeDefined()
+      expect(conn4.inUse).toBe(true)
     })
   })
 
   describe('getStats', () => {
-    it('should return correct statistics', async () => {
-      await pool.acquireConnection()
-      const stats = pool.getStats()
+    it('should return correct stats', async () => {
+      const conn1 = await pool.acquireConnection()
+      const conn2 = await pool.acquireConnection()
 
-      expect(stats.totalConnections).toBe(1)
-      expect(stats.activeConnections).toBe(1)
+      pool.releaseConnection(conn1)
+
+      const stats = pool.getStats()
+      expect(stats.totalConnections).toBe(2)
+      expect(stats.activeConnections).toBe(1) // conn2 still in use
       expect(stats.queueLength).toBe(0)
-      expect(stats.totalRequests).toBe(1)
+      expect(stats.totalRequests).toBe(2)
+      expect(stats.maxConnections).toBe(3)
+    })
+  })
+
+  describe('cleanupIdleConnections', () => {
+    it('should clean up idle connections that exceed idle timeout', async () => {
+      // Create pool with very short idle timeout
+      const shortIdlePool = new ConnectionPool({
+        ...defaultPoolConfig,
+        idleTimeout: 1, // 1ms idle timeout
+      })
+
+      const conn = await shortIdlePool.acquireConnection()
+      expect(shortIdlePool.getStats().totalConnections).toBe(1)
+
+      // Release it so it becomes idle
+      shortIdlePool.releaseConnection(conn)
+
+      // Wait for the idle timeout to expire
+      await new Promise((r) => setTimeout(r, 10))
+
+      // Trigger cleanup via private method access
+      ;(shortIdlePool as any).cleanupIdleConnections()
+
+      // The idle connection should have been cleaned up
+      expect(shortIdlePool.getStats().totalConnections).toBe(0)
+
+      await shortIdlePool.dispose()
+    })
+
+    it('should not clean up in-use connections', async () => {
+      const shortIdlePool = new ConnectionPool({
+        ...defaultPoolConfig,
+        idleTimeout: 1, // 1ms idle timeout
+      })
+
+      const conn = await shortIdlePool.acquireConnection()
+
+      // Don't release — connection is still in use
+      ;(shortIdlePool as any).cleanupIdleConnections()
+
+      // In-use connection should not be cleaned up
+      expect(shortIdlePool.getStats().totalConnections).toBe(1)
+      expect(conn.inUse).toBe(true)
+
+      await shortIdlePool.dispose()
+    })
+
+    it('should be a no-op when the pool is disposed', async () => {
+      ;(pool as any).disposed = true
+
+      // Should not throw
+      expect(() => {
+        ;(pool as any).cleanupIdleConnections()
+      }).not.toThrow()
     })
   })
 
   describe('isHealthy', () => {
-    it('should return true when pool is under capacity', () => {
+    it('should return true when pool is not full', () => {
       expect(pool.isHealthy()).toBe(true)
     })
 
-    it('should return false when pool is at capacity', async () => {
+    it('should return false when pool is at max connections with queued requests', async () => {
       await pool.acquireConnection()
       await pool.acquireConnection()
       await pool.acquireConnection()
 
-      expect(pool.isHealthy()).toBe(false)
-    })
-
-    it('should return false when queue is overloaded', async () => {
-      // Fill connections and queue a lot of requests
-      await pool.acquireConnection()
-      await pool.acquireConnection()
-      await pool.acquireConnection()
-
-      // With maxConnections=3, queue threshold is 2*3=6
-      // But we only queue 1 request, so it should still be healthy by queue metric
-      // Actually, isHealthy checks: totalConnections < maxConnections AND queueLength < queueThreshold
-      // Since totalConnections=3 and maxConnections=3, the first condition fails
+      // Pool is at max capacity
       expect(pool.isHealthy()).toBe(false)
     })
   })
@@ -213,28 +234,43 @@ describe('ConnectionPool', () => {
   describe('dispose', () => {
     it('should clean up all connections', async () => {
       await pool.acquireConnection()
-      await pool.acquireConnection()
-
       await pool.dispose()
+
       const stats = pool.getStats()
       expect(stats.totalConnections).toBe(0)
-    })
-
-    it('should reject queued requests', async () => {
-      await pool.acquireConnection()
-      await pool.acquireConnection()
-      await pool.acquireConnection()
-
-      const queuedPromise = pool.acquireConnection()
-
-      await pool.dispose()
-
-      await expect(queuedPromise).rejects.toThrow('Connection pool disposed')
+      expect(stats.queueLength).toBe(0)
     })
 
     it('should be idempotent', async () => {
       await pool.dispose()
       await expect(pool.dispose()).resolves.not.toThrow()
+    })
+
+    it('should reject queued requests when disposed', async () => {
+      const qPool = new ConnectionPool({ ...defaultPoolConfig, connectionTimeout: 5000 })
+
+      // Exhaust all connections
+      const conn1 = await qPool.acquireConnection()
+      const conn2 = await qPool.acquireConnection()
+      const conn3 = await qPool.acquireConnection()
+
+      // Queue two requests
+      const req1 = qPool.acquireConnection()
+      const req2 = qPool.acquireConnection()
+
+      // Verify queued
+      expect(qPool.getStats().queueLength).toBe(2)
+
+      // Dispose — should reject queued requests
+      await qPool.dispose()
+
+      // Both queued promises should reject
+      await expect(req1).rejects.toThrow('Connection pool disposed')
+      await expect(req2).rejects.toThrow('Connection pool disposed')
+
+      // Stats should show no connections or queue
+      expect(qPool.getStats().totalConnections).toBe(0)
+      expect(qPool.getStats().queueLength).toBe(0)
     })
   })
 })
