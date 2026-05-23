@@ -694,6 +694,94 @@ describe('analysis methods', () => {
       // Should not throw even when pool dispose fails
       await expect(poolBridge.dispose()).resolves.not.toThrow()
     })
+
+    it('should release connection in finally block when request fails', async () => {
+      const failPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'fail-conn' }),
+        releaseConnection: vi.fn(),
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        failPool,
+      )
+      ;(poolBridge as any).retryAttempts = 1
+      ;(poolBridge as any).retryDelay = 0
+
+      // Make fetch reject to trigger the finally block with a pooled connection
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Service down'))
+
+      const session: TherapeuticSession = {
+        sessionId: 'pool-error',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+
+      // Verify pool acquired and released despite error
+      expect(failPool.acquireConnection).toHaveBeenCalled()
+      expect(failPool.releaseConnection).toHaveBeenCalled()
+      // Should return fallback result
+      expect(result.fallbackMode).toBe(true)
+    })
+
+    it('should handle pool without releaseConnection method', async () => {
+      const partialPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'partial-conn' }),
+        // No releaseConnection method
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        partialPool,
+      )
+      ;(poolBridge as any).retryAttempts = 1
+      ;(poolBridge as any).retryDelay = 0
+
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Down'))
+
+      const session: TherapeuticSession = {
+        sessionId: 'partial-pool',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+
+      // Should not throw despite missing releaseConnection
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+      expect(result.fallbackMode).toBe(true)
+    })
+
+    it('should release pooled connection on retry exhaustion', async () => {
+      const retryPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'retry-conn' }),
+        releaseConnection: vi.fn(),
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        retryPool,
+      )
+      ;(poolBridge as any).retryAttempts = 2
+      ;(poolBridge as any).retryDelay = 0
+
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Persistent failure'))
+
+      // Acquire the connection and run a failing analysis
+      const session: TherapeuticSession = {
+        sessionId: 'retry-pool',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+
+      // For each retry attempt (2), acquireConnection is called, and for each
+      // attempt, releaseConnection is called in the finally block
+      expect(retryPool.releaseConnection).toHaveBeenCalled()
+      expect(result.fallbackMode).toBe(true)
+    })
   })
 
   describe('AbortController signal in non-test environment', () => {
