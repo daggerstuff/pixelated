@@ -18,9 +18,26 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import numpy as np
 import pytest
 
-# Skip tests if NVIDIA_API_KEY not available
+def _is_nvidia_api_unreachable() -> bool:
+    """Check if NVIDIA API should be skipped or is unreachable."""
+    if os.environ.get("RUN_LIVE_TESTS") != "true":
+        return True
+    if not os.environ.get("NVIDIA_API_KEY"):
+        return True
+    import socket
+    try:
+        socket.setdefaulttimeout(0.5)
+        # Attempt to connect to Google DNS IP to check if internet egress is active at all
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(("8.8.8.8", 53))
+        return False
+    except OSError:
+        return True
+
+
+# Skip tests if NVIDIA_API_KEY not available or offline/not requested
 requires_nvidia_api_key = pytest.mark.skipif(
-    not os.environ.get("NVIDIA_API_KEY"), reason="NVIDIA_API_KEY not found in environment"
+    _is_nvidia_api_unreachable(), reason="NVIDIA API is not reachable or NVIDIA_API_KEY not found or RUN_LIVE_TESTS not set to true"
 )
 
 

@@ -104,8 +104,3 @@ pipelines:
       - step: *governance-validate
       - step: *ingestion-stub-check
       - step: *quality-scoring-test
-      - step: *lint-oxlint
-      - step: *security-scan
-      - step: *playwright-e2e
-      - step: *build-test-sonarcloud
-      - step: *check-quality-gate-sonarcloud

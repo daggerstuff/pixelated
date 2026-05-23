@@ -100,9 +100,9 @@ function createWriter(
       return new JSONWriter(writeStream);
     case "csv":
       return new CSVWriter(writeStream);
-    case "jsonl": { throw new Error('Not implemented yet: "jsonl" case') }
-    default:
+    case "jsonl":
       return new JSONLWriter(writeStream);
+    default:
   }
 }
 
@@ -489,9 +489,10 @@ export async function validateMergedDataset(filePath: string): Promise<{
       case "csv":
         sampleCount = await validateCSVDataset(validatedPath, errors);
         break;
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
-      default:
+      case undefined:
+      case "jsonl":
         sampleCount = await validateJSONLDataset(validatedPath, errors);
+        break;
     }
   } catch (error: unknown) {
     errors.push(`Read error: ${error}`);
