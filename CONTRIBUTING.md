@@ -28,7 +28,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 feat: add emotion timeline visualization
 fix: resolve race condition in session save
 docs: update WALKTHROUGH with troubleshooting section
-chore: bump pnpm to 11.1.2
+chore: bump pnpm to 11.3.0
 ```
 
 ## Before Pushing
