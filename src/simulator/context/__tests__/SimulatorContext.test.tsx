@@ -30,7 +30,7 @@ class UseSimulatorErrorBoundary extends Component<{
     this.props.onError(error)
   }
 
-  async render() {
+  render() {
     if (this.state.hasError) {
       return null
     }

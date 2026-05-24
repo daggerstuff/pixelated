@@ -39,7 +39,9 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
             ]
         }
         mock_file = MagicMock()
-        mock_file.__enter__.return_value.read.return_value = str(mock_config).replace("'", '"')
+        mock_file.__enter__.return_value.read.return_value = str(mock_config).replace(
+            "'", '"'
+        )
         mock_open.return_value = mock_file
 
         # Create service instance
@@ -47,7 +49,9 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
 
         # Verify configuration was loaded
         self.assertEqual(service.api_key, self.mock_api_key)
-        self.assertEqual(service.api_base_url, "https://test.api.nvidia.com/v1/chat/completions")
+        self.assertEqual(
+            service.api_base_url, "https://test.api.nvidia.com/v1/chat/completions"
+        )
 
     @patch("bias_detection.services.nvidia_api_service.os.path.exists")
     @patch.dict(
@@ -73,7 +77,9 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
 
         # Mock environment variable not set
         with (
-            patch.dict("bias_detection.services.nvidia_api_service.os.environ", {}, clear=True),
+            patch.dict(
+                "bias_detection.services.nvidia_api_service.os.environ", {}, clear=True
+            ),
             self.assertRaises(ValueError),
         ):
             NvidiaAPIService()
@@ -87,7 +93,9 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
 
         mock_response = MagicMock()
         mock_response.json.return_value = {
-            "choices": [{"message": {"content": "Hello! I'm doing well, thank you for asking."}}],
+            "choices": [
+                {"message": {"content": "Hello! I'm doing well, thank you for asking."}}
+            ],
             "usage": {"prompt_tokens": 10, "completion_tokens": 20},
         }
         mock_response.raise_for_status = MagicMock()
@@ -148,7 +156,9 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
     async def test_convenience_functions(self):
         """Test convenience functions"""
         # Mock the service
-        with patch("bias_detection.services.nvidia_api_service.NvidiaAPIService") as mock_service_class:
+        with patch(
+            "bias_detection.services.nvidia_api_service.NvidiaAPIService"
+        ) as mock_service_class:
             mock_service_instance = AsyncMock()
             mock_service_class.return_value = mock_service_instance
 

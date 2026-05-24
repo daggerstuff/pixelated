@@ -7,7 +7,7 @@ import * as RiskScoring from '@/lib/analytics/risk'
 import { StatisticalAnalysis } from '@/lib/analytics/statistics'
 import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
-import type { EncryptedData } from '@/lib/fhe/types'
+// No EncryptedData import needed — mock factory returns a string
 import { redis } from '@/lib/redis'
 import type { BreachDetails } from '@/lib/security/breach-notification'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
@@ -115,14 +115,6 @@ describe('breachAnalytics', () => {
     },
   ]
 
-  const mockEncryptedData: EncryptedData = {
-    id: 'encrypted_mock',
-    data: 'encrypted_data',
-    dataType: 'string',
-    metadata: {
-      source: 'test',
-    },
-  }
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -204,7 +196,7 @@ describe('breachAnalytics', () => {
     ])
     mockedAnalyzeTrends.mockResolvedValue(['increasing', 'stable'])
     mockedCalculateTrend.mockReturnValue(0.15)
-    mockedFheEncrypt.mockResolvedValue(mockEncryptedData)
+    mockedFheEncrypt.mockResolvedValue('mocked_encrypted_data')
   })
 
   afterEach(() => {
@@ -238,9 +230,9 @@ describe('breachAnalytics', () => {
             id: 'breach_1',
             severity: 'high',
             affectedUsers: ['user1', 'user2'],
-            dataTypes: undefined,
-            attackVector: undefined,
-            description: undefined,
+            dataTypes: ['passwords', 'emails'],
+            attackVector: 'monitoring',
+            description: 'Unauthorized access to account',
             metadata: {},
             remediationStatus: 'completed',
             timestamp: new Date(mockBreaches[0].timestamp),
@@ -251,9 +243,9 @@ describe('breachAnalytics', () => {
             id: 'breach_2',
             severity: 'critical',
             affectedUsers: ['user3', 'user4', 'user5'],
-            dataTypes: undefined,
-            attackVector: undefined,
-            description: undefined,
+            dataTypes: ['medical_records'],
+            attackVector: 'siem',
+            description: 'Sensitive data exposed in logs',
             metadata: {},
             remediationStatus: 'completed',
             timestamp: new Date(mockBreaches[1].timestamp),
@@ -502,9 +494,8 @@ describe('breachAnalytics', () => {
           riskScore: 0.75,
           complianceScore: 0.98,
           notificationEffectiveness: 0.95,
-          encryptedData: 'encrypted_data',
+          encryptedData: 'mocked_encrypted_data',
         },
-        generatedAt: '',
       })
       expect(Array.isArray(report.trends)).toBe(true)
       expect(Array.isArray(report.predictions)).toBe(true)
@@ -512,6 +503,7 @@ describe('breachAnalytics', () => {
       expect(Array.isArray(report.insights)).toBe(true)
       expect(typeof report.metrics.averageResponseTime).toBe('number')
       expect(typeof report.generatedAt).toBe('string')
+      expect(report.generatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
 
       expect(mockedFheEncrypt).toHaveBeenCalled()
     })

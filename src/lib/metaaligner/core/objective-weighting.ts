@@ -439,15 +439,15 @@ export class ObjectiveWeightingEngine {
       case ContextType.EDUCATIONAL:
         clarity += 0.1
         break
-      case ContextType.SUPPORT: {
-        throw new Error('Not implemented yet: ContextType.SUPPORT case')
-      }
-      case ContextType.INFORMATIONAL: {
-        throw new Error('Not implemented yet: ContextType.INFORMATIONAL case')
-      }
-      case ContextType.GENERAL: {
-        throw new Error('Not implemented yet: ContextType.GENERAL case')
-      }
+      case ContextType.SUPPORT:
+        clarity += 0.15
+        break
+      case ContextType.INFORMATIONAL:
+        clarity += 0.1
+        break
+      case ContextType.GENERAL:
+        // Base clarity is sufficient for general context
+        break
     }
 
     return Math.min(1.0, clarity)

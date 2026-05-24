@@ -44,7 +44,9 @@ class SecurityManager:
         self.pbkdf2_iterations = pbkdf2_iterations
         encryption_password = encryption_password or os.getenv("ENCRYPTION_PASSWORD")
         encryption_salt = encryption_salt or os.getenv("ENCRYPTION_SALT")
-        self.encryption_key = self._generate_encryption_key(encryption_password, encryption_salt)
+        self.encryption_key = self._generate_encryption_key(
+            encryption_password, encryption_salt
+        )
         self.fernet = Fernet(self.encryption_key)
         self.jwt_secret_key = jwt_secret_key or os.getenv("JWT_SECRET_KEY")
 
@@ -91,7 +93,9 @@ class SecurityManager:
         """Create a cryptographic hash of a session ID."""
         return hashlib.sha256(session_id.encode()).hexdigest()
 
-    def verify_jwt_token(self, token: str, secret_key: str | None = None) -> dict[str, Any]:
+    def verify_jwt_token(
+        self, token: str, secret_key: str | None = None
+    ) -> dict[str, Any]:
         """Verify JWT token and return payload."""
         effective_secret = secret_key or self.jwt_secret_key
         if not effective_secret:
@@ -115,7 +119,9 @@ class AuditLogger:
     service (e.g., AWS CloudWatch Logs, Splunk, ELK stack).
     """
 
-    def __init__(self, security_manager: SecurityManager, audit_log_path: str | None = None):
+    def __init__(
+        self, security_manager: SecurityManager, audit_log_path: str | None = None
+    ):
         self.security_manager = security_manager
         # Use environment variable for production path, default to /var/log/ for HIPAA compliance
         self.audit_log_path = audit_log_path or os.environ.get(
@@ -147,12 +153,16 @@ class AuditLogger:
         }
 
         if sensitive_data:
-            audit_entry["encrypted_details"] = self.security_manager.encrypt_data(json.dumps(details))
+            audit_entry["encrypted_details"] = self.security_manager.encrypt_data(
+                json.dumps(details)
+            )
 
         try:
             # Use run_in_executor to avoid blocking the event loop
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(None, partial(self._write_audit_log, audit_entry))
+            await loop.run_in_executor(
+                None, partial(self._write_audit_log, audit_entry)
+            )
             logger.info("Audit event logged: %s for user: %s", event_type, user_id)
         except Exception as e:
             logger.error("Failed to write audit log: %s", e)
