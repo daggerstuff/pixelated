@@ -269,13 +269,9 @@ export default defineConfig({
       },
     ],
     pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: false,
-        maxForks: process.env['CI'] ? 4 : 8,
-        minForks: process.env['CI'] ? 1 : 2,
-      },
-    },
+    singleFork: false,
+    maxForks: process.env['CI'] ? 4 : 8,
+    minForks: process.env['CI'] ? 1 : 2,
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
@@ -317,7 +313,7 @@ export default defineConfig({
     teardownTimeout: 60_000,
     fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
-    isolate: !process.env['CI'],
+    isolate: true,
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
   },
