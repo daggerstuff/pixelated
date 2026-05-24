@@ -65,3 +65,8 @@
   or explicitly within the route handler (e.g., using
   `verifyAuthToken(authHeader)`), and enforce proper error handling for
   missing/invalid tokens.
+
+## 2024-05-24 - Missing Authentication on Dashboard API Endpoint
+- Vulnerability: Unauthenticated access to dashboard data endpoint.
+- Learning: Global middleware may not cover all API routes, exposing endpoints that erroneously rely on `request.user`.
+- Prevention: Ensure endpoints explicitly verify tokens or are covered by the global middleware pattern.
