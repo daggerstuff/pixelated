@@ -317,7 +317,7 @@ export default defineConfig({
     teardownTimeout: 60_000,
     fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
-    isolate: !process.env['CI'],
+    isolate: true,
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
   },
