@@ -208,6 +208,7 @@ export default defineConfig({
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
+          isolate: true,
           exclude: [
             '**/node_modules/**',
             'src/lib/security/__tests__/**/*.test.ts',
@@ -265,6 +266,7 @@ export default defineConfig({
             ...cpuBoundNodeTestExcludes,
           ],
           environment: 'node',
+          isolate: true,
         },
       },
     ],
