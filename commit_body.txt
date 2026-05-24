@@ -1,0 +1,4 @@
+💡 What: Memoize date formatting for alert timestamps and patient last contact/assessments.
+🎯 Why: Creating new `Date` objects inside `.map()` arrays causes O(N) re-renders.
+📊 Impact: Prevents expensive allocations on every render for large arrays.
+🔬 Measurement: Profiler.
