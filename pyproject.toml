@@ -134,6 +134,7 @@ test = [
   "pytest-asyncio",
   "coverage",
   "types-requests",
+  "hypothesis>=6.152.9",
 ]
 dev = [
   "black",
