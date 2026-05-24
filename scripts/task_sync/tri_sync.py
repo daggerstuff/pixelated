@@ -287,8 +287,50 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     if not records:
         raise ValueError("Cannot select a canonical record from an empty sequence")
 
-    def sort_key(record: TaskRecord) -> tuple[datetime, int]:
-        return (record.updated_at, PROVIDER_PRIORITY.get(record.provider, 0))
+    def compute_strength_score(title: str, clean_body: str) -> float:
+        score = 0.0
+
+        # Base score is length
+        score += len(clean_body)
+
+        # Check if it is a migration stub
+        is_stub = False
+        if "migrated from" in clean_body.lower() and len(clean_body) < 250:
+            lines = [line.strip() for line in clean_body.splitlines() if line.strip()]
+            stub_keywords = {"migrated from", "source type", "source status", "source priority", "priority:", "status:"}
+            match_count = sum(1 for line in lines if any(k in line.lower() for k in stub_keywords))
+            if match_count >= len(lines) - 1:
+                is_stub = True
+
+        if is_stub:
+            score -= 5000.0
+
+        # Proper markdown headers check
+        header_count = len(re.findall(r"^#{1,6}\s+\S+", clean_body, re.MULTILINE))
+        score += header_count * 50.0
+
+        # Check for corrupted list headers, e.g. code blocks containing '1. ' or list-like headers
+        # like '1. Task Overview' or '  1. Implementation Checklist'
+        corrupted_headers = len(re.findall(r"```\s*\n\s*\d+\.\s+\S+", clean_body))
+        corrupted_headers += len(re.findall(r"^\s*\d+\.\s+(Task Overview|Implementation Checklist|Objective|Milestones|Success Metrics|Definition of Done|Verified Files|Path Notes|Dependencies|Status|Background|Target Release)", clean_body, re.MULTILINE | re.IGNORECASE))
+        score -= corrupted_headers * 100.0
+
+        # Checklist check
+        checklist_count = len(re.findall(r"-\s+\[\s*\]", clean_body))
+        score += checklist_count * 30.0
+
+        # Match words with title
+        title_words = set(re.findall(r"\w+", title.lower()))
+        body_words = set(re.findall(r"\w+", clean_body.lower()))
+        matching_words = title_words.intersection(body_words)
+        score += len(matching_words) * 10.0
+
+        return score
+
+    def sort_key(record: TaskRecord) -> tuple[float, datetime, int]:
+        clean_body = record.clean_body if record.clean_body is not None else task_body_without_sync_block(record.body)
+        score = compute_strength_score(record.title, clean_body)
+        return (score, record.updated_at, PROVIDER_PRIORITY.get(record.provider, 0))
 
     return max(records, key=sort_key)
 

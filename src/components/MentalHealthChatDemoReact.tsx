@@ -286,9 +286,24 @@ export default function MentalHealthChatDemoReact({
                 </div>
               ))}
               {processing && (
-                <div className="flex justify-start">
-                  <div className="bg-muted max-w-[80%] rounded-lg px-4 py-2">
-                    <p>...</p>
+                <div
+                  className="flex justify-start"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="bg-muted max-w-[80%] rounded-lg px-4 py-3">
+                    <div className="flex space-x-1.5 h-4 items-center">
+                      <div className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"></div>
+                      <div
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        style={{ animationDelay: '0.2s' }}
+                      ></div>
+                      <div
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        style={{ animationDelay: '0.4s' }}
+                      ></div>
+                      <span className="sr-only">Assistant is typing...</span>
+                    </div>
                   </div>
                 </div>
               )}

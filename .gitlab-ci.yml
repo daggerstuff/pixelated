@@ -10,7 +10,7 @@ stages:
 
 variables:
   NODE_VERSION: '24.14.1'
-  PNPM_VERSION: '11.1.2'
+  PNPM_VERSION: '11.3.0'
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
   # Required for terraform jobs:
@@ -382,6 +382,38 @@ security:scan:
     when:
       - runner_system_failure
       - stuck_or_timeout_failure
+
+# Coverage report (consolidated TS + Python)
+coverage:report:
+  stage: test
+  image: node:${NODE_VERSION}-slim
+  needs:
+    - job: test:unit
+    - job: test:integration
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+      /dev/null
+    - npm install -g pnpm@$PNPM_VERSION
+  script:
+    - echo "Generating consolidated coverage report..."
+    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - chmod +x scripts/consolidate-coverage.sh
+    - ./scripts/consolidate-coverage.sh
+  artifacts:
+    paths:
+      - coverage/
+    expire_in: 1 month
+    when: always
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  timeout: 10m
 
 # Note: Kubernetes deployment is handled through the Azure AKS deployment system.
 # This GitLab pipeline remains focused on validation, testing, build, and security jobs.
