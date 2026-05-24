@@ -125,21 +125,38 @@ export const CrisisMonitoringDashboard: React.FC<
     return undefined
   }, [fetchDashboardData, autoRefresh, refreshInterval])
 
-  // Performance optimization: Memoize derived alert values to prevent unnecessary O(N) filtering on every render
-  const unacknowledgedAlertsCount = useMemo(() => {
-    return alerts.filter((a) => !a.acknowledged).length
+  // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render
+  const memoizedAlerts = useMemo(() => {
+    return alerts.map((alert) => ({
+      ...alert,
+      timestampString: new Date(alert.timestamp).toLocaleString(),
+    }))
   }, [alerts])
 
+  // Performance optimization: Memoize derived alert values to prevent unnecessary O(N) filtering on every render
+  const unacknowledgedAlertsCount = useMemo(() => {
+    return memoizedAlerts.filter((a) => !a.acknowledged).length
+  }, [memoizedAlerts])
+
   const criticalUnacknowledgedAlerts = useMemo(() => {
-    return alerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
-  }, [alerts])
+    return memoizedAlerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
+  }, [memoizedAlerts])
+
+  // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render
+  const memoizedPatients = useMemo(() => {
+    return patients.map((patient) => ({
+      ...patient,
+      lastContactString: new Date(patient.lastContact).toLocaleDateString(),
+      lastAssessmentString: new Date(patient.lastAssessment).toLocaleDateString(),
+    }))
+  }, [patients])
 
   // Performance optimization: Memoize derived patient risk data to prevent O(N) operations on every render
   const highRiskPatients = useMemo(() => {
-    return patients.filter(
+    return memoizedPatients.filter(
       (p) => p.currentRisk === 'high' || p.currentRisk === 'imminent',
     )
-  }, [patients])
+  }, [memoizedPatients])
 
   const riskDistribution = useMemo(() => {
     const distribution = {
@@ -372,7 +389,7 @@ export const CrisisMonitoringDashboard: React.FC<
                         <div className="font-medium">{patient.name}</div>
                         <div className="text-gray-500 text-sm">
                           Last contact:{' '}
-                          {new Date(patient.lastContact).toLocaleDateString()}
+                          {patient.lastContactString}
                         </div>
                       </div>
                     </div>
@@ -433,7 +450,7 @@ export const CrisisMonitoringDashboard: React.FC<
 
         {/* Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
-          {alerts.map((alert) => (
+          {memoizedAlerts.map((alert) => (
             <Card
               key={alert.id}
               className={`border-l-4 ${getSeverityColor(alert.severity)}`}
@@ -452,7 +469,7 @@ export const CrisisMonitoringDashboard: React.FC<
                         {alert.severity.toUpperCase()}
                       </Badge>
                       <span className="text-gray-500 text-sm">
-                        {new Date(alert.timestamp).toLocaleString()}
+                        {alert.timestampString}
                       </span>
                       {alert.acknowledged && (
                         <Badge variant="outline" className="text-green-600">
@@ -508,7 +525,7 @@ export const CrisisMonitoringDashboard: React.FC<
         {/* Patients Tab */}
         <TabsContent value="patients" className="space-y-4">
           <div className="grid gap-4">
-            {patients.map((patient) => (
+            {memoizedPatients.map((patient) => (
               <Card key={patient.id}>
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
@@ -551,16 +568,14 @@ export const CrisisMonitoringDashboard: React.FC<
                       <div className="text-gray-500 text-right text-sm">
                         <div>Last assessment:</div>
                         <div>
-                          {new Date(
-                            patient.lastAssessment,
-                          ).toLocaleDateString()}
+                          {patient.lastAssessmentString}
                         </div>
                       </div>
 
                       <div className="text-gray-500 text-right text-sm">
                         <div>Last contact:</div>
                         <div>
-                          {new Date(patient.lastContact).toLocaleDateString()}
+                          {patient.lastContactString}
                         </div>
                       </div>
 
