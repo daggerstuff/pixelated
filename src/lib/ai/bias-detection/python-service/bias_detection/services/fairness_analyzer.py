@@ -2,8 +2,8 @@
 Advanced fairness analysis service using AIF360, Fairlearn, and statistical methods.
 """
 
-import logging
 import importlib.util
+import logging
 from typing import Any
 
 import numpy as np
@@ -77,6 +77,7 @@ def _load_fairlearn() -> bool:
         equalized_odds_difference = None
 
     return FAIRLEARN_AVAILABLE
+
 
 # Removed unused model and placeholder imports
 

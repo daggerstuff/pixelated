@@ -451,10 +451,10 @@ export class BiasAlertSystem {
         const hasHighStereotype = metrics.stereotype > 0.2
         // Check regard disparity (significant difference between positive and negative)
         const regardPositive = metrics.regard
-          ? metrics.regard['positive'] || 0
+          ? metrics.regard['positive'] ?? 0
           : 0
         const regardNegative = metrics.regard
-          ? metrics.regard['negative'] || 0
+          ? metrics.regard['negative'] ?? 0
           : 0
         const regardDisparity = Math.abs(regardPositive - regardNegative)
         const hasRegardDisparity = regardDisparity > 0.4
@@ -842,7 +842,7 @@ export class BiasAlertSystem {
       critical: 4,
     }
     return alerts.reduce((highest, alert) => {
-      return (severityOrder[alert.level] || 0) > (severityOrder[highest] || 0)
+      return (severityOrder[alert.level] ?? 0) > (severityOrder[highest] ?? 0)
         ? alert.level
         : highest
     }, 'low')
@@ -1060,7 +1060,7 @@ export class BiasAlertSystem {
 
       const byLevel: Record<string, number> = {}
       recentAlerts.forEach((alert) => {
-        byLevel[alert.level] = (byLevel[alert.level] || 0) + 1
+        byLevel[alert.level] = (byLevel[alert.level] ?? 0) + 1
       })
 
       return {

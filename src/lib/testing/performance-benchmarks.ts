@@ -91,7 +91,7 @@ export class MemoryMonitor {
     average: number
   } {
     const finalMemory =
-      this.samples[this.samples.length - 1] || this.initialMemory
+      this.samples[this.samples.length - 1] ?? this.initialMemory
     const average =
       this.samples.length > 0
         ? this.samples.reduce((sum, mem) => sum + mem, 0) / this.samples.length
@@ -239,10 +239,10 @@ export class PerformanceBenchmarkRunner {
       successfulRequests,
       failedRequests,
       averageResponseTime,
-      minResponseTime: sortedResponseTimes[0] || 0,
-      maxResponseTime: sortedResponseTimes[sortedResponseTimes.length - 1] || 0,
-      p95ResponseTime: sortedResponseTimes[p95Index] || 0,
-      p99ResponseTime: sortedResponseTimes[p99Index] || 0,
+      minResponseTime: sortedResponseTimes[0] ?? 0,
+      maxResponseTime: sortedResponseTimes[sortedResponseTimes.length - 1] ?? 0,
+      p95ResponseTime: sortedResponseTimes[p95Index] ?? 0,
+      p99ResponseTime: sortedResponseTimes[p99Index] ?? 0,
       requestsPerSecond: (successfulRequests / duration) * 1000,
       errorRate: failedRequests / totalRequests,
       memoryUsage: {
@@ -479,7 +479,7 @@ if (require.main === module) {
 
   runner
     .runFullBenchmark()
-    .then( async (results) => {
+    .then(async (results) => {
       const report = runner.generateReport(results)
       console.log('\n' + report)
 

@@ -53,7 +53,7 @@ describe('Business Intelligence Persistence Tests', () => {
       competitors: 15,
       marketLeader: 'Test Leader',
       avgPricing: 450.75,
-      marketShareDistribution: { 'Test Leader': 40, Other: 60 },
+      marketShareDistribution: { 'Test Leader': 40, 'Other': 60 },
       featureFrequency: { ai_insights: 0.8 },
       competitiveGaps: ['predictive_analytics'],
       lastUpdated: new Date(),

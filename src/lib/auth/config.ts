@@ -32,12 +32,12 @@ function ensureJwtSecret(): string {
 export const JWT_CONFIG = {
   secret: ensureJwtSecret(),
   audience:
-    (process.env.JWT_AUDIENCE ??
-    import.meta.env.JWT_AUDIENCE) ??
+    process.env.JWT_AUDIENCE ??
+    import.meta.env.JWT_AUDIENCE ??
     'pixelated-empathy',
   issuer:
-    (process.env.JWT_ISSUER ??
-    import.meta.env.JWT_ISSUER) ??
+    process.env.JWT_ISSUER ??
+    import.meta.env.JWT_ISSUER ??
     'pixelated-auth-service',
   accessTokenExpiry: 24 * 60 * 60, // 24 hours - matching original inline config per PR requirements
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
@@ -46,17 +46,17 @@ export const JWT_CONFIG = {
 
 // Auth0 Configuration
 export const AUTH0_CONFIG = {
-  domain: (process.env.AUTH0_DOMAIN ?? import.meta.env.AUTH0_DOMAIN) ?? '',
+  domain: process.env.AUTH0_DOMAIN ?? import.meta.env.AUTH0_DOMAIN ?? '',
   clientId:
-    (process.env.AUTH0_CLIENT_ID ?? import.meta.env.AUTH0_CLIENT_ID) ?? '',
+    process.env.AUTH0_CLIENT_ID ?? import.meta.env.AUTH0_CLIENT_ID ?? '',
   clientSecret:
-    (process.env.AUTH0_CLIENT_SECRET ??
-    import.meta.env.AUTH0_CLIENT_SECRET) ??
+    process.env.AUTH0_CLIENT_SECRET ??
+    import.meta.env.AUTH0_CLIENT_SECRET ??
     '',
-  audience: (process.env.AUTH0_AUDIENCE ?? import.meta.env.AUTH0_AUDIENCE) ?? '',
+  audience: process.env.AUTH0_AUDIENCE ?? import.meta.env.AUTH0_AUDIENCE ?? '',
   callbackUrl:
-    (process.env.AUTH0_CALLBACK_URL ??
-    import.meta.env.AUTH0_CALLBACK_URL) ??
+    process.env.AUTH0_CALLBACK_URL ??
+    import.meta.env.AUTH0_CALLBACK_URL ??
     'http://localhost:4321/api/auth/callback',
   scope: 'openid profile email offline_access',
 }
@@ -111,8 +111,8 @@ export const SECURITY_CONFIG = {
   csrf: {
     enabled: process.env.NODE_ENV === 'production' || import.meta.env.PROD,
     secret:
-      (process.env.CSRF_SECRET ??
-      import.meta.env.CSRF_SECRET) ??
+      process.env.CSRF_SECRET ??
+      import.meta.env.CSRF_SECRET ??
       'fallback-csrf-secret',
   },
   headers: {

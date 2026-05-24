@@ -391,10 +391,10 @@ let memoryCacheService: MemoryCacheService | null = null
  */
 export function getCacheService(): CacheClient {
   // Initialize Vercel KV cache service if not already initialized
-  vercelKVCacheService ??= new VercelKVCacheService();
+  vercelKVCacheService ??= new VercelKVCacheService()
 
   // Initialize memory cache service if not already initialized
-  memoryCacheService ??= new MemoryCacheService();
+  memoryCacheService ??= new MemoryCacheService()
 
   // Use Vercel KV if connected, otherwise fall back to memory cache
   if (vercelKVCacheService.connected) {

@@ -113,16 +113,16 @@ describe('auditLoggingService', () => {
         metadata: Record<string, unknown>
       }
       expect(loggedEntry.userId).not.toBe(testEntry.userId)
-      expect(loggedEntry.metadata?.sessionId).not.toBe(testEntry.metadata.sessionId)
+      expect(loggedEntry.metadata?.sessionId).not.toBe(
+        testEntry.metadata.sessionId,
+      )
     })
   })
 
   describe('cleanup', () => {
     it('should log cleanup message', async () => {
       await auditLoggingService.cleanup()
-      expect(infoSpy).toHaveBeenCalledWith(
-        'Audit logging service cleaned up',
-      )
+      expect(infoSpy).toHaveBeenCalledWith('Audit logging service cleaned up')
       expect(debugSpy).toHaveBeenCalledTimes(0)
       expect(warnSpy).toHaveBeenCalledTimes(0)
     })

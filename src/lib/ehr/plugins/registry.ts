@@ -101,10 +101,7 @@ export class PluginRegistry {
     this.events.on(event, listener as (...args: unknown[]) => void)
   }
 
-  off(
-    event: string,
-    listener: (...args: unknown[]) => void,
-  ): void {
+  off(event: string, listener: (...args: unknown[]) => void): void {
     this.events.off(event, listener as (...args: unknown[]) => void)
   }
 }

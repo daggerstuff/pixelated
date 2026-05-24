@@ -33,7 +33,7 @@
   }
 
   // Load script helper function
-   async function loadScript(src) {
+  async function loadScript(src) {
     return new Promise((resolve, reject) => {
       const script = document.createElement('script')
       script.src = src
@@ -138,10 +138,10 @@
           userAgent: navigator.userAgent,
           timestamp: new Date().toISOString(),
         }
-         const analyticsEndpoint =
-           (window.ANALYTICS_ENDPOINT && window.ANALYTICS_ENDPOINT.length > 0
-             ? window.ANALYTICS_ENDPOINT
-             : '/api/analytics/polyfill-usage')
+        const analyticsEndpoint =
+          window.ANALYTICS_ENDPOINT && window.ANALYTICS_ENDPOINT.length > 0
+            ? window.ANALYTICS_ENDPOINT
+            : '/api/analytics/polyfill-usage'
         navigator.sendBeacon(analyticsEndpoint, JSON.stringify(polyfillData))
       } catch (error) {
         console.error('Failed to send polyfill analytics', error)

@@ -101,7 +101,6 @@ vi.mock('bcryptjs', () => ({
   genSalt: vi.fn(),
 }))
 
-
 // Mock Node.js built-in modules with node: prefix
 const { mockRandomBytes, mockRandomUUID } = vi.hoisted(() => ({
   mockRandomBytes: vi.fn().mockReturnValue(Buffer.from('test')),
@@ -123,7 +122,6 @@ vi.mock('node:crypto', () => ({
   randomFill: vi.fn(),
   randomInt: vi.fn(),
 }))
-
 
 import {
   GET as profileGetHandler,

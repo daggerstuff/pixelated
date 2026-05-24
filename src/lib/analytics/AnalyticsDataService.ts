@@ -255,7 +255,7 @@ export class AnalyticsDataService {
         return null
       }
 
-      const currentScore = metrics[metrics.length - 1]?.value || 0
+      const currentScore = metrics[metrics.length - 1]?.value ?? 0
       const previousScore =
         metrics.length > 1 ? metrics[metrics.length - 2]?.value : currentScore
       const safePreviousScore = previousScore ?? currentScore

@@ -396,7 +396,7 @@ describe('AdaptiveSelector', () => {
     // Verify weights are default weights
     let totalDefaultWeight = 0
     const defaultWeights: Record<string, number> =
-      CORE_MENTAL_HEALTH_OBJECTIVES.reduce< Record<string, number>>(
+      CORE_MENTAL_HEALTH_OBJECTIVES.reduce<Record<string, number>>(
         (acc, obj) => {
           acc[obj.id] = obj.weight
           totalDefaultWeight += obj.weight

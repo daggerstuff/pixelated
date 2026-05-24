@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     // 1. Initialize and get connection
-     initializeDatabase()
+    initializeDatabase()
 
     // 2. Parse request
     const body = (await request.json()) as unknown
@@ -90,11 +90,11 @@ export const POST: APIRoute = async ({ request }) => {
       // Create session if not provided
       let finalSessionId = sessionId
       finalSessionId ??= await sessionManager.createSession({
-          therapistId,
-          clientId,
-          sessionType: sessionType ?? 'individual',
-          context: { description: context ?? '', therapistNotes },
-        });
+        therapistId,
+        clientId,
+        sessionType: sessionType ?? 'individual',
+        context: { description: context ?? '', therapistNotes },
+      })
 
       // Save analysis
       return biasAnalysisManager.saveAnalysis({
@@ -153,7 +153,7 @@ export const GET: APIRoute = async ({ url }) => {
   }
 
   try {
-     initializeDatabase()
+    initializeDatabase()
     const summary = await biasAnalysisManager.getBiasSummary(therapistId)
 
     return new Response(

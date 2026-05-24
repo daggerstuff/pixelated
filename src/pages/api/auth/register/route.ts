@@ -52,7 +52,7 @@ export async function POST({ request }: { request: Request }) {
 
     // Split full name
     const nameParts = fullName.split(' ')
-    const firstName = nameParts[0] || ''
+    const firstName = nameParts[0] ?? ''
     const lastName = nameParts.slice(1).join(' ') || ''
 
     // Create new user

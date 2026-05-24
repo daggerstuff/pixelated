@@ -15,7 +15,10 @@ class WebRTCSignalingService {
   private static instance: WebRTCSignalingService
   // TODO: Implement WebSocketService integration
   // private wsService: WebSocketService
-  private readonly messageHandlers: Map<string, (message: SignalingMessage) => void>
+  private readonly messageHandlers: Map<
+    string,
+    (message: SignalingMessage) => void
+  >
 
   private constructor() {
     // TODO: Initialize WebSocketService when available

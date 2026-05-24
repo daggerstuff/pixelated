@@ -36,7 +36,7 @@ const defaultRetryOn = (res: Response | null, err: unknown | null) => {
   return false
 }
 
-const sleep =  async (ms: number) => new Promise((r) => setTimeout(r, ms))
+const sleep = async (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 export async function fetchWithRetry(
   input: RequestInfo | URL,

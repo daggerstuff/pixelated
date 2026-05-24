@@ -52,42 +52,64 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
       alertConfigurations: [
         {
           level: 'emergency',
-          responseTimeMinutes: 5,
-          requiresStaffIntervention: true,
-          escalationTimeoutMinutes: 15,
+          name: 'Emergency',
+          description: 'Immediate life-threatening crisis',
+          thresholdScore: 0.9,
+          triggerTerms: ['suicide', 'kill myself'],
+          autoEscalateAfterMs: 5 * 60 * 1000,
+          requiredActions: [
+            'Contact emergency services',
+            'Notify on-call therapist',
+          ],
+          responseTemplate: 'Emergency response for {triggerTerms}',
+          escalationTimeMs: 15 * 60 * 1000,
         },
         {
-          level: 'urgent',
-          responseTimeMinutes: 15,
-          requiresStaffIntervention: true,
-          escalationTimeoutMinutes: 30,
+          level: 'moderate',
+          name: 'Moderate',
+          description: 'Moderate crisis requiring prompt response',
+          thresholdScore: 0.5,
+          triggerTerms: ['hurt myself', 'self harm'],
+          autoEscalateAfterMs: 15 * 60 * 1000,
+          requiredActions: ['Contact on-call therapist'],
+          responseTemplate: 'Moderate response for {triggerTerms}',
+          escalationTimeMs: 30 * 60 * 1000,
         },
         {
           level: 'severe',
-          responseTimeMinutes: 30,
-          requiresStaffIntervention: true,
-          escalationTimeoutMinutes: 60,
+          name: 'Severe',
+          description: 'Severe crisis requiring urgent attention',
+          thresholdScore: 0.7,
+          triggerTerms: ['overdose', 'voices'],
+          autoEscalateAfterMs: 30 * 60 * 1000,
+          requiredActions: ['Schedule urgent evaluation'],
+          responseTemplate: 'Severe response for {triggerTerms}',
+          escalationTimeMs: 60 * 60 * 1000,
         },
         {
           level: 'concern',
-          responseTimeMinutes: 60,
-          requiresStaffIntervention: false,
-          escalationTimeoutMinutes: 120,
+          name: 'Concern',
+          description: 'Concerning patterns requiring monitoring',
+          thresholdScore: 0.3,
+          triggerTerms: ['overwhelmed', 'anxious'],
+          autoEscalateAfterMs: 60 * 60 * 1000,
+          requiredActions: ['Schedule check-in'],
+          responseTemplate: 'Concern response for {triggerTerms}',
+          escalationTimeMs: 120 * 60 * 1000,
         },
       ],
       staffChannels: {
-        emergency: '#crisis-emergency',
-        urgent: '#crisis-support',
-        severe: '#crisis-monitoring',
-        concern: '#wellness-check',
+        emergency: ['#crisis-emergency'],
+        moderate: ['#crisis-support'],
+        severe: ['#crisis-monitoring'],
+        concern: ['#wellness-check'],
       },
       crisisEventRecorder: mockEventRecorder,
       slackWebhookUrl: 'https://hooks.slack.com/test',
-      slackNotifier: mockSlackWebhook,
     })
 
     // Mock Pixel API responses with sophisticated crisis pattern detection
-    mockPixelApi = vi.fn( async (url: string, options: any) => {
+    mockPixelApi = vi.fn(async (url: string, options: any) => {
       const request = JSON.parse(options.body)
       const query = request.user_query.toLowerCase()
       const history = request.conversation_history ?? []
@@ -253,7 +275,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
       return Promise.resolve({
         ok: true,
         status: 200,
-        json:  async () =>
+        json: async () =>
           Promise.resolve({
             response: "I hear you and I'm here to support you.",
             inference_time_ms: 45, // <50ms target
@@ -280,13 +302,13 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('detects escalating self-harm patterns', async () => {
       const testCase = SELF_HARM_TESTS[1] // High severity escalating
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
 
       expect(['high', 'critical']).toContain(analysis.riskLevel)
-      expect(analysis.indicators.length).toBeGreaterThan(0)
+      expect((analysis.indicators ?? []).length).toBeGreaterThan(0)
     })
   })
 
@@ -294,19 +316,19 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('detects acute panic with immediate intervention needs', async () => {
       const testCase = PANIC_ATTACK_TESTS[0] // Critical panic attack
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
 
       expect(['high', 'critical']).toContain(analysis.riskLevel)
       expect(
-        analysis.indicators.some(
+        (analysis.indicators ?? []).some(
           (ind) => ind.type === 'crisis' || ind.type === 'emotional_distress',
         ),
       ).toBe(true)
 
-      const highSeverityIndicator = analysis.indicators.find(
+      const highSeverityIndicator = (analysis.indicators ?? []).find(
         (ind) => ind.severity > 0.5,
       )
       expect(highSeverityIndicator).toBeDefined()
@@ -317,13 +339,13 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('detects active overdose with emergency routing', async () => {
       const testCase = SUBSTANCE_ABUSE_TESTS[0] // Critical overdose
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
 
       expect(analysis.riskLevel).toBe('critical')
-      const crisisIndicator = analysis.indicators.find(
+      const crisisIndicator = (analysis.indicators ?? []).find(
         (ind) => ind.type === 'crisis',
       )
       expect(crisisIndicator).toBeDefined()
@@ -335,13 +357,13 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('detects command hallucinations with critical escalation', async () => {
       const testCase = PSYCHOTIC_SYMPTOMS_TESTS[0] // Critical command hallucinations
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
 
       expect(analysis.riskLevel).toBe('critical')
-      const crisisIndicator = analysis.indicators.find(
+      const crisisIndicator = (analysis.indicators ?? []).find(
         (ind) => ind.type === 'crisis',
       )
       expect(crisisIndicator).toBeDefined()
@@ -353,7 +375,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('correctly identifies safe therapeutic conversations', async () => {
       const testCase = NON_CRISIS_TESTS[0] // Work stress
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
@@ -366,13 +388,15 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('does not flag positive progress as crisis', async () => {
       const testCase = NON_CRISIS_TESTS[1] // Positive progress
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
 
       expect(analysis.riskLevel).toBe('low')
-      expect(analysis.sentiment.overall).toBeGreaterThan(-0.5)
+      expect((analysis.sentiment ?? { overall: 0 }).overall).toBeGreaterThan(
+        -0.5,
+      )
     })
   })
 
@@ -380,11 +404,11 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('escalates unhandled crisis events after timeout', async () => {
       const testCase = SUICIDAL_IDEATION_TESTS[1]
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
-      const crisisIndicator = analysis.indicators.find(
+      const crisisIndicator = (analysis.indicators ?? []).find(
         (ind) => ind.type === 'crisis',
       )
 
@@ -408,11 +432,11 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('resolves crisis events with proper audit trail', async () => {
       const testCase = PANIC_ATTACK_TESTS[2] // Medium panic
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const analysis = await detector.analyze(conversationText)
-      const crisisIndicator = analysis.indicators.find(
+      const crisisIndicator = (analysis.indicators ?? []).find(
         (ind) => ind.type === 'crisis' || ind.type === 'emotional_distress',
       )
 
@@ -463,15 +487,16 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
         for (const testCase of crisisCases) {
           const conversationText = testCase.session.conversationHistory
-            .map((msg) => msg.content)
+            .map((msg: { role: string; content: string }) => msg.content)
             .join(' ')
 
           const analysis = await detector.analyze(conversationText)
 
           const isCrisisDetected =
-            analysis.riskLevel === 'critical' ||
-            (analysis.riskLevel === 'high' && analysis.requiresIntervention) ??
-            analysis.indicators.some(
+            (analysis.riskLevel === 'critical' ||
+              (analysis.riskLevel === 'high' &&
+                analysis.requiresIntervention)) ??
+            (analysis.indicators ?? []).some(
               (ind) => ind.type === 'crisis' && ind.severity > 0.7,
             )
 
@@ -492,14 +517,14 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
       for (const testCase of safeCases) {
         const conversationText = testCase.session.conversationHistory
-          .map((msg) => msg.content)
+          .map((msg: { role: string; content: string }) => msg.content)
           .join(' ')
 
         const analysis = await detector.analyze(conversationText)
 
         const isCrisisDetected =
           analysis.riskLevel === 'critical' ||
-          analysis.indicators.some((ind) => ind.type === 'crisis')
+          (analysis.indicators ?? []).some((ind) => ind.type === 'crisis')
 
         if (isCrisisDetected) {
           falsePositives++
@@ -514,7 +539,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
     it('completes crisis analysis within performance budget (<50ms)', async () => {
       const testCase = SUICIDAL_IDEATION_TESTS[0]
       const conversationText = testCase.session.conversationHistory
-        .map((msg) => msg.content)
+        .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
       const startTime = performance.now()

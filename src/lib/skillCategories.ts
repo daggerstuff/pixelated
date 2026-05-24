@@ -9,7 +9,7 @@ export type SkillCategory = (typeof SKILL_CATEGORIES)[number]
 const SKILL_NAME_MAP: Record<string, SkillCategory> = {
   'active listening': 'interpersonal',
   'rapport building': 'interpersonal',
-  empathy: 'interpersonal',
+  'empathy': 'interpersonal',
   'reflective listening': 'interpersonal',
 
   'cognitive restructuring': 'therapeutic',
@@ -19,7 +19,7 @@ const SKILL_NAME_MAP: Record<string, SkillCategory> = {
 
   'technical assessment': 'technical',
   'technical skill': 'technical',
-  documentation: 'technical',
+  'documentation': 'technical',
 }
 
 export function isValidCategory(cat?: string): cat is SkillCategory {

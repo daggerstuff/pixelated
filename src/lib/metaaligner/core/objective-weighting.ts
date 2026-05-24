@@ -387,7 +387,7 @@ export class ObjectiveWeightingEngine {
     if (total === 0) {
       // Equal weights if all are zero
       const equalWeight = 1.0 / Object.keys(weights).length
-      return Object.keys(weights).reduce< Record<string, number>>(
+      return Object.keys(weights).reduce<Record<string, number>>(
         (normalized, id) => {
           normalized[id] = equalWeight
           return normalized
@@ -439,9 +439,15 @@ export class ObjectiveWeightingEngine {
       case ContextType.EDUCATIONAL:
         clarity += 0.1
         break
-      case ContextType.SUPPORT: { throw new Error('Not implemented yet: ContextType.SUPPORT case') }
-      case ContextType.INFORMATIONAL: { throw new Error('Not implemented yet: ContextType.INFORMATIONAL case') }
-      case ContextType.GENERAL: { throw new Error('Not implemented yet: ContextType.GENERAL case') }
+      case ContextType.SUPPORT:
+        clarity += 0.15
+        break
+      case ContextType.INFORMATIONAL:
+        clarity += 0.1
+        break
+      case ContextType.GENERAL:
+        // Base clarity is sufficient for general context
+        break
     }
 
     return Math.min(1.0, clarity)
@@ -638,7 +644,7 @@ export const ObjectiveBalancer = {
     let totalWeight = 0
 
     for (const [id, score] of Object.entries(scores)) {
-      const weight = weights[id] || 0
+      const weight = weights[id] ?? 0
       weightedSum += score * weight
       totalWeight += weight
     }
@@ -653,7 +659,7 @@ export const ObjectiveBalancer = {
     let sum = 0
 
     for (const [id, score] of Object.entries(scores)) {
-      const weight = weights[id] || 0
+      const weight = weights[id] ?? 0
       sum += score * weight
     }
 
@@ -668,7 +674,7 @@ export const ObjectiveBalancer = {
     let totalWeight = 0
 
     for (const [id, score] of Object.entries(scores)) {
-      const weight = weights[id] || 0
+      const weight = weights[id] ?? 0
       if (score > 0) {
         weightedSum += weight / score
         totalWeight += weight
@@ -686,7 +692,7 @@ export const ObjectiveBalancer = {
     let totalWeight = 0
 
     for (const [id, score] of Object.entries(scores)) {
-      const weight = weights[id] || 0
+      const weight = weights[id] ?? 0
       if (score > 0) {
         logSum += weight * Math.log(score)
         totalWeight += weight

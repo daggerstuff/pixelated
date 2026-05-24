@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 # Add the ai directory to Python path
-sys.path.insert(0, str(Path(__file__).parent / "ai"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "ai"))
 
 try:
     from pixel.data.clinical_knowledge_embedder import (
@@ -83,14 +83,9 @@ try:
         test_basic_functionality()
 
 except ImportError:
-
     # Test that the file structure is correct
-    embedder_file = (
-        Path(__file__).parent / "ai" / "pixel" / "data" / "clinical_knowledge_embedder.py"
-    )
-    test_file = (
-        Path(__file__).parent / "ai" / "pixel" / "data" / "test_clinical_knowledge_embedder.py"
-    )
+    embedder_file = Path(__file__).parent / "ai" / "pixel" / "data" / "clinical_knowledge_embedder.py"
+    test_file = Path(__file__).parent / "ai" / "pixel" / "data" / "test_clinical_knowledge_embedder.py"
 
     # File existence is checked but not used in this standalone test
     embedder_file.exists()

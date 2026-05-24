@@ -73,7 +73,9 @@ describe('notification-worker', () => {
   let mockExit: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    mockExit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never)
+    mockExit = vi
+      .spyOn(process, 'exit')
+      .mockImplementation(() => undefined as never)
 
     // Save original listeners
     sigtermListeners = process.listeners('SIGTERM')

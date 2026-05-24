@@ -66,13 +66,11 @@ class SecurityManager:
         """
         if not password:
             raise RuntimeError(
-                "Encryption password is required. Pass as argument or set "
-                "ENCRYPTION_PASSWORD environment variable."
+                "Encryption password is required. Pass as argument or set ENCRYPTION_PASSWORD environment variable."
             )
         if not salt:
             raise RuntimeError(
-                "Encryption salt is required. Pass as argument or set "
-                "ENCRYPTION_SALT environment variable."
+                "Encryption salt is required. Pass as argument or set ENCRYPTION_SALT environment variable."
             )
 
         kdf = PBKDF2HMAC(

@@ -1343,15 +1343,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Utility functions
    */
   private groupBy<T>(array: T[], key: string): Record<string, T[]> {
-    return array.reduce< Record<string, T[]>>(
-      (groups, item) => {
-        const value = this.getNestedValue(item, key) ?? 'unknown'
-        groups[value] = groups[value] ?? []
-        groups[value].push(item)
-        return groups
-      },
-      {},
-    )
+    return array.reduce<Record<string, T[]>>((groups, item) => {
+      const value = this.getNestedValue(item, key) ?? 'unknown'
+      groups[value] = groups[value] ?? []
+      groups[value].push(item)
+      return groups
+    }, {})
   }
 
   private getNestedValue(obj: unknown, path: string): unknown {
@@ -1359,13 +1356,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
   }
 
   private countOccurrences(array: string[]): Record<string, number> {
-    return array.reduce< Record<string, number>>(
-      (counts, item) => {
-        counts[item] = (counts[item] || 0) + 1
-        return counts
-      },
-      {},
-    )
+    return array.reduce<Record<string, number>>((counts, item) => {
+      counts[item] = (counts[item] ?? 0) + 1
+      return counts
+    }, {})
   }
 
   private calculateTemporalSpan(threats: ThreatData[]): number {
@@ -1773,7 +1767,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
       return {
         total_correlations: totalCorrelations,
-        type_distribution: typeDistribution.reduce< Record<string, number>>(
+        type_distribution: typeDistribution.reduce<Record<string, number>>(
           (acc, item) => {
             acc[item._id] = item.count
             return acc

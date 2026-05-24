@@ -15,10 +15,12 @@ const logger = createBuildSafeLogger('documentation-api')
 const repository = new AIRepository()
 
 function resolveSafeLlmBaseUrl(): string | undefined {
-  return process.env['LLM_BASE_URL'] ??
+  return (
+    process.env['LLM_BASE_URL'] ??
     process.env['LLM_API_URL'] ??
     process.env['OPENAI_BASE_URL'] ??
     'https://api.openai.com/v1'
+  )
 }
 const llmConfig = {
   apiKey: process.env['LLM_API_KEY'] ?? 'dummy-key',

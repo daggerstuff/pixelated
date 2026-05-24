@@ -26,12 +26,29 @@ on:
       - '.github/workflows/deploy-kubernetes.yml'
   pull_request:
     branches: [staging]
+    paths:
+      - 'src/**'
+      - 'ai/**'
+      - 'docker/**'
+      - 'k8s/**'
+      - 'terraform/**'
+      - 'scripts/**'
+      - 'config/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'tsconfig.json'
+      - 'pyproject.toml'
+      - '.editorconfig'
+      - '.dockerignore'
+      - '.vscode/**'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/deploy-kubernetes.yml'
   workflow_dispatch:
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 100
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       ARTIFACT_REGISTRY_LOCATION: us-west1
@@ -58,7 +75,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
-          version: 11.1.2
+          version: 11.2.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v6

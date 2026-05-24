@@ -286,8 +286,8 @@ export class AdvancedPatternAnalysisService {
           const correlation = await this.calculateTechniqueCorrelation(
             technique1,
             technique2,
-            techniqueGroups[technique1] || [],
-            techniqueGroups[technique2] || [],
+            techniqueGroups[technique1] ?? [],
+            techniqueGroups[technique2] ?? [],
             sessions,
           )
 
@@ -345,7 +345,7 @@ export class AdvancedPatternAnalysisService {
       insights.push(...anomalyInsights)
 
       // Store insights for historical analysis
-      const sessionId = sessions[0]?.sessionId || 'unknown'
+      const sessionId = sessions[0]?.sessionId ?? 'unknown'
       if (!this.insightHistory.has(sessionId)) {
         this.insightHistory.set(sessionId, [])
       }
@@ -483,9 +483,7 @@ export class AdvancedPatternAnalysisService {
         // Extract technique type from intervention ID or metadata
         const techniqueType = this.extractTechniqueType(intervention)
 
-        if (!groups[techniqueType]) {
-          groups[techniqueType] = []
-        }
+        groups[techniqueType] ??= [];
         groups[techniqueType].push(intervention)
 
         return groups
@@ -579,7 +577,7 @@ export class AdvancedPatternAnalysisService {
     const sumY = y.slice(0, n).reduce((sum, val) => sum + val, 0)
     const sumXY = x
       .slice(0, n)
-      .reduce((sum, val, i) => sum + val * (y[i] || 0), 0)
+      .reduce((sum, val, i) => sum + val * (y[i] ?? 0), 0)
     const sumX2 = x.slice(0, n).reduce((sum, val) => sum + val * val, 0)
     const sumY2 = y.slice(0, n).reduce((sum, val) => sum + val * val, 0)
 
@@ -777,7 +775,7 @@ export class AdvancedPatternAnalysisService {
     }>,
   ): EmotionAnalysis[] {
     // Simple ensemble - in production this would intelligently combine results
-    return results[0]?.patterns || []
+    return results[0]?.patterns ?? []
   }
 
   private async processWithSpecificModel(

@@ -324,21 +324,59 @@ export class PresidioPHIDetector {
         return '[PHONE]'
       case PHIEntityType.PERSON:
         return '[NAME]'
-      case PHIEntityType.ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.ADDRESS case') }
-      case PHIEntityType.LOCATION: { throw new Error('Not implemented yet: PHIEntityType.LOCATION case') }
-      case PHIEntityType.MEDICAL_RECORD_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_RECORD_NUMBER case') }
-      case PHIEntityType.DATE_TIME: { throw new Error('Not implemented yet: PHIEntityType.DATE_TIME case') }
-      case PHIEntityType.AGE: { throw new Error('Not implemented yet: PHIEntityType.AGE case') }
-      case PHIEntityType.IP_ADDRESS: { throw new Error('Not implemented yet: PHIEntityType.IP_ADDRESS case') }
-      case PHIEntityType.URL: { throw new Error('Not implemented yet: PHIEntityType.URL case') }
-      case PHIEntityType.US_PASSPORT: { throw new Error('Not implemented yet: PHIEntityType.US_PASSPORT case') }
-      case PHIEntityType.US_DRIVER_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.US_DRIVER_LICENSE case') }
-      case PHIEntityType.CREDIT_CARD: { throw new Error('Not implemented yet: PHIEntityType.CREDIT_CARD case') }
-      case PHIEntityType.US_BANK_NUMBER: { throw new Error('Not implemented yet: PHIEntityType.US_BANK_NUMBER case') }
-      case PHIEntityType.IBAN_CODE: { throw new Error('Not implemented yet: PHIEntityType.IBAN_CODE case') }
-      case PHIEntityType.US_ITIN: { throw new Error('Not implemented yet: PHIEntityType.US_ITIN case') }
-      case PHIEntityType.MEDICAL_LICENSE: { throw new Error('Not implemented yet: PHIEntityType.MEDICAL_LICENSE case') }
-      case PHIEntityType.ORGANIZATION: { throw new Error('Not implemented yet: PHIEntityType.ORGANIZATION case') }
+      case PHIEntityType.ADDRESS: {
+        throw new Error('Not implemented yet: PHIEntityType.ADDRESS case')
+      }
+      case PHIEntityType.LOCATION: {
+        throw new Error('Not implemented yet: PHIEntityType.LOCATION case')
+      }
+      case PHIEntityType.MEDICAL_RECORD_NUMBER: {
+        throw new Error(
+          'Not implemented yet: PHIEntityType.MEDICAL_RECORD_NUMBER case',
+        )
+      }
+      case PHIEntityType.DATE_TIME: {
+        throw new Error('Not implemented yet: PHIEntityType.DATE_TIME case')
+      }
+      case PHIEntityType.AGE: {
+        throw new Error('Not implemented yet: PHIEntityType.AGE case')
+      }
+      case PHIEntityType.IP_ADDRESS: {
+        throw new Error('Not implemented yet: PHIEntityType.IP_ADDRESS case')
+      }
+      case PHIEntityType.URL: {
+        throw new Error('Not implemented yet: PHIEntityType.URL case')
+      }
+      case PHIEntityType.US_PASSPORT: {
+        throw new Error('Not implemented yet: PHIEntityType.US_PASSPORT case')
+      }
+      case PHIEntityType.US_DRIVER_LICENSE: {
+        throw new Error(
+          'Not implemented yet: PHIEntityType.US_DRIVER_LICENSE case',
+        )
+      }
+      case PHIEntityType.CREDIT_CARD: {
+        throw new Error('Not implemented yet: PHIEntityType.CREDIT_CARD case')
+      }
+      case PHIEntityType.US_BANK_NUMBER: {
+        throw new Error(
+          'Not implemented yet: PHIEntityType.US_BANK_NUMBER case',
+        )
+      }
+      case PHIEntityType.IBAN_CODE: {
+        throw new Error('Not implemented yet: PHIEntityType.IBAN_CODE case')
+      }
+      case PHIEntityType.US_ITIN: {
+        throw new Error('Not implemented yet: PHIEntityType.US_ITIN case')
+      }
+      case PHIEntityType.MEDICAL_LICENSE: {
+        throw new Error(
+          'Not implemented yet: PHIEntityType.MEDICAL_LICENSE case',
+        )
+      }
+      case PHIEntityType.ORGANIZATION: {
+        throw new Error('Not implemented yet: PHIEntityType.ORGANIZATION case')
+      }
       default:
         return '[REDACTED]'
     }

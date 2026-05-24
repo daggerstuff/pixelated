@@ -1,14 +1,14 @@
-import json
 import hashlib
+import json
 import os
-from typing import Any, Dict
+from typing import Any
 
-from fastapi import FastAPI, Request, HTTPException, Depends
-from motor.motor_asyncio import AsyncIOMotorClient
 import redis.asyncio as redis
+from fastapi import Depends, FastAPI, HTTPException, Request
+from motor.motor_asyncio import AsyncIOMotorClient
 
 # Import authentication middleware and dependencies from existing project
-from ai.scripts.fastapi_auth_middleware import FastAPIAuthenticationMiddleware, AuthenticationDependencies
+from ai.scripts.fastapi_auth_middleware import AuthenticationDependencies, FastAPIAuthenticationMiddleware
 
 # Environment configuration (fallback to defaults for development)
 MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
@@ -22,10 +22,11 @@ mongo_db = mongo_client[MONGODB_DB]
 # Initialise Redis client (async)
 redis_client = redis.from_url(REDIS_URL)
 
+
 # Simple authentication system placeholder – in real code this would be the shared instance
 # Here we create a minimal stub that satisfies the middleware constructor
 class _DummyAuthSystem:
-    def verify_jwt_token(self, token: str) -> Dict[str, Any] | None:
+    def verify_jwt_token(self, token: str) -> dict[str, Any] | None:
         # Accept any token for demo purposes – real verification lives elsewhere
         return {"user_id": "dummy"}
 
@@ -42,7 +43,9 @@ class _DummyAuthSystem:
     def users(self):
         return {"dummy": type("User", (), {"is_active": True, "role": None})()}
 
+
 _auth_system = _DummyAuthSystem()
+
 
 def create_app() -> FastAPI:
     app = FastAPI(title="Reprioritizer Service", version="0.1.0")
@@ -90,6 +93,7 @@ def create_app() -> FastAPI:
         return {"score": score, "cached": False}
 
     return app
+
 
 # Create the FastAPI instance that will be imported by the server or tests
 app = create_app()

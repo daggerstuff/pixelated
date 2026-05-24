@@ -33,7 +33,7 @@ class TestDatasetPipeline:
 
         # Test loading
         assert dataset_file.exists()
-        with open(dataset_file, "r") as f:
+        with open(dataset_file) as f:
             loaded_data = json.load(f)
 
         assert len(loaded_data) == 3
@@ -72,9 +72,7 @@ class TestDatasetPipeline:
     def test_large_dataset_processing(self):
         """Test processing of large datasets"""
         # Simulate large dataset
-        large_dataset = [
-            {"input": f"text_{i}", "output": f"response_{i}", "label": "test"} for i in range(1000)
-        ]
+        large_dataset = [{"input": f"text_{i}", "output": f"response_{i}", "label": "test"} for i in range(1000)]
 
         processed_count = sum(bool(item["input"] and item["output"]) for item in large_dataset)
         assert processed_count == 1000

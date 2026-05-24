@@ -2,12 +2,12 @@ import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
-import { Table } from '@/components/ui/table.tsx'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
 } from '@/components/ui/table-types.ts'
+import { Table } from '@/components/ui/table.tsx'
 import type {
   Source,
   SourceList as SourceListType,
@@ -116,7 +116,7 @@ export function SourceList({
       accessor: (row) => (
         <button
           onClick={() => onSourceClick?.(row)}
-          className='text-primary line-clamp-2 text-left font-medium hover:underline'
+          className="text-primary line-clamp-2 text-left font-medium hover:underline"
         >
           {row.title}
         </button>
@@ -127,7 +127,7 @@ export function SourceList({
       id: 'authors',
       header: 'Authors',
       accessor: (row) => (
-        <span className='line-clamp-1 text-sm'>
+        <span className="line-clamp-1 text-sm">
           {row.authors.slice(0, 2).join(', ')}
           {row.authors.length > 2 && ` +${row.authors.length - 2}`}
         </span>
@@ -145,7 +145,7 @@ export function SourceList({
       id: 'sourceType',
       header: 'Type',
       accessor: (row) => (
-        <span className='text-sm capitalize'>{row.sourceType}</span>
+        <span className="text-sm capitalize">{row.sourceType}</span>
       ),
       sortable: true,
     },
@@ -154,11 +154,11 @@ export function SourceList({
       header: 'Access',
       accessor: (row) =>
         row.openAccess ? (
-          <span className='bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1 text-xs'>
+          <span className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded px-2 py-1 text-xs">
             Open
           </span>
         ) : (
-          <span className='bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 rounded px-2 py-1 text-xs'>
+          <span className="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 rounded px-2 py-1 text-xs">
             Closed
           </span>
         ),
@@ -169,13 +169,13 @@ export function SourceList({
       accessor: (row) => (
         <a
           href={row.url}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='text-primary hover:text-primary/80'
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-primary hover:text-primary/80"
           onClick={(e) => e.stopPropagation()}
           aria-label={`Open ${row.title} in new tab`}
         >
-          <ExternalLink className='h-4 w-4' />
+          <ExternalLink className="h-4 w-4" />
         </a>
       ),
       align: 'right',
@@ -197,21 +197,21 @@ export function SourceList({
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
-        <div className='flex flex-1 gap-2'>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-1 gap-2">
           <input
-            type='text'
-            placeholder='Search sources...'
+            type="text"
+            placeholder="Search sources..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
+            className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
           />
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className='border-input rounded-md border bg-background px-3 py-2 text-sm capitalize'
+            className="border-input rounded-md border bg-background px-3 py-2 text-sm capitalize"
           >
-            <option value='all'>All Types</option>
+            <option value="all">All Types</option>
             {sourceTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
@@ -221,14 +221,14 @@ export function SourceList({
           <select
             value={accessFilter}
             onChange={(e) => setAccessFilter(e.target.value)}
-            className='border-input rounded-md border bg-background px-3 py-2 text-sm'
+            className="border-input rounded-md border bg-background px-3 py-2 text-sm"
           >
-            <option value='all'>All Access</option>
-            <option value='open'>Open Access</option>
-            <option value='closed'>Closed Access</option>
+            <option value="all">All Access</option>
+            <option value="open">Open Access</option>
+            <option value="closed">Closed Access</option>
           </select>
         </div>
-        <div className='text-muted-foreground text-sm'>
+        <div className="text-muted-foreground text-sm">
           Showing {filteredAndSortedSources.length} of {sources.total} sources
         </div>
       </div>

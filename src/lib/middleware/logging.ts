@@ -22,8 +22,8 @@ export const loggingMiddleware = defineMiddleware(async ({ request }, next) => {
   const userAgent = request.headers.get('user-agent') ?? 'unknown'
   const referer = request.headers.get('referer') ?? 'direct'
   const ip =
-    (request.headers.get('x-forwarded-for') ??
-    request.headers.get('cf-connecting-ip')) ??
+    request.headers.get('x-forwarded-for') ??
+    request.headers.get('cf-connecting-ip') ??
     'unknown'
 
   // Try to get user from session

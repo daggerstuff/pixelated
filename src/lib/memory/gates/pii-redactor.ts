@@ -7,26 +7,26 @@
  */
 
 export interface PiiRedactionResult {
-  scrubbedText: string;
-  piiTypesFound: string[];
-  piiCounts: Record<string, number>;
-  confidence: number;
-  wasRedacted: boolean;
+  scrubbedText: string
+  piiTypesFound: string[]
+  piiCounts: Record<string, number>
+  confidence: number
+  wasRedacted: boolean
 }
 
 export interface PiiGateEvaluation {
-  gate: string;
-  decision: 'pass' | 'block' | 'escalate';
-  reason: string;
-  confidence: number;
+  gate: string
+  decision: 'pass' | 'block' | 'escalate'
+  reason: string
+  confidence: number
 }
 
 interface PiiMatch {
-  piiType: PiiType;
-  matchedText: string;
-  start: number;
-  end: number;
-  confidence: number;
+  piiType: PiiType
+  matchedText: string
+  start: number
+  end: number
+  confidence: number
 }
 
 type PiiType =
@@ -36,9 +36,9 @@ type PiiType =
   | 'dob'
   | 'medical_record_number'
   | 'ip_address'
-  | 'credit_card';
+  | 'credit_card'
 
-const GATE_NAME = 'gate0_pii_redaction';
+const GATE_NAME = 'gate0_pii_redaction'
 
 const CONSERVATIVE_PII_TYPES = new Set<PiiType>([
   'email',
@@ -47,9 +47,9 @@ const CONSERVATIVE_PII_TYPES = new Set<PiiType>([
   'medical_record_number',
   'ip_address',
   'credit_card',
-]);
+])
 
-const PHI_TYPES = new Set<PiiType>(['ssn', 'medical_record_number']);
+const PHI_TYPES = new Set<PiiType>(['ssn', 'medical_record_number'])
 
 const THERAPY_ALLOWLIST = new Set([
   'therapist',
@@ -66,7 +66,7 @@ const THERAPY_ALLOWLIST = new Set([
   'boundaries',
   'trigger',
   'healing',
-]);
+])
 
 const PII_PATTERNS: Record<PiiType, RegExp[]> = {
   email: [/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g],
@@ -91,11 +91,11 @@ const PII_PATTERNS: Record<PiiType, RegExp[]> = {
     /\b(?:\d{4}[\s-]?){3}\d{4}\b/g,
     /\b\d{4}[\s-]?\d{6}[\s-]?\d{5}\b/g,
   ],
-};
+}
 
 export class PiiRedactor {
-  private readonly driftCounts: Record<string, number> = {};
-  private readonly driftTypes = new Set<string>();
+  private readonly driftCounts: Record<string, number> = {}
+  private readonly driftTypes = new Set<string>()
 
   redact(content: string): PiiRedactionResult {
     if (!content) {
@@ -105,15 +105,15 @@ export class PiiRedactor {
         piiCounts: {},
         confidence: 0,
         wasRedacted: false,
-      };
+      }
     }
 
-    const matches = this.detectConservativeMatches(content);
-    const { scrubbedText, piiCounts } = this.applyMatches(content, matches);
-    const confidence = Math.max(0, ...matches.map((match) => match.confidence));
-    const piiTypesFound = Object.keys(piiCounts);
+    const matches = this.detectConservativeMatches(content)
+    const { scrubbedText, piiCounts } = this.applyMatches(content, matches)
+    const confidence = Math.max(0, ...matches.map((match) => match.confidence))
+    const piiTypesFound = Object.keys(piiCounts)
 
-    this.recordDrift(piiCounts);
+    this.recordDrift(piiCounts)
 
     return {
       scrubbedText,
@@ -121,15 +121,15 @@ export class PiiRedactor {
       piiCounts,
       confidence,
       wasRedacted: piiTypesFound.length > 0,
-    };
+    }
   }
 
   evaluate(content: string): PiiGateEvaluation {
-    const result = this.redact(content);
+    const result = this.redact(content)
     const totalPiiCount = Object.values(result.piiCounts).reduce(
       (total, count) => total + count,
       0,
-    );
+    )
 
     if (this.hasHighConfidencePhi(result)) {
       return {
@@ -137,7 +137,7 @@ export class PiiRedactor {
         decision: 'block',
         reason: 'High-confidence PHI detected in memory content',
         confidence: result.confidence,
-      };
+      }
     }
 
     if (totalPiiCount > 3) {
@@ -146,15 +146,16 @@ export class PiiRedactor {
         decision: 'escalate',
         reason: 'Multiple PII instances redacted; human review recommended',
         confidence: result.confidence,
-      };
+      }
     }
 
     return {
       gate: GATE_NAME,
       decision: 'pass',
-      reason: totalPiiCount === 0 ? 'No PII detected' : 'PII detected and scrubbed',
+      reason:
+        totalPiiCount === 0 ? 'No PII detected' : 'PII detected and scrubbed',
       confidence: result.confidence,
-    };
+    }
   }
 
   getPiiDriftReport(): Record<string, unknown> {
@@ -166,29 +167,29 @@ export class PiiRedactor {
         ),
       ),
       timestamp: new Date().toISOString(),
-    };
+    }
   }
 
   private detectConservativeMatches(content: string): PiiMatch[] {
-    const matches: PiiMatch[] = [];
+    const matches: PiiMatch[] = []
 
     for (const [piiType, patterns] of Object.entries(PII_PATTERNS) as [
       PiiType,
       RegExp[],
     ][]) {
       if (!CONSERVATIVE_PII_TYPES.has(piiType)) {
-        continue;
+        continue
       }
 
       for (const pattern of patterns) {
-        pattern.lastIndex = 0;
+        pattern.lastIndex = 0
 
         for (const match of content.matchAll(pattern)) {
-          const matchedText = match[0];
-          const start = match.index ?? 0;
+          const matchedText = match[0]
+          const start = match.index ?? 0
 
           if (this.isAllowlisted(matchedText)) {
-            continue;
+            continue
           }
 
           matches.push({
@@ -197,88 +198,92 @@ export class PiiRedactor {
             start,
             end: start + matchedText.length,
             confidence: this.confidenceFor(piiType),
-          });
+          })
         }
       }
     }
 
-    return this.filterOverlaps(matches);
+    return this.filterOverlaps(matches)
   }
 
   private applyMatches(
     content: string,
     matches: PiiMatch[],
   ): { scrubbedText: string; piiCounts: Record<string, number> } {
-    let scrubbedText = content;
-    const piiCounts: Record<string, number> = {};
+    let scrubbedText = content
+    const piiCounts: Record<string, number> = {}
 
     for (const match of [...matches].reverse()) {
-      const redaction = this.redactionFor(match.piiType);
-      scrubbedText = `${scrubbedText.slice(0, match.start)}${redaction}${scrubbedText.slice(match.end)}`;
-      piiCounts[match.piiType] = (piiCounts[match.piiType] ?? 0) + 1;
+      const redaction = this.redactionFor(match.piiType)
+      scrubbedText = `${scrubbedText.slice(0, match.start)}${redaction}${scrubbedText.slice(match.end)}`
+      piiCounts[match.piiType] = (piiCounts[match.piiType] ?? 0) + 1
     }
 
-    return { scrubbedText, piiCounts };
+    return { scrubbedText, piiCounts }
   }
 
   private recordDrift(piiCounts: Record<string, number>): void {
     for (const [piiType, count] of Object.entries(piiCounts)) {
-      this.driftTypes.add(piiType);
-      this.driftCounts[piiType] = (this.driftCounts[piiType] ?? 0) + count;
+      this.driftTypes.add(piiType)
+      this.driftCounts[piiType] = (this.driftCounts[piiType] ?? 0) + count
     }
   }
 
   private hasHighConfidencePhi(result: PiiRedactionResult): boolean {
     return (
       result.confidence > 0.9 &&
-      Object.keys(result.piiCounts).some((piiType) => PHI_TYPES.has(piiType as PiiType))
-    );
+      Object.keys(result.piiCounts).some((piiType) =>
+        PHI_TYPES.has(piiType as PiiType),
+      )
+    )
   }
 
   private confidenceFor(piiType: PiiType): number {
     if (PHI_TYPES.has(piiType)) {
-      return 0.98;
+      return 0.98
     }
 
     if (CONSERVATIVE_PII_TYPES.has(piiType)) {
-      return 0.95;
+      return 0.95
     }
 
-    return 0;
+    return 0
   }
 
   private filterOverlaps(matches: PiiMatch[]): PiiMatch[] {
-    const filteredMatches: PiiMatch[] = [];
-    let previousEnd = 0;
+    const filteredMatches: PiiMatch[] = []
+    let previousEnd = 0
 
-    for (const match of [...matches].sort((left, right) => left.start - right.start)) {
+    for (const match of [...matches].sort(
+      (left, right) => left.start - right.start,
+    )) {
       if (match.start >= previousEnd) {
-        filteredMatches.push(match);
-        previousEnd = match.end;
-        continue;
+        filteredMatches.push(match)
+        previousEnd = match.end
+        continue
       }
 
-      const previous = filteredMatches.at(-1);
+      const previous = filteredMatches.at(-1)
       if (!previous) {
-        continue;
+        continue
       }
 
       if (match.end - match.start > previous.end - previous.start) {
-        filteredMatches[filteredMatches.length - 1] = match;
-        previousEnd = match.end;
+        filteredMatches[filteredMatches.length - 1] = match
+        previousEnd = match.end
       }
     }
 
-    return filteredMatches;
+    return filteredMatches
   }
 
   private isAllowlisted(text: string): boolean {
-    return THERAPY_ALLOWLIST.has(text.trim().toLowerCase());
+    return THERAPY_ALLOWLIST.has(text.trim().toLowerCase())
   }
 
   private redactionFor(piiType: PiiType): string {
-    return `[${piiType.toUpperCase()}]`;
+    return `[${piiType.toUpperCase()}]`
   }
 }
 
-export const piiRedactor = new PiiRedactor();
+export const piiRedactor = new PiiRedactor()

@@ -150,9 +150,15 @@ export function usePipelineWebSocket({
                 onStatusChange?.('completed', 'Pipeline execution completed')
               }
               break
-            case "progress_request": { throw new Error('Not implemented yet: "progress_request" case') }
-            case "status_request": { throw new Error('Not implemented yet: "status_request" case') }
-            case "subscribe": { throw new Error('Not implemented yet: "subscribe" case') }
+            case 'progress_request': {
+              throw new Error('Not implemented yet: "progress_request" case')
+            }
+            case 'status_request': {
+              throw new Error('Not implemented yet: "status_request" case')
+            }
+            case 'subscribe': {
+              throw new Error('Not implemented yet: "subscribe" case')
+            }
           }
         } catch (error: unknown) {
           console.error('Failed to parse WebSocket message:', error)

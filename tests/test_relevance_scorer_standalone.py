@@ -183,7 +183,7 @@ def test_relevance_scorer_structure():
         combined_score = combine_scores(0.8, 0.7, 0.6, 0.9, 0.5, weights)
         assert 0 <= combined_score <= 1
 
-    except Exception as e:
+    except Exception:
         # Silently handle test errors
         pass
 
@@ -267,7 +267,7 @@ def test_relevance_scorer_structure():
         dsm5_count = sum(r.knowledge_type == "dsm5" for r in diverse_ranked)
         assert dsm5_count <= 2  # Should limit DSM-5 results
 
-    except Exception as e:
+    except Exception:
         # Silently handle advanced feature test errors
         pass
 

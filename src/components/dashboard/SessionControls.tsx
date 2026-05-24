@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+
 import { cn } from '@/lib/utils'
 import type { TherapistSession } from '@/types/dashboard'
 
@@ -49,12 +50,16 @@ export function SessionControls({
   }, [])
 
   return (
-    <section className='space-y-4' aria-label='Session Controls'>
-      <h3 className='text-lg font-semibold'>Session Controls</h3>
+    <section className="space-y-4" aria-label="Session Controls">
+      <h3 className="text-lg font-semibold">Session Controls</h3>
 
-      <div className='flex gap-2' role='group' aria-label='Session Action Controls'>
+      <div
+        className="flex gap-2"
+        role="group"
+        aria-label="Session Action Controls"
+      >
         <button
-          type='button'
+          type="button"
           ref={(el) => {
             buttonRefs.current['pause'] = el
           }}
@@ -68,14 +73,14 @@ export function SessionControls({
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'disabled:opacity-50 disabled:cursor-not-allowed',
           )}
         >
           Pause Session
         </button>
 
         <button
-          type='button'
+          type="button"
           ref={(el) => {
             buttonRefs.current['resume'] = el
           }}
@@ -89,14 +94,14 @@ export function SessionControls({
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'disabled:opacity-50 disabled:cursor-not-allowed',
           )}
         >
           Resume Session
         </button>
 
         <button
-          type='button'
+          type="button"
           ref={(el) => {
             buttonRefs.current['end'] = el
           }}
@@ -110,7 +115,7 @@ export function SessionControls({
               : 'bg-gray-200 text-gray-500',
             'px-3 py-2 rounded transition-opacity',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
-            'disabled:opacity-50 disabled:cursor-not-allowed'
+            'disabled:opacity-50 disabled:cursor-not-allowed',
           )}
         >
           End Session
@@ -118,11 +123,11 @@ export function SessionControls({
       </div>
 
       <div>
-        <h4 className='text-md font-medium'>Recent Sessions</h4>
+        <h4 className="text-md font-medium">Recent Sessions</h4>
         {sessions.length === 0 ? (
-          <div className='text-sm italic'>No recent sessions available</div>
+          <div className="text-sm italic">No recent sessions available</div>
         ) : (
-          <ul className='space-y-2' role='list'>
+          <ul className="space-y-2" role="list">
             {sessions.slice(0, 3).map((session) => (
               <li
                 key={session.id}
@@ -130,21 +135,21 @@ export function SessionControls({
                   'flex items-center justify-between p-3 bg-background rounded border transition-colors',
                   'hover:bg-muted/50',
                 )}
-                role='listitem'
+                role="listitem"
                 aria-label={`Session ${session.id}, status: ${session.status}`}
               >
                 <div>
-                  <div className='text-sm font-medium'>
+                  <div className="text-sm font-medium">
                     Session {session.id}
                   </div>
-                  <div className='text-muted-foreground text-xs'>
+                  <div className="text-muted-foreground text-xs">
                     {new Date(session.startTime).toLocaleTimeString([], {
                       hour: '2-digit',
                       minute: '2-digit',
                     })}
                   </div>
                   {session.endTime && (
-                    <div className='text-muted-foreground text-xs'>
+                    <div className="text-muted-foreground text-xs">
                       Ended:{' '}
                       {new Date(session.endTime).toLocaleTimeString([], {
                         hour: '2-digit',

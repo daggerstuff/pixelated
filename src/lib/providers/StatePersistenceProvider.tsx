@@ -414,21 +414,21 @@ export function StatePersistenceDebugger() {
         <button onClick={refreshStats}>Refresh</button>
         <button onClick={handleExport}>Export</button>
         <input
-          type='file'
-          accept='.json'
+          type="file"
+          accept=".json"
           onChange={handleImport}
           style={{ display: 'none' }}
-          id='import-input'
+          id="import-input"
         />
         <button
-          onClick={() =>
-            (document.getElementById('import-input'))?.click()
-          }
+          onClick={() => document.getElementById('import-input')?.click()}
         >
           Import
         </button>
         <button onClick={createBackup}>Backup</button>
-        <button onClick={ async () => confirm('Clear all state?') && clearAllState()}>
+        <button
+          onClick={async () => confirm('Clear all state?') && clearAllState()}
+        >
           Clear
         </button>
       </div>

@@ -53,7 +53,11 @@ def create_minimal_test_session_data() -> SessionData:
     """Create a minimal valid session payload for edge-case tests."""
     return SessionData(
         session_id="minimal_test_session",
-        participant_demographics={"age": [30], "gender": ["female"], "region": ["north"]},
+        participant_demographics={
+            "age": [30],
+            "gender": ["female"],
+            "region": ["north"],
+        },
         training_scenario={"scenario_id": "minimal_scenario"},
         content={"scenario_type": "chat"},
         ai_responses=[],
@@ -96,12 +100,16 @@ def create_synthetic_dataset(session_data: SessionData) -> dict[str, Any]:
             "response_id": [f"r-{i}" for i in range(row_count)],
             "predicted_label": responses_array[:row_count],
             "actual_label": expected,
-            "gender": list(genders)[:row_count]
-            if len(genders) >= row_count
-            else list(genders) + ["unknown"] * (row_count - len(genders)),
-            "age": list(ages)[:row_count]
-            if len(ages) >= row_count
-            else list(ages) + [None] * (row_count - len(ages)),
+            "gender": (
+                list(genders)[:row_count]
+                if len(genders) >= row_count
+                else list(genders) + ["unknown"] * (row_count - len(genders))
+            ),
+            "age": (
+                list(ages)[:row_count]
+                if len(ages) >= row_count
+                else list(ages) + [None] * (row_count - len(ages))
+            ),
         }
     )
 

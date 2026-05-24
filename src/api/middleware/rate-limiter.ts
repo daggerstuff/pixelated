@@ -68,10 +68,11 @@ const setRateLimitHeader = (
 
 const getClientIp = (req: RateLimiterRequest): string => {
   const forwarded = req.headers['x-forwarded-for']
-  const forwardIp =
-    (Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0])?.trim()
+  const forwardIp = (
+    Array.isArray(forwarded) ? forwarded[0] : forwarded?.split(',')[0]
+  )?.trim()
 
-  return ((forwardIp ?? req.ip) ?? req.socket?.remoteAddress) ?? '127.0.0.1'
+  return forwardIp ?? req.ip ?? req.socket?.remoteAddress ?? '127.0.0.1'
 }
 
 /**
@@ -87,11 +88,8 @@ export async function incrementRedisCounter(
   try {
     const redis = getRedisClient()
     const tx = redis.multi()
-    if (
-      tx &&
-      typeof (tx as Promise<unknown>).then === 'function'
-    ) {
-      const txResults =  tx
+    if (tx && typeof (tx as Promise<unknown>).then === 'function') {
+      const txResults = tx
       if (
         Array.isArray(txResults) &&
         txResults.length > 0 &&
@@ -106,16 +104,16 @@ export async function incrementRedisCounter(
       tx &&
       typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).incr ===
         'function' &&
-      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).expire ===
-        'function' &&
+      typeof (tx as { incr: unknown; expire: unknown; exec: unknown })
+        .expire === 'function' &&
       typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).exec ===
         'function'
 
     if (hasTransactionMethods) {
       const redisTx = tx as any
-      ;(redisTx).incr(key)
-      ;(redisTx).expire(key, windowSeconds)
-      const txResults = await (redisTx).exec()
+      redisTx.incr(key)
+      redisTx.expire(key, windowSeconds)
+      const txResults = await redisTx.exec()
       if (
         !Array.isArray(txResults) ||
         txResults.length === 0 ||
@@ -157,22 +155,25 @@ export function rateLimiter(
   const windowSeconds = windowMs / 1000
 
   const applyHeaders = (count: number, resetTime: number) => {
-    setRateLimitHeader(
-      res,
-      'X-RateLimit-Limit',
-      String(maxRequests),
-    )
+    setRateLimitHeader(res, 'X-RateLimit-Limit', String(maxRequests))
     setRateLimitHeader(
       res,
       'X-RateLimit-Remaining',
       String(Math.max(0, maxRequests - count)),
     )
-    setRateLimitHeader(res, 'X-RateLimit-Reset', String(Math.ceil(resetTime / 1000)))
+    setRateLimitHeader(
+      res,
+      'X-RateLimit-Reset',
+      String(Math.ceil(resetTime / 1000)),
+    )
   }
 
   const handleLimitExceeded = () => {
     const response = res.status(429)
-    if (response && typeof (response as { json?: unknown }).json === 'function') {
+    if (
+      response &&
+      typeof (response as { json?: unknown }).json === 'function'
+    ) {
       ;(response as { json: (body: unknown) => RateLimiterResponse }).json(
         tooManyRequestsPayload,
       )
@@ -258,11 +259,7 @@ export function rateLimitByUser(
     userStore[userId] = record
 
     // Set rate limit headers
-    setRateLimitHeader(
-      res,
-      'X-RateLimit-Limit',
-      String(maxRequests),
-    )
+    setRateLimitHeader(res, 'X-RateLimit-Limit', String(maxRequests))
     setRateLimitHeader(
       res,
       'X-RateLimit-Remaining',

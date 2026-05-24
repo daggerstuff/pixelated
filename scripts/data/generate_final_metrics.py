@@ -61,9 +61,7 @@ def analyze_dataset(file_path: Path) -> dict:
 
     stats["sample_keys"] = list(stats["sample_keys"])
     stats["avg_messages"] = (
-        sum(stats["message_counts"]) / len(stats["message_counts"])
-        if stats["message_counts"]
-        else 0
+        sum(stats["message_counts"]) / len(stats["message_counts"]) if stats["message_counts"] else 0
     )
 
     return stats
@@ -73,9 +71,7 @@ def main():
     datasets = [
         (
             "Tier1 Priority Curated",
-            Path(
-                "ai/training/ready_packages/datasets/cache/orchestrator_output/processed_s3_tier_datasets.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/orchestrator_output/processed_s3_tier_datasets.jsonl"),
         ),
         (
             "Mental Health Clean",
@@ -83,15 +79,11 @@ def main():
         ),
         (
             "Training V3 - Counseling",
-            Path(
-                "ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"),
         ),
         (
             "Training V3 - Helios",
-            Path(
-                "ai/training/ready_packages/datasets/cache/training_v3_converted/heliosbrahma_converted.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/training_v3_converted/heliosbrahma_converted.jsonl"),
         ),
     ]
 

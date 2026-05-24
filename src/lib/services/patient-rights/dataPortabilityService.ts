@@ -346,31 +346,31 @@ export async function getDataExportDetails(
       }
     }
 
-     // Calculate progress based on status
-     let progress = 0
-     switch (exportRequest.status) {
-       case 'pending':
-         progress = 0
-         break
-       case 'processing':
-         // In a real implementation, this might come from a progress tracker
-         progress = 50
-         break
-       case 'completed':
-         progress = 100
-         break
-       case 'failed':
-         progress = 100
-         break
-       case "cancelled":
-         progress = 100
-         break
-       case "expired":
-         progress = 100
-         break
-       default:
-         progress = 0
-     }
+    // Calculate progress based on status
+    let progress = 0
+    switch (exportRequest.status) {
+      case 'pending':
+        progress = 0
+        break
+      case 'processing':
+        // In a real implementation, this might come from a progress tracker
+        progress = 50
+        break
+      case 'completed':
+        progress = 100
+        break
+      case 'failed':
+        progress = 100
+        break
+      case 'cancelled':
+        progress = 100
+        break
+      case 'expired':
+        progress = 100
+        break
+      default:
+        progress = 0
+    }
 
     // Calculate estimated completion time
     // In a real implementation, this would be more sophisticated
@@ -907,48 +907,48 @@ export async function downloadDataExport(
       }
     }
 
-     // Check if the export is ready for download
-     if (exportRequest.status !== 'completed') {
-       logger.warn('Export not ready for download', {
-         exportId,
-         status: exportRequest.status,
-       })
+    // Check if the export is ready for download
+    if (exportRequest.status !== 'completed') {
+      logger.warn('Export not ready for download', {
+        exportId,
+        status: exportRequest.status,
+      })
 
-       // Calculate progress and estimated completion time
-       let progress = 0
-       switch (exportRequest.status) {
-         case 'pending':
-           progress = 0
-           break
-         case 'processing':
-           progress = 50
-           break
-         case 'cancelled':
-           progress = 100
-           break
-         case 'expired':
-           progress = 100
-           break
-         case 'failed':
-           progress = 100
-           break
-         default:
-           progress = 0
-       }
+      // Calculate progress and estimated completion time
+      let progress = 0
+      switch (exportRequest.status) {
+        case 'pending':
+          progress = 0
+          break
+        case 'processing':
+          progress = 50
+          break
+        case 'cancelled':
+          progress = 100
+          break
+        case 'expired':
+          progress = 100
+          break
+        case 'failed':
+          progress = 100
+          break
+        default:
+          progress = 0
+      }
 
-       const createdAt = new Date(exportRequest.createdAt)
-       const estimatedCompletionTime = new Date(
-         createdAt.getTime() + 5 * 60 * 1000,
-       ) // 5 minutes from creation
+      const createdAt = new Date(exportRequest.createdAt)
+      const estimatedCompletionTime = new Date(
+        createdAt.getTime() + 5 * 60 * 1000,
+      ) // 5 minutes from creation
 
-       return {
-         success: false,
-         error: 'not_ready',
-         message: 'Export is not ready for download',
-         status: exportRequest.status,
-         progress,
-         estimatedCompletionTime: estimatedCompletionTime.toISOString(),
-       }
+      return {
+        success: false,
+        error: 'not_ready',
+        message: 'Export is not ready for download',
+        status: exportRequest.status,
+        progress,
+        estimatedCompletionTime: estimatedCompletionTime.toISOString(),
+      }
     }
 
     // Cast to get access to format and dataFormat properties
@@ -1065,7 +1065,7 @@ const mockDb = {
   ...db,
   // Add mock implementations for missing models
   patient: {
-    findUnique:  async (_params: MockDbFindParams): Promise<Patient | null> => {
+    findUnique: async (_params: MockDbFindParams): Promise<Patient | null> => {
       return Promise.resolve({
         id: _params.where['id'] as string,
         name: 'Test Patient',
@@ -1074,19 +1074,21 @@ const mockDb = {
   },
   // dataExport and exportFile removed - now using dataExportDAO
   patientUser: {
-    findFirst:  async (_params: { where: unknown }): Promise<PatientUser | null> => {
+    findFirst: async (_params: {
+      where: unknown
+    }): Promise<PatientUser | null> => {
       return Promise.resolve(null)
     },
   },
   providerPatientAccess: {
-    findFirst:  async (_params: {
+    findFirst: async (_params: {
       where: unknown
     }): Promise<ProviderPatientAccess | null> => {
       return Promise.resolve(null)
     },
   },
   user: {
-    findUnique:  async (_params: MockDbFindParams): Promise<User | null> => {
+    findUnique: async (_params: MockDbFindParams): Promise<User | null> => {
       return Promise.resolve({
         id: _params.where['id'] as string,
         roles: [{ name: 'user' }],

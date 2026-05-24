@@ -7,9 +7,9 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
+import numpy as np
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
-import numpy as np
 
 from ..config import settings
 from ..models import (
@@ -23,11 +23,12 @@ from ..models import (
 )
 from .cache_service import cache_service
 from .database_service import DatabaseService
-from .model_service import ModelEnsembleService
 from .diagnostic_service import DiagnosticService
 from .fairness_analyzer import FairnessAnalyzer
+from .model_service import ModelEnsembleService
 from .placeholder_service import placeholder_service
-from .security_service import AuditLogger as _ServiceAuditLogger, SecurityManager
+from .security_service import AuditLogger as _ServiceAuditLogger
+from .security_service import SecurityManager
 
 logger = structlog.get_logger(__name__)
 
@@ -35,7 +36,9 @@ logger = structlog.get_logger(__name__)
 class _CompatibilityAuditLogger:
     """Compatibility wrapper that keeps legacy audit logger call signatures."""
 
-    def __init__(self, security_manager: SecurityManager, audit_file: str | None = None):
+    def __init__(
+        self, security_manager: SecurityManager, audit_file: str | None = None
+    ):
         self._legacy = _ServiceAuditLogger(security_manager, audit_file)
 
     @property
@@ -97,7 +100,9 @@ class BiasDetectionService:
             "timestamp": getattr(session_data, "timestamp", None),
         }
 
-    async def analyze_session(self, session_data: object, user_id: str) -> dict[str, Any]:
+    async def analyze_session(
+        self, session_data: object, user_id: str
+    ) -> dict[str, Any]:
         data = self._coerce_session_data(session_data)
         fairlearn = await self._run_fairlearn_analysis(data)
         interpretability = await self._run_interpretability_analysis(data)
@@ -158,7 +163,9 @@ class BiasDetectionService:
         result["predictions"] = predictions.tolist()
         return result
 
-    async def _run_interpretability_analysis(self, session_data: object) -> dict[str, Any]:
+    async def _run_interpretability_analysis(
+        self, session_data: object
+    ) -> dict[str, Any]:
         return await self.diagnostic_service.run_interpretability_analysis(
             self._coerce_session_data(session_data)
         )

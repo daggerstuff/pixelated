@@ -83,7 +83,7 @@ test.describe('Theme Performance Tests', () => {
 
     test('should have minimal layout shifts', async () => {
       // Measure cumulative layout shift
-      const cls = await page.evaluate( async () => {
+      const cls = await page.evaluate(async () => {
         return new Promise((resolve) => {
           let clsValue = 0
           let clsEntries = 0
@@ -114,7 +114,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Measure theme switch performance
-      await page.evaluate( async () => {
+      await page.evaluate(async () => {
         return new Promise((resolve) => {
           const marks = []
 
@@ -149,7 +149,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Measure layout performance during theme switch
-      const layoutMetrics = await page.evaluate( async () => {
+      const layoutMetrics = await page.evaluate(async () => {
         return new Promise((resolve) => {
           let layoutCount = 0
           let styleCount = 0
@@ -181,7 +181,7 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Check for efficient DOM batching
-      const domBatches = await page.evaluate( async () => {
+      const domBatches = await page.evaluate(async () => {
         return new Promise((resolve) => {
           let mutationCount = 0
           let batchCount = 0
@@ -223,7 +223,7 @@ test.describe('Theme Performance Tests', () => {
   test.describe('Animation Performance', () => {
     test('should maintain smooth animations at 60fps', async () => {
       // Measure animation frame rate
-      const frameMetrics = await page.evaluate( async () => {
+      const frameMetrics = await page.evaluate(async () => {
         return new Promise((resolve) => {
           let frames = 0
           let lastTime = performance.now()
@@ -368,7 +368,7 @@ test.describe('Theme Performance Tests', () => {
         return {
           totalSelectors: selectors.length,
           complexSelectors: selectors.filter(
-            (s) => (s.includes('>') ?? s.includes('+')) ?? s.includes('~'),
+            (s) => s.includes('>') ?? s.includes('+') ?? s.includes('~'),
           ).length,
           universalSelectors: selectors.filter((s) => s.includes('*')).length,
         }

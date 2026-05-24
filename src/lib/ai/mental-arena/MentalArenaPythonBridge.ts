@@ -1044,7 +1044,7 @@ export class MentalArenaPythonBridge {
       }
     }
 
-    const allowedVersions = whitelist[whitelistKey] || []
+    const allowedVersions = whitelist[whitelistKey] ?? []
 
     if (!versionSpec) {
       violations.push(`Package missing version specification: ${packageName}`)

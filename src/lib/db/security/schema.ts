@@ -17,11 +17,11 @@ function createMockClient() {
   logger.warn(message)
 
   return {
-    connect:  async () =>
+    connect: async () =>
       Promise.resolve({
         collection: () => ({
-          createIndex:  async () => Promise.resolve(),
-          insertOne:  async () => Promise.resolve(),
+          createIndex: async () => Promise.resolve(),
+          insertOne: async () => Promise.resolve(),
         }),
       }),
   }

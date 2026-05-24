@@ -16,8 +16,10 @@ class _ObjectView:
     def __getattr__(self, name: str) -> Any:
         return self._payload.get(name)
 
+
 def _object_view(payload: Mapping[str, Any]) -> _ObjectView:
     return _ObjectView(payload)
+
 
 def _json_request(
     method: str,

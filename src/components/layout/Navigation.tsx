@@ -102,7 +102,7 @@ export function Navigation({
             isMobile ? 'block py-2' : '',
           )}
         >
-          {item.icon && <span className='mr-2'>{item.icon}</span>}
+          {item.icon && <span className="mr-2">{item.icon}</span>}
           {item.label}
         </a>
       ))}

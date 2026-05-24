@@ -1184,7 +1184,7 @@ export class ThreatHuntingSystem extends EventEmitter {
 
     for (const finding of findings) {
       bySeverity[finding.severity]++
-      byType[finding.type] = (byType[finding.type] || 0) + 1
+      byType[finding.type] = (byType[finding.type] ?? 0) + 1
     }
 
     return {
@@ -1253,7 +1253,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       // Find hunts that might be interested in this data
       const relevantHunts = await this.huntsCollection
         .find({
-          status: 'active',
+          'status': 'active',
           'scope.data_sources': dataInfo.data_source,
         })
         .toArray()
@@ -1483,8 +1483,8 @@ export class ThreatHuntingSystem extends EventEmitter {
       for (const result of allResults) {
         for (const finding of result.findings) {
           totalFindings++
-          byHuntType[finding.type] = (byHuntType[finding.type] || 0) + 1
-          bySeverity[finding.severity] = (bySeverity[finding.severity] || 0) + 1
+          byHuntType[finding.type] = (byHuntType[finding.type] ?? 0) + 1
+          bySeverity[finding.severity] = (bySeverity[finding.severity] ?? 0) + 1
         }
       }
 

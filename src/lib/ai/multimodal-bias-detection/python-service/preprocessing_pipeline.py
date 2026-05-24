@@ -11,7 +11,7 @@ import io
 import logging
 import tempfile
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import librosa
 import numpy as np
@@ -51,28 +51,21 @@ class AudioPreprocessingPipeline:
             logger.info("Loading audio preprocessing processors")
 
             # Load Whisper processor for speech-to-text preprocessing
-            self.whisper_processor = WhisperProcessor.from_pretrained(
-                f"openai/{settings.speech_to_text_model}"
-            )
+            self.whisper_processor = WhisperProcessor.from_pretrained(f"openai/{settings.speech_to_text_model}")
 
             # Load Wav2Vec2 processor for audio classification
-            self.wav2vec_processor = Wav2Vec2Processor.from_pretrained(
-                f"facebook/{settings.audio_model_name}"
-            )
+            self.wav2vec_processor = Wav2Vec2Processor.from_pretrained(f"facebook/{settings.audio_model_name}")
 
             self.is_loaded = True
             logger.info("Audio processors loaded successfully")
             return True
 
         except Exception as e:
-            logger.error(f"Failed to load audio processors: {str(e)}")
+            logger.error(f"Failed to load audio processors: {e!s}")
             return False
 
     async def preprocess_audio(
-        self,
-        audio_data: Union[str, bytes],
-        extract_features: bool = True,
-        normalize: bool = True
+        self, audio_data: str | bytes, extract_features: bool = True, normalize: bool = True
     ) -> dict[str, Any]:
         """Preprocess audio data for bias detection"""
         if not self.is_loaded:
@@ -85,9 +78,7 @@ class AudioPreprocessingPipeline:
             # Validate audio duration
             duration = len(audio_array) / sample_rate
             if duration > settings.max_audio_duration:
-                raise ValueError(
-                    f"Audio duration {duration}s exceeds maximum {settings.max_audio_duration}s"
-                )
+                raise ValueError(f"Audio duration {duration}s exceeds maximum {settings.max_audio_duration}s")
 
             # Normalize audio if requested
             if normalize:
@@ -105,7 +96,7 @@ class AudioPreprocessingPipeline:
                 "Audio preprocessing completed",
                 duration=duration,
                 sample_rate=sample_rate,
-                features_extracted=extract_features
+                features_extracted=extract_features,
             )
 
             return {
@@ -116,15 +107,15 @@ class AudioPreprocessingPipeline:
                 "model_inputs": model_inputs,
                 "metadata": {
                     "channels": 1 if len(audio_array.shape) == 1 else audio_array.shape[1],
-                    "normalized": normalize
-                }
+                    "normalized": normalize,
+                },
             }
 
         except Exception as e:
-            logger.error(f"Audio preprocessing failed: {str(e)}")
+            logger.error(f"Audio preprocessing failed: {e!s}")
             raise
 
-    async def _load_audio(self, audio_data: Union[str, bytes]) -> tuple[np.ndarray, int]:
+    async def _load_audio(self, audio_data: str | bytes) -> tuple[np.ndarray, int]:
         """Load audio from various input formats"""
         if isinstance(audio_data, str):
             # Base64 encoded audio
@@ -147,7 +138,7 @@ class AudioPreprocessingPipeline:
 
             return audio_array, sample_rate
 
-        elif isinstance(audio_data, bytes):
+        if isinstance(audio_data, bytes):
             # Direct audio bytes
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
                 tmp_file.write(audio_data)
@@ -158,8 +149,7 @@ class AudioPreprocessingPipeline:
 
             return audio_array, sample_rate
 
-        else:
-            raise ValueError(f"Unsupported audio data type: {type(audio_data)}")
+        raise ValueError(f"Unsupported audio data type: {type(audio_data)}")
 
     def _normalize_audio(self, audio_array: np.ndarray) -> np.ndarray:
         """Normalize audio array to [-1, 1] range"""
@@ -170,28 +160,16 @@ class AudioPreprocessingPipeline:
 
         return audio_array
 
-    async def _extract_audio_features(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int
-    ) -> dict[str, Any]:
+    async def _extract_audio_features(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Extract audio features for analysis"""
         try:
             features = {
                 "tempo": float(librosa.beat.tempo(y=audio_array, sr=sample_rate)[0]),
                 "energy": float(np.mean(librosa.feature.rms(y=audio_array))),
-                "spectral_centroid": float(
-                    np.mean(librosa.feature.spectral_centroid(y=audio_array, sr=sample_rate))
-                ),
-                "zero_crossing_rate": float(
-                    np.mean(librosa.feature.zero_crossing_rate(y=audio_array))
-                ),
-                "spectral_rolloff": float(
-                    np.mean(librosa.feature.spectral_rolloff(y=audio_array, sr=sample_rate))
-                ),
-                "spectral_bandwidth": float(
-                    np.mean(librosa.feature.spectral_bandwidth(y=audio_array, sr=sample_rate))
-                )
+                "spectral_centroid": float(np.mean(librosa.feature.spectral_centroid(y=audio_array, sr=sample_rate))),
+                "zero_crossing_rate": float(np.mean(librosa.feature.zero_crossing_rate(y=audio_array))),
+                "spectral_rolloff": float(np.mean(librosa.feature.spectral_rolloff(y=audio_array, sr=sample_rate))),
+                "spectral_bandwidth": float(np.mean(librosa.feature.spectral_bandwidth(y=audio_array, sr=sample_rate))),
             }
 
             # Extract MFCC features
@@ -207,38 +185,24 @@ class AudioPreprocessingPipeline:
             return features
 
         except Exception as e:
-            logger.warning(f"Audio feature extraction failed: {str(e)}")
+            logger.warning(f"Audio feature extraction failed: {e!s}")
             return {}
 
-    async def _prepare_model_inputs(
-        self,
-        audio_array: np.ndarray,
-        sample_rate: int
-    ) -> dict[str, Any]:
+    async def _prepare_model_inputs(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Prepare audio data for model input"""
         try:
             # Prepare for Whisper (speech-to-text)
-            whisper_inputs = self.whisper_processor(
-                audio_array,
-                sampling_rate=sample_rate,
-                return_tensors="pt"
-            )
+            whisper_inputs = self.whisper_processor(audio_array, sampling_rate=sample_rate, return_tensors="pt")
 
             # Prepare for Wav2Vec2 (audio classification)
             wav2vec_inputs = self.wav2vec_processor(
-                audio_array,
-                sampling_rate=sample_rate,
-                return_tensors="pt",
-                padding="longest"
+                audio_array, sampling_rate=sample_rate, return_tensors="pt", padding="longest"
             )
 
-            return {
-                "whisper_inputs": whisper_inputs,
-                "wav2vec_inputs": wav2vec_inputs
-            }
+            return {"whisper_inputs": whisper_inputs, "wav2vec_inputs": wav2vec_inputs}
 
         except Exception as e:
-            logger.warning(f"Model input preparation failed: {str(e)}")
+            logger.warning(f"Model input preparation failed: {e!s}")
             return {}
 
 
@@ -255,23 +219,18 @@ class VisionPreprocessingPipeline:
             logger.info("Loading vision preprocessing processor")
 
             # Load ViT image processor
-            self.image_processor = ViTImageProcessor.from_pretrained(
-                f"google/{settings.vision_model_name}"
-            )
+            self.image_processor = ViTImageProcessor.from_pretrained(f"google/{settings.vision_model_name}")
 
             self.is_loaded = True
             logger.info("Vision processor loaded successfully")
             return True
 
         except Exception as e:
-            logger.error(f"Failed to load vision processor: {str(e)}")
+            logger.error(f"Failed to load vision processor: {e!s}")
             return False
 
     async def preprocess_image(
-        self,
-        image_data: Union[str, bytes],
-        resize: bool = True,
-        normalize: bool = True
+        self, image_data: str | bytes, resize: bool = True, normalize: bool = True
     ) -> dict[str, Any]:
         """Preprocess image data for bias detection"""
         if not self.is_loaded:
@@ -288,8 +247,7 @@ class VisionPreprocessingPipeline:
                     image = self._resize_image(image, settings.max_image_dimensions)
                 else:
                     raise ValueError(
-                        f"Image dimensions ({width}x{height}) exceed maximum "
-                        f"{settings.max_image_dimensions}px"
+                        f"Image dimensions ({width}x{height}) exceed maximum {settings.max_image_dimensions}px"
                     )
 
             # Convert to RGB if needed
@@ -299,29 +257,21 @@ class VisionPreprocessingPipeline:
             # Prepare image for model input
             model_inputs = await self._prepare_model_inputs(image)
 
-            logger.info(
-                "Image preprocessing completed",
-                width=image.size[0],
-                height=image.size[1],
-                resized=resize
-            )
+            logger.info("Image preprocessing completed", width=image.size[0], height=image.size[1], resized=resize)
 
             return {
                 "image": image,
                 "width": image.size[0],
                 "height": image.size[1],
                 "model_inputs": model_inputs,
-                "metadata": {
-                    "original_mode": image.mode,
-                    "normalized": normalize
-                }
+                "metadata": {"original_mode": image.mode, "normalized": normalize},
             }
 
         except Exception as e:
-            logger.error(f"Image preprocessing failed: {str(e)}")
+            logger.error(f"Image preprocessing failed: {e!s}")
             raise
 
-    async def _load_image(self, image_data: Union[str, bytes]) -> Image.Image:
+    async def _load_image(self, image_data: str | bytes) -> Image.Image:
         """Load image from various input formats"""
         if isinstance(image_data, str):
             # Base64 encoded image
@@ -334,13 +284,12 @@ class VisionPreprocessingPipeline:
 
             return image
 
-        elif isinstance(image_data, bytes):
+        if isinstance(image_data, bytes):
             # Direct image bytes
             image = Image.open(io.BytesIO(image_data))
             return image
 
-        else:
-            raise ValueError(f"Unsupported image data type: {type(image_data)}")
+        raise ValueError(f"Unsupported image data type: {type(image_data)}")
 
     def _resize_image(self, image: Image.Image, max_dimension: int) -> Image.Image:
         """Resize image while maintaining aspect ratio"""
@@ -358,17 +307,12 @@ class VisionPreprocessingPipeline:
         """Prepare image data for model input"""
         try:
             # Prepare for ViT
-            vit_inputs = self.image_processor(
-                images=image,
-                return_tensors="pt"
-            )
+            vit_inputs = self.image_processor(images=image, return_tensors="pt")
 
-            return {
-                "vit_inputs": vit_inputs
-            }
+            return {"vit_inputs": vit_inputs}
 
         except Exception as e:
-            logger.warning(f"Model input preparation failed: {str(e)}")
+            logger.warning(f"Model input preparation failed: {e!s}")
             return {}
 
 
@@ -385,23 +329,18 @@ class VideoPreprocessingPipeline:
             logger.info("Loading video preprocessing processor")
 
             # Load VideoMAE image processor
-            self.video_processor = VideoMAEImageProcessor.from_pretrained(
-                "MCG-NJU/videomae-base"
-            )
+            self.video_processor = VideoMAEImageProcessor.from_pretrained("MCG-NJU/videomae-base")
 
             self.is_loaded = True
             logger.info("Video processor loaded successfully")
             return True
 
         except Exception as e:
-            logger.error(f"Failed to load video processor: {str(e)}")
+            logger.error(f"Failed to load video processor: {e!s}")
             return False
 
     async def preprocess_video(
-        self,
-        video_data: Union[str, bytes],
-        extract_frames: bool = True,
-        normalize: bool = True
+        self, video_data: str | bytes, extract_frames: bool = True, normalize: bool = True
     ) -> dict[str, Any]:
         """Preprocess video data for bias detection"""
         if not self.is_loaded:
@@ -419,27 +358,20 @@ class VideoPreprocessingPipeline:
             # Prepare video for model input
             model_inputs = await self._prepare_model_inputs(frames)
 
-            logger.info(
-                "Video preprocessing completed",
-                frames_extracted=len(frames),
-                extract_frames=extract_frames
-            )
+            logger.info("Video preprocessing completed", frames_extracted=len(frames), extract_frames=extract_frames)
 
             return {
                 "video_path": video_path,
                 "frames": frames,
                 "model_inputs": model_inputs,
-                "metadata": {
-                    "frame_count": len(frames),
-                    "normalized": normalize
-                }
+                "metadata": {"frame_count": len(frames), "normalized": normalize},
             }
 
         except Exception as e:
-            logger.error(f"Video preprocessing failed: {str(e)}")
+            logger.error(f"Video preprocessing failed: {e!s}")
             raise
 
-    async def _save_video(self, video_data: Union[str, bytes]) -> str:
+    async def _save_video(self, video_data: str | bytes) -> str:
         """Save video data to temporary file"""
         if isinstance(video_data, str):
             # Base64 encoded video
@@ -498,7 +430,7 @@ class VideoPreprocessingPipeline:
             Path(video_path).unlink()
             return []
         except Exception as e:
-            logger.warning(f"Frame extraction failed: {str(e)}")
+            logger.warning(f"Frame extraction failed: {e!s}")
             Path(video_path).unlink()
             return []
 
@@ -509,17 +441,12 @@ class VideoPreprocessingPipeline:
                 return {}
 
             # Prepare for VideoMAE
-            videomae_inputs = self.video_processor(
-                images=frames,
-                return_tensors="pt"
-            )
+            videomae_inputs = self.video_processor(images=frames, return_tensors="pt")
 
-            return {
-                "videomae_inputs": videomae_inputs
-            }
+            return {"videomae_inputs": videomae_inputs}
 
         except Exception as e:
-            logger.warning(f"Model input preparation failed: {str(e)}")
+            logger.warning(f"Model input preparation failed: {e!s}")
             return {}
 
 
@@ -531,55 +458,41 @@ class MultimodalPreprocessingPipeline:
         self.vision_pipeline = VisionPreprocessingPipeline()
         self.video_pipeline = VideoPreprocessingPipeline()
 
-    async def preprocess_multimodal_data(
-        self,
-        data: Dict[str, Any]
-    ) -> dict[str, Any]:
+    async def preprocess_multimodal_data(self, data: Dict[str, Any]) -> dict[str, Any]:
         """Preprocess multimodal data (audio, vision, video)"""
         try:
             results = {}
 
             # Preprocess audio if present
             if "audio" in data:
-                results["audio"] = await self.audio_pipeline.preprocess_audio(
-                    data["audio"]
-                )
+                results["audio"] = await self.audio_pipeline.preprocess_audio(data["audio"])
 
             # Preprocess image if present
             if "image" in data:
-                results["image"] = await self.vision_pipeline.preprocess_image(
-                    data["image"]
-                )
+                results["image"] = await self.vision_pipeline.preprocess_image(data["image"])
 
             # Preprocess video if present
             if "video" in data:
-                results["video"] = await self.video_pipeline.preprocess_video(
-                    data["video"]
-                )
+                results["video"] = await self.video_pipeline.preprocess_video(data["video"])
 
             # Combine metadata
             metadata = {
                 "modalities_processed": list(results.keys()),
                 "timestamp": asyncio.get_event_loop().time(),
-                "preprocessing_complete": True
+                "preprocessing_complete": True,
             }
 
-            logger.info(
-                "Multimodal preprocessing completed",
-                modalities=list(results.keys())
-            )
+            logger.info("Multimodal preprocessing completed", modalities=list(results.keys()))
 
-            return {
-                "results": results,
-                "metadata": metadata
-            }
+            return {"results": results, "metadata": metadata}
 
         except Exception as e:
-            logger.error(f"Multimodal preprocessing failed: {str(e)}")
+            logger.error(f"Multimodal preprocessing failed: {e!s}")
             raise
 
 
 # Utility functions for data validation and error handling
+
 
 def validate_audio_format(file_path: str) -> bool:
     """Validate audio file format"""
@@ -621,6 +534,7 @@ def get_file_size(file_path: str) -> int:
 
 # Performance monitoring utilities
 
+
 class PreprocessingMetrics:
     """Performance metrics for preprocessing operations"""
 
@@ -635,7 +549,7 @@ class PreprocessingMetrics:
 
     def get_average_time(self, operation: str) -> float:
         """Get average time for an operation"""
-        if operation in self.metrics and self.metrics[operation]:
+        if self.metrics.get(operation):
             return sum(self.metrics[operation]) / len(self.metrics[operation])
         return 0.0
 
@@ -647,12 +561,13 @@ class PreprocessingMetrics:
                 "average_time": sum(times) / len(times) if times else 0,
                 "min_time": min(times) if times else 0,
                 "max_time": max(times) if times else 0,
-                "count": len(times)
+                "count": len(times),
             }
         return summary
 
 
 # Example usage and testing
+
 
 async def main():
     """Example usage of the preprocessing pipeline"""

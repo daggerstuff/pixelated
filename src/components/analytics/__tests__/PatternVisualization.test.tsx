@@ -82,7 +82,11 @@ describe('PatternVisualization', () => {
     expect(screen.getByText('Increasing anxiety levels')).toBeInTheDocument()
 
     // Check cross-session pattern
-    expect(screen.getByRole('button', { name: /Select cross-session pattern: Topic avoidance/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: /Select cross-session pattern: Topic avoidance/i,
+      }),
+    ).toBeInTheDocument()
 
     // Check risk correlation
     expect(screen.getByText('Immediate action recommended')).toBeInTheDocument()

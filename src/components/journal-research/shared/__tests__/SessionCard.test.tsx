@@ -11,9 +11,9 @@ describe('SessionCard', () => {
     expect(screen.getByText(mockSession.sessionId)).toBeInTheDocument()
     expect(screen.getByText(/Started/)).toBeInTheDocument()
     expect(screen.getByText(mockSession.currentPhase)).toBeInTheDocument()
-    expect(
-      screen.getByText('Sources:').parentElement,
-    ).toHaveTextContent(/Sources:\s*2/)
+    expect(screen.getByText('Sources:').parentElement).toHaveTextContent(
+      /Sources:\s*2/,
+    )
   })
 
   it('displays progress percentage correctly', () => {
@@ -80,7 +80,7 @@ describe('SessionCard', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <SessionCard session={mockSession} className='custom-class' />,
+      <SessionCard session={mockSession} className="custom-class" />,
     )
 
     const card = container.querySelector('.custom-class')

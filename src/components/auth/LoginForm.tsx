@@ -142,8 +142,8 @@ export function LoginForm({
       if (result.error) {
         const errorMessage =
           typeof result.error === 'object' && result.error !== null
-            ? (result.error as { message?: string }).message ??
-              'Login failed. Please check your credentials.'
+            ? ((result.error as { message?: string }).message ??
+              'Login failed. Please check your credentials.')
             : 'Login failed. Please check your credentials.'
 
         toast.error(errorMessage)
@@ -279,11 +279,11 @@ export function LoginForm({
 
   // Render reset success message
   const renderResetSuccess = () => (
-    <div className='space-y-4 text-center'>
-      <h2 className='text-gradient text-responsive--heading'>
+    <div className="space-y-4 text-center">
+      <h2 className="text-gradient text-responsive--heading">
         Password Reset Email Sent
       </h2>
-      <p className='text-responsive--body'>
+      <p className="text-responsive--body">
         Check your email for a link to reset your password. If it doesn&apos;t
         appear within a few minutes, check your spam folder.
       </p>
@@ -293,61 +293,61 @@ export function LoginForm({
           setResetEmailSent(false)
           setErrors({})
         }}
-        className='btn btn-primary btn-responsive touch-focus'
+        className="btn btn-primary btn-responsive touch-focus"
       >
-        <span className='text-responsive--small'>Return to Login</span>
+        <span className="text-responsive--small">Return to Login</span>
       </button>
     </div>
   )
 
   // Render main form
   const renderMainForm = () => (
-    <div className='auth-form-container form-container responsive-auth-container text-center'>
+    <div className="auth-form-container form-container responsive-auth-container text-center">
       {mode === 'reset' && (
         <h2
-          className='text-gradient text-responsive--heading'
-          data-testid='reset-password-heading'
+          className="text-gradient text-responsive--heading"
+          data-testid="reset-password-heading"
         >
           Reset Password
         </h2>
       )}
       {mode === 'login' && (
-        <h2 className='text-gradient text-responsive--heading'>Sign In</h2>
+        <h2 className="text-gradient text-responsive--heading">Sign In</h2>
       )}
 
       <form
         noValidate
         onSubmit={handleSubmit}
-        className='auth-form form-responsive'
-        data-testid='login-form'
+        className="auth-form form-responsive"
+        data-testid="login-form"
       >
-        <div className='form-group form-group-responsive'>
-          <label htmlFor='email' className='form-label text-responsive--small'>
+        <div className="form-group form-group-responsive">
+          <label htmlFor="email" className="form-label text-responsive--small">
             Email
           </label>
           <div
             className={`input-wrapper ${focusedInput === 'email' ? 'focused' : ''} ${errors.email ? 'error' : ''}`}
           >
             <Input
-              id='email'
-              type='email'
+              id="email"
+              type="email"
               value={email}
               onChange={handleEmailChange}
               onFocus={() => setFocusedInput('email')}
               onBlur={handleEmailBlur}
               disabled={isLoading}
-              placeholder='your@email.com'
+              placeholder="your@email.com"
               className={`form-input input-responsive ${errors.email ? 'border-destructive' : ''}`}
               aria-invalid={errors.email ? 'true' : 'false'}
-              aria-describedby='email-error'
-              autoComplete='email'
+              aria-describedby="email-error"
+              autoComplete="email"
             />
           </div>
           <div
-            id='email-error'
-            className='error-message text-responsive--caption mt-1'
-            role='alert'
-            aria-live='polite'
+            id="email-error"
+            className="error-message text-responsive--caption mt-1"
+            role="alert"
+            aria-live="polite"
             style={{
               display: errors.email ? ('block' as const) : ('none' as const),
             }}
@@ -360,19 +360,19 @@ export function LoginForm({
         {mode === 'login' && renderRememberMe()}
 
         <button
-          type='submit'
-          className='btn btn-primary btn-responsive'
+          type="submit"
+          className="btn btn-primary btn-responsive"
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className='flex items-center justify-center gap-2'>
-              <span className='loading-spinner'></span>
-              <span className='text-responsive--small'>
+            <span className="flex items-center justify-center gap-2">
+              <span className="loading-spinner"></span>
+              <span className="text-responsive--small">
                 {mode === 'login' ? 'Signing in...' : 'Sending...'}
               </span>
             </span>
           ) : (
-            <span className='text-responsive--small'>
+            <span className="text-responsive--small">
               {mode === 'login' ? 'Sign In' : 'Send Reset Link'}
             </span>
           )}
@@ -386,33 +386,33 @@ export function LoginForm({
 
   // Render password field
   const renderPasswordField = () => (
-    <div className='form-group form-group-responsive'>
-      <label htmlFor='password' className='form-label text-responsive--small'>
+    <div className="form-group form-group-responsive">
+      <label htmlFor="password" className="form-label text-responsive--small">
         Password
       </label>
       <div
         className={`input-wrapper ${focusedInput === 'password' ? 'focused' : ''} ${errors.password ? 'error' : ''}`}
       >
         <Input
-          id='password'
-          type='password'
+          id="password"
+          type="password"
           value={password}
           onChange={handlePasswordChange}
           onFocus={() => setFocusedInput('password')}
           onBlur={handlePasswordBlur}
           disabled={isLoading}
-          placeholder='••••••••'
+          placeholder="••••••••"
           className={`form-input input-responsive ${errors.password ? 'border-destructive' : ''}`}
           aria-invalid={errors.password ? 'true' : 'false'}
-          aria-describedby='password-error'
-          autoComplete='current-password'
+          aria-describedby="password-error"
+          autoComplete="current-password"
         />
       </div>
       <div
-        id='password-error'
-        className='error-message text-responsive--caption mt-1'
-        role='alert'
-        aria-live='polite'
+        id="password-error"
+        className="error-message text-responsive--caption mt-1"
+        role="alert"
+        aria-live="polite"
         style={{
           display: errors.password ? ('block' as const) : ('none' as const),
         }}
@@ -424,21 +424,21 @@ export function LoginForm({
 
   // Render remember me checkbox
   const renderRememberMe = () => (
-    <div className='form-group remember-me form-group-responsive'>
+    <div className="form-group remember-me form-group-responsive">
       <label
-        htmlFor='rememberMeCheckbox'
-        className='checkbox-container touch-target'
+        htmlFor="rememberMeCheckbox"
+        className="checkbox-container touch-target"
       >
         <input
-          id='rememberMeCheckbox'
-          type='checkbox'
+          id="rememberMeCheckbox"
+          type="checkbox"
           checked={rememberMe}
           onChange={handleRememberMeChange}
           disabled={isLoading}
-          className='remember-checkbox'
+          className="remember-checkbox"
         />
 
-        <span className='checkbox-label text-responsive--small'>
+        <span className="checkbox-label text-responsive--small">
           Remember me
         </span>
       </label>
@@ -448,35 +448,35 @@ export function LoginForm({
   // Render OAuth section
   const renderOAuthSection = () => (
     <>
-      <div className='auth-separator'>
-        <hr className='my-4' />
+      <div className="auth-separator">
+        <hr className="my-4" />
       </div>
 
       <button
-        type='button'
+        type="button"
         onClick={handleGoogleSignIn}
-        className='btn btn-outline btn-responsive'
+        className="btn btn-outline btn-responsive"
         disabled={isLoading}
-        aria-label='Sign in with Google'
+        aria-label="Sign in with Google"
       >
-        <span className='text-responsive--small'>Continue with Google</span>
+        <span className="text-responsive--small">Continue with Google</span>
       </button>
     </>
   )
 
   // Render auth links
   const renderAuthLinks = () => (
-    <div className='auth-links space-y-2'>
+    <div className="auth-links space-y-2">
       {mode === 'login' && showResetPassword && (
         <button
-          type='button'
+          type="button"
           onClick={() => {
             setMode('reset')
             setErrors({})
             setFocusedInput(null)
           }}
-          className='text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline'
-          data-testid='forgot-password-button'
+          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline"
+          data-testid="forgot-password-button"
         >
           Forgot your password?
         </button>
@@ -484,12 +484,12 @@ export function LoginForm({
 
       {mode === 'reset' && (
         <button
-          type='button'
+          type="button"
           onClick={() => {
             setMode('login')
             setErrors({})
           }}
-          className='text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline'
+          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus underline"
         >
           Back to Login
         </button>
@@ -497,9 +497,9 @@ export function LoginForm({
 
       {mode === 'login' && showSignup && (
         <button
-          type='button'
+          type="button"
           onClick={() => (globalThis.location.href = '/signup')}
-          className='text-gray-400 text-responsive--small hover:text-gray-300 touch-focus mt-2 underline'
+          className="text-gray-400 text-responsive--small hover:text-gray-300 touch-focus mt-2 underline"
         >
           Don&apos;t have an account? Sign up
         </button>

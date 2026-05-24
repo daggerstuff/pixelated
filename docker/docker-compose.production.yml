@@ -16,7 +16,6 @@ services:
       - DB_NAME=${DB_NAME:-pixelated}
       - DB_USER=${DB_USER:-pixelated_user}
       - DB_PASSWORD_FILE=/run/secrets/db-password
-      - REDIS_URL=redis://redis:6379
       - REDIS_PASSWORD_FILE=/run/secrets/redis-password
       - JWT_SECRET_FILE=/run/secrets/jwt-secret
       - AUTH0_DOMAIN_FILE=/run/secrets/auth0-domain

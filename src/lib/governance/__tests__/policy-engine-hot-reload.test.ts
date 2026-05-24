@@ -80,7 +80,9 @@ describe('PolicyEngine hot-reload', () => {
         {
           id: 'r2',
           action: 'access',
-          conditions: [{ field: 'role', operator: 'equals', value: 'superadmin' }],
+          conditions: [
+            { field: 'role', operator: 'equals', value: 'superadmin' },
+          ],
           required: [],
         },
       ],

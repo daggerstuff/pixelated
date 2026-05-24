@@ -205,11 +205,11 @@ export function TherapyChatClient() {
       {({ containerRef, messagesEndRef, showScrollButton, scrollToBottom }) => (
         <div className={isExpanded ? 'fixed inset-0 z-50' : ''}>
           {/* Header */}
-          <div className='from-purple-900 via-purple-800 to-purple-900 mb-4 flex items-center justify-between rounded-t-lg bg-gradient-to-r p-3'>
-            <h1 className='text-xl font-bold'>
+          <div className="from-purple-900 via-purple-800 to-purple-900 mb-4 flex items-center justify-between rounded-t-lg bg-gradient-to-r p-3">
+            <h1 className="text-xl font-bold">
               Pixelated Empathy Therapy Chat
             </h1>
-            <div className='flex items-center space-x-2'>
+            <div className="flex items-center space-x-2">
               <SecurityBadge
                 securityLevel={securityLevel}
                 encryptionEnabled={encryptionEnabled}
@@ -217,19 +217,19 @@ export function TherapyChatClient() {
               />
 
               {isConnected && (
-                <span className='bg-green-800 text-green-200 rounded px-2 py-1 text-xs'>
+                <span className="bg-green-800 text-green-200 rounded px-2 py-1 text-xs">
                   Live
                 </span>
               )}
               <button
                 onClick={() => setShowAnalytics(!showAnalytics)}
-                className='bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm'
+                className="bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm"
               >
                 {showAnalytics ? 'Hide Analytics' : 'Show Analytics'}
               </button>
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
-                className='bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm'
+                className="bg-purple-700 hover:bg-purple-600 rounded px-2 py-1 text-sm"
               >
                 {isExpanded ? 'Minimize' : 'Expand'}
               </button>
@@ -247,14 +247,14 @@ export function TherapyChatClient() {
 
           {/* FHE initialization warning */}
           {encryptionEnabled && !fheInitialized && (
-            <div className='bg-yellow-800 border-yellow-700 text-yellow-400 mb-4 rounded border bg-opacity-30 p-2 text-sm'>
+            <div className="bg-yellow-800 border-yellow-700 text-yellow-400 mb-4 rounded border bg-opacity-30 p-2 text-sm">
               Initializing FHE encryption system... This might take a moment.
             </div>
           )}
 
           {/* Analytics dashboard */}
           {showAnalytics && (
-            <div className='mb-4'>
+            <div className="mb-4">
               <AnalyticsDashboardReact
                 messages={messages}
                 securityLevel={securityLevel}
@@ -272,9 +272,9 @@ export function TherapyChatClient() {
             } border-purple-900 bg-black mb-2 rounded-md border bg-opacity-50 p-2 shadow-sm transition-all duration-200`}
           >
             {messages.length === 0 ? (
-              <div className='text-gray-400 flex h-full flex-col items-center justify-center'>
-                <p className='mb-2 text-xl font-medium'>Begin Your Session</p>
-                <p className='max-w-md text-center'>
+              <div className="text-gray-400 flex h-full flex-col items-center justify-center">
+                <p className="mb-2 text-xl font-medium">Begin Your Session</p>
+                <p className="max-w-md text-center">
                   Start therapy training with our AI client simulation.
                   {encryptionEnabled &&
                     (securityLevel === 'maximum'
@@ -309,8 +309,8 @@ export function TherapyChatClient() {
           {showScrollButton && (
             <button
               onClick={scrollToBottom}
-              className='bg-purple-700 text-white hover:bg-purple-600 fixed bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors'
-              aria-label='Scroll to bottom'
+              className="bg-purple-700 text-white hover:bg-purple-600 fixed bottom-20 right-4 rounded-full p-2 shadow-lg transition-colors"
+              aria-label="Scroll to bottom"
             >
               ↓
             </button>

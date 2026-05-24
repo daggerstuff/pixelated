@@ -25,10 +25,9 @@ from real_ml_models import (
     get_real_hf_analysis,
 )
 
-from bias_detection.sentry_metrics import bias_metrics
-
 # Import existing bias detection components
 from bias_detection.compat import BiasDetectionConfig, BiasDetectionService, SessionData
+from bias_detection.sentry_metrics import bias_metrics
 
 logger = logging.getLogger(__name__)
 
@@ -436,8 +435,7 @@ class RealTimeBiasDetector:
                     # Here you would integrate with the memory system
                     # For now, just log the update
                     logger.info(
-                        f"Memory update: feedback for session {update['session_id']}, "
-                        f"adjustment={update['adjustment']}"
+                        f"Memory update: feedback for session {update['session_id']}, adjustment={update['adjustment']}"
                     )
 
                 await asyncio.sleep(0.1)  # Prevent busy waiting

@@ -331,23 +331,75 @@ export const useFHEStore = create<FHEState>()((set, get) => {
                 )
               }
               break
-            case FHEOperation.Subtraction: { throw new Error('Not implemented yet: FHEOperation.Subtraction case') }
-            case FHEOperation.Square: { throw new Error('Not implemented yet: FHEOperation.Square case') }
-            case FHEOperation.Negation: { throw new Error('Not implemented yet: FHEOperation.Negation case') }
-            case FHEOperation.Rotation: { throw new Error('Not implemented yet: FHEOperation.Rotation case') }
-            case FHEOperation.Polynomial: { throw new Error('Not implemented yet: FHEOperation.Polynomial case') }
-            case FHEOperation.Rescale: { throw new Error('Not implemented yet: FHEOperation.Rescale case') }
-            case FHEOperation.SENTIMENT: { throw new Error('Not implemented yet: FHEOperation.SENTIMENT case') }
-            case FHEOperation.CATEGORIZE: { throw new Error('Not implemented yet: FHEOperation.CATEGORIZE case') }
-            case FHEOperation.SUMMARIZE: { throw new Error('Not implemented yet: FHEOperation.SUMMARIZE case') }
-            case FHEOperation.TOKENIZE: { throw new Error('Not implemented yet: FHEOperation.TOKENIZE case') }
-            case FHEOperation.FILTER: { throw new Error('Not implemented yet: FHEOperation.FILTER case') }
-            case FHEOperation.CUSTOM: { throw new Error('Not implemented yet: FHEOperation.CUSTOM case') }
-            case FHEOperation.WORD_COUNT: { throw new Error('Not implemented yet: FHEOperation.WORD_COUNT case') }
-            case FHEOperation.CHARACTER_COUNT: { throw new Error('Not implemented yet: FHEOperation.CHARACTER_COUNT case') }
-            case FHEOperation.KEYWORD_DENSITY: { throw new Error('Not implemented yet: FHEOperation.KEYWORD_DENSITY case') }
-            case FHEOperation.READING_LEVEL: { throw new Error('Not implemented yet: FHEOperation.READING_LEVEL case') }
-            case FHEOperation.ANALYZE: { throw new Error('Not implemented yet: FHEOperation.ANALYZE case') }
+            case FHEOperation.Subtraction: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.Subtraction case',
+              )
+            }
+            case FHEOperation.Square: {
+              throw new Error('Not implemented yet: FHEOperation.Square case')
+            }
+            case FHEOperation.Negation: {
+              throw new Error('Not implemented yet: FHEOperation.Negation case')
+            }
+            case FHEOperation.Rotation: {
+              throw new Error('Not implemented yet: FHEOperation.Rotation case')
+            }
+            case FHEOperation.Polynomial: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.Polynomial case',
+              )
+            }
+            case FHEOperation.Rescale: {
+              throw new Error('Not implemented yet: FHEOperation.Rescale case')
+            }
+            case FHEOperation.SENTIMENT: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.SENTIMENT case',
+              )
+            }
+            case FHEOperation.CATEGORIZE: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.CATEGORIZE case',
+              )
+            }
+            case FHEOperation.SUMMARIZE: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.SUMMARIZE case',
+              )
+            }
+            case FHEOperation.TOKENIZE: {
+              throw new Error('Not implemented yet: FHEOperation.TOKENIZE case')
+            }
+            case FHEOperation.FILTER: {
+              throw new Error('Not implemented yet: FHEOperation.FILTER case')
+            }
+            case FHEOperation.CUSTOM: {
+              throw new Error('Not implemented yet: FHEOperation.CUSTOM case')
+            }
+            case FHEOperation.WORD_COUNT: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.WORD_COUNT case',
+              )
+            }
+            case FHEOperation.CHARACTER_COUNT: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.CHARACTER_COUNT case',
+              )
+            }
+            case FHEOperation.KEYWORD_DENSITY: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.KEYWORD_DENSITY case',
+              )
+            }
+            case FHEOperation.READING_LEVEL: {
+              throw new Error(
+                'Not implemented yet: FHEOperation.READING_LEVEL case',
+              )
+            }
+            case FHEOperation.ANALYZE: {
+              throw new Error('Not implemented yet: FHEOperation.ANALYZE case')
+            }
             default:
               throw new Error(`Operation ${operation} not implemented`)
           }

@@ -314,8 +314,8 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
           text,
           sessionId: sessionId ?? streamConfigRef.current.sessionId,
           contextType:
-            (contextType ??
-            streamConfigRef.current.contextType) ??
+            contextType ??
+            streamConfigRef.current.contextType ??
             defaultContextType,
         }),
       )
@@ -473,7 +473,7 @@ async function blobToBase64(blob: Blob): Promise<string> {
     reader.onloadend = () => {
       const { result } = reader
       if (typeof result === 'string') {
-        const base64 = result.split(',')[1] || ''
+        const base64 = result.split(',')[1] ?? ''
         resolve(base64)
       } else {
         reject(new Error('Failed to convert blob to base64'))

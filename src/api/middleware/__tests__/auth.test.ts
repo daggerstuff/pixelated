@@ -57,14 +57,16 @@ describe('Authentication Middleware', () => {
         },
       })
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled()
-      expect(mockRequest.user).toEqual({
-        sub: 'user123',
-        email: 'test@example.com',
-        roles: ['user'],
-        emailVerified: false,
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+        expect(mockRequest.user).toEqual({
+          sub: 'user123',
+          email: 'test@example.com',
+          roles: ['user'],
+          emailVerified: false,
+        })
       })
     })
 
@@ -74,24 +76,28 @@ describe('Authentication Middleware', () => {
         error: 'Invalid token',
       })
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(statusSpy).toHaveBeenCalledWith(401)
-      expect(jsonSpy).toHaveBeenCalledWith({
-        error: 'Invalid token',
-        code: 'UNAUTHORIZED',
+      await vi.waitFor(() => {
+        expect(statusSpy).toHaveBeenCalledWith(401)
+        expect(jsonSpy).toHaveBeenCalledWith({
+          error: 'Invalid token',
+          code: 'UNAUTHORIZED',
+        })
       })
     })
 
     it('should handle authentication error gracefully', async () => {
       mockAuthenticateRequest.mockRejectedValue(new Error('Auth service error'))
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(statusSpy).toHaveBeenCalledWith(401)
-      expect(jsonSpy).toHaveBeenCalledWith({
-        error: 'Auth service error',
-        code: 'AUTH_ERROR',
+      await vi.waitFor(() => {
+        expect(statusSpy).toHaveBeenCalledWith(401)
+        expect(jsonSpy).toHaveBeenCalledWith({
+          error: 'Auth service error',
+          code: 'AUTH_ERROR',
+        })
       })
     })
 
@@ -102,9 +108,11 @@ describe('Authentication Middleware', () => {
         error: 'No authorization header',
       })
 
-      await authMiddleware(mockRequest, mockResponse, mockNext)
+      authMiddleware(mockRequest, mockResponse, mockNext)
 
-      expect(statusSpy).toHaveBeenCalledWith(401)
+      await vi.waitFor(() => {
+        expect(statusSpy).toHaveBeenCalledWith(401)
+      })
     })
   })
 

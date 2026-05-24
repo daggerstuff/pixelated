@@ -9,7 +9,12 @@ import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
 import React, { useState, useCallback, useEffect } from 'react'
 
 import { Badge } from '@/components/ui/badge/index.ts'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index.ts'
 import { usePixelConversationIntegration } from '@/hooks/usePixelConversationIntegration'
 import type { PixelInferenceResponse } from '@/types/pixel'
 
@@ -116,18 +121,18 @@ export function PixelEnhancedChat({
   )
 
   return (
-    <div className='flex h-full gap-4'>
+    <div className="flex h-full gap-4">
       {/* Chat Area */}
-      <div className='bg-white border-gray-200 flex flex-1 flex-col rounded-lg border'>
+      <div className="bg-white border-gray-200 flex flex-1 flex-col rounded-lg border">
         {/* Header */}
-        <div className='border-gray-200 border-b p-4'>
-          <div className='flex items-center justify-between'>
-            <h2 className='text-gray-900 text-lg font-semibold'>
+        <div className="border-gray-200 border-b p-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-gray-900 text-lg font-semibold">
               Therapeutic Conversation
             </h2>
             <button
               onClick={() => setShowMetrics(!showMetrics)}
-              className='text-blue-600 hover:text-blue-700 text-sm'
+              className="text-blue-600 hover:text-blue-700 text-sm"
             >
               {showMetrics ? 'Hide' : 'Show'} Metrics
             </button>
@@ -135,9 +140,9 @@ export function PixelEnhancedChat({
         </div>
 
         {/* Messages */}
-        <div className='flex-1 space-y-4 overflow-y-auto p-4'>
+        <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages.length === 0 ? (
-            <div className='text-gray-400 mt-8 text-center'>
+            <div className="text-gray-400 mt-8 text-center">
               <p>Start a conversation to see Pixel analysis</p>
             </div>
           ) : (
@@ -151,8 +156,8 @@ export function PixelEnhancedChat({
             ))
           )}
           {isAnalyzing && (
-            <div className='flex justify-center py-4'>
-              <div className='border-blue-600 h-6 w-6 animate-spin rounded-full border-b-2'></div>
+            <div className="flex justify-center py-4">
+              <div className="border-blue-600 h-6 w-6 animate-spin rounded-full border-b-2"></div>
             </div>
           )}
         </div>
@@ -160,21 +165,21 @@ export function PixelEnhancedChat({
         {/* Input */}
         <form
           onSubmit={handleSendMessage}
-          className='border-gray-200 border-t p-4'
+          className="border-gray-200 border-t p-4"
         >
-          <div className='flex gap-2'>
+          <div className="flex gap-2">
             <input
-              type='text'
+              type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder='Type your message...'
+              placeholder="Type your message..."
               disabled={isAnalyzing}
-              className='border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2'
+              className="border-gray-300 focus:ring-blue-500 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-2"
             />
             <button
-              type='submit'
+              type="submit"
               disabled={isAnalyzing || !inputValue.trim()}
-              className='bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 rounded-lg px-4 py-2'
+              className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 rounded-lg px-4 py-2"
             >
               Send
             </button>
@@ -184,21 +189,21 @@ export function PixelEnhancedChat({
 
       {/* Metrics Sidebar */}
       {showMetrics && (
-        <div className='w-80 space-y-4 overflow-y-auto'>
+        <div className="w-80 space-y-4 overflow-y-auto">
           {lastAnalysis?.behavioral_pattern && (
             <Card>
               <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <span className='text-blue-700 h-4 w-4'>🧠</span>
+                <CardTitle className="flex items-center gap-2">
+                  <span className="text-blue-700 h-4 w-4">🧠</span>
                   <span>Behavioral Pattern</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className='space-y-2'>
-                <p className='text-sm font-medium'>
+              <CardContent className="space-y-2">
+                <p className="text-sm font-medium">
                   {lastAnalysis.behavioral_pattern}
                 </p>
                 {lastAnalysis.behavioral_pattern_confidence !== undefined && (
-                  <p className='text-gray-600 text-sm'>
+                  <p className="text-gray-600 text-sm">
                     Confidence:{' '}
                     {(lastAnalysis.behavioral_pattern_confidence * 100).toFixed(
                       0,
@@ -214,14 +219,14 @@ export function PixelEnhancedChat({
           {eqMetrics && eqMetrics.turnsAnalyzed > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Zap className='text-yellow-600 h-4 w-4' />
+                <CardTitle className="flex items-center gap-2">
+                  <Zap className="text-yellow-600 h-4 w-4" />
                   EQ Metrics
                 </CardTitle>
               </CardHeader>
-              <CardContent className='space-y-2'>
+              <CardContent className="space-y-2">
                 <MetricBar
-                  label='Emotional Awareness'
+                  label="Emotional Awareness"
                   value={
                     eqMetrics.emotionalAwareness[
                       eqMetrics.emotionalAwareness.length - 1
@@ -229,7 +234,7 @@ export function PixelEnhancedChat({
                   }
                 />
                 <MetricBar
-                  label='Empathy'
+                  label="Empathy"
                   value={
                     eqMetrics.empathyRecognition[
                       eqMetrics.empathyRecognition.length - 1
@@ -237,7 +242,7 @@ export function PixelEnhancedChat({
                   }
                 />
                 <MetricBar
-                  label='Regulation'
+                  label="Regulation"
                   value={
                     eqMetrics.emotionalRegulation[
                       eqMetrics.emotionalRegulation.length - 1
@@ -245,7 +250,7 @@ export function PixelEnhancedChat({
                   }
                 />
                 <MetricBar
-                  label='Social Cognition'
+                  label="Social Cognition"
                   value={
                     eqMetrics.socialCognition[
                       eqMetrics.socialCognition.length - 1
@@ -253,7 +258,7 @@ export function PixelEnhancedChat({
                   }
                 />
                 <MetricBar
-                  label='Interpersonal Skills'
+                  label="Interpersonal Skills"
                   value={
                     eqMetrics.interpersonalSkills[
                       eqMetrics.interpersonalSkills.length - 1
@@ -274,23 +279,23 @@ export function PixelEnhancedChat({
               }
             >
               <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
+                <CardTitle className="flex items-center gap-2">
                   {crisisStatus.isCrisis ? (
                     <>
-                      <AlertCircle className='text-red-600 h-4 w-4' />
-                      <span className='text-red-900'>Crisis Alert</span>
+                      <AlertCircle className="text-red-600 h-4 w-4" />
+                      <span className="text-red-900">Crisis Alert</span>
                     </>
                   ) : (
                     <>
-                      <Zap className='text-green-600 h-4 w-4' />
-                      <span className='text-green-900'>No Crisis Detected</span>
+                      <Zap className="text-green-600 h-4 w-4" />
+                      <span className="text-green-900">No Crisis Detected</span>
                     </>
                   )}
                 </CardTitle>
               </CardHeader>
-              <CardContent className='space-y-2'>
-                <div className='flex items-center justify-between'>
-                  <span className='text-sm font-medium'>Risk Level:</span>
+              <CardContent className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Risk Level:</span>
                   <Badge
                     variant={
                       crisisStatus.riskLevel === 'critical'
@@ -305,12 +310,12 @@ export function PixelEnhancedChat({
                 </div>
                 {crisisStatus.signals.length > 0 && (
                   <div>
-                    <p className='mb-1 text-sm font-medium'>Signals:</p>
-                    <div className='space-y-1'>
+                    <p className="mb-1 text-sm font-medium">Signals:</p>
+                    <div className="space-y-1">
                       {crisisStatus.signals.map((signal) => (
                         <div
                           key={`${signal.type}:${signal.severity}`}
-                          className='bg-red-100 text-red-800 rounded px-2 py-1 text-xs'
+                          className="bg-red-100 text-red-800 rounded px-2 py-1 text-xs"
                         >
                           {signal.type} (severity: {signal.severity.toFixed(2)})
                         </div>
@@ -319,8 +324,8 @@ export function PixelEnhancedChat({
                   </div>
                 )}
                 {crisisStatus.interventionTriggered && (
-                  <div className='bg-red-200 mt-2 rounded p-2'>
-                    <p className='text-red-900 text-xs font-semibold'>
+                  <div className="bg-red-200 mt-2 rounded p-2">
+                    <p className="text-red-900 text-xs font-semibold">
                       Intervention: {crisisStatus.interventionType}
                     </p>
                   </div>
@@ -331,29 +336,29 @@ export function PixelEnhancedChat({
 
           {/* Bias Detection */}
           {biasFlags.length > 0 && (
-            <Card className='border-orange-300 bg-orange-50'>
+            <Card className="border-orange-300 bg-orange-50">
               <CardHeader>
-                <CardTitle className='flex items-center justify-between gap-2'>
-                  <span className='flex items-center gap-2'>
-                    <AlertTriangle className='text-orange-600 h-4 w-4' />
+                <CardTitle className="flex items-center justify-between gap-2">
+                  <span className="flex items-center gap-2">
+                    <AlertTriangle className="text-orange-600 h-4 w-4" />
                     Bias Detected
                   </span>
                   <button
                     onClick={clearBiasFlags}
-                    className='text-orange-600 hover:text-orange-700 text-xs'
+                    className="text-orange-600 hover:text-orange-700 text-xs"
                   >
                     Clear
                   </button>
                 </CardTitle>
               </CardHeader>
-              <CardContent className='space-y-2'>
+              <CardContent className="space-y-2">
                 {biasFlags.map((flag) => (
                   <div
                     key={`${flag.detected}:${flag.severity}:${flag.suggestedCorrection ?? ''}`}
-                    className='text-sm'
+                    className="text-sm"
                   >
-                    <div className='flex items-center justify-between'>
-                      <p className='text-orange-900 font-medium'>
+                    <div className="flex items-center justify-between">
+                      <p className="text-orange-900 font-medium">
                         {flag.detected}
                       </p>
                       <Badge
@@ -365,7 +370,7 @@ export function PixelEnhancedChat({
                       </Badge>
                     </div>
                     {flag.suggestedCorrection && (
-                      <p className='text-orange-800 mt-1 text-xs'>
+                      <p className="text-orange-800 mt-1 text-xs">
                         Suggestion: {flag.suggestedCorrection}
                       </p>
                     )}
@@ -403,23 +408,23 @@ function MessageBubble({
             : 'bg-gray-100 text-gray-900'
         }`}
       >
-        <p className='text-sm'>{message.content}</p>
+        <p className="text-sm">{message.content}</p>
         {showMetrics && pixelMetrics && (
-          <div className='mt-2 space-y-1 text-xs'>
+          <div className="mt-2 space-y-1 text-xs">
             {pixelMetrics.eq_scores && (
               <div>
-                <p className='font-semibold opacity-75'>
+                <p className="font-semibold opacity-75">
                   Overall EQ: {pixelMetrics.eq_scores.overall_eq.toFixed(2)}
                 </p>
               </div>
             )}
             {pixelMetrics.behavioral_pattern && (
               <div>
-                <p className='font-semibold opacity-75'>
+                <p className="font-semibold opacity-75">
                   Pattern: {pixelMetrics.behavioral_pattern}
                 </p>
                 {pixelMetrics.behavioral_pattern_confidence !== undefined && (
-                  <p className='opacity-75'>
+                  <p className="opacity-75">
                     Confidence:{' '}
                     {(pixelMetrics.behavioral_pattern_confidence * 100).toFixed(
                       0,
@@ -431,7 +436,7 @@ function MessageBubble({
             )}
             {pixelMetrics.conversation_metadata && (
               <div>
-                <p className='opacity-75'>
+                <p className="opacity-75">
                   Safety:{' '}
                   {pixelMetrics.conversation_metadata.safety_score.toFixed(2)},
                   Bias:{' '}
@@ -440,20 +445,20 @@ function MessageBubble({
               </div>
             )}
             {pixelMetrics.memories && pixelMetrics.memories.length > 0 && (
-              <details className='mt-1'>
-                <summary className='cursor-pointer font-semibold opacity-75 hover:opacity-100'>
+              <details className="mt-1">
+                <summary className="cursor-pointer font-semibold opacity-75 hover:opacity-100">
                   📚 Context Used ({pixelMetrics.memories.length})
                 </summary>
-                <ul className='bg-black/5 mt-1 max-h-32 list-disc space-y-1 overflow-y-auto rounded p-2 pl-3 opacity-90'>
+                <ul className="bg-black/5 mt-1 max-h-32 list-disc space-y-1 overflow-y-auto rounded p-2 pl-3 opacity-90">
                   {pixelMetrics.memories.map((mem, i) => (
-                    <li key={i} className='text-[10px] leading-3'>
+                    <li key={i} className="text-[10px] leading-3">
                       {mem}
                     </li>
                   ))}
                 </ul>
               </details>
             )}
-            <p className='pt-1 opacity-50'>
+            <p className="pt-1 opacity-50">
               Latency: {pixelMetrics.inference_time_ms.toFixed(0)}ms
             </p>
           </div>
@@ -469,15 +474,15 @@ function MessageBubble({
 function MetricBar({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <div className='mb-1 flex items-center justify-between'>
-        <span className='text-gray-700 text-sm font-medium'>{label}</span>
-        <span className='text-gray-600 text-xs font-semibold'>
+      <div className="mb-1 flex items-center justify-between">
+        <span className="text-gray-700 text-sm font-medium">{label}</span>
+        <span className="text-gray-600 text-xs font-semibold">
           {(value * 100).toFixed(0)}%
         </span>
       </div>
-      <div className='bg-gray-200 h-2 w-full rounded-full'>
+      <div className="bg-gray-200 h-2 w-full rounded-full">
         <div
-          className='bg-blue-600 h-2 rounded-full transition-all'
+          className="bg-blue-600 h-2 rounded-full transition-all"
           style={{ width: `${value * 100}%` }}
         ></div>
       </div>

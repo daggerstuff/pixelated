@@ -521,7 +521,7 @@ class PatientManager {
 
     const counts: Record<string, number> = {}
     emotions.forEach((emotion) => {
-      counts[emotion] = (counts[emotion] || 0) + 1
+      counts[emotion] = (counts[emotion] ?? 0) + 1
     })
 
     return Object.entries(counts)
@@ -806,7 +806,7 @@ class PatientManager {
     }
 
     patients.forEach((patient) => {
-      byRiskLevel[patient.riskLevel] = (byRiskLevel[patient.riskLevel] || 0) + 1
+      byRiskLevel[patient.riskLevel] = (byRiskLevel[patient.riskLevel] ?? 0) + 1
     })
 
     const averageProgress =

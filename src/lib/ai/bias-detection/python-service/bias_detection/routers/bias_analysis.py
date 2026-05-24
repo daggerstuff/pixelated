@@ -9,9 +9,9 @@ from fastapi import APIRouter, Depends, Response, status
 
 from bias_detection.deps import (
     AuthenticatedUser,
-    require_authenticated_user,
     get_analysis_orchestrator,
     get_database_service,
+    require_authenticated_user,
     require_rate_limit,
 )
 from bias_detection.models import BiasAnalysisRequest, BiasAnalysisResponse

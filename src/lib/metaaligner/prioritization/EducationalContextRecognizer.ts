@@ -375,7 +375,7 @@ export class EducationalContextRecognizer {
     queries: { query: string }[],
   ): Promise<EducationalContextResult[]> {
     return Promise.all(
-      queries.map( async (q) => this.recognizeEducationalContext(q.query)),
+      queries.map(async (q) => this.recognizeEducationalContext(q.query)),
     )
   }
 

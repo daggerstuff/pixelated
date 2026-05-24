@@ -35,12 +35,12 @@ function initializeAuth0Management() {
   }
 
   auth0Management ??= new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:logs read:users',
-    });
+    domain: AUTH0_CONFIG.domain,
+    clientId: AUTH0_CONFIG.managementClientId,
+    clientSecret: AUTH0_CONFIG.managementClientSecret,
+    audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+    scope: 'read:logs read:users',
+  })
 }
 
 // Initialize the management client
@@ -139,7 +139,7 @@ export class Auth0ActivityTrackingService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    this.db ??= await mongodb.connect();
+    this.db ??= await mongodb.connect()
     return this.db
   }
 
@@ -361,7 +361,7 @@ export class Auth0ActivityTrackingService {
 
           case 's': // Success login
             // Log successful authentication
-             logSecurityEvent(
+            logSecurityEvent(
               SecurityEventType.AUTHENTICATION_SUCCESS,
               log.user_id,
               {
@@ -379,7 +379,7 @@ export class Auth0ActivityTrackingService {
           await collection.insertOne(securityEvent)
 
           // Also log to the main security event system
-           logSecurityEvent(securityEvent.type, securityEvent.userId, {
+          logSecurityEvent(securityEvent.type, securityEvent.userId, {
             logId: securityEvent.id,
             severity: securityEvent.severity,
             description: securityEvent.description,
@@ -473,7 +473,7 @@ export class Auth0ActivityTrackingService {
       // Calculate summary statistics
       const eventTypes = activities.reduce(
         (acc: Record<string, number>, activity) => {
-          acc[activity.eventType] = (acc[activity.eventType] || 0) + 1
+          acc[activity.eventType] = (acc[activity.eventType] ?? 0) + 1
           return acc
         },
         {},
@@ -614,7 +614,7 @@ export class Auth0ActivityTrackingService {
       })
 
       // Log session termination
-       logSecurityEvent(SecurityEventType.SESSION_TERMINATED, userId, {
+      logSecurityEvent(SecurityEventType.SESSION_TERMINATED, userId, {
         sessionId: sessionId,
         timestamp: new Date().toISOString(),
       })
@@ -630,20 +630,16 @@ export class Auth0ActivityTrackingService {
       console.error('Failed to terminate user session:', error)
 
       // Log session termination error
-       logSecurityEvent(
-        SecurityEventType.SESSION_TERMINATION_ERROR,
-        userId,
-        {
-          sessionId: sessionId,
-          error:
-            error instanceof Error
-              ? error instanceof Error
-                ? error.message
-                : 'Unknown error'
-              : 'Unknown error',
-          timestamp: new Date().toISOString(),
-        },
-      )
+      logSecurityEvent(SecurityEventType.SESSION_TERMINATION_ERROR, userId, {
+        sessionId: sessionId,
+        error:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      })
 
       return false
     }
@@ -663,7 +659,7 @@ export class Auth0ActivityTrackingService {
     }
 
     // Log configuration update
-     logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
+    logSecurityEvent(SecurityEventType.CONFIGURATION_CHANGED, null, {
       configType: 'activity_tracking',
       changes: Object.keys(newConfig),
       timestamp: new Date().toISOString(),

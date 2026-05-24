@@ -598,7 +598,7 @@ export class BiasAuditService {
         key = 'unknown'
       }
 
-      if (!groups[key]) groups[key] = []
+      groups[key] ??= []
       groups[key].push(result)
     }
 
@@ -824,7 +824,7 @@ let biasAuditServiceInstance: BiasAuditService | null = null
 export function getBiasAuditService(
   config?: BiasAuditServiceConfig,
 ): BiasAuditService {
-  biasAuditServiceInstance ??= new BiasAuditService(config);
+  biasAuditServiceInstance ??= new BiasAuditService(config)
   return biasAuditServiceInstance
 }
 

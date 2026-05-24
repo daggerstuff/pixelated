@@ -25,9 +25,9 @@ export function Avatar({
       )}
     >
       {src ? (
-        <img src={src} alt={alt} className='h-full w-full object-cover' />
+        <img src={src} alt={alt} className="h-full w-full object-cover" />
       ) : (
-        <span className='text-sm font-medium'>{initials}</span>
+        <span className="text-sm font-medium">{initials}</span>
       )}
     </div>
   )

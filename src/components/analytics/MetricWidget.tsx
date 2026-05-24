@@ -123,7 +123,9 @@ export function MetricWidget({
           return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
         }
         return `${minutes}:${seconds.toString().padStart(2, '0')}`
-      case "number": { throw new Error('Not implemented yet: "number" case') }
+      case 'number': {
+        throw new Error('Not implemented yet: "number" case')
+      }
       default:
         return numValue.toLocaleString()
     }
@@ -153,17 +155,17 @@ export function MetricWidget({
       className={className}
       variant={variant}
     >
-      <div className='space-y-2'>
-        <div className='text-3xl font-bold' aria-live='polite'>
-          <span className='sr-only'>{title} value</span>
+      <div className="space-y-2">
+        <div className="text-3xl font-bold" aria-live="polite">
+          <span className="sr-only">{title} value</span>
           {prefix}
           {formatValue(currentValue)}
           {suffix}
         </div>
 
         {percentChange !== null && (
-          <div className='flex items-center text-sm'>
-            <span className='text-gray-500 mr-1'>vs previous:</span>
+          <div className="flex items-center text-sm">
+            <span className="text-gray-500 mr-1">vs previous:</span>
             <span
               className={`flex items-center font-medium ${
                 percentChange > 0
@@ -174,11 +176,11 @@ export function MetricWidget({
               }`}
             >
               {percentChange > 0 ? (
-                <ArrowUpRight className='mr-1 h-4 w-4' />
+                <ArrowUpRight className="mr-1 h-4 w-4" />
               ) : percentChange < 0 ? (
-                <ArrowDownRight className='mr-1 h-4 w-4' />
+                <ArrowDownRight className="mr-1 h-4 w-4" />
               ) : (
-                <Minus className='mr-1 h-4 w-4' />
+                <Minus className="mr-1 h-4 w-4" />
               )}
               {Math.abs(percentChange || 0).toFixed(1)}%
             </span>

@@ -30,35 +30,22 @@ class TestRealTimeBiasDetectionIntegration:
     @pytest.fixture
     def bias_detector(self):
         """Create RealTimeBiasDetector instance"""
-        return RealTimeBiasDetector(
-            model_name="fairlearn_classifier",
-            threshold=0.7,
-            enable_feedback=True
-        )
+        return RealTimeBiasDetector(model_name="fairlearn_classifier", threshold=0.7, enable_feedback=True)
 
     @pytest.fixture
     def feedback_manager(self):
         """Create FeedbackLoopManager instance"""
-        return FeedbackLoopManager(
-            update_interval=30,
-            min_feedback_samples=10
-        )
+        return FeedbackLoopManager(update_interval=30, min_feedback_samples=10)
 
     @pytest.fixture
     def streaming_analyzer(self):
         """Create StreamingBiasAnalyzer instance"""
-        return StreamingBiasAnalyzer(
-            window_size=100,
-            slide_interval=10
-        )
+        return StreamingBiasAnalyzer(window_size=100, slide_interval=10)
 
     @pytest.fixture
     def memory_handler(self):
         """Create MemoryUpdateHandler instance"""
-        return MemoryUpdateHandler(
-            update_threshold=0.1,
-            max_batch_size=50
-        )
+        return MemoryUpdateHandler(update_threshold=0.1, max_batch_size=50)
 
     @pytest.mark.asyncio
     async def test_real_time_conversation_analysis(self, bias_detector):
@@ -69,13 +56,9 @@ class TestRealTimeBiasDetectionIntegration:
                 {"role": "user", "content": "I need help with my application"},
                 {"role": "assistant", "content": "I'd be happy to help you with your application"},
                 {"role": "user", "content": "As a woman in tech, I face unique challenges"},
-                {"role": "assistant", "content": "I understand. Women in tech often face specific challenges"}
+                {"role": "assistant", "content": "I understand. Women in tech often face specific challenges"},
             ],
-            "metadata": {
-                "user_id": "user_123",
-                "timestamp": datetime.now().isoformat(),
-                "context": "career_advice"
-            }
+            "metadata": {"user_id": "user_123", "timestamp": datetime.now().isoformat(), "context": "career_advice"},
         }
 
         # Process conversation in real-time
@@ -100,7 +83,7 @@ class TestRealTimeBiasDetectionIntegration:
             "user_feedback": "inaccurate",
             "corrected_bias": {"gender": 0.1, "race": 0.05},
             "timestamp": datetime.now().isoformat(),
-            "user_id": "user_123"
+            "user_id": "user_123",
         }
 
         # Process feedback
@@ -119,12 +102,14 @@ class TestRealTimeBiasDetectionIntegration:
         # Generate test data stream
         test_messages = []
         for i in range(1000):
-            test_messages.append({
-                "id": f"msg_{i}",
-                "content": f"Test message {i} about technology and careers",
-                "timestamp": datetime.now().isoformat(),
-                "user_id": f"user_{i % 100}"
-            })
+            test_messages.append(
+                {
+                    "id": f"msg_{i}",
+                    "content": f"Test message {i} about technology and careers",
+                    "timestamp": datetime.now().isoformat(),
+                    "user_id": f"user_{i % 100}",
+                }
+            )
 
         start_time = time.time()
 
@@ -158,7 +143,7 @@ class TestRealTimeBiasDetectionIntegration:
             "bias_scores": {"gender": 0.8, "race": 0.3, "age": 0.1},
             "confidence": 0.85,
             "context": "job_interview",
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
         # Process detection results
@@ -173,25 +158,27 @@ class TestRealTimeBiasDetectionIntegration:
         assert "update_history" in updated_memory
 
     @pytest.mark.asyncio
-    async def test_end_to_end_bias_detection_pipeline(self, bias_detector, feedback_manager, streaming_analyzer, memory_handler):
+    async def test_end_to_end_bias_detection_pipeline(
+        self, bias_detector, feedback_manager, streaming_analyzer, memory_handler
+    ):
         """Test complete end-to-end bias detection pipeline"""
         # Simulate real conversation flow
         conversation_flow = [
             {
                 "message": "Tell me about leadership opportunities",
                 "user_id": "user_456",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             },
             {
                 "message": "As a minority candidate, I worry about bias in promotions",
-                "user_id": "user_456", 
-                "timestamp": (datetime.now() + timedelta(seconds=30)).isoformat()
+                "user_id": "user_456",
+                "timestamp": (datetime.now() + timedelta(seconds=30)).isoformat(),
             },
             {
                 "message": "What makes someone a good leader?",
                 "user_id": "user_456",
-                "timestamp": (datetime.now() + timedelta(seconds=60)).isoformat()
-            }
+                "timestamp": (datetime.now() + timedelta(seconds=60)).isoformat(),
+            },
         ]
 
         pipeline_results = []
@@ -208,7 +195,7 @@ class TestRealTimeBiasDetectionIntegration:
                 "message_id": msg.get("id", "msg_unknown"),
                 "streaming_analysis": stream_result,
                 "bias_detection": bias_result,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
             pipeline_results.append(combined_result)
@@ -221,7 +208,9 @@ class TestRealTimeBiasDetectionIntegration:
         assert len(pipeline_results) == 3
 
         # Check for bias detection in sensitive messages
-        sensitive_message_results = [r for r in pipeline_results if "minority" in r["streaming_analysis"].get("content", "").lower()]
+        sensitive_message_results = [
+            r for r in pipeline_results if "minority" in r["streaming_analysis"].get("content", "").lower()
+        ]
         assert len(sensitive_message_results) > 0
 
         for result in sensitive_message_results:
@@ -235,36 +224,22 @@ class TestPerformanceOptimizationIntegration:
     @pytest.fixture
     def performance_optimizer(self):
         """Create PerformanceOptimizer instance"""
-        return PerformanceOptimizer(
-            batch_size=32,
-            cache_ttl=3600,
-            max_workers=4
-        )
+        return PerformanceOptimizer(batch_size=32, cache_ttl=3600, max_workers=4)
 
     @pytest.fixture
     def batch_processor(self):
         """Create BatchProcessor instance"""
-        return BatchProcessor(
-            batch_size=64,
-            processing_timeout=30.0
-        )
+        return BatchProcessor(batch_size=64, processing_timeout=30.0)
 
     @pytest.fixture
     def cache_manager(self):
         """Create CacheManager instance"""
-        return CacheManager(
-            max_size=1000,
-            ttl=3600,
-            eviction_policy="lru"
-        )
+        return CacheManager(max_size=1000, ttl=3600, eviction_policy="lru")
 
     @pytest.fixture
     def parallel_processor(self):
         """Create ParallelProcessor instance"""
-        return ParallelProcessor(
-            max_workers=8,
-            chunk_size=16
-        )
+        return ParallelProcessor(max_workers=8, chunk_size=16)
 
     @pytest.mark.asyncio
     async def test_large_dataset_batch_processing(self, batch_processor):
@@ -272,11 +247,13 @@ class TestPerformanceOptimizationIntegration:
         # Generate large test dataset
         large_dataset = []
         for i in range(10000):
-            large_dataset.append({
-                "id": f"record_{i}",
-                "text": f"Sample text for bias analysis {i}",
-                "metadata": {"source": f"source_{i % 10}"}
-            })
+            large_dataset.append(
+                {
+                    "id": f"record_{i}",
+                    "text": f"Sample text for bias analysis {i}",
+                    "metadata": {"source": f"source_{i % 10}"},
+                }
+            )
 
         start_time = time.time()
 
@@ -301,7 +278,7 @@ class TestPerformanceOptimizationIntegration:
             {"text": "Leadership qualities for managers", "context": "hiring"},
             {"text": "Technical skills assessment", "context": "interview"},
             {"text": "Leadership qualities for managers", "context": "hiring"},  # Duplicate
-            {"text": "Team collaboration strategies", "context": "management"}
+            {"text": "Team collaboration strategies", "context": "management"},
         ]
 
         # First run - cache miss
@@ -328,12 +305,14 @@ class TestPerformanceOptimizationIntegration:
         # Create computationally intensive tasks
         complex_tasks = []
         for i in range(100):
-            complex_tasks.append({
-                "id": f"task_{i}",
-                "data": list(range(1000)),  # Large dataset
-                "operation": "bias_analysis",
-                "complexity": "high"
-            })
+            complex_tasks.append(
+                {
+                    "id": f"task_{i}",
+                    "data": list(range(1000)),  # Large dataset
+                    "operation": "bias_analysis",
+                    "complexity": "high",
+                }
+            )
 
         start_time = time.time()
 
@@ -359,7 +338,7 @@ class TestPerformanceOptimizationIntegration:
         operations = [
             {"name": "bias_detection", "duration": 0.5, "memory_usage": 100},
             {"name": "feedback_processing", "duration": 0.2, "memory_usage": 50},
-            {"name": "memory_update", "duration": 0.1, "memory_usage": 30}
+            {"name": "memory_update", "duration": 0.1, "memory_usage": 30},
         ]
 
         for op in operations:
@@ -397,22 +376,22 @@ class TestBiasDetectionMetricsIntegration:
                 "bias_type": "gender",
                 "confidence": 0.85,
                 "context": "hiring",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             },
             {
                 "event_type": "false_positive",
                 "bias_type": "race",
                 "confidence": 0.45,
                 "context": "promotion",
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             },
             {
                 "event_type": "bias_corrected",
                 "bias_type": "age",
                 "confidence": 0.72,
                 "context": "interview",
-                "timestamp": datetime.now().isoformat()
-            }
+                "timestamp": datetime.now().isoformat(),
+            },
         ]
 
         # Track events
@@ -444,7 +423,7 @@ class TestBiasDetectionMetricsIntegration:
                 "bias_detected": True,
                 "bias_type": "gender",
                 "confidence": 0.9,
-                "context": "performance_review"
+                "context": "performance_review",
             }
 
             # Track in Sentry
@@ -463,21 +442,19 @@ class TestBiasDetectionMetricsIntegration:
     async def test_metrics_alert_system(self, bias_metrics):
         """Test metrics-based alert system"""
         # Configure alert thresholds
-        alert_thresholds = {
-            "detection_rate": 0.8,
-            "false_positive_rate": 0.2,
-            "accuracy": 0.7
-        }
+        alert_thresholds = {"detection_rate": 0.8, "false_positive_rate": 0.2, "accuracy": 0.7}
 
         # Simulate high bias detection scenario
         for i in range(100):
-            bias_metrics.track_event({
-                "event_type": "bias_detected",
-                "bias_type": "gender",
-                "confidence": 0.9,
-                "context": "hiring",
-                "timestamp": datetime.now().isoformat()
-            })
+            bias_metrics.track_event(
+                {
+                    "event_type": "bias_detected",
+                    "bias_type": "gender",
+                    "confidence": 0.9,
+                    "context": "hiring",
+                    "timestamp": datetime.now().isoformat(),
+                }
+            )
 
         # Check for alerts
         alerts = bias_metrics.check_alerts(alert_thresholds)
