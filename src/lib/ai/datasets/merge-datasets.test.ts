@@ -2,7 +2,7 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { getMergedDatasetPath, validateMergedDataset } from "./merge-datasets";
+import { getMergedDatasetPath, mergedDatasetExists, validateMergedDataset } from "./merge-datasets";
 
 // Note: mergeAllDatasets tests are integration tests that require
 // the actual ALLOWED_DIRECTORIES setup. These unit tests focus on
@@ -35,6 +35,26 @@ describe("merge-datasets", () => {
       expect(path).toContain("data");
       expect(path).toContain("merged");
     });
+  });
+});
+
+describe("mergedDatasetExists", () => {
+  it("should return false when no merged dataset exists", () => {
+    const exists = mergedDatasetExists("nonexistent-" + Date.now() + ".jsonl");
+    expect(exists).toBe(false);
+  });
+
+  it("should return true for a created merged dataset", () => {
+    const projectMergedDir = join(process.cwd(), "data", "merged");
+    mkdirSync(projectMergedDir, { recursive: true });
+    const testFile = join(projectMergedDir, "test-exists.jsonl");
+    writeFileSync(testFile, '{"test":"data"}', "utf-8");
+
+    expect(mergedDatasetExists("test-exists.jsonl")).toBe(true);
+  });
+
+  it("should default to mental_health_dataset.jsonl when no path given", () => {
+    expect(mergedDatasetExists()).toBe(false);
   });
 });
 

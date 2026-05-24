@@ -40,8 +40,8 @@ export interface HuggingFaceRecord {
 
 const SYSTEM_PROMPT = `You are an empathetic, professional mental health counselor. Respond to clients with warmth, validation, and evidence-based therapeutic techniques. Maintain appropriate boundaries while providing supportive guidance. Prioritize client safety and wellbeing.`;
 
-export function preparedDatasetsExist(): PreparedDatasetStatus {
-  const dataDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
+export function preparedDatasetsExist(baseDir?: string): PreparedDatasetStatus {
+  const dataDir = baseDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
   const openaiPath = safeJoin(dataDir, "openai_dataset.jsonl");
   const huggingfacePath = safeJoin(dataDir, "huggingface_dataset.jsonl");
 
@@ -81,15 +81,15 @@ async function* findNormalizedFiles(baseDir: string): AsyncGenerator<string> {
   }
 }
 
-export async function prepareForOpenAI(): Promise<string | null> {
+export async function prepareForOpenAI(sourceDir?: string, outputDir?: string): Promise<string | null> {
   try {
     logger.info("Preparing dataset for OpenAI fine-tuning format");
 
-    const normalizedDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
-    const outputDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
-    const outputPath = safeJoin(outputDir, "openai_dataset.jsonl");
+    const normalizedDir = sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
+    const outDir = outputDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
+    const outputPath = safeJoin(outDir, "openai_dataset.jsonl");
 
-    mkdirSync(outputDir, { recursive: true });
+    mkdirSync(outDir, { recursive: true });
 
     let recordCount = 0;
     let skippedCount = 0;
@@ -142,15 +142,15 @@ export async function prepareForOpenAI(): Promise<string | null> {
   }
 }
 
-export async function prepareForHuggingFace(): Promise<string | null> {
+export async function prepareForHuggingFace(sourceDir?: string, outputDir?: string): Promise<string | null> {
   try {
     logger.info("Preparing dataset for HuggingFace format");
 
-    const normalizedDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
-    const outputDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
-    const outputPath = safeJoin(outputDir, "huggingface_dataset.jsonl");
+    const normalizedDir = sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
+    const outDir = outputDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
+    const outputPath = safeJoin(outDir, "huggingface_dataset.jsonl");
 
-    mkdirSync(outputDir, { recursive: true });
+    mkdirSync(outDir, { recursive: true });
 
     let recordCount = 0;
     let skippedCount = 0;
@@ -203,9 +203,9 @@ export async function prepareForHuggingFace(): Promise<string | null> {
   }
 }
 
-export async function prepareAllFormats(): Promise<DatasetPaths> {
-  const openaiPath = await prepareForOpenAI();
-  const huggingfacePath = await prepareForHuggingFace();
+export async function prepareAllFormats(sourceDir?: string, outputDir?: string): Promise<DatasetPaths> {
+  const openaiPath = await prepareForOpenAI(sourceDir, outputDir);
+  const huggingfacePath = await prepareForHuggingFace(sourceDir, outputDir);
 
   return {
     openai: openaiPath,
