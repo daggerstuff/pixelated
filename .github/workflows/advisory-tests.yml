@@ -24,7 +24,7 @@ env:
 jobs:
   advisory-test-suite:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v6
@@ -36,15 +36,15 @@ jobs:
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+        with:
+          version: 11.3.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 24.14.1
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 11.1.2
 
       - name: Get pnpm store path
         id: pnpm-store

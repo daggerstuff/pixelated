@@ -22,6 +22,23 @@ from ai.rag.nemotron_benchmark import (
 )
 
 
+def _is_nvidia_api_unreachable() -> bool:
+    """Check if NVIDIA API should be skipped or is unreachable."""
+    if os.environ.get("RUN_LIVE_TESTS") != "true":
+        return True
+    if not os.environ.get("NVIDIA_API_KEY"):
+        return True
+    import socket
+    try:
+        socket.setdefaulttimeout(0.5)
+        # Attempt to connect to Google DNS IP to check if internet egress is active at all
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(("8.8.8.8", 53))
+        return False
+    except OSError:
+        return True
+
+
 @asynccontextmanager
 async def mock_async_context_manager(return_value=None, side_effect=None):
     """Helper to create proper async context manager mock."""
@@ -252,8 +269,8 @@ class TestBenchmarkIntegration:
     """Integration tests for benchmark (requires API key)."""
 
     @pytest.mark.skipif(
-        not os.environ.get("NVIDIA_API_KEY"),
-        reason="NVIDIA_API_KEY not found in environment",
+        _is_nvidia_api_unreachable(),
+        reason="NVIDIA API is not reachable or NVIDIA_API_KEY not found",
     )
     @pytest.mark.asyncio
     async def test_benchmark_single_model_live(self):

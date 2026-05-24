@@ -70,6 +70,7 @@ describe("preparedDatasetsExist", () => {
 
   beforeEach(() => {
     preparedDir = join(process.cwd(), "data", "prepared");
+    try { rmSync(preparedDir, { recursive: true, force: true }); } catch {}
   });
 
   afterEach(() => {
@@ -112,5 +113,19 @@ describe("preparedDatasetsExist", () => {
     const status = preparedDatasetsExist();
     expect(status.openai).toBe(true);
     expect(status.huggingface).toBe(true);
+  });
+
+  it("should check custom baseDir when provided", () => {
+    const customDir = join(process.cwd(), "data", "custom-scoped");
+    try { rmSync(customDir, { recursive: true, force: true }); } catch {} finally {
+      mkdirSync(customDir, { recursive: true });
+    }
+    writeFileSync(join(customDir, "openai_dataset.jsonl"), "test", "utf-8");
+
+    const status = preparedDatasetsExist(customDir);
+    expect(status.openai).toBe(true);
+    expect(status.huggingface).toBe(false);
+
+    try { rmSync(customDir, { recursive: true, force: true }); } catch {}
   });
 });
