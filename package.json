@@ -312,7 +312,7 @@
     "twilio": "latest",
     "uuid": "latest",
     "vue": "latest",
-    "ws": "^8.20.1",
+    "ws": "^8.21.0",
     "zod": "^4.4.3",
     "zustand": "latest"
   },
