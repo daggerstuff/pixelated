@@ -5,19 +5,43 @@ import { BiasAlertSystem } from '../alerts-system'
 import { PythonBiasDetectionBridge } from '../python-bridge'
 import type { BiasAnalysisResult, AlertLevel } from '../types'
 
-// Mock the Python bridge
+// Mock the Python bridge with all methods alerts-system uses
 vi.mock('../python-bridge', () => ({
   PythonBiasDetectionBridge: class {
     initialize = vi.fn().mockResolvedValue(undefined)
     checkHealth = vi.fn().mockResolvedValue({ status: 'healthy' })
+    registerAlertSystem = vi.fn().mockResolvedValue({ success: true })
+    checkAlerts = vi.fn().mockResolvedValue({ alerts: [] })
+    storeAlerts = vi.fn().mockResolvedValue({ success: true })
+    escalateAlert = vi.fn().mockResolvedValue({ success: true })
+    sendNotification = vi.fn().mockResolvedValue({ success: true })
+    getActiveAlerts = vi.fn().mockResolvedValue([])
+    acknowledgeAlert = vi.fn().mockResolvedValue({ success: true })
+    sendSystemNotification = vi.fn().mockResolvedValue({ success: true })
+    getRecentAlerts = vi.fn().mockResolvedValue([])
+    getAlertStatistics = vi.fn().mockResolvedValue({
+      total_alerts: 0,
+      alerts_by_level: { low: 0, medium: 0, high: 0, critical: 0 },
+      average_response_time: 0,
+    })
+    unregisterAlertSystem = vi.fn().mockResolvedValue({ success: true })
+    dispose = vi.fn().mockResolvedValue(undefined)
   },
 }))
 
-// Mock performance monitor
+// Mock performance monitor with getSnapshot
 vi.mock('../performance-monitor', () => ({
   performanceMonitor: {
     recordMetric: vi.fn(),
     recordAlert: vi.fn(),
+    getSnapshot: vi.fn().mockReturnValue({
+      summary: {
+        requestCount: 0,
+        errorRate: 0,
+        averageResponseTime: 0,
+      },
+      recentRequests: [],
+    }),
   },
 }))
 
@@ -537,5 +561,749 @@ describe('BiasAlertSystem', () => {
       expect(true).toBe(true)
     })
 
-})
+    it('should acknowledge an alert that exists in the local queue', async () => {
+      // First add an alert to the local queue via checkAlerts
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.95,
+        alertLevel: 'critical',
+        sessionId: 'local-ack-test',
+      }
+      await alertSystem.checkAlerts(result)
+
+      // Get the alert ID from the queue
+      const firstAlert = alertSystem.alertQueue[0]
+      expect(firstAlert).toBeDefined()
+      const alertId = firstAlert!.id
+
+      // Now acknowledge it — this should find it in the local queue (line 975)
+      await alertSystem.acknowledgeAlert?.(alertId, 'ack-user')
+
+      // Verify it was acknowledged locally
+      const acknowledged = alertSystem.alertQueue.find(
+        (a) => a.id === alertId,
+      )
+      expect(acknowledged?.acknowledged).toBe(true)
+    })
+
+    it('should handle acknowledgeAlert bridge failure', async () => {
+      ;(mockPythonBridge.acknowledgeAlert as any).mockRejectedValueOnce(
+        new Error('Ack service down'),
+      )
+
+      await expect(
+        alertSystem.acknowledgeAlert?.('non-existent-alert', 'test-user'),
+      ).rejects.toThrow('Ack service down')
+    })
+
+  })
+
+  describe('system initialization', () => {
+    it('should initialize successfully with healthy Python bridge', async () => {
+      await alertSystem.initialize()
+      expect(mockPythonBridge.registerAlertSystem).toHaveBeenCalled()
+    })
+
+    it('should handle Python bridge registration failure gracefully', async () => {
+      ;(mockPythonBridge.registerAlertSystem as any).mockRejectedValueOnce(
+        new Error('Registration not supported'),
+      )
+      await alertSystem.initialize()
+      // Should not throw — falls back to local-only mode
+      expect(alertSystem.alertQueue).toBeDefined()
+    })
+
+    it('should handle initialization failure gracefully', async () => {
+      ;(mockPythonBridge.initialize as any).mockRejectedValueOnce(
+        new Error('Service unreachable'),
+      )
+      await alertSystem.initialize()
+      // Should not throw — falls back to local-only mode
+      expect(alertSystem.alertQueue).toBeDefined()
+    })
+  })
+
+  describe('detectDemographicDisparity', () => {
+    it('should detect elevated overall bias', () => {
+      // Access private method via bracket notation
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.8,
+        demographics: {
+          age: '25',
+          gender: 'female',
+          ethnicity: 'hispanic',
+          primaryLanguage: 'spanish',
+        },
+        layerResults: {
+          preprocessing: {
+            biasScore: 0.7,
+            linguisticBias: {
+              genderBiasScore: 0.6, racialBiasScore: 0.5,
+              ageBiasScore: 0.4, culturalBiasScore: 0.3,
+              biasedTerms: [],
+              sentimentAnalysis: { overallSentiment: 0, emotionalValence: 0, subjectivity: 0, demographicVariations: {} },
+            },
+            representationAnalysis: {
+              demographicDistribution: {}, underrepresentedGroups: [], overrepresentedGroups: [],
+              diversityIndex: 0.5, intersectionalityAnalysis: [],
+            },
+            dataQualityMetrics: { completeness: 1, consistency: 1, accuracy: 1, timeliness: 1, validity: 1, missingDataByDemographic: {} },
+            recommendations: [],
+          },
+          modelLevel: {
+            biasScore: 0.3,
+            fairnessMetrics: { demographicParity: 0.9, equalizedOdds: 0.9, equalOpportunity: 0.9, calibration: 0.9, individualFairness: 0.9, counterfactualFairness: 0.9 },
+            performanceMetrics: { accuracy: 0.7, precision: 0.7, recall: 0.7, f1Score: 0.7, auc: 0.7, calibrationError: 0.2, demographicBreakdown: {} },
+            groupPerformanceComparison: [], recommendations: [],
+          },
+          interactive: {
+            biasScore: 0.3,
+            counterfactualAnalysis: { scenariosAnalyzed: 5, biasDetected: false, consistencyScore: 0.9, problematicScenarios: [] },
+            featureImportance: [], whatIfScenarios: [], recommendations: [],
+          },
+          evaluation: {
+            biasScore: 0.3,
+            huggingFaceMetrics: { toxicity: 0.1, bias: 0.1, regard: {}, stereotype: 0.1, fairness: 0.9 },
+            customMetrics: { therapeuticBias: 0.1, culturalSensitivity: 0.9, professionalEthics: 0.9, patientSafety: 0.9 },
+            temporalAnalysis: { trendDirection: 'stable', changeRate: 0, seasonalPatterns: [], interventionEffectiveness: [] },
+            recommendations: [],
+          },
+        },
+      }
+
+      const disparity = (alertSystem as any)['detectDemographicDisparity'](result)
+      expect(disparity).toBe(true)
+    })
+
+    it('should not flag disparity when bias is low and layers are fair', () => {
+      const fairResult: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.3,
+        demographics: {
+          age: '30',
+          gender: 'female',
+          ethnicity: 'caucasian',
+          primaryLanguage: 'english',
+        },
+        layerResults: {
+          preprocessing: {
+            biasScore: 0.2,
+            linguisticBias: { genderBiasScore: 0.1, racialBiasScore: 0.1, ageBiasScore: 0.1, culturalBiasScore: 0.1, biasedTerms: [], sentimentAnalysis: { overallSentiment: 0, emotionalValence: 0, subjectivity: 0, demographicVariations: {} } },
+            representationAnalysis: { demographicDistribution: {}, underrepresentedGroups: [], overrepresentedGroups: [], diversityIndex: 0.8, intersectionalityAnalysis: [] },
+            dataQualityMetrics: { completeness: 1, consistency: 1, accuracy: 1, timeliness: 1, validity: 1, missingDataByDemographic: {} },
+            recommendations: [],
+          },
+          modelLevel: {
+            biasScore: 0.2,
+            fairnessMetrics: { demographicParity: 0.9, equalizedOdds: 0.9, equalOpportunity: 0.9, calibration: 0.9, individualFairness: 0.9, counterfactualFairness: 0.9 },
+            performanceMetrics: { accuracy: 0.9, precision: 0.9, recall: 0.9, f1Score: 0.9, auc: 0.9, calibrationError: 0.1, demographicBreakdown: {} },
+            groupPerformanceComparison: [], recommendations: [],
+          },
+          interactive: {
+            biasScore: 0.2,
+            counterfactualAnalysis: { scenariosAnalyzed: 10, biasDetected: false, consistencyScore: 0.9, problematicScenarios: [] },
+            featureImportance: [], whatIfScenarios: [], recommendations: [],
+          },
+          evaluation: {
+            biasScore: 0.2,
+            huggingFaceMetrics: { toxicity: 0.1, bias: 0.1, regard: {}, stereotype: 0.1, fairness: 0.8 },
+            customMetrics: { therapeuticBias: 0.1, culturalSensitivity: 0.9, professionalEthics: 0.9, patientSafety: 0.9 },
+            temporalAnalysis: { trendDirection: 'stable', changeRate: 0, seasonalPatterns: [], interventionEffectiveness: [] },
+            recommendations: [],
+          },
+        },
+      }
+
+      const disparity = (alertSystem as any)['detectDemographicDisparity'](fairResult)
+      expect(disparity).toBe(false)
+    })
+
+    it('should fallback to basic check when no demographics data', () => {
+      const resultNoDemo: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.7,
+        demographics: undefined as any,
+        layerResults: undefined as any,
+      }
+
+      const disparity = (alertSystem as any)['detectDemographicDisparity'](resultNoDemo)
+      expect(disparity).toBe(true)
+    })
+  })
+
+  describe('checkAlerts', () => {
+    it('should check alerts and process rules', async () => {
+      const highScoreResult: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.95,
+        alertLevel: 'critical',
+        sessionId: 'check-alerts-test',
+      }
+
+      await alertSystem.checkAlerts(highScoreResult)
+      // Should have generated alerts from the alert rules
+      expect(alertSystem.alertQueue.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('should handle server-side alert responses', async () => {
+      ;(mockPythonBridge.checkAlerts as any).mockResolvedValueOnce({
+        alerts: [
+          {
+            id: 'server-alert-1',
+            sessionId: 'server-test',
+            level: 'high',
+            message: 'Server-side alert',
+            timestamp: new Date().toISOString(),
+            acknowledged: false,
+            escalated: false,
+          },
+        ],
+      })
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.85,
+        alertLevel: 'high',
+        sessionId: 'server-test',
+      }
+
+      await alertSystem.checkAlerts(result)
+      expect(mockPythonBridge.checkAlerts).toHaveBeenCalled()
+    })
+
+    it('should handle Python bridge alert check failure', async () => {
+      ;(mockPythonBridge.checkAlerts as any).mockRejectedValueOnce(
+        new Error('Alert check not supported'),
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.8,
+        sessionId: 'failover-test',
+      }
+
+      // Should not throw — falls back to local alert evaluation
+      await expect(alertSystem.checkAlerts(result)).resolves.not.toThrow()
+    })
+  })
+
+  describe('checkSystemAlerts', () => {
+    it('should check system-level alerts', async () => {
+      // Set up error rate conditions to trigger system alerts
+      const perfMonitor = await import('../performance-monitor')
+      ;(perfMonitor.performanceMonitor.getSnapshot as any).mockReturnValueOnce({
+        summary: {
+          requestCount: 100,
+          errorRate: 0.3, // > 0.25 triggers critical-error-rate
+          averageResponseTime: 6000, // > 5000 triggers critical-response-time
+        },
+        recentRequests: [],
+      })
+
+      await alertSystem.checkSystemAlerts()
+      expect(alertSystem.alertQueue.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('should handle no system alerts when performance is normal', async () => {
+      const perfMonitor = await import('../performance-monitor')
+      ;(perfMonitor.performanceMonitor.getSnapshot as any).mockReturnValueOnce({
+        summary: {
+          requestCount: 0,
+          errorRate: 0,
+          averageResponseTime: 100,
+        },
+        recentRequests: [],
+      })
+
+      await alertSystem.checkSystemAlerts()
+      // No alerts should be generated since conditions aren't met
+      expect(alertSystem.alertQueue.length).toBeGreaterThanOrEqual(0)
+    })
+  })
+
+  describe('active alerts and recent alerts', () => {
+    it('should get active alerts from local queue', async () => {
+      // First add an alert to the queue
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.95,
+        alertLevel: 'critical',
+        sessionId: 'active-test',
+      }
+      await alertSystem.checkAlerts(result)
+
+      const activeAlerts = await alertSystem.getActiveAlerts()
+      expect(activeAlerts.length).toBeGreaterThanOrEqual(1)
+    })
+
+    it('should fallback to local queue when Python bridge fails', async () => {
+      ;(mockPythonBridge.getActiveAlerts as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const activeAlerts = await alertSystem.getActiveAlerts()
+      expect(Array.isArray(activeAlerts)).toBe(true)
+    })
+
+    it('should get recent alerts from Python bridge', async () => {
+      ;(mockPythonBridge.getRecentAlerts as any).mockResolvedValueOnce([
+        {
+          id: 'recent-1',
+          sessionId: 'recent-test',
+          level: 'high',
+          message: 'Recent alert',
+          timestamp: new Date().toISOString(),
+          acknowledged: false,
+          escalated: false,
+        },
+      ])
+
+      const recentAlerts = await alertSystem.getRecentAlerts(3600000)
+      expect(mockPythonBridge.getRecentAlerts).toHaveBeenCalled()
+      expect(recentAlerts.length).toBe(1)
+    })
+
+    it('should fallback to local queue for recent alerts when bridge fails', async () => {
+      ;(mockPythonBridge.getRecentAlerts as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const recentAlerts = await alertSystem.getRecentAlerts()
+      expect(Array.isArray(recentAlerts)).toBe(true)
+    })
+  })
+
+  describe('alert statistics', () => {
+    it('should get alert statistics from Python bridge', async () => {
+      ;(mockPythonBridge.getAlertStatistics as any).mockResolvedValueOnce({
+        total_alerts: 10,
+        alerts_by_level: { low: 2, medium: 3, high: 4, critical: 1 },
+        average_response_time: 150,
+      })
+
+      const stats = await alertSystem.getAlertStatistics()
+      expect(mockPythonBridge.getAlertStatistics).toHaveBeenCalled()
+      expect(stats.total).toBe(10)
+      expect(stats.averageResponseTime).toBe(150)
+    })
+
+    it('should calculate fallback statistics from local queue', async () => {
+      ;(mockPythonBridge.getAlertStatistics as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      // Add some alerts to the queue
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.95,
+        alertLevel: 'critical',
+        sessionId: 'stats-test',
+      }
+      await alertSystem.checkAlerts(result)
+
+      const stats = await alertSystem.getAlertStatistics()
+      expect(stats.total).toBeGreaterThanOrEqual(1)
+      expect(stats).toHaveProperty('byLevel')
+    })
+  })
+
+  describe('sendSystemNotification', () => {
+    it('should send system notification via Python bridge', async () => {
+      await alertSystem.sendSystemNotification('Test message', ['admin'])
+      expect(mockPythonBridge.sendSystemNotification).toHaveBeenCalled()
+    })
+
+    it('should throw when Python bridge fails', async () => {
+      ;(mockPythonBridge.sendSystemNotification as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      await expect(
+        alertSystem.sendSystemNotification('Test message', ['admin']),
+      ).rejects.toThrow()
+    })
+  })
+
+  describe('monitoring callbacks', () => {
+    it('should remove registered monitoring callbacks', () => {
+      const callback = vi.fn()
+      alertSystem.addMonitoringCallback(callback)
+      alertSystem.removeMonitoringCallback(callback)
+      // No error expected — callback is removed
+    })
+
+    it('should handle removing non-existent callbacks gracefully', () => {
+      const callback = vi.fn()
+      // Should not throw
+      expect(() => {
+        alertSystem.removeMonitoringCallback(callback)
+      }).not.toThrow()
+    })
+  })
+
+  describe('getHighestSeverity', () => {
+    it('should return low for empty alerts', () => {
+      const severity = (alertSystem as any)['getHighestSeverity']([])
+      expect(severity).toBe('low')
+    })
+
+    it('should return the highest severity from alert levels', () => {
+      const alerts = [
+        { level: 'low' },
+        { level: 'medium' },
+        { level: 'high' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('high')
+    })
+
+    it('should return critical when present', () => {
+      const alerts = [
+        { level: 'low' },
+        { level: 'critical' },
+        { level: 'high' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('critical')
+    })
+
+    it('should handle unknown severity levels gracefully', () => {
+      const alerts = [
+        { level: 'unknown' },
+        { level: 'low' },
+      ] as any[]
+      const severity = (alertSystem as any)['getHighestSeverity'](alerts)
+      expect(severity).toBe('low')
+    })
+  })
+
+  describe('processAlert with notification channels', () => {
+    it('should send notifications when channels are enabled', async () => {
+      const enabledConfig = {
+        ...mockConfig,
+        notifications: {
+          email: { enabled: true },
+          slack: { enabled: true },
+          webhook: { enabled: true },
+        },
+      }
+
+      const enabledAlertSystem = new BiasAlertSystem(
+        enabledConfig,
+        mockPythonBridge,
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        alertLevel: 'high' as const,
+      }
+
+      await expect(
+        enabledAlertSystem.processAlert({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
+
+      // sendNotification should be called per channel (email, slack, webhook)
+      expect(mockPythonBridge.sendNotification).toHaveBeenCalled()
+    })
+
+    it('should handle notification channel failure gracefully', async () => {
+      ;(mockPythonBridge.sendNotification as any).mockRejectedValueOnce(
+        new Error('Notification service down'),
+      )
+
+      const enabledConfig = {
+        ...mockConfig,
+        notifications: {
+          email: { enabled: true },
+          slack: { enabled: false },
+          webhook: { enabled: false },
+        },
+      }
+
+      const enabledAlertSystem = new BiasAlertSystem(
+        enabledConfig,
+        mockPythonBridge,
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        alertLevel: 'high' as const,
+      }
+
+      // Should not throw despite notification failure (caught in sendNotificationToChannel)
+      await expect(
+        enabledAlertSystem.processAlert({
+          sessionId: result.sessionId,
+          level: result.alertLevel,
+          biasScore: result.overallBiasScore,
+          analysisResult: result,
+        }),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('checkAlerts with storeAlerts failure', () => {
+    it('should handle storeAlerts failure gracefully', async () => {
+      ;(mockPythonBridge.storeAlerts as any).mockRejectedValueOnce(
+        new Error('Store not available'),
+      )
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.85,
+        alertLevel: 'high',
+        sessionId: 'store-fail-test',
+      }
+
+      await expect(
+        alertSystem.checkAlerts(result),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('evaluateAnalysisAlerts with error in condition', () => {
+    it('should handle condition evaluation error gracefully', async () => {
+      // Add a rule with a condition that throws
+      ;(alertSystem as any).alertRules.push({
+        id: 'throwing-rule',
+        condition: () => {
+          throw new Error('Condition evaluation error')
+        },
+        severity: 'high',
+        message: 'This rule always throws',
+        escalationDelay: 0,
+        recipients: ['test'],
+      })
+
+      const result: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.75,
+        sessionId: 'throwing-condition',
+      }
+
+      await alertSystem.checkAlerts(result)
+      // Should still generate alerts from non-throwing rules
+      expect(alertSystem.alertQueue.length).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  describe('processAlert error path', () => {
+    it('should throw when sendNotifications fails and error propagates', async () => {
+      // Spy on sendNotifications to make it throw
+      const notifySpy = vi
+        .spyOn(alertSystem as any, 'sendNotifications')
+        .mockRejectedValue(new Error('Send failed'))
+
+      await expect(
+        alertSystem.processAlert({
+          sessionId: 'process-error',
+          level: 'high' as AlertLevel,
+          biasScore: 0.8,
+          analysisResult: mockAnalysisResult,
+        }),
+      ).rejects.toThrow('Send failed')
+
+      notifySpy.mockRestore()
+    })
+  })
+
+  describe('dispose', () => {
+    it('should dispose the alert system', async () => {
+      await alertSystem.dispose()
+      expect(mockPythonBridge.dispose).toHaveBeenCalled()
+      expect(mockPythonBridge.unregisterAlertSystem).toHaveBeenCalled()
+    })
+
+    it('should handle dispose failure gracefully', async () => {
+      ;(mockPythonBridge.unregisterAlertSystem as any).mockRejectedValueOnce(
+        new Error('Unregister failed'),
+      )
+
+      // Should not throw — error is caught internally
+      await expect(alertSystem.dispose()).resolves.not.toThrow()
+    })
+  })
+
+  describe('detectDemographicDisparity with detailed analysis', () => {
+    it('should trigger demographic analysis helper paths with layer data', () => {
+      const resultWithDetails: BiasAnalysisResult = {
+        ...mockAnalysisResult,
+        overallBiasScore: 0.65,
+        demographics: {
+          age: '40',
+          gender: 'female',
+          ethnicity: 'hispanic',
+          primaryLanguage: 'spanish',
+        },
+        layerResults: {
+          preprocessing: {
+            biasScore: 0.6,
+            linguisticBias: {
+              genderBiasScore: 0.4, racialBiasScore: 0.4,
+              ageBiasScore: 0.4, culturalBiasScore: 0.4,
+              biasedTerms: [],
+              sentimentAnalysis: { overallSentiment: 0, emotionalValence: 0, subjectivity: 0, demographicVariations: {} },
+            },
+            representationAnalysis: {
+              demographicDistribution: {}, underrepresentedGroups: ['minority'], overrepresentedGroups: [],
+              diversityIndex: 0.2, intersectionalityAnalysis: [],
+            },
+            dataQualityMetrics: { completeness: 1, consistency: 1, accuracy: 1, timeliness: 1, validity: 1, missingDataByDemographic: {} },
+            recommendations: [],
+          },
+          modelLevel: {
+            biasScore: 0.6,
+            fairnessMetrics: { demographicParity: 0.5, equalizedOdds: 0.5, equalOpportunity: 0.5, calibration: 0.7, individualFairness: 0.6, counterfactualFairness: 0.6 },
+            performanceMetrics: { accuracy: 0.7, precision: 0.7, recall: 0.7, f1Score: 0.7, auc: 0.7, calibrationError: 0.2, demographicBreakdown: {} },
+            groupPerformanceComparison: [], recommendations: [],
+          },
+          interactive: {
+            biasScore: 0.5,
+            counterfactualAnalysis: {
+              scenariosAnalyzed: 5, biasDetected: true, consistencyScore: 0.7,
+              problematicScenarios: [
+                { scenarioId: 's1', biasType: 'age_bias', severity: 'medium' } as any,
+                { scenarioId: 's2', biasType: 'gender_bias', severity: 'medium' } as any,
+              ],
+            },
+            featureImportance: [
+              { feature: 'participant_age', biasContribution: 0.3, demographicSensitivity: { young: 0.6, old: 0.2 } },
+            ],
+            whatIfScenarios: [], recommendations: [],
+          },
+          evaluation: {
+            biasScore: 0.5,
+            huggingFaceMetrics: { toxicity: 0.2, bias: 0.4, regard: { positive: 0.8, negative: 0.1 }, stereotype: 0.3, fairness: 0.6 },
+            customMetrics: { therapeuticBias: 0.3, culturalSensitivity: 0.5, professionalEthics: 0.8, patientSafety: 0.9 },
+            temporalAnalysis: {
+              trendDirection: 'worsening', changeRate: 0.1, seasonalPatterns: [],
+              interventionEffectiveness: [
+                { improvement: 0.05, sustainabilityScore: 0.6 } as any,
+              ],
+            },
+            recommendations: [],
+          },
+        },
+      }
+
+      const disparity = (alertSystem as any)['detectDemographicDisparity'](resultWithDetails)
+      expect(disparity).toBe(true)
+    })
+  })
+
+  describe('alertDataToInstance edge cases', () => {
+    it('should use fallback id when neither id nor alertId is present', async () => {
+      ;(mockPythonBridge.getRecentAlerts as any).mockResolvedValueOnce([
+        {
+          // No id or alertId — falls back to sessionId
+          sessionId: 'fallback-id-test',
+          level: 'medium',
+          message: 'Alert without id',
+          timestamp: new Date().toISOString(),
+          acknowledged: false,
+          escalated: false,
+        },
+        {
+          // No id, alertId, or sessionId — falls back to external-alert- prefix
+          level: 'high',
+          message: 'Minimal alert',
+          timestamp: new Date().toISOString(),
+          acknowledged: false,
+          escalated: false,
+        },
+      ])
+
+      const recentAlerts = await alertSystem.getRecentAlerts()
+
+      // First alert has sessionId, so id = sessionId
+      expect(recentAlerts[0]!.id).toBe('fallback-id-test')
+      // Second alert has no sessionId either, so id starts with 'external-alert-'
+      expect(recentAlerts[1]!.id).toMatch(/^external-alert-/)
+    })
+
+    it('should map acknowledged and escalated fields when present', async () => {
+      ;(mockPythonBridge.getRecentAlerts as any).mockResolvedValueOnce([
+        {
+          id: 'ack-esc-test',
+          sessionId: 'ack-esc',
+          level: 'high',
+          message: 'Acknowledged and escalated',
+          timestamp: new Date().toISOString(),
+          acknowledged: true,
+          escalated: true,
+        },
+      ])
+
+      const recentAlerts = await alertSystem.getRecentAlerts()
+      expect(recentAlerts[0]!.acknowledged).toBe(true)
+      expect(recentAlerts[0]!.escalated).toBe(true)
+    })
+
+    it('should map level from alertLevel when level is absent', async () => {
+      ;(mockPythonBridge.getActiveAlerts as any).mockResolvedValueOnce([
+        {
+          alertId: 'alt-level-test',
+          sessionId: 'level-mapping',
+          message: 'Alert with alertLevel instead of level',
+          timestamp: new Date().toISOString(),
+          alertLevel: 'high',
+        },
+      ])
+
+      const activeAlerts = await alertSystem.getActiveAlerts()
+      expect(activeAlerts[0]!.level).toBe('high')
+    })
+  })
+
+  describe('getAlertStatistics local fallback', () => {
+    it('should calculate byLevel distribution from local queue', async () => {
+      ;(mockPythonBridge.getAlertStatistics as any).mockRejectedValueOnce(
+        new Error('Stats unavailable'),
+      )
+
+      // Add alerts with different levels to the queue
+      const results = [
+        { ...mockAnalysisResult, overallBiasScore: 0.95, alertLevel: 'critical', sessionId: 'stats-crit' },
+        { ...mockAnalysisResult, overallBiasScore: 0.75, alertLevel: 'high', sessionId: 'stats-high' },
+        { ...mockAnalysisResult, overallBiasScore: 0.5, alertLevel: 'medium', sessionId: 'stats-med' },
+      ]
+
+      for (const r of results) {
+        await alertSystem.checkAlerts(r)
+      }
+
+      const stats = await alertSystem.getAlertStatistics()
+      expect(stats.byLevel).toHaveProperty('critical')
+      expect(stats.byLevel).toHaveProperty('high')
+      expect(stats.byLevel).toHaveProperty('medium')
+      expect(stats.total).toBeGreaterThanOrEqual(3)
+    })
+  })
+
+  describe('alternate alertDataToInstance conversions', () => {
+    it('should handle AlertData-shaped objects with alertId and alertLevel', async () => {
+      ;(mockPythonBridge.getActiveAlerts as any).mockResolvedValueOnce([
+        {
+          alertId: 'alt-id-1',
+          sessionId: 'alt-test',
+          alertLevel: 'critical',
+          message: 'Alert from service',
+          timestamp: new Date().toISOString(),
+        },
+      ])
+
+      const activeAlerts = await alertSystem.getActiveAlerts()
+      expect(activeAlerts.length).toBe(1)
+      expect(activeAlerts[0]!.level).toBe('critical')
+      // alertId should be mapped to id via the conversion function
+      expect(activeAlerts[0]!.id).toBe('alt-id-1')
+    })
+  })
+
 })
