@@ -341,3 +341,10 @@ job.md
 test.md
 gusher-pix.json
 package/bundle/
+
+.antigravitycli/
+.ai/
+.codegraph/
+aws
+scratch
+sliced_output
