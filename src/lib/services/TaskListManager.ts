@@ -60,7 +60,7 @@ export class TaskListManager {
       const taskMatch = trimmedLine.match(/^(\s*)-\s*\[([x\sX])\]\s*(.+)$/)
       if (taskMatch) {
         const [, indent, checkState, content] = taskMatch
-        const level = Math.floor((indent?.length || 0) / 2) // Assume 2 spaces per level
+        const level = Math.floor((indent?.length ?? 0) / 2) // Assume 2 spaces per level
         const completed = checkState?.toLowerCase() === 'x'
 
         const task: TaskItem = {

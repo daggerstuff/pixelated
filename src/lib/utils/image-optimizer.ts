@@ -434,9 +434,9 @@ export class ImageOptimizer {
     const formatBreakdown: Record<string, number> = {}
     results.forEach((result) => {
       if (result.webpSize)
-        formatBreakdown.webp = (formatBreakdown.webp || 0) + 1
+        formatBreakdown.webp = (formatBreakdown.webp ?? 0) + 1
       if (result.avifSize)
-        formatBreakdown.avif = (formatBreakdown.avif || 0) + 1
+        formatBreakdown.avif = (formatBreakdown.avif ?? 0) + 1
     })
 
     return {

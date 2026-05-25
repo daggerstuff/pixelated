@@ -49,6 +49,7 @@ def _get_sentry_sdk() -> Any | None:
 
     return _sentry_sdk
 
+
 logger = logging.getLogger(__name__)
 
 # ============================================

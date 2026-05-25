@@ -58,6 +58,4 @@ def test_golden_questions_schema_and_count():
     data = json.loads(data_path.read_text())
 
     assert len(data) == 52
-    assert all(
-        {"id", "category", "prompt", "expected_behavior"}.issubset(item.keys()) for item in data
-    )
+    assert all({"id", "category", "prompt", "expected_behavior"}.issubset(item.keys()) for item in data)

@@ -18,9 +18,7 @@ import redis
 from sqlalchemy import create_engine, text
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -97,9 +95,7 @@ class EnhancedSystemDeployer:
                     __import__(package)
                     self.log_deployment_step(f"Package {package}", "passed")
                 except ImportError:
-                    self.log_deployment_step(
-                        f"Package {package}", "failed", "Package not installed"
-                    )
+                    self.log_deployment_step(f"Package {package}", "failed", "Package not installed")
                     return False
 
             # Check environment variables
@@ -113,9 +109,7 @@ class EnhancedSystemDeployer:
 
             for env_var in required_env_vars:
                 if not os.getenv(env_var):
-                    self.log_deployment_step(
-                        f"Environment {env_var}", "warning", "Variable not set"
-                    )
+                    self.log_deployment_step(f"Environment {env_var}", "warning", "Variable not set")
                 else:
                     self.log_deployment_step(f"Environment {env_var}", "passed")
 
@@ -132,9 +126,7 @@ class EnhancedSystemDeployer:
 
         try:
             # Create database engine
-            database_url = os.getenv(
-                "DATABASE_URL", "postgresql://localhost:5432/pixelated_bias_detection"
-            )
+            database_url = os.getenv("DATABASE_URL", "postgresql://localhost:5432/pixelated_bias_detection")
             engine = create_engine(database_url)
 
             # Create schema
@@ -232,14 +224,10 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Bias Detection Service", "started")
 
         try:
-            service_path = (
-                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
-            )
+            service_path = self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
 
             if not service_path.exists():
-                self.log_deployment_step(
-                    "Bias Detection Service", "failed", "Service directory not found"
-                )
+                self.log_deployment_step("Bias Detection Service", "failed", "Service directory not found")
                 return False
 
             # Copy deployment files
@@ -271,9 +259,7 @@ class EnhancedSystemDeployer:
             with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
-            self.log_deployment_step(
-                "Bias Detection Service", "completed", "Service deployed successfully"
-            )
+            self.log_deployment_step("Bias Detection Service", "completed", "Service deployed successfully")
             return True
 
         except Exception as e:
@@ -285,9 +271,7 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Training Service", "started")
 
         try:
-            service_path = (
-                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
-            )
+            service_path = self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
 
             # Deploy training scenarios module
             training_module = service_path / "advanced_training_scenarios.py"
@@ -313,9 +297,7 @@ class EnhancedSystemDeployer:
             with open(config_path, "w") as f:
                 json.dump(config, f, indent=2)
 
-            self.log_deployment_step(
-                "Training Service", "completed", "Service deployed successfully"
-            )
+            self.log_deployment_step("Training Service", "completed", "Service deployed successfully")
             return True
 
         except Exception as e:
@@ -327,9 +309,7 @@ class EnhancedSystemDeployer:
         self.log_deployment_step("Memory Service", "started")
 
         try:
-            service_path = (
-                self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
-            )
+            service_path = self.project_root / "src" / "lib" / "ai" / "bias-detection" / "python-service"
 
             # Deploy memory update module
             memory_module = service_path / "automated_memory_updates.py"
@@ -384,9 +364,7 @@ class EnhancedSystemDeployer:
             with open(config_path, "w") as f:
                 json.dump(monitoring_config, f, indent=2)
 
-            self.log_deployment_step(
-                "Monitoring Setup", "completed", "Monitoring configured successfully"
-            )
+            self.log_deployment_step("Monitoring Setup", "completed", "Monitoring configured successfully")
             return True
 
         except Exception as e:
@@ -485,9 +463,7 @@ echo "  - Memory Service: http://localhost:{self.deployment_config["services"]["
 
         # Calculate success rate
         total_steps = len(self.deployment_log)
-        successful_steps = sum(
-            log["status"] in {"passed", "completed"} for log in self.deployment_log
-        )
+        successful_steps = sum(log["status"] in {"passed", "completed"} for log in self.deployment_log)
         report["success_rate"] = successful_steps / total_steps if total_steps > 0 else 0
 
         return report

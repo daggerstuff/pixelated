@@ -2,14 +2,14 @@ import path from 'node:path'
 import process from 'node:process'
 
 import node from '@astrojs/node'
-import vercel from '@astrojs/vercel'
 import react from '@astrojs/react'
+import vercel from '@astrojs/vercel'
 import sentry from '@sentry/astro'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
-import { loadEnv } from 'vite'
+import { loadEnv, createLogger } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =
@@ -479,10 +479,10 @@ export default defineConfig({
         'astro-icon/components': path.resolve(
           './src/components/ui/astro-icon-components.ts',
         ),
-        stream: 'stream-browserify',
-        zlib: 'browserify-zlib',
-        buffer: 'buffer',
-        util: 'util',
+        'stream': 'stream-browserify',
+        'zlib': 'browserify-zlib',
+        'buffer': 'buffer',
+        'util': 'util',
       },
       extensions: ['.astro', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json'],
       preserveSymlinks: false,
@@ -494,11 +494,57 @@ export default defineConfig({
         'stream-browserify',
         'browserify-zlib',
         'buffer',
-        'util',
         'path-browserify',
         'events',
       ],
       external: [
+        // ── Node built-ins ─────────────────────────────────────────────────
+        // Marking these as SSR externals prevents Vite's dep scanner from
+        // treating them as browser modules and emitting "externalized for
+        // browser compatibility" warnings on server-side source files.
+        'node:async_hooks',
+        'node:buffer',
+        'node:child_process',
+        'node:crypto',
+        'node:dns',
+        'node:events',
+        'node:fs',
+        'node:fs/promises',
+        'node:http',
+        'node:https',
+        'node:net',
+        'node:os',
+        'node:path',
+        'node:process',
+        'node:stream',
+        'node:stream/promises',
+        'node:tls',
+        'node:url',
+        'node:util',
+        'node:worker_threads',
+        'node:zlib',
+        // bare specifiers (legacy imports without node: prefix)
+        'async_hooks',
+        'buffer',
+        'child_process',
+        'crypto',
+        'dns',
+        'events',
+        'fs',
+        'fs/promises',
+        'http',
+        'https',
+        'net',
+        'os',
+        'path',
+        'process',
+        'stream',
+        'tls',
+        'url',
+        'util',
+        'worker_threads',
+        'zlib',
+        // ── Third-party server-only packages ───────────────────────────────
         '@google-cloud/storage',
         '@aws-sdk/client-s3',
         '@aws-sdk/client-dynamodb',
@@ -532,6 +578,9 @@ export default defineConfig({
       ],
     },
     optimizeDeps: {
+      // Only scan client-facing entrypoints — exclude server-only trees entirely.
+      // This prevents "externalized for browser compatibility" noise from files
+      // that legitimately import Node built-ins (crypto, fs, path, …).
       entries: [
         'src/pages/**/*.{ts,tsx,js,jsx,astro}',
         'src/layouts/**/*.{ts,tsx,js,jsx,astro}',
@@ -539,8 +588,62 @@ export default defineConfig({
         'src/middleware.ts',
       ],
       exclude: [
+        // ── Server-only source directories ─────────────────────────────────
+        'src/lib/security',
+        'src/lib/crypto',
+        'src/lib/server',
+        'src/lib/server-only',
+        'src/lib/auth',
+        'src/lib/websocket',
+        'src/lib/agent-note-collab',
+        'src/lib/logging',
+        'src/lib/middleware',
+        'src/lib/monitoring',
+        'src/lib/backup',
+        'src/lib/fhe',
+        'src/lib/threat-detection',
+        'src/lib/threat-intelligence',
+        'src/lib/visual-regression',
+        'src/scripts',
+        'src/server.prod.ts',
+        // ── Node built-ins (never pre-bundle) ──────────────────────────────
+        'node:async_hooks',
+        'node:buffer',
+        'node:child_process',
+        'node:crypto',
+        'node:dns',
+        'node:events',
+        'node:fs',
+        'node:fs/promises',
+        'node:http',
+        'node:https',
+        'node:net',
+        'node:os',
+        'node:path',
+        'node:process',
+        'node:stream',
+        'node:tls',
+        'node:url',
+        'node:util',
+        'node:worker_threads',
+        'node:zlib',
+        'crypto',
+        'fs',
+        'fs/promises',
+        'path',
+        'util',
+        'stream',
+        'os',
+        'child_process',
+        'worker_threads',
+        'http',
+        'https',
+        'net',
+        'tls',
+        // ── Third-party server-only packages ───────────────────────────────
         '@aws-sdk/client-s3',
         '@aws-sdk/client-kms',
+        '@google-cloud/storage',
         'sharp',
         'canvas',
         'puppeteer',
@@ -555,7 +658,6 @@ export default defineConfig({
         '@tensorflow/tfjs',
         '@tensorflow/tfjs-layers',
         'mongodb',
-        'recharts',
         'chart.js',
         '@spotlightjs/astro',
         'zustand',
@@ -563,6 +665,19 @@ export default defineConfig({
         '@tanstack/react-query',
       ],
     },
+    customLogger: (() => {
+      const logger = createLogger()
+      const originalWarn = logger.warn.bind(logger)
+      logger.warn = (msg, opts) => {
+        // Drop the "externalized for browser compatibility" dep-scan noise.
+        // These are all intentional server-side imports; the warning is
+        // meaningless for an SSR-only project using @astrojs/node.
+        if (msg.includes('has been externalized for browser compatibility'))
+          return
+        originalWarn(msg, opts)
+      }
+      return logger
+    })(),
   },
   integrations: (() => {
     const MIN_DEV = process.env.MIN_DEV === '1'

@@ -134,16 +134,14 @@ def merge_jira_import_dupes(
             # Prefer open canonical; fall back to any Linear-linked issue.
             existing = by_linear_pix.get(pix)
             if not existing or (
-                issue.get("status") != "closed"
-                and issues_by_id.get(existing, {}).get("status") == "closed"
+                issue.get("status") != "closed" and issues_by_id.get(existing, {}).get("status") == "closed"
             ):
                 by_linear_pix[pix] = issue["id"]
         title = (issue.get("title") or "").strip().lower()
         if title:
             existing = by_title.get(title)
             if not existing or (
-                issue.get("status") != "closed"
-                and issues_by_id.get(existing, {}).get("status") == "closed"
+                issue.get("status") != "closed" and issues_by_id.get(existing, {}).get("status") == "closed"
             ):
                 by_title[title] = issue["id"]
 
@@ -246,9 +244,7 @@ def apply_jsonl_batch(
                 ref_updated += 1
 
     if merge_jira_imports:
-        issue_rows, jira_import_closed, jira_linked = merge_jira_import_dupes(
-            issue_rows, key_map
-        )
+        issue_rows, jira_import_closed, jira_linked = merge_jira_import_dupes(issue_rows, key_map)
 
     print(
         f"JSONL batch: migration_closed={migration_closed}, "
@@ -324,7 +320,10 @@ def main() -> int:
         for index, (issue_id, source_pix) in enumerate(migration_dupes, start=1):
             if index % args.batch_size == 1:
                 print(f"  batch {index}-{min(index + args.batch_size - 1, len(migration_dupes))}")
-            if not run_bd(["close", issue_id, "--reason", f"Duplicate of gusher {source_pix or 'PIX'} → ADHD migration"], dry_run=dry_run):
+            if not run_bd(
+                ["close", issue_id, "--reason", f"Duplicate of gusher {source_pix or 'PIX'} → ADHD migration"],
+                dry_run=dry_run,
+            ):
                 failed += 1
 
     if not args.skip_synckey_close:

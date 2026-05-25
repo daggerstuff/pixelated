@@ -127,9 +127,7 @@ def audit_path(path: str, max_lines: int) -> AuditResult:
         schema_ok=schema_ok,
         turns_avg=statistics.mean(turns) if turns else None,
         turns_p50=statistics.median(turns) if turns else None,
-        turns_p95=(
-            turns_sorted[percentile_index(len(turns_sorted), 0.95)] if turns_sorted else None
-        ),
+        turns_p95=(turns_sorted[percentile_index(len(turns_sorted), 0.95)] if turns_sorted else None),
         content_len_avg=statistics.mean(text_lengths) if text_lengths else None,
         content_len_p50=statistics.median(text_lengths) if text_lengths else None,
         role_distribution_top=roles.most_common(8),

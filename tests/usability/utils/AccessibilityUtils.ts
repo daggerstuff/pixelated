@@ -122,7 +122,7 @@ export class AccessibilityUtils {
       const ariaLabel = await link.getAttribute('aria-label')
       const title = await link.getAttribute('title')
 
-      const linkText = (text?.trim() ?? ariaLabel) ?? title
+      const linkText = text?.trim() ?? ariaLabel ?? title
 
       if (!linkText || linkText.length < 2) {
         const href = await link.getAttribute('href')

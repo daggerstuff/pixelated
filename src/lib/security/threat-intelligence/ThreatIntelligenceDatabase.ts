@@ -375,7 +375,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Calculate expiration date
       const ttl =
-        this.config.retention.stix_types[stixObject.type] ||
+        this.config.retention.stix_types[stixObject.type] ??
         this.config.retention.default_ttl
       if (this.config.retention.enabled && ttl > 0) {
         dataToStore.expires_at = new Date(Date.now() + ttl * 1000)
@@ -947,9 +947,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           { stix_id: stixId },
           {
             $set: {
-              encrypted_data: encryptedData,
+              'encrypted_data': encryptedData,
               'metadata.processed': true,
-              updated_at: new Date(),
+              'updated_at': new Date(),
             },
           },
         )
@@ -958,9 +958,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
           { stix_id: stixId },
           {
             $set: {
-              stix_object: updatedData,
+              'stix_object': updatedData,
               'metadata.processed': true,
-              updated_at: new Date(),
+              'updated_at': new Date(),
             },
           },
         )
@@ -1180,13 +1180,10 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         this.stixCollection.countDocuments({ 'metadata.validated': true }),
       ])
 
-      const byTypeMap = byType.reduce< Record<string, number>>(
-        (acc, item) => {
-          acc[item._id] = item.count
-          return acc
-        },
-        {},
-      )
+      const byTypeMap = byType.reduce<Record<string, number>>((acc, item) => {
+        acc[item._id] = item.count
+        return acc
+      }, {})
 
       return {
         total_objects: totalObjects,

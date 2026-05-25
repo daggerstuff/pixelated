@@ -327,7 +327,7 @@ export class MarketAnalyticsService {
     // Mock implementation - replace with actual market research APIs
     const mockData: Record<string, { current: number; total: number }> = {
       'healthcare-institutions': { current: 150, total: 2000 },
-      universities: { current: 75, total: 500 },
+      'universities': { current: 75, total: 500 },
       'private-practices': { current: 300, total: 8000 },
       'corporate-wellness': { current: 50, total: 1000 },
       'government-agencies': { current: 25, total: 200 },

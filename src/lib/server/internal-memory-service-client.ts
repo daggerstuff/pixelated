@@ -1,7 +1,4 @@
-import {
-  buildScopePayload,
-  buildScopeQuery,
-} from './internal-memory-scope'
+import { buildScopePayload, buildScopeQuery } from './internal-memory-scope'
 import {
   MemoryServiceRequestSigner,
   type InternalMemoryServiceClientConfig,

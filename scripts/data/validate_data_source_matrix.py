@@ -2,15 +2,24 @@
 """
 Validate the data source matrix CSV against defined rules and constraints.
 """
+
 import csv
 from pathlib import Path
-from typing import Optional
 
 MATRIX_PATH = Path("business-strategy/data_source_matrix.csv")
 EXPECTED_HEADERS = [
-    "source_name", "category", "license", "pii_present", "deidentification_required",
-    "risk_level", "approval_status", "reviewer", "review_date", "allowed_uses",
-    "prohibited_uses", "acceptance_criteria"
+    "source_name",
+    "category",
+    "license",
+    "pii_present",
+    "deidentification_required",
+    "risk_level",
+    "approval_status",
+    "reviewer",
+    "review_date",
+    "allowed_uses",
+    "prohibited_uses",
+    "acceptance_criteria",
 ]
 
 ENUMS = {
@@ -22,7 +31,7 @@ ENUMS = {
 BOOL_FIELDS = ["pii_present", "deidentification_required"]
 
 
-def parse_bool(val: str) -> Optional[bool]:
+def parse_bool(val: str) -> bool | None:
     v = val.strip().lower()
     if v in ("true", "1", "yes", "y"):
         return True
@@ -35,9 +44,7 @@ def validate_enums(row: dict, ctx: str, errors: list[str]):
     for field, allowed in ENUMS.items():
         val = (row.get(field) or "").strip().lower()
         if val not in allowed:
-            errors.append(
-                f"{ctx}: invalid {field}='{row.get(field)}', allowed={sorted(allowed)}"
-            )
+            errors.append(f"{ctx}: invalid {field}='{row.get(field)}', allowed={sorted(allowed)}")
 
 
 def validate_booleans(row: dict, ctx: str, errors: list[str]) -> dict[str, bool]:
@@ -58,13 +65,9 @@ def validate_use_lists(row: dict, ctx: str, errors: list[str]):
         if raw:
             items = [x.strip() for x in raw.split(";") if x.strip()]
             if not items:
-                errors.append(
-                    f"{ctx}: {lf} has invalid list format; use semicolon-separated values"
-                )
+                errors.append(f"{ctx}: {lf} has invalid list format; use semicolon-separated values")
         else:
-            errors.append(
-                f"{ctx}: {lf} should not be empty; specify at least one item or 'none'"
-            )
+            errors.append(f"{ctx}: {lf} should not be empty; specify at least one item or 'none'")
 
 
 def validate_approval_rules(row: dict, ctx: str, bool_values: dict[str, bool], errors: list[str]):
@@ -87,9 +90,7 @@ def validate_approval_rules(row: dict, ctx: str, bool_values: dict[str, bool], e
     if (row.get("risk_level") or "").strip().lower() == "high" and status_val == "approved":
         ac = (row.get("acceptance_criteria") or "").lower()
         if not any(k in ac for k in ("mitigation", "contract")):
-            errors.append(
-                f"{ctx}: high risk approved must include mitigation/contract in acceptance_criteria"
-            )
+            errors.append(f"{ctx}: high risk approved must include mitigation/contract in acceptance_criteria")
 
 
 def main() -> int:

@@ -114,7 +114,7 @@ describe('RUMWidget', () => {
   })
 
   it('applies custom className', () => {
-    const { container } = render(<RUMWidget className='test-class' />)
+    const { container } = render(<RUMWidget className="test-class" />)
 
     expect(
       container.querySelector('.rum-widget.test-class'),

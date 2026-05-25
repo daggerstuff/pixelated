@@ -604,6 +604,7 @@ class TestIntegration:
 
     def test_pdf_extraction_integration(self):
         """Test PDF extraction path with a mocked PDF parser."""
+
         class _FakePage:
             def __init__(self, text: str) -> None:
                 self._text = text
@@ -614,7 +615,7 @@ class TestIntegration:
         class _FakePdfReader:
             def __init__(self, _path: str) -> None:
                 self.pages = [
-                    _FakePage("Chapter 1: Integration Tests\n" + " therapy "*10),
+                    _FakePage("Chapter 1: Integration Tests\n" + " therapy " * 10),
                     _FakePage("This chapter continues the therapeutic discussion on healing and recovery.\n" * 10),
                 ]
 
@@ -640,6 +641,7 @@ class TestIntegration:
 
     def test_epub_extraction_integration(self):
         """Test EPUB extraction path with a mocked EPUB parser."""
+
         class _FakeDocumentItem:
             def __init__(self, content: str) -> None:
                 self._content = content
@@ -689,9 +691,7 @@ class TestIntegration:
         assert len(segments) >= 2
         assert all(segment.file_format == "epub" for segment in segments)
         normalized_segments = [segment.content_text.lower() for segment in segments]
-        assert any(
-            "recovery" in text or "mindfulness" in text or "emotional" in text for text in normalized_segments
-        )
+        assert any("recovery" in text or "mindfulness" in text or "emotional" in text for text in normalized_segments)
 
 
 if __name__ == "__main__":

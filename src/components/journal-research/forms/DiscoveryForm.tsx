@@ -93,39 +93,39 @@ export function DiscoveryForm({
         <CardTitle>Initiate Discovery</CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className='space-y-6'>
-          <div className='space-y-2'>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
             <Label>Target Sources</Label>
-            <div className='flex flex-wrap gap-2'>
+            <div className="flex flex-wrap gap-2">
               {availableSources.map((source) => (
                 <label
                   key={source}
-                  className='hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2'
+                  className="hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md border p-2"
                 >
                   <input
-                    type='checkbox'
+                    type="checkbox"
                     checked={sources.includes(source)}
                     onChange={() => handleSourceToggle(source)}
-                    className='rounded'
+                    className="rounded"
                   />
-                  <span className='text-sm capitalize'>{source}</span>
+                  <span className="text-sm capitalize">{source}</span>
                 </label>
               ))}
             </div>
             <FieldError error={errors['sources']} />
             {sources.length === 0 && (
-              <p className='text-yellow-500 text-sm'>
+              <p className="text-yellow-500 text-sm">
                 Please select at least one source
               </p>
             )}
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='keywords'>Search Keywords</Label>
-            <div className='flex gap-2'>
+          <div className="space-y-2">
+            <Label htmlFor="keywords">Search Keywords</Label>
+            <div className="flex gap-2">
               <input
-                id='keywords'
-                type='text'
+                id="keywords"
+                type="text"
                 value={keywordInput}
                 onChange={(e) => setKeywordInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -134,30 +134,30 @@ export function DiscoveryForm({
                     handleAddKeyword()
                   }
                 }}
-                placeholder='Enter keyword'
-                className='border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm'
+                placeholder="Enter keyword"
+                className="border-input flex-1 rounded-md border bg-background px-3 py-2 text-sm"
               />
               <Button
-                type='button'
+                type="button"
                 onClick={handleAddKeyword}
-                variant='outline'
-                size='sm'
+                variant="outline"
+                size="sm"
               >
                 Add
               </Button>
             </div>
             {keywords.length > 0 && (
-              <div className='mt-2 flex flex-wrap gap-2'>
+              <div className="mt-2 flex flex-wrap gap-2">
                 {keywords.map((keyword) => (
                   <span
                     key={keyword}
-                    className='bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs'
+                    className="bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs"
                   >
                     {keyword}
                     <button
-                      type='button'
+                      type="button"
                       onClick={() => handleRemoveKeyword(keyword)}
-                      className='text-muted-foreground hover:text-foreground'
+                      className="text-muted-foreground hover:text-foreground"
                       aria-label={`Remove ${keyword}`}
                     >
                       ×
@@ -171,13 +171,13 @@ export function DiscoveryForm({
 
           <ErrorMessage error={submitError} fieldErrors={errors} />
 
-          <div className='flex justify-end gap-2'>
+          <div className="flex justify-end gap-2">
             {onCancel && (
-              <Button type='button' variant='outline' onClick={onCancel}>
+              <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type='submit' disabled={isLoading || sources.length === 0}>
+            <Button type="submit" disabled={isLoading || sources.length === 0}>
               {isLoading ? 'Starting Discovery...' : 'Start Discovery'}
             </Button>
           </div>

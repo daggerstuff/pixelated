@@ -112,8 +112,8 @@ class ApiVersionManager {
    */
   parseVersionFromRequest(request: Request): ApiVersion | null {
     const versionHeader =
-      (request.headers.get('X-API-Version') ??
-      request.headers.get('API-Version')) ??
+      request.headers.get('X-API-Version') ??
+      request.headers.get('API-Version') ??
       request.url
         .match(/\/v(\d+)\/(\d+)\/(\d+)\//)
         ?.slice(1)

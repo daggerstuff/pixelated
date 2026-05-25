@@ -128,10 +128,9 @@ export class HIPAAComplianceService {
       logger.error('HIPAA++ Compliance Service initialization failed', {
         error: message,
       })
-      throw new Error(
-        `HIPAA++ initialization failed: ${message}`,
-        { cause: error },
-      )
+      throw new Error(`HIPAA++ initialization failed: ${message}`, {
+        cause: error,
+      })
     }
   }
 

@@ -786,7 +786,7 @@ ddescribe('BiasDetectionEngine Performance Benchmarks', () => {
       // Performance should not degrade exponentially
       const simpleTime = scalabilityResults['simple']
       const complexTime = scalabilityResults['complex']
-      const scalingFactor = (complexTime || 0) / (simpleTime || 1)
+      const scalingFactor = (complexTime ?? 0) / (simpleTime ?? 1)
 
       expect(scalingFactor).toBeLessThan(10) // Should not be more than 10x slower for 10x complexity
 

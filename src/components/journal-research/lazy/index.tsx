@@ -10,10 +10,10 @@ import { ErrorBoundary } from '@/lib/error'
 // Loading fallback component
 function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
   return (
-    <div className='flex min-h-[200px] items-center justify-center p-8'>
-      <div className='flex flex-col items-center gap-2'>
-        <div className='border-primary h-8 w-8 animate-spin rounded-full border-b-2' />
-        <p className='text-muted-foreground text-sm'>{message}</p>
+    <div className="flex min-h-[200px] items-center justify-center p-8">
+      <div className="flex flex-col items-center gap-2">
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-b-2" />
+        <p className="text-muted-foreground text-sm">{message}</p>
       </div>
     </div>
   )
@@ -22,10 +22,10 @@ function LoadingFallback({ message = 'Loading...' }: { message?: string }) {
 // Error fallback component
 function ErrorFallback({ error }: { error: Error }) {
   return (
-    <div className='flex min-h-[200px] items-center justify-center p-8'>
-      <div className='text-center'>
-        <p className='text-red-500 text-sm'>Failed to load component</p>
-        <p className='text-muted-foreground mt-1 text-xs'>{error.message}</p>
+    <div className="flex min-h-[200px] items-center justify-center p-8">
+      <div className="text-center">
+        <p className="text-red-500 text-sm">Failed to load component</p>
+        <p className="text-muted-foreground mt-1 text-xs">{error.message}</p>
       </div>
     </div>
   )
@@ -54,129 +54,129 @@ function withLazyLoading<P extends object>(
 
 // Lazy load page components
 export const LazyDashboardPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/DashboardPage').then((module) => ({
       default: module.DashboardPage,
     })),
   ),
-  <LoadingFallback message='Loading dashboard...' />,
+  <LoadingFallback message="Loading dashboard..." />,
 )
 
 export const LazySessionsListPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/SessionsListPage').then((module) => ({
       default: module.SessionsListPage,
     })),
   ),
-  <LoadingFallback message='Loading sessions...' />,
+  <LoadingFallback message="Loading sessions..." />,
 )
 
 export const LazySessionDetailPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/SessionDetailPage').then((module) => ({
       default: module.SessionDetailPage,
     })),
   ),
-  <LoadingFallback message='Loading session details...' />,
+  <LoadingFallback message="Loading session details..." />,
 )
 
 export const LazyDiscoveryPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/DiscoveryPage').then((module) => ({
       default: module.DiscoveryPage,
     })),
   ),
-  <LoadingFallback message='Loading discovery...' />,
+  <LoadingFallback message="Loading discovery..." />,
 )
 
 export const LazyEvaluationPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/EvaluationPage').then((module) => ({
       default: module.EvaluationPage,
     })),
   ),
-  <LoadingFallback message='Loading evaluation...' />,
+  <LoadingFallback message="Loading evaluation..." />,
 )
 
 export const LazyAcquisitionPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/AcquisitionPage').then((module) => ({
       default: module.AcquisitionPage,
     })),
   ),
-  <LoadingFallback message='Loading acquisition...' />,
+  <LoadingFallback message="Loading acquisition..." />,
 )
 
 export const LazyIntegrationPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/IntegrationPage').then((module) => ({
       default: module.IntegrationPage,
     })),
   ),
-  <LoadingFallback message='Loading integration...' />,
+  <LoadingFallback message="Loading integration..." />,
 )
 
 export const LazyReportsPage = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../pages/ReportsPage').then((module) => ({
       default: module.ReportsPage,
     })),
   ),
-  <LoadingFallback message='Loading reports...' />,
+  <LoadingFallback message="Loading reports..." />,
 )
 
 // Lazy load feature components (heavy components)
 export const LazyDashboard = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../features/Dashboard').then((module) => ({
       default: module.Dashboard,
     })),
   ),
-  <LoadingFallback message='Loading dashboard...' />,
+  <LoadingFallback message="Loading dashboard..." />,
 )
 
 export const LazyProgressCharts = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../charts/ProgressCharts').then((module) => ({
       default: module.ProgressCharts,
     })),
   ),
-  <LoadingFallback message='Loading charts...' />,
+  <LoadingFallback message="Loading charts..." />,
 )
 
 export const LazyReportGenerator = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../features/ReportGenerator').then((module) => ({
       default: module.ReportGenerator,
     })),
   ),
-  <LoadingFallback message='Loading report generator...' />,
+  <LoadingFallback message="Loading report generator..." />,
 )
 
 export const LazyReportViewer = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../features/ReportViewer').then((module) => ({
       default: module.ReportViewer,
     })),
   ),
-  <LoadingFallback message='Loading report viewer...' />,
+  <LoadingFallback message="Loading report viewer..." />,
 )
 
 // Lazy load chart components
 export const LazyMetricsChart = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../charts/MetricsChart').then((module) => ({
       default: module.MetricsChart,
     })),
   ),
-  <LoadingFallback message='Loading metrics chart...' />,
+  <LoadingFallback message="Loading metrics chart..." />,
 )
 
 export const LazyPhaseProgressChart = withLazyLoading(
-  lazy( async () =>
+  lazy(async () =>
     import('../charts/PhaseProgressChart').then((module) => ({
       default: module.PhaseProgressChart,
     })),
   ),
-  <LoadingFallback message='Loading progress chart...' />,
+  <LoadingFallback message="Loading progress chart..." />,
 )

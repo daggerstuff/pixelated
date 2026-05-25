@@ -955,7 +955,7 @@ describe('Threat Detection Integration', () => {
       const context = { userId: '123', ip: '192.168.1.1' }
 
       // Create multiple concurrent requests
-      const requests = Array.from({ length: 10 },  async (_, i) =>
+      const requests = Array.from({ length: 10 }, async (_, i) =>
         threatDetectionService.checkRequest(`${identifier}_${i}`, context),
       )
 

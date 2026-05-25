@@ -28,8 +28,7 @@ function resolveProviderApiKey(): string | undefined {
 
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    LLM_PROVIDER_BASE_URLS.map((key) => process.env[key]).find(Boolean) ??
-    ''
+    LLM_PROVIDER_BASE_URLS.map((key) => process.env[key]).find(Boolean) ?? ''
 
   return baseUrl
 }

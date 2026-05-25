@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ github.ref }}
+      group: codeql-${{ github.workflow }}-${{ matrix.language }}-${{ github.ref }}
       cancel-in-progress: true
     strategy:
       fail-fast: false
@@ -64,7 +64,7 @@ jobs:
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
-          version: 11.1.2
+          version: 11.3.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -124,7 +124,9 @@ jobs:
         env:
           # Point uv at the venv that prepare-uv-venv created so it doesn't
           # fall back to the system interpreter when USE_SYSTEM is empty.
-          VIRTUAL_ENV: ${{ github.workspace }}/src/lib/ai/bias-detection/python-service/.venv
+          VIRTUAL_ENV:
+            ${{ github.workspace
+            }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           # Install Python dependencies for CodeQL analysis
           # Check if bias-detection service exists

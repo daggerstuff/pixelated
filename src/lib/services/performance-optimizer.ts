@@ -393,8 +393,8 @@ export class PerformanceOptimizer {
 
     // Set timer for batch processing if not already set
     batch.timer ??= setTimeout(async () => {
-        await this.processBatch(batchName, processor)
-      }, this.config.batching.batchTimeout);
+      await this.processBatch(batchName, processor)
+    }, this.config.batching.batchTimeout)
   }
 
   private async processBatch(

@@ -21,9 +21,7 @@ export class DashboardUpdater {
   private updateSecurityLevel(
     level: SystemMetrics['activeSecurityLevel'],
   ): void {
-    const element = document.getElementById(
-      'security-level-value',
-    )!
+    const element = document.getElementById('security-level-value')!
     if (!element) {
       return
     }
@@ -106,7 +104,7 @@ export class DashboardUpdater {
 
     // Set up interval for updates
     this.updateInterval = window.setInterval(
-       async () => this.updateMetrics(),
+      async () => this.updateMetrics(),
       this.UPDATE_INTERVAL_MS,
     )
   }

@@ -6,9 +6,12 @@ import { renderAstro } from '@/test/utils/astro'
 type AstroSlotRenderer = { render: () => string }
 type MockAstroOptions = { default?: AstroSlotRenderer }
 
-type CardProps = { class?: string; 'data-slot'?: string; children?: string }
+type CardProps = { 'class'?: string; 'data-slot'?: string; 'children'?: string }
 
-function getSlotContent(props: CardProps = {}, options?: MockAstroOptions): string {
+function getSlotContent(
+  props: CardProps = {},
+  options?: MockAstroOptions,
+): string {
   if (props.children) return props.children
   return options?.default?.render() ?? ''
 }
@@ -34,7 +37,10 @@ function Card(props: CardProps = {}, options?: MockAstroOptions) {
   }
 }
 
-function CardHeader(props: { 'data-slot'?: string; children?: string } = {}, options?: MockAstroOptions) {
+function CardHeader(
+  props: { 'data-slot'?: string; 'children'?: string } = {},
+  options?: MockAstroOptions,
+) {
   const classes = [
     '@container/card-header',
     'grid',
@@ -55,31 +61,46 @@ function CardHeader(props: { 'data-slot'?: string; children?: string } = {}, opt
   }
 }
 
-function CardTitle(props: { children?: string } = {}, options?: MockAstroOptions) {
+function CardTitle(
+  props: { children?: string } = {},
+  options?: MockAstroOptions,
+) {
   return {
     html: `<h3 data-slot="card-title" class="leading-none font-semibold">${getSlotContent(props, options)}</h3>`,
   }
 }
 
-function CardDescription(props: { children?: string } = {}, options?: MockAstroOptions) {
+function CardDescription(
+  props: { children?: string } = {},
+  options?: MockAstroOptions,
+) {
   return {
     html: `<p data-slot="card-description" class="text-sm text-muted-foreground">${getSlotContent(props, options)}</p>`,
   }
 }
 
-function CardContent(props: { children?: string } = {}, options?: MockAstroOptions) {
+function CardContent(
+  props: { children?: string } = {},
+  options?: MockAstroOptions,
+) {
   return {
     html: `<div data-slot="card-content" class="px-6">${getSlotContent(props, options)}</div>`,
   }
 }
 
-function CardFooter(props: { children?: string } = {}, options?: MockAstroOptions) {
+function CardFooter(
+  props: { children?: string } = {},
+  options?: MockAstroOptions,
+) {
   return {
     html: `<div data-slot="card-footer" class="flex items-center px-6 [.border-t]:pt-6">${getSlotContent(props, options)}</div>`,
   }
 }
 
-function CardAction(props: { children?: string } = {}, options?: MockAstroOptions) {
+function CardAction(
+  props: { children?: string } = {},
+  options?: MockAstroOptions,
+) {
   return {
     html: `<div data-slot="card-action" class="col-start-2 row-span-2 row-start-1 self-start justify-self-end">${getSlotContent(props, options)}</div>`,
   }

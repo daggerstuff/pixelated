@@ -194,7 +194,7 @@ test.describe('API Security Tests', () => {
 
       for (const endpoint of sensitiveEndpoints) {
         // Make rapid requests to trigger rate limiting
-        const promises = Array.from({ length: 50 },  async () =>
+        const promises = Array.from({ length: 50 }, async () =>
           request.post(endpoint, {
             data: { email: 'test@example.com', password: 'password' },
           }),

@@ -1,5 +1,3 @@
-
-
 def test_ears_gate_class_exists():
     from ai.core.pipelines.ears_compliance_gate import EarsComplianceGate
 

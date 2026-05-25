@@ -231,7 +231,7 @@ export class SecretsManager {
       'slack-webhook': 'SLACK_WEBHOOK_URL',
     }
 
-    return mapping[filename] || filename.toUpperCase().replace(/-/g, '_')
+    return mapping[filename] ?? filename.toUpperCase().replace(/-/g, '_')
   }
 
   /**
@@ -385,7 +385,7 @@ export class SecretsManager {
 let secretsManager: SecretsManager | null = null
 
 export function getSecretsManager(): SecretsManager {
-  secretsManager ??= SecretsManager.getInstance();
+  secretsManager ??= SecretsManager.getInstance()
   return secretsManager
 }
 

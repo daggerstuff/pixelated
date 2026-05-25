@@ -119,7 +119,7 @@ export function useMemory(options: UseMemoryOptions = {}): UseMemoryReturn {
             metadata: {
               ...metadata,
               role: metadata?.role ?? 'user',
-              category: (metadata?.category ?? category) ?? 'general',
+              category: metadata?.category ?? category ?? 'general',
               userId,
             },
           },

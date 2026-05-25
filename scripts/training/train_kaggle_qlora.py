@@ -209,9 +209,7 @@ def tokenize_data(examples, tokenizer, max_length=2048):
                 text = conv_text
         elif "prompt" in item and "response" in item:
             # Prompt/response format
-            text = (
-                f"<|user|>{item['prompt']}</|user|>\n<|assistant|>{item['response']}</|assistant|>"
-            )
+            text = f"<|user|>{item['prompt']}</|user|>\n<|assistant|>{item['response']}</|assistant|>"
         else:
             # Fallback to string representation
             text = str(item)

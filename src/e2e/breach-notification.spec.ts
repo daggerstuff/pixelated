@@ -10,7 +10,7 @@ class MockAuthService {
   private constructor() {}
 
   static getInstance(): MockAuthService {
-    MockAuthService.instance ??= new MockAuthService();
+    MockAuthService.instance ??= new MockAuthService()
     return MockAuthService.instance
   }
 
@@ -298,11 +298,11 @@ const noopTestDescribe = (() => undefined) as typeof test.describe
 
       await page.fill(
         '[data-testid="date-from"]',
-        today.toISOString().split('T')[0] || '',
+        today.toISOString().split('T')[0] ?? '',
       )
       await page.fill(
         '[data-testid="date-to"]',
-        tomorrow.toISOString().split('T')[0] || '',
+        tomorrow.toISOString().split('T')[0] ?? '',
       )
       await page.click('[data-testid="apply-filters"]')
 

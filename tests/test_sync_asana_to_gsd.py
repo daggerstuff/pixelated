@@ -13,18 +13,15 @@ sys.path.insert(0, str(SCRIPT_DIR))
 
 import importlib.util
 
-spec = importlib.util.spec_from_file_location(
-    "sync_asana_to_gsd", SCRIPT_DIR / "sync_asana_to_gsd.py"
-)
+spec = importlib.util.spec_from_file_location("sync_asana_to_gsd", SCRIPT_DIR / "sync_asana_to_gsd.py")
 assert spec is not None and spec.loader is not None
 sync_module = importlib.util.module_from_spec(spec)
 
 mock_requests = MagicMock()
 sys.modules["requests"] = mock_requests
 
-with patch.object(Path, "exists", return_value=False):
-    with patch.dict(os.environ, {}, clear=False):
-        spec.loader.exec_module(sync_module)
+with patch.object(Path, "exists", return_value=False), patch.dict(os.environ, {}, clear=False):
+    spec.loader.exec_module(sync_module)
 
 
 class TestFindGsdRoot(unittest.TestCase):
@@ -72,12 +69,8 @@ class TestGetGsdPaths(unittest.TestCase):
 
             self.assertEqual(paths["root"], root / ".agent" / "internal")
             self.assertEqual(paths["state"], root / ".agent" / "internal" / "plans" / "STATE.md")
-            self.assertEqual(
-                paths["roadmap"], root / ".agent" / "internal" / "plans" / "ROADMAP.md"
-            )
-            self.assertEqual(
-                paths["project"], root / ".agent" / "internal" / "plans" / "PROJECT.md"
-            )
+            self.assertEqual(paths["roadmap"], root / ".agent" / "internal" / "plans" / "ROADMAP.md")
+            self.assertEqual(paths["project"], root / ".agent" / "internal" / "plans" / "PROJECT.md")
 
     def test_returns_workstream_paths(self):
         """Should return workstream-specific paths."""
@@ -88,9 +81,7 @@ class TestGetGsdPaths(unittest.TestCase):
 
             paths = sync_module.get_gsd_paths(root, ws="my-ws")
 
-            self.assertEqual(
-                paths["planning"], root / ".agent" / "internal" / "workstreams" / "my-ws"
-            )
+            self.assertEqual(paths["planning"], root / ".agent" / "internal" / "workstreams" / "my-ws")
             self.assertEqual(paths["state"], ws_dir / "STATE.md")
 
     def test_detects_active_workstream_from_file(self):
@@ -153,9 +144,7 @@ class TestUpdateGsdState(unittest.TestCase):
         """Should replace existing Asana Progress section."""
         with tempfile.TemporaryDirectory() as tmpdir:
             state_file = Path(tmpdir) / "STATE.md"
-            state_file.write_text(
-                "# State\n\n## Asana Progress\n\nOld content\n\n## Other Section\n\nMore content"
-            )
+            state_file.write_text("# State\n\n## Asana Progress\n\nOld content\n\n## Other Section\n\nMore content")
 
             status = {"total": 10, "completed": 5, "incomplete": 5}
 
@@ -371,9 +360,8 @@ class TestMainFunction(unittest.TestCase):
     def test_exits_without_token(self):
         """Should exit with error when ASANA_PAT not set."""
         with patch.dict(os.environ, {"ASANA_PAT": ""}, clear=False):
-            with patch("sys.exit") as mock_exit:
-                with patch("builtins.print"):
-                    sync_module.main()
+            with patch("sys.exit") as mock_exit, patch("builtins.print"):
+                sync_module.main()
             mock_exit.assert_called_with(1)
 
 

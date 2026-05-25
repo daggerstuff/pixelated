@@ -22,7 +22,7 @@ function StatusButton() {
   return (
     <button
       onClick={handleClick}
-      className='bg-blue-600 hover:bg-blue-700 text-white mr-3 rounded-md px-4 py-2'
+      className="bg-blue-600 hover:bg-blue-700 text-white mr-3 rounded-md px-4 py-2"
     >
       Status Hook: Click Me ({count})
     </button>
@@ -45,7 +45,7 @@ function AlertButton() {
   return (
     <button
       onClick={handleClick}
-      className='bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2'
+      className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2"
     >
       Alert Hook: Severity ({severity})
     </button>
@@ -56,12 +56,12 @@ function AlertButton() {
 export function LiveRegionDemoReact() {
   return (
     <LiveRegionProvider>
-      <div className='border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-md border p-4'>
-        <h3 className='mb-4 text-lg font-medium'>React Live Region Hooks</h3>
-        <p className='mb-4 text-sm'>
+      <div className="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-md border p-4">
+        <h3 className="mb-4 text-lg font-medium">React Live Region Hooks</h3>
+        <p className="mb-4 text-sm">
           These buttons use React hooks to access the live region system.
         </p>
-        <div className='flex flex-wrap gap-4'>
+        <div className="flex flex-wrap gap-4">
           <StatusButton />
           <AlertButton />
         </div>

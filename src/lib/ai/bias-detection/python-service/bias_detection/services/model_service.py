@@ -15,7 +15,6 @@ import numpy as np
 import structlog
 
 if TYPE_CHECKING:
-    import tensorflow as tf
     import torch
 
 TRANSFORMER_IMPORT_ATTEMPTED = False
@@ -53,8 +52,11 @@ def _load_transformers() -> None:
     TRANSFORMER_IMPORT_ATTEMPTED = True
 
     try:
-        from transformers import AutoTokenizer, BertModel
-        from transformers import TFBertForSequenceClassification
+        from transformers import (
+            AutoTokenizer,
+            BertModel,
+            TFBertForSequenceClassification,
+        )
 
         TRANSFORMERS_AVAILABLE = True
     except Exception:
@@ -111,6 +113,7 @@ def _load_torch() -> Any | None:
 def _ml_services_enabled() -> bool:
     flag = os.getenv("BIAS_DETECTION_DISABLE_LOCAL_ML_SERVICES", "").lower().strip()
     return flag not in {"1", "true", "yes", "on"}
+
 
 from bias_detection.config import settings
 from bias_detection.models import BiasType, ConfidenceLevel
@@ -244,8 +247,7 @@ class TensorFlowModelService(ModelService):
         _load_transformers()
         if TFBertForSequenceClassification is None:
             raise ImportError(
-                "TFBertForSequenceClassification is not available in the installed "
-                "transformers version."
+                "TFBertForSequenceClassification is not available in the installed transformers version."
             )
         return TFBertForSequenceClassification.from_pretrained(
             "bert-base-uncased", num_labels=len(BiasType.__members__)
@@ -431,8 +433,7 @@ class PyTorchModelService(ModelService):
         self._torch = _load_torch()
         if self._torch is None:
             raise ImportError(
-                "PyTorch is not available. Install a working PyTorch build or disable "
-                "PyTorch-backed inference."
+                "PyTorch is not available. Install a working PyTorch build or disable PyTorch-backed inference."
             )
         _load_transformers()
         if not _transformer_available():

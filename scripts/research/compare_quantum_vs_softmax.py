@@ -9,6 +9,7 @@ from ai.pixel.research.quantum_emotional_states import QuantumEmotionState
 EMOTIONS = ["joy", "sadness", "anger", "fear", "surprise", "disgust"]
 NUM_SIMULATIONS = 10000
 
+
 def run_softmax_simulation():
     """Simulates emotion measurement using a standard softmax probability distribution."""
     print("--- Running Softmax Simulation ---")
@@ -31,6 +32,7 @@ def run_softmax_simulation():
     print(f"Result Distribution: {Counter(results)}")
     print(f"Duration: {duration:.4f} seconds")
     return duration
+
 
 def run_quantum_simulation():
     """Simulates emotion measurement using the QuantumEmotionState class."""
@@ -55,6 +57,7 @@ def run_quantum_simulation():
     print(f"Result Distribution: {Counter(results)}")
     print(f"Duration: {duration:.4f} seconds")
     return duration
+
 
 if __name__ == "__main__":
     softmax_time = run_softmax_simulation()

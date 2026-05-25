@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field, validator
 
 class MediaType(str, Enum):
     """Types of media that can be analyzed"""
+
     IMAGE = "image"
     AUDIO = "audio"
     VIDEO = "video"
@@ -20,6 +21,7 @@ class MediaType(str, Enum):
 
 class BiasType(str, Enum):
     """Types of bias that can be detected in multimedia"""
+
     VISUAL_REPRESENTATION = "visual_representation"
     GENDER_STEREOTYPES = "gender_stereotypes"
     RACIAL_BIAS = "racial_bias"
@@ -40,6 +42,7 @@ class BiasType(str, Enum):
 
 class AnalysisStatus(str, Enum):
     """Status of multi-modal bias analysis"""
+
     PENDING = "pending"
     UPLOADING = "uploading"
     PROCESSING = "processing"
@@ -51,6 +54,7 @@ class AnalysisStatus(str, Enum):
 
 class ConfidenceLevel(str, Enum):
     """Confidence levels for bias detection"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -60,46 +64,20 @@ class ConfidenceLevel(str, Enum):
 class ImageAnalysisRequest(BaseModel):
     """Request model for image bias analysis"""
 
-    image_url: str | None = Field(
-        default=None,
-        description="URL of the image to analyze"
-    )
-    image_data: str | None = Field(
-        default=None,
-        description="Base64 encoded image data"
-    )
-    image_format: str = Field(
-        default="auto",
-        description="Image format: jpg, png, gif, etc."
-    )
+    image_url: str | None = Field(default=None, description="URL of the image to analyze")
+    image_data: str | None = Field(default=None, description="Base64 encoded image data")
+    image_format: str = Field(default="auto", description="Image format: jpg, png, gif, etc.")
     analysis_type: str = Field(
-        default="comprehensive",
-        description="Type of analysis: faces, objects, text, comprehensive"
+        default="comprehensive", description="Type of analysis: faces, objects, text, comprehensive"
     )
-    bias_types: list[BiasType] | None = Field(
-        default=None,
-        description="Specific bias types to check for"
-    )
-    sensitivity: str = Field(
-        default="medium",
-        description="Analysis sensitivity: low, medium, high"
-    )
+    bias_types: list[BiasType] | None = Field(default=None, description="Specific bias types to check for")
+    sensitivity: str = Field(default="medium", description="Analysis sensitivity: low, medium, high")
     include_recommendations: bool = Field(
-        default=True,
-        description="Whether to include bias mitigation recommendations"
+        default=True, description="Whether to include bias mitigation recommendations"
     )
-    include_visual_explanations: bool = Field(
-        default=True,
-        description="Whether to include visual explanations"
-    )
-    user_id: str | None = Field(
-        default=None,
-        description="User ID for tracking and personalization"
-    )
-    session_id: str | None = Field(
-        default=None,
-        description="Session ID for request correlation"
-    )
+    include_visual_explanations: bool = Field(default=True, description="Whether to include visual explanations")
+    user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
+    session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
@@ -119,6 +97,7 @@ class ImageAnalysisRequest(BaseModel):
 
     class Config:
         """Pydantic configuration"""
+
         use_enum_values = True
         validate_assignment = True
 
@@ -126,50 +105,19 @@ class ImageAnalysisRequest(BaseModel):
 class AudioAnalysisRequest(BaseModel):
     """Request model for audio bias analysis"""
 
-    audio_url: str | None = Field(
-        default=None,
-        description="URL of the audio file to analyze"
-    )
-    audio_data: str | None = Field(
-        default=None,
-        description="Base64 encoded audio data"
-    )
-    audio_format: str = Field(
-        default="auto",
-        description="Audio format: mp3, wav, flac, etc."
-    )
-    analysis_type: str = Field(
-        default="comprehensive",
-        description="Type of analysis: speech, music, comprehensive"
-    )
-    language: str = Field(
-        default="auto",
-        description="Language of the audio content (ISO 639-1 code)"
-    )
-    bias_types: list[BiasType] | None = Field(
-        default=None,
-        description="Specific bias types to check for"
-    )
-    sensitivity: str = Field(
-        default="medium",
-        description="Analysis sensitivity: low, medium, high"
-    )
-    include_transcript: bool = Field(
-        default=True,
-        description="Whether to include speech-to-text transcript"
-    )
+    audio_url: str | None = Field(default=None, description="URL of the audio file to analyze")
+    audio_data: str | None = Field(default=None, description="Base64 encoded audio data")
+    audio_format: str = Field(default="auto", description="Audio format: mp3, wav, flac, etc.")
+    analysis_type: str = Field(default="comprehensive", description="Type of analysis: speech, music, comprehensive")
+    language: str = Field(default="auto", description="Language of the audio content (ISO 639-1 code)")
+    bias_types: list[BiasType] | None = Field(default=None, description="Specific bias types to check for")
+    sensitivity: str = Field(default="medium", description="Analysis sensitivity: low, medium, high")
+    include_transcript: bool = Field(default=True, description="Whether to include speech-to-text transcript")
     include_recommendations: bool = Field(
-        default=True,
-        description="Whether to include bias mitigation recommendations"
+        default=True, description="Whether to include bias mitigation recommendations"
     )
-    user_id: str | None = Field(
-        default=None,
-        description="User ID for tracking and personalization"
-    )
-    session_id: str | None = Field(
-        default=None,
-        description="Session ID for request correlation"
-    )
+    user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
+    session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
@@ -196,56 +144,28 @@ class AudioAnalysisRequest(BaseModel):
 
     class Config:
         """Pydantic configuration"""
+
         use_enum_values = True
 
 
 class VideoAnalysisRequest(BaseModel):
     """Request model for video bias analysis"""
 
-    video_url: str | None = Field(
-        default=None,
-        description="URL of the video file to analyze"
-    )
-    video_data: str | None = Field(
-        default=None,
-        description="Base64 encoded video data"
-    )
-    video_format: str = Field(
-        default="auto",
-        description="Video format: mp4, avi, mov, etc."
-    )
+    video_url: str | None = Field(default=None, description="URL of the video file to analyze")
+    video_data: str | None = Field(default=None, description="Base64 encoded video data")
+    video_format: str = Field(default="auto", description="Video format: mp4, avi, mov, etc.")
     analysis_type: str = Field(
-        default="comprehensive",
-        description="Type of analysis: visual, audio, text, comprehensive"
+        default="comprehensive", description="Type of analysis: visual, audio, text, comprehensive"
     )
-    frame_extraction_rate: int = Field(
-        default=1,
-        description="Frame extraction rate (frames per second)"
-    )
-    bias_types: list[BiasType] | None = Field(
-        default=None,
-        description="Specific bias types to check for"
-    )
-    sensitivity: str = Field(
-        default="medium",
-        description="Analysis sensitivity: low, medium, high"
-    )
-    include_transcript: bool = Field(
-        default=True,
-        description="Whether to include speech-to-text transcript"
-    )
+    frame_extraction_rate: int = Field(default=1, description="Frame extraction rate (frames per second)")
+    bias_types: list[BiasType] | None = Field(default=None, description="Specific bias types to check for")
+    sensitivity: str = Field(default="medium", description="Analysis sensitivity: low, medium, high")
+    include_transcript: bool = Field(default=True, description="Whether to include speech-to-text transcript")
     include_recommendations: bool = Field(
-        default=True,
-        description="Whether to include bias mitigation recommendations"
+        default=True, description="Whether to include bias mitigation recommendations"
     )
-    user_id: str | None = Field(
-        default=None,
-        description="User ID for tracking and personalization"
-    )
-    session_id: str | None = Field(
-        default=None,
-        description="Session ID for request correlation"
-    )
+    user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
+    session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
@@ -272,68 +192,31 @@ class VideoAnalysisRequest(BaseModel):
 
     class Config:
         """Pydantic configuration"""
+
         use_enum_values = True
 
 
 class MultimodalAnalysisRequest(BaseModel):
     """Request model for combined multi-modal bias analysis"""
 
-    text_content: str | None = Field(
-        default=None,
-        description="Text content to analyze alongside media"
-    )
-    image_url: str | None = Field(
-        default=None,
-        description="URL of the image to analyze"
-    )
-    image_data: str | None = Field(
-        default=None,
-        description="Base64 encoded image data"
-    )
-    audio_url: str | None = Field(
-        default=None,
-        description="URL of the audio file to analyze"
-    )
-    audio_data: str | None = Field(
-        default=None,
-        description="Base64 encoded audio data"
-    )
-    video_url: str | None = Field(
-        default=None,
-        description="URL of the video file to analyze"
-    )
-    video_data: str | None = Field(
-        default=None,
-        description="Base64 encoded video data"
-    )
-    analysis_priority: str = Field(
-        default="balanced",
-        description="Priority: text, visual, audio, balanced"
-    )
-    bias_types: list[BiasType] | None = Field(
-        default=None,
-        description="Specific bias types to check for"
-    )
-    sensitivity: str = Field(
-        default="medium",
-        description="Analysis sensitivity: low, medium, high"
-    )
+    text_content: str | None = Field(default=None, description="Text content to analyze alongside media")
+    image_url: str | None = Field(default=None, description="URL of the image to analyze")
+    image_data: str | None = Field(default=None, description="Base64 encoded image data")
+    audio_url: str | None = Field(default=None, description="URL of the audio file to analyze")
+    audio_data: str | None = Field(default=None, description="Base64 encoded audio data")
+    video_url: str | None = Field(default=None, description="URL of the video file to analyze")
+    video_data: str | None = Field(default=None, description="Base64 encoded video data")
+    analysis_priority: str = Field(default="balanced", description="Priority: text, visual, audio, balanced")
+    bias_types: list[BiasType] | None = Field(default=None, description="Specific bias types to check for")
+    sensitivity: str = Field(default="medium", description="Analysis sensitivity: low, medium, high")
     include_cross_modal_analysis: bool = Field(
-        default=True,
-        description="Whether to analyze relationships between modalities"
+        default=True, description="Whether to analyze relationships between modalities"
     )
     include_recommendations: bool = Field(
-        default=True,
-        description="Whether to include bias mitigation recommendations"
+        default=True, description="Whether to include bias mitigation recommendations"
     )
-    user_id: str | None = Field(
-        default=None,
-        description="User ID for tracking and personalization"
-    )
-    session_id: str | None = Field(
-        default=None,
-        description="Session ID for request correlation"
-    )
+    user_id: str | None = Field(default=None, description="User ID for tracking and personalization")
+    session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
     def validate_sensitivity(cls, v: str) -> str:
@@ -360,6 +243,7 @@ class MultimodalAnalysisRequest(BaseModel):
 
     class Config:
         """Pydantic configuration"""
+
         use_enum_values = True
 
 
@@ -369,10 +253,7 @@ class DetectedObject(BaseModel):
     object_class: str = Field(description="Object class/type")
     confidence: float = Field(ge=0.0, le=1.0, description="Detection confidence")
     bbox: list[float] = Field(description="Bounding box coordinates [x1, y1, x2, y2]")
-    attributes: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Object attributes (age, gender, race, etc.)"
-    )
+    attributes: dict[str, Any] = Field(default_factory=dict, description="Object attributes (age, gender, race, etc.)")
 
 
 class FaceDetection(BaseModel):
@@ -381,17 +262,11 @@ class FaceDetection(BaseModel):
     face_id: str = Field(description="Unique face identifier")
     bbox: list[float] = Field(description="Bounding box coordinates [x1, y1, x2, y2]")
     confidence: float = Field(ge=0.0, le=1.0, description="Detection confidence")
-    landmarks: list[list[float]] = Field(
-        description="Facial landmarks coordinates"
-    )
+    landmarks: list[list[float]] = Field(description="Facial landmarks coordinates")
     demographics: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Estimated demographics (age, gender, race, etc.)"
+        default_factory=dict, description="Estimated demographics (age, gender, race, etc.)"
     )
-    emotions: dict[str, float] = Field(
-        default_factory=dict,
-        description="Emotion detection results"
-    )
+    emotions: dict[str, float] = Field(default_factory=dict, description="Emotion detection results")
 
 
 class TextExtraction(BaseModel):
@@ -410,14 +285,8 @@ class AudioSegment(BaseModel):
     end_time: float = Field(description="End time in seconds")
     transcript: str = Field(description="Speech-to-text transcript")
     confidence: float = Field(ge=0.0, le=1.0, description="Transcription confidence")
-    speaker_id: str | None = Field(
-        default=None,
-        description="Speaker identification"
-    )
-    emotion: str | None = Field(
-        default=None,
-        description="Detected emotion"
-    )
+    speaker_id: str | None = Field(default=None, description="Speaker identification")
+    emotion: str | None = Field(default=None, description="Detected emotion")
     language: str = Field(description="Detected language")
 
 
@@ -425,30 +294,16 @@ class VisualBiasScore(BaseModel):
     """Visual bias score for image/video analysis"""
 
     bias_type: BiasType
-    score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Bias score from 0.0 (no bias) to 1.0 (maximum bias)"
-    )
-    confidence: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Confidence in the bias detection"
-    )
+    score: float = Field(ge=0.0, le=1.0, description="Bias score from 0.0 (no bias) to 1.0 (maximum bias)")
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence in the bias detection")
     confidence_level: ConfidenceLevel
-    evidence: list[str] = Field(
-        description="Visual evidence supporting the bias detection"
-    )
-    explanation: str = Field(
-        description="Explanation of why this bias was detected"
-    )
+    evidence: list[str] = Field(description="Visual evidence supporting the bias detection")
+    explanation: str = Field(description="Explanation of why this bias was detected")
     affected_regions: list[list[float]] = Field(
-        default_factory=list,
-        description="Regions in the image/video where bias was detected"
+        default_factory=list, description="Regions in the image/video where bias was detected"
     )
     objects_involved: list[DetectedObject] = Field(
-        default_factory=list,
-        description="Objects involved in the bias detection"
+        default_factory=list, description="Objects involved in the bias detection"
     )
 
 
@@ -456,57 +311,27 @@ class AudioBiasScore(BaseModel):
     """Audio bias score for audio analysis"""
 
     bias_type: BiasType
-    score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Bias score from 0.0 (no bias) to 1.0 (maximum bias)"
-    )
-    confidence: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Confidence in the bias detection"
-    )
+    score: float = Field(ge=0.0, le=1.0, description="Bias score from 0.0 (no bias) to 1.0 (maximum bias)")
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence in the bias detection")
     confidence_level: ConfidenceLevel
-    evidence: list[str] = Field(
-        description="Audio evidence supporting the bias detection"
-    )
-    explanation: str = Field(
-        description="Explanation of why this bias was detected"
-    )
+    evidence: list[str] = Field(description="Audio evidence supporting the bias detection")
+    explanation: str = Field(description="Explanation of why this bias was detected")
     segments_involved: list[AudioSegment] = Field(
-        default_factory=list,
-        description="Audio segments where bias was detected"
+        default_factory=list, description="Audio segments where bias was detected"
     )
-    keywords_detected: list[str] = Field(
-        default_factory=list,
-        description="Biased keywords or phrases detected"
-    )
+    keywords_detected: list[str] = Field(default_factory=list, description="Biased keywords or phrases detected")
 
 
 class MultimodalBiasScore(BaseModel):
     """Combined multi-modal bias score"""
 
     bias_type: BiasType
-    overall_score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Overall bias score across all modalities"
-    )
-    modality_scores: dict[str, float] = Field(
-        description="Individual scores by modality (text, visual, audio)"
-    )
-    confidence: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Confidence in the bias detection"
-    )
+    overall_score: float = Field(ge=0.0, le=1.0, description="Overall bias score across all modalities")
+    modality_scores: dict[str, float] = Field(description="Individual scores by modality (text, visual, audio)")
+    confidence: float = Field(ge=0.0, le=1.0, description="Confidence in the bias detection")
     confidence_level: ConfidenceLevel
-    cross_modal_evidence: list[str] = Field(
-        description="Evidence of bias across multiple modalities"
-    )
-    explanation: str = Field(
-        description="Explanation of multi-modal bias detection"
-    )
+    cross_modal_evidence: list[str] = Field(description="Evidence of bias across multiple modalities")
+    explanation: str = Field(description="Explanation of multi-modal bias detection")
 
 
 class VisualRecommendation(BaseModel):
@@ -514,16 +339,9 @@ class VisualRecommendation(BaseModel):
 
     type: str = Field(description="Type of visual recommendation")
     description: str = Field(description="Detailed recommendation description")
-    visual_examples: list[str] = Field(
-        default_factory=list,
-        description="Visual examples or references"
-    )
-    implementation_difficulty: str = Field(
-        description="Difficulty: easy, medium, hard"
-    )
-    estimated_impact: str = Field(
-        description="Expected impact: low, medium, high"
-    )
+    visual_examples: list[str] = Field(default_factory=list, description="Visual examples or references")
+    implementation_difficulty: str = Field(description="Difficulty: easy, medium, hard")
+    estimated_impact: str = Field(description="Expected impact: low, medium, high")
 
 
 class MultimodalRecommendation(BaseModel):
@@ -531,20 +349,11 @@ class MultimodalRecommendation(BaseModel):
 
     type: str = Field(description="Type of multi-modal recommendation")
     description: str = Field(description="Detailed recommendation description")
-    affected_modalities: list[str] = Field(
-        description="Modalities this recommendation applies to"
-    )
+    affected_modalities: list[str] = Field(description="Modalities this recommendation applies to")
     priority: str = Field(description="Priority: high, medium, low")
-    implementation_difficulty: str = Field(
-        description="Difficulty: easy, medium, hard"
-    )
-    estimated_impact: str = Field(
-        description="Expected impact: low, medium, high"
-    )
-    examples: list[dict[str, Any]] = Field(
-        default_factory=list,
-        description="Multi-modal examples"
-    )
+    implementation_difficulty: str = Field(description="Difficulty: easy, medium, hard")
+    estimated_impact: str = Field(description="Expected impact: low, medium, high")
+    examples: list[dict[str, Any]] = Field(default_factory=list, description="Multi-modal examples")
 
 
 class MultimodalAnalysisResponse(BaseModel):
@@ -557,66 +366,36 @@ class MultimodalAnalysisResponse(BaseModel):
     content_hash: str = Field(description="SHA256 hash of the analyzed content")
 
     # Analysis results
-    overall_bias_score: float = Field(
-        ge=0.0,
-        le=1.0,
-        description="Overall bias score across all detected biases"
-    )
-    bias_scores: list[MultimodalBiasScore] = Field(
-        description="Individual bias scores by type"
-    )
-    dominant_bias_types: list[BiasType] = Field(
-        description="Most significant bias types detected"
-    )
+    overall_bias_score: float = Field(ge=0.0, le=1.0, description="Overall bias score across all detected biases")
+    bias_scores: list[MultimodalBiasScore] = Field(description="Individual bias scores by type")
+    dominant_bias_types: list[BiasType] = Field(description="Most significant bias types detected")
 
     # Modality-specific results
-    visual_analysis: dict[str, Any] | None = Field(
-        default=None,
-        description="Visual analysis results"
-    )
-    audio_analysis: dict[str, Any] | None = Field(
-        default=None,
-        description="Audio analysis results"
-    )
-    text_analysis: dict[str, Any] | None = Field(
-        default=None,
-        description="Text analysis results"
-    )
+    visual_analysis: dict[str, Any] | None = Field(default=None, description="Visual analysis results")
+    audio_analysis: dict[str, Any] | None = Field(default=None, description="Audio analysis results")
+    text_analysis: dict[str, Any] | None = Field(default=None, description="Text analysis results")
 
     # Cross-modal analysis
     cross_modal_patterns: list[dict[str, Any]] = Field(
-        default_factory=list,
-        description="Patterns detected across modalities"
+        default_factory=list, description="Patterns detected across modalities"
     )
     modality_correlations: dict[str, float] = Field(
-        default_factory=dict,
-        description="Correlation scores between modalities"
+        default_factory=dict, description="Correlation scores between modalities"
     )
 
     # Recommendations and insights
     recommendations: list[MultimodalRecommendation] = Field(
-        default_factory=list,
-        description="Multi-modal bias mitigation recommendations"
+        default_factory=list, description="Multi-modal bias mitigation recommendations"
     )
     alternative_representations: list[dict[str, Any]] = Field(
-        default_factory=list,
-        description="Alternative bias-neutral representations"
+        default_factory=list, description="Alternative bias-neutral representations"
     )
 
     # Technical details
-    processing_time_ms: int = Field(
-        description="Processing time in milliseconds"
-    )
-    model_versions: dict[str, str] = Field(
-        description="Model versions used for analysis"
-    )
-    modalities_analyzed: list[str] = Field(
-        description="Modalities that were analyzed"
-    )
-    file_metadata: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Original file metadata"
-    )
+    processing_time_ms: int = Field(description="Processing time in milliseconds")
+    model_versions: dict[str, str] = Field(description="Model versions used for analysis")
+    modalities_analyzed: list[str] = Field(description="Modalities that were analyzed")
+    file_metadata: dict[str, Any] = Field(default_factory=dict, description="Original file metadata")
 
     # Timestamps
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -624,6 +403,7 @@ class MultimodalAnalysisResponse(BaseModel):
 
     class Config:
         """Pydantic configuration"""
+
         use_enum_values = True
         json_encoders = {
             datetime: lambda v: v.isoformat(),
@@ -637,22 +417,10 @@ class HealthResponse(BaseModel):
     status: str = Field(description="Service status: healthy, degraded, unhealthy")
     version: str = Field(description="Service version")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    modalities: dict[str, str] = Field(
-        default_factory=dict,
-        description="Status of each modality service"
-    )
-    gpu_status: dict[str, Any] = Field(
-        default_factory=dict,
-        description="GPU availability and status"
-    )
-    dependencies: dict[str, str] = Field(
-        default_factory=dict,
-        description="Status of external dependencies"
-    )
-    metrics: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Service metrics"
-    )
+    modalities: dict[str, str] = Field(default_factory=dict, description="Status of each modality service")
+    gpu_status: dict[str, Any] = Field(default_factory=dict, description="GPU availability and status")
+    dependencies: dict[str, str] = Field(default_factory=dict, description="Status of external dependencies")
+    metrics: dict[str, Any] = Field(default_factory=dict, description="Service metrics")
 
 
 class ErrorResponse(BaseModel):
@@ -663,7 +431,4 @@ class ErrorResponse(BaseModel):
     details: dict[str, Any] | None = Field(default=None, description="Error details")
     request_id: str | None = Field(default=None, description="Request ID")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-    affected_modalities: list[str] = Field(
-        default_factory=list,
-        description="Modalities affected by the error"
-    )
+    affected_modalities: list[str] = Field(default_factory=list, description="Modalities affected by the error")

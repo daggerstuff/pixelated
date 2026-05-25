@@ -20,6 +20,12 @@ vi.mock('@/lib/services/notification/NotificationService', () => ({
   },
 }))
 
+vi.mock('@auth0/auth0-react', () => ({
+  useAuth0: () => ({
+    getAccessTokenSilently: vi.fn().mockResolvedValue('mock-token'),
+  }),
+}))
+
 import { useNotificationPreferences } from '../useNotificationPreferences'
 
 const NotificationChannel = {

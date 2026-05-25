@@ -6,68 +6,154 @@
  * crisis detection, session trajectory tracking.
  */
 
-
-
 // ─── Plutchik wheel categories ────────────────────────────────────────────────
 
 export const PLUTCHIK_PRIMARY = new Set([
-  'joy', 'sadness', 'anger', 'fear', 'surprise', 'disgust', 'trust', 'anticipation',
+  'joy',
+  'sadness',
+  'anger',
+  'fear',
+  'surprise',
+  'disgust',
+  'trust',
+  'anticipation',
 ])
 
 export const PLUTCHIK_SECONDARY = new Set([
-  'optimism', 'love', 'submission', 'awe', 'disapproval', 'remorse', 'contempt', 'aggression',
+  'optimism',
+  'love',
+  'submission',
+  'awe',
+  'disapproval',
+  'remorse',
+  'contempt',
+  'aggression',
 ])
 
 export const ALL_EMOTION_CATEGORIES = new Set([
-  ...PLUTCHIK_PRIMARY, ...PLUTCHIK_SECONDARY,
+  ...PLUTCHIK_PRIMARY,
+  ...PLUTCHIK_SECONDARY,
 ])
 
 // ─── Emotion-to-multiplier mapping ───────────────────────────────────────────
 
 export const EMOTION_MULTIPLIER: Record<string, number> = {
   // Crisis indicators
-  suicide: 5.0, 'self-harm': 5.0, overdose: 5.0, panic: 5.0, psychosis: 5.0,
+  'suicide': 5.0,
+  'self-harm': 5.0,
+  'overdose': 5.0,
+  'panic': 5.0,
+  'psychosis': 5.0,
   // High-intensity
-  grief: 2.5, trauma: 2.5, despair: 2.5, hopelessness: 2.5,
-  anxiety: 2.0, fear: 2.0, anger: 2.0, terror: 2.0,
+  'grief': 2.5,
+  'trauma': 2.5,
+  'despair': 2.5,
+  'hopelessness': 2.5,
+  'anxiety': 2.0,
+  'fear': 2.0,
+  'anger': 2.0,
+  'terror': 2.0,
   // Standard
-  joy: 1.0, sadness: 1.0, surprise: 1.0, disgust: 1.0,
-  trust: 1.0, anticipation: 1.0,
+  'joy': 1.0,
+  'sadness': 1.0,
+  'surprise': 1.0,
+  'disgust': 1.0,
+  'trust': 1.0,
+  'anticipation': 1.0,
   // Secondary
-  optimism: 1.0, love: 1.0, submission: 1.0,
-  awe: 1.0, disapproval: 1.0, remorse: 1.0, contempt: 1.0, aggression: 1.5,
+  'optimism': 1.0,
+  'love': 1.0,
+  'submission': 1.0,
+  'awe': 1.0,
+  'disapproval': 1.0,
+  'remorse': 1.0,
+  'contempt': 1.0,
+  'aggression': 1.5,
 }
 
 export function emotionMultiplier(categories: string[]): number {
   if (!categories.length) return 1.0
-  return Math.max(...categories.map((c) => EMOTION_MULTIPLIER[c.toLowerCase()] ?? 1.0))
+  return Math.max(
+    ...categories.map((c) => EMOTION_MULTIPLIER[c.toLowerCase()] ?? 1.0),
+  )
 }
 
 // ─── VAD lexicon ─────────────────────────────────────────────────────────────
 
 const HIGH_VALENCE = new Set([
-  'happy', 'joy', 'grateful', 'hopeful', 'excited', 'relieved', 'peaceful',
-  'love', 'appreciate', 'wonderful', 'better', 'improving', 'progress',
+  'happy',
+  'joy',
+  'grateful',
+  'hopeful',
+  'excited',
+  'relieved',
+  'peaceful',
+  'love',
+  'appreciate',
+  'wonderful',
+  'better',
+  'improving',
+  'progress',
 ])
 const LOW_VALENCE = new Set([
-  'sad', 'depressed', 'hopeless', 'worthless', 'anxious', 'worried', 'fear',
-  'terrible', 'awful', 'horrible', 'devastated', 'anguish', 'despair',
+  'sad',
+  'depressed',
+  'hopeless',
+  'worthless',
+  'anxious',
+  'worried',
+  'fear',
+  'terrible',
+  'awful',
+  'horrible',
+  'devastated',
+  'anguish',
+  'despair',
 ])
 const HIGH_AROUSAL = new Set([
-  'panic', 'overwhelmed', 'shocked', 'frantic', 'intense', 'trembling',
-  'racing', 'pounding', 'breathing', 'screaming',
+  'panic',
+  'overwhelmed',
+  'shocked',
+  'frantic',
+  'intense',
+  'trembling',
+  'racing',
+  'pounding',
+  'breathing',
+  'screaming',
 ])
 const LOW_AROUSAL = new Set([
-  'calm', 'peaceful', 'relaxed', 'numb', 'detached', 'empty', 'flat',
-  'indifferent', 'still', 'quiet', 'resting',
+  'calm',
+  'peaceful',
+  'relaxed',
+  'numb',
+  'detached',
+  'empty',
+  'flat',
+  'indifferent',
+  'still',
+  'quiet',
+  'resting',
 ])
 const HIGH_DOMINANCE = new Set([
-  'control', 'confident', 'capable', 'strong', 'determined', 'empowered',
-  'boundaries', 'standing up',
+  'control',
+  'confident',
+  'capable',
+  'strong',
+  'determined',
+  'empowered',
+  'boundaries',
+  'standing up',
 ])
 const LOW_DOMINANCE = new Set([
-  'helpless', 'powerless', 'trapped', 'stuck', 'unable', 'surrendering',
-  'out of control', 'giving up',
+  'helpless',
+  'powerless',
+  'trapped',
+  'stuck',
+  'unable',
+  'surrendering',
+  'out of control',
+  'giving up',
 ])
 
 function tokenise(text: string): Set<string> {
@@ -79,7 +165,8 @@ function scoreDimension(
   pos: Set<string>,
   neg: Set<string>,
 ): number {
-  let posCount = 0, negCount = 0
+  let posCount = 0,
+    negCount = 0
   for (const w of tokens) {
     if (pos.has(w)) posCount++
     if (neg.has(w)) negCount++
@@ -89,7 +176,11 @@ function scoreDimension(
   return (posCount - negCount) / (2 * total) + 0.5
 }
 
-export function vadScore(text: string): { valence: number; arousal: number; dominance: number } {
+export function vadScore(text: string): {
+  valence: number
+  arousal: number
+  dominance: number
+} {
   const tokens = tokenise(text)
   const valence = scoreDimension(tokens, HIGH_VALENCE, LOW_VALENCE)
   const arousal = scoreDimension(tokens, HIGH_AROUSAL, LOW_AROUSAL)
@@ -110,7 +201,11 @@ export interface EmotionClassificationResult {
   multiplier: number
 }
 
-export type TrajectoryTrend = 'escalating' | 'de-escalating' | 'stable' | 'volatile'
+export type TrajectoryTrend =
+  | 'escalating'
+  | 'de-escalating'
+  | 'stable'
+  | 'volatile'
 
 export interface EmotionTrajectory {
   startValence: number
@@ -122,28 +217,73 @@ export interface EmotionTrajectory {
   trend: TrajectoryTrend
   maxIntensity: number
   crisisIndicators: string[]
-  trajectoryScores: Array<{ valence: number; arousal: number; dominance: number }>
+  trajectoryScores: Array<{
+    valence: number
+    arousal: number
+    dominance: number
+  }>
 }
 
 // Keyword → Plutchik mapping (multi-word phrases use substring match)
 const KEYWORD_MAP: Record<string, string[]> = {
-  joy: ['happy', 'joy', 'glad', 'excited', 'wonderful', 'grateful', 'love'],
-  sadness: ['sad', 'unhappy', 'depressed', 'grief', 'sorrow', 'crying', 'tears'],
-  anger: ['angry', 'rage', 'furious', 'frustrated', 'irritated', 'mad'],
-  fear: ['afraid', 'scared', 'fearful', 'frightened', 'terrified', 'panic', 'anxious', 'worried', 'nervous'],
-  surprise: ['surprised', 'amazed', 'shocked', 'unexpected', 'wow'],
-  disgust: ['disgusted', 'revolted', 'gross', 'sickened', 'repulsed'],
-  trust: ['trust', 'believe', 'confidence', 'rely', 'comfort'],
-  anticipation: ['anticipate', 'expect', 'looking forward', 'hopeful', 'hope'],
-  grief: ['grief', 'mourning', 'loss', 'bereavement', 'lost'],
-  trauma: ['trauma', 'traumatic', 'abuse', 'violence', 'assault'],
-  despair: ['despair', 'hopeless', 'worthless', 'helpless', 'giving up'],
-  suicide: ['suicide', 'kill myself', 'end it all', 'no reason to live', 'end my life'],
-  'self-harm': ['cut myself', 'self-harm', 'hurt myself', 'self injury', 'selfharm'],
+  'joy': ['happy', 'joy', 'glad', 'excited', 'wonderful', 'grateful', 'love'],
+  'sadness': [
+    'sad',
+    'unhappy',
+    'depressed',
+    'grief',
+    'sorrow',
+    'crying',
+    'tears',
+  ],
+  'anger': ['angry', 'rage', 'furious', 'frustrated', 'irritated', 'mad'],
+  'fear': [
+    'afraid',
+    'scared',
+    'fearful',
+    'frightened',
+    'terrified',
+    'panic',
+    'anxious',
+    'worried',
+    'nervous',
+  ],
+  'surprise': ['surprised', 'amazed', 'shocked', 'unexpected', 'wow'],
+  'disgust': ['disgusted', 'revolted', 'gross', 'sickened', 'repulsed'],
+  'trust': ['trust', 'believe', 'confidence', 'rely', 'comfort'],
+  'anticipation': [
+    'anticipate',
+    'expect',
+    'looking forward',
+    'hopeful',
+    'hope',
+  ],
+  'grief': ['grief', 'mourning', 'loss', 'bereavement', 'lost'],
+  'trauma': ['trauma', 'traumatic', 'abuse', 'violence', 'assault'],
+  'despair': ['despair', 'hopeless', 'worthless', 'helpless', 'giving up'],
+  'suicide': [
+    'suicide',
+    'kill myself',
+    'end it all',
+    'no reason to live',
+    'end my life',
+  ],
+  'self-harm': [
+    'cut myself',
+    'self-harm',
+    'hurt myself',
+    'self injury',
+    'selfharm',
+  ],
 }
 
 const MAX_KEYWORDS = 7
-const CRISIS_CATEGORIES = new Set(['suicide', 'self-harm', 'panic', 'psychosis'])
+const CRISIS_CATEGORIES = new Set([
+  'suicide',
+  'self-harm',
+  'panic',
+  'psychosis',
+])
 
 function classifyLexicon(
   text: string,
@@ -201,7 +341,8 @@ function computeTrend(
   if (valences.length < 2) return 'stable'
 
   const mean = valences.reduce((s, v) => s + v, 0) / valences.length
-  const variance = valences.reduce((s, v) => s + (v - mean) ** 2, 0) / valences.length
+  const variance =
+    valences.reduce((s, v) => s + (v - mean) ** 2, 0) / valences.length
   if (variance > 0.04) return 'volatile'
 
   const valenceTrend = valences[0]! - valences[valences.length - 1]!
@@ -231,16 +372,22 @@ export class EmotionClassifier {
     return classifyLexicon(text, _multiLabel)
   }
 
-  classifyBatch(texts: string[], _multiLabel = true): EmotionClassificationResult[] {
+  classifyBatch(
+    texts: string[],
+    _multiLabel = true,
+  ): EmotionClassificationResult[] {
     return texts.map((t) => this.classify(t, _multiLabel))
   }
 
   sessionTrajectory(results: EmotionClassificationResult[]): EmotionTrajectory {
     if (!results.length) {
       return {
-        startValence: 0.5, endValence: 0.5,
-        startArousal: 0.5, endArousal: 0.5,
-        startDominance: 0.5, endDominance: 0.5,
+        startValence: 0.5,
+        endValence: 0.5,
+        startArousal: 0.5,
+        endArousal: 0.5,
+        startDominance: 0.5,
+        endDominance: 0.5,
         trend: 'stable',
         maxIntensity: 0,
         crisisIndicators: [],
@@ -259,7 +406,10 @@ export class EmotionClassifier {
 
     let maxIntensity = 0
     for (const r of results) {
-      if (r.topCategory !== null && (r.categoryScores[r.topCategory] ?? 0) > maxIntensity) {
+      if (
+        r.topCategory !== null &&
+        (r.categoryScores[r.topCategory] ?? 0) > maxIntensity
+      ) {
         maxIntensity = r.categoryScores[r.topCategory] ?? 0
       }
     }

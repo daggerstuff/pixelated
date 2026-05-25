@@ -1,3 +1,3 @@
 from .torch_proxy import nn, torch
 
-__all__ = ["torch", "nn"]
+__all__ = ["nn", "torch"]

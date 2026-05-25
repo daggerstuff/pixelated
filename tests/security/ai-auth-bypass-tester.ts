@@ -279,7 +279,7 @@ async function testJWTManipulation(endpoint: Endpoint): Promise<TestResult> {
       url: `${config.baseUrl}${endpoint.path}`,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${fakeToken}`,
+        'Authorization': `Bearer ${fakeToken}`,
       },
       data:
         endpoint.method === 'POST'
@@ -361,7 +361,7 @@ async function testCookieManipulation(endpoint: Endpoint): Promise<TestResult> {
       url: `${config.baseUrl}${endpoint.path}`,
       headers: {
         'Content-Type': 'application/json',
-        Cookie: fakeCookie,
+        'Cookie': fakeCookie,
       },
       data:
         endpoint.method === 'POST'
@@ -621,7 +621,7 @@ async function testRBACBypass(endpoint: Endpoint): Promise<TestResult> {
       url: `${config.baseUrl}${endpoint.path}`,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.validUserToken}`,
+        'Authorization': `Bearer ${config.validUserToken}`,
       },
       data:
         endpoint.method === 'POST'

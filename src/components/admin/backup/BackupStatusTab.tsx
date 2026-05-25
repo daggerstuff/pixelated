@@ -41,13 +41,13 @@ const formatDate = (dateString: string) => {
 const renderStatusBadge = (status: BackupStatus) => {
   switch (status) {
     case BackupStatus.PENDING:
-      return <Badge variant='outline'>Pending</Badge>
+      return <Badge variant="outline">Pending</Badge>
 
     case BackupStatus.IN_PROGRESS:
       return (
         <Badge
-          variant='secondary'
-          className='bg-blue-100 text-blue-800 hover:bg-blue-100'
+          variant="secondary"
+          className="bg-blue-100 text-blue-800 hover:bg-blue-100"
         >
           In Progress
         </Badge>
@@ -56,40 +56,42 @@ const renderStatusBadge = (status: BackupStatus) => {
     case BackupStatus.COMPLETED:
       return (
         <Badge
-          variant='outline'
-          className='bg-green-100 text-green-800 hover:bg-green-100'
+          variant="outline"
+          className="bg-green-100 text-green-800 hover:bg-green-100"
         >
           Completed
         </Badge>
       )
 
     case BackupStatus.FAILED:
-      return <Badge variant='destructive'>Failed</Badge>
+      return <Badge variant="destructive">Failed</Badge>
 
     case BackupStatus.VERIFIED:
       return (
         <Badge
-          variant='outline'
-          className='bg-green-100 text-green-800 hover:bg-green-100'
+          variant="outline"
+          className="bg-green-100 text-green-800 hover:bg-green-100"
         >
           Verified
         </Badge>
       )
 
     case BackupStatus.VERIFICATION_FAILED:
-      return <Badge variant='destructive'>Verification Failed</Badge>
+      return <Badge variant="destructive">Verification Failed</Badge>
 
     case BackupStatus.EXPIRED:
       return (
         <Badge
-          variant='outline'
-          className='bg-gray-100 text-gray-800 hover:bg-gray-100'
+          variant="outline"
+          className="bg-gray-100 text-gray-800 hover:bg-gray-100"
         >
           Expired
         </Badge>
       )
 
-    case BackupStatus.DELETED: { throw new Error('Not implemented yet: BackupStatus.DELETED case') }
+    case BackupStatus.DELETED: {
+      throw new Error('Not implemented yet: BackupStatus.DELETED case')
+    }
     default:
       return null
   }
@@ -101,8 +103,8 @@ const renderTypeBadge = (type: BackupType) => {
     case BackupType.FULL:
       return (
         <Badge
-          variant='outline'
-          className='bg-purple-100 text-purple-800 hover:bg-purple-100'
+          variant="outline"
+          className="bg-purple-100 text-purple-800 hover:bg-purple-100"
         >
           Full
         </Badge>
@@ -111,8 +113,8 @@ const renderTypeBadge = (type: BackupType) => {
     case BackupType.DIFFERENTIAL:
       return (
         <Badge
-          variant='outline'
-          className='bg-blue-100 text-blue-800 hover:bg-blue-100'
+          variant="outline"
+          className="bg-blue-100 text-blue-800 hover:bg-blue-100"
         >
           Differential
         </Badge>
@@ -121,14 +123,16 @@ const renderTypeBadge = (type: BackupType) => {
     case BackupType.TRANSACTION:
       return (
         <Badge
-          variant='outline'
-          className='bg-gray-100 text-gray-800 hover:bg-gray-100'
+          variant="outline"
+          className="bg-gray-100 text-gray-800 hover:bg-gray-100"
         >
           Transaction
         </Badge>
       )
 
-    case BackupType.INCREMENTAL: { throw new Error('Not implemented yet: BackupType.INCREMENTAL case') }
+    case BackupType.INCREMENTAL: {
+      throw new Error('Not implemented yet: BackupType.INCREMENTAL case')
+    }
     default:
       return null
   }
@@ -156,34 +160,34 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
   onVerifyBackup,
 }) => {
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <h2 className='text-xl font-semibold'>Backup Status</h2>
-        <div className='flex gap-2'>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-semibold">Backup Status</h2>
+        <div className="flex gap-2">
           <Button
             onClick={() => onCreateBackup(BackupType.TRANSACTION)}
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
           >
             Create Transaction Backup
           </Button>
           <Button
             onClick={() => onCreateBackup(BackupType.DIFFERENTIAL)}
-            variant='outline'
-            size='sm'
+            variant="outline"
+            size="sm"
           >
             Create Differential Backup
           </Button>
-          <Button onClick={() => onCreateBackup(BackupType.FULL)} size='sm'>
+          <Button onClick={() => onCreateBackup(BackupType.FULL)} size="sm">
             Create Full Backup
           </Button>
         </div>
       </div>
 
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {backups.length === 0 ? (
-          <Card className='col-span-full'>
-            <CardContent className='text-gray-500 py-8 text-center'>
+          <Card className="col-span-full">
+            <CardContent className="text-gray-500 py-8 text-center">
               No backups have been created yet. Use the buttons above to create
               your first backup.
             </CardContent>
@@ -199,9 +203,9 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                   : ''
               }
             >
-              <CardHeader className='pb-2'>
-                <div className='flex items-center justify-between'>
-                  <CardTitle className='text-base'>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">
                     {renderTypeBadge(backup.type)}
                   </CardTitle>
                   {renderStatusBadge(backup.status)}
@@ -211,53 +215,53 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className='grid grid-cols-2 gap-x-4 gap-y-2 text-sm'>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <div>
-                    <span className='font-medium'>ID:</span>
+                    <span className="font-medium">ID:</span>
                     <br />
-                    <span className='text-gray-600 text-xs'>{backup.id}</span>
+                    <span className="text-gray-600 text-xs">{backup.id}</span>
                   </div>
                   <div>
-                    <span className='font-medium'>Size:</span>
+                    <span className="font-medium">Size:</span>
                     <br />
-                    <span className='text-gray-600'>
+                    <span className="text-gray-600">
                       {formatBytes(backup.size)}
                     </span>
                   </div>
                   <div>
-                    <span className='font-medium'>Location:</span>
+                    <span className="font-medium">Location:</span>
                     <br />
-                    <span className='text-gray-600'>{backup.location}</span>
+                    <span className="text-gray-600">{backup.location}</span>
                   </div>
                   <div>
-                    <span className='font-medium'>Retention Until:</span>
+                    <span className="font-medium">Retention Until:</span>
                     <br />
-                    <span className='text-gray-600'>
+                    <span className="text-gray-600">
                       {new Date(backup.retentionDate).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className='flex justify-end space-x-2 pt-0'>
+              <CardFooter className="flex justify-end space-x-2 pt-0">
                 {[
                   BackupStatus.COMPLETED,
                   BackupStatus.VERIFICATION_FAILED,
                 ].includes(backup.status) && (
                   <Button
-                    variant='outline'
-                    size='sm'
+                    variant="outline"
+                    size="sm"
                     onClick={() => onVerifyBackup(backup.id)}
                   >
                     Verify
                   </Button>
                 )}
                 {backup.status === BackupStatus.IN_PROGRESS && (
-                  <Button variant='outline' size='sm' disabled>
-                    <span className='border-current border-r-transparent mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid'></span>
+                  <Button variant="outline" size="sm" disabled>
+                    <span className="border-current border-r-transparent mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid"></span>
                     In Progress
                   </Button>
                 )}
-                <Button variant='outline' size='sm'>
+                <Button variant="outline" size="sm">
                   Details
                 </Button>
               </CardFooter>
@@ -266,24 +270,24 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
         )}
       </div>
 
-      <div className='mt-6'>
-        <h3 className='mb-2 text-lg font-semibold'>Backup Schedule</h3>
+      <div className="mt-6">
+        <h3 className="mb-2 text-lg font-semibold">Backup Schedule</h3>
         <Card>
-          <CardContent className='py-4'>
-            <table className='w-full text-sm'>
+          <CardContent className="py-4">
+            <table className="w-full text-sm">
               <thead>
-                <tr className='border-b'>
-                  <th className='py-2 text-left'>Type</th>
-                  <th className='py-2 text-left'>Schedule</th>
-                  <th className='py-2 text-left'>Next Run</th>
-                  <th className='py-2 text-left'>Retention</th>
+                <tr className="border-b">
+                  <th className="py-2 text-left">Type</th>
+                  <th className="py-2 text-left">Schedule</th>
+                  <th className="py-2 text-left">Next Run</th>
+                  <th className="py-2 text-left">Retention</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className='border-b'>
-                  <td className='py-2'>Full Backup</td>
-                  <td className='py-2'>Weekly (Sunday at midnight)</td>
-                  <td className='py-2'>
+                <tr className="border-b">
+                  <td className="py-2">Full Backup</td>
+                  <td className="py-2">Weekly (Sunday at midnight)</td>
+                  <td className="py-2">
                     {(() => {
                       // Calculate next Sunday
                       const now = new Date()
@@ -294,12 +298,12 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                       return nextSunday.toLocaleDateString()
                     })()}
                   </td>
-                  <td className='py-2'>365 days</td>
+                  <td className="py-2">365 days</td>
                 </tr>
-                <tr className='border-b'>
-                  <td className='py-2'>Differential Backup</td>
-                  <td className='py-2'>Daily at midnight (except Sunday)</td>
-                  <td className='py-2'>
+                <tr className="border-b">
+                  <td className="py-2">Differential Backup</td>
+                  <td className="py-2">Daily at midnight (except Sunday)</td>
+                  <td className="py-2">
                     {(() => {
                       // Calculate next day at midnight
                       const now = new Date()
@@ -309,12 +313,12 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                       return tomorrow.toLocaleDateString()
                     })()}
                   </td>
-                  <td className='py-2'>30 days</td>
+                  <td className="py-2">30 days</td>
                 </tr>
                 <tr>
-                  <td className='py-2'>Transaction Backup</td>
-                  <td className='py-2'>Hourly</td>
-                  <td className='py-2'>
+                  <td className="py-2">Transaction Backup</td>
+                  <td className="py-2">Hourly</td>
+                  <td className="py-2">
                     {(() => {
                       // Calculate next hour
                       const now = new Date()
@@ -323,7 +327,7 @@ const BackupStatusTab: FC<BackupStatusTabProps> = ({
                       return nextHour.toLocaleTimeString()
                     })()}
                   </td>
-                  <td className='py-2'>7 days</td>
+                  <td className="py-2">7 days</td>
                 </tr>
               </tbody>
             </table>

@@ -17,12 +17,6 @@ import numpy as np
 import pandas as pd
 import pytest
 from fastapi.testclient import TestClient
-from bias_utils import (
-    create_minimal_test_session_data,
-    create_synthetic_dataset,
-    create_test_session_data,
-)
-from placeholder_adapters import PlaceholderAdapters
 
 # Import the service and related classes
 from bias_detection.app import app
@@ -33,6 +27,12 @@ from bias_detection.compat import (
     SessionData,
 )
 from bias_detection.services.bias_detection_service import BiasDetectionService
+from bias_utils import (
+    create_minimal_test_session_data,
+    create_synthetic_dataset,
+    create_test_session_data,
+)
+from placeholder_adapters import PlaceholderAdapters
 
 # Create instance for testing
 analysis_adapters = PlaceholderAdapters()

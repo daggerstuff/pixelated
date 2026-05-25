@@ -40,7 +40,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
   if (isLoading) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Loading session...</p>
+        <p className="text-muted-foreground">Loading session...</p>
       </div>
     )
   }
@@ -48,7 +48,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
   if (!session) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>Session not found</p>
+        <p className="text-muted-foreground">Session not found</p>
       </div>
     )
   }
@@ -56,18 +56,18 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>{session.sessionId}</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">{session.sessionId}</h1>
+          <p className="text-muted-foreground mt-1">
             Started {format(session.startDate, 'MMM d, yyyy')} • Current phase:{' '}
-            <span className='capitalize'>{session.currentPhase}</span>
+            <span className="capitalize">{session.currentPhase}</span>
           </p>
         </div>
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className='border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium'
+            className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
           >
             {isEditing ? 'Cancel' : 'Edit'}
           </button>
@@ -81,7 +81,7 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
                 deleteMutation.mutate(session.sessionId)
               }
             }}
-            className='bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium'
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 text-sm font-medium"
           >
             Delete
           </button>
@@ -136,40 +136,40 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
           <CardTitle>Session Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='grid gap-4 md:grid-cols-2'>
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Session ID
               </p>
-              <p className='mt-1'>{session.sessionId}</p>
+              <p className="mt-1">{session.sessionId}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Start Date
               </p>
-              <p className='mt-1'>{format(session.startDate, 'PPpp')}</p>
+              <p className="mt-1">{format(session.startDate, 'PPpp')}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Current Phase
               </p>
-              <p className='mt-1 capitalize'>{session.currentPhase}</p>
+              <p className="mt-1 capitalize">{session.currentPhase}</p>
             </div>
             <div>
-              <p className='text-muted-foreground text-sm font-medium'>
+              <p className="text-muted-foreground text-sm font-medium">
                 Target Sources
               </p>
-              <p className='mt-1'>{session.targetSources.join(', ')}</p>
+              <p className="mt-1">{session.targetSources.join(', ')}</p>
             </div>
-            <div className='md:col-span-2'>
-              <p className='text-muted-foreground text-sm font-medium'>
+            <div className="md:col-span-2">
+              <p className="text-muted-foreground text-sm font-medium">
                 Search Keywords
               </p>
-              <div className='mt-1 space-y-1'>
+              <div className="mt-1 space-y-1">
                 {Object.entries(session.searchKeywords).map(
                   ([category, keywords]) => (
                     <div key={category}>
-                      <span className='font-medium'>{category}:</span>{' '}
+                      <span className="font-medium">{category}:</span>{' '}
                       {keywords.join(', ')}
                     </div>
                   ),
@@ -177,40 +177,40 @@ export function SessionDetail({ sessionId, className }: SessionDetailProps) {
               </div>
             </div>
             {session.progressMetrics && (
-              <div className='md:col-span-2'>
-                <p className='text-muted-foreground text-sm font-medium'>
+              <div className="md:col-span-2">
+                <p className="text-muted-foreground text-sm font-medium">
                   Progress Metrics
                 </p>
-                <div className='mt-2 grid grid-cols-2 gap-4 md:grid-cols-4'>
+                <div className="mt-2 grid grid-cols-2 gap-4 md:grid-cols-4">
                   <div>
-                    <p className='text-muted-foreground text-xs'>
+                    <p className="text-muted-foreground text-xs">
                       Sources Identified
                     </p>
-                    <p className='text-lg font-semibold'>
+                    <p className="text-lg font-semibold">
                       {session.progressMetrics['sources_identified'] ?? 0}
                     </p>
                   </div>
                   <div>
-                    <p className='text-muted-foreground text-xs'>
+                    <p className="text-muted-foreground text-xs">
                       Datasets Evaluated
                     </p>
-                    <p className='text-lg font-semibold'>
+                    <p className="text-lg font-semibold">
                       {session.progressMetrics['datasets_evaluated'] ?? 0}
                     </p>
                   </div>
                   <div>
-                    <p className='text-muted-foreground text-xs'>
+                    <p className="text-muted-foreground text-xs">
                       Datasets Acquired
                     </p>
-                    <p className='text-lg font-semibold'>
+                    <p className="text-lg font-semibold">
                       {session.progressMetrics['datasets_acquired'] ?? 0}
                     </p>
                   </div>
                   <div>
-                    <p className='text-muted-foreground text-xs'>
+                    <p className="text-muted-foreground text-xs">
                       Integration Plans
                     </p>
-                    <p className='text-lg font-semibold'>
+                    <p className="text-lg font-semibold">
                       {session.progressMetrics['integration_plans_created'] ??
                         0}
                     </p>

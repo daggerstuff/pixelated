@@ -86,9 +86,7 @@ def pull_trials(output_dir: Path, limit: int) -> int:
             text=json.dumps(
                 {
                     "brief_summary": protocol.get("descriptionModule", {}).get("briefSummary", ""),
-                    "detailed_description": protocol.get("descriptionModule", {}).get(
-                        "detailedDescription", ""
-                    ),
+                    "detailed_description": protocol.get("descriptionModule", {}).get("detailedDescription", ""),
                 }
             ),
             metadata={
@@ -115,9 +113,7 @@ def pull_trials(output_dir: Path, limit: int) -> int:
                 "primary_outcomes": [o.get("measure", "") for o in outcomes],
                 "status": protocol.get("statusModule", {}).get("overallStatus", ""),
                 "phase": protocol.get("designModule", {}).get("phases", []),
-                "enrollment": protocol.get("designModule", {})
-                .get("enrollmentInfo", {})
-                .get("count", 0),
+                "enrollment": protocol.get("designModule", {}).get("enrollmentInfo", {}).get("count", 0),
             },
             license="public_domain",
             license_verified=True,

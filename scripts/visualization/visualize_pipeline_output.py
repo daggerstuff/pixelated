@@ -26,10 +26,7 @@ def plot_flow_dynamics(flow_data, output_dir):
 
 def plot_meta_intelligence(meta_data, output_dir):
     """Plot meta intelligence metrics."""
-    metrics = {
-        "Deviation": meta_data["deviation"],
-        "Reflection Score": meta_data["reflection_score"]
-    }
+    metrics = {"Deviation": meta_data["deviation"], "Reflection Score": meta_data["reflection_score"]}
 
     plt.figure(figsize=(6, 5))
     plt.bar(list(metrics.keys()), list(metrics.values()), color=["skyblue", "lightgreen"])
@@ -50,14 +47,8 @@ def visualize_latest_run():
         # Create a dummy log file for demonstration purposes
         dummy_data = {
             "output": {
-                "flow_dynamics": {
-                    "velocity": [[0.1, 0.2, -0.1]],
-                    "acceleration": [[0.05, -0.02, 0.03]]
-                },
-                "meta_intelligence": {
-                    "deviation": 0.5,
-                    "reflection_score": 0.8
-                }
+                "flow_dynamics": {"velocity": [[0.1, 0.2, -0.1]], "acceleration": [[0.05, -0.02, 0.03]]},
+                "meta_intelligence": {"deviation": 0.5, "reflection_score": 0.8},
             }
         }
         with log_file.open("w") as f:
@@ -65,10 +56,9 @@ def visualize_latest_run():
 
     # Use contextlib.suppress to handle potential file reading errors gracefully
     latest_run = None
-    with suppress(Exception):
-        with log_file.open() as f:
-            if lines := f.readlines():
-                latest_run = lines[-1]
+    with suppress(Exception), log_file.open() as f:
+        if lines := f.readlines():
+            latest_run = lines[-1]
 
     if latest_run:
         data = json.loads(latest_run)
@@ -83,6 +73,7 @@ def visualize_latest_run():
         print(f"Visualizations saved to {output_dir}")
     else:
         print("Could not read log file data")
+
 
 if __name__ == "__main__":
     visualize_latest_run()

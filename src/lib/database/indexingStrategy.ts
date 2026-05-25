@@ -290,7 +290,7 @@ class IndexingStrategy {
       idx_patients_search: 0.23,
     }
 
-    return mockUsage[indexName] || 0.01
+    return mockUsage[indexName] ?? 0.01
   }
 
   private async getAverageQueryTime(): Promise<number> {

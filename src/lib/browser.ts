@@ -6,14 +6,12 @@
  * Checks if code is running in a browser environment
  * This is useful for conditionally running code that requires browser APIs
  */
-export const isBrowser =
-  typeof window?.document?.createElement !== 'undefined'
+export const isBrowser = typeof window?.document?.createElement !== 'undefined'
 
 /**
  * Checks if code is running in a Node.js environment
  */
-export const isNode =
-  process.versions?.node != null
+export const isNode = process.versions?.node != null
 
 /**
  * Checks if code is running in a server-side environment (e.g., Node.js)

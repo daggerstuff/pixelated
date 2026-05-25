@@ -112,7 +112,7 @@ export function getEnv(): z.infer<typeof envSchema> {
 export const env = (() => {
   let cachedEnvInstance: z.infer<typeof envSchema> | null = null
   return () => {
-    cachedEnvInstance ??= getEnv();
+    cachedEnvInstance ??= getEnv()
     return cachedEnvInstance
   }
 })()
@@ -173,7 +173,7 @@ export const config = {
   ai: {
     llmApiKey: (): string | undefined => env().LLM_API_KEY,
     llmBaseUrl: (): string | undefined =>
-      (env().LLM_BASE_URL ?? env().LLM_API_URL) ?? env().OPENAI_BASE_URL,
+      env().LLM_BASE_URL ?? env().LLM_API_URL ?? env().OPENAI_BASE_URL,
     openAiKey: (): string | undefined => env().OPENAI_API_KEY,
     openAiBaseUrl: (): string | undefined => env().OPENAI_BASE_URL,
     anthropicApiKey: (): string | undefined => env().ANTHROPIC_API_KEY,

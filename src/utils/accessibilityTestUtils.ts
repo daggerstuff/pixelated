@@ -71,7 +71,7 @@ const WCAG_MAP: Record<string, string[]> = {
   'image-alt': ['1.1.1'],
   'input-button-name': ['4.1.2'],
   'input-image-alt': ['1.1.1'],
-  label: ['3.3.2'],
+  'label': ['3.3.2'],
   'link-name': ['4.1.2'],
   // Add more mappings as needed
 }
@@ -352,8 +352,7 @@ export async function checkScreenReaderIssues(page: Page): Promise<{
 
           // Check if there's a label with a matching 'for' attribute
           const hasLabelFor =
-            (document.querySelector(`label[for="${id}"]`)!) !==
-            null
+            document.querySelector(`label[for="${id}"]`)! !== null
           return !hasLabelFor
         })
         .map((el) => ({

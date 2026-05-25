@@ -10,7 +10,8 @@ workflows. We take security seriously and welcome responsible disclosure.
 If you discover a security issue:
 
 1. **Do NOT open a public issue.**
-2. **Email [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)**
+2. **Email
+   [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)**
    - Subject: `Security Flaw Discovered by [Your Name]`
    - Include:
      - Detailed description of the vulnerability
@@ -25,11 +26,11 @@ We aim to respond within **48 hours**.
 
 ## Supported Versions
 
-| Version | Supported |
-|---|---|
-| `main` | Yes |
-| `develop` | Yes |
-| Everything else | No |
+| Version         | Supported |
+| --------------- | --------- |
+| `main`          | Yes       |
+| `develop`       | Yes       |
+| Everything else | No        |
 
 ---
 
@@ -77,6 +78,7 @@ We transparently track risks that cannot be addressed by simple upgrades.
 
 ## Contact
 
-- **Email**: [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
+- **Email**:
+  [security@pixelatedempathy.com](mailto:security@pixelatedempathy.com)
 - **Twitter**: [@PixelEmpathy](https://twitter.com/PixelEmpathy) (DMs open for
   general inquiries, not vulnerability reports)

@@ -32,3 +32,7 @@ Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for filter 
 
 Learning: Repeated Date instantiation and toLocaleDateString() calls inside React map loops are an expensive performance bottleneck.
 Action: Memoized derived chart data in SessionChart to compute strings once per data change.
+
+## 2025-03-22 - O(N^2) Array Includes inside map loop
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders when iterating over selected patients.
+Action: Replaced `selectedPatients.includes(patient.id)` with a memoized `Set.has()` using `useMemo` in `TherapistDashboard.tsx`.

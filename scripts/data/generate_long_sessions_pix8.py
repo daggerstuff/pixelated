@@ -30,9 +30,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from ai.common.llm_client import LLMClient
 from ai.pipelines.design.service import NeMoDataDesignerService
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -55,9 +54,7 @@ class PIX8LongSessionGenerator:
         self.max_turns = max_turns
         # Use correct path relative to project root
         project_root = Path(__file__).resolve().parent.parent.parent
-        self.extractor_script = (
-            project_root / "ai/training/ready_packages/scripts/extract_long_running_therapy.py"
-        )
+        self.extractor_script = project_root / "ai/training/ready_packages/scripts/extract_long_running_therapy.py"
 
         logger.info("Initialized PIX-8 long session generator")
         logger.info(f"Output directory: {self.output_dir}")
@@ -135,9 +132,7 @@ class PIX8LongSessionGenerator:
         with open(file_path) as f:
             return sum(1 for _ in f)
 
-    def _generate_patient_profiles(
-        self, target_count: int, designer: NeMoDataDesignerService
-    ) -> list[dict[str, Any]]:
+    def _generate_patient_profiles(self, target_count: int, designer: NeMoDataDesignerService) -> list[dict[str, Any]]:
         """Internal method to generate patient profiles with retry logic."""
         max_retries = 5
         base_delay = 5
@@ -148,9 +143,7 @@ class PIX8LongSessionGenerator:
                 # We generate slightly more than needed to handle potential generation failures
                 profile_count = max(int(target_count * 1.1), 1)
 
-                logger.info(
-                    f"Attempt {attempt + 1}/{max_retries}: Requesting {profile_count} profiles..."
-                )
+                logger.info(f"Attempt {attempt + 1}/{max_retries}: Requesting {profile_count} profiles...")
 
                 dataset_result = designer.generate_therapeutic_dataset(
                     num_samples=profile_count,
@@ -183,9 +176,7 @@ class PIX8LongSessionGenerator:
                     logger.info(f"Retrying in {sleep_time:.2f}s...")
                     time.sleep(sleep_time)
                 else:
-                    logger.error(
-                        "All NeMo generation attempts failed. Using LLM global fallback for profiles."
-                    )
+                    logger.error("All NeMo generation attempts failed. Using LLM global fallback for profiles.")
                     return self._generate_llm_fallback_profiles(target_count)
 
         return patient_profiles
@@ -233,9 +224,7 @@ class PIX8LongSessionGenerator:
             for i in range(0, count, chunk_size):
                 current_chunk = min(chunk_size, count - i)
                 chunk_prompt = prompt.replace(f"Generate {count}", f"Generate {current_chunk}")
-                res_text = llm.generate(
-                    chunk_prompt, system_prompt="You are a clinical data architect."
-                )
+                res_text = llm.generate(chunk_prompt, system_prompt="You are a clinical data architect.")
 
                 # Extract JSON
                 start = res_text.find("[")
@@ -360,11 +349,7 @@ class PIX8LongSessionGenerator:
                 recent_contents = [m.get("content", "").lower().strip() for m in filtered[-10:]]
                 duplicate_count = sum(
                     rc == content_lower
-                    or (
-                        len(rc) > 5
-                        and len(content_lower) > 5
-                        and (rc in content_lower or content_lower in rc)
-                    )
+                    or (len(rc) > 5 and len(content_lower) > 5 and (rc in content_lower or content_lower in rc))
                     for rc in recent_contents
                 )
                 if duplicate_count >= 3:
@@ -517,9 +502,7 @@ class PIX8LongSessionGenerator:
                 )
 
                 if not segment_msgs:
-                    logger.warning(
-                        f"  Phase {phase_idx + 1} ({phase['name']}) returned empty — skipping"
-                    )
+                    logger.warning(f"  Phase {phase_idx + 1} ({phase['name']}) returned empty — skipping")
                     continue
 
                 all_messages.extend(segment_msgs)
@@ -551,9 +534,7 @@ class PIX8LongSessionGenerator:
                 )
                 return None
 
-            logger.info(
-                f"  ✅ Session {idx}: {len(filtered_messages)} turns (target was {total_turns})"
-            )
+            logger.info(f"  ✅ Session {idx}: {len(filtered_messages)} turns (target was {total_turns})")
 
             return {
                 "id": f"syn_pix8_{idx}_{int(time.time())}",
@@ -653,15 +634,11 @@ class PIX8LongSessionGenerator:
             "status": "completed",
         }
 
-        logger.info(
-            f"✅ Synthetic generation complete: {generated_count} sessions saved to {output_file}"
-        )
+        logger.info(f"✅ Synthetic generation complete: {generated_count} sessions saved to {output_file}")
 
         return stats
 
-    def generate_all(
-        self, extraction_target: int = 100000, synthesis_target: int = 100000
-    ) -> dict[str, Any]:
+    def generate_all(self, extraction_target: int = 100000, synthesis_target: int = 100000) -> dict[str, Any]:
         """
         Generate all long-running sessions for PIX-8.
 
@@ -692,9 +669,7 @@ class PIX8LongSessionGenerator:
         synthesis_stats = self.generate_synthetic_sessions(target_count=synthesis_target)
 
         # Aggregate statistics
-        total_generated = extraction_stats.get("extracted_count", 0) + synthesis_stats.get(
-            "generated_count", 0
-        )
+        total_generated = extraction_stats.get("extracted_count", 0) + synthesis_stats.get("generated_count", 0)
 
         aggregate_stats = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -720,9 +695,7 @@ class PIX8LongSessionGenerator:
         logger.info(f"\n💾 Statistics saved: {stats_file}")
 
         if total_generated < aggregate_stats["target_total"]:
-            logger.warning(
-                f"\n⚠️  Generated {total_generated:,} / {aggregate_stats['target_total']:,} sessions"
-            )
+            logger.warning(f"\n⚠️  Generated {total_generated:,} / {aggregate_stats['target_total']:,} sessions")
             logger.warning("    Consider additional data sources or synthetic generation")
 
         logger.info("=" * 80)
@@ -732,9 +705,7 @@ class PIX8LongSessionGenerator:
 
 def main():
     """Run PIX-8 long-running session generation."""
-    parser = argparse.ArgumentParser(
-        description="Generate long-running therapy sessions for PIX-8 dataset enhancement"
-    )
+    parser = argparse.ArgumentParser(description="Generate long-running therapy sessions for PIX-8 dataset enhancement")
     parser.add_argument(
         "--output-dir",
         type=Path,
@@ -753,12 +724,8 @@ def main():
         default=50,
         help="Maximum number of turns mapped for LLM generation (default: 50)",
     )
-    parser.add_argument(
-        "--extract-only", action="store_true", help="Only extract from existing datasets"
-    )
-    parser.add_argument(
-        "--synthesis-only", action="store_true", help="Only generate synthetic sessions"
-    )
+    parser.add_argument("--extract-only", action="store_true", help="Only extract from existing datasets")
+    parser.add_argument("--synthesis-only", action="store_true", help="Only generate synthetic sessions")
     parser.add_argument(
         "--extraction-target",
         type=int,
@@ -774,18 +741,14 @@ def main():
 
     args = parser.parse_args()
 
-    generator = PIX8LongSessionGenerator(
-        output_dir=args.output_dir, min_turns=args.min_turns, max_turns=args.max_turns
-    )
+    generator = PIX8LongSessionGenerator(output_dir=args.output_dir, min_turns=args.min_turns, max_turns=args.max_turns)
 
     if args.extract_only:
         generator.extract_from_existing_datasets(target_count=args.extraction_target)
     elif args.synthesis_only:
         generator.generate_synthetic_sessions(target_count=args.synthesis_target)
     else:
-        generator.generate_all(
-            extraction_target=args.extraction_target, synthesis_target=args.synthesis_target
-        )
+        generator.generate_all(extraction_target=args.extraction_target, synthesis_target=args.synthesis_target)
 
     logger.info("\n✅ PIX-8 long session generation complete!")
 

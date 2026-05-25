@@ -96,7 +96,7 @@ export const POST = async ({
     const user = await auth0UserService.createUser(email, password, role)
 
     // Log security event
-     logSecurityEvent(SecurityEventType.USER_CREATED, user.id, {
+    logSecurityEvent(SecurityEventType.USER_CREATED, user.id, {
       email: user.email,
       role: user.role,
       clientInfo,
@@ -136,7 +136,7 @@ export const POST = async ({
   } catch (error: any) {
     console.error('Sign up error:', error)
 
-     logSecurityEvent('error', {
+    logSecurityEvent('error', {
       error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,
       timestamp: Date.now(),

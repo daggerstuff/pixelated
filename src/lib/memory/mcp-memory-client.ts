@@ -27,7 +27,8 @@ export const mcpMemoryManager = {
 
     const rawData = (await response.json()) as unknown
     const data = isRecord(rawData) ? rawData : {}
-    const memoryId = typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined
+    const memoryId =
+      typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined
     if (!memoryId) {
       throw new Error('Memory add response did not include memory_id')
     }
@@ -110,8 +111,9 @@ export const mcpMemoryManager = {
     const rawData = (await response.json()) as unknown
     const data = isRecord(rawData) ? rawData : {}
 
-    const totalMemories = typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
-    
+    const totalMemories =
+      typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
+
     let categoryCounts: Record<string, number> = {}
     if (isRecord(data['categoryCounts'])) {
       for (const [key, value] of Object.entries(data['categoryCounts'])) {
@@ -251,7 +253,12 @@ function mapMemoryEntries(memories: unknown): MemoryEntry[] {
     const memory = isRecord(item) ? item : {}
     return {
       id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
-      content: typeof memory['content'] === 'string' ? memory['content'] : (typeof memory['memory'] === 'string' ? memory['memory'] : ''),
+      content:
+        typeof memory['content'] === 'string'
+          ? memory['content']
+          : typeof memory['memory'] === 'string'
+            ? memory['memory']
+            : '',
       metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
     }
   })

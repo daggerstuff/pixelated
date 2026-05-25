@@ -244,7 +244,7 @@ export async function shareDocument(
   const permissions = getDocumentPermissions(document)
   const sharedWithUserObjectId = toObjectId(sharedWithUserId)
 
-  document.permissions ??= permissions;
+  document.permissions ??= permissions
 
   if (
     permissionLevel === 'view' &&

@@ -15,7 +15,7 @@ import type { APIContext } from 'astro'
  */
 export const GET = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next =  async () =>
+  const next = async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )
@@ -88,7 +88,7 @@ export const GET = async (context: APIContext) => {
  */
 export const POST = async (context: APIContext) => {
   // Apply admin middleware to check for admin status and required permission
-  const next =  async () =>
+  const next = async () =>
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )

@@ -137,11 +137,7 @@ export function createEnhancedFHEService(
       try {
         stats.operationCount++
         logger.debug('Processing encrypted data', { operation })
-        return await processEncrypted(
-          encryptedData,
-          operation,
-          params,
-        )
+        return await processEncrypted(encryptedData, operation, params)
       } catch (error: unknown) {
         stats.errorCount++
         logger.error('Processing failed', { operation, error })

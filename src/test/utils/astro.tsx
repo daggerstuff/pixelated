@@ -218,8 +218,8 @@ export type AstroMockProps<T> = T & {
   'client:visible'?: boolean
   'client:media'?: string
   'client:only'?: boolean
-  class?: string
-  className?: string
+  'class'?: string
+  'className'?: string
 }
 
 /**

@@ -88,14 +88,15 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
   }, [userId])
 
   // Performance optimization: Memoize toggle handler to provide stable reference to child inputs
-  const handleDimensionToggle = useCallback((
-    dimension: keyof typeof selectedDimensions,
-  ) => {
-    setSelectedDimensions((prev) => ({
-      ...prev,
-      [dimension]: !prev[dimension],
-    }))
-  }, [])
+  const handleDimensionToggle = useCallback(
+    (dimension: keyof typeof selectedDimensions) => {
+      setSelectedDimensions((prev) => ({
+        ...prev,
+        [dimension]: !prev[dimension],
+      }))
+    },
+    [],
+  )
 
   // Memoize the calculation of averages to avoid O(N) recalculations on checkbox toggles
   const averages = useMemo(() => {
@@ -121,8 +122,8 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
   if (isLoading) {
     return (
       <div className={`emotion-dimensional-analysis ${className ?? ''}`}>
-        <div className='flex h-64 items-center justify-center'>
-          <div className='text-gray-500 text-lg'>
+        <div className="flex h-64 items-center justify-center">
+          <div className="text-gray-500 text-lg">
             Loading emotion analysis...
           </div>
         </div>
@@ -134,24 +135,24 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     <div
       className={`emotion-dimensional-analysis ${className ?? ''} space-y-6`}
     >
-      <div className='bg-white rounded-lg p-6 shadow'>
-        <h3 className='mb-4 text-xl font-semibold'>Dimensional Controls</h3>
-        <div className='space-y-3'>
+      <div className="bg-white rounded-lg p-6 shadow">
+        <h3 className="mb-4 text-xl font-semibold">Dimensional Controls</h3>
+        <div className="space-y-3">
           {Object.entries(selectedDimensions).map(([dimension, isSelected]) => (
-            <label key={dimension} className='flex items-center space-x-2'>
+            <label key={dimension} className="flex items-center space-x-2">
               <input
-                type='checkbox'
+                type="checkbox"
                 checked={isSelected}
                 onChange={() =>
                   handleDimensionToggle(
                     dimension as keyof typeof selectedDimensions,
                   )
                 }
-                className='form-checkbox text-blue-600 h-4 w-4'
+                className="form-checkbox text-blue-600 h-4 w-4"
                 aria-describedby={`desc-${dimension}`}
               />
-              <span className='font-medium capitalize'>{dimension}</span>
-              <span id={`desc-${dimension}`} className='text-gray-500 text-sm'>
+              <span className="font-medium capitalize">{dimension}</span>
+              <span id={`desc-${dimension}`} className="text-gray-500 text-sm">
                 {dimension === 'valence' && '(Positive/Negative)'}
                 {dimension === 'arousal' && '(Energized/Calm)'}
                 {dimension === 'dominance' && '(Control/Submissive)'}
@@ -161,37 +162,37 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className='bg-white rounded-lg p-6 shadow'>
-        <h3 className='mb-4 text-xl font-semibold'>Emotion Plot</h3>
+      <div className="bg-white rounded-lg p-6 shadow">
+        <h3 className="mb-4 text-xl font-semibold">Emotion Plot</h3>
         <div
-          className='bg-gray-50 relative rounded-lg p-4'
+          className="bg-gray-50 relative rounded-lg p-4"
           style={{ height: '400px' }}
         >
-          <svg width='100%' height='100%' viewBox='0 0 400 300'>
+          <svg width="100%" height="100%" viewBox="0 0 400 300">
             {/* Axes */}
             <line
-              x1='50'
-              y1='250'
-              x2='350'
-              y2='250'
-              stroke='#666'
-              strokeWidth='2'
+              x1="50"
+              y1="250"
+              x2="350"
+              y2="250"
+              stroke="#666"
+              strokeWidth="2"
             />
             <line
-              x1='50'
-              y1='250'
-              x2='50'
-              y2='50'
-              stroke='#666'
-              strokeWidth='2'
+              x1="50"
+              y1="250"
+              x2="50"
+              y2="50"
+              stroke="#666"
+              strokeWidth="2"
             />
 
             {/* Labels */}
             <text
-              x='200'
-              y='280'
-              textAnchor='middle'
-              className='fill-gray-600 text-sm'
+              x="200"
+              y="280"
+              textAnchor="middle"
+              className="fill-gray-600 text-sm"
             >
               {selectedDimensions.valence
                 ? 'Valence'
@@ -200,11 +201,11 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                   : 'Dominance'}
             </text>
             <text
-              x='30'
-              y='150'
-              textAnchor='middle'
-              className='fill-gray-600 text-sm'
-              transform='rotate(-90, 30, 150)'
+              x="30"
+              y="150"
+              textAnchor="middle"
+              className="fill-gray-600 text-sm"
+              transform="rotate(-90, 30, 150)"
             >
               {selectedDimensions.arousal && selectedDimensions.valence
                 ? 'Arousal'
@@ -240,10 +241,10 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                   key={point.id}
                   cx={x}
                   cy={y}
-                  r='6'
+                  r="6"
                   fill={getEmotionColor(point.emotion)}
-                  stroke='#fff'
-                  strokeWidth='2'
+                  stroke="#fff"
+                  strokeWidth="2"
                   opacity={point.confidence}
                 >
                   <title>{`${point.emotion} (${new Date(point.timestamp).toLocaleTimeString()})`}</title>
@@ -254,30 +255,30 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className='bg-white rounded-lg p-6 shadow'>
-        <h3 className='mb-4 text-xl font-semibold'>Emotion Timeline</h3>
-        <div className='space-y-3'>
+      <div className="bg-white rounded-lg p-6 shadow">
+        <h3 className="mb-4 text-xl font-semibold">Emotion Timeline</h3>
+        <div className="space-y-3">
           {emotionData.map((point) => (
             <div
               key={point.id}
-              className='bg-gray-50 flex items-center justify-between rounded-lg p-3'
+              className="bg-gray-50 flex items-center justify-between rounded-lg p-3"
             >
-              <div className='flex items-center space-x-3'>
+              <div className="flex items-center space-x-3">
                 <div
-                  className='h-4 w-4 rounded-full'
+                  className="h-4 w-4 rounded-full"
                   style={{ backgroundColor: getEmotionColor(point.emotion) }}
                 />
-                <span className='font-medium capitalize'>{point.emotion}</span>
-                <span className='text-gray-500 text-sm'>
+                <span className="font-medium capitalize">{point.emotion}</span>
+                <span className="text-gray-500 text-sm">
                   {new Date(point.timestamp).toLocaleString()}
                 </span>
               </div>
-              <div className='text-right'>
-                <div className='text-gray-600 text-sm'>
+              <div className="text-right">
+                <div className="text-gray-600 text-sm">
                   V: {point.valence.toFixed(2)} | A: {point.arousal.toFixed(2)}{' '}
                   | D: {point.dominance.toFixed(2)}
                 </div>
-                <div className='text-gray-500 text-xs'>
+                <div className="text-gray-500 text-xs">
                   Confidence: {(point.confidence * 100).toFixed(1)}%
                 </div>
               </div>
@@ -286,26 +287,26 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
         </div>
       </div>
 
-      <div className='bg-white rounded-lg p-6 shadow'>
-        <h3 className='mb-4 text-xl font-semibold'>Statistics</h3>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
-          <div className='bg-blue-50 rounded-lg p-4 text-center'>
-            <div className='text-blue-600 text-2xl font-bold'>
+      <div className="bg-white rounded-lg p-6 shadow">
+        <h3 className="mb-4 text-xl font-semibold">Statistics</h3>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="bg-blue-50 rounded-lg p-4 text-center">
+            <div className="text-blue-600 text-2xl font-bold">
               {averages.valence.toFixed(2)}
             </div>
-            <div className='text-gray-600 text-sm'>Average Valence</div>
+            <div className="text-gray-600 text-sm">Average Valence</div>
           </div>
-          <div className='bg-green-50 rounded-lg p-4 text-center'>
-            <div className='text-green-600 text-2xl font-bold'>
+          <div className="bg-green-50 rounded-lg p-4 text-center">
+            <div className="text-green-600 text-2xl font-bold">
               {averages.arousal.toFixed(2)}
             </div>
-            <div className='text-gray-600 text-sm'>Average Arousal</div>
+            <div className="text-gray-600 text-sm">Average Arousal</div>
           </div>
-          <div className='bg-purple-50 rounded-lg p-4 text-center'>
-            <div className='text-purple-600 text-2xl font-bold'>
+          <div className="bg-purple-50 rounded-lg p-4 text-center">
+            <div className="text-purple-600 text-2xl font-bold">
               {averages.dominance.toFixed(2)}
             </div>
-            <div className='text-gray-600 text-sm'>Average Dominance</div>
+            <div className="text-gray-600 text-sm">Average Dominance</div>
           </div>
         </div>
       </div>

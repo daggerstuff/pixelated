@@ -121,7 +121,7 @@ export class EmotionContext {
 
     recentEmotions.forEach((profile) => {
       Object.entries(profile.emotions).forEach(([emotion, intensity]) => {
-        emotionSums[emotion] = (emotionSums[emotion] || 0) + intensity
+        emotionSums[emotion] = (emotionSums[emotion] ?? 0) + intensity
       })
     })
 
@@ -194,8 +194,8 @@ export class EmotionContext {
     ])
 
     for (const emotion of Array.from(allEmotions)) {
-      const val1 = emotions1[emotion] || 0
-      const val2 = emotions2[emotion] || 0
+      const val1 = emotions1[emotion] ?? 0
+      const val2 = emotions2[emotion] ?? 0
       distance += Math.abs(val1 - val2)
     }
 

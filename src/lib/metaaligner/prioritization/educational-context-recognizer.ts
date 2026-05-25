@@ -373,7 +373,7 @@ export class EducationalContextRecognizer {
     }>,
   ): Promise<EducationalContextResult[]> {
     return Promise.all(
-      queries.map( async ({ query, userProfile, conversationHistory }) =>
+      queries.map(async ({ query, userProfile, conversationHistory }) =>
         this.recognizeEducationalContext(
           query,
           userProfile,
@@ -611,7 +611,7 @@ Adapt complexity and resource recommendations accordingly.`
         }
       }
       // Ultimate fallback: try the original content
-      jsonStr ??= content;
+      jsonStr ??= content
       logger.info('Extracted JSON string from AI response', { jsonStr })
       const parsed = JSON.parse(jsonStr)
       logger.info('Parsed AI response JSON', { parsed })

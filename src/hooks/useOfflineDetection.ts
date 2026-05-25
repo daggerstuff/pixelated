@@ -55,7 +55,7 @@ export function useOfflineDetection({
       webkitConnection?: NetworkInformationLike
     }
     const connection =
-      (nav.connection ?? nav.mozConnection) ?? nav.webkitConnection
+      nav.connection ?? nav.mozConnection ?? nav.webkitConnection
 
     setNetworkState({
       isOnline,

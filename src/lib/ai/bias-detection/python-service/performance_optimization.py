@@ -15,17 +15,17 @@ import asyncio
 import gc
 import logging
 import time
+from collections.abc import Callable
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
-from bias_detection.sentry_metrics import service_metrics, track_latency
-
 # Import existing components
 from bias_detection.compat import BiasDetectionConfig, BiasDetectionService, SessionData
+from bias_detection.sentry_metrics import service_metrics, track_latency
 
 logger = logging.getLogger(__name__)
 
@@ -562,8 +562,7 @@ class PerformanceOptimizedBiasDetector:
             self.performance_metrics.parallel_efficiency = processed_count / total_time
 
             logger.info(
-                f"Large dataset processing completed: "
-                f"{processed_count}/{total_sessions} sessions in {total_time:.2f}s"
+                f"Large dataset processing completed: {processed_count}/{total_sessions} sessions in {total_time:.2f}s"
             )
 
             return {

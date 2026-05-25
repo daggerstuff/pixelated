@@ -43,8 +43,7 @@ interface NotificationTemplate {
 // Resolve environment-dependent values lazily so tests can update process.env between runs.
 const getBreachEnv = () => {
   const configuredStakeholders = process.env['SECURITY_STAKEHOLDERS']
-  const stakeholderList =
-    configuredStakeholders ?? 'admin@example.com'
+  const stakeholderList = configuredStakeholders ?? 'admin@example.com'
 
   return {
     ORGANIZATION_NAME:
@@ -273,7 +272,7 @@ async function notifyInternalStakeholders(
 ): Promise<void> {
   try {
     const env = getBreachEnv()
-    const notifications = env.SECURITY_STAKEHOLDERS.map( async (email) =>
+    const notifications = env.SECURITY_STAKEHOLDERS.map(async (email) =>
       sendEmail({
         to: email,
         subject: `Security Breach Alert - ${breach.severity.toUpperCase()} - ${breach.id}`,

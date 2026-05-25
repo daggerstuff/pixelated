@@ -446,12 +446,8 @@ def test_wave1_family_scoring_prefers_full_overlay() -> None:
         "clinician_hook_entries": 22,
     }
 
-    assert _score_variant(variants["I1.1"], baseline_metrics) < _score_variant(
-        variants["I1.2"], simulation_overlay
-    )
-    assert _score_variant(variants["I1.2"], simulation_overlay) < _score_variant(
-        variants["I1.3"], full_overlay
-    )
+    assert _score_variant(variants["I1.1"], baseline_metrics) < _score_variant(variants["I1.2"], simulation_overlay)
+    assert _score_variant(variants["I1.2"], simulation_overlay) < _score_variant(variants["I1.3"], full_overlay)
 
 
 def test_wave2_family_scoring_prefers_full_overlay() -> None:
@@ -479,12 +475,8 @@ def test_wave2_family_scoring_prefers_full_overlay() -> None:
         "clinician_hook_entries": 31,
     }
 
-    assert _score_variant(variants["J1.1"], baseline_metrics) < _score_variant(
-        variants["J1.2"], simulation_overlay
-    )
-    assert _score_variant(variants["J1.2"], simulation_overlay) < _score_variant(
-        variants["J1.3"], full_overlay
-    )
+    assert _score_variant(variants["J1.1"], baseline_metrics) < _score_variant(variants["J1.2"], simulation_overlay)
+    assert _score_variant(variants["J1.2"], simulation_overlay) < _score_variant(variants["J1.3"], full_overlay)
 
 
 def test_wave3_family_scoring_prefers_full_overlay() -> None:
@@ -516,12 +508,8 @@ def test_wave3_family_scoring_prefers_full_overlay() -> None:
         "clinician_hook_entries": 28,
     }
 
-    assert _score_variant(variants["K1.1"], baseline_metrics) < _score_variant(
-        variants["K1.2"], eval_benchmark_overlay
-    )
-    assert _score_variant(variants["K1.2"], eval_benchmark_overlay) < _score_variant(
-        variants["K1.3"], full_overlay
-    )
+    assert _score_variant(variants["K1.1"], baseline_metrics) < _score_variant(variants["K1.2"], eval_benchmark_overlay)
+    assert _score_variant(variants["K1.2"], eval_benchmark_overlay) < _score_variant(variants["K1.3"], full_overlay)
 
 
 def test_wave4_family_scoring_prefers_full_overlay() -> None:
@@ -561,12 +549,8 @@ def test_wave4_family_scoring_prefers_full_overlay() -> None:
         "clinician_hook_entries": 30,
     }
 
-    assert _score_variant(variants["L1.1"], baseline_metrics) < _score_variant(
-        variants["L1.2"], eval_benchmark_overlay
-    )
-    assert _score_variant(variants["L1.2"], eval_benchmark_overlay) < _score_variant(
-        variants["L1.3"], full_overlay
-    )
+    assert _score_variant(variants["L1.1"], baseline_metrics) < _score_variant(variants["L1.2"], eval_benchmark_overlay)
+    assert _score_variant(variants["L1.2"], eval_benchmark_overlay) < _score_variant(variants["L1.3"], full_overlay)
 
 
 def test_release_candidate_source_limits_follow_wave1_winner() -> None:

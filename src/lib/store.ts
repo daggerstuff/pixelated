@@ -491,7 +491,7 @@ export const useStore = create<StoreState>()(
                 featureUsage: {
                   ...state.usageStats.featureUsage,
                   [featureName]:
-                    (state.usageStats.featureUsage[featureName] || 0) + 1,
+                    (state.usageStats.featureUsage[featureName] ?? 0) + 1,
                 },
               },
             })),

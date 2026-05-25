@@ -12,6 +12,11 @@ import {
   getConfigSummary,
   isProductionReady,
   validateConfig,
+  mergeWithDefaults,
+  loadConfigFromEnv,
+  createConfigWithEnvOverrides,
+  updateConfiguration,
+  getEnvironmentConfigSummary,
 } from '../config'
 
 describe('BiasDetectionConfigManager', () => {
@@ -508,5 +513,330 @@ describe('Configuration Integration', () => {
     const config2 = biasDetectionConfig.getConfig()
 
     expect(config1).toEqual(config2)
+  })
+})
+
+describe('validateConfig Edge Cases', () => {
+  let originalEnv: NodeJS.ProcessEnv
+
+  beforeEach(() => {
+    originalEnv = { ...process.env }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  it('should reject invalid pythonServiceUrl protocol', () => {
+    expect(() =>
+      validateConfig({ pythonServiceUrl: 'ftp://bad-service.com' }),
+    ).toThrow(/must use http.*https/)
+  })
+
+  it('should reject malformed pythonServiceUrl', () => {
+    expect(() =>
+      validateConfig({ pythonServiceUrl: 'not-a-url' }),
+    ).toThrow(/must be a valid URL/)
+  })
+
+  it('should reject pythonServiceTimeout below minimum', () => {
+    expect(() =>
+      validateConfig({ pythonServiceTimeout: 500 }),
+    ).toThrow(/must be between 1000ms and 300000ms/)
+  })
+
+  it('should reject pythonServiceTimeout above maximum', () => {
+    expect(() =>
+      validateConfig({ pythonServiceTimeout: 500000 }),
+    ).toThrow(/must be between 1000ms and 300000ms/)
+  })
+
+  it('should reject invalid evaluation metrics', () => {
+    expect(() =>
+      validateConfig({ evaluationMetrics: ['invalid_metric'] }),
+    ).toThrow(/Invalid evaluation metrics/)
+  })
+
+  it('should reject out-of-order thresholds', () => {
+    expect(() =>
+      validateConfig({ thresholds: { warning: 0.8, high: 0.5, critical: 0.9 } }),
+    ).toThrow(/ascending order/)
+  })
+
+  it('should reject non-boolean hipaaCompliant', () => {
+    expect(() =>
+      validateConfig({ hipaaCompliant: 'yes' as unknown as boolean }),
+    ).toThrow(/hipaaCompliant must be a boolean/)
+  })
+
+  it('should reject non-boolean auditLogging', () => {
+    expect(() =>
+      validateConfig({ auditLogging: 1 as unknown as boolean }),
+    ).toThrow(/auditLogging must be a boolean/)
+  })
+
+  it('should reject individual layer weight out of range', () => {
+    expect(() =>
+      validateConfig({ layerWeights: { preprocessing: 1.5 } }),
+    ).toThrow(/must be between 0.0 and 1.0/)
+  })
+})
+
+describe('mergeWithDefaults', () => {
+  let originalEnv: NodeJS.ProcessEnv
+
+  beforeEach(() => {
+    originalEnv = { ...process.env }
+    const envVarsToDelete = [
+      'BIAS_WARNING_THRESHOLD',
+      'BIAS_HIGH_THRESHOLD',
+      'BIAS_CRITICAL_THRESHOLD',
+      'BIAS_DETECTION_SERVICE_URL',
+      'LOG_LEVEL',
+    ]
+    envVarsToDelete.forEach((key) => {
+      delete process.env[key]
+    })
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  it('should return defaults when no user config provided', () => {
+    const merged = mergeWithDefaults()
+    expect(merged.thresholds?.warning).toBe(0.3)
+    expect(merged.thresholds?.high).toBe(0.6)
+    expect(merged.thresholds?.critical).toBe(0.8)
+  })
+
+  it('should merge user config over defaults', () => {
+    const merged = mergeWithDefaults({
+      environment: 'staging',
+      thresholds: { warning: 0.4, high: 0.7, critical: 0.9 },
+    })
+    expect(merged.environment).toBe('staging')
+    expect(merged.thresholds?.warning).toBe(0.4)
+    expect(merged.thresholds?.critical).toBe(0.9)
+  })
+
+  it('should throw when user config fails validation', () => {
+    expect(() => mergeWithDefaults({ hipaaCompliant: 'bad' as unknown as boolean })).toThrow(
+      'Configuration validation failed',
+    )
+  })
+})
+
+describe('loadConfigFromEnv', () => {
+  let originalEnv: NodeJS.ProcessEnv
+
+  beforeEach(() => {
+    originalEnv = { ...process.env }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  it('should parse evaluation metrics from env var', () => {
+    process.env.BIAS_EVALUATION_METRICS = 'demographic_parity,equalized_odds'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.evaluationMetrics).toEqual(['demographic_parity', 'equalized_odds'])
+  })
+
+  it('should parse cache TTL from env var', () => {
+    process.env.CACHE_TTL = '600000'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.cacheConfig?.ttl).toBe(600000)
+  })
+
+  it('should parse boolean HIPAA and masking flags', () => {
+    process.env.ENABLE_HIPAA_COMPLIANCE = 'true'
+    process.env.ENABLE_AUDIT_LOGGING = 'false'
+    process.env.ENABLE_DATA_MASKING = 'true'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.hipaaCompliant).toBe(true)
+    expect(envConfig.auditLogging).toBe(false)
+    expect(envConfig.dataMaskingEnabled).toBe(true)
+  })
+
+  it('should parse alert config from env vars', () => {
+    process.env.BIAS_ALERT_SLACK_WEBHOOK = 'https://hooks.slack.com/test'
+    process.env.BIAS_ALERT_EMAIL_RECIPIENTS = 'a@b.com,c@d.com'
+    process.env.BIAS_ALERT_COOLDOWN_MINUTES = '5'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.alertConfig?.slackWebhookUrl).toBe('https://hooks.slack.com/test')
+    expect(envConfig.alertConfig?.enableSlackNotifications).toBe(true)
+    expect(envConfig.alertConfig?.emailRecipients).toEqual(['a@b.com', 'c@d.com'])
+    expect(envConfig.alertConfig?.enableEmailNotifications).toBe(true)
+    expect(envConfig.alertConfig?.alertCooldownMinutes).toBe(5)
+  })
+
+  it('should parse metrics config from env vars', () => {
+    process.env.BIAS_METRICS_RETENTION_DAYS = '60'
+    process.env.BIAS_DASHBOARD_REFRESH_RATE = '120'
+    process.env.BIAS_ENABLE_REAL_TIME_MONITORING = 'false'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.metricsConfig?.metricsRetentionDays).toBe(60)
+    expect(envConfig.metricsConfig?.dashboardRefreshRate).toBe(120)
+    expect(envConfig.metricsConfig?.enableRealTimeMonitoring).toBe(false)
+  })
+
+  it('should parse performance config from env vars', () => {
+    process.env.MAX_CONCURRENT_ANALYSES = '25'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.performanceConfig?.maxConcurrentAnalyses).toBe(25)
+  })
+
+  it('should parse LOG_LEVEL debug to enableDebug', () => {
+    process.env.LOG_LEVEL = 'debug'
+    const envConfig = loadConfigFromEnv()
+    expect(envConfig.loggingConfig?.enableDebug).toBe(true)
+  })
+
+  it('should return empty config when no env vars are set', () => {
+    const envVarsToDelete = [
+      'BIAS_DETECTION_SERVICE_URL',
+      'BIAS_SERVICE_TIMEOUT',
+      'BIAS_WARNING_THRESHOLD',
+      'BIAS_HIGH_THRESHOLD',
+      'BIAS_CRITICAL_THRESHOLD',
+      'BIAS_WEIGHT_PREPROCESSING',
+      'BIAS_WEIGHT_MODEL_LEVEL',
+      'BIAS_WEIGHT_INTERACTIVE',
+      'BIAS_WEIGHT_EVALUATION',
+      'BIAS_EVALUATION_METRICS',
+      'ENABLE_HIPAA_COMPLIANCE',
+      'ENABLE_AUDIT_LOGGING',
+      'ENABLE_DATA_MASKING',
+      'BIAS_ALERT_SLACK_WEBHOOK',
+      'BIAS_ALERT_EMAIL_RECIPIENTS',
+      'BIAS_ALERT_COOLDOWN_MINUTES',
+      'BIAS_METRICS_RETENTION_DAYS',
+      'BIAS_DASHBOARD_REFRESH_RATE',
+      'BIAS_ENABLE_REAL_TIME_MONITORING',
+      'LOG_LEVEL',
+      'CACHE_TTL',
+      'MAX_CONCURRENT_ANALYSES',
+      'PYTHON_SERVICE_PORT',
+    ]
+    envVarsToDelete.forEach((k) => delete process.env[k])
+
+    const envConfig = loadConfigFromEnv()
+    // Should be mostly empty (thresholds and logging only have non-empty keys)
+    expect(Object.keys(envConfig).length).toBe(0)
+  })
+})
+
+describe('Standalone Utility Functions', () => {
+  let originalEnv: NodeJS.ProcessEnv
+
+  beforeEach(() => {
+    originalEnv = { ...process.env }
+  })
+
+  afterEach(() => {
+    process.env = originalEnv
+  })
+
+  describe('getEnvironmentConfigSummary', () => {
+    it('should list loaded env vars', () => {
+      process.env.BIAS_WARNING_THRESHOLD = '0.5'
+      process.env.BIAS_DETECTION_SERVICE_URL = 'http://test:5000'
+      const summary = getEnvironmentConfigSummary()
+      expect(summary.loaded).toContain('BIAS_WARNING_THRESHOLD')
+      expect(summary.loaded).toContain('BIAS_DETECTION_SERVICE_URL')
+      expect(summary.available.length).toBeGreaterThan(10)
+    })
+
+    it('should return empty loaded array when no env vars set', () => {
+      // Delete all env vars that getEnvironmentConfigSummary checks
+      const relevantVars = [
+        'BIAS_DETECTION_SERVICE_URL',
+        'BIAS_SERVICE_TIMEOUT',
+        'BIAS_WARNING_THRESHOLD',
+        'BIAS_HIGH_THRESHOLD',
+        'BIAS_CRITICAL_THRESHOLD',
+        'BIAS_WEIGHT_PREPROCESSING',
+        'BIAS_WEIGHT_MODEL_LEVEL',
+        'BIAS_WEIGHT_INTERACTIVE',
+        'BIAS_WEIGHT_EVALUATION',
+        'BIAS_EVALUATION_METRICS',
+        'ENABLE_HIPAA_COMPLIANCE',
+        'ENABLE_AUDIT_LOGGING',
+        'ENABLE_DATA_MASKING',
+        'BIAS_ALERT_SLACK_WEBHOOK',
+        'BIAS_ALERT_EMAIL_RECIPIENTS',
+        'BIAS_ALERT_COOLDOWN_MINUTES',
+        'BIAS_METRICS_RETENTION_DAYS',
+        'BIAS_DASHBOARD_REFRESH_RATE',
+        'BIAS_ENABLE_REAL_TIME_MONITORING',
+      ]
+      relevantVars.forEach((k) => delete process.env[k])
+      const summary = getEnvironmentConfigSummary()
+      expect(summary.loaded).toEqual([])
+    })
+  })
+
+  describe('getConfigSummary (standalone)', () => {
+    it('should return valid summary for default config', () => {
+      const summary = getConfigSummary()
+      expect(summary.isValid).toBe(true)
+      expect(summary.source).toBe('merged')
+      expect(summary.errors).toEqual([])
+    })
+  })
+
+  describe('isProductionReady (standalone)', () => {
+    it('should flag missing HTTPS and localhost in production', () => {
+      // Default URL is localhost:5000
+      const result = isProductionReady()
+      expect(result.ready).toBe(false)
+      expect(result.issues.some((i) => i.includes('HTTPS'))).toBe(true)
+    })
+
+    it('should flag missing HTTPS and alert method by default', () => {
+      process.env['JWT_SECRET'] = 'a'.repeat(32)
+      process.env['ENCRYPTION_KEY'] = 'b'.repeat(32)
+      const result = isProductionReady()
+      // Defaults have hipaaCompliant:true & auditLogging:true, so those pass.
+      // But default URL is localhost (not HTTPS) and no alerts configured.
+      expect(result.issues.some((i) => i.includes('HTTPS'))).toBe(true)
+      expect(result.issues.some((i) => i.includes('alert'))).toBe(true)
+    })
+  })
+
+  describe('createConfigWithEnvOverrides', () => {
+    it('should merge user config over env over defaults', () => {
+      process.env.BIAS_WARNING_THRESHOLD = '0.5'
+      const config = createConfigWithEnvOverrides({
+        environment: 'production',
+        thresholds: { warning: 0.6, high: 0.7, critical: 0.9 },
+      })
+      // User config takes precedence over env
+      expect(config.thresholds?.warning).toBe(0.6)
+      expect(config.environment).toBe('production')
+    })
+
+    it('should fall back to defaults when no env or user config', () => {
+      const config = createConfigWithEnvOverrides({})
+      expect(config.thresholds?.warning).toBe(0.3)
+    })
+  })
+
+  describe('updateConfiguration (standalone)', () => {
+    it('should merge updates into current config', () => {
+      const current = createConfigWithEnvOverrides()
+      const updated = updateConfiguration(current, { environment: 'staging' })
+      expect(updated.environment).toBe('staging')
+      expect(updated.thresholds).toEqual(current.thresholds)
+    })
+
+    it('should throw on invalid updates', () => {
+      const current = createConfigWithEnvOverrides()
+      expect(() =>
+        updateConfiguration(current, { hipaaCompliant: 'bad' as unknown as boolean }),
+      ).toThrow()
+    })
   })
 })

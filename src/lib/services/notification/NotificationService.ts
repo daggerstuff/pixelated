@@ -6,7 +6,6 @@ import type { RoutingContext } from '../../../lib/ai/mental-llama/routing/Mental
 import { EmailService, type EmailConfig } from '../../../lib/email'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { redis } from '../../../lib/redis'
-
 import type { IRedisService } from '../redis/types'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'

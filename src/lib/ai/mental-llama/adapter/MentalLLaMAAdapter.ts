@@ -259,7 +259,7 @@ export class MentalLLaMAAdapter {
           mentalHealthCategory: "crisis",
           confidence: route.confidence,
           explanation:
-            (route.insights?.llmReasoning!) ||
+            (route.insights?.llmReasoning) ??
             "Crisis detected by routing rules or preliminary analysis.",
           supportingEvidence: route.insights?.matchedKeyword ? [route.insights.matchedKeyword] : [],
           isCrisis: true,
@@ -330,7 +330,7 @@ export class MentalLLaMAAdapter {
     rawOutput: unknown;
     llmFailures: AnalysisFailure[];
   }> {
-    let categoryForPrompt = effectiveCategories[0] || "general_mental_health";
+    let categoryForPrompt = effectiveCategories[0] ?? "general_mental_health";
     if (categoryForPrompt === "unknown" || categoryForPrompt === "none") {
       categoryForPrompt = "general_mental_health";
     }

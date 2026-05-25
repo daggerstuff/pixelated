@@ -292,7 +292,9 @@ export class TherapeuticResponseGenerator {
         followUp.push('What makes it difficult to reach out to people?')
         followUp.push('Who in your life has been supportive in the past?')
         break
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         followUp.push('How long have you been feeling this way?')
         followUp.push('What brought you to share this today?')

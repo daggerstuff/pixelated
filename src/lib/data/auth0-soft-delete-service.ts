@@ -35,12 +35,12 @@ function initializeAuth0Management() {
   }
 
   auth0Management ??= new ManagementClient({
-      domain: AUTH0_CONFIG.domain,
-      clientId: AUTH0_CONFIG.managementClientId,
-      clientSecret: AUTH0_CONFIG.managementClientSecret,
-      audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-      scope: 'read:users update:users delete:users',
-    });
+    domain: AUTH0_CONFIG.domain,
+    clientId: AUTH0_CONFIG.managementClientId,
+    clientSecret: AUTH0_CONFIG.managementClientSecret,
+    audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
+    scope: 'read:users update:users delete:users',
+  })
 }
 
 // Initialize the management client
@@ -118,7 +118,7 @@ export class Auth0SoftDeleteService {
    * Connect to MongoDB
    */
   private async connectToDatabase(): Promise<Db> {
-    this.db ??= await mongodb.connect();
+    this.db ??= await mongodb.connect()
     return this.db
   }
 

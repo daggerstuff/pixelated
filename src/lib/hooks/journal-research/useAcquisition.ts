@@ -68,7 +68,7 @@ export const useAcquisitionListQuery = (
       sessionId ?? 'unknown',
       { page, pageSize, filters },
     ),
-    queryFn:  async () => listAcquisitions(sessionId ?? '', { page, pageSize }),
+    queryFn: async () => listAcquisitions(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data) => filterAcquisitions(data, filters),
   })
@@ -85,7 +85,7 @@ export const useAcquisitionQuery = (
       sessionId ?? 'unknown',
       acquisitionId ?? 'unknown',
     ),
-    queryFn:  async () => getAcquisition(sessionId ?? '', acquisitionId ?? ''),
+    queryFn: async () => getAcquisition(sessionId ?? '', acquisitionId ?? ''),
     enabled: Boolean(sessionId && acquisitionId) && enabled,
   })
 }
@@ -95,7 +95,7 @@ export const useAcquisitionInitiateMutation = (sessionId: string | null) => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.acquisition.initiate(),
-    mutationFn:  async (payload: AcquisitionInitiatePayload) =>
+    mutationFn: async (payload: AcquisitionInitiatePayload) =>
       initiateAcquisition(sessionId ?? '', payload),
     onSuccess: (acquisition: Acquisition) => {
       void queryClient.invalidateQueries({
@@ -117,7 +117,7 @@ export const useAcquisitionUpdateMutation = (sessionId: string | null) => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.acquisition.update(),
-    mutationFn:  async ({
+    mutationFn: async ({
       acquisitionId,
       payload,
     }: {

@@ -362,7 +362,7 @@ export class TestReportGenerator {
                         <td><strong>${test.test}</strong></td>
                         <td>${test.browser}${test.viewport ? ` (${test.viewport})` : ''}</td>
                         <td><span class="status-badge status-${test.status}">${test.status}</span></td>
-                        <td>${(test.error ?? test.details?.message) ?? 'No additional details'}</td>
+                        <td>${test.error ?? test.details?.message ?? 'No additional details'}</td>
                     </tr>
                 `,
                   )
@@ -453,7 +453,7 @@ ${details
   .map((test) => {
     const viewport = test.viewport ? ` (${test.viewport})` : ''
     const details =
-      (test.error ?? test.details?.message) ?? 'No additional details'
+      test.error ?? test.details?.message ?? 'No additional details'
     return `| ${test.test} | ${test.browser}${viewport} | ${test.status} | ${details} |`
   })
   .join('\n')}

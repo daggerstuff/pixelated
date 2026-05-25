@@ -105,9 +105,7 @@ GROUND_TRUTH_CASES = [
 ]
 
 
-def validate_classification(
-    classifier: HybridTaxonomyClassifier, test_case: GroundTruthExample
-) -> dict[str, Any]:
+def validate_classification(classifier: HybridTaxonomyClassifier, test_case: GroundTruthExample) -> dict[str, Any]:
     """
     Validate a single classification against ground truth.
 
@@ -184,9 +182,7 @@ def run_validation(use_llm: bool = True) -> None:
         if diff in by_difficulty:
             stats = by_difficulty[diff]
             acc = stats["correct"] / stats["total"] if stats["total"] > 0 else 0
-            logger.info(
-                f"  {diff.capitalize():12s}: {stats['correct']}/{stats['total']} ({acc:.1%})"
-            )
+            logger.info(f"  {diff.capitalize():12s}: {stats['correct']}/{stats['total']} ({acc:.1%})")
 
     # Identify failures
     failures = [r for r in results if not r["correct"]]
@@ -195,9 +191,7 @@ def run_validation(use_llm: bool = True) -> None:
         logger.info("❌ FAILED CASES:")
         for f in failures:
             logger.info(f"  • {f['description']}")
-            logger.info(
-                f"    Expected: {f['expected']}, Got: {f['actual']} ({f['confidence']:.1%})"
-            )
+            logger.info(f"    Expected: {f['expected']}, Got: {f['actual']} ({f['confidence']:.1%})")
             logger.info(f"    Difficulty: {f['difficulty']}")
 
     logger.info("=" * 80)
