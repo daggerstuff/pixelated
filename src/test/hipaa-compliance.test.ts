@@ -10,7 +10,7 @@
  * - 45 CFR 164.310 - Physical Safeguards
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 // Mock implementations for testing
 interface AuditEvent {

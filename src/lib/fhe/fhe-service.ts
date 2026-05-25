@@ -10,7 +10,6 @@ import homomorphicOps from './homomorphic-ops'
 import { SealResourceScope } from './seal-memory'
 import { SealService } from './seal-service'
 import type { SealCipherText } from './seal-service'
-import { SealSchemeType } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type {
   FHEService,

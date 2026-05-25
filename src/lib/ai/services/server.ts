@@ -451,7 +451,6 @@ Respond in JSON format with the following structure:
       }
 
       let service: ReturnType<typeof getAIServiceByProvider> = null
-      let selectedProvider = parsedProvider
 
       // If specific provider requested, try it first
       if (parsedProvider) {

@@ -22,7 +22,7 @@ router.use(authMiddleware)
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, stage, ownerId } = req.query
+    const {page, limit, stage} = req.query
     const { user } = req as any
 
     const result = await listSalesOpportunities(user.id, {

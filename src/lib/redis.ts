@@ -64,7 +64,7 @@ function createMockRedisClient(): RedisClient {
       : []
   }
 
-  const parseStringRecord = (value: string): Record<string, string> => {
+
     const parsed: unknown = JSON.parse(value)
     if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
       const result: Record<string, string> = {}
