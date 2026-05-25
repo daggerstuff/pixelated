@@ -151,7 +151,7 @@ router.get(
 router.get(
   '/:documentId',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
 
     const document = await documentService.getDocument(documentId, req.user!.id)
 
@@ -174,7 +174,7 @@ router.put(
   '/:documentId',
   requirePermission('edit'),
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
     const { title, content, status, description } = req.body
 
     const document = await documentService.updateDocument(
@@ -207,7 +207,7 @@ router.delete(
   '/:documentId',
   requireRole(['admin', 'manager']),
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
 
     const deleted = await documentService.deleteDocument(
       documentId,
@@ -232,7 +232,7 @@ router.delete(
 router.post(
   '/:documentId/share',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
     const { sharedWith, permissionLevel } = req.body
 
     if (!sharedWith || !permissionLevel) {
@@ -262,7 +262,7 @@ router.post(
 router.post(
   '/:documentId/comments',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
     const { content, parentCommentId } = req.body
 
     if (!content) {
@@ -291,7 +291,7 @@ router.post(
 router.get(
   '/:documentId/comments',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -317,7 +317,7 @@ router.get(
 router.get(
   '/:documentId/versions',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -342,7 +342,7 @@ router.get(
 router.get(
   '/:documentId/export',
   asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params.documentId)
+    const documentId = ensureString(req.params['documentId'])
     const { format: formatQuery = 'json' } = req.query
     const format = ensureString(formatQuery)
 

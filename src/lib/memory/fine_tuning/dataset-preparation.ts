@@ -108,10 +108,10 @@ export class DatasetPreparator {
       positive: [],
     }
     for (const ex of examples) {
-      const v = (ex.metadata.valence as number) ?? 0
-      if (v < -0.2) buckets.negative.push(ex)
-      else if (v > 0.2) buckets.positive.push(ex)
-      else buckets.neutral.push(ex)
+      const v = (ex.metadata['valence'] as number) ?? 0
+      if (v < -0.2) buckets['negative'].push(ex)
+      else if (v > 0.2) buckets['positive'].push(ex)
+      else buckets['neutral'].push(ex)
     }
 
     const maxSize = Math.max(...Object.values(buckets).map((b) => b.length), 1)
@@ -155,8 +155,8 @@ export class DatasetPreparator {
 
   private computeStats(split: DatasetSplit, piiLeak: boolean): DatasetStats {
     const all = [...split.train, ...split.val, ...split.test]
-    const valences = all.map((ex) => (ex.metadata.valence as number) ?? 0)
-    const crisisCount = all.filter((ex) => ex.metadata.crisis_flag).length
+    const valences = all.map((ex) => (ex.metadata['valence'] as number) ?? 0)
+    const crisisCount = all.filter((ex) => ex.metadata['crisis_flag']).length
     return {
       totalExamples: all.length,
       trainCount: split.train.length,

@@ -101,19 +101,19 @@ export class CloudProviderManager {
   private loadConfiguration(): CloudProviderConfig {
     return {
       aws: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
-        region: process.env.AWS_REGION ?? 'us-east-1',
+        accessKeyId: process.env['AWS_ACCESS_KEY_ID'] ?? '',
+        secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] ?? '',
+        region: process.env['AWS_REGION'] ?? 'us-east-1',
       },
       gcp: {
-        projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '',
+        projectId: process.env['GOOGLE_CLOUD_PROJECT'] ?? '',
+        keyFilename: process.env['GOOGLE_APPLICATION_CREDENTIALS'] ?? '',
       },
       azure: {
-        subscriptionId: process.env.AZURE_SUBSCRIPTION_ID ?? '',
-        clientId: process.env.AZURE_CLIENT_ID ?? '',
-        clientSecret: process.env.AZURE_CLIENT_SECRET ?? '',
-        tenantId: process.env.AZURE_TENANT_ID ?? '',
+        subscriptionId: process.env['AZURE_SUBSCRIPTION_ID'] ?? '',
+        clientId: process.env['AZURE_CLIENT_ID'] ?? '',
+        clientSecret: process.env['AZURE_CLIENT_SECRET'] ?? '',
+        tenantId: process.env['AZURE_TENANT_ID'] ?? '',
       },
     }
   }
@@ -717,21 +717,6 @@ export class CloudProviderManager {
       'eu-central': 'eu-central-1',
       'apac-singapore': 'ap-southeast-1',
       'apac-tokyo': 'ap-northeast-1',
-    }
-
-    return regionMap[location] ?? location
-  }
-
-  /**
-   * Get GCP region name from location
-   */
-  private getGCPRegionName(location: string): string {
-    const regionMap: Record<string, string> = {
-      'us-east': 'us-east1',
-      'us-west': 'us-west1',
-      'eu-central': 'europe-west3',
-      'apac-singapore': 'asia-southeast1',
-      'apac-tokyo': 'asia-northeast1',
     }
 
     return regionMap[location] ?? location

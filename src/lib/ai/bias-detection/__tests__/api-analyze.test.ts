@@ -232,7 +232,7 @@ describe("Session Analysis API Endpoint", () => {
     },
   };
 
-  const mockSessionForRequest = {
+
     sessionId: "123e4567-e89b-12d3-a456-426614174000",
     timestamp: "2024-01-15T10:00:00Z",
     participantDemographics: {
@@ -289,7 +289,7 @@ describe("Session Analysis API Endpoint", () => {
   };
 
   // Mock result for GET endpoint (slightly different from POST)
-  const mockGetAnalysisResult = {
+
     sessionId: "123e4567-e89b-12d3-a456-426614174000",
     overallScore: 0.65,
     riskLevel: "medium" as const,
@@ -645,7 +645,7 @@ describe("Session Analysis API Endpoint", () => {
       expect(lastResponse).toBeDefined();
       // expect(lastResponse!.status).toBe(429) // Mock API doesn't implement rate limiting
 
-      const _responseData = await lastResponse.json();
+
       // expect(responseData.success).toBe(false) // Mock API always returns success=true
       // expect(responseData.error).toBe('Rate Limit Exceeded')
     });

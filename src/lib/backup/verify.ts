@@ -31,7 +31,6 @@ interface BackupVerificationResult {
 }
 
 export class BackupVerificationService extends EventEmitter {
-  private readonly redis: RedisService
   private readonly config: BackupConfig
   private readonly backupDir: string
 
@@ -127,17 +126,17 @@ export class BackupVerificationService extends EventEmitter {
 
       // Verify metadata
       const metadata: BackupMetadata = {
-        timestamp: backup.timestamp,
+        timestamp: backup['timestamp'],
         checksum,
         size: data.length,
-        type: backup.type,
+        type: backup['type'],
         status: 'pending',
-        version: backup.version,
-        environment: backup.environment,
+        version: backup['version'],
+        environment: backup['environment'],
       }
 
       // Verify data integrity
-      if (!this.verifyDataIntegrity(backup.data)) {
+      if (!this.verifyDataIntegrity(backup['data'])) {
         return {
           file: filename,
           isValid: false,
@@ -174,10 +173,10 @@ export class BackupVerificationService extends EventEmitter {
     return (
       backup !== null &&
       typeof backup === 'object' &&
-      typeof (backup as Record<string, unknown>).timestamp === 'number' &&
-      typeof (backup as Record<string, unknown>).version === 'string' &&
-      typeof (backup as Record<string, unknown>).environment === 'string' &&
-      typeof (backup as Record<string, unknown>).data === 'object'
+      typeof (backup as Record<string, unknown>)['timestamp'] === 'number' &&
+      typeof (backup as Record<string, unknown>)['version'] === 'string' &&
+      typeof (backup as Record<string, unknown>)['environment'] === 'string' &&
+      typeof (backup as Record<string, unknown>)['data'] === 'object'
     )
   }
 
@@ -246,8 +245,8 @@ export class BackupVerificationService extends EventEmitter {
     return (
       data !== null &&
       typeof data === 'object' &&
-      typeof (data as Record<string, unknown>).version === 'string' &&
-      typeof (data as Record<string, unknown>).environment === 'string'
+      typeof (data as Record<string, unknown>)['version'] === 'string' &&
+      typeof (data as Record<string, unknown>)['environment'] === 'string'
     )
   }
 
@@ -261,13 +260,13 @@ export class BackupVerificationService extends EventEmitter {
       >
 
       // Verify backup structure
-      if (!backup.data || !backup.metadata) {
+      if (!backup['data'] || !backup['metadata']) {
         throw new Error('Invalid backup structure')
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity(backup.data)
+        this.verifyDataIntegrity(backup['data'])
       }
 
       // Verify restoration capability
@@ -293,7 +292,7 @@ export class BackupVerificationService extends EventEmitter {
 
       // Test restore a small subset of data
       const testData = this.extractTestData(
-        (backup as Record<string, unknown>).data,
+        (backup as Record<string, unknown>)['data'],
       )
       await this.restoreTestData(testRedis, testData)
 

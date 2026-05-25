@@ -29,7 +29,7 @@ describe('allscripts Provider', () => {
     name: 'Test Allscripts Provider',
     baseUrl: 'https://fhir.allscriptscloud.com/fhir/r4',
     clientId: 'example-client-id',
-    clientSecret: process.env.CLIENT_SECRET ?? 'example-client-secret',
+    clientSecret: process.env['CLIENT_SECRET'] ?? 'example-client-secret',
     scopes: ['user/Patient.read', 'user/Observation.read'],
   }
 

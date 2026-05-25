@@ -22,7 +22,6 @@ export interface Session {
 
 class AuthClient {
   private _session: Session | null = null
-  private _isLoading: boolean = false
 
   /**
    * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.

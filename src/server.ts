@@ -78,17 +78,17 @@ if (typeof setupExpressErrorHandler === 'function') {
 }
 
 // Environment variables
-const PORT = process.env.WS_PORT ?? 3001
-const REDIS_URL = process.env.REDIS_URL ?? 'redis://localhost:6379'
+const PORT = process.env['WS_PORT'] ?? 3001
+const REDIS_URL = process.env['REDIS_URL'] ?? 'redis://localhost:6379'
 const DATABASE_URL =
-  process.env.DATABASE_URL ??
+  process.env['DATABASE_URL'] ??
   'postgresql://postgres:postgres@localhost:5432/pixelated'
 
 // Database connection
 const db = new Pool({
   connectionString: DATABASE_URL,
   ssl:
-    process.env.NODE_ENV === 'production'
+    process.env['NODE_ENV'] === 'production'
       ? { rejectUnauthorized: false }
       : false,
 })
@@ -115,7 +115,7 @@ redis.on('error', (err: unknown) => {
 // Attempt connection with fallback for development
 if (typeof redis.connect === 'function') {
   redis.connect().catch((err) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env['NODE_ENV'] === 'development') {
       console.warn(
         'Failed to connect to Redis in development, using mock:',
         err instanceof Error ? err.message : String(err),
@@ -136,7 +136,7 @@ if (typeof redis.connect === 'function') {
     }
   })
 } else {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env['NODE_ENV'] === 'development') {
     console.warn(
       'Redis client does not expose connect(), skipping eager connection fallback.',
     )
@@ -146,7 +146,7 @@ if (typeof redis.connect === 'function') {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+    origin: process.env['FRONTEND_URL'] ?? 'http://localhost:3000',
     credentials: true,
   }),
 )
@@ -178,7 +178,7 @@ app.use(
     res.status(500).json({
       error: 'Internal server error',
       message:
-        process.env.NODE_ENV === 'production'
+        process.env['NODE_ENV'] === 'production'
           ? 'Something went wrong'
           : error.message,
     })
@@ -202,7 +202,7 @@ process.on('SIGTERM', async () => {
 })
 
 // Start server only if not in test mode
-const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST
+const isTest = process.env['NODE_ENV'] === 'test' || process.env['VITEST']
 
 if (!isTest) {
   server.listen(PORT, () => {

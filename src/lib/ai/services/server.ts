@@ -21,7 +21,7 @@ const appLogger = createBuildSafeLogger('ai-server')
 
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
 
-const AI_PROVIDER_VALUES: readonly AIProviderType[] = [
+
   'anthropic',
   'openai',
   'azure-openai',
@@ -503,10 +503,14 @@ Respond in JSON format with the following structure:
       )
 
       for await (const chunk of stream) {
-        res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+        res.write(`data: ${JSON.stringify(chunk)}
+
+`)
       }
 
-      res.write('data: [DONE]\n\n')
+      res.write('data: [DONE]
+
+')
       res.end()
      } catch (error: unknown) {
        appLogger.error('Streaming chat failed:', error)
@@ -517,7 +521,9 @@ Respond in JSON format with the following structure:
          })
        } else {
          res.write(
-           `data: ${JSON.stringify({ error: formatErrorMessage(error, 'Streaming failed') })}\n\n`,
+           `data: ${JSON.stringify({ error: formatErrorMessage(error, 'Streaming failed') })}
+
+`,
          )
         res.end()
       }

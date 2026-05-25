@@ -288,7 +288,7 @@ export class FHEAnalyticsService {
       logger.error('Failed to analyze sentiment trend', { error })
       const errorRecord = toErrorRecord(error)
       throw new Error(
-        `Sentiment analysis error: ${String(errorRecord.message)}`,
+        `Sentiment analysis error: ${String(errorRecord['message'])}`,
         {
           cause: error,
         },

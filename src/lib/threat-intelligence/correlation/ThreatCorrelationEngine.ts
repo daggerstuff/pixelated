@@ -123,7 +123,7 @@ export class ThreatCorrelationEngineCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for correlation engine')
     } catch (error: unknown) {
@@ -135,7 +135,7 @@ export class ThreatCorrelationEngineCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ??
+        process.env['MONGODB_URI'] ??
           'mongodb://localhost:27017/threat_correlation',
       )
       await this.mongoClient.connect()
@@ -199,7 +199,7 @@ export class ThreatCorrelationEngineCore
         .toArray()
 
       for (const pattern of patterns) {
-        this.correlationPatterns.set(pattern.patternId, pattern)
+        this.correlationPatterns.set(pattern['patternId'], pattern)
       }
 
       logger.info(`Loaded ${patterns.length} correlation patterns`)
@@ -976,11 +976,11 @@ export class ThreatCorrelationEngineCore
         .find({
           threatId: { $ne: threatId },
           $or: [
-            { regions: { $in: targetThreat.regions } },
-            { severity: targetThreat.severity },
+            { regions: { $in: targetThreat['regions'] } },
+            { severity: targetThreat['severity'] },
             {
               'indicators.indicatorType': {
-                $in: targetThreat.indicators.map(
+                $in: targetThreat['indicators'].map(
                   (i: { indicatorType: string }) => i.indicatorType,
                 ),
               },
@@ -1001,11 +1001,11 @@ export class ThreatCorrelationEngineCore
 
         if (similarityScore >= similarityThreshold) {
           similarThreats.push({
-            threatId: candidate.threatId,
+            threatId: candidate['threatId'],
             similarityScore,
             matchingIndicators: await this.findMatchingIndicators(
-              targetThreat.indicators,
-              candidate.indicators,
+              targetThreat['indicators'],
+              candidate['indicators'],
             ),
             matchingAttributes: this.findMatchingAttributes(
               targetThreat,

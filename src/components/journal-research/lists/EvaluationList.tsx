@@ -5,8 +5,8 @@ import type {
   TableColumn,
   TableDataSource,
   TableState,
-} from '@/components/ui/table-types.ts'
-import { Table } from '@/components/ui/table.tsx'
+} from '@/components/ui/table-types'
+import { Table } from '@/components/ui/table'
 import type {
   Evaluation,
   EvaluationList as EvaluationListType,

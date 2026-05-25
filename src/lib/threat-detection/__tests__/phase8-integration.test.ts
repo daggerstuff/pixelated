@@ -42,7 +42,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
   beforeEach(async () => {
     // Setup in-memory MongoDB
     mongod = await MongoMemoryServer.create()
-    process.env.MONGODB_URI = mongod.getUri()
+    process.env['MONGODB_URI'] = mongod.getUri()
 
     // Setup mock Redis
     redis = new Redis()
@@ -101,7 +101,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       },
     )
 
-    process.env.MONGODB_URI = mongod.getUri()
+    process.env['MONGODB_URI'] = mongod.getUri()
     await threatDetectionSystem.huntingService.initializeServices()
     await threatDetectionSystem.monitoringService.initializeServices()
   })
@@ -241,7 +241,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     it('should update threat intelligence feeds', async () => {
       const { intelligenceService } = threatDetectionSystem
 
-      process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
+      process.env['ALIENVAULT_API_KEY'] = 'test_valid_api_key'
 
       setMockFetchResponse({
         results: [{ ip: '192.168.1.1', reputation: 'bad' }],
@@ -251,7 +251,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       expect(global.fetch).toHaveBeenCalledTimes(2)
 
-      delete process.env.ALIENVAULT_API_KEY
+      delete process.env['ALIENVAULT_API_KEY']
     })
   })
 
@@ -406,7 +406,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
     it('should maintain low latency for threat intelligence lookups', async () => {
       const { intelligenceService } = threatDetectionSystem
 
-      process.env.ALIENVAULT_API_KEY = 'test_valid_api_key'
+      process.env['ALIENVAULT_API_KEY'] = 'test_valid_api_key'
 
       setMockFetchResponse({
         data: [],
@@ -418,7 +418,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       expect(latency).toBeLessThan(1000)
 
-      delete process.env.ALIENVAULT_API_KEY
+      delete process.env['ALIENVAULT_API_KEY']
     })
   })
 
@@ -446,12 +446,12 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       const { intelligenceService } = threatDetectionSystem
 
       // Test with invalid API key
-      process.env.ALIENVAULT_API_KEY = 'invalid_key'
+      process.env['ALIENVAULT_API_KEY'] = 'invalid_key'
 
       await expect(intelligenceService.updateFeeds()).rejects.toThrow()
 
       // Test with missing API key
-      delete process.env.ALIENVAULT_API_KEY
+      delete process.env['ALIENVAULT_API_KEY']
 
       await expect(intelligenceService.updateFeeds()).rejects.toThrow()
     })

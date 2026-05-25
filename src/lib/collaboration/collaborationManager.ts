@@ -171,7 +171,7 @@ class CollaborationManager {
       admin: ['read', 'write', 'comment', 'upload', 'manage_users', 'delete'],
     }
 
-    return permissions[role] ?? permissions.viewer
+    return permissions[role] ?? permissions['viewer']
   }
 
   /**
@@ -286,11 +286,6 @@ class CollaborationManager {
   ): Promise<string> {
     // Use session-specific encryption key
     return `encrypted_${btoa(content)}` // Mock encryption
-  }
-
-  private async getSessionEncryptionKey(sessionId: string): Promise<string> {
-    // Generate or retrieve session encryption key
-    return `session_key_${sessionId}`
   }
 
   private addMessage(sessionId: string, message: SecureMessage): void {

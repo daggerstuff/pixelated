@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { authClient } from '@/lib/auth-client.ts'
+import { authClient } from '@/lib/auth-client'
 
 import { toast } from '../ui/toast'
 

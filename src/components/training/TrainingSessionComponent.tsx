@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
-import { authClient } from '@/lib/auth-client.ts'
+import { authClient } from '@/lib/auth-client'
 
 import { useConversationMemory } from '../../hooks/useMemory'
 import { getJournalResearchAuthToken } from '../../lib/api/journal-research/auth'
@@ -295,7 +295,7 @@ export function TrainingSessionComponent() {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
         content: noteContent,
-        timestamp: String(msg.payload?.timestamp ?? new Date().toISOString()),
+        timestamp: String(msg.payload?.['timestamp'] ?? new Date().toISOString()),
       }
 
       setCoachingNotes((prev) => [...prev, coachingNote])

@@ -41,7 +41,6 @@ export interface TestMetrics {
  */
 class TestSuiteManager {
   private readonly config: TestSuiteConfig
-  private readonly testResults = new Map<string, TestResult>()
   private isRunning = false
   private lastRun?: Date
 

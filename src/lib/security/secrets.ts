@@ -34,7 +34,7 @@ export function getSecret(name: string, defaultValue?: string): string {
   const value = process.env[name] ?? defaultValue
 
   if (!value) {
-    const isProduction = process.env.NODE_ENV === 'production'
+    const isProduction = process.env['NODE_ENV'] === 'production'
     const isMandatory = MANDATORY_SECRETS.includes(name)
 
     if (isProduction && isMandatory) {
@@ -46,7 +46,7 @@ export function getSecret(name: string, defaultValue?: string): string {
 
     if (isMandatory) {
       logger.warn(
-        `Warning: Mandatory secret ${name} is missing in ${process.env.NODE_ENV} environment.`,
+        `Warning: Mandatory secret ${name} is missing in ${process.env['NODE_ENV']} environment.`,
       )
     }
   }
@@ -64,7 +64,7 @@ export function validateSecrets(): boolean {
   const missing = MANDATORY_SECRETS.filter((name) => !process.env[name])
 
   if (missing.length > 0) {
-    const isProduction = process.env.NODE_ENV === 'production'
+    const isProduction = process.env['NODE_ENV'] === 'production'
     const message = `Startup secret validation failed. Missing: ${missing.join(', ')}`
 
     if (isProduction) {

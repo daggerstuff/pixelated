@@ -40,7 +40,6 @@ export interface InterventionResult {
  */
 class InterventionEngine {
   private rules: InterventionRule[] = []
-  private context: InterventionContext | null = null
 
   constructor() {
     this.initializeRules()

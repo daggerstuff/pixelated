@@ -257,7 +257,7 @@ export class PythonBiasDetectionBridge {
         }
         // Simplified signal handling for test compatibility
         // In test environments, don't use AbortSignal to avoid compatibility issues
-        if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+        if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
           // Skip signal setup in tests
         } else {
           // Always create a fresh AbortController to avoid identity issues

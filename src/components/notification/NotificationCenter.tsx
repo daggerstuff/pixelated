@@ -1,9 +1,9 @@
 import { Bell, Check, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { Badge } from '../ui/badge/index.ts'
-import { Button } from '../ui/button/index.ts'
-import { Card } from '../ui/card/index.ts'
+import { Badge } from '../ui/badge/index'
+import { Button } from '../ui/button/index'
+import { Card } from '../ui/card/index'
 import { useWebSocket } from '../../hooks/useWebSocket'
 import type { NotificationItem } from '../../lib/services/notification/NotificationService'
 import { NotificationStatus } from '../../lib/services/notification/NotificationService'

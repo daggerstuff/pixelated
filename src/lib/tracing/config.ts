@@ -44,37 +44,37 @@ export function getTracingConfig(): TracingConfig {
 
   // Default to enabled in production, can be disabled via env var
   const enabled =
-    import.meta.env.TRACING_ENABLED !== 'false' &&
-    (isProduction || import.meta.env.TRACING_ENABLED === 'true')
+    import.meta.env['TRACING_ENABLED'] !== 'false' &&
+    (isProduction || import.meta.env['TRACING_ENABLED'] === 'true')
 
   return {
     enabled,
-    serviceName: import.meta.env.TRACING_SERVICE_NAME ?? 'pixelated-empathy',
-    serviceVersion: import.meta.env.TRACING_SERVICE_VERSION ?? '1.0.0',
+    serviceName: import.meta.env['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
+    serviceVersion: import.meta.env['TRACING_SERVICE_VERSION'] ?? '1.0.0',
     environment:
       import.meta.env.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
       type:
-        (import.meta.env.TRACING_EXPORTER_TYPE as
+        (import.meta.env['TRACING_EXPORTER_TYPE'] as
           | 'otlp'
           | 'console'
           | 'jaeger'
           | 'zipkin') || 'otlp',
       endpoint:
-        import.meta.env.TRACING_EXPORTER_ENDPOINT ?? 'http://localhost:4318',
-      headers: import.meta.env.TRACING_EXPORTER_HEADERS
-        ? JSON.parse(import.meta.env.TRACING_EXPORTER_HEADERS)
+        import.meta.env['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
+      headers: import.meta.env['TRACING_EXPORTER_HEADERS']
+        ? JSON.parse(import.meta.env['TRACING_EXPORTER_HEADERS'])
         : undefined,
     },
     sampling: {
-      ratio: parseFloat(import.meta.env.TRACING_SAMPLING_RATIO ?? '1.0'),
+      ratio: parseFloat(import.meta.env['TRACING_SAMPLING_RATIO'] ?? '1.0'),
     },
     instrumentation: {
-      http: import.meta.env.TRACING_INSTRUMENT_HTTP !== 'false',
-      express: import.meta.env.TRACING_INSTRUMENT_EXPRESS !== 'false',
-      mongodb: import.meta.env.TRACING_INSTRUMENT_MONGODB !== 'false',
-      postgres: import.meta.env.TRACING_INSTRUMENT_POSTGRES !== 'false',
-      redis: import.meta.env.TRACING_INSTRUMENT_REDIS !== 'false',
+      http: import.meta.env['TRACING_INSTRUMENT_HTTP'] !== 'false',
+      express: import.meta.env['TRACING_INSTRUMENT_EXPRESS'] !== 'false',
+      mongodb: import.meta.env['TRACING_INSTRUMENT_MONGODB'] !== 'false',
+      postgres: import.meta.env['TRACING_INSTRUMENT_POSTGRES'] !== 'false',
+      redis: import.meta.env['TRACING_INSTRUMENT_REDIS'] !== 'false',
     },
   }
 }

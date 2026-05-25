@@ -29,8 +29,6 @@ type ConsistencyServiceSpy = MockInstance<
   typeof BeliefConsistencyService.prototype.checkBeliefConsistency
 >
 
-let mockProfileService: PatientProfileService
-let mockConsistencyService: BeliefConsistencyService
 let getProfileByIdSpy!: ProfileServiceSpy
 let checkBeliefConsistencySpy!: ConsistencyServiceSpy
 
@@ -730,7 +728,7 @@ describe('PatientResponseService', () => {
       const profile = responseService.getDefaultEmotionalProfile()
       expect(profile).toHaveProperty('emotions')
       expect(profile).toHaveProperty('id')
-      expect(profile.emotions.neutral).toBeGreaterThanOrEqual(0)
+      expect(profile.emotions['neutral']).toBeGreaterThanOrEqual(0)
     })
 
     it('getCurrentEmotionalProfile should return null initially', () => {

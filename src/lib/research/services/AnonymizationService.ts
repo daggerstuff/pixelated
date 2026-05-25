@@ -456,7 +456,7 @@ export class AnonymizationService {
   private encryptField(value: string): string {
     const algorithm = 'aes-256-cbc'
     const key = crypto.scryptSync(
-      process.env.RESEARCH_ENCRYPTION_KEY ?? 'default-key',
+      process.env['RESEARCH_ENCRYPTION_KEY'] ?? 'default-key',
       'salt',
       32,
     )

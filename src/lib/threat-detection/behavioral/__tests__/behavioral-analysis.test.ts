@@ -5,7 +5,7 @@
  * user profiling, anomaly detection, and pattern recognition.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { AdvancedBehavioralAnalysisService } from '../behavioral-analysis-service'
 import { BehavioralAnalysisRepository } from '../behavioral-analysis-repository'
@@ -191,6 +191,7 @@ describe('Behavioral Analysis Service', () => {
     mlEnabled: true,
     redisUrl: 'redis://localhost:6379',
     mongoUrl: 'mongodb://localhost:27017',
+    mlEnabled: true,
     modelPath: '/tmp/model',
     privacyConfig: {
       epsilon: 1,

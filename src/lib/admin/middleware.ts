@@ -86,7 +86,7 @@ export function adminGuard(requiredPermission?: AdminPermission) {
 
     // Continue with the request
     // Apply the admin context to the request for use in the route handler
-    context.locals.admin = admin
+    context.locals['admin'] = admin
 
     return next()
   }

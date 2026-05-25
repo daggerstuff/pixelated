@@ -41,7 +41,7 @@ export interface GestaltAnalysisResponse {
   raw_metadata?: Record<string, unknown>
 }
 
-const PIXEL_API_URL = process.env.PIX_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_URL = process.env['PIX_API_URL'] ?? 'http://localhost:8001'
 
 export class GestaltClient {
   /**

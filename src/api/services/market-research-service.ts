@@ -5,7 +5,7 @@ import { slug } from '@/utils/common'
 // Market Research Service Layer
 import { getPostgresPool } from '../../lib/database/connection'
 import {
-  MarketResearchDocument,
+  _MarketResearchDocument,
   MarketResearch as MarketResearchModel,
 } from '../../lib/database/mongodb/schemas'
 import { ForbiddenError, NotFoundError } from '../middleware/error-handler'

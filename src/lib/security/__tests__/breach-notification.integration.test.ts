@@ -87,8 +87,8 @@ describe('breachNotificationSystem Integration Tests', () => {
     vi.clearAllMocks()
 
     // Setup redis mock
-    vi.mocked(redis.set).mockResolvedValue('OK')
-    vi.mocked(redis.get).mockResolvedValue(
+    vi.mocked(redis['set']).mockResolvedValue('OK')
+    vi.mocked(redis['get']).mockResolvedValue(
       JSON.stringify({
         ...mockBreach,
         id: 'test_breach_id',
@@ -96,11 +96,11 @@ describe('breachNotificationSystem Integration Tests', () => {
         notificationStatus: 'pending',
       }),
     )
-    vi.mocked(redis.keys).mockResolvedValue(['breach:test_breach_id'])
-    vi.mocked(redis.hset).mockResolvedValue(1)
-    vi.mocked(redis.expire).mockResolvedValue(1)
-    vi.mocked(redis.hset).mockResolvedValue(1)
-    vi.mocked(redis.expire).mockResolvedValue(1)
+    vi.mocked(redis['keys']).mockResolvedValue(['breach:test_breach_id'])
+    vi.mocked(redis['hset']).mockResolvedValue(1)
+    vi.mocked(redis['expire']).mockResolvedValue(1)
+    vi.mocked(redis['hset']).mockResolvedValue(1)
+    vi.mocked(redis['expire']).mockResolvedValue(1)
 
     // Setup auth mock
     mockGetUserById.mockResolvedValue(mockUser)
@@ -121,7 +121,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       const breachId = await reportBreach(mockBreach)
 
       expect(breachId).toBeDefined()
-      expect(redis.set).toHaveBeenCalled()
+      expect(redis['set']).toHaveBeenCalled()
       expect(mockSendEmail).toHaveBeenCalled()
       expect(logger.error).toHaveBeenCalledWith(
         'Security breach detected:',
@@ -229,7 +229,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       const breachId = await runTestScenario(scenario)
 
       expect(breachId).toBeDefined()
-      expect(redis.set).toHaveBeenCalledWith(
+      expect(redis['set']).toHaveBeenCalledWith(
         expect.stringContaining('breach:test:'),
         expect.any(String),
         'EX',
@@ -264,14 +264,14 @@ describe('breachNotificationSystem Integration Tests', () => {
 
       await updateMetrics(breach)
 
-      expect(redis.hset).toHaveBeenCalled()
-      expect(redis.expire).toHaveBeenCalled()
+      expect(redis['hset']).toHaveBeenCalled()
+      expect(redis['expire']).toHaveBeenCalled()
     })
   })
 
   describe('error Handling', () => {
     it('should handle redis errors gracefully', async () => {
-      vi.mocked(redis.set).mockRejectedValue(new Error('Redis error'))
+      vi.mocked(redis['set']).mockRejectedValue(new Error('Redis error'))
 
       await expect(reportBreach(mockBreach)).rejects.toThrow('Redis error')
       expect(logger.error).toHaveBeenCalledWith(
