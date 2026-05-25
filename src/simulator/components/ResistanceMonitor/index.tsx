@@ -19,7 +19,7 @@
  * @see GestaltClient (src/lib/services/ai/GestaltClient.ts)
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import _React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type {
   CrisisLevel,
@@ -169,18 +169,18 @@ function DefenseGauge({
   }, [displayValue, confidence, defenseName])
 
   return (
-    <div className={styles.gaugeWrap}>
-      <span className={styles.gaugeLabel}>Defense Confidence</span>
+    <div className={styles['gaugeWrap']}>
+      <span className={styles['gaugeLabel']}>Defense Confidence</span>
       <canvas
         ref={canvasRef}
         width={GAUGE_WIDTH}
         height={GAUGE_HEIGHT}
-        className={styles.gaugeCanvas}
+        className={styles['gaugeCanvas']}
         style={{ width: GAUGE_WIDTH, height: GAUGE_HEIGHT }}
         aria-label={`Defense confidence ${Math.round(confidence * 100)}% — ${defenseName}`}
         role="img"
       />
-      <div className={styles.gaugeFooter}>
+      <div className={styles['gaugeFooter']}>
         <span>Low</span>
         <span style={{ fontWeight: 700, color: '#cbd5e1' }}>{defenseName}</span>
         <span>High</span>
@@ -193,16 +193,16 @@ function DefenseGauge({
 function crisisStripClass(level: CrisisLevel): string {
   switch (level) {
     case 'acute':
-      return styles.crisisStripAcute
+      return styles['crisisStripAcute']
     case 'high':
-      return styles.crisisStripHigh
+      return styles['crisisStripHigh']
     case 'elevated':
-      return styles.crisisStripElevated
+      return styles['crisisStripElevated']
     case 'none': {
       throw new Error('Not implemented yet: "none" case')
     }
     default:
-      return styles.crisisStripNone
+      return styles['crisisStripNone']
   }
 }
 
@@ -216,7 +216,7 @@ function CrisisIcon({ level }: { level: CrisisLevel }) {
   }
   const { icon, label } = map[level]
   return (
-    <span className={styles.crisisIcon} aria-label={label} role="img">
+    <span className={styles['crisisIcon']} aria-label={label} role="img">
       {icon}
     </span>
   )
@@ -224,9 +224,9 @@ function CrisisIcon({ level }: { level: CrisisLevel }) {
 
 /** Maturity fill colour based on value thresholds. */
 function maturityFillClass(maturity: number): string {
-  if (maturity >= 0.71) return styles.maturityHigh
-  if (maturity >= 0.43) return styles.maturityMid
-  return styles.maturityLow
+  if (maturity >= 0.71) return styles['maturityHigh']
+  if (maturity >= 0.43) return styles['maturityMid']
+  return styles['maturityLow']
 }
 
 // ---------------------------------------------------------------------------
@@ -296,12 +296,12 @@ export function ResistanceMonitor({
   const dotClass = useCallback((status: typeof connectionStatus) => {
     switch (status) {
       case 'connected':
-        return styles.statusDotConnected
+        return styles['statusDotConnected']
       case 'connecting':
       case 'reconnecting':
-        return styles.statusDotConnecting
+        return styles['statusDotConnecting']
       case 'error':
-        return styles.statusDotError
+        return styles['statusDotError']
       case 'disconnected': {
         throw new Error('Not implemented yet: "disconnected" case')
       }
@@ -309,7 +309,7 @@ export function ResistanceMonitor({
         throw new Error('Not implemented yet: "idle" case')
       }
       default:
-        return styles.statusDotIdle
+        return styles['statusDotIdle']
     }
   }, [])
 
@@ -325,10 +325,10 @@ export function ResistanceMonitor({
       : null
 
   const renderStatusBar = () => (
-    <div className={styles.statusBar}>
-      <span className={styles.statusLabel}>
+    <div className={styles['statusBar']}>
+      <span className={styles['statusLabel']}>
         <span
-          className={`${styles.statusDot} ${dotClass(connectionStatus)}`}
+          className={`${styles['statusDot']} ${dotClass(connectionStatus)}`}
           role="status"
           aria-label={connectionStatus}
         />
@@ -342,11 +342,11 @@ export function ResistanceMonitor({
         {lastUpdateTime ? `Updated ${formattedLastSeen}` : 'No data yet'}
       </span>
 
-      <div className={styles.statusActions}>
+      <div className={styles['statusActions']}>
         {(connectionStatus === 'disconnected' ||
           connectionStatus === 'error') && (
           <button
-            className={styles.reconnectBtn}
+            className={styles['reconnectBtn']}
             onClick={reconnect}
             type="button"
             aria-label="Reconnect to Gestalt Engine"
@@ -368,7 +368,7 @@ export function ResistanceMonitor({
     }
     return (
       <div
-        className={`${styles.crisisStrip} ${crisisStripClass(level)}`}
+        className={`${styles['crisisStrip']} ${crisisStripClass(level)}`}
         role="alert"
         aria-live={level === 'acute' ? 'assertive' : 'polite'}
       >
@@ -379,11 +379,11 @@ export function ResistanceMonitor({
   }
 
   const renderEmptyState = () => (
-    <div className={styles.emptyState}>
-      <span className={styles.emptyIcon} aria-hidden="true">
+    <div className={styles['emptyState']}>
+      <span className={styles['emptyIcon']} aria-hidden="true">
         📡
       </span>
-      <p className={styles.emptyText}>
+      <p className={styles['emptyText']}>
         {connectionStatus === 'connecting' ||
         connectionStatus === 'reconnecting'
           ? 'Connecting to Gestalt Engine…'
@@ -402,23 +402,23 @@ export function ResistanceMonitor({
   )
 
   const renderMetrics = () => (
-    <div className={styles.body}>
+    <div className={styles['body']}>
       {/* Defense label */}
-      <div className={styles.cell}>
-        <span className={styles.cellLabel}>Defense Mechanism</span>
-        <span className={styles.cellValue}>
+      <div className={styles['cell']}>
+        <span className={styles['cellLabel']}>Defense Mechanism</span>
+        <span className={styles['cellValue']}>
           {payload?.defense_label_name ?? '—'}
         </span>
-        <span className={styles.cellSubValue}>
+        <span className={styles['cellSubValue']}>
           Label #{payload?.defense_label ?? '—'}
         </span>
       </div>
 
       {/* Dominant emotion */}
-      <div className={styles.cell}>
-        <span className={styles.cellLabel}>Dominant Emotion</span>
+      <div className={styles['cell']}>
+        <span className={styles['cellLabel']}>Dominant Emotion</span>
         <span
-          className={styles.cellValue}
+          className={styles['cellValue']}
           style={{
             color:
               PLUTCHIK_COLORS[payload?.dominant_emotion ?? ''] ?? '#f1f5f9',
@@ -427,7 +427,7 @@ export function ResistanceMonitor({
         >
           {payload?.dominant_emotion ?? '—'}
         </span>
-        <span className={styles.cellSubValue}>
+        <span className={styles['cellSubValue']}>
           Intensity{' '}
           {payload != null
             ? `${Math.round(payload.dominant_emotion_intensity * 100)}%`
@@ -438,15 +438,15 @@ export function ResistanceMonitor({
   )
 
   const renderMaturityBar = () => (
-    <div className={styles.maturityWrap}>
-      <div className={styles.maturityHeader}>
-        <span className={styles.cellLabel}>Defense Maturity</span>
+    <div className={styles['maturityWrap']}>
+      <div className={styles['maturityHeader']}>
+        <span className={styles['cellLabel']}>Defense Maturity</span>
         <span style={{ fontSize: 11, fontWeight: 700, color: '#94a3b8' }}>
           {maturityPct != null ? `${maturityPct}%` : 'N/A'}
         </span>
       </div>
       <div
-        className={styles.maturityBarTrack}
+        className={styles['maturityBarTrack']}
         role="progressbar"
         aria-valuenow={maturityPct ?? 0}
         aria-valuemin={0}
@@ -454,10 +454,10 @@ export function ResistanceMonitor({
         aria-label="Defense maturity score"
       >
         <div
-          className={`${styles.maturityBarFill} ${
+          className={`${styles['maturityBarFill']} ${
             maturityPct != null
               ? maturityFillClass(maturityPct / 100)
-              : styles.maturityLow
+              : styles['maturityLow']
           }`}
           style={{ width: `${maturityPct ?? 0}%` }}
         />
@@ -471,7 +471,7 @@ export function ResistanceMonitor({
 
     return (
       <div
-        className={styles.emotionGrid}
+        className={styles['emotionGrid']}
         role="group"
         aria-label="Plutchik emotion scores"
       >
@@ -484,13 +484,13 @@ export function ResistanceMonitor({
           return (
             <div
               key={emotion}
-              className={styles.emotionChip}
+              className={styles['emotionChip']}
               aria-selected={isDominant}
               title={`${emotion}: ${pct}%`}
             >
-              <div className={styles.emotionBar}>
+              <div className={styles['emotionBar']}>
                 <div
-                  className={styles.emotionBarFill}
+                  className={styles['emotionBarFill']}
                   style={{
                     height: `${pct}%`,
                     background: color,
@@ -498,8 +498,8 @@ export function ResistanceMonitor({
                   }}
                 />
               </div>
-              <span className={styles.emotionName}>{emotion}</span>
-              <span className={styles.emotionScore}>{pct}%</span>
+              <span className={styles['emotionName']}>{emotion}</span>
+              <span className={styles['emotionScore']}>{pct}%</span>
             </div>
           )
         })}
@@ -510,11 +510,11 @@ export function ResistanceMonitor({
   const renderPrediction = () => {
     const isAcute = payload?.crisis_level === 'acute'
     return (
-      <div className={styles.predictionWrap}>
-        <span className={styles.cellLabel}>Behavioral Prediction</span>
+      <div className={styles['predictionWrap']}>
+        <span className={styles['cellLabel']}>Behavioral Prediction</span>
         <p
-          className={`${styles.predictionText} ${
-            isAcute ? styles.predictionTextAcute : ''
+          className={`${styles['predictionText']} ${
+            isAcute ? styles['predictionTextAcute'] : ''
           }`}
         >
           {payload?.behavioral_prediction ??
@@ -528,11 +528,11 @@ export function ResistanceMonitor({
     const score = payload?.breakthrough_score ?? 0
     const pct = Math.round(score * 100)
     return (
-      <div className={styles.breakthroughWrap}>
-        <span className={styles.breakthroughLabel}>Breakthrough</span>
+      <div className={styles['breakthroughWrap']}>
+        <span className={styles['breakthroughLabel']}>Breakthrough</span>
         <div
-          className={`${styles.breakthroughBarTrack} ${
-            score > 0.7 ? styles.breakthroughHigh : ''
+          className={`${styles['breakthroughBarTrack']} ${
+            score > 0.7 ? styles['breakthroughHigh'] : ''
           }`}
           role="progressbar"
           aria-valuenow={pct}
@@ -541,13 +541,13 @@ export function ResistanceMonitor({
           aria-label="Breakthrough score"
         >
           <div
-            className={`${styles.breakthroughBarFill} ${
-              score > 0.7 ? styles.breakthroughHigh : ''
+            className={`${styles['breakthroughBarFill']} ${
+              score > 0.7 ? styles['breakthroughHigh'] : ''
             }`}
             style={{ width: `${pct}%` }}
           />
         </div>
-        <span className={styles.breakthroughScore}>{pct}%</span>
+        <span className={styles['breakthroughScore']}>{pct}%</span>
       </div>
     )
   }
@@ -557,7 +557,7 @@ export function ResistanceMonitor({
   // ---------------------------------------------------------------------------
 
   const isAcute = payload?.crisis_level === 'acute'
-  const panelClass = [styles.panel, isAcute ? styles.panelAcute : '', className]
+  const panelClass = [styles['panel'], isAcute ? styles['panelAcute'] : '', className]
     .filter(Boolean)
     .join(' ')
 

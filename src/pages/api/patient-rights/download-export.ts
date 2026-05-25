@@ -122,7 +122,7 @@ export const GET = async ({ request }) => {
       metadata: {
         exportId: safeExportId,
         generatedAt: new Date().toISOString(),
-        patientId: process.env.PATIENT_ID ?? 'example-patient-id',
+        patientId: process.env['PATIENT_ID'] ?? 'example-patient-id',
         requestedBy: user.id,
         formatVersion: '1.0',
       },

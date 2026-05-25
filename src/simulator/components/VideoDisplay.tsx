@@ -44,8 +44,8 @@ const toSessionDescription = (
     return null
   }
 
-  const rawType = data.type
-  const rawSdp = data.sdp
+  const rawType = data['type']
+  const rawSdp = data['sdp']
 
   if (
     typeof rawType !== 'string' ||
@@ -63,14 +63,14 @@ const toIceCandidate = (data: unknown): RTCIceCandidateInit | null => {
     return null
   }
 
-  const rawCandidate = data.candidate
+  const rawCandidate = data['candidate']
   if (typeof rawCandidate !== 'string') {
     return null
   }
 
-  const rawSdpMid = data.sdpMid
-  const rawSdpMLineIndex = data.sdpMLineIndex
-  const rawUsernameFragment = data.usernameFragment
+  const rawSdpMid = data['sdpMid']
+  const rawSdpMLineIndex = data['sdpMLineIndex']
+  const rawUsernameFragment = data['usernameFragment']
 
   if (
     rawSdpMLineIndex !== undefined &&
@@ -106,11 +106,11 @@ const toIceCandidate = (data: unknown): RTCIceCandidateInit | null => {
 const ICE_SERVERS: IceServer[] = [
   {
     urls: [
-      process.env.TURN_SERVER_URL ?? 'turn:turn.pixelatedempathy.com:3478',
+      process.env['TURN_SERVER_URL'] ?? 'turn:turn.pixelatedempathy.com:3478',
     ],
 
-    username: process.env.TURN_SERVER_USERNAME,
-    credential: process.env.TURN_SERVER_PASSWORD,
+    username: process.env['TURN_SERVER_USERNAME'],
+    credential: process.env['TURN_SERVER_PASSWORD'],
   },
   { urls: ['stun:stun.l.google.com:19302'] },
 ]

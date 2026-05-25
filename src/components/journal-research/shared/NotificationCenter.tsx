@@ -7,7 +7,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
+} from '@/components/ui/card/card'
 import {
   useNotificationStore,
   useFilteredNotifications,

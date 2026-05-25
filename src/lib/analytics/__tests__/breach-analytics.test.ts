@@ -71,7 +71,7 @@ describe('breachAnalytics', () => {
   }
 
   const mockedListRecentBreaches = vi.mocked(listRecentBreaches)
-  const mockedRedisGet = vi.mocked(redis.get)
+  const mockedRedisGet = vi.mocked(redis['get'])
   const mockedCalculateOverallRisk = vi.mocked(RiskScoring.calculateOverallRisk)
   const mockedCalculateDailyRisk = vi.mocked(RiskScoring.calculateDailyRisk)
   const mockedCalculateScore = vi.mocked(ComplianceMetrics.calculateScore)

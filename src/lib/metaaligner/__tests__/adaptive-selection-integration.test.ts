@@ -19,7 +19,7 @@ import { ContextType } from '../core/objectives'
 import { AdaptiveSelector } from '../prioritization/adaptive-selector'
 import {
   ContextDetector,
-  type ContextDetectionResult,
+  type _ContextDetectionResult,
 } from '../prioritization/context-detector'
 import {
   ContextTransitionDetector,
@@ -524,7 +524,7 @@ describe('Adaptive Selection Integration Tests', () => {
       // Should fall back to GENERAL
       expect(result.detectedContext).toBe(ContextType.GENERAL)
       expect(result.confidence).toBeLessThan(0.5)
-      expect(result.metadata.error).toBeDefined()
+      expect(result.metadata['error']).toBeDefined()
     })
 
     it('should handle objective switching errors without crashing', async () => {
@@ -584,7 +584,6 @@ describe('Adaptive Selection Integration Tests', () => {
 
     it('Scenario 2: Crisis Escalation from General Conversation', async () => {
       // Casual start
-      const result1 = await adaptiveSelector.selectObjectives('Hello')
 
       // Sudden crisis
       const result2 = await adaptiveSelector.selectObjectives(

@@ -186,10 +186,10 @@ describe('Authentication System Integration', () => {
       isNewUser: false,
     })
     // Set test environment variables
-    process.env.JWT_SECRET = 'test-secret-key'
-    process.env.JWT_AUDIENCE = 'test-audience'
-    process.env.JWT_ISSUER = 'test-issuer'
-    process.env.BCRYPT_ROUNDS = '10'
+    process.env['JWT_SECRET'] = 'test-secret-key'
+    process.env['JWT_AUDIENCE'] = 'test-audience'
+    process.env['JWT_ISSUER'] = 'test-issuer'
+    process.env['BCRYPT_ROUNDS'] = '10'
 
     // Default CSRF mock
     mockRedis.getFromCache.mockImplementation(async (key: string) => {
@@ -244,9 +244,9 @@ describe('Authentication System Integration', () => {
 
       expect(registerResponse.status).toBe(201)
       const registerData = await readJsonObject(registerResponse)
-      expect(registerData.success).toBe(true)
-      const registerUser = expectRecord(registerData.user)
-      expect(expectString(registerUser.id)).toBe('user123')
+      expect(registerData['success']).toBe(true)
+      const registerUser = expectRecord(registerData['user'])
+      expect(expectString(registerUser['id'])).toBe('user123')
 
       // Mock login
       mockAuth0UserService.signIn.mockResolvedValue({
@@ -284,8 +284,8 @@ describe('Authentication System Integration', () => {
 
       expect(loginResponse.status).toBe(200)
       const loginData = await readJsonObject(loginResponse)
-      expect(loginData.success).toBe(true)
-      expect(expectString(loginData.token)).toBe('access.token.456')
+      expect(loginData['success']).toBe(true)
+      expect(expectString(loginData['token'])).toBe('access.token.456')
 
       // Mock dependencies for logout
       mockAuth0UserService.signOut.mockResolvedValue({ success: true })
@@ -324,7 +324,7 @@ describe('Authentication System Integration', () => {
 
       expect(logoutResponse.status).toBe(200)
       const logoutData = await readJsonObject(logoutResponse)
-      expect(logoutData.success).toBe(true)
+      expect(logoutData['success']).toBe(true)
     })
 
     it('should enforce rate limiting across the flow', async () => {
@@ -353,7 +353,7 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(429)
       const data = await readJsonObject(response)
-      expect(expectString(data.error)).toContain('Rate limit exceeded')
+      expect(expectString(data['error'])).toContain('Rate limit exceeded')
     })
 
     it('should enforce CSRF protection', async () => {
@@ -379,7 +379,7 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(403)
       const data = await readJsonObject(response)
-      expect(expectString(data.error)).toContain('Invalid CSRF token')
+      expect(expectString(data['error'])).toContain('Invalid CSRF token')
     })
   })
 
@@ -467,9 +467,9 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(201)
       const data = await readJsonObject(response)
-      const user = expectRecord(data.user)
+      const user = expectRecord(data['user'])
       // Note: sanitizeInput removes < and >
-      expect(expectString(user.email)).toBe(
+      expect(expectString(user['email'])).toBe(
         'scriptalert(xss)/scripttest@example.com',
       )
     })
@@ -494,10 +494,10 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(400)
       const data = await readJsonObject(response)
-      expect(expectString(data.error)).toBe(
+      expect(expectString(data['error'])).toBe(
         'Password does not meet requirements',
       )
-      expect(data.details).toBeDefined()
+      expect(data['details']).toBeDefined()
     })
 
     it('should validate email format in registration', async () => {
@@ -520,7 +520,7 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(400)
       const data = await readJsonObject(response)
-      expect(expectString(data.error)).toBe('Invalid email format')
+      expect(expectString(data['error'])).toBe('Invalid email format')
     })
 
     it('should prevent timing attacks in login', async () => {
@@ -786,9 +786,9 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(200)
       const data = await readJsonObject(response)
-      const user = expectRecord(data.user)
-      expect(expectString(user.id)).toBe('user123')
-      expect(expectString(user.fullName)).toBe('John Doe')
+      const user = expectRecord(data['user'])
+      expect(expectString(user['id'])).toBe('user123')
+      expect(expectString(user['fullName'])).toBe('John Doe')
     })
 
     it('should update user profile', async () => {
@@ -836,9 +836,9 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(200)
       const data = await readJsonObject(response)
-      expect(data.success).toBe(true)
-      const user = expectRecord(data.user)
-      expect(expectString(user.fullName)).toBe('Jane Doe')
+      expect(data['success']).toBe(true)
+      const user = expectRecord(data['user'])
+      expect(expectString(user['fullName'])).toBe('Jane Doe')
 
       // Verify security log
       expect(mockSecurity.logSecurityEvent).toHaveBeenCalled()
@@ -866,7 +866,7 @@ describe('Authentication System Integration', () => {
 
       expect(response.status).toBe(400)
       const data = await readJsonObject(response)
-      expect(expectString(data.message)).toContain('Missing token')
+      expect(expectString(data['message'])).toContain('Missing token')
     })
 
     it('should attempt verification with valid params', async () => {

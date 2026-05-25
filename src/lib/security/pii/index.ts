@@ -9,7 +9,7 @@
  * FHE capabilities when available.
  */
 
-import { fheService, FHEOperation, RealFHEService } from '../../fhe'
+import { fheService, FHEOperation } from '../../fhe'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger
@@ -581,11 +581,11 @@ class PIIDetectionService {
         confidence,
         isEncrypted: true,
         metadata: {
-          operationId: result.metadata?.operation?.toString() ?? 'unknown',
+          operationId: result.metadata?.['operation']?.toString() ?? 'unknown',
           processingTime:
-            result.metadata?.timestamp &&
-            typeof result.metadata.timestamp === 'number'
-              ? (Date.now() - result.metadata.timestamp).toString()
+            result.metadata?.['timestamp'] &&
+            typeof result.metadata['timestamp'] === 'number'
+              ? (Date.now() - result.metadata['timestamp']).toString()
               : '0',
         },
       }

@@ -984,8 +984,8 @@ export class DeploymentOrchestrator extends EventEmitter {
     try {
       // In a real implementation, this would check health scores from HealthMonitor
       const minHealthScore =
-        (typeof step.successCriteria.minHealthScore === 'number'
-          ? step.successCriteria.minHealthScore
+        (typeof step.successCriteria['minHealthScore'] === 'number'
+          ? step.successCriteria['minHealthScore']
           : undefined) ?? 80
 
       // Simulate health check validation
@@ -1022,12 +1022,12 @@ export class DeploymentOrchestrator extends EventEmitter {
     try {
       // In a real implementation, this would run actual performance tests
       const maxResponseTime =
-        (typeof step.successCriteria.maxResponseTime === 'number'
-          ? step.successCriteria.maxResponseTime
+        (typeof step.successCriteria['maxResponseTime'] === 'number'
+          ? step.successCriteria['maxResponseTime']
           : undefined) ?? 200
       const minThroughput =
-        (typeof step.successCriteria.minThroughput === 'number'
-          ? step.successCriteria.minThroughput
+        (typeof step.successCriteria['minThroughput'] === 'number'
+          ? step.successCriteria['minThroughput']
           : undefined) ?? 100
 
       // Simulate performance test results
@@ -1123,24 +1123,6 @@ export class DeploymentOrchestrator extends EventEmitter {
               ? error.message
               : 'Unknown error'
             : 'Unknown error',
-      }
-    }
-  }
-
-  /**
-   * Handle deployment failure
-   */
-  private handleDeploymentFailure(data: unknown): void {
-    logger.error('Handling deployment failure', data)
-
-    // Find affected executions
-    for (const [executionId, execution] of this.activeExecutions.entries()) {
-      if (execution.status === 'running') {
-        execution.status = 'failed'
-        execution.errors.push(`Deployment failure: ${JSON.stringify(data)}`)
-        execution.completedAt = new Date()
-
-        this.emit('execution-failed', { executionId, error: data })
       }
     }
   }

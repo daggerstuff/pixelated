@@ -56,7 +56,7 @@ interface PerformanceMetrics {
 }
 
 // Add small helper to avoid exposing stacks in responses and to control logging
-const isProduction = process.env.NODE_ENV === 'production'
+const isProduction = process.env['NODE_ENV'] === 'production'
 
 function safeErrorForLogging(err: unknown) {
   return {
@@ -447,7 +447,6 @@ export const PUT: APIRoute = async ({ request }) => {
 
   try {
     // Apply security middleware with timeout (same pattern as POST)
-    const _securityStart = Date.now()
     const securityResult = await Promise.race([
       securityMiddleware(request, {}),
       new Promise<Response>((resolve) =>

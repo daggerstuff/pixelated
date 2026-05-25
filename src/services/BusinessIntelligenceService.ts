@@ -150,7 +150,7 @@ export class BusinessIntelligenceService {
 
   constructor(db: Pool) {
     this.db = db
-    this.alphaVantageApiKey = process.env.ALPHA_VANTAGE_API_KEY ?? 'demo'
+    this.alphaVantageApiKey = process.env['ALPHA_VANTAGE_API_KEY'] ?? 'demo'
   }
 
   async getMarketData(symbol: string): Promise<MarketData> {
@@ -658,14 +658,14 @@ export class BusinessIntelligenceService {
     volume: number
     marketCap: number
   } | null {
-    const symbol = this.toStringOrUndefined(rawMeta.symbol)
-    const price = this.toNumberOrUndefined(rawMeta.regularMarketPrice)
-    const change = this.toNumberOrUndefined(rawMeta.regularMarketChange)
+    const symbol = this.toStringOrUndefined(rawMeta['symbol'])
+    const price = this.toNumberOrUndefined(rawMeta['regularMarketPrice'])
+    const change = this.toNumberOrUndefined(rawMeta['regularMarketChange'])
     const changePercent = this.toNumberOrUndefined(
-      rawMeta.regularMarketChangePercent,
+      rawMeta['regularMarketChangePercent'],
     )
-    const volume = this.toNumberOrUndefined(rawMeta.regularMarketVolume)
-    const marketCap = this.toNumberOrUndefined(rawMeta.marketCap)
+    const volume = this.toNumberOrUndefined(rawMeta['regularMarketVolume'])
+    const marketCap = this.toNumberOrUndefined(rawMeta['marketCap'])
 
     if (
       !symbol ||

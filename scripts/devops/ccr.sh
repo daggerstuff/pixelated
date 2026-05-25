@@ -78,22 +78,17 @@ else
   fi
 fi
 
-# Kill an existing CCR on the same port (best-effort)
+# Check for an existing CCR on the same port. If already running, skip starting a new instance.
 if lsof -iTCP:"$CCR_PORT" -sTCP:LISTEN -Pn >/dev/null 2>&1; then
-  echo "[CCR] Detected process on port $CCR_PORT; attempting to terminate"
-  # shellcheck disable=SC2009
-  pids=$(ps aux | grep "claude-code-router" | grep -v grep | awk '{print $2}') || true
-  if [[ -n "${pids:-}" ]]; then
-    echo "$pids" | xargs -r kill || true
-    for i in {1..10}; do
-      if lsof -iTCP:"$CCR_PORT" -sTCP:LISTEN -Pn >/dev/null 2>&1; then
-        sleep 1
-      else
-        break
-      fi
-    done
-  fi
-fi
+  echo "[CCR] Detected existing Claude Code Router on port $CCR_PORT. Skipping start."
+  # Export env variables for the existing instance
+  export ANTHROPIC_BASE_URL="http://localhost:$CCR_PORT"
+  export ANTHROPIC_API_KEY="any-string-is-ok"
+  echo "[CCR] Exported ANTHROPIC_BASE_URL=$ANTHROPIC_BASE_URL"
+  echo "[CCR] Exported ANTHROPIC_API_KEY=(hidden)"
+else
+  # No existing instance, proceed to start a new CCR
+
 
 # Export env for Claude Code to talk to CCR as early as possible, so they persist even if health fails
 export ANTHROPIC_BASE_URL="http://localhost:$CCR_PORT"
@@ -103,7 +98,7 @@ echo "[CCR] Exported ANTHROPIC_BASE_URL=$ANTHROPIC_BASE_URL"
 echo "[CCR] Exported ANTHROPIC_API_KEY=(hidden)"
 
 # Start CCR
-echo "[CCR] Starting Claude Code Router..."
+# Starting message moved into else block
 nohup pnpm dlx @musistudio/claude-code-router@latest start --port "$CCR_PORT" >"$CCR_LOG_PATH" 2>&1 &
 CCR_PID=$!
 echo "[CCR] PID: $CCR_PID"
@@ -122,6 +117,7 @@ for i in {1..180}; do
     _ccr_fail 1
   fi
 done
+fi
 
 if [[ $_CCR_SOURCED -eq 1 ]]; then
   # Sourced: exports persist in current shell

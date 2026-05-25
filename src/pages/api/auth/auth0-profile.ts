@@ -52,8 +52,8 @@ export const GET = async ({ request }) => {
           id: user.id,
           email: user.email,
           role: user.role,
-          emailVerified: user.email_verified,
-          profile: user.user_metadata,
+          emailVerified: user['email_verified'],
+          profile: user['user_metadata'],
         },
       }),
       {
@@ -120,8 +120,8 @@ export const PATCH = async ({ request }) => {
           id: updatedUser.id,
           email: updatedUser.email,
           role: updatedUser.role,
-          emailVerified: updatedUser.email_verified,
-          profile: updatedUser.user_metadata,
+          emailVerified: updatedUser['email_verified'],
+          profile: updatedUser['user_metadata'],
         },
       }),
       {

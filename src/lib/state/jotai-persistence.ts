@@ -293,7 +293,6 @@ export function atomWithTTL<Value>(
 export class StatePersistenceManager {
   private static instance: StatePersistenceManager
   private readonly persistedAtoms: Map<string, unknown> = new Map()
-  private readonly syncSubscriptions: Map<string, () => void> = new Map()
 
   static getInstance(): StatePersistenceManager {
     if (!StatePersistenceManager.instance) {

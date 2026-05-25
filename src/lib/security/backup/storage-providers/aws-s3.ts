@@ -71,7 +71,7 @@ export class S3StorageProvider implements StorageProvider {
   private initialized = false
 
   constructor(private readonly config: StorageProviderConfig) {
-    this.bucketName = (config.bucket as string) || ''
+    this.bucketName = (config['bucket'] as string) || ''
     if (!this.bucketName) {
       throw new Error('Bucket name is required for S3 storage provider')
     }
@@ -89,9 +89,9 @@ export class S3StorageProvider implements StorageProvider {
       } = await import('@aws-sdk/client-s3')
       // Create S3 instance with provided credentials
       const s3Instance = new S3({
-        credentials: this.config.credentials as S3Credentials,
-        region: this.config.region as string,
-        ...(this.config.options as Partial<S3Config>),
+        credentials: this.config['credentials'] as S3Credentials,
+        region: this.config['region'] as string,
+        ...(this.config['options'] as Partial<S3Config>),
       })
 
       // Shim to match our strict S3Client interface

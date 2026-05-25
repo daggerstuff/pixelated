@@ -5,13 +5,13 @@ export function buildScopePayload(scope: InternalMemoryScopeInput) {
     user_id: scope.userId,
     include_shared: scope.includeShared ?? true,
   }
-  if (scope.accountId) payload.account_id = scope.accountId
-  if (scope.workspaceId) payload.workspace_id = scope.workspaceId
-  if (scope.orgId) payload.org_id = scope.orgId
-  if (scope.projectId) payload.project_id = scope.projectId
-  if (scope.sessionId) payload.session_id = scope.sessionId
-  if (scope.agentId) payload.agent_id = scope.agentId
-  if (scope.runId) payload.run_id = scope.runId
+  if (scope.accountId) payload['account_id'] = scope.accountId
+  if (scope.workspaceId) payload['workspace_id'] = scope.workspaceId
+  if (scope.orgId) payload['org_id'] = scope.orgId
+  if (scope.projectId) payload['project_id'] = scope.projectId
+  if (scope.sessionId) payload['session_id'] = scope.sessionId
+  if (scope.agentId) payload['agent_id'] = scope.agentId
+  if (scope.runId) payload['run_id'] = scope.runId
   return payload
 }
 

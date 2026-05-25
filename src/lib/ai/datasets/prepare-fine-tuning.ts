@@ -1,6 +1,5 @@
 import { createReadStream, createWriteStream, existsSync, mkdirSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { pipeline } from "node:stream/promises";
 import { ALLOWED_DIRECTORIES, safeJoin } from "../../../utils/path-security";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
@@ -181,7 +180,7 @@ export async function prepareForHuggingFace(sourceDir?: string, outputDir?: stri
           const hfRecord: HuggingFaceRecord = {
             conversations,
             source: record.source,
-            quality_score: (record.metadata?.quality_score as number) ?? 0.5,
+            quality_score: (record.metadata?.['quality_score'] as number) ?? 0.5,
           };
 
           writeStream.write(JSON.stringify(hfRecord) + "\n");

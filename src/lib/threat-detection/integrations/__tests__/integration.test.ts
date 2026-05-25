@@ -137,8 +137,8 @@ describe('Threat Detection Integration', () => {
       )
 
       const result = await threatDetectionService.analyzeThreat(threatData)
-      expect(result.metadata!.reason).toBe('service_disabled_or_error')
-      expect(result.metadata!.source).toBe('threat_detection_service')
+      expect(result.metadata!['reason']).toBe('service_disabled_or_error')
+      expect(result.metadata!['source']).toBe('threat_detection_service')
     })
 
     it('should check request with rate limiting', async () => {
@@ -685,7 +685,7 @@ describe('Threat Detection Integration', () => {
       expect(sanitized).not.toHaveProperty('token')
       expect(sanitized).not.toHaveProperty('creditCard')
       expect(sanitized).toHaveProperty('normalData', 'this is fine')
-      expect(sanitized.longString).toHaveLength(100) // Truncated
+      expect(sanitized['longString']).toHaveLength(100) // Truncated
     })
 
     it('should determine if request should be blocked', () => {
@@ -907,8 +907,8 @@ describe('Threat Detection Integration', () => {
         new Error('Orchestrator error'),
       )
       const result = await threatDetectionService.analyzeThreat(threatData)
-      expect(result.metadata!.reason).toBe('service_disabled_or_error')
-      expect(result.metadata!.source).toBe('threat_detection_service')
+      expect(result.metadata!['reason']).toBe('service_disabled_or_error')
+      expect(result.metadata!['source']).toBe('threat_detection_service')
     })
 
     it('should handle rate limiter errors gracefully', async () => {

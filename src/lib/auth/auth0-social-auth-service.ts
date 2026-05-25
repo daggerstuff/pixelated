@@ -9,7 +9,7 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 type Auth0RuntimeConfig = {
   domain: string
@@ -32,25 +32,25 @@ function getFirstDefined(...values: Array<string | undefined>): string {
 function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
   return {
     domain: getFirstDefined(
-      process.env.AUTH0_DOMAIN,
-      process.env.PUBLIC_AUTH0_DOMAIN,
+      process.env['AUTH0_DOMAIN'],
+      process.env['PUBLIC_AUTH0_DOMAIN'],
       auth0Config.domain,
     ),
     clientId: getFirstDefined(
-      process.env.AUTH0_CLIENT_ID,
-      process.env.PUBLIC_AUTH0_CLIENT_ID,
+      process.env['AUTH0_CLIENT_ID'],
+      process.env['PUBLIC_AUTH0_CLIENT_ID'],
       auth0Config.clientId,
     ),
     clientSecret: getFirstDefined(
-      process.env.AUTH0_CLIENT_SECRET,
+      process.env['AUTH0_CLIENT_SECRET'],
       auth0Config.clientSecret,
     ),
     managementClientId: getFirstDefined(
-      process.env.AUTH0_MANAGEMENT_CLIENT_ID,
+      process.env['AUTH0_MANAGEMENT_CLIENT_ID'],
       auth0Config.managementClientId,
     ),
     managementClientSecret: getFirstDefined(
-      process.env.AUTH0_MANAGEMENT_CLIENT_SECRET,
+      process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'],
       auth0Config.managementClientSecret,
     ),
   }

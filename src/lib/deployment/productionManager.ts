@@ -61,7 +61,6 @@ class ProductionManager {
   private readonly config: DeploymentConfig
   private readonly environments = new Map<string, EnvironmentConfig>()
   private readonly deployments = new Map<string, DeploymentArtifact>()
-  private readonly healthChecks = new Map<string, DeploymentHealth>()
 
   constructor() {
     this.config = {
@@ -427,15 +426,15 @@ class ProductionManager {
     const checks: Record<string, any> = {}
 
     // API health check
-    checks.api = await this.checkEndpoint(
+    checks['api'] = await this.checkEndpoint(
       `${this.environments.get(environment)?.apiUrl}/health`,
     )
 
     // Database health check
-    checks.database = await this.checkDatabaseConnection(environment)
+    checks['database'] = await this.checkDatabaseConnection(environment)
 
     // Real-time service health check
-    checks.realtime = await this.checkRealtimeService(environment)
+    checks['realtime'] = await this.checkRealtimeService(environment)
 
     // Determine overall status
     const criticalCount = Object.values(checks).filter(

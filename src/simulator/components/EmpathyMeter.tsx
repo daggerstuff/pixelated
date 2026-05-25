@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import _React, { useEffect, useRef } from 'react'
 
 interface EmpathyMeterProps {
   /** Value between 0 and 1 representing empathy level */

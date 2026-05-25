@@ -4,11 +4,11 @@ import type { MemoryBlock } from '../../../types/memory'
 
 function makeMemory(overrides: Partial<Record<string, unknown>> = {}): MemoryBlock {
   return {
-    id: (overrides.id as string) ?? 'mem_001',
-    tenantId: (overrides.tenantId as string) ?? 't1',
-    sessionId: (overrides.sessionId as string) ?? 's1',
-    content: (overrides.content as string) ?? 'test memory content',
-    timestamp: (overrides.timestamp as number) ?? Date.now(),
+    id: (overrides['id'] as string) ?? 'mem_001',
+    tenantId: (overrides['tenantId'] as string) ?? 't1',
+    sessionId: (overrides['sessionId'] as string) ?? 's1',
+    content: (overrides['content'] as string) ?? 'test memory content',
+    timestamp: (overrides['timestamp'] as number) ?? Date.now(),
     importance: {
       raw: 0.5,
       recency: 0.5,
@@ -17,15 +17,15 @@ function makeMemory(overrides: Partial<Record<string, unknown>> = {}): MemoryBlo
       actionability: 0.3,
     },
     emotions: {
-      valence: (overrides.valence as number) ?? 0.0,
-      arousal: (overrides.arousal as number) ?? 0.5,
-      categories: (overrides.categories as string[]) ?? [],
+      valence: (overrides['valence'] as number) ?? 0.0,
+      arousal: (overrides['arousal'] as number) ?? 0.5,
+      categories: (overrides['categories'] as string[]) ?? [],
     },
     gating: {
-      piiStatus: (overrides.piiStatus as string) ?? 'absent',
-      crisisFlag: (overrides.crisisFlag as boolean) ?? false,
-      traumaIndicators: (overrides.traumaIndicators as string[]) ?? [],
-      consentGate: (overrides.consentGate as string) ?? 'open',
+      piiStatus: (overrides['piiStatus'] as string) ?? 'absent',
+      crisisFlag: (overrides['crisisFlag'] as boolean) ?? false,
+      traumaIndicators: (overrides['traumaIndicators'] as string[]) ?? [],
+      consentGate: (overrides['consentGate'] as string) ?? 'open',
     },
     consolidation: {
       phase: 'raw',
@@ -49,14 +49,14 @@ describe('DatasetPreparator', () => {
       const [split1] = p1.prepare(memories)
       const [split2] = p2.prepare(memories)
 
-      expect(split1.train.map((e) => e.metadata.memory_id)).toEqual(
-        split2.train.map((e) => e.metadata.memory_id),
+      expect(split1.train.map((e) => e.metadata['memory_id'])).toEqual(
+        split2.train.map((e) => e.metadata['memory_id']),
       )
-      expect(split1.val.map((e) => e.metadata.memory_id)).toEqual(
-        split2.val.map((e) => e.metadata.memory_id),
+      expect(split1.val.map((e) => e.metadata['memory_id'])).toEqual(
+        split2.val.map((e) => e.metadata['memory_id']),
       )
-      expect(split1.test.map((e) => e.metadata.memory_id)).toEqual(
-        split2.test.map((e) => e.metadata.memory_id),
+      expect(split1.test.map((e) => e.metadata['memory_id'])).toEqual(
+        split2.test.map((e) => e.metadata['memory_id']),
       )
     })
 
@@ -71,8 +71,8 @@ describe('DatasetPreparator', () => {
       const [split1] = p1.prepare(memories)
       const [split2] = p2.prepare(memories)
 
-      const train1 = split1.train.map((e) => e.metadata.memory_id).join(',')
-      const train2 = split2.train.map((e) => e.metadata.memory_id).join(',')
+      const train1 = split1.train.map((e) => e.metadata['memory_id']).join(',')
+      const train2 = split2.train.map((e) => e.metadata['memory_id']).join(',')
       expect(train1).not.toBe(train2)
     })
   })

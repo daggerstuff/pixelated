@@ -149,27 +149,6 @@ class OfflineManager {
     }
   }
 
-  private handleOnline(): void {
-    this.networkState = {
-      ...this.networkState,
-      isOnline: true,
-      isOffline: false,
-    } as OfflineState
-    this.emit('online')
-
-    // Immediately try to sync when coming back online
-    setTimeout(async () => this.sync(), 1000)
-  }
-
-  private handleOffline(): void {
-    this.networkState = {
-      ...this.networkState,
-      isOnline: false,
-      isOffline: true,
-    } as OfflineState
-    this.emit('offline')
-  }
-
   private startAutoSync(): void {
     if (this.syncInterval) {
       clearInterval(this.syncInterval)

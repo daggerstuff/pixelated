@@ -1547,7 +1547,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         }
       })
 
-      metrics.serviceAvailability = {
+      metrics['serviceAvailability'] = {
         monitoringService: monitoringServiceStatus,
         awsServices: awsServices.map(({ name }) => ({
           name,
@@ -1570,38 +1570,38 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       if (!this.cloudWatch || !this.sns) {
         issues.push('CRITICAL: AWS services not properly initialized')
-        metrics.awsConnectivity = 'failed'
+        metrics['awsConnectivity'] = 'failed'
         return
       }
 
       // Test CloudWatch connectivity
       try {
         // Note: In production, you'd use listMetrics or a similar lightweight operation
-        metrics.cloudWatchConnectivity = 'operational'
+        metrics['cloudWatchConnectivity'] = 'operational'
       } catch (error: unknown) {
         issues.push(
           `CloudWatch connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         )
-        metrics.cloudWatchConnectivity = 'failed'
+        metrics['cloudWatchConnectivity'] = 'failed'
       }
 
       // Test SNS connectivity
       try {
         // Note: In production, you'd use listTopics or a similar lightweight operation
-        metrics.snsConnectivity = 'operational'
+        metrics['snsConnectivity'] = 'operational'
       } catch (error: unknown) {
         issues.push(
           `SNS connectivity failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         )
-        metrics.snsConnectivity = 'failed'
+        metrics['snsConnectivity'] = 'failed'
       }
 
-      metrics.awsConnectivity = {
-        cloudWatch: metrics.cloudWatchConnectivity,
-        sns: metrics.snsConnectivity,
+      metrics['awsConnectivity'] = {
+        cloudWatch: metrics['cloudWatchConnectivity'],
+        sns: metrics['snsConnectivity'],
         overall:
-          metrics.cloudWatchConnectivity === 'operational' &&
-          metrics.snsConnectivity === 'operational'
+          metrics['cloudWatchConnectivity'] === 'operational' &&
+          metrics['snsConnectivity'] === 'operational'
             ? 'healthy'
             : 'degraded',
       }
@@ -1609,7 +1609,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       issues.push(
         `AWS connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
-      metrics.awsConnectivity = 'failed'
+      metrics['awsConnectivity'] = 'failed'
     }
   }
 
@@ -1628,7 +1628,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       const memoryThreshold = 0.85 // 85% threshold
       const memoryUsagePercent = memoryUsage.heapUsed / memoryUsage.heapTotal
 
-      metrics.memoryUsage = {
+      metrics['memoryUsage'] = {
         heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024), // MB
         heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024), // MB
         usagePercent: Math.round(memoryUsagePercent * 100),
@@ -1645,7 +1645,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       const start = process.hrtime.bigint()
       setImmediate(() => {
         const delay = Number(process.hrtime.bigint() - start) / 1000000 // Convert to milliseconds
-        metrics.cpuMetrics = {
+        metrics['cpuMetrics'] = {
           eventLoopDelay: Math.round(delay * 100) / 100, // Round to 2 decimal places
           status: delay > 100 ? 'high' : 'normal', // 100ms threshold
         }
@@ -1660,12 +1660,12 @@ export class HIPAAMonitoringService extends EventEmitter {
       // Check disk space (if possible in the environment)
       try {
         // Note: Disk space checking would require additional modules in production
-        metrics.diskUsage = {
+        metrics['diskUsage'] = {
           status: 'unknown', // Would be implemented with proper disk access
           note: 'Disk space monitoring requires additional system access',
         }
       } catch (error: unknown) {
-        metrics.diskUsage = {
+        metrics['diskUsage'] = {
           status: 'check_failed',
           error:
             error instanceof Error
@@ -1715,7 +1715,7 @@ export class HIPAAMonitoringService extends EventEmitter {
         issues.push(`HIPAA configuration issues: ${configIssues.join(', ')}`)
       }
 
-      metrics.configuration = {
+      metrics['configuration'] = {
         environmentVariables: {
           totalRequired: requiredEnvVars.length,
           missing: missingEnvVars.length,
@@ -1758,10 +1758,10 @@ export class HIPAAMonitoringService extends EventEmitter {
 
       if (dbConfig.host === 'not_configured') {
         issues.push('Database configuration not found')
-        metrics.databaseConnectivity = 'not_configured'
+        metrics['databaseConnectivity'] = 'not_configured'
       } else {
         // Simulate connectivity test
-        metrics.databaseConnectivity = {
+        metrics['databaseConnectivity'] = {
           host: dbConfig.host,
           port: dbConfig.port,
           name: dbConfig.name,
@@ -1773,7 +1773,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       issues.push(
         `Database connectivity check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
-      metrics.databaseConnectivity = 'check_failed'
+      metrics['databaseConnectivity'] = 'check_failed'
     }
   }
 
@@ -1799,12 +1799,12 @@ export class HIPAAMonitoringService extends EventEmitter {
         !encryptionConfig.keyManagementService
       ) {
         issues.push('Encryption service configuration incomplete')
-        metrics.encryptionService = 'configuration_incomplete'
+        metrics['encryptionService'] = 'configuration_incomplete'
         return
       }
 
       // Simulate encryption service test
-      metrics.encryptionService = {
+      metrics['encryptionService'] = {
         algorithm: encryptionConfig.algorithm,
         keySize: encryptionConfig.keySize,
         keyManagementService: encryptionConfig.keyManagementService,
@@ -1815,7 +1815,7 @@ export class HIPAAMonitoringService extends EventEmitter {
       issues.push(
         `Encryption service check failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
-      metrics.encryptionService = 'check_failed'
+      metrics['encryptionService'] = 'check_failed'
     }
   }
 

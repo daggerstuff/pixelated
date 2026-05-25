@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import React from 'react'
+import _React from 'react'
 
 interface AnalyticsProviderProps {
   children: ReactNode

@@ -1,5 +1,5 @@
 /* @vitest-environment node */
-import { existsSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 import { FineTuningOrchestrator } from "./training-orchestrator";

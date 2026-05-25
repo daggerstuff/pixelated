@@ -94,14 +94,14 @@ export function parseEvidenceFrontmatter(
 
     const body = trimmed.slice(frontmatterMatch[0].length)
     const title =
-      normalizeString(parsed.title) ?? inferTitle(body) ?? 'Untitled'
+      normalizeString(parsed['title']) ?? inferTitle(body) ?? 'Untitled'
     const category =
-      normalizeString(parsed.category) ?? normalizeString(parsed.series)
+      normalizeString(parsed['category']) ?? normalizeString(parsed['series'])
 
     return {
       body,
       title,
-      tags: normalizeTags(parsed.tags),
+      tags: normalizeTags(parsed['tags']),
       category,
     }
   } catch {

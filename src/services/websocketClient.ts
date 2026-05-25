@@ -55,8 +55,8 @@ export class WebSocketClient {
 
   connect(): void {
     const resolvedServerUrl =
-      typeof import.meta.env.PUBLIC_WEBSOCKET_URL === 'string'
-        ? import.meta.env.PUBLIC_WEBSOCKET_URL
+      typeof import.meta.env['PUBLIC_WEBSOCKET_URL'] === 'string'
+        ? import.meta.env['PUBLIC_WEBSOCKET_URL']
         : 'ws://localhost:3001'
     this.socket = io(resolvedServerUrl, {
       auth: { token: this.token },

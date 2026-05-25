@@ -12,9 +12,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN ?? '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
+  domain: process.env['AUTH0_DOMAIN'] ?? '',
+  managementClientId: process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ?? '',
+  managementClientSecret: process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ?? '',
 }
 
 // Initialize Auth0 management client

@@ -7,8 +7,8 @@ import { LRUCache } from './lru-cache'
 const ALLOWED_ORIGINS = [
   'https://app.pixelatedempathy.com',
   'https://api.pixelatedempathy.com',
-  process.env.ALLOWED_ORIGIN,
-  process.env.DEV_ALLOWED_ORIGIN,
+  process.env['ALLOWED_ORIGIN'],
+  process.env['DEV_ALLOWED_ORIGIN'],
 ].filter(
   (origin): origin is string => typeof origin === 'string' && origin.length > 0,
 )

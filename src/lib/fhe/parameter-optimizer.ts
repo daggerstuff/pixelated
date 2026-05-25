@@ -795,8 +795,8 @@ export class FHEParameterOptimizer {
     if (context.parameters) {
       // Check for data size
       const dataSize =
-        typeof context.parameters.dataSize === 'number'
-          ? context.parameters.dataSize
+        typeof context.parameters['dataSize'] === 'number'
+          ? context.parameters['dataSize']
           : 0
       if (dataSize > 1000000) {
         modifier *= 1.5 // Large data increases complexity
@@ -806,8 +806,8 @@ export class FHEParameterOptimizer {
 
       // Check for batch operations
       const batchSize =
-        typeof context.parameters.batchSize === 'number'
-          ? context.parameters.batchSize
+        typeof context.parameters['batchSize'] === 'number'
+          ? context.parameters['batchSize']
           : 0
       if (batchSize > 10) {
         modifier *= 1.3 // Batch operations increase complexity
@@ -815,19 +815,6 @@ export class FHEParameterOptimizer {
     }
 
     return modifier
-  }
-
-  /**
-   * Determine appropriate security level based on operation complexity
-   */
-  private determineSecurityLevel(complexity: number): SecurityLevel {
-    if (complexity >= 9) {
-      return SecurityLevel.TC256 // Highest security for critical operations
-    } else if (complexity >= 7) {
-      return SecurityLevel.TC192 // High security for important operations
-    } else {
-      return SecurityLevel.TC128 // Standard security
-    }
   }
 
   /**
