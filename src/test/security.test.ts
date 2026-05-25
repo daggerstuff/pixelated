@@ -82,9 +82,9 @@ describe('JWT Token Validation', () => {
       signature: 'signature-here',
     }
 
-    expect(mockToken.header.alg).toBe('HS256')
-    expect(mockToken.header.typ).toBe('JWT')
-    expect(mockToken.payload.sub).toBeDefined()
+    expect(mockToken.header['alg']).toBe('HS256')
+    expect(mockToken.header['typ']).toBe('JWT')
+    expect(mockToken.payload['sub']).toBeDefined()
   })
 
   it('checks token expiration', () => {

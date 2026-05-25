@@ -80,18 +80,18 @@ class PatientManager {
     }
 
     // Encrypt sensitive fields
-    if (patientData.contact?.email) {
+    if (patientData['contact']?.email) {
       patientProfile.contact = {
-        ...patientData.contact,
-        email: await encryptionManager.encrypt(patientData.contact.email),
+        ...patientData['contact'],
+        email: await encryptionManager.encrypt(patientData['contact'].email),
       }
       patientProfile.encryptedFields.push('contact.email')
     }
 
-    if (patientData.contact?.phone) {
+    if (patientData['contact']?.phone) {
       patientProfile.contact = {
         ...patientProfile.contact,
-        phone: await encryptionManager.encrypt(patientData.contact.phone),
+        phone: await encryptionManager.encrypt(patientData['contact'].phone),
       }
       patientProfile.encryptedFields.push('contact.phone')
     }

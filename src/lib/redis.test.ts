@@ -64,10 +64,10 @@ describe('Redis Module', () => {
     vi.restoreAllMocks()
     vi.clearAllMocks()
     // Reset environment variables
-    delete process.env.REDIS_URL
-    delete process.env.UPSTASH_REDIS_REST_URL
-    delete process.env.UPSTASH_REDIS_REST_TOKEN
-    delete process.env.NODE_ENV
+    delete process.env['REDIS_URL']
+    delete process.env['UPSTASH_REDIS_REST_URL']
+    delete process.env['UPSTASH_REDIS_REST_TOKEN']
+    delete process.env['NODE_ENV']
   })
 
   describe('getRedisClient', () => {
@@ -223,18 +223,18 @@ describe('Redis Module', () => {
 
   describe('createRedisClient function', () => {
     it('should create real Redis client when REDIS_URL is present', () => {
-      process.env.REDIS_URL = 'redis://localhost:6379'
+      process.env['REDIS_URL'] = 'redis://localhost:6379'
       // We need to re-import to test the factory function
       // Since we can't easily re-import, we'll test the logic directly
       expect(typeof redis).toBe('object')
-      expect(redis.get).toBeDefined()
+      expect(redis['get']).toBeDefined()
     })
 
     it('should use mock client in production when no credentials', () => {
-      process.env.NODE_ENV = 'production'
+      process.env['NODE_ENV'] = 'production'
       // The mock client should have been created due to missing credentials
       expect(typeof redis).toBe('object')
-      expect(redis.get).toBeDefined()
+      expect(redis['get']).toBeDefined()
     })
   })
 })

@@ -15,7 +15,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from '@/components/ui/LazyChart.tsx'
+} from '@/components/ui/LazyChart'
 
 interface MentalHealthHistoryChartProps {
   analysisHistory: Array<{

@@ -4,7 +4,7 @@
 
 import type { ReactNode } from 'react'
 
-import { Alert } from '@/components/ui/alert.tsx'
+import { Alert } from '@/components/ui/alert'
 import { normalizeError, formatErrorForUser, getFieldErrors } from '@/lib/error'
 import { cn } from '@/lib/utils'
 

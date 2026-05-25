@@ -240,7 +240,7 @@ export class AnalyticsService {
             return false
           }
 
-          const ttlValue = event.metadata?.ttl
+          const ttlValue = event.metadata?.['ttl']
           if (typeof ttlValue === 'undefined') {
             return true
           }
@@ -311,7 +311,7 @@ export class AnalyticsService {
             return false
           }
 
-          const ttlValue = metric.tags?.ttl
+          const ttlValue = metric.tags?.['ttl']
           if (typeof ttlValue === 'undefined') {
             return true
           }

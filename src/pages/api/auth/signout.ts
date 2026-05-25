@@ -23,7 +23,7 @@ export const POST = async ({ request }: { request: Request }) => {
 
     // Clear cookies
     const headers = new Headers()
-    const isProd = process.env.NODE_ENV === 'production'
+    const isProd = process.env['NODE_ENV'] === 'production'
     headers.append(
       'Set-Cookie',
       `auth-token=; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=0`,

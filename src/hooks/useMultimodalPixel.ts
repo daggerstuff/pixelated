@@ -93,7 +93,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
   if (streamUrl === undefined && typeof window !== 'undefined') {
     try {
       streamUrl =
-        (import.meta.env?.PUBLIC_PIXEL_WS_URL as string | undefined) ??
+        (import.meta.env?.['PUBLIC_PIXEL_WS_URL'] as string | undefined) ??
         `${window.location.origin.replace('http', 'ws')}/api/websocket/pixel-multimodal`
     } catch {
       streamUrl = `${window.location.origin.replace('http', 'ws')}/api/websocket/pixel-multimodal`
@@ -218,14 +218,14 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
         ws.onmessage = (event) => {
           try {
             const payload = JSON.parse(event.data) as Record<string, unknown>
-            const type = payload.type as string
+            const type = payload['type'] as string
             if (type === 'status') {
               setState((prev) => ({
                 ...prev,
-                streamStatus: (payload.status as string) || prev.streamStatus,
+                streamStatus: (payload['status'] as string) || prev.streamStatus,
               }))
             } else if (type === 'result') {
-              const data = payload.data as MultimodalInferenceResponse
+              const data = payload['data'] as MultimodalInferenceResponse
               setState((prev) => ({
                 ...prev,
                 lastResponse: data,
@@ -247,7 +247,7 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
             } else if (type === 'error') {
               setState((prev) => ({
                 ...prev,
-                streamError: (payload.message as string) || 'Stream error',
+                streamError: (payload['message'] as string) || 'Stream error',
                 streamStatus: 'error',
               }))
             }

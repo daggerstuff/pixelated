@@ -7,7 +7,6 @@ import { RealTimeAnalyzer } from "./real-time-analyzer";
 export class ContextualEnhancer {
   private readonly sessionHistory: Map<string, SessionContext[]> = new Map();
   private readonly progressTracker: Map<string, TherapeuticProgress> = new Map();
-  private readonly analyzer: RealTimeAnalyzer;
   private readonly logger: Logger;
 
   constructor() {
@@ -235,18 +234,6 @@ export class ContextualEnhancer {
    */
   private getSessionHistory(sessionId: string): SessionContext[] {
     return this.sessionHistory.get(sessionId) ?? [];
-  }
-
-  private addToSessionHistory(sessionId: string, context: SessionContext): void {
-    const history = this.getSessionHistory(sessionId);
-    history.push(context);
-
-    // Keep last 10 sessions for context
-    if (history.length > 10) {
-      history.shift();
-    }
-
-    this.sessionHistory.set(sessionId, history);
   }
 
   /**

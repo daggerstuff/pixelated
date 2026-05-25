@@ -24,7 +24,6 @@ interface Metric {
 }
 
 export class MonitoringService extends EventEmitter {
-  private readonly redis: RedisService
   private readonly analytics: AnalyticsService
   private readonly config: MonitoringConfig
   private initialized: boolean = false

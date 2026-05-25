@@ -194,14 +194,14 @@ export const PUT = async ({
 
     // Validate and map updates for Auth0
     const auth0Updates: Record<string, any> = {}
-    if (updates.fullName) auth0Updates.name = updates.fullName
-    if (updates.avatarUrl) auth0Updates.picture = updates.avatarUrl
-    if (updates.userMetadata) auth0Updates.user_metadata = updates.userMetadata
+    if (updates.fullName) auth0Updates['name'] = updates.fullName
+    if (updates.avatarUrl) auth0Updates['picture'] = updates.avatarUrl
+    if (updates.userMetadata) auth0Updates['user_metadata'] = updates.userMetadata
 
     // Legacy support for 'preferences'
     if (updates.preferences) {
-      auth0Updates.user_metadata = {
-        ...auth0Updates.user_metadata,
+      auth0Updates['user_metadata'] = {
+        ...auth0Updates['user_metadata'],
         preferences: updates.preferences,
       }
     }

@@ -124,7 +124,6 @@ export class MultiRegionDeploymentManager extends EventEmitter {
   private readonly configurationManager: ConfigurationManager
   private readonly cloudProviderManager: CloudProviderManager
   private readonly healthMonitor: HealthMonitor
-  private readonly deploymentOrchestrator: DeploymentOrchestrator
   private readonly deploymentStatuses: Map<string, DeploymentStatus> = new Map()
   private isInitialized = false
 

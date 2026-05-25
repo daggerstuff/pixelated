@@ -419,7 +419,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           if (typeof message !== 'string') return
 
           const rawSyncData = asRecord(JSON.parse(message))
-          const feedId = getString(rawSyncData.feed_id)
+          const feedId = getString(rawSyncData['feed_id'])
           if (!feedId) {
             return
           }
@@ -439,8 +439,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
           if (typeof message !== 'string') return
 
           const rawStatusData = asRecord(JSON.parse(message))
-          const feedId = getString(rawStatusData.feed_id)
-          const status = getString(rawStatusData.status)
+          const feedId = getString(rawStatusData['feed_id'])
+          const status = getString(rawStatusData['status'])
           if (
             feedId &&
             (status === 'active' ||
@@ -529,7 +529,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     switch (auth.type) {
       case 'api_key':
         client.defaults.headers.common['X-API-Key'] = getHeaderValue(
-          auth.credentials.api_key,
+          auth.credentials['api_key'],
         )
         break
       case 'oauth2':
@@ -537,8 +537,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
         this.setupOAuth2Authentication(client, auth.credentials)
         break
       case 'basic_auth':
-        const username = getString(auth.credentials.username)
-        const password = getString(auth.credentials.password)
+        const username = getString(auth.credentials['username'])
+        const password = getString(auth.credentials['password'])
         client.defaults.auth = {
           username,
           password,
@@ -604,8 +604,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       })
 
       const responseData = asRecord(response.data)
-      token = getString(responseData.access_token)
-      const expiresIn = getNumber(responseData.expires_in, 3600)
+      token = getString(responseData['access_token'])
+      const expiresIn = getNumber(responseData['expires_in'], 3600)
 
       // Store token with expiration
       if (!token) {
@@ -631,9 +631,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     // Implement certificate-based authentication
     // Use https.Agent when PEM strings or buffers are provided
     try {
-      const cert = getString(credentials.certificate)
-      const key = getString(credentials.private_key)
-      const ca = getString(credentials.ca_certificate)
+      const cert = getString(credentials['certificate'])
+      const key = getString(credentials['private_key'])
+      const ca = getString(credentials['ca_certificate'])
 
       if (cert || key || ca) {
         return new https.Agent({ cert, key, ca })
@@ -1996,10 +1996,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     for (const indicator of indicators) {
       // Add enrichment data based on transformation parameters
       if (
-        transformation.parameters.add_geolocation &&
+        transformation.parameters['add_geolocation'] &&
         indicator.type === 'ip'
       ) {
-        indicator.attributes.geolocation = await this.getIPGeolocation(
+        indicator.attributes['geolocation'] = await this.getIPGeolocation(
           indicator.value,
         )
       }
@@ -2103,8 +2103,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     parameters: Record<string, unknown>,
   ): number {
     const normalized = this.mapSTIXConfidence(value)
-    const multiplier = getNumber(parameters.multiplier, 1)
-    const offset = getNumber(parameters.offset, 0)
+    const multiplier = getNumber(parameters['multiplier'], 1)
+    const offset = getNumber(parameters['offset'], 0)
     return clamp01(normalized * multiplier + offset)
   }
 
@@ -2164,7 +2164,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     fieldValue: unknown,
     parameters: Record<string, unknown>,
   ): boolean {
-    const operator = getString(parameters.operator, 'eq')
+    const operator = getString(parameters['operator'], 'eq')
     const filterValue = this.getNestedValue(parameters, 'value')
 
     switch (operator) {

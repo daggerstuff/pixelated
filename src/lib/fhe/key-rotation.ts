@@ -98,14 +98,14 @@ const isAwsListSecretsResponse = (
     return false
   }
 
-  if (value.SecretList !== undefined) {
-    if (!Array.isArray(value.SecretList)) {
+  if (value['SecretList'] !== undefined) {
+    if (!Array.isArray(value['SecretList'])) {
       return false
     }
   }
 
-  if (value.NextToken !== undefined) {
-    return typeof value.NextToken === 'string'
+  if (value['NextToken'] !== undefined) {
+    return typeof value['NextToken'] === 'string'
   }
 
   return true
@@ -116,11 +116,11 @@ const isAwsSecretValue = (value: unknown): value is AwsSecretValue => {
     return false
   }
 
-  if (value.SecretString === undefined) {
+  if (value['SecretString'] === undefined) {
     return true
   }
 
-  return typeof value.SecretString === 'string'
+  return typeof value['SecretString'] === 'string'
 }
 
 interface KeyVersion {
@@ -1278,12 +1278,12 @@ export class KeyRotationService extends EventEmitter {
       return null
     }
 
-    const id = parsed.id
-    const publicKey = parsed.publicKey
-    const privateKeyEncrypted = parsed.privateKeyEncrypted
-    const created = parsed.created
-    const expires = parsed.expires
-    const version = parsed.version
+    const id = parsed['id']
+    const publicKey = parsed['publicKey']
+    const privateKeyEncrypted = parsed['privateKeyEncrypted']
+    const created = parsed['created']
+    const expires = parsed['expires']
+    const version = parsed['version']
 
     if (
       typeof id !== 'string' ||

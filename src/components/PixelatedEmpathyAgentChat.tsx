@@ -90,24 +90,24 @@ const isBiasAnalysis = (value: unknown): value is BiasAnalysis => {
   }
 
   if (
-    typeof value.overall_score !== 'number' ||
-    !Array.isArray(value.detected_biases) ||
-    typeof value.cultural_sensitivity_score !== 'number' ||
-    typeof value.inclusive_language_score !== 'number'
+    typeof value['overall_score'] !== 'number' ||
+    !Array.isArray(value['detected_biases']) ||
+    typeof value['cultural_sensitivity_score'] !== 'number' ||
+    typeof value['inclusive_language_score'] !== 'number'
   ) {
     return false
   }
 
-  return value.detected_biases.every((item) => {
+  return value['detected_biases'].every((item) => {
     if (!isRecord(item)) {
       return false
     }
 
     if (
-      typeof item.type !== 'string' ||
-      typeof item.description !== 'string' ||
-      !Array.isArray(item.recommendations) ||
-      !item.recommendations.every(
+      typeof item['type'] !== 'string' ||
+      typeof item['description'] !== 'string' ||
+      !Array.isArray(item['recommendations']) ||
+      !item['recommendations'].every(
         (recommendation) => typeof recommendation === 'string',
       )
     ) {
@@ -115,8 +115,8 @@ const isBiasAnalysis = (value: unknown): value is BiasAnalysis => {
     }
 
     return (
-      isBiasSeverity(item.severity) &&
-      biasSeverityValues.includes(item.severity as any)
+      isBiasSeverity(item['severity']) &&
+      biasSeverityValues.includes(item['severity'] as any)
     )
   })
 }

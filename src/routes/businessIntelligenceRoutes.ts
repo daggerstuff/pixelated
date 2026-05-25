@@ -49,15 +49,15 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
     }
 
     return {
-      type: parseString(value.type) as CreateBusinessAlertInput['type'],
-      title: parseString(value.title) ?? '',
-      description: parseString(value.description) ?? '',
+      type: parseString(value['type']) as CreateBusinessAlertInput['type'],
+      title: parseString(value['title']) ?? '',
+      description: parseString(value['description']) ?? '',
       severity: parseString(
-        value.severity,
+        value['severity'],
       ) as CreateBusinessAlertInput['severity'],
-      source: parseString(value.source) ?? '',
-      isRead: parseBoolean(value.isRead) ?? false,
-      actionUrl: parseString(value.actionUrl),
+      source: parseString(value['source']) ?? '',
+      isRead: parseBoolean(value['isRead']) ?? false,
+      actionUrl: parseString(value['actionUrl']),
     }
   }
 
@@ -66,21 +66,21 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       return undefined
     }
 
-    const userId = parseString(value.userId)
+    const userId = parseString(value['userId'])
     if (!userId) {
       return undefined
     }
 
     return {
       userId,
-      revenue: parseNumber(value.revenue) ?? 0,
-      growthRate: parseNumber(value.growthRate) ?? 0,
-      customerAcquisitionCost: parseNumber(value.customerAcquisitionCost) ?? 0,
-      customerLifetimeValue: parseNumber(value.customerLifetimeValue) ?? 0,
-      churnRate: parseNumber(value.churnRate) ?? 0,
-      netPromoterScore: parseNumber(value.netPromoterScore) ?? 0,
-      marketShare: parseNumber(value.marketShare) ?? 0,
-      employeeCount: parseNumber(value.employeeCount) ?? 0,
+      revenue: parseNumber(value['revenue']) ?? 0,
+      growthRate: parseNumber(value['growthRate']) ?? 0,
+      customerAcquisitionCost: parseNumber(value['customerAcquisitionCost']) ?? 0,
+      customerLifetimeValue: parseNumber(value['customerLifetimeValue']) ?? 0,
+      churnRate: parseNumber(value['churnRate']) ?? 0,
+      netPromoterScore: parseNumber(value['netPromoterScore']) ?? 0,
+      marketShare: parseNumber(value['marketShare']) ?? 0,
+      employeeCount: parseNumber(value['employeeCount']) ?? 0,
     }
   }
 

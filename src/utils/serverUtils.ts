@@ -26,7 +26,7 @@ export function safelyGetHeader(
   defaultValue: string = '',
 ): string {
   // Check if we're in a server context where headers are available
-  const isBuild = import.meta.env.COMMAND === 'build'
+  const isBuild = import.meta.env['COMMAND'] === 'build'
   if (import.meta.env.SSR && astro.request?.headers && !isBuild) {
     const headerValue = astro.request.headers.get(headerName)
     return headerValue ?? defaultValue
@@ -44,10 +44,10 @@ export function safelyGetHeader(
  */
 export function safelyGetHeaders(astro: AstroGlobal): Record<string, string> {
   console.error(
-    `[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env.COMMAND}`,
+    `[ServerUtils] safelyGetHeaders called. COMMAND=${import.meta.env['COMMAND']}`,
   )
   // Only try to access headers in SSR context and not during static build
-  const isBuild = import.meta.env.COMMAND === 'build'
+  const isBuild = import.meta.env['COMMAND'] === 'build'
   if (import.meta.env.SSR && astro.request?.headers && !isBuild) {
     const headers: Record<string, string> = {}
 

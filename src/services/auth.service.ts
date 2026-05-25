@@ -59,7 +59,7 @@ export class AuthService {
   }
 
   async generateToken(user: User): Promise<string> {
-    return jwt.sign({ id: user.id }, process.env.JWT_SECRET!, {
+    return jwt.sign({ id: user.id }, process.env['JWT_SECRET']!, {
       expiresIn: '1h',
     })
   }

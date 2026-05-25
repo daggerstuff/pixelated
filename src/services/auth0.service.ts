@@ -9,7 +9,7 @@ import {
   ManagementClient,
   AuthenticationClient,
   UserInfoClient,
-  type AuthenticationClientOptions,
+  type _AuthenticationClientOptions,
 } from 'auth0'
 
 import type { AuthRole } from '../config/auth.config'
@@ -73,9 +73,6 @@ function isExtendedAuthenticationClient(
 type ExtendedUserInfoClient = Omit<UserInfoClient, 'getUserInfo'> & {
   getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
-import type { Db } from 'mongodb'
-
-import { mongodb } from '../config/mongodb.config'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import type {
   MFAFactor,
@@ -93,7 +90,7 @@ import type {
 } from '../lib/auth/auth0-webauthn-service'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 function toStringEnvValue(value: unknown): string | undefined {
   return typeof value === 'string' && value !== '' ? value : undefined
@@ -167,23 +164,23 @@ let auth0UserInfo: ExtendedUserInfoClient | null = null
 function initializeAuth0Clients() {
   const config: Auth0ServiceConfig = {
     domain:
-      toStringEnvValue(process.env.AUTH0_DOMAIN) ??
-      toStringEnvValue(import.meta.env.AUTH0_DOMAIN),
+      toStringEnvValue(process.env['AUTH0_DOMAIN']) ??
+      toStringEnvValue(import.meta.env['AUTH0_DOMAIN']),
     clientId:
-      toStringEnvValue(process.env.AUTH0_CLIENT_ID) ??
-      toStringEnvValue(import.meta.env.AUTH0_CLIENT_ID),
+      toStringEnvValue(process.env['AUTH0_CLIENT_ID']) ??
+      toStringEnvValue(import.meta.env['AUTH0_CLIENT_ID']),
     clientSecret:
-      toStringEnvValue(process.env.AUTH0_CLIENT_SECRET) ??
-      toStringEnvValue(import.meta.env.AUTH0_CLIENT_SECRET),
+      toStringEnvValue(process.env['AUTH0_CLIENT_SECRET']) ??
+      toStringEnvValue(import.meta.env['AUTH0_CLIENT_SECRET']),
     audience:
-      toStringEnvValue(process.env.AUTH0_AUDIENCE) ??
-      toStringEnvValue(import.meta.env.AUTH0_AUDIENCE),
+      toStringEnvValue(process.env['AUTH0_AUDIENCE']) ??
+      toStringEnvValue(import.meta.env['AUTH0_AUDIENCE']),
     managementClientId:
-      toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_ID) ??
-      toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_ID),
+      toStringEnvValue(process.env['AUTH0_MANAGEMENT_CLIENT_ID']) ??
+      toStringEnvValue(import.meta.env['AUTH0_MANAGEMENT_CLIENT_ID']),
     managementClientSecret:
-      toStringEnvValue(process.env.AUTH0_MANAGEMENT_CLIENT_SECRET) ??
-      toStringEnvValue(import.meta.env.AUTH0_MANAGEMENT_CLIENT_SECRET),
+      toStringEnvValue(process.env['AUTH0_MANAGEMENT_CLIENT_SECRET']) ??
+      toStringEnvValue(import.meta.env['AUTH0_MANAGEMENT_CLIENT_SECRET']),
   }
 
   // Initialize Management Client if config is available
@@ -236,19 +233,9 @@ function initializeAuth0Clients() {
  * Auth0 User Service Class
  */
 export class Auth0UserService {
-  private db: Db | null = null
-
   constructor() {
     // Initialize Auth0 clients
     initializeAuth0Clients()
-  }
-
-  /**
-   * Connect to MongoDB for additional user data
-   */
-  private async connectToDatabase(): Promise<Db> {
-    this.db ??= await mongodb.connect()
-    return this.db
   }
 
   /**
@@ -269,7 +256,7 @@ export class Auth0UserService {
         password: password,
         realm: 'Username-Password-Authentication',
         scope: 'openid profile email',
-        audience: process.env.AUTH0_AUDIENCE ?? '',
+        audience: process.env['AUTH0_AUDIENCE'] ?? '',
       })
       const tokenResponse = response.data as Auth0PasswordGrantResponse
 
@@ -450,9 +437,9 @@ export class Auth0UserService {
             break
           case 'role':
             // Update both user_metadata and app_metadata for role
-            userMetadataUpdates.role = value
+            userMetadataUpdates['role'] = value
             if (typeof value === 'string') {
-              appMetadataUpdates.roles = [this.mapRoleToAuth0Role(value)]
+              appMetadataUpdates['roles'] = [this.mapRoleToAuth0Role(value)]
             }
             break
           default:
@@ -470,11 +457,11 @@ export class Auth0UserService {
       }
 
       if (Object.keys(userMetadataUpdates).length > 0) {
-        updateParams.user_metadata = userMetadataUpdates
+        updateParams['user_metadata'] = userMetadataUpdates
       }
 
       if (Object.keys(appMetadataUpdates).length > 0) {
-        updateParams.app_metadata = appMetadataUpdates
+        updateParams['app_metadata'] = appMetadataUpdates
       }
 
       const updateRes = await auth0Management.users.update(userId, updateParams)
@@ -623,7 +610,7 @@ export class Auth0UserService {
         ttl_sec: 3600, // 1 hour
       })
       const ticket = this.toRecord(ticketRes.data)
-      return ticket ? (this.toStringOrUndefined(ticket.ticket) ?? null) : null
+      return ticket ? (this.toStringOrUndefined(ticket['ticket']) ?? null) : null
     } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
@@ -857,7 +844,7 @@ export class Auth0UserService {
     const appMetadata = this.toRecord(
       user.app_metadata ?? user['https://pixelated-empathy.com/app_metadata'],
     )
-    const appMetadataRoles = appMetadata?.roles
+    const appMetadataRoles = appMetadata?.['roles']
     if (this.isStringArray(appMetadataRoles) && appMetadataRoles.length > 0) {
       return this.mapAuth0RoleToRole(appMetadataRoles[0])
     }
@@ -865,7 +852,7 @@ export class Auth0UserService {
     const userMetadata = this.toRecord(
       user.user_metadata ?? user['https://pixelated-empathy.com/user_metadata'],
     )
-    const metadataRole = this.toStringOrUndefined(userMetadata?.role)
+    const metadataRole = this.toStringOrUndefined(userMetadata?.['role'])
     return this.normalizeRole(metadataRole)
   }
 

@@ -134,7 +134,7 @@ export const GET = async ({
 
 function convertToCSV(data: Record<string, unknown>): string {
   const sessions =
-    (data.sessions as Array<Record<string, unknown>> | undefined) ?? []
+    (data['sessions'] as Array<Record<string, unknown>> | undefined) ?? []
   const headers = [
     'sessionId',
     'timestamp',
@@ -149,18 +149,18 @@ function convertToCSV(data: Record<string, unknown>): string {
   const csvRows = [
     headers.join(','),
     ...sessions.map((session) => {
-      const demographics = session.participantDemographics as
+      const demographics = session['participantDemographics'] as
         | Record<string, unknown>
         | undefined
       return [
-        (session.sessionId as string) || '',
-        (session.timestamp as string) || '',
-        String(session.biasScore ?? ''),
-        (session.alertLevel as string) || '',
-        (demographics?.gender as string) || '',
-        String(demographics?.age ?? ''),
-        (demographics?.ethnicity as string) || '',
-        (session.scenario as string) || '',
+        (session['sessionId'] as string) || '',
+        (session['timestamp'] as string) || '',
+        String(session['biasScore'] ?? ''),
+        (session['alertLevel'] as string) || '',
+        (demographics?.['gender'] as string) || '',
+        String(demographics?.['age'] ?? ''),
+        (demographics?.['ethnicity'] as string) || '',
+        (session['scenario'] as string) || '',
       ].join(',')
     }),
   ]

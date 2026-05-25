@@ -25,7 +25,7 @@ export async function connectMongoDB(): Promise<MongoConnection> {
   }
 
   try {
-    const mongoUri = process.env.MONGODB_URI
+    const mongoUri = process.env['MONGODB_URI']
     if (!mongoUri) {
       throw new Error('MONGODB_URI is not defined in environment variables')
     }
@@ -70,7 +70,7 @@ export async function connectPostgreSQL(): Promise<Pool> {
   }
 
   try {
-    const postgresUri = process.env.DATABASE_URL
+    const postgresUri = process.env['DATABASE_URL']
     if (!postgresUri) {
       throw new Error('DATABASE_URL is not defined in environment variables')
     }
@@ -110,7 +110,7 @@ export async function connectRedis(): Promise<Redis> {
   }
 
   try {
-    const redisUrl = process.env.REDIS_URL
+    const redisUrl = process.env['REDIS_URL']
     if (!redisUrl) {
       throw new Error('REDIS_URL is not defined in environment variables')
     }

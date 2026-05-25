@@ -3,24 +3,24 @@ import { useState, useEffect } from 'react'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
-import { Button } from '@/components/ui/button/index.ts'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button/index'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
-import { Label } from '@/components/ui/label.tsx'
+} from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select.tsx'
-import { Switch } from '@/components/ui/switch.tsx'
+} from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { cn } from '@/lib/utils'
 
 export type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'never'

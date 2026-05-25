@@ -8,7 +8,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
+} from '@/components/ui/card/card'
 import type { Source } from '@/lib/api/journal-research/types'
 
 export interface SourceCardProps {

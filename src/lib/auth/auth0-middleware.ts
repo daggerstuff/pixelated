@@ -689,7 +689,7 @@ export async function authenticateRequest(
 
     // Check scopes if required
     if (requiredScopes.length > 0) {
-      const permissions = (validation.payload?.permissions as string[]) || []
+      const permissions = (validation.payload?.['permissions'] as string[]) || []
       const hasAllScopes = requiredScopes.every((scope) =>
         permissions.includes(scope),
       )
@@ -718,21 +718,21 @@ export async function authenticateRequest(
     // then falls back to Postgres. On first login it creates the mapping.
     const auth0Sub = validation.userId!
     const email =
-      typeof validation.payload?.email === 'string'
-        ? validation.payload.email
+      typeof validation.payload?.['email'] === 'string'
+        ? validation.payload['email']
         : ''
-    const emailVerified = validation.payload?.email_verified === true
+    const emailVerified = validation.payload?.['email_verified'] === true
     const name =
-      typeof validation.payload?.name === 'string'
-        ? validation.payload.name
+      typeof validation.payload?.['name'] === 'string'
+        ? validation.payload['name']
         : undefined
     const picture =
-      typeof validation.payload?.picture === 'string'
-        ? validation.payload.picture
+      typeof validation.payload?.['picture'] === 'string'
+        ? validation.payload['picture']
         : undefined
     const sid =
-      typeof validation.payload?.sid === 'string'
-        ? validation.payload.sid
+      typeof validation.payload?.['sid'] === 'string'
+        ? validation.payload['sid']
         : undefined
 
     const { resolveIdentity } = await import('./user-identity')
@@ -950,7 +950,7 @@ export async function authenticateRequest(
     authenticatedRequest.tokenId = validation.tokenId
     authenticatedRequest.sessionId = sid
     authenticatedRequest.authMode = 'jwt'
-    authenticatedRequest.scopes = validation.payload?.permissions as
+    authenticatedRequest.scopes = validation.payload?.['permissions'] as
       | string[]
       | undefined
 

@@ -483,7 +483,7 @@ export class NotificationService {
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
-    await redis.hset(
+    await redis['hset'](
       `notifications:${userId}`,
       notificationId,
       JSON.stringify(parsed),

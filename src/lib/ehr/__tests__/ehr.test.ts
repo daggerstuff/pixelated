@@ -19,7 +19,7 @@ describe('eHR Service', () => {
     vendor: 'epic' as const,
     baseUrl: 'https://fhir.epic.com/interconnect-fhir-oauth',
     clientId: testId || 'example-client-id',
-    clientSecret: process.env.CLIENT_SECRET ?? 'example-client-secret',
+    clientSecret: process.env['CLIENT_SECRET'] ?? 'example-client-secret',
     scopes: ['launch/patient', 'patient/*.read'],
     initialize: vi.fn(),
     cleanup: vi.fn(),
@@ -124,7 +124,7 @@ describe('epic Provider', () => {
     name: 'Test Epic Provider',
     baseUrl: 'https://fhir.epic.com/interconnect-fhir-oauth',
     clientId: testId || 'example-client-id',
-    clientSecret: process.env.CLIENT_SECRET ?? 'example-client-secret',
+    clientSecret: process.env['CLIENT_SECRET'] ?? 'example-client-secret',
     scopes: ['launch/patient', 'patient/*.read'],
   }
 

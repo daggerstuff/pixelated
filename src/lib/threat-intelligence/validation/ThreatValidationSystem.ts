@@ -110,7 +110,7 @@ export class ThreatValidationSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat validation')
     } catch (error: unknown) {
@@ -122,7 +122,7 @@ export class ThreatValidationSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ??
+        process.env['MONGODB_URI'] ??
           'mongodb://localhost:27017/threat_validation',
       )
       await this.mongoClient.connect()
@@ -140,7 +140,7 @@ export class ThreatValidationSystemCore
       const rules = await rulesCollection.find({ enabled: true }).toArray()
 
       for (const rule of rules) {
-        this.validationRules.set(rule.ruleId, rule)
+        this.validationRules.set(rule['ruleId'], rule)
       }
 
       logger.info(`Loaded ${rules.length} validation rules from database`)
@@ -1110,14 +1110,14 @@ export class ThreatValidationSystemCore
       // Calculate average similarity based on indicator overlap
       let totalSimilarity = 0
       for (const similarThreat of similarThreats) {
-        const commonIndicators = similarThreat.indicators.filter(
+        const commonIndicators = similarThreat['indicators'].filter(
           (i: ThreatIndicator) =>
             threat.indicators.some((ti) => ti.value === i.value),
         )
 
         const similarity =
           commonIndicators.length /
-          Math.max(similarThreat.indicators.length, threat.indicators.length)
+          Math.max(similarThreat['indicators'].length, threat.indicators.length)
         totalSimilarity += similarity
       }
 
@@ -1143,7 +1143,7 @@ export class ThreatValidationSystemCore
         })
 
         if (reputation) {
-          totalReputation += reputation.score
+          totalReputation += reputation['score']
           reputationCount++
         }
       }
@@ -1377,7 +1377,7 @@ export class ThreatValidationSystemCore
       let totalTime = 0
       for (const validation of completedValidations) {
         const timeDiff =
-          validation.completedAt.getTime() - validation.createdAt.getTime()
+          validation['completedAt'].getTime() - validation['createdAt'].getTime()
         totalTime += timeDiff
       }
 
@@ -1440,7 +1440,7 @@ export class ThreatValidationSystemCore
 
       const validationsBySeverity: Record<string, number> = {}
       for (const result of results) {
-        validationsBySeverity[result.severity] = result.count
+        validationsBySeverity[result['severity']] = result['count']
       }
 
       return validationsBySeverity
@@ -1462,7 +1462,7 @@ export class ThreatValidationSystemCore
 
       const validationsByType: Record<string, number> = {}
       for (const result of results) {
-        validationsByType[result.threatType] = result.count
+        validationsByType[result['threatType']] = result['count']
       }
 
       return validationsByType

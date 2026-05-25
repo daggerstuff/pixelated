@@ -38,7 +38,6 @@ export class ResearchQueryEngine {
   private readonly config: QueryEngineConfig
   private readonly anonymizationService: AnonymizationService
   private readonly consentService: ConsentManagementService
-  private readonly hipaaService: HIPAADataService
   private readonly queryCache: Map<
     string,
     { result: QueryResult; timestamp: Date }
@@ -537,11 +536,11 @@ export class ResearchQueryEngine {
     const parameters: Record<string, unknown> = {}
 
     if (text.includes('emotion') || text.includes('feelings')) {
-      entities.topic = 'emotion-analysis'
+      entities['topic'] = 'emotion-analysis'
     }
 
     if (text.includes('technique') || text.includes('approach')) {
-      entities.topic = 'technique-effectiveness'
+      entities['topic'] = 'technique-effectiveness'
     }
 
     return { intent, entities, parameters }

@@ -150,7 +150,7 @@ export class FineTuningOrchestrator {
       },
     };
     if (config.suffix) {
-      body.suffix = config.suffix;
+      body['suffix'] = config.suffix;
     }
 
     const response = await this.fetchOrThrow(this.baseUrl, {

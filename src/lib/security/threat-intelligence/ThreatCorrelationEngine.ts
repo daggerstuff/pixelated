@@ -1542,9 +1542,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
       )
     }
 
-    if (correlation.similarity_metrics?.severity_increase_rate) {
+    if (correlation.similarity_metrics?.['severity_increase_rate']) {
       recommendations.push(
-        `Monitor for escalation patterns (rate: ${correlation.similarity_metrics.severity_increase_rate.toFixed(2)})`,
+        `Monitor for escalation patterns (rate: ${correlation.similarity_metrics['severity_increase_rate'].toFixed(2)})`,
       )
     }
 
@@ -1696,19 +1696,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
       const filter: Record<string, unknown> = {}
 
       if (query.types && query.types.length > 0) {
-        filter.correlation_type = { $in: query.types }
+        filter['correlation_type'] = { $in: query.types }
       }
 
       if (query.minConfidence) {
-        filter.confidence = { $gte: query.minConfidence }
+        filter['confidence'] = { $gte: query.minConfidence }
       }
 
       if (query.startDate || query.endDate) {
-        filter.timestamp = {}
+        filter['timestamp'] = {}
         if (query.startDate)
-          (filter.timestamp as Record<string, Date>).$gte = query.startDate
+          (filter['timestamp'] as Record<string, Date>)['$gte'] = query.startDate
         if (query.endDate)
-          (filter.timestamp as Record<string, Date>).$lte = query.endDate
+          (filter['timestamp'] as Record<string, Date>)['$lte'] = query.endDate
       }
 
       if (query.regions && query.regions.length > 0) {
@@ -1769,7 +1769,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
         total_correlations: totalCorrelations,
         type_distribution: typeDistribution.reduce<Record<string, number>>(
           (acc, item) => {
-            acc[item._id] = item.count
+            acc[item['_id']] = item['count']
             return acc
           },
           {},

@@ -769,19 +769,19 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       // Step 1: Edge detection (if applicable)
       const edgeDetection = this.components.get('edge')
       if (edgeDetection && threatData.source === 'edge') {
-        pipelineResults.edge = await edgeDetection.analyzeThreat(threatData)
+        pipelineResults['edge'] = await edgeDetection.analyzeThreat(threatData)
       }
 
       // Step 2: Global network processing
       const globalNetwork = this.components.get('global')
       if (globalNetwork) {
-        pipelineResults.global = await globalNetwork.processThreat(threatData)
+        pipelineResults['global'] = await globalNetwork.processThreat(threatData)
       }
 
       // Step 3: Correlation analysis
       const correlationEngine = this.components.get('correlation')
       if (correlationEngine) {
-        pipelineResults.correlation =
+        pipelineResults['correlation'] =
           await correlationEngine.correlateThreat(threatId)
       }
 
@@ -800,7 +800,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
           },
           ['accuracy', 'completeness', 'reliability'],
         )
-        pipelineResults.validation = {
+        pipelineResults['validation'] = {
           validation_id: validationId,
           status: 'pending',
         }
@@ -809,17 +809,17 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       // Step 5: Response orchestration (if high confidence)
       if (
         threatData.confidence > 0.8 ||
-        pipelineResults.correlation?.confidence > 0.8
+        pipelineResults['correlation']?.confidence > 0.8
       ) {
         const responseOrchestrator = this.components.get('response')
         if (responseOrchestrator) {
-          pipelineResults.response =
+          pipelineResults['response'] =
             await responseOrchestrator.orchestrateResponse({
               threat_id: threatId,
               severity: threatData.severity ?? 'medium',
               confidence: threatData.confidence ?? 0.5,
               affected_regions: threatData.regions ?? ['global'],
-              correlation_data: pipelineResults.correlation,
+              correlation_data: pipelineResults['correlation'],
             })
         }
       }

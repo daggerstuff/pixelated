@@ -1,19 +1,19 @@
 import { NotificationChannel } from '../../lib/services/notification/NotificationService'
 import { cn } from '../../lib/utils'
 import { useNotificationPreferences } from '../hooks/useNotificationPreferences'
-import { Alert } from '../ui/alert.tsx'
-import { Card } from '../ui/card/index.ts'
-import { Input } from '../ui/input.tsx'
-import { Label } from '../ui/label.tsx'
+import { Alert } from '../ui/alert'
+import { Card } from '../ui/card/index'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../ui/select.tsx'
-import { Skeleton } from '../ui/skeleton.tsx'
-import { Switch } from '../ui/switch.tsx'
+} from '../ui/select'
+import { Skeleton } from '../ui/skeleton'
+import { Switch } from '../ui/switch'
 
 type NotificationFrequency = 'immediate' | 'batched' | 'daily' | 'weekly'
 

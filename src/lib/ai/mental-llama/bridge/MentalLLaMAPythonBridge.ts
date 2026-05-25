@@ -243,9 +243,9 @@ export class MentalLLaMAPythonBridge {
 
     const candidate = value
     return (
-      typeof candidate.hasMentalHealthIssue === 'boolean' &&
-      typeof candidate.confidence === 'number' &&
-      typeof candidate.riskLevel === 'string'
+      typeof candidate['hasMentalHealthIssue'] === 'boolean' &&
+      typeof candidate['confidence'] === 'number' &&
+      typeof candidate['riskLevel'] === 'string'
     )
   }
 
@@ -258,10 +258,10 @@ export class MentalLLaMAPythonBridge {
 
     const candidate = value
     return (
-      typeof candidate.id === 'string' &&
-      typeof candidate.success === 'boolean' &&
-      (candidate.error === undefined || typeof candidate.error === 'string') &&
-      (candidate.logs === undefined || Array.isArray(candidate.logs))
+      typeof candidate['id'] === 'string' &&
+      typeof candidate['success'] === 'boolean' &&
+      (candidate['error'] === undefined || typeof candidate['error'] === 'string') &&
+      (candidate['logs'] === undefined || Array.isArray(candidate['logs']))
     )
   }
 

@@ -28,7 +28,7 @@ const act = async (callback: () => void | Promise<void>): Promise<void> => {
 import '@testing-library/jest-dom'
 
 // Keep auth-config imports from exploding in test/bootstrap contexts.
-process.env.JWT_SECRET ??= 'test-jwt-secret'
+process.env['JWT_SECRET'] ??= 'test-jwt-secret'
 
 vi.mock('react', async (importOriginal) => {
   const actual = await importOriginal<typeof import('react')>()

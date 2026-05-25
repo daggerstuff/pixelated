@@ -297,7 +297,7 @@ describe('Core Mental Health Objectives', () => {
       expect(context.userProfile?.mentalHealthHistory?.conditions).toContain(
         'anxiety',
       )
-      expect(context.sessionMetadata?.sessionId).toBe('123')
+      expect(context.sessionMetadata?.['sessionId']).toBe('123')
     })
   })
 })

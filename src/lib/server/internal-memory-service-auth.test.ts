@@ -16,13 +16,13 @@ describe('resolveInternalMemoryServiceConfig', () => {
   })
 
   it('prefers MEMORY_SERVICE_* variables when present', () => {
-    process.env.MEMORY_SERVICE_BASE_URL = 'http://memory.internal:54321'
-    process.env.MEMORY_SERVICE_ACTOR_ID = 'product-gateway'
-    process.env.MEMORY_SERVICE_ACTOR_SECRET = 'top-secret'
-    process.env.MEMORY_SERVICE_TIMEOUT_MS = '9000'
-    process.env.SUBCONSCIOUS_MEMORY_BASE_URL = 'http://ignored'
-    process.env.SUBCONSCIOUS_MEMORY_ACTOR_ID = 'ignored-id'
-    process.env.SUBCONSCIOUS_MEMORY_ACTOR_SECRET = 'ignored-secret'
+    process.env['MEMORY_SERVICE_BASE_URL'] = 'http://memory.internal:54321'
+    process.env['MEMORY_SERVICE_ACTOR_ID'] = 'product-gateway'
+    process.env['MEMORY_SERVICE_ACTOR_SECRET'] = 'top-secret'
+    process.env['MEMORY_SERVICE_TIMEOUT_MS'] = '9000'
+    process.env['SUBCONSCIOUS_MEMORY_BASE_URL'] = 'http://ignored'
+    process.env['SUBCONSCIOUS_MEMORY_ACTOR_ID'] = 'ignored-id'
+    process.env['SUBCONSCIOUS_MEMORY_ACTOR_SECRET'] = 'ignored-secret'
 
     expect(resolveInternalMemoryServiceConfig()).toEqual({
       baseUrl: 'http://memory.internal:54321',
@@ -33,14 +33,14 @@ describe('resolveInternalMemoryServiceConfig', () => {
   })
 
   it('falls back to SUBCONSCIOUS_MEMORY_* variables', () => {
-    delete process.env.MEMORY_SERVICE_BASE_URL
-    delete process.env.MEMORY_SERVICE_ACTOR_ID
-    delete process.env.MEMORY_SERVICE_ACTOR_SECRET
-    delete process.env.MEMORY_SERVICE_TIMEOUT_MS
-    process.env.SUBCONSCIOUS_MEMORY_BASE_URL =
+    delete process.env['MEMORY_SERVICE_BASE_URL']
+    delete process.env['MEMORY_SERVICE_ACTOR_ID']
+    delete process.env['MEMORY_SERVICE_ACTOR_SECRET']
+    delete process.env['MEMORY_SERVICE_TIMEOUT_MS']
+    process.env['SUBCONSCIOUS_MEMORY_BASE_URL'] =
       'http://subconscious.internal:54321'
-    process.env.SUBCONSCIOUS_MEMORY_ACTOR_ID = 'subconscious-gateway'
-    process.env.SUBCONSCIOUS_MEMORY_ACTOR_SECRET = 'subconscious-secret'
+    process.env['SUBCONSCIOUS_MEMORY_ACTOR_ID'] = 'subconscious-gateway'
+    process.env['SUBCONSCIOUS_MEMORY_ACTOR_SECRET'] = 'subconscious-secret'
 
     expect(resolveInternalMemoryServiceConfig()).toEqual({
       baseUrl: 'http://subconscious.internal:54321',
@@ -51,9 +51,9 @@ describe('resolveInternalMemoryServiceConfig', () => {
   })
 
   it('fails fast when the actor id is missing', () => {
-    delete process.env.MEMORY_SERVICE_ACTOR_ID
-    delete process.env.SUBCONSCIOUS_MEMORY_ACTOR_ID
-    process.env.MEMORY_SERVICE_ACTOR_SECRET = 'secret'
+    delete process.env['MEMORY_SERVICE_ACTOR_ID']
+    delete process.env['SUBCONSCIOUS_MEMORY_ACTOR_ID']
+    process.env['MEMORY_SERVICE_ACTOR_SECRET'] = 'secret'
 
     expect(() => resolveInternalMemoryServiceConfig()).toThrow(
       /MEMORY_SERVICE_ACTOR_ID or SUBCONSCIOUS_MEMORY_ACTOR_ID is required/,
@@ -61,9 +61,9 @@ describe('resolveInternalMemoryServiceConfig', () => {
   })
 
   it('fails fast when the actor secret is missing', () => {
-    process.env.MEMORY_SERVICE_ACTOR_ID = 'product-gateway'
-    delete process.env.MEMORY_SERVICE_ACTOR_SECRET
-    delete process.env.SUBCONSCIOUS_MEMORY_ACTOR_SECRET
+    process.env['MEMORY_SERVICE_ACTOR_ID'] = 'product-gateway'
+    delete process.env['MEMORY_SERVICE_ACTOR_SECRET']
+    delete process.env['SUBCONSCIOUS_MEMORY_ACTOR_SECRET']
 
     expect(() => resolveInternalMemoryServiceConfig()).toThrow(
       /MEMORY_SERVICE_ACTOR_SECRET or SUBCONSCIOUS_MEMORY_ACTOR_SECRET is required/,

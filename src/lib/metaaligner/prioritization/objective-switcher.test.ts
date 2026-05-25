@@ -8,9 +8,9 @@ import type {
 } from './context-transition-detector'
 import {
   ObjectiveSwitcher,
-  ObjectiveSwitchObserver,
-  type SwitchMetadata,
-  type ObjectiveSwitcherConfig,
+  _ObjectiveSwitchObserver,
+  type _SwitchMetadata,
+  type _ObjectiveSwitcherConfig,
 } from './objective-switcher'
 
 describe('ObjectiveSwitcher', () => {

@@ -54,9 +54,6 @@ const rateLimitConfigs: RateLimitConfig[] = [
  * Redis-based rate limiter implementation
  */
 export class RateLimiter {
-  private readonly defaultLimit: number
-  private readonly windowMs: number
-  private readonly userLimits: Record<string, number>
   private readonly storage: Map<string, number>
 
   constructor(defaultLimit = 30, windowMs = 60 * 1000) {
@@ -85,7 +82,7 @@ export class RateLimiter {
     remaining: number
     reset: number
   } {
-    const limit = (limits[role] ?? limits.anonymous) || 10
+    const limit = (limits[role] ?? limits['anonymous']) || 10
     const now = Date.now()
     const resetTime = now + windowMs
 

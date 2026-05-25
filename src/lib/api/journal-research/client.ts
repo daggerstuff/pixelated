@@ -80,7 +80,7 @@ export class JournalResearchApiClient {
 
     this.baseUrl =
       options.baseUrl ??
-      import.meta.env.PUBLIC_JOURNAL_RESEARCH_API_URL ??
+      import.meta.env['PUBLIC_JOURNAL_RESEARCH_API_URL'] ??
       fallbackBaseUrl
     this.timeout = options.timeout ?? 30000
     this.fetchImpl = options.fetchImpl
