@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """Programmatically enrich Jira ADHD tasks mapped in Linear with detailed technical specifications."""
 
+import logging
 import os
 import sys
 
@@ -285,14 +286,15 @@ Hook the automated backlog steering and prioritization pipeline directly into th
 
 
 def main():
-    print("Fetching issues from Linear...")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    logging.info("Fetching issues from Linear...")
     try:
         issues = export_linear_issues()
     except Exception as e:
-        print(f"Error fetching Linear issues: {e}")
+        logging.error("Error fetching Linear issues: %s", e)
         sys.exit(1)
 
-    print(f"Successfully loaded {len(issues)} issues from Linear.")
+    logging.info("Successfully loaded %d issues from Linear.", len(issues))
 
     enriched_count = 0
 
@@ -326,12 +328,12 @@ def main():
         if not matched_key:
             continue
 
-        print(f"\n--- Found matching issue: {matched_key} ('{title}') ---")
+        logging.info("--- Found matching issue: %s ('%s') ---", matched_key, title)
         target_spec = TARGETS[matched_key]
 
         # Check if the description already has the enriched body to avoid redundant operations
         if "### Core Objective" in clean_body and "### Verification & Testing Checklist" in clean_body:
-            print(f"Issue {matched_key} is already enriched. Skipping.")
+            logging.info("Issue %s is already enriched. Skipping.", matched_key)
             continue
 
         # Reconstruct the SyncMetadata object to preserve sync keys and status
@@ -352,17 +354,17 @@ def main():
         enriched_body = merge_body_with_sync_metadata(target_spec["body"].strip(), sync_meta)
 
         # Perform the update on Linear
-        print(f"Updating issue in Linear with enriched specs (ID: {issue_id})...")
+        logging.info("Updating issue in Linear with enriched specs (ID: %s)...", issue_id)
         action = {"action": "update", "target_id": issue_id, "title": title, "body": enriched_body}
 
         try:
             apply_linear_action(action)
-            print(f"Successfully enriched {matched_key} in Linear!")
+            logging.info("Successfully enriched %s in Linear!", matched_key)
             enriched_count += 1
         except Exception as e:
-            print(f"Error enriching {matched_key}: {e}")
+            logging.error("Error enriching %s: %s", matched_key, e)
 
-    print(f"\nTask enrichment process complete. Enriched {enriched_count} issues.")
+    logging.info("Task enrichment process complete. Enriched %d issues.", enriched_count)
 
 
 if __name__ == "__main__":
