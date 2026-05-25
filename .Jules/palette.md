@@ -64,3 +64,7 @@
   reader announcements if not explicitly hidden.
 - Action: Added `aria-hidden="true"` to decorative SVGs inside links and an
   empty `alt=""` with `aria-hidden="true"` to the decorative brand logo image.
+## 2026-05-22 - Chat Loading States
+
+- Learning: Literal text indicators (like `...`) in chat interfaces are not inherently accessible and provide poor micro-UX.
+- Action: Replaced plain text indicator with a CSS-animated bouncing dot loader, and added `role="status"` and `aria-live="polite"` with visually hidden `sr-only` text to ensure screen readers announce "Assistant is typing..." properly.

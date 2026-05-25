@@ -211,6 +211,106 @@ describe('PatientProfileService', () => {
     })
   })
 
-  // Removed describe blocks for 'checkBeliefConsistency', 'generateConsistentResponse', and 'createResponseContext'
-  // as they belong to other services now.
+  describe('Error Handling', () => {
+    it('should handle KVStore error in getProfileById', async () => {
+      mockKvStoreInstance.get.mockRejectedValue(new Error('KVStore error'))
+      const result = await service.getProfileById('error-id')
+      expect(result).toBeNull()
+    })
+
+    it('should handle KVStore error in saveProfile', async () => {
+      mockKvStoreInstance.set.mockRejectedValue(new Error('KVStore error'))
+      const profile = createTestPatientProfile('err-save', 'Error Save')
+      const result = await service.saveProfile(profile)
+      expect(result).toBe(false)
+    })
+
+    it('should handle KVStore error in deleteProfile', async () => {
+      mockKvStoreInstance.delete.mockRejectedValue(
+        new Error('KVStore error'),
+      )
+      const result = await service.deleteProfile('err-delete')
+      expect(result).toBe(false)
+    })
+
+    it('should handle KVStore error in getAvailableProfiles', async () => {
+      mockKvStoreInstance.keys.mockRejectedValue(
+        new Error('KVStore error'),
+      )
+      const result = await service.getAvailableProfiles()
+      expect(result).toEqual([])
+    })
+
+    it('should handle null profiles in getAvailableProfiles', async () => {
+      mockKvStoreInstance.keys.mockResolvedValue([
+        'profile_existing',
+        'profile_deleted',
+      ])
+      mockKvStoreInstance.get.mockImplementation(async (key: string) => {
+        if (key === 'profile_existing') {
+          return createTestPatientProfile('existing', 'Existing User')
+        }
+        // profile_deleted returns null (simulating race condition or stale key)
+        return null
+      })
+
+      const result = await service.getAvailableProfiles()
+      expect(result).toEqual([{ id: 'existing', name: 'Existing User' }])
+    })
+  })
+
+  describe('addMessageToPatientHistory - Edge Cases', () => {
+    it('should add message with sessionId and metadata', async () => {
+      const initialProfile = createTestPatientProfile(
+        'edge1',
+        'Edge Case User',
+      )
+      mockKvStoreInstance.get.mockResolvedValue(initialProfile)
+      mockKvStoreInstance.set.mockResolvedValue(undefined)
+
+      const updated = await service.addMessageToPatientHistory(
+        'edge1',
+        'Message with context',
+        'therapist',
+        'session-123',
+        { source: 'test', confidence: 0.9 },
+      )
+
+      expect(updated).not.toBeNull()
+      expect(updated?.conversationHistory).toHaveLength(1)
+      expect(updated?.conversationHistory[0]).toMatchObject({
+        content: 'Message with context',
+        role: 'therapist',
+        sessionId: 'session-123',
+        metadata: { source: 'test', confidence: 0.9 },
+      })
+    })
+
+    it('should return null when saveProfile fails', async () => {
+      const initialProfile = createTestPatientProfile('edge2', 'Save Fail')
+      mockKvStoreInstance.get.mockResolvedValue(initialProfile)
+      mockKvStoreInstance.set.mockRejectedValue(new Error('Save failed'))
+
+      const result = await service.addMessageToPatientHistory(
+        'edge2',
+        'This will fail to save',
+        'patient',
+      )
+      expect(result).toBeNull()
+    })
+
+    it('should handle system role messages', async () => {
+      const initialProfile = createTestPatientProfile('edge3', 'System Msg')
+      mockKvStoreInstance.get.mockResolvedValue(initialProfile)
+      mockKvStoreInstance.set.mockResolvedValue(undefined)
+
+      const updated = await service.addMessageToPatientHistory(
+        'edge3',
+        'System initialized',
+        'system',
+      )
+      expect(updated).not.toBeNull()
+      expect(updated?.conversationHistory[0].role).toBe('system')
+    })
+  })
 })

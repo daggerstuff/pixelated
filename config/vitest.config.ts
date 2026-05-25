@@ -208,6 +208,7 @@ export default defineConfig({
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
+          isolate: true,
           exclude: [
             '**/node_modules/**',
             'src/lib/security/__tests__/**/*.test.ts',
@@ -265,17 +266,14 @@ export default defineConfig({
             ...cpuBoundNodeTestExcludes,
           ],
           environment: 'node',
+          isolate: true,
         },
       },
     ],
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: !!process.env['CI'],
-        maxThreads: process.env['CI'] ? 4 : 8,
-        minThreads: process.env['CI'] ? 1 : 2,
-      },
-    },
+    pool: 'forks',
+    singleFork: false,
+    maxForks: process.env['CI'] ? 4 : 8,
+    minForks: process.env['CI'] ? 1 : 2,
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
@@ -293,11 +291,11 @@ export default defineConfig({
       thresholds: {
         // PIX-223+: Thresholds raised after boosting BiasDetectionEngine (57%→88%),
         // performance-optimizer (81%→91%), connection-pool (27%→97%), python-bridge 85%,
-        // alerts-system 83%, metrics-collector 70%. Overall project ~58% stmts.
-        lines: 40,
-        functions: 35,
-        branches: 30,
-        statements: 40,
+        // alerts-system ~84%, metrics-collector ~80%. Overall project ~58% stmts.
+        lines: 45,
+        functions: 40,
+        branches: 32,
+        statements: 45,
       },
       exclude: [
         'node_modules/**',
@@ -315,9 +313,9 @@ export default defineConfig({
     },
     // PIX-223: Timeout guard — force-kill hanging tests after 2× timeout
     teardownTimeout: 60_000,
-    fileParallelism: !process.env['CI'],
+    fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
-    isolate: !process.env['CI'],
+    isolate: true,
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
   },

@@ -160,25 +160,10 @@ describe('Dashboard Performance Tests', () => {
   const mockOnSessionControl = vi.fn()
 
   beforeEach(() => {
-    vi.useFakeTimers()
-    performance.mark = vi.fn()
-    performance.measure = vi.fn(
-      () =>
-        ({
-          duration: 100,
-          entryType: 'measure',
-          name: 'test-measure',
-          startTime: 0,
-          detail: null,
-        }) as PerformanceMeasure,
-    )
-    performance.getEntriesByName = vi.fn(() => [])
-    performance.clearMarks = vi.fn()
-    performance.clearMeasures = vi.fn()
+    vi.clearAllMocks()
   })
 
   afterEach(() => {
-    vi.useRealTimers()
     vi.clearAllMocks()
   })
 

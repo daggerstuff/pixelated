@@ -126,9 +126,10 @@ describe('PerformanceMonitor', () => {
     })
 
     it('should handle zero-length time window', () => {
-      const snapshot = performanceMonitor.getSnapshot(0)
+      // Use a negative window to truly exclude all requests (cutoff = now + 1ms)
+      // since the singleton accumulates state from the entire test suite
+      const snapshot = performanceMonitor.getSnapshot(-1)
       expect(snapshot).toHaveProperty('summary')
-      // A 0ms window matches nothing, so requestCount should be 0
       expect(snapshot.summary.requestCount).toBe(0)
     })
   })

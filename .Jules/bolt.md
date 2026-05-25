@@ -2,14 +2,13 @@
 
 ## 2024-06-01 - Extract Tooltip
 
-Learning: Inline components in Recharts cause unnecessary re-renders. Action:
-Extracted `CustomTooltip` to module level.
+Learning: Inline components in Recharts cause unnecessary re-renders.
+Action: Extracted `CustomTooltip` to module level.
 
 ## 2024-06-03 - O(N^2) React Rendering
 
-Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks
-during React renders. Action: Replaced `Array.includes()` with a `Set` generated
-via `useMemo` for O(1) lookups.
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders.
+Action: Replaced `Array.includes()` with a `Set` generated via `useMemo` for O(1) lookups.
 
 ## 2024-05-18 - Stable Reference for Checkbox Toggles
 
@@ -18,9 +17,8 @@ Action: Wrapped handleDimensionToggle in useCallback.
 
 ## 2025-03-20 - Set for Filters
 
-Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks
-during React renders when rendering filter lists. Action: Replaced
-`Array.includes()` with `Set.has()` using `useMemo` for filter option arrays.
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders when rendering filter lists.
+Action: Replaced `Array.includes()` with `Set.has()` using `useMemo` for filter option arrays.
 
 ## 2025-03-20 - Inline Callback Re-renders
 
@@ -28,15 +26,13 @@ during React renders when rendering filter lists. Action: Replaced
 
 ## 2025-03-20 - Inline Callback Re-renders
 
-- Learning: Inline arrow functions passed as props to child components cause
-  unnecessary re-renders. When using useCallback to memoize state updater
-  callbacks, use the functional update pattern to avoid adding state variables
-  to the dependency array.
-- Action: Wrapped inline patient selection handler in useCallback using a
-  functional state update.
-
+- Learning: Inline arrow functions passed as props to child components cause unnecessary re-renders. When using useCallback to memoize state updater callbacks, use the functional update pattern to avoid adding state variables to the dependency array.
+- Action: Wrapped inline patient selection handler in useCallback using a functional state update.
 ## 2025-03-20 - Expensive Date formatting in map loops
 
-Learning: Repeated Date instantiation and toLocaleDateString() calls inside
-React map loops are an expensive performance bottleneck. Action: Memoized
-derived chart data in SessionChart to compute strings once per data change.
+Learning: Repeated Date instantiation and toLocaleDateString() calls inside React map loops are an expensive performance bottleneck.
+Action: Memoized derived chart data in SessionChart to compute strings once per data change.
+
+## 2025-03-22 - O(N^2) Array Includes inside map loop
+Learning: `Array.includes()` inside `.map()` loops causes O(N²) bottlenecks during React renders when iterating over selected patients.
+Action: Replaced `selectedPatients.includes(patient.id)` with a memoized `Set.has()` using `useMemo` in `TherapistDashboard.tsx`.
