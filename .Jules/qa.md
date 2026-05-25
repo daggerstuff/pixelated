@@ -101,6 +101,6 @@
 - Action: Verify regex behavior matches expected text outputs, as sometimes
   chained replaces don't remove multiple distinct occurrences.
 
-## 2026-06-26 - path utility testing
-- Pattern: Mocking `astro:config/server` in Vitest before importing the module under test.
-- Action: Use `vi.mock('astro:config/server', () => ({ base: '/mock-base' }))` to safely test functions depending on the Astro server base path.
+## 2026-06-25 - analyzeTherapeuticTechniques confidence scoring edge cases
+- Pattern: Writing specific edge case tests for algorithms that compute a multi-factor confidence score based on regex matches.
+- Action: Include assertions checking exact or near-exact math (using `toBeCloseTo`) based on heuristic implementations.
