@@ -184,6 +184,5 @@ afterEach(() => {
   void import('@testing-library/react')
     .then(({ cleanup }) => cleanup())
     .catch(() => {})
-  vi.useRealTimers()
   vi.restoreAllMocks()
 })
