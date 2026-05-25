@@ -31,12 +31,12 @@ export const HttpResponse = {
   json: <T>(data: T) => ({
     ok: true,
     status: 200,
-    json:  async () => Promise.resolve(data),
+    json: async () => Promise.resolve(data),
   }),
   text: (text: string) => ({
     ok: true,
     status: 200,
-    text:  async () => Promise.resolve(text),
+    text: async () => Promise.resolve(text),
   }),
 }
 

@@ -68,7 +68,7 @@ async def require_rate_limit() -> None:
     This keeps API route dependency wiring intact while rate limiting is handled
     by upstream infrastructure in current deployments.
     """
-    return None
+    return
 
 
 # Type alias for authenticated user payload

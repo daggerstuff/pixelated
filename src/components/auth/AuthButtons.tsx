@@ -11,31 +11,31 @@ const AuthButtonsInner = () => {
   const isAuthenticated = !!user
 
   if (isPending) {
-    return <div className='text-slate-300 text-sm font-medium'>Loading...</div>
+    return <div className="text-slate-300 text-sm font-medium">Loading...</div>
   }
 
   if (isAuthenticated) {
     return (
-      <div className='flex items-center gap-4'>
-        <div className='text-slate-300 hidden text-sm font-medium lg:block'>
+      <div className="flex items-center gap-4">
+        <div className="text-slate-300 hidden text-sm font-medium lg:block">
           {user?.avatarUrl ? (
             <img
               src={user.avatarUrl}
               alt={user.fullName ?? user.email}
-              className='mr-2 inline-block h-8 w-8 rounded-full'
+              className="mr-2 inline-block h-8 w-8 rounded-full"
             />
           ) : null}
           {user?.fullName ?? user?.email}
         </div>
         <button
-          onClick={ async () => authClient.signOut()}
-          className='text-slate-300 hover:text-white text-sm font-medium transition-colors'
+          onClick={async () => authClient.signOut()}
+          className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
         >
           Log out
         </button>
         <a
-          href='/dashboard'
-          className='border-white/10 text-white hover:border-white/25 hover:bg-white/5 rounded-[4px] border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors'
+          href="/dashboard"
+          className="border-white/10 text-white hover:border-white/25 hover:bg-white/5 rounded-[4px] border px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] transition-colors"
         >
           Dashboard
         </a>
@@ -44,16 +44,16 @@ const AuthButtonsInner = () => {
   }
 
   return (
-    <div className='flex items-center gap-4'>
+    <div className="flex items-center gap-4">
       <a
-        href='/api/auth/login'
-        className='text-slate-300 hover:text-white text-sm font-medium transition-colors'
+        href="/api/auth/login"
+        className="text-slate-300 hover:text-white text-sm font-medium transition-colors"
       >
         Log in
       </a>
       <a
-        href='/demo-hub'
-        className='rounded-[4px] bg-[var(--accent-primary)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--bg-primary)] transition-all hover:-translate-y-px hover:brightness-110'
+        href="/demo-hub"
+        className="rounded-[4px] bg-[var(--accent-primary)] px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--bg-primary)] transition-all hover:-translate-y-px hover:brightness-110"
       >
         See Demo
       </a>

@@ -124,7 +124,9 @@ export function usePasswordStrength(password: string): PasswordStrengthInfo {
         feedback = 'Strong - excellent password'
         color = '#38a169' // dark green
         break
-      case true: { throw new Error('Not implemented yet: true case') }
+      case true: {
+        throw new Error('Not implemented yet: true case')
+      }
       default:
         strength = 'weak'
         feedback = 'Password could be stronger'

@@ -87,9 +87,7 @@ class S3Recategorizer:
         logger.info(f"S3 Bucket: {s3_config.bucket_name}")
         logger.info("Using NVIDIA NIM GLM4.7 for low-confidence cases")
 
-    def list_files_to_recategorize(
-        self, prefix: str = "processed_ready/", limit: int | None = None
-    ) -> list[str]:
+    def list_files_to_recategorize(self, prefix: str = "processed_ready/", limit: int | None = None) -> list[str]:
         """
         List files that need recategorization.
 
@@ -130,17 +128,11 @@ class S3Recategorizer:
             return record["text"]
 
         if "messages" in record and isinstance(record["messages"], list):
-            return " ".join(
-                msg["content"]
-                for msg in record["messages"]
-                if isinstance(msg, dict) and "content" in msg
-            )
+            return " ".join(msg["content"] for msg in record["messages"] if isinstance(msg, dict) and "content" in msg)
 
         if "conversation" in record and isinstance(record["conversation"], list):
             return " ".join(
-                turn["content"]
-                for turn in record["conversation"]
-                if isinstance(turn, dict) and "content" in turn
+                turn["content"] for turn in record["conversation"] if isinstance(turn, dict) and "content" in turn
             )
 
         # Fallback: try to find any text field
@@ -193,9 +185,7 @@ class S3Recategorizer:
                         record["metadata"]["category"] = classification.category.value
                         record["metadata"]["category_confidence"] = classification.confidence
                         record["metadata"]["category_reasoning"] = classification.reasoning
-                        record["metadata"]["recategorized_at"] = datetime.now(
-                            timezone.utc
-                        ).isoformat()
+                        record["metadata"]["recategorized_at"] = datetime.now(timezone.utc).isoformat()
                         stats["classified"] += 1
                         stats["categories"][classification.category.value] += 1
                     else:
@@ -301,22 +291,14 @@ class S3Recategorizer:
 
 def main():
     """Run the recategorization process."""
-    parser = argparse.ArgumentParser(
-        description="Re-categorize S3 'Other' files using hybrid classifier"
-    )
+    parser = argparse.ArgumentParser(description="Re-categorize S3 'Other' files using hybrid classifier")
     parser.add_argument("--limit", type=int, help="Limit number of files (for testing)")
-    parser.add_argument(
-        "--threshold", type=float, default=0.70, help="Confidence threshold (default: 0.70)"
-    )
-    parser.add_argument(
-        "--output-dir", type=Path, default=Path("metrics"), help="Output directory for statistics"
-    )
+    parser.add_argument("--threshold", type=float, default=0.70, help="Confidence threshold (default: 0.70)")
+    parser.add_argument("--output-dir", type=Path, default=Path("metrics"), help="Output directory for statistics")
 
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
     recategorizer = S3Recategorizer(output_dir=args.output_dir, confidence_threshold=args.threshold)
     stats = recategorizer.process_all_files(limit=args.limit)

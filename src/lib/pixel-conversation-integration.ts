@@ -442,7 +442,7 @@ let instance: PixelConversationIntegration | null = null
 export function getPixelIntegration(
   config?: PixelIntegrationConfig,
 ): PixelConversationIntegration {
-  instance ??= new PixelConversationIntegration(config);
+  instance ??= new PixelConversationIntegration(config)
   return instance
 }
 

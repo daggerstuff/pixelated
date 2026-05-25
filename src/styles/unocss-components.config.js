@@ -32,7 +32,7 @@ export default defineConfig({
   theme: {
     colors: {
       // Primary color scale (OKLCH-based)
-      primary: {
+      'primary': {
         50: 'oklch(96.5% 0.02 41.116)',
         100: 'oklch(92.1% 0.04 41.116)',
         200: 'oklch(87.6% 0.08 41.116)',
@@ -46,7 +46,7 @@ export default defineConfig({
         950: 'oklch(39.1% 0.30 41.116)',
       },
       // Secondary color scale
-      secondary: {
+      'secondary': {
         50: 'oklch(96.8% 0.02 276.42)',
         100: 'oklch(92.4% 0.04 276.42)',
         200: 'oklch(87.9% 0.08 276.42)',
@@ -60,7 +60,7 @@ export default defineConfig({
         950: 'oklch(32.8% 0.194 276.42)',
       },
       // Accent colors
-      accent: {
+      'accent': {
         50: 'oklch(96.2% 0.03 101.93)',
         100: 'oklch(91.8% 0.06 101.93)',
         200: 'oklch(87.3% 0.09 101.93)',
@@ -74,7 +74,7 @@ export default defineConfig({
         950: 'oklch(38.1% 0.23 101.93)',
       },
       // Neutral colors (dark theme optimized)
-      neutral: {
+      'neutral': {
         50: 'oklch(95.1% 0.004 94.33)',
         100: 'oklch(90.5% 0.007 91.03)',
         200: 'oklch(82.1% 0.01 87.72)',
@@ -88,17 +88,17 @@ export default defineConfig({
         950: 'oklch(10.2% 0.003 42.15)',
       },
       // Semantic colors
-      background: 'var(--color-neutral-950)',
-      foreground: 'var(--color-neutral-100)',
-      card: 'var(--color-neutral-900)',
+      'background': 'var(--color-neutral-950)',
+      'foreground': 'var(--color-neutral-100)',
+      'card': 'var(--color-neutral-900)',
       'card-foreground': 'var(--color-neutral-100)',
-      popover: 'var(--color-neutral-900)',
+      'popover': 'var(--color-neutral-900)',
       'popover-foreground': 'var(--color-neutral-100)',
-      muted: 'var(--color-neutral-700)',
+      'muted': 'var(--color-neutral-700)',
       'muted-foreground': 'var(--color-neutral-500)',
-      border: 'var(--color-neutral-800)',
-      input: 'var(--color-neutral-800)',
-      ring: 'var(--color-primary-500)',
+      'border': 'var(--color-neutral-800)',
+      'input': 'var(--color-neutral-800)',
+      'ring': 'var(--color-primary-500)',
     },
 
     // Animation durations matching design system
@@ -112,7 +112,7 @@ export default defineConfig({
       'slide-in-down': 'slideInDown 0.5s ease-out',
       'scale-in': 'scaleIn 0.3s ease-out',
       'bounce-in': 'bounceIn 0.6s ease-out',
-      float: 'float 6s ease-in-out infinite',
+      'float': 'float 6s ease-in-out infinite',
       'pulse-slow': 'pulse 3s ease-in-out infinite',
       'spin-slow': 'spin 4s linear infinite',
     },
@@ -122,11 +122,11 @@ export default defineConfig({
       '4xs': '0.125rem', // 2px
       '3xs': '0.25rem', // 4px
       '2xs': '0.5rem', // 8px
-      xs: '0.75rem', // 12px
-      sm: '1rem', // 16px
-      md: '1.5rem', // 24px
-      lg: '2rem', // 32px
-      xl: '3rem', // 48px
+      'xs': '0.75rem', // 12px
+      'sm': '1rem', // 16px
+      'md': '1.5rem', // 24px
+      'lg': '2rem', // 32px
+      'xl': '3rem', // 48px
       '2xl': '4rem', // 64px
       '3xl': '6rem', // 96px
       '4xl': '8rem', // 128px
@@ -139,11 +139,11 @@ export default defineConfig({
       '4xs': '0.125rem',
       '3xs': '0.25rem',
       '2xs': '0.375rem',
-      xs: '0.5rem',
-      sm: '0.625rem',
-      md: '0.75rem',
-      lg: '1rem',
-      xl: '1.25rem',
+      'xs': '0.5rem',
+      'sm': '0.625rem',
+      'md': '0.75rem',
+      'lg': '1rem',
+      'xl': '1.25rem',
       '2xl': '1.5rem',
       '3xl': '1.75rem',
       '4xl': '2rem',
@@ -153,13 +153,13 @@ export default defineConfig({
 
     // Custom shadows
     boxShadow: {
-      sm: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-      md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
-      lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
-      xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+      'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+      'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+      'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)',
+      'xl': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
       '2xl': '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-      inner: 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
-      glow: '0 0 20px rgba(59, 130, 246, 0.3)',
+      'inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.05)',
+      'glow': '0 0 20px rgba(59, 130, 246, 0.3)',
       'glow-lg': '0 0 40px rgba(59, 130, 246, 0.4)',
       'glow-primary': '0 0 20px var(--color-primary-500)',
       'glow-secondary': '0 0 20px var(--color-secondary-500)',
@@ -211,11 +211,11 @@ export default defineConfig({
       'card',
       {
         'background-color': 'var(--bg-secondary)',
-        border: '1px solid var(--border-secondary)',
+        'border': '1px solid var(--border-secondary)',
         'border-radius': 'var(--card-radius)',
-        padding: 'var(--card-padding)',
+        'padding': 'var(--card-padding)',
         'box-shadow': 'var(--card-shadow)',
-        transition: 'all var(--duration-normal) var(--ease-in-out)',
+        'transition': 'all var(--duration-normal) var(--ease-in-out)',
       },
     ],
 
@@ -223,7 +223,7 @@ export default defineConfig({
       'card-hover',
       {
         'box-shadow': 'var(--card-shadow-hover)',
-        transform: 'translateY(-2px)',
+        'transform': 'translateY(-2px)',
       },
     ],
 
@@ -231,15 +231,15 @@ export default defineConfig({
     [
       'btn',
       {
-        display: 'inline-flex',
+        'display': 'inline-flex',
         'align-items': 'center',
         'justify-content': 'center',
-        padding: 'var(--button-padding-y) var(--button-padding-x)',
+        'padding': 'var(--button-padding-y) var(--button-padding-x)',
         'border-radius': 'var(--button-radius)',
         'font-weight': 'var(--button-font-weight)',
-        transition: 'all var(--duration-fast) var(--ease-out)',
-        cursor: 'pointer',
-        border: 'none',
+        'transition': 'all var(--duration-fast) var(--ease-out)',
+        'cursor': 'pointer',
+        'border': 'none',
         'text-decoration': 'none',
       },
     ],
@@ -248,7 +248,7 @@ export default defineConfig({
       'btn-primary',
       {
         'background-color': 'var(--color-primary-600)',
-        color: 'white',
+        'color': 'white',
       },
     ],
 
@@ -256,8 +256,8 @@ export default defineConfig({
       'btn-secondary',
       {
         'background-color': 'var(--bg-tertiary)',
-        color: 'var(--text-primary)',
-        border: '1px solid var(--border-primary)',
+        'color': 'var(--text-primary)',
+        'border': '1px solid var(--border-primary)',
       },
     ],
 
@@ -265,7 +265,7 @@ export default defineConfig({
     [
       'text-gradient',
       {
-        background:
+        'background':
           'linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500))',
         '-webkit-background-clip': 'text',
         '-webkit-text-fill-color': 'transparent',
@@ -277,18 +277,18 @@ export default defineConfig({
     [
       'glass',
       {
-        background: 'rgba(255, 255, 255, 0.1)',
+        'background': 'rgba(255, 255, 255, 0.1)',
         'backdrop-filter': 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.2)',
+        'border': '1px solid rgba(255, 255, 255, 0.2)',
       },
     ],
 
     [
       'glass-dark',
       {
-        background: 'rgba(0, 0, 0, 0.2)',
+        'background': 'rgba(0, 0, 0, 0.2)',
         'backdrop-filter': 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
+        'border': '1px solid rgba(255, 255, 255, 0.1)',
       },
     ],
   ],
@@ -413,11 +413,11 @@ export default defineConfig({
 
   // Responsive breakpoints matching design system
   breakpoints: {
-    xs: '475px',
-    sm: '640px',
-    md: '768px',
-    lg: '1024px',
-    xl: '1280px',
+    'xs': '475px',
+    'sm': '640px',
+    'md': '768px',
+    'lg': '1024px',
+    'xl': '1280px',
     '2xl': '1536px',
     '3xl': '1920px',
   },

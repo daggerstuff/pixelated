@@ -81,7 +81,9 @@ export class LogRotationService {
         break
       }
       case 'daily':
-      case undefined: { throw new Error('Not implemented yet: undefined case') }
+      case undefined: {
+        throw new Error('Not implemented yet: undefined case')
+      }
       default:
         dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
     }

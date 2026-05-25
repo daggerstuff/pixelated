@@ -122,7 +122,7 @@ function Table<T extends TableRowData>({
         <TableBody>
           {dataSource.loading ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className='py-8 text-center'>
+              <TableCell colSpan={columns.length} className="py-8 text-center">
                 Loading...
               </TableCell>
             </TableRow>
@@ -130,14 +130,14 @@ function Table<T extends TableRowData>({
             <TableRow>
               <TableCell
                 colSpan={columns.length}
-                className='text-red-500 py-8 text-center'
+                className="text-red-500 py-8 text-center"
               >
                 {dataSource.error}
               </TableCell>
             </TableRow>
           ) : dataSource.data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columns.length} className='py-8 text-center'>
+              <TableCell colSpan={columns.length} className="py-8 text-center">
                 No data available
               </TableCell>
             </TableRow>
@@ -328,43 +328,43 @@ function TableHead({
       {...props}
     >
       {sortable ? (
-        <div className='flex items-center gap-2'>
+        <div className="flex items-center gap-2">
           <span>{children}</span>
-          <span className='flex flex-col'>
+          <span className="flex flex-col">
             <svg
-              xmlns='http://www.w3.org/2000/svg'
+              xmlns="http://www.w3.org/2000/svg"
               className={cn('h-2 w-2', {
                 'text-gray-700 dark:text-gray-300': sortAsc,
                 'text-gray-400 dark:text-gray-600': !sortAsc,
               })}
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-              aria-hidden='true'
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
             >
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
-                d='M5 15l7-7 7 7'
+                d="M5 15l7-7 7 7"
               />
             </svg>
             <svg
-              xmlns='http://www.w3.org/2000/svg'
+              xmlns="http://www.w3.org/2000/svg"
               className={cn('h-2 w-2', {
                 'text-gray-700 dark:text-gray-300': sortDesc,
                 'text-gray-400 dark:text-gray-600': !sortDesc,
               })}
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='currentColor'
-              aria-hidden='true'
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
             >
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
-                d='M19 9l-7 7-7-7'
+                d="M19 9l-7 7-7-7"
               />
             </svg>
           </span>
@@ -462,10 +462,10 @@ function TablePagination({
       {...props}
     >
       {showPageSize && (
-        <div className='flex items-center gap-2'>
-          <span className='text-gray-700 dark:text-gray-300 text-sm'>Show</span>
+        <div className="flex items-center gap-2">
+          <span className="text-gray-700 dark:text-gray-300 text-sm">Show</span>
           <select
-            className='border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 rounded-md border px-2 py-1 text-sm'
+            className="border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-700 rounded-md border px-2 py-1 text-sm"
             value={pageSize}
             onChange={(e) => onPageSizeChange?.(Number(e.target.value))}
           >
@@ -478,7 +478,7 @@ function TablePagination({
         </div>
       )}
 
-      <div className='flex items-center gap-2'>
+      <div className="flex items-center gap-2">
         <button
           className={cn(
             'flex h-8 w-8 items-center justify-center rounded-md',
@@ -488,20 +488,20 @@ function TablePagination({
           )}
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
-          aria-label='Previous page'
+          aria-label="Previous page"
         >
           <svg
-            xmlns='http://www.w3.org/2000/svg'
-            className='h-4 w-4'
-            fill='none'
-            viewBox='0 0 24 24'
-            stroke='currentColor'
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
+              strokeLinecap="round"
+              strokeLinejoin="round"
               strokeWidth={2}
-              d='M15 19l-7-7 7-7'
+              d="M15 19l-7-7 7-7"
             />
           </svg>
         </button>
@@ -534,28 +534,28 @@ function TablePagination({
           )}
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
-          aria-label='Next page'
+          aria-label="Next page"
         >
           <svg
-            xmlns='http://www.w3.org/2000/svg'
-            className='h-4 w-4'
-            fill='none'
-            viewBox='0 0 24 24'
-            stroke='currentColor'
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
           >
             <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
+              strokeLinecap="round"
+              strokeLinejoin="round"
               strokeWidth={2}
-              d='M9 5l7 7-7 7'
+              d="M9 5l7 7-7 7"
             />
           </svg>
         </button>
       </div>
 
-      <div className='text-gray-700 dark:text-gray-300 text-sm'>
-        Page <span className='font-medium'>{currentPage}</span> of{' '}
-        <span className='font-medium'>{totalPages}</span>
+      <div className="text-gray-700 dark:text-gray-300 text-sm">
+        Page <span className="font-medium">{currentPage}</span> of{' '}
+        <span className="font-medium">{totalPages}</span>
       </div>
     </div>
   )

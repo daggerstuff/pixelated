@@ -79,12 +79,8 @@ def test_build_storage_plan_maps_manifest_entries_to_local_and_future_s3_paths(
     assert plan["volume_root"] == str(tmp_path / "pixelated-workspace")
     assert plan["future_bucket"] == "pixel-data-phx"
     assert plan["materialization"]["status"] == "pending"
-    assert plan["entries"][0]["local_path"].endswith(
-        "pixelated-workspace/curated_sources/final_dataset"
-    )
-    assert (
-        plan["entries"][0]["future_s3_uri"] == "s3://pixel-data-phx/curated_sources/final_dataset/"
-    )
+    assert plan["entries"][0]["local_path"].endswith("pixelated-workspace/curated_sources/final_dataset")
+    assert plan["entries"][0]["future_s3_uri"] == "s3://pixel-data-phx/curated_sources/final_dataset/"
     assert plan["entries"][1]["local_path"].endswith("pixelated-workspace/salvage/raw_datasets")
     assert plan["entries"][1]["future_s3_uri"] == "s3://pixel-data-phx/salvage/raw_datasets/"
     assert plan["entries"][2]["materialize"] is False

@@ -5,11 +5,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-211.\n\nSource type: Epic\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-211"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-211"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -17,11 +13,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-240.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-240"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-240"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -29,11 +21,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-278.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-278"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-278"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -41,11 +29,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-279.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-279"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-279"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -53,11 +37,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-280.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-280"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-280"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -65,11 +45,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-281.\n\nSource type: Epic\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-281"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-281"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -77,11 +53,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-372.\n\nSource type: Epic\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-epic",
-        "source-pix-372"
-      ],
+      "label": ["migrated-from-pix", "source-epic", "source-pix-372"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -357,10 +329,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-108.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-108"
-      ],
+      "label": ["migrated-from-pix", "source-pix-108"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -368,10 +337,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-109.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-109"
-      ],
+      "label": ["migrated-from-pix", "source-pix-109"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -393,10 +359,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-110.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-110"
-      ],
+      "label": ["migrated-from-pix", "source-pix-110"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -404,10 +367,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-111.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-111"
-      ],
+      "label": ["migrated-from-pix", "source-pix-111"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -415,10 +375,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-112.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-112"
-      ],
+      "label": ["migrated-from-pix", "source-pix-112"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -426,10 +383,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-113.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-113"
-      ],
+      "label": ["migrated-from-pix", "source-pix-113"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -437,10 +391,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-114.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-114"
-      ],
+      "label": ["migrated-from-pix", "source-pix-114"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -448,10 +399,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-115.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-115"
-      ],
+      "label": ["migrated-from-pix", "source-pix-115"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -459,10 +407,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-116.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-116"
-      ],
+      "label": ["migrated-from-pix", "source-pix-116"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -470,10 +415,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-117.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-117"
-      ],
+      "label": ["migrated-from-pix", "source-pix-117"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -481,10 +423,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-118.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-118"
-      ],
+      "label": ["migrated-from-pix", "source-pix-118"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -492,10 +431,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-119.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-119"
-      ],
+      "label": ["migrated-from-pix", "source-pix-119"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -518,10 +454,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-120.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-120"
-      ],
+      "label": ["migrated-from-pix", "source-pix-120"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -529,10 +462,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-121.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-121"
-      ],
+      "label": ["migrated-from-pix", "source-pix-121"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -540,10 +470,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-122.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-122"
-      ],
+      "label": ["migrated-from-pix", "source-pix-122"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -551,10 +478,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-123.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-123"
-      ],
+      "label": ["migrated-from-pix", "source-pix-123"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -562,10 +486,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-124.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-124"
-      ],
+      "label": ["migrated-from-pix", "source-pix-124"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -573,10 +494,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-125.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-125"
-      ],
+      "label": ["migrated-from-pix", "source-pix-125"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -584,10 +502,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-126.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-126"
-      ],
+      "label": ["migrated-from-pix", "source-pix-126"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -595,10 +510,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-127.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-127"
-      ],
+      "label": ["migrated-from-pix", "source-pix-127"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -606,10 +518,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-128.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-128"
-      ],
+      "label": ["migrated-from-pix", "source-pix-128"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -617,10 +526,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-129.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-129"
-      ],
+      "label": ["migrated-from-pix", "source-pix-129"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -643,10 +549,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-130.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-130"
-      ],
+      "label": ["migrated-from-pix", "source-pix-130"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -654,10 +557,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-131.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-131"
-      ],
+      "label": ["migrated-from-pix", "source-pix-131"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -665,10 +565,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-132.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-132"
-      ],
+      "label": ["migrated-from-pix", "source-pix-132"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -676,10 +573,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-133.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-133"
-      ],
+      "label": ["migrated-from-pix", "source-pix-133"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -687,10 +581,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-134.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-134"
-      ],
+      "label": ["migrated-from-pix", "source-pix-134"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -698,10 +589,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-135.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-135"
-      ],
+      "label": ["migrated-from-pix", "source-pix-135"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -709,10 +597,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-136.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-136"
-      ],
+      "label": ["migrated-from-pix", "source-pix-136"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -720,10 +605,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-137.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-137"
-      ],
+      "label": ["migrated-from-pix", "source-pix-137"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -731,10 +613,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-138.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-138"
-      ],
+      "label": ["migrated-from-pix", "source-pix-138"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -742,10 +621,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-139.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-139"
-      ],
+      "label": ["migrated-from-pix", "source-pix-139"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -768,10 +644,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-140.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-140"
-      ],
+      "label": ["migrated-from-pix", "source-pix-140"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -779,10 +652,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-141.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-141"
-      ],
+      "label": ["migrated-from-pix", "source-pix-141"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -790,10 +660,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-142.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-142"
-      ],
+      "label": ["migrated-from-pix", "source-pix-142"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -801,10 +668,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-143.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-143"
-      ],
+      "label": ["migrated-from-pix", "source-pix-143"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -812,10 +676,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-144.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-144"
-      ],
+      "label": ["migrated-from-pix", "source-pix-144"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -823,10 +684,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-145.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-145"
-      ],
+      "label": ["migrated-from-pix", "source-pix-145"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -834,10 +692,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-146.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-146"
-      ],
+      "label": ["migrated-from-pix", "source-pix-146"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -845,10 +700,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-147.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-147"
-      ],
+      "label": ["migrated-from-pix", "source-pix-147"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -856,10 +708,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-148.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-148"
-      ],
+      "label": ["migrated-from-pix", "source-pix-148"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -867,10 +716,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-149.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-149"
-      ],
+      "label": ["migrated-from-pix", "source-pix-149"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -893,10 +739,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-150.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-150"
-      ],
+      "label": ["migrated-from-pix", "source-pix-150"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -904,10 +747,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-151.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-151"
-      ],
+      "label": ["migrated-from-pix", "source-pix-151"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -915,10 +755,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-152.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-152"
-      ],
+      "label": ["migrated-from-pix", "source-pix-152"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -926,10 +763,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-153.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-153"
-      ],
+      "label": ["migrated-from-pix", "source-pix-153"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -937,10 +771,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-154.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-154"
-      ],
+      "label": ["migrated-from-pix", "source-pix-154"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -948,10 +779,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-155.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-155"
-      ],
+      "label": ["migrated-from-pix", "source-pix-155"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -959,10 +787,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-156.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-156"
-      ],
+      "label": ["migrated-from-pix", "source-pix-156"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -970,10 +795,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-157.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-157"
-      ],
+      "label": ["migrated-from-pix", "source-pix-157"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -981,10 +803,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-158.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-158"
-      ],
+      "label": ["migrated-from-pix", "source-pix-158"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -992,10 +811,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-159.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-159"
-      ],
+      "label": ["migrated-from-pix", "source-pix-159"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1018,10 +834,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-160.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-160"
-      ],
+      "label": ["migrated-from-pix", "source-pix-160"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1029,10 +842,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-161.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-161"
-      ],
+      "label": ["migrated-from-pix", "source-pix-161"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1040,10 +850,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-162.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-162"
-      ],
+      "label": ["migrated-from-pix", "source-pix-162"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1051,10 +858,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-163.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-163"
-      ],
+      "label": ["migrated-from-pix", "source-pix-163"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1062,10 +866,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-164.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-164"
-      ],
+      "label": ["migrated-from-pix", "source-pix-164"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1073,10 +874,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-165.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-165"
-      ],
+      "label": ["migrated-from-pix", "source-pix-165"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1084,10 +882,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-166.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-166"
-      ],
+      "label": ["migrated-from-pix", "source-pix-166"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1095,10 +890,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-167.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-167"
-      ],
+      "label": ["migrated-from-pix", "source-pix-167"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1106,10 +898,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-168.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-168"
-      ],
+      "label": ["migrated-from-pix", "source-pix-168"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1117,10 +906,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-169.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-169"
-      ],
+      "label": ["migrated-from-pix", "source-pix-169"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1128,12 +914,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-17.\n\nSource type: Task\nSource status: Done\nSource priority: Low\n",
-      "label": [
-        "historical",
-        "migrated-from-pix",
-        "platform",
-        "source-pix-17"
-      ],
+      "label": ["historical", "migrated-from-pix", "platform", "source-pix-17"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1141,10 +922,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-170.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-170"
-      ],
+      "label": ["migrated-from-pix", "source-pix-170"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1152,10 +930,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-171.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-171"
-      ],
+      "label": ["migrated-from-pix", "source-pix-171"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1163,10 +938,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-172.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-172"
-      ],
+      "label": ["migrated-from-pix", "source-pix-172"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1174,10 +946,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-173.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-173"
-      ],
+      "label": ["migrated-from-pix", "source-pix-173"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1185,10 +954,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-174.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-174"
-      ],
+      "label": ["migrated-from-pix", "source-pix-174"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1196,10 +962,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-175.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-175"
-      ],
+      "label": ["migrated-from-pix", "source-pix-175"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1207,10 +970,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-176.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-176"
-      ],
+      "label": ["migrated-from-pix", "source-pix-176"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1218,10 +978,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-177.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-177"
-      ],
+      "label": ["migrated-from-pix", "source-pix-177"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1229,10 +986,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-178.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-178"
-      ],
+      "label": ["migrated-from-pix", "source-pix-178"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1240,10 +994,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-179.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-179"
-      ],
+      "label": ["migrated-from-pix", "source-pix-179"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1265,10 +1016,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-180.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-180"
-      ],
+      "label": ["migrated-from-pix", "source-pix-180"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1276,10 +1024,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-181.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-181"
-      ],
+      "label": ["migrated-from-pix", "source-pix-181"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1287,10 +1032,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-182.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-182"
-      ],
+      "label": ["migrated-from-pix", "source-pix-182"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1298,10 +1040,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-183.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-183"
-      ],
+      "label": ["migrated-from-pix", "source-pix-183"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1309,10 +1048,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-184.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-184"
-      ],
+      "label": ["migrated-from-pix", "source-pix-184"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1320,10 +1056,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-185.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-185"
-      ],
+      "label": ["migrated-from-pix", "source-pix-185"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1331,10 +1064,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-186.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-186"
-      ],
+      "label": ["migrated-from-pix", "source-pix-186"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1342,10 +1072,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-187.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-187"
-      ],
+      "label": ["migrated-from-pix", "source-pix-187"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1353,10 +1080,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-188.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-188"
-      ],
+      "label": ["migrated-from-pix", "source-pix-188"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1364,10 +1088,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-189.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-189"
-      ],
+      "label": ["migrated-from-pix", "source-pix-189"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1389,10 +1110,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-190.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-190"
-      ],
+      "label": ["migrated-from-pix", "source-pix-190"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1400,10 +1118,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-191.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-191"
-      ],
+      "label": ["migrated-from-pix", "source-pix-191"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1411,10 +1126,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-192.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-192"
-      ],
+      "label": ["migrated-from-pix", "source-pix-192"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1422,10 +1134,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-193.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-193"
-      ],
+      "label": ["migrated-from-pix", "source-pix-193"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1433,10 +1142,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-194.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-194"
-      ],
+      "label": ["migrated-from-pix", "source-pix-194"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1444,10 +1150,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-195.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-195"
-      ],
+      "label": ["migrated-from-pix", "source-pix-195"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1455,10 +1158,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-196.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-196"
-      ],
+      "label": ["migrated-from-pix", "source-pix-196"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1466,10 +1166,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-197.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-197"
-      ],
+      "label": ["migrated-from-pix", "source-pix-197"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1477,10 +1174,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-198.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-198"
-      ],
+      "label": ["migrated-from-pix", "source-pix-198"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1488,10 +1182,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-199.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-199"
-      ],
+      "label": ["migrated-from-pix", "source-pix-199"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1526,10 +1217,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-200.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-200"
-      ],
+      "label": ["migrated-from-pix", "source-pix-200"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1537,10 +1225,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-201.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-201"
-      ],
+      "label": ["migrated-from-pix", "source-pix-201"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1548,10 +1233,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-202.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-202"
-      ],
+      "label": ["migrated-from-pix", "source-pix-202"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1559,10 +1241,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-203.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-203"
-      ],
+      "label": ["migrated-from-pix", "source-pix-203"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1570,10 +1249,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-204.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-204"
-      ],
+      "label": ["migrated-from-pix", "source-pix-204"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1581,10 +1257,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-205.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-205"
-      ],
+      "label": ["migrated-from-pix", "source-pix-205"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1592,10 +1265,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-206.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-206"
-      ],
+      "label": ["migrated-from-pix", "source-pix-206"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1603,10 +1273,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-207.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-207"
-      ],
+      "label": ["migrated-from-pix", "source-pix-207"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1614,10 +1281,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-208.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-208"
-      ],
+      "label": ["migrated-from-pix", "source-pix-208"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1625,10 +1289,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-209.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-209"
-      ],
+      "label": ["migrated-from-pix", "source-pix-209"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1650,10 +1311,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-210.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-210"
-      ],
+      "label": ["migrated-from-pix", "source-pix-210"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1661,11 +1319,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-212.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "architecture",
-        "migrated-from-pix",
-        "source-pix-212"
-      ],
+      "label": ["architecture", "migrated-from-pix", "source-pix-212"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1673,11 +1327,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-213.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "Feature",
-        "migrated-from-pix",
-        "source-pix-213"
-      ],
+      "label": ["Feature", "migrated-from-pix", "source-pix-213"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1685,11 +1335,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-214.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "architecture",
-        "migrated-from-pix",
-        "source-pix-214"
-      ],
+      "label": ["architecture", "migrated-from-pix", "source-pix-214"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1697,11 +1343,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-215.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "Feature",
-        "migrated-from-pix",
-        "source-pix-215"
-      ],
+      "label": ["Feature", "migrated-from-pix", "source-pix-215"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1709,10 +1351,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-216.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-216"
-      ],
+      "label": ["migrated-from-pix", "source-pix-216"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1720,10 +1359,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-217.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-217"
-      ],
+      "label": ["migrated-from-pix", "source-pix-217"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1731,10 +1367,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-218.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-218"
-      ],
+      "label": ["migrated-from-pix", "source-pix-218"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1742,10 +1375,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-219.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-219"
-      ],
+      "label": ["migrated-from-pix", "source-pix-219"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1767,11 +1397,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-220.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "compliance",
-        "migrated-from-pix",
-        "source-pix-220"
-      ],
+      "label": ["compliance", "migrated-from-pix", "source-pix-220"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1779,11 +1405,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-221.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "Feature",
-        "migrated-from-pix",
-        "source-pix-221"
-      ],
+      "label": ["Feature", "migrated-from-pix", "source-pix-221"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1791,10 +1413,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-222.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-222"
-      ],
+      "label": ["migrated-from-pix", "source-pix-222"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1802,10 +1421,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-223.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-223"
-      ],
+      "label": ["migrated-from-pix", "source-pix-223"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1813,10 +1429,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-224.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-224"
-      ],
+      "label": ["migrated-from-pix", "source-pix-224"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1824,10 +1437,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-225.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-225"
-      ],
+      "label": ["migrated-from-pix", "source-pix-225"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1835,11 +1445,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-226.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "compliance",
-        "migrated-from-pix",
-        "source-pix-226"
-      ],
+      "label": ["compliance", "migrated-from-pix", "source-pix-226"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1847,10 +1453,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-227.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-227"
-      ],
+      "label": ["migrated-from-pix", "source-pix-227"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1858,10 +1461,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-228.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-228"
-      ],
+      "label": ["migrated-from-pix", "source-pix-228"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1869,10 +1469,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-229.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-229"
-      ],
+      "label": ["migrated-from-pix", "source-pix-229"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1894,10 +1491,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-230.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-230"
-      ],
+      "label": ["migrated-from-pix", "source-pix-230"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1905,10 +1499,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-231.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-231"
-      ],
+      "label": ["migrated-from-pix", "source-pix-231"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1916,10 +1507,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-232.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-232"
-      ],
+      "label": ["migrated-from-pix", "source-pix-232"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1927,10 +1515,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-233.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-233"
-      ],
+      "label": ["migrated-from-pix", "source-pix-233"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1938,10 +1523,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-234.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-234"
-      ],
+      "label": ["migrated-from-pix", "source-pix-234"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1949,10 +1531,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-235.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-235"
-      ],
+      "label": ["migrated-from-pix", "source-pix-235"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1960,10 +1539,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-236.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-236"
-      ],
+      "label": ["migrated-from-pix", "source-pix-236"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1971,10 +1547,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-237.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-237"
-      ],
+      "label": ["migrated-from-pix", "source-pix-237"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1982,10 +1555,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-238.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-238"
-      ],
+      "label": ["migrated-from-pix", "source-pix-238"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -1993,10 +1563,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-239.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-239"
-      ],
+      "label": ["migrated-from-pix", "source-pix-239"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2018,10 +1585,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-241.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-241"
-      ],
+      "label": ["migrated-from-pix", "source-pix-241"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2029,10 +1593,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-242.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-242"
-      ],
+      "label": ["migrated-from-pix", "source-pix-242"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2040,10 +1601,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-243.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-243"
-      ],
+      "label": ["migrated-from-pix", "source-pix-243"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2051,10 +1609,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-244.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-244"
-      ],
+      "label": ["migrated-from-pix", "source-pix-244"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2062,10 +1617,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-245.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-245"
-      ],
+      "label": ["migrated-from-pix", "source-pix-245"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2073,10 +1625,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-246.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-246"
-      ],
+      "label": ["migrated-from-pix", "source-pix-246"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2084,10 +1633,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-247.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-247"
-      ],
+      "label": ["migrated-from-pix", "source-pix-247"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2095,10 +1641,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-248.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-248"
-      ],
+      "label": ["migrated-from-pix", "source-pix-248"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2106,10 +1649,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-249.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-249"
-      ],
+      "label": ["migrated-from-pix", "source-pix-249"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2117,11 +1657,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-25.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
-      "label": [
-        "migrated-from-pix",
-        "platform",
-        "source-pix-25"
-      ],
+      "label": ["migrated-from-pix", "platform", "source-pix-25"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2129,10 +1665,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-250.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-250"
-      ],
+      "label": ["migrated-from-pix", "source-pix-250"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2140,10 +1673,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-251.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-251"
-      ],
+      "label": ["migrated-from-pix", "source-pix-251"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2151,10 +1681,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-252.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-252"
-      ],
+      "label": ["migrated-from-pix", "source-pix-252"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2162,10 +1689,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-253.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-253"
-      ],
+      "label": ["migrated-from-pix", "source-pix-253"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2173,10 +1697,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-254.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-254"
-      ],
+      "label": ["migrated-from-pix", "source-pix-254"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2184,10 +1705,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-255.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-255"
-      ],
+      "label": ["migrated-from-pix", "source-pix-255"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2195,10 +1713,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-256.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-256"
-      ],
+      "label": ["migrated-from-pix", "source-pix-256"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2206,10 +1721,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-257.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-257"
-      ],
+      "label": ["migrated-from-pix", "source-pix-257"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2217,10 +1729,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-258.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-258"
-      ],
+      "label": ["migrated-from-pix", "source-pix-258"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2228,10 +1737,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-259.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-259"
-      ],
+      "label": ["migrated-from-pix", "source-pix-259"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2253,10 +1759,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-260.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-260"
-      ],
+      "label": ["migrated-from-pix", "source-pix-260"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2264,10 +1767,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-261.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-261"
-      ],
+      "label": ["migrated-from-pix", "source-pix-261"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2275,10 +1775,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-262.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-262"
-      ],
+      "label": ["migrated-from-pix", "source-pix-262"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2286,10 +1783,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-263.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-263"
-      ],
+      "label": ["migrated-from-pix", "source-pix-263"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2297,10 +1791,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-264.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-264"
-      ],
+      "label": ["migrated-from-pix", "source-pix-264"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2308,10 +1799,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-265.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-265"
-      ],
+      "label": ["migrated-from-pix", "source-pix-265"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2319,10 +1807,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-266.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-266"
-      ],
+      "label": ["migrated-from-pix", "source-pix-266"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2330,10 +1815,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-267.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-267"
-      ],
+      "label": ["migrated-from-pix", "source-pix-267"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2341,10 +1823,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-268.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-268"
-      ],
+      "label": ["migrated-from-pix", "source-pix-268"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2352,10 +1831,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-269.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-269"
-      ],
+      "label": ["migrated-from-pix", "source-pix-269"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2376,10 +1852,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-270.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-270"
-      ],
+      "label": ["migrated-from-pix", "source-pix-270"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2387,10 +1860,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-271.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-271"
-      ],
+      "label": ["migrated-from-pix", "source-pix-271"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2398,10 +1868,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-272.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-272"
-      ],
+      "label": ["migrated-from-pix", "source-pix-272"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2409,10 +1876,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-273.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-273"
-      ],
+      "label": ["migrated-from-pix", "source-pix-273"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2420,10 +1884,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-274.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-274"
-      ],
+      "label": ["migrated-from-pix", "source-pix-274"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2431,10 +1892,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-275.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-275"
-      ],
+      "label": ["migrated-from-pix", "source-pix-275"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2442,10 +1900,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-276.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-276"
-      ],
+      "label": ["migrated-from-pix", "source-pix-276"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2453,10 +1908,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-277.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-277"
-      ],
+      "label": ["migrated-from-pix", "source-pix-277"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2599,11 +2051,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-290.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-1-infra",
-        "source-pix-290"
-      ],
+      "label": ["migrated-from-pix", "phase-1-infra", "source-pix-290"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2624,11 +2072,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-292.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-1-infra",
-        "source-pix-292"
-      ],
+      "label": ["migrated-from-pix", "phase-1-infra", "source-pix-292"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2676,11 +2120,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-296.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-2-data",
-        "source-pix-296"
-      ],
+      "label": ["migrated-from-pix", "phase-2-data", "source-pix-296"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2806,11 +2246,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-304.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-2-data",
-        "source-pix-304"
-      ],
+      "label": ["migrated-from-pix", "phase-2-data", "source-pix-304"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2897,11 +2333,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-310.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-2-data",
-        "source-pix-310"
-      ],
+      "label": ["migrated-from-pix", "phase-2-data", "source-pix-310"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -2962,11 +2394,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-315.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-2-data",
-        "source-pix-315"
-      ],
+      "label": ["migrated-from-pix", "phase-2-data", "source-pix-315"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3000,11 +2428,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-318.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-3-sdg",
-        "source-pix-318"
-      ],
+      "label": ["migrated-from-pix", "phase-3-sdg", "source-pix-318"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3346,11 +2770,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-341.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-6-eval",
-        "source-pix-341"
-      ],
+      "label": ["migrated-from-pix", "phase-6-eval", "source-pix-341"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3476,10 +2896,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-350.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-350"
-      ],
+      "label": ["migrated-from-pix", "source-pix-350"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3487,10 +2904,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-351.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-351"
-      ],
+      "label": ["migrated-from-pix", "source-pix-351"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3498,10 +2912,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-352.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-352"
-      ],
+      "label": ["migrated-from-pix", "source-pix-352"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3509,10 +2920,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-353.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-353"
-      ],
+      "label": ["migrated-from-pix", "source-pix-353"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3520,10 +2928,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-354.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-354"
-      ],
+      "label": ["migrated-from-pix", "source-pix-354"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3531,10 +2936,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-355.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-355"
-      ],
+      "label": ["migrated-from-pix", "source-pix-355"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3542,10 +2944,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-356.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-356"
-      ],
+      "label": ["migrated-from-pix", "source-pix-356"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3553,10 +2952,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-357.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-357"
-      ],
+      "label": ["migrated-from-pix", "source-pix-357"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3564,10 +2960,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-358.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-358"
-      ],
+      "label": ["migrated-from-pix", "source-pix-358"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3575,10 +2968,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-359.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-359"
-      ],
+      "label": ["migrated-from-pix", "source-pix-359"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3599,10 +2989,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-360.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-360"
-      ],
+      "label": ["migrated-from-pix", "source-pix-360"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3610,11 +2997,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-361.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "phase-2-data",
-        "source-pix-361"
-      ],
+      "label": ["migrated-from-pix", "phase-2-data", "source-pix-361"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3622,10 +3005,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-362.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-362"
-      ],
+      "label": ["migrated-from-pix", "source-pix-362"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3633,10 +3013,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-363.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-363"
-      ],
+      "label": ["migrated-from-pix", "source-pix-363"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3644,10 +3021,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-364.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-364"
-      ],
+      "label": ["migrated-from-pix", "source-pix-364"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3655,10 +3029,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-365.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-365"
-      ],
+      "label": ["migrated-from-pix", "source-pix-365"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3666,10 +3037,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-366.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-366"
-      ],
+      "label": ["migrated-from-pix", "source-pix-366"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3677,10 +3045,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-367.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-367"
-      ],
+      "label": ["migrated-from-pix", "source-pix-367"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3688,10 +3053,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-368.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-368"
-      ],
+      "label": ["migrated-from-pix", "source-pix-368"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3699,10 +3061,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-369.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-369"
-      ],
+      "label": ["migrated-from-pix", "source-pix-369"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3723,10 +3082,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-370.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-370"
-      ],
+      "label": ["migrated-from-pix", "source-pix-370"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3734,10 +3090,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-371.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-371"
-      ],
+      "label": ["migrated-from-pix", "source-pix-371"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3745,10 +3098,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-373.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-373"
-      ],
+      "label": ["migrated-from-pix", "source-pix-373"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3756,10 +3106,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-374.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-374"
-      ],
+      "label": ["migrated-from-pix", "source-pix-374"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3767,10 +3114,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-375.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-375"
-      ],
+      "label": ["migrated-from-pix", "source-pix-375"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3778,10 +3122,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-376.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-376"
-      ],
+      "label": ["migrated-from-pix", "source-pix-376"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3789,10 +3130,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-377.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-377"
-      ],
+      "label": ["migrated-from-pix", "source-pix-377"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3800,10 +3138,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-378.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-378"
-      ],
+      "label": ["migrated-from-pix", "source-pix-378"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3811,10 +3146,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-379.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-379"
-      ],
+      "label": ["migrated-from-pix", "source-pix-379"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3835,10 +3167,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-380.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-380"
-      ],
+      "label": ["migrated-from-pix", "source-pix-380"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3846,10 +3175,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-381.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-381"
-      ],
+      "label": ["migrated-from-pix", "source-pix-381"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3857,10 +3183,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-382.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-382"
-      ],
+      "label": ["migrated-from-pix", "source-pix-382"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3868,10 +3191,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-383.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-383"
-      ],
+      "label": ["migrated-from-pix", "source-pix-383"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3879,10 +3199,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-384.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-384"
-      ],
+      "label": ["migrated-from-pix", "source-pix-384"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3890,10 +3207,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-385.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-385"
-      ],
+      "label": ["migrated-from-pix", "source-pix-385"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3901,10 +3215,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-386.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-386"
-      ],
+      "label": ["migrated-from-pix", "source-pix-386"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3912,10 +3223,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-387.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-387"
-      ],
+      "label": ["migrated-from-pix", "source-pix-387"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3923,10 +3231,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-388.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-388"
-      ],
+      "label": ["migrated-from-pix", "source-pix-388"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3934,10 +3239,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-389.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-389"
-      ],
+      "label": ["migrated-from-pix", "source-pix-389"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3958,10 +3260,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-390.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-390"
-      ],
+      "label": ["migrated-from-pix", "source-pix-390"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3969,10 +3268,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-391.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-391"
-      ],
+      "label": ["migrated-from-pix", "source-pix-391"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3980,10 +3276,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-392.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-392"
-      ],
+      "label": ["migrated-from-pix", "source-pix-392"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -3991,10 +3284,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-393.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-393"
-      ],
+      "label": ["migrated-from-pix", "source-pix-393"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4002,10 +3292,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-394.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-394"
-      ],
+      "label": ["migrated-from-pix", "source-pix-394"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4013,10 +3300,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-395.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-395"
-      ],
+      "label": ["migrated-from-pix", "source-pix-395"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4024,10 +3308,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-396.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-396"
-      ],
+      "label": ["migrated-from-pix", "source-pix-396"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4035,10 +3316,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-397.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-397"
-      ],
+      "label": ["migrated-from-pix", "source-pix-397"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4046,10 +3324,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-398.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-398"
-      ],
+      "label": ["migrated-from-pix", "source-pix-398"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4057,10 +3332,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-399.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-399"
-      ],
+      "label": ["migrated-from-pix", "source-pix-399"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4307,12 +3579,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-56.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "fhe",
-        "migrated-from-pix",
-        "privacy",
-        "source-pix-56"
-      ],
+      "label": ["fhe", "migrated-from-pix", "privacy", "source-pix-56"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4320,11 +3587,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-57.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "platform",
-        "source-pix-57"
-      ],
+      "label": ["migrated-from-pix", "platform", "source-pix-57"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4413,11 +3676,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-63.\n\nSource type: Task\nSource status: In Progress\nSource priority: High\n",
-      "label": [
-        "data-pipeline",
-        "migrated-from-pix",
-        "source-pix-63"
-      ],
+      "label": ["data-pipeline", "migrated-from-pix", "source-pix-63"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4439,11 +3698,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-65.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
-      "label": [
-        "migrated-from-pix",
-        "platform",
-        "source-pix-65"
-      ],
+      "label": ["migrated-from-pix", "platform", "source-pix-65"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4451,11 +3706,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-66.\n\nSource type: Task\nSource status: To Do\nSource priority: High\n",
-      "label": [
-        "data-pipeline",
-        "migrated-from-pix",
-        "source-pix-66"
-      ],
+      "label": ["data-pipeline", "migrated-from-pix", "source-pix-66"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4517,11 +3768,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-70.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "data-pipeline",
-        "migrated-from-pix",
-        "source-pix-70"
-      ],
+      "label": ["data-pipeline", "migrated-from-pix", "source-pix-70"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4569,10 +3816,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-82.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-82"
-      ],
+      "label": ["migrated-from-pix", "source-pix-82"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4580,10 +3824,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-83.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-83"
-      ],
+      "label": ["migrated-from-pix", "source-pix-83"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4591,10 +3832,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-84.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-84"
-      ],
+      "label": ["migrated-from-pix", "source-pix-84"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4602,10 +3840,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-85.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-85"
-      ],
+      "label": ["migrated-from-pix", "source-pix-85"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4613,10 +3848,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-86.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-86"
-      ],
+      "label": ["migrated-from-pix", "source-pix-86"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4624,10 +3856,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-87.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-87"
-      ],
+      "label": ["migrated-from-pix", "source-pix-87"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4635,10 +3864,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-88.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-88"
-      ],
+      "label": ["migrated-from-pix", "source-pix-88"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4646,10 +3872,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-89.\n\nSource type: Task\nSource status: In Progress\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-89"
-      ],
+      "label": ["migrated-from-pix", "source-pix-89"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4671,10 +3894,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-90.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-90"
-      ],
+      "label": ["migrated-from-pix", "source-pix-90"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4682,10 +3902,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-91.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-91"
-      ],
+      "label": ["migrated-from-pix", "source-pix-91"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4693,10 +3910,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-92.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-92"
-      ],
+      "label": ["migrated-from-pix", "source-pix-92"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4704,10 +3918,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-93.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-93"
-      ],
+      "label": ["migrated-from-pix", "source-pix-93"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4715,10 +3926,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-94.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-94"
-      ],
+      "label": ["migrated-from-pix", "source-pix-94"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4726,10 +3934,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-95.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-95"
-      ],
+      "label": ["migrated-from-pix", "source-pix-95"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4737,10 +3942,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-96.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-96"
-      ],
+      "label": ["migrated-from-pix", "source-pix-96"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4748,10 +3950,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-97.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-97"
-      ],
+      "label": ["migrated-from-pix", "source-pix-97"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4759,10 +3958,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-98.\n\nSource type: Task\nSource status: Done\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-98"
-      ],
+      "label": ["migrated-from-pix", "source-pix-98"],
       "assignee": "chad@pixelated.love"
     },
     {
@@ -4770,10 +3966,7 @@
       "projectKey": "ADHD",
       "issueType": "Task",
       "description": "Migrated from slimshadyme PIX-99.\n\nSource type: Task\nSource status: To Do\nSource priority: Medium\n",
-      "label": [
-        "migrated-from-pix",
-        "source-pix-99"
-      ],
+      "label": ["migrated-from-pix", "source-pix-99"],
       "assignee": "chad@pixelated.love"
     }
   ]

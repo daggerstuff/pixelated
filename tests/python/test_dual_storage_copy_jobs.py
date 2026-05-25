@@ -97,9 +97,7 @@ def test_build_copy_plan_creates_local_and_s3_jobs_with_blocked_local_state() ->
         "/mnt/garbage/pixelated-dual-storage/curated_sources/final_dataset/",
         "s3://pixel-data-phx/curated_sources/final_dataset/",
     ]
-    assert job["s3_job"]["source"] == (
-        "/mnt/garbage/pixelated-dual-storage/curated_sources/final_dataset/"
-    )
+    assert job["s3_job"]["source"] == ("/mnt/garbage/pixelated-dual-storage/curated_sources/final_dataset/")
     assert job["s3_job"]["depends_on"] == "local_stage"
 
 

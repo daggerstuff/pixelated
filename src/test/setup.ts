@@ -3,13 +3,15 @@
  * This file is automatically loaded by Vitest before tests are run
  */
 
-import { vi } from 'vitest'
-import './patch-react-act.cjs'
 import { flushSync } from 'react-dom'
+import { vi } from 'vitest'
+
+import './patch-react-act.cjs'
 
 // React 19 compatibility shim for environments that do not provide `act` directly.
 const act = async (callback: () => void | Promise<void>): Promise<void> => {
-  const result = typeof flushSync === 'function' ? flushSync(callback) : callback()
+  const result =
+    typeof flushSync === 'function' ? flushSync(callback) : callback()
   if (result && typeof result === 'object' && 'then' in result) {
     await Promise.resolve(result)
   }
@@ -182,5 +184,6 @@ afterEach(() => {
   void import('@testing-library/react')
     .then(({ cleanup }) => cleanup())
     .catch(() => {})
+  vi.useRealTimers()
   vi.restoreAllMocks()
 })

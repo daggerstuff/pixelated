@@ -23,5 +23,5 @@ export async function getAssetUrl(path: string): Promise<string> {
     : `/public${path.startsWith('/') ? '' : '/'}${path}`
 
   // Return CDN URL if available, fallback to original path
-  return assetMap[normalizedPath] || path
+  return assetMap[normalizedPath] ?? path
 }

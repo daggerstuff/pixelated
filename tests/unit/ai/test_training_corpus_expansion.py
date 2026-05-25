@@ -125,9 +125,7 @@ def test_build_candidate_and_draft_entry_round_trip(tmp_path) -> None:
                 "state_id": "state_reassurance_not_sticking",
                 "label": "Reassurance Not Sticking",
             },
-            therapist_moves=(
-                {"move_id": "move_belief_disputation", "label": "Belief Disputation"},
-            ),
+            therapist_moves=({"move_id": "move_belief_disputation", "label": "Belief Disputation"},),
         ),
     )
 

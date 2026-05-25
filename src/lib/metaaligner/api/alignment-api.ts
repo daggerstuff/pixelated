@@ -239,13 +239,10 @@ export class MetaAlignerAPI {
       const evaluation: AlignmentEvaluationResult = {
         objectiveResults,
         overallScore,
-        weights: objectives.reduce< Record<string, number>>(
-          (weights, obj) => {
-            weights[obj.id] = obj.weight
-            return weights
-          },
-          {},
-        ),
+        weights: objectives.reduce<Record<string, number>>((weights, obj) => {
+          weights[obj.id] = obj.weight
+          return weights
+        }, {}),
         normalizedScores: Object.fromEntries(
           Object.entries(objectiveResults).map(([id, result]) => [
             id,

@@ -18,13 +18,13 @@ export function ScenarioSelector({
   onSelect,
 }: ScenarioSelectorProps) {
   return (
-    <div className='relative mb-4'>
+    <div className="relative mb-4">
       <button
         onClick={() => setShowScenarios(!showScenarios)}
-        className='border-purple-700 bg-black flex w-full items-center justify-between rounded-md border bg-opacity-50 p-2 text-left'
+        className="border-purple-700 bg-black flex w-full items-center justify-between rounded-md border bg-opacity-50 p-2 text-left"
       >
-        <span className='flex items-center'>
-          <IconUserCircle className='text-purple-500 mr-2 h-5 w-5' />
+        <span className="flex items-center">
+          <IconUserCircle className="text-purple-500 mr-2 h-5 w-5" />
 
           <span>
             Scenario: <strong>{selectedScenario.name}</strong>
@@ -36,15 +36,15 @@ export function ScenarioSelector({
       </button>
 
       {showScenarios && (
-        <div className='bg-black border-purple-800 absolute z-10 mt-1 w-full rounded-md border bg-opacity-80 shadow-lg'>
+        <div className="bg-black border-purple-800 absolute z-10 mt-1 w-full rounded-md border bg-opacity-80 shadow-lg">
           {scenarios.map((scenario) => (
             <button
               key={scenario.name}
-              className='hover:bg-purple-900 block w-full px-4 py-2 text-left first:rounded-t-md last:rounded-b-md'
+              className="hover:bg-purple-900 block w-full px-4 py-2 text-left first:rounded-t-md last:rounded-b-md"
               onClick={() => onSelect(scenario)}
             >
-              <div className='font-medium'>{scenario.name}</div>
-              <div className='text-gray-300 text-sm'>
+              <div className="font-medium">{scenario.name}</div>
+              <div className="text-gray-300 text-sm">
                 {scenario.description}
               </div>
             </button>

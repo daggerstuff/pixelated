@@ -93,7 +93,7 @@ export class ExternalThreatFeedIntegrationCore
       timeout: 30000,
       headers: {
         'User-Agent': 'Pixelated-Threat-Feed-Integration/1.0',
-        Accept: 'application/json',
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     })
@@ -108,7 +108,7 @@ export class ExternalThreatFeedIntegrationCore
         })
         return config
       },
-       async (error) => {
+      async (error) => {
         logger.error('HTTP request error', { error })
         return Promise.reject(error)
       },
@@ -123,7 +123,7 @@ export class ExternalThreatFeedIntegrationCore
         })
         return response
       },
-       async (error) => {
+      async (error) => {
         logger.error('HTTP response error', {
           error: error instanceof Error ? error.message : 'Unknown error',
           status: error.response?.status,
@@ -394,12 +394,12 @@ export class ExternalThreatFeedIntegrationCore
   private getFeedProcessingInterval(updateFrequency: string): number {
     const intervals: Record<string, number> = {
       'real-time': 5 * 60 * 1000, // 5 minutes
-      hourly: 60 * 60 * 1000, // 1 hour
-      daily: 24 * 60 * 60 * 1000, // 24 hours
-      weekly: 7 * 24 * 60 * 60 * 1000, // 7 days
+      'hourly': 60 * 60 * 1000, // 1 hour
+      'daily': 24 * 60 * 60 * 1000, // 24 hours
+      'weekly': 7 * 24 * 60 * 60 * 1000, // 7 days
     }
 
-    return intervals[updateFrequency] || 60 * 60 * 1000 // Default to hourly
+    return intervals[updateFrequency] ?? 60 * 60 * 1000 // Default to hourly
   }
 
   private async processFeedForSubscription(
@@ -536,7 +536,9 @@ export class ExternalThreatFeedIntegrationCore
             password: subscription.apiKey,
           }
           break
-        case undefined: { throw new Error('Not implemented yet: undefined case') }
+        case undefined: {
+          throw new Error('Not implemented yet: undefined case')
+        }
       }
     }
 
@@ -1364,7 +1366,7 @@ class STIXFeedProcessor implements FeedProcessor {
       unknown: 'general',
     }
 
-    return typeMap[indicatorType] || 'general'
+    return typeMap[indicatorType] ?? 'general'
   }
 }
 
@@ -1434,8 +1436,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
 
   private mapTAXIIThreatLevel(obj: any): string {
     if (obj.labels?.includes('malicious-activity')) return 'high'
-    if (obj.labels?.includes('suspicious-activity'))
-      return 'medium'
+    if (obj.labels?.includes('suspicious-activity')) return 'medium'
     return 'low'
   }
 
@@ -1492,7 +1493,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
       unknown: 'general',
     }
 
-    return typeMap[indicatorType] || 'general'
+    return typeMap[indicatorType] ?? 'general'
   }
 }
 
@@ -1542,16 +1543,16 @@ class MISPFeedProcessor implements FeedProcessor {
     const typeMap: Record<string, string> = {
       'ip-dst': 'ip',
       'ip-src': 'ip',
-      domain: 'domain',
-      url: 'url',
-      md5: 'file_hash',
-      sha1: 'file_hash',
-      sha256: 'file_hash',
-      filename: 'file_name',
-      email: 'email',
+      'domain': 'domain',
+      'url': 'url',
+      'md5': 'file_hash',
+      'sha1': 'file_hash',
+      'sha256': 'file_hash',
+      'filename': 'file_name',
+      'email': 'email',
     }
 
-    return typeMap[mispType] || 'unknown'
+    return typeMap[mispType] ?? 'unknown'
   }
 
   private mapMISPSeverity(comment: string): string {
@@ -1624,7 +1625,7 @@ class MISPFeedProcessor implements FeedProcessor {
       unknown: 'general',
     }
 
-    return typeMap[indicatorType] || 'general'
+    return typeMap[indicatorType] ?? 'general'
   }
 }
 
@@ -1673,17 +1674,17 @@ class OTXFeedProcessor implements FeedProcessor {
 
   private mapOTXType(otxType: string): string {
     const typeMap: Record<string, string> = {
-      IPv4: 'ip',
-      domain: 'domain',
-      hostname: 'domain',
-      URL: 'url',
+      'IPv4': 'ip',
+      'domain': 'domain',
+      'hostname': 'domain',
+      'URL': 'url',
       'FileHash-MD5': 'file_hash',
       'FileHash-SHA1': 'file_hash',
       'FileHash-SHA256': 'file_hash',
-      email: 'email',
+      'email': 'email',
     }
 
-    return typeMap[otxType] || 'unknown'
+    return typeMap[otxType] ?? 'unknown'
   }
 
   private mapOTXSeverity(tlp: string): string {
@@ -1694,7 +1695,7 @@ class OTXFeedProcessor implements FeedProcessor {
       red: 'critical',
     }
 
-    return severityMap[tlp] || 'medium'
+    return severityMap[tlp] ?? 'medium'
   }
 
   async convertToThreat(
@@ -1753,7 +1754,7 @@ class OTXFeedProcessor implements FeedProcessor {
       unknown: 'general',
     }
 
-    return typeMap[indicatorType] || 'general'
+    return typeMap[indicatorType] ?? 'general'
   }
 }
 
@@ -1888,13 +1889,13 @@ class GenericFeedProcessor implements FeedProcessor {
         for (const item of data) {
           if (item.indicator || item.value || item.ioc) {
             items.push({
-              itemId: ((item.id ?? item.indicator) ?? item.value) ?? item.ioc,
-              indicator: (item.indicator ?? item.value) ?? item.ioc,
-              indicatorType: (item.type ?? item.indicator_type) ?? 'unknown',
-              severity: (item.severity ?? item.threat_level) ?? 'medium',
-              confidence: (item.confidence ?? item.reliability) ?? 0.5,
-              timestamp: new Date((item.timestamp ?? item.created) ?? Date.now()),
-              description: (item.description ?? item.notes) ?? '',
+              itemId: item.id ?? item.indicator ?? item.value ?? item.ioc,
+              indicator: item.indicator ?? item.value ?? item.ioc,
+              indicatorType: item.type ?? item.indicator_type ?? 'unknown',
+              severity: item.severity ?? item.threat_level ?? 'medium',
+              confidence: item.confidence ?? item.reliability ?? 0.5,
+              timestamp: new Date(item.timestamp ?? item.created ?? Date.now()),
+              description: item.description ?? item.notes ?? '',
               source: subscription.provider,
               metadata: {
                 rawData: item,
@@ -1986,6 +1987,6 @@ class GenericFeedProcessor implements FeedProcessor {
       unknown: 'general',
     }
 
-    return typeMap[indicatorType] || 'general'
+    return typeMap[indicatorType] ?? 'general'
   }
 }

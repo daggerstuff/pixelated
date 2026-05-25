@@ -100,7 +100,7 @@ export const useSessionListQuery = ({
       pageSize,
       filters,
     }),
-    queryFn:  async () => listSessions({ page, pageSize }),
+    queryFn: async () => listSessions({ page, pageSize }),
     enabled,
     select: (data) =>
       applySessionFilters(data, filters.searchTerm, filters.phases),
@@ -114,7 +114,7 @@ export const useSessionQuery = (
   const { enabled = true } = options
   return useQuery({
     queryKey: journalResearchQueryKeys.sessions.detail(sessionId ?? 'unknown'),
-    queryFn:  async () => getSession(sessionId ?? ''),
+    queryFn: async () => getSession(sessionId ?? ''),
     enabled: Boolean(sessionId) && enabled,
   })
 }
@@ -124,7 +124,7 @@ export const useCreateSessionMutation = () => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.sessions.create(),
-    mutationFn:  async (payload: CreateSessionPayload) => createSession(payload),
+    mutationFn: async (payload: CreateSessionPayload) => createSession(payload),
     onSuccess: (session) => {
       void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.root,
@@ -140,7 +140,7 @@ export const useUpdateSessionMutation = () => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.sessions.update(),
-    mutationFn:  async ({
+    mutationFn: async ({
       sessionId,
       payload,
     }: {
@@ -164,7 +164,7 @@ export const useDeleteSessionMutation = () => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.sessions.delete(),
-    mutationFn:  async (sessionId: string) => deleteSession(sessionId),
+    mutationFn: async (sessionId: string) => deleteSession(sessionId),
     onSuccess: (_, sessionId) => {
       void queryClient.invalidateQueries({
         queryKey: journalResearchQueryKeys.sessions.root,

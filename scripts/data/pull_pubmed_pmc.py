@@ -110,11 +110,7 @@ def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> di
             "dois": [],
         }
 
-    title_el = (
-        article.find(".//ArticleTitle")
-        or article.find(".//article-title")
-        or article.find(".//title")
-    )
+    title_el = article.find(".//ArticleTitle") or article.find(".//article-title") or article.find(".//title")
     title = title_el.text.strip() if title_el is not None and title_el.text else ""
 
     journal_el = article.find(".//Journal/Title") or article.find(".//journal-title")
@@ -124,9 +120,7 @@ def _extract_common_metadata(root: ET.Element, article: ET.Element | None) -> di
     pub_year = pub_date_el.text if pub_date_el is not None and pub_date_el.text else ""
 
     mesh_terms = []
-    for mesh in root.findall(".//MeshHeading/DescriptorName") or article.findall(
-        ".//kwd-group//kwd"
-    ):
+    for mesh in root.findall(".//MeshHeading/DescriptorName") or article.findall(".//kwd-group//kwd"):
         if mesh.text:
             mesh_terms.append(mesh.text.strip())
 

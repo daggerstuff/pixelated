@@ -52,37 +52,37 @@ export default function SentryTest({ className = '' }: SentryTestProps) {
 
   return (
     <div className={`sentry-test-component ${className}`}>
-      <div className='bg-yellow-100 border-yellow-400 rounded-lg border p-4'>
-        <h3 className='text-yellow-800 mb-2 text-sm font-semibold'>
+      <div className="bg-yellow-100 border-yellow-400 rounded-lg border p-4">
+        <h3 className="text-yellow-800 mb-2 text-sm font-semibold">
           🧪 Sentry Integration Test (Development Only)
         </h3>
-        <div className='flex flex-wrap gap-2'>
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={handleTestError}
-            className='bg-red-500 text-white hover:bg-red-600 rounded px-3 py-1 text-xs'
+            className="bg-red-500 text-white hover:bg-red-600 rounded px-3 py-1 text-xs"
           >
             Test Error
           </button>
           <button
             onClick={handleTestMessage}
-            className='bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1 text-xs'
+            className="bg-blue-500 text-white hover:bg-blue-600 rounded px-3 py-1 text-xs"
           >
             Test Message
           </button>
           <button
             onClick={handleFullTest}
-            className='bg-green-500 text-white hover:bg-green-600 rounded px-3 py-1 text-xs'
+            className="bg-green-500 text-white hover:bg-green-600 rounded px-3 py-1 text-xs"
           >
             Full Test
           </button>
         </div>
-        <p className='text-yellow-700 mt-2 text-xs'>
+        <p className="text-yellow-700 mt-2 text-xs">
           Check your Sentry dashboard at{' '}
           <a
-            href='https://pixelated-empathy-dq.sentry.io/projects/pixel-astro/'
-            target='_blank'
-            rel='noopener noreferrer'
-            className='underline'
+            href="https://pixelated-empathy-dq.sentry.io/projects/pixel-astro/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
           >
             Sentry Dashboard
           </a>

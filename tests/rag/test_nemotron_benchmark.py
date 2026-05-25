@@ -8,7 +8,6 @@ These tests validate the benchmark components:
 - Result aggregation
 """
 
-import asyncio
 import os
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, MagicMock
@@ -21,6 +20,23 @@ from ai.rag.nemotron_benchmark import (
     NemotronBenchmark,
     TaskType,
 )
+
+
+def _is_nvidia_api_unreachable() -> bool:
+    """Check if NVIDIA API should be skipped or is unreachable."""
+    if os.environ.get("RUN_LIVE_TESTS") != "true":
+        return True
+    if not os.environ.get("NVIDIA_API_KEY"):
+        return True
+    import socket
+    try:
+        socket.setdefaulttimeout(0.5)
+        # Attempt to connect to Google DNS IP to check if internet egress is active at all
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            s.connect(("8.8.8.8", 53))
+        return False
+    except OSError:
+        return True
 
 
 @asynccontextmanager
@@ -124,11 +140,7 @@ class TestNemotronBenchmark:
         """Test successful request handling."""
         mock_response = MagicMock()
         mock_response.status = 200
-        mock_response.json = AsyncMock(
-            return_value={
-                "choices": [{"message": {"content": "Test response"}}]
-            }
-        )
+        mock_response.json = AsyncMock(return_value={"choices": [{"message": {"content": "Test response"}}]})
 
         # Create proper async context manager
         mock_cm = AsyncMock()
@@ -153,7 +165,7 @@ class TestNemotronBenchmark:
     async def test_make_request_timeout(self, benchmark):
         """Test timeout handling."""
         mock_cm = AsyncMock()
-        mock_cm.__aenter__.side_effect = asyncio.TimeoutError()
+        mock_cm.__aenter__.side_effect = TimeoutError()
         mock_cm.__aexit__.return_value = None
 
         mock_session = MagicMock()
@@ -257,8 +269,8 @@ class TestBenchmarkIntegration:
     """Integration tests for benchmark (requires API key)."""
 
     @pytest.mark.skipif(
-        not os.environ.get("NVIDIA_API_KEY"),
-        reason="NVIDIA_API_KEY not found in environment",
+        _is_nvidia_api_unreachable(),
+        reason="NVIDIA API is not reachable or NVIDIA_API_KEY not found",
     )
     @pytest.mark.asyncio
     async def test_benchmark_single_model_live(self):

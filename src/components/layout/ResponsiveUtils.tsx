@@ -16,16 +16,16 @@ const RESIZE_DEBOUNCE_DELAY = 150
 
 // Responsive visibility utilities
 export const ShowOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className='block sm:hidden'>{children}</div>
+  <div className="block sm:hidden">{children}</div>
 )
 export const HideOnMobile: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className='hidden sm:block'>{children}</div>
+  <div className="hidden sm:block">{children}</div>
 )
 export const ShowOnTablet: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className='hidden md:block lg:hidden'>{children}</div>
+  <div className="hidden md:block lg:hidden">{children}</div>
 )
 export const ShowOnDesktop: FC<{ children: ReactNode }> = ({ children }) => (
-  <div className='hidden lg:block'>{children}</div>
+  <div className="hidden lg:block">{children}</div>
 )
 
 // Responsive spacing utilities
@@ -126,11 +126,11 @@ export const useResponsive = () => {
 
 // Breakpoint constants for consistent usage
 export const BREAKPOINTS = {
-  xs: 0,
-  sm: 640,
-  md: 768,
-  lg: 1024,
-  xl: 1280,
+  'xs': 0,
+  'sm': 640,
+  'md': 768,
+  'lg': 1024,
+  'xl': 1280,
   '2xl': 1536,
 } as const
 

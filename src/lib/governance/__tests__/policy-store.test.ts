@@ -44,4 +44,41 @@ describe('PolicyStore', () => {
     const retrieved = await store.getPolicy('update-test')
     expect(retrieved?.version).toBe('2.0.0')
   })
+
+  it('tracks version history on policy updates', async () => {
+    const v1: GovernancePolicy = {
+      id: 'versioned',
+      version: '1.0.0',
+      rules: [
+        {
+          id: 'r1',
+          action: 'encrypt',
+          conditions: [],
+          required: ['fhe_encryption'],
+        },
+      ],
+    }
+    await store.savePolicy(v1)
+
+    const v2: GovernancePolicy = {
+      id: 'versioned',
+      version: '2.0.0',
+      rules: [
+        {
+          id: 'r2',
+          action: 'access',
+          conditions: [],
+          required: ['audit_logged'],
+        },
+      ],
+    }
+    await store.savePolicy(v2)
+
+    const history = await store.getPolicyHistory('versioned')
+    expect(history.length).toBe(2)
+    expect(history[0].version).toBe('2.0.0')
+    expect(history[0].previousVersion).toBe('1.0.0')
+    expect(history[1].version).toBe('1.0.0')
+    expect(history[1].previousVersion).toBeNull()
+  })
 })

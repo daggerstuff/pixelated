@@ -137,7 +137,7 @@ export const onRequest = defineMiddleware(
  * Middleware factory function for easier configuration
  */
 export function createPIIMiddleware(config: Partial<PIIMiddlewareConfig> = {}) {
-  return  async (request: Request, next: () => Promise<Response>) =>
+  return async (request: Request, next: () => Promise<Response>) =>
     piiMiddleware(request, next, config)
 }
 

@@ -343,17 +343,17 @@ describe('Auth0 Integration Tests', () => {
       }
 
       const mockUserProfile = {
-        user_id: 'auth0|123456',
-        email: 'test@example.com',
-        email_verified: true,
-        name: 'Test User',
-        picture: 'https://example.com/avatar.jpg',
-        created_at: '2023-01-01T00:00:00Z',
-        last_login: '2023-01-02T00:00:00Z',
-        app_metadata: { roles: ['user'] },
+        'user_id': 'auth0|123456',
+        'email': 'test@example.com',
+        'email_verified': true,
+        'name': 'Test User',
+        'picture': 'https://example.com/avatar.jpg',
+        'created_at': '2023-01-01T00:00:00Z',
+        'last_login': '2023-01-02T00:00:00Z',
+        'app_metadata': { roles: ['user'] },
         'https://pixelated.empathy/app_metadata': { roles: ['patient'] },
         'https://pixelated.empathy/user_metadata': { role: 'user' },
-        user_metadata: { role: 'user' },
+        'user_metadata': { role: 'user' },
       }
 
       // Mock Auth0 clients
@@ -364,7 +364,7 @@ describe('Auth0 Integration Tests', () => {
       mockUserInfoClient.getUserInfo.mockResolvedValue({
         data: {
           ...mockUserProfile,
-          sub: mockUserProfile.user_id,
+          'sub': mockUserProfile.user_id,
           'https://pixelated-empathy.com/app_metadata':
             mockUserProfile['https://pixelated.empathy/app_metadata'],
           'https://pixelated-empathy.com/user_metadata':
@@ -637,10 +637,10 @@ describe('Auth0 Integration Tests', () => {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTYiLCJpc3MiOiJodHRwczovL3Rlc3QtZG9tYWluLmF1dGgwLmNvbS8iLCJhdWQiOiJodHRwczovL2FwaS5waXhlbGF0ZWQtZW1wYXRoeS5jb20iLCJleHAiOjk5OTk5OTk5OTksImlhdCI6MTYxNjIzOTAyMn0.signature'
 
       const mockUserInfo = {
-        sub: 'auth0|123456',
-        iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelated-empathy.com',
-        exp: 9999999999,
+        'sub': 'auth0|123456',
+        'iss': 'https://test-domain.auth0.com/',
+        'aud': 'https://api.pixelated-empathy.com',
+        'exp': 9999999999,
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
       }
 
@@ -688,8 +688,8 @@ describe('Auth0 Integration Tests', () => {
       }
 
       const mockUserResponse = {
-        sub: 'auth0|123456',
-        jti: 'new-token-id-456',
+        'sub': 'auth0|123456',
+        'jti': 'new-token-id-456',
         'https://pixelated.empathy/app_metadata': { roles: ['patient'] },
       }
 
@@ -945,11 +945,11 @@ describe('Auth0 Integration Tests', () => {
 
     it('should log security events for token validation', async () => {
       const mockPayload = {
-        sub: 'auth0|123456',
-        iss: 'https://test-domain.auth0.com/',
-        aud: 'https://api.pixelated-empathy.com',
-        exp: 9999999999,
-        jti: 'token-id-123', // Added jti for tokenId expectation
+        'sub': 'auth0|123456',
+        'iss': 'https://test-domain.auth0.com/',
+        'aud': 'https://api.pixelated-empathy.com',
+        'exp': 9999999999,
+        'jti': 'token-id-123', // Added jti for tokenId expectation
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
       }
 
@@ -984,10 +984,10 @@ describe('Auth0 Integration Tests', () => {
         expires_in: 3600,
       }
       const mockUserResponse = {
-        sub: 'auth0|123456',
-        email: 'test@example.com',
-        name: 'Test User',
-        jti: 'new-token-id',
+        'sub': 'auth0|123456',
+        'email': 'test@example.com',
+        'name': 'Test User',
+        'jti': 'new-token-id',
         'https://pixelated.empathy/app_metadata': { roles: ['patient'] },
       }
 
@@ -1031,12 +1031,12 @@ describe('Auth0 Integration Tests', () => {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHx1c2VyMTIzIiwiaXNzIjoiaHR0cHM6Ly90ZXN0LWRvbWFpbi5hdXRoMC5jb20vIiwiYXVkIjoiaHR0cHM6Ly9hcGkucGl4ZWxhdGVkLWVtcGF0aHkuY29tIiwiZXhwIjo5OTk5OTk5OTk5fQ.signature'
 
       const mockUserProfile = {
-        user_id: 'auth0|user123',
-        email: 'test@example.com',
-        email_verified: true,
-        name: 'Test User',
-        app_metadata: { roles: ['user'] }, // Use 'user' for consistency
-        user_metadata: { role: 'user' },
+        'user_id': 'auth0|user123',
+        'email': 'test@example.com',
+        'email_verified': true,
+        'name': 'Test User',
+        'app_metadata': { roles: ['user'] }, // Use 'user' for consistency
+        'user_metadata': { role: 'user' },
         'https://pixelated.empathy/app_metadata': { roles: ['patient'] },
         'https://pixelated.empathy/user_metadata': { role: 'user' },
       }
@@ -1060,10 +1060,10 @@ describe('Auth0 Integration Tests', () => {
       // 2. Validate Token - set up mock for the userInfo call
       mockUserInfoClient.getUserInfo.mockResolvedValue({
         data: {
-          sub: 'auth0|user123',
-          aud: 'https://api.pixelated-empathy.com',
-          iss: 'https://test-domain.auth0.com/',
-          exp: 9999999999,
+          'sub': 'auth0|user123',
+          'aud': 'https://api.pixelated-empathy.com',
+          'iss': 'https://test-domain.auth0.com/',
+          'exp': 9999999999,
           'https://pixelated.empathy/app_metadata': { roles: ['patient'] },
         },
       })

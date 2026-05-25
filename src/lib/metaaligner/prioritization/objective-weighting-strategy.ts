@@ -44,7 +44,7 @@ export const defaultWeightingStrategy: ObjectiveWeightingStrategy = (
   if (params.customFactors) {
     adjusted = adjusted.map((obj) =>
       obj.key in (params.customFactors ?? {})
-        ? { ...obj, weight: obj.weight * (params.customFactors![obj.key] || 1) }
+        ? { ...obj, weight: obj.weight * (params.customFactors![obj.key] ?? 1) }
         : obj,
     )
   }

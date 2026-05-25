@@ -59,19 +59,19 @@ export function ComparativeProgressControls({
   }
 
   return (
-    <div className='flex flex-col justify-between gap-4 sm:flex-row'>
+    <div className="flex flex-col justify-between gap-4 sm:flex-row">
       <div>
         <label
-          htmlFor='metric-select'
-          className='mb-1 block text-sm font-medium'
+          htmlFor="metric-select"
+          className="mb-1 block text-sm font-medium"
         >
           Metric
         </label>
         <select
-          id='metric-select'
+          id="metric-select"
           value={metric}
           onChange={(e) => setMetric(e.target.value)}
-          className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto'
+          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto"
           disabled={isLoading}
         >
           {availableMetrics.map((option) => (
@@ -84,16 +84,16 @@ export function ComparativeProgressControls({
 
       <div>
         <label
-          htmlFor='cohort-select'
-          className='mb-1 block text-sm font-medium'
+          htmlFor="cohort-select"
+          className="mb-1 block text-sm font-medium"
         >
           Comparison Group
         </label>
         <select
-          id='cohort-select'
+          id="cohort-select"
           value={cohort}
           onChange={(e) => setCohort(e.target.value)}
-          className='bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto'
+          className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-700 focus:ring-indigo-500 w-full rounded-md border px-3 py-2 shadow-sm focus:outline-none focus:ring-2 sm:w-auto"
           disabled={isLoading}
         >
           {availableCohorts.map((option) => (
@@ -105,14 +105,14 @@ export function ComparativeProgressControls({
       </div>
 
       <div>
-        <label htmlFor='date-range' className='mb-1 block text-sm font-medium'>
+        <label htmlFor="date-range" className="mb-1 block text-sm font-medium">
           Time Period
         </label>
-        <div className='flex flex-col'>
-          <div className='flex items-center gap-2'>
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
             <input
-              type='date'
-              id='start-date'
+              type="date"
+              id="start-date"
               value={dateRange.startDate}
               onChange={handleStartDateChange}
               className={`bg-white dark:bg-gray-800 w-full border px-3 py-2 sm:w-auto ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} focus:ring-indigo-500 rounded-md shadow-sm focus:outline-none focus:ring-2`}
@@ -120,8 +120,8 @@ export function ComparativeProgressControls({
             />
             <span>to</span>
             <input
-              type='date'
-              id='end-date'
+              type="date"
+              id="end-date"
               value={dateRange.endDate}
               onChange={handleEndDateChange}
               className={`bg-white dark:bg-gray-800 w-full border px-3 py-2 sm:w-auto ${dateError ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} focus:ring-indigo-500 rounded-md shadow-sm focus:outline-none focus:ring-2`}
@@ -129,7 +129,7 @@ export function ComparativeProgressControls({
             />
           </div>
           {dateError && (
-            <div className='text-red-500 mt-1 text-xs'>{dateError}</div>
+            <div className="text-red-500 mt-1 text-xs">{dateError}</div>
           )}
         </div>
       </div>

@@ -392,10 +392,8 @@ export class BiasDetectionDatabaseService {
         if (demo) {
           // Helper to update aggregation
           const update = (dimension: string, value: string) => {
-            if (!aggregation[dimension]) aggregation[dimension] = {}
-            if (!aggregation[dimension][value]) {
-              aggregation[dimension][value] = { count: 0, totalBias: 0 }
-            }
+            aggregation[dimension] ??= {};
+            aggregation[dimension][value] ??= { count: 0, totalBias: 0 };
             aggregation[dimension][value].count++
             aggregation[dimension][value].totalBias += biasScore
           }

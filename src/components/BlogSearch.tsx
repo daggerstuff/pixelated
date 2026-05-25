@@ -73,26 +73,26 @@ export function BlogSearch() {
   }
 
   return (
-    <div className='mx-auto w-full max-w-2xl'>
-      <form onSubmit={handleSearch} className='relative' role='search'>
+    <div className="mx-auto w-full max-w-2xl">
+      <form onSubmit={handleSearch} className="relative" role="search">
         <Input
-          type='search'
-          placeholder='Search blog posts...'
+          type="search"
+          placeholder="Search blog posts..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className='w-full pl-10'
-          aria-label='Search blog posts'
+          className="w-full pl-10"
+          aria-label="Search blog posts"
         />
 
         <Search
-          className='text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2'
-          aria-hidden='true'
+          className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+          aria-hidden="true"
         />
 
         <Button
-          type='submit'
-          variant='ghost'
-          size='sm'
+          type="submit"
+          variant="ghost"
+          size="sm"
           className={cn(
             'absolute right-0 top-0 h-full px-3',
             isSearching && 'opacity-50 cursor-not-allowed',
@@ -101,7 +101,7 @@ export function BlogSearch() {
           aria-label={isSearching ? 'Searching...' : 'Search'}
         >
           {isSearching ? (
-            <Loader2 className='h-4 w-4 animate-spin' aria-hidden='true' />
+            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
           ) : (
             'Search'
           )}
@@ -110,27 +110,27 @@ export function BlogSearch() {
 
       {/* Screen reader only live region for search status */}
       <div
-        role='status'
-        aria-live='polite'
-        aria-atomic='true'
-        className='sr-only'
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
       >
         {isSearching ? 'Searching...' : ''}
       </div>
 
       {results.length > 0 && (
-        <div className='mt-4 space-y-4'>
+        <div className="mt-4 space-y-4">
           {results.map((result) => (
-            <article key={result['id']} className='bg-muted/50 rounded-lg p-4'>
-              <h3 className='mb-2 text-lg font-semibold'>
+            <article key={result['id']} className="bg-muted/50 rounded-lg p-4">
+              <h3 className="mb-2 text-lg font-semibold">
                 <a
                   href={`/blog/${result['slug']}`}
-                  className='hover:text-primary transition-colors'
+                  className="hover:text-primary transition-colors"
                 >
                   {result['title']}
                 </a>
               </h3>
-              <p className='text-muted-foreground'>{result['description']}</p>
+              <p className="text-muted-foreground">{result['description']}</p>
             </article>
           ))}
         </div>

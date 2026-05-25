@@ -49,7 +49,7 @@ export class ThreatReportGenerator {
     let totalConfidence = 0
 
     findings.forEach((f) => {
-      severityDist[f.severity] = (severityDist[f.severity] || 0) + 1
+      severityDist[f.severity] = (severityDist[f.severity] ?? 0) + 1
       totalConfidence += f.confidence
     })
 
@@ -96,7 +96,7 @@ export class ThreatReportGenerator {
       high: 3,
       critical: 4,
     }
-    return map[severity] || 1
+    return map[severity] ?? 1
   }
 
   public numberToSeverity(num: number): 'low' | 'medium' | 'high' | 'critical' {
@@ -118,6 +118,6 @@ export class ThreatReportGenerator {
       benign: 'low',
       anomaly: 'medium',
     }
-    return map[threatLevel] || 'low'
+    return map[threatLevel] ?? 'low'
   }
 }

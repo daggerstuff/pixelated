@@ -70,19 +70,19 @@ export function Dashboard({ className }: DashboardProps) {
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Journal Research Dashboard</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">Journal Research Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
             Monitor and manage your research sessions
           </p>
         </div>
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           {quickActions.map((action) => (
             <button
               key={action.label}
               onClick={action.action}
-              className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
             >
               {action.label}
             </button>
@@ -97,7 +97,7 @@ export function Dashboard({ className }: DashboardProps) {
             <CardTitle>Current Session Progress</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='space-y-4'>
+            <div className="space-y-4">
               <SessionCard session={selectedSession} />
               {metrics && (
                 <LazyProgressCharts progress={progress} metrics={metrics} />
@@ -114,15 +114,15 @@ export function Dashboard({ className }: DashboardProps) {
         </CardHeader>
         <CardContent>
           {sessionsLoading ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               Loading sessions...
             </div>
           ) : recentSessions.length === 0 ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               No sessions yet. Create your first session to get started.
             </div>
           ) : (
-            <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {recentSessions.map((session) => (
                 <SessionCard
                   key={session.sessionId}
@@ -171,29 +171,29 @@ export function Dashboard({ className }: DashboardProps) {
           <CardTitle>Recent Activity</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='space-y-3'>
+          <div className="space-y-3">
             {recentSessions.length === 0 ? (
-              <div className='text-muted-foreground py-4 text-center'>
+              <div className="text-muted-foreground py-4 text-center">
                 No recent activity
               </div>
             ) : (
               recentSessions.map((session) => (
                 <div
                   key={session.sessionId}
-                  className='flex items-center justify-between border-b pb-3 last:border-0'
+                  className="flex items-center justify-between border-b pb-3 last:border-0"
                 >
                   <div>
-                    <p className='font-medium'>{session.sessionId}</p>
-                    <p className='text-muted-foreground text-sm'>
+                    <p className="font-medium">{session.sessionId}</p>
+                    <p className="text-muted-foreground text-sm">
                       Started {format(session.startDate, 'MMM d, yyyy')} •{' '}
                       {session.currentPhase}
                     </p>
                   </div>
-                  <div className='text-right'>
-                    <p className='text-sm font-medium'>
+                  <div className="text-right">
+                    <p className="text-sm font-medium">
                       {session.progressMetrics?.['progress_percentage'] ?? 0}%
                     </p>
-                    <p className='text-muted-foreground text-xs'>Progress</p>
+                    <p className="text-muted-foreground text-xs">Progress</p>
                   </div>
                 </div>
               ))

@@ -340,7 +340,7 @@ let defaultMapperService: ContextMapperService | null = null
  * Get or create the default mapper service
  */
 export function getContextMapperService(): ContextMapperService {
-  defaultMapperService ??= new ContextMapperService();
+  defaultMapperService ??= new ContextMapperService()
   return defaultMapperService
 }
 

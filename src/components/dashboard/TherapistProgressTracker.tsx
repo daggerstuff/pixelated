@@ -61,17 +61,17 @@ export function TherapistProgressTracker({
   return (
     <div
       className={cn('space-y-6', className)}
-      aria-label='Therapist Progress Tracker'
+      aria-label="Therapist Progress Tracker"
       tabIndex={0}
     >
       {/* Session Overview */}
       <section
-        className='bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2'
-        aria-labelledby='overview-heading'
+        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        aria-labelledby="overview-heading"
         tabIndex={0}
       >
-        <div className='flex items-center justify-between'>
-          <h4 id='overview-heading' className='text-md mb-3 font-semibold'>
+        <div className="flex items-center justify-between">
+          <h4 id="overview-heading" className="text-md mb-3 font-semibold">
             Session Overview
           </h4>
           <button
@@ -81,7 +81,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse session overview'
                 : 'Expand session overview'
             }
-            className='text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2'
+            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
             aria-expanded={expandedSections['overview']}
           >
             {expandedSections['overview'] ? '−' : '+'}
@@ -106,12 +106,12 @@ export function TherapistProgressTracker({
 
       {/* Overall Progress */}
       <section
-        className='bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2'
-        aria-labelledby='progress-heading'
+        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        aria-labelledby="progress-heading"
         tabIndex={0}
       >
-        <div className='flex items-center justify-between'>
-          <h4 id='progress-heading' className='text-md mb-3 font-semibold'>
+        <div className="flex items-center justify-between">
+          <h4 id="progress-heading" className="text-md mb-3 font-semibold">
             Overall Progress
           </h4>
           <button
@@ -121,25 +121,25 @@ export function TherapistProgressTracker({
                 ? 'Collapse overall progress'
                 : 'Expand overall progress'
             }
-            className='text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2'
+            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
             aria-expanded={expandedSections['progress']}
           >
             {expandedSections['progress'] ? '−' : '+'}
           </button>
         </div>
         {expandedSections['progress'] && (
-          <ProgressBar value={session.progress} label='Session Completion' />
+          <ProgressBar value={session.progress} label="Session Completion" />
         )}
       </section>
 
       {/* Skill Development */}
       <section
-        className='bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2'
-        aria-labelledby='skills-heading'
+        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        aria-labelledby="skills-heading"
         tabIndex={0}
       >
-        <div className='flex items-center justify-between'>
-          <h4 id='skills-heading' className='text-md mb-3 font-semibold'>
+        <div className="flex items-center justify-between">
+          <h4 id="skills-heading" className="text-md mb-3 font-semibold">
             Skill Development
           </h4>
           <button
@@ -149,7 +149,7 @@ export function TherapistProgressTracker({
                 ? 'Collapse skill development'
                 : 'Expand skill development'
             }
-            className='text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2'
+            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
             aria-expanded={expandedSections['skills']}
           >
             {expandedSections['skills'] ? '−' : '+'}
@@ -157,15 +157,15 @@ export function TherapistProgressTracker({
         </div>
 
         {expandedSections['skills'] && (
-          <div className='space-y-3'>
+          <div className="space-y-3">
             {skillsLoading && (
-              <div className='text-muted-foreground text-sm'>
+              <div className="text-muted-foreground text-sm">
                 Loading skills…
               </div>
             )}
 
             {skillsError && (
-              <div className='text-red-600 text-sm'>
+              <div className="text-red-600 text-sm">
                 Failed to load skills: {skillsError.message}
               </div>
             )}
@@ -173,7 +173,7 @@ export function TherapistProgressTracker({
             {!skillsLoading &&
               !skillsError &&
               (!effectiveSkills || effectiveSkills.length === 0) && (
-                <div className='text-muted-foreground text-sm'>
+                <div className="text-muted-foreground text-sm">
                   No skill progress available for this session.
                 </div>
               )}
@@ -182,21 +182,21 @@ export function TherapistProgressTracker({
               !skillsError &&
               effectiveSkills &&
               effectiveSkills.length > 0 && (
-                <div className='space-y-2' role='list'>
+                <div className="space-y-2" role="list">
                   {effectiveSkills.map(
                     (skill: SkillProgress, index: number) => (
                       <div
                         key={`${skill.skill}-${index}`}
-                        className='focus-within:ring-primary flex items-center justify-between rounded p-2 focus-within:bg-background focus-within:ring-1 hover:bg-background'
+                        className="focus-within:ring-primary flex items-center justify-between rounded p-2 focus-within:bg-background focus-within:ring-1 hover:bg-background"
                         tabIndex={0}
-                        role='listitem'
+                        role="listitem"
                         aria-label={`${skill.skill}: ${skill.score}% (${skill.trend})`}
                       >
-                        <span className='text-sm font-medium'>
+                        <span className="text-sm font-medium">
                           {skill.skill}
                         </span>
-                        <div className='flex items-center gap-2'>
-                          <span className='text-muted-foreground text-sm'>
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm">
                             {skill.score}%
                           </span>
                           <span
@@ -226,12 +226,12 @@ export function TherapistProgressTracker({
 
       {/* Session Notes */}
       <section
-        className='bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2'
-        aria-labelledby='notes-heading'
+        className="bg-muted focus:ring-primary rounded-md p-4 focus:outline-none focus:ring-2"
+        aria-labelledby="notes-heading"
         tabIndex={0}
       >
-        <div className='flex items-center justify-between'>
-          <h4 id='notes-heading' className='text-md mb-3 font-semibold'>
+        <div className="flex items-center justify-between">
+          <h4 id="notes-heading" className="text-md mb-3 font-semibold">
             Session Notes
           </h4>
           <button
@@ -241,18 +241,18 @@ export function TherapistProgressTracker({
                 ? 'Collapse session notes'
                 : 'Expand session notes'
             }
-            className='text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2'
+            className="text-muted-foreground focus:ring-primary rounded hover:text-foreground focus:outline-none focus:ring-2"
             aria-expanded={expandedSections['notes']}
           >
             {expandedSections['notes'] ? '−' : '+'}
           </button>
         </div>
         {expandedSections['notes'] && (
-          <div className='text-sm'>
+          <div className="text-sm">
             {session.notes ? (
               <p>{session.notes}</p>
             ) : (
-              <p className='text-muted-foreground italic'>
+              <p className="text-muted-foreground italic">
                 Session notes and observations will appear here...
               </p>
             )}

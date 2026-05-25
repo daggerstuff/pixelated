@@ -55,7 +55,7 @@ export function getActionType(method: string): string {
     GET: 'READ',
   }
 
-  return methodMap[method.toUpperCase()] || 'UNKNOWN'
+  return methodMap[method.toUpperCase()] ?? 'UNKNOWN'
 }
 
 interface MockRequest {
@@ -78,7 +78,7 @@ export function getResourceType(path: string): string {
   if (parts.length === 0) return 'unknown'
 
   const resource = parts[0]
-  return resource || 'unknown'
+  return resource ?? 'unknown'
 }
 
 export function getResourceId(path: string): string | undefined {

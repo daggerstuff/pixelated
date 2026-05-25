@@ -5,6 +5,8 @@
  * optimal parameters for different operations and optimization strategies.
  */
 
+import { fileURLToPath } from 'node:url'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   fheParameterOptimizer,
@@ -12,7 +14,6 @@ import {
 } from '../parameter-optimizer'
 import { SealSchemeType } from '../seal-types'
 import { FHEOperation } from '../types'
-import { fileURLToPath } from 'node:url'
 
 const logger = createBuildSafeLogger('fhe-parameter-optimization-example')
 

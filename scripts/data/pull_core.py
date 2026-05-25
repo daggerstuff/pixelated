@@ -65,14 +65,10 @@ def _get_fulltext(api_key: str, work_id: str, max_retries: int = 3) -> str:
         except (HTTPError, Exception) as e:
             if attempt < max_retries - 1:
                 delay = 2**attempt
-                logger.warning(
-                    "CORE fulltext retry %d/%d for %s: %s", attempt + 1, max_retries, work_id, e
-                )
+                logger.warning("CORE fulltext retry %d/%d for %s: %s", attempt + 1, max_retries, work_id, e)
                 time.sleep(delay)
             else:
-                logger.warning(
-                    "CORE fulltext failed for %s after %d retries: %s", work_id, max_retries, e
-                )
+                logger.warning("CORE fulltext failed for %s after %d retries: %s", work_id, max_retries, e)
     return ""
 
 

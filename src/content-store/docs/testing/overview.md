@@ -82,7 +82,7 @@ pnpm run test:coverage
 
 For more detailed information about specific testing areas, refer to:
 
-- [Test Patterns](/testing/patterns)
-- [Test Execution](/testing/execution)
-- [Debugging Tests](/testing/debugging)
-- [Coverage Requirements](/testing/coverage)
+- [Test Patterns](./patterns.md)
+- [Test Execution](./execution.md)
+- [Debugging Tests](./debugging.md)
+- [Coverage Requirements](./coverage.md)

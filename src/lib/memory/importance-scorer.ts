@@ -6,10 +6,7 @@
  * All weights configurable via ScoringWeights env vars.
  */
 
-import type {
-  MemoryBlock,
-  ScoringWeights,
-} from '@/types/memory'
+import type { MemoryBlock, ScoringWeights } from '@/types/memory'
 
 // ─── Cosine similarity ────────────────────────────────────────────────────────
 
@@ -49,10 +46,20 @@ export function exponentialDecay(
 // ─── Emotional weight multipliers ─────────────────────────────────────────────
 
 const CRISIS_CATEGORIES = new Set([
-  'suicide', 'self-harm', 'overdose', 'panic', 'psychosis',
+  'suicide',
+  'self-harm',
+  'overdose',
+  'panic',
+  'psychosis',
 ])
 const HIGH_CATEGORIES = new Set([
-  'grief', 'trauma', 'anxiety', 'fear', 'anger', 'despair', 'hopelessness',
+  'grief',
+  'trauma',
+  'anxiety',
+  'fear',
+  'anger',
+  'despair',
+  'hopelessness',
 ])
 
 export function emotionalWeight(categories: string[]): number {
@@ -67,8 +74,8 @@ export function emotionalWeight(categories: string[]): number {
 export const DEFAULT_WEIGHTS: ScoringWeights = {
   alpha: 0.25,
   beta: 0.25,
-  gamma: 0.30,
-  delta: 0.20,
+  gamma: 0.3,
+  delta: 0.2,
   decayTauDays: 7,
 }
 
@@ -80,8 +87,8 @@ function loadWeightsFromEnv(): ScoringWeights {
   return {
     alpha: e('MEMORY_SCORE_ALPHA', 0.25),
     beta: e('MEMORY_SCORE_BETA', 0.25),
-    gamma: e('MEMORY_SCORE_GAMMA', 0.30),
-    delta: e('MEMORY_SCORE_DELTA', 0.20),
+    gamma: e('MEMORY_SCORE_GAMMA', 0.3),
+    delta: e('MEMORY_SCORE_DELTA', 0.2),
     decayTauDays: e('MEMORY_DECAY_TAU_DAYS', 7),
   }
 }
@@ -106,9 +113,7 @@ export class ImportanceScorer {
       undefined,
       this.weights.decayTauDays,
     )
-    const relevance = context
-      ? cosineSimilarity(memory.content, context)
-      : 0.5
+    const relevance = context ? cosineSimilarity(memory.content, context) : 0.5
     const emotional = emotionalWeight(memory.emotions.categories)
     const actionability = memory.importance.actionability
 
@@ -131,12 +136,15 @@ export class ImportanceScorer {
       undefined,
       this.weights.decayTauDays,
     )
-    const relevance = context
-      ? cosineSimilarity(memory.content, context)
-      : 0.5
+    const relevance = context ? cosineSimilarity(memory.content, context) : 0.5
     const emotional = emotionalWeight(memory.emotions.categories)
     const actionability = memory.importance.actionability
-    const raw = this.weightsCompute(recency, relevance, emotional, actionability)
+    const raw = this.weightsCompute(
+      recency,
+      relevance,
+      emotional,
+      actionability,
+    )
 
     return {
       recency: Math.round(recency * 1e6) / 1e6,

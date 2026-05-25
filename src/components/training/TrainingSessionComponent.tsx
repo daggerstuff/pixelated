@@ -651,13 +651,13 @@ export function TrainingSessionComponent() {
   ])
 
   return (
-    <div className='bg-white/5 border-white/10 mx-auto grid max-w-4xl grid-cols-1 gap-6 rounded-2xl border p-8 shadow-2xl backdrop-blur-md md:grid-cols-3'>
-      <div className='md:col-span-2'>
-        <div className='mb-6 flex items-center justify-between'>
-          <h2 className='text-white text-2xl font-bold'>
+    <div className="bg-white/5 border-white/10 mx-auto grid max-w-4xl grid-cols-1 gap-6 rounded-2xl border p-8 shadow-2xl backdrop-blur-md md:grid-cols-3">
+      <div className="md:col-span-2">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-white text-2xl font-bold">
             Therapist Training Session
           </h2>
-          <div className='flex space-x-2'>
+          <div className="flex space-x-2">
             <button
               onClick={() => setRole('trainee')}
               className={`rounded px-3 py-1 text-sm ${!isObserver ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300'}`}
@@ -673,7 +673,7 @@ export function TrainingSessionComponent() {
           </div>
         </div>
 
-        <div className='mb-6 max-h-96 space-y-4 overflow-y-auto'>
+        <div className="mb-6 max-h-96 space-y-4 overflow-y-auto">
           {conversation.map((entry) => (
             <div
               key={entry.id}
@@ -683,15 +683,15 @@ export function TrainingSessionComponent() {
                   : 'bg-green-500/20 border-green-500 border-l-4'
               }`}
             >
-              <div className='text-gray-300 mb-1 text-sm font-semibold'>
+              <div className="text-gray-300 mb-1 text-sm font-semibold">
                 {entry.role === 'client' ? 'Client' : 'Therapist'}
               </div>
-              <div className='text-white'>{entry.message}</div>
+              <div className="text-white">{entry.message}</div>
             </div>
           ))}
         </div>
 
-        <div className='space-y-4'>
+        <div className="space-y-4">
           <textarea
             value={therapistResponse}
             onChange={(e) => setTherapistResponse(e.target.value)}
@@ -715,31 +715,31 @@ export function TrainingSessionComponent() {
         </div>
 
         {evaluation && (
-          <div className='bg-yellow-500/20 border-yellow-500/30 mt-6 rounded-lg border p-4'>
-            <div className='text-yellow-300 mb-2 font-semibold'>
+          <div className="bg-yellow-500/20 border-yellow-500/30 mt-6 rounded-lg border p-4">
+            <div className="text-yellow-300 mb-2 font-semibold">
               AI Feedback
             </div>
-            <div className='text-white whitespace-pre-line'>{evaluation}</div>
+            <div className="text-white whitespace-pre-line">{evaluation}</div>
           </div>
         )}
       </div>
 
       {/* Sidebar for Coaching Notes */}
-      <div className='bg-black/20 rounded-xl p-4 md:col-span-1'>
-        <h3 className='text-purple-300 mb-4 text-lg font-semibold'>
+      <div className="bg-black/20 rounded-xl p-4 md:col-span-1">
+        <h3 className="text-purple-300 mb-4 text-lg font-semibold">
           Coaching Notes
         </h3>
         {coachingNotes.length === 0 ? (
-          <div className='text-gray-400 text-sm italic'>No notes yet.</div>
+          <div className="text-gray-400 text-sm italic">No notes yet.</div>
         ) : (
-          <div className='max-h-[500px] space-y-3 overflow-y-auto'>
+          <div className="max-h-[500px] space-y-3 overflow-y-auto">
             {coachingNotes.map((note) => (
               <div
                 key={note.id}
-                className='bg-purple-900/30 border-purple-500/30 rounded border p-3 text-sm'
+                className="bg-purple-900/30 border-purple-500/30 rounded border p-3 text-sm"
               >
-                <div className='text-purple-200 mb-1'>{note.content}</div>
-                <div className='text-purple-400/50 text-xs'>
+                <div className="text-purple-200 mb-1">{note.content}</div>
+                <div className="text-purple-400/50 text-xs">
                   {new Date(note.timestamp).toLocaleTimeString()}
                 </div>
               </div>

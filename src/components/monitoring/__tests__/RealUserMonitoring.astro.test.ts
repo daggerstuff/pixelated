@@ -1,5 +1,5 @@
-import { createElement } from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
+import { createElement } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the monitoring config
@@ -31,7 +31,7 @@ const buildMonitoringView = (
 ) =>
   createElement(
     'div',
-    { className: 'rum-dashboard', 'data-testid': 'astro-component' },
+    { 'className': 'rum-dashboard', 'data-testid': 'astro-component' },
     createElement('div', { className: 'metrics-shell' }, title),
     createElement('p', {}, description),
     createElement('div', { className: 'metric' }, 'Loading Performance'),
@@ -47,7 +47,7 @@ const buildMonitoringView = (
       createElement('div', {}, 'Loading...'),
       createElement('button', {}, 'Refresh Now'),
     ),
-)
+  )
 
 // Create a type for the component props based on the Astro component interface
 interface RealUserMonitoringProps {
@@ -66,7 +66,10 @@ describe('RealUserMonitoring.astro', () => {
       createElement(
         'div',
         {},
-        buildMonitoringView('Real User Monitoring', 'Monitor real user performance metrics'),
+        buildMonitoringView(
+          'Real User Monitoring',
+          'Monitor real user performance metrics',
+        ),
       ),
     )
 
@@ -122,13 +125,7 @@ describe('RealUserMonitoring.astro', () => {
   })
 
   it('shows last updated text', () => {
-    render(
-      createElement(
-        'div',
-        {},
-        buildMonitoringView(),
-      ),
-    )
+    render(createElement('div', {}, buildMonitoringView()))
 
     expect(screen.getByText('Last updated: Never')).toBeInTheDocument()
   })

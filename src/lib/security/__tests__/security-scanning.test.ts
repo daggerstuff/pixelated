@@ -1,6 +1,7 @@
 // @vitest-environment node
 import * as fs from 'fs'
 import * as path from 'path'
+
 import { describe, it, expect } from 'vitest'
 
 describe('Security Scanning Configuration', () => {

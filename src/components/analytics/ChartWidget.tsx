@@ -173,8 +173,8 @@ export function ChartWidget({
           backgroundColor:
             series.color ?? defaultColors[i % defaultColors.length],
           borderColor:
-            (series.color ??
-            defaultColors[i % defaultColors.length]?.replace('0.5', '1')) ??
+            series.color ??
+            defaultColors[i % defaultColors.length]?.replace('0.5', '1') ??
             'rgba(59, 130, 246, 1)',
           borderWidth: type === 'line' ? 2 : 1,
           tension: 0.4,
@@ -269,15 +269,15 @@ export function ChartWidget({
       value={range}
       onValueChange={(value: string) => setRange(value as TimeRange)}
     >
-      <SelectTrigger className='h-8 w-[100px] text-xs'>
+      <SelectTrigger className="h-8 w-[100px] text-xs">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value='day'>Day</SelectItem>
-        <SelectItem value='week'>Week</SelectItem>
-        <SelectItem value='month'>Month</SelectItem>
-        <SelectItem value='quarter'>Quarter</SelectItem>
-        <SelectItem value='year'>Year</SelectItem>
+        <SelectItem value="day">Day</SelectItem>
+        <SelectItem value="week">Week</SelectItem>
+        <SelectItem value="month">Month</SelectItem>
+        <SelectItem value="quarter">Quarter</SelectItem>
+        <SelectItem value="year">Year</SelectItem>
       </SelectContent>
     </Select>
   ) : null
@@ -294,9 +294,9 @@ export function ChartWidget({
       <div
         style={{ height: `${height}px` }}
         aria-label={description ? `${title}: ${description}` : title}
-        role='img'
+        role="img"
       >
-        <div className='sr-only'>
+        <div className="sr-only">
           {description ? `${title}: ${description}` : title}
           {/* Optionally, summarize the data here for screen readers */}
         </div>

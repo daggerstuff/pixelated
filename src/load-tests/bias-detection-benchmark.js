@@ -233,11 +233,11 @@ function generateSessionData(baseSession) {
 
 function generatePatientPresentation(scenarioType) {
   const presentations = {
-    depression:
+    'depression':
       'Patient presents with persistent low mood, fatigue, and social withdrawal for the past 6 weeks.',
-    anxiety:
+    'anxiety':
       'Patient reports excessive worry, restlessness, and difficulty concentrating affecting daily activities.',
-    trauma:
+    'trauma':
       'Patient exhibits symptoms of PTSD following a recent traumatic event, including flashbacks and hypervigilance.',
     'substance-abuse':
       'Patient acknowledges problematic alcohol use impacting work and relationships.',
@@ -294,7 +294,7 @@ export default function () {
       {
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${AUTH_TOKEN}`,
+          'Authorization': `Bearer ${AUTH_TOKEN}`,
         },
         tags: {
           endpoint: 'analyze',
@@ -323,10 +323,7 @@ export default function () {
       'response has analysis data': (r) => {
         try {
           const body = JSON.parse(r.body)
-          return (
-            body.success &&
-            body.data?.overallBiasScore !== undefined
-          )
+          return body.success && body.data?.overallBiasScore !== undefined
         } catch {
           return false
         }

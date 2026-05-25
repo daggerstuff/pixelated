@@ -80,7 +80,7 @@ function AlertDialogPortal({ children }: { children: React.ReactNode }) {
     return null
   }
 
-  return <div className='fixed inset-0 z-50'>{children}</div>
+  return <div className="fixed inset-0 z-50">{children}</div>
 }
 
 function AlertDialogOverlay({
@@ -91,7 +91,7 @@ function AlertDialogOverlay({
 
   return (
     <button
-      type='button'
+      type="button"
       className={cn(
         'fixed inset-0 z-50 bg-black/50 animate-in fade-in-0',
         className,
@@ -134,9 +134,9 @@ function AlertDialogContent({
             e.stopPropagation()
           }
         }}
-        aria-modal='true'
-        aria-labelledby='alert-dialog-title'
-        aria-describedby='alert-dialog-description'
+        aria-modal="true"
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
         open
         {...props}
       >

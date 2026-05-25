@@ -69,10 +69,10 @@ export default function RealTimePrompts({
 
   return (
     <div className={cn('mt-2', className)}>
-      <div className='text-gray-700 mb-2 text-sm font-medium'>
+      <div className="text-gray-700 mb-2 text-sm font-medium">
         Suggested Therapeutic Responses:
       </div>
-      <div className='space-y-2'>
+      <div className="space-y-2">
         {prompts.map((prompt, index) => (
           <div
             key={prompt}

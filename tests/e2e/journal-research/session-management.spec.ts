@@ -186,7 +186,7 @@ test.describe('Journal Research Session Management', () => {
       const deleteButton = page.locator('button:has-text("Delete")')
       if ((await deleteButton.count()) > 0) {
         // Confirm deletion
-        page.on('dialog',  async (dialog) => dialog.accept())
+        page.on('dialog', async (dialog) => dialog.accept())
         await deleteButton.click()
 
         // Verify redirect to sessions list

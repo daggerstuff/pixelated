@@ -20,14 +20,13 @@ export type AuthenticatedUser = {
   [key: string]: unknown
 }
 
-
 export function authMiddleware(
   req: Request,
   res: Response,
   next: NextFunction,
 ): void {
   // Run the async authentication flow and forward any errors to Express error handling
-  (async () => {
+  ;(async () => {
     // Adapt the Express Request into a standard Web API Request object to support
     // the shared `authenticateRequest` function used by both Express and Astro middleware.
     const headers = Object.entries(req.headers).reduce<Record<string, string>>(
@@ -66,7 +65,8 @@ export function authMiddleware(
 
     next()
   })().catch((error: unknown) => {
-    const errorMessage = error instanceof Error ? error.message : 'Authentication failed'
+    const errorMessage =
+      error instanceof Error ? error.message : 'Authentication failed'
     res.status(401).json({
       error: errorMessage,
       code: 'AUTH_ERROR',

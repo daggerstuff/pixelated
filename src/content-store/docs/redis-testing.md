@@ -210,7 +210,7 @@ jobs:
       - uses: actions/checkout@v6.0.2
       - uses: pnpm/action-setup@v6.0.6
         with:
-          version: 11.1.2
+          version: 11.3.0
       - uses: actions/setup-node@v6.4.0
         with:
           node-version: '20'

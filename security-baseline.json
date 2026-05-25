@@ -1,11 +1,92 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "baseline": {
     "security_policies": {
       "enforce_mfa": true,
       "audit_logging": true,
-      "data_encryption": true
+      "data_encryption": true,
+      "authentication": {
+        "session_timeout_seconds": 900,
+        "max_login_attempts": 5,
+        "account_lockout_minutes": 30,
+        "password_min_length": 12,
+        "password_require_special": true,
+        "password_require_numbers": true,
+        "password_require_uppercase": true
+      },
+      "rate_limiting": {
+        "enabled": true,
+        "max_requests_per_minute": 100,
+        "burst_size": 20
+      },
+      "session_management": {
+        "rotate_on_login": true,
+        "invalidate_on_logout": true,
+        "prevent_concurrent_sessions": true
+      },
+      "csp_policy": {
+        "default_src": "'self'",
+        "script_src": "'self'",
+        "style_src": "'self' 'unsafe-inline'",
+        "img_src": "'self' data:",
+        "connect_src": "'self'",
+        "report_uri": "/api/v1/csp-violation"
+      }
     },
-    "compliance_standards": ["HIPAA", "GDPR"]
+    "compliance_standards": ["HIPAA", "GDPR", "SOC2", "ISO-27001"],
+    "encryption": {
+      "data_at_rest": {
+        "algorithm": "AES-256-GCM",
+        "key_rotation_days": 90
+      },
+      "data_in_transit": {
+        "protocol": "TLS 1.3",
+        "certificate_path": "/etc/ssl/certs/pixelated.crt"
+      },
+      "fhe_enabled": true,
+      "key_management": {
+        "provider": "AWS KMS",
+        "key_rotation_interval_days": 90
+      }
+    },
+    "audit": {
+      "log_level": "warn",
+      "log_retention_days": 365,
+      "include_events": [
+        "authentication",
+        "authorization_failures",
+        "data_access",
+        "admin_actions",
+        "encryption_key_operations",
+        "phi_access"
+      ],
+      "audit_log_format": "structured_json"
+    },
+    "vulnerability_scanning": {
+      "dependency_audit_enabled": true,
+      "docker_image_scan_enabled": true,
+      "sast_tools": ["trivy", "semgrep", "oxlint"],
+      "schedule": {
+        "dependencies": "weekly",
+        "docker_images": "on_build",
+        "static_analysis": "per_commit"
+      },
+      "severity_threshold": "high",
+      "fail_pipeline_on": "critical"
+    },
+    "testing": {
+      "unit_test_coverage_target": 70,
+      "security_unit_tests_required": true,
+      "hipaa_compliance_tests_required": true,
+      "penetration_test_schedule": "quarterly",
+      "dependency_vulnerability_check_cmd": "pnpm audit --audit-level moderate"
+    },
+    "incident_response": {
+      "contact_email": "security@pixelatedempathy.com",
+      "response_time_target_minutes": 15,
+      "resolution_time_target_hours": 4,
+      "post_mortem_required_for": ["phi_breach", "data_loss", "service_outage"],
+      "notification_authorities_within_hours": 72
+    }
   }
 }

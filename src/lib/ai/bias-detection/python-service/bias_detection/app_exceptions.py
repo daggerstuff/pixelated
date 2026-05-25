@@ -2,8 +2,9 @@
 Global exception handlers for the FastAPI application.
 """
 
-import structlog
 import os
+
+import structlog
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError

@@ -65,7 +65,12 @@ import { Button } from '@/components/ui/button/index.ts'
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card/index.ts'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card/index.ts'
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -89,7 +94,12 @@ import {
   Radar,
 } from '@/components/ui/LazyChart.tsx'
 import { Progress } from '@/components/ui/progress.tsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs.tsx'
 import type {
   BiasDashboardData,
   BiasAnalysisResult,
@@ -131,8 +141,8 @@ interface AlertAction {
 const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (active && payload?.length) {
     return (
-      <div className='bg-white border-gray-200 rounded-lg border p-3 shadow-lg'>
-        <p className='font-medium'>{`${label}`}</p>
+      <div className="bg-white border-gray-200 rounded-lg border p-3 shadow-lg">
+        <p className="font-medium">{`${label}`}</p>
         {payload.map((entry) => (
           <p
             key={`${entry.name}-${entry.value}`}
@@ -469,7 +479,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           : now
 
       return data.filter((item) => {
-        const itemDate = new Date((item.timestamp ?? item.date) ?? '')
+        const itemDate = new Date(item.timestamp ?? item.date ?? '')
         return itemDate >= startTime && itemDate <= endTime
       })
     },
@@ -658,7 +668,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const handleBulkAlertAction = useCallback(
     async (alertIds: string[], action: AlertAction['type']) => {
       try {
-        const promises = alertIds.map( async (alertId) =>
+        const promises = alertIds.map(async (alertId) =>
           handleAlertAction(alertId, action),
         )
         await Promise.all(promises)
@@ -818,7 +828,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         ): Record<string, unknown> | undefined => {
           if (isObject(obj) && key in obj) {
             const v = obj[key]
-            return isObject(v) ? (v) : undefined
+            return isObject(v) ? v : undefined
           }
           return undefined
         }
@@ -1062,7 +1072,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // Export dashboard data
 
   // Enhanced export function with progress tracking
-  const exportDataWithOptions = useCallback( async () => {
+  const exportDataWithOptions = useCallback(async () => {
     return exportBiasDashboardData({
       format: exportFormat,
       exportDateRange,
@@ -1130,36 +1140,42 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         return {
           text: 'Live updates connected',
           color: 'text-green-500',
-          icon: <Activity className='mr-1 h-3 w-3' />,
+          icon: <Activity className="mr-1 h-3 w-3" />,
           pulse: false,
         }
       case 'connecting':
         return {
           text: 'Connecting to live updates...',
           color: 'text-yellow-500',
-          icon: <RefreshCw className='mr-1 h-3 w-3 animate-spin' />,
+          icon: <RefreshCw className="mr-1 h-3 w-3 animate-spin" />,
           pulse: true,
         }
       case 'reconnecting':
         return {
           text: `Reconnecting... (attempt ${wsReconnectAttempts})`,
           color: 'text-orange-500',
-          icon: <RefreshCw className='mr-1 h-3 w-3 animate-spin' />,
+          icon: <RefreshCw className="mr-1 h-3 w-3 animate-spin" />,
           pulse: true,
         }
       case 'error':
         return {
           text: 'Live updates failed',
           color: 'text-red-500',
-          icon: <AlertTriangle className='mr-1 h-3 w-3' />,
+          icon: <AlertTriangle className="mr-1 h-3 w-3" />,
           pulse: false,
         }
-      case "disconnected": { throw new Error('Not implemented yet: "disconnected" case') }
+      case 'disconnected':
+        return {
+          text: 'Disconnected from live updates',
+          color: 'text-gray-400',
+          icon: <Activity className="mr-1 h-3 w-3" />,
+          pulse: false,
+        }
       default:
         return {
           text: 'Live updates disabled',
           color: 'text-gray-500',
-          icon: <Activity className='mr-1 h-3 w-3' />,
+          icon: <Activity className="mr-1 h-3 w-3" />,
           pulse: false,
         }
     }
@@ -1250,9 +1266,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   if (loading && !dashboardData) {
     return (
       <div className={`p-6 ${className}`}>
-        <div className='flex h-64 items-center justify-center'>
-          <RefreshCw className='text-blue-500 h-8 w-8 animate-spin' />
-          <span className='ml-2 text-lg'>
+        <div className="flex h-64 items-center justify-center">
+          <RefreshCw className="text-blue-500 h-8 w-8 animate-spin" />
+          <span className="ml-2 text-lg">
             Loading bias detection dashboard...
           </span>
         </div>
@@ -1264,23 +1280,23 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
     return (
       <div className={`p-6 ${className}`}>
         <Alert
-          variant='error'
-          title='Error Loading Dashboard'
+          variant="error"
+          title="Error Loading Dashboard"
           description={
             <div>
               {error}
               <Button
-                variant='outline'
-                size='sm'
-                className='mt-2'
+                variant="outline"
+                size="sm"
+                className="mt-2"
                 onClick={fetchDashboardData}
               >
-                <RefreshCw className='mr-2 h-4 w-4' />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Retry
               </Button>
             </div>
           }
-          icon={<AlertTriangle className='h-4 w-4' />}
+          icon={<AlertTriangle className="h-4 w-4" />}
         />
       </div>
     )
@@ -1297,21 +1313,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {/* New High Bias Alert Notification */}
       {newHighBiasAlert && (
         <div
-          className='bg-orange-100 border-orange-500 mb-4 flex items-center justify-between border-l-4 p-4'
-          role='alert'
-          data-testid='new-high-bias-alert'
+          className="bg-orange-100 border-orange-500 mb-4 flex items-center justify-between border-l-4 p-4"
+          role="alert"
+          data-testid="new-high-bias-alert"
         >
           <div>
-            <span className='text-orange-700 mr-2 font-bold'>
+            <span className="text-orange-700 mr-2 font-bold">
               New high bias alert
             </span>
-            <span className='text-orange-800 text-sm'>
+            <span className="text-orange-800 text-sm">
               {newHighBiasAlert.message}
             </span>
           </div>
           <button
-            className='bg-orange-200 text-orange-800 hover:bg-orange-300 ml-4 rounded px-2 py-1'
-            aria-label='Dismiss new high bias alert'
+            className="bg-orange-200 text-orange-800 hover:bg-orange-300 ml-4 rounded px-2 py-1"
+            aria-label="Dismiss new high bias alert"
             onClick={() => setNewHighBiasAlert(null)}
           >
             Dismiss
@@ -1319,11 +1335,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         </div>
       )}
       {/* Skip Links for Accessibility */}
-      <div className='sr-only'>
+      <div className="sr-only">
         <button
-          type='button'
+          type="button"
           ref={skipLinkRef}
-          className='skip-link focus:bg-blue-600 focus:text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:px-4 focus:py-2'
+          className="skip-link focus:bg-blue-600 focus:text-white focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded focus:px-4 focus:py-2"
           onClick={() => {
             mainContentRef.current?.focus()
             announceToScreenReader('Jumped to main content')
@@ -1332,8 +1348,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           Skip to main content
         </button>
         <button
-          type='button'
-          className='skip-link focus:bg-blue-600 focus:text-white focus:not-sr-only focus:absolute focus:left-32 focus:top-4 focus:z-50 focus:rounded focus:px-4 focus:py-2'
+          type="button"
+          className="skip-link focus:bg-blue-600 focus:text-white focus:not-sr-only focus:absolute focus:left-32 focus:top-4 focus:z-50 focus:rounded focus:px-4 focus:py-2"
           onClick={() => {
             // Use programmatic tab switching if needed
             announceToScreenReader('Jumped to alerts section')
@@ -1344,7 +1360,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       </div>
 
       {/* Screen Reader Announcements */}
-      <div aria-live='polite' aria-atomic='true' className='sr-only'>
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
         {announcements.map((announcement, index) => (
           <div key={`announcement-${index}-${Date.now()}`}>{announcement}</div>
         ))}
@@ -1385,7 +1401,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           className={`flex ${isMobile ? 'flex-col space-y-2' : 'items-center space-x-2'} ${isMobile ? 'w-full' : ''}`}
         >
           <Button
-            variant='outline'
+            variant="outline"
             size={isMobile ? 'default' : 'sm'}
             onClick={() => {
               setAutoRefresh(!autoRefresh)
@@ -1403,7 +1419,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </Button>
 
           <Button
-            variant='outline'
+            variant="outline"
             size={isMobile ? 'default' : 'sm'}
             onClick={() => {
               void fetchDashboardData()
@@ -1411,7 +1427,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             }}
             disabled={loading}
             className={isMobile ? 'w-full justify-start' : ''}
-            aria-label='Refresh dashboard data'
+            aria-label="Refresh dashboard data"
           >
             <RefreshCw
               className={`h-4 w-4 ${isMobile ? 'mr-2' : 'mr-2'} ${loading ? 'animate-spin' : ''}`}
@@ -1424,11 +1440,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             (wsConnectionStatus === 'error' ||
               wsConnectionStatus === 'disconnected') && (
               <Button
-                variant='outline'
+                variant="outline"
                 size={isMobile ? 'default' : 'sm'}
                 onClick={reconnectWebSocket}
                 className={isMobile ? 'w-full justify-start' : ''}
-                aria-label='Reconnect to live updates'
+                aria-label="Reconnect to live updates"
               >
                 <Activity className={`h-4 w-4 ${isMobile ? 'mr-2' : 'mr-2'}`} />
                 Reconnect Live Updates
@@ -1436,7 +1452,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             )}
 
           <Button
-            variant='outline'
+            variant="outline"
             size={isMobile ? 'default' : 'sm'}
             onClick={() => {
               setShowNotificationSettings(!showNotificationSettings)
@@ -1445,24 +1461,24 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               )
             }}
             className={isMobile ? 'w-full justify-start' : ''}
-            aria-label='Notification Settings Button - Open notification settings'
+            aria-label="Notification Settings Button - Open notification settings"
             aria-expanded={showNotificationSettings}
-            data-testid='notifications-button'
+            data-testid="notifications-button"
           >
             <Bell className={`h-4 w-4 ${isMobile ? 'mr-2' : 'mr-2'}`} />
             Notification Settings
           </Button>
 
           <Button
-            variant='outline'
+            variant="outline"
             size={isMobile ? 'default' : 'sm'}
             onClick={() => {
               setShowExportDialog(true)
               announceToScreenReader('Export dialog opened')
             }}
             className={isMobile ? 'w-full justify-start' : ''}
-            aria-label='Export Data Button - Open data export options'
-            data-testid='export-button'
+            aria-label="Export Data Button - Open data export options"
+            data-testid="export-button"
           >
             <Download className={`h-4 w-4 ${isMobile ? 'mr-2' : 'mr-2'}`} />
             Export Data
@@ -1474,175 +1490,189 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {showNotificationSettings && (
         <Card>
           <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
-              <span className='flex items-center'>
-                <Bell className='mr-2 h-5 w-5' />
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center">
+                <Bell className="mr-2 h-5 w-5" />
                 Notification Settings Panel
               </span>
               <Button
-                variant='ghost'
-                size='sm'
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowNotificationSettings(false)}
-                aria-label='Close notification settings panel'
-                data-testid='close-notification-settings'
+                aria-label="Close notification settings panel"
+                data-testid="close-notification-settings"
               >
-                <X className='h-4 w-4' />
+                <X className="h-4 w-4" />
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               {/* Notification Channels */}
-              <div className='space-y-4'>
-                <h4 className='flex items-center font-semibold'>
-                  <MessageSquare className='mr-2 h-4 w-4' />
+              <div className="space-y-4">
+                <h4 className="flex items-center font-semibold">
+                  <MessageSquare className="mr-2 h-4 w-4" />
                   Notification Channels
                 </h4>
 
-                <div className='space-y-3'>
+                <div className="space-y-3">
                   <label
-                    htmlFor='inAppNotificationsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="inAppNotificationsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='inAppNotificationsCheckbox'
-                      type='checkbox'
+                      id="inAppNotificationsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.inAppEnabled}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           inAppEnabled: e.target.checked,
                         })
                       }
-                      className='rounded'
-                      aria-label='Enable in-app notifications'
+                      className="rounded"
+                      aria-label="Enable in-app notifications"
                     />
-                    <Bell className='h-4 w-4' />
+                    <Bell className="h-4 w-4" />
                     <span>In-App Notifications</span>
                   </label>
 
                   <label
-                    htmlFor='emailNotificationsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="emailNotificationsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='emailNotificationsCheckbox'
-                      type='checkbox'
+                      id="emailNotificationsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.emailEnabled}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           emailEnabled: e.target.checked,
                         })
                       }
-                      className='rounded'
-                      aria-label='Enable email notifications'
+                      className="rounded"
+                      aria-label="Enable email notifications"
                     />
-                    <Mail className='h-4 w-4' />
+                    <Mail className="h-4 w-4" />
                     <span>Email Notifications</span>
                   </label>
 
                   <label
-                    htmlFor='smsNotificationsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="smsNotificationsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='smsNotificationsCheckbox'
-                      type='checkbox'
+                      id="smsNotificationsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.smsEnabled}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           smsEnabled: e.target.checked,
                         })
                       }
-                      className='rounded'
-                      aria-label='Enable SMS notifications'
+                      className="rounded"
+                      aria-label="Enable SMS notifications"
                     />
-                    <MessageSquare className='h-4 w-4' />
+                    <MessageSquare className="h-4 w-4" />
                     <span>SMS Notifications</span>
                   </label>
                 </div>
               </div>
 
               {/* Alert Level Settings */}
-              <div className='space-y-4'>
-                <h4 className='flex items-center font-semibold'>
-                  <AlertTriangle className='mr-2 h-4 w-4' />
+              <div className="space-y-4">
+                <h4 className="flex items-center font-semibold">
+                  <AlertTriangle className="mr-2 h-4 w-4" />
                   Alert Level Notifications
                 </h4>
 
-                <div className='space-y-3'>
+                <div className="space-y-3">
                   <label
-                    htmlFor='criticalAlertsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="criticalAlertsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='criticalAlertsCheckbox'
-                      type='checkbox'
+                      id="criticalAlertsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.criticalAlerts}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           criticalAlerts: e.target.checked,
                         })
                       }
-                      className='rounded'
+                      className="rounded"
                     />
-                    <AlertCircle className='text-red-500 h-4 w-4' />
+                    <AlertCircle className="text-red-500 h-4 w-4" />
                     <span>Critical Alerts</span>
                   </label>
 
                   <label
-                    htmlFor='highAlertsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="highAlertsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='highAlertsCheckbox'
-                      type='checkbox'
+                      id="highAlertsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.highAlerts}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           highAlerts: e.target.checked,
                         })
                       }
-                      className='rounded'
+                      className="rounded"
                     />
-                    <AlertTriangle className='text-orange-500 h-4 w-4' />
+                    <AlertTriangle className="text-orange-500 h-4 w-4" />
                     <span>High Priority Alerts</span>
                   </label>
 
                   <label
-                    htmlFor='mediumAlertsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="mediumAlertsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='mediumAlertsCheckbox'
-                      type='checkbox'
+                      id="mediumAlertsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.mediumAlerts}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           mediumAlerts: e.target.checked,
                         })
                       }
-                      className='rounded'
+                      className="rounded"
                     />
-                    <Info className='text-yellow-500 h-4 w-4' />
+                    <Info className="text-yellow-500 h-4 w-4" />
                     <span>Medium Priority Alerts</span>
                   </label>
 
                   <label
-                    htmlFor='lowAlertsCheckbox'
-                    className='flex items-center space-x-3'
+                    htmlFor="lowAlertsCheckbox"
+                    className="flex items-center space-x-3"
                   >
                     <input
-                      id='lowAlertsCheckbox'
-                      type='checkbox'
+                      id="lowAlertsCheckbox"
+                      type="checkbox"
                       checked={notificationSettings.lowAlerts}
-                      onChange={ async (e: React.ChangeEvent<HTMLInputElement>) =>
+                      onChange={async (
+                        e: React.ChangeEvent<HTMLInputElement>,
+                      ) =>
                         updateNotificationSettings({
                           lowAlerts: e.target.checked,
                         })
                       }
-                      className='rounded'
+                      className="rounded"
                     />
-                    <CheckCircle className='text-blue-500 h-4 w-4' />
+                    <CheckCircle className="text-blue-500 h-4 w-4" />
                     <span>Low Priority Alerts</span>
                   </label>
                 </div>
@@ -1650,16 +1680,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             </div>
 
             {/* Test Notification */}
-            <div className='mt-6 border-t pt-4'>
-              <div className='flex items-center justify-between'>
+            <div className="mt-6 border-t pt-4">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h4 className='font-semibold'>Test Notifications</h4>
-                  <p className='text-muted-foreground text-sm'>
+                  <h4 className="font-semibold">Test Notifications</h4>
+                  <p className="text-muted-foreground text-sm">
                     Send a test notification to verify your settings
                   </p>
                 </div>
                 <Button
-                  variant='outline'
+                  variant="outline"
                   onClick={sendTestNotification}
                   disabled={
                     !notificationSettings.emailEnabled &&
@@ -1667,7 +1697,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     !notificationSettings.inAppEnabled
                   }
                 >
-                  <Bell className='mr-2 h-4 w-4' />
+                  <Bell className="mr-2 h-4 w-4" />
                   Send Test
                 </Button>
               </div>
@@ -1680,42 +1710,42 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {showExportDialog && (
         <Card>
           <CardHeader>
-            <CardTitle className='flex items-center justify-between'>
-              <span className='flex items-center'>
-                <Download className='mr-2 h-5 w-5' />
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center">
+                <Download className="mr-2 h-5 w-5" />
                 Export Dashboard Data Dialog
               </span>
               <Button
-                variant='ghost'
-                size='sm'
+                variant="ghost"
+                size="sm"
                 onClick={() => setShowExportDialog(false)}
                 disabled={exportProgress.isExporting}
-                aria-label='Close export dialog'
-                data-testid='close-export-dialog'
+                aria-label="Close export dialog"
+                data-testid="close-export-dialog"
               >
-                <X className='h-4 w-4' />
+                <X className="h-4 w-4" />
               </Button>
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='space-y-6'>
+            <div className="space-y-6">
               {/* Export Format Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <PieChartIcon className='mr-2 h-4 w-4' />
+              <div className="space-y-3">
+                <h4 className="flex items-center font-semibold">
+                  <PieChartIcon className="mr-2 h-4 w-4" />
                   Export Format
                 </h4>
-                <div className='grid grid-cols-3 gap-3'>
+                <div className="grid grid-cols-3 gap-3">
                   <label
-                    htmlFor='exportFormatJson'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as JSON format'
+                    htmlFor="exportFormatJson"
+                    className="hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3"
+                    aria-label="Export data as JSON format"
                   >
                     <input
-                      id='exportFormatJson'
-                      type='radio'
-                      name='exportFormat'
-                      value='json'
+                      id="exportFormatJson"
+                      type="radio"
+                      name="exportFormat"
+                      value="json"
                       checked={exportFormat === 'json'}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const value = e.target.value
@@ -1723,14 +1753,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           setExportFormat(value)
                         }
                       }}
-                      className='rounded'
-                      aria-describedby='json-format-description'
+                      className="rounded"
+                      aria-describedby="json-format-description"
                     />
                     <div>
-                      <div className='font-medium'>JSON</div>
+                      <div className="font-medium">JSON</div>
                       <div
-                        className='text-muted-foreground text-xs'
-                        id='json-format-description'
+                        className="text-muted-foreground text-xs"
+                        id="json-format-description"
                       >
                         Raw data format
                       </div>
@@ -1738,15 +1768,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   </label>
 
                   <label
-                    htmlFor='exportFormatCsv'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as CSV format'
+                    htmlFor="exportFormatCsv"
+                    className="hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3"
+                    aria-label="Export data as CSV format"
                   >
                     <input
-                      id='exportFormatCsv'
-                      type='radio'
-                      name='exportFormat'
-                      value='csv'
+                      id="exportFormatCsv"
+                      type="radio"
+                      name="exportFormat"
+                      value="csv"
                       checked={exportFormat === 'csv'}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const value = e.target.value
@@ -1754,14 +1784,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           setExportFormat(value)
                         }
                       }}
-                      className='rounded'
-                      aria-describedby='csv-format-description'
+                      className="rounded"
+                      aria-describedby="csv-format-description"
                     />
                     <div>
-                      <div className='font-medium'>CSV</div>
+                      <div className="font-medium">CSV</div>
                       <div
-                        className='text-muted-foreground text-xs'
-                        id='csv-format-description'
+                        className="text-muted-foreground text-xs"
+                        id="csv-format-description"
                       >
                         Spreadsheet format
                       </div>
@@ -1769,15 +1799,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   </label>
 
                   <label
-                    htmlFor='exportFormatPdf'
-                    className='hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3'
-                    aria-label='Export data as PDF format'
+                    htmlFor="exportFormatPdf"
+                    className="hover:bg-muted flex cursor-pointer items-center space-x-2 rounded-lg border p-3"
+                    aria-label="Export data as PDF format"
                   >
                     <input
-                      id='exportFormatPdf'
-                      type='radio'
-                      name='exportFormat'
-                      value='pdf'
+                      id="exportFormatPdf"
+                      type="radio"
+                      name="exportFormat"
+                      value="pdf"
                       checked={exportFormat === 'pdf'}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         const value = e.target.value
@@ -1785,14 +1815,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           setExportFormat(value)
                         }
                       }}
-                      className='rounded'
-                      aria-describedby='pdf-format-description'
+                      className="rounded"
+                      aria-describedby="pdf-format-description"
                     />
                     <div>
-                      <div className='font-medium'>PDF</div>
+                      <div className="font-medium">PDF</div>
                       <div
-                        className='text-muted-foreground text-xs'
-                        id='pdf-format-description'
+                        className="text-muted-foreground text-xs"
+                        id="pdf-format-description"
                       >
                         Report format
                       </div>
@@ -1802,22 +1832,22 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               </div>
 
               {/* Date Range Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <Calendar className='mr-2 h-4 w-4' />
+              <div className="space-y-3">
+                <h4 className="flex items-center font-semibold">
+                  <Calendar className="mr-2 h-4 w-4" />
                   Date Range
                 </h4>
-                <div className='grid grid-cols-2 gap-3'>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label
-                      htmlFor='export-start-date'
-                      className='text-sm font-medium'
+                      htmlFor="export-start-date"
+                      className="text-sm font-medium"
                     >
                       Start Date
                     </label>
                     <input
-                      id='export-start-date'
-                      type='date'
+                      id="export-start-date"
+                      type="date"
                       value={exportDateRange.start}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDateRange((prev) => ({
@@ -1825,19 +1855,19 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           start: e.target.value,
                         }))
                       }
-                      className='mt-1 w-full rounded-md border bg-background p-2'
+                      className="mt-1 w-full rounded-md border bg-background p-2"
                     />
                   </div>
                   <div>
                     <label
-                      htmlFor='export-end-date'
-                      className='text-sm font-medium'
+                      htmlFor="export-end-date"
+                      className="text-sm font-medium"
                     >
                       End Date
                     </label>
                     <input
-                      id='export-end-date'
-                      type='date'
+                      id="export-end-date"
+                      type="date"
                       value={exportDateRange.end}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDateRange((prev) => ({
@@ -1845,26 +1875,26 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           end: e.target.value,
                         }))
                       }
-                      className='mt-1 w-full rounded-md border bg-background p-2'
+                      className="mt-1 w-full rounded-md border bg-background p-2"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Data Types Selection */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <BarChart3 className='mr-2 h-4 w-4' />
+              <div className="space-y-3">
+                <h4 className="flex items-center font-semibold">
+                  <BarChart3 className="mr-2 h-4 w-4" />
                   Data to Include
                 </h4>
-                <div className='grid grid-cols-2 gap-3'>
+                <div className="grid grid-cols-2 gap-3">
                   <label
-                    htmlFor='exportSummaryCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportSummaryCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportSummaryCheckbox'
-                      type='checkbox'
+                      id="exportSummaryCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.summary}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1872,18 +1902,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           summary: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Summary Metrics</span>
                   </label>
 
                   <label
-                    htmlFor='exportAlertsCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportAlertsCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportAlertsCheckbox'
-                      type='checkbox'
+                      id="exportAlertsCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.alerts}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1891,18 +1921,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           alerts: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Alerts</span>
                   </label>
 
                   <label
-                    htmlFor='exportTrendsCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportTrendsCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportTrendsCheckbox'
-                      type='checkbox'
+                      id="exportTrendsCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.trends}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1910,18 +1940,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           trends: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Trend Data</span>
                   </label>
 
                   <label
-                    htmlFor='exportDemographicsCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportDemographicsCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportDemographicsCheckbox'
-                      type='checkbox'
+                      id="exportDemographicsCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.demographics}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1929,18 +1959,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           demographics: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Demographics</span>
                   </label>
 
                   <label
-                    htmlFor='exportSessionsCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportSessionsCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportSessionsCheckbox'
-                      type='checkbox'
+                      id="exportSessionsCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.sessions}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1948,18 +1978,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           sessions: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Session Data</span>
                   </label>
 
                   <label
-                    htmlFor='exportRecommendationsCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="exportRecommendationsCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='exportRecommendationsCheckbox'
-                      type='checkbox'
+                      id="exportRecommendationsCheckbox"
+                      type="checkbox"
                       checked={exportDataTypes.recommendations}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportDataTypes((prev) => ({
@@ -1967,7 +1997,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           recommendations: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Recommendations</span>
                   </label>
@@ -1975,19 +2005,19 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               </div>
 
               {/* Export Filters */}
-              <div className='space-y-3'>
-                <h4 className='flex items-center font-semibold'>
-                  <Filter className='mr-2 h-4 w-4' />
+              <div className="space-y-3">
+                <h4 className="flex items-center font-semibold">
+                  <Filter className="mr-2 h-4 w-4" />
                   Export Options
                 </h4>
-                <div className='space-y-3'>
+                <div className="space-y-3">
                   <label
-                    htmlFor='applyCurrentFiltersCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="applyCurrentFiltersCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='applyCurrentFiltersCheckbox'
-                      type='checkbox'
+                      id="applyCurrentFiltersCheckbox"
+                      type="checkbox"
                       checked={exportFilters.applyCurrentFilters}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportFilters((prev) => ({
@@ -1995,18 +2025,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           applyCurrentFilters: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Apply current dashboard filters</span>
                   </label>
 
                   <label
-                    htmlFor='includeArchivedCheckbox'
-                    className='flex items-center space-x-2'
+                    htmlFor="includeArchivedCheckbox"
+                    className="flex items-center space-x-2"
                   >
                     <input
-                      id='includeArchivedCheckbox'
-                      type='checkbox'
+                      id="includeArchivedCheckbox"
+                      type="checkbox"
                       checked={exportFilters.includeArchived}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                         setExportFilters((prev) => ({
@@ -2014,25 +2044,25 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           includeArchived: e.target.checked,
                         }))
                       }
-                      className='rounded'
+                      className="rounded"
                     />
                     <span>Include archived alerts</span>
                   </label>
 
-                  <div className='grid grid-cols-2 gap-3'>
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label
-                        htmlFor='export-min-bias'
-                        className='text-sm font-medium'
+                        htmlFor="export-min-bias"
+                        className="text-sm font-medium"
                       >
                         Min Bias Score
                       </label>
                       <input
-                        id='export-min-bias'
-                        type='number'
-                        min='0'
-                        max='1'
-                        step='0.1'
+                        id="export-min-bias"
+                        type="number"
+                        min="0"
+                        max="1"
+                        step="0.1"
                         value={exportFilters.minBiasScore}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setExportFilters((prev) => ({
@@ -2040,22 +2070,22 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             minBiasScore: Number.parseFloat(e.target.value),
                           }))
                         }
-                        className='mt-1 w-full rounded-md border bg-background p-2'
+                        className="mt-1 w-full rounded-md border bg-background p-2"
                       />
                     </div>
                     <div>
                       <label
-                        htmlFor='export-max-bias'
-                        className='text-sm font-medium'
+                        htmlFor="export-max-bias"
+                        className="text-sm font-medium"
                       >
                         Max Bias Score
                       </label>
                       <input
-                        id='export-max-bias'
-                        type='number'
-                        min='0'
-                        max='1'
-                        step='0.1'
+                        id="export-max-bias"
+                        type="number"
+                        min="0"
+                        max="1"
+                        step="0.1"
                         value={exportFilters.maxBiasScore}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                           setExportFilters((prev) => ({
@@ -2063,7 +2093,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             maxBiasScore: Number.parseFloat(e.target.value),
                           }))
                         }
-                        className='mt-1 w-full rounded-md border bg-background p-2'
+                        className="mt-1 w-full rounded-md border bg-background p-2"
                       />
                     </div>
                   </div>
@@ -2072,19 +2102,19 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
               {/* Export Progress */}
               {exportProgress.isExporting && (
-                <div className='space-y-3'>
-                  <h4 className='flex items-center font-semibold'>
-                    <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                <div className="space-y-3">
+                  <h4 className="flex items-center font-semibold">
+                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                     Export Progress
                   </h4>
-                  <div className='space-y-2'>
-                    <div className='flex items-center justify-between text-sm'>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
                       <span>{exportProgress.status}</span>
                       <span>{exportProgress.progress}%</span>
                     </div>
                     <Progress
                       value={exportProgress.progress}
-                      className='w-full'
+                      className="w-full"
                     />
                   </div>
                 </div>
@@ -2099,11 +2129,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       : 'bg-green-50 text-green-700 border-green-200 border'
                   }`}
                 >
-                  <div className='flex items-center'>
+                  <div className="flex items-center">
                     {exportProgress.status.startsWith('Error') ? (
-                      <AlertTriangle className='mr-2 h-4 w-4' />
+                      <AlertTriangle className="mr-2 h-4 w-4" />
                     ) : (
-                      <CheckCircle className='mr-2 h-4 w-4' />
+                      <CheckCircle className="mr-2 h-4 w-4" />
                     )}
                     {exportProgress.status}
                   </div>
@@ -2111,17 +2141,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               )}
 
               {/* Action Buttons */}
-              <div className='flex items-center justify-between border-t pt-4'>
-                <div className='text-muted-foreground text-sm'>
+              <div className="flex items-center justify-between border-t pt-4">
+                <div className="text-muted-foreground text-sm">
                   {Object.values(exportDataTypes).filter(Boolean).length} data
                   types selected
                 </div>
-                <div className='flex items-center space-x-2'>
+                <div className="flex items-center space-x-2">
                   <Button
-                    variant='outline'
+                    variant="outline"
                     onClick={() => setShowExportDialog(false)}
                     disabled={exportProgress.isExporting}
-                    data-testid='cancel-export'
+                    data-testid="cancel-export"
                   >
                     Cancel Export
                   </Button>
@@ -2131,16 +2161,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       exportProgress.isExporting ||
                       !Object.values(exportDataTypes).some(Boolean)
                     }
-                    data-testid='export-data-button'
+                    data-testid="export-data-button"
                   >
                     {exportProgress.isExporting ? (
                       <>
-                        <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
+                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                         Exporting Data...
                       </>
                     ) : (
                       <>
-                        <Download className='mr-2 h-4 w-4' />
+                        <Download className="mr-2 h-4 w-4" />
                         Export as {exportFormat.toUpperCase()}
                       </>
                     )}
@@ -2155,29 +2185,29 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {/* Filtering Controls */}
       <Card>
         <CardHeader>
-          <CardTitle className='flex items-center'>
-            <Filter className='mr-2 h-5 w-5' />
+          <CardTitle className="flex items-center">
+            <Filter className="mr-2 h-5 w-5" />
             Filters & Time Range
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Time Range Selection */}
-            <div className='space-y-2'>
+            <div className="space-y-2">
               <label
-                htmlFor='time-range-select'
-                className='flex items-center text-sm font-medium'
+                htmlFor="time-range-select"
+                className="flex items-center text-sm font-medium"
               >
-                <Clock className='mr-1 h-4 w-4' />
+                <Clock className="mr-1 h-4 w-4" />
                 Time Range
               </label>
               <select
-                id='time-range-select'
+                id="time-range-select"
                 value={selectedTimeRange}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setSelectedTimeRange(e.target.value)
                 }
-                className='w-full rounded-md border bg-background p-2'
+                className="w-full rounded-md border bg-background p-2"
               >
                 {timeRangeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -2190,17 +2220,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             {/* Custom Date Range */}
             {selectedTimeRange === 'custom' && (
               <>
-                <div className='space-y-2'>
+                <div className="space-y-2">
                   <label
-                    htmlFor='custom-start-date'
-                    className='flex items-center text-sm font-medium'
+                    htmlFor="custom-start-date"
+                    className="flex items-center text-sm font-medium"
                   >
-                    <Calendar className='mr-1 h-4 w-4' />
+                    <Calendar className="mr-1 h-4 w-4" />
                     Start Date
                   </label>
                   <input
-                    id='custom-start-date'
-                    type='datetime-local'
+                    id="custom-start-date"
+                    type="datetime-local"
                     value={customDateRange.start}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCustomDateRange((prev) => ({
@@ -2208,20 +2238,20 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         start: e.target.value,
                       }))
                     }
-                    className='w-full rounded-md border bg-background p-2'
+                    className="w-full rounded-md border bg-background p-2"
                   />
                 </div>
-                <div className='space-y-2'>
+                <div className="space-y-2">
                   <label
-                    htmlFor='custom-end-date'
-                    className='flex items-center text-sm font-medium'
+                    htmlFor="custom-end-date"
+                    className="flex items-center text-sm font-medium"
                   >
-                    <Calendar className='mr-1 h-4 w-4' />
+                    <Calendar className="mr-1 h-4 w-4" />
                     End Date
                   </label>
                   <input
-                    id='custom-end-date'
-                    type='datetime-local'
+                    id="custom-end-date"
+                    type="datetime-local"
                     value={customDateRange.end}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                       setCustomDateRange((prev) => ({
@@ -2229,23 +2259,23 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         end: e.target.value,
                       }))
                     }
-                    className='w-full rounded-md border bg-background p-2'
+                    className="w-full rounded-md border bg-background p-2"
                   />
                 </div>
               </>
             )}
 
             {/* Bias Score Filter */}
-            <div className='space-y-2'>
+            <div className="space-y-2">
               <label
-                htmlFor='bias-score-filter'
-                className='flex items-center text-sm font-medium'
+                htmlFor="bias-score-filter"
+                className="flex items-center text-sm font-medium"
               >
-                <BarChart3 className='mr-1 h-4 w-4' />
+                <BarChart3 className="mr-1 h-4 w-4" />
                 Bias Score Level
               </label>
               <select
-                id='bias-score-filter'
+                id="bias-score-filter"
                 value={biasScoreFilter}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   const val = e.target.value
@@ -2258,26 +2288,26 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     setBiasScoreFilter(val)
                   }
                 }}
-                className='w-full rounded-md border bg-background p-2'
+                className="w-full rounded-md border bg-background p-2"
               >
-                <option value='all'>All Levels</option>
-                <option value='low'>Low (&lt; 30%)</option>
-                <option value='medium'>Medium (30-60%)</option>
-                <option value='high'>High (&gt; 60%)</option>
+                <option value="all">All Levels</option>
+                <option value="low">Low (&lt; 30%)</option>
+                <option value="medium">Medium (30-60%)</option>
+                <option value="high">High (&gt; 60%)</option>
               </select>
             </div>
 
             {/* Alert Level Filter */}
-            <div className='space-y-2'>
+            <div className="space-y-2">
               <label
-                htmlFor='alert-level-filter'
-                className='flex items-center text-sm font-medium'
+                htmlFor="alert-level-filter"
+                className="flex items-center text-sm font-medium"
               >
-                <AlertTriangle className='mr-1 h-4 w-4' />
+                <AlertTriangle className="mr-1 h-4 w-4" />
                 Alert Level
               </label>
               <select
-                id='alert-level-filter'
+                id="alert-level-filter"
                 value={alertLevelFilter}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   const value = e.target.value
@@ -2285,32 +2315,32 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     setAlertLevelFilter(value)
                   }
                 }}
-                className='w-full rounded-md border bg-background p-2'
+                className="w-full rounded-md border bg-background p-2"
               >
-                <option value='all'>All Alerts</option>
-                <option value='low'>Low Priority</option>
-                <option value='medium'>Medium Priority</option>
-                <option value='high'>High Priority</option>
-                <option value='critical'>Critical</option>
+                <option value="all">All Alerts</option>
+                <option value="low">Low Priority</option>
+                <option value="medium">Medium Priority</option>
+                <option value="high">High Priority</option>
+                <option value="critical">Critical</option>
               </select>
             </div>
 
             {/* Demographics Filter */}
-            <div className='space-y-2'>
+            <div className="space-y-2">
               <label
-                htmlFor='demographics-filter'
-                className='flex items-center text-sm font-medium'
+                htmlFor="demographics-filter"
+                className="flex items-center text-sm font-medium"
               >
-                <Users className='mr-1 h-4 w-4' />
+                <Users className="mr-1 h-4 w-4" />
                 Demographics
               </label>
               <select
-                id='demographics-filter'
+                id="demographics-filter"
                 value={selectedDemographicFilter}
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setSelectedDemographicFilter(e.target.value)
                 }
-                className='w-full rounded-md border bg-background p-2'
+                className="w-full rounded-md border bg-background p-2"
               >
                 {demographicFilterOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -2321,10 +2351,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             </div>
 
             {/* Clear Filters Button */}
-            <div className='space-y-2'>
-              <div className='text-sm font-medium opacity-0'>Clear</div>
+            <div className="space-y-2">
+              <div className="text-sm font-medium opacity-0">Clear</div>
               <Button
-                variant='outline'
+                variant="outline"
                 onClick={() => {
                   setSelectedTimeRange('24h')
                   setBiasScoreFilter('all')
@@ -2332,7 +2362,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   setSelectedDemographicFilter('all')
                   setCustomDateRange({ start: '', end: '' })
                 }}
-                className='w-full'
+                className="w-full"
               >
                 Clear All Filters
               </Button>
@@ -2340,8 +2370,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </div>
 
           {/* Filter Summary */}
-          <div className='bg-muted mt-4 rounded-md p-3'>
-            <p className='text-muted-foreground text-sm'>
+          <div className="bg-muted mt-4 rounded-md p-3">
+            <p className="text-muted-foreground text-sm">
               <strong>Active Filters:</strong>
               {selectedTimeRange !== '24h' &&
                 ` Time: ${timeRangeOptions.find((o) => o.value === selectedTimeRange)?.label}`}
@@ -2365,27 +2395,27 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           alert.level === 'critical' || alert.level === 'high',
       ).length > 0 && (
         <Alert
-          variant='error'
-          title='High Priority Bias Alerts'
+          variant="error"
+          title="High Priority Bias Alerts"
           description={`${filteredAlerts.filter((alert: AlertItem) => alert.level === 'critical' || alert.level === 'high').length} critical or high-priority bias issues require immediate attention.`}
-          icon={<AlertTriangle className='h-4 w-4' />}
+          icon={<AlertTriangle className="h-4 w-4" />}
         />
       )}
 
       {/* Summary Cards - Update with filtered data counts */}
-      <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
               Total Sessions
             </CardTitle>
-            <Users className='text-muted-foreground h-4 w-4' />
+            <Users className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>
+            <div className="text-2xl font-bold">
               {summary?.totalSessions?.toLocaleString() ?? '0'}
             </div>
-            <p className='text-muted-foreground text-xs'>
+            <p className="text-muted-foreground text-xs">
               {filteredSessions.length !== recentAnalyses.length &&
                 `${filteredSessions.length} match current filters`}
             </p>
@@ -2393,11 +2423,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         </Card>
 
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
               Average Bias Score
             </CardTitle>
-            <BarChart3 className='text-muted-foreground h-4 w-4' />
+            <BarChart3 className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
             <div
@@ -2436,21 +2466,21 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     100
                   : (summary?.averageBiasScore ?? 0) * 100
               }
-              className='mt-2'
+              className="mt-2"
             />
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
               Filtered Alerts
             </CardTitle>
-            <AlertTriangle className='text-muted-foreground h-4 w-4' />
+            <AlertTriangle className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className='text-2xl font-bold'>{filteredAlerts.length}</div>
-            <p className='text-muted-foreground text-xs'>
+            <div className="text-2xl font-bold">{filteredAlerts.length}</div>
+            <p className="text-muted-foreground text-xs">
               {filteredAlerts.length !== alerts.length &&
                 `of ${alerts.length} total alerts`}
             </p>
@@ -2458,19 +2488,19 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         </Card>
 
         <Card>
-          <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-            <CardTitle className='text-sm font-medium'>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
               Compliance Score
             </CardTitle>
-            <Eye className='text-muted-foreground h-4 w-4' />
+            <Eye className="text-muted-foreground h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className='text-green-600 text-2xl font-bold'>
+            <div className="text-green-600 text-2xl font-bold">
               {((summary.complianceScore ?? 0) * 100).toFixed(1)}%
             </div>
             <Progress
               value={(summary.complianceScore ?? 0) * 100}
-              className='mt-2'
+              className="mt-2"
             />
           </CardContent>
         </Card>
@@ -2479,41 +2509,41 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       {/* Main Content Tabs */}
       <main
         ref={mainContentRef}
-        id='main-content'
+        id="main-content"
         tabIndex={-1}
-        className='focus:outline-none'
-        aria-label='Dashboard main content'
+        className="focus:outline-none"
+        aria-label="Dashboard main content"
       >
-        <Tabs defaultValue='trends' className='w-full'>
+        <Tabs defaultValue="trends" className="w-full">
           <TabsList
             className={`grid w-full ${isMobile ? 'grid-cols-2' : isTablet ? 'grid-cols-3' : 'grid-cols-5'} ${isMobile ? 'h-auto' : ''}`}
           >
             <TabsTrigger
-              value='trends'
+              value="trends"
               className={isMobile ? 'py-3 text-xs' : ''}
-              aria-label='Trends Tab - View bias trends and analytics'
-              data-testid='trends-tab'
+              aria-label="Trends Tab - View bias trends and analytics"
+              data-testid="trends-tab"
             >
               {isMobile ? 'Trends' : 'Trends Tab'}
             </TabsTrigger>
             <TabsTrigger
-              value='demographics'
+              value="demographics"
               className={isMobile ? 'py-3 text-xs' : ''}
-              aria-label='Demographics Tab - View demographic breakdown'
-              data-testid='demographics-tab'
+              aria-label="Demographics Tab - View demographic breakdown"
+              data-testid="demographics-tab"
             >
               {isMobile ? 'Demo' : 'Demographics Tab'}
             </TabsTrigger>
             <TabsTrigger
-              value='alerts'
+              value="alerts"
               className={isMobile ? 'py-3 text-xs' : ''}
               aria-label={`Alerts Tab - View alerts. ${filteredAlerts.length} alerts currently active`}
-              data-testid='alerts-tab'
+              data-testid="alerts-tab"
             >
               {isMobile ? 'Alerts' : 'Alerts Tab'}
               {filteredAlerts.length > 0 && (
                 <Badge
-                  variant='destructive'
+                  variant="destructive"
                   className={`ml-2 ${isMobile ? 'px-1 text-xs' : ''}`}
                   aria-label={`${filteredAlerts.length} active alerts`}
                 >
@@ -2524,16 +2554,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             {!isMobile && (
               <>
                 <TabsTrigger
-                  value='sessions'
-                  aria-label='Recent Sessions Tab - View recent session data'
-                  data-testid='sessions-tab'
+                  value="sessions"
+                  aria-label="Recent Sessions Tab - View recent session data"
+                  data-testid="sessions-tab"
                 >
                   Recent Sessions Tab
                 </TabsTrigger>
                 <TabsTrigger
-                  value='recommendations'
-                  aria-label='Recommendations Tab - View system recommendations'
-                  data-testid='recommendations-tab'
+                  value="recommendations"
+                  aria-label="Recommendations Tab - View system recommendations"
+                  data-testid="recommendations-tab"
                 >
                   Recommendations Tab
                 </TabsTrigger>
@@ -2543,20 +2573,20 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
           {/* Mobile-specific additional tabs */}
           {isMobile && (
-            <TabsList className='mt-2 grid w-full grid-cols-2'>
+            <TabsList className="mt-2 grid w-full grid-cols-2">
               <TabsTrigger
-                value='sessions'
-                className='py-3 text-xs'
-                aria-label='Recent Sessions Tab - View recent session data'
-                data-testid='sessions-tab-mobile'
+                value="sessions"
+                className="py-3 text-xs"
+                aria-label="Recent Sessions Tab - View recent session data"
+                data-testid="sessions-tab-mobile"
               >
                 Sessions Tab
               </TabsTrigger>
               <TabsTrigger
-                value='recommendations'
-                className='py-3 text-xs'
-                aria-label='Recommendations Tab - View system recommendations'
-                data-testid='recommendations-tab-mobile'
+                value="recommendations"
+                className="py-3 text-xs"
+                aria-label="Recommendations Tab - View system recommendations"
+                data-testid="recommendations-tab-mobile"
               >
                 Recommendations Tab
               </TabsTrigger>
@@ -2564,7 +2594,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           )}
 
           {/* Trends Tab - Use filtered data */}
-          <TabsContent value='trends' className='space-y-6'>
+          <TabsContent value="trends" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>
@@ -2573,33 +2603,33 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer
-                  width='100%'
+                  width="100%"
                   height={getResponsiveChartHeight()}
                 >
                   <AreaChart data={filteredTrends}>
                     <defs>
                       <linearGradient
-                        id='biasScoreGradient'
-                        x1='0'
-                        y1='0'
-                        x2='0'
-                        y2='1'
+                        id="biasScoreGradient"
+                        x1="0"
+                        y1="0"
+                        x2="0"
+                        y2="1"
                       >
                         <stop
-                          offset='5%'
-                          stopColor='#ef4444'
+                          offset="5%"
+                          stopColor="#ef4444"
                           stopOpacity={0.8}
                         />
                         <stop
-                          offset='95%'
-                          stopColor='#ef4444'
+                          offset="95%"
+                          stopColor="#ef4444"
                           stopOpacity={0.1}
                         />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray='3 3' />
+                    <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
-                      dataKey='date'
+                      dataKey="date"
                       tickFormatter={(value: string | number) =>
                         new Date(value).toLocaleDateString()
                       }
@@ -2609,22 +2639,22 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     <Legend />
                     <ReferenceLine
                       y={0.3}
-                      stroke='#f59e0b'
-                      strokeDasharray='3 3'
-                      label='Warning'
+                      stroke="#f59e0b"
+                      strokeDasharray="3 3"
+                      label="Warning"
                     />
                     <ReferenceLine
                       y={0.6}
-                      stroke='#ef4444'
-                      strokeDasharray='3 3'
-                      label='High'
+                      stroke="#ef4444"
+                      strokeDasharray="3 3"
+                      label="High"
                     />
                     <Area
-                      type='monotone'
-                      dataKey='biasScore'
-                      stroke='#ef4444'
+                      type="monotone"
+                      dataKey="biasScore"
+                      stroke="#ef4444"
                       fillOpacity={1}
-                      fill='url(#biasScoreGradient)'
+                      fill="url(#biasScoreGradient)"
                       animationDuration={reducedMotion ? 0 : 1000}
                     />
                   </AreaChart>
@@ -2641,13 +2671,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer
-                    width='100%'
+                    width="100%"
                     height={getResponsiveChartHeight() - 100}
                   >
                     <BarChart data={filteredTrends}>
-                      <CartesianGrid strokeDasharray='3 3' />
+                      <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
-                        dataKey='date'
+                        dataKey="date"
                         tickFormatter={(value: string | number) =>
                           new Date(value).toLocaleDateString()
                         }
@@ -2656,8 +2686,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       <Tooltip content={<CustomTooltip />} />
                       <Legend />
                       <Bar
-                        dataKey='sessionCount'
-                        fill='#3b82f6'
+                        dataKey="sessionCount"
+                        fill="#3b82f6"
                         radius={[4, 4, 0, 0]}
                         animationDuration={reducedMotion ? 0 : 1000}
                       />
@@ -2672,13 +2702,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer
-                    width='100%'
+                    width="100%"
                     height={getResponsiveChartHeight() - 100}
                   >
                     <BarChart data={filteredTrends}>
-                      <CartesianGrid strokeDasharray='3 3' />
+                      <CartesianGrid strokeDasharray="3 3" />
                       <XAxis
-                        dataKey='date'
+                        dataKey="date"
                         tickFormatter={(value: string | number) =>
                           new Date(value).toLocaleDateString()
                         }
@@ -2687,8 +2717,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       <Tooltip content={<CustomTooltip />} />
                       <Legend />
                       <Bar
-                        dataKey='alertCount'
-                        fill='#f59e0b'
+                        dataKey="alertCount"
+                        fill="#f59e0b"
                         radius={[4, 4, 0, 0]}
                         animationDuration={reducedMotion ? 0 : 1000}
                       />
@@ -2705,7 +2735,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer
-                  width='100%'
+                  width="100%"
                   height={getResponsiveChartHeight()}
                 >
                   <RadarChart
@@ -2719,13 +2749,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     ]}
                   >
                     <PolarGrid />
-                    <PolarAngleAxis dataKey='metric' />
+                    <PolarAngleAxis dataKey="metric" />
                     <PolarRadiusAxis angle={30} domain={[0, 1]} />
                     <Radar
-                      name='Bias Score'
-                      dataKey='value'
-                      stroke='#ef4444'
-                      fill='#ef4444'
+                      name="Bias Score"
+                      dataKey="value"
+                      stroke="#ef4444"
+                      fill="#ef4444"
                       fillOpacity={0.6}
                       animationDuration={reducedMotion ? 0 : 1000}
                     />
@@ -2737,15 +2767,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
 
           {/* Demographics Tab */}
-          <TabsContent value='demographics' className='space-y-6'>
-            <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+          <TabsContent value="demographics" className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Age Distribution */}
               <Card>
                 <CardHeader>
                   <CardTitle>Age Distribution</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width='100%' height={250}>
+                  <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
                         data={Object.entries(demographics.age ?? {}).map(
@@ -2754,11 +2784,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             value: count,
                           }),
                         )}
-                        cx='50%'
-                        cy='50%'
+                        cx="50%"
+                        cy="50%"
                         outerRadius={80}
-                        fill='#8884d8'
-                        dataKey='value'
+                        fill="#8884d8"
+                        dataKey="value"
                         label={({
                           name,
                           percent,
@@ -2797,8 +2827,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className='bg-white rounded border p-2 shadow'>
-                                <p className='font-semibold'>
+                              <div className="bg-white rounded border p-2 shadow">
+                                <p className="font-semibold">
                                   {payload[0]?.name}
                                 </p>
                                 <p>Count: {payload[0]?.value}</p>
@@ -2827,7 +2857,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   <CardTitle>Gender Distribution</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width='100%' height={250}>
+                  <ResponsiveContainer width="100%" height={250}>
                     <PieChart>
                       <Pie
                         data={Object.entries(demographics.gender ?? {}).map(
@@ -2836,11 +2866,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             value: count,
                           }),
                         )}
-                        cx='50%'
-                        cy='50%'
+                        cx="50%"
+                        cy="50%"
                         outerRadius={80}
-                        fill='#82ca9d'
-                        dataKey='value'
+                        fill="#82ca9d"
+                        dataKey="value"
                         label={({
                           name,
                           percent,
@@ -2879,8 +2909,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         }) => {
                           if (active && payload && payload.length) {
                             return (
-                              <div className='bg-white rounded border p-2 shadow'>
-                                <p className='font-semibold'>
+                              <div className="bg-white rounded border p-2 shadow">
+                                <p className="font-semibold">
                                   {payload[0]?.name}
                                 </p>
                                 <p>Count: {payload[0]?.value}</p>
@@ -2910,7 +2940,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                 <CardTitle>Ethnicity Breakdown</CardTitle>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width='100%' height={300}>
+                <ResponsiveContainer width="100%" height={300}>
                   <BarChart
                     data={Object.entries(demographics.ethnicity ?? {}).map(
                       ([ethnicity, count]) => ({
@@ -2918,16 +2948,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         count,
                       }),
                     )}
-                    layout='horizontal'
+                    layout="horizontal"
                   >
-                    <CartesianGrid strokeDasharray='3 3' />
-                    <XAxis type='number' />
-                    <YAxis dataKey='ethnicity' type='category' width={100} />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis type="number" />
+                    <YAxis dataKey="ethnicity" type="category" width={100} />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
                     <Bar
-                      dataKey='count'
-                      fill='#8884d8'
+                      dataKey="count"
+                      fill="#8884d8"
                       radius={[0, 4, 4, 0]}
                       animationDuration={1000}
                       animationBegin={0}
@@ -2939,16 +2969,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
 
           {/* Alerts Tab - Use filtered data */}
-          <TabsContent value='alerts' className='space-y-4'>
+          <TabsContent value="alerts" className="space-y-4">
             {/* Alert Management Controls */}
             {filteredAlerts.length > 0 && (
               <Card>
-                <CardContent className='p-4'>
-                  <div className='flex items-center justify-between'>
-                    <div className='flex items-center space-x-4'>
-                      <label className='flex items-center space-x-2'>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center space-x-2">
                         <input
-                          type='checkbox'
+                          type="checkbox"
                           checked={
                             selectedAlerts.size === filteredAlerts.length &&
                             filteredAlerts.length > 0
@@ -2958,9 +2988,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                               ? selectAllAlerts()
                               : clearAlertSelection()
                           }
-                          className='rounded'
+                          className="rounded"
                         />
-                        <span className='text-sm'>
+                        <span className="text-sm">
                           {selectedAlerts.size > 0
                             ? `${selectedAlerts.size} selected`
                             : 'Select all'}
@@ -2968,57 +2998,57 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                       </label>
 
                       {selectedAlerts.size > 0 && (
-                        <div className='flex items-center space-x-2'>
+                        <div className="flex items-center space-x-2">
                           <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={ async () =>
+                            variant="outline"
+                            size="sm"
+                            onClick={async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'acknowledge',
                               )
                             }
                           >
-                            <Check className='mr-1 h-4 w-4' />
+                            <Check className="mr-1 h-4 w-4" />
                             Acknowledge
                           </Button>
 
                           <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={ async () =>
+                            variant="outline"
+                            size="sm"
+                            onClick={async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'dismiss',
                               )
                             }
                           >
-                            <X className='mr-1 h-4 w-4' />
+                            <X className="mr-1 h-4 w-4" />
                             Dismiss
                           </Button>
 
                           <Button
-                            variant='outline'
-                            size='sm'
-                            onClick={ async () =>
+                            variant="outline"
+                            size="sm"
+                            onClick={async () =>
                               handleBulkAlertAction(
                                 Array.from(selectedAlerts),
                                 'archive',
                               )
                             }
                           >
-                            <Archive className='mr-1 h-4 w-4' />
+                            <Archive className="mr-1 h-4 w-4" />
                             Archive
                           </Button>
                         </div>
                       )}
                     </div>
 
-                    <div className='flex items-center space-x-2'>
-                      <Badge variant='secondary'>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant="secondary">
                         {filteredAlerts.length} alerts
                       </Badge>
-                      <Badge variant='destructive'>
+                      <Badge variant="destructive">
                         {
                           filteredAlerts.filter(
                             (a: AlertItem) =>
@@ -3035,17 +3065,17 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
             {filteredAlerts.length === 0 ? (
               <Card>
-                <CardContent className='py-8 text-center'>
-                  <p className='text-muted-foreground'>
+                <CardContent className="py-8 text-center">
+                  <p className="text-muted-foreground">
                     {alerts.length === 0
                       ? 'No active alerts'
                       : 'No alerts match current filters'}
                   </p>
                   {alerts.length > 0 && filteredAlerts.length === 0 && (
                     <Button
-                      variant='outline'
-                      size='sm'
-                      className='mt-2'
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
                       onClick={() => {
                         setAlertLevelFilter('all')
                         setSelectedTimeRange('24h')
@@ -3067,31 +3097,31 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                     key={alert.alertId}
                     className={isSelected ? 'ring-blue-500 ring-2' : ''}
                   >
-                    <CardContent className='p-4'>
-                      <div className='flex items-start space-x-3'>
+                    <CardContent className="p-4">
+                      <div className="flex items-start space-x-3">
                         {/* Selection Checkbox */}
                         <input
-                          type='checkbox'
+                          type="checkbox"
                           checked={isSelected}
                           onChange={() => toggleAlertSelection(alert.alertId)}
-                          className='mt-1 rounded'
+                          className="mt-1 rounded"
                         />
 
                         {/* Alert Content */}
-                        <div className='flex-1'>
-                          <div className='flex items-start justify-between'>
-                            <div className='flex items-start space-x-3'>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start space-x-3">
                               <Badge
                                 className={`${getAlertColor(alert.level)} text-white`}
                               >
                                 {alert.level?.toUpperCase() || 'UNKNOWN'}
                               </Badge>
                               <div>
-                                <h4 className='font-semibold'>{alert.type}</h4>
-                                <p className='text-muted-foreground mt-1 text-sm'>
+                                <h4 className="font-semibold">{alert.type}</h4>
+                                <p className="text-muted-foreground mt-1 text-sm">
                                   {alert.message}
                                 </p>
-                                <p className='text-muted-foreground mt-2 text-xs'>
+                                <p className="text-muted-foreground mt-2 text-xs">
                                   Session: {alert.sessionId} •{' '}
                                   {alert.timestamp
                                     ? new Date(alert.timestamp).toLocaleString()
@@ -3100,27 +3130,27 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
                                 {/* Alert Status */}
                                 {lastAction && (
-                                  <div className='mt-2 flex items-center space-x-2'>
+                                  <div className="mt-2 flex items-center space-x-2">
                                     <Badge
-                                      variant='outline'
-                                      className='text-xs'
+                                      variant="outline"
+                                      className="text-xs"
                                     >
                                       {lastAction.type === 'acknowledge' && (
-                                        <Check className='mr-1 h-3 w-3' />
+                                        <Check className="mr-1 h-3 w-3" />
                                       )}
                                       {lastAction.type === 'dismiss' && (
-                                        <X className='mr-1 h-3 w-3' />
+                                        <X className="mr-1 h-3 w-3" />
                                       )}
                                       {lastAction.type === 'archive' && (
-                                        <Archive className='mr-1 h-3 w-3' />
+                                        <Archive className="mr-1 h-3 w-3" />
                                       )}
                                       {lastAction.type === 'escalate' && (
-                                        <AlertTriangle className='mr-1 h-3 w-3' />
+                                        <AlertTriangle className="mr-1 h-3 w-3" />
                                       )}
                                       {lastAction.type.charAt(0).toUpperCase() +
                                         lastAction.type.slice(1)}
                                     </Badge>
-                                    <span className='text-muted-foreground text-xs'>
+                                    <span className="text-muted-foreground text-xs">
                                       {new Date(
                                         lastAction.timestamp,
                                       ).toLocaleString()}
@@ -3130,7 +3160,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
                                 {/* Alert Notes */}
                                 {alertNotes.has(alert.alertId) && (
-                                  <div className='bg-muted mt-2 rounded p-2 text-sm'>
+                                  <div className="bg-muted mt-2 rounded p-2 text-sm">
                                     <strong>Notes:</strong>{' '}
                                     {alertNotes.get(alert.alertId)}
                                   </div>
@@ -3139,26 +3169,26 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             </div>
 
                             {/* Action Buttons */}
-                            <div className='flex items-center space-x-2'>
+                            <div className="flex items-center space-x-2">
                               {!alert.acknowledged && (
                                 <>
                                   <Button
-                                    size='sm'
-                                    variant='outline'
-                                    onClick={ async () =>
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={async () =>
                                       handleAlertAction(
                                         alert.alertId,
                                         'acknowledge',
                                       )
                                     }
                                   >
-                                    <Check className='mr-1 h-4 w-4' />
+                                    <Check className="mr-1 h-4 w-4" />
                                     Acknowledge
                                   </Button>
 
                                   <Button
-                                    size='sm'
-                                    variant='outline'
+                                    size="sm"
+                                    variant="outline"
                                     onClick={() => {
                                       const notes = prompt(
                                         'Add notes (optional):',
@@ -3170,15 +3200,15 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                       )
                                     }}
                                   >
-                                    <AlertTriangle className='mr-1 h-4 w-4' />
+                                    <AlertTriangle className="mr-1 h-4 w-4" />
                                     Escalate
                                   </Button>
                                 </>
                               )}
 
                               <Button
-                                size='sm'
-                                variant='outline'
+                                size="sm"
+                                variant="outline"
                                 onClick={() => {
                                   const notes = prompt('Add notes (optional):')
                                   if (notes) {
@@ -3189,18 +3219,18 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                                   }
                                 }}
                               >
-                                <MessageSquare className='mr-1 h-4 w-4' />
+                                <MessageSquare className="mr-1 h-4 w-4" />
                                 Note
                               </Button>
 
                               <Button
-                                size='sm'
-                                variant='outline'
-                                onClick={ async () =>
+                                size="sm"
+                                variant="outline"
+                                onClick={async () =>
                                   handleAlertAction(alert.alertId, 'dismiss')
                                 }
                               >
-                                <X className='mr-1 h-4 w-4' />
+                                <X className="mr-1 h-4 w-4" />
                                 Dismiss
                               </Button>
                             </div>
@@ -3208,23 +3238,23 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
 
                           {/* Action History */}
                           {actions.length > 0 && (
-                            <div className='mt-3 border-t pt-3'>
-                              <details className='text-sm'>
-                                <summary className='text-muted-foreground cursor-pointer hover:text-foreground'>
+                            <div className="mt-3 border-t pt-3">
+                              <details className="text-sm">
+                                <summary className="text-muted-foreground cursor-pointer hover:text-foreground">
                                   Action History ({actions.length})
                                 </summary>
-                                <div className='mt-2 space-y-1'>
+                                <div className="mt-2 space-y-1">
                                   {actions.map((action) => (
                                     <div
                                       key={action.id}
-                                      className='flex items-center justify-between text-xs'
+                                      className="flex items-center justify-between text-xs"
                                     >
                                       <span>
                                         {action.type.charAt(0).toUpperCase() +
                                           action.type.slice(1)}
                                         {action.notes && ` - ${action.notes}`}
                                       </span>
-                                      <span className='text-muted-foreground'>
+                                      <span className="text-muted-foreground">
                                         {new Date(
                                           action.timestamp,
                                         ).toLocaleString()}
@@ -3245,11 +3275,11 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
 
           {/* Recent Sessions Tab - Use filtered data */}
-          <TabsContent value='sessions' className='space-y-4'>
+          <TabsContent value="sessions" className="space-y-4">
             {filteredSessions.length === 0 ? (
               <Card>
-                <CardContent className='py-8 text-center'>
-                  <p className='text-muted-foreground'>
+                <CardContent className="py-8 text-center">
+                  <p className="text-muted-foreground">
                     {recentAnalyses.length === 0
                       ? 'No recent sessions'
                       : 'No sessions match current filters'}
@@ -3257,9 +3287,9 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                   {recentAnalyses.length > 0 &&
                     filteredSessions.length === 0 && (
                       <Button
-                        variant='outline'
-                        size='sm'
-                        className='mt-2'
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
                         onClick={() => {
                           setBiasScoreFilter('all')
                           setSelectedTimeRange('24h')
@@ -3273,13 +3303,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
             ) : (
               filteredSessions.map((analysis: BiasAnalysisItem) => (
                 <Card key={analysis['sessionId']}>
-                  <CardContent className='p-4'>
-                    <div className='flex items-center justify-between'>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
                       <div>
-                        <h4 className='font-semibold'>
+                        <h4 className="font-semibold">
                           Session {analysis['sessionId']}
                         </h4>
-                        <div className='mt-2 flex items-center space-x-4'>
+                        <div className="mt-2 flex items-center space-x-4">
                           <span
                             className={`text-sm font-medium ${getBiasScoreColor(analysis.overallBiasScore)}`}
                           >
@@ -3298,13 +3328,13 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           </Badge>
                         </div>
                       </div>
-                      <div className='text-right'>
-                        <p className='text-muted-foreground text-sm'>
+                      <div className="text-right">
+                        <p className="text-muted-foreground text-sm">
                           {analysis.timestamp
                             ? new Date(analysis.timestamp).toLocaleString()
                             : 'Unknown time'}
                         </p>
-                        <Button size='sm' variant='outline' className='mt-2'>
+                        <Button size="sm" variant="outline" className="mt-2">
                           View Details
                         </Button>
                       </div>
@@ -3316,14 +3346,14 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
           </TabsContent>
 
           {/* Recommendations Tab */}
-          <TabsContent value='recommendations' className='space-y-4'>
+          <TabsContent value="recommendations" className="space-y-4">
             {recommendations?.length > 0 ? (
               recommendations.map((rec: DashboardRecommendation) => (
                 <Card key={rec.id}>
-                  <CardContent className='p-4'>
-                    <div className='flex items-start justify-between'>
-                      <div className='flex-1'>
-                        <div className='mb-2 flex items-center space-x-2'>
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="mb-2 flex items-center space-x-2">
                           <Badge
                             variant={
                               rec.priority === 'critical'
@@ -3333,16 +3363,16 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           >
                             {rec.priority}
                           </Badge>
-                          <h4 className='font-semibold'>{rec.title}</h4>
+                          <h4 className="font-semibold">{rec.title}</h4>
                         </div>
-                        <p className='text-muted-foreground mb-3 text-sm'>
+                        <p className="text-muted-foreground mb-3 text-sm">
                           {rec.description}
                         </p>
-                        <div className='flex items-center space-x-2'>
-                          <Button size='sm' variant='outline'>
+                        <div className="flex items-center space-x-2">
+                          <Button size="sm" variant="outline">
                             View Details
                           </Button>
-                          <Button size='sm'>Implement</Button>
+                          <Button size="sm">Implement</Button>
                         </div>
                       </div>
                     </div>
@@ -3351,8 +3381,8 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
               ))
             ) : (
               <Card>
-                <CardContent className='py-8 text-center'>
-                  <p className='text-muted-foreground'>
+                <CardContent className="py-8 text-center">
+                  <p className="text-muted-foreground">
                     No recommendations available
                   </p>
                 </CardContent>

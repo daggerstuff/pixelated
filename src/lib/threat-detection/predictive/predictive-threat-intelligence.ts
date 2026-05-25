@@ -1291,14 +1291,11 @@ export class AdvancedPredictiveThreatIntelligence
   private groupByThreatType(
     threats: ThreatData[],
   ): Record<string, ThreatData[]> {
-    return threats.reduce< Record<string, ThreatData[]>>(
-      (acc, threat) => {
-        if (!acc[threat.threatType]) acc[threat.threatType] = []
-        acc[threat.threatType].push(threat)
-        return acc
-      },
-      {},
-    )
+    return threats.reduce<Record<string, ThreatData[]>>((acc, threat) => {
+      acc[threat.threatType] ??= []
+      acc[threat.threatType].push(threat)
+      return acc
+    }, {})
   }
 
   private async trainLSTMModel(

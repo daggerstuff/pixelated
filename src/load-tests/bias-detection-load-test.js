@@ -37,7 +37,7 @@ const AUTH_TOKEN = globalThis.__ENV?.AUTH_TOKEN ?? 'test-jwt-token'
 // Headers for authenticated requests
 const headers = {
   'Content-Type': 'application/json',
-  Authorization: `Bearer ${AUTH_TOKEN}`,
+  'Authorization': `Bearer ${AUTH_TOKEN}`,
 }
 
 // Sample test data for bias detection
@@ -325,7 +325,7 @@ export function teardown(data) {
 // Handle summary statistics
 export function handleSummary(data) {
   return {
-    stdout: textSummary(data, { indent: ' ', enableColors: true }),
+    'stdout': textSummary(data, { indent: ' ', enableColors: true }),
     'load-test-results.json': JSON.stringify(data, null, 2),
   }
 }

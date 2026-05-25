@@ -178,7 +178,7 @@ function DefenseGauge({
         className={styles.gaugeCanvas}
         style={{ width: GAUGE_WIDTH, height: GAUGE_HEIGHT }}
         aria-label={`Defense confidence ${Math.round(confidence * 100)}% — ${defenseName}`}
-        role='img'
+        role="img"
       />
       <div className={styles.gaugeFooter}>
         <span>Low</span>
@@ -198,7 +198,9 @@ function crisisStripClass(level: CrisisLevel): string {
       return styles.crisisStripHigh
     case 'elevated':
       return styles.crisisStripElevated
-    case "none": { throw new Error('Not implemented yet: "none" case') }
+    case 'none': {
+      throw new Error('Not implemented yet: "none" case')
+    }
     default:
       return styles.crisisStripNone
   }
@@ -214,7 +216,7 @@ function CrisisIcon({ level }: { level: CrisisLevel }) {
   }
   const { icon, label } = map[level]
   return (
-    <span className={styles.crisisIcon} aria-label={label} role='img'>
+    <span className={styles.crisisIcon} aria-label={label} role="img">
       {icon}
     </span>
   )
@@ -300,8 +302,12 @@ export function ResistanceMonitor({
         return styles.statusDotConnecting
       case 'error':
         return styles.statusDotError
-      case "disconnected": { throw new Error('Not implemented yet: "disconnected" case') }
-      case "idle": { throw new Error('Not implemented yet: "idle" case') }
+      case 'disconnected': {
+        throw new Error('Not implemented yet: "disconnected" case')
+      }
+      case 'idle': {
+        throw new Error('Not implemented yet: "idle" case')
+      }
       default:
         return styles.statusDotIdle
     }
@@ -323,7 +329,7 @@ export function ResistanceMonitor({
       <span className={styles.statusLabel}>
         <span
           className={`${styles.statusDot} ${dotClass(connectionStatus)}`}
-          role='status'
+          role="status"
           aria-label={connectionStatus}
         />
         Gestalt Engine
@@ -342,8 +348,8 @@ export function ResistanceMonitor({
           <button
             className={styles.reconnectBtn}
             onClick={reconnect}
-            type='button'
-            aria-label='Reconnect to Gestalt Engine'
+            type="button"
+            aria-label="Reconnect to Gestalt Engine"
           >
             Reconnect
           </button>
@@ -363,7 +369,7 @@ export function ResistanceMonitor({
     return (
       <div
         className={`${styles.crisisStrip} ${crisisStripClass(level)}`}
-        role='alert'
+        role="alert"
         aria-live={level === 'acute' ? 'assertive' : 'polite'}
       >
         <CrisisIcon level={level} />
@@ -374,7 +380,7 @@ export function ResistanceMonitor({
 
   const renderEmptyState = () => (
     <div className={styles.emptyState}>
-      <span className={styles.emptyIcon} aria-hidden='true'>
+      <span className={styles.emptyIcon} aria-hidden="true">
         📡
       </span>
       <p className={styles.emptyText}>
@@ -441,11 +447,11 @@ export function ResistanceMonitor({
       </div>
       <div
         className={styles.maturityBarTrack}
-        role='progressbar'
+        role="progressbar"
         aria-valuenow={maturityPct ?? 0}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label='Defense maturity score'
+        aria-label="Defense maturity score"
       >
         <div
           className={`${styles.maturityBarFill} ${
@@ -466,8 +472,8 @@ export function ResistanceMonitor({
     return (
       <div
         className={styles.emotionGrid}
-        role='group'
-        aria-label='Plutchik emotion scores'
+        role="group"
+        aria-label="Plutchik emotion scores"
       >
         {PLUTCHIK_ORDER.map((emotion) => {
           const score = scores[emotion] ?? 0
@@ -528,11 +534,11 @@ export function ResistanceMonitor({
           className={`${styles.breakthroughBarTrack} ${
             score > 0.7 ? styles.breakthroughHigh : ''
           }`}
-          role='progressbar'
+          role="progressbar"
           aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label='Breakthrough score'
+          aria-label="Breakthrough score"
         >
           <div
             className={`${styles.breakthroughBarFill} ${
@@ -558,7 +564,7 @@ export function ResistanceMonitor({
   return (
     <section
       className={panelClass}
-      aria-label='Resistance Monitor — Live Gestalt Defense State'
+      aria-label="Resistance Monitor — Live Gestalt Defense State"
     >
       {renderStatusBar()}
       {renderCrisisStrip()}

@@ -59,9 +59,7 @@ def resolve_asana_project_ids() -> tuple[str, ...]:
     raw_project_ids = _strip_env("PIXELATED_ASANA_PROJECT_IDS")
     if raw_project_ids:
         project_ids = tuple(
-            project_id
-            for project_id in (candidate.strip() for candidate in raw_project_ids.split(","))
-            if project_id
+            project_id for project_id in (candidate.strip() for candidate in raw_project_ids.split(",")) if project_id
         )
         if project_ids:
             return project_ids
@@ -157,6 +155,11 @@ def _dedupe_project_ids(project_ids: list[str]) -> tuple[str, ...]:
 def _resolve_default_asana_project_id(asana: Mapping[str, Any]) -> str:
     all_projects = asana.get("all_projects")
     if isinstance(all_projects, Mapping):
+        mtgc_value = all_projects.get("master_training_gap_closure")
+        mtgc_project_id = _normalize_project_id(mtgc_value)
+        if mtgc_project_id:
+            return mtgc_project_id
+
         active_sprint_value = all_projects.get("active_sprint")
         active_sprint_project_id = _normalize_project_id(active_sprint_value)
         if active_sprint_project_id:
@@ -354,9 +357,7 @@ def _validate_jira_project_candidate(candidate: str, *, allow_fallback: bool) ->
         )
     if allow_fallback:
         return ""
-    raise RuntimeError(
-        f"Configured Jira project '{candidate}' does not exist or is not accessible."
-    )
+    raise RuntimeError(f"Configured Jira project '{candidate}' does not exist or is not accessible.")
 
 
 def infer_jira_project_key_from_sync_state(state_path: Path | None = None) -> str:
@@ -470,11 +471,7 @@ def create_jira_project() -> dict[str, str]:
 
 
 def resolve_jira_project_name() -> str:
-    return (
-        _strip_env("PIXELATED_JIRA_PROJECT_NAME")
-        or _strip_env("JIRA_PROJECT_NAME")
-        or DEFAULT_JIRA_PROJECT_NAME
-    )
+    return _strip_env("PIXELATED_JIRA_PROJECT_NAME") or _strip_env("JIRA_PROJECT_NAME") or DEFAULT_JIRA_PROJECT_NAME
 
 
 def jira_project_key_candidates(project_name: str) -> list[str]:
@@ -641,7 +638,7 @@ def build_asana_headers(token: str) -> dict[str, str]:
 
 
 def build_jira_auth_header(user: str, token: str) -> dict[str, str]:
-    encoded = base64.b64encode(f"{user}:{token}".encode("utf-8")).decode("ascii")
+    encoded = base64.b64encode(f"{user}:{token}".encode()).decode("ascii")
     return {
         "Authorization": f"Basic {encoded}",
         "Content-Type": "application/json",
@@ -650,11 +647,7 @@ def build_jira_auth_header(user: str, token: str) -> dict[str, str]:
 
 
 def resolve_github_api_url() -> str:
-    return (
-        _strip_env("GITHUB_API_URL")
-        or _strip_env("GITHUB_ENTERPRISE_URL")
-        or DEFAULT_GITHUB_API_URL
-    )
+    return _strip_env("GITHUB_API_URL") or _strip_env("GITHUB_ENTERPRISE_URL") or DEFAULT_GITHUB_API_URL
 
 
 def resolve_github_token() -> str:
@@ -712,8 +705,9 @@ def resolve_linear_parent_issue_id() -> str:
 
 
 def build_linear_headers(token: str) -> dict[str, str]:
+    auth = token if token.startswith("lin_api_") else f"Bearer {token}"
     return {
-        "Authorization": f"Bearer {token}",
+        "Authorization": auth,
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
@@ -727,19 +721,19 @@ def _linear_issues_query(filter_by_team: str = "", filter_by_project: str = "") 
         filter_parts.append(f'project: {{ id: {{ eq: "{filter_by_project}" }} }}')
     filter_clause = ""
     if filter_parts:
-        filter_clause = f', filter: {{ {" ".join(filter_parts)} }}'
+        filter_clause = f", filter: {{ {' '.join(filter_parts)} }}"
     return (
         "query($after: String) { "
         "issues(first: 100, after: $after"
         f"{filter_clause}"
-        ') { nodes { id title description state updatedAt createdAt } pageInfo { hasNextPage endCursor } } }'
+        ") { nodes { id title description state { id name type } updatedAt createdAt } pageInfo { hasNextPage endCursor } } }"
     )
 
 
 def _linear_graphql_query(query: str, variables: Mapping[str, Any] | None = None) -> Any:
     api_url = resolve_linear_api_url()
     headers = build_linear_headers(resolve_linear_token())
-    payload = {"query": query}
+    payload: dict[str, Any] = {"query": query}
     if variables is not None:
         payload["variables"] = dict(variables)
     return _json_request("POST", api_url, headers=headers, payload=payload)
@@ -871,8 +865,7 @@ def export_asana_tasks() -> list[dict[str, Any]]:
     worker_count = max(1, min(DEFAULT_ASANA_EXPORT_WORKERS, len(project_ids)))
     with ThreadPoolExecutor(max_workers=worker_count) as executor:
         futures = {
-            executor.submit(_fetch_asana_project_tasks, project_id, headers): project_id
-            for project_id in project_ids
+            executor.submit(_fetch_asana_project_tasks, project_id, headers): project_id for project_id in project_ids
         }
         for future in as_completed(futures):
             project_id = futures[future]
@@ -936,10 +929,7 @@ def _request_asana_project_task_page(
     }
     if offset:
         query["offset"] = offset
-    url = (
-        f"https://app.asana.com/api/1.0/projects/{project_id}/tasks?"
-        f"{parse.urlencode(query)}"
-    )
+    url = f"https://app.asana.com/api/1.0/projects/{project_id}/tasks?{parse.urlencode(query)}"
     return _json_request("GET", url, headers=headers)
 
 
@@ -1088,16 +1078,10 @@ def export_github_issues() -> list[dict[str, Any]]:
                 "direction": "desc",
             }
         )
-        payload = _json_request(
-            "GET", f"{api_url}/repos/{owner}/{repo}/issues?{query}", headers=headers
-        )
+        payload = _json_request("GET", f"{api_url}/repos/{owner}/{repo}/issues?{query}", headers=headers)
         if not isinstance(payload, list) or not payload:
             break
-        issues.extend(
-            item
-            for item in payload
-            if isinstance(item, Mapping) and "pull_request" not in item
-        )
+        issues.extend(dict(item) for item in payload if isinstance(item, Mapping) and "pull_request" not in item)
         if len(payload) < 100:
             break
         page += 1
@@ -1148,9 +1132,7 @@ def export_linear_issues() -> list[dict[str, Any]]:
     issues: list[dict[str, Any]] = []
 
     while True:
-        response = _extract_graphql_payload(
-            _linear_graphql_query(query, {"after": cursor})
-        )
+        response = _extract_graphql_payload(_linear_graphql_query(query, {"after": cursor}))
         issues_payload = response.get("issues")
         if not isinstance(issues_payload, Mapping):
             break
@@ -1183,10 +1165,7 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         "description": str(action.get("body") or ""),
     }
 
-    mutation = (
-        "mutation($input: IssueCreateInput!) { "
-        "issueCreate(input: $input) { success issue { id title } } }"
-    )
+    mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
     key = "issueCreate"
 
     if action_type == "create":
@@ -1200,16 +1179,17 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         if parent_issue_id:
             input_payload["parentId"] = parent_issue_id
     else:
-        input_payload["id"] = target_id
         mutation = (
-            "mutation($input: IssueUpdateInput!) { "
-            "issueUpdate(input: $input) { success issue { id title } } }"
+            "mutation($id: String!, $input: IssueUpdateInput!) { "
+            "issueUpdate(id: $id, input: $input) { success issue { id title } } }"
         )
         key = "issueUpdate"
 
-    response = _extract_graphql_payload(
-        _linear_graphql_query(mutation, {"input": input_payload})
-    )
+    variables: dict[str, Any] = {"input": input_payload}
+    if action_type != "create":
+        variables["id"] = target_id
+
+    response = _extract_graphql_payload(_linear_graphql_query(mutation, variables))
     container = response.get(key)
     issue = container.get("issue") if isinstance(container, Mapping) else None
     if not isinstance(issue, Mapping):
