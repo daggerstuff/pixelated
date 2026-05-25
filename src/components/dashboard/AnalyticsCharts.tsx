@@ -168,34 +168,26 @@ interface SkillProgressProps {
   isLoading: boolean
 }
 
+// Performance optimization: Extract static maps outside component to prevent recreation on every render and enable O(1) lookups
+const TREND_ICONS: Record<'up' | 'down' | 'stable', string> = {
+  up: '↗',
+  down: '↘',
+  stable: '→',
+}
+
+const TREND_COLORS: Record<'up' | 'down' | 'stable', string> = {
+  up: 'text-green-600',
+  down: 'text-red-600',
+  stable: 'text-gray-600',
+}
+
 const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   if (isLoading) {
     return <LoadingSkeleton />
   }
 
-  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => {
-    switch (trend) {
-      case 'up':
-        return '↗'
-      case 'down':
-        return '↘'
-      case 'stable':
-      default:
-        return '→'
-    }
-  }
-
-  const getTrendColor = (trend: 'up' | 'down' | 'stable') => {
-    switch (trend) {
-      case 'up':
-        return 'text-green-600'
-      case 'down':
-        return 'text-red-600'
-      case 'stable':
-      default:
-        return 'text-gray-600'
-    }
-  }
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => TREND_ICONS[trend] ?? TREND_ICONS.stable
+  const getTrendColor = (trend: 'up' | 'down' | 'stable') => TREND_COLORS[trend] ?? TREND_COLORS.stable
 
   return (
     <div className="bg-white rounded-lg p-6 shadow">
@@ -237,6 +229,15 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
   )
 }
 
+// Performance optimization: Extract static map outside component to prevent recreation on every render and enable O(1) lookups
+const COLOR_CLASSES_MAP: Record<string, string> = {
+  blue: 'text-blue-600',
+  green: 'text-green-600',
+  purple: 'text-purple-600',
+  orange: 'text-orange-600',
+  red: 'text-red-600',
+}
+
 // Summary stats component
 interface SummaryStatsProps {
   data: MetricSummary[]
@@ -257,23 +258,10 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
   }
 
   const getColorClasses = (color?: string) => {
-    switch (color) {
-      case 'blue':
-        return 'text-blue-600'
-      case 'green':
-        return 'text-green-600'
-      case 'purple':
-        return 'text-purple-600'
-      case 'orange':
-        return 'text-orange-600'
-      case 'red':
-        return 'text-red-600'
-      case undefined: {
-        throw new Error('Not implemented yet: undefined case')
-      }
-      default:
-        return 'text-gray-600'
+    if (color === undefined) {
+      throw new Error('Not implemented yet: undefined case')
     }
+    return COLOR_CLASSES_MAP[color] || 'text-gray-600'
   }
 
   return (
