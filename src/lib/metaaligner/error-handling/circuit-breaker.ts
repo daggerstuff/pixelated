@@ -31,7 +31,6 @@ export interface ICircuitBreaker {
 export class CircuitBreaker implements ICircuitBreaker {
   private state: CircuitBreakerState = CircuitBreakerState.CLOSED
   private failures = 0
-  private lastError: Error | null = null
   private nextAttempt: number = Date.now()
 
   constructor(

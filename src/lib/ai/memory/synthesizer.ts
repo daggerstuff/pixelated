@@ -44,7 +44,6 @@ export class MemorySynthesizer {
       }
 
       // 3. Create a synthesized "Abstract Memory"
-      const synthesizedContent = this.generateSynthesizedContent(mergeCandidates);
       const merged_ids = mergeCandidates.map(m => m.id);
 
       appLogger.info('Synthesis completed', {
@@ -159,13 +158,5 @@ export class MemorySynthesizer {
       reciprocity: valid.reduce((acc, m) => acc + (m.metrics?.reciprocity ?? 0), 0) / valid.length,
       validation_accuracy: valid.reduce((acc, m) => acc + (m.metrics?.validation_accuracy ?? 0), 0) / valid.length,
     };
-  }
-
-  /**
-   * Place-holder for LLM-driven synthesis. 
-   * In a real system, this would call an LLM to "gist" the merged content.
-   */
-  private generateSynthesizedContent(candidates: MemoryObject[]): string {
-    return `Synthesized context from ${candidates.length} previous observations regarding ${candidates[0]?.gist ?? 'session flow'}.`;
   }
 }

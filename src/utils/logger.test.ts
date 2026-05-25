@@ -5,7 +5,7 @@ import {
   vi,
   beforeEach,
   afterEach,
-  afterAll,
+  _afterAll,
 } from 'vitest'
 
 import { createLogger, LogLevel, setLogLevel, logger } from './logger'

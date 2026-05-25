@@ -388,7 +388,7 @@ describe('AdaptiveSelector', () => {
     expect(result.contextDetectionResult.detectedContext).toBe(
       ContextType.GENERAL,
     )
-    expect(result.contextDetectionResult.metadata.error).toBeDefined()
+    expect(result.contextDetectionResult.metadata['error']).toBeDefined()
     expect(result.selectedObjectives.length).toBe(
       CORE_MENTAL_HEALTH_OBJECTIVES.length,
     )

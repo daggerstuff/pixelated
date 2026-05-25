@@ -59,7 +59,6 @@ if (!skipTests) {
       )
       for (const [featureKey, feature] of Object.entries(FEATURES)) {
         console.log(`  ✓ Testing feature: ${featureKey}`)
-        const detectionCode = feature.detectionFn.toString()
         const result = await page.evaluate((fn) => fn(), feature.detectionFn)
         compatibilityResults.browsers['chromium'] = {
           pages: compatibilityResults.browsers['chromium'].pages,

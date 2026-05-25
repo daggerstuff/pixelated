@@ -77,7 +77,7 @@ describe('RedisService', () => {
       // Create a clean instance for each test
       redis = new RedisService({
         url: process.env['REDIS_URL']!,
-        keyPrefix: process.env.REDIS_KEY_PREFIX!,
+        keyPrefix: process.env['REDIS_KEY_PREFIX']!,
         maxRetries: 3,
         retryDelay: 100,
         connectTimeout: 5000,
@@ -357,7 +357,7 @@ describe('RedisService', () => {
       // Create a new instance with short timeout
       const shortTimeoutRedis = new RedisService({
         url: process.env['REDIS_URL']!,
-        keyPrefix: process.env.REDIS_KEY_PREFIX!,
+        keyPrefix: process.env['REDIS_KEY_PREFIX']!,
         connectTimeout: 1,
       })
 

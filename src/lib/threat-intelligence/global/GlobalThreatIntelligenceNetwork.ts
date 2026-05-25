@@ -7,7 +7,7 @@ import crypto from 'crypto'
 import { EventEmitter } from 'events'
 
 import Redis from 'ioredis'
-import { MongoClient, Db } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { type ExternalThreatIntelligenceService } from '../../threat-detection/integrations/external-threat-intelligence'
@@ -89,7 +89,6 @@ export class GlobalThreatIntelligenceNetworkCore
 {
   private redis!: Redis
   private mongoClient!: MongoClient
-  private db!: Db
 
   private edgeDetectionSystem!: EdgeThreatDetectionSystem
   private correlationEngine!: ThreatCorrelationEngine
@@ -100,10 +99,7 @@ export class GlobalThreatIntelligenceNetworkCore
   private validationSystem!: ThreatValidationSystem
 
   private readonly existingResponseOrchestrator?: AdvancedResponseOrchestrator
-  private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
-  private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
 
-  private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly threatProcessingQueue: string[] = []
   private readonly regionStatus: Map<string, RegionStatus> = new Map()
@@ -155,7 +151,7 @@ export class GlobalThreatIntelligenceNetworkCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established')
     } catch (error: unknown) {
@@ -167,7 +163,7 @@ export class GlobalThreatIntelligenceNetworkCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ??
+        process.env['MONGODB_URI'] ??
           'mongodb://localhost:27017/global_threat_intelligence',
       )
       await this.mongoClient.connect()
@@ -832,13 +828,13 @@ export class GlobalThreatIntelligenceNetworkCore
       const components: Record<string, ComponentHealth> = {}
 
       // Check each subsystem
-      components.edgeDetection = await this.checkEdgeDetectionHealth()
-      components.correlation = await this.checkCorrelationHealth()
-      components.database = await this.checkDatabaseHealth()
-      components.orchestration = await this.checkOrchestrationHealth()
-      components.hunting = await this.checkHuntingHealth()
-      components.feedIntegration = await this.checkFeedIntegrationHealth()
-      components.validation = await this.checkValidationHealth()
+      components['edgeDetection'] = await this.checkEdgeDetectionHealth()
+      components['correlation'] = await this.checkCorrelationHealth()
+      components['database'] = await this.checkDatabaseHealth()
+      components['orchestration'] = await this.checkOrchestrationHealth()
+      components['hunting'] = await this.checkHuntingHealth()
+      components['feedIntegration'] = await this.checkFeedIntegrationHealth()
+      components['validation'] = await this.checkValidationHealth()
 
       // Calculate overall health
       const unhealthyComponents = Object.values(components).filter(

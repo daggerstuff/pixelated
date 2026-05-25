@@ -1,26 +1,5 @@
 import crypto from 'crypto'
 
-function generateSecureId(prefix = ''): string {
-  try {
-    const nodeCrypto = crypto as unknown as {
-      randomUUID?: () => string
-      randomBytes?: (n: number) => Buffer
-    }
-
-    if (typeof nodeCrypto.randomUUID === 'function') {
-      return `${prefix}${nodeCrypto.randomUUID()}`
-    }
-
-    if (typeof nodeCrypto.randomBytes === 'function') {
-      return `${prefix}${nodeCrypto.randomBytes(16).toString('hex')}`
-    }
-  } catch {
-    // ignore errors when crypto is unavailable
-  }
-
-  return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-}
-
 /**
  * Predictive Threat Intelligence System
  * Provides time series forecasting, emerging threat detection, and threat propagation modeling
@@ -196,8 +175,6 @@ export class AdvancedPredictiveThreatIntelligence
   private noveltyDetector!: NoveltyDetector
   private propagationModeler!: PropagationModeler
   seasonalAnalyzer!: SeasonalAnalyzer
-  private riskAssessor!: RiskAssessor
-  private modelRegistry!: ModelRegistry
 
   constructor(
     private readonly config: {
@@ -496,51 +473,6 @@ export class AdvancedPredictiveThreatIntelligence
       this.emit('seasonal_pattern_identification_error', { error })
       throw error
     }
-  }
-
-  // Renamed to avoid duplicate identifier
-  private async extractSeasonalPatternsFromComponents(
-    seasonalComponents: SeasonalComponents,
-  ): Promise<SeasonalPattern[]> {
-    const patterns: SeasonalPattern[] = []
-
-    // Analyze daily patterns
-    if (seasonalComponents.daily) {
-      const dailyPattern = await this.analyzeDailySeasonality(
-        seasonalComponents.daily,
-      )
-      if (dailyPattern.isSignificant) {
-        patterns.push({
-          patternId: 'daily_pattern',
-          seasonalityType: 'daily',
-          amplitude: dailyPattern.amplitude,
-          phase: dailyPattern.phase,
-          frequency: dailyPattern.frequency,
-          confidence: dailyPattern.confidence,
-          statisticalSignificance: dailyPattern.pValue,
-        })
-      }
-    }
-
-    // Analyze weekly patterns
-    if (seasonalComponents.weekly) {
-      const weeklyPattern = await this.analyzeWeeklySeasonality(
-        seasonalComponents.weekly,
-      )
-      if (weeklyPattern.isSignificant) {
-        patterns.push({
-          patternId: 'weekly_pattern',
-          seasonalityType: 'weekly',
-          amplitude: weeklyPattern.amplitude,
-          phase: weeklyPattern.phase,
-          frequency: weeklyPattern.frequency,
-          confidence: weeklyPattern.confidence,
-          statisticalSignificance: weeklyPattern.pValue,
-        })
-      }
-    }
-
-    return patterns
   }
 
   async assessRisk(
@@ -1119,46 +1051,6 @@ export class AdvancedPredictiveThreatIntelligence
     patterns: SeasonalPattern[],
   ): Promise<SeasonalPattern[]> {
     return patterns.filter((p) => p.statisticalSignificance < 0.05)
-  }
-
-  private async analyzeDailySeasonality(
-    _component: TimeSeriesComponent,
-  ): Promise<{
-    isSignificant: boolean
-    amplitude: number
-    phase: number
-    frequency: number
-    confidence: number
-    pValue: number
-  }> {
-    return {
-      isSignificant: false,
-      amplitude: 0,
-      phase: 0,
-      frequency: 0,
-      confidence: 0,
-      pValue: 1,
-    }
-  }
-
-  private async analyzeWeeklySeasonality(
-    _component: TimeSeriesComponent,
-  ): Promise<{
-    isSignificant: boolean
-    amplitude: number
-    phase: number
-    frequency: number
-    confidence: number
-    pValue: number
-  }> {
-    return {
-      isSignificant: false,
-      amplitude: 0,
-      phase: 0,
-      frequency: 0,
-      confidence: 0,
-      pValue: 1,
-    }
   }
 
   private async preprocessThreats(threats: Threat[]): Promise<Threat[]> {
@@ -1835,7 +1727,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
         validationSplit: 0.2,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            console.log(`Epoch ${epoch}: loss = ${logs?.loss}`)
+            console.log(`Epoch ${epoch}: loss = ${logs?.['loss']}`)
           },
         },
       })

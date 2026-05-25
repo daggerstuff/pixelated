@@ -1,4 +1,2 @@
-# Exclude specific peer dependencies that conflict with Astro build
-peer-dependency-rules.ignoreMissing[]="@capacitor/preferences"
-peer-dependency-rules.ignoreMissing[]="@capacitor/core" 
-peer-dependency-rules.ignoreMissing[]="@netlify/blobs"
+# All workspace-wide configurations (overrides, peer dependency rules, allowBuilds)
+# have been migrated to the root pnpm-workspace.yaml per pnpm 11 requirements.

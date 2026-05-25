@@ -70,7 +70,7 @@ export function withDLPProtection(
     context: Record<string, any>,
   ): Promise<Response | undefined> => {
     try {
-      const userId = context.user?.id ?? 'unknown'
+      const userId = context['user']?.id ?? 'unknown'
 
       // Check request body if enabled
       if (

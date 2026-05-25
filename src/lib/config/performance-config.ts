@@ -162,9 +162,9 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST ?? 'localhost',
-        port: parseInt(process.env.REDIS_PORT ?? '6379'),
-        password: process.env.REDIS_PASSWORD,
+        host: process.env['REDIS_HOST'] ?? 'localhost',
+        port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
+        password: process.env['REDIS_PASSWORD'],
         db: 0,
         maxRetriesPerRequest: 3,
         retryDelayOnFailover: 100,
@@ -268,9 +268,9 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST ?? 'localhost',
-        port: parseInt(process.env.REDIS_PORT ?? '6379'),
-        password: process.env.REDIS_PASSWORD,
+        host: process.env['REDIS_HOST'] ?? 'localhost',
+        port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
+        password: process.env['REDIS_PASSWORD'],
         db: 1,
         maxRetriesPerRequest: 3,
         retryDelayOnFailover: 200,
@@ -374,9 +374,9 @@ const ENV_CONFIGS = {
     },
     redis: {
       connection: {
-        host: process.env.REDIS_HOST ?? 'localhost',
-        port: parseInt(process.env.REDIS_PORT ?? '6379'),
-        password: process.env.REDIS_PASSWORD,
+        host: process.env['REDIS_HOST'] ?? 'localhost',
+        port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
+        password: process.env['REDIS_PASSWORD'],
         db: 2,
         maxRetriesPerRequest: 5,
         retryDelayOnFailover: 300,
@@ -417,7 +417,7 @@ const ENV_CONFIGS = {
         enableImageOptimization: true,
         enableLazyLoading: true,
         enablePreloading: true,
-        cdnUrl: process.env.CDN_URL,
+        cdnUrl: process.env['CDN_URL'],
       },
       runtime: {
         enableServiceWorker: true,
@@ -447,7 +447,7 @@ const ENV_CONFIGS = {
  * Get performance configuration for current environment
  */
 export function getPerformanceConfig(): PerformanceConfig {
-  const env = process.env.NODE_ENV ?? 'development'
+  const env = process.env['NODE_ENV'] ?? 'development'
   const config =
     ENV_CONFIGS[env as keyof typeof ENV_CONFIGS] || ENV_CONFIGS.development
 
@@ -457,12 +457,12 @@ export function getPerformanceConfig(): PerformanceConfig {
     api: {
       ...config.api,
       timeout: parseInt(
-        process.env.API_TIMEOUT ?? config.api.timeout.toString(),
+        process.env['API_TIMEOUT'] ?? config.api.timeout.toString(),
       ),
       rateLimit: {
         ...config.api.rateLimit,
         maxRequests: parseInt(
-          process.env.API_RATE_LIMIT ??
+          process.env['API_RATE_LIMIT'] ??
             config.api.rateLimit.maxRequests.toString(),
         ),
       },
@@ -472,7 +472,7 @@ export function getPerformanceConfig(): PerformanceConfig {
       pool: {
         ...config.database.pool,
         max: parseInt(
-          process.env.DB_MAX_CONNECTIONS ?? config.database.pool.max.toString(),
+          process.env['DB_MAX_CONNECTIONS'] ?? config.database.pool.max.toString(),
         ),
       },
     },
@@ -480,9 +480,9 @@ export function getPerformanceConfig(): PerformanceConfig {
       ...config.redis,
       connection: {
         ...config.redis.connection,
-        host: process.env.REDIS_HOST ?? config.redis.connection.host,
+        host: process.env['REDIS_HOST'] ?? config.redis.connection.host,
         port: parseInt(
-          process.env.REDIS_PORT ?? config.redis.connection.port.toString(),
+          process.env['REDIS_PORT'] ?? config.redis.connection.port.toString(),
         ),
       },
     },

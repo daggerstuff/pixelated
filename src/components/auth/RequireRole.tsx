@@ -1,5 +1,5 @@
 import type { AuthRole } from '@/config/auth.config'
-import { useSession } from '@/lib/auth-client.ts'
+import { useSession } from '@/lib/auth-client'
 import type { UserRole } from '@/types/auth'
 
 interface RequireRoleProps {

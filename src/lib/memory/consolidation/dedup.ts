@@ -24,7 +24,6 @@ export interface DedupResult {
 export class SemanticDeduplicator {
   private readonly threshold: number
   private idf: Map<string, number> = new Map()
-  private vocabulary: string[] = []
 
   constructor(threshold = DEDUP_THRESHOLD) {
     this.threshold = threshold

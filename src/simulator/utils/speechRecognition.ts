@@ -388,7 +388,7 @@ export function getTherapeuticPrompts(
       ],
     }
 
-    const domainPrompts = generalPrompts[domain] ?? generalPrompts.general
+    const domainPrompts = generalPrompts[domain] ?? generalPrompts['general']
     if (domainPrompts) {
       const selectedPrompt =
         domainPrompts[Math.floor(Math.random() * domainPrompts.length)]

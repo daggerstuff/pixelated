@@ -3,30 +3,30 @@ import { MemorySystemEvaluator } from './evaluation'
 
 function makeMemory(overrides: Partial<any> = {}): any {
   return {
-    id: overrides.id ?? `mem_${Math.random().toString(36).slice(2, 10)}`,
-    tenantId: overrides.tenantId ?? 't1',
-    sessionId: overrides.sessionId ?? 's1',
-    content: overrides.content ?? 'test memory content',
-    timestamp: overrides.timestamp ?? Date.now(),
-    importance: overrides.importance ?? {
+    id: overrides['id'] ?? `mem_${Math.random().toString(36).slice(2, 10)}`,
+    tenantId: overrides['tenantId'] ?? 't1',
+    sessionId: overrides['sessionId'] ?? 's1',
+    content: overrides['content'] ?? 'test memory content',
+    timestamp: overrides['timestamp'] ?? Date.now(),
+    importance: overrides['importance'] ?? {
       raw: 0.5,
       recency: 0.5,
       relevance: 0.5,
       emotionalWeight: 1.0,
       actionability: 0.3,
     },
-    emotions: overrides.emotions ?? {
+    emotions: overrides['emotions'] ?? {
       valence: 0.0,
       arousal: 0.5,
       categories: [],
     },
-    gating: overrides.gating ?? {
+    gating: overrides['gating'] ?? {
       piiStatus: 'absent',
       crisisFlag: false,
       traumaIndicators: [],
       consentGate: 'open',
     },
-    consolidation: overrides.consolidation ?? {
+    consolidation: overrides['consolidation'] ?? {
       phase: 'raw',
       lastProcessed: 0,
       remCycles: 3,
@@ -63,7 +63,7 @@ describe('DatasetPreparator', () => {
       makeMemory({ content: 'my email is test@example.com' }),
       makeMemory({ content: 'my SSN is 123-45-6789' }),
     ]
-    const [split, stats] = preparator.prepare(memories)
+    const [_split, stats] = preparator.prepare(memories)
     expect(stats.piiLeakDetected).toBe(true)
   })
 
@@ -80,7 +80,7 @@ describe('DatasetPreparator', () => {
         emotions: { valence: 0.5, arousal: 0.5, categories: ['joy'] },
       }),
     ]
-    const [split, stats] = preparator.prepare(memories)
+    const [_split, stats] = preparator.prepare(memories)
     expect(stats.totalExamples).toBeGreaterThanOrEqual(3)
   })
 })

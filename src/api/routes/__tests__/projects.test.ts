@@ -587,9 +587,9 @@ describe('Projects API', () => {
         .expect(404)
 
       const errorMessage =
-        typeof response.body.error === 'string'
-          ? response.body.error
-          : (response.body.error as { message?: string })?.message
+        typeof response.body['error'] === 'string'
+          ? response.body['error']
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -641,7 +641,7 @@ describe('Projects API', () => {
         .send(invalidData)
         .expect(400)
 
-      expect(response.body.error).toBeDefined()
+      expect(response.body['error']).toBeDefined()
     })
 
     it('should return 404 for non-existent project', async () => {
@@ -652,9 +652,9 @@ describe('Projects API', () => {
         .expect(404)
 
       const errorMessage =
-        typeof response.body.error === 'string'
-          ? response.body.error
-          : (response.body.error as { message?: string })?.message
+        typeof response.body['error'] === 'string'
+          ? response.body['error']
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -701,7 +701,7 @@ describe('Projects API', () => {
         .send(invalidData)
         .expect(400)
 
-      expect(response.body.error).toBeDefined()
+      expect(response.body['error']).toBeDefined()
     })
   })
 
@@ -718,7 +718,7 @@ describe('Projects API', () => {
         .send(shareData)
         .expect(200)
 
-      expect(response.body.success).toBe(true)
+      expect(response.body['success']).toBe(true)
     })
 
     it('should validate permission level', async () => {
@@ -734,9 +734,9 @@ describe('Projects API', () => {
         .expect(400)
 
       const errorMessage =
-        typeof response.body.error === 'string'
-          ? response.body.error
-          : (response.body.error as { message?: string })?.message
+        typeof response.body['error'] === 'string'
+          ? response.body['error']
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('permission')
     })
@@ -767,8 +767,8 @@ describe('Projects API', () => {
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
-      expect(response.body.success).toBe(true)
-      expect(response.body.data).toBeInstanceOf(Array)
+      expect(response.body['success']).toBe(true)
+      expect(response.body['data']).toBeInstanceOf(Array)
     })
   })
 })

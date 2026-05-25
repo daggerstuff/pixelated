@@ -697,7 +697,7 @@ function calculateConversationQuality(request: ConversationRequest): void {
   // Simulate quality calculation based on knowledge integration
   const baseScore = 80
   const kb = request.knowledgeBase as { dsm5Criteria?: unknown[] }
-  const cp = request.conversationParameters as { targetTechniques?: unknown[] }
+  const cp = request['conversationParameters'] as { targetTechniques?: unknown[] }
   const knowledgeIntegration = Math.min(
     95,
     baseScore + (kb.dsm5Criteria?.length ?? 0) * 2,
@@ -727,7 +727,7 @@ function calculateConversationQuality(request: ConversationRequest): void {
 
 function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
   return dialogue.map((turn, index) => {
-    const ks = turn.knowledgeSource as {
+    const ks = turn['knowledgeSource'] as {
       type: string
       reference: string
       confidence: number
@@ -739,7 +739,7 @@ function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
           source: ks.type,
           content: ks.reference,
           application:
-            turn.speaker === 'therapist'
+            turn['speaker'] === 'therapist'
               ? 'therapeutic_intervention'
               : 'client_response_pattern',
           confidence: ks.confidence,

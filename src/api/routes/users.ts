@@ -67,7 +67,7 @@ router.get(
 router.get(
   '/:userId',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.params.userId as string
+    const userId = req.params['userId'] as string
     const { user } = req as any
 
     // Users can view their own profile, admins can view anyone
@@ -100,7 +100,7 @@ router.get(
 router.put(
   '/:userId',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.params.userId as string
+    const userId = req.params['userId'] as string
     const { name, email, status, role } = req.body
     const { user } = req as any
 
@@ -219,7 +219,7 @@ router.delete(
   '/:userId',
   requireRoles(['admin']),
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.params.userId as string
+    const userId = req.params['userId'] as string
 
     const pool = getPostgresPool()
     const result = await pool.query(

@@ -208,6 +208,7 @@ export default defineConfig({
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
+          isolate: true,
           exclude: [
             '**/node_modules/**',
             'src/lib/security/__tests__/**/*.test.ts',
@@ -265,13 +266,18 @@ export default defineConfig({
             ...cpuBoundNodeTestExcludes,
           ],
           environment: 'node',
+          isolate: true,
         },
       },
     ],
-    pool: 'threads',
-    singleThread: !!process.env['CI'],
-    maxThreads: process.env['CI'] ? 4 : 8,
-    minThreads: process.env['CI'] ? 1 : 2,
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        maxForks: process.env['CI'] ? 4 : 8,
+        minForks: process.env['CI'] ? 1 : 2,
+      },
+    },
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
@@ -311,7 +317,7 @@ export default defineConfig({
     },
     // PIX-223: Timeout guard — force-kill hanging tests after 2× timeout
     teardownTimeout: 60_000,
-    fileParallelism: !process.env['CI'],
+    fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
     isolate: !process.env['CI'],
     ...(process.env['CI'] ? { watch: false } : {}),

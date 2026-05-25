@@ -19,7 +19,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null
@@ -406,7 +406,7 @@ export class Auth0AdaptiveMFAService {
         if (!isInAllowedWindow) {
           triggered = true
           description = `Login outside of allowed time windows`
-          value.allowedWindows = this.config.allowedTimeWindows
+          value['allowedWindows'] = this.config.allowedTimeWindows
         } else {
           description = `Login within allowed time windows`
         }
@@ -448,11 +448,11 @@ export class Auth0AdaptiveMFAService {
           if (recentLogs.length >= this.config.maxFailedAttempts) {
             triggered = true
             description = `Multiple failed login attempts detected (${recentLogs.length})`
-            value.failedAttempts = recentLogs.length
-            value.maxAllowed = this.config.maxFailedAttempts
+            value['failedAttempts'] = recentLogs.length
+            value['maxAllowed'] = this.config.maxFailedAttempts
           } else {
             description = `Normal login behavior (${recentLogs.length} recent failed attempts)`
-            value.failedAttempts = recentLogs.length
+            value['failedAttempts'] = recentLogs.length
           }
         }
 
@@ -466,7 +466,7 @@ export class Auth0AdaptiveMFAService {
           if (timeDiff > 30 * 24 * 60 * 60 * 1000) {
             triggered = true
             description = `Unusual login pattern - last login was over 30 days ago`
-            value.daysSinceLastLogin = Math.round(
+            value['daysSinceLastLogin'] = Math.round(
               timeDiff / (24 * 60 * 60 * 1000),
             )
           }
@@ -516,7 +516,7 @@ export class Auth0AdaptiveMFAService {
         if (isSuspicious) {
           triggered = true
           description = `Suspicious user agent detected`
-          value.suspiciousPattern = suspiciousAgents.find((agent) =>
+          value['suspiciousPattern'] = suspiciousAgents.find((agent) =>
             lowerUserAgent.includes(agent),
           )
         } else {

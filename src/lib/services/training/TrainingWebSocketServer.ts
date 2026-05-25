@@ -242,7 +242,7 @@ export class TrainingWebSocketServer {
   private async validateClient(
     token: string,
   ): Promise<ClientAuthResult | null> {
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isDevelopment = process.env['NODE_ENV'] === 'development'
 
     // Development mode: Allow authentication with any token (or no token)
     // This bypasses authentication for local development/testing
@@ -381,7 +381,7 @@ export class TrainingWebSocketServer {
 
     // In development mode, allow role to be set from payload (for testing different roles)
     // In production, role should come from authentication token only
-    const isDevelopment = process.env.NODE_ENV === 'development'
+    const isDevelopment = process.env['NODE_ENV'] === 'development'
     if (isDevelopment && payload.role) {
       client.role = payload.role
     }

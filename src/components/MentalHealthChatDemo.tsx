@@ -11,18 +11,18 @@ import {
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
 import { MentalHealthInsights } from '@/components/MentalHealthInsights'
-import { Badge } from '@/components/ui/badge/index.ts'
-import BrainVisualization from '@/components/ui/BrainVisualization.tsx'
-import { Button } from '@/components/ui/button/index.ts'
-import { Card, CardContent } from '@/components/ui/card/index.ts'
-import { Input } from '@/components/ui/input.tsx'
-import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard.tsx'
+import { Badge } from '@/components/ui/badge/index'
+import BrainVisualization from '@/components/ui/BrainVisualization'
+import { Button } from '@/components/ui/button/index'
+import { Card, CardContent } from '@/components/ui/card/index'
+import { Input } from '@/components/ui/input'
+import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
+} from '@/components/ui/tabs'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {

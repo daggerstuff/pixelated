@@ -137,7 +137,7 @@ export const GET = async ({
         {
           $set: {
             fullName: socialUser.name,
-            avatarUrl: socialUser.picture ?? existingProfile.avatarUrl,
+            avatarUrl: socialUser.picture ?? existingProfile['avatarUrl'],
             provider: socialUser.provider,
             updatedAt: new Date(),
           },

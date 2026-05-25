@@ -451,7 +451,6 @@ class ModelOptimizer {
     estimatedTime: number;
     riskLevel: "low" | "medium" | "high";
   }> {
-    const _analysis = await this.analyzePerformance();
     const pipeline: OptimizationStrategy[] = [];
 
     // Select strategies based on targets

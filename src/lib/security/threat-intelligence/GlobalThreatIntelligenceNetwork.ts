@@ -561,9 +561,9 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
     threat: ThreatIntelligence,
   ): Promise<ThreatIntelligence> {
     try {
-      if (threat.data?.encrypted) {
+      if (threat.data?.['encrypted']) {
         const decryptedData = await decrypt(
-          threat.data.encrypted,
+          threat.data['encrypted'],
           this.config.encryption.key,
         )
         return JSON.parse(decryptedData)
@@ -681,7 +681,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
         timestamp: new Date(),
         redis: redisHealth === 'PONG',
         mongodb: !!mongoHealth,
-        database: dbStats.ok === 1,
+        database: dbStats['ok'] === 1,
         threats_count: await this.threatsCollection.countDocuments(),
       }
 

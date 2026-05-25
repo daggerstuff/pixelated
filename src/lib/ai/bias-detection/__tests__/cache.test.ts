@@ -35,11 +35,33 @@ vi.mock('../../utils/logger', () => ({
   }),
 }))
 
+// In-memory mock store for simulated Redis operations
+const { mockRedisStore } = vi.hoisted(() => {
+  const store = new Map<string, { data: string; expiry: string | null }>()
+  return {
+    mockRedisStore: {
+      get: vi.fn(async (key: string) => store.get(key)?.data ?? null),
+      set: vi.fn(async (key: string, value: string, _ttl?: number) => {
+        store.set(key, { data: value, expiry: null })
+      }),
+      delete: vi.fn(async (key: string) => { store.delete(key) }),
+      keys: vi.fn(async (_pattern?: string) => Array.from(store.keys())),
+      clearByPrefix: vi.fn(async (_prefix: string) => { store.clear() }),
+      _reset: () => { store.clear() },
+    },
+  }
+})
+
+vi.mock('../../../services/cacheService', () => ({
+  getCacheService: () => mockRedisStore,
+}))
+
 describe('BiasDetectionCache', () => {
   let cache: BiasDetectionCache
 
   beforeEach(async () => {
     await resetCacheManager()
+    mockRedisStore._reset()
     cache = new BiasDetectionCache({
       maxSize: 10,
       defaultTtl: 1000, // 1 second for testing
@@ -287,6 +309,7 @@ describe('BiasAnalysisCache', () => {
 
   beforeEach(async () => {
     await resetCacheManager()
+    mockRedisStore._reset()
     analysisCache = new BiasAnalysisCache({
       maxSize: 10,
       defaultTtl: 1000,
@@ -524,6 +547,7 @@ describe('DashboardCache', () => {
 
   beforeEach(async () => {
     await resetCacheManager()
+    mockRedisStore._reset()
     dashboardCache = new DashboardCache({
       maxSize: 10,
       defaultTtl: 1000,
@@ -633,6 +657,7 @@ describe('ReportCache', () => {
 
   beforeEach(async () => {
     await resetCacheManager()
+    mockRedisStore._reset()
     reportCache = new ReportCache({
       maxSize: 10,
       defaultTtl: 1000,
@@ -963,5 +988,177 @@ describe('Convenience Functions', () => {
       const result = await getCachedReport('non-existent')
       expect(result).toBeNull()
     })
+  })
+})
+
+describe('BiasDetectionCache Edge Cases', () => {
+  let cache: BiasDetectionCache
+
+  beforeEach(async () => {
+    await resetCacheManager()
+    mockRedisStore._reset()
+    cache = new BiasDetectionCache({
+      maxSize: 5,
+      defaultTtl: 1000,
+      cleanupInterval: 500,
+    })
+  })
+
+  afterEach(() => {
+    void cache.destroy()
+  })
+
+  describe('Delete Edge Cases', () => {
+    it('should return false when deleting a non-existent key', async () => {
+      const memCache = new BiasDetectionCache({ maxSize: 5, defaultTtl: 1000, useRedis: false })
+      const result = await memCache.delete('non-existent-key')
+      expect(result).toBe(false)
+      void memCache.destroy()
+    })
+
+    it('should return true when deleting from memory only', async () => {
+      await cache.set('mem-only', { data: 'test' })
+      const result = await cache.delete('mem-only')
+      expect(result).toBe(true)
+    })
+  })
+
+  describe('Key Pattern Matching', () => {
+    it('should return empty array when pattern matches no keys', async () => {
+      await cache.set('aaa', { data: 'test' })
+      await cache.set('bbb', { data: 'test' })
+
+      const result = cache.getKeysByPattern(/^zzz:/)
+      expect(result).toEqual([])
+    })
+  })
+
+  describe('Has with expired entry', () => {
+    it('should return false for expired memory entry', async () => {
+      await cache.set('expire-key', { data: 'test' }, { ttl: 10 })
+      await new Promise((resolve) => setTimeout(resolve, 30))
+
+      const exists = await cache.has('expire-key')
+      expect(exists).toBe(false)
+    })
+  })
+
+  describe('LRU Eviction Edge Cases', () => {
+    it('should evict oldest inserted entry when full (memory-only)', async () => {
+      const small = new BiasDetectionCache({ maxSize: 2, defaultTtl: 50000, useRedis: false })
+
+      await small.set('k1', 'v1')
+      await small.set('k2', 'v2')
+
+      // k1 was inserted first → older lastAccessed → should be evicted
+      await small.set('k3', 'v3')
+      const keysAfter = small.getKeys()
+
+      expect(keysAfter).toHaveLength(2)
+      expect(keysAfter).toContain('k2')
+      expect(keysAfter).toContain('k3')
+      expect(keysAfter).not.toContain('k1')
+      expect(small.getStats().evictionCount).toBeGreaterThan(0)
+
+      await small.destroy()
+    })
+  })
+
+  describe('BiasAnalysisCache Invalidation Edge Cases', () => {
+    let analysisCache: BiasAnalysisCache
+
+    beforeEach(() => {
+      analysisCache = new BiasAnalysisCache({ maxSize: 10, defaultTtl: 1000 })
+    })
+
+    afterEach(() => {
+      void analysisCache.destroy()
+    })
+
+    it('should invalidate by gender demographics', async () => {
+      const session: TherapeuticSession = {
+        sessionId: 's1',
+        timestamp: new Date(),
+        participantDemographics: { age: '25-35', gender: 'female', ethnicity: 'hispanic', primaryLanguage: 'en' },
+        scenario: { scenarioId: 'sc-1', type: 'depression', complexity: 'intermediate', tags: [], description: '' },
+        content: { patientPresentation: '', therapeuticInterventions: [], patientResponses: [], sessionNotes: '' },
+        aiResponses: [],
+        expectedOutcomes: [],
+        transcripts: [],
+        metadata: { trainingInstitution: '', traineeId: '', sessionDuration: 30, completionStatus: 'completed' },
+      }
+      await analysisCache.cacheSession(session)
+
+      const invalidated = await analysisCache.invalidateByDemographics({ gender: 'female', ethnicity: 'hispanic' })
+      expect(invalidated).toBeGreaterThan(0)
+    })
+
+    it('should return 0 when no demographics match', async () => {
+      const result = await analysisCache.invalidateByDemographics({ age: '99-99', gender: 'unknown' })
+      expect(result).toBe(0)
+    })
+  })
+
+  describe('CacheManager ClearAll and Destroy', () => {
+    it('should clear all caches without error', async () => {
+      const manager = getCacheManager()
+      await expect(manager.clearAll()).resolves.not.toThrow()
+    })
+
+    it('should destroy cache manager without error', async () => {
+      const manager = getCacheManager()
+      await expect(manager.destroy()).resolves.not.toThrow()
+    })
+  })
+})
+
+describe('DashboardCache Additional Coverage', () => {
+  let dashboardCache: DashboardCache
+
+  beforeEach(async () => {
+    await resetCacheManager()
+    dashboardCache = new DashboardCache({ maxSize: 10, defaultTtl: 1000 })
+  })
+
+  afterEach(() => {
+    void dashboardCache.destroy()
+  })
+
+  it('should get stats without error', () => {
+    const stats = dashboardCache.getStats()
+    expect(stats).toHaveProperty('totalEntries')
+  })
+
+  it('should invalidate all dashboards returning 0 when none cached', async () => {
+    const result = await dashboardCache.invalidateAllDashboards()
+    expect(result).toBe(0)
+  })
+
+  it('should invalidate user dashboard returning 0 for non-existent user', async () => {
+    const result = await dashboardCache.invalidateUserDashboard('non-existent')
+    expect(result).toBe(0)
+  })
+})
+
+describe('ReportCache Additional Coverage', () => {
+  let reportCache: ReportCache
+
+  beforeEach(async () => {
+    await resetCacheManager()
+    reportCache = new ReportCache({ maxSize: 10, defaultTtl: 1000 })
+  })
+
+  afterEach(() => {
+    void reportCache.destroy()
+  })
+
+  it('should get stats without error', () => {
+    const stats = reportCache.getStats()
+    expect(stats).toHaveProperty('totalEntries')
+  })
+
+  it('should return 0 when invalidating non-existent report', async () => {
+    const result = await reportCache.invalidateReport('non-existent')
+    expect(result).toBe(0)
   })
 })

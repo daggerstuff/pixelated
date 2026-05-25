@@ -5,8 +5,6 @@ import type { WebRTCServiceInterface, WebRTCConnectionConfig } from '../types'
  * Implements privacy-first architecture with zero data retention
  */
 export class WebRTCService implements WebRTCServiceInterface {
-  private sessionId: string = ''
-  private userId: string = ''
   private peerConnection: RTCPeerConnection | null = null
   private localStream: MediaStream | null = null
   private remoteStream: MediaStream | null = null
@@ -20,7 +18,6 @@ export class WebRTCService implements WebRTCServiceInterface {
   private connectionMonitorInterval: ReturnType<typeof setInterval> | null =
     null
   private isShuttingDown = false
-  private lastIceCandidate: RTCIceCandidate | null = null
   private isInitialized = false
 
   /**
@@ -293,7 +290,6 @@ export class WebRTCService implements WebRTCServiceInterface {
     // Handle ICE candidates
     this.peerConnection.onicecandidate = (event) => {
       if (event.candidate) {
-        this.lastIceCandidate = event.candidate
         // In a production implementation, send this to the signaling server
         this.sendIceCandidateToSignalingServer(event.candidate)
       }
@@ -466,25 +462,6 @@ export class WebRTCService implements WebRTCServiceInterface {
   }
 
   /**
-   * Handle a received ICE candidate from a peer
-   */
-  private async handleReceivedIceCandidate(
-    candidate: RTCIceCandidate,
-  ): Promise<void> {
-    if (!this.peerConnection) {
-      return
-    }
-
-    try {
-      // Add the received ICE candidate
-      await this.peerConnection.addIceCandidate(candidate)
-      console.log('Successfully added remote ICE candidate')
-    } catch (error: unknown) {
-      console.error('Error adding received ICE candidate:', error)
-    }
-  }
-
-  /**
    * Handle connection state changes
    */
   private handleConnectionStateChange() {
@@ -609,9 +586,7 @@ export class WebRTCService implements WebRTCServiceInterface {
   /**
    * Connect to a session (WebRTCServiceInterface implementation)
    */
-  async connect(sessionId: string, userId: string): Promise<void> {
-    this.sessionId = sessionId
-    this.userId = userId
+  async connect(_sessionId: string, _userId: string): Promise<void> {
     await this.initializeConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
       iceTransportPolicy: 'all',
@@ -681,7 +656,6 @@ export class WebRTCService implements WebRTCServiceInterface {
     this.remoteStream = null
 
     // Reset state variables
-    this.lastIceCandidate = null
   }
 
   /**

@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react'
 
 // Card components not used - using GlowCard instead
-import { Badge } from '@/components/ui/badge/index.ts'
+import { Badge } from '@/components/ui/badge/index'
 
 import { GlowCard } from '../glow-card/GlowCard'
 

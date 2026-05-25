@@ -1,16 +1,16 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 
-import { Button } from '@/components/ui/button/index.ts'
-import { Card } from '@/components/ui/card/index.ts'
+import { Button } from '@/components/ui/button/index'
+import { Card } from '@/components/ui/card/index'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog.tsx'
-import { Input } from '@/components/ui/input/index.ts'
-import { Progress } from '@/components/ui/progress.tsx'
-import { Textarea } from '@/components/ui/textarea/index.ts'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input/index'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea/index'
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
 import type { CognitiveModel } from '@/lib/ai/types/CognitiveModel'
 import { GoalStatus, GoalCategory } from '@/lib/ai/types/TherapeuticGoals'

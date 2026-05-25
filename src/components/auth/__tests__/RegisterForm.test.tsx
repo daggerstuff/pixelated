@@ -2,7 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { authClient } from '@/lib/auth-client.ts'
+import { authClient } from '@/lib/auth-client'
 
 import { RegisterForm } from '../RegisterForm'
 

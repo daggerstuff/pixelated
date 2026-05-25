@@ -303,7 +303,6 @@ class RealTimeProcessor {
     if (timeSinceLastProcess < stage.processingInterval) return
 
     try {
-      const startTime = Date.now()
 
       // Process data through stage processor
       const processedData = await stage.processor.process(data)

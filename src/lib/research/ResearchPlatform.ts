@@ -739,15 +739,15 @@ export class ResearchPlatform {
       }
 
       const consentLevel = this.mapConsentLevel(
-        this.asString(consentData.level) ?? this.config.consent.defaultLevel,
+        this.asString(consentData['level']) ?? this.config.consent.defaultLevel,
       )
       const metadata =
-        this.toRecord(consentData.metadata) ??
-        this.toRecord(consentData.metaData) ??
+        this.toRecord(consentData['metadata']) ??
+        this.toRecord(consentData['metaData']) ??
         undefined
       const reason =
-        typeof consentData.reason === 'string' ? consentData.reason : undefined
-      const immediate = this.toBoolean(consentData.immediate)
+        typeof consentData['reason'] === 'string' ? consentData['reason'] : undefined
+      const immediate = this.toBoolean(consentData['immediate'])
       const update: ConsentUpdate = {
         clientId,
         newLevel: consentLevel,
@@ -782,8 +782,8 @@ export class ResearchPlatform {
               const initialized = await this.consentService.initializeConsent(
                 clientId,
                 this.mapConsentLevel(
-                  typeof consentData.level === 'string'
-                    ? consentData.level
+                  typeof consentData['level'] === 'string'
+                    ? consentData['level']
                     : this.config.consent.defaultLevel,
                 ),
                 metadata,
@@ -971,7 +971,7 @@ export class ResearchPlatform {
     }
 
     // Validate HIPAA config
-    if (!process.env.HIPAA_MASTER_KEY) {
+    if (!process.env['HIPAA_MASTER_KEY']) {
       errors.push('HIPAA master key not configured')
     }
 
@@ -1043,15 +1043,15 @@ export class ResearchPlatform {
   ): ResearchDataPoint | undefined {
     if (!this.isRecord(entry)) return undefined
 
-    const timestamp = this.parseDate(entry.timestamp)
+    const timestamp = this.parseDate(entry['timestamp'])
     const sessionDuration =
-      typeof entry.sessionDuration === 'number'
-        ? entry.sessionDuration
+      typeof entry['sessionDuration'] === 'number'
+        ? entry['sessionDuration']
         : undefined
     if (
-      typeof entry.id !== 'string' ||
-      typeof entry.clientId !== 'string' ||
-      typeof entry.sessionId !== 'string' ||
+      typeof entry['id'] !== 'string' ||
+      typeof entry['clientId'] !== 'string' ||
+      typeof entry['sessionId'] !== 'string' ||
       !timestamp ||
       typeof sessionDuration !== 'number'
     ) {
@@ -1059,51 +1059,51 @@ export class ResearchPlatform {
     }
 
     return {
-      id: entry.id,
-      clientId: entry.clientId,
-      sessionId: entry.sessionId,
+      id: entry['id'],
+      clientId: entry['clientId'],
+      sessionId: entry['sessionId'],
       timestamp,
-      emotionScores: this.toNumberRecord(entry.emotionScores),
-      techniqueEffectiveness: this.toNumberRecord(entry.techniqueEffectiveness),
+      emotionScores: this.toNumberRecord(entry['emotionScores']),
+      techniqueEffectiveness: this.toNumberRecord(entry['techniqueEffectiveness']),
       sessionDuration,
-      age: this.asString(entry.age),
-      gender: this.asString(entry.gender),
-      location: this.asString(entry.location),
-      therapeuticApproach: this.asString(entry.therapeuticApproach),
+      age: this.asString(entry['age']),
+      gender: this.asString(entry['gender']),
+      location: this.asString(entry['location']),
+      therapeuticApproach: this.asString(entry['therapeuticApproach']),
       outcomeScore:
-        typeof entry.outcomeScore === 'number' ? entry.outcomeScore : undefined,
-      metadata: this.toRecord(entry.metadata),
+        typeof entry['outcomeScore'] === 'number' ? entry['outcomeScore'] : undefined,
+      metadata: this.toRecord(entry['metadata']),
     }
   }
 
   private parseResearchQuery(query: unknown): ResearchQuery | undefined {
     if (!this.isRecord(query)) return undefined
 
-    const type = this.asString(query.type)
+    const type = this.asString(query['type'])
     if (!type || !this.isResearchQueryType(type)) {
       return undefined
     }
 
-    const anonymizationLevel = this.asString(query.anonymizationLevel)
+    const anonymizationLevel = this.asString(query['anonymizationLevel'])
     if (!anonymizationLevel || !this.isAnonymizationLevel(anonymizationLevel)) {
       return undefined
     }
 
     return {
-      id: this.asString(query.id) ?? crypto.randomUUID(),
+      id: this.asString(query['id']) ?? crypto.randomUUID(),
       type,
-      sql: this.asString(query.sql),
-      parameters: this.toRecord(query.parameters) ?? {},
-      description: this.asString(query.description) ?? '',
-      context: this.asString(query.context),
-      expectedOutput: this.asString(query.expectedOutput),
-      requiresApproval: this.toBoolean(query.requiresApproval),
+      sql: this.asString(query['sql']),
+      parameters: this.toRecord(query['parameters']) ?? {},
+      description: this.asString(query['description']) ?? '',
+      context: this.asString(query['context']),
+      expectedOutput: this.asString(query['expectedOutput']),
+      requiresApproval: this.toBoolean(query['requiresApproval']),
       anonymizationLevel: anonymizationLevel,
       createdAt:
-        this.parseDateString(query.createdAt) ?? new Date().toISOString(),
-      createdBy: this.asString(query.createdBy) ?? 'system',
-      approvedBy: this.asString(query.approvedBy),
-      approvedAt: this.parseDateString(query.approvedAt),
+        this.parseDateString(query['createdAt']) ?? new Date().toISOString(),
+      createdBy: this.asString(query['createdBy']) ?? 'system',
+      approvedBy: this.asString(query['approvedBy']),
+      approvedAt: this.parseDateString(query['approvedAt']),
     }
   }
 
@@ -1133,7 +1133,7 @@ export class ResearchPlatform {
   ): DiscoveryRequest | undefined {
     if (!this.isRecord(request)) return undefined
 
-    const patternTypes = request.patternTypes
+    const patternTypes = request['patternTypes']
     if (!Array.isArray(patternTypes) || patternTypes.length === 0)
       return undefined
     const parsedPatternTypes = patternTypes
@@ -1146,17 +1146,17 @@ export class ResearchPlatform {
           type === 'cluster',
       )
 
-    const metrics = request.metrics
+    const metrics = request['metrics']
     if (!Array.isArray(metrics) || metrics.length === 0) return undefined
     const parsedMetrics = metrics.flatMap((metric) => {
       const parsed = this.asString(metric)
       return parsed === undefined ? [] : [parsed]
     })
 
-    const timeRange = request.timeRange
+    const timeRange = request['timeRange']
     if (!this.isRecord(timeRange)) return undefined
-    const start = this.parseDate(timeRange.start)
-    const end = this.parseDate(timeRange.end)
+    const start = this.parseDate(timeRange['start'])
+    const end = this.parseDate(timeRange['end'])
     if (!start || !end) return undefined
 
     if (parsedPatternTypes.length === 0 || parsedMetrics.length === 0)
@@ -1166,8 +1166,8 @@ export class ResearchPlatform {
       patternTypes: parsedPatternTypes,
       metrics: parsedMetrics,
       timeRange: { start, end },
-      demographicFilters: this.toRecord(request.demographicFilters),
-      techniqueFilters: this.toRecord(request.techniqueFilters),
+      demographicFilters: this.toRecord(request['demographicFilters']),
+      techniqueFilters: this.toRecord(request['techniqueFilters']),
     }
   }
 
@@ -1182,11 +1182,11 @@ export class ResearchPlatform {
       }
     | undefined {
     if (!this.isRecord(value)) return undefined
-    const id = this.asString(value.id)
-    const statement = this.asString(value.statement)
-    const nullHypothesis = this.asString(value.nullHypothesis)
-    const alternativeHypothesis = this.asString(value.alternativeHypothesis)
-    const variables = value.variables
+    const id = this.asString(value['id'])
+    const statement = this.asString(value['statement'])
+    const nullHypothesis = this.asString(value['nullHypothesis'])
+    const alternativeHypothesis = this.asString(value['alternativeHypothesis'])
+    const variables = value['variables']
     if (
       !id ||
       !statement ||
@@ -1204,7 +1204,7 @@ export class ResearchPlatform {
     })
     if (parsedVariables.length === 0) return undefined
 
-    const expectedDirection = this.asString(value.expectedDirection)
+    const expectedDirection = this.asString(value['expectedDirection'])
     if (
       expectedDirection !== 'positive' &&
       expectedDirection !== 'negative' &&
@@ -1225,7 +1225,7 @@ export class ResearchPlatform {
 
   private parseEvidenceRequest(request: unknown): EvidenceRequest | undefined {
     if (!this.isRecord(request)) return undefined
-    const hypotheses = request.hypotheses
+    const hypotheses = request['hypotheses']
     if (!Array.isArray(hypotheses) || hypotheses.length === 0) return undefined
 
     const parsedHypotheses = hypotheses
@@ -1239,15 +1239,15 @@ export class ResearchPlatform {
 
     return {
       hypotheses: parsedHypotheses,
-      dataFilters: this.toRecord(request.dataFilters),
-      timeRange: this.isRecord(request.timeRange)
+      dataFilters: this.toRecord(request['dataFilters']),
+      timeRange: this.isRecord(request['timeRange'])
         ? {
-            start: this.parseDate(request.timeRange.start) ?? new Date(0),
-            end: this.parseDate(request.timeRange.end) ?? new Date(0),
+            start: this.parseDate(request['timeRange']['start']) ?? new Date(0),
+            end: this.parseDate(request['timeRange']['end']) ?? new Date(0),
           }
         : undefined,
-      demographicFilters: this.toRecord(request.demographicFilters),
-      techniqueFilters: this.toRecord(request.techniqueFilters),
+      demographicFilters: this.toRecord(request['demographicFilters']),
+      techniqueFilters: this.toRecord(request['techniqueFilters']),
     }
   }
 
@@ -1287,7 +1287,7 @@ export class ResearchPlatform {
 
   private async initializeServices(): Promise<void> {
     // Initialize encryption keys
-    if (!process.env.HIPAA_MASTER_KEY) {
+    if (!process.env['HIPAA_MASTER_KEY']) {
       logger.warn('HIPAA master key not found, using default')
     }
 

@@ -42,15 +42,10 @@ export interface IndexingPlan {
  * Intelligent Database Indexing Manager
  */
 class IndexingStrategy {
-  private readonly config: DatabaseConfig
   private queryPatterns: QueryPattern[] = []
-  private readonly indexHistory = new Map<
-    string,
-    { created: Date; performance: number }
-  >()
 
   constructor(config: DatabaseConfig) {
-    this.config = config
+    this.queryPatterns = []
     this.initializeQueryPatterns()
   }
 

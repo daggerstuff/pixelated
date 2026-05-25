@@ -164,11 +164,11 @@ let mcpInstance: MCPIntegration | null = null
 export function getMCPIntegration(): MCPIntegration {
   if (!mcpInstance) {
     const config: MCPModelConfig = {
-      modelId: process.env.MCP_MODEL_ID ?? 'default',
-      endpoint: process.env.MCP_ENDPOINT ?? 'http://localhost:8000',
-      apiKey: process.env.MCP_API_KEY,
-      maxTokens: parseInt(process.env.MCP_MAX_TOKENS ?? '1000'),
-      temperature: parseFloat(process.env.MCP_TEMPERATURE ?? '0.7'),
+      modelId: process.env['MCP_MODEL_ID'] ?? 'default',
+      endpoint: process.env['MCP_ENDPOINT'] ?? 'http://localhost:8000',
+      apiKey: process.env['MCP_API_KEY'],
+      maxTokens: parseInt(process.env['MCP_MAX_TOKENS'] ?? '1000'),
+      temperature: parseFloat(process.env['MCP_TEMPERATURE'] ?? '0.7'),
     }
 
     mcpInstance = new MCPIntegration(config)

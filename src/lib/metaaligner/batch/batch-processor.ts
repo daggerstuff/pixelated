@@ -50,7 +50,6 @@ export interface BatchProcessorMetrics {
  */
 export class BatchProcessor implements IBatchProcessor {
   private readonly queue: UnifiedProcessingRequest[] = []
-  private readonly api: IUnifiedMetaAlignerAPI
   private readonly config: BatchProcessorConfig
   private timeoutId: NodeJS.Timeout | null = null
   private readonly circuitBreaker: CircuitBreaker

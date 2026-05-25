@@ -804,10 +804,10 @@ describe('Enhanced Monitoring Service', () => {
       const result = await service.performRealTimeMonitoring(monitoringData)
 
       expect(result).toBeDefined()
-      expect(result.healthStatus).toBeDefined()
-      expect(result.alerts).toBeDefined()
-      expect(result.insights).toBeDefined()
-      expect(result.actions).toBeDefined()
+      expect(result['healthStatus']).toBeDefined()
+      expect(result['alerts']).toBeDefined()
+      expect(result['insights']).toBeDefined()
+      expect(result['actions']).toBeDefined()
     })
 
     it('should trigger alerts based on thresholds', async () => {
@@ -840,9 +840,9 @@ describe('Enhanced Monitoring Service', () => {
       const result = await service.performRealTimeMonitoring(monitoringData)
 
       expect(result).toBeDefined()
-      expect(result.healthStatus).toBe('unknown')
-      expect(result.insights).toHaveLength(0)
-      expect(result.errors).toContain('AI analysis timeout')
+      expect(result['healthStatus']).toBe('unknown')
+      expect(result['insights']).toHaveLength(0)
+      expect(result['errors']).toContain('AI analysis timeout')
     })
   })
 
@@ -953,7 +953,7 @@ describe('Enhanced Monitoring Service', () => {
       const endTime = Date.now()
 
       expect(report).toBeDefined()
-      expect(report.alerts).toHaveLength(100)
+      expect(report['alerts']).toHaveLength(100)
       expect(endTime - startTime).toBeLessThan(3000) // Should complete in under 3 seconds
     })
   })
@@ -1055,7 +1055,7 @@ describe('Enhanced Monitoring Service', () => {
 
       expect(alert).toBeDefined()
       expect(alert.severity).toBe('high')
-      expect(alert.metadata.insightType).toBe('threshold')
+      expect(alert.metadata['insightType']).toBe('threshold')
     })
   })
 })

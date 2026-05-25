@@ -7,7 +7,7 @@ Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeS
 
 ### Runtime Versions
 - **Node.js**: 24.14.1 (see `.nvmrc`)
-- **pnpm**: 11.1.2 (see `package.json`)
+- **pnpm**: 11.3.0 (see `package.json`)
 - **Python**: 3.13 (see `.python-version`)
 - **uv**: Python package and environment manager (always prefer `uv run` for execution)
 

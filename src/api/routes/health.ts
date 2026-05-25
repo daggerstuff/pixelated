@@ -20,7 +20,7 @@ router.get('/', (req: Request, res: Response) => {
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    environment: process.env.NODE_ENV ?? 'development',
+    environment: process.env['NODE_ENV'] ?? 'development',
   })
 })
 
@@ -46,7 +46,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
     const serverStatus = await adminDb.serverStatus()
     health.services.mongodb = {
       status: 'connected',
-      uptime: serverStatus.uptime,
+      uptime: serverStatus['uptime'],
     }
   } catch (error: unknown) {
     health.services.mongodb = {
