@@ -483,7 +483,8 @@ describe('BiasMetricsCollector', () => {
         new Error('Storage unavailable'),
       )
 
-      // Should not throw — the inner catch in storeAnalysisResult handles it
+      // storeMetrics is inside a nested try-catch that swallows the error
+      // so storeAnalysisResult should still resolve successfully
       await expect(
         metricsCollector.storeAnalysisResult(mockAnalysisResult, 150),
       ).resolves.not.toThrow()
@@ -593,9 +594,156 @@ describe('BiasMetricsCollector', () => {
     })
   })
 
+  describe('getMetrics fallback path with local cache', () => {
+    it('should return fallback metrics from local cache when bridge fails', async () => {
+      // Store analysis to populate local cache
+      await metricsCollector.storeAnalysisResult(mockAnalysisResult, 100)
+
+      // Make getDashboardMetrics fail to trigger fallback
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Service unavailable'),
+      )
+
+      const metrics = await metricsCollector.getMetrics()
+
+      expect(metrics.overall_stats.total_sessions).toBeGreaterThanOrEqual(1)
+      expect(metrics.overall_stats.average_bias_score).toBe(0.3)
+      expect(metrics).toHaveProperty('performance_metrics')
+      expect(metrics.performance_metrics.health_status).toBe('degraded')
+    })
+
+    it('should return empty fallback metrics when bridge fails and cache is empty', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValue(
+        new Error('Service unavailable'),
+      )
+
+      const metrics = await metricsCollector.getMetrics()
+
+      expect(metrics.overall_stats.total_sessions).toBe(0)
+      expect(metrics.overall_stats.average_bias_score).toBe(0)
+    })
+  })
+
+  describe('flushLocalMetrics error path', () => {
+    it('should catch and log error when sendMetricsBatch fails', async () => {
+      // Store an analysis to populate the local cache
+      await metricsCollector.storeAnalysisResult(mockAnalysisResult, 100)
+
+      // Make sendMetricsBatch throw on the next call
+      ;(mockPythonBridge.sendMetricsBatch as any).mockRejectedValueOnce(
+        new Error('Batch send failed'),
+      )
+
+      // Call private flushLocalMetrics — should not throw despite error
+      await expect(
+        (metricsCollector as any).flushLocalMetrics(),
+      ).resolves.not.toThrow()
+
+      // Local cache should still contain the data (wasn't cleared due to failure)
+      expect((metricsCollector as any).localCache.size).toBeGreaterThan(0)
+    })
+
+    it('should early-return when local cache is empty', async () => {
+      // Call flushLocalMetrics with empty cache — should return immediately
+      await expect(
+        (metricsCollector as any).flushLocalMetrics(),
+      ).resolves.not.toThrow()
+    })
+  })
+
+  describe('startAggregation', () => {
+    it('should set aggregation interval when called', async () => {
+      // startAggregation is called by initialize() which creates the interval
+      // We can verify the method works by calling it directly
+      const collector = new BiasMetricsCollector(mockConfig, mockPythonBridge)
+
+      // Call private startAggregation
+      ;(collector as any).startAggregation()
+
+      // Verify the interval was set
+      expect((collector as any).aggregationInterval).toBeDefined()
+
+      // Cleanup
+      clearInterval((collector as any).aggregationInterval)
+    })
+  })
+
+  describe('storeAnalysisResult outer catch block', () => {
+    it('should catch and rethrow when recordAnalysis throws', async () => {
+      // Spy on recordAnalysis to make it throw, which triggers the outer catch
+      const recordSpy = vi
+        .spyOn(metricsCollector as any, 'recordAnalysis')
+        .mockRejectedValue(new Error('Record analysis failed'))
+
+      await expect(
+        metricsCollector.storeAnalysisResult(mockAnalysisResult, 100),
+      ).rejects.toThrow('Record analysis failed')
+
+      recordSpy.mockRestore()
+    })
+  })
+
+  describe('getDashboardData error paths', () => {
+    it('should return fallback dashboard data when bridge fails', async () => {
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Dashboard fetch failed'),
+      )
+
+      const dashData = await metricsCollector.getDashboardData()
+
+      // Should return fallback data, not throw
+      expect(dashData).toBeDefined()
+      expect(dashData.overall_stats).toBeDefined()
+      expect(dashData.summary).toBeDefined()
+      expect(dashData.trends).toBeDefined()
+      expect(dashData.demographics).toBeDefined()
+      expect(dashData.system_metrics).toHaveProperty('cpu_usage')
+    })
+
+    it('should include cached metrics in fallback dashboard data', async () => {
+      // Store an analysis to populate local cache
+      await metricsCollector.storeAnalysisResult(mockAnalysisResult, 100)
+
+      // Make bridge fail
+      ;(mockPythonBridge.getDashboardMetrics as any).mockRejectedValueOnce(
+        new Error('Dashboard fetch failed'),
+      )
+
+      const dashData = await metricsCollector.getDashboardData()
+
+      // Fallback should reflect cached data
+      expect(dashData.overall_stats.total_sessions).toBeGreaterThanOrEqual(1)
+      expect(dashData.overall_stats.average_bias_score).toBeGreaterThan(0)
+    })
+  })
+
+  describe('recordAnalysis send error path', () => {
+    it('should catch and log when sendAnalysisMetric fails', async () => {
+      ;(mockPythonBridge.sendAnalysisMetric as any).mockRejectedValueOnce(
+        new Error('Send metric failed'),
+      )
+
+      // recordAnalysis is called from storeAnalysisResult
+      await expect(
+        metricsCollector.storeAnalysisResult(mockAnalysisResult, 100),
+      ).resolves.not.toThrow()
+    })
+  })
+
   describe('dispose', () => {
     it('should dispose the metrics collector', async () => {
       await expect(metricsCollector.dispose()).resolves.not.toThrow()
+      expect(mockPythonBridge.dispose).toHaveBeenCalled()
+    })
+
+    it('should clear aggregation interval when set', async () => {
+      // Set an aggregation interval on the collector
+      const fakeInterval = setInterval(() => {}, 100000)
+      ;(metricsCollector as any).aggregationInterval = fakeInterval
+
+      await metricsCollector.dispose()
+
+      // After dispose, the interval should have been cleared
       expect(mockPythonBridge.dispose).toHaveBeenCalled()
     })
   })

@@ -208,6 +208,7 @@ export default defineConfig({
                   'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
                 ],
           environment: 'jsdom',
+          isolate: true,
           exclude: [
             '**/node_modules/**',
             'src/lib/security/__tests__/**/*.test.ts',
@@ -265,13 +266,18 @@ export default defineConfig({
             ...cpuBoundNodeTestExcludes,
           ],
           environment: 'node',
+          isolate: true,
         },
       },
     ],
     pool: 'forks',
-    singleFork: false,
-    maxForks: process.env['CI'] ? 4 : 8,
-    minForks: process.env['CI'] ? 1 : 2,
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        maxForks: process.env['CI'] ? 4 : 8,
+        minForks: process.env['CI'] ? 1 : 2,
+      },
+    },
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
@@ -313,7 +319,7 @@ export default defineConfig({
     teardownTimeout: 60_000,
     fileParallelism: true,
     maxConcurrency: process.env['CI'] ? 2 : 8,
-    isolate: true,
+    isolate: !process.env['CI'],
     ...(process.env['CI'] ? { watch: false } : {}),
     ...(process.env['CI'] ? { bail: 10 } : {}),
   },

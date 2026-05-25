@@ -26,29 +26,12 @@ on:
       - '.github/workflows/deploy-kubernetes.yml'
   pull_request:
     branches: [staging]
-    paths:
-      - 'src/**'
-      - 'ai/**'
-      - 'docker/**'
-      - 'k8s/**'
-      - 'terraform/**'
-      - 'scripts/**'
-      - 'config/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'tsconfig.json'
-      - 'pyproject.toml'
-      - '.editorconfig'
-      - '.dockerignore'
-      - '.vscode/**'
-      - '.github/workflows/ci.yml'
-      - '.github/workflows/deploy-kubernetes.yml'
   workflow_dispatch:
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 30
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       ARTIFACT_REGISTRY_LOCATION: us-west1

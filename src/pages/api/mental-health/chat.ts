@@ -1,4 +1,6 @@
 import type { APIRoute, APIContext } from 'astro'
+
+import { verifyAuthToken } from '../../../utils/auth'
 export const prerender = false
 
 export interface ChatRequest {
@@ -546,6 +548,30 @@ function extractKeyTopics(message: string): string[] {
 }
 
 export const POST: APIRoute = async ({ request }) => {
+  const authHeader = request.headers.get('Authorization')
+  if (!authHeader) {
+    return new Response(
+      JSON.stringify({ error: 'Authorization header required' }),
+      {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      },
+    )
+  }
+
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : authHeader
+
+  try {
+    await verifyAuthToken(token)
+  } catch (error) {
+    return new Response(JSON.stringify({ error: 'Invalid or expired token' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const startTime = Date.now()
 
   try {

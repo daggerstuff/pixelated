@@ -210,6 +210,6 @@ describe('File Operations', () => {
 
 For more information about specific testing areas, refer to:
 
-- [Test Execution](/testing/execution)
-- [Debugging Tests](/testing/debugging)
-- [Coverage Requirements](/testing/coverage)
+- [Test Execution](./execution.md)
+- [Debugging Tests](./debugging.md)
+- [Coverage Requirements](./coverage.md)
