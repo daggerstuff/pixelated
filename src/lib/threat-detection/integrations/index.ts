@@ -111,7 +111,6 @@ export {
 }
 
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
-import { redis } from '../../redis'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 
 /**

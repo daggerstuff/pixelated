@@ -21,7 +21,7 @@ router.use(authMiddleware)
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, status, ownerId } = req.query
+    const {page, limit, status} = req.query
     const { user } = req as any
 
     const result = await listStrategicPlans(user.id, {

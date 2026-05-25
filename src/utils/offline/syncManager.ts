@@ -1,5 +1,5 @@
 import indexedDBRequestQueue from './indexedDBRequestQueue'
-import { type QueuedRequest } from './requestQueue'
+import {type} from './requestQueue'
 
 /**
  * Sync Manager with exponential backoff for offline-first synchronization.

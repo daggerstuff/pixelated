@@ -44,7 +44,6 @@ export class MemorySynthesizer {
       }
 
       // 3. Create a synthesized "Abstract Memory"
-      const synthesizedContent = this.generateSynthesizedContent(mergeCandidates);
       const merged_ids = mergeCandidates.map(m => m.id);
 
       appLogger.info('Synthesis completed', {

@@ -1,7 +1,7 @@
 import request from 'supertest'
 // Authentication API Integration Tests
 // Tests for OAuth-based authentication flow with Auth0
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, afterAll } from 'vitest'
 
 import {
   generateTestId,
@@ -10,9 +10,6 @@ import {
 import { app } from '../../../server'
 
 describe('Authentication API', () => {
-  const testEmail = `test-${generateTestId()}@test.com`
-  const testPassword = 'SecurePassword123!'
-  const testName = 'Test User'
   let authToken: string
 
   afterAll(async () => {

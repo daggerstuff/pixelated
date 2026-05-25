@@ -1,5 +1,5 @@
 // Forgetting Mechanisms — Sprint 3, Task 4 (TypeScript mirror)
-import { MemoryBlock, ConsolidationPhase } from '../../../types/memory'
+import { MemoryBlock } from '../../../types/memory'
 
 export enum ForgetAction {
   PRESERVE = 'preserve',

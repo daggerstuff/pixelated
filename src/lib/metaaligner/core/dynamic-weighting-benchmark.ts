@@ -3,7 +3,6 @@
  * Tests sub-250ms performance and generates visualization data
  */
 
-import { ObjectiveId } from '../config/mapping-config'
 import { DynamicWeightingEngine } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
 
@@ -462,7 +461,6 @@ export function exportVisualizationDataForGraphing(
 if (require.main === module) {
   runBenchmarkSuite()
     .then((suite) => {
-      const jsonData = exportVisualizationDataForGraphing(suite)
       console.log('\n📁 Visualization data available (JSON):')
       console.log(
         '   Save to file for graphing with tools like Python/matplotlib or Chart.js',

@@ -1,6 +1,5 @@
 import { createReadStream, createWriteStream, existsSync, mkdirSync } from "node:fs";
 import { createInterface } from "node:readline";
-import { pipeline } from "node:stream/promises";
 import { ALLOWED_DIRECTORIES, safeJoin } from "../../../utils/path-security";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 

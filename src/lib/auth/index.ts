@@ -9,7 +9,6 @@ import { authConfig } from '../../config/auth.config'
 import { getUserById as getAuth0UserById } from '../../services/auth0.service'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import { getSession } from './session'
 
 export type { SessionData } from './session'
 // Re-export session for compatibility
