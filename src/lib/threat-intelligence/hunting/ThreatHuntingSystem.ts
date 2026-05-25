@@ -211,8 +211,8 @@ export class ThreatHuntingSystemCore
       return undefined
     }
 
-    const startTime = this.parseDate(value.startTime)
-    const endTime = this.parseDate(value.endTime)
+    const startTime = this.parseDate(value['startTime'])
+    const endTime = this.parseDate(value['endTime'])
 
     if (!startTime || !endTime) {
       return undefined
@@ -298,7 +298,7 @@ export class ThreatHuntingSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
     } catch (error: unknown) {
@@ -310,7 +310,7 @@ export class ThreatHuntingSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_hunting',
+        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_hunting',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_hunting')
@@ -915,7 +915,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.7,
         data: conn,
-        timestamp: this.toDate(conn.timestamp),
+        timestamp: this.toDate(conn['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious connections hunt failed:', { error })
@@ -950,7 +950,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: query,
-        timestamp: this.toDate(query.timestamp),
+        timestamp: this.toDate(query['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Unusual DNS queries hunt failed:', { error })
@@ -1039,7 +1039,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.8,
         data: exfil,
-        timestamp: this.toDate(exfil.timestamp),
+        timestamp: this.toDate(exfil['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Data exfiltration hunt failed:', { error })
@@ -1077,7 +1077,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: proc,
-        timestamp: this.toDate(proc.timestamp),
+        timestamp: this.toDate(proc['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious processes hunt failed:', { error })
@@ -1124,7 +1124,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.7,
         data: file,
-        timestamp: this.toDate(file.timestamp),
+        timestamp: this.toDate(file['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('File system anomalies hunt failed:', { error })
@@ -1162,7 +1162,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: reg,
-        timestamp: this.toDate(reg.timestamp),
+        timestamp: this.toDate(reg['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Registry modifications hunt failed:', { error })
@@ -1195,7 +1195,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.9,
         data: persist,
-        timestamp: this.toDate(persist.timestamp),
+        timestamp: this.toDate(persist['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Persistence mechanisms hunt failed:', { error })
@@ -1284,7 +1284,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: escalation,
-        timestamp: this.toDate(escalation.timestamp),
+        timestamp: this.toDate(escalation['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Privilege escalation hunt failed:', { error })
@@ -1405,7 +1405,7 @@ export class ThreatHuntingSystemCore
       const malwareCollection = this.getCollection('malware_signatures')
       const knownSignatures = await malwareCollection.find({}).toArray()
       const signatureHashes = knownSignatures
-        .map((sig) => this.toStringValue(sig.hash))
+        .map((sig) => this.toStringValue(sig['hash']))
         .filter(
           (hash): hash is string => typeof hash === 'string' && hash.length > 0,
         )
@@ -1427,7 +1427,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 1.0,
         data: file,
-        timestamp: this.toDate(file.timestamp),
+        timestamp: this.toDate(file['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Known malware signatures hunt failed:', { error })
@@ -1463,7 +1463,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.6,
         data: file,
-        timestamp: this.toDate(file.timestamp),
+        timestamp: this.toDate(file['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Suspicious file hashes hunt failed:', { error })
@@ -1504,7 +1504,7 @@ export class ThreatHuntingSystemCore
         severity: 'high',
         confidence: 0.8,
         data: this.toDocumentRecord(indicator),
-        timestamp: this.toDate(indicator.timestamp),
+        timestamp: this.toDate(indicator['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Malware behavioral indicators hunt failed:', { error })
@@ -1593,7 +1593,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.95,
         data: dump,
-        timestamp: this.toDate(dump.timestamp),
+        timestamp: this.toDate(dump['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Credential dumping hunt failed:', { error })
@@ -1689,7 +1689,7 @@ export class ThreatHuntingSystemCore
         severity: 'critical',
         confidence: 0.85,
         data: exploit,
-        timestamp: this.toDate(exploit.timestamp),
+        timestamp: this.toDate(exploit['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Service exploitation hunt failed:', { error })
@@ -1730,7 +1730,7 @@ export class ThreatHuntingSystemCore
         severity: 'medium',
         confidence: 0.8,
         data: tool,
-        timestamp: this.toDate(tool.timestamp),
+        timestamp: this.toDate(tool['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Remote access tools hunt failed:', { error })
@@ -1789,10 +1789,10 @@ export class ThreatHuntingSystemCore
 
       return securityEvents.map((event) => ({
         type: 'security_event',
-        severity: this.normalizeSeverity(event.severity),
+        severity: this.normalizeSeverity(event['severity']),
         confidence: 0.8,
         data: this.toDocumentRecord(event),
-        timestamp: this.toDate(event.timestamp),
+        timestamp: this.toDate(event['timestamp']),
       }))
     } catch (error: unknown) {
       logger.error('Basic security analysis failed:', { error })
@@ -1946,8 +1946,8 @@ export class ThreatHuntingSystemCore
             processResult.confidence * 1.2,
             1.0,
           )
-          processResult.relatedFindings = relatedFiles
-            .map((f) => this.toStringValue(f.data.filePath))
+          processResult['relatedFindings'] = relatedFiles
+            .map((f) => this.toStringValue(f.data['filePath']))
             .filter((path): path is string => path !== undefined)
         }
       }
@@ -1972,14 +1972,14 @@ export class ThreatHuntingSystemCore
       )
 
       for (const loginResult of loginResults) {
-        const loginDataId = this.toStringValue(loginResult.data._id)
+        const loginDataId = this.toStringValue(loginResult.data['_id'])
         const userAccess = accessResults.filter(
-          (access) => this.toStringValue(access.data._id) === loginDataId,
+          (access) => this.toStringValue(access.data['_id']) === loginDataId,
         )
 
         if (userAccess.length > 0) {
           loginResult.confidence = Math.min(loginResult.confidence * 1.2, 1.0)
-          loginResult.relatedFindings = userAccess.map((a) => a.type)
+          loginResult['relatedFindings'] = userAccess.map((a) => a.type)
         }
       }
 
@@ -2011,17 +2011,17 @@ export class ThreatHuntingSystemCore
       // Correlate behavioral indicators with signatures
       for (const behavioralResult of behavioralResults) {
         const behavioralSourceIp = this.toStringValue(
-          behavioralResult.data.sourceIp,
+          behavioralResult.data['sourceIp'],
         )
         const behavioralProcessId = this.toStringValue(
-          behavioralResult.data.processId,
+          behavioralResult.data['processId'],
         )
 
         const relatedSignatures = signatureResults.filter((sig) => {
-          if (this.toStringValue(sig.data.sourceIp) === behavioralSourceIp) {
+          if (this.toStringValue(sig.data['sourceIp']) === behavioralSourceIp) {
             return true
           }
-          return this.toStringValue(sig.data.processId) === behavioralProcessId
+          return this.toStringValue(sig.data['processId']) === behavioralProcessId
         })
 
         if (relatedSignatures.length > 0) {
@@ -2060,13 +2060,13 @@ export class ThreatHuntingSystemCore
           (enumResult) =>
             this.toStringValue(
               this.getNestedValue(enumResult.data, '_id.sourceIp'),
-            ) === this.toStringValue(credentialResult.data.sourceIp),
+            ) === this.toStringValue(credentialResult.data['sourceIp']),
         )
 
         const relatedRemote = remoteResults.filter(
           (remoteResult) =>
-            this.toStringValue(remoteResult.data.sourceIp) ===
-            this.toStringValue(credentialResult.data.sourceIp),
+            this.toStringValue(remoteResult.data['sourceIp']) ===
+            this.toStringValue(credentialResult.data['sourceIp']),
         )
 
         if (relatedEnumeration.length > 0 || relatedRemote.length > 0) {
@@ -2233,7 +2233,7 @@ export class ThreatHuntingSystemCore
 
     try {
       // Extract IP addresses
-      const sourceIp = this.toStringValue(result.data.sourceIp)
+      const sourceIp = this.toStringValue(result.data['sourceIp'])
       if (sourceIp) {
         indicators.push({
           indicatorType: 'ip',
@@ -2244,7 +2244,7 @@ export class ThreatHuntingSystemCore
         })
       }
 
-      const destinationIp = this.toStringValue(result.data.destinationIp)
+      const destinationIp = this.toStringValue(result.data['destinationIp'])
       if (destinationIp) {
         indicators.push({
           indicatorType: 'ip',
@@ -2256,7 +2256,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Extract file hashes
-      const fileHash = this.toStringValue(result.data.fileHash)
+      const fileHash = this.toStringValue(result.data['fileHash'])
       if (fileHash) {
         indicators.push({
           indicatorType: 'file_hash',
@@ -2268,7 +2268,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Extract domain names
-      const domainName = this.toStringValue(result.data.domainName)
+      const domainName = this.toStringValue(result.data['domainName'])
       if (domainName) {
         indicators.push({
           indicatorType: 'domain',
@@ -2280,7 +2280,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Extract URLs
-      const url = this.toStringValue(result.data.url)
+      const url = this.toStringValue(result.data['url'])
       if (url) {
         indicators.push({
           indicatorType: 'url',
@@ -2292,7 +2292,7 @@ export class ThreatHuntingSystemCore
       }
 
       // Extract process names
-      const processName = this.toStringValue(result.data.processName)
+      const processName = this.toStringValue(result.data['processName'])
       if (processName) {
         indicators.push({
           indicatorType: 'process',
@@ -2339,9 +2339,9 @@ export class ThreatHuntingSystemCore
 
   private mapToHuntFinding(result: RawHuntFinding): HuntFinding {
     const findingId =
-      this.toStringValue(result.data.findingId) ?? `finding_${Date.now()}`
-    const evidence = this.toStringArray(result.data.evidence)
-    const description = this.toStringValue(result.data.description)
+      this.toStringValue(result.data['findingId']) ?? `finding_${Date.now()}`
+    const evidence = this.toStringArray(result.data['evidence'])
+    const description = this.toStringValue(result.data['description'])
 
     return {
       findingId,
@@ -2350,7 +2350,7 @@ export class ThreatHuntingSystemCore
       description: `${result.type}: ${description ?? 'Threat hunting anomaly detected'}`,
       evidence,
       remediation:
-        this.toStringValue(result.data.remediation) ??
+        this.toStringValue(result.data['remediation']) ??
         'Investigate and validate the alert.',
     }
   }
@@ -2832,8 +2832,8 @@ export class ThreatHuntingSystemCore
 
       let totalTime = 0
       for (const execution of completedExecutions) {
-        const startTime = this.toDate(execution.startTime)
-        const completedTime = this.toDate(execution.completedTime)
+        const startTime = this.toDate(execution['startTime'])
+        const completedTime = this.toDate(execution['completedTime'])
         const timeDiff = completedTime.getTime() - startTime.getTime()
         totalTime += timeDiff
       }

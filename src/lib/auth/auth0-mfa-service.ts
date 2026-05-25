@@ -38,7 +38,7 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 // Initialize Auth0 clients
 type ExtendedManagementClient = ManagementClient & {
@@ -130,16 +130,16 @@ type SupportedFactorType = Extract<
 function isGuardianEnrollment(value: unknown): value is GuardianEnrollment {
   return (
     isRecord(value) &&
-    typeof value.id === 'string' &&
-    typeof value.type === 'string'
+    typeof value['id'] === 'string' &&
+    typeof value['type'] === 'string'
   )
 }
 
 function isGuardianFactor(value: unknown): value is GuardianFactor {
   return (
     isRecord(value) &&
-    typeof value.name === 'string' &&
-    typeof value.enabled === 'boolean'
+    typeof value['name'] === 'string' &&
+    typeof value['enabled'] === 'boolean'
   )
 }
 
@@ -170,8 +170,8 @@ function parseEnrollmentTicket(
     return undefined
   }
 
-  if (typeof value.ticket_id === 'string') {
-    return { ticket_id: value.ticket_id }
+  if (typeof value['ticket_id'] === 'string') {
+    return { ticket_id: value['ticket_id'] }
   }
 
   return undefined

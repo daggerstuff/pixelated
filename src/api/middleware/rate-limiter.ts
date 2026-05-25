@@ -123,12 +123,12 @@ export async function incrementRedisCounter(
       }
       return parseCount(txResults[0][1])
     } else {
-      if (typeof redis.incr !== 'function') {
+      if (typeof redis['incr'] !== 'function') {
         return 0
       }
-      const rawCount = await redis.incr(key)
-      if (typeof redis.expire === 'function') {
-        await redis.expire(key, windowSeconds)
+      const rawCount = await redis['incr'](key)
+      if (typeof redis['expire'] === 'function') {
+        await redis['expire'](key, windowSeconds)
       }
       return parseCount(rawCount)
     }

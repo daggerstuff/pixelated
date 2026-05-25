@@ -427,7 +427,7 @@ export class PlatformStatusMonitor {
       components,
       lastUpdated: new Date(),
       uptime: Date.now() - this.startTime.getTime(),
-      version: process.env.APP_VERSION ?? '1.0.0',
+      version: process.env['APP_VERSION'] ?? '1.0.0',
     }
   }
 

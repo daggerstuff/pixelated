@@ -107,14 +107,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     try {
       this.mongoClient = new MongoClient(
         this.config.mongoUrl ??
-          process.env.MONGODB_URI ??
+          process.env['MONGODB_URI'] ??
           'mongodb://localhost:27017/threat_detection',
       )
       await this.mongoClient.connect()
 
       this.redis = new Redis(
         this.config.redisUrl ??
-          process.env.REDIS_URL ??
+          process.env['REDIS_URL'] ??
           'redis://localhost:6379',
       )
 
@@ -402,25 +402,25 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         // Handle different response formats
         const obj = data as Record<string, unknown>
 
-        if (obj.threats && Array.isArray(obj.threats)) {
+        if (obj['threats'] && Array.isArray(obj['threats'])) {
           // Format: { threats: [...] }
-          for (const item of obj.threats) {
+          for (const item of obj['threats']) {
             const transformed = this.transformIntelligenceItem(feed, item)
             if (transformed) {
               intelligence.push(transformed)
             }
           }
-        } else if (obj.data && Array.isArray(obj.data)) {
+        } else if (obj['data'] && Array.isArray(obj['data'])) {
           // Format: { data: [...] }
-          for (const item of obj.data) {
+          for (const item of obj['data']) {
             const transformed = this.transformIntelligenceItem(feed, item)
             if (transformed) {
               intelligence.push(transformed)
             }
           }
-        } else if (obj.objects && Array.isArray(obj.objects)) {
+        } else if (obj['objects'] && Array.isArray(obj['objects'])) {
           // STIX2 format
-          for (const item of obj.objects) {
+          for (const item of obj['objects']) {
             const transformed = this.transformSTIX2Item(feed, item)
             if (transformed) {
               intelligence.push(transformed)
@@ -453,16 +453,16 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = String(data.value ?? data.ioc ?? data.indicator ?? '')
-      const iocType = String(data.type ?? data.ioc_type ?? 'unknown')
+      const iocValue = String(data['value'] ?? data['ioc'] ?? data['indicator'] ?? '')
+      const iocType = String(data['type'] ?? data['ioc_type'] ?? 'unknown')
       const threatType = String(
-        data.threat_type ?? data.malware_family ?? 'unknown',
+        data['threat_type'] ?? data['malware_family'] ?? 'unknown',
       )
       const severity = this.mapSeverity(
-        String(data.severity ?? data.confidence ?? 'medium'),
+        String(data['severity'] ?? data['confidence'] ?? 'medium'),
       )
       const confidence = this.extractConfidence(
-        (data.confidence ?? data.score ?? 50) as unknown,
+        (data['confidence'] ?? data['score'] ?? 50) as unknown,
       )
 
       if (!iocValue) {
@@ -478,35 +478,35 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         severity,
         confidence,
         firstSeen: new Date(
-          (data.first_seen ?? data.created ?? Date.now()) as any,
+          (data['first_seen'] ?? data['created'] ?? Date.now()) as any,
         ),
         lastSeen: new Date(
-          (data.last_seen ?? data.updated ?? Date.now()) as any,
+          (data['last_seen'] ?? data['updated'] ?? Date.now()) as any,
         ),
-        expirationDate: data.expiration_date
-          ? new Date(data.expiration_date as string)
+        expirationDate: data['expiration_date']
+          ? new Date(data['expiration_date'] as string)
           : undefined,
-        source: String(data.source ?? feed.name),
-        tags: Array.isArray(data.tags) ? (data.tags as string[]) : [],
+        source: String(data['source'] ?? feed.name),
+        tags: Array.isArray(data['tags']) ? (data['tags'] as string[]) : [],
         metadata: {
           originalData: data,
           feedType: feed.type,
           transformationDate: new Date(),
         },
-        relatedIOCs: Array.isArray(data.related_iocs)
-          ? (data.related_iocs as string[])
+        relatedIOCs: Array.isArray(data['related_iocs'])
+          ? (data['related_iocs'] as string[])
           : undefined,
-        attribution: data.attribution
+        attribution: data['attribution']
           ? {
               actor:
-                ((data.attribution as Record<string, unknown>)
-                  .actor as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['actor'] as string) || 'unknown',
               campaign:
-                ((data.attribution as Record<string, unknown>)
-                  .campaign as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['campaign'] as string) || 'unknown',
               family:
-                ((data.attribution as Record<string, unknown>)
-                  .family as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['family'] as string) || 'unknown',
             }
           : undefined,
       }
@@ -531,7 +531,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Only process indicator and malware objects
-      if (data.type !== 'indicator' && data.type !== 'malware') {
+      if (data['type'] !== 'indicator' && data['type'] !== 'malware') {
         return null
       }
 
@@ -539,20 +539,20 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       let iocType = 'unknown'
       let threatType = 'unknown'
 
-      if (data.type === 'indicator') {
+      if (data['type'] === 'indicator') {
         // Extract IOC from pattern
-        const pattern = (data.pattern as string) || ''
+        const pattern = (data['pattern'] as string) || ''
         const patternMatch = pattern.match(/([a-zA-Z]+)\s*=\s*['"]([^'"]+)['"]/)
 
         if (patternMatch) {
           iocType = patternMatch[1].toLowerCase()
           iocValue = patternMatch[2]
         }
-      } else if (data.type === 'malware') {
+      } else if (data['type'] === 'malware') {
         iocType = 'malware'
-        iocValue = (data.name as string) || 'unknown'
-        threatType = data.labels
-          ? (data.labels as string[]).join(', ')
+        iocValue = (data['name'] as string) || 'unknown'
+        threatType = data['labels']
+          ? (data['labels'] as string[]).join(', ')
           : 'malware'
       }
 
@@ -562,20 +562,20 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       return {
         intelligenceId:
-          (data.id as string) || `intel_${feed.name}_${Date.now()}`,
+          (data['id'] as string) || `intel_${feed.name}_${Date.now()}`,
         feedName: feed.name,
         iocType,
         iocValue,
         threatType,
-        severity: this.mapSeverity(String(data.confidence ?? 'medium')),
-        confidence: this.extractConfidence(data.confidence ?? 50),
-        firstSeen: new Date((data.created ?? Date.now()) as any),
-        lastSeen: new Date((data.modified ?? Date.now()) as any),
-        source: (data.created_by_ref as string) || feed.name,
-        tags: Array.isArray(data.labels) ? (data.labels as string[]) : [],
+        severity: this.mapSeverity(String(data['confidence'] ?? 'medium')),
+        confidence: this.extractConfidence(data['confidence'] ?? 50),
+        firstSeen: new Date((data['created'] ?? Date.now()) as any),
+        lastSeen: new Date((data['modified'] ?? Date.now()) as any),
+        source: (data['created_by_ref'] as string) || feed.name,
+        tags: Array.isArray(data['labels']) ? (data['labels'] as string[]) : [],
         metadata: {
-          stixType: data.type || 'unknown',
-          specVersion: (data.spec_version as string) || '2.0',
+          stixType: data['type'] || 'unknown',
+          specVersion: (data['spec_version'] as string) || '2.0',
           transformationDate: new Date(),
         },
       }
@@ -827,38 +827,38 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       // Build query filter
       if (query.iocType) {
-        filter.iocType = query.iocType
+        filter['iocType'] = query.iocType
       }
 
       if (query.iocValue) {
-        filter.iocValue = query.iocValue
+        filter['iocValue'] = query.iocValue
       }
 
       if (query.threatType) {
-        filter.threatType = query.threatType
+        filter['threatType'] = query.threatType
       }
 
       if (query.severity) {
-        filter.severity = query.severity
+        filter['severity'] = query.severity
       }
 
       if (query.tags && query.tags.length > 0) {
-        filter.tags = { $in: query.tags }
+        filter['tags'] = { $in: query.tags }
       }
 
       if (query.source) {
-        filter.source = query.source
+        filter['source'] = query.source
       }
 
       if (query.timeRange) {
-        filter.lastSeen = {
+        filter['lastSeen'] = {
           $gte: query.timeRange.start,
           $lte: query.timeRange.end,
         }
       }
 
       // Add expiration filter
-      filter.$or = [
+      filter['$or'] = [
         { expirationDate: { $exists: false } },
         { expirationDate: { $gt: new Date() } },
       ]
@@ -1005,7 +1005,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
             enrichmentTimestamp: new Date(),
             sources: Array.from(
               new Set(
-                intelligenceFindings.flatMap((f) => f.sources as string[]),
+                intelligenceFindings.flatMap((f) => f['sources'] as string[]),
               ),
             ),
           },
@@ -1033,27 +1033,27 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
     try {
       // Extract from actions
       for (const action of threatResponse.actions) {
-        if (action.actionType === 'ip_block' && action.parameters.sourceIp) {
-          iocs.push({ type: 'ip', value: action.parameters.sourceIp as string })
+        if (action.actionType === 'ip_block' && action.parameters['sourceIp']) {
+          iocs.push({ type: 'ip', value: action.parameters['sourceIp'] as string })
         }
 
-        if (action.actionType === 'domain_block' && action.parameters.domain) {
+        if (action.actionType === 'domain_block' && action.parameters['domain']) {
           iocs.push({
             type: 'domain',
-            value: action.parameters.domain as string,
+            value: action.parameters['domain'] as string,
           })
         }
       }
 
       // Extract from metadata
-      if (threatResponse.metadata?.ip) {
-        iocs.push({ type: 'ip', value: threatResponse.metadata.ip as string })
+      if (threatResponse.metadata?.['ip']) {
+        iocs.push({ type: 'ip', value: threatResponse.metadata['ip'] as string })
       }
 
-      if (threatResponse.metadata?.userAgent) {
+      if (threatResponse.metadata?.['userAgent']) {
         iocs.push({
           type: 'user_agent',
-          value: threatResponse.metadata.userAgent as string,
+          value: threatResponse.metadata['userAgent'] as string,
         })
       }
     } catch (error: unknown) {
@@ -1161,7 +1161,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       feedStats[feed.name] = {
         total,
         active,
-        lastUpdate: lastUpdate?.lastSeen ?? new Date(0),
+        lastUpdate: lastUpdate?.['lastSeen'] ?? new Date(0),
       }
     }
 

@@ -44,8 +44,8 @@ function isSerializedCiphertextInput(
 ): value is SerializedCiphertextInput {
   return (
     isRecord(value) &&
-    typeof value.serializedCiphertext === 'string' &&
-    value.serializedCiphertext.length > 0
+    typeof value['serializedCiphertext'] === 'string' &&
+    value['serializedCiphertext'].length > 0
   )
 }
 
@@ -65,8 +65,8 @@ function parseSerializedCiphertextInput(
 function isSerializedSealObject(value: unknown): value is SerializedSealObject {
   return (
     isRecord(value) &&
-    typeof value.save === 'function' &&
-    typeof value.delete === 'function'
+    typeof value['save'] === 'function' &&
+    typeof value['delete'] === 'function'
   )
 }
 
@@ -366,7 +366,7 @@ export class HomomorphicOperations {
                 `Sentiment analysis failed: ${formatOperationError(sentimentResult.error)}`,
               )
             }
-            metadata.confidence = 0.85
+            metadata['confidence'] = 0.85
             break
 
           case FHEOperation.CATEGORIZE:
@@ -381,8 +381,8 @@ export class HomomorphicOperations {
               operation: 'categorize',
               timestamp: Date.now(),
             })
-            metadata.categories = normalizeOptionalRecordToStringArray(
-              params?.categories,
+            metadata['categories'] = normalizeOptionalRecordToStringArray(
+              params?.['categories'],
             )
             break
 
@@ -501,7 +501,7 @@ export class HomomorphicOperations {
         // Add a constant or another ciphertext
         addResult = await this.sealOps.add(
           inputCiphertext,
-          getNumericArray(params?.addend, [1]),
+          getNumericArray(params?.['addend'], [1]),
         )
         if (addResult.success && addResult.result) {
           const res = resolveSerializedResult(addResult.result)
@@ -513,7 +513,7 @@ export class HomomorphicOperations {
         // Subtract a constant or another ciphertext
         subResult = await this.sealOps.subtract(
           inputCiphertext,
-          getNumericArray(params?.subtrahend, [1]),
+          getNumericArray(params?.['subtrahend'], [1]),
         )
         if (subResult.success && subResult.result) {
           const res = resolveSerializedResult(subResult.result)
@@ -525,7 +525,7 @@ export class HomomorphicOperations {
         // Multiply by a constant or another ciphertext
         multResult = await this.sealOps.multiply(
           inputCiphertext,
-          getNumericArray(params?.multiplier, [2]),
+          getNumericArray(params?.['multiplier'], [2]),
         )
         if (multResult.success && multResult.result) {
           const res = resolveSerializedResult(multResult.result)
@@ -551,7 +551,7 @@ export class HomomorphicOperations {
         // Apply a polynomial function
         polyResult = await this.sealOps.polynomial(
           inputCiphertext,
-          getNumericArray(params?.coefficients, [0, 1]),
+          getNumericArray(params?.['coefficients'], [0, 1]),
         )
         if (polyResult.success && polyResult.result) {
           const res = resolveSerializedResult(polyResult.result)
@@ -568,7 +568,7 @@ export class HomomorphicOperations {
         // Rotate the ciphertext
         rotResult = await this.sealOps.rotate(
           inputCiphertext,
-          getNumericValue(params?.steps, 1),
+          getNumericValue(params?.['steps'], 1),
         )
         if (rotResult.success && rotResult.result) {
           const res = resolveSerializedResult(rotResult.result)
@@ -648,8 +648,8 @@ export class HomomorphicOperations {
           parsed = null
         }
 
-        if (isRecord(parsed) && typeof parsed.data === 'string') {
-          decodedData = parsed.data
+        if (isRecord(parsed) && typeof parsed['data'] === 'string') {
+          decodedData = parsed['data']
         } else {
           decodedData = 'Unknown encoded format'
         }
@@ -666,16 +666,16 @@ export class HomomorphicOperations {
     switch (operation) {
       case FHEOperation.SENTIMENT:
         result = await this.analyzeSentiment(decodedData)
-        metadata.confidence = 0.85
+        metadata['confidence'] = 0.85
         break
 
       case FHEOperation.CATEGORIZE:
         result = await this.categorizeText(
           decodedData,
-          normalizeOptionalRecordToStringArray(params?.categories),
+          normalizeOptionalRecordToStringArray(params?.['categories']),
         )
-        metadata.categories = normalizeOptionalRecordToStringArray(
-          params?.categories,
+        metadata['categories'] = normalizeOptionalRecordToStringArray(
+          params?.['categories'],
         )
         break
 
@@ -684,13 +684,13 @@ export class HomomorphicOperations {
           decodedData,
           getNumericValue(params?.['maxLength'], 100),
         )
-        metadata.maxLength = getNumericValue(params?.['maxLength'], 100)
+        metadata['maxLength'] = getNumericValue(params?.['maxLength'], 100)
         break
 
       case FHEOperation.TOKENIZE:
         tokens = await this.tokenizeText(decodedData)
         result = JSON.stringify(tokens)
-        metadata.tokenCount = tokens.length
+        metadata['tokenCount'] = tokens.length
         break
 
       case FHEOperation.FILTER:
@@ -698,7 +698,7 @@ export class HomomorphicOperations {
           decodedData,
           getStringArray(params?.['filterTerms']),
         )
-        metadata.filtered = true
+        metadata['filtered'] = true
         break
 
       case FHEOperation.CUSTOM:
@@ -712,20 +712,20 @@ export class HomomorphicOperations {
             customOperation,
             params,
           )
-          metadata.custom = customOperation
+          metadata['custom'] = customOperation
         }
         break
 
       case FHEOperation.WORD_COUNT: {
         const words = decodedData.trim().split(/\s+/).filter(Boolean)
         result = String(words.length)
-        metadata.wordCount = words.length
+        metadata['wordCount'] = words.length
         break
       }
 
       case FHEOperation.CHARACTER_COUNT:
         result = String(decodedData.length)
-        metadata.characterCount = decodedData.length
+        metadata['characterCount'] = decodedData.length
         break
 
       case FHEOperation.KEYWORD_DENSITY: {
@@ -739,7 +739,7 @@ export class HomomorphicOperations {
           keywordDensity[normalized] = matches ? matches.length : 0
         }
         result = JSON.stringify(keywordDensity)
-        metadata.keywordDensity = keywordDensity
+        metadata['keywordDensity'] = keywordDensity
         break
       }
 
@@ -749,10 +749,10 @@ export class HomomorphicOperations {
           decodedData.split(/[.!?]+/).filter(Boolean).length,
           1,
         )
-        metadata.readingLevel =
+        metadata['readingLevel'] =
           (words.length / sentenceCount) * 0.5 +
           (decodedData.length / Math.max(words.length, 1)) * 0.5
-        result = String(metadata.readingLevel)
+        result = String(metadata['readingLevel'])
         break
       }
 
@@ -766,7 +766,7 @@ export class HomomorphicOperations {
           uniqueWordCount: uniqueWords.size,
           characterCount: decodedData.length,
         })
-        metadata.supported = true
+        metadata['supported'] = true
         break
       }
 
@@ -779,13 +779,13 @@ export class HomomorphicOperations {
       case FHEOperation.Polynomial:
       case FHEOperation.Rescale:
         result = `Unsupported operation: ${operation}`
-        metadata.supported = false
+        metadata['supported'] = false
         break
 
       default: {
         const operationName = String(operation)
         result = `Unsupported operation: ${operationName}`
-        metadata.supported = false
+        metadata['supported'] = false
         break
       }
     }

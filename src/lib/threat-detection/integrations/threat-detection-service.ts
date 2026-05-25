@@ -76,7 +76,6 @@ export interface ThreatDetectionConfig {
 
 export class ThreatDetectionService {
   private readonly orchestrator: AdvancedResponseOrchestrator
-  private readonly rateLimiter: DistributedRateLimiter
   private readonly rateLimitingBridge: RateLimitingBridge
   private readonly middleware: ThreatDetectionMiddleware
   private readonly config: ThreatDetectionConfig
@@ -267,8 +266,8 @@ export class ThreatDetectionService {
    * Analyze rate limiting related threats
    */
   private analyzeRateLimitingThreat(threatData: ThreatData): number {
-    const violationCount = threatData.riskFactors?.violationCount ?? 0
-    const timeWindow = threatData.riskFactors?.timeWindow ?? 60000
+    const violationCount = threatData.riskFactors?.['violationCount'] ?? 0
+    const timeWindow = threatData.riskFactors?.['timeWindow'] ?? 60000
 
     // Calculate violation rate
     const violationRate = violationCount / (timeWindow / 1000) // violations per second
@@ -284,8 +283,8 @@ export class ThreatDetectionService {
    */
   private detectRateLimitingPatterns(threatData: ThreatData): string[] {
     const patterns: string[] = []
-    const violationCount = threatData.riskFactors?.violationCount ?? 0
-    const timeWindow = threatData.riskFactors?.timeWindow ?? 60000
+    const violationCount = threatData.riskFactors?.['violationCount'] ?? 0
+    const timeWindow = threatData.riskFactors?.['timeWindow'] ?? 60000
 
     // Check for burst patterns
     if (violationCount > timeWindow / 1000) {
@@ -298,7 +297,7 @@ export class ThreatDetectionService {
     }
 
     // Check for endpoint targeting
-    if (threatData.riskFactors?.endpoint) {
+    if (threatData.riskFactors?.['endpoint']) {
       patterns.push('endpoint_targeting')
     }
 
@@ -378,15 +377,15 @@ export class ThreatDetectionService {
     const patterns: string[] = []
 
     // Add patterns based on risk factors
-    if (threatData.riskFactors?.ip) {
+    if (threatData.riskFactors?.['ip']) {
       patterns.push('suspicious_ip')
     }
 
-    if (threatData.riskFactors?.userAgent) {
+    if (threatData.riskFactors?.['userAgent']) {
       patterns.push('suspicious_user_agent')
     }
 
-    if (threatData.riskFactors?.endpoint) {
+    if (threatData.riskFactors?.['endpoint']) {
       patterns.push('sensitive_endpoint_access')
     }
 

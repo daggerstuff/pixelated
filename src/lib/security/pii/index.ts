@@ -581,11 +581,11 @@ class PIIDetectionService {
         confidence,
         isEncrypted: true,
         metadata: {
-          operationId: result.metadata?.operation?.toString() ?? 'unknown',
+          operationId: result.metadata?.['operation']?.toString() ?? 'unknown',
           processingTime:
-            result.metadata?.timestamp &&
-            typeof result.metadata.timestamp === 'number'
-              ? (Date.now() - result.metadata.timestamp).toString()
+            result.metadata?.['timestamp'] &&
+            typeof result.metadata['timestamp'] === 'number'
+              ? (Date.now() - result.metadata['timestamp']).toString()
               : '0',
         },
       }

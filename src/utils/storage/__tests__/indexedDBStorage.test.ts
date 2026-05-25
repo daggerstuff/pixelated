@@ -15,7 +15,6 @@ describe('IndexedDBStorage', () => {
   let mockDb: IDBPDatabase<any>
   let mockTransaction: IDBTransaction
   let mockObjectStore: IDBObjectStore
-  let mockRequest: IDBRequest
 
   beforeEach(() => {
     // Reset mocks

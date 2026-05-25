@@ -121,9 +121,9 @@ export class AdvancedResponseOrchestrator
   }
 
   private async initializeServices(): Promise<void> {
-    this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+    this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
     this.mongoClient = new MongoClient(
-      process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_detection',
+      process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_detection',
     )
 
     this.responseExecutor = new ConcurrentResponseExecutor(this.config)
@@ -379,7 +379,7 @@ export class AdvancedResponseOrchestrator
       confidence,
       riskFactors: mlAnalysis.riskFactors,
       recommendedActions: mlAnalysis.recommendedActions,
-      patterns: (mlAnalysis.riskFactors.patternMatches as string[]) || [],
+      patterns: (mlAnalysis.riskFactors['patternMatches'] as string[]) || [],
       analysisTimestamp: new Date(),
     }
   }
@@ -395,19 +395,19 @@ export class AdvancedResponseOrchestrator
     // Determine response type based on severity
     if (
       analysis.severity === 'critical' ||
-      analysis.estimatedImpact > strategies.critical
+      analysis.estimatedImpact > strategies['critical']
     ) {
       primaryType = 'block'
       escalationLevel = 4
     } else if (
       analysis.severity === 'high' ||
-      analysis.estimatedImpact > strategies.high
+      analysis.estimatedImpact > strategies['high']
     ) {
       primaryType = 'rate_limit'
       escalationLevel = 3
     } else if (
       analysis.severity === 'medium' ||
-      analysis.estimatedImpact > strategies.medium
+      analysis.estimatedImpact > strategies['medium']
     ) {
       primaryType = 'investigate'
       escalationLevel = 2
@@ -462,7 +462,7 @@ export class AdvancedResponseOrchestrator
           actionType: 'ip_block',
           target: 'firewall',
           parameters: {
-            sourceIp: analysis.riskFactors.ip,
+            sourceIp: analysis.riskFactors['ip'],
             duration: '24h',
             reason: `Critical threat detected: ${analysis.threatId}`,
           },
@@ -477,7 +477,7 @@ export class AdvancedResponseOrchestrator
           actionType: 'rate_limiting',
           target: 'rate_limiter',
           parameters: {
-            userId: analysis.riskFactors.userId,
+            userId: analysis.riskFactors['userId'],
             limit: 10,
             windowMs: 60000,
             reason: `High threat detected: ${analysis.threatId}`,
@@ -549,7 +549,7 @@ export class AdvancedResponseOrchestrator
         actionType: 'user_notification',
         target: 'user_management',
         parameters: {
-          userId: analysis.riskFactors.userId,
+          userId: analysis.riskFactors['userId'],
           message: `Security concern detected on your account. Please verify recent activity.`,
           priority: 'high',
         },
@@ -645,9 +645,9 @@ export class AdvancedResponseOrchestrator
     for (const action of response.actions) {
       if (action.actionType === 'rate_limiting') {
         await this.rateLimitingService.applyRateLimit(
-          action.parameters.userId as string,
-          action.parameters.limit as number,
-          action.parameters.windowMs as number,
+          action.parameters['userId'] as string,
+          action.parameters['limit'] as number,
+          action.parameters['windowMs'] as number,
         )
       }
     }

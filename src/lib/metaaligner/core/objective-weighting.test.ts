@@ -227,7 +227,7 @@ describe('ObjectiveWeightingEngine', () => {
       // Ratio of empathy to an unadjusted objective (if one existed) would increase by ~1.5
       // Ratio of empathy to safety: (initialE * 1.5) / (initialS * 0.8)
       const empathySafetyRatioInitial =
-        initialWeights.empathy / initialWeights.safety
+        initialWeights['empathy'] / initialWeights['safety']
       const empathySafetyRatioFinal =
         result.weights['empathy'] / result.weights['safety']
       expect(empathySafetyRatioFinal).toBeCloseTo(
@@ -236,7 +236,7 @@ describe('ObjectiveWeightingEngine', () => {
       )
 
       const correctnessSafetyRatioInitial =
-        initialWeights.correctness / initialWeights.safety
+        initialWeights['correctness'] / initialWeights['safety']
       const correctnessSafetyRatioFinal =
         result.weights['correctness'] / result.weights['safety']
       // Correctness boost (1+0.5) = 1.5; Safety reduction 0.8
@@ -497,7 +497,7 @@ describe('ObjectiveBalancer', () => {
 
     test('should handle single objective', () => {
       const singleResult = {
-        correctness: mockEvaluationResults.correctness,
+        correctness: mockEvaluationResults['correctness'],
       }
       const singleWeight = { correctness: 1.0 }
 

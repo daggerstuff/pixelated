@@ -10,7 +10,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from '@/components/ui/LazyChart.tsx'
+} from '@/components/ui/LazyChart'
 import { cn } from '@/lib/utils'
 
 // Define types for our component

@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
+} from '@/components/ui/card/card'
 import {
   useEvaluationQuery,
   useEvaluationUpdateMutation,

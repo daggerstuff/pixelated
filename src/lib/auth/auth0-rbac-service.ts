@@ -44,10 +44,10 @@ function toAuth0ManagementRoles(value: unknown): Auth0ManagementRole[] {
     if (isRecord(entry)) {
       const role = entry
       roles.push({
-        id: typeof role.id === 'string' ? role.id : undefined,
+        id: typeof role['id'] === 'string' ? role['id'] : undefined,
         name:
-          typeof role.name === 'string' || Array.isArray(role.name)
-            ? role.name
+          typeof role['name'] === 'string' || Array.isArray(role['name'])
+            ? role['name']
             : undefined,
       })
     }
@@ -66,11 +66,11 @@ function toAuth0UserRoles(value: unknown): Auth0UserRole[] {
       const userRole = entry
       roles.push({
         name:
-          typeof userRole.name === 'string' ||
-          typeof userRole.name === 'number' ||
-          typeof userRole.name === 'boolean'
-            ? String(userRole.name)
-            : userRole.name,
+          typeof userRole['name'] === 'string' ||
+          typeof userRole['name'] === 'number' ||
+          typeof userRole['name'] === 'boolean'
+            ? String(userRole['name'])
+            : userRole['name'],
       })
     }
   }
@@ -511,8 +511,8 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
             return (
               isRecord(r) &&
               Object.hasOwn(r, 'name') &&
-              typeof r.name === 'string' &&
-              r.name === roleName
+              typeof r['name'] === 'string' &&
+              r['name'] === roleName
             )
           },
         )

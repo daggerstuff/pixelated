@@ -162,22 +162,22 @@ export async function getAlertStatistics(
     }
 
     return {
-      total: parseInt(stats.total ?? '0', 10),
-      active: parseInt(stats.active ?? '0', 10),
-      resolved: parseInt(stats.resolved ?? '0', 10),
+      total: parseInt(stats['total'] ?? '0', 10),
+      active: parseInt(stats['active'] ?? '0', 10),
+      resolved: parseInt(stats['resolved'] ?? '0', 10),
       bySeverity: {
-        critical: parseInt(stats.critical ?? '0', 10),
-        high: parseInt(stats.high ?? '0', 10),
-        medium: parseInt(stats.medium ?? '0', 10),
-        low: parseInt(stats.low ?? '0', 10),
+        critical: parseInt(stats['critical'] ?? '0', 10),
+        high: parseInt(stats['high'] ?? '0', 10),
+        medium: parseInt(stats['medium'] ?? '0', 10),
+        low: parseInt(stats['low'] ?? '0', 10),
       },
       bySource: {
-        rate_limiting: parseInt(stats.rate_limiting ?? '0', 10),
-        behavioral_analysis: parseInt(stats.behavioral_analysis ?? '0', 10),
-        threat_intelligence: parseInt(stats.threat_intelligence ?? '0', 10),
-        system_monitoring: parseInt(stats.system_monitoring ?? '0', 10),
+        rate_limiting: parseInt(stats['rate_limiting'] ?? '0', 10),
+        behavioral_analysis: parseInt(stats['behavioral_analysis'] ?? '0', 10),
+        threat_intelligence: parseInt(stats['threat_intelligence'] ?? '0', 10),
+        system_monitoring: parseInt(stats['system_monitoring'] ?? '0', 10),
       },
-      avgResolutionTime: parseInt(stats.avgResolutionTime ?? '0', 10),
+      avgResolutionTime: parseInt(stats['avgResolutionTime'] ?? '0', 10),
     }
   } catch (error: unknown) {
     console.error('Error getting alert statistics:', error)
@@ -287,13 +287,13 @@ function generateRecommendations(
   }
 
   // Specific source recommendations
-  if (metrics.bySource.rate_limiting > 10) {
+  if (metrics.bySource['rate_limiting'] > 10) {
     recommendations.push(
       'Multiple rate limiting alerts. Review API usage patterns and consider rate limit adjustments.',
     )
   }
 
-  if (metrics.bySource.behavioral_analysis > 5) {
+  if (metrics.bySource['behavioral_analysis'] > 5) {
     recommendations.push(
       'Multiple behavioral analysis alerts. Consider enhancing user behavior monitoring.',
     )

@@ -309,12 +309,12 @@ function isRawCollaborationSession(
   if (!isRecord(value)) return false
 
   return (
-    typeof value.id === 'string' &&
-    typeof value.documentId === 'string' &&
-    typeof value.userId === 'string' &&
-    typeof value.socketId === 'string' &&
-    (typeof value.lastActivity === 'string' ||
-      value.lastActivity instanceof Date)
+    typeof value['id'] === 'string' &&
+    typeof value['documentId'] === 'string' &&
+    typeof value['userId'] === 'string' &&
+    typeof value['socketId'] === 'string' &&
+    (typeof value['lastActivity'] === 'string' ||
+      value['lastActivity'] instanceof Date)
   )
 }
 

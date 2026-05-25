@@ -202,12 +202,12 @@ export class AuditService {
     }
 
     if (options?.startDate || options?.endDate) {
-      filter.timestamp = {}
+      filter['timestamp'] = {}
       if (options.startDate) {
-        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
+        ;(filter['timestamp'] as Record<string, Date>)['$gte'] = options.startDate
       }
       if (options.endDate) {
-        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
+        ;(filter['timestamp'] as Record<string, Date>)['$lte'] = options.endDate
       }
     }
 
@@ -242,16 +242,16 @@ export class AuditService {
     }
 
     if (options?.actions) {
-      filter.action = { $in: options.actions }
+      filter['action'] = { $in: options.actions }
     }
 
     if (options?.startDate || options?.endDate) {
-      filter.timestamp = {}
+      filter['timestamp'] = {}
       if (options.startDate) {
-        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
+        ;(filter['timestamp'] as Record<string, Date>)['$gte'] = options.startDate
       }
       if (options.endDate) {
-        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
+        ;(filter['timestamp'] as Record<string, Date>)['$lte'] = options.endDate
       }
     }
 
@@ -283,12 +283,12 @@ export class AuditService {
     }
 
     if (options?.startDate || options?.endDate) {
-      filter.timestamp = {}
+      filter['timestamp'] = {}
       if (options.startDate) {
-        ;(filter.timestamp as Record<string, Date>).$gte = options.startDate
+        ;(filter['timestamp'] as Record<string, Date>)['$gte'] = options.startDate
       }
       if (options.endDate) {
-        ;(filter.timestamp as Record<string, Date>).$lte = options.endDate
+        ;(filter['timestamp'] as Record<string, Date>)['$lte'] = options.endDate
       }
     }
 
@@ -330,15 +330,15 @@ export class AuditService {
     }
 
     // Additional factors from details
-    if (params.details?.suspiciousActivity) {
+    if (params.details?.['suspiciousActivity']) {
       score += 40
     }
 
-    if (params.details?.newDevice) {
+    if (params.details?.['newDevice']) {
       score += 20
     }
 
-    if (params.details?.unusualLocation) {
+    if (params.details?.['unusualLocation']) {
       score += 30
     }
 

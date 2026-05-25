@@ -5,27 +5,27 @@ import { Sentry } from '../../../../config/instrument.mjs'
 type ProbeMode = 'message' | 'error'
 
 const resolveSentryDsn = () =>
-  process.env.SENTRY_DSN ??
-  process.env.PUBLIC_SENTRY_DSN ??
-  process.env.SENTRY_PUBLIC_DSN ??
-  process.env.VITE_SENTRY_DSN
+  process.env['SENTRY_DSN'] ??
+  process.env['PUBLIC_SENTRY_DSN'] ??
+  process.env['SENTRY_PUBLIC_DSN'] ??
+  process.env['VITE_SENTRY_DSN']
 
 const resolveSentryRelease = () =>
-  process.env.SENTRY_RELEASE ??
-  process.env.PUBLIC_SENTRY_RELEASE ??
-  process.env.PUBLIC_APP_VERSION ??
-  process.env.VERCEL_GIT_COMMIT_SHA ??
-  process.env.RENDER_GIT_COMMIT ??
-  process.env.NETLIFY_COMMIT_REF ??
-  process.env.RAILWAY_GIT_COMMIT_SHA ??
-  process.env.GITHUB_SHA ??
-  process.env.CI_COMMIT_SHA ??
+  process.env['SENTRY_RELEASE'] ??
+  process.env['PUBLIC_SENTRY_RELEASE'] ??
+  process.env['PUBLIC_APP_VERSION'] ??
+  process.env['VERCEL_GIT_COMMIT_SHA'] ??
+  process.env['RENDER_GIT_COMMIT'] ??
+  process.env['NETLIFY_COMMIT_REF'] ??
+  process.env['RAILWAY_GIT_COMMIT_SHA'] ??
+  process.env['GITHUB_SHA'] ??
+  process.env['CI_COMMIT_SHA'] ??
   process.env['npm_package_version']
 
 const hasValidProbeToken = (request: Request) => {
   const requiredToken =
-    process.env.SENTRY_DIAGNOSTIC_TOKEN ?? process.env.SENTRY_TEST_TOKEN
-  if (!requiredToken || process.env.NODE_ENV !== 'production') {
+    process.env['SENTRY_DIAGNOSTIC_TOKEN'] ?? process.env['SENTRY_TEST_TOKEN']
+  if (!requiredToken || process.env['NODE_ENV'] !== 'production') {
     return true
   }
 
@@ -99,9 +99,9 @@ const runProbe = async (request: Request): Promise<Response> => {
 
   const body = await readProbeBody(request)
   const url = new URL(request.url)
-  const mode = (body.mode as ProbeMode) || url.searchParams.get('mode')
+  const mode = (body['mode'] as ProbeMode) || url.searchParams.get('mode')
   const eventMessage =
-    ((body.message as string) || url.searchParams.get('message')) ??
+    ((body['message'] as string) || url.searchParams.get('message')) ??
     'Sentry server probe event'
 
   const eventId = emitProbeEvent(
@@ -116,7 +116,7 @@ const runProbe = async (request: Request): Promise<Response> => {
       eventId,
       dsn: redactDsn(dsn),
       release: resolveSentryRelease() ?? null,
-      nodeEnv: process.env.NODE_ENV ?? 'unknown',
+      nodeEnv: process.env['NODE_ENV'] ?? 'unknown',
       timestamp: new Date().toISOString(),
     }),
     {

@@ -119,7 +119,7 @@ function isServiceLoadBalancerConfig(
   value: unknown,
 ): value is ServiceLoadBalancerConfig {
   return (
-    isRecord(value) && typeof value.name === 'string' && value.name.length > 0
+    isRecord(value) && typeof value['name'] === 'string' && value['name'].length > 0
   )
 }
 
@@ -131,12 +131,12 @@ function isServiceDiscoveryConfig(
   }
 
   return (
-    value.consul === undefined ||
-    isRecord(value.consul) ||
-    value.etcd === undefined ||
-    isRecord(value.etcd) ||
-    value.zookeeper === undefined ||
-    isRecord(value.zookeeper)
+    value['consul'] === undefined ||
+    isRecord(value['consul']) ||
+    value['etcd'] === undefined ||
+    isRecord(value['etcd']) ||
+    value['zookeeper'] === undefined ||
+    isRecord(value['zookeeper'])
   )
 }
 
@@ -145,13 +145,13 @@ function getServiceList(config: unknown): ServiceLoadBalancerConfig[] {
     return []
   }
 
-  const deploymentServices = isRecord(config.deployment)
-    ? config.deployment.services
+  const deploymentServices = isRecord(config['deployment'])
+    ? config['deployment']['services']
     : undefined
   const serviceList = Array.isArray(deploymentServices)
     ? deploymentServices
-    : Array.isArray(config.services)
-      ? config.services
+    : Array.isArray(config['services'])
+      ? config['services']
       : []
 
   return serviceList.filter(isServiceLoadBalancerConfig)
@@ -197,22 +197,22 @@ function toDiscoveredServiceInstance(
     return null
   }
 
-  const host = asString(payload.host)
-  const port = asNumber(payload.port)
+  const host = asString(payload['host'])
+  const port = asNumber(payload['port'])
 
   if (!host || port === undefined) {
     return null
   }
 
-  const metadataCandidate = isRecord(payload.metadata) ? payload.metadata : {}
-  const statusCandidate = asString(payload.status)
+  const metadataCandidate = isRecord(payload['metadata']) ? payload['metadata'] : {}
+  const statusCandidate = asString(payload['status'])
   const status =
     statusCandidate === 'healthy' || statusCandidate === 'unhealthy'
       ? statusCandidate
       : 'unknown'
   const registeredAtValue = new Date(
-    asString(payload.registeredAt) ??
-      asNumber(payload.registeredAt) ??
+    asString(payload['registeredAt']) ??
+      asNumber(payload['registeredAt']) ??
       Date.now(),
   )
 
@@ -222,13 +222,13 @@ function toDiscoveredServiceInstance(
     region,
     host,
     port,
-    protocol: asString(payload.protocol) ?? 'http',
-    version: asString(payload.version) ?? '1.0.0',
+    protocol: asString(payload['protocol']) ?? 'http',
+    version: asString(payload['version']) ?? '1.0.0',
     metadata: metadataCandidate,
     status,
     registeredAt: registeredAtValue,
     lastHeartbeat: new Date(),
-    tags: asStringArrayValue(payload.tags),
+    tags: asStringArrayValue(payload['tags']),
   }
 }
 
@@ -239,39 +239,39 @@ function isConsulServiceDiscoveryEntry(
     return false
   }
 
-  const service = isRecord(value.Service) ? value.Service : undefined
-  const node = isRecord(value.Node) ? value.Node : undefined
+  const service = isRecord(value['Service']) ? value['Service'] : undefined
+  const node = isRecord(value['Node']) ? value['Node'] : undefined
 
   return (
-    typeof value.Service === 'object' &&
+    typeof value['Service'] === 'object' &&
     service !== undefined &&
-    typeof service.ID === 'string' &&
-    typeof service.Service === 'string' &&
-    typeof service.Port === 'number' &&
-    typeof value.Node === 'object' &&
+    typeof service['ID'] === 'string' &&
+    typeof service['Service'] === 'string' &&
+    typeof service['Port'] === 'number' &&
+    typeof value['Node'] === 'object' &&
     node !== undefined &&
-    typeof node.Datacenter === 'string' &&
-    typeof node.Address === 'string'
+    typeof node['Datacenter'] === 'string' &&
+    typeof node['Address'] === 'string'
   )
 }
 
 function isConsulClient(value: unknown): value is ConsulClient {
-  if (!isRecord(value) || !isRecord(value.agent) || !isRecord(value.health)) {
+  if (!isRecord(value) || !isRecord(value['agent']) || !isRecord(value['health'])) {
     return false
   }
 
-  const agent = value.agent
-  const health = value.health
-  const consulService = isRecord(agent.service) ? agent.service : undefined
+  const agent = value['agent']
+  const health = value['health']
+  const consulService = isRecord(agent['service']) ? agent['service'] : undefined
 
   return (
-    typeof agent.self === 'function' &&
-    typeof agent.service === 'object' &&
-    agent.service !== null &&
+    typeof agent['self'] === 'function' &&
+    typeof agent['service'] === 'object' &&
+    agent['service'] !== null &&
     consulService !== undefined &&
-    typeof consulService.register === 'function' &&
-    typeof consulService.deregister === 'function' &&
-    typeof health.service === 'function'
+    typeof consulService['register'] === 'function' &&
+    typeof consulService['deregister'] === 'function' &&
+    typeof health['service'] === 'function'
   )
 }
 
@@ -286,11 +286,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private readonly consulClients: Map<string, ConsulClient> = new Map()
   private readonly etcdClients: Map<string, EtcdClient> = new Map()
   private readonly zookeeperClients: Map<string, ZooKeeperClient> = new Map()
-  private readonly dnsClient: DNSClient
   private readonly serviceRegistry: Map<string, ServiceInstance[]> = new Map()
   private readonly discoveryBackends: Map<string, DiscoveryBackendRecord> =
     new Map()
-  private isInitialized = false
   private heartbeatInterval: NodeJS.Timeout | null = null
   private cleanupInterval: NodeJS.Timeout | null = null
   private readonly serviceCache: Map<string, ServiceCacheEntry> = new Map()
@@ -1686,10 +1684,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
  * Load Balancer implementation
  */
 class LoadBalancer {
-  private readonly serviceName: string
   private readonly algorithm: string
-  private readonly healthCheck: Record<string, unknown> | undefined
-  private readonly circuitBreaker: Record<string, unknown> | undefined
   private currentIndex = 0
   private readonly instanceWeights: Map<string, number> = new Map()
 
@@ -1776,8 +1771,8 @@ class LoadBalancer {
         weight = 0
       } else {
         // Adjust weight based on metadata
-        if (typeof instance.metadata.weight === 'string') {
-          const parsedWeight = Number.parseInt(instance.metadata.weight, 10)
+        if (typeof instance.metadata['weight'] === 'string') {
+          const parsedWeight = Number.parseInt(instance.metadata['weight'], 10)
           weight = Number.isNaN(parsedWeight) ? 100 : parsedWeight
         }
       }

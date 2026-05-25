@@ -68,7 +68,7 @@ describe('PiiRedactor', () => {
   it('tracks drift across calls', () => {
     redactor.redact('My email is a@b.com')
     const report = redactor.getPiiDriftReport()
-    expect(report.typesFound).toContain('email')
+    expect(report['typesFound']).toContain('email')
   })
 
   it('singleton export works', () => {

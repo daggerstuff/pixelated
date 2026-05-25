@@ -54,7 +54,7 @@ if (!React.act || typeof React.act !== 'function') {
   }
 }
 
-if (!reactCjs.act || typeof reactCjs.act !== 'function') {
+if (!reactCjs['act'] || typeof reactCjs['act'] !== 'function') {
   if (
     !cjsActDescriptor ||
     cjsActDescriptor.configurable ||

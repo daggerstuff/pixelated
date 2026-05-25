@@ -351,17 +351,6 @@ export class RealFHEService implements FHEService {
   public getEncryptionMode(): EncryptionMode {
     return this.getMode()
   }
-
-  /**
-   * Check if service is initialized
-   */
-  private checkInitialized() {
-    if (!this.initialized) {
-      throw new Error(
-        'Real FHE service not initialized. Call initialize() first.',
-      )
-    }
-  }
 }
 
 // Export a singleton instance

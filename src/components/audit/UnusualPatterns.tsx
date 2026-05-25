@@ -1,4 +1,4 @@
-import { ScrollArea } from '@/components/ui/scroll-area.tsx'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 import type { UnusualPattern } from '../../lib/audit/analysis'
 import { Badge } from '../ui/badge'

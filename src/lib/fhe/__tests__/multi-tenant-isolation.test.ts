@@ -77,7 +77,7 @@ describe('FHE Multi-tenant Isolation', () => {
     )
 
     expect(configWithTenant.tenantConfig?.tenantId).toBe(customTenant.tenantId)
-    expect(configWithTenant.keySize).toBe(1024)
+    expect(configWithTenant['keySize']).toBe(1024)
     expect(configWithTenant).toMatchObject({
       customParam1: 'value1',
       customParam2: 'value2',

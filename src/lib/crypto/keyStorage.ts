@@ -222,7 +222,7 @@ export class KeyStorage {
         }
 
     const result = await this.dynamoClient.send(new QueryCommand(queryParams))
-    return (result.Items ?? []).map((item) => item.keyId)
+    return (result.Items ?? []).map((item) => item['keyId'])
   }
 
   /**

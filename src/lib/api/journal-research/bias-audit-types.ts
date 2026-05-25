@@ -238,40 +238,40 @@ export const parseDatasetAuditResult = (
   data: Record<string, unknown>,
 ): DatasetAuditResult => {
   return DatasetAuditResultSchema.parse({
-    auditId: data.audit_id,
-    datasetId: data.dataset_id,
-    datasetName: data.dataset_name,
-    auditedAt: new Date(data.audited_at as string),
-    auditedBy: data.audited_by,
-    overallBiasScore: data.overall_bias_score,
-    passesThreshold: data.passes_threshold,
-    quarantineStatus: data.quarantine_status,
-    sampleSize: data.sample_size,
-    totalRecords: data.total_records,
-    metrics: (data.metrics as Array<Record<string, unknown>>)?.map((m) => ({
-      metricName: m.metric_name,
-      score: m.score,
-      threshold: m.threshold,
-      passed: m.passed,
-      details: m.details,
+    auditId: data['audit_id'],
+    datasetId: data['dataset_id'],
+    datasetName: data['dataset_name'],
+    auditedAt: new Date(data['audited_at'] as string),
+    auditedBy: data['audited_by'],
+    overallBiasScore: data['overall_bias_score'],
+    passesThreshold: data['passes_threshold'],
+    quarantineStatus: data['quarantine_status'],
+    sampleSize: data['sample_size'],
+    totalRecords: data['total_records'],
+    metrics: (data['metrics'] as Array<Record<string, unknown>>)?.map((m) => ({
+      metricName: m['metric_name'],
+      score: m['score'],
+      threshold: m['threshold'],
+      passed: m['passed'],
+      details: m['details'],
     })),
     demographicBreakdown: (
-      data.demographic_breakdown as Array<Record<string, unknown>>
+      data['demographic_breakdown'] as Array<Record<string, unknown>>
     )?.map((d) => ({
-      category: d.category,
-      scores: d.scores,
-      overallScore: d.overall_score,
-      concernLevel: d.concern_level,
+      category: d['category'],
+      scores: d['scores'],
+      overallScore: d['overall_score'],
+      concernLevel: d['concern_level'],
     })),
     scoreDistribution: (
-      data.score_distribution as Array<Record<string, unknown>>
+      data['score_distribution'] as Array<Record<string, unknown>>
     )?.map((s) => ({
-      range: s.range,
-      count: s.count,
-      percentage: s.percentage,
+      range: s['range'],
+      count: s['count'],
+      percentage: s['percentage'],
     })),
-    recommendations: data.recommendations,
-    notes: data.notes,
+    recommendations: data['recommendations'],
+    notes: data['notes'],
   })
 }
 
@@ -279,18 +279,18 @@ export const parseDatasetForAudit = (
   data: Record<string, unknown>,
 ): DatasetForAudit => {
   return DatasetForAuditSchema.parse({
-    datasetId: data.dataset_id,
-    name: data.name,
-    sourceId: data.source_id,
-    filePath: data.file_path,
-    fileSize: data.file_size,
-    recordCount: data.record_count,
-    format: data.format,
-    uploadedAt: new Date(data.uploaded_at as string),
-    uploadedBy: data.uploaded_by,
-    quarantineStatus: data.quarantine_status,
-    lastAuditId: data.last_audit_id,
-    lastAuditScore: data.last_audit_score,
+    datasetId: data['dataset_id'],
+    name: data['name'],
+    sourceId: data['source_id'],
+    filePath: data['file_path'],
+    fileSize: data['file_size'],
+    recordCount: data['record_count'],
+    format: data['format'],
+    uploadedAt: new Date(data['uploaded_at'] as string),
+    uploadedBy: data['uploaded_by'],
+    quarantineStatus: data['quarantine_status'],
+    lastAuditId: data['last_audit_id'],
+    lastAuditScore: data['last_audit_score'],
   })
 }
 
@@ -298,15 +298,15 @@ export const parseAuditSummary = (
   data: Record<string, unknown>,
 ): AuditSummary => {
   return AuditSummarySchema.parse({
-    totalDatasets: data.total_datasets,
-    pendingReview: data.pending_review,
-    underAudit: data.under_audit,
-    approved: data.approved,
-    quarantined: data.quarantined,
-    rejected: data.rejected,
-    averageBiasScore: data.average_bias_score,
-    lastAuditDate: data.last_audit_date
-      ? new Date(data.last_audit_date as string)
+    totalDatasets: data['total_datasets'],
+    pendingReview: data['pending_review'],
+    underAudit: data['under_audit'],
+    approved: data['approved'],
+    quarantined: data['quarantined'],
+    rejected: data['rejected'],
+    averageBiasScore: data['average_bias_score'],
+    lastAuditDate: data['last_audit_date']
+      ? new Date(data['last_audit_date'] as string)
       : undefined,
   })
 }

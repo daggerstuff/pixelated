@@ -15,7 +15,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@/components/ui/card/card.tsx'
+} from '@/components/ui/card/card'
 import type {
   QuarantineStatus,
   DatasetForAudit,

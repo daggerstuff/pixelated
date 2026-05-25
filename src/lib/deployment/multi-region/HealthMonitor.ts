@@ -83,7 +83,6 @@ export class HealthMonitor extends EventEmitter {
       message: string
     }>
   > = new Map()
-  private isInitialized = false
   private healthCheckInterval: NodeJS.Timeout | null = null
   private metricsRetentionInterval: NodeJS.Timeout | null = null
 

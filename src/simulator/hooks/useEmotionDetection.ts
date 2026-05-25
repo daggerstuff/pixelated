@@ -30,8 +30,8 @@ export const useEmotionDetection = () => {
   useEffect(() => {
     const initProvider = async () => {
       try {
-        const baseUrl = process.env.EMOTION_LLAMA_API_URL
-        const apiKey = process.env.EMOTION_LLAMA_API_KEY
+        const baseUrl = process.env['EMOTION_LLAMA_API_URL']
+        const apiKey = process.env['EMOTION_LLAMA_API_KEY']
 
         if (!baseUrl || !apiKey) {
           logger.error(

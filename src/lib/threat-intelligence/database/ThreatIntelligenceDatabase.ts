@@ -171,9 +171,9 @@ export class ThreatIntelligenceDatabaseCore
   private async initializeRedis(): Promise<void> {
     try {
       this.redis = new Redis({
-        host: process.env.REDIS_HOST ?? 'localhost',
-        port: parseInt(process.env.REDIS_PORT ?? '6379'),
-        password: process.env.REDIS_PASSWORD,
+        host: process.env['REDIS_HOST'] ?? 'localhost',
+        port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
+        password: process.env['REDIS_PASSWORD'],
         db: 1, // Use database 1 for threat intelligence cache
       })
 
@@ -674,7 +674,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Then get the associated threat
-      return await this.getThreatById(indicator.threatId)
+      return await this.getThreatById(indicator['threatId'])
     } catch (error: unknown) {
       logger.error('Failed to get threat by indicator:', {
         error,
@@ -704,7 +704,7 @@ export class ThreatIntelligenceDatabaseCore
 
       const threatsByRegion: Record<string, number> = {}
       for (const result of results) {
-        threatsByRegion[result.region] = result.count
+        threatsByRegion[result['region']] = result['count']
       }
 
       return threatsByRegion
@@ -732,7 +732,7 @@ export class ThreatIntelligenceDatabaseCore
 
       const threatsBySeverity: Record<string, number> = {}
       for (const result of results) {
-        threatsBySeverity[result.severity] = result.count
+        threatsBySeverity[result['severity']] = result['count']
       }
 
       return threatsBySeverity
@@ -809,7 +809,7 @@ export class ThreatIntelligenceDatabaseCore
           .project({ threatId: 1 })
           .toArray()
 
-        const threatIds = threatsInRegion.map((t) => t.threatId)
+        const threatIds = threatsInRegion.map((t) => t['threatId'])
 
         query = {
           correlatedThreats: { $in: threatIds },

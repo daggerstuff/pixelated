@@ -113,7 +113,7 @@ describe('Middleware Stack Integration', () => {
   })
 
   it('should process middleware in correct order: logger -> rateLimit -> auth', async () => {
-    mockRequest.headers.authorization = 'Bearer valid-token'
+    mockRequest.headers['authorization'] = 'Bearer valid-token'
     mockAuthenticateRequest.mockResolvedValue({ id: 'user123' })
 
     const callOrder: string[] = []
@@ -150,7 +150,7 @@ describe('Middleware Stack Integration', () => {
 
   it('should handle auth failure before reaching next middleware', async () => {
     mockAuthenticateRequest.mockRejectedValue(new Error('Invalid token'))
-    mockRequest.headers.authorization = 'Bearer invalid'
+    mockRequest.headers['authorization'] = 'Bearer invalid'
     mockAuthMiddleware.mockImplementation(
       async (__req: TestRequest, _res: MockResponse, _next: NextFunction) => {
         throw new Error('Invalid token')

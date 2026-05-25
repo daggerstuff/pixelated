@@ -150,7 +150,7 @@ export const POST: APIRoute = async ({ request }) => {
           'trigger-webhook': (alert) => {
             // Use fetch to send alert to configured webhook endpoint
             // This assumes webhook URL is configured in environment variables
-            const webhookUrl = process.env.RATE_LIMIT_WEBHOOK_URL
+            const webhookUrl = process.env['RATE_LIMIT_WEBHOOK_URL']
             if (!webhookUrl) {
               logger.warn(
                 'RATE_LIMIT_WEBHOOK_URL not configured, skipping webhook',
@@ -189,8 +189,8 @@ export const POST: APIRoute = async ({ request }) => {
           // Send email notification to administrators
           'send-email': (alert) => {
             // Use email service configured in environment
-            const emailServiceUrl = process.env.EMAIL_SERVICE_URL
-            const adminEmail = process.env.ADMIN_EMAIL
+            const emailServiceUrl = process.env['EMAIL_SERVICE_URL']
+            const adminEmail = process.env['ADMIN_EMAIL']
 
             if (!emailServiceUrl || !adminEmail) {
               logger.warn(
@@ -203,7 +203,7 @@ export const POST: APIRoute = async ({ request }) => {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.EMAIL_SERVICE_TOKEN}`,
+                'Authorization': `Bearer ${process.env['EMAIL_SERVICE_TOKEN']}`,
               },
               body: JSON.stringify({
                 to: adminEmail,

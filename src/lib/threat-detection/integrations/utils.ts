@@ -160,8 +160,8 @@ export async function calculateThreatScore(
 
   // Add risk factor contributions
   if (threatData.riskFactors) {
-    const violationCount = threatData.riskFactors.violationCount ?? 0
-    const timeWindow = threatData.riskFactors.timeWindow ?? 60000
+    const violationCount = threatData.riskFactors['violationCount'] ?? 0
+    const timeWindow = threatData.riskFactors['timeWindow'] ?? 60000
 
     // Calculate violation rate
     const violationRate = violationCount / (timeWindow / 1000)
@@ -169,22 +169,22 @@ export async function calculateThreatScore(
 
     // Add points for suspicious patterns
     if (
-      threatData.riskFactors.ip &&
-      isSuspiciousIPSync(threatData.riskFactors.ip)
+      threatData.riskFactors['ip'] &&
+      isSuspiciousIPSync(threatData.riskFactors['ip'])
     ) {
       score += 15
     }
 
     if (
-      threatData.riskFactors.userAgent &&
-      isSuspiciousUserAgent(threatData.riskFactors.userAgent)
+      threatData.riskFactors['userAgent'] &&
+      isSuspiciousUserAgent(threatData.riskFactors['userAgent'])
     ) {
       score += 10
     }
 
     if (
-      threatData.riskFactors.endpoint &&
-      isSensitiveEndpoint(threatData.riskFactors.endpoint)
+      threatData.riskFactors['endpoint'] &&
+      isSensitiveEndpoint(threatData.riskFactors['endpoint'])
     ) {
       score += 20
     }
@@ -303,10 +303,10 @@ export async function checkSuspiciousIPWithIntelligence(
     const threatService = new ExternalThreatIntelligenceService({
       mongoUrl:
         config.mongoUrl ??
-        process.env.MONGODB_URL ??
+        process.env['MONGODB_URL'] ??
         'mongodb://localhost:27017',
       redisUrl:
-        config.redisUrl ?? process.env.REDIS_URL ?? 'redis://localhost:6379',
+        config.redisUrl ?? process.env['REDIS_URL'] ?? 'redis://localhost:6379',
       enabled: true,
       feeds: [],
       updateInterval: 3600000,
@@ -386,8 +386,8 @@ export function formatThreatResponseForLogging(
       metadata: action.metadata,
     })),
     recommendations: [], // Removed from interface, sending empty array for compat or remove entirely
-    timestamp: response.metadata?.timestamp,
-    source: response.metadata?.source,
+    timestamp: response.metadata?.['timestamp'],
+    source: response.metadata?.['source'],
   }
 }
 
@@ -431,9 +431,9 @@ export function extractRateLimitParams(response: ThreatResponse): {
   }
 
   return {
-    maxRequests: (rateLimitAction.metadata?.maxRequests as number) || 10,
-    windowMs: (rateLimitAction.metadata?.windowMs as number) || 60000,
-    message: (rateLimitAction.metadata?.message as string) || undefined,
+    maxRequests: (rateLimitAction.metadata?.['maxRequests'] as number) || 10,
+    windowMs: (rateLimitAction.metadata?.['windowMs'] as number) || 60000,
+    message: (rateLimitAction.metadata?.['message'] as string) || undefined,
   }
 }
 
