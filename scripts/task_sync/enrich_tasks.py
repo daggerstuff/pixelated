@@ -80,7 +80,7 @@ Design and implement a highly scalable, serverless ML training infrastructure ca
 """,
     },
     "ADHD-316": {
-        "title": "Sprint 1: Memory Schema & Unification (May 12 - May 25)",
+        "title": "Sprint 1: Memory Schema & Unification (May 12 – May 25)",
         "body": """### Core Objective
 Unify the clinical data definitions across all application modules, establishing a shared, strictly-typed memory schema structure spanning the Astro frontend, package libraries, and Python ML/AI adapters.
 
@@ -111,7 +111,7 @@ Unify the clinical data definitions across all application modules, establishing
 """,
     },
     "ADHD-317": {
-        "title": "Sprint 2: Gating & Ingestion (May 26 - June 8)",
+        "title": "Sprint 2: Gating & Ingestion (May 26 – June 8)",
         "body": """### Core Objective
 Implement the real-time clinical safety and data ingestion gating layer to screen all conversational inputs, evaluate safety levels, detect high emotional arousal, and route messages dynamically.
 
@@ -139,7 +139,7 @@ Implement the real-time clinical safety and data ingestion gating layer to scree
 """,
     },
     "ADHD-321": {
-        "title": "Sprint 3: Dreaming & Consolidation (June 9 - June 22)",
+        "title": "Sprint 3: Dreaming & Consolidation (June 9 – June 22)",
         "body": """### Core Objective
 Build the background memory consolidation and summarization engine ("Dreaming") that runs offline to analyze daily interaction logs, synthesize long-term semantic understandings, and execute database garbage collection.
 
