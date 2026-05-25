@@ -64,7 +64,7 @@
   reader announcements if not explicitly hidden.
 - Action: Added `aria-hidden="true"` to decorative SVGs inside links and an
   empty `alt=""` with `aria-hidden="true"` to the decorative brand logo image.
-## 2026-05-22 - Chat Loading States
+## 2026-05-24 - Dynamic aria-labels for Alert Dismiss Buttons
 
-- Learning: Literal text indicators (like `...`) in chat interfaces are not inherently accessible and provide poor micro-UX.
-- Action: Replaced plain text indicator with a CSS-animated bouncing dot loader, and added `role="status"` and `aria-live="polite"` with visually hidden `sr-only` text to ensure screen readers announce "Assistant is typing..." properly.
+- Learning: Hardcoded `aria-label="Dismiss alert"` on dismiss buttons across multiple alerts makes it difficult for screen reader users to distinguish which specific alert they are dismissing.
+- Action: Updated `Alert.astro` dismiss button to dynamically use the alert's title via `aria-label={title ? \`Dismiss \${title} alert\` : "Dismiss alert"}`.
