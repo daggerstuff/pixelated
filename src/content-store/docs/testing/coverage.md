@@ -228,6 +228,6 @@ npm run test:coverage:check
 
 For more information about specific testing areas, refer to:
 
-- [Test Patterns](/testing/patterns)
-- [Test Execution](/testing/execution)
-- [Debugging Tests](/testing/debugging)
+- [Test Patterns](./patterns.md)
+- [Test Execution](./execution.md)
+- [Debugging Tests](./debugging.md)
