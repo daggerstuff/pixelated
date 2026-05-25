@@ -1,4 +1,4 @@
-import { MemoryBlock, ConsolidationPhase } from '../../../types/memory'
+import { MemoryBlock } from '../../../types/memory'
 import { MemoryInventory } from './memory-inventory'
 
 function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {

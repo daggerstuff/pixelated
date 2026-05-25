@@ -3,7 +3,7 @@ import { EventEmitter } from 'events'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { ThreatInvestigationRepository } from './threat-investigation-repository'
 import { ThreatReportGenerator } from './threat-report-generator'
-import { Investigation, InvestigationStepResult, HuntFinding } from './types'
+import { Investigation, InvestigationStepResult } from './types'
 
 const logger = createBuildSafeLogger('threat-investigation-manager')
 

@@ -1,4 +1,4 @@
-import { type IDBPDatabase } from 'idb'
+import {type} from 'idb'
 
 /**
  * IndexedDB storage wrapper for offline-first scenarios.

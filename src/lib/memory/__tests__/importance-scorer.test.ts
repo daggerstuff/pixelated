@@ -214,7 +214,6 @@ describe('ImportanceScorer', () => {
   describe('latency benchmark', () => {
     it('scores in under 10ms each on average', () => {
       const scorer = new ImportanceScorer()
-      const m = makeMemory()
       const ms = scorer.benchmark(500)
       expect(ms).toBeLessThan(10)
     })

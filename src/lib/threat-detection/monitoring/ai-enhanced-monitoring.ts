@@ -337,7 +337,6 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const info = await this.redis.info()
       // Prefixed with '_' because the returned memory usage value is not used directly
       // but may be useful for future enhancements. This avoids lint errors for unused vars.
-      const _memory = await this.redis.memory('usage', '*')
 
       return {
         connectedClients: parseInt(

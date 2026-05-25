@@ -665,7 +665,7 @@ export class PromptOptimizerService {
   private selectOptimizationStrategy(
     context: PromptOptimization['therapeuticContext'],
   ): string {
-    const { sessionPhase, patientState, primaryConcern } = context
+    const {sessionPhase, patientState} = context
 
     // Strategy selection logic
     if (patientState === 'distressed') {
