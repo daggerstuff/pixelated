@@ -109,6 +109,9 @@ export class BehavioralAnalysisRepository {
     const value = parseInt(match[1]!, 10)
     const unit = match[2]!
 
+    // Switch is exhaustive: the regex guard on line ~106 ensures unit is
+    // one of 'h', 'd', or 'm', so the default branch is unreachable at
+    // runtime. The default exists only as a defensive fallback.
     switch (unit) {
       case 'm':
         return value * 60 * 1000 // minutes
