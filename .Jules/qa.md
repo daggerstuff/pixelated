@@ -104,3 +104,7 @@
 ## 2026-06-26 - path utility testing
 - Pattern: Mocking `astro:config/server` in Vitest before importing the module under test.
 - Action: Use `vi.mock('astro:config/server', () => ({ base: '/mock-base' }))` to safely test functions depending on the Astro server base path.
+
+## 2026-07-01 - matchMedia jsdom environment
+- Pattern: When testing code that relies on `window.matchMedia` in a jsdom environment, Vitest may fail because it's not implemented.
+- Action: Use `Object.defineProperty(window, 'matchMedia', ...)` to provide a mock implementation before testing functions that rely on it.
