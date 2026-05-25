@@ -297,10 +297,6 @@ export class InterventionAnalysisService {
     const afterEmotion = response.emotionAfter
 
     // Check for emotional coherence (not conflicting high emotions)
-
-      (sum, val) => sum + val,
-      0,
-    )
     const emotionCount = Object.values(afterEmotion.emotions).filter(
       (val) => val > 0.3,
     ).length
