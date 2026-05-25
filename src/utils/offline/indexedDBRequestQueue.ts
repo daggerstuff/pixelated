@@ -4,7 +4,7 @@
  * Uses IndexedDB for persistent storage to avoid blocking the main thread
  */
 
-import { type IDBPDatabase } from 'idb'
+import {type} from 'idb'
 
 import IndexedDBStorage from '../storage/indexedDBStorage'
 

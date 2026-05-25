@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { AgentActivityDAO, type AgentActivityRecord } from '@/services/mongodb.dao'
+import {AgentActivityDAO, type} from '@/services/mongodb.dao'
 import { v4 as uuidv4 } from 'uuid'
 
 const logger = createBuildSafeLogger('pixel-inference-stream')
@@ -35,7 +35,6 @@ export const POST: APIRoute = async ({ request }) => {
     if (!reader) throw new Error('No response body from backend')
 
     const collectedActivities: any[] = []
-    const encoder = new TextEncoder()
     const decoder = new TextDecoder()
 
     // Create a custom stream to collect activities while proxying

@@ -654,9 +654,6 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     rateLimit: RateLimitConfig,
   ): void {
     let requestQueue: Array<() => void> = []
-    let _requestsThisMinute = 0
-    let _requestsThisHour = 0
-    let _requestsThisDay = 0
 
     const processQueue = () => {
       while (requestQueue.length > 0 && this.canMakeRequest(rateLimit)) {

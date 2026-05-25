@@ -3,7 +3,6 @@
  * Implements bulk user import/export capabilities for administrators
  */
 
-import { promisify } from 'util'
 
 import { ManagementClient } from 'auth0'
 import { parse } from 'csv-parse'

@@ -46,7 +46,6 @@ export class MemorySystemEvaluator {
   }
 
   evaluate(memories: MemoryBlock[], testQueries?: string[]): EvaluationReport {
-    const t0 = Date.now()
 
     const retrieval = this.evaluateRetrieval(memories, testQueries)
     const response = this.evaluateResponse(memories)

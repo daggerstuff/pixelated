@@ -110,7 +110,6 @@ describe('path-security utilities', () => {
   describe('validatePathAgainstMultiple', () => {
     it('should return path if it matches one of the directories', () => {
       const dirs = ['/a', '/b', '/c']
-      const result = validatePath('test.txt', '/b') // Valid for /b
       const multiResult = validatePathAgainstMultiple('test.txt', dirs)
 
       // In this mock-less test, path.resolve will use process.cwd()

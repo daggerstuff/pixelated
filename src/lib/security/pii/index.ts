@@ -9,7 +9,7 @@
  * FHE capabilities when available.
  */
 
-import { fheService, FHEOperation, RealFHEService } from '../../fhe'
+import { fheService, FHEOperation } from '../../fhe'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 // Initialize logger

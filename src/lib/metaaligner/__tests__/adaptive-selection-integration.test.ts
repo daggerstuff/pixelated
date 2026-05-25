@@ -584,7 +584,6 @@ describe('Adaptive Selection Integration Tests', () => {
 
     it('Scenario 2: Crisis Escalation from General Conversation', async () => {
       // Casual start
-      const result1 = await adaptiveSelector.selectObjectives('Hello')
 
       // Sudden crisis
       const result2 = await adaptiveSelector.selectObjectives(

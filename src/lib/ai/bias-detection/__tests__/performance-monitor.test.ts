@@ -1,7 +1,7 @@
 /**
  * Unit tests for Bias Detection Performance Monitor
  */
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 
 import { performanceMonitor } from '../performance-monitor'
 

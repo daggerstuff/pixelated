@@ -447,7 +447,6 @@ export const PUT: APIRoute = async ({ request }) => {
 
   try {
     // Apply security middleware with timeout (same pattern as POST)
-    const _securityStart = Date.now()
     const securityResult = await Promise.race([
       securityMiddleware(request, {}),
       new Promise<Response>((resolve) =>

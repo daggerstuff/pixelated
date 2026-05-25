@@ -72,8 +72,7 @@ router.get(
 router.put(
   '/:researchId',
   asyncHandler(async (req: Request, res: Response) => {
-    const researchId = req.params.researchId as string
-    const { title, industry, targetMarket, methodology, budget, status } =
+    const {title, industry, targetMarket, methodology, budget} =
       req.body
     const { user } = req as any
 
@@ -102,7 +101,6 @@ router.put(
 router.delete(
   '/:researchId',
   asyncHandler(async (req: Request, res: Response) => {
-    const _researchId = req.params.researchId as string
     const { user } = req as any
 
     // Note: deleteResearch is not implemented in the service yet

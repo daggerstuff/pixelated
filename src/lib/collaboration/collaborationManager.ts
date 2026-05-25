@@ -285,7 +285,6 @@ class CollaborationManager {
     sessionId: string,
   ): Promise<string> {
     // Use session-specific encryption key
-    const _sessionKey = await this.getSessionEncryptionKey(sessionId)
     return `encrypted_${btoa(content)}` // Mock encryption
   }
 

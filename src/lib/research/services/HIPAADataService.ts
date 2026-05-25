@@ -669,7 +669,6 @@ export class HIPAADataService {
    * Validate access control matrix
    */
   private validateAccessControlMatrix(): boolean {
-    const roles = this.config.accessControlMatrix.roles
     const requiredRoles = ['researcher', 'data-scientist', 'therapist', 'admin']
 
     return requiredRoles.every(

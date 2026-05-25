@@ -4,7 +4,7 @@
  */
 
 import { userManager } from '../db'
-import { validateToken, type TokenValidationResult } from './auth0-jwt-service'
+import {validateToken, type} from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
 
 /**

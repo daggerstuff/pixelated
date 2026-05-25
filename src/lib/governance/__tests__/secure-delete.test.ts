@@ -22,7 +22,6 @@ describe('LifecycleManager secureDelete', () => {
     expect(manager.getRetention(recordId)).toBeDefined()
 
     // Crypto-shred delete
-    const result = await manager.secureDelete(recordId)
 
     // Verify the record is deleted (crypto-shred = key deletion)
     expect(manager.getRetention(recordId)).toBeUndefined()
