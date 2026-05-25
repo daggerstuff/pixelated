@@ -166,21 +166,21 @@ async function generateItemId(
   patternId: string,
   domain: UpstreamDomain,
 ): Promise<string> {
-  const raw = `${domain}:${patternId}`;
-  let hex = crypto.randomUUID().replace(/-/g, '').slice(0, 6);
-  const encoder = new TextEncoder();
-  const data = encoder.encode(raw);
-  let hashHex = '';
+  const raw = `${domain}:${patternId}`
+  let hex = crypto.randomUUID().replace(/-/g, '').slice(0, 6)
+  const encoder = new TextEncoder()
+  const data = encoder.encode(raw)
+  let hashHex = ''
   try {
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
     hashHex = Array.from(new Uint8Array(hashBuffer))
       .slice(0, 6)
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
   } catch {
     // fallback path uses random hex above
   }
-  return `reprio-${hashHex || hex}`;
+  return `reprio-${hashHex || hex}`
 }
 
 function generateRunId(): string {
@@ -324,12 +324,16 @@ export class EvidenceAccumulator {
     report: Record<string, unknown>,
   ): EvidencePoint[] {
     const evidencePoints: EvidencePoint[] = []
-    
+
     const rawFailurePatterns = report['failure_patterns']
-    const failurePatterns = isRecordArray(rawFailurePatterns) ? rawFailurePatterns : []
+    const failurePatterns = isRecordArray(rawFailurePatterns)
+      ? rawFailurePatterns
+      : []
 
     const rawUpstreamMappings = report['upstream_mappings']
-    const upstreamMappings = isRecordArray(rawUpstreamMappings) ? rawUpstreamMappings : []
+    const upstreamMappings = isRecordArray(rawUpstreamMappings)
+      ? rawUpstreamMappings
+      : []
 
     const mappingLookup: Record<string, Record<string, unknown>> = {}
     for (const mapping of upstreamMappings) {
@@ -348,8 +352,9 @@ export class EvidenceAccumulator {
       const mapping = mappingLookup[patternId] ?? {}
 
       const upstreamDomainRaw = mapping['upstream_domain']
-      const upstreamDomain = typeof upstreamDomainRaw === 'string' ? upstreamDomainRaw : 'curation'
-      
+      const upstreamDomain =
+        typeof upstreamDomainRaw === 'string' ? upstreamDomainRaw : 'curation'
+
       let domain = UpstreamDomain.CURATION
       const normalizedDomain = upstreamDomain.toLowerCase()
       for (const val of Object.values(UpstreamDomain)) {
@@ -360,8 +365,9 @@ export class EvidenceAccumulator {
       }
 
       const severityStrRaw = pattern['severity']
-      const severityStr = typeof severityStrRaw === 'string' ? severityStrRaw : 'medium'
-      
+      const severityStr =
+        typeof severityStrRaw === 'string' ? severityStrRaw : 'medium'
+
       let severity = EvidenceSeverity.MEDIUM
       const normalizedSeverity = severityStr.toLowerCase()
       for (const val of Object.values(EvidenceSeverity)) {
@@ -376,19 +382,24 @@ export class EvidenceAccumulator {
 
       const rootCauseHypothesisRaw = mapping['root_cause_hypothesis']
       const patternDescriptionRaw = pattern['description']
-      
+
       let rootCause = ''
-      if (typeof rootCauseHypothesisRaw === 'string' && rootCauseHypothesisRaw) {
+      if (
+        typeof rootCauseHypothesisRaw === 'string' &&
+        rootCauseHypothesisRaw
+      ) {
         rootCause = rootCauseHypothesisRaw
       } else if (typeof patternDescriptionRaw === 'string') {
         rootCause = patternDescriptionRaw
       }
 
       const patternTypeRaw = pattern['pattern_type']
-      const patternType = typeof patternTypeRaw === 'string' ? patternTypeRaw : 'unknown'
+      const patternType =
+        typeof patternTypeRaw === 'string' ? patternTypeRaw : 'unknown'
 
       const descriptionRaw = pattern['description']
-      const description = typeof descriptionRaw === 'string' ? descriptionRaw : ''
+      const description =
+        typeof descriptionRaw === 'string' ? descriptionRaw : ''
 
       const frequencyRaw = pattern['frequency']
       const frequency = typeof frequencyRaw === 'number' ? frequencyRaw : 0.0
@@ -538,7 +549,10 @@ export class EvidenceAccumulator {
 // ─── PriorityCalculator ──────────────────────────────────────────────────────
 
 export class PriorityCalculator {
-  private static readonly DOMAIN_URGENCY: Record<UpstreamDomain, number | undefined> = {
+  private static readonly DOMAIN_URGENCY: Record<
+    UpstreamDomain,
+    number | undefined
+  > = {
     [UpstreamDomain.PRIVACY]: 1.5,
     [UpstreamDomain.ACQUISITION]: 1.2,
     [UpstreamDomain.CURATION]: 1.0,
@@ -695,9 +709,9 @@ export class ReprioritizationEngine {
         existing.priorityTier = tier
         existing.priorityScore = score
         existing.reasonForChange = change.reason
-        const idSet = new Set(existing.evidencePatternIds);
-        idSet.add(accumulation.patternId);
-        existing.evidencePatternIds = Array.from(idSet);
+        const idSet = new Set(existing.evidencePatternIds)
+        idSet.add(accumulation.patternId)
+        existing.evidencePatternIds = Array.from(idSet)
         reprioritized.push(existing)
       } else {
         const newItem: BacklogItem = {
@@ -801,8 +815,9 @@ export class ReprioritizationEngine {
       const rec = d
       rec['totalItems'] = (rec['totalItems'] ?? 0) + 1
       if (newItems.includes(item)) rec['newItems'] = (rec['newItems'] ?? 0) + 1
-      else if (reprioritized.includes(item)) rec['reprioritizedItems'] = (rec['reprioritizedItems'] ?? 0) + 1
-      else rec['unchangedItems'] = (rec['unchangedItems'] ?? 0) + 1;
+      else if (reprioritized.includes(item))
+        rec['reprioritizedItems'] = (rec['reprioritizedItems'] ?? 0) + 1
+      else rec['unchangedItems'] = (rec['unchangedItems'] ?? 0) + 1
 
       const tierKey = `${item.priorityTier}Count`
       rec[tierKey] = (rec[tierKey] ?? 0) + 1
@@ -811,7 +826,8 @@ export class ReprioritizationEngine {
     for (const acc of Array.from(accumulations.values())) {
       const rec = byDomain[acc.domain]
       if (rec && acc.isActionable) {
-        rec['actionableEvidenceCount'] = (rec['actionableEvidenceCount'] ?? 0) + 1
+        rec['actionableEvidenceCount'] =
+          (rec['actionableEvidenceCount'] ?? 0) + 1
       }
     }
 

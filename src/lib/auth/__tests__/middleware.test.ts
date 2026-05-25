@@ -136,13 +136,13 @@ describe('Authentication Middleware', () => {
 
       expect(result.success).toBe(true)
       expect(result.request).toBeDefined()
-      const user = (result.request!).user
+      const user = result.request!.user
       expect(user).toMatchObject({
         id: mockUser.id,
         email: mockUser.email,
         role: mockUser.role,
       })
-      expect((result.request!).tokenId).toBe('token123')
+      expect(result.request!.tokenId).toBe('token123')
     })
 
     it('should reject request without authorization header', async () => {

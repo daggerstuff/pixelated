@@ -67,30 +67,30 @@ export default function SearchFilters({
   )
 
   return (
-    <div className='bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl'>
-      <div className='mb-6 flex items-center justify-between'>
-        <h3 className='text-white text-xl font-bold'>Advanced Filters</h3>
+    <div className="bg-slate-800 border-slate-700 rounded-lg border p-6 text-left shadow-xl">
+      <div className="mb-6 flex items-center justify-between">
+        <h3 className="text-white text-xl font-bold">Advanced Filters</h3>
         {onClose && (
-          <button onClick={onClose} className='text-slate-400 hover:text-white'>
-            <span className='sr-only'>Close</span>✕
+          <button onClick={onClose} className="text-slate-400 hover:text-white">
+            <span className="sr-only">Close</span>✕
           </button>
         )}
       </div>
 
-      <div className='space-y-6'>
+      <div className="space-y-6">
         {/* Year Range */}
         <div>
-          <label className='text-slate-300 mb-2 block text-sm font-medium'>
+          <label className="text-slate-300 mb-2 block text-sm font-medium">
             Year Range
           </label>
-          <div className='flex items-center gap-4'>
+          <div className="flex items-center gap-4">
             <input
-              type='number'
-              min='1900'
-              max='2026'
-              placeholder='From'
-              aria-label='Year From'
-              className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
+              type="number"
+              min="1900"
+              max="2026"
+              placeholder="From"
+              aria-label="Year From"
+              className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
               value={localFilters.yearFrom ?? ''}
               onChange={(e) =>
                 setLocalFilters({
@@ -101,14 +101,14 @@ export default function SearchFilters({
                 })
               }
             />
-            <span className='text-slate-500'>-</span>
+            <span className="text-slate-500">-</span>
             <input
-              type='number'
-              min='1900'
-              max='2026'
-              placeholder='To'
-              aria-label='Year To'
-              className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
+              type="number"
+              min="1900"
+              max="2026"
+              placeholder="To"
+              aria-label="Year To"
+              className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
               value={localFilters.yearTo ?? ''}
               onChange={(e) =>
                 setLocalFilters({
@@ -122,24 +122,24 @@ export default function SearchFilters({
 
         {/* Relevance Threshold */}
         <div>
-          <div className='mb-2 flex justify-between'>
+          <div className="mb-2 flex justify-between">
             <label
-              htmlFor='min-relevance'
-              className='text-slate-300 block text-sm font-medium'
+              htmlFor="min-relevance"
+              className="text-slate-300 block text-sm font-medium"
             >
               Min Relevance Score
             </label>
-            <span className='text-pink-400 font-mono text-sm'>
+            <span className="text-pink-400 font-mono text-sm">
               {localFilters.minRelevance.toFixed(1)}
             </span>
           </div>
           <input
-            id='min-relevance'
-            type='range'
-            min='0'
-            max='1'
-            step='0.1'
-            className='bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg'
+            id="min-relevance"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            className="bg-slate-700 accent-pink-500 h-2 w-full cursor-pointer appearance-none rounded-lg"
             value={localFilters.minRelevance}
             onChange={(e) =>
               setLocalFilters({
@@ -152,10 +152,10 @@ export default function SearchFilters({
 
         {/* Topics */}
         <div>
-          <label className='text-slate-300 mb-3 block text-sm font-medium'>
+          <label className="text-slate-300 mb-3 block text-sm font-medium">
             Therapeutic Topics
           </label>
-          <div className='flex flex-wrap gap-2'>
+          <div className="flex flex-wrap gap-2">
             {COMMON_TOPICS.map((topic) => {
               const isSelected = selectedTopicsSet.has(topic)
               return (
@@ -179,36 +179,36 @@ export default function SearchFilters({
         {/* Sort By */}
         <div>
           <label
-            htmlFor='sort-by'
-            className='text-slate-300 mb-2 block text-sm font-medium'
+            htmlFor="sort-by"
+            className="text-slate-300 mb-2 block text-sm font-medium"
           >
             Sort By
           </label>
           <select
-            id='sort-by'
-            className='bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1'
+            id="sort-by"
+            className="bg-slate-900 border-slate-700 text-white focus:ring-pink-500 w-full rounded border px-3 py-2 outline-none focus:ring-1"
             value={localFilters.sortBy}
             onChange={(e) =>
               setLocalFilters({ ...localFilters, sortBy: e.target.value })
             }
           >
-            <option value='relevance'>Relevance (Default)</option>
-            <option value='year_desc'>Year (Newest)</option>
-            <option value='year_asc'>Year (Oldest)</option>
+            <option value="relevance">Relevance (Default)</option>
+            <option value="year_desc">Year (Newest)</option>
+            <option value="year_asc">Year (Oldest)</option>
           </select>
         </div>
 
         {/* Actions */}
-        <div className='border-slate-700 flex gap-3 border-t pt-4'>
+        <div className="border-slate-700 flex gap-3 border-t pt-4">
           <button
             onClick={handleApply}
-            className='bg-pink-600 hover:bg-pink-700 text-white flex-1 rounded py-2 font-medium transition-colors'
+            className="bg-pink-600 hover:bg-pink-700 text-white flex-1 rounded py-2 font-medium transition-colors"
           >
             Apply Filters
           </button>
           <button
             onClick={handleReset}
-            className='border-slate-600 text-slate-300 hover:bg-slate-700 rounded border px-4 py-2 transition-colors'
+            className="border-slate-600 text-slate-300 hover:bg-slate-700 rounded border px-4 py-2 transition-colors"
           >
             Reset
           </button>

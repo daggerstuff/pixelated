@@ -184,9 +184,7 @@ export function useAnalyticsData() {
             groupKey = `${date.getMonth() + 1}`
           }
 
-          if (!groupedMetrics[groupKey]) {
-            groupedMetrics[groupKey] = []
-          }
+          groupedMetrics[groupKey] ??= []
 
           ;(groupedMetrics[groupKey] ??= []).push(metric.value)
         })

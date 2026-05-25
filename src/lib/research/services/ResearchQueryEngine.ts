@@ -39,8 +39,10 @@ export class ResearchQueryEngine {
   private readonly anonymizationService: AnonymizationService
   private readonly consentService: ConsentManagementService
   private readonly hipaaService: HIPAADataService
-  private readonly queryCache: Map<string, { result: QueryResult; timestamp: Date }> =
-    new Map()
+  private readonly queryCache: Map<
+    string,
+    { result: QueryResult; timestamp: Date }
+  > = new Map()
   private readonly pendingApprovals: Map<string, QueryApproval> = new Map()
 
   constructor(
@@ -496,15 +498,15 @@ export class ResearchQueryEngine {
     queryType: string,
   ): Promise<boolean> {
     const permissions = {
-      researcher: ['sql', 'pattern-discovery', 'aggregate-analysis'],
+      'researcher': ['sql', 'pattern-discovery', 'aggregate-analysis'],
       'data-scientist': [
         'sql',
         'pattern-discovery',
         'longitudinal-analysis',
         'cohort-comparison',
       ],
-      therapist: ['own-client-analysis'],
-      admin: ['all'],
+      'therapist': ['own-client-analysis'],
+      'admin': ['all'],
     }
 
     const userPermissions = permissions[userRole] ?? []
@@ -671,7 +673,7 @@ export class ResearchQueryEngine {
       high: 'full',
     }
 
-    const consentLevel = levelMapping[anonymizationLevel] || 'full'
+    const consentLevel = levelMapping[anonymizationLevel] ?? 'full'
 
     // Apply anonymization based on level
     const anonymizedData =

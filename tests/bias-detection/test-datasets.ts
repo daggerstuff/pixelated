@@ -571,21 +571,20 @@ export const ALL_BIAS_TEST_CASES: BiasTestCase[] = [
 /**
  * Ground truth annotations for validation
  */
-export const GROUND_TRUTH_LABELS = ALL_BIAS_TEST_CASES.reduce< Record<
+export const GROUND_TRUTH_LABELS = ALL_BIAS_TEST_CASES.reduce<
+  Record<
     string,
     { category: string; severity: string; biasScore: number; hasBias: boolean }
-  >>(
-  (acc, testCase) => {
-    acc[testCase.id] = {
-      category: testCase.category,
-      severity: testCase.expectedSeverity,
-      biasScore: testCase.expectedBiasScore,
-      hasBias: testCase.expectedBiasScore > 0.3, // threshold for bias detection
-    }
-    return acc
-  },
-  {},
-)
+  >
+>((acc, testCase) => {
+  acc[testCase.id] = {
+    category: testCase.category,
+    severity: testCase.expectedSeverity,
+    biasScore: testCase.expectedBiasScore,
+    hasBias: testCase.expectedBiasScore > 0.3, // threshold for bias detection
+  }
+  return acc
+}, {})
 
 /**
  * Test case statistics

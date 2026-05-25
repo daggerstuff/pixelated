@@ -241,18 +241,18 @@ export default function DLPRuleEditor() {
       </CardHeader>
       <CardContent>
         <form
-          className='space-y-4'
+          className="space-y-4"
           onSubmit={(e) => {
             e.preventDefault()
             saveRule()
           }}
         >
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='rule-id'>Rule ID</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="rule-id">Rule ID</Label>
               <Input
-                id='rule-id'
-                placeholder='unique-rule-id'
+                id="rule-id"
+                placeholder="unique-rule-id"
                 value={currentRule.id}
                 onChange={handleTextChange('id')}
                 readOnly={isEditing}
@@ -260,48 +260,48 @@ export default function DLPRuleEditor() {
               />
             </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='rule-name'>Rule Name</Label>
+            <div className="space-y-2">
+              <Label htmlFor="rule-name">Rule Name</Label>
               <Input
-                id='rule-name'
-                placeholder='PHI Detection'
+                id="rule-name"
+                placeholder="PHI Detection"
                 value={currentRule.name}
                 onChange={handleTextChange('name')}
               />
-              <p className='text-muted-foreground text-xs'>
+              <p className="text-muted-foreground text-xs">
                 Descriptive label only; not used for matching.
               </p>
             </div>
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='rule-pattern'>Match pattern</Label>
+          <div className="space-y-2">
+            <Label htmlFor="rule-pattern">Match pattern</Label>
             <Input
-              id='rule-pattern'
-              placeholder='e.g. SSN, \\d{3}-\\d{2}-\\d{4}, or literal phrase'
+              id="rule-pattern"
+              placeholder="e.g. SSN, \\d{3}-\\d{2}-\\d{4}, or literal phrase"
               value={currentRule.matchPattern ?? ''}
               onChange={handleTextChange('matchPattern')}
             />
-            <p className='text-muted-foreground text-xs'>
+            <p className="text-muted-foreground text-xs">
               Literal text or regex to detect. Content matching this will
               trigger the rule.
             </p>
           </div>
 
-          <div className='space-y-2'>
-            <Label htmlFor='rule-description'>Description</Label>
+          <div className="space-y-2">
+            <Label htmlFor="rule-description">Description</Label>
             <Textarea
-              id='rule-description'
-              placeholder='Describe what this rule does and when it applies'
+              id="rule-description"
+              placeholder="Describe what this rule does and when it applies"
               value={currentRule.description}
               onChange={handleTextChange('description')}
               rows={3}
             />
           </div>
 
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-2'>
-              <Label htmlFor='rule-action'>Action</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="rule-action">Action</Label>
               <Select
                 value={currentRule.action ?? DLPAction.REDACT}
                 onValueChange={handleActionChange}
@@ -320,41 +320,41 @@ export default function DLPRuleEditor() {
               </Select>
             </div>
 
-            <div className='flex items-center space-x-2 pt-6'>
+            <div className="flex items-center space-x-2 pt-6">
               <Switch
-                id='rule-active'
+                id="rule-active"
                 checked={!!currentRule.isActive}
                 onCheckedChange={(checked: boolean) =>
                   handleChange('isActive', checked)
                 }
               />
 
-              <Label htmlFor='rule-active'>Active</Label>
+              <Label htmlFor="rule-active">Active</Label>
             </div>
           </div>
 
           {currentRule.action === DLPAction.REDACT && (
-            <div className='bg-muted rounded-md p-4'>
-              <p className='text-muted-foreground mb-2 text-sm'>
+            <div className="bg-muted rounded-md p-4">
+              <p className="text-muted-foreground mb-2 text-sm">
                 <strong>Preview:</strong> When this rule is triggered, matching
                 content will be redacted.
               </p>
-              <div className='text-sm'>
+              <div className="text-sm">
                 <span>Original: </span>
-                <span className='font-mono'>
+                <span className="font-mono">
                   This contains {currentRule.matchPattern ?? '[pattern]'}
                 </span>
               </div>
-              <div className='text-sm'>
+              <div className="text-sm">
                 <span>Redacted: </span>
-                <span className='font-mono'>This contains [REDACTED]</span>
+                <span className="font-mono">This contains [REDACTED]</span>
               </div>
             </div>
           )}
 
-          <div className='flex justify-end space-x-2 pt-4'>
+          <div className="flex justify-end space-x-2 pt-4">
             <Button
-              type='button'
+              type="button"
               onClick={() => {
                 setCurrentRule(defaultRule)
                 setIsEditing(false)
@@ -368,7 +368,7 @@ export default function DLPRuleEditor() {
             >
               Cancel
             </Button>
-            <Button type='submit'>
+            <Button type="submit">
               {isEditing ? 'Update Rule' : 'Create Rule'}
             </Button>
           </div>

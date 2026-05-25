@@ -60,9 +60,9 @@ const SourceSelector = React.memo(function SourceSelector({
 
   return (
     <div
-      className='flex flex-wrap justify-center gap-2'
-      role='group'
-      aria-label='Filter by source'
+      className="flex flex-wrap justify-center gap-2"
+      role="group"
+      aria-label="Filter by source"
     >
       <button
         className={`source-chip ${isSelected('all') ? 'active' : ''}`}
@@ -90,14 +90,14 @@ const SourceSelector = React.memo(function SourceSelector({
       <button
         className={`source-chip ${isSelected('dataset') ? 'active' : ''}`}
         onClick={() => toggleSource('dataset')}
-        title='Therapy Datasets (HuggingFace, etc.)'
+        title="Therapy Datasets (HuggingFace, etc.)"
         aria-pressed={isSelected('dataset')}
       >
         Datasets
       </button>
 
       {/* Divider if we want to show specific popular sources */}
-      <div className='bg-slate-700 mx-2 h-6 w-px self-center'></div>
+      <div className="bg-slate-700 mx-2 h-6 w-px self-center"></div>
 
       <button
         className={`source-chip ${isSelected('arxiv') ? 'active' : ''}`}

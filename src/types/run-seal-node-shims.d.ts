@@ -5,10 +5,7 @@ declare module 'node:child_process' {
     encoding?: BufferEncoding | 'buffer' | 'binary' | 'hex' | 'base64'
   }
 
-  export function execSync(
-    command: string,
-    options?: ExecSyncOptions,
-  ): unknown
+  export function execSync(command: string, options?: ExecSyncOptions): unknown
 }
 
 declare module 'node:path' {

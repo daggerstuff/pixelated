@@ -1,3 +1,4 @@
+import type { PolicyStore } from './policy-store'
 import type {
   GovernancePolicy,
   PolicyEvaluationResult,
@@ -42,6 +43,16 @@ interface CompiledPolicy {
 export class PolicyEngine {
   private readonly policies: Map<string, CompiledPolicy> = new Map()
   private loadedVersion: string | null = null
+  private policyStore: PolicyStore | null = null
+  private readonly policyIds: Set<string> = new Set()
+
+  setPolicyStore(store: PolicyStore): void {
+    this.policyStore = store
+  }
+
+  addPolicyId(policyId: string): void {
+    this.policyIds.add(policyId)
+  }
 
   async loadPolicy(policy: GovernancePolicy): Promise<void> {
     // Pre-compile rules for performance and safety
@@ -149,8 +160,19 @@ export class PolicyEngine {
   }
 
   async reloadPolicies(): Promise<void> {
-    // TODO: Hot-reload from MongoDB
-    logger.info('Policy reload triggered')
+    if (!this.policyStore) {
+      logger.info('No policy store configured for reload')
+      return
+    }
+
+    this.policies.clear()
+    for (const policyId of this.policyIds) {
+      const policy = await this.policyStore.getPolicy(policyId)
+      if (policy) {
+        await this.loadPolicy(policy)
+      }
+    }
+    logger.info(`Reloaded ${this.policyIds.size} policies from store`)
   }
 
   getVersion(): string | null {

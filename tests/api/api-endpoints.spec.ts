@@ -443,7 +443,7 @@ test.describe('API Endpoints Test Suite', () => {
       const token = await apiUtils.getValidToken()
 
       // Make multiple rapid requests to trigger rate limiting
-      const promises = Array.from({ length: 100 },  async () =>
+      const promises = Array.from({ length: 100 }, async () =>
         request.get('/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -476,7 +476,7 @@ test.describe('API Endpoints Test Suite', () => {
     test('should handle concurrent requests', async ({ request }) => {
       const token = await apiUtils.getValidToken()
 
-      const promises = Array.from({ length: 10 },  async () =>
+      const promises = Array.from({ length: 10 }, async () =>
         request.get('/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,

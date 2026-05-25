@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-
 import * as tf from '@tensorflow/tfjs'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -64,6 +63,14 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
         'AdvancedBehavioralAnalysisService is not initialized. Call initializeServices(redis, mongoClient) first.',
       )
     }
+  }
+
+  /**
+   * Returns whether the ML model was successfully loaded and is ready for inference.
+   * Consumers can use this to distinguish between "ML is disabled" and "ML model loaded but unavailable."
+   */
+  get isMLReady(): boolean {
+    return this.mlModelLoaded && this.model !== null
   }
 
   /**

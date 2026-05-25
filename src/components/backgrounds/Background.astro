@@ -1,6 +1,8 @@
 ---
 import Plum from '@/components/backgrounds/Plum.astro'
 import Rose from '@/components/backgrounds/Rose.astro'
+import Dot from './Dot.astro'
+import Particle from './Particle.astro'
 
 interface Props {
   type: string
@@ -10,11 +12,9 @@ const { type } = Astro.props
 
 let BackgroundComponent: any = null
 if (type === 'dot') {
-  const Dot = (await import('./Dot.astro')).default
   BackgroundComponent = Dot
 }
 if (type === 'particle') {
-  const Particle = (await import('./Particle.astro')).default
   BackgroundComponent = Particle
 }
 if (type === 'plum') {

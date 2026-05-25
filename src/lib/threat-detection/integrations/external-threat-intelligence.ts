@@ -106,15 +106,15 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   private async initializeServices(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        (this.config.mongoUrl ??
-          process.env.MONGODB_URI) ??
+        this.config.mongoUrl ??
+          process.env.MONGODB_URI ??
           'mongodb://localhost:27017/threat_detection',
       )
       await this.mongoClient.connect()
 
       this.redis = new Redis(
-        (this.config.redisUrl ??
-          process.env.REDIS_URL) ??
+        this.config.redisUrl ??
+          process.env.REDIS_URL ??
           'redis://localhost:6379',
       )
 
@@ -453,13 +453,13 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = String(((data.value ?? data.ioc) ?? data.indicator) ?? '')
-      const iocType = String((data.type ?? data.ioc_type) ?? 'unknown')
+      const iocValue = String(data.value ?? data.ioc ?? data.indicator ?? '')
+      const iocType = String(data.type ?? data.ioc_type ?? 'unknown')
       const threatType = String(
-        (data.threat_type ?? data.malware_family) ?? 'unknown',
+        data.threat_type ?? data.malware_family ?? 'unknown',
       )
       const severity = this.mapSeverity(
-        String((data.severity ?? data.confidence) ?? 'medium'),
+        String(data.severity ?? data.confidence ?? 'medium'),
       )
       const confidence = this.extractConfidence(
         (data.confidence ?? data.score ?? 50) as unknown,
@@ -478,10 +478,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         severity,
         confidence,
         firstSeen: new Date(
-          ((data.first_seen ?? data.created) ?? Date.now()) as any,
+          (data.first_seen ?? data.created ?? Date.now()) as any,
         ),
         lastSeen: new Date(
-          ((data.last_seen ?? data.updated) ?? Date.now()) as any,
+          (data.last_seen ?? data.updated ?? Date.now()) as any,
         ),
         expirationDate: data.expiration_date
           ? new Date(data.expiration_date as string)
@@ -504,8 +504,9 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
               campaign:
                 ((data.attribution as Record<string, unknown>)
                   .campaign as string) || 'unknown',
-              family: (((data.attribution as Record<string, unknown>)
-                  .family as string) || 'unknown'),
+              family:
+                ((data.attribution as Record<string, unknown>)
+                  .family as string) || 'unknown',
             }
           : undefined,
       }
@@ -573,7 +574,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         source: (data.created_by_ref as string) || feed.name,
         tags: Array.isArray(data.labels) ? (data.labels as string[]) : [],
         metadata: {
-          stixType: (data.type || 'unknown'),
+          stixType: data.type || 'unknown',
           specVersion: (data.spec_version as string) || '2.0',
           transformationDate: new Date(),
         },
@@ -599,7 +600,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       severe: 'critical',
     }
 
-    return severityMap[severity.toLowerCase()] || 'medium'
+    return severityMap[severity.toLowerCase()] ?? 'medium'
   }
 
   /**

@@ -99,7 +99,7 @@ export const useEvaluationListQuery = (
       pageSize,
       filters,
     }),
-    queryFn:  async () => listEvaluations(sessionId ?? '', { page, pageSize }),
+    queryFn: async () => listEvaluations(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data) => filterEvaluations(data, filters),
   })
@@ -116,7 +116,7 @@ export const useEvaluationQuery = (
       sessionId ?? 'unknown',
       evaluationId ?? 'unknown',
     ),
-    queryFn:  async () => getEvaluation(sessionId ?? '', evaluationId ?? ''),
+    queryFn: async () => getEvaluation(sessionId ?? '', evaluationId ?? ''),
     enabled: Boolean(sessionId && evaluationId) && enabled,
   })
 }
@@ -126,7 +126,7 @@ export const useEvaluationInitiateMutation = (sessionId: string | null) => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.evaluation.initiate(),
-    mutationFn:  async (payload: EvaluationInitiatePayload) =>
+    mutationFn: async (payload: EvaluationInitiatePayload) =>
       initiateEvaluation(sessionId ?? '', payload),
     onSuccess: (evaluation: Evaluation) => {
       void queryClient.invalidateQueries({
@@ -148,7 +148,7 @@ export const useEvaluationUpdateMutation = (sessionId: string | null) => {
 
   return useMutation({
     mutationKey: journalResearchMutationKeys.evaluation.update(),
-    mutationFn:  async ({
+    mutationFn: async ({
       evaluationId,
       payload,
     }: {

@@ -17,7 +17,12 @@ import { Button } from '@/components/ui/button/index.ts'
 import { Card, CardContent } from '@/components/ui/card/index.ts'
 import { Input } from '@/components/ui/input.tsx'
 import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard.tsx'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.tsx'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs.tsx'
 import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {

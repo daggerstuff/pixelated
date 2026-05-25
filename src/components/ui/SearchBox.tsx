@@ -215,8 +215,12 @@ export default function SearchBox({
   return (
     <>
       {/* Screen reader announcement for search results */}
-      <div className='sr-only' aria-live='polite' role='status'>
-        {!isSearching && isSearchReady && isOpen && query === debouncedQuery && query.length >= minQueryLength
+      <div className="sr-only" aria-live="polite" role="status">
+        {!isSearching &&
+        isSearchReady &&
+        isOpen &&
+        query === debouncedQuery &&
+        query.length >= minQueryLength
           ? hasResults
             ? `${results.length} result${results.length === 1 ? '' : 's'} found.`
             : showNoResults
@@ -226,126 +230,126 @@ export default function SearchBox({
       </div>
 
       <div
-        className='relative w-full'
-        role='combobox'
+        className="relative w-full"
+        role="combobox"
         aria-expanded={showResults}
-        aria-haspopup='listbox'
-        aria-controls='search-results'
+        aria-haspopup="listbox"
+        aria-controls="search-results"
       >
-        <div className='relative'>
-        <input
-          ref={inputRef}
-          type='text'
-          value={query}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => query.length >= minQueryLength && setIsOpen(true)}
-          placeholder={placeholder}
-          aria-label='Search'
-          aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
-          className={`border-gray-300 dark:border-gray-700 dark:bg-gray-800 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
-          aria-autocomplete='list'
-          aria-controls='search-results'
-          aria-activedescendant={
-            showResults && activeIndex >= 0
-              ? `result-${activeIndex}`
-              : undefined
-          }
-          autoComplete='off'
-        />
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => query.length >= minQueryLength && setIsOpen(true)}
+            placeholder={placeholder}
+            aria-label="Search"
+            aria-keyshortcuts={shortcutSymbol === '⌘' ? 'Meta+K' : 'Control+K'}
+            className={`border-gray-300 dark:border-gray-700 dark:bg-gray-800 w-full rounded-md border px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500 ${className}`}
+            aria-autocomplete="list"
+            aria-controls="search-results"
+            aria-activedescendant={
+              showResults && activeIndex >= 0
+                ? `result-${activeIndex}`
+                : undefined
+            }
+            autoComplete="off"
+          />
 
-        {query.length === 0 && (
-          <div className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2'>
-            <kbd className='border-gray-200 bg-gray-100 text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 hidden h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 sm:inline-flex'>
-              <span className='text-xs'>{shortcutSymbol}</span>K
-            </kbd>
-          </div>
-        )}
+          {query.length === 0 && (
+            <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2">
+              <kbd className="border-gray-200 bg-gray-100 text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 hidden h-5 select-none items-center gap-1 rounded border px-1.5 font-mono text-[10px] font-medium opacity-100 sm:inline-flex">
+                <span className="text-xs">{shortcutSymbol}</span>K
+              </kbd>
+            </div>
+          )}
 
-        {query.length > 0 && (
-          <button
-            type='button'
-            className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-2 top-1/2 -translate-y-1/2'
-            onClick={() => {
-              setQuery('')
-              setIsOpen(false)
-              inputRef.current?.focus()
-            }}
-            aria-label='Clear search'
-            tabIndex={-1}
-          >
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='16'
-              height='16'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
+          {query.length > 0 && (
+            <button
+              type="button"
+              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-2 top-1/2 -translate-y-1/2"
+              onClick={() => {
+                setQuery('')
+                setIsOpen(false)
+                inputRef.current?.focus()
+              }}
+              aria-label="Clear search"
+              tabIndex={-1}
             >
-              <line x1='18' y1='6' x2='6' y2='18'></line>
-              <line x1='6' y1='6' x2='18' y2='18'></line>
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* Results dropdown */}
-      {showResults && (
-        <div
-          ref={resultsRef}
-          id='search-results'
-          className='bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 absolute z-20 mt-1 w-full overflow-hidden rounded-md border shadow-lg'
-          role='listbox'
-        >
-          {hasResults ? (
-            <ul className='divide-gray-200 dark:divide-gray-700 divide-y'>
-              {results.map((result, index) => (
-                <li key={result.id} role='presentation'>
-                  <button
-                    id={`result-${index}`}
-                    type='button'
-                    role='option'
-                    aria-selected={index === activeIndex}
-                    className={`w-full px-4 py-3 text-left focus:outline-none ${
-                      index === activeIndex
-                        ? 'bg-gray-100 dark:bg-gray-700'
-                        : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                    }`}
-                    onClick={() => handleResultClick(result)}
-                    tabIndex={-1}
-                  >
-                    <div className='text-gray-900 dark:text-white font-medium'>
-                      {result.title}
-                    </div>
-                    {result.content && (
-                      <div className='text-gray-500 dark:text-gray-400 line-clamp-2 text-sm'>
-                        {result.content.substring(0, 150)}...
-                      </div>
-                    )}
-                    {result.category && (
-                      <div className='mt-1'>
-                        <span className='bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium'>
-                          {result.category}
-                        </span>
-                      </div>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            showNoResults &&
-            query.length >= minQueryLength && (
-              <div className='text-gray-500 dark:text-gray-400 px-4 py-3 text-sm'>
-                No results found for &quot;{query}&quot;
-              </div>
-            )
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           )}
         </div>
-      )}
+
+        {/* Results dropdown */}
+        {showResults && (
+          <div
+            ref={resultsRef}
+            id="search-results"
+            className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 absolute z-20 mt-1 w-full overflow-hidden rounded-md border shadow-lg"
+            role="listbox"
+          >
+            {hasResults ? (
+              <ul className="divide-gray-200 dark:divide-gray-700 divide-y">
+                {results.map((result, index) => (
+                  <li key={result.id} role="presentation">
+                    <button
+                      id={`result-${index}`}
+                      type="button"
+                      role="option"
+                      aria-selected={index === activeIndex}
+                      className={`w-full px-4 py-3 text-left focus:outline-none ${
+                        index === activeIndex
+                          ? 'bg-gray-100 dark:bg-gray-700'
+                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+                      }`}
+                      onClick={() => handleResultClick(result)}
+                      tabIndex={-1}
+                    >
+                      <div className="text-gray-900 dark:text-white font-medium">
+                        {result.title}
+                      </div>
+                      {result.content && (
+                        <div className="text-gray-500 dark:text-gray-400 line-clamp-2 text-sm">
+                          {result.content.substring(0, 150)}...
+                        </div>
+                      )}
+                      {result.category && (
+                        <div className="mt-1">
+                          <span className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
+                            {result.category}
+                          </span>
+                        </div>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              showNoResults &&
+              query.length >= minQueryLength && (
+                <div className="text-gray-500 dark:text-gray-400 px-4 py-3 text-sm">
+                  No results found for &quot;{query}&quot;
+                </div>
+              )
+            )}
+          </div>
+        )}
       </div>
     </>
   )

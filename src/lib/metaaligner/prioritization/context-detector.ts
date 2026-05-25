@@ -84,7 +84,9 @@ Be thorough in identifying indicators but prioritize safety - if there's any ind
 export class ContextDetector {
   private readonly aiService: AIService
   private readonly crisisDetectionService: CrisisDetectionService | undefined
-  private readonly educationalContextRecognizer: EducationalContextRecognizer | undefined
+  private readonly educationalContextRecognizer:
+    | EducationalContextRecognizer
+    | undefined
   private readonly model: string
   private readonly enableCrisisIntegration: boolean
   private readonly enableEducationalRecognition: boolean
@@ -374,7 +376,7 @@ export class ContextDetector {
     }>,
   ): Promise<ContextDetectionResult[]> {
     return Promise.all(
-      inputs.map( async (input) =>
+      inputs.map(async (input) =>
         this.detectContext(
           input['text'],
           input['conversationHistory'],

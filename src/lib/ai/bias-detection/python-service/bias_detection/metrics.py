@@ -4,7 +4,7 @@ from __future__ import annotations
 
 
 class _NoopMetric:
-    def labels(self, *_args: object, **_kwargs: object) -> "_NoopMetric":
+    def labels(self, *_args: object, **_kwargs: object) -> _NoopMetric:
         return self
 
     def inc(self, *_args: object, **_kwargs: object) -> None:

@@ -17,19 +17,15 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from ai.pipelines.design.llm_classifier import LLMClassificationConfig, LLMTaxonomyClassifier
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(asctime)s] [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S"
-)
+logging.basicConfig(level=logging.INFO, format="[%(asctime)s] [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 logger = logging.getLogger(__name__)
 
 
 def test_nvidia_nim_connection():
     """Test basic NVIDIA NIM API connection."""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("🧪 Testing NVIDIA NIM GLM4.7 Connection")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Check API key
     api_key = os.getenv("OPENAI_API_KEY")
@@ -43,10 +39,7 @@ def test_nvidia_nim_connection():
 
     # Initialize classifier
     try:
-        config = LLMClassificationConfig(
-            model="z-ai/glm4.7",
-            base_url="https://integrate.api.nvidia.com/v1"
-        )
+        config = LLMClassificationConfig(model="z-ai/glm4.7", base_url="https://integrate.api.nvidia.com/v1")
         classifier = LLMTaxonomyClassifier(config=config)
         logger.info(f"✅ LLM Classifier initialized with model: {config.model}")
         logger.info(f"✅ Base URL: {config.base_url}")
@@ -67,7 +60,7 @@ def test_classifications(classifier):
 Therapist: I hear that you're in a lot of pain right now. Can you tell me more about these thoughts?
 Patient: I have pills at home. I've been thinking about taking them all.
 Therapist: Thank you for being honest with me. This is serious and I want to help keep you safe.""",
-            "expected": "crisis_support"
+            "expected": "crisis_support",
         },
         {
             "name": "Trauma Processing",
@@ -75,7 +68,7 @@ Therapist: Thank you for being honest with me. This is serious and I want to hel
 Therapist: PTSD symptoms like nightmares are common after trauma. Let's work on some grounding techniques.
 Patient: Sometimes I have flashbacks during the day too. It feels like I'm back there.
 Therapist: We'll use EMDR therapy to help process these traumatic memories.""",
-            "expected": "trauma_processing"
+            "expected": "trauma_processing",
         },
         {
             "name": "Relationship Therapy",
@@ -84,13 +77,13 @@ Patient B: That's not true. You never listen to me.
 Therapist: I can see you're both frustrated. Let's practice active listening techniques.
 Patient A: I do listen, but nothing I say matters.
 Therapist: Let's work on using 'I' statements to express your feelings.""",
-            "expected": "relationship_therapy"
+            "expected": "relationship_therapy",
         },
     ]
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("🎯 Running Classification Tests")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     results = []
     for i, test_case in enumerate(test_cases, 1):
@@ -109,32 +102,36 @@ Therapist: Let's work on using 'I' statements to express your feelings.""",
             status = "✅ CORRECT" if is_correct else f"❌ INCORRECT (expected {test_case['expected']})"
             logger.info(f"Result: {status}")
 
-            results.append({
-                "name": test_case["name"],
-                "expected": test_case["expected"],
-                "actual": result.category.value,
-                "confidence": result.confidence,
-                "correct": is_correct
-            })
+            results.append(
+                {
+                    "name": test_case["name"],
+                    "expected": test_case["expected"],
+                    "actual": result.category.value,
+                    "confidence": result.confidence,
+                    "correct": is_correct,
+                }
+            )
 
         except Exception as e:
             logger.error(f"❌ Classification failed: {e}")
-            results.append({
-                "name": test_case["name"],
-                "expected": test_case["expected"],
-                "actual": "ERROR",
-                "confidence": 0.0,
-                "correct": False
-            })
+            results.append(
+                {
+                    "name": test_case["name"],
+                    "expected": test_case["expected"],
+                    "actual": "ERROR",
+                    "confidence": 0.0,
+                    "correct": False,
+                }
+            )
 
     return results
 
 
 def print_summary(results):
     """Print test summary."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("📊 TEST SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     total = len(results)
     correct = sum(1 for r in results if r["correct"])
@@ -149,7 +146,7 @@ def print_summary(results):
         status = "✅" if result["correct"] else "❌"
         logger.info(f"{status} {result['name']}: {result['actual']} ({result['confidence']:.1%})")
 
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     if accuracy == 100:
         logger.info("🎉 ALL TESTS PASSED!")
@@ -158,7 +155,7 @@ def print_summary(results):
     else:
         logger.info("❌ TESTS FAILED")
 
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     return accuracy == 100
 

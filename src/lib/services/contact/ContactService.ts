@@ -233,7 +233,7 @@ export class ContactService {
 
         return {
           success: false,
-          message: validationError?.message || 'Validation failed',
+          message: validationError?.message ?? 'Validation failed',
         }
       }
 

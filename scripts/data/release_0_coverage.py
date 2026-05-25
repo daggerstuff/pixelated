@@ -168,9 +168,7 @@ def list_objects(client: Any, bucket: str, prefix: str, max_keys: int = 25) -> S
     try:
         paginator = client.get_paginator("list_objects_v2")
         keys: list[str] = []
-        for page in paginator.paginate(
-            Bucket=bucket, Prefix=prefix, PaginationConfig={"MaxItems": max_keys}
-        ):
+        for page in paginator.paginate(Bucket=bucket, Prefix=prefix, PaginationConfig={"MaxItems": max_keys}):
             for obj in page.get("Contents", []):
                 keys.append(obj["Key"])
                 if len(keys) >= max_keys:

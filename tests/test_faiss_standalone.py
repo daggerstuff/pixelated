@@ -47,9 +47,7 @@ def _check_file_content():
             "def benchmark_search_performance",
         ]
 
-        missing_components = [
-            component for component in required_components if component not in content
-        ]
+        missing_components = [component for component in required_components if component not in content]
         assert len(missing_components) == 0, f"Missing components: {missing_components}"
 
         # Check for advanced features
@@ -72,6 +70,7 @@ def _check_file_content():
 def _test_mock_index():
     """Test mock FAISS index functionality."""
     try:
+
         class SimpleMockIndex:
             def __init__(self, dimension):
                 self.dimension = dimension

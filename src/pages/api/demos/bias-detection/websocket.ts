@@ -24,7 +24,7 @@ export const GET: APIRoute = async ({ request }) => {
         status: 426,
         headers: {
           'Content-Type': 'application/json',
-          Upgrade: 'websocket',
+          'Upgrade': 'websocket',
         },
       },
     )

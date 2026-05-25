@@ -17,6 +17,7 @@ def resolve_asana_token() -> str:
         raise RuntimeError("Missing Asana token. Set ASANA_ACCESS_TOKEN or ASANA_PAT.")
     return token
 
+
 def resolve_asana_project_id() -> str:
     project_id = _strip_env("PIXELATED_ASANA_PROJECT_ID")
     if project_id:
@@ -31,8 +32,10 @@ def resolve_asana_project_id() -> str:
         raise RuntimeError("Missing Asana project id. Set ASANA_PROJECT_ID.")
     return project_id
 
+
 def read_default_asana_project_id(config_path: Path | None = None) -> str:
     return str(_load_internal_config(config_path).get("asana_project_id", "")).strip()
+
 
 def build_asana_headers(token: str) -> dict[str, str]:
     return {
@@ -40,6 +43,7 @@ def build_asana_headers(token: str) -> dict[str, str]:
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
+
 
 def asana_create_payload(action: Any, project_id: str) -> dict[str, Any]:
     return {
@@ -51,6 +55,7 @@ def asana_create_payload(action: Any, project_id: str) -> dict[str, Any]:
         }
     }
 
+
 def asana_update_payload(action: Any) -> dict[str, Any]:
     return {
         "data": {
@@ -59,6 +64,7 @@ def asana_update_payload(action: Any) -> dict[str, Any]:
             "completed": action.status == "closed",
         }
     }
+
 
 def export_asana_tasks() -> list[dict[str, Any]]:
     token = resolve_asana_token()
@@ -72,10 +78,7 @@ def export_asana_tasks() -> list[dict[str, Any]]:
         query = {"limit": "100", "opt_fields": fields}
         if offset:
             query["offset"] = offset
-        url = (
-            f"https://app.asana.com/api/1.0/projects/{project_id}/tasks?"
-            f"{parse.urlencode(query)}"
-        )
+        url = f"https://app.asana.com/api/1.0/projects/{project_id}/tasks?{parse.urlencode(query)}"
         payload = _json_request("GET", url, headers=headers)
         tasks.extend(payload.get("data", []))
         next_page = payload.get("next_page") or {}
@@ -83,6 +86,7 @@ def export_asana_tasks() -> list[dict[str, Any]]:
         if not offset:
             break
     return tasks
+
 
 def apply_asana_action(action: Mapping[str, Any]) -> dict[str, Any]:
     token = resolve_asana_token()
@@ -92,16 +96,13 @@ def apply_asana_action(action: Mapping[str, Any]) -> dict[str, Any]:
     view = _object_view(action)
     if not view.target_id:
         payload = asana_create_payload(view, project_id)
-        response = _json_request(
-            "POST", "https://app.asana.com/api/1.0/tasks", headers=headers, payload=payload
-        )
+        response = _json_request("POST", "https://app.asana.com/api/1.0/tasks", headers=headers, payload=payload)
         return response.get("data", {})
-    else:
-        payload = asana_update_payload(view)
-        response = _json_request(
-            "PUT",
-            f"https://app.asana.com/api/1.0/tasks/{view.target_id}",
-            headers=headers,
-            payload=payload,
-        )
-        return response.get("data", {})
+    payload = asana_update_payload(view)
+    response = _json_request(
+        "PUT",
+        f"https://app.asana.com/api/1.0/tasks/{view.target_id}",
+        headers=headers,
+        payload=payload,
+    )
+    return response.get("data", {})

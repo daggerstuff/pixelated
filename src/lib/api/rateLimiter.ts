@@ -64,7 +64,7 @@ class RateLimiter {
     this.metrics.totalRequests++
 
     const results = await Promise.all(
-      this.config.rules.map( async (rule) => this.checkRule(request, rule)),
+      this.config.rules.map(async (rule) => this.checkRule(request, rule)),
     )
 
     // Request is allowed if ANY rule passes (OR logic) or if ALL rules pass (AND logic)
@@ -179,7 +179,7 @@ class RateLimiter {
     const realIp = request.headers.get('x-real-ip')
     const clientIp = request.headers.get('x-client-ip')
 
-    const ip = ((forwardedFor?.split(',')[0] ?? realIp) ?? clientIp) ?? 'unknown'
+    const ip = forwardedFor?.split(',')[0] ?? realIp ?? clientIp ?? 'unknown'
 
     // Include user agent for more granular limiting
     const userAgent = request.headers.get('user-agent') ?? 'unknown'

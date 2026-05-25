@@ -398,7 +398,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       // Update metrics
       this.metrics.totalThreatsProcessed++
       this.metrics.threatsBySeverity[event.severity] =
-        (this.metrics.threatsBySeverity[event.severity] || 0) + 1
+        (this.metrics.threatsBySeverity[event.severity] ?? 0) + 1
 
       // Emit system event
       this.emit('threat:detected', {

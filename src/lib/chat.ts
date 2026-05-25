@@ -203,7 +203,8 @@ function toRecommendationAnalysis(
     confidence: analysis.confidence,
     explanation: analysis.explanation,
     supportingEvidence: analysis.supportingEvidence,
-    isCrisis: analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
+    isCrisis:
+      analysis.riskLevel === 'high' || analysis.riskLevel === 'critical',
     timestamp: new Date(analysis.timestamp).toISOString(),
     stressLevel: analysis.riskLevel === 'high' ? 0.8 : 0.4,
   }
@@ -406,7 +407,7 @@ export function createMentalHealthChat(
         ]
 
         return (
-          interventions[Math.floor(Math.random() * interventions.length)] ||
+          interventions[Math.floor(Math.random() * interventions.length)] ??
           "I'm here to support you."
         )
       } catch (error: unknown) {

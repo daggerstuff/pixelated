@@ -114,16 +114,16 @@ export const PersistentStateDemo: FC = () => {
     counterLoaded && nameLoaded && prefsLoaded && todosLoaded && scoresLoaded
 
   return (
-    <ResponsiveContainer size='lg'>
-      <div className='space-y-8 p-8'>
-        <ResponsiveText size='xl' className='mb-8 text-center'>
+    <ResponsiveContainer size="lg">
+      <div className="space-y-8 p-8">
+        <ResponsiveText size="xl" className="mb-8 text-center">
           Persistent State Management Demo
         </ResponsiveText>
 
         {!isLoaded && (
           <FadeIn>
-            <div className='bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8 text-center'>
-              <div className='border-blue-500 border-t-transparent mb-4 inline-block h-6 w-6 animate-spin rounded-full border-2'></div>
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-8 text-center">
+              <div className="border-blue-500 border-t-transparent mb-4 inline-block h-6 w-6 animate-spin rounded-full border-2"></div>
               <p>Loading saved state...</p>
             </div>
           </FadeIn>
@@ -133,51 +133,51 @@ export const PersistentStateDemo: FC = () => {
           <>
             {/* Basic State Examples */}
             <SlideUp>
-              <section className='space-y-6'>
-                <h2 className='mb-4 text-2xl font-semibold'>
+              <section className="space-y-6">
+                <h2 className="mb-4 text-2xl font-semibold">
                   Basic State Persistence
                 </h2>
 
-                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">
                       Counter (with debouncing)
                     </h3>
-                    <div className='bg-gray-50 dark:bg-gray-800 flex items-center gap-4 rounded-lg p-4'>
+                    <div className="bg-gray-50 dark:bg-gray-800 flex items-center gap-4 rounded-lg p-4">
                       <button
                         onClick={() => setCounter((prev) => prev - 1)}
-                        className='bg-red-500 text-white hover:bg-red-600 h-10 w-10 rounded-lg transition-colors'
+                        className="bg-red-500 text-white hover:bg-red-600 h-10 w-10 rounded-lg transition-colors"
                       >
                         -
                       </button>
-                      <span className='min-w-[3rem] text-center font-mono text-2xl'>
+                      <span className="min-w-[3rem] text-center font-mono text-2xl">
                         {counter}
                       </span>
                       <button
                         onClick={() => setCounter((prev) => prev + 1)}
-                        className='bg-green-500 text-white hover:bg-green-600 h-10 w-10 rounded-lg transition-colors'
+                        className="bg-green-500 text-white hover:bg-green-600 h-10 w-10 rounded-lg transition-colors"
                       >
                         +
                       </button>
                     </div>
-                    <p className='text-gray-600 dark:text-gray-400 text-sm'>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Counter value persists across browser sessions with 500ms
                       debouncing
                     </p>
                   </div>
 
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">
                       Username (cross-tab sync)
                     </h3>
                     <input
-                      type='text'
+                      type="text"
                       value={userName}
                       onChange={(e) => setUserName(e.target.value)}
-                      placeholder='Enter your name'
-                      className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-full rounded-lg border px-3 py-2'
+                      placeholder="Enter your name"
+                      className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white w-full rounded-lg border px-3 py-2"
                     />
-                    <p className='text-gray-600 dark:text-gray-400 text-sm'>
+                    <p className="text-gray-600 dark:text-gray-400 text-sm">
                       Username syncs across browser tabs in real-time
                     </p>
                   </div>
@@ -187,17 +187,17 @@ export const PersistentStateDemo: FC = () => {
 
             {/* Object State Example */}
             <SlideUp>
-              <section className='space-y-6'>
-                <h2 className='mb-4 text-2xl font-semibold'>
+              <section className="space-y-6">
+                <h2 className="mb-4 text-2xl font-semibold">
                   Object State Persistence
                 </h2>
 
-                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>User Preferences</h3>
-                    <div className='bg-gray-50 dark:bg-gray-800 space-y-3 rounded-lg p-4'>
-                      <div className='flex items-center justify-between'>
-                        <label className='text-sm font-medium'>Theme</label>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">User Preferences</h3>
+                    <div className="bg-gray-50 dark:bg-gray-800 space-y-3 rounded-lg p-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Theme</label>
                         <select
                           value={preferences.theme}
                           onChange={(e) =>
@@ -206,30 +206,30 @@ export const PersistentStateDemo: FC = () => {
                               e.target.value as 'light' | 'dark',
                             )
                           }
-                          className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded border px-2 py-1 text-sm'
+                          className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded border px-2 py-1 text-sm"
                         >
-                          <option value='light'>Light</option>
-                          <option value='dark'>Dark</option>
+                          <option value="light">Light</option>
+                          <option value="dark">Dark</option>
                         </select>
                       </div>
 
-                      <div className='flex items-center justify-between'>
-                        <label className='text-sm font-medium'>Language</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">Language</label>
                         <select
                           value={preferences.language}
                           onChange={(e) =>
                             updatePreference('language', e.target.value)
                           }
-                          className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded border px-2 py-1 text-sm'
+                          className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded border px-2 py-1 text-sm"
                         >
-                          <option value='en'>English</option>
-                          <option value='es'>Spanish</option>
-                          <option value='fr'>French</option>
+                          <option value="en">English</option>
+                          <option value="es">Spanish</option>
+                          <option value="fr">French</option>
                         </select>
                       </div>
 
-                      <div className='flex items-center justify-between'>
-                        <label className='text-sm font-medium'>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">
                           Notifications
                         </label>
                         <button
@@ -255,14 +255,14 @@ export const PersistentStateDemo: FC = () => {
                         </button>
                       </div>
 
-                      <div className='flex items-center justify-between'>
-                        <label className='text-sm font-medium'>
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium">
                           Items per page
                         </label>
                         <input
-                          type='number'
-                          min='5'
-                          max='50'
+                          type="number"
+                          min="5"
+                          max="50"
                           value={preferences.itemsPerPage}
                           onChange={(e) =>
                             updatePreference(
@@ -270,15 +270,15 @@ export const PersistentStateDemo: FC = () => {
                               parseInt(e.target.value) || 10,
                             )
                           }
-                          className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-16 rounded border px-2 py-1 text-sm'
+                          className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 w-16 rounded border px-2 py-1 text-sm"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>Current Preferences</h3>
-                    <pre className='bg-gray-100 dark:bg-gray-900 overflow-auto rounded-lg p-4 text-xs'>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Current Preferences</h3>
+                    <pre className="bg-gray-100 dark:bg-gray-900 overflow-auto rounded-lg p-4 text-xs">
                       {JSON.stringify(preferences, null, 2)}
                     </pre>
                   </div>
@@ -288,28 +288,28 @@ export const PersistentStateDemo: FC = () => {
 
             {/* Array State Example */}
             <SlideUp>
-              <section className='space-y-6'>
-                <h2 className='mb-4 text-2xl font-semibold'>
+              <section className="space-y-6">
+                <h2 className="mb-4 text-2xl font-semibold">
                   Array State Persistence
                 </h2>
 
-                <div className='space-y-4'>
-                  <div className='flex gap-4'>
+                <div className="space-y-4">
+                  <div className="flex gap-4">
                     <button
                       onClick={addTodo}
-                      className='bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors'
+                      className="bg-blue-500 hover:bg-blue-600 text-white rounded-lg px-4 py-2 transition-colors"
                     >
                       Add Todo
                     </button>
                     <button
                       onClick={resetAll}
-                      className='bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 transition-colors'
+                      className="bg-red-500 hover:bg-red-600 text-white rounded-lg px-4 py-2 transition-colors"
                     >
                       Reset All
                     </button>
                   </div>
 
-                  <div className='space-y-2'>
+                  <div className="space-y-2">
                     {todoItems.map((item, index) => (
                       <div
                         key={item.id}
@@ -329,14 +329,14 @@ export const PersistentStateDemo: FC = () => {
                         >
                           {item.completed && (
                             <svg
-                              className='text-white mx-auto h-4 w-4'
-                              fill='currentColor'
-                              viewBox='0 0 20 20'
+                              className="text-white mx-auto h-4 w-4"
+                              fill="currentColor"
+                              viewBox="0 0 20 20"
                             >
                               <path
-                                fillRule='evenodd'
-                                d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'
-                                clipRule='evenodd'
+                                fillRule="evenodd"
+                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                clipRule="evenodd"
                               />
                             </svg>
                           )}
@@ -348,7 +348,7 @@ export const PersistentStateDemo: FC = () => {
                         </span>
                         <button
                           onClick={() => todoActions.removeAt(index)}
-                          className='text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300'
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                         >
                           ×
                         </button>
@@ -361,25 +361,25 @@ export const PersistentStateDemo: FC = () => {
 
             {/* Map State Example */}
             <SlideUp>
-              <section className='space-y-6'>
-                <h2 className='mb-4 text-2xl font-semibold'>
+              <section className="space-y-6">
+                <h2 className="mb-4 text-2xl font-semibold">
                   Map State Persistence
                 </h2>
 
-                <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>Game Scores</h3>
-                    <div className='space-y-3'>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Game Scores</h3>
+                    <div className="space-y-3">
                       {Array.from(userScores.entries()).map(
                         ([level, score]) => (
-                          <div key={level} className='flex items-center gap-3'>
-                            <label className='min-w-[60px] text-sm font-medium'>
+                          <div key={level} className="flex items-center gap-3">
+                            <label className="min-w-[60px] text-sm font-medium">
                               {level}:
                             </label>
                             <input
-                              type='number'
-                              min='0'
-                              max='1000'
+                              type="number"
+                              min="0"
+                              max="1000"
                               value={score}
                               onChange={(e) =>
                                 updateScore(
@@ -387,7 +387,7 @@ export const PersistentStateDemo: FC = () => {
                                   parseInt(e.target.value) || 0,
                                 )
                               }
-                              className='border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded border px-3 py-2 text-sm'
+                              className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 flex-1 rounded border px-3 py-2 text-sm"
                             />
                           </div>
                         ),
@@ -396,16 +396,16 @@ export const PersistentStateDemo: FC = () => {
                         onClick={() =>
                           updateScore(`level${userScores.size + 1}`, 0)
                         }
-                        className='bg-purple-500 hover:bg-purple-600 text-white w-full rounded-lg px-3 py-2 text-sm transition-colors'
+                        className="bg-purple-500 hover:bg-purple-600 text-white w-full rounded-lg px-3 py-2 text-sm transition-colors"
                       >
                         Add Level
                       </button>
                     </div>
                   </div>
 
-                  <div className='space-y-4'>
-                    <h3 className='text-lg font-medium'>Scores Map</h3>
-                    <pre className='bg-gray-100 dark:bg-gray-900 overflow-auto rounded-lg p-4 text-xs'>
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">Scores Map</h3>
+                    <pre className="bg-gray-100 dark:bg-gray-900 overflow-auto rounded-lg p-4 text-xs">
                       {JSON.stringify(Object.fromEntries(userScores), null, 2)}
                     </pre>
                   </div>
@@ -415,36 +415,36 @@ export const PersistentStateDemo: FC = () => {
 
             {/* Storage Info */}
             <SlideUp>
-              <section className='space-y-4'>
-                <h2 className='mb-4 text-2xl font-semibold'>
+              <section className="space-y-4">
+                <h2 className="mb-4 text-2xl font-semibold">
                   Storage Information
                 </h2>
 
-                <div className='bg-gray-50 dark:bg-gray-800 rounded-lg p-4'>
-                  <div className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
+                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
                     <div>
-                      <div className='text-gray-600 dark:text-gray-400 font-medium'>
+                      <div className="text-gray-600 dark:text-gray-400 font-medium">
                         Counter
                       </div>
-                      <div className='font-mono'>{counter}</div>
+                      <div className="font-mono">{counter}</div>
                     </div>
                     <div>
-                      <div className='text-gray-600 dark:text-gray-400 font-medium'>
+                      <div className="text-gray-600 dark:text-gray-400 font-medium">
                         Todos
                       </div>
-                      <div className='font-mono'>{todoItems.length}</div>
+                      <div className="font-mono">{todoItems.length}</div>
                     </div>
                     <div>
-                      <div className='text-gray-600 dark:text-gray-400 font-medium'>
+                      <div className="text-gray-600 dark:text-gray-400 font-medium">
                         Scores
                       </div>
-                      <div className='font-mono'>{userScores.size}</div>
+                      <div className="font-mono">{userScores.size}</div>
                     </div>
                     <div>
-                      <div className='text-gray-600 dark:text-gray-400 font-medium'>
+                      <div className="text-gray-600 dark:text-gray-400 font-medium">
                         Theme
                       </div>
-                      <div className='font-mono capitalize'>
+                      <div className="font-mono capitalize">
                         {preferences.theme}
                       </div>
                     </div>

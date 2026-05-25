@@ -113,10 +113,9 @@ export function requireSecretKey(): string {
   }
 
   // Fall back to environment variable if in Node environment
-  const key =
-    process?.env
-      ? process.env['SECRET_KEY'] ?? process.env['JWT_SECRET']
-      : undefined
+  const key = process?.env
+    ? (process.env['SECRET_KEY'] ?? process.env['JWT_SECRET'])
+    : undefined
 
   if (!key) {
     throw new SecurityError(

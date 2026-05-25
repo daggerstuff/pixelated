@@ -114,9 +114,7 @@ def plot_time_series(data: dict[str, Any], output_dir: Path | str) -> None:
 
     ax2.plot(iterations, safety_weights, label="Safety", linewidth=2, marker="o", markersize=4)
     ax2.plot(iterations, empathy_weights, label="Empathy", linewidth=2, marker="s", markersize=4)
-    ax2.plot(
-        iterations, correctness_weights, label="Correctness", linewidth=2, marker="^", markersize=4
-    )
+    ax2.plot(iterations, correctness_weights, label="Correctness", linewidth=2, marker="^", markersize=4)
 
     set_axes_labels_title(ax2, "Weight", "Objective Weight Evolution with Smoothing")
     ax2.legend()

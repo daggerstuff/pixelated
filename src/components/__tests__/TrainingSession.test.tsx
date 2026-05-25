@@ -1,10 +1,57 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react'
-import { describe, expect, it, afterEach } from 'vitest'
+import { describe, expect, it, afterEach, vi } from 'vitest'
 
 import TrainingSession from '../TrainingSession'
 
 import '@testing-library/jest-dom/vitest'
+
+vi.mock('../../hooks/useConversationMemory', () => ({
+  useConversationMemory: () => ({
+    memory: {
+      history: [],
+      context: {},
+      sessionState: 'idle' as const,
+      progress: 0,
+      progressSnapshots: [],
+      progressMetrics: {
+        totalMessages: 0,
+        therapistMessages: 0,
+        clientMessages: 0,
+        responsesCount: 0,
+        sessionDuration: 0,
+        activeTime: 0,
+        skillScores: {},
+        responseTime: 0,
+        conversationFlow: 0,
+        milestonesReached: [],
+      },
+    },
+    progress: 0,
+    progressSnapshots: [],
+    progressMetrics: {
+      totalMessages: 0,
+      therapistMessages: 0,
+      clientMessages: 0,
+      responsesCount: 0,
+      sessionDuration: 0,
+      activeTime: 0,
+      skillScores: {},
+      responseTime: 0,
+      conversationFlow: 0,
+      milestonesReached: [],
+    },
+    addMessage: vi.fn(),
+    setSessionState: vi.fn(),
+    setProgress: vi.fn(),
+    addProgressSnapshot: vi.fn(),
+    updateSkillScore: vi.fn(),
+    updateConversationFlow: vi.fn(),
+    addMilestone: vi.fn(),
+    resetSession: vi.fn(),
+    setMemory: vi.fn(),
+  }),
+}))
 
 describe('TrainingSession', () => {
   afterEach(() => cleanup())

@@ -1,0 +1,7 @@
+{
+  "buildCommand": "DEPLOY_TARGET=vercel astro build",
+  "outputDirectory": ".vercel/output",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": "astro",
+  "regions": ["iad1"]
+}

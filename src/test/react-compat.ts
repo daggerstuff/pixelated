@@ -1,5 +1,6 @@
-import * as ReactNS from '../../node_modules/react/index.js'
 import { flushSync } from 'react-dom'
+
+import * as ReactNS from '../../node_modules/react/index.js'
 
 const flush = <T>(callback: () => T) => {
   if (typeof flushSync === 'function') {

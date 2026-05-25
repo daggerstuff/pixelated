@@ -22,7 +22,7 @@ export const EmotionAnalysis: React.FC<EmotionAnalysisProps> = ({ text }) => {
   }
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       <EmotionDetector
         text={text}
         onAnalysisComplete={handleAnalysisComplete}

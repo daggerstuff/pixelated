@@ -181,15 +181,15 @@ def main():
     logging.info("=" * 50)
 
     # Test individual language detection
-    test_text = "If you're in immediate danger, please call 911. You can also contact the 988 Suicide & Crisis Lifeline."
+    test_text = (
+        "If you're in immediate danger, please call 911. You can also contact the 988 Suicide & Crisis Lifeline."
+    )
     institutional_result = validator.detect_institutional_language(test_text)
     collaborative_result = validator.detect_collaborative_language(test_text)
 
     logging.info(f"Institutional language detected: {institutional_result['has_violations']}")
     logging.info(f"Violations found: {institutional_result['violation_count']}")
-    logging.info(
-        f"Collaborative language found: {collaborative_result['has_collaborative_language']}"
-    )
+    logging.info(f"Collaborative language found: {collaborative_result['has_collaborative_language']}")
 
     logging.info("\n" + "=" * 50)
     logging.info("🧪 Testing Crisis Response Styles...")
@@ -207,9 +207,7 @@ def main():
         logging.info(f"Response Preview: {result['response']}")
 
         if not result["passed"]:
-            logging.warning(
-                f"Violations: {len(result['validation']['institutional_violations']['violations'])}"
-            )
+            logging.warning(f"Violations: {len(result['validation']['institutional_violations']['violations'])}")
 
     logging.info("📊 Overall Results:")
     logging.info(f"Pass Rate: {test_results['overall_pass_rate']:.1%}")

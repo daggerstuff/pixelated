@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class IEEESearchConfig:
     """Configuration for IEEE Xplore API integration"""
+
     api_key: str
     base_url: str = "https://ieeexplore.ieee.org/api/v1"
     search_endpoint: str = "/search"
@@ -55,6 +56,7 @@ class IEEESearchConfig:
 @dataclass
 class IEEEPaper:
     """IEEE Xplore paper data structure"""
+
     paper_id: str
     title: str
     authors: list[dict[str, str]]
@@ -80,6 +82,7 @@ class IEEEPaper:
 @dataclass
 class IEEESearchCriteria:
     """Enhanced search criteria for IEEE Xplore"""
+
     query: str
     publication_years: tuple[int, int] | None = None
     publication_types: list[str] | None = None  # journal, conference, standard
@@ -125,8 +128,8 @@ class IEEEXploreClient:
                 headers={
                     "Accept": "application/json",
                     "Content-Type": "application/json",
-                    "User-Agent": "PixelatedEmpathy/1.0"
-                }
+                    "User-Agent": "PixelatedEmpathy/1.0",
+                },
             )
 
     async def close(self) -> None:
@@ -162,10 +165,9 @@ class IEEEXploreClient:
             cache_time = self.cache_timestamps.get(cache_key, 0)
             if time.time() - cache_time < self.config.cache_ttl:
                 return self.cache[cache_key]
-            else:
-                # Expired cache entry
-                del self.cache[cache_key]
-                del self.cache_timestamps[cache_key]
+            # Expired cache entry
+            del self.cache[cache_key]
+            del self.cache_timestamps[cache_key]
 
         return None
 
@@ -203,16 +205,15 @@ class IEEEXploreClient:
                     result = await response.json()
                     self._set_cached_result(cache_key, result)
                     return result
-                elif response.status == 429:
+                if response.status == 429:
                     # Rate limit exceeded
                     retry_after = int(response.headers.get("Retry-After", 60))
                     logger.warning(f"Rate limit exceeded, retrying after {retry_after}s")
                     await asyncio.sleep(retry_after)
                     raise aiohttp.ClientError("Rate limit exceeded")
-                else:
-                    error_text = await response.text()
-                    logger.error(f"IEEE API error {response.status}: {error_text}")
-                    raise aiohttp.ClientError(f"IEEE API error {response.status}")
+                error_text = await response.text()
+                logger.error(f"IEEE API error {response.status}: {error_text}")
+                raise aiohttp.ClientError(f"IEEE API error {response.status}")
 
         except Exception as e:
             logger.error(f"Request failed for endpoint {endpoint}: {e}")
@@ -225,7 +226,7 @@ class IEEEXploreClient:
             "max_records": min(criteria.max_results, self.config.max_results_per_request),
             "sort_order": criteria.sort_by,
             "sort_order_dir": criteria.order,
-            "content_type": criteria.content_type
+            "content_type": criteria.content_type,
         }
 
         # Add advanced search parameters
@@ -291,7 +292,7 @@ class IEEEXploreClient:
                     publication_type=article.get("content_type", "journal"),
                     ieee_terms=article.get("ieee_terms", []),
                     mesh_terms=article.get("mesh_terms", []),
-                    metadata=article
+                    metadata=article,
                 )
 
                 papers.append(paper)
@@ -308,19 +309,23 @@ class IEEEXploreClient:
 
         if isinstance(authors_data, dict):
             for author in authors_data.get("authors", []):
-                authors.append({
-                    "name": author.get("full_name", ""),
-                    "affiliation": author.get("affiliation", ""),
-                    "email": author.get("email", "")
-                })
+                authors.append(
+                    {
+                        "name": author.get("full_name", ""),
+                        "affiliation": author.get("affiliation", ""),
+                        "email": author.get("email", ""),
+                    }
+                )
         elif isinstance(authors_data, list):
             for author in authors_data:
                 if isinstance(author, dict):
-                    authors.append({
-                        "name": author.get("full_name", author.get("name", "")),
-                        "affiliation": author.get("affiliation", ""),
-                        "email": author.get("email", "")
-                    })
+                    authors.append(
+                        {
+                            "name": author.get("full_name", author.get("name", "")),
+                            "affiliation": author.get("affiliation", ""),
+                            "email": author.get("email", ""),
+                        }
+                    )
 
         return authors
 
@@ -368,10 +373,20 @@ class IEEEXploreClient:
 
         # Bias-related keywords
         bias_keywords = {
-            "bias", "fairness", "equity", "discrimination", "ethics",
-            "algorithmic fairness", "machine learning bias", "ai ethics",
-            "healthcare disparities", "demographic parity", "equalized odds",
-            "fairness constraints", "bias mitigation", "ethical ai"
+            "bias",
+            "fairness",
+            "equity",
+            "discrimination",
+            "ethics",
+            "algorithmic fairness",
+            "machine learning bias",
+            "ai ethics",
+            "healthcare disparities",
+            "demographic parity",
+            "equalized odds",
+            "fairness constraints",
+            "bias mitigation",
+            "ethical ai",
         }
 
         # Check title and abstract for bias-related terms
@@ -384,11 +399,15 @@ class IEEEXploreClient:
         score += title_matches * 0.3 + abstract_matches * 0.1
 
         # Check IEEE terms
-        ieee_bias_terms = [term for term in paper.ieee_terms if any(bias_word in term.lower() for bias_word in bias_keywords)]
+        ieee_bias_terms = [
+            term for term in paper.ieee_terms if any(bias_word in term.lower() for bias_word in bias_keywords)
+        ]
         score += len(ieee_bias_terms) * 0.2
 
         # Check mesh terms
-        mesh_bias_terms = [term for term in paper.mesh_terms if any(bias_word in term.lower() for bias_word in bias_keywords)]
+        mesh_bias_terms = [
+            term for term in paper.mesh_terms if any(bias_word in term.lower() for bias_word in bias_keywords)
+        ]
         score += len(mesh_bias_terms) * 0.15
 
         return min(3.0, score)  # Cap at 3.0
@@ -430,7 +449,7 @@ class IEEEXploreClient:
             mesh_terms=article.get("mesh_terms", []),
             references=article.get("references", []),
             citations=article.get("citations", []),
-            metadata=article
+            metadata=article,
         )
 
     async def get_citation_analysis(self, paper_id: str) -> dict[str, Any]:
@@ -453,7 +472,7 @@ class IEEEXploreClient:
             "citation_trend": response.get("citation_trend", "stable"),
             "highly_cited": response.get("highly_cited", False),
             "citation_velocity": response.get("citation_velocity", 0.0),
-            "influence_score": response.get("influence_score", 0.0)
+            "influence_score": response.get("influence_score", 0.0),
         }
 
 
@@ -467,15 +486,34 @@ class IEEEResearchPipeline:
     def _load_bias_keywords(self) -> set[str]:
         """Load bias-related keywords for enhanced searching"""
         return {
-            "algorithmic bias", "machine learning bias", "ai bias", "bias detection",
-            "fairness in ai", "ethical ai", "algorithmic fairness", "bias mitigation",
-            "demographic parity", "equalized odds", "fairness constraints",
-            "healthcare disparities", "medical bias", "clinical bias",
-            "diagnostic bias", "treatment bias", "health equity",
-            "algorithmic accountability", "ai ethics", "responsible ai",
-            "bias in healthcare", "healthcare equity", "medical ethics",
-            "clinical decision support", "healthcare algorithms",
-            "patient safety", "healthcare quality", "health disparities"
+            "algorithmic bias",
+            "machine learning bias",
+            "ai bias",
+            "bias detection",
+            "fairness in ai",
+            "ethical ai",
+            "algorithmic fairness",
+            "bias mitigation",
+            "demographic parity",
+            "equalized odds",
+            "fairness constraints",
+            "healthcare disparities",
+            "medical bias",
+            "clinical bias",
+            "diagnostic bias",
+            "treatment bias",
+            "health equity",
+            "algorithmic accountability",
+            "ai ethics",
+            "responsible ai",
+            "bias in healthcare",
+            "healthcare equity",
+            "medical ethics",
+            "clinical decision support",
+            "healthcare algorithms",
+            "patient safety",
+            "healthcare quality",
+            "health disparities",
         }
 
     @track_latency("research.ieee_pipeline_search")
@@ -484,7 +522,7 @@ class IEEEResearchPipeline:
         query: str,
         max_results: int = 50,
         publication_years: tuple[int, int] | None = None,
-        min_citations: int = 5
+        min_citations: int = 5,
     ) -> list[ResearchPaper]:
         """Search for bias-related papers with enhanced criteria"""
 
@@ -496,14 +534,16 @@ class IEEEResearchPipeline:
             min_citations=min_citations,
             keywords=list(self.bias_keywords),
             subject_areas=[
-                "Computing and Processing", "Engineering Profession",
-                "Signal Processing and Analysis", "Bioengineering",
+                "Computing and Processing",
+                "Engineering Profession",
+                "Signal Processing and Analysis",
+                "Bioengineering",
                 "Communication, Networking and Broadcast Technologies",
-                "Components, Circuits, Devices and Systems"
+                "Components, Circuits, Devices and Systems",
             ],
             publication_types=["journal", "conference"],
             sort_by="relevance",
-            content_type="papers"
+            content_type="papers",
         )
 
         # Search IEEE Xplore
@@ -543,7 +583,7 @@ class IEEEResearchPipeline:
                 relevance_score=ieee_paper.relevance_score,
                 bias_relevance_score=ieee_paper.bias_relevance_score,
                 source="ieee_xplore",
-                metadata=ieee_paper.metadata
+                metadata=ieee_paper.metadata,
             )
 
             # Create ResearchPaper
@@ -558,20 +598,20 @@ class IEEEResearchPipeline:
                     "publication_info": {
                         "title": ieee_paper.publication_title,
                         "year": ieee_paper.publication_year,
-                        "type": ieee_paper.publication_type
-                    }
+                        "type": ieee_paper.publication_type,
+                    },
                 },
                 bias_analysis={
                     "relevance_score": ieee_paper.bias_relevance_score,
                     "keyword_matches": self._extract_bias_keywords(ieee_paper),
                     "methodology_focus": self._detect_methodology_focus(ieee_paper),
-                    "applicability_score": self._calculate_applicability_score(ieee_paper)
+                    "applicability_score": self._calculate_applicability_score(ieee_paper),
                 },
                 quality_score=ieee_paper.relevance_score,
                 confidence=min(0.95, ieee_paper.relevance_score / 5.0),
                 source_reliability=0.9,  # IEEE is highly reliable
                 extraction_date=datetime.now(timezone.utc),
-                processing_status="completed"
+                processing_status="completed",
             )
 
             return research_paper
@@ -598,18 +638,38 @@ class IEEEResearchPipeline:
     def _detect_methodology_focus(self, ieee_paper: IEEEPaper) -> str:
         """Detect if paper focuses on methodology, application, or theory"""
         methodology_keywords = {
-            "method", "algorithm", "approach", "technique", "framework",
-            "methodology", "procedure", "process", "system"
+            "method",
+            "algorithm",
+            "approach",
+            "technique",
+            "framework",
+            "methodology",
+            "procedure",
+            "process",
+            "system",
         }
 
         application_keywords = {
-            "application", "implementation", "deployment", "case study",
-            "evaluation", "assessment", "experiment", "study"
+            "application",
+            "implementation",
+            "deployment",
+            "case study",
+            "evaluation",
+            "assessment",
+            "experiment",
+            "study",
         }
 
         theory_keywords = {
-            "theory", "theoretical", "analysis", "model", "formulation",
-            "proof", "theorem", "lemma", "conceptual"
+            "theory",
+            "theoretical",
+            "analysis",
+            "model",
+            "formulation",
+            "proof",
+            "theorem",
+            "lemma",
+            "conceptual",
         }
 
         text_content = f"{ieee_paper.title} {ieee_paper.abstract}".lower()
@@ -620,10 +680,9 @@ class IEEEResearchPipeline:
 
         if methodology_count >= application_count and methodology_count >= theory_count:
             return "methodology"
-        elif application_count >= methodology_count and application_count >= theory_count:
+        if application_count >= methodology_count and application_count >= theory_count:
             return "application"
-        else:
-            return "theory"
+        return "theory"
 
     def _calculate_applicability_score(self, ieee_paper: IEEEPaper) -> float:
         """Calculate applicability score for bias detection research"""
@@ -646,8 +705,14 @@ class IEEEResearchPipeline:
 
         # Check for implementation keywords
         implementation_keywords = {
-            "implementation", "evaluation", "assessment", "framework",
-            "tool", "system", "platform", "software"
+            "implementation",
+            "evaluation",
+            "assessment",
+            "framework",
+            "tool",
+            "system",
+            "platform",
+            "software",
         }
 
         text_content = f"{ieee_paper.title} {ieee_paper.abstract}".lower()
@@ -671,6 +736,7 @@ async def initialize_ieee_client(config: IEEESearchConfig | None = None) -> IEEE
         if config is None:
             # Load from environment or config file
             import os
+
             api_key = os.getenv("IEEE_API_KEY", "demo_key")
             config = IEEESearchConfig(api_key=api_key)
 
@@ -694,18 +760,12 @@ async def get_ieee_pipeline() -> IEEEResearchPipeline:
 
 # API endpoints for IEEE Xplore integration
 async def search_ieee_papers(
-    query: str,
-    max_results: int = 50,
-    publication_years: tuple[int, int] | None = None,
-    min_citations: int = 5
+    query: str, max_results: int = 50, publication_years: tuple[int, int] | None = None, min_citations: int = 5
 ) -> list[ResearchPaper]:
     """API endpoint for IEEE paper search"""
     pipeline = await get_ieee_pipeline()
     return await pipeline.search_bias_related_papers(
-        query=query,
-        max_results=max_results,
-        publication_years=publication_years,
-        min_citations=min_citations
+        query=query, max_results=max_results, publication_years=publication_years, min_citations=min_citations
     )
 
 
@@ -723,8 +783,7 @@ async def get_ieee_citation_analysis(paper_id: str) -> dict[str, Any]:
 
 # Integration with main research pipeline
 async def integrate_ieee_with_pipeline(
-    search_criteria: SearchCriteria,
-    pipeline_config: dict[str, Any]
+    search_criteria: SearchCriteria, pipeline_config: dict[str, Any]
 ) -> list[ResearchPaper]:
     """Integrate IEEE Xplore results with main research pipeline"""
 
@@ -732,13 +791,12 @@ async def integrate_ieee_with_pipeline(
     ieee_criteria = IEEESearchCriteria(
         query=search_criteria.query,
         max_results=pipeline_config.get("max_results", 50),
-        publication_years=(
-            search_criteria.start_year,
-            search_criteria.end_year
-        ) if search_criteria.start_year and search_criteria.end_year else None,
+        publication_years=(search_criteria.start_year, search_criteria.end_year)
+        if search_criteria.start_year and search_criteria.end_year
+        else None,
         min_citations=pipeline_config.get("min_citations", 5),
         sort_by=pipeline_config.get("sort_by", "relevance"),
-        content_type="papers"
+        content_type="papers",
     )
 
     # Search IEEE Xplore
@@ -771,7 +829,7 @@ if __name__ == "__main__":
             query="algorithmic bias healthcare machine learning",
             max_results=10,
             publication_years=(2020, 2024),
-            min_citations=5
+            min_citations=5,
         )
 
         print(f"Found {len(results)} bias-related papers from IEEE Xplore")

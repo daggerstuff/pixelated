@@ -436,7 +436,7 @@ describe('Phase 4.2: Bias Detection Accuracy Tests', () => {
 
       const start = performance.now()
       await Promise.all(
-        testCases.map( async (tc) => engine.analyzeSession(tc.session)),
+        testCases.map(async (tc) => engine.analyzeSession(tc.session)),
       )
       const duration = performance.now() - start
 

@@ -223,7 +223,7 @@ export class PixelCrisisDetector {
     }
 
     const maxSeverity = Math.max(
-      ...signals.map((signal) => severityMap[signal] || 0.6),
+      ...signals.map((signal) => severityMap[signal] ?? 0.6),
     )
     return Math.min(1.0, maxSeverity)
   }

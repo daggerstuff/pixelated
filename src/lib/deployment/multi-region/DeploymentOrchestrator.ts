@@ -93,7 +93,8 @@ export class DeploymentOrchestrator extends EventEmitter {
   private readonly config: DeploymentOrchestratorConfig
   private readonly cloudProviderManager: CloudProviderManager
   private readonly deploymentPlans: Map<string, DeploymentPlan> = new Map()
-  private readonly activeExecutions: Map<string, DeploymentExecution> = new Map()
+  private readonly activeExecutions: Map<string, DeploymentExecution> =
+    new Map()
   private readonly rollbackPoints: Map<string, RollbackPoint> = new Map()
   private isInitialized = false
 
@@ -569,7 +570,7 @@ export class DeploymentOrchestrator extends EventEmitter {
         regions: regions.length,
       })
 
-      const deploymentPromises = regions.map( async (region) =>
+      const deploymentPromises = regions.map(async (region) =>
         this.cloudProviderManager.deployRegion(region),
       )
 

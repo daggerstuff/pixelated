@@ -27,10 +27,10 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       className={`h-2 w-2 rounded-full ${
         isConnected ? 'bg-green-500' : 'bg-red-500'
       }`}
-      aria-hidden='true'
+      aria-hidden="true"
     />
 
-    <span className='text-muted-foreground text-sm'>
+    <span className="text-muted-foreground text-sm">
       {isConnected ? 'Connected' : 'Disconnected'}
     </span>
   </div>
@@ -98,33 +98,33 @@ export const EmotionSimulator: React.FC = () => {
 
   return (
     <div
-      className='space-y-6 p-4'
-      role='region'
-      aria-label='Emotion Analysis Simulator'
+      className="space-y-6 p-4"
+      role="region"
+      aria-label="Emotion Analysis Simulator"
     >
-      <div className='flex flex-wrap items-center justify-between gap-4'>
-        <div className='flex items-center space-x-2'>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center space-x-2">
           <Switch
-            id='consent-switch'
+            id="consent-switch"
             checked={hasConsent}
             onCheckedChange={handleConsentChange}
-            aria-label='Audio analysis consent'
+            aria-label="Audio analysis consent"
           />
 
-          <label htmlFor='consent-switch' className='text-sm'>
+          <label htmlFor="consent-switch" className="text-sm">
             Allow audio analysis
           </label>
         </div>
-        <div className='flex items-center space-x-2'>
+        <div className="flex items-center space-x-2">
           <Button
             onClick={handleStart}
             disabled={!hasConsent || isProcessing || !isConnected}
-            variant='default'
-            aria-label='Start emotion analysis'
+            variant="default"
+            aria-label="Start emotion analysis"
           >
             {isProcessing ? (
               <>
-                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Analyzing...
               </>
             ) : (
@@ -134,16 +134,16 @@ export const EmotionSimulator: React.FC = () => {
           <Button
             onClick={handleStop}
             disabled={!isProcessing}
-            variant='secondary'
-            aria-label='Stop emotion analysis'
+            variant="secondary"
+            aria-label="Stop emotion analysis"
           >
             Stop Analysis
           </Button>
           <Button
             onClick={handleReset}
             disabled={isProcessing}
-            variant='outline'
-            aria-label='Reset analysis data'
+            variant="outline"
+            aria-label="Reset analysis data"
           >
             Reset
           </Button>
@@ -151,24 +151,24 @@ export const EmotionSimulator: React.FC = () => {
       </div>
 
       {lastError && (
-        <Alert variant='error' title='Error' description={lastError} />
+        <Alert variant="error" title="Error" description={lastError} />
       )}
 
       {!isConnected && (
         <Alert
-          variant='warning'
-          title='Connection Lost'
-          description='Unable to connect to the analysis service. Please check your connection and try again.'
+          variant="warning"
+          title="Connection Lost"
+          description="Unable to connect to the analysis service. Please check your connection and try again."
         />
       )}
 
-      <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <EmotionDisplay />
         <SpeechPatternDisplay />
         <TechniqueDisplay />
       </div>
 
-      <ConnectionStatus isConnected={isConnected} className='mt-4' />
+      <ConnectionStatus isConnected={isConnected} className="mt-4" />
     </div>
   )
 }

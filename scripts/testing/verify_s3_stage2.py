@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Verify Stage 2 persona artifact exists in Hetzner S3. Loads .env only; prints S3_VERIFY_OK or S3_VERIFY_MISSING."""
+
 import os
 from pathlib import Path
 
@@ -16,6 +17,7 @@ BUCKET = "pixel-data"
 ENDPOINT = "https://hel1.your-objectstorage.com"
 REGION = "hel1"
 KEY = "final_dataset/shards/curriculum/stage2/synthetic_persona_batch_10000.jsonl"
+
 
 def main() -> None:
     ak = os.environ.get("HETZNER_S3_ACCESS_KEY")
@@ -35,6 +37,7 @@ def main() -> None:
         print("S3_VERIFY_OK")
     except (ClientError, Exception):
         print("S3_VERIFY_MISSING")
+
 
 if __name__ == "__main__":
     main()

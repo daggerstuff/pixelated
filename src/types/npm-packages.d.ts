@@ -87,7 +87,7 @@ declare module 'typeorm' {
     length?: number
   }): PropertyDecorator
   export function PrimaryGeneratedColumn(
-    type?: 'increment' | 'uuid' | 'rowid' | string,
+    type?: 'increment' | 'uuid' | 'rowid' | (string & {}),
   ): PropertyDecorator
   export function PrimaryColumn(options?: {
     type?: string
@@ -140,4 +140,14 @@ declare module 'typeorm' {
     update(conditions: unknown, partial: Partial<T>): Promise<void>
     query(sql: string, parameters?: unknown[]): Promise<unknown>
   }
+}
+
+declare module '@vercel/speed-insights/astro' {
+  const SpeedInsights: any
+  export default SpeedInsights
+}
+
+declare module '@vercel/analytics/astro' {
+  const Analytics: any
+  export default Analytics
 }

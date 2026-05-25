@@ -76,11 +76,13 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         mock_exists.return_value = False
 
         # Mock environment variable not set
-        with patch.dict(
-            "bias_detection.services.nvidia_api_service.os.environ", {}, clear=True
+        with (
+            patch.dict(
+                "bias_detection.services.nvidia_api_service.os.environ", {}, clear=True
+            ),
+            self.assertRaises(ValueError),
         ):
-            with self.assertRaises(ValueError):
-                NvidiaAPIService()
+            NvidiaAPIService()
 
     @patch("bias_detection.services.nvidia_api_service.httpx.AsyncClient")
     async def test_chat_completion_success(self, mock_httpx_client):

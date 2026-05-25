@@ -613,7 +613,7 @@ export class BackgroundJobQueue {
           a.createdAt.getTime() - b.createdAt.getTime(),
       )
 
-    return pendingJobs[0] || null
+    return pendingJobs[0] ?? null
   }
 
   private async processJob(job: BackgroundJob): Promise<void> {

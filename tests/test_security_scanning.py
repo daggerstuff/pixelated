@@ -19,12 +19,7 @@ import pytest
 @pytest.fixture
 def mock_request():
     """Create a mock request for testing"""
-    return {
-        "method": "POST",
-        "headers": {},
-        "body": {},
-        "ip": "192.168.1.1"
-    }
+    return {"method": "POST", "headers": {}, "body": {}, "ip": "192.168.1.1"}
 
 
 @pytest.fixture
@@ -46,7 +41,7 @@ class TestInputValidation:
             "1 OR 1=1",
             "' UNION SELECT * FROM users --",
             "'; EXEC xp_cmdshell('dir'); --",
-            "1; DELETE FROM sessions"
+            "1; DELETE FROM sessions",
         ]
 
         # These patterns should be detected as malicious
@@ -62,7 +57,7 @@ class TestInputValidation:
             "<img src=x onerror=alert(1)>",
             "<svg onload=alert('XSS')>",
             "javascript:alert(1)",
-            "<body onload=alert('XSS')>"
+            "<body onload=alert('XSS')>",
         ]
 
         for pattern in xss_patterns:
@@ -76,7 +71,7 @@ class TestInputValidation:
             "../../../etc/passwd",
             "..\\..\\..\\windows\\system32",
             ".../...//etc/passwd",
-            "%2e%2e%2f%2e%2e%2fetc%2fpasswd"
+            "%2e%2e%2f%2e%2e%2fetc%2fpasswd",
         ]
 
         for pattern in traversal_patterns:
@@ -86,13 +81,7 @@ class TestInputValidation:
 
     def test_command_injection_prevention(self):
         """Verify command injection attempts are blocked"""
-        command_patterns = [
-            "; ls -la",
-            "| cat /etc/passwd",
-            "`whoami`",
-            "$(/bin/ls)",
-            "&& rm -rf /"
-        ]
+        command_patterns = ["; ls -la", "| cat /etc/passwd", "`whoami`", "$(/bin/ls)", "&& rm -rf /"]
 
         for pattern in command_patterns:
             # Verify we can detect command injection patterns
@@ -113,11 +102,7 @@ class TestInputValidation:
 
     def test_phi_field_validation(self):
         """Verify PHI fields are properly validated"""
-        phi_fields = {
-            "ssn": "123-45-6789",
-            "medical_record_number": "MRN-12345",
-            "patient_id": "PAT-67890"
-        }
+        phi_fields = {"ssn": "123-45-6789", "medical_record_number": "MRN-12345", "patient_id": "PAT-67890"}
 
         # SSN should match format
         ssn_pattern = r"^\d{3}-\d{2}-\d{4}$"
@@ -138,7 +123,7 @@ class TestAuthenticationBypassPrevention:
             "require_uppercase": True,
             "require_lowercase": True,
             "require_numbers": True,
-            "require_special_chars": True
+            "require_special_chars": True,
         }
 
         assert password_policy["min_length"] >= 12
@@ -152,32 +137,27 @@ class TestAuthenticationBypassPrevention:
         for weak in weak_passwords:
             # Weak passwords should fail complexity check
             is_strong = (
-                len(weak) >= 12 and
-                re.search(r"[A-Z]", weak) and
-                re.search(r"[a-z]", weak) and
-                re.search(r"\d", weak) and
-                re.search(r"[!@#$%^&*]", weak)
+                len(weak) >= 12
+                and re.search(r"[A-Z]", weak)
+                and re.search(r"[a-z]", weak)
+                and re.search(r"\d", weak)
+                and re.search(r"[!@#$%^&*]", weak)
             )
             assert is_strong is False, f"Password {weak} should be considered weak"
 
         # Strong password should pass
         is_strong = (
-            len(strong_password) >= 12 and
-            re.search(r"[A-Z]", strong_password) and
-            re.search(r"[a-z]", strong_password) and
-            re.search(r"\d", strong_password) and
-            re.search(r"[!@#$%^&*]", strong_password)
+            len(strong_password) >= 12
+            and re.search(r"[A-Z]", strong_password)
+            and re.search(r"[a-z]", strong_password)
+            and re.search(r"\d", strong_password)
+            and re.search(r"[!@#$%^&*]", strong_password)
         )
         assert is_strong, "Strong password should pass validation"
 
     def test_brute_force_detection(self):
         """Verify brute force attempts are detected"""
-        failed_attempts = {
-            "user_id": "user-123",
-            "count": 10,
-            "window_minutes": 15,
-            "locked": True
-        }
+        failed_attempts = {"user_id": "user-123", "count": 10, "window_minutes": 15, "locked": True}
 
         # After 5 failed attempts, account should be locked
         assert failed_attempts["count"] >= 5
@@ -193,11 +173,7 @@ class TestAuthenticationBypassPrevention:
 
     def test_token_expiration_enforced(self):
         """Verify tokens expire correctly"""
-        token_config = {
-            "access_token_ttl_minutes": 15,
-            "refresh_token_ttl_days": 7,
-            "idle_timeout_minutes": 30
-        }
+        token_config = {"access_token_ttl_minutes": 15, "refresh_token_ttl_days": 7, "idle_timeout_minutes": 30}
 
         assert token_config["access_token_ttl_minutes"] <= 30
         assert token_config["idle_timeout_minutes"] <= 60
@@ -213,7 +189,7 @@ class TestSecretManagement:
             r'api[_-]?key\s*=\s*["\'][a-zA-Z0-9]{32,}["\']',
             r'secret[_-]?key\s*=\s*["\'][a-zA-Z0-9]{32,}["\']',
             r'password\s*=\s*["\'][^"\']{8,}["\']',
-            r'aws[_-]?access[_-]?key\s*=\s*["\'][A-Z0-9]{20}["\']'
+            r'aws[_-]?access[_-]?key\s*=\s*["\'][A-Z0-9]{20}["\']',
         ]
 
         # Test that these patterns would be detected
@@ -235,7 +211,7 @@ class TestSecretManagement:
         env_vars = {
             "DATABASE_URL": "postgresql://user:pass@localhost/db",
             "API_KEY": "sk_test_1234567890abcdef",
-            "JWT_SECRET": "super-secret-jwt-key-12345"
+            "JWT_SECRET": "super-secret-jwt-key-12345",
         }
 
         for key, value in env_vars.items():
@@ -253,11 +229,7 @@ class TestSecretManagement:
 
     def test_encryption_at_rest_for_secrets(self):
         """Verify secrets are encrypted at rest"""
-        secret_storage = {
-            "encryption_enabled": True,
-            "algorithm": "AES-256-GCM",
-            "key_management": "AWS_KMS"
-        }
+        secret_storage = {"encryption_enabled": True, "algorithm": "AES-256-GCM", "key_management": "AWS_KMS"}
 
         assert secret_storage["encryption_enabled"] is True
         assert secret_storage["algorithm"] == "AES-256-GCM"
@@ -268,12 +240,7 @@ class TestRateLimiting:
 
     def test_rate_limit_configuration(self):
         """Verify rate limiting is configured"""
-        rate_limit_config = {
-            "requests_per_minute": 60,
-            "requests_per_hour": 1000,
-            "burst_limit": 10,
-            "enabled": True
-        }
+        rate_limit_config = {"requests_per_minute": 60, "requests_per_hour": 1000, "burst_limit": 10, "enabled": True}
 
         assert rate_limit_config["enabled"] is True
         assert rate_limit_config["requests_per_minute"] > 0
@@ -291,7 +258,7 @@ class TestRateLimiting:
             "status_code": 429,
             "error": "RATE_LIMIT_EXCEEDED",
             "message": "Too many requests",
-            "retry_after_seconds": 60
+            "retry_after_seconds": 60,
         }
 
         assert rate_limit_response["status_code"] == 429
@@ -303,7 +270,7 @@ class TestRateLimiting:
             "/api/auth/login": {"requests_per_minute": 5, "burst": 3},
             "/api/auth/register": {"requests_per_minute": 3, "burst": 1},
             "/api/sessions": {"requests_per_minute": 60, "burst": 10},
-            "/api/export": {"requests_per_minute": 1, "burst": 1}
+            "/api/export": {"requests_per_minute": 1, "burst": 1},
         }
 
         assert endpoint_limits["/api/auth/login"]["requests_per_minute"] < 10
@@ -316,14 +283,11 @@ class TestCORSConfiguration:
     def test_cors_whitelist_configured(self):
         """Verify CORS whitelist is configured"""
         cors_config = {
-            "allowed_origins": [
-                "https://app.pixelatedempathy.com",
-                "https://admin.pixelatedempathy.com"
-            ],
+            "allowed_origins": ["https://app.pixelatedempathy.com", "https://admin.pixelatedempathy.com"],
             "allowed_methods": ["GET", "POST", "PUT", "DELETE"],
             "allowed_headers": ["Authorization", "Content-Type"],
             "credentials": True,
-            "max_age": 86400
+            "max_age": 86400,
         }
 
         assert len(cors_config["allowed_origins"]) > 0
@@ -331,10 +295,7 @@ class TestCORSConfiguration:
 
     def test_no_wildcard_origins(self):
         """Verify wildcard origins are not used"""
-        cors_config = {
-            "allowed_origins": ["https://app.pixelatedempathy.com"],
-            "allow_wildcard": False
-        }
+        cors_config = {"allowed_origins": ["https://app.pixelatedempathy.com"], "allow_wildcard": False}
 
         assert cors_config["allow_wildcard"] is False
         assert "*" not in cors_config["allowed_origins"]
@@ -345,7 +306,7 @@ class TestCORSConfiguration:
             "Access-Control-Allow-Origin": "https://app.pixelatedempathy.com",
             "Access-Control-Allow-Credentials": "true",
             "Access-Control-Max-Age": "86400",
-            "Vary": "Origin"
+            "Vary": "Origin",
         }
 
         assert cors_headers["Access-Control-Allow-Origin"] != "*"
@@ -362,7 +323,7 @@ class TestSecurityHeaders:
             "script_src": ["'self'"],
             "style_src": ["'self'"],
             "img_src": ["'self'", "data:"],
-            "frame_ancestors": ["'none'"]
+            "frame_ancestors": ["'none'"],
         }
 
         assert csp_config["default_src"] == ["'self'"]
@@ -373,7 +334,7 @@ class TestSecurityHeaders:
         xss_header = {
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
-            "X-XSS-Protection": "1; mode=block"
+            "X-XSS-Protection": "1; mode=block",
         }
 
         assert xss_header["X-Content-Type-Options"] == "nosniff"
@@ -383,7 +344,7 @@ class TestSecurityHeaders:
         """Verify HSTS is enabled"""
         hsts_config = {
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
-            "max_age_seconds": 31536000
+            "max_age_seconds": 31536000,
         }
 
         assert "includeSubDomains" in hsts_config["Strict-Transport-Security"]
@@ -399,7 +360,7 @@ class TestVulnerabilityScanning:
             "enabled": True,
             "scan_on_build": True,
             "fail_on_critical": True,
-            "tools": ["snyk", "dependabot", "pip-audit"]
+            "tools": ["snyk", "dependabot", "pip-audit"],
         }
 
         assert vulnerability_scan["enabled"] is True
@@ -411,7 +372,7 @@ class TestVulnerabilityScanning:
             "enabled": True,
             "tools": ["semgrep", "bandit", "pyright"],
             "run_on_pr": True,
-            "fail_on_high_severity": True
+            "fail_on_high_severity": True,
         }
 
         assert sast_config["enabled"] is True
@@ -419,12 +380,7 @@ class TestVulnerabilityScanning:
 
     def test_dast_integration(self):
         """Verify DAST integration"""
-        dast_config = {
-            "enabled": True,
-            "tools": ["owasp-zap", "burp-suite"],
-            "run_nightly": True,
-            "staging_only": True
-        }
+        dast_config = {"enabled": True, "tools": ["owasp-zap", "burp-suite"], "run_nightly": True, "staging_only": True}
 
         assert dast_config["enabled"] is True
         assert dast_config["staging_only"] is True

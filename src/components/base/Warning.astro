@@ -1,9 +1,15 @@
 ---
+import DOMPurify from "isomorphic-dompurify"
+
 interface Props {
   html: string
+
+
 }
 
-const { html } = Astro.props
+const { html, rawHTMLString } = Astro.props as Props & { rawHTMLString?: string }
+const content = rawHTMLString || html
+const sanitizedContent = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } })
 ---
 
 <div class="prose mx-auto">
@@ -28,7 +34,7 @@ const { html } = Astro.props
         </svg>
       </div><div class="callout-title-text">WARNING</div>
     </div><div class="callout-content">
-      <p set:html={html} />
+      <p set:html={sanitizedContent} />
     </div>
   </div>
 </div>

@@ -223,7 +223,7 @@ export class AuditLogger {
       timestamp: new Date(),
     })
 
-    this.persistenceQueue.schedule(auditEvent,  async () =>
+    this.persistenceQueue.schedule(auditEvent, async () =>
       this.persistEventWithRetry(auditEvent),
     )
 
@@ -303,7 +303,7 @@ export class AuditLogger {
 /**
  * Convenience utility for logging therapeutic events.
  */
-export const logTherapeuticEvent =  async (
+export const logTherapeuticEvent = async (
   userId: string,
   action: string,
   resourceId?: string,
@@ -320,7 +320,7 @@ export const logTherapeuticEvent =  async (
     status: 'success',
   })
 
-export const logSecurityAlert =  async (
+export const logSecurityAlert = async (
   userId: string,
   action: AuditAction | string,
   severity: AuditSeverity,

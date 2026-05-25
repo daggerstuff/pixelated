@@ -238,7 +238,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
     return {
       url: url.toString(),
       headers: {
-        get: vi.fn((key: string) => defaultHeaders[key.toLowerCase()] || null),
+        get: vi.fn((key: string) => defaultHeaders[key.toLowerCase()] ?? null),
       },
     } as unknown as Request
   }
@@ -551,7 +551,7 @@ describe('Bias Detection Dashboard API Endpoint', () => {
               authorization: 'Bearer valid-token',
               'content-type': 'application/json',
             }
-            return headers[key.toLowerCase()] || null
+            return headers[key.toLowerCase()] ?? null
           }),
         },
       } as unknown as Request

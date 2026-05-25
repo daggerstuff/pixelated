@@ -142,7 +142,7 @@ describe('athenahealth Provider', () => {
       // but fail for endpoint verification
       const mockSearchResources = vi
         .fn()
-        .mockImplementation( async (resourceType: string) => {
+        .mockImplementation(async (resourceType: string) => {
           if (resourceType === 'CapabilityStatement') {
             return Promise.resolve([
               {

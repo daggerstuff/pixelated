@@ -28,7 +28,7 @@ export const useReportListQuery = (
       page,
       pageSize,
     }),
-    queryFn:  async () => listReports(sessionId ?? '', { page, pageSize }),
+    queryFn: async () => listReports(sessionId ?? '', { page, pageSize }),
     enabled: Boolean(sessionId) && enabled,
     select: (data: ReportList) => data,
   })
@@ -44,7 +44,7 @@ export const useReportQuery = (
       sessionId ?? 'unknown',
       reportId ?? 'unknown',
     ),
-    queryFn:  async () => getReport(sessionId ?? '', reportId ?? ''),
+    queryFn: async () => getReport(sessionId ?? '', reportId ?? ''),
     enabled: Boolean(sessionId && reportId) && enabled,
   })
 }
@@ -53,7 +53,7 @@ export const useGenerateReportMutation = (sessionId: string | null) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationKey: journalResearchMutationKeys.reports.generate(),
-    mutationFn:  async (payload: ReportGeneratePayload) =>
+    mutationFn: async (payload: ReportGeneratePayload) =>
       generateReport(sessionId ?? '', payload),
     onSuccess: (result: Report) => {
       void queryClient.invalidateQueries({

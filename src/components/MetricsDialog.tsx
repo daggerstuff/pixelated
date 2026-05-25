@@ -35,81 +35,81 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
   }
 
   return (
-    <div className='bg-black fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-opacity-50 p-4'>
-      <div className='bg-white dark:bg-gray-800 relative w-full max-w-md rounded-lg p-6'>
+    <div className="bg-black fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-opacity-50 p-4">
+      <div className="bg-white dark:bg-gray-800 relative w-full max-w-md rounded-lg p-6">
         <button
-          type='button'
+          type="button"
           onClick={onClose}
-          className='text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-3 top-3'
+          className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 absolute right-3 top-3"
           aria-label={TEXT.closeAriaLabel}
         >
           <svg
-            className='h-5 w-5'
-            fill='none'
-            stroke='currentColor'
-            viewBox='0 0 24 24'
+            className="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
             <path
-              strokeLinecap='round'
-              strokeLinejoin='round'
-              strokeWidth='2'
-              d='M6 18L18 6M6 6l12 12'
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
             />
           </svg>
         </button>
 
-        <h3 className='mb-6 text-xl font-semibold'>{TEXT.title}</h3>
+        <h3 className="mb-6 text-xl font-semibold">{TEXT.title}</h3>
 
-        <div className='space-y-6'>
+        <div className="space-y-6">
           <div>
-            <h4 className='text-md mb-2 font-medium'>{TEXT.overview}</h4>
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='bg-gray-100 dark:bg-gray-700 rounded-lg p-3'>
-                <p className='text-gray-500 dark:text-gray-400 text-xs'>
+            <h4 className="text-md mb-2 font-medium">{TEXT.overview}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
                   {TEXT.totalSessions}
                 </p>
-                <p className='text-2xl font-bold'>{metrics.sessionCount}</p>
+                <p className="text-2xl font-bold">{metrics.sessionCount}</p>
               </div>
-              <div className='bg-gray-100 dark:bg-gray-700 rounded-lg p-3'>
-                <p className='text-gray-500 dark:text-gray-400 text-xs'>
+              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3">
+                <p className="text-gray-500 dark:text-gray-400 text-xs">
                   {TEXT.averageScore}
                 </p>
-                <p className='text-2xl font-bold'>{metrics.averageScore}%</p>
+                <p className="text-2xl font-bold">{metrics.averageScore}%</p>
               </div>
             </div>
           </div>
 
           <div>
-            <h4 className='text-md mb-2 font-medium'>{TEXT.skillsBreakdown}</h4>
-            <div className='space-y-2'>
+            <h4 className="text-md mb-2 font-medium">{TEXT.skillsBreakdown}</h4>
+            <div className="space-y-2">
               <div>
-                <p className='mb-1 text-sm font-medium'>
+                <p className="mb-1 text-sm font-medium">
                   {TEXT.skillsImproving}
                 </p>
                 {metrics.skillsImproving.length > 0 ? (
-                  <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
+                  <ul className="text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm">
                     {metrics.skillsImproving.map((skill) => (
                       <li key={skill}>{skill}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className='text-gray-500 dark:text-gray-400 text-sm italic'>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm italic">
                     {TEXT.noProgressYet}
                   </p>
                 )}
               </div>
               <div>
-                <p className='mb-1 text-sm font-medium'>
+                <p className="mb-1 text-sm font-medium">
                   {TEXT.skillsNeedingFocus}
                 </p>
                 {metrics.skillsNeeding.length > 0 ? (
-                  <ul className='text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm'>
+                  <ul className="text-gray-600 dark:text-gray-400 list-disc pl-5 text-sm">
                     {metrics.skillsNeeding.map((skill) => (
                       <li key={skill}>{skill}</li>
                     ))}
                   </ul>
                 ) : (
-                  <p className='text-gray-500 dark:text-gray-400 text-sm italic'>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm italic">
                     {TEXT.keepPracticing}
                   </p>
                 )}
@@ -118,11 +118,11 @@ export function MetricsDialog({ isOpen, onClose }: MetricsDialogProps) {
           </div>
         </div>
 
-        <div className='mt-8 flex justify-center'>
+        <div className="mt-8 flex justify-center">
           <button
-            type='button'
+            type="button"
             onClick={onClose}
-            className='bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2'
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-md px-4 py-2"
           >
             {TEXT.closeButton}
           </button>

@@ -130,7 +130,7 @@ describe('SessionList', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <SessionList sessions={mockSessionList} className='custom-class' />,
+      <SessionList sessions={mockSessionList} className="custom-class" />,
     )
 
     const listContainer = container.querySelector('.custom-class')

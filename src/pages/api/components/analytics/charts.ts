@@ -137,7 +137,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     logger.info('Generated chart data', {
       type,
       category,
-      dataPoints: chartData.data.datasets[0]?.data.length || 0,
+      dataPoints: chartData.data.datasets[0]?.data.length ?? 0,
       userId: user.id,
     })
 

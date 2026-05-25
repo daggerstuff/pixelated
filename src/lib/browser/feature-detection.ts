@@ -51,8 +51,7 @@ export const FEATURES: Record<string, FeatureDefinition> = {
   CSSVariables: {
     name: 'CSSVariables',
     description: 'Support for CSS custom properties',
-    detectionFn: () =>
-      window.CSS?.supports?.('--a', '0'),
+    detectionFn: () => window.CSS?.supports?.('--a', '0'),
   },
   Fetch: {
     name: 'Fetch',
@@ -282,7 +281,7 @@ export function withFeature<T>(
 // Helper function to dynamically import a module
 // This adds a layer of abstraction that helps TypeScript
 // ignore the actual import path at compile time
- async function dynamicImport(modulePath: string): Promise<unknown> {
+async function dynamicImport(modulePath: string): Promise<unknown> {
   return import(modulePath)
 }
 

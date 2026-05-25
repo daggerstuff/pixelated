@@ -97,15 +97,11 @@ def finalize_reorganization():
     # 1. Curated Sets (Wendy Gold)
     # Move from legacy consolidated path to v1 stage1
     logger.info("\n--- Phase 6: Finalizing Curated Sets ---")
-    process_prefix_migration(
-        "datasets/consolidated/datasets/", "training/v1/stage1_foundation/curated/"
-    )
+    process_prefix_migration("datasets/consolidated/datasets/", "training/v1/stage1_foundation/curated/")
 
     # 2. Stage 3 - Reddit Forum Data
     logger.info("\n--- Phase 7: Stage 3 Reddit Data ---")
-    process_prefix_migration(
-        "archive/gdrive/raw/reddit_mental_health/", "training/v1/stage3_stress_test/raw/reddit/"
-    )
+    process_prefix_migration("archive/gdrive/raw/reddit_mental_health/", "training/v1/stage3_stress_test/raw/reddit/")
     process_prefix_migration(
         "archive/gdrive/raw/original_reddit_data/",
         "training/v1/stage3_stress_test/raw/reddit/original/",
@@ -113,9 +109,7 @@ def finalize_reorganization():
 
     # 3. Stage 3 - Edge Cases & DPO
     logger.info("\n--- Phase 8: Stage 3 Processed Data ---")
-    process_prefix_migration(
-        "archive/gdrive/processed/edge_cases/", "training/v1/stage3_stress_test/processed/"
-    )
+    process_prefix_migration("archive/gdrive/processed/edge_cases/", "training/v1/stage3_stress_test/processed/")
 
     # Specific file moves for edge cases if they exist in other folders
     mappings = {

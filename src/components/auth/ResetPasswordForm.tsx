@@ -64,22 +64,22 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
   }
 
   return (
-    <div className='reset-password-form'>
+    <div className="reset-password-form">
       {error && (
-        <div className='error-message bg-red-50 border-red-200 text-red-700 mb-4 rounded border p-3'>
+        <div className="error-message bg-red-50 border-red-200 text-red-700 mb-4 rounded border p-3">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className='form-container'>
-        <div className='form-group mb-4'>
-          <label htmlFor='password' className='mb-2 block font-medium'>
+      <form onSubmit={handleSubmit} className="form-container">
+        <div className="form-group mb-4">
+          <label htmlFor="password" className="mb-2 block font-medium">
             New Password
           </label>
           <input
-            id='password'
-            type='password'
-            className='w-full rounded border p-2'
+            id="password"
+            type="password"
+            className="w-full rounded border p-2"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setPassword(e.target.value)
@@ -87,37 +87,37 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
             required
             disabled={isLoading}
             minLength={8}
-            placeholder='••••••••'
-            autoComplete='new-password'
+            placeholder="••••••••"
+            autoComplete="new-password"
           />
 
-          <small className='text-gray-500 mt-1 text-xs'>
+          <small className="text-gray-500 mt-1 text-xs">
             Password must be at least 8 characters
           </small>
         </div>
 
-        <div className='form-group mb-6'>
-          <label htmlFor='confirmPassword' className='mb-2 block font-medium'>
+        <div className="form-group mb-6">
+          <label htmlFor="confirmPassword" className="mb-2 block font-medium">
             Confirm Password
           </label>
           <input
-            id='confirmPassword'
-            type='password'
-            className='w-full rounded border p-2'
+            id="confirmPassword"
+            type="password"
+            className="w-full rounded border p-2"
             value={confirmPassword}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setConfirmPassword(e.target.value)
             }
             required
             disabled={isLoading}
-            placeholder='••••••••'
-            autoComplete='new-password'
+            placeholder="••••••••"
+            autoComplete="new-password"
           />
         </div>
 
         <button
-          type='submit'
-          className='bg-teal-600 text-white hover:bg-teal-700 w-full rounded px-4 py-2 transition-colors'
+          type="submit"
+          className="bg-teal-600 text-white hover:bg-teal-700 w-full rounded px-4 py-2 transition-colors"
           disabled={isLoading}
         >
           {isLoading ? 'Resetting Password...' : 'Reset Password'}

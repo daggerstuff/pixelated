@@ -698,7 +698,7 @@ class ProductionIntelligenceService extends EventEmitter {
           throw new Error(`Feed ${feed.name} returned HTTP ${response.status}`)
         }
         const data = await response.json()
-        const indicators = (data.data ?? data.results) ?? []
+        const indicators = data.data ?? data.results ?? []
         for (const indicator of indicators) {
           this.iocs.push({
             ...indicator,

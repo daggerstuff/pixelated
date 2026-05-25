@@ -213,7 +213,7 @@ def clean_file(input_path: str, output_path: str, report_path: str = None) -> di
     print(f"\nProcessing: {input_path}")
 
     # Load data
-    with open(input_path, "r") as f:
+    with open(input_path) as f:
         if input_path.endswith(".jsonl"):
             data = [json.loads(line) for line in f if line.strip()]
         else:
@@ -279,9 +279,7 @@ def main():
     parser.add_argument("input", help="Input file or directory")
     parser.add_argument("output", help="Output file or directory")
     parser.add_argument("--report", help="Report output file")
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Show what would be removed without saving"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be removed without saving")
     args = parser.parse_args()
 
     input_path = Path(args.input)
@@ -305,9 +303,7 @@ def main():
 
         print(f"\n{'=' * 60}")
         print(f"TOTAL: {total_stats['total']} samples")
-        print(
-            f"Removed: {total_stats['removed']} ({total_stats['removed'] / total_stats['total'] * 100:.1f}%)"
-        )
+        print(f"Removed: {total_stats['removed']} ({total_stats['removed'] / total_stats['total'] * 100:.1f}%)")
         print(f"Kept: {total_stats['kept']}")
 
     else:

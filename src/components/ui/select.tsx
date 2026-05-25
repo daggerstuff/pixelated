@@ -60,7 +60,7 @@ export function Select({
 
   // Initialize with controlled value or defaultValue
   const [internalValue, setInternalValue] = useState<string>(
-    value ?? (defaultValue ?? ''),
+    value ?? defaultValue ?? '',
   )
 
   // Dropdown state
@@ -159,10 +159,10 @@ export function Select({
 
 // Props for the SelectTrigger component
 export interface SelectTriggerProps {
-  children?: ReactNode
-  className?: string
+  'children'?: ReactNode
+  'className'?: string
   'aria-label'?: string
-  id?: string
+  'id'?: string
 }
 
 // SelectTrigger component - the button that opens the dropdown
@@ -196,10 +196,10 @@ export function SelectTrigger({
 
   return (
     <button
-      type='button'
-      role='combobox'
+      type="button"
+      role="combobox"
       aria-expanded={isOpen}
-      aria-controls='select-listbox'
+      aria-controls="select-listbox"
       aria-label={ariaLabel ?? 'Select option'}
       className={`select-trigger ${isOpen ? 'select-trigger-open' : ''} ${className}`}
       ref={triggerRef}
@@ -209,22 +209,22 @@ export function SelectTrigger({
       id={id}
     >
       {children ?? selectedLabel}
-      <span className='select-trigger-icon'>
+      <span className="select-trigger-icon">
         {/* Custom downward chevron icon */}
         <svg
-          width='12'
-          height='12'
-          viewBox='0 0 12 12'
-          fill='none'
-          xmlns='http://www.w3.org/2000/svg'
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
           style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
         >
           <path
-            d='M2.5 4.5L6 8L9.5 4.5'
-            stroke='currentColor'
-            strokeWidth='1.5'
-            strokeLinecap='round'
-            strokeLinejoin='round'
+            d="M2.5 4.5L6 8L9.5 4.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
         </svg>
       </span>
@@ -253,10 +253,10 @@ export function SelectContent({
 
   return (
     <div
-      id='select-listbox'
+      id="select-listbox"
       className={`select-content ${position === 'popper' ? 'select-content-popper' : 'select-content-item-aligned'} ${className}`}
       ref={contentRef}
-      role='listbox'
+      role="listbox"
     >
       {children}
     </div>
@@ -315,7 +315,7 @@ export function SelectItem({
 
   return (
     <div
-      role='option'
+      role="option"
       aria-selected={isSelected}
       className={`select-item ${isSelected ? 'select-item-selected' : ''} ${disabled ? 'select-item-disabled' : ''} ${className}`}
       onClick={() => !disabled && setValue(value)}
@@ -327,21 +327,21 @@ export function SelectItem({
     >
       {children}
       {isSelected && (
-        <span className='select-item-check'>
+        <span className="select-item-check">
           {/* Custom check icon */}
           <svg
-            width='12'
-            height='12'
-            viewBox='0 0 12 12'
-            fill='none'
-            xmlns='http://www.w3.org/2000/svg'
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
-              d='M2.5 6L5 8.5L9.5 4'
-              stroke='currentColor'
-              strokeWidth='1.5'
-              strokeLinecap='round'
-              strokeLinejoin='round'
+              d="M2.5 6L5 8.5L9.5 4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </span>
@@ -359,7 +359,7 @@ export interface SelectGroupProps {
 // SelectGroup component - a group of related options
 export function SelectGroup({ children, className = '' }: SelectGroupProps) {
   return (
-    <div className={`select-group ${className}`} role='group'>
+    <div className={`select-group ${className}`} role="group">
       {children}
     </div>
   )
@@ -427,7 +427,7 @@ export function SimpleSelect({
 
   return (
     <div className={`simple-select ${className}`}>
-      {label && <label className='simple-select-label'>{label}</label>}
+      {label && <label className="simple-select-label">{label}</label>}
       <Select {...selectProps} />
     </div>
   )

@@ -560,7 +560,7 @@ class ProductionManager {
       .filter((d) => d.version !== 'current') // Exclude current deployment
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
 
-    return deployments[0] || null
+    return deployments[0] ?? null
   }
 
   /**

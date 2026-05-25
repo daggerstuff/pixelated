@@ -194,7 +194,7 @@ export class HealthMonitor extends EventEmitter {
    */
   private async performHealthChecks(): Promise<void> {
     try {
-      const checkPromises = this.regions.map( async (region) =>
+      const checkPromises = this.regions.map(async (region) =>
         this.performRegionHealthCheck(region),
       )
 

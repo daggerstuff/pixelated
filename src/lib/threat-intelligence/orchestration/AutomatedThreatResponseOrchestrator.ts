@@ -81,7 +81,8 @@ export class AutomatedThreatResponseOrchestratorCore
   private db!: Db
   private readonly responseStrategies: Map<string, ResponseStrategy> = new Map()
   private readonly activeResponses: Map<string, ThreatResponse> = new Map()
-  private readonly integrationEndpoints: Map<string, IntegrationEndpoint> = new Map()
+  private readonly integrationEndpoints: Map<string, IntegrationEndpoint> =
+    new Map()
 
   constructor(private readonly config: OrchestrationConfig) {
     super()
@@ -386,8 +387,12 @@ export class AutomatedThreatResponseOrchestratorCore
         return value < (condition.value as number)
       case 'equals':
         return value === (condition.value as number)
-      case "contains": { throw new Error('Not implemented yet: "contains" case') }
-      case "matches": { throw new Error('Not implemented yet: "matches" case') }
+      case 'contains': {
+        throw new Error('Not implemented yet: "contains" case')
+      }
+      case 'matches': {
+        throw new Error('Not implemented yet: "matches" case')
+      }
       default:
         return false
     }
@@ -423,9 +428,15 @@ export class AutomatedThreatResponseOrchestratorCore
         return currentTime > conditionTime
       case 'less_than':
         return currentTime < conditionTime
-      case "contains": { throw new Error('Not implemented yet: "contains" case') }
-      case "equals": { throw new Error('Not implemented yet: "equals" case') }
-      case "matches": { throw new Error('Not implemented yet: "matches" case') }
+      case 'contains': {
+        throw new Error('Not implemented yet: "contains" case')
+      }
+      case 'equals': {
+        throw new Error('Not implemented yet: "equals" case')
+      }
+      case 'matches': {
+        throw new Error('Not implemented yet: "matches" case')
+      }
       default:
         return false
     }
@@ -446,9 +457,15 @@ export class AutomatedThreatResponseOrchestratorCore
           regions.length === targetRegions.length &&
           regions.every((region) => targetRegions.includes(region))
         )
-      case "greater_than": { throw new Error('Not implemented yet: "greater_than" case') }
-      case "less_than": { throw new Error('Not implemented yet: "less_than" case') }
-      case "matches": { throw new Error('Not implemented yet: "matches" case') }
+      case 'greater_than': {
+        throw new Error('Not implemented yet: "greater_than" case')
+      }
+      case 'less_than': {
+        throw new Error('Not implemented yet: "less_than" case')
+      }
+      case 'matches': {
+        throw new Error('Not implemented yet: "matches" case')
+      }
       default:
         return false
     }
@@ -572,7 +589,7 @@ export class AutomatedThreatResponseOrchestratorCore
       },
     }
 
-    return defaultStrategies[severity] || defaultStrategies['medium']
+    return defaultStrategies[severity] ?? defaultStrategies['medium']
   }
 
   private async generateResponseActions(
@@ -640,8 +657,12 @@ export class AutomatedThreatResponseOrchestratorCore
             regions: threat.regions,
           }
           break
-        case "isolate": { throw new Error('Not implemented yet: "isolate" case') }
-        case "mitigate": { throw new Error('Not implemented yet: "mitigate" case') }
+        case 'isolate': {
+          throw new Error('Not implemented yet: "isolate" case')
+        }
+        case 'mitigate': {
+          throw new Error('Not implemented yet: "mitigate" case')
+        }
       }
 
       return customizedAction
@@ -863,7 +884,9 @@ export class AutomatedThreatResponseOrchestratorCore
         case 'mitigate':
           executionResult = await this.executeMitigateAction(action, response)
           break
-        case "rate_limit": { throw new Error('Not implemented yet: "rate_limit" case') }
+        case 'rate_limit': {
+          throw new Error('Not implemented yet: "rate_limit" case')
+        }
         default:
           logger.error('Unknown action type', { actionType: action.actionType })
           executionResult = false
@@ -1078,7 +1101,7 @@ export class AutomatedThreatResponseOrchestratorCore
       medium: 'medium',
       low: 'low',
     }
-    return levels[severity] || 'medium'
+    return levels[severity] ?? 'medium'
   }
 
   private async sendCriticalNotification(data: any): Promise<void> {
@@ -1254,7 +1277,9 @@ export class AutomatedThreatResponseOrchestratorCore
           return await this.rollbackBlockAction(action, response)
         case 'remove_rate_limit':
           return await this.rollbackRateLimitAction(action, response)
-        case undefined: { throw new Error('Not implemented yet: undefined case') }
+        case undefined: {
+          throw new Error('Not implemented yet: undefined case')
+        }
         default:
           logger.warn('Unknown rollback strategy', {
             actionId: action.actionId,

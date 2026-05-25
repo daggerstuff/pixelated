@@ -247,7 +247,7 @@ export class MentalHealthTaskRouter implements IMentalHealthTaskRouter {
       // Unable to find JSON in response; as a last resort, try to use the plain text
       const plain = raw.trim().toLowerCase()
       const mapped = this.mapLlmCategoryToAnalyzer(
-        plain.split(/\s|\.|,|\n/)[0] || 'general',
+        plain.split(/\s|\.|,|\n/)[0] ?? 'general',
       )
       return {
         targetAnalyzer: mapped,

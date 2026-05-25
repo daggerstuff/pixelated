@@ -122,13 +122,13 @@ export const PasswordInputWithStrength = forwardRef<
 
     return (
       <div className={`password-input-wrapper ${wrapperClassName}`}>
-        <div className='form-group'>
-          <label htmlFor={name} className='mb-2 block font-medium'>
+        <div className="form-group">
+          <label htmlFor={name} className="mb-2 block font-medium">
             {label}
-            {required && <span className='text-red-500 ml-1'>*</span>}
+            {required && <span className="text-red-500 ml-1">*</span>}
           </label>
 
-          <div className='relative'>
+          <div className="relative">
             <input
               ref={ref}
               id={name}
@@ -147,22 +147,22 @@ export const PasswordInputWithStrength = forwardRef<
 
             {showToggleButton && (
               <button
-                type='button'
-                className='text-gray-500 hover:text-gray-700 focus-visible:ring-blue-300 absolute right-3 top-1/2 -translate-y-1/2 transform rounded-sm focus:outline-none focus-visible:ring-2'
+                type="button"
+                className="text-gray-500 hover:text-gray-700 focus-visible:ring-blue-300 absolute right-3 top-1/2 -translate-y-1/2 transform rounded-sm focus:outline-none focus-visible:ring-2"
                 onClick={togglePasswordVisibility}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
                 title={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className='h-4 w-4' aria-hidden='true' />
+                  <EyeOff className="h-4 w-4" aria-hidden="true" />
                 ) : (
-                  <Eye className='h-4 w-4' aria-hidden='true' />
+                  <Eye className="h-4 w-4" aria-hidden="true" />
                 )}
               </button>
             )}
 
             {isShowingError && (
-              <div className='error-label md:hidden'>{error}</div>
+              <div className="error-label md:hidden">{error}</div>
             )}
           </div>
 
@@ -170,14 +170,14 @@ export const PasswordInputWithStrength = forwardRef<
             <div
               id={`${name}-error`}
               className={`${isFocused ? 'hidden md:block' : ''} text-red-500 mt-1 text-sm`}
-              role='alert'
+              role="alert"
             >
               {error}
             </div>
           )}
 
           {helperText && (
-            <div id={`${name}-helper`} className='text-gray-500 mt-1 text-xs'>
+            <div id={`${name}-helper`} className="text-gray-500 mt-1 text-xs">
               {helperText}
             </div>
           )}
@@ -186,8 +186,8 @@ export const PasswordInputWithStrength = forwardRef<
             <>
               <div
                 id={`${name}-strength`}
-                className='password-strength-meter mt-2'
-                role='progressbar'
+                className="password-strength-meter mt-2"
+                role="progressbar"
                 aria-valuenow={
                   strength === 'empty'
                     ? 0
@@ -201,7 +201,7 @@ export const PasswordInputWithStrength = forwardRef<
                 }
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label='Password strength'
+                aria-label="Password strength"
                 aria-valuetext={strength}
               >
                 <div
@@ -224,11 +224,11 @@ export const PasswordInputWithStrength = forwardRef<
 
               {showStrengthText && (
                 <div
-                  className='password-feedback mt-1 text-xs'
+                  className="password-feedback mt-1 text-xs"
                   style={{ color }}
-                  aria-live='polite'
-                  aria-atomic='true'
-                  role='status'
+                  aria-live="polite"
+                  aria-atomic="true"
+                  role="status"
                 >
                   {debouncedFeedback}
                 </div>

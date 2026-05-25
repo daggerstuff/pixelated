@@ -72,7 +72,7 @@ export function createProviderComposition(
   return (
     ...providers: ProviderType[]
   ): ComponentType<ProviderComponentProps> => {
-    const ProviderComposition =  async ({
+    const ProviderComposition = async ({
       children,
       ...props
     }: ProviderComponentProps) =>
@@ -120,12 +120,15 @@ export type ExtractProviderProps<T> =
  * </TypedProviders>
  * ```
  */
-export function createTypedProviderComposition<Props extends Record<string, unknown> = Record<string, unknown>,
->(...providers: ComponentType<{ children: ReactNode } & Record<string, unknown>>[]) {
+export function createTypedProviderComposition(
+  ...providers: ComponentType<
+    { children: ReactNode } & Record<string, unknown>
+  >[]
+) {
   return () => {
-    type TypedProviderProps = { children: ReactNode } & Props
+    type TypedProviderProps = { children: ReactNode } & Record<string, unknown>
     // Create a wrapper function that uses createElement instead of JSX
-    const TypedProviderComposition =  async ({
+    const TypedProviderComposition = async ({
       children,
       ...props
     }: TypedProviderProps) => {

@@ -36,6 +36,21 @@ const formattedDate = pubDate?.toLocaleDateString('en-us', {
 
 const { cspNonce } = Astro.locals
 const { nprogress, mediumZoom } = FEATURES
+
+// Build JSON-LD in frontmatter to avoid angle brackets in template expressions
+const jsonLdHtml =
+  pubDate && author
+    ? JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        'headline': title,
+        'image': [image],
+        'datePublished': pubDate.toISOString(),
+        'author': [{ '@type': 'Person', 'name': author }],
+      })
+        .replace(/</g, '\\u003c')
+        .replace(/>/g, '\\u003e')
+    : null
 ---
 
 <!doctype html>
@@ -64,28 +79,10 @@ const { nprogress, mediumZoom } = FEATURES
       )
     }
 
-    <!-- Structured data for blog post -->
+    {/* Structured data for blog post */}
     {
-      pubDate && author && (
-        <script
-          is:inline
-          type="application/ld+json"
-          set:html={JSON.stringify({
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            'headline': title,
-            'image': [image],
-            'datePublished': pubDate.toISOString(),
-            'author': [
-              {
-                '@type': 'Person',
-                'name': author,
-              },
-            ],
-          })
-            .replace(/</g, '\\u003c')
-            .replace(/>/g, '\\u003e')}
-        />
+      jsonLdHtml && (
+        <script is:inline type="application/ld+json" set:html={jsonLdHtml} />
       )
     }
   </head>

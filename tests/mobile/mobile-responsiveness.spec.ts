@@ -471,7 +471,7 @@ test.describe('Mobile Edge Cases and Error Handling', () => {
 
     // Simulate slow network
     await page.route('**/*', (route) => {
-      setTimeout( async () => route.continue(), 1000) // Add 1s delay
+      setTimeout(async () => route.continue(), 1000) // Add 1s delay
     })
 
     await page.goto('/demo')

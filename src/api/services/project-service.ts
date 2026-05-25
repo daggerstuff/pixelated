@@ -338,9 +338,13 @@ export async function searchProjects(
     ).limit(limit)
     limitedResult =
       typeof (limited as { sort?: unknown }).sort === 'function'
-        ? await (limited as { sort: (sort: { createdAt: -1 | 1 }) => Promise<Project[]> | Project[] }).sort(
-            { createdAt: -1 },
-          )
+        ? await (
+            limited as {
+              sort: (sort: {
+                createdAt: -1 | 1
+              }) => Promise<Project[]> | Project[]
+            }
+          ).sort({ createdAt: -1 })
         : limited
   } else {
     limitedResult = queryResult

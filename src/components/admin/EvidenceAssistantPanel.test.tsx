@@ -216,7 +216,9 @@ describe('EvidenceAssistantPanel', () => {
   })
 
   it('renders hook-reported errors', async () => {
-    mockedHookState.error = new Error('search endpoint is temporarily unavailable')
+    mockedHookState.error = new Error(
+      'search endpoint is temporarily unavailable',
+    )
     await renderPanel()
 
     expect(

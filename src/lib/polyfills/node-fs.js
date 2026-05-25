@@ -29,9 +29,9 @@ export async function readdir() {
 }
 
 export const promises = {
-  readFile:  async () => Promise.resolve(''),
-  writeFile:  async () => Promise.resolve(),
-  readdir:  async () => Promise.resolve([]),
+  readFile: async () => Promise.resolve(''),
+  writeFile: async () => Promise.resolve(),
+  readdir: async () => Promise.resolve([]),
 }
 
 export default {

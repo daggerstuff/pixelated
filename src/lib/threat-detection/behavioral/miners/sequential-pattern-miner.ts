@@ -178,7 +178,7 @@ export class SequentialPatternMiner implements PatternMiner {
     for (const sequence of sequences) {
       const uniqueItems = Array.from(new Set(sequence))
       for (const item of uniqueItems) {
-        itemCounts[item] = (itemCounts[item] || 0) + 1
+        itemCounts[item] = (itemCounts[item] ?? 0) + 1
       }
     }
 
@@ -219,9 +219,7 @@ export class SequentialPatternMiner implements PatternMiner {
 
     sequences.forEach((sequence, seqIndex) => {
       sequence.forEach((item, itemIndex) => {
-        if (!idLists[item]) {
-          idLists[item] = []
-        }
+        idLists[item] ??= []
         idLists[item].push([seqIndex, itemIndex])
       })
     })

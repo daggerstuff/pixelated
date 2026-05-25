@@ -701,7 +701,7 @@ export class EvidenceGenerationService {
     return sign * y
   }
 
-  private  async generatePDFReport(report: EvidenceReport): Promise<string> {
+  private async generatePDFReport(report: EvidenceReport): Promise<string> {
     // In real implementation, use PDF generation library
     return Promise.resolve(`PDF Report: ${report.title}`)
   }
