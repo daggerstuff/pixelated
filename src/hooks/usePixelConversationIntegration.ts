@@ -215,7 +215,6 @@ export function usePixelEQMetrics(
 
   const refresh = useCallback(() => {
     if (integration) {
-      const metrics = integration.getEQMetricsTrend()
       // State would be updated via the hook's internal mechanism
     }
   }, [integration])
@@ -242,7 +241,7 @@ export function usePixelCrisisDetection(
   riskLevel: string
   signals: Array<{ type: string; severity: number }>
 } {
-  const { crisisStatus, integration } = usePixelConversationIntegration({
+  const {crisisStatus} = usePixelConversationIntegration({
     sessionId,
     userId,
     autoInitialize: true,

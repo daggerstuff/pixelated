@@ -3,7 +3,6 @@
  * Implements bulk user import/export capabilities for administrators
  */
 
-import { promisify } from 'util'
 
 import { ManagementClient } from 'auth0'
 import { parse } from 'csv-parse'
@@ -17,9 +16,9 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
 const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN ?? '',
-  managementClientId: process.env.AUTH0_MANAGEMENT_CLIENT_ID ?? '',
-  managementClientSecret: process.env.AUTH0_MANAGEMENT_CLIENT_SECRET ?? '',
+  domain: process.env['AUTH0_DOMAIN'] ?? '',
+  managementClientId: process.env['AUTH0_MANAGEMENT_CLIENT_ID'] ?? '',
+  managementClientSecret: process.env['AUTH0_MANAGEMENT_CLIENT_SECRET'] ?? '',
 }
 
 // Initialize Auth0 management client

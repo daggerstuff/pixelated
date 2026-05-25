@@ -23,7 +23,7 @@ const resolvedAct =
     : fallbackAct
 
 const reactNamespace = ReactNS as Record<string, unknown>
-if (typeof reactNamespace.act !== 'function') {
+if (typeof reactNamespace['act'] !== 'function') {
   Object.defineProperty(reactNamespace, 'act', {
     value: resolvedAct,
     configurable: true,

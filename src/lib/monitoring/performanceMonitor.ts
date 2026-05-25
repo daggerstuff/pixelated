@@ -289,10 +289,10 @@ class PerformanceMonitor {
     }
 
     recommendations.forEach((rec) => {
-      if (rec.includes('caching')) improvement.responseTime -= 20
-      if (rec.includes('garbage collection')) improvement.memoryUsage -= 15
-      if (rec.includes('load balancing')) improvement.cpuUsage -= 25
-      if (rec.includes('error rate')) improvement.errorRate -= 50
+      if (rec.includes('caching')) improvement['responseTime'] -= 20
+      if (rec.includes('garbage collection')) improvement['memoryUsage'] -= 15
+      if (rec.includes('load balancing')) improvement['cpuUsage'] -= 25
+      if (rec.includes('error rate')) improvement['errorRate'] -= 50
     })
 
     return improvement

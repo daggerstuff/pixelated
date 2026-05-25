@@ -9,8 +9,8 @@ import {
   EMOTION_MULTIPLIER,
   PLUTCHIK_PRIMARY,
   EmotionClassifier,
-  type EmotionClassificationResult,
-  type EmotionTrajectory,
+  type _EmotionClassificationResult,
+  type _EmotionTrajectory,
 } from '../emotion-classifier'
 
 // ─── VAD scorer ──────────────────────────────────────────────────────────────

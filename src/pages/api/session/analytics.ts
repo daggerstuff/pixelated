@@ -111,16 +111,16 @@ const isSaveAnalyticsPayload = (
   value: unknown,
 ): value is SaveAnalyticsPayload => {
   if (!isRecord(value)) return false
-  if (typeof value.sessionId !== 'string') return false
-  if (!isRecord(value.analyticsData)) return false
-  const analyticsData = value.analyticsData
+  if (typeof value['sessionId'] !== 'string') return false
+  if (!isRecord(value['analyticsData'])) return false
+  const analyticsData = value['analyticsData']
   return (
-    Array.isArray(analyticsData.sessionMetrics) &&
-    Array.isArray(analyticsData.skillProgress) &&
-    analyticsData.sessionMetrics.every(isSessionMetricPayload) &&
-    analyticsData.skillProgress.every(isSkillProgressPayload) &&
-    analyticsData.sessionMetrics.length <= MAX_ANALYTICS_ITEMS &&
-    analyticsData.skillProgress.length <= MAX_ANALYTICS_ITEMS
+    Array.isArray(analyticsData['sessionMetrics']) &&
+    Array.isArray(analyticsData['skillProgress']) &&
+    analyticsData['sessionMetrics'].every(isSessionMetricPayload) &&
+    analyticsData['skillProgress'].every(isSkillProgressPayload) &&
+    analyticsData['sessionMetrics'].length <= MAX_ANALYTICS_ITEMS &&
+    analyticsData['skillProgress'].length <= MAX_ANALYTICS_ITEMS
   )
 }
 

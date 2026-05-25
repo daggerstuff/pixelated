@@ -237,7 +237,7 @@ describe('score()', () => {
     const result = await client.score('mem_123', 't1')
 
     expect(result.id).toBe('mem_123')
-    expect(result.components.recency).toBe(0.85)
+    expect(result.components['recency']).toBe(0.85)
   })
 })
 

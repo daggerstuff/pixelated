@@ -111,7 +111,6 @@ export {
 }
 
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
-import { redis } from '../../redis'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 
 /**
@@ -609,7 +608,7 @@ export const defaultThreatIntelligenceConfig: ThreatIntelligenceConfig = {
       type: 'community',
       url: 'https://otx.alienvault.com/api/v1',
       authType: 'api_key',
-      apiKey: process.env.ALIENVAULT_API_KEY,
+      apiKey: process.env['ALIENVAULT_API_KEY'],
       rateLimit: {
         requestsPerMinute: 30,
         burstLimit: 5,
@@ -623,8 +622,8 @@ export const defaultThreatIntelligenceConfig: ThreatIntelligenceConfig = {
   updateInterval: 3600000, // 1 hour
   cacheTimeout: 86400000, // 24 hours
   apiKeys: {
-    alienvault: process.env.ALIENVAULT_API_KEY ?? '',
-    virustotal: process.env.VIRUSTOTAL_API_KEY ?? '',
-    abuseipdb: process.env.ABUSEIPDB_API_KEY ?? '',
+    alienvault: process.env['ALIENVAULT_API_KEY'] ?? '',
+    virustotal: process.env['VIRUSTOTAL_API_KEY'] ?? '',
+    abuseipdb: process.env['ABUSEIPDB_API_KEY'] ?? '',
   },
 }

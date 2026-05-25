@@ -384,7 +384,7 @@ export class EducationalContextRecognizer {
       currentTopic: `${result.educationalType} - ${result.topicArea}`,
       nextSteps: ['Learn about symptoms'],
       estimatedTimeToComplete: '15-30 minutes',
-      relatedConcepts: result.metadata.relatedTopics ?? [],
+      relatedConcepts: result.metadata['relatedTopics'] ?? [],
     }
   }
 }

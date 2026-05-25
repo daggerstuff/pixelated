@@ -79,7 +79,6 @@ export class CrossRegionDataSyncManager extends EventEmitter {
   private readonly redisClients: Map<string, Redis> = new Map()
   private clickhouseClient: ClickhouseClient | null = null
   private syncInterval: NodeJS.Timeout | null = null
-  private isInitialized = false
   private readonly syncStatus: Map<string, SyncStatus> = new Map()
   private readonly healthChecks: Map<
     string,
@@ -233,14 +232,14 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     )
       ? (this.config.getConfig().secrets.databases as Record<string, unknown>)
       : {}
-    const databaseSecrets = this.isRecord(configDatabases.cockroachdb)
-      ? configDatabases.cockroachdb
+    const databaseSecrets = this.isRecord(configDatabases['cockroachdb'])
+      ? configDatabases['cockroachdb']
       : {}
     const secrets = databaseSecrets as CockroachDbSecrets
     const connectionString =
       typeof secrets.connectionString === 'string'
         ? secrets.connectionString
-        : (process.env.COCKROACH_CONNECTION_STRING ?? '')
+        : (process.env['COCKROACH_CONNECTION_STRING'] ?? '')
 
     try {
       const parsed = connectionString ? new URL(connectionString) : null
@@ -258,15 +257,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             ? parsed.username
             : typeof secrets.user === 'string'
               ? secrets.user
-              : (process.env.COCKROACH_USER ?? 'root'),
+              : (process.env['COCKROACH_USER'] ?? 'root'),
         password:
           typeof parsed?.password === 'string' && parsed.password.length > 0
             ? parsed.password
             : typeof secrets.password === 'string' &&
                 secrets.password.length > 0
               ? secrets.password
-              : (process.env.COCKROACH_PASSWORD ?? ''),
-        sslCert: process.env.COCKROACH_SSL_CERT ?? null,
+              : (process.env['COCKROACH_PASSWORD'] ?? ''),
+        sslCert: process.env['COCKROACH_SSL_CERT'] ?? null,
         sslMode:
           typeof secrets.sslMode === 'string' ? secrets.sslMode : undefined,
       }
@@ -277,9 +276,9 @@ export class CrossRegionDataSyncManager extends EventEmitter {
         host: 'localhost',
         port: 26257,
         database: 'defaultdb',
-        user: process.env.COCKROACH_USER ?? 'root',
-        password: process.env.COCKROACH_PASSWORD ?? '',
-        sslCert: process.env.COCKROACH_SSL_CERT ?? null,
+        user: process.env['COCKROACH_USER'] ?? 'root',
+        password: process.env['COCKROACH_PASSWORD'] ?? '',
+        sslCert: process.env['COCKROACH_SSL_CERT'] ?? null,
       }
     }
   }
@@ -293,14 +292,14 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     )
       ? (this.config.getConfig().secrets.databases as Record<string, unknown>)
       : {}
-    const secrets = this.isRecord(configDatabases.mongo)
-      ? configDatabases.mongo
+    const secrets = this.isRecord(configDatabases['mongo'])
+      ? configDatabases['mongo']
       : {}
     return {
       connectionString:
-        process.env.MONGODB_CONNECTION_STRING ??
-        (typeof secrets.connectionString === 'string'
-          ? secrets.connectionString
+        process.env['MONGODB_CONNECTION_STRING'] ??
+        (typeof secrets['connectionString'] === 'string'
+          ? secrets['connectionString']
           : undefined) ??
         'mongodb://localhost:27017/pixelated',
       ...secrets,
@@ -322,16 +321,16 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     )
       ? (this.config.getConfig().secrets.databases as Record<string, unknown>)
       : {}
-    const defaults = this.isRecord(configDatabases.redis)
-      ? configDatabases.redis
+    const defaults = this.isRecord(configDatabases['redis'])
+      ? configDatabases['redis']
       : {}
     const secrets: RedisDbSecrets = { ...defaults }
     const typedSecrets = {
       database: secrets.database,
       password: secrets.password,
-      host: process.env.REDIS_HOST ?? secrets.host,
+      host: process.env['REDIS_HOST'] ?? secrets.host,
       port:
-        process.env.REDIS_PORT ??
+        process.env['REDIS_PORT'] ??
         (typeof secrets.port === 'number' || typeof secrets.port === 'string'
           ? `${secrets.port}`
           : undefined),
@@ -347,7 +346,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
             : '6379',
         ) ?? 6379,
       password:
-        process.env.REDIS_PASSWORD ??
+        process.env['REDIS_PASSWORD'] ??
         (typeof typedSecrets.password === 'string'
           ? typedSecrets.password
           : ''),
@@ -365,17 +364,17 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     )
       ? (this.config.getConfig().secrets.databases as Record<string, unknown>)
       : {}
-    const defaults = this.isRecord(configDatabases.clickhouse)
-      ? configDatabases.clickhouse
+    const defaults = this.isRecord(configDatabases['clickhouse'])
+      ? configDatabases['clickhouse']
       : {}
 
     return {
-      host: process.env.CLICKHOUSE_HOST ?? 'localhost',
-      port: this.toNumberOrUndefined(process.env.CLICKHOUSE_PORT) ?? 8123,
-      username: process.env.CLICKHOUSE_USERNAME ?? 'default',
-      password: process.env.CLICKHOUSE_PASSWORD ?? '',
-      database: process.env.CLICKHOUSE_DATABASE ?? 'default',
-      https: process.env.CLICKHOUSE_HTTPS === 'true',
+      host: process.env['CLICKHOUSE_HOST'] ?? 'localhost',
+      port: this.toNumberOrUndefined(process.env['CLICKHOUSE_PORT']) ?? 8123,
+      username: process.env['CLICKHOUSE_USERNAME'] ?? 'default',
+      password: process.env['CLICKHOUSE_PASSWORD'] ?? '',
+      database: process.env['CLICKHOUSE_DATABASE'] ?? 'default',
+      https: process.env['CLICKHOUSE_HTTPS'] === 'true',
       ...defaults,
     }
   }
@@ -1097,13 +1096,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     `
 
     const values = [
-      this.normalizeRecordId(user._id),
-      user.email,
-      user.username,
+      this.normalizeRecordId(user['_id']),
+      user['email'],
+      user['username'],
       region,
-      JSON.stringify(user.metadata ?? {}),
-      user.createdAt ?? new Date(),
-      user.updatedAt ?? new Date(),
+      JSON.stringify(user['metadata'] ?? {}),
+      user['createdAt'] ?? new Date(),
+      user['updatedAt'] ?? new Date(),
     ]
 
     await this.getCockroachClient().query(query, values)
@@ -1192,13 +1191,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     `
 
     const values = [
-      this.normalizeRecordId(session._id),
-      this.normalizeRecordId(session.userId),
+      this.normalizeRecordId(session['_id']),
+      this.normalizeRecordId(session['userId']),
       region,
-      session.token,
-      session.expiresAt,
-      JSON.stringify(session.metadata ?? {}),
-      session.createdAt ?? new Date(),
+      session['token'],
+      session['expiresAt'],
+      JSON.stringify(session['metadata'] ?? {}),
+      session['createdAt'] ?? new Date(),
     ]
 
     await this.getCockroachClient().query(query, values)
@@ -1246,12 +1245,12 @@ export class CrossRegionDataSyncManager extends EventEmitter {
               await this.syncMessageToCockroachDB(message, region)
 
               // Sync AI analyses if available
-              const analysis = this.toRecord(message.aiAnalysis)
+              const analysis = this.toRecord(message['aiAnalysis'])
               if (analysis) {
                 await this.syncAIAnalysisToCockroachDB(
                   analysis,
                   this.normalizeRecordId(message._id),
-                  this.normalizeRecordId(conversation.userId),
+                  this.normalizeRecordId(conversation['userId']),
                   region,
                 )
               }
@@ -1322,14 +1321,14 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     `
 
     const values = [
-      this.normalizeRecordId(conversation._id),
-      this.normalizeRecordId(conversation.userId),
+      this.normalizeRecordId(conversation['_id']),
+      this.normalizeRecordId(conversation['userId']),
       region,
-      conversation.title,
-      conversation.status ?? 'active',
-      JSON.stringify(conversation.metadata ?? {}),
-      conversation.createdAt ?? new Date(),
-      conversation.updatedAt ?? new Date(),
+      conversation['title'],
+      conversation['status'] ?? 'active',
+      JSON.stringify(conversation['metadata'] ?? {}),
+      conversation['createdAt'] ?? new Date(),
+      conversation['updatedAt'] ?? new Date(),
     ]
 
     await this.getCockroachClient().query(query, values)
@@ -1352,15 +1351,15 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     `
 
     const values = [
-      this.normalizeRecordId(message._id),
-      this.normalizeRecordId(message.conversationId),
-      this.normalizeRecordId(message.userId),
+      this.normalizeRecordId(message['_id']),
+      this.normalizeRecordId(message['conversationId']),
+      this.normalizeRecordId(message['userId']),
       region,
-      message.content,
-      message.messageType ?? 'text',
-      message.sentimentScore ?? null,
-      JSON.stringify(message.metadata ?? {}),
-      message.createdAt ?? new Date(),
+      message['content'],
+      message['messageType'] ?? 'text',
+      message['sentimentScore'] ?? null,
+      JSON.stringify(message['metadata'] ?? {}),
+      message['createdAt'] ?? new Date(),
     ]
 
     await this.getCockroachClient().query(query, values)
@@ -1386,16 +1385,16 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     `
 
     const values = [
-      analysis._id ?? uuidv4(),
+      analysis['_id'] ?? uuidv4(),
       messageId,
       userId,
       region,
-      analysis.analysisType,
-      analysis.biasScore ?? null,
-      analysis.empathyScore ?? null,
-      analysis.mentalHealthScore ?? null,
-      JSON.stringify(analysis.recommendations ?? {}),
-      analysis.createdAt ?? new Date(),
+      analysis['analysisType'],
+      analysis['biasScore'] ?? null,
+      analysis['empathyScore'] ?? null,
+      analysis['mentalHealthScore'] ?? null,
+      JSON.stringify(analysis['recommendations'] ?? {}),
+      analysis['createdAt'] ?? new Date(),
     ]
 
     await this.getCockroachClient().query(query, values)
@@ -1451,11 +1450,11 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           // Update sync log
           await this.getCockroachClient().query(
             'UPDATE sync_log SET sync_status = $1, retry_count = retry_count + 1, updated_at = now() WHERE id = $2',
-            ['completed', log.id],
+            ['completed', log['id']],
           )
         } catch (error: unknown) {
           this.logger.error(
-            `Failed to retry sync operation ${this.toLogString(log.id)}`,
+            `Failed to retry sync operation ${this.toLogString(log['id'])}`,
             {
               error,
             },
@@ -1464,7 +1463,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           // Update retry count
           await this.getCockroachClient().query(
             'UPDATE sync_log SET retry_count = retry_count + 1, error_message = $1, updated_at = now() WHERE id = $2',
-            [error instanceof Error ? error.message : 'Unknown error', log.id],
+            [error instanceof Error ? error.message : 'Unknown error', log['id']],
           )
         }
       }
@@ -1483,8 +1482,8 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     log: Record<string, unknown>,
   ): Promise<void> {
     // Implementation depends on the specific operation
-    const tableName = this.toLogString(log.table_name)
-    const recordId = this.toLogString(log.record_id)
+    const tableName = this.toLogString(log['table_name'])
+    const recordId = this.toLogString(log['record_id'])
     this.logger.info(
       `Retrying sync operation for ${tableName} record ${recordId}`,
     )
@@ -1605,21 +1604,21 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           .toArray()
 
         for (const analytic of recentAnalytics) {
-          const userId = this.normalizeRecordId(analytic.userId)
-          const sessionId = this.normalizeRecordId(analytic.sessionId)
+          const userId = this.normalizeRecordId(analytic['userId'])
+          const sessionId = this.normalizeRecordId(analytic['sessionId'])
           const eventType =
-            typeof analytic.eventType === 'string' ? analytic.eventType : ''
+            typeof analytic['eventType'] === 'string' ? analytic['eventType'] : ''
           const ipAddress =
-            typeof analytic.ipAddress === 'string' ? analytic.ipAddress : ''
+            typeof analytic['ipAddress'] === 'string' ? analytic['ipAddress'] : ''
           const userAgent =
-            typeof analytic.userAgent === 'string' ? analytic.userAgent : ''
+            typeof analytic['userAgent'] === 'string' ? analytic['userAgent'] : ''
           const eventData =
-            typeof analytic.eventData === 'object' ? analytic.eventData : {}
+            typeof analytic['eventData'] === 'object' ? analytic['eventData'] : {}
 
           analytics.push({
             timestamp:
-              analytic.timestamp instanceof Date
-                ? analytic.timestamp
+              analytic['timestamp'] instanceof Date
+                ? analytic['timestamp']
                 : new Date(),
             user_id: userId || uuidv4(),
             region,

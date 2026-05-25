@@ -124,7 +124,6 @@ export class ModelServingServer extends EventEmitter {
   private readonly modelConfigs: Map<string, ModelConfig>
   private redis: Redis
   private mongoClient: MongoClient
-  private featureStore: FeatureStore
   private modelRegistry: ModelRegistry
   private monitoring: ModelMonitoring
   private readonly performanceCache: Map<string, PerformanceMetrics>
@@ -397,7 +396,7 @@ export class ModelServingServer extends EventEmitter {
         case 'polynomial':
           engineered = this.createPolynomialFeatures(
             engineered,
-            config?.parameters.degree,
+            config?.parameters['degree'],
           )
           break
         case 'interaction':
@@ -406,7 +405,7 @@ export class ModelServingServer extends EventEmitter {
         case 'binning':
           engineered = this.createBinnedFeatures(
             engineered,
-            config?.parameters.bins,
+            config?.parameters['bins'],
           )
           break
         default:

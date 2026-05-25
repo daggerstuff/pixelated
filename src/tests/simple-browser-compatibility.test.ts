@@ -92,7 +92,7 @@ test('basic browser compatibility check', async ({ page, browser }) => {
     })
 
     // If we're in a CI environment, take additional screenshots for reporting
-    if (process.env.CI) {
+    if (process.env['CI']) {
       const browserName = browser.browserType().name()
       ensureDirectoryExists('./test-results/cross-browser')
       await page.screenshot({

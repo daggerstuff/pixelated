@@ -18,7 +18,7 @@ const logger = createBuildSafeLogger('speech-recognition')
 export function useSpeechRecognition() {
   const [isListening, setIsProcessing] = useState(false)
   const [transcript, setTranscript] = useState('')
-  const [detectedTechniques, setDetectedTechniques] = useState<string[]>([])
+  const [detectedTechniques, _setDetectedTechniques] = useState<string[]>([])
   const recognitionRef = useRef<any>(null)
 
   useEffect(() => {

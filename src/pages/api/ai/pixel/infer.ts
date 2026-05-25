@@ -89,8 +89,8 @@ interface ModelStatusResponse {
 // Configuration
 // ============================================================================
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
+const PIXEL_API_URL = process.env['PIXEL_API_URL'] ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env['PIXEL_API_KEY'] ?? ''
 const REQUEST_TIMEOUT_MS = 30000
 const MAX_RETRIES = 3
 

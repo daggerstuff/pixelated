@@ -33,7 +33,6 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   private readonly lambdaClient: LambdaClient
   private readonly route53Client: Route53Client
   private readonly cloudWatchClient: CloudWatchClient
-  private isActive = false
   private failoverState: FailoverState
   private healthCheckInterval: NodeJS.Timeout | null = null
   private failoverTimeout: NodeJS.Timeout | null = null
@@ -1476,7 +1475,6 @@ class CircuitBreaker {
   private readonly name: string
   private readonly failureThreshold: number
   private readonly resetTimeout: number
-  private readonly monitoringPeriod: number
   private readonly onStateChange?: (state: string) => void
 
   private state: 'closed' | 'open' | 'half-open' = 'closed'

@@ -97,7 +97,7 @@ export class ProductMemoryGateway {
         ...toInternalScope(input),
         content: input.content,
         category:
-          typeof metadata.category === 'string' ? metadata.category : undefined,
+          typeof metadata['category'] === 'string' ? metadata['category'] : undefined,
         metadata,
       }),
     )

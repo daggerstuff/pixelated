@@ -58,28 +58,28 @@ export class ServiceIntegrationTester {
       // Test Memory Service
       const memoryStart = Date.now()
       results.memoryService = await this.testMemoryService()
-      serviceTimings.memoryService = Date.now() - memoryStart
+      serviceTimings['memoryService'] = Date.now() - memoryStart
 
       // Test FHE Service
       const fheStart = Date.now()
       results.fheService = await this.testFHEService()
-      serviceTimings.fheService = Date.now() - fheStart
+      serviceTimings['fheService'] = Date.now() - fheStart
 
       // Test Bias Detection
       const biasStart = Date.now()
       results.biasDetection = await this.testBiasDetection()
-      serviceTimings.biasDetection = Date.now() - biasStart
+      serviceTimings['biasDetection'] = Date.now() - biasStart
 
       // Test Emotion Analysis
       const emotionStart = Date.now()
       results.emotionAnalysis = await this.testEmotionAnalysis()
-      serviceTimings.emotionAnalysis = Date.now() - emotionStart
+      serviceTimings['emotionAnalysis'] = Date.now() - emotionStart
 
       // Test Cross-Service Communication
       const crossStart = Date.now()
       results.crossServiceCommunication =
         await this.testCrossServiceCommunication()
-      serviceTimings.crossServiceCommunication = Date.now() - crossStart
+      serviceTimings['crossServiceCommunication'] = Date.now() - crossStart
     } catch (error: unknown) {
       errors.push(
         `Integration test failed: ${error instanceof Error ? String(error) : String(error)}`,
@@ -364,9 +364,9 @@ function isValidEncryptedData<T>(
   }
 
   return (
-    typeof encryptedData.id === 'string' &&
-    typeof encryptedData.dataType === 'string' &&
-    encryptedData.data !== undefined
+    typeof encryptedData['id'] === 'string' &&
+    typeof encryptedData['dataType'] === 'string' &&
+    encryptedData['data'] !== undefined
   )
 }
 

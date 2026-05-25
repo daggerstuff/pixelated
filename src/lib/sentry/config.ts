@@ -95,8 +95,8 @@ export function resolveSentryDsn(): string | undefined {
 
   if (
     import.meta.env.DEV ||
-    process.env.NODE_ENV !== 'production' ||
-    process.env.SENTRY_DEBUG
+    process.env['NODE_ENV'] !== 'production' ||
+    process.env['SENTRY_DEBUG']
   ) {
     console.log(
       `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,

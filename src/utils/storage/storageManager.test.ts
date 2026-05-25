@@ -50,7 +50,6 @@ describe('StorageManager - Quota Estimation Fallback', () => {
     })
 
     // To catch unhandled rejections in Node.js/Vitest during the test
-    let unhandledError: any = null
     const listener = (reason: any) => {
       unhandledError = reason
     }

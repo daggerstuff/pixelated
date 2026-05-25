@@ -37,6 +37,27 @@ describe('ConnectionPool', () => {
     await pool.dispose()
   })
 
+  describe('cleanup interval via fake timers', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('should trigger cleanupIdleConnections via the periodic interval', () => {
+      vi.useFakeTimers()
+      const fpPool = new ConnectionPool(defaultPoolConfig)
+
+      const cleanupSpy = vi.spyOn(fpPool as any, 'cleanupIdleConnections')
+
+      // Advance past the 60s interval
+      vi.advanceTimersByTime(60000)
+
+      expect(cleanupSpy).toHaveBeenCalledTimes(1)
+
+      fpPool.dispose()
+      vi.useRealTimers()
+    })
+  })
+
   describe('acquireConnection', () => {
     it('should return a connection when pool is not full', async () => {
       const conn = await pool.acquireConnection()
@@ -69,8 +90,6 @@ describe('ConnectionPool', () => {
     it('should queue requests when pool is full', async () => {
       // Exhaust all connections
       const conn1 = await pool.acquireConnection()
-      const conn2 = await pool.acquireConnection()
-      const conn3 = await pool.acquireConnection()
 
       // Try to acquire a 4th - should queue
       const acquirePromise = pool.acquireConnection()
@@ -95,14 +114,40 @@ describe('ConnectionPool', () => {
       })
 
       // Exhaust all connections
-      const conn1 = await fastTimeoutPool.acquireConnection()
-      const conn2 = await fastTimeoutPool.acquireConnection()
-      const conn3 = await fastTimeoutPool.acquireConnection()
 
       // 4th should timeout
       await expect(fastTimeoutPool.acquireConnection()).rejects.toThrow('Connection pool timeout')
 
       await fastTimeoutPool.dispose()
+    })
+
+    it('should handle timeout when connection was acquired before timeout fires', async () => {
+      const earlyPool = new ConnectionPool({
+        ...defaultPoolConfig,
+        connectionTimeout: 100, // 100ms timeout
+      })
+
+      // Exhaust all connections
+      const c1 = await earlyPool.acquireConnection()
+
+      // Queue a request
+      const acquirePromise = earlyPool.acquireConnection()
+
+      // Release a connection quickly — the queued request gets fulfilled
+      earlyPool.releaseConnection(c1)
+
+      // The queued request should succeed
+      const c4 = await acquirePromise
+      expect(c4).toBeDefined()
+      expect(c4.inUse).toBe(true)
+
+      // Wait for the timeout to fire (it should find index === -1)
+      await new Promise((r) => setTimeout(r, 150))
+
+      // Pool should still be in valid state
+      expect(earlyPool.getStats().totalConnections).toBe(3)
+
+      await earlyPool.dispose()
     })
 
     it('should throw when pool is disposed', async () => {
@@ -131,7 +176,6 @@ describe('ConnectionPool', () => {
 
     it('should process queued requests on release', async () => {
       const conn1 = await pool.acquireConnection()
-      const conn2 = await pool.acquireConnection()
       await pool.acquireConnection() // conn3 - exhaust pool
 
       // Queue a request
@@ -149,7 +193,6 @@ describe('ConnectionPool', () => {
   describe('getStats', () => {
     it('should return correct stats', async () => {
       const conn1 = await pool.acquireConnection()
-      const conn2 = await pool.acquireConnection()
 
       pool.releaseConnection(conn1)
 
@@ -159,6 +202,15 @@ describe('ConnectionPool', () => {
       expect(stats.queueLength).toBe(0)
       expect(stats.totalRequests).toBe(2)
       expect(stats.maxConnections).toBe(3)
+    })
+  })
+
+  describe('createConnection', () => {
+    it('should throw when creating a connection after pool is disposed', async () => {
+      await pool.dispose()
+      expect(() => (pool as any).createConnection()).toThrow(
+        'Connection pool disposed',
+      )
     })
   })
 
@@ -250,9 +302,6 @@ describe('ConnectionPool', () => {
       const qPool = new ConnectionPool({ ...defaultPoolConfig, connectionTimeout: 5000 })
 
       // Exhaust all connections
-      const conn1 = await qPool.acquireConnection()
-      const conn2 = await qPool.acquireConnection()
-      const conn3 = await qPool.acquireConnection()
 
       // Queue two requests
       const req1 = qPool.acquireConnection()

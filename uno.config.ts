@@ -51,7 +51,7 @@ export default defineConfig({
       warn: false,
     }),
     // Skip web fonts in CI/Test to avoid timeouts
-    ...(process.env.CI === 'true' || process.env.NODE_ENV === 'test'
+    ...(process.env['CI'] === 'true' || process.env['NODE_ENV'] === 'test'
       ? []
       : [
           presetWebFonts({

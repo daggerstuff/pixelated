@@ -72,7 +72,7 @@ router.get(
 router.get(
   '/:projectId',
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params.projectId as string
+    const projectId = req.params['projectId'] as string
     const { user } = req as any
 
     const project = await getProject(projectId, user.id)
@@ -88,7 +88,7 @@ router.get(
 router.put(
   '/:projectId',
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params.projectId as string
+    const projectId = req.params['projectId'] as string
     const { name, description, category, budget, status } = req.body
     const { user } = req as any
 
@@ -111,7 +111,7 @@ router.put(
 router.post(
   '/:projectId/objectives',
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params.projectId as string
+    const projectId = req.params['projectId'] as string
     const { title, description, successCriteria, deadline } = req.body
     const { user } = req as any
 
@@ -139,7 +139,7 @@ router.post(
 router.post(
   '/:projectId/share',
   asyncHandler(async (req: Request, res: Response) => {
-    const projectId = req.params.projectId as string
+    const projectId = req.params['projectId'] as string
     const { userId, permissionLevel } = req.body
     const { user } = req as any
 
@@ -174,7 +174,7 @@ router.post(
 router.get(
   '/search/:query',
   asyncHandler(async (req: Request, res: Response) => {
-    const query = req.params.query as string
+    const query = req.params['query'] as string
     const { user } = req as any
 
     const results = await searchProjects(query, user.id)

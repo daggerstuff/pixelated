@@ -22,8 +22,6 @@ export interface CrisisDetectionConfig {
 export class CrisisDetectionService {
   private readonly aiService: AIService
   private readonly sensitivityLevel: 'low' | 'medium' | 'high'
-  private readonly model?: string
-  private readonly defaultPrompt?: string
 
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
@@ -334,17 +332,17 @@ export class CrisisDetectionService {
 
         if (typeof parsed === 'object' && parsed !== null) {
           return {
-            score: Math.min(Math.max(Number(parsed.score) || 0, 0), 1), // Clamp between 0-1
-            category: typeof parsed.category === 'string' ? parsed.category : 'general_concern',
+            score: Math.min(Math.max(Number(parsed['score']) || 0, 0), 1), // Clamp between 0-1
+            category: typeof parsed['category'] === 'string' ? parsed['category'] : 'general_concern',
             severity:
-              typeof parsed.severity === 'string'
-                ? (parsed.severity as 'low' | 'medium' | 'high' | 'critical')
+              typeof parsed['severity'] === 'string'
+                ? (parsed['severity'] as 'low' | 'medium' | 'high' | 'critical')
                 : 'low',
-            indicators: Array.isArray(parsed.indicators)
-              ? parsed.indicators.filter((indicator) => typeof indicator === 'string')
+            indicators: Array.isArray(parsed['indicators'])
+              ? parsed['indicators'].filter((indicator) => typeof indicator === 'string')
               : [],
-            recommendations: Array.isArray(parsed.recommendations)
-              ? parsed.recommendations.filter(
+            recommendations: Array.isArray(parsed['recommendations'])
+              ? parsed['recommendations'].filter(
                   (rec) => typeof rec === 'string',
                 )
               : [],

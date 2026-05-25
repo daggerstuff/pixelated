@@ -121,11 +121,11 @@ function remarkDirectiveSugar() {
             d,
           )
         } else if (youtubeId) {
-          src = VIDEO_PLATFORMS.youtubeId(youtubeId)
+          src = VIDEO_PLATFORMS['youtubeId'](youtubeId)
         } else if (bilibiliId) {
-          src = VIDEO_PLATFORMS.bilibiliId(bilibiliId)
+          src = VIDEO_PLATFORMS['bilibiliId'](bilibiliId)
         } else if (vimeoId) {
-          src = VIDEO_PLATFORMS.vimeoId(vimeoId)
+          src = VIDEO_PLATFORMS['vimeoId'](vimeoId)
         }
 
         if (!src && iframeSrc) {

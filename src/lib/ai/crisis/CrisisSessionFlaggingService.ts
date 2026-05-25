@@ -376,7 +376,7 @@ export class CrisisSessionFlaggingService {
       const query: Record<string, unknown> = { user_id: userId }
 
       if (!includeResolved) {
-        query.status = { $nin: ['resolved', 'dismissed'] }
+        query['status'] = { $nin: ['resolved', 'dismissed'] }
       }
 
       const flags = await db

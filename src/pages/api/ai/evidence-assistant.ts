@@ -155,17 +155,17 @@ async function parseSearchBody(request: Request): Promise<SearchBody> {
   }
 
   return {
-    query: typeof payload.query === 'string' ? payload.query : undefined,
-    limit: typeof payload.limit === 'number' ? payload.limit : undefined,
-    collection: isEvidenceCollection(payload.collection)
-      ? payload.collection
+    query: typeof payload['query'] === 'string' ? payload['query'] : undefined,
+    limit: typeof payload['limit'] === 'number' ? payload['limit'] : undefined,
+    collection: isEvidenceCollection(payload['collection'])
+      ? payload['collection']
       : undefined,
-    category: typeof payload.category === 'string' ? payload.category : undefined,
+    category: typeof payload['category'] === 'string' ? payload['category'] : undefined,
     generateAnswer:
-      typeof payload.generateAnswer === 'boolean'
-        ? payload.generateAnswer
+      typeof payload['generateAnswer'] === 'boolean'
+        ? payload['generateAnswer']
         : undefined,
-    provider: isAIProviderType(payload.provider) ? payload.provider : undefined,
+    provider: isAIProviderType(payload['provider']) ? payload['provider'] : undefined,
   }
 }
 

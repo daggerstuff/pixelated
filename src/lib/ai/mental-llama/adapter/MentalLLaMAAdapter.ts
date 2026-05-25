@@ -35,7 +35,6 @@ export class MentalLLaMAAdapter {
   private readonly expertGuidanceOrchestrator: ExpertGuidanceOrchestrator;
 
   // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
-  private readonly crisisSessionFlaggingServiceImport?: Promise<unknown>;
 
   constructor(options: MentalLLaMAAdapterOptions) {
     this.modelProvider = options.modelProvider;

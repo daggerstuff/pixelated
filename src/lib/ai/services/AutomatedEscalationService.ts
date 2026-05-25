@@ -227,7 +227,7 @@ export class AutomatedEscalationService {
     escalationEvent: EscalationEvent,
     context?: any,
   ): Promise<void> {
-    const { protocolActivated, riskLevel, _userId } = escalationEvent
+    const {protocolActivated, riskLevel} = escalationEvent
 
     for (const contact of protocolActivated.contacts) {
       try {

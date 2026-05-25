@@ -152,7 +152,7 @@ describe('ObjectiveMetricsEngine', () => {
   describe('calculateObjectiveMetrics', () => {
     test('should calculate basic objective metrics correctly', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -174,7 +174,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should calculate criteria breakdown correctly', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -197,7 +197,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should calculate trend information', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -225,9 +225,9 @@ describe('ObjectiveMetricsEngine', () => {
 
       expect(metrics.overallScore).toBe(0.8)
       expect(Object.keys(metrics.objectiveMetrics)).toHaveLength(3)
-      expect(metrics.objectiveMetrics.correctness).toBeDefined()
-      expect(metrics.objectiveMetrics.empathy).toBeDefined()
-      expect(metrics.objectiveMetrics.safety).toBeDefined()
+      expect(metrics.objectiveMetrics['correctness']).toBeDefined()
+      expect(metrics.objectiveMetrics['empathy']).toBeDefined()
+      expect(metrics.objectiveMetrics['safety']).toBeDefined()
 
       expect(metrics.balanceScore).toBeGreaterThanOrEqual(0)
       expect(metrics.balanceScore).toBeLessThanOrEqual(1)
@@ -298,7 +298,7 @@ describe('ObjectiveMetricsEngine', () => {
           objectiveResults: {
             ...mockEvaluationResult.objectiveResults,
             correctness: {
-              ...mockEvaluationResult.objectiveResults.correctness,
+              ...mockEvaluationResult.objectiveResults['correctness'],
               score: 0.7 + i * 0.05, // Improving trend
             },
           },
@@ -341,7 +341,7 @@ describe('ObjectiveMetricsEngine', () => {
       engine.setBaseline('correctness', 0.6)
 
       const objective = mockObjectives[0]
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,
@@ -362,7 +362,7 @@ describe('ObjectiveMetricsEngine', () => {
         objectiveResults: {
           ...mockEvaluationResult.objectiveResults,
           correctness: {
-            ...mockEvaluationResult.objectiveResults.correctness,
+            ...mockEvaluationResult.objectiveResults['correctness'],
             score: 0.9,
           },
         },
@@ -387,7 +387,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const safetyObjective = mockObjectives[2] // safety
-      const evaluationResult = mockEvaluationResult.objectiveResults.safety
+      const evaluationResult = mockEvaluationResult.objectiveResults['safety']
       const metrics = engine.calculateObjectiveMetrics(
         safetyObjective,
         evaluationResult,
@@ -404,7 +404,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const correctnessObjective = mockObjectives[0] // correctness
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         correctnessObjective,
         evaluationResult,
@@ -425,7 +425,7 @@ describe('ObjectiveMetricsEngine', () => {
           objectiveResults: {
             ...mockEvaluationResult.objectiveResults,
             correctness: {
-              ...mockEvaluationResult.objectiveResults.correctness,
+              ...mockEvaluationResult.objectiveResults['correctness'],
               score: 0.8 + (Math.random() * 0.02 - 0.01), // Very small variation
             },
           },
@@ -434,7 +434,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const objective = mockObjectives[0]
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,
@@ -455,7 +455,7 @@ describe('ObjectiveMetricsEngine', () => {
           objectiveResults: {
             ...mockEvaluationResult.objectiveResults,
             correctness: {
-              ...mockEvaluationResult.objectiveResults.correctness,
+              ...mockEvaluationResult.objectiveResults['correctness'],
               score: scores[i],
             },
           },
@@ -464,7 +464,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const objective = mockObjectives[0]
-      const evaluationResult = mockEvaluationResult.objectiveResults.correctness
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,
@@ -531,7 +531,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const evaluationResult = {
-        ...mockEvaluationResult.objectiveResults.correctness,
+        ...mockEvaluationResult.objectiveResults['correctness'],
         criteriaScores: {}, // No scores for criteria
       }
 
@@ -560,10 +560,10 @@ describe('DEFAULT_METRICS_CONFIG', () => {
 
     expect(DEFAULT_METRICS_CONFIG.benchmarkThresholds).toBeDefined()
     expect(
-      DEFAULT_METRICS_CONFIG.benchmarkThresholds.excellent,
-    ).toBeGreaterThan(DEFAULT_METRICS_CONFIG.benchmarkThresholds.good)
-    expect(DEFAULT_METRICS_CONFIG.benchmarkThresholds.good).toBeGreaterThan(
-      DEFAULT_METRICS_CONFIG.benchmarkThresholds.acceptable,
+      DEFAULT_METRICS_CONFIG.benchmarkThresholds['excellent'],
+    ).toBeGreaterThan(DEFAULT_METRICS_CONFIG.benchmarkThresholds['good'])
+    expect(DEFAULT_METRICS_CONFIG.benchmarkThresholds['good']).toBeGreaterThan(
+      DEFAULT_METRICS_CONFIG.benchmarkThresholds['acceptable'],
     )
   })
 })

@@ -514,19 +514,19 @@ export class AIRepository {
     const query: Record<string, unknown> = {};
 
     if (filter?.clientId) {
-      query.clientId = filter.clientId;
+      query['clientId'] = filter.clientId;
     }
     if (filter?.therapistId) {
-      query.therapistId = filter.therapistId;
+      query['therapistId'] = filter.therapistId;
     }
     if (filter?.startDate) {
-      query.startTime = { $gte: filter.startDate };
+      query['startTime'] = { $gte: filter.startDate };
     }
     if (filter?.endDate) {
-      query.endTime = { $lte: filter.endDate };
+      query['endTime'] = { $lte: filter.endDate };
     }
     if (filter?.status) {
-      query.status = filter.status;
+      query['status'] = filter.status;
     }
 
     const results = await collection
@@ -736,10 +736,10 @@ export class AIRepository {
     const query: Record<string, unknown> = { userId };
 
     if (options?.alertLevel) {
-      query.alertLevel = { $in: options.alertLevel };
+      query['alertLevel'] = { $in: options.alertLevel };
     }
     if (options?.timeRange) {
-      query.createdAt = {
+      query['createdAt'] = {
         $gte: options.timeRange.start,
         $lte: options.timeRange.end,
       };
@@ -783,19 +783,19 @@ export class AIRepository {
     const query: Record<string, unknown> = {};
 
     if (options?.metricType) {
-      query.metricType = { $in: options.metricType };
+      query['metricType'] = { $in: options.metricType };
     }
     if (options?.metricName) {
-      query.metricName = { $in: options.metricName };
+      query['metricName'] = { $in: options.metricName };
     }
     if (options?.aggregationPeriod) {
-      query.aggregationPeriod = options.aggregationPeriod;
+      query['aggregationPeriod'] = options.aggregationPeriod;
     }
     if (options?.userId) {
-      query.userId = options.userId;
+      query['userId'] = options.userId;
     }
     if (options?.timeRange) {
-      query.timestamp = {
+      query['timestamp'] = {
         $gte: options.timeRange.start,
         $lte: options.timeRange.end,
       };
@@ -863,22 +863,22 @@ export class AIRepository {
     const query: Record<string, unknown> = {};
 
     if (options?.alertLevel) {
-      query.alertLevel = { $in: options.alertLevel };
+      query['alertLevel'] = { $in: options.alertLevel };
     }
     if (options?.alertType) {
-      query.alertType = { $in: options.alertType };
+      query['alertType'] = { $in: options.alertType };
     }
     if (options?.acknowledgedOnly) {
-      query.acknowledged = true;
+      query['acknowledged'] = true;
     }
     if (options?.unresolvedOnly) {
-      query.resolved = false;
+      query['resolved'] = false;
     }
     if (options?.userId) {
-      query.userId = options.userId;
+      query['userId'] = options.userId;
     }
     if (options?.timeRange) {
-      query.createdAt = {
+      query['createdAt'] = {
         $gte: options.timeRange.start,
         $lte: options.timeRange.end,
       };
@@ -912,28 +912,28 @@ export class AIRepository {
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
 
     if (updates["acknowledged"] !== undefined) {
-      updateData.acknowledged = updates["acknowledged"];
-      updateData.acknowledgedAt = updates["acknowledged"] ? new Date() : null;
+      updateData['acknowledged'] = updates["acknowledged"];
+      updateData['acknowledgedAt'] = updates["acknowledged"] ? new Date() : null;
       if (updates["acknowledgedBy"]) {
-        updateData.acknowledgedBy = updates["acknowledgedBy"];
+        updateData['acknowledgedBy'] = updates["acknowledgedBy"];
       }
     }
 
     if (updates["resolved"] !== undefined) {
-      updateData.resolved = updates["resolved"];
-      updateData.resolvedAt = updates["resolved"] ? new Date() : null;
+      updateData['resolved'] = updates["resolved"];
+      updateData['resolvedAt'] = updates["resolved"] ? new Date() : null;
       if (updates["resolvedBy"]) {
-        updateData.resolvedBy = updates["resolvedBy"];
+        updateData['resolvedBy'] = updates["resolvedBy"];
       }
     }
 
     if (updates["escalated"] !== undefined) {
-      updateData.escalated = updates["escalated"];
-      updateData.escalatedAt = updates["escalated"] ? new Date() : null;
+      updateData['escalated'] = updates["escalated"];
+      updateData['escalatedAt'] = updates["escalated"] ? new Date() : null;
     }
 
     if (updates["actions"]) {
-      updateData.actions = updates["actions"];
+      updateData['actions'] = updates["actions"];
     }
 
     const result = await collection.updateOne({ alertId }, { $set: updateData });
@@ -1087,9 +1087,9 @@ export class AIRepository {
     const results = await collection.find(query).toArray();
     return results.map(({ _id: _, ...correlation }) => {
       return {
-        emotion1: String(correlation.emotion1),
-        emotion2: String(correlation.emotion2),
-        correlation: Number(correlation.correlation),
+        emotion1: String(correlation['emotion1']),
+        emotion2: String(correlation['emotion2']),
+        correlation: Number(correlation['correlation']),
       };
     });
   }

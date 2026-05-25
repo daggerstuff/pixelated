@@ -9,7 +9,7 @@ import {
 function resolveMemoryId(
   params: Record<string, string | undefined>,
 ): string | undefined {
-  return params.memoryId
+  return params['memoryId']
 }
 
 export const GET = withAuthenticatedMemoryRoute(
