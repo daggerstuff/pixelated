@@ -181,7 +181,7 @@ describe('AnalyticsService', () => {
     expect(events).toHaveLength(1)
     expect(events[0]?.id).toBe('event-2')
     expect(metrics).toHaveLength(1)
-    expect(metrics[0]?.tags?.endpoint).toBe('/api/therapy')
+    expect(metrics[0]?.tags?.['endpoint']).toBe('/api/therapy')
   })
 
   it('unregisters websocket clients on close', () => {

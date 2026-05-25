@@ -42,22 +42,22 @@ const isAuditLogEntry = (value: unknown): value is AuditLogEntry => {
   }
 
   return (
-    typeof value.id === 'string' &&
-    typeof value.timestamp === 'string' &&
-    typeof value.userId === 'string' &&
-    typeof value.action === 'string' &&
-    typeof value.resource === 'string' &&
-    isAuditEventType(value.eventType) &&
-    isAuditEventStatus(value.status) &&
-    (value.userRole === undefined || typeof value.userRole === 'string') &&
-    (value.resourceId === undefined || typeof value.resourceId === 'string') &&
-    (value.ipAddress === undefined || typeof value.ipAddress === 'string') &&
-    (value.userAgent === undefined || typeof value.userAgent === 'string') &&
-    (value.sessionId === undefined || typeof value.sessionId === 'string') &&
-    (value.organizationId === undefined ||
-      typeof value.organizationId === 'string') &&
-    (value.patientId === undefined || typeof value.patientId === 'string') &&
-    (value.notes === undefined || typeof value.notes === 'string')
+    typeof value['id'] === 'string' &&
+    typeof value['timestamp'] === 'string' &&
+    typeof value['userId'] === 'string' &&
+    typeof value['action'] === 'string' &&
+    typeof value['resource'] === 'string' &&
+    isAuditEventType(value['eventType']) &&
+    isAuditEventStatus(value['status']) &&
+    (value['userRole'] === undefined || typeof value['userRole'] === 'string') &&
+    (value['resourceId'] === undefined || typeof value['resourceId'] === 'string') &&
+    (value['ipAddress'] === undefined || typeof value['ipAddress'] === 'string') &&
+    (value['userAgent'] === undefined || typeof value['userAgent'] === 'string') &&
+    (value['sessionId'] === undefined || typeof value['sessionId'] === 'string') &&
+    (value['organizationId'] === undefined ||
+      typeof value['organizationId'] === 'string') &&
+    (value['patientId'] === undefined || typeof value['patientId'] === 'string') &&
+    (value['notes'] === undefined || typeof value['notes'] === 'string')
   )
 }
 

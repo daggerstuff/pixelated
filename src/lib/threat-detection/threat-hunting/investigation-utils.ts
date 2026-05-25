@@ -137,11 +137,11 @@ export async function generateInvestigationReport(
 
   if (includeTimeline) {
     const tl = inv.timeline
-    report.timeline = Array.isArray(tl) ? tl : []
+    report['timeline'] = Array.isArray(tl) ? tl : []
   }
   if (includeEvidence) {
     const ev = inv.evidence
-    report.evidence = Array.isArray(ev) ? ev : []
+    report['evidence'] = Array.isArray(ev) ? ev : []
   }
   if (includeRecommendations) {
     // Simple heuristic recommendations for tests
@@ -153,7 +153,7 @@ export async function generateInvestigationReport(
     } else {
       recommendations.push('review_security_controls')
     }
-    report.recommendations = recommendations
+    report['recommendations'] = recommendations
   }
 
   return report

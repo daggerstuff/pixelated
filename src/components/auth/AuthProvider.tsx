@@ -71,7 +71,7 @@ export const PixelatedAuthProvider = ({
   }
 
   if (!hasAuth0DomainShape(domain)) {
-    if (process.env.NODE_ENV !== 'test') {
+    if (process.env['NODE_ENV'] !== 'test') {
       console.warn('[Auth0] Domain shape looks unusual:', domain)
     }
   }

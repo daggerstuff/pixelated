@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import { Input } from '@/components/ui/input.tsx'
-import { toast } from '@/components/ui/toast.tsx'
-import { authClient } from '@/lib/auth-client.ts'
+import { Input } from '@/components/ui/input'
+import { toast } from '@/components/ui/toast'
+import { authClient } from '@/lib/auth-client'
 
 import '@/styles/login-form-responsive.css'
 

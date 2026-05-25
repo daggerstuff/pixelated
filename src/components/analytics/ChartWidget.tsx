@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select.tsx'
+} from '@/components/ui/select'
 
 import { DashboardWidget } from './DashboardWidget'
 

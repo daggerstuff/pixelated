@@ -179,7 +179,7 @@ export class ExternalThreatFeedIntegrationCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for feed integration')
     } catch (error: unknown) {
@@ -191,7 +191,7 @@ export class ExternalThreatFeedIntegrationCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_feeds',
+        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_feeds',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_feeds')
@@ -569,26 +569,26 @@ export class ExternalThreatFeedIntegrationCore
 
     return items.filter((item) => {
       // Apply severity filter
-      if (filters.severity && item.severity !== filters.severity) {
+      if (filters['severity'] && item.severity !== filters['severity']) {
         return false
       }
 
       // Apply confidence filter
-      if (filters.minConfidence && item.confidence < filters.minConfidence) {
+      if (filters['minConfidence'] && item.confidence < filters['minConfidence']) {
         return false
       }
 
       // Apply time filter
-      if (filters.maxAge) {
+      if (filters['maxAge']) {
         const itemAge = Date.now() - new Date(item.timestamp).getTime()
-        if (itemAge > filters.maxAge) {
+        if (itemAge > filters['maxAge']) {
           return false
         }
       }
 
       // Apply custom filter function if provided
-      if (filters.customFilter && typeof filters.customFilter === 'function') {
-        return filters.customFilter(item)
+      if (filters['customFilter'] && typeof filters['customFilter'] === 'function') {
+        return filters['customFilter'](item)
       }
 
       return true
@@ -991,7 +991,7 @@ export class ExternalThreatFeedIntegrationCore
         ])
         .toArray()
 
-      return result[0]?.totalItems ?? 0
+      return result[0]?.['totalItems'] ?? 0
     } catch (error: unknown) {
       logger.error('Failed to calculate total items processed:', { error })
       return 0
@@ -1009,7 +1009,7 @@ export class ExternalThreatFeedIntegrationCore
         ])
         .toArray()
 
-      return result[0]?.avgTime ?? 0
+      return result[0]?.['avgTime'] ?? 0
     } catch (error: unknown) {
       logger.error('Failed to calculate average processing time:', { error })
       return 0
@@ -1030,7 +1030,7 @@ export class ExternalThreatFeedIntegrationCore
 
       const feedsByType: Record<string, number> = {}
       for (const result of results) {
-        feedsByType[result.feedType] = result.count
+        feedsByType[result['feedType']] = result['count']
       }
 
       return feedsByType
@@ -1054,7 +1054,7 @@ export class ExternalThreatFeedIntegrationCore
 
       const feedsByProvider: Record<string, number> = {}
       for (const result of results) {
-        feedsByProvider[result.provider] = result.count
+        feedsByProvider[result['provider']] = result['count']
       }
 
       return feedsByProvider
@@ -1605,7 +1605,7 @@ class MISPFeedProcessor implements FeedProcessor {
           provider: subscription.provider,
           itemId: item.itemId,
           description: item.description,
-          eventId: item.metadata?.eventId,
+          eventId: item.metadata?.['eventId'],
         },
       }
     } catch (error: unknown) {
@@ -1734,8 +1734,8 @@ class OTXFeedProcessor implements FeedProcessor {
           provider: subscription.provider,
           itemId: item.itemId,
           description: item.description,
-          pulseId: item.metadata?.pulseId,
-          tags: item.metadata?.tags,
+          pulseId: item.metadata?.['pulseId'],
+          tags: item.metadata?.['tags'],
         },
       }
     } catch (error: unknown) {
@@ -1862,10 +1862,10 @@ class VirusTotalFeedProcessor implements FeedProcessor {
           provider: subscription.provider,
           itemId: item.itemId,
           description: item.description,
-          fileName: item.metadata?.fileName,
-          fileSize: item.metadata?.fileSize,
-          fileType: item.metadata?.fileType,
-          vtLink: item.metadata?.vtLink,
+          fileName: item.metadata?.['fileName'],
+          fileSize: item.metadata?.['fileSize'],
+          fileType: item.metadata?.['fileType'],
+          vtLink: item.metadata?.['vtLink'],
         },
       }
     } catch (error: unknown) {
@@ -1967,7 +1967,7 @@ class GenericFeedProcessor implements FeedProcessor {
           provider: subscription.provider,
           itemId: item.itemId,
           description: item.description,
-          rawData: item.metadata?.rawData,
+          rawData: item.metadata?.['rawData'],
         },
       }
     } catch (error: unknown) {

@@ -69,10 +69,10 @@ type DemographicsSnapshot = {
 
 function toDemographics(demographics: Record<string, unknown> | undefined): DemographicsSnapshot {
   return {
-    age: toStringValue(demographics?.age),
-    gender: toStringValue(demographics?.gender),
-    ethnicity: toStringValue(demographics?.ethnicity),
-    primaryLanguage: toStringValue(demographics?.primaryLanguage),
+    age: toStringValue(demographics?.['age']),
+    gender: toStringValue(demographics?.['gender']),
+    ethnicity: toStringValue(demographics?.['ethnicity']),
+    primaryLanguage: toStringValue(demographics?.['primaryLanguage']),
   };
 }
 
@@ -591,28 +591,28 @@ export class BiasDetectionEngine {
     if (this.config.auditLogging) {
       const auditLogger = getAuditLogger();
       const sessionRecord = session as Record<string, unknown>;
-      const roleRecord = isRecordValue(sessionRecord.userRole) ? sessionRecord.userRole : {};
-      const roleName = toStringValue(roleRecord.name);
-      const roleLevel = toNumberValue(roleRecord.level);
-      const institution = toStringValue(sessionRecord.userInstitution);
-      const department = toStringValue(sessionRecord.userDepartment);
+      const roleRecord = isRecordValue(sessionRecord['userRole']) ? sessionRecord['userRole'] : {};
+      const roleName = toStringValue(roleRecord['name']);
+      const roleLevel = toNumberValue(roleRecord['level']);
+      const institution = toStringValue(sessionRecord['userInstitution']);
+      const department = toStringValue(sessionRecord['userDepartment']);
       const user: UserContext = {
-        userId: toStringValue(sessionRecord.userId),
-        email: toStringValue(sessionRecord.userEmail),
+        userId: toStringValue(sessionRecord['userId']),
+        email: toStringValue(sessionRecord['userEmail']),
         role: {
-          id: toStringValue(roleRecord.id),
+          id: toStringValue(roleRecord['id']),
           name: roleName === "" ? "analyst" : roleName,
-          description: toStringValue(roleRecord.description),
+          description: toStringValue(roleRecord['description']),
           level: roleLevel === 0 ? 1 : roleLevel,
         },
-        permissions: toStringArrayValue(sessionRecord.userPermissions),
+        permissions: toStringArrayValue(sessionRecord['userPermissions']),
         institution: institution === "" ? undefined : institution,
         department: department === "" ? undefined : department,
       };
-      const requestMeta = isRecordValue(sessionRecord.requestMeta) ? sessionRecord.requestMeta : {};
+      const requestMeta = isRecordValue(sessionRecord['requestMeta']) ? sessionRecord['requestMeta'] : {};
       const request = {
-        ipAddress: toStringValue(requestMeta.ipAddress),
-        userAgent: toStringValue(requestMeta.userAgent),
+        ipAddress: toStringValue(requestMeta['ipAddress']),
+        userAgent: toStringValue(requestMeta['userAgent']),
       };
       const demographics = toDemographics(maskedDemo);
       await auditLogger.logBiasAnalysis(

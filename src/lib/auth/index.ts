@@ -9,7 +9,6 @@ import { authConfig } from '../../config/auth.config'
 import { getUserById as getAuth0UserById } from '../../services/auth0.service'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import { getSession } from './session'
 
 export type { SessionData } from './session'
 // Re-export session for compatibility
@@ -188,7 +187,7 @@ export async function initializeAuthSystem(): Promise<void> {
 export async function getUserById(
   userId: string,
 ): Promise<{ id: string; email?: string; name?: string } | null> {
-  if (import.meta.env?.MODE === 'test' || process.env.NODE_ENV === 'test') {
+  if (import.meta.env?.MODE === 'test' || process.env['NODE_ENV'] === 'test') {
     return {
       id: userId,
       email: `${userId}@example.com`,

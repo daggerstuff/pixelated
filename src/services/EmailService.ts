@@ -66,8 +66,8 @@ export class EmailService {
           port: 587,
           secure: false,
           auth: {
-            user: process.env.AWS_SES_USER ?? '',
-            pass: process.env.AWS_SES_PASS ?? '',
+            user: process.env['AWS_SES_USER'] ?? '',
+            pass: process.env['AWS_SES_PASS'] ?? '',
           },
         })
 

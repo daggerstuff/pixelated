@@ -71,17 +71,17 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
 const isSessionAnalyticsPayload = (
   value: unknown,
 ): value is SessionAnalyticsPayload => {
-  if (!isObject(value) || typeof value.sessionId !== 'string') {
+  if (!isObject(value) || typeof value['sessionId'] !== 'string') {
     return false
   }
 
-  const analyticsData = value.analyticsData
+  const analyticsData = value['analyticsData']
   if (!isObject(analyticsData)) {
     return false
   }
 
-  const sessionMetrics = analyticsData.sessionMetrics
-  const skillProgress = analyticsData.skillProgress
+  const sessionMetrics = analyticsData['sessionMetrics']
+  const skillProgress = analyticsData['skillProgress']
   if (!Array.isArray(sessionMetrics) || !Array.isArray(skillProgress)) {
     return false
   }

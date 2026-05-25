@@ -78,37 +78,37 @@ const parseResponseBody = async <T>(
 }
 
 const hasErrorResponse = (value: unknown): value is ErrorResponse =>
-  isObject(value) && typeof value.error === 'string'
+  isObject(value) && typeof value['error'] === 'string'
 
 const hasPostSuccessResponse = (value: unknown): value is PostSuccessResponse =>
   isObject(value) &&
-  typeof value.success === 'boolean' &&
-  typeof value.sessionId === 'string' &&
-  typeof value.therapistId === 'string'
+  typeof value['success'] === 'boolean' &&
+  typeof value['sessionId'] === 'string' &&
+  typeof value['therapistId'] === 'string'
 
 const hasSessionSkillsResponse = (
   value: unknown,
 ): value is SessionSkillsResponse =>
   isObject(value) &&
-  typeof value.sessionId === 'string' &&
-  isObject(value.skillScores)
+  typeof value['sessionId'] === 'string' &&
+  isObject(value['skillScores'])
 
 const hasTherapistSkillRow = (value: unknown): value is TherapistSkillRow =>
   isObject(value) &&
-  typeof value.skill_name === 'string' &&
-  typeof value.skill_category === 'string' &&
-  typeof value.current_score === 'number' &&
-  typeof value.practice_sessions === 'number' &&
-  typeof value.last_practiced === 'string' &&
-  typeof value.created_at === 'string'
+  typeof value['skill_name'] === 'string' &&
+  typeof value['skill_category'] === 'string' &&
+  typeof value['current_score'] === 'number' &&
+  typeof value['practice_sessions'] === 'number' &&
+  typeof value['last_practiced'] === 'string' &&
+  typeof value['created_at'] === 'string'
 
 const hasTherapistSkillsResponse = (
   value: unknown,
 ): value is TherapistSkillsResponse =>
   isObject(value) &&
-  typeof value.therapistId === 'string' &&
-  Array.isArray(value.skills) &&
-  value.skills.every(hasTherapistSkillRow)
+  typeof value['therapistId'] === 'string' &&
+  Array.isArray(value['skills']) &&
+  value['skills'].every(hasTherapistSkillRow)
 
 const createRequestContext = (request: Request): APIContext => ({
   site: undefined,

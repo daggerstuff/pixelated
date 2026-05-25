@@ -108,7 +108,7 @@ export class LocalStorageProvider implements StorageProvider {
   private readonly prefix: string
 
   constructor(config: Record<string, unknown>) {
-    this.prefix = (config.prefix as string) || 'backup-'
+    this.prefix = (config['prefix'] as string) || 'backup-'
   }
 
   async initialize(): Promise<void> {
@@ -188,8 +188,8 @@ export class IndexedDBStorageProvider implements StorageProvider {
   private db: IDBDatabase | null = null
 
   constructor(config: Record<string, unknown>) {
-    this.dbName = (config.dbName as string) || 'backupStorage'
-    this.storeName = (config.storeName as string) || 'backups'
+    this.dbName = (config['dbName'] as string) || 'backupStorage'
+    this.storeName = (config['storeName'] as string) || 'backups'
   }
 
   async initialize(): Promise<void> {

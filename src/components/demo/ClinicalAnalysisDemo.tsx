@@ -12,22 +12,22 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
-import { Progress } from '@/components/ui/progress.tsx'
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
+} from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 
 interface RiskAssessment {
   level: 'low' | 'moderate' | 'high' | 'critical'

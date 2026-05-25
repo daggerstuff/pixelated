@@ -8,7 +8,7 @@
  * Throws an error if the secret is missing, whitespace-only, or matches the legacy fallback.
  */
 function ensureJwtSecret(): string {
-  const secret = process.env.JWT_SECRET ?? import.meta.env.JWT_SECRET
+  const secret = process.env['JWT_SECRET'] ?? import.meta.env['JWT_SECRET']
   const legacyFallback = 'fallback-secret-change-in-production'
 
   if (!secret || secret.trim().length === 0) {
@@ -32,12 +32,12 @@ function ensureJwtSecret(): string {
 export const JWT_CONFIG = {
   secret: ensureJwtSecret(),
   audience:
-    process.env.JWT_AUDIENCE ??
-    import.meta.env.JWT_AUDIENCE ??
+    process.env['JWT_AUDIENCE'] ??
+    import.meta.env['JWT_AUDIENCE'] ??
     'pixelated-empathy',
   issuer:
-    process.env.JWT_ISSUER ??
-    import.meta.env.JWT_ISSUER ??
+    process.env['JWT_ISSUER'] ??
+    import.meta.env['JWT_ISSUER'] ??
     'pixelated-auth-service',
   accessTokenExpiry: 24 * 60 * 60, // 24 hours - matching original inline config per PR requirements
   refreshTokenExpiry: 7 * 24 * 60 * 60, // 7 days
@@ -46,17 +46,17 @@ export const JWT_CONFIG = {
 
 // Auth0 Configuration
 export const AUTH0_CONFIG = {
-  domain: process.env.AUTH0_DOMAIN ?? import.meta.env.AUTH0_DOMAIN ?? '',
+  domain: process.env['AUTH0_DOMAIN'] ?? import.meta.env['AUTH0_DOMAIN'] ?? '',
   clientId:
-    process.env.AUTH0_CLIENT_ID ?? import.meta.env.AUTH0_CLIENT_ID ?? '',
+    process.env['AUTH0_CLIENT_ID'] ?? import.meta.env['AUTH0_CLIENT_ID'] ?? '',
   clientSecret:
-    process.env.AUTH0_CLIENT_SECRET ??
-    import.meta.env.AUTH0_CLIENT_SECRET ??
+    process.env['AUTH0_CLIENT_SECRET'] ??
+    import.meta.env['AUTH0_CLIENT_SECRET'] ??
     '',
-  audience: process.env.AUTH0_AUDIENCE ?? import.meta.env.AUTH0_AUDIENCE ?? '',
+  audience: process.env['AUTH0_AUDIENCE'] ?? import.meta.env['AUTH0_AUDIENCE'] ?? '',
   callbackUrl:
-    process.env.AUTH0_CALLBACK_URL ??
-    import.meta.env.AUTH0_CALLBACK_URL ??
+    process.env['AUTH0_CALLBACK_URL'] ??
+    import.meta.env['AUTH0_CALLBACK_URL'] ??
     'http://localhost:4321/api/auth/callback',
   scope: 'openid profile email offline_access',
 }
@@ -101,7 +101,7 @@ export const RATE_LIMIT_CONFIG = {
 // Security Configuration
 export const SECURITY_CONFIG = {
   cors: {
-    origin: (process.env.CORS_ORIGIN ?? import.meta.env.CORS_ORIGIN)?.split(
+    origin: (process.env['CORS_ORIGIN'] ?? import.meta.env['CORS_ORIGIN'])?.split(
       ',',
     ) ?? ['http://localhost:4321'],
     credentials: true,
@@ -109,10 +109,10 @@ export const SECURITY_CONFIG = {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   },
   csrf: {
-    enabled: process.env.NODE_ENV === 'production' || import.meta.env.PROD,
+    enabled: process.env['NODE_ENV'] === 'production' || import.meta.env.PROD,
     secret:
-      process.env.CSRF_SECRET ??
-      import.meta.env.CSRF_SECRET ??
+      process.env['CSRF_SECRET'] ??
+      import.meta.env['CSRF_SECRET'] ??
       'fallback-csrf-secret',
   },
   headers: {
@@ -234,7 +234,7 @@ export function getAuthConfig() {
 export function validateAuthConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
-  const isProd = process.env.NODE_ENV === 'production' || import.meta.env.PROD
+  const isProd = process.env['NODE_ENV'] === 'production' || import.meta.env.PROD
 
   // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
   try {
@@ -262,10 +262,10 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
  */
 export function getEnvironmentConfig() {
   const isDevelopment =
-    process.env.NODE_ENV === 'development' || import.meta.env.DEV
+    process.env['NODE_ENV'] === 'development' || import.meta.env.DEV
   const isProduction =
-    process.env.NODE_ENV === 'production' || import.meta.env.PROD
-  const isTest = process.env.NODE_ENV === 'test'
+    process.env['NODE_ENV'] === 'production' || import.meta.env.PROD
+  const isTest = process.env['NODE_ENV'] === 'test'
 
   return {
     isDevelopment,
@@ -273,8 +273,8 @@ export function getEnvironmentConfig() {
     isTest,
     debug:
       isDevelopment ||
-      process.env.DEBUG === 'true' ||
-      import.meta.env.DEBUG === 'true',
+      process.env['DEBUG'] === 'true' ||
+      import.meta.env['DEBUG'] === 'true',
     strictMode: isProduction,
     enableDetailedErrors: isDevelopment,
     enableStackTraces: isDevelopment || isTest,

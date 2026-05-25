@@ -75,7 +75,6 @@ import { resolveIdentity } from '../user-identity'
 
 describe('Authentication Middleware', () => {
   let mockRequest: Request
-  let _mockResponse: Response
 
   beforeEach(() => {
     vi.clearAllMocks()

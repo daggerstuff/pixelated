@@ -8,13 +8,13 @@
 import { AlertCircle, Zap, AlertTriangle } from 'lucide-react'
 import React, { useState, useCallback, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
+import { Badge } from '@/components/ui/badge/index'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
+} from '@/components/ui/card/index'
 import { usePixelConversationIntegration } from '@/hooks/usePixelConversationIntegration'
 import type { PixelInferenceResponse } from '@/types/pixel'
 

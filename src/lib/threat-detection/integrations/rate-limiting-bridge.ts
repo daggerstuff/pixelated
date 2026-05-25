@@ -165,13 +165,13 @@ export class RateLimitingBridge {
       )
 
       for (const action of actions) {
-        if (action.parameters.userId && action.parameters.limit) {
+        if (action.parameters['userId'] && action.parameters['limit']) {
           await this.rateLimiter.checkLimit(
-            action.parameters.userId as string,
+            action.parameters['userId'] as string,
             {
               name: `threat_${threatResponse.responseId}`,
-              maxRequests: action.parameters.limit as number,
-              windowMs: (action.parameters.windowMs as number) || 60000,
+              maxRequests: action.parameters['limit'] as number,
+              windowMs: (action.parameters['windowMs'] as number) || 60000,
               enableAttackDetection: true,
             },
             context as unknown as Record<string, unknown>,

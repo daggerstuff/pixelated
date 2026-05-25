@@ -109,7 +109,7 @@ describe('error-handler middleware', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
-    process.env.NODE_ENV = 'test'
+    process.env['NODE_ENV'] = 'test'
   })
 
   describe('errorHandler', () => {
@@ -220,7 +220,7 @@ describe('error-handler middleware', () => {
     })
 
     it('should include stack trace and request info in development mode', () => {
-      process.env.NODE_ENV = 'development'
+      process.env['NODE_ENV'] = 'development'
       const error = new Error('Test error')
       errorHandler(error, req, res, next)
 

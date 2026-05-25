@@ -695,26 +695,26 @@ export type AnimationPreset =
 
 export const animationPresets: Record<AnimationPreset, Variants> = {
   // Quick access to most commonly used sequences
-  fadeIn: pageTransitionSequences.fadeSlide,
-  slideUp: pageTransitionSequences.slideUp,
-  scaleIn: pageTransitionSequences.scaleIn,
+  fadeIn: pageTransitionSequences['fadeSlide'],
+  slideUp: pageTransitionSequences['slideUp'],
+  scaleIn: pageTransitionSequences['scaleIn'],
 
   // List animations
-  stagger: listAnimationSequences.staggeredFade,
-  cascade: listAnimationSequences.cascadeIn,
+  stagger: listAnimationSequences['staggeredFade'],
+  cascade: listAnimationSequences['cascadeIn'],
 
   // Interactive
-  button: interactiveSequences.buttonHover,
-  card: interactiveSequences.cardFloat,
+  button: interactiveSequences['buttonHover'],
+  card: interactiveSequences['cardFloat'],
 
   // Modals
-  modal: modalSequences.scaleUp,
+  modal: modalSequences['scaleUp'],
 
   // Notifications
-  toast: notificationSequences.slideInRight,
+  toast: notificationSequences['slideInRight'],
 
   // Loading
-  loading: loadingSequences.pulse,
+  loading: loadingSequences['pulse'],
 }
 export type SequenceType =
   | 'page'

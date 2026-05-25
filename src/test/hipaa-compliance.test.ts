@@ -10,7 +10,7 @@
  * - 45 CFR 164.310 - Physical Safeguards
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 // Mock implementations for testing
 interface AuditEvent {
@@ -92,7 +92,7 @@ describe('HIPAA Audit Trail Logging', () => {
     }
 
     expect(event.event_type).toBe('DATA_EXPORT')
-    expect((event.details as Record<string, number>).record_count).toBe(50)
+    expect((event.details as Record<string, number>)['record_count']).toBe(50)
   })
 
   it('audit log contains all required HIPAA fields', () => {

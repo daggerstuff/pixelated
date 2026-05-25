@@ -1,4 +1,3 @@
-import { v4 as uuidv4 } from 'uuid';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 import type { MemoryObject } from './types';
 

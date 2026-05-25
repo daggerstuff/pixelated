@@ -5,8 +5,8 @@ import type {
   TableColumn,
   TableState,
   TableDataSource,
-} from '@/components/ui/table-types.ts'
-import { Table } from '@/components/ui/table.tsx'
+} from '@/components/ui/table-types'
+import { Table } from '@/components/ui/table'
 import type {
   Session,
   SessionList as SessionListType,

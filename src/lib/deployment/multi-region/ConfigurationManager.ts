@@ -168,7 +168,6 @@ export interface ComplianceConfig {
 
 export class ConfigurationManager extends EventEmitter {
   private config: MultiRegionConfig
-  private isInitialized = false
   private readonly configWatchers: Map<string, NodeJS.Timeout> = new Map()
   private readonly featureFlagCache: Map<string, boolean> = new Map()
 
@@ -293,7 +292,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   private async loadEnvironmentConfig(): Promise<void> {
     try {
-      const environment = process.env.NODE_ENV ?? 'development'
+      const environment = process.env['NODE_ENV'] ?? 'development'
       logger.info(`Loading configuration for environment: ${environment}`)
 
       // Load environment-specific overrides
@@ -535,92 +534,92 @@ export class ConfigurationManager extends EventEmitter {
       logger.info('Loading secrets from environment variables')
 
       // AWS credentials
-      if (process.env.AWS_ACCESS_KEY_ID) {
+      if (process.env['AWS_ACCESS_KEY_ID']) {
         this.config.secrets.cloudProviders.aws.accessKeyId =
-          process.env.AWS_ACCESS_KEY_ID
+          process.env['AWS_ACCESS_KEY_ID']
       }
-      if (process.env.AWS_SECRET_ACCESS_KEY) {
+      if (process.env['AWS_SECRET_ACCESS_KEY']) {
         this.config.secrets.cloudProviders.aws.secretAccessKey =
-          process.env.AWS_SECRET_ACCESS_KEY
+          process.env['AWS_SECRET_ACCESS_KEY']
       }
-      if (process.env.AWS_REGION) {
-        this.config.secrets.cloudProviders.aws.region = process.env.AWS_REGION
+      if (process.env['AWS_REGION']) {
+        this.config.secrets.cloudProviders.aws.region = process.env['AWS_REGION']
       }
 
       // GCP credentials
-      if (process.env.GOOGLE_CLOUD_PROJECT) {
+      if (process.env['GOOGLE_CLOUD_PROJECT']) {
         this.config.secrets.cloudProviders.gcp.projectId =
-          process.env.GOOGLE_CLOUD_PROJECT
+          process.env['GOOGLE_CLOUD_PROJECT']
       }
-      if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      if (process.env['GOOGLE_APPLICATION_CREDENTIALS']) {
         this.config.secrets.cloudProviders.gcp.keyFilename =
-          process.env.GOOGLE_APPLICATION_CREDENTIALS
+          process.env['GOOGLE_APPLICATION_CREDENTIALS']
       }
 
       // Azure credentials
-      if (process.env.AZURE_SUBSCRIPTION_ID) {
+      if (process.env['AZURE_SUBSCRIPTION_ID']) {
         this.config.secrets.cloudProviders.azure.subscriptionId =
-          process.env.AZURE_SUBSCRIPTION_ID
+          process.env['AZURE_SUBSCRIPTION_ID']
       }
-      if (process.env.AZURE_CLIENT_ID) {
+      if (process.env['AZURE_CLIENT_ID']) {
         this.config.secrets.cloudProviders.azure.clientId =
-          process.env.AZURE_CLIENT_ID
+          process.env['AZURE_CLIENT_ID']
       }
-      if (process.env.AZURE_CLIENT_SECRET) {
+      if (process.env['AZURE_CLIENT_SECRET']) {
         this.config.secrets.cloudProviders.azure.clientSecret =
-          process.env.AZURE_CLIENT_SECRET
+          process.env['AZURE_CLIENT_SECRET']
       }
-      if (process.env.AZURE_TENANT_ID) {
+      if (process.env['AZURE_TENANT_ID']) {
         this.config.secrets.cloudProviders.azure.tenantId =
-          process.env.AZURE_TENANT_ID
+          process.env['AZURE_TENANT_ID']
       }
 
       // Database credentials
-      if (process.env.COCKROACHDB_CONNECTION_STRING) {
+      if (process.env['COCKROACHDB_CONNECTION_STRING']) {
         this.config.secrets.databases.cockroachdb.connectionString =
-          process.env.COCKROACHDB_CONNECTION_STRING
+          process.env['COCKROACHDB_CONNECTION_STRING']
       }
-      if (process.env.REDIS_URL) {
-        this.config.secrets.databases.redis.url = process.env.REDIS_URL
+      if (process.env['REDIS_URL']) {
+        this.config.secrets.databases.redis.url = process.env['REDIS_URL']
       }
-      if (process.env.REDIS_PASSWORD) {
+      if (process.env['REDIS_PASSWORD']) {
         this.config.secrets.databases.redis.password =
-          process.env.REDIS_PASSWORD
+          process.env['REDIS_PASSWORD']
       }
 
       // AI service credentials
-      if (process.env.OPENAI_API_KEY) {
+      if (process.env['OPENAI_API_KEY']) {
         this.config.secrets.aiServices.openai.apiKey =
-          process.env.OPENAI_API_KEY
+          process.env['OPENAI_API_KEY']
       }
-      if (process.env.OPENAI_ORGANIZATION) {
+      if (process.env['OPENAI_ORGANIZATION']) {
         this.config.secrets.aiServices.openai.organization =
-          process.env.OPENAI_ORGANIZATION
+          process.env['OPENAI_ORGANIZATION']
       }
-      if (process.env.GOOGLE_AI_API_KEY) {
+      if (process.env['GOOGLE_AI_API_KEY']) {
         this.config.secrets.aiServices.google.apiKey =
-          process.env.GOOGLE_AI_API_KEY
+          process.env['GOOGLE_AI_API_KEY']
       }
-      if (process.env.GOOGLE_CLOUD_PROJECT) {
+      if (process.env['GOOGLE_CLOUD_PROJECT']) {
         this.config.secrets.aiServices.google.projectId =
-          process.env.GOOGLE_CLOUD_PROJECT
+          process.env['GOOGLE_CLOUD_PROJECT']
       }
 
       // Monitoring credentials
-      if (process.env.SENTRY_DSN) {
-        this.config.secrets.monitoring.sentry.dsn = process.env.SENTRY_DSN
+      if (process.env['SENTRY_DSN']) {
+        this.config.secrets.monitoring.sentry.dsn = process.env['SENTRY_DSN']
       }
-      if (process.env.SENTRY_AUTH_TOKEN) {
+      if (process.env['SENTRY_AUTH_TOKEN']) {
         this.config.secrets.monitoring.sentry.authToken =
-          process.env.SENTRY_AUTH_TOKEN
+          process.env['SENTRY_AUTH_TOKEN']
       }
-      if (process.env.DATADOG_API_KEY) {
+      if (process.env['DATADOG_API_KEY']) {
         this.config.secrets.monitoring.datadog.apiKey =
-          process.env.DATADOG_API_KEY
+          process.env['DATADOG_API_KEY']
       }
-      if (process.env.DATADOG_APP_KEY) {
+      if (process.env['DATADOG_APP_KEY']) {
         this.config.secrets.monitoring.datadog.appKey =
-          process.env.DATADOG_APP_KEY
+          process.env['DATADOG_APP_KEY']
       }
 
       logger.info('Secrets loaded from environment variables')
@@ -849,14 +848,14 @@ export class ConfigurationManager extends EventEmitter {
   } {
     return {
       domainName:
-        process.env.MULTI_REGION_DOMAIN_NAME ??
+        process.env['MULTI_REGION_DOMAIN_NAME'] ??
         this.config.deployment.regions[0]?.name ??
         'example.com',
       hostedZoneId:
-        process.env.MULTI_REGION_HOSTED_ZONE_ID ?? 'Z00000000000000000000',
+        process.env['MULTI_REGION_HOSTED_ZONE_ID'] ?? 'Z00000000000000000000',
       cloudflareZoneId:
-        process.env.MULTI_REGION_CLOUDFLARE_ZONE_ID ?? undefined,
-      ttl: Number.parseInt(process.env.MULTI_REGION_DNS_TTL ?? '60', 10),
+        process.env['MULTI_REGION_CLOUDFLARE_ZONE_ID'] ?? undefined,
+      ttl: Number.parseInt(process.env['MULTI_REGION_DNS_TTL'] ?? '60', 10),
     }
   }
 
@@ -864,7 +863,7 @@ export class ConfigurationManager extends EventEmitter {
    * Get current environment name
    */
   getEnvironment(): string {
-    return process.env.NODE_ENV ?? 'production'
+    return process.env['NODE_ENV'] ?? 'production'
   }
 
   /**

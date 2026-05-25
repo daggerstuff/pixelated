@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { authClient } from '@/lib/auth-client.ts'
+import { authClient } from '@/lib/auth-client'
 import { cn } from '@/lib/utils'
 
 import type { UserRole } from '../../types/auth'

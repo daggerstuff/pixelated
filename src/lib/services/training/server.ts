@@ -1,7 +1,7 @@
 import { TrainingWebSocketServer } from './TrainingWebSocketServer.ts'
 
-const PORT = process.env.TRAINING_WS_PORT
-  ? parseInt(process.env.TRAINING_WS_PORT)
+const PORT = process.env['TRAINING_WS_PORT']
+  ? parseInt(process.env['TRAINING_WS_PORT'])
   : 8084
 
 const server = new TrainingWebSocketServer(PORT)

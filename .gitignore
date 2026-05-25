@@ -197,6 +197,9 @@ k8s/base/secrets.local.yaml
 /security-report.md
 /security-reports/
 /test-results/
+# Test output files
+*_output.txt
+test_output.txt
 security-scan-artifacts
 
 # === TEMP & CACHES ===

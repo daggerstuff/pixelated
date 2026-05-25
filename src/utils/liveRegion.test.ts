@@ -5,9 +5,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
 import {
   announceStatus,
-  announceAlert,
-  log,
-  announceProgress,
+  _announceAlert,
+  _log,
+  _announceProgress,
 } from './liveRegion'
 
 describe('liveRegion utilities', () => {

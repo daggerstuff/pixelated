@@ -14,17 +14,17 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useCallback } from 'react'
 
-import Alert from '@/components/ui/alert.tsx'
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
+import Alert from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
-import { Progress } from '@/components/ui/progress.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
+import { Textarea } from '@/components/ui/textarea'
 import { apiClient, APIError } from '@/lib/api-client'
 import type { CrisisDetectionResponse } from '@/types/crisis-detection'
 

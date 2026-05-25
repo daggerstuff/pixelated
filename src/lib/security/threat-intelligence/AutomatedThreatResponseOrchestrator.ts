@@ -657,27 +657,27 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'block',
-            target: action.parameters.indicator ?? 'unknown',
+            target: action.parameters['indicator'] ?? 'unknown',
             status: 'started',
-            message: `Blocking indicator: ${action.parameters.indicator}`,
+            message: `Blocking indicator: ${action.parameters['indicator']}`,
           }
 
           // Simulate blocking action (in real implementation, call actual APIs)
           await this.simulateBlockAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully blocked indicator: ${action.parameters.indicator}`
+          logEntry.message = `Successfully blocked indicator: ${action.parameters['indicator']}`
           executionLog.push(logEntry)
 
-          result.blocked_indicators.push(action.parameters.indicator)
+          result.blocked_indicators.push(action.parameters['indicator'])
           result.affected_systems.push(
-            `firewall:${action.parameters.system_id}`,
+            `firewall:${action.parameters['system_id']}`,
           )
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'block',
-            target: action.parameters.indicator ?? 'unknown',
+            target: action.parameters['indicator'] ?? 'unknown',
             status: 'failed',
             message: `Failed to block indicator: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -730,26 +730,26 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'isolate',
-            target: action.parameters.system_id ?? 'unknown',
+            target: action.parameters['system_id'] ?? 'unknown',
             status: 'started',
-            message: `Isolating system: ${action.parameters.system_id}`,
+            message: `Isolating system: ${action.parameters['system_id']}`,
           }
 
           // Simulate isolation action
           await this.simulateIsolateAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully isolated system: ${action.parameters.system_id}`
+          logEntry.message = `Successfully isolated system: ${action.parameters['system_id']}`
           executionLog.push(logEntry)
 
           result.affected_systems.push(
-            `endpoint:${action.parameters.system_id}`,
+            `endpoint:${action.parameters['system_id']}`,
           )
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'isolate',
-            target: action.parameters.system_id ?? 'unknown',
+            target: action.parameters['system_id'] ?? 'unknown',
             status: 'failed',
             message: `Failed to isolate system: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -802,24 +802,24 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'notify',
-            target: action.parameters.recipient ?? 'unknown',
+            target: action.parameters['recipient'] ?? 'unknown',
             status: 'started',
-            message: `Sending notification to: ${action.parameters.recipient}`,
+            message: `Sending notification to: ${action.parameters['recipient']}`,
           }
 
           // Simulate notification action
           await this.simulateNotifyAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully sent notification to: ${action.parameters.recipient}`
+          logEntry.message = `Successfully sent notification to: ${action.parameters['recipient']}`
           executionLog.push(logEntry)
 
-          result.notifications_sent.push(action.parameters.recipient)
+          result.notifications_sent.push(action.parameters['recipient'])
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'notify',
-            target: action.parameters.recipient ?? 'unknown',
+            target: action.parameters['recipient'] ?? 'unknown',
             status: 'failed',
             message: `Failed to send notification: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -889,24 +889,24 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'escalate',
-            target: action.parameters.escalation_target ?? 'unknown',
+            target: action.parameters['escalation_target'] ?? 'unknown',
             status: 'started',
-            message: `Escalating to: ${action.parameters.escalation_target}`,
+            message: `Escalating to: ${action.parameters['escalation_target']}`,
           }
 
           // Simulate escalation action
           await this.simulateEscalateAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully escalated to: ${action.parameters.escalation_target}`
+          logEntry.message = `Successfully escalated to: ${action.parameters['escalation_target']}`
           executionLog.push(logEntry)
 
-          result.escalations_triggered.push(action.parameters.escalation_target)
+          result.escalations_triggered.push(action.parameters['escalation_target'])
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'escalate',
-            target: action.parameters.escalation_target ?? 'unknown',
+            target: action.parameters['escalation_target'] ?? 'unknown',
             status: 'failed',
             message: `Failed to escalate: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -959,26 +959,26 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'remediate',
-            target: action.parameters.vulnerability ?? 'unknown',
+            target: action.parameters['vulnerability'] ?? 'unknown',
             status: 'started',
-            message: `Remediating vulnerability: ${action.parameters.vulnerability}`,
+            message: `Remediating vulnerability: ${action.parameters['vulnerability']}`,
           }
 
           // Simulate remediation action
           await this.simulateRemediateAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully remediated vulnerability: ${action.parameters.vulnerability}`
+          logEntry.message = `Successfully remediated vulnerability: ${action.parameters['vulnerability']}`
           executionLog.push(logEntry)
 
           result.affected_systems.push(
-            `vulnerability:${action.parameters.vulnerability}`,
+            `vulnerability:${action.parameters['vulnerability']}`,
           )
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'remediate',
-            target: action.parameters.vulnerability ?? 'unknown',
+            target: action.parameters['vulnerability'] ?? 'unknown',
             status: 'failed',
             message: `Failed to remediate vulnerability: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -1031,26 +1031,26 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'collect',
-            target: action.parameters.data_source ?? 'unknown',
+            target: action.parameters['data_source'] ?? 'unknown',
             status: 'started',
-            message: `Collecting data from: ${action.parameters.data_source}`,
+            message: `Collecting data from: ${action.parameters['data_source']}`,
           }
 
           // Simulate data collection action
           await this.simulateCollectAction(action)
 
           logEntry.status = 'success'
-          logEntry.message = `Successfully collected data from: ${action.parameters.data_source}`
+          logEntry.message = `Successfully collected data from: ${action.parameters['data_source']}`
           executionLog.push(logEntry)
 
           result.affected_systems.push(
-            `data_source:${action.parameters.data_source}`,
+            `data_source:${action.parameters['data_source']}`,
           )
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),
             action: 'collect',
-            target: action.parameters.data_source ?? 'unknown',
+            target: action.parameters['data_source'] ?? 'unknown',
             status: 'failed',
             message: `Failed to collect data: ${error instanceof Error ? error.message : 'Unknown error'}`,
             details: {
@@ -1270,7 +1270,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
             const logEntry: ExecutionLogEntry = {
               timestamp: new Date(),
               action: 'rollback',
-              target: action.parameters.indicator ?? 'unknown',
+              target: action.parameters['indicator'] ?? 'unknown',
               status: 'started',
               message: `Rolling back action: ${action.action_type}`,
             }
@@ -1285,7 +1285,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
             const logEntry: ExecutionLogEntry = {
               timestamp: new Date(),
               action: 'rollback',
-              target: action.parameters.indicator ?? 'unknown',
+              target: action.parameters['indicator'] ?? 'unknown',
               status: 'failed',
               message: `Failed to rollback action: ${error instanceof Error ? error.message : 'Unknown error'}`,
               details: {
@@ -1436,14 +1436,14 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
 
       const byStatusMap = byStatus.reduce<Record<string, number>>(
         (acc, item) => {
-          acc[item['_id']] = item.count
+          acc[item['_id']] = item['count']
           return acc
         },
         {},
       )
 
       const byTypeMap = byType.reduce<Record<string, number>>((acc, item) => {
-        acc[item['_id']] = item.count
+        acc[item['_id']] = item['count']
         return acc
       }, {})
 

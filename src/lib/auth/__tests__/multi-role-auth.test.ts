@@ -127,8 +127,8 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Set test environment variables
-    process.env.TOTP_ISSUER = 'Pixelated Test Platform'
-    process.env.JWT_SECRET = 'test-secret-key'
+    process.env['TOTP_ISSUER'] = 'Pixelated Test Platform'
+    process.env['JWT_SECRET'] = 'test-secret-key'
   })
 
   afterEach(() => {

@@ -1,7 +1,7 @@
 import request from 'supertest'
 // Authentication API Integration Tests
 // Tests for OAuth-based authentication flow with Auth0
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { describe, it, expect, afterAll } from 'vitest'
 
 import {
   generateTestId,
@@ -10,10 +10,6 @@ import {
 import { app } from '../../../server'
 
 describe('Authentication API', () => {
-  const testEmail = `test-${generateTestId()}@test.com`
-  const testPassword = 'SecurePassword123!'
-  const testName = 'Test User'
-  let authToken: string
 
   afterAll(async () => {
     // No cleanup needed - no test user created in these tests
@@ -22,29 +18,29 @@ describe('Authentication API', () => {
   describe('GET /api/auth/login', () => {
     it('should redirect to Auth0 login when Auth0 is configured', async () => {
       const hasAuth0Config = !!(
-        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+        process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_ID']
       )
 
       if (hasAuth0Config) {
         const response = await request(app).get('/api/auth/login')
         expect(response.status).toBe(302)
-        expect(response.headers.location).toContain('auth0.com')
+        expect(response.headers['location']).toContain('auth0.com')
       } else {
         const response = await request(app).get('/api/auth/login')
         expect(response.status).toBe(500)
-        expect(response.body.error).toContain('Auth0 configuration')
+        expect(response.body['error']).toContain('Auth0 configuration')
       }
     })
 
     it('should include required OAuth parameters in redirect', async () => {
       const hasAuth0Config = !!(
-        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+        process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_ID']
       )
 
       if (hasAuth0Config) {
         const response = await request(app).get('/api/auth/login')
         expect(response.status).toBe(302)
-        const location = response.headers.location
+        const location = response.headers['location']
         expect(location).toContain('response_type=code')
         expect(location).toContain('client_id=')
         expect(location).toContain('redirect_uri=')
@@ -54,13 +50,13 @@ describe('Authentication API', () => {
 
     it('should return 500 when Auth0 is not configured', async () => {
       const hasAuth0Config = !!(
-        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+        process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_ID']
       )
 
       if (!hasAuth0Config) {
         const response = await request(app).get('/api/auth/login')
         expect(response.status).toBe(500)
-        expect(response.body.code).toBe('CONFIG_ERROR')
+        expect(response.body['code']).toBe('CONFIG_ERROR')
       }
     })
   })
@@ -69,7 +65,7 @@ describe('Authentication API', () => {
     it('should reject callback without authorization code', async () => {
       const response = await request(app).get('/api/auth/callback')
       expect(response.status).toBe(400)
-      expect(response.body.error).toContain('code')
+      expect(response.body['error']).toContain('code')
     })
 
     it('should reject callback with invalid code format', async () => {
@@ -82,28 +78,28 @@ describe('Authentication API', () => {
     it('should logout successfully', async () => {
       const response = await request(app).post('/api/auth/logout')
       const hasAuth0Config = !!(
-        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+        process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_ID']
       )
 
       if (hasAuth0Config) {
         expect([200]).toContain(response.status)
       } else {
         expect(response.status).toBe(500)
-        expect(response.body.code).toBe('CONFIG_ERROR')
+        expect(response.body['code']).toBe('CONFIG_ERROR')
       }
     })
 
     it('should clear session data', async () => {
       const response = await request(app).post('/api/auth/logout')
       const hasAuth0Config = !!(
-        process.env.AUTH0_DOMAIN && process.env.AUTH0_CLIENT_ID
+        process.env['AUTH0_DOMAIN'] && process.env['AUTH0_CLIENT_ID']
       )
 
       if (hasAuth0Config) {
         expect(response.status).toBe(200)
       } else {
         expect(response.status).toBe(500)
-        expect(response.body.code).toBe('CONFIG_ERROR')
+        expect(response.body['code']).toBe('CONFIG_ERROR')
       }
     })
   })

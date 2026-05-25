@@ -1,17 +1,17 @@
 import { useState, useEffect, useMemo } from 'react'
 
 import { MentalHealthHistoryChart } from '@/components/MentalHealthHistoryChart'
-import { Button } from '@/components/ui/button/index.ts'
-import { Card, CardContent } from '@/components/ui/card/index.ts'
-import { Input } from '@/components/ui/input.tsx'
-import { Label } from '@/components/ui/label.tsx'
-import { Switch } from '@/components/ui/switch.tsx'
+import { Button } from '@/components/ui/button/index'
+import { Card, CardContent } from '@/components/ui/card/index'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
+} from '@/components/ui/tabs'
 import type { MentalHealthAnalysis } from '@/lib/chat'
 import { createMentalHealthChat } from '@/lib/chat'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -286,9 +286,24 @@ export default function MentalHealthChatDemoReact({
                 </div>
               ))}
               {processing && (
-                <div className="flex justify-start">
-                  <div className="bg-muted max-w-[80%] rounded-lg px-4 py-2">
-                    <p>...</p>
+                <div
+                  className="flex justify-start"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="bg-muted max-w-[80%] rounded-lg px-4 py-3">
+                    <div className="flex space-x-1.5 h-4 items-center">
+                      <div className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"></div>
+                      <div
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        style={{ animationDelay: '0.2s' }}
+                      ></div>
+                      <div
+                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        style={{ animationDelay: '0.4s' }}
+                      ></div>
+                      <span className="sr-only">Assistant is typing...</span>
+                    </div>
                   </div>
                 </div>
               )}

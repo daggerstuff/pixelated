@@ -20,7 +20,7 @@ import type {
 } from '@/lib/api/journal-research/bias-audit-types'
 import {
   getBiasAuditService,
-  type BiasAuditServiceConfig,
+  type _BiasAuditServiceConfig,
 } from '@/lib/services/bias-audit-service'
 
 // Query keys

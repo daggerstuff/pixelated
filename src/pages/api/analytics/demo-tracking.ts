@@ -73,12 +73,12 @@ export const POST = async ({ request }) => {
 
     // Log which analytics integrations will be attempted
     const hasGA = Boolean(
-      import.meta.env.PUBLIC_GA_MEASUREMENT_ID && import.meta.env.GA_API_SECRET,
+      import.meta.env['PUBLIC_GA_MEASUREMENT_ID'] && import.meta.env['GA_API_SECRET'],
     )
-    const hasMixpanel = Boolean(import.meta.env.MIXPANEL_TOKEN)
+    const hasMixpanel = Boolean(import.meta.env['MIXPANEL_TOKEN'])
     const hasCustom = Boolean(
-      import.meta.env.CUSTOM_ANALYTICS_ENDPOINT &&
-      import.meta.env.CUSTOM_ANALYTICS_TOKEN,
+      import.meta.env['CUSTOM_ANALYTICS_ENDPOINT'] &&
+      import.meta.env['CUSTOM_ANALYTICS_TOKEN'],
     )
     console.log('Attempting analytics integrations:', {
       hasGA,
@@ -189,7 +189,7 @@ async function sendToGoogleAnalytics(
   event: EnrichedAnalyticsEvent,
 ): Promise<void> {
   // Google Analytics 4 Measurement Protocol
-  const GA_MEASUREMENT_ID = import.meta.env.PUBLIC_GA_MEASUREMENT_ID
+  const GA_MEASUREMENT_ID = import.meta.env['PUBLIC_GA_MEASUREMENT_ID']
   const { GA_API_SECRET } = import.meta.env
 
   if (!GA_MEASUREMENT_ID || !GA_API_SECRET) {

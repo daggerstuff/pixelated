@@ -1,4 +1,3 @@
-import { EventEmitter } from 'events'
 
 // Re-export types used by threat-data-utils
 export type ThreatSeverity = 'low' | 'medium' | 'high' | 'critical'

@@ -10,7 +10,6 @@ import homomorphicOps from './homomorphic-ops'
 import { SealResourceScope } from './seal-memory'
 import { SealService } from './seal-service'
 import type { SealCipherText } from './seal-service'
-import { SealSchemeType } from './seal-types'
 import { EncryptionMode, FHEOperation } from './types'
 import type {
   FHEService,
@@ -351,17 +350,6 @@ export class RealFHEService implements FHEService {
    */
   public getEncryptionMode(): EncryptionMode {
     return this.getMode()
-  }
-
-  /**
-   * Check if service is initialized
-   */
-  private checkInitialized() {
-    if (!this.initialized) {
-      throw new Error(
-        'Real FHE service not initialized. Call initialize() first.',
-      )
-    }
   }
 }
 

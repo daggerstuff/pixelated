@@ -21,9 +21,9 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('pixel-multimodal-ws')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
-const WS_PORT = Number(process.env.WS_PIXEL_PORT ?? 8091)
+const PIXEL_API_URL = process.env['PIXEL_API_URL'] ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env['PIXEL_API_KEY'] ?? ''
+const WS_PORT = Number(process.env['WS_PIXEL_PORT'] ?? 8091)
 const REQUEST_TIMEOUT_MS = 45000
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024 // 25MB safety cap
 
@@ -66,13 +66,13 @@ function ensureServer(): WebSocketServer {
     ws.on('message', async (data) => {
       try {
         const message = JSON.parse(data.toString()) as Record<string, unknown>
-        const type = message.type as string
+        const type = message['type'] as string
 
         switch (type) {
           case 'text': {
-            state.text = (message.text as string) || ''
-            state.contextType = (message.contextType as string) || 'therapeutic'
-            state.sessionId = (message.sessionId as string) || state.sessionId
+            state.text = (message['text'] as string) || ''
+            state.contextType = (message['contextType'] as string) || 'therapeutic'
+            state.sessionId = (message['sessionId'] as string) || state.sessionId
             ws.send(
               JSON.stringify({
                 type: 'status',
@@ -83,8 +83,8 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'chunk': {
-            const base64 = (message.chunk as string) || ''
-            const mimeType = (message.mimeType as string) || 'audio/webm'
+            const base64 = (message['chunk'] as string) || ''
+            const mimeType = (message['mimeType'] as string) || 'audio/webm'
             if (!base64) break
             const buffer = Buffer.from(base64, 'base64')
             state.totalBytes += buffer.length
@@ -110,11 +110,11 @@ function ensureServer(): WebSocketServer {
             break
           }
           case 'complete': {
-            const text = ((message.text as string) || state.text) ?? ''
+            const text = ((message['text'] as string) || state.text) ?? ''
             const contextType =
-              ((message.contextType as string) || state.contextType) ??
+              ((message['contextType'] as string) || state.contextType) ??
               'therapeutic'
-            const sessionId = (message.sessionId as string) || state.sessionId
+            const sessionId = (message['sessionId'] as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
             break
           }

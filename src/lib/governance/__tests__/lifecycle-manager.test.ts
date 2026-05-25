@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
-import { LifecycleManager, RetentionPeriod } from '../lifecycle-manager'
+import { LifecycleManager } from '../lifecycle-manager'
 
 describe('LifecycleManager', () => {
   let lifecycleManager: LifecycleManager

@@ -24,7 +24,7 @@ const SECURITY_CONFIG = {
   },
   STORAGE: {
     SECRETS_DIR: validatePath(
-      process.env.SECRETS_DIR ?? './config/secrets',
+      process.env['SECRETS_DIR'] ?? './config/secrets',
       ALLOWED_DIRECTORIES.PROJECT_ROOT,
     ),
     PERMISSIONS: 0o600, // Read/write for owner only
@@ -126,16 +126,16 @@ export class SecretsManager {
    */
   private loadFromEnvironment(): void {
     const envSecrets = {
-      DB_PASSWORD: process.env.DB_PASSWORD,
-      JWT_SECRET: process.env.JWT_SECRET,
-      REDIS_PASSWORD: process.env.REDIS_PASSWORD,
-      ENCRYPTION_KEY: process.env.ENCRYPTION_KEY,
-      RESEND_API_KEY: process.env.RESEND_API_KEY,
-      AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
-      AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-      SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-      SLACK_WEBHOOK_URL: process.env.SLACK_WEBHOOK_URL,
+      DB_PASSWORD: process.env['DB_PASSWORD'],
+      JWT_SECRET: process.env['JWT_SECRET'],
+      REDIS_PASSWORD: process.env['REDIS_PASSWORD'],
+      ENCRYPTION_KEY: process.env['ENCRYPTION_KEY'],
+      RESEND_API_KEY: process.env['RESEND_API_KEY'],
+      AWS_ACCESS_KEY_ID: process.env['AWS_ACCESS_KEY_ID'],
+      AWS_SECRET_ACCESS_KEY: process.env['AWS_SECRET_ACCESS_KEY'],
+      OPENAI_API_KEY: process.env['OPENAI_API_KEY'],
+      SENTRY_AUTH_TOKEN: process.env['SENTRY_AUTH_TOKEN'],
+      SLACK_WEBHOOK_URL: process.env['SLACK_WEBHOOK_URL'],
     }
 
     Object.entries(envSecrets).forEach(([key, value]) => {
@@ -290,18 +290,18 @@ export class SecretsManager {
    */
   getDatabaseConfig() {
     return {
-      host: process.env.DB_HOST ?? 'localhost',
-      port: parseInt(process.env.DB_PORT ?? '5432'),
-      database: process.env.DB_NAME ?? 'pixelated',
-      user: process.env.DB_USER ?? 'postgres',
+      host: process.env['DB_HOST'] ?? 'localhost',
+      port: parseInt(process.env['DB_PORT'] ?? '5432'),
+      database: process.env['DB_NAME'] ?? 'pixelated',
+      user: process.env['DB_USER'] ?? 'postgres',
       password: this.getSecret('DB_PASSWORD'),
       ssl:
-        process.env.NODE_ENV === 'production'
+        process.env['NODE_ENV'] === 'production'
           ? {
               rejectUnauthorized: true,
-              ca: process.env.DB_SSL_CA,
-              cert: process.env.DB_SSL_CERT,
-              key: process.env.DB_SSL_KEY,
+              ca: process.env['DB_SSL_CA'],
+              cert: process.env['DB_SSL_CERT'],
+              key: process.env['DB_SSL_KEY'],
             }
           : false,
     }
@@ -313,9 +313,9 @@ export class SecretsManager {
   getJWTConfig() {
     return {
       secret: this.getSecret('JWT_SECRET'),
-      expiresIn: process.env.JWT_EXPIRES_IN ?? '7d',
-      issuer: process.env.JWT_ISSUER ?? 'pixelated-empathy',
-      audience: process.env.JWT_AUDIENCE ?? 'pixelated-users',
+      expiresIn: process.env['JWT_EXPIRES_IN'] ?? '7d',
+      issuer: process.env['JWT_ISSUER'] ?? 'pixelated-empathy',
+      audience: process.env['JWT_AUDIENCE'] ?? 'pixelated-users',
     }
   }
 
@@ -324,11 +324,11 @@ export class SecretsManager {
    */
   getRedisConfig() {
     return {
-      url: process.env.REDIS_URL,
+      url: process.env['REDIS_URL'],
       password: this.getSecret('REDIS_PASSWORD'),
-      host: process.env.REDIS_HOST ?? 'localhost',
-      port: parseInt(process.env.REDIS_PORT ?? '6379'),
-      db: parseInt(process.env.REDIS_DB ?? '0'),
+      host: process.env['REDIS_HOST'] ?? 'localhost',
+      port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
+      db: parseInt(process.env['REDIS_DB'] ?? '0'),
     }
   }
 

@@ -172,9 +172,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
   private async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ?? 'mongodb://localhost:27017/threat_detection',
+        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_detection',
       )
 
       await this.mongoClient.connect()
@@ -337,7 +337,6 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const info = await this.redis.info()
       // Prefixed with '_' because the returned memory usage value is not used directly
       // but may be useful for future enhancements. This avoids lint errors for unused vars.
-      const _memory = await this.redis.memory('usage', '*')
 
       return {
         connectedClients: parseInt(
@@ -386,7 +385,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         recentThreats,
         totalThreats,
         blockedRequests,
-        databaseSize: await db.stats().then((stats) => stats.dataSize),
+        databaseSize: await db.stats().then((stats) => stats['dataSize']),
       }
     } catch (error: unknown) {
       logger.error('Failed to collect database metrics:', { error })
@@ -446,9 +445,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return {
         severityDistribution,
-        topThreats: topThreats.map((t) => t._id),
+        topThreats: topThreats.map((t) => t['_id']),
         totalThreats: severityDistribution.reduce(
-          (sum, item) => sum + item.count,
+          (sum, item) => sum + item['count'],
           0,
         ),
       }
@@ -462,9 +461,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     rawMetrics: Record<string, unknown>,
   ): Promise<SecurityMetrics> {
     try {
-      const threats = rawMetrics.threats as Record<string, unknown>
-      const system = rawMetrics.system as Record<string, unknown>
-      const redis = rawMetrics.redis as Record<string, unknown>
+      const threats = rawMetrics['threats'] as Record<string, unknown>
+      const system = rawMetrics['system'] as Record<string, unknown>
+      const redis = rawMetrics['redis'] as Record<string, unknown>
 
       // Calculate anomaly score using AI if available
       let anomalyScore = 0
@@ -477,15 +476,15 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return {
         timestamp: new Date(),
-        threatCount: (threats.totalThreats as number) || 0,
-        blockedRequests: (threats.blockedRequests as number) || 0,
+        threatCount: (threats['totalThreats'] as number) || 0,
+        blockedRequests: (threats['blockedRequests'] as number) || 0,
         anomalyScore,
         riskLevel,
-        topThreats: (threats.topThreats as string[]) || [],
+        topThreats: (threats['topThreats'] as string[]) || [],
         systemHealth: {
-          cpu: (system.cpu as number) || 0,
-          memory: (system.memory as number) || 0,
-          responseTime: (redis.commandsProcessed as number) || 0,
+          cpu: (system['cpu'] as number) || 0,
+          memory: (system['memory'] as number) || 0,
+          responseTime: (redis['commandsProcessed'] as number) || 0,
           errorRate: this.calculateErrorRate(threats),
         },
       }
@@ -524,20 +523,20 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   }
 
   private extractAnomalyFeatures(metrics: Record<string, unknown>): number[] {
-    const threats = metrics.threats as Record<string, unknown>
-    const system = metrics.system as Record<string, unknown>
-    const redis = metrics.redis as Record<string, unknown>
+    const threats = metrics['threats'] as Record<string, unknown>
+    const system = metrics['system'] as Record<string, unknown>
+    const redis = metrics['redis'] as Record<string, unknown>
 
     return [
-      (threats.totalThreats as number) || 0,
-      (threats.blockedRequests as number) || 0,
-      (system.cpu as number) || 0,
-      (system.memory as number) || 0,
-      (redis.connectedClients as number) || 0,
-      (redis.usedMemory as number) || 0,
-      (redis.keyspaceHits as number) || 0,
-      (redis.keyspaceMisses as number) || 0,
-      (redis.commandsProcessed as number) || 0,
+      (threats['totalThreats'] as number) || 0,
+      (threats['blockedRequests'] as number) || 0,
+      (system['cpu'] as number) || 0,
+      (system['memory'] as number) || 0,
+      (redis['connectedClients'] as number) || 0,
+      (redis['usedMemory'] as number) || 0,
+      (redis['keyspaceHits'] as number) || 0,
+      (redis['keyspaceMisses'] as number) || 0,
+      (redis['commandsProcessed'] as number) || 0,
       (Date.now() % 86400000) / 3600000, // Hour of day (0-24)
     ]
   }
@@ -546,8 +545,8 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     threats: Record<string, unknown>,
     anomalyScore: number,
   ): SecurityMetrics['riskLevel'] {
-    const threatCount = (threats.totalThreats as number) || 0
-    const blockedRequests = (threats.blockedRequests as number) || 0
+    const threatCount = (threats['totalThreats'] as number) || 0
+    const blockedRequests = (threats['blockedRequests'] as number) || 0
 
     if (threatCount > 100 || blockedRequests > 50 || anomalyScore > 0.8) {
       return 'critical'
@@ -562,8 +561,8 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
   private calculateErrorRate(threats: Record<string, unknown>): number {
     // Simplified error rate calculation
-    const totalThreats = (threats.totalThreats as number) || 0
-    const blockedRequests = (threats.blockedRequests as number) || 0
+    const totalThreats = (threats['totalThreats'] as number) || 0
+    const blockedRequests = (threats['blockedRequests'] as number) || 0
 
     return totalThreats > 0 ? blockedRequests / totalThreats : 0
   }
@@ -1118,7 +1117,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         aiModelLoaded: this.anomalyDetectionModel !== null,
         metricsCollected: metricsCount,
         alertsGenerated: alertsCount,
-        lastMetricsTimestamp: lastMetric?.timestamp,
+        lastMetricsTimestamp: lastMetric?.['timestamp'],
       }
     } catch (error: unknown) {
       logger.error('Failed to get health status:', { error })
@@ -1597,17 +1596,17 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         }
 
         if (aiResult) {
-          result.insights = aiResult.insights || []
+          result['insights'] = aiResult.insights || []
           // Merge other results
         }
       } catch (error: unknown) {
-        result.errors = [(error as Error).message]
-        result.healthStatus = 'degraded' // or unknown
+        result['errors'] = [(error as Error).message]
+        result['healthStatus'] = 'degraded' // or unknown
         if (
           (error instanceof Error ? error.message : 'Unknown error') ===
           'AI analysis timeout'
         ) {
-          result.healthStatus = 'unknown' // Match test expectation if any
+          result['healthStatus'] = 'unknown' // Match test expectation if any
         }
       }
     }

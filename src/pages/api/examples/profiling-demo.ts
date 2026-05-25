@@ -42,7 +42,7 @@ export const GET = async (_) => {
     )
   } catch (error: unknown) {
     console.error('Error in profiling demo API:', error)
-    const isProd = process.env.NODE_ENV === 'production'
+    const isProd = process.env['NODE_ENV'] === 'production'
     return new Response(
       JSON.stringify({
         success: false,
