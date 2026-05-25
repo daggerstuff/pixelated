@@ -256,6 +256,6 @@ describe('Resource Tests', () => {
 
 For more information about specific testing areas, refer to:
 
-- [Test Patterns](/testing/patterns)
-- [Test Execution](/testing/execution)
-- [Coverage Requirements](/testing/coverage)
+- [Test Patterns](./patterns.md)
+- [Test Execution](./execution.md)
+- [Coverage Requirements](./coverage.md)

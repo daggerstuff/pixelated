@@ -228,9 +228,9 @@ npm run test:clean
 
 For more information about specific testing areas, refer to:
 
-- [Test Patterns](/testing/patterns)
-- [Debugging Tests](/testing/debugging)
-- [Coverage Requirements](/testing/coverage)
+- [Test Patterns](./patterns.md)
+- [Debugging Tests](./debugging.md)
+- [Coverage Requirements](./coverage.md)
 
 ```
 
