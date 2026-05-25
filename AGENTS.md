@@ -37,6 +37,7 @@ pnpm vitest run -c config/vitest.config.ts
 ## Core Developer Rules
 
 ### ✅ Always
+- **Global Configuration Hygiene**: Keep all agent-specific dotfiles, configs, and custom assets at the global home directory level (`~/.<agent_name>`). Never create or commit agent-specific folders or configuration files at the project level to avoid littering the codebase.
 - **Continuity First**: Respect guidelines in this root `AGENTS.md` followed by any subdirectory-specific instruction files.
 - **Surgical Edits**: Keep changes minimal, safe, and tightly scoped. Remove only imports, variables, or assets made completely obsolete by your edits.
 - **Assumptions-First & Simplicity**: Never assume undocumented behaviors. Write clear, readable, self-documenting code.
