@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events'
-
 import * as tf from '@tensorflow/tfjs'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -17,7 +16,6 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
   private repository: BehavioralAnalysisRepository | null = null
   private model: tf.LayersModel | null = null
   private isInitialized: boolean = false
-  private mlModelLoaded: boolean = false
 
   constructor(private readonly config: BehavioralConfig) {
     super()
@@ -38,7 +36,6 @@ export class AdvancedBehavioralAnalysisService extends EventEmitter {
         // Load model if enabled
         try {
           this.model = await tf.loadLayersModel(this.config.modelPath)
-          this.mlModelLoaded = true
           logger.info('ML model loaded successfully')
         } catch (err) {
           logger.error('Failed to load ML model', { error: err })
