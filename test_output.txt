@@ -1,0 +1,617 @@
+
+ RUN  v4.1.0 /home/vivi/pixelated
+
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts (43 tests | 37 failed) 97ms
+       × should initialize with correct configuration 15ms
+       × should use default configuration when none provided 5ms
+       × should use custom configuration when provided 2ms
+       × should create investigation with correct data 2ms
+       × should update investigation status correctly 2ms
+       × should close investigation with resolution data 1ms
+       × should get investigation by ID 1ms
+       × should return null for non-existent investigation 1ms
+       × should get active investigations 2ms
+       × should get investigations by priority 2ms
+       ✓ should create investigation with validation 2ms
+       ✓ should update investigation with partial data 1ms
+       ✓ should close investigation with resolution 1ms
+       ✓ should generate comprehensive investigation report 1ms
+       ✓ should export investigation data in multiple formats 2ms
+       × should create hunt query with correct parameters 1ms
+       × should execute hunt query and return results 3ms
+       × should save hunt template for reuse 2ms
+       × should load hunt templates 4ms
+       × should schedule hunt query execution 2ms
+       × should create timeline for investigation 1ms
+       × should add timeline event 1ms
+       × should analyze timeline patterns 1ms
+       × should export timeline data 1ms
+       × should search threat data with filters 2ms
+       × should search with complex query patterns 1ms
+       × should handle empty search results 1ms
+       × should analyze threat patterns using AI 1ms
+       × should correlate behavioral and threat data 1ms
+       × should predict future threats using historical data 1ms
+       × should perform real-time threat hunting 1ms
+       × should detect real-time anomalies 7ms
+       × should handle real-time hunting timeouts 2ms
+       × should handle Redis connection errors gracefully 1ms
+       × should handle invalid investigation data 1ms
+       × should handle hunt query execution errors 2ms
+       × should handle timeline analysis errors 3ms
+       × should handle concurrent investigation creation 1ms
+       × should handle large threat data searches efficiently 3ms
+       ✓ should generate reports efficiently 3ms
+       × should integrate investigations with hunt queries 1ms
+       × should integrate timeline with pattern analysis 1ms
+       × should handle complete threat hunting workflow 1ms
+stderr | worktrees/fhe-expansion/src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Error Handling > should handle hunt query execution errors
+[build-safe-logger][threat-hunting-service] Failed to execute hunt query: {
+  error: Error: Query execution failed
+      at [90m/home/vivi/pixelated/[39mworktrees/fhe-expansion/src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1114:39
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:296:11
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:1258:26
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:1681:20
+      at new Promise (<anonymous>)
+      at runWithCancel [90m(file:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:1678:10[90m)[39m
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:1660:20
+      at new Promise (<anonymous>)
+      at runWithTimeout [90m(file:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:1627:10[90m)[39m
+      at [90mfile:///home/vivi/pixelated/[39mnode_modules/[4m.pnpm[24m/@vitest+runner@4.1.0/node_modules/[4m@vitest/runner[24m/dist/index.js:2309:64
+}
+
+ ✓ worktrees/fhe-expansion/src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts (43 tests) 620ms
+       ✓ should handle real-time hunting timeouts  503ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 37 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Service Initialization > should initialize with correct configuration
+AssertionError: expected undefined to be { …(3) } // Object.is equality
+
+[32m- Expected:[39m
+{
+  "executeResponse": [Function Mock],
+  "getInvestigationResults": [Function Mock],
+  "getStatistics": [Function Mock],
+}
+
+[31m+ Received:[39m
+undefined
+
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:98:36
+     96|       expect(service.config).toBeDefined()
+     97|       expect(service.redis).toBe(mockRedis)
+     98|       expect(service.orchestrator).toBe(mockOrchestrator)
+       |                                    ^
+     99|       expect(service.aiService).toBe(mockAIService)
+    100|       expect(service.behavioralService).toBe(mockBehavioralService)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Service Initialization > should use default configuration when none provided
+AssertionError: expected { …(3) } to deeply equal { enabled: true, …(8) }
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[32m-   "autoArchiveCompleted": true,[39m
+[32m-   "enableAIAnalysis": true,[39m
+[32m-   "enableRealTimeHunting": true,[39m
+[32m-   "enabled": true,[39m
+[32m-   "maxHuntQueries": 50,[39m
+[32m-   "maxInvestigations": 100,[39m
+[32m-   "maxResultsPerQuery": 1000,[39m
+[32m-   "reportFormats": [[39m
+[32m-     "pdf",[39m
+[32m-     "json",[39m
+[32m-     "csv",[39m
+[32m-   ],[39m
+[32m-   "timelineRetention": 86400000,[39m
+[31m+   "analyzeTrends": [Function Mock],[39m
+[31m+   "getThreatForecast": [Function Mock],[39m
+[31m+   "predictThreats": [Function Mock],[39m
+[2m  }[22m
+
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:114:37
+    112|         mockPredictiveService,
+    113|       )
+    114|       expect(defaultService.config).toEqual({
+       |                                     ^
+    115|         enabled: true,
+    116|         maxInvestigations: 100,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Service Initialization > should use custom configuration when provided
+AssertionError: expected { …(3) } to deeply equal { enabled: false, …(8) }
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  {[22m
+[32m-   "autoArchiveCompleted": false,[39m
+[32m-   "enableAIAnalysis": false,[39m
+[32m-   "enableRealTimeHunting": false,[39m
+[32m-   "enabled": false,[39m
+[32m-   "maxHuntQueries": 25,[39m
+[32m-   "maxInvestigations": 50,[39m
+[32m-   "maxResultsPerQuery": 500,[39m
+[32m-   "reportFormats": [[39m
+[32m-     "json",[39m
+[32m-   ],[39m
+[32m-   "timelineRetention": 43200000,[39m
+[31m+   "analyzeTrends": [Function Mock],[39m
+[31m+   "getThreatForecast": [Function Mock],[39m
+[31m+   "predictThreats": [Function Mock],[39m
+[2m  }[22m
+
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:148:36
+    146|         customConfig as any,
+    147|       )
+    148|       expect(customService.config).toEqual(customConfig)
+       |                                    ^
+    149|     })
+    150|   })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should create investigation with correct data
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:171:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should update investigation status correctly
+Error: The property "updateInvestigation" is not defined on the object.
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:211:10
+    209|       // Mock updateInvestigation - it returns void but we can verify …
+    210|       const updateSpy = vi
+    211|         .spyOn(service, 'updateInvestigation')
+       |          ^
+    212|         .mockResolvedValue(undefined)
+    213|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should close investigation with resolution data
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.closeInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:307:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:247:49
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should get investigation by ID
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.getInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:288:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:276:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should return null for non-existent investigation
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.getInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:288:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:288:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should get active investigations
+TypeError: service.getActiveInvestigations is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:313:36
+    311|       )
+    312|
+    313|       const result = await service.getActiveInvestigations()
+       |                                    ^
+    314|
+    315|       expect(result).toEqual(activeInvestigations)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Investigation Management > should get investigations by priority
+TypeError: service.getInvestigationsByPriority is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:343:36
+    341|       )
+    342|
+    343|       const result = await service.getInvestigationsByPriority('high')
+       |                                    ^
+    344|
+    345|       expect(result).toEqual(highPriorityInvestigations)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Hunt Query Management > should create hunt query with correct parameters
+TypeError: service.createHuntQuery is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:523:39
+    521|       mockRedis.set.mockResolvedValue('OK')
+    522|
+    523|       const huntQuery = await service.createHuntQuery(queryData)
+       |                                       ^
+    524|
+    525|       expect(huntQuery).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Hunt Query Management > should execute hunt query and return results
+AssertionError: expected [] to deeply equal [ Array(2) ]
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [[39m
+[32m-   {[39m
+[32m-     "event": "suspicious_activity",[39m
+[32m-     "id": "1",[39m
+[32m-     "timestamp": "2026-03-26T21:12:07.887Z",[39m
+[32m-   },[39m
+[32m-   {[39m
+[32m-     "event": "unusual_pattern",[39m
+[32m-     "id": "2",[39m
+[32m-     "timestamp": "2026-03-26T21:12:07.887Z",[39m
+[32m-   },[39m
+[32m- ][39m
+[31m+ [][39m
+
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:565:23
+    563|       const results = await service.executeHuntQuery(queryId as any)
+    564|
+    565|       expect(results).toEqual(mockResults)
+       |                       ^
+    566|       expect(results).toHaveLength(2)
+    567|       expect(mockRedis.lrange).toHaveBeenCalledWith(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Hunt Query Management > should save hunt template for reuse
+TypeError: service.saveHuntTemplate is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:595:38
+    593|       mockRedis.set.mockResolvedValue('OK')
+    594|
+    595|       const template = await service.saveHuntTemplate(templateData)
+       |                                      ^
+    596|
+    597|       expect(template).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Hunt Query Management > should load hunt templates
+TypeError: service.loadHuntTemplates is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:617:45
+    615|       )
+    616|
+    617|       const loadedTemplates = await service.loadHuntTemplates()
+       |                                             ^
+    618|
+    619|       expect(loadedTemplates).toEqual(templates)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Hunt Query Management > should schedule hunt query execution
+TypeError: service.scheduleHunt is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:637:39
+    635|       mockRedis.set.mockResolvedValue('OK')
+    636|
+    637|       const scheduled = await service.scheduleHunt(queryId, scheduleDa…
+       |                                       ^
+    638|
+    639|       expect(scheduled).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Timeline Management > should create timeline for investigation
+TypeError: service.createTimeline is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:658:38
+    656|       mockRedis.set.mockResolvedValue('OK')
+    657|
+    658|       const timeline = await service.createTimeline(
+       |                                      ^
+    659|         investigationId,
+    660|         timelineData,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Timeline Management > should add timeline event
+TypeError: service.addTimelineEvent is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:694:45
+    692|       mockRedis.lpush.mockResolvedValue(1)
+    693|
+    694|       const updatedTimeline = await service.addTimelineEvent(
+       |                                             ^
+    695|         timelineId,
+    696|         eventData,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Timeline Management > should analyze timeline patterns
+TypeError: service.analyzeTimeline is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:752:38
+    750|       })
+    751|
+    752|       const analysis = await service.analyzeTimeline(timelineId)
+       |                                      ^
+    753|
+    754|       expect(analysis).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Timeline Management > should export timeline data
+TypeError: service.exportTimeline is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:778:38
+    776|       })
+    777|
+    778|       const exported = await service.exportTimeline(timelineId, 'json')
+       |                                      ^
+    779|
+    780|       expect(exported).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Threat Data Search > should search threat data with filters
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.searchThreatData src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:317:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:824:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Threat Data Search > should search with complex query patterns
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.searchThreatData src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:317:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:855:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Threat Data Search > should handle empty search results
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.searchThreatData src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:317:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:870:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Pattern Analysis > should analyze threat patterns using AI
+TypeError: service.analyzePatterns is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:923:38
+    921|       })
+    922|
+    923|       const analysis = await service.analyzePatterns(threatData)
+       |                                      ^
+    924|
+    925|       expect(analysis).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Pattern Analysis > should correlate behavioral and threat data
+TypeError: service.correlateThreatWithBehavior is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:954:41
+    952|       )
+    953|
+    954|       const correlation = await service.correlateThreatWithBehavior(
+       |                                         ^
+    955|         threatData[0],
+    956|       )
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Pattern Analysis > should predict future threats using historical data
+TypeError: service.predictFutureThreats is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:989:41
+    987|       })
+    988|
+    989|       const predictions = await service.predictFutureThreats(historica…
+       |                                         ^
+    990|
+    991|       expect(predictions).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Real-time Hunting > should perform real-time threat hunting
+TypeError: service.performRealTimeHunting is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1030:37
+    1028|       ])
+    1029|
+    1030|       const results = await service.performRealTimeHunting(huntingData)
+       |                                     ^
+    1031|
+    1032|       expect(results).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Real-time Hunting > should detect real-time anomalies
+TypeError: service.detectRealTimeAnomalies is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1056:39
+    1054|       })
+    1055|
+    1056|       const anomalies = await service.detectRealTimeAnomalies(realTime…
+       |                                       ^
+    1057|
+    1058|       expect(anomalies).toHaveLength(1)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Real-time Hunting > should handle real-time hunting timeouts
+TypeError: service.performRealTimeHunting is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1073:37
+    1071|       mockRedis.lrange.mockReturnValue(new Promise(() => {}))
+    1072|
+    1073|       const results = await service.performRealTimeHunting(huntingData)
+       |                                     ^
+    1074|
+    1075|       expect(results).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Error Handling > should handle Redis connection errors gracefully
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1091:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Error Handling > should handle invalid investigation data
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1106:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Error Handling > should handle hunt query execution errors
+AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1119:30
+    1117|
+    1118|       expect(results).toBeDefined()
+    1119|       expect(results.errors).toContain('Query execution failed')
+       |                              ^
+    1120|       expect(results.data).toHaveLength(0)
+    1121|     })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Error Handling > should handle timeline analysis errors
+TypeError: service.analyzeTimeline is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1127:38
+    1125|       mockRedis.get.mockRejectedValue(new Error('Timeline not found'))
+    1126|
+    1127|       const analysis = await service.analyzeTimeline(timelineId)
+       |                                      ^
+    1128|
+    1129|       expect(analysis).toBeDefined()
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Performance > should handle concurrent investigation creation
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1147:17
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1146:36
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Performance > should handle large threat data searches efficiently
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.searchThreatData src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:317:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1184:37
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Integration Tests > should integrate investigations with hunt queries
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1231:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Integration Tests > should integrate timeline with pattern analysis
+TypeError: service.createTimeline is not a function
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1255:38
+    1253|       mockRedis.set.mockResolvedValue('OK')
+    1254|
+    1255|       const timeline = await service.createTimeline('inv_1', timelineD…
+       |                                      ^
+    1256|
+    1257|       const events = [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/37]⎯
+
+ FAIL  src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts > Threat Hunting Service > Integration Tests > should handle complete threat hunting workflow
+Error: ThreatHuntingService is not initialized. Call .initialize() first.
+ ❯ ThreatHuntingService.checkInitialized src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:83:13
+     81|   private checkInitialized(): void {
+     82|     if (!this.isInitialized) {
+     83|       throw new Error('ThreatHuntingService is not initialized. Call .…
+       |             ^
+     84|     }
+     85|   }
+ ❯ ThreatHuntingService.createInvestigation src/lib/threat-detection/threat-hunting/threat-hunting-service.ts:298:10
+ ❯ src/lib/threat-detection/threat-hunting/__tests__/threat-hunting.test.ts:1313:43
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/37]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  37 failed | 49 passed (86)
+   Start at  21:12:07
+   Duration  1.82s (transform 547ms, setup 0ms, import 1.43s, tests 717ms, environment 0ms)
+

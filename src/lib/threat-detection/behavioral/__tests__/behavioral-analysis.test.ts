@@ -5,7 +5,7 @@
  * user profiling, anomaly detection, and pattern recognition.
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { AdvancedBehavioralAnalysisService } from '../behavioral-analysis-service'
 import {
@@ -97,9 +97,9 @@ vi.mock('../../response-orchestration')
 
 describe('Behavioral Analysis Service', () => {
   let service: AdvancedBehavioralAnalysisService
-  let mockOrchestrator: any
 
   const defaultConfig = {
+    mlEnabled: true,
     redisUrl: 'redis://localhost:6379',
     mongoUrl: 'mongodb://localhost:27017',
     modelPath: '/tmp/model',

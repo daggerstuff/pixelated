@@ -532,7 +532,7 @@ NODE_OPTIONS=--max_old_space_size=4096 pnpm test
 
 Following these setup guides will ensure a consistent testing environment across
 all stages of development. For more detailed information on specific testing
-patterns, refer to the [Test Patterns Documentation](/docs/api/test-patterns).
+patterns, refer to the [Test Patterns Documentation](../api/test-patterns).
 
 For any issues not covered in this guide, please refer to the
-[Troubleshooting Guide](/docs/testing/debugging) or open an issue on GitHub.
+[Troubleshooting Guide](./debugging.md) or open an issue on GitHub.

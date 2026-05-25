@@ -106,8 +106,8 @@ export class BehavioralAnalysisRepository {
     const match = timeframe.match(/^(\d+)([hdm])$/)
     if (!match) return 0
 
-    const value = parseInt(match[1], 10)
-    const unit = match[2]
+    const value = parseInt(match[1]!, 10)
+    const unit = match[2]!
 
     switch (unit) {
       case 'm':
@@ -116,9 +116,6 @@ export class BehavioralAnalysisRepository {
         return value * 60 * 60 * 1000 // hours
       case 'd':
         return value * 24 * 60 * 60 * 1000 // days
-      case undefined: {
-        throw new Error('Not implemented yet: undefined case')
-      }
       default:
         return 0
     }
