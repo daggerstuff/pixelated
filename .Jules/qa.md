@@ -68,9 +68,6 @@
 - Pattern: Writing edge case tests for utility functions with text manipulation.
 - Action: Verify regex behavior matches expected text outputs, as sometimes chained replaces don't remove multiple distinct occurrences.
 
-## 2026-05-19 - verifyAuthToken edge cases
-
-- Pattern: Testing header manipulation edge cases (e.g. prefix stripping) when wrapping third-party verification functions.
-- Action: Write tests that verify standard input (with 'Bearer ' prefix) and edge case input (without prefix), using `vi.mock` to mock the underlying wrapped auth verification service.
-
-## 2026-05-19 - verifyAuthToken edge cases | Pattern: Testing header manipulation edge cases (e.g. prefix stripping) when wrapping third-party verification functions. | Action: Write tests that verify standard input (with 'Bearer ' prefix) and edge case input (without prefix), using `vi.mock` to mock the underlying wrapped auth verification service.
+## 2024-05-22 - getRecommendedScenario edge cases
+- Pattern: Added tests for an untested utility function handling array filtering logic.
+- Action: Ensured positive paths and null return boundaries were fully covered.
