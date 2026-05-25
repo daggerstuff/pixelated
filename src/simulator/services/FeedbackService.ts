@@ -35,14 +35,14 @@ function isAudioProcessorMessage(
     return false
   }
 
-  if (value.type !== 'audioData') {
+  if (value['type'] !== 'audioData') {
     return false
   }
 
   return (
-    value.data instanceof Float32Array &&
-    isRecord(value.metadata) &&
-    typeof value.metadata.timestamp === 'number'
+    value['data'] instanceof Float32Array &&
+    isRecord(value['metadata']) &&
+    typeof value['metadata']['timestamp'] === 'number'
   )
 }
 

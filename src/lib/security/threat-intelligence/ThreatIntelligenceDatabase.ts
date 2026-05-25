@@ -1181,7 +1181,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       ])
 
       const byTypeMap = byType.reduce<Record<string, number>>((acc, item) => {
-        acc[item._id] = item.count
+        acc[item['_id']] = item['count']
         return acc
       }, {})
 

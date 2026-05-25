@@ -165,7 +165,7 @@ function getResourceId(req: Request): string | undefined {
   }
 
   // Try to extract from query params
-  const id = (req.query.id as string) || (req.query.documentId as string)
+  const id = (req.query['id'] as string) || (req.query['documentId'] as string)
   return id || undefined
 }
 

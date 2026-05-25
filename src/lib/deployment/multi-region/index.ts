@@ -619,51 +619,51 @@ function buildDefaultConfiguration(): MultiRegionConfig {
     secrets: {
       cloudProviders: {
         aws: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID ?? '',
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY ?? '',
-          region: process.env.AWS_REGION ?? 'us-east-1',
+          accessKeyId: process.env['AWS_ACCESS_KEY_ID'] ?? '',
+          secretAccessKey: process.env['AWS_SECRET_ACCESS_KEY'] ?? '',
+          region: process.env['AWS_REGION'] ?? 'us-east-1',
         },
         gcp: {
-          projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
-          keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS ?? '',
+          projectId: process.env['GOOGLE_CLOUD_PROJECT'] ?? '',
+          keyFilename: process.env['GOOGLE_APPLICATION_CREDENTIALS'] ?? '',
         },
         azure: {
-          subscriptionId: process.env.AZURE_SUBSCRIPTION_ID ?? '',
-          clientId: process.env.AZURE_CLIENT_ID ?? '',
-          clientSecret: process.env.AZURE_CLIENT_SECRET ?? '',
-          tenantId: process.env.AZURE_TENANT_ID ?? '',
+          subscriptionId: process.env['AZURE_SUBSCRIPTION_ID'] ?? '',
+          clientId: process.env['AZURE_CLIENT_ID'] ?? '',
+          clientSecret: process.env['AZURE_CLIENT_SECRET'] ?? '',
+          tenantId: process.env['AZURE_TENANT_ID'] ?? '',
         },
       },
       databases: {
         cockroachdb: {
           connectionString:
-            process.env.COCKROACH_CONNECTION_STRING ??
+            process.env['COCKROACH_CONNECTION_STRING'] ??
             'postgres://localhost:26257/defaultdb',
-          sslMode: process.env.COCKROACH_SSL_MODE ?? 'disable',
+          sslMode: process.env['COCKROACH_SSL_MODE'] ?? 'disable',
         },
         redis: {
-          url: process.env.REDIS_URL ?? 'redis://localhost:6379',
-          password: process.env.REDIS_PASSWORD ?? '',
+          url: process.env['REDIS_URL'] ?? 'redis://localhost:6379',
+          password: process.env['REDIS_PASSWORD'] ?? '',
         },
       },
       aiServices: {
         openai: {
-          apiKey: process.env.OPENAI_API_KEY ?? '',
-          organization: process.env.OPENAI_ORGANIZATION ?? '',
+          apiKey: process.env['OPENAI_API_KEY'] ?? '',
+          organization: process.env['OPENAI_ORGANIZATION'] ?? '',
         },
         google: {
-          apiKey: process.env.GOOGLE_API_KEY ?? '',
-          projectId: process.env.GOOGLE_CLOUD_PROJECT ?? '',
+          apiKey: process.env['GOOGLE_API_KEY'] ?? '',
+          projectId: process.env['GOOGLE_CLOUD_PROJECT'] ?? '',
         },
       },
       monitoring: {
         sentry: {
-          dsn: process.env.SENTRY_DSN ?? '',
-          authToken: process.env.SENTRY_AUTH_TOKEN ?? '',
+          dsn: process.env['SENTRY_DSN'] ?? '',
+          authToken: process.env['SENTRY_AUTH_TOKEN'] ?? '',
         },
         datadog: {
-          apiKey: process.env.DATADOG_API_KEY ?? '',
-          appKey: process.env.DATADOG_APP_KEY ?? '',
+          apiKey: process.env['DATADOG_API_KEY'] ?? '',
+          appKey: process.env['DATADOG_APP_KEY'] ?? '',
         },
       },
     },

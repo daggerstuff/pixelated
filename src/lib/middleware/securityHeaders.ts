@@ -14,7 +14,7 @@ export const securityHeaders: MiddlewareHandler = async (
 
   const nonce = context.locals.cspNonce
   const isRelaxedScriptEnv =
-    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test'
+    process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test'
   const scriptSourceList = [
     "'self'",
     "'unsafe-inline'",
@@ -49,7 +49,7 @@ export const securityHeaders: MiddlewareHandler = async (
 
   // Conditionally add upgrade-insecure-requests
   // This can cause loops with Cloudflare Flexible SSL if the browser forces HTTPS and the proxy only speaks HTTP
-  if (process.env.DISABLE_HSTS !== 'true') {
+  if (process.env['DISABLE_HSTS'] !== 'true') {
     csp.push('upgrade-insecure-requests')
   }
 
@@ -87,8 +87,8 @@ export const securityHeaders: MiddlewareHandler = async (
   // Only set HSTS header in production and if not explicitly disabled
   // disabling HSTS is necessary to avoid loops during development or when using proxies like Cloudflare Flexible SSL
   if (
-    process.env.NODE_ENV === 'production' &&
-    process.env.DISABLE_HSTS !== 'true'
+    process.env['NODE_ENV'] === 'production' &&
+    process.env['DISABLE_HSTS'] !== 'true'
   ) {
     response.headers.set(
       'Strict-Transport-Security',

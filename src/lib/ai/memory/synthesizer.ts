@@ -159,12 +159,4 @@ export class MemorySynthesizer {
       validation_accuracy: valid.reduce((acc, m) => acc + (m.metrics?.validation_accuracy ?? 0), 0) / valid.length,
     };
   }
-
-  /**
-   * Place-holder for LLM-driven synthesis. 
-   * In a real system, this would call an LLM to "gist" the merged content.
-   */
-  private generateSynthesizedContent(candidates: MemoryObject[]): string {
-    return `Synthesized context from ${candidates.length} previous observations regarding ${candidates[0]?.gist ?? 'session flow'}.`;
-  }
 }

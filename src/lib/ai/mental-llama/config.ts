@@ -114,6 +114,6 @@ export const DEFAULT_PRODUCTION_CONFIG: ProductionConfig = {
     enablePerformanceTracking: true,
     metricsCollectionIntervalMs: 60000,
     enableDetailedLogging:
-      typeof process !== 'undefined' && process.env.NODE_ENV !== 'production',
+      typeof process !== 'undefined' && process.env['NODE_ENV'] !== 'production',
   },
 }

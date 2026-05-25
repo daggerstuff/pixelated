@@ -6,7 +6,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
+} from '@/components/ui/card/card'
 import type { ProgressMetrics } from '@/lib/api/journal-research/types'
 import { cn } from '@/lib/utils'
 

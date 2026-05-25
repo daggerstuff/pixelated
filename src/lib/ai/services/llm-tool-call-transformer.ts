@@ -82,20 +82,20 @@ const toNormalizedToolCall = (item: unknown, index: number): NormalizedToolCall 
     return null
   }
   const toolCall = item as Record<string, unknown>
-  const functionData = toRecord(toolCall.function)
+  const functionData = toRecord(toolCall['function'])
 
   const name =
-    typeof toolCall.name === 'string'
-      ? toolCall.name
-      : typeof functionData.name === 'string'
-        ? functionData.name
+    typeof toolCall['name'] === 'string'
+      ? toolCall['name']
+      : typeof functionData['name'] === 'string'
+        ? functionData['name']
         : `tool_${index + 1}`
 
-  const rawArgs = toolCall.arguments ?? functionData.arguments ?? toolCall['function.arguments']
+  const rawArgs = toolCall['arguments'] ?? functionData['arguments'] ?? toolCall['function.arguments']
 
   return {
-    id: normalizeToolCallId(toolCall.id, index),
-    type: typeof toolCall.type === 'string' ? toolCall.type : 'function',
+    id: normalizeToolCallId(toolCall['id'], index),
+    type: typeof toolCall['type'] === 'string' ? toolCall['type'] : 'function',
     function: {
       name,
       arguments: normalizeArguments(rawArgs),
@@ -122,11 +122,11 @@ const normalizeMessageForToolCalls = (
   index: number,
 ): ToolCallContainer => {
   const normalized = { ...(toRecord(message) as ToolCallContainer) }
-  const legacyFunctionCall = toRecord((message as Record<string, unknown>).function_call)
+  const legacyFunctionCall = toRecord((message as Record<string, unknown>)['function_call'])
   const hasFunctionCallShape =
     typeof normalized.tool_calls === 'undefined' &&
-    (typeof legacyFunctionCall.name === 'string' ||
-      typeof normalized.function_call === 'object')
+    (typeof legacyFunctionCall['name'] === 'string' ||
+      typeof normalized['function_call'] === 'object')
 
   const hasToolCalls = Array.isArray(normalized.tool_calls)
 
@@ -137,23 +137,23 @@ const normalizeMessageForToolCalls = (
 
   if (hasFunctionCallShape) {
     const syntheticToolCall: NormalizedToolCall = {
-      id: normalizeToolCallId(normalized.tool_call_id, index),
+      id: normalizeToolCallId(normalized['tool_call_id'], index),
       type: 'function',
       function: {
         name:
-          typeof legacyFunctionCall.name === 'string'
-            ? legacyFunctionCall.name
+          typeof legacyFunctionCall['name'] === 'string'
+            ? legacyFunctionCall['name']
             : `tool_${index + 1}`,
         arguments: normalizeArguments(
-          legacyFunctionCall.arguments ?? (message as Record<string, unknown>).arguments,
+          legacyFunctionCall['arguments'] ?? (message as Record<string, unknown>)['arguments'],
         ),
       },
       name:
-        typeof legacyFunctionCall.name === 'string'
-          ? legacyFunctionCall.name
+        typeof legacyFunctionCall['name'] === 'string'
+          ? legacyFunctionCall['name']
           : `tool_${index + 1}`,
       arguments: normalizeArguments(
-        legacyFunctionCall.arguments ?? (message as Record<string, unknown>).arguments,
+        legacyFunctionCall['arguments'] ?? (message as Record<string, unknown>)['arguments'],
       ),
     }
     normalized.tool_calls = [syntheticToolCall]
@@ -172,7 +172,7 @@ const normalizeToolCalls = (
 export const normalizeToolCallPayload = <T extends Record<string, unknown>>(
   payload: T,
 ): T => {
-  const messages = payload?.messages
+  const messages = payload?.['messages']
   if (!Array.isArray(messages)) {
     return payload
   }
@@ -187,19 +187,19 @@ export const normalizeToolCallPayload = <T extends Record<string, unknown>>(
 
 export const extractToolCallSummary = (toolCall: unknown): string => {
   const normalized = toRecord(toolCall)
-  const functionData = toRecord(normalized.function)
+  const functionData = toRecord(normalized['function'])
   const functionName =
-    typeof functionData.name === 'string'
-      ? functionData.name
-      : typeof normalized.name === 'string'
-        ? normalized.name
+    typeof functionData['name'] === 'string'
+      ? functionData['name']
+      : typeof normalized['name'] === 'string'
+        ? normalized['name']
         : 'tool'
 
   const rawArgs =
-    typeof normalized.arguments === 'string'
-      ? normalized.arguments
-      : typeof functionData.arguments === 'string'
-        ? functionData.arguments
+    typeof normalized['arguments'] === 'string'
+      ? normalized['arguments']
+      : typeof functionData['arguments'] === 'string'
+        ? functionData['arguments']
         : '{}'
 
   return `${functionName}(${rawArgs})`

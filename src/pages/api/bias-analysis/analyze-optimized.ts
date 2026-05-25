@@ -56,7 +56,7 @@ interface PerformanceMetrics {
 }
 
 // Add small helper to avoid exposing stacks in responses and to control logging
-const isProduction = process.env.NODE_ENV === 'production'
+const isProduction = process.env['NODE_ENV'] === 'production'
 
 function safeErrorForLogging(err: unknown) {
   return {

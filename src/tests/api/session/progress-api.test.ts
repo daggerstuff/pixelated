@@ -81,7 +81,7 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
 const hasErrorResponseShape = (value: unknown): value is ErrorResponse => {
-  return isObject(value) && 'error' in value && typeof value.error === 'string'
+  return isObject(value) && 'error' in value && typeof value['error'] === 'string'
 }
 
 const hasProgressMetricsShape = (
@@ -89,8 +89,8 @@ const hasProgressMetricsShape = (
 ): value is { totalMessages: number; progress: number } => {
   return (
     isObject(value) &&
-    typeof value.totalMessages === 'number' &&
-    typeof value.progress === 'number'
+    typeof value['totalMessages'] === 'number' &&
+    typeof value['progress'] === 'number'
   )
 }
 
@@ -100,9 +100,9 @@ const hasFeedbackRowsShape = (value: unknown): value is FeedbackRow[] => {
     value.every(
       (row): row is FeedbackRow =>
         isObject(row) &&
-        typeof row.therapist_id === 'string' &&
-        typeof row.feedback === 'string' &&
-        typeof row.created_at === 'string',
+        typeof row['therapist_id'] === 'string' &&
+        typeof row['feedback'] === 'string' &&
+        typeof row['created_at'] === 'string',
     )
   )
 }
@@ -115,8 +115,8 @@ const hasSnapshotRowsShape = (
     value.every(
       (row): row is { timestamp: string; value: number } =>
         isObject(row) &&
-        typeof row.timestamp === 'string' &&
-        typeof row.value === 'number',
+        typeof row['timestamp'] === 'string' &&
+        typeof row['value'] === 'number',
     )
   )
 }
@@ -124,17 +124,17 @@ const hasSnapshotRowsShape = (
 const hasSuccessPostShape = (value: unknown): value is SuccessPostResponse => {
   return (
     isObject(value) &&
-    typeof value.success === 'boolean' &&
-    typeof value.sessionId === 'string'
+    typeof value['success'] === 'boolean' &&
+    typeof value['sessionId'] === 'string'
   )
 }
 
 const hasSuccessGetShape = (value: unknown): value is SuccessGetResponse => {
   if (!isObject(value)) return false
-  if (typeof value.sessionId !== 'string') return false
-  if (!hasProgressMetricsShape(value.progressMetrics)) return false
-  if (!hasSnapshotRowsShape(value.progressSnapshots)) return false
-  if (!hasFeedbackRowsShape(value.feedback) && value.feedback !== null)
+  if (typeof value['sessionId'] !== 'string') return false
+  if (!hasProgressMetricsShape(value['progressMetrics'])) return false
+  if (!hasSnapshotRowsShape(value['progressSnapshots'])) return false
+  if (!hasFeedbackRowsShape(value['feedback']) && value['feedback'] !== null)
     return false
   return true
 }

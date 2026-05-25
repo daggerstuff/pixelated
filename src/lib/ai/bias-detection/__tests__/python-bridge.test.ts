@@ -789,15 +789,15 @@ describe('analysis methods', () => {
     let savedVitest: string | undefined
 
     beforeEach(() => {
-      savedNodeEnv = process.env.NODE_ENV
-      savedVitest = process.env.VITEST
-      delete process.env.NODE_ENV
-      delete process.env.VITEST
+      savedNodeEnv = process.env['NODE_ENV']
+      savedVitest = process.env['VITEST']
+      delete process.env['NODE_ENV']
+      delete process.env['VITEST']
     })
 
     afterEach(() => {
-      process.env.NODE_ENV = savedNodeEnv
-      if (savedVitest) process.env.VITEST = savedVitest
+      process.env['NODE_ENV'] = savedNodeEnv
+      if (savedVitest) process.env['VITEST'] = savedVitest
     })
 
     it('should attach AbortController signal to fetch options', async () => {

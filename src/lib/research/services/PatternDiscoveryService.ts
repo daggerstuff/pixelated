@@ -150,11 +150,11 @@ export class PatternDiscoveryService {
     }
 
     return result.data.map((row: Record<string, unknown>) => ({
-      variables: [row.variable1, row.variable2],
-      correlation: row.correlation,
-      pValue: row.p_value,
-      sampleSize: row.sample_size,
-      confidenceInterval: [row.ci_lower, row.ci_upper],
+      variables: [row['variable1'], row['variable2']],
+      correlation: row['correlation'],
+      pValue: row['p_value'],
+      sampleSize: row['sample_size'],
+      confidenceInterval: [row['ci_lower'], row['ci_upper']],
     }))
   }
 
@@ -464,8 +464,8 @@ export class PatternDiscoveryService {
       direction = 'decreasing'
     }
 
-    const firstTimestamp = data[0].timestamp
-    const lastTimestamp = data[data.length - 1].timestamp
+    const firstTimestamp = data[0]['timestamp']
+    const lastTimestamp = data[data.length - 1]['timestamp']
 
     return {
       metric,
@@ -589,7 +589,7 @@ export class PatternDiscoveryService {
         features.map((feature, i) => [feature, centroids[index][i]]),
       ),
       members: cluster.map((i) => {
-        const clientId = data[i].client_id
+        const clientId = data[i]['client_id']
         return typeof clientId === 'string' ? clientId : `client_${i}`
       }),
       size: cluster.length,
@@ -729,12 +729,12 @@ export class PatternDiscoveryService {
     const supportingData = pattern.supportingData
 
     if (
-      supportingData?.sampleSize &&
-      typeof supportingData.sampleSize === 'number' &&
-      supportingData.sampleSize < this.config.minSampleSize
+      supportingData?.['sampleSize'] &&
+      typeof supportingData['sampleSize'] === 'number' &&
+      supportingData['sampleSize'] < this.config.minSampleSize
     ) {
       issues.push(
-        `Sample size ${supportingData.sampleSize} below minimum ${this.config.minSampleSize}`,
+        `Sample size ${supportingData['sampleSize']} below minimum ${this.config.minSampleSize}`,
       )
     }
 

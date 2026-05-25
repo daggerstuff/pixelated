@@ -468,14 +468,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractNetworkFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.packet_count ?? 0,
-      data.bytes_transferred ?? 0,
-      data.unique_destinations ?? 0,
-      data.connection_duration ?? 0,
-      data.protocol_type ?? 0,
-      data.port_number ?? 0,
-      data.flag_count ?? 0,
-      data.error_rate ?? 0,
+      data['packet_count'] ?? 0,
+      data['bytes_transferred'] ?? 0,
+      data['unique_destinations'] ?? 0,
+      data['connection_duration'] ?? 0,
+      data['protocol_type'] ?? 0,
+      data['port_number'] ?? 0,
+      data['flag_count'] ?? 0,
+      data['error_rate'] ?? 0,
     ]
 
     return features.slice(0, 10) // Ensure consistent length
@@ -486,14 +486,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractBehavioralFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.login_attempts ?? 0,
-      data.failed_logins ?? 0,
-      data.access_frequency ?? 0,
-      data.time_of_access ?? 0,
-      data.resource_access_count ?? 0,
-      data.privilege_escalation_attempts ?? 0,
-      data.anomalous_actions ?? 0,
-      data.session_duration ?? 0,
+      data['login_attempts'] ?? 0,
+      data['failed_logins'] ?? 0,
+      data['access_frequency'] ?? 0,
+      data['time_of_access'] ?? 0,
+      data['resource_access_count'] ?? 0,
+      data['privilege_escalation_attempts'] ?? 0,
+      data['anomalous_actions'] ?? 0,
+      data['session_duration'] ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -504,14 +504,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractContentFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.content_length ?? 0,
-      data.keyword_density ?? 0,
-      data.suspicious_keywords ?? 0,
-      data.encoding_type ?? 0,
-      data.attachment_count ?? 0,
-      data.link_count ?? 0,
-      data.script_count ?? 0,
-      data.obfuscation_level ?? 0,
+      data['content_length'] ?? 0,
+      data['keyword_density'] ?? 0,
+      data['suspicious_keywords'] ?? 0,
+      data['encoding_type'] ?? 0,
+      data['attachment_count'] ?? 0,
+      data['link_count'] ?? 0,
+      data['script_count'] ?? 0,
+      data['obfuscation_level'] ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -522,14 +522,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private extractSystemFeatures(data: Record<string, unknown>): number[] {
     const features = [
-      data.cpu_usage ?? 0,
-      data.memory_usage ?? 0,
-      data.disk_io ?? 0,
-      data.network_io ?? 0,
-      data.process_count ?? 0,
-      data.thread_count ?? 0,
-      data.handle_count ?? 0,
-      data.error_count ?? 0,
+      data['cpu_usage'] ?? 0,
+      data['memory_usage'] ?? 0,
+      data['disk_io'] ?? 0,
+      data['network_io'] ?? 0,
+      data['process_count'] ?? 0,
+      data['thread_count'] ?? 0,
+      data['handle_count'] ?? 0,
+      data['error_count'] ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -832,7 +832,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     modelResults: Record<string, ModelResult>,
     inputType: string,
   ): string {
-    const classificationResult = modelResults.classification
+    const classificationResult = modelResults['classification']
     if (classificationResult && classificationResult.predictions.length > 0) {
       const maxIndex = classificationResult.predictions.indexOf(
         Math.max(...classificationResult.predictions),
@@ -889,41 +889,41 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       // Extract indicators based on input type and model results
       switch (input.type) {
         case 'network':
-          if (input.data.ip_address) {
+          if (input.data['ip_address']) {
             indicators.push({
               type: 'ip_address',
-              value: input.data.ip_address,
-              confidence: modelResults.anomaly.confidence,
+              value: input.data['ip_address'],
+              confidence: modelResults['anomaly'].confidence,
               source: 'anomaly_detection',
             })
           }
           break
         case 'behavioral':
-          if (input.data.user_id) {
+          if (input.data['user_id']) {
             indicators.push({
               type: 'user_id',
-              value: input.data.user_id,
-              confidence: modelResults.classification.confidence,
+              value: input.data['user_id'],
+              confidence: modelResults['classification'].confidence,
               source: 'classification',
             })
           }
           break
         case 'content':
-          if (input.data.hash) {
+          if (input.data['hash']) {
             indicators.push({
               type: 'file_hash',
-              value: input.data.hash,
-              confidence: modelResults.clustering.confidence,
+              value: input.data['hash'],
+              confidence: modelResults['clustering'].confidence,
               source: 'clustering',
             })
           }
           break
         case 'system':
-          if (input.data.process_id) {
+          if (input.data['process_id']) {
             indicators.push({
               type: 'process_id',
-              value: input.data.process_id,
-              confidence: modelResults.prediction.confidence,
+              value: input.data['process_id'],
+              confidence: modelResults['prediction'].confidence,
               source: 'prediction',
             })
           }
@@ -949,10 +949,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       explanation += `potential threat detected with high confidence. `
 
       // Add model-specific explanations
-      if (modelResults.anomaly.confidence > 0.7) {
+      if (modelResults['anomaly'].confidence > 0.7) {
         explanation += `Anomaly detection identified unusual patterns. `
       }
-      if (modelResults.classification.confidence > 0.7) {
+      if (modelResults['classification'].confidence > 0.7) {
         explanation += `Classification model confirmed threat category. `
       }
     } else {

@@ -187,7 +187,7 @@ export async function initializeAuthSystem(): Promise<void> {
 export async function getUserById(
   userId: string,
 ): Promise<{ id: string; email?: string; name?: string } | null> {
-  if (import.meta.env?.MODE === 'test' || process.env.NODE_ENV === 'test') {
+  if (import.meta.env?.MODE === 'test' || process.env['NODE_ENV'] === 'test') {
     return {
       id: userId,
       email: `${userId}@example.com`,

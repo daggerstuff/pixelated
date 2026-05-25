@@ -200,27 +200,27 @@ export async function updateProject(
   if (updates.name !== undefined) {
     project.name = updates.name
     project.slug = slug(updates.name)
-    changes.name = updates.name
+    changes['name'] = updates.name
   }
 
   if (updates.description !== undefined) {
     project.description = updates.description
-    changes.description = updates.description
+    changes['description'] = updates.description
   }
 
   if (updates.category !== undefined) {
     project.category = updates.category
-    changes.category = updates.category
+    changes['category'] = updates.category
   }
 
   if (updates.budget !== undefined) {
     project.budget = updates.budget
-    changes.budget = updates.budget
+    changes['budget'] = updates.budget
   }
 
   if (updates.status !== undefined) {
     project.status = updates.status
-    changes.status = updates.status
+    changes['status'] = updates.status
   }
 
   project.updatedAt = new Date()
@@ -294,11 +294,11 @@ export async function listProjects(
   }
 
   if (options.category) {
-    query.category = options.category
+    query['category'] = options.category
   }
 
   if (options.status) {
-    query.status = options.status
+    query['status'] = options.status
   }
 
   const projects = await ProjectModel.find(query)

@@ -55,7 +55,7 @@ router.post(
 router.get(
   '/search/:query',
   asyncHandler(async (req: Request, res: Response) => {
-    const query = req.params.query as string
+    const query = req.params['query'] as string
     const { id } = (req as any).user
 
     const results = await searchMarketResearch(query, id)
@@ -74,7 +74,7 @@ router.get(
 router.post(
   '/:researchId/share',
   asyncHandler(async (req: Request, res: Response) => {
-    const researchId = req.params.researchId as string
+    const researchId = req.params['researchId'] as string
     const { userId, permissionLevel } = req.body
     const { id } = (req as any).user
 

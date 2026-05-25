@@ -59,9 +59,9 @@ import {
   isTrendItemArray,
 } from '@/components/admin/bias-detection/utils/dashboard-type-guards'
 import { exportBiasDashboardData } from '@/components/admin/bias-detection/utils/export-dashboard-data'
-import { Alert } from '@/components/ui/alert.tsx'
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
+import { Alert } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
 // Lazy load the charts component to reduce initial bundle size
 // const _BiasCharts = lazy(() => import('./BiasCharts').then(module => ({ default: module.BiasCharts })));
 // Note: Removing lazy import as it's currently commented out
@@ -70,7 +70,7 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
+} from '@/components/ui/card/index'
 // Use lazy-loaded chart components to reduce bundle size
 import {
   XAxis,
@@ -92,14 +92,14 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from '@/components/ui/LazyChart.tsx'
-import { Progress } from '@/components/ui/progress.tsx'
+} from '@/components/ui/LazyChart'
+import { Progress } from '@/components/ui/progress'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
+} from '@/components/ui/tabs'
 import type {
   BiasDashboardData,
   BiasAnalysisResult,

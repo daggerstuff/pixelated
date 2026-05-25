@@ -95,13 +95,13 @@ export class ThreatInvestigationManager extends EventEmitter {
           if (this.behavioralService) {
             // Extract userId from params or investigation context
             const userId =
-              params.userId ??
-              params.user_id ??
+              params['userId'] ??
+              params['user_id'] ??
               investigation.assignedTo ??
               'unknown'
             // Map timeWindow (ms) to timeframe format or use provided timeframe
             const timeframe =
-              params.timeframe ?? this.formatTimeframe(params.timeWindow)
+              params['timeframe'] ?? this.formatTimeframe(params['timeWindow'])
             stepFindings = await this.behavioralService.analyzeUserBehavior(
               String(userId),
               timeframe,
@@ -111,7 +111,7 @@ export class ThreatInvestigationManager extends EventEmitter {
 
         case 'query_threat_intel':
           if (this.aiService) {
-            const intel = await this.aiService.getThreatIntel(params.indicator)
+            const intel = await this.aiService.getThreatIntel(params['indicator'])
             stepFindings = intel ? [intel] : []
           }
           break

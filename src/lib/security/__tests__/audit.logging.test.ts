@@ -59,8 +59,8 @@ describe('auditLoggingService', () => {
       if (
         typeof parsedEntry !== 'object' ||
         parsedEntry === null ||
-        typeof parsedEntry.details !== 'object' ||
-        parsedEntry.details === null
+        typeof parsedEntry['details'] !== 'object' ||
+        parsedEntry['details'] === null
       ) {
         return
       }
@@ -103,8 +103,8 @@ describe('auditLoggingService', () => {
       if (
         typeof parsedEntry !== 'object' ||
         parsedEntry === null ||
-        typeof parsedEntry.metadata !== 'object' ||
-        parsedEntry.metadata === null
+        typeof parsedEntry['metadata'] !== 'object' ||
+        parsedEntry['metadata'] === null
       ) {
         return
       }
@@ -113,7 +113,7 @@ describe('auditLoggingService', () => {
         metadata: Record<string, unknown>
       }
       expect(loggedEntry.userId).not.toBe(testEntry.userId)
-      expect(loggedEntry.metadata?.sessionId).not.toBe(
+      expect(loggedEntry.metadata?.['sessionId']).not.toBe(
         testEntry.metadata.sessionId,
       )
     })

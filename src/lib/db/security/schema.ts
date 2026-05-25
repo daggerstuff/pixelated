@@ -5,7 +5,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('security-schema')
 
 const mongoUri = process.env['MONGODB_URI']
-const mongoDbName = process.env.MONGODB_DB_NAME
+const mongoDbName = process.env['MONGODB_DB_NAME']
 
 // Create mock client for builds without proper credentials
 function createMockClient() {

@@ -28,7 +28,7 @@ function extractHtml(renderResult: unknown): string {
     renderResult !== null &&
     'html' in renderResult
   ) {
-    const html = (renderResult as Record<string, unknown>).html
+    const html = (renderResult as Record<string, unknown>)['html']
     if (typeof html === 'string') {
       return html
     }

@@ -97,8 +97,8 @@ describe('BiasDetectionConfigManager', () => {
     })
 
     it('should override defaults with environment variables', () => {
-      process.env.BIAS_WARNING_THRESHOLD = '0.4'
-      process.env.BIAS_HIGH_THRESHOLD = '0.7'
+      process.env['BIAS_WARNING_THRESHOLD'] = '0.4'
+      process.env['BIAS_HIGH_THRESHOLD'] = '0.7'
       process.env['PYTHON_SERVICE_HOST'] = 'remote-host'
       process.env['PYTHON_SERVICE_PORT'] = '8080'
       process.env['CACHE_ENABLED'] = 'false'
@@ -111,7 +111,7 @@ describe('BiasDetectionConfigManager', () => {
     })
 
     it('should handle invalid environment variable values gracefully', () => {
-      process.env.BIAS_WARNING_THRESHOLD = 'invalid'
+      process.env['BIAS_WARNING_THRESHOLD'] = 'invalid'
       process.env['PYTHON_SERVICE_PORT'] = 'not-a-number'
       process.env['CACHE_ENABLED'] = 'maybe'
 
@@ -402,7 +402,7 @@ describe('BiasDetectionConfigManager', () => {
       expect(originalConfig.thresholds?.warning).toBe(0.3)
 
       // Change environment variable
-      process.env.BIAS_WARNING_THRESHOLD = '0.5'
+      process.env['BIAS_WARNING_THRESHOLD'] = '0.5'
 
       // Reload configuration
       const reloadedConfig = configManager.reloadConfiguration()
@@ -458,8 +458,8 @@ describe('BiasDetectionConfigManager', () => {
     })
 
     it('should parse float environment variables correctly', () => {
-      process.env.BIAS_WARNING_THRESHOLD = '0.35'
-      process.env.BIAS_WEIGHT_PREPROCESSING = '0.3'
+      process.env['BIAS_WARNING_THRESHOLD'] = '0.35'
+      process.env['BIAS_WEIGHT_PREPROCESSING'] = '0.3'
 
       // Reset instance
       ;(BiasDetectionConfigManager as unknown as { instance?: unknown }).instance = undefined
@@ -639,21 +639,21 @@ describe('loadConfigFromEnv', () => {
   })
 
   it('should parse evaluation metrics from env var', () => {
-    process.env.BIAS_EVALUATION_METRICS = 'demographic_parity,equalized_odds'
+    process.env['BIAS_EVALUATION_METRICS'] = 'demographic_parity,equalized_odds'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.evaluationMetrics).toEqual(['demographic_parity', 'equalized_odds'])
   })
 
   it('should parse cache TTL from env var', () => {
-    process.env.CACHE_TTL = '600000'
+    process.env['CACHE_TTL'] = '600000'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.cacheConfig?.ttl).toBe(600000)
   })
 
   it('should parse boolean HIPAA and masking flags', () => {
-    process.env.ENABLE_HIPAA_COMPLIANCE = 'true'
-    process.env.ENABLE_AUDIT_LOGGING = 'false'
-    process.env.ENABLE_DATA_MASKING = 'true'
+    process.env['ENABLE_HIPAA_COMPLIANCE'] = 'true'
+    process.env['ENABLE_AUDIT_LOGGING'] = 'false'
+    process.env['ENABLE_DATA_MASKING'] = 'true'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.hipaaCompliant).toBe(true)
     expect(envConfig.auditLogging).toBe(false)
@@ -661,9 +661,9 @@ describe('loadConfigFromEnv', () => {
   })
 
   it('should parse alert config from env vars', () => {
-    process.env.BIAS_ALERT_SLACK_WEBHOOK = 'https://hooks.slack.com/test'
-    process.env.BIAS_ALERT_EMAIL_RECIPIENTS = 'a@b.com,c@d.com'
-    process.env.BIAS_ALERT_COOLDOWN_MINUTES = '5'
+    process.env['BIAS_ALERT_SLACK_WEBHOOK'] = 'https://hooks.slack.com/test'
+    process.env['BIAS_ALERT_EMAIL_RECIPIENTS'] = 'a@b.com,c@d.com'
+    process.env['BIAS_ALERT_COOLDOWN_MINUTES'] = '5'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.alertConfig?.slackWebhookUrl).toBe('https://hooks.slack.com/test')
     expect(envConfig.alertConfig?.enableSlackNotifications).toBe(true)
@@ -673,9 +673,9 @@ describe('loadConfigFromEnv', () => {
   })
 
   it('should parse metrics config from env vars', () => {
-    process.env.BIAS_METRICS_RETENTION_DAYS = '60'
-    process.env.BIAS_DASHBOARD_REFRESH_RATE = '120'
-    process.env.BIAS_ENABLE_REAL_TIME_MONITORING = 'false'
+    process.env['BIAS_METRICS_RETENTION_DAYS'] = '60'
+    process.env['BIAS_DASHBOARD_REFRESH_RATE'] = '120'
+    process.env['BIAS_ENABLE_REAL_TIME_MONITORING'] = 'false'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.metricsConfig?.metricsRetentionDays).toBe(60)
     expect(envConfig.metricsConfig?.dashboardRefreshRate).toBe(120)
@@ -683,13 +683,13 @@ describe('loadConfigFromEnv', () => {
   })
 
   it('should parse performance config from env vars', () => {
-    process.env.MAX_CONCURRENT_ANALYSES = '25'
+    process.env['MAX_CONCURRENT_ANALYSES'] = '25'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.performanceConfig?.maxConcurrentAnalyses).toBe(25)
   })
 
   it('should parse LOG_LEVEL debug to enableDebug', () => {
-    process.env.LOG_LEVEL = 'debug'
+    process.env['LOG_LEVEL'] = 'debug'
     const envConfig = loadConfigFromEnv()
     expect(envConfig.loggingConfig?.enableDebug).toBe(true)
   })
@@ -741,8 +741,8 @@ describe('Standalone Utility Functions', () => {
 
   describe('getEnvironmentConfigSummary', () => {
     it('should list loaded env vars', () => {
-      process.env.BIAS_WARNING_THRESHOLD = '0.5'
-      process.env.BIAS_DETECTION_SERVICE_URL = 'http://test:5000'
+      process.env['BIAS_WARNING_THRESHOLD'] = '0.5'
+      process.env['BIAS_DETECTION_SERVICE_URL'] = 'http://test:5000'
       const summary = getEnvironmentConfigSummary()
       expect(summary.loaded).toContain('BIAS_WARNING_THRESHOLD')
       expect(summary.loaded).toContain('BIAS_DETECTION_SERVICE_URL')
@@ -808,7 +808,7 @@ describe('Standalone Utility Functions', () => {
 
   describe('createConfigWithEnvOverrides', () => {
     it('should merge user config over env over defaults', () => {
-      process.env.BIAS_WARNING_THRESHOLD = '0.5'
+      process.env['BIAS_WARNING_THRESHOLD'] = '0.5'
       const config = createConfigWithEnvOverrides({
         environment: 'production',
         thresholds: { warning: 0.6, high: 0.7, critical: 0.9 },

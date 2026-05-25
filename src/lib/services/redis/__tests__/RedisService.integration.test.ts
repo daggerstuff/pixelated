@@ -303,7 +303,7 @@ describeFn('RedisService Integration Tests', () => {
         highConfidencePatterns.forEach((pattern) => {
           const parsed = parseRedisRecord(pattern)
           expect(typeof parsed['confidence']).toBe('number')
-          expect(parsed.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(parsed['confidence']).toBeGreaterThanOrEqual(0.8)
         })
       })
     })

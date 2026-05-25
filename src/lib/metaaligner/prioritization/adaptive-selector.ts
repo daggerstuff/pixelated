@@ -133,7 +133,7 @@ export class AdaptiveSelector {
 
     // If detection failed (marked with metadata.error), use exact default weights without recalculation
     const hasDetectionError =
-      'error' in detection.metadata && detection.metadata.error !== undefined
+      'error' in detection.metadata && detection.metadata['error'] !== undefined
     if (hasDetectionError) {
       selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,

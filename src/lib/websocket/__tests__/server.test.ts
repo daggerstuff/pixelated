@@ -248,7 +248,7 @@ describe('therapyChatWebSocketServer', () => {
   describe('broadcast methods', () => {
     it('should broadcast to specific session', () => {
       const sessionId = '123'
-      const clientId = process.env.CLIENT_ID ?? 'example-client-id'
+      const clientId = process.env['CLIENT_ID'] ?? 'example-client-id'
 
       // Add client to session
       mockClients.set(clientId, mockWebSocket)

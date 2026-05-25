@@ -90,7 +90,7 @@ export function requireRoles(allowedRoles: string[]) {
       return
     }
 
-    const userRoles = user.roles ?? []
+    const userRoles = user['roles'] ?? []
     const hasRequiredRole = allowedRoles.some((role) =>
       userRoles.includes(role),
     )
@@ -124,7 +124,7 @@ export function requirePermissions(requiredPermissions: string[]) {
       return
     }
 
-    const userPermissions = user.permissions ?? []
+    const userPermissions = user['permissions'] ?? []
     const hasAllPermissions = requiredPermissions.every((permission) =>
       userPermissions.includes(permission),
     )

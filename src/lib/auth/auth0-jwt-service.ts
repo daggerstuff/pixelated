@@ -21,7 +21,7 @@ import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 type Auth0UserInfoClient = {
   getUserInfo?: (
@@ -45,10 +45,10 @@ type Auth0UserInfoClientConstructor = new (options: {
 
 function getRuntimeAuth0Config(): Auth0RuntimeConfig {
   return {
-    domain: process.env.AUTH0_DOMAIN ?? auth0Config.domain,
-    clientId: process.env.AUTH0_CLIENT_ID ?? auth0Config.clientId,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET ?? auth0Config.clientSecret,
-    audience: process.env.AUTH0_AUDIENCE ?? auth0Config.audience,
+    domain: process.env['AUTH0_DOMAIN'] ?? auth0Config.domain,
+    clientId: process.env['AUTH0_CLIENT_ID'] ?? auth0Config.clientId,
+    clientSecret: process.env['AUTH0_CLIENT_SECRET'] ?? auth0Config.clientSecret,
+    audience: process.env['AUTH0_AUDIENCE'] ?? auth0Config.audience,
   }
 }
 
@@ -215,11 +215,11 @@ function toAuth0TokenResponse(value: unknown): Auth0TokenResponse | null {
   }
 
   return {
-    access_token: value.access_token,
-    refresh_token: value.refresh_token,
-    expires_in: value.expires_in,
-    id_token: value.id_token,
-    token_type: value.token_type,
+    access_token: value['access_token'],
+    refresh_token: value['refresh_token'],
+    expires_in: value['expires_in'],
+    id_token: value['id_token'],
+    token_type: value['token_type'],
   }
 }
 
@@ -280,18 +280,18 @@ function isAuth0TokenClaims(payload: unknown): payload is Auth0TokenClaims {
   }
   const tokenClaims = payload
 
-  if (tokenClaims.iss !== undefined && typeof tokenClaims.iss !== 'string') {
+  if (tokenClaims['iss'] !== undefined && typeof tokenClaims['iss'] !== 'string') {
     return false
   }
 
-  if (tokenClaims.sub !== undefined && typeof tokenClaims.sub !== 'string') {
+  if (tokenClaims['sub'] !== undefined && typeof tokenClaims['sub'] !== 'string') {
     return false
   }
 
   if (
-    tokenClaims.aud !== undefined &&
-    typeof tokenClaims.aud !== 'string' &&
-    !Array.isArray(tokenClaims.aud)
+    tokenClaims['aud'] !== undefined &&
+    typeof tokenClaims['aud'] !== 'string' &&
+    !Array.isArray(tokenClaims['aud'])
   ) {
     return false
   }
@@ -335,16 +335,6 @@ function decodeAuth0JwtPayload(token: string): Auth0TokenClaims | null {
   }
 
   return payload
-}
-
-function isUserRole(value: string | undefined | null): value is UserRole {
-  return (
-    value === 'admin' ||
-    value === 'therapist' ||
-    value === 'patient' ||
-    value === 'researcher' ||
-    value === 'guest'
-  )
 }
 
 /**
@@ -524,16 +514,16 @@ export async function validateToken(
     }
 
     // Extract accountId and workspaceId from user info
-    const userMetadata = toStringRecord(userInfoData.user_metadata)
-    const appMetadata = toStringRecord(userInfoData.app_metadata)
+    const userMetadata = toStringRecord(userInfoData['user_metadata'])
+    const appMetadata = toStringRecord(userInfoData['app_metadata'])
     const accountId =
-      toOptionalString(userInfoData.accountId) ??
-      toOptionalString(userMetadata.accountId) ??
-      toOptionalString(appMetadata.accountId)
+      toOptionalString(userInfoData['accountId']) ??
+      toOptionalString(userMetadata['accountId']) ??
+      toOptionalString(appMetadata['accountId'])
     const workspaceId =
-      toOptionalString(userInfoData.workspaceId) ??
-      toOptionalString(userMetadata.workspaceId) ??
-      toOptionalString(appMetadata.workspaceId)
+      toOptionalString(userInfoData['workspaceId']) ??
+      toOptionalString(userMetadata['workspaceId']) ??
+      toOptionalString(appMetadata['workspaceId'])
 
     return {
       valid: true,
@@ -597,8 +587,8 @@ export async function refreshAccessToken(
       throw new AuthenticationError('Invalid user payload')
     }
     const userPayload = userResponseData
-    const userId = typeof userPayload.sub === 'string' ? userPayload.sub : ''
-    const accessTokenId = userPayload.jti
+    const userId = typeof userPayload['sub'] === 'string' ? userPayload['sub'] : ''
+    const accessTokenId = userPayload['jti']
     const role = extractRoleFromPayload(userPayload)
 
     // Log token refresh event

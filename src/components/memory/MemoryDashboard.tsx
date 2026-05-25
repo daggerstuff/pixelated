@@ -26,16 +26,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog.tsx'
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
+} from '@/components/ui/card/index'
 import {
   Dialog,
   DialogContent,
@@ -44,29 +44,29 @@ import {
   DialogHeader,
   DialogTitle,
   useDialog,
-} from '@/components/ui/dialog.tsx'
-import { Input } from '@/components/ui/input.tsx'
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select.tsx'
+} from '@/components/ui/select'
 import {
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table.tsx'
+} from '@/components/ui/table'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
+} from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 import { useMemory, useUserPreferences } from '@/hooks/useMemory'
 import type { MemoryEntry } from '@/lib/memory/memory-client'
 

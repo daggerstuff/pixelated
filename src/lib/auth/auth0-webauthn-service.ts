@@ -10,7 +10,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
@@ -26,18 +26,18 @@ function toWebAuthnCredentialInput(
   value: Record<string, unknown>,
 ): WebAuthnCredentialInput {
   return {
-    id: typeof value.id === 'string' ? value.id : undefined,
-    name: typeof value.name === 'string' ? value.name : undefined,
+    id: typeof value['id'] === 'string' ? value['id'] : undefined,
+    name: typeof value['name'] === 'string' ? value['name'] : undefined,
     type:
-      value.type === 'webauthn-roaming' || value.type === 'webauthn-platform'
-        ? value.type
+      value['type'] === 'webauthn-roaming' || value['type'] === 'webauthn-platform'
+        ? value['type']
         : undefined,
     publicKey:
-      typeof value.publicKey === 'string' ? value.publicKey : undefined,
-    counter: typeof value.counter === 'number' ? value.counter : undefined,
+      typeof value['publicKey'] === 'string' ? value['publicKey'] : undefined,
+    counter: typeof value['counter'] === 'number' ? value['counter'] : undefined,
     deviceType:
-      typeof value.deviceType === 'string' ? value.deviceType : undefined,
-    backedUp: typeof value.backedUp === 'boolean' ? value.backedUp : undefined,
+      typeof value['deviceType'] === 'string' ? value['deviceType'] : undefined,
+    backedUp: typeof value['backedUp'] === 'boolean' ? value['backedUp'] : undefined,
   }
 }
 

@@ -13,21 +13,21 @@ import {
 import { useState } from 'react'
 import type { FC } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
-import { Button } from '@/components/ui/button/index.ts'
+import { Badge } from '@/components/ui/badge/index'
+import { Button } from '@/components/ui/button/index'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
-import { Progress } from '@/components/ui/progress.tsx'
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
+} from '@/components/ui/tabs'
 
 interface DemoStep {
   id: string

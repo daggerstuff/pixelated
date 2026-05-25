@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('pixel-stats-api')
-const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
+const PIXEL_API_URL = process.env['PIXEL_API_URL'] ?? 'http://localhost:8001'
 
 export const GET: APIRoute = async () => {
   try {

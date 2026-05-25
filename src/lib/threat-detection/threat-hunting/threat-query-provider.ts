@@ -46,14 +46,14 @@ export class ThreatQueryProvider {
   ): Promise<HuntFinding[]> {
     try {
       const findings: HuntFinding[] = []
-      const rawPattern = (query.patternMatch as string) || 'rate_limit:*'
+      const rawPattern = (query['patternMatch'] as string) || 'rate_limit:*'
       const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
       const pattern = sanitizedSuffix.includes(':')
         ? sanitizedSuffix
         : `rate_limit:${sanitizedSuffix}`
 
-      if (query.patternMatch || query.scanEnabled) {
-        const [nextCursor, keys] = await this.redis.scan(
+      if (query['patternMatch'] || query['scanEnabled']) {
+        const [_nextCursor, keys] = await this.redis.scan(
           '0',
           'MATCH',
           pattern,
@@ -109,12 +109,12 @@ export class ThreatQueryProvider {
     }
   }> {
     const pagination =
-      (searchData.pagination as { page?: number; limit?: number }) || {}
+      (searchData['pagination'] as { page?: number; limit?: number }) || {}
     const { page = 1, limit = 50 } = pagination
     const skip = (page - 1) * limit
 
     // P3.1 SECURITY FIX: Sanitize input and strictly prefix with 'threat:'.
-    const rawPattern = (searchData.patternMatch as string) || '*'
+    const rawPattern = (searchData['patternMatch'] as string) || '*'
     const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
     const pattern = `threat:${sanitizedSuffix}`
 
