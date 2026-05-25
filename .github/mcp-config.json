@@ -1,6 +1,9 @@
 {
   "asana": {
     "oauthClientId": "YOUR_ASANA_CLIENT_ID",
+    "auth": { "redirectPort": 3000 },
+    "oauthPublicClient": "YOUR_ASANA_PUBLIC_CLIENT_ID"
+    "oauthClientId": "YOUR_ASANA_CLIENT_ID",
     "oauthPublicClient": "YOUR_ASANA_PUBLIC_CLIENT_ID"
   }
 }
