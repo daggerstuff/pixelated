@@ -8,7 +8,8 @@ type ErrorBoundaryProps = {
 }
 
 function ErrorBoundary(props: ErrorBoundaryProps = {}) {
-  const fallback = props.fallback ?? 'Something went wrong. Please try refreshing the page.'
+  const fallback =
+    props.fallback ?? 'Something went wrong. Please try refreshing the page.'
   const children = props.children ?? ''
   const listeners = new WeakMap<EventTarget, Map<string, EventListener>>()
 
@@ -18,7 +19,13 @@ function ErrorBoundary(props: ErrorBoundaryProps = {}) {
   window.addEventListener('unhandledrejection', onUnhandledRejection)
 
   const mark = `data-${Math.random().toString(36).slice(2)}`
-  listeners.set(window, new Map([[`error-${mark}`, onError], [`unhandled-${mark}`, onUnhandledRejection]]))
+  listeners.set(
+    window,
+    new Map([
+      [`error-${mark}`, onError],
+      [`unhandled-${mark}`, onUnhandledRejection],
+    ]),
+  )
 
   return {
     html: `<error-boundary ${mark}><slot>${children}</slot><p slot="fallback">${fallback}</p></error-boundary>`,
@@ -30,7 +37,9 @@ function ErrorBoundary(props: ErrorBoundaryProps = {}) {
         const tracked = listeners.get(window)
         if (tracked) {
           tracked.forEach((listener, key) => {
-            const name = key.startsWith('error') ? 'error' : 'unhandledrejection'
+            const name = key.startsWith('error')
+              ? 'error'
+              : 'unhandledrejection'
             window.removeEventListener(name, listener)
           })
           tracked.clear()

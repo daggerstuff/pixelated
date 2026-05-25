@@ -12,11 +12,11 @@ const UserProfileInner = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className='py-10 text-center'>
-        <h2 className='mb-4 text-xl'>You are not logged in.</h2>
+      <div className="py-10 text-center">
+        <h2 className="mb-4 text-xl">You are not logged in.</h2>
         <button
-          onClick={ async () => loginWithRedirect()}
-          className='bg-white text-slate-950 hover:bg-slate-200 rounded-full px-6 py-3 font-semibold transition-colors'
+          onClick={async () => loginWithRedirect()}
+          className="bg-white text-slate-950 hover:bg-slate-200 rounded-full px-6 py-3 font-semibold transition-colors"
         >
           Log In to View Profile
         </button>
@@ -26,25 +26,25 @@ const UserProfileInner = () => {
 
   return (
     <div>
-      <div className='mb-6 flex items-center gap-4'>
+      <div className="mb-6 flex items-center gap-4">
         {user?.picture && (
           <img
             src={user.picture}
             alt={user.name}
-            className='border-white/10 h-20 w-20 rounded-full border-2'
+            className="border-white/10 h-20 w-20 rounded-full border-2"
           />
         )}
         <div>
-          <h2 className='text-white text-2xl font-bold'>{user?.name}</h2>
-          <p className='text-slate-400'>{user?.email}</p>
+          <h2 className="text-white text-2xl font-bold">{user?.name}</h2>
+          <p className="text-slate-400">{user?.email}</p>
         </div>
       </div>
 
-      <div className='bg-slate-900/50 border-white/10 rounded-lg border p-6'>
-        <h3 className='text-white mb-4 text-lg font-semibold'>
+      <div className="bg-slate-900/50 border-white/10 rounded-lg border p-6">
+        <h3 className="text-white mb-4 text-lg font-semibold">
           User Profile Data (Auth0 SDK)
         </h3>
-        <pre className='text-slate-300 overflow-auto whitespace-pre-wrap font-mono text-xs'>
+        <pre className="text-slate-300 overflow-auto whitespace-pre-wrap font-mono text-xs">
           {JSON.stringify(user, null, 2)}
         </pre>
       </div>

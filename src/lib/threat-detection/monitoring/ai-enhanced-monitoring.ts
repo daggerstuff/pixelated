@@ -379,7 +379,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         .collection('threat_responses')
         .countDocuments({
           'actions.actionType': 'block',
-          createdAt: { $gte: new Date(Date.now() - 3600000) },
+          'createdAt': { $gte: new Date(Date.now() - 3600000) },
         })
 
       return {

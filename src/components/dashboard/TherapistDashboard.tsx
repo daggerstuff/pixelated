@@ -36,9 +36,7 @@ export function TherapistDashboard({
   }, [sessions])
   if (!onSessionControl) {
     return (
-      <div role='alert'>
-        TherapistDashboard requires onSessionControl prop
-      </div>
+      <div role="alert">TherapistDashboard requires onSessionControl prop</div>
     )
   }
 
@@ -74,12 +72,12 @@ export function TherapistDashboard({
   )
 
   return (
-    <div className='relative'>
+    <div className="relative">
       {/* Navigation for accessibility tests */}
-      <nav aria-label='Dashboard Navigation' className='sr-only'>
+      <nav aria-label="Dashboard Navigation" className="sr-only">
         <ul>
           <li>
-            <a href='#main-content'>Main Content</a>
+            <a href="#main-content">Main Content</a>
           </li>
         </ul>
       </nav>
@@ -87,8 +85,8 @@ export function TherapistDashboard({
       {/* Skip to main content link for keyboard users */}
       {showSkipLink && (
         <a
-          href='#main-content'
-          className='focus:ring-primary sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2'
+          href="#main-content"
+          className="focus:ring-primary sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2"
           onClick={(e) => {
             e.preventDefault()
             const mainContent = document.getElementById('main-content')
@@ -102,21 +100,21 @@ export function TherapistDashboard({
       )}
 
       <section
-        id='main-content'
+        id="main-content"
         className={cn(
           'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-6',
           'bg-background text-foreground rounded-lg shadow-lg w-full min-h-[60vh]',
           'focus:outline-none',
         )}
-        aria-label='Therapist Dashboard'
-        role='main'
+        aria-label="Therapist Dashboard"
+        role="main"
         tabIndex={-1}
       >
         {/* Session Controls */}
         <aside
-          className='bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4'
-          aria-label='Session Controls'
-          role='region'
+          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          aria-label="Session Controls"
+          role="region"
           tabIndex={0}
         >
           <SessionControls
@@ -127,23 +125,23 @@ export function TherapistDashboard({
 
         {/* Analytics Charts */}
         <section
-          className='bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4'
-          aria-label='Analytics Charts'
-          role='region'
+          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          aria-label="Analytics Charts"
+          role="region"
           tabIndex={0}
         >
-          <h3 className='text-lg font-semibold'>Analytics Overview</h3>
+          <h3 className="text-lg font-semibold">Analytics Overview</h3>
           <AnalyticsCharts />
         </section>
 
         {/* Progress Widgets */}
         <section
-          className='bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4'
-          aria-label='Progress Tracking Widgets'
-          role='region'
+          className="bg-muted col-span-1 flex flex-col gap-4 rounded-md p-4"
+          aria-label="Progress Tracking Widgets"
+          role="region"
           tabIndex={0}
         >
-          <h3 className='text-lg font-semibold'>Session Progress</h3>
+          <h3 className="text-lg font-semibold">Session Progress</h3>
           {latestSession && (
             <TherapistProgressTracker session={latestSession} />
           )}
@@ -152,12 +150,12 @@ export function TherapistDashboard({
         {/* Therapy Progress Charts - Full width on larger screens */}
         {therapistData && (
           <section
-            className='bg-muted flex flex-col gap-4 rounded-md p-4 md:col-span-2 xl:col-span-3'
-            aria-label='Therapy Progress Charts'
-            role='region'
+            className="bg-muted flex flex-col gap-4 rounded-md p-4 md:col-span-2 xl:col-span-3"
+            aria-label="Therapy Progress Charts"
+            role="region"
             tabIndex={0}
           >
-            <h3 className='text-lg font-semibold'>Therapy Progress Overview</h3>
+            <h3 className="text-lg font-semibold">Therapy Progress Overview</h3>
             <TherapyProgressCharts data={therapistData} />
           </section>
         )}

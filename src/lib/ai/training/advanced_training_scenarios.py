@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 class TrainingType(Enum):
     """Types of advanced training scenarios"""
+
     CULTURAL_COMPETENCY = "cultural_competency"
     TRAUMA_INFORMED = "trauma_informed"
     LGBTQ_INCLUSIVE = "lgbtq_inclusive"
@@ -49,6 +50,7 @@ class TrainingType(Enum):
 
 class DifficultyLevel(Enum):
     """Difficulty levels for training scenarios"""
+
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
@@ -58,6 +60,7 @@ class DifficultyLevel(Enum):
 @dataclass
 class CulturalContext:
     """Cultural context for training scenarios"""
+
     ethnicity: str
     cultural_background: str
     language_preferences: list[str]
@@ -74,6 +77,7 @@ class CulturalContext:
 @dataclass
 class TraumaContext:
     """Trauma-informed care context"""
+
     trauma_history: list[str]
     trauma_triggers: list[str]
     safety_needs: list[str]
@@ -89,6 +93,7 @@ class TraumaContext:
 @dataclass
 class IntersectionalityProfile:
     """Intersectionality profile for complex scenarios"""
+
     identities: dict[str, str]
     overlapping_oppressions: list[str]
     privilege_factors: list[str]
@@ -102,6 +107,7 @@ class IntersectionalityProfile:
 @dataclass
 class TrainingResponse:
     """Response to training scenario"""
+
     response_text: str
     response_type: str  # verbal, written, action
     cultural_competency_score: float
@@ -118,6 +124,7 @@ class TrainingResponse:
 @dataclass
 class ScenarioBranch:
     """Branching scenario path"""
+
     branch_id: str
     condition: str
     next_scenario_id: str
@@ -130,6 +137,7 @@ class ScenarioBranch:
 @dataclass
 class AdvancedTrainingScenario:
     """Advanced training scenario with cultural and trauma-informed elements"""
+
     scenario_id: str
     training_type: TrainingType
     difficulty: DifficultyLevel
@@ -156,6 +164,7 @@ class AdvancedTrainingScenario:
 @dataclass
 class TrainingMetricsAdvanced:
     """Advanced metrics for cultural competency and trauma-informed training"""
+
     cultural_competency_scores: list[float] = field(default_factory=list)
     trauma_informed_scores: list[float] = field(default_factory=list)
     bias_awareness_scores: list[float] = field(default_factory=list)
@@ -197,7 +206,7 @@ class CulturalCompetencyScenarios:
                 "primary_language": "Spanish",
                 "english_proficiency": "limited",
                 "insurance": "Medicaid",
-                "occupation": "housekeeper"
+                "occupation": "housekeeper",
             },
             cultural_context=CulturalContext(
                 ethnicity="Hispanic/Latino",
@@ -209,38 +218,38 @@ class CulturalCompetencyScenarios:
                     "income_level": "low",
                     "education_level": "high school",
                     "employment_status": "employed",
-                    "housing_stability": "stable"
+                    "housing_stability": "stable",
                 },
                 health_beliefs=[
                     "Traditional remedies alongside Western medicine",
                     "Hot/cold balance in body",
                     "Family involvement in care decisions",
-                    "Respect for authority figures"
+                    "Respect for authority figures",
                 ],
                 communication_styles=[
                     "Indirect communication",
                     "Respectful of hierarchy",
                     "Non-confrontational",
-                    "Family spokesperson may speak"
+                    "Family spokesperson may speak",
                 ],
                 decision_making_patterns=[
                     "Family-centered decisions",
                     "Elder consultation",
                     "Religious considerations",
-                    "Traditional healing preferences"
+                    "Traditional healing preferences",
                 ],
                 traditional_practices=[
                     "Herbal remedies",
                     "Prayer and spiritual healing",
                     "Family care rituals",
-                    "Traditional diet modifications"
+                    "Traditional diet modifications",
                 ],
                 barriers_to_care=[
                     "Language barriers",
                     "Financial constraints",
                     "Transportation issues",
-                    "Cultural misunderstandings"
-                ]
+                    "Cultural misunderstandings",
+                ],
             ),
             trauma_context=None,
             intersectionality_profile=None,
@@ -249,19 +258,19 @@ class CulturalCompetencyScenarios:
                 "Language-appropriate communication",
                 "Cultural sensitivity to traditional practices",
                 "Family involvement in care planning",
-                "Respect for cultural health beliefs"
+                "Respect for cultural health beliefs",
             ],
             learning_objectives=[
                 "Understand Hispanic/Latino cultural health beliefs",
                 "Practice culturally sensitive communication",
                 "Navigate traditional vs. Western medicine integration",
-                "Involve family in healthcare decisions appropriately"
+                "Involve family in healthcare decisions appropriately",
             ],
             cultural_competency_goals=[
                 "Demonstrate respect for cultural health practices",
                 "Use appropriate communication styles",
                 "Understand family dynamics in healthcare",
-                "Address language barriers effectively"
+                "Address language barriers effectively",
             ],
             trauma_informed_goals=[],
             branching_paths=[
@@ -272,49 +281,52 @@ class CulturalCompetencyScenarios:
                     feedback="Excellent cultural sensitivity demonstrated",
                     learning_points=["Cultural respect builds trust", "Integration of practices improves outcomes"],
                     cultural_insights=["Traditional practices have value", "Cultural humility is essential"],
-                    trauma_considerations=[]
+                    trauma_considerations=[],
                 ),
                 ScenarioBranch(
                     branch_id="dismiss_traditional",
                     condition="Provider dismisses traditional practices",
                     next_scenario_id="cultural_challenge_001",
                     feedback="Cultural insensitivity may harm therapeutic relationship",
-                    learning_points=["Dismissal of cultural practices damages trust", "Cultural competence requires openness"],
+                    learning_points=[
+                        "Dismissal of cultural practices damages trust",
+                        "Cultural competence requires openness",
+                    ],
                     cultural_insights=["All health beliefs deserve respect", "Cultural practices often have wisdom"],
-                    trauma_considerations=["Cultural dismissal can be traumatic"]
-                )
+                    trauma_considerations=["Cultural dismissal can be traumatic"],
+                ),
             ],
             assessment_criteria={
                 "cultural_sensitivity": 0.8,
                 "communication_appropriateness": 0.7,
                 "family_involvement": 0.6,
-                "traditional_practice_integration": 0.5
+                "traditional_practice_integration": 0.5,
             },
             resources=[
                 "Hispanic/Latino cultural competency guidelines",
                 "Traditional medicine integration protocols",
                 "Medical Spanish resources",
-                "Family-centered care principles"
+                "Family-centered care principles",
             ],
             reflection_questions=[
                 "How did cultural background affect this interaction?",
                 "What traditional practices were mentioned?",
                 "How was family involvement handled?",
-                "What could improve cultural competency?"
+                "What could improve cultural competency?",
             ],
             debrief_points=[
                 "Cultural humility in healthcare",
                 "Traditional medicine integration",
                 "Language access importance",
-                "Family-centered care benefits"
+                "Family-centered care benefits",
             ],
             cultural_sensitivity_alerts=[
                 "Avoid stereotyping",
                 "Respect traditional practices",
                 "Use appropriate language services",
-                "Understand family dynamics"
+                "Understand family dynamics",
             ],
-            trauma_safety_alerts=[]
+            trauma_safety_alerts=[],
         )
 
         scenarios.append(hispanic_scenario)
@@ -354,7 +366,7 @@ class TraumaInformedScenarios:
                 "ethnicity": "Caucasian",
                 "primary_language": "English",
                 "occupation": "teacher",
-                "insurance": "private"
+                "insurance": "private",
             },
             cultural_context=CulturalContext(
                 ethnicity="Caucasian",
@@ -366,13 +378,13 @@ class TraumaInformedScenarios:
                     "income_level": "middle",
                     "education_level": "college",
                     "employment_status": "employed",
-                    "housing_stability": "unstable"
+                    "housing_stability": "unstable",
                 },
                 health_beliefs=["Western medicine", "privacy important"],
                 communication_styles=["Direct but guarded", "Needs reassurance"],
                 decision_making_patterns=["Independent", "Cautious"],
                 traditional_practices=[],
-                barriers_to_care=["Trust issues", "Fear of judgment", "Privacy concerns"]
+                barriers_to_care=["Trust issues", "Fear of judgment", "Privacy concerns"],
             ),
             trauma_context=TraumaContext(
                 trauma_history=["Domestic violence", "Emotional abuse", "Physical abuse"],
@@ -384,13 +396,13 @@ class TraumaInformedScenarios:
                 intergenerational_trauma_indicators=["Family violence patterns", "Learned helplessness"],
                 resilience_factors=["Employment stability", "Supportive friends", "Therapy engagement"],
                 coping_mechanisms=["Avoidance", "Hypervigilance", "Control-seeking"],
-                support_systems=["Therapist", "Close friends", "Support group"]
+                support_systems=["Therapist", "Close friends", "Support group"],
             ),
             intersectionality_profile=IntersectionalityProfile(
                 identities={
                     "gender": "female",
                     "socioeconomic_status": "middle_class",
-                    "survivor_status": "domestic_violence"
+                    "survivor_status": "domestic_violence",
                 },
                 overlapping_oppressions=["Gender-based violence", "Power imbalances"],
                 privilege_factors=["Education", "Employment", "Language"],
@@ -398,31 +410,31 @@ class TraumaInformedScenarios:
                 power_dynamics={"healthcare_setting": "vulnerable", "personal_life": "seeking_empowerment"},
                 accessibility_needs=["Emotional safety", "Privacy", "Choice"],
                 discrimination_experiences=["Victim blaming", "Disbelief", "Minimization"],
-                resilience_strategies=["Therapy", "Support networks", "Self-advocacy"]
+                resilience_strategies=["Therapy", "Support networks", "Self-advocacy"],
             ),
             scenario_setup="Sarah presents for routine care but shows signs of hypervigilance and discomfort with male providers.",
             expected_interactions=[
                 "Trauma-sensitive communication",
                 "Safety and choice emphasis",
                 "Avoidance of trauma triggers",
-                "Empowerment-focused approach"
+                "Empowerment-focused approach",
             ],
             learning_objectives=[
                 "Recognize trauma responses and triggers",
                 "Practice trauma-informed communication",
                 "Create physically and emotionally safe environments",
-                "Support survivor empowerment and choice"
+                "Support survivor empowerment and choice",
             ],
             cultural_competency_goals=[
                 "Understand intersectionality of trauma and identity",
                 "Respect cultural responses to trauma",
-                "Address power dynamics in healthcare"
+                "Address power dynamics in healthcare",
             ],
             trauma_informed_goals=[
                 "Recognize trauma responses",
                 "Avoid re-traumatization",
                 "Promote safety and choice",
-                "Support empowerment"
+                "Support empowerment",
             ],
             branching_paths=[
                 ScenarioBranch(
@@ -432,7 +444,7 @@ class TraumaInformedScenarios:
                     feedback="Excellent trauma-informed care demonstrated",
                     learning_points=["Safety creates healing", "Choice promotes empowerment"],
                     cultural_insights=["Trauma affects whole person", "Safety is cultural"],
-                    trauma_considerations=["Avoiding triggers prevents harm", "Choice restores power"]
+                    trauma_considerations=["Avoiding triggers prevents harm", "Choice restores power"],
                 ),
                 ScenarioBranch(
                     branch_id="trauma_insensitive",
@@ -441,45 +453,45 @@ class TraumaInformedScenarios:
                     feedback="Trauma insensitivity may cause harm",
                     learning_points=["Ignoring trauma signs is harmful", "Trauma-informed care is essential"],
                     cultural_insights=["Trauma affects healthcare interactions", "Safety is paramount"],
-                    trauma_considerations=["Re-traumatization must be avoided", "Power dynamics matter"]
-                )
+                    trauma_considerations=["Re-traumatization must be avoided", "Power dynamics matter"],
+                ),
             ],
             assessment_criteria={
                 "trauma_sensitivity": 0.9,
                 "safety_creation": 0.8,
                 "choice_promotion": 0.7,
-                "empowerment_support": 0.6
+                "empowerment_support": 0.6,
             },
             resources=[
                 "Trauma-informed care principles",
                 "Domestic violence survivor resources",
                 "Safety planning guidelines",
-                "Empowerment-based care approaches"
+                "Empowerment-based care approaches",
             ],
             reflection_questions=[
                 "What trauma signs were present?",
                 "How was safety addressed?",
                 "What choices were offered?",
-                "How was empowerment supported?"
+                "How was empowerment supported?",
             ],
             debrief_points=[
                 "Trauma-informed care principles",
                 "Safety in healthcare settings",
                 "Empowerment through choice",
-                "Avoiding re-traumatization"
+                "Avoiding re-traumatization",
             ],
             cultural_sensitivity_alerts=[
                 "Respect trauma responses",
                 "Understand intersectionality",
                 "Avoid victim-blaming",
-                "Support cultural coping"
+                "Support cultural coping",
             ],
             trauma_safety_alerts=[
                 "Maintain physical and emotional safety",
                 "Avoid trauma triggers",
                 "Respect survivor choices",
-                "Prevent re-traumatization"
-            ]
+                "Prevent re-traumatization",
+            ],
         )
 
         scenarios.append(dv_scenario)
@@ -520,7 +532,7 @@ class LGBTQInclusiveScenarios:
                 "ethnicity": "Asian American",
                 "primary_language": "English",
                 "occupation": "software_engineer",
-                "insurance": "private"
+                "insurance": "private",
             },
             cultural_context=CulturalContext(
                 ethnicity="Asian American",
@@ -532,13 +544,13 @@ class LGBTQInclusiveScenarios:
                     "income_level": "middle",
                     "education_level": "college",
                     "employment_status": "employed",
-                    "housing_stability": "stable"
+                    "housing_stability": "stable",
                 },
                 health_beliefs=["Holistic health", "Gender-affirming care importance"],
                 communication_styles=["Direct", "Needs validation", "Privacy-conscious"],
                 decision_making_patterns=["Independent", "Informed consent focused"],
                 traditional_practices=["Mindfulness", "Community support"],
-                barriers_to_care=["Discrimination fears", "Lack of provider knowledge", "Insurance barriers"]
+                barriers_to_care=["Discrimination fears", "Lack of provider knowledge", "Insurance barriers"],
             ),
             trauma_context=TraumaContext(
                 trauma_history=["Gender dysphoria", "Discrimination", "Misgendering"],
@@ -550,14 +562,14 @@ class LGBTQInclusiveScenarios:
                 intergenerational_trauma_indicators=["Family rejection patterns", "Cultural stigma"],
                 resilience_factors=["Community support", "Self-awareness", "Advocacy skills"],
                 coping_mechanisms=["Community connection", "Self-care", "Advocacy"],
-                support_systems=["LGBTQ+ community", "Chosen family", "Online support"]
+                support_systems=["LGBTQ+ community", "Chosen family", "Online support"],
             ),
             intersectionality_profile=IntersectionalityProfile(
                 identities={
                     "gender_identity": "transgender_male",
                     "sexual_orientation": "queer",
                     "race_ethnicity": "asian_american",
-                    "socioeconomic_status": "middle_class"
+                    "socioeconomic_status": "middle_class",
                 },
                 overlapping_oppressions=["Transphobia", "Racism", "Minority stress"],
                 privilege_factors=["Education", "Employment", "Language"],
@@ -565,32 +577,32 @@ class LGBTQInclusiveScenarios:
                 power_dynamics={"healthcare_setting": "vulnerable", "personal_life": "self_advocating"},
                 accessibility_needs=["Gender-affirming care", "Respectful language", "Privacy"],
                 discrimination_experiences=["Misgendering", "Deadnaming", "Medical discrimination"],
-                resilience_strategies=["Community support", "Self-advocacy", "Education"]
+                resilience_strategies=["Community support", "Self-advocacy", "Education"],
             ),
             scenario_setup="Alex seeks gender-affirming hormone therapy and experiences anxiety about provider competency.",
             expected_interactions=[
                 "Gender-affirming care provision",
                 "Respectful pronoun and name usage",
                 "Trauma-informed approach",
-                "Intersectional awareness"
+                "Intersectional awareness",
             ],
             learning_objectives=[
                 "Understand transgender healthcare needs",
                 "Practice gender-affirming care principles",
                 "Use inclusive language and pronouns",
-                "Address intersectional discrimination"
+                "Address intersectional discrimination",
             ],
             cultural_competency_goals=[
                 "Understand transgender health disparities",
                 "Respect gender identity and expression",
                 "Provide culturally humble care",
-                "Address intersectional needs"
+                "Address intersectional needs",
             ],
             trauma_informed_goals=[
                 "Recognize minority stress impacts",
                 "Create safe spaces for trans patients",
                 "Avoid re-traumatization",
-                "Support empowerment"
+                "Support empowerment",
             ],
             branching_paths=[
                 ScenarioBranch(
@@ -600,7 +612,7 @@ class LGBTQInclusiveScenarios:
                     feedback="Excellent gender-affirming care provided",
                     learning_points=["Gender-affirming care saves lives", "Respect builds trust"],
                     cultural_insights=["Trans identities are valid", "Affirmation is healing"],
-                    trauma_considerations=["Minority stress is real", "Affirmation reduces harm"]
+                    trauma_considerations=["Minority stress is real", "Affirmation reduces harm"],
                 ),
                 ScenarioBranch(
                     branch_id="transphobic",
@@ -609,45 +621,45 @@ class LGBTQInclusiveScenarios:
                     feedback="Transphobic bias causes significant harm",
                     learning_points=["Transphobia is deadly", "Competency saves lives"],
                     cultural_insights=["Trans people face discrimination", "Competency is essential"],
-                    trauma_considerations=["Transphobia is traumatic", "Competency prevents harm"]
-                )
+                    trauma_considerations=["Transphobia is traumatic", "Competency prevents harm"],
+                ),
             ],
             assessment_criteria={
                 "gender_affirming_care": 0.9,
                 "inclusive_language": 0.8,
                 "trauma_sensitivity": 0.7,
-                "intersectional_awareness": 0.6
+                "intersectional_awareness": 0.6,
             },
             resources=[
                 "WPATH Standards of Care",
                 "Transgender healthcare guidelines",
                 "Gender-affirming care protocols",
-                "LGBTQ+ inclusive language guide"
+                "LGBTQ+ inclusive language guide",
             ],
             reflection_questions=[
                 "How were pronouns handled?",
                 "What gender-affirming care was provided?",
                 "How was minority stress addressed?",
-                "What intersectional factors were considered?"
+                "What intersectional factors were considered?",
             ],
             debrief_points=[
                 "Gender-affirming care principles",
                 "Inclusive language importance",
                 "Minority stress impacts",
-                "Intersectional discrimination"
+                "Intersectional discrimination",
             ],
             cultural_sensitivity_alerts=[
                 "Use correct pronouns and names",
                 "Respect gender identity",
                 "Avoid assumptions",
-                "Understand minority stress"
+                "Understand minority stress",
             ],
             trauma_safety_alerts=[
                 "Create safe spaces",
                 "Avoid misgendering",
                 "Respect body autonomy",
-                "Support empowerment"
-            ]
+                "Support empowerment",
+            ],
         )
 
         scenarios.append(trans_scenario)
@@ -693,11 +705,7 @@ class AdvancedTrainingEngine:
 
     @track_latency("training.advanced_scenario_start")
     async def start_advanced_training_session(
-        self,
-        user_id: str,
-        training_type: TrainingType,
-        difficulty: DifficultyLevel,
-        scenario_id: str | None = None
+        self, user_id: str, training_type: TrainingType, difficulty: DifficultyLevel, scenario_id: str | None = None
     ) -> dict[str, Any]:
         """Start an advanced training session"""
 
@@ -726,8 +734,8 @@ class AdvancedTrainingEngine:
                 "trauma_informed": [],
                 "bias_awareness": [],
                 "communication": [],
-                "empathy": []
-            }
+                "empathy": [],
+            },
         }
 
         self.active_sessions[session_id] = session_data
@@ -741,7 +749,7 @@ class AdvancedTrainingEngine:
             "learning_objectives": scenario.learning_objectives,
             "cultural_context": scenario.cultural_context,
             "trauma_context": scenario.trauma_context,
-            "intersectionality_profile": scenario.intersectionality_profile
+            "intersectionality_profile": scenario.intersectionality_profile,
         }
 
     def _get_scenario_by_id(self, scenario_id: str) -> AdvancedTrainingScenario | None:
@@ -759,10 +767,7 @@ class AdvancedTrainingEngine:
 
     @track_latency("training.advanced_response_process")
     async def process_training_response(
-        self,
-        session_id: str,
-        user_response: str,
-        response_type: str = "verbal"
+        self, session_id: str, user_response: str, response_type: str = "verbal"
     ) -> dict[str, Any]:
         """Process user response to training scenario"""
 
@@ -773,19 +778,17 @@ class AdvancedTrainingEngine:
         scenario = session_data["scenario"]
 
         # Analyze response
-        analysis = await self._analyze_training_response(
-            user_response,
-            scenario,
-            session_data
-        )
+        analysis = await self._analyze_training_response(user_response, scenario, session_data)
 
         # Update session data
-        session_data["responses"].append({
-            "response": user_response,
-            "type": response_type,
-            "analysis": analysis,
-            "timestamp": datetime.now(timezone.utc)
-        })
+        session_data["responses"].append(
+            {
+                "response": user_response,
+                "type": response_type,
+                "analysis": analysis,
+                "timestamp": datetime.now(timezone.utc),
+            }
+        )
 
         # Update metrics
         self._update_training_metrics(analysis, session_data)
@@ -801,14 +804,11 @@ class AdvancedTrainingEngine:
             "feedback": analysis.get("feedback", ""),
             "learning_points": analysis.get("learning_points", []),
             "cultural_insights": analysis.get("cultural_insights", []),
-            "trauma_considerations": analysis.get("trauma_considerations", [])
+            "trauma_considerations": analysis.get("trauma_considerations", []),
         }
 
     async def _analyze_training_response(
-        self,
-        user_response: str,
-        scenario: AdvancedTrainingScenario,
-        session_data: dict[str, Any]
+        self, user_response: str, scenario: AdvancedTrainingScenario, session_data: dict[str, Any]
     ) -> dict[str, Any]:
         """Analyze training response for cultural competency and trauma-informed care"""
 
@@ -825,7 +825,7 @@ class AdvancedTrainingEngine:
             "trauma_considerations": [],
             "positive_aspects": [],
             "missed_opportunities": [],
-            "improvement_suggestions": []
+            "improvement_suggestions": [],
         }
 
         # Analyze based on scenario type
@@ -838,10 +838,10 @@ class AdvancedTrainingEngine:
 
         # Calculate overall scores
         analysis["appropriateness_score"] = (
-            analysis["cultural_competency_score"] * 0.3 +
-            analysis["trauma_informed_score"] * 0.3 +
-            analysis["bias_awareness_score"] * 0.2 +
-            analysis["communication_effectiveness"] * 0.2
+            analysis["cultural_competency_score"] * 0.3
+            + analysis["trauma_informed_score"] * 0.3
+            + analysis["bias_awareness_score"] * 0.2
+            + analysis["communication_effectiveness"] * 0.2
         )
 
         # Generate feedback
@@ -849,11 +849,7 @@ class AdvancedTrainingEngine:
 
         return analysis
 
-    async def _analyze_cultural_response(
-        self,
-        response: str,
-        scenario: AdvancedTrainingScenario
-    ) -> dict[str, Any]:
+    async def _analyze_cultural_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
         """Analyze cultural competency response"""
 
         response_lower = response.lower()
@@ -863,7 +859,7 @@ class AdvancedTrainingEngine:
             "cultural_competency_score": 0.0,
             "bias_awareness_score": 0.0,
             "communication_effectiveness": 0.0,
-            "empathy_demonstration": 0.0
+            "empathy_demonstration": 0.0,
         }
 
         # Check for cultural sensitivity indicators
@@ -891,41 +887,41 @@ class AdvancedTrainingEngine:
             scores["bias_awareness_score"] -= 0.1
 
         # Calculate final scores
-        scores["cultural_competency_score"] = min(1.0, scores["cultural_competency_score"] + (positive_indicators * 0.1))
-        scores["bias_awareness_score"] = max(0.0, scores["bias_awareness_score"] + (positive_indicators * 0.1) - (negative_indicators * 0.1))
+        scores["cultural_competency_score"] = min(
+            1.0, scores["cultural_competency_score"] + (positive_indicators * 0.1)
+        )
+        scores["bias_awareness_score"] = max(
+            0.0, scores["bias_awareness_score"] + (positive_indicators * 0.1) - (negative_indicators * 0.1)
+        )
         scores["communication_effectiveness"] = scores["cultural_competency_score"] * 0.8
         scores["empathy_demonstration"] = scores["cultural_competency_score"] * 0.9
 
         # Generate learning points
         learning_points = []
         if positive_indicators > 0:
-            learning_points.extend([
-                "Cultural sensitivity demonstrated",
-                "Respect for cultural practices shown",
-                "Awareness of cultural factors evident"
-            ])
+            learning_points.extend(
+                [
+                    "Cultural sensitivity demonstrated",
+                    "Respect for cultural practices shown",
+                    "Awareness of cultural factors evident",
+                ]
+            )
 
         if negative_indicators > 0:
-            learning_points.extend([
-                "Be cautious of stereotypes",
-                "Cultural humility is important",
-                "Individual variation within cultures"
-            ])
+            learning_points.extend(
+                ["Be cautious of stereotypes", "Cultural humility is important", "Individual variation within cultures"]
+            )
 
         scores["learning_points"] = learning_points
         scores["cultural_insights"] = [
             "Cultural competency requires ongoing learning",
             "Individual experiences vary within cultures",
-            "Cultural humility is essential"
+            "Cultural humility is essential",
         ]
 
         return scores
 
-    async def _analyze_trauma_response(
-        self,
-        response: str,
-        scenario: AdvancedTrainingScenario
-    ) -> dict[str, Any]:
+    async def _analyze_trauma_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
         """Analyze trauma-informed response"""
 
         response_lower = response.lower()
@@ -936,7 +932,7 @@ class AdvancedTrainingEngine:
             "cultural_competency_score": 0.0,
             "bias_awareness_score": 0.0,
             "communication_effectiveness": 0.0,
-            "empathy_demonstration": 0.0
+            "empathy_demonstration": 0.0,
         }
 
         # Check for trauma-informed indicators
@@ -984,16 +980,12 @@ class AdvancedTrainingEngine:
             "Safety is paramount in trauma-informed care",
             "Choice restores power to trauma survivors",
             "Empowerment promotes healing",
-            "Avoiding triggers prevents re-traumatization"
+            "Avoiding triggers prevents re-traumatization",
         ]
 
         return scores
 
-    async def _analyze_lgbtq_response(
-        self,
-        response: str,
-        scenario: AdvancedTrainingScenario
-    ) -> dict[str, Any]:
+    async def _analyze_lgbtq_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
         """Analyze LGBTQ+ inclusive response"""
 
         response_lower = response.lower()
@@ -1003,7 +995,7 @@ class AdvancedTrainingEngine:
             "trauma_informed_score": 0.0,
             "bias_awareness_score": 0.0,
             "communication_effectiveness": 0.0,
-            "empathy_demonstration": 0.0
+            "empathy_demonstration": 0.0,
         }
 
         # Check for LGBTQ+ inclusive indicators
@@ -1047,7 +1039,7 @@ class AdvancedTrainingEngine:
             "LGBTQ+ identities deserve respect and affirmation",
             "Inclusive language creates safety",
             "Cultural humility is essential",
-            "Intersectionality matters in LGBTQ+ care"
+            "Intersectionality matters in LGBTQ+ care",
         ]
 
         return scores
@@ -1073,10 +1065,7 @@ class AdvancedTrainingEngine:
         training_metrics.bias_awareness_score(analysis.get("bias_awareness_score", 0))
 
     def _determine_next_action(
-        self,
-        analysis: dict[str, Any],
-        scenario: AdvancedTrainingScenario,
-        session_data: dict[str, Any]
+        self, analysis: dict[str, Any], scenario: AdvancedTrainingScenario, session_data: dict[str, Any]
     ) -> dict[str, Any]:
         """Determine next action based on analysis"""
 
@@ -1090,36 +1079,27 @@ class AdvancedTrainingEngine:
                     "feedback": branch.feedback,
                     "learning_points": branch.learning_points,
                     "cultural_insights": branch.cultural_insights,
-                    "trauma_considerations": branch.trauma_considerations
+                    "trauma_considerations": branch.trauma_considerations,
                 }
 
         # Check if scenario is complete
         if len(session_data["responses"]) >= 3:  # Minimum 3 interactions
-            return {
-                "action": "complete",
-                "final_assessment": self._generate_final_assessment(session_data)
-            }
+            return {"action": "complete", "final_assessment": self._generate_final_assessment(session_data)}
 
         # Continue with current scenario
-        return {
-            "action": "continue",
-            "suggestions": analysis.get("improvement_suggestions", [])
-        }
+        return {"action": "continue", "suggestions": analysis.get("improvement_suggestions", [])}
 
     def _evaluate_branch_condition(
-        self,
-        condition: str,
-        analysis: dict[str, Any],
-        session_data: dict[str, Any]
+        self, condition: str, analysis: dict[str, Any], session_data: dict[str, Any]
     ) -> bool:
         """Evaluate branching condition"""
 
         # Simple condition evaluation based on scores
-        if "respect" in condition.lower() and analysis.get("cultural_competency_score", 0) > 0.7:
+        if ("respect" in condition.lower() and analysis.get("cultural_competency_score", 0) > 0.7) or (
+            "trauma" in condition.lower() and analysis.get("trauma_informed_score", 0) > 0.7
+        ):
             return True
-        elif "trauma" in condition.lower() and analysis.get("trauma_informed_score", 0) > 0.7:
-            return True
-        elif "insensitive" in condition.lower() and analysis.get("cultural_competency_score", 0) < 0.4:
+        if "insensitive" in condition.lower() and analysis.get("cultural_competency_score", 0) < 0.4:
             return True
 
         return False
@@ -1132,7 +1112,7 @@ class AdvancedTrainingEngine:
             "trauma": analysis.get("trauma_informed_score", 0),
             "bias": analysis.get("bias_awareness_score", 0),
             "communication": analysis.get("communication_effectiveness", 0),
-            "empathy": analysis.get("empathy_demonstration", 0)
+            "empathy": analysis.get("empathy_demonstration", 0),
         }
 
         # Generate feedback based on scores
@@ -1174,11 +1154,11 @@ class AdvancedTrainingEngine:
 
         # Determine overall performance
         overall_score = (
-            avg_scores.get("cultural_competency", 0) * 0.3 +
-            avg_scores.get("trauma_informed", 0) * 0.3 +
-            avg_scores.get("bias_awareness", 0) * 0.2 +
-            avg_scores.get("communication", 0) * 0.1 +
-            avg_scores.get("empathy", 0) * 0.1
+            avg_scores.get("cultural_competency", 0) * 0.3
+            + avg_scores.get("trauma_informed", 0) * 0.3
+            + avg_scores.get("bias_awareness", 0) * 0.2
+            + avg_scores.get("communication", 0) * 0.1
+            + avg_scores.get("empathy", 0) * 0.1
         )
 
         # Performance level
@@ -1197,7 +1177,7 @@ class AdvancedTrainingEngine:
             "detailed_scores": avg_scores,
             "strengths": self._identify_strengths(avg_scores),
             "areas_for_improvement": self._identify_improvements(avg_scores),
-            "recommendations": self._generate_recommendations(avg_scores)
+            "recommendations": self._generate_recommendations(avg_scores),
         }
 
     def _identify_strengths(self, scores: dict[str, float]) -> list[str]:
@@ -1239,25 +1219,31 @@ class AdvancedTrainingEngine:
         recommendations = []
 
         if scores.get("cultural_competency", 0) < 0.6:
-            recommendations.extend([
-                "Complete cultural competency training modules",
-                "Study specific cultural health practices",
-                "Practice cultural humility exercises"
-            ])
+            recommendations.extend(
+                [
+                    "Complete cultural competency training modules",
+                    "Study specific cultural health practices",
+                    "Practice cultural humility exercises",
+                ]
+            )
 
         if scores.get("trauma_informed", 0) < 0.6:
-            recommendations.extend([
-                "Review trauma-informed care principles",
-                "Practice safety and choice techniques",
-                "Study trauma survivor experiences"
-            ])
+            recommendations.extend(
+                [
+                    "Review trauma-informed care principles",
+                    "Practice safety and choice techniques",
+                    "Study trauma survivor experiences",
+                ]
+            )
 
         if scores.get("bias_awareness", 0) < 0.6:
-            recommendations.extend([
-                "Complete implicit bias training",
-                "Practice bias recognition exercises",
-                "Study intersectionality concepts"
-            ])
+            recommendations.extend(
+                [
+                    "Complete implicit bias training",
+                    "Practice bias recognition exercises",
+                    "Study intersectionality concepts",
+                ]
+            )
 
         return recommendations
 
@@ -1284,7 +1270,7 @@ class AdvancedTrainingEngine:
             "final_assessment": final_assessment,
             "total_responses": len(session_data["responses"]),
             "completion_status": "completed",
-            "completion_date": datetime.now(timezone.utc).isoformat()
+            "completion_date": datetime.now(timezone.utc).isoformat(),
         }
 
         # Clean up session
@@ -1303,22 +1289,34 @@ class AdvancedTrainingEngine:
 
         return {
             "cultural_competency": {
-                "average_score": sum(self.training_metrics.cultural_competency_scores) / len(self.training_metrics.cultural_competency_scores) if self.training_metrics.cultural_competency_scores else 0,
-                "total_sessions": len(self.training_metrics.cultural_competency_scores)
+                "average_score": sum(self.training_metrics.cultural_competency_scores)
+                / len(self.training_metrics.cultural_competency_scores)
+                if self.training_metrics.cultural_competency_scores
+                else 0,
+                "total_sessions": len(self.training_metrics.cultural_competency_scores),
             },
             "trauma_informed": {
-                "average_score": sum(self.training_metrics.trauma_informed_scores) / len(self.training_metrics.trauma_informed_scores) if self.training_metrics.trauma_informed_scores else 0,
-                "total_sessions": len(self.training_metrics.trauma_informed_scores)
+                "average_score": sum(self.training_metrics.trauma_informed_scores)
+                / len(self.training_metrics.trauma_informed_scores)
+                if self.training_metrics.trauma_informed_scores
+                else 0,
+                "total_sessions": len(self.training_metrics.trauma_informed_scores),
             },
             "bias_awareness": {
-                "average_score": sum(self.training_metrics.bias_awareness_scores) / len(self.training_metrics.bias_awareness_scores) if self.training_metrics.bias_awareness_scores else 0,
-                "total_sessions": len(self.training_metrics.bias_awareness_scores)
+                "average_score": sum(self.training_metrics.bias_awareness_scores)
+                / len(self.training_metrics.bias_awareness_scores)
+                if self.training_metrics.bias_awareness_scores
+                else 0,
+                "total_sessions": len(self.training_metrics.bias_awareness_scores),
             },
             "overall_metrics": {
                 "total_sessions_completed": len(self.training_metrics.cultural_competency_scores),
-                "average_overall_score": sum(self.training_metrics.cultural_competency_scores) / len(self.training_metrics.cultural_competency_scores) if self.training_metrics.cultural_competency_scores else 0,
-                "improvement_rate": self.training_metrics.cultural_knowledge_improvement
-            }
+                "average_overall_score": sum(self.training_metrics.cultural_competency_scores)
+                / len(self.training_metrics.cultural_competency_scores)
+                if self.training_metrics.cultural_competency_scores
+                else 0,
+                "improvement_rate": self.training_metrics.cultural_knowledge_improvement,
+            },
         }
 
 
@@ -1346,10 +1344,7 @@ async def get_advanced_training_engine() -> AdvancedTrainingEngine:
 
 # API endpoints for advanced training
 async def start_advanced_training(
-    user_id: str,
-    training_type: str,
-    difficulty: str,
-    scenario_id: str | None = None
+    user_id: str, training_type: str, difficulty: str, scenario_id: str | None = None
 ) -> dict[str, Any]:
     """API endpoint to start advanced training"""
     engine = await get_advanced_training_engine()
@@ -1359,24 +1354,17 @@ async def start_advanced_training(
     difficulty_enum = DifficultyLevel(difficulty)
 
     return await engine.start_advanced_training_session(
-        user_id=user_id,
-        training_type=training_type_enum,
-        difficulty=difficulty_enum,
-        scenario_id=scenario_id
+        user_id=user_id, training_type=training_type_enum, difficulty=difficulty_enum, scenario_id=scenario_id
     )
 
 
 async def process_advanced_response(
-    session_id: str,
-    user_response: str,
-    response_type: str = "verbal"
+    session_id: str, user_response: str, response_type: str = "verbal"
 ) -> dict[str, Any]:
     """API endpoint to process training response"""
     engine = await get_advanced_training_engine()
     return await engine.process_training_response(
-        session_id=session_id,
-        user_response=user_response,
-        response_type=response_type
+        session_id=session_id, user_response=user_response, response_type=response_type
     )
 
 
@@ -1399,9 +1387,7 @@ if __name__ == "__main__":
 
         # Start cultural competency training
         session = await engine.start_advanced_training_session(
-            user_id="test_user",
-            training_type=TrainingType.CULTURAL_COMPETENCY,
-            difficulty=DifficultyLevel.INTERMEDIATE
+            user_id="test_user", training_type=TrainingType.CULTURAL_COMPETENCY, difficulty=DifficultyLevel.INTERMEDIATE
         )
 
         print(f"Training session started: {session['session_id']}")
@@ -1411,14 +1397,11 @@ if __name__ == "__main__":
         responses = [
             "I understand you have traditional health practices. Can you tell me more about them?",
             "I respect your cultural beliefs and want to work together on your care plan.",
-            "Would you like to involve your family in these healthcare decisions?"
+            "Would you like to involve your family in these healthcare decisions?",
         ]
 
         for response in responses:
-            result = await engine.process_training_response(
-                session["session_id"],
-                response
-            )
+            result = await engine.process_training_response(session["session_id"], response)
             print(f"Response analysis: {result['analysis']['cultural_competency_score']}")
 
         # Complete training

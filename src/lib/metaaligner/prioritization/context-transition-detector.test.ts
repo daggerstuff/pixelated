@@ -565,7 +565,9 @@ describe('ContextTransitionDetector', () => {
           }
           return transition
         })
-        .filter((transition) => transition?.transitionType === 'crisis_elevation')
+        .filter(
+          (transition) => transition?.transitionType === 'crisis_elevation',
+        )
 
       expect(crisisTransitions).toHaveLength(1)
       expect(crisisTransitions[0]!.detected).toBe(true)

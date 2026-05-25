@@ -73,7 +73,7 @@ function createMockRedisClient(): RedisClient {
           result[key] = rawValue
         }
       }
-        return result
+      return result
     }
     return {}
   }
@@ -123,10 +123,10 @@ function createMockRedisClient(): RedisClient {
     },
     hgetall: async (key: string) => {
       const result: Record<string, string> = {}
-    for (const [k, v] of Array.from(mockStore.entries())) {
+      for (const [k, v] of Array.from(mockStore.entries())) {
         if (k.startsWith(`${key}:`)) {
           const field = k.substring(key.length + 1)
-        result[field] = v
+          result[field] = v
         }
       }
       return result

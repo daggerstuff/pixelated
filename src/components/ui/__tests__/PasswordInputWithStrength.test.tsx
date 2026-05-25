@@ -12,9 +12,9 @@ describe('PasswordInputWithStrength', () => {
   it('renders password input with strength indicator', () => {
     render(
       <PasswordInputWithStrength
-        label='Password'
-        name='password'
-        value='initial'
+        label="Password"
+        name="password"
+        value="initial"
       />,
     )
     expect(screen.getByLabelText('Password')).toBeInTheDocument()
@@ -25,16 +25,22 @@ describe('PasswordInputWithStrength', () => {
 
   it('updates strength meter when value changes', () => {
     const { rerender } = render(
-      <PasswordInputWithStrength label='Password' name='password' value='123' />,
+      <PasswordInputWithStrength
+        label="Password"
+        name="password"
+        value="123"
+      />,
     )
 
-    expect(screen.getByRole('progressbar', { name: /password strength/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole('progressbar', { name: /password strength/i }),
+    ).toBeInTheDocument()
 
     rerender(
       <PasswordInputWithStrength
-        label='Password'
-        name='password'
-        value='StrongPass123!'
+        label="Password"
+        name="password"
+        value="StrongPass123!"
       />,
     )
 

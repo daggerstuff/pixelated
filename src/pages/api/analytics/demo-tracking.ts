@@ -54,8 +54,8 @@ export const POST = async ({ request }) => {
       ...eventData,
       server_timestamp: Date.now(),
       ip_address:
-        (request.headers.get('x-forwarded-for') ??
-        request.headers.get('x-real-ip')) ??
+        request.headers.get('x-forwarded-for') ??
+        request.headers.get('x-real-ip') ??
         'unknown',
       user_agent: request.headers.get('user-agent') ?? eventData.user_agent,
     }
@@ -293,7 +293,7 @@ async function sendToCustomAnalytics(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
+        'Authorization': `Bearer ${CUSTOM_ANALYTICS_TOKEN}`,
       },
       body: JSON.stringify(event),
     })
@@ -327,9 +327,9 @@ function generateAnalyticsSummary(
   // Count A/B variants
   events.forEach((event) => {
     summary.ab_variants[event.ab_variant] =
-      (summary.ab_variants[event.ab_variant] || 0) + 1
+      (summary.ab_variants[event.ab_variant] ?? 0) + 1
     summary.event_types[event.event] =
-      (summary.event_types[event.event] || 0) + 1
+      (summary.event_types[event.event] ?? 0) + 1
   })
 
   // Calculate conversion funnel

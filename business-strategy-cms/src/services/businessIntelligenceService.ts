@@ -321,7 +321,7 @@ export class BusinessIntelligenceService {
         0,
       ) / competitors.length
 
-    const marketShareDistribution = competitors.reduce< Record<string, number>>(
+    const marketShareDistribution = competitors.reduce<Record<string, number>>(
       (acc, c) => {
         acc[c.name] = c.marketShare
         return acc
@@ -424,7 +424,7 @@ export class BusinessIntelligenceService {
     // Mock implementation - replace with actual market research APIs
     const mockData: Record<string, { current: number; total: number }> = {
       'healthcare-institutions': { current: 150, total: 2000 },
-      universities: { current: 75, total: 500 },
+      'universities': { current: 75, total: 500 },
       'private-practices': { current: 300, total: 8000 },
       'corporate-wellness': { current: 50, total: 1000 },
     }

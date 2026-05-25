@@ -77,7 +77,9 @@ describe('SecurityDashboard', () => {
   it('filters events by type', async () => {
     await renderAstro(SecurityDashboard)
 
-    const eventTypeSelect = screen.getByRole('combobox', { name: /event type/i })
+    const eventTypeSelect = screen.getByRole('combobox', {
+      name: /event type/i,
+    })
 
     // Select 'login' type
     fireEvent.change(eventTypeSelect, { target: { value: 'login' } })

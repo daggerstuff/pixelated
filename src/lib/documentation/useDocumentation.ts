@@ -61,15 +61,15 @@ let aiRepositoryInstance: AIRepository | null = null
 let refCount = 0
 
 const getAIRepositoryInstance = (): AIRepository => {
-  aiRepositoryInstance ??= new AIRepository();
+  aiRepositoryInstance ??= new AIRepository()
   return aiRepositoryInstance
 }
 
 function resolveSafeLlmBaseUrl(): string {
   const baseUrl =
-    ((process.env['LLM_BASE_URL'] ??
-    process.env['LLM_API_URL']) ??
-    process.env['OPENAI_BASE_URL']) ??
+    process.env['LLM_BASE_URL'] ??
+    process.env['LLM_API_URL'] ??
+    process.env['OPENAI_BASE_URL'] ??
     ''
 
   return baseUrl

@@ -26,25 +26,25 @@ class PerformanceMonitor:
             "cpu": {
                 "usage_percent": psutil.cpu_percent(interval=1),
                 "load_average": psutil.getloadavg(),
-                "core_count": psutil.cpu_count()
+                "core_count": psutil.cpu_count(),
             },
             "memory": {
                 "total": psutil.virtual_memory().total,
                 "available": psutil.virtual_memory().available,
                 "percent": psutil.virtual_memory().percent,
-                "used": psutil.virtual_memory().used
+                "used": psutil.virtual_memory().used,
             },
             "disk": {
                 "usage_percent": psutil.disk_usage("/").percent,
                 "free_space": psutil.disk_usage("/").free,
-                "total_space": psutil.disk_usage("/").total
+                "total_space": psutil.disk_usage("/").total,
             },
             "network": {
                 "bytes_sent": psutil.net_io_counters().bytes_sent,
                 "bytes_recv": psutil.net_io_counters().bytes_recv,
                 "packets_sent": psutil.net_io_counters().packets_sent,
-                "packets_recv": psutil.net_io_counters().packets_recv
-            }
+                "packets_recv": psutil.net_io_counters().packets_recv,
+            },
         }
 
     def collect_application_metrics(self) -> dict[str, Any]:
@@ -65,20 +65,20 @@ class PerformanceMonitor:
                 "health_check": {
                     "status_code": health_response.status_code,
                     "response_time_ms": health_response_time,
-                    "available": health_response.status_code == 200
+                    "available": health_response.status_code == 200,
                 },
                 "api_performance": {
                     "status_code": api_response.status_code,
                     "response_time_ms": api_response_time,
-                    "available": api_response.status_code == 200
-                }
+                    "available": api_response.status_code == 200,
+                },
             }
         except Exception as e:
             return {
                 "timestamp": datetime.utcnow().isoformat(),
                 "error": str(e),
                 "health_check": {"available": False},
-                "api_performance": {"available": False}
+                "api_performance": {"available": False},
             }
 
     def collect_database_metrics(self) -> dict[str, Any]:
@@ -87,17 +87,9 @@ class PerformanceMonitor:
         # For now, returning mock data
         return {
             "timestamp": datetime.utcnow().isoformat(),
-            "connections": {
-                "active": 15,
-                "idle": 5,
-                "max": 50
-            },
-            "query_performance": {
-                "avg_query_time_ms": 45.2,
-                "slow_queries_count": 2,
-                "queries_per_second": 125.5
-            },
-            "cache_hit_ratio": 0.95
+            "connections": {"active": 15, "idle": 5, "max": 50},
+            "query_performance": {"avg_query_time_ms": 45.2, "slow_queries_count": 2, "queries_per_second": 125.5},
+            "cache_hit_ratio": 0.95,
         }
 
     def analyze_performance_trends(self) -> dict[str, Any]:
@@ -114,12 +106,8 @@ class PerformanceMonitor:
 
         return {
             "analysis_timestamp": datetime.utcnow().isoformat(),
-            "trends": {
-                "cpu_usage": cpu_trend,
-                "memory_usage": memory_trend,
-                "response_time": response_time_trend
-            },
-            "recommendations": self.generate_recommendations(recent_metrics)
+            "trends": {"cpu_usage": cpu_trend, "memory_usage": memory_trend, "response_time": response_time_trend},
+            "recommendations": self.generate_recommendations(recent_metrics),
         }
 
     def generate_recommendations(self, metrics: list[dict]) -> list[str]:
@@ -151,11 +139,7 @@ class PerformanceMonitor:
             db_metrics = self.collect_database_metrics()
 
             # Combine metrics
-            combined_metrics = {
-                "system": system_metrics,
-                "application": app_metrics,
-                "database": db_metrics
-            }
+            combined_metrics = {"system": system_metrics, "application": app_metrics, "database": db_metrics}
 
             self.metrics_history.append(combined_metrics)
 
@@ -219,8 +203,7 @@ class PerformanceMonitor:
         return {
             "monitoring_report": {
                 "timestamp": datetime.utcnow().isoformat(),
-                "monitoring_duration_minutes": len(self.metrics_history)
-                * 0.5,  # Assuming 30s intervals
+                "monitoring_duration_minutes": len(self.metrics_history) * 0.5,  # Assuming 30s intervals
                 "total_measurements": len(self.metrics_history),
                 "summary_statistics": {
                     "cpu_usage": {
@@ -235,11 +218,10 @@ class PerformanceMonitor:
                     },
                 },
                 "performance_trends": self.analyze_performance_trends(),
-                "recommendations": self.generate_recommendations(
-                    self.metrics_history
-                ),
+                "recommendations": self.generate_recommendations(self.metrics_history),
             }
         }
+
 
 if __name__ == "__main__":
     monitor = PerformanceMonitor()

@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import type { Result, NodeResult } from 'axe-core'
 
 test.describe('Accessibility Audit and Compliance', () => {
   let page: Page
@@ -20,9 +21,9 @@ test.describe('Accessibility Audit and Compliance', () => {
       // Log any violations for debugging
       if (accessibilityScanResults.violations.length > 0) {
         console.log('Accessibility violations found:')
-        accessibilityScanResults.violations.forEach((violation) => {
+        accessibilityScanResults.violations.forEach((violation: Result) => {
           console.log(`- ${violation.id}: ${violation.description}`)
-          violation.nodes.forEach((node) => {
+          violation.nodes.forEach((node: NodeResult) => {
             console.log(`  Target: ${node.target}`)
             console.log(`  HTML: ${node.html}`)
           })
@@ -220,9 +221,9 @@ test.describe('Accessibility Audit and Compliance', () => {
 
             // Element should have some form of accessible name
             const hasAccessibleName =
-              ((ariaLabel ??
-              ariaLabelledby) ??
-              title) ??
+              ariaLabel ??
+              ariaLabelledby ??
+              title ??
               (textContent && textContent.trim().length > 0)
 
             if (!hasAccessibleName) {
@@ -429,7 +430,7 @@ test.describe('Accessibility Audit and Compliance', () => {
           const hasAriaLabel = ariaLabel ?? ariaLabelledby
 
           // Image should either be marked as decorative or have description
-          expect(isDecorative || hasDescription ?? hasAriaLabel).toBe(true)
+          expect(isDecorative || (hasDescription ?? hasAriaLabel)).toBe(true)
         }
       }
     })
@@ -507,7 +508,7 @@ test.describe('Accessibility Audit and Compliance', () => {
           const title = await element.getAttribute('title')
 
           // Should provide keyboard instructions
-          const hasKeyboardInstructions = (ariaDescribedby ?? ariaLabel) ?? title
+          const hasKeyboardInstructions = ariaDescribedby ?? ariaLabel ?? title
           expect(hasKeyboardInstructions).toBe(true)
         }
       }

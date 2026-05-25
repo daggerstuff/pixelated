@@ -111,9 +111,7 @@ def analyze_session_bias(session: TherapeuticSession) -> BiasAnalysisResult:
     indicators.extend(age_indicators)
 
     # Ethnicity bias detection
-    ethnicity_indicators = detect_ethnicity_bias(
-        all_text, session.participant_demographics.ethnicity
-    )
+    ethnicity_indicators = detect_ethnicity_bias(all_text, session.participant_demographics.ethnicity)
     indicators.extend(ethnicity_indicators)
 
     # Calculate overall bias score
@@ -180,9 +178,7 @@ def detect_age_bias(text: str, age: str) -> list[BiasIndicator]:
         return indicators
 
     # Map age ranges to categories
-    age_category = (
-        "young" if "18-25" in age or "26-35" in age else "elderly" if "65+" in age else None
-    )
+    age_category = "young" if "18-25" in age or "26-35" in age else "elderly" if "65+" in age else None
 
     if not age_category:
         return indicators

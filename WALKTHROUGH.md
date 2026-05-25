@@ -28,13 +28,13 @@ and workflows so you can contribute confidently.
 
 **Key technologies:**
 
-| Layer | Stack |
-|---|---|
-| Frontend & SSR | Astro 6, React 19, TypeScript, UnoCSS |
-| Backend services | Express, FastAPI, Flask |
-| Databases | MongoDB 6, PostgreSQL 15, Redis 7 |
-| Package managers | pnpm (JS/TS), uv (Python) |
-| Container runtime | Docker Compose |
+| Layer             | Stack                                 |
+| ----------------- | ------------------------------------- |
+| Frontend & SSR    | Astro 6, React 19, TypeScript, UnoCSS |
+| Backend services  | Express, FastAPI, Flask               |
+| Databases         | MongoDB 6, PostgreSQL 15, Redis 7     |
+| Package managers  | pnpm (JS/TS), uv (Python)             |
+| Container runtime | Docker Compose                        |
 
 ---
 
@@ -43,7 +43,7 @@ and workflows so you can contribute confidently.
 ### Prerequisites
 
 - Node.js ≥ 24 (see `.nvmrc`) — install via `nvm install`
-- pnpm ≥ 11.1.2
+- pnpm ≥ 11.3.0
 - Python 3.13 + [uv](https://github.com/astral-sh/uv)
 - Docker (must be running)
 
@@ -78,23 +78,23 @@ pnpm dev:all-services
 Starts the Astro frontend plus all background workers, WebSocket server, and
 Python AI services concurrently.
 
-| Service | URL |
-|---|---|
-| Main app | http://localhost:5173 |
+| Service        | URL                   |
+| -------------- | --------------------- |
+| Main app       | http://localhost:5173 |
 | Bias detection | http://localhost:8001 |
-| AI inference | http://localhost:8002 |
+| AI inference   | http://localhost:8002 |
 
 ### Individual services
 
-| Need | Command |
-|---|---|
-| Frontend only | `pnpm dev` |
-| Bias detection service | `pnpm dev:bias-detection` |
-| AI inference service | `pnpm dev:ai-service` |
-| Training server | `pnpm dev:training-server` |
-| WebSocket server | `pnpm dev:websocket` |
-| Academic sourcing API | `pnpm dev:academic-sourcing` |
-| Background worker | `pnpm dev:worker` |
+| Need                   | Command                      |
+| ---------------------- | ---------------------------- |
+| Frontend only          | `pnpm dev`                   |
+| Bias detection service | `pnpm dev:bias-detection`    |
+| AI inference service   | `pnpm dev:ai-service`        |
+| Training server        | `pnpm dev:training-server`   |
+| WebSocket server       | `pnpm dev:websocket`         |
+| Academic sourcing API  | `pnpm dev:academic-sourcing` |
+| Background worker      | `pnpm dev:worker`            |
 
 ---
 
@@ -102,17 +102,17 @@ Python AI services concurrently.
 
 ### Commands
 
-| Task | Command |
-|---|---|
-| All tests | `pnpm test` |
-| Unit tests | `pnpm test:unit` |
+| Task              | Command                 |
+| ----------------- | ----------------------- |
+| All tests         | `pnpm test`             |
+| Unit tests        | `pnpm test:unit`        |
 | Integration tests | `pnpm test:integration` |
-| E2E tests | `pnpm e2e` |
-| E2E UI mode | `pnpm e2e:ui` |
-| Lint | `pnpm lint` |
-| Format check | `pnpm format:check` |
-| Typecheck | `pnpm typecheck` |
-| Check all | `pnpm check:all` |
+| E2E tests         | `pnpm e2e`              |
+| E2E UI mode       | `pnpm e2e:ui`           |
+| Lint              | `pnpm lint`             |
+| Format check      | `pnpm format:check`     |
+| Typecheck         | `pnpm typecheck`        |
+| Check all         | `pnpm check:all`        |
 
 ### Redis test gotcha
 
@@ -194,16 +194,16 @@ uv run --python 3.13 pytest   # always run through uv for correct venv
 
 ## Where Things Live
 
-| Directory | What's here |
-|---|---|
-| `src/` | Astro pages, React components, API routes, middleware |
-| `ai/` | Python ML models, training pipelines, inference services |
-| `scripts/` | Operational utilities, deployment helpers, test runners |
-| `config/` | Vitest, Playwright, tsconfig overrides |
-| `docker/` | Dockerfiles, compose files, monitoring stacks |
-| `tests/` | Integration, browser, security, and API tests |
-| `public/` | Static assets, images, favicons |
-| `.agent/internal/` | Private docs, plans, runbooks |
+| Directory          | What's here                                              |
+| ------------------ | -------------------------------------------------------- |
+| `src/`             | Astro pages, React components, API routes, middleware    |
+| `ai/`              | Python ML models, training pipelines, inference services |
+| `scripts/`         | Operational utilities, deployment helpers, test runners  |
+| `config/`          | Vitest, Playwright, tsconfig overrides                   |
+| `docker/`          | Dockerfiles, compose files, monitoring stacks            |
+| `tests/`           | Integration, browser, security, and API tests            |
+| `public/`          | Static assets, images, favicons                          |
+| `.agent/internal/` | Private docs, plans, runbooks                            |
 
 ---
 

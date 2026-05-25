@@ -200,9 +200,9 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       case 'multiply':
         return '✖️'
       case 'compare':
-        return <Search className='h-4 w-4' />
+        return <Search className="h-4 w-4" />
       case 'aggregate':
-        return <ChartBar className='h-4 w-4' />
+        return <ChartBar className="h-4 w-4" />
       default:
         return '🔧'
     }
@@ -228,11 +228,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       <div
         className={`from-blue-50 to-indigo-100 flex h-64 flex-col items-center justify-center rounded-lg bg-gradient-to-br ${className}`}
       >
-        <div className='border-blue-600 mb-4 h-12 w-12 animate-spin rounded-full border-b-2'></div>
-        <h3 className='text-gray-800 mb-2 text-lg font-semibold'>
+        <div className="border-blue-600 mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
+        <h3 className="text-gray-800 mb-2 text-lg font-semibold">
           Initializing FHE Library
         </h3>
-        <p className='text-gray-600 max-w-md text-center'>
+        <p className="text-gray-600 max-w-md text-center">
           Loading Microsoft SEAL WebAssembly module for Fully Homomorphic
           Encryption operations...
         </p>
@@ -242,11 +242,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
 
   return (
     <div className={`bg-white rounded-lg p-6 shadow-lg ${className}`}>
-      <div className='mb-6'>
-        <h2 className='text-gray-900 mb-2 text-2xl font-bold'>
+      <div className="mb-6">
+        <h2 className="text-gray-900 mb-2 text-2xl font-bold">
           🔒 Fully Homomorphic Encryption Demo
         </h2>
-        <p className='text-gray-600'>
+        <p className="text-gray-600">
           Perform computations on encrypted data without ever decrypting it.
           This demo simulates FHE operations for privacy-preserving therapy data
           analysis.
@@ -254,19 +254,19 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       </div>
 
       {/* Operation Setup */}
-      <div className='bg-gray-50 mb-6 rounded-lg p-4'>
-        <h3 className='mb-4 text-lg font-semibold'>Setup Operation</h3>
+      <div className="bg-gray-50 mb-6 rounded-lg p-4">
+        <h3 className="mb-4 text-lg font-semibold">Setup Operation</h3>
 
-        <div className='mb-4 grid grid-cols-1 gap-4 md:grid-cols-4'>
+        <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-4">
           <div>
             <label
-              htmlFor='operation-type'
-              className='text-gray-700 mb-1 block text-sm font-medium'
+              htmlFor="operation-type"
+              className="text-gray-700 mb-1 block text-sm font-medium"
             >
               Operation Type
             </label>
             <select
-              id='operation-type'
+              id="operation-type"
               value={currentOperation.operation}
               onChange={(e) =>
                 setCurrentOperation({
@@ -274,25 +274,25 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                   operation: e.target.value as FHEOperation['operation'],
                 })
               }
-              className='border-gray-300 w-full rounded-md border p-2'
+              className="border-gray-300 w-full rounded-md border p-2"
             >
-              <option value='add'>Addition</option>
-              <option value='multiply'>Multiplication</option>
-              <option value='compare'>Comparison</option>
-              <option value='aggregate'>Aggregation</option>
+              <option value="add">Addition</option>
+              <option value="multiply">Multiplication</option>
+              <option value="compare">Comparison</option>
+              <option value="aggregate">Aggregation</option>
             </select>
           </div>
 
           <div>
             <label
-              htmlFor='input-1'
-              className='text-gray-700 mb-1 block text-sm font-medium'
+              htmlFor="input-1"
+              className="text-gray-700 mb-1 block text-sm font-medium"
             >
               Input 1 (Patient Score)
             </label>
             <input
-              id='input-1'
-              type='number'
+              id="input-1"
+              type="number"
               value={currentOperation.input1}
               onChange={(e) =>
                 setCurrentOperation({
@@ -300,23 +300,23 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                   input1: parseInt(e.target.value) || 0,
                 })
               }
-              className='border-gray-300 w-full rounded-md border p-2'
-              min='0'
-              max='100'
+              className="border-gray-300 w-full rounded-md border p-2"
+              min="0"
+              max="100"
             />
           </div>
 
           {currentOperation.operation !== 'aggregate' && (
             <div>
               <label
-                htmlFor='input-2'
-                className='text-gray-700 mb-1 block text-sm font-medium'
+                htmlFor="input-2"
+                className="text-gray-700 mb-1 block text-sm font-medium"
               >
                 Input 2 (Baseline)
               </label>
               <input
-                id='input-2'
-                type='number'
+                id="input-2"
+                type="number"
                 value={currentOperation.input2}
                 onChange={(e) =>
                   setCurrentOperation({
@@ -324,25 +324,25 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                     input2: parseInt(e.target.value) || 0,
                   })
                 }
-                className='border-gray-300 w-full rounded-md border p-2'
-                min='0'
-                max='100'
+                className="border-gray-300 w-full rounded-md border p-2"
+                min="0"
+                max="100"
               />
             </div>
           )}
 
-          <div className='flex items-end'>
+          <div className="flex items-end">
             <button
               onClick={executeOperation}
               disabled={!fheInitialized}
-              className='bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 w-full rounded-md px-4 py-2 transition-colors disabled:cursor-not-allowed'
+              className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-400 w-full rounded-md px-4 py-2 transition-colors disabled:cursor-not-allowed"
             >
               Execute FHE Operation
             </button>
           </div>
         </div>
 
-        <div className='text-gray-600 text-sm'>
+        <div className="text-gray-600 text-sm">
           <p>
             <strong>Privacy Note:</strong> All computations are performed on
             encrypted data. The raw values are never exposed during processing.
@@ -351,22 +351,22 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       </div>
 
       {/* Results */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Operation History */}
         <div>
-          <div className='mb-4 flex items-center justify-between'>
-            <h3 className='text-lg font-semibold'>Operation History</h3>
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="text-lg font-semibold">Operation History</h3>
             <button
               onClick={clearResults}
-              className='bg-gray-200 text-gray-700 hover:bg-gray-300 rounded px-3 py-1 text-sm transition-colors'
+              className="bg-gray-200 text-gray-700 hover:bg-gray-300 rounded px-3 py-1 text-sm transition-colors"
             >
               Clear
             </button>
           </div>
 
-          <div className='max-h-96 space-y-3 overflow-y-auto'>
+          <div className="max-h-96 space-y-3 overflow-y-auto">
             {operations.length === 0 ? (
-              <div className='text-gray-500 py-8 text-center'>
+              <div className="text-gray-500 py-8 text-center">
                 No operations performed yet. Try executing an FHE operation
                 above.
               </div>
@@ -374,14 +374,14 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
               operations.map((operation) => (
                 <div
                   key={operation.id}
-                  className='bg-white rounded-lg border p-4 shadow-sm'
+                  className="bg-white rounded-lg border p-4 shadow-sm"
                 >
-                  <div className='mb-2 flex items-center justify-between'>
-                    <div className='flex items-center gap-2'>
-                      <span className='text-lg'>
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">
                         {getOperationIcon(operation.operation)}
                       </span>
-                      <span className='font-semibold capitalize'>
+                      <span className="font-semibold capitalize">
                         {operation.operation}
                       </span>
                       <span
@@ -391,13 +391,13 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                       </span>
                     </div>
                     {operation.executionTime && (
-                      <span className='text-gray-500 text-xs'>
+                      <span className="text-gray-500 text-xs">
                         {operation.executionTime.toFixed(2)}ms
                       </span>
                     )}
                   </div>
 
-                  <div className='space-y-1 text-sm'>
+                  <div className="space-y-1 text-sm">
                     <div>
                       <strong>Inputs:</strong> {operation.input1}
                       {operation.input2 !== undefined &&
@@ -411,11 +411,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
                     )}
 
                     {showAdvanced && operation.encryptedInput1 && (
-                      <div className='mt-2 text-xs'>
-                        <div className='text-gray-700 font-medium'>
+                      <div className="mt-2 text-xs">
+                        <div className="text-gray-700 font-medium">
                           Encrypted Data:
                         </div>
-                        <div className='bg-gray-100 mt-1 break-all rounded p-2 font-mono'>
+                        <div className="bg-gray-100 mt-1 break-all rounded p-2 font-mono">
                           Input: {operation.encryptedInput1}
                           {operation.encryptedInput2 && (
                             <>
@@ -442,55 +442,55 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
         {/* Benchmarks */}
         {enableBenchmarks && (
           <div>
-            <h3 className='mb-4 text-lg font-semibold'>
+            <h3 className="mb-4 text-lg font-semibold">
               Performance Benchmarks
             </h3>
 
             {benchmarkResults.length === 0 ? (
-              <div className='text-gray-500 py-8 text-center'>
+              <div className="text-gray-500 py-8 text-center">
                 Run some operations to see performance comparisons.
               </div>
             ) : (
-              <div className='max-h-96 space-y-3 overflow-y-auto'>
+              <div className="max-h-96 space-y-3 overflow-y-auto">
                 {benchmarkResults.map((result) => (
                   <div
                     key={`${result.operation}-${result.fheTime}-${result.plaintextTime}`}
-                    className='bg-white rounded-lg border p-4 shadow-sm'
+                    className="bg-white rounded-lg border p-4 shadow-sm"
                   >
-                    <div className='mb-2 flex items-center justify-between'>
-                      <span className='font-semibold capitalize'>
+                    <div className="mb-2 flex items-center justify-between">
+                      <span className="font-semibold capitalize">
                         {getOperationIcon(result.operation)} {result.operation}
                       </span>
-                      <span className='text-red-600 text-sm font-medium'>
+                      <span className="text-red-600 text-sm font-medium">
                         {result.overhead.toFixed(1)}× slower
                       </span>
                     </div>
 
-                    <div className='space-y-2'>
-                      <div className='flex justify-between text-sm'>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
                         <span>Plaintext:</span>
-                        <span className='font-mono'>
+                        <span className="font-mono">
                           {result.plaintextTime.toFixed(3)}ms
                         </span>
                       </div>
-                      <div className='flex justify-between text-sm'>
+                      <div className="flex justify-between text-sm">
                         <span>FHE:</span>
-                        <span className='font-mono'>
+                        <span className="font-mono">
                           {result.fheTime.toFixed(2)}ms
                         </span>
                       </div>
 
                       {/* Visual bar comparison */}
-                      <div className='mt-2'>
-                        <div className='bg-gray-200 h-2 overflow-hidden rounded-full'>
+                      <div className="mt-2">
+                        <div className="bg-gray-200 h-2 overflow-hidden rounded-full">
                           <div
-                            className='bg-green-500 h-full'
+                            className="bg-green-500 h-full"
                             style={{
                               width: `${Math.min(100, (result.plaintextTime / result.fheTime) * 100)}%`,
                             }}
                           />
                         </div>
-                        <div className='text-gray-500 mt-1 text-xs'>
+                        <div className="text-gray-500 mt-1 text-xs">
                           Green: Plaintext speed relative to FHE
                         </div>
                       </div>
@@ -504,11 +504,11 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
       </div>
 
       {/* Educational Info */}
-      <div className='bg-blue-50 mt-6 rounded-lg p-4'>
-        <h4 className='text-blue-900 mb-2 font-semibold'>
-          <Lightbulb className='h-5 w-5' /> Why FHE Matters for Therapy Data
+      <div className="bg-blue-50 mt-6 rounded-lg p-4">
+        <h4 className="text-blue-900 mb-2 font-semibold">
+          <Lightbulb className="h-5 w-5" /> Why FHE Matters for Therapy Data
         </h4>
-        <ul className='text-blue-800 space-y-1 text-sm'>
+        <ul className="text-blue-800 space-y-1 text-sm">
           <li>
             • <strong>Privacy-Preserving Analytics:</strong> Analyze patient
             data without seeing raw values

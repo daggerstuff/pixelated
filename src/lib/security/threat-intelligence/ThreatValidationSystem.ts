@@ -499,7 +499,7 @@ export class ThreatValidationSystem extends EventEmitter {
       const validation: ThreatValidation = {
         id: validationId,
         threat_id: queueItem.threat_data.id,
-        validation_type: queueItem.validation_types[0] || 'accuracy',
+        validation_type: queueItem.validation_types[0] ?? 'accuracy',
         status: 'in_progress',
         validator_type: this.determineValidatorType(queueItem),
         validation_criteria: this.getValidationCriteria(
@@ -1723,8 +1723,8 @@ export class ThreatValidationSystem extends EventEmitter {
 
       for (const validation of allValidations) {
         byValidationType[validation.validation_type] =
-          (byValidationType[validation.validation_type] || 0) + 1
-        byStatus[validation.status] = (byStatus[validation.status] || 0) + 1
+          (byValidationType[validation.validation_type] ?? 0) + 1
+        byStatus[validation.status] = (byStatus[validation.status] ?? 0) + 1
         totalScore += validation.validation_result.overall_score
       }
 

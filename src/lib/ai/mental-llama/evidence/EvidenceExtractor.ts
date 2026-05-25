@@ -806,9 +806,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
     const categorized: { [category: string]: EvidenceItem[] } = {}
 
     evidenceItems.forEach((item) => {
-      if (!categorized[item.category]) {
-        categorized[item.category] = []
-      }
+      categorized[item.category] ??= [];
       categorized[item.category].push(item)
     })
 
@@ -928,7 +926,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
     evidenceResult: EvidenceExtractionResult,
     category: string,
   ): EvidenceItem[] {
-    return evidenceResult.categorizedEvidence[category] || []
+    return evidenceResult.categorizedEvidence[category] ?? []
   }
 
   /**

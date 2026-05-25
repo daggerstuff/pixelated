@@ -9,8 +9,8 @@ export interface InternalMemoryServiceClientConfig {
 
 export function resolveInternalMemoryServiceConfig(): InternalMemoryServiceClientConfig {
   const baseUrl =
-    (process.env.MEMORY_SERVICE_BASE_URL ??
-    process.env.SUBCONSCIOUS_MEMORY_BASE_URL) ??
+    process.env.MEMORY_SERVICE_BASE_URL ??
+    process.env.SUBCONSCIOUS_MEMORY_BASE_URL ??
     'http://127.0.0.1:54321'
   const actorId =
     process.env.MEMORY_SERVICE_ACTOR_ID ??

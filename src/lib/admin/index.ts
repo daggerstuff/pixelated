@@ -140,7 +140,7 @@ export class AdminService {
   /**
    * Lock a therapy session
    */
-   async lockSession(sessionId: string): Promise<void> {
+  async lockSession(sessionId: string): Promise<void> {
     console.debug('lockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -148,7 +148,7 @@ export class AdminService {
   /**
    * Unlock a therapy session
    */
-   async unlockSession(sessionId: string): Promise<void> {
+  async unlockSession(sessionId: string): Promise<void> {
     console.debug('unlockSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -156,7 +156,7 @@ export class AdminService {
   /**
    * Archive a therapy session
    */
-   async archiveSession(sessionId: string): Promise<void> {
+  async archiveSession(sessionId: string): Promise<void> {
     console.debug('archiveSession called for:', sessionId)
     throw new Error('Method not implemented.')
   }
@@ -329,7 +329,7 @@ export class AdminService {
       },
     }
 
-    return mockUsers[userId] || null
+    return mockUsers[userId] ?? null
   }
 
   /**
@@ -358,14 +358,14 @@ export class AdminService {
           string
         >
         authHeader =
-          localsHeaders['authorization'] ||
-          localsHeaders['Authorization'] ||
+          (localsHeaders['authorization'] ?? localsHeaders['Authorization']) ||
           null
       }
 
       // Fallback to direct header access with case-insensitive lookup
-      authHeader ??= context.request.headers.get('authorization') ??
-          context.request.headers.get('Authorization');
+      authHeader ??=
+        context.request.headers.get('authorization') ??
+        context.request.headers.get('Authorization')
 
       const tokenFromHeader = authHeader?.replace(/^Bearer\s+/i, '')
 

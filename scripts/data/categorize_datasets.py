@@ -35,9 +35,7 @@ def categorize_record(record: dict) -> str:
         first_msg = record["messages"][0].get("content", "").lower()
 
         # Therapeutic indicators
-        therapeutic_keywords = [
-            "therapy", "counseling", "depression", "anxiety", "trauma", "ptsd", "abuse"
-        ]
+        therapeutic_keywords = ["therapy", "counseling", "depression", "anxiety", "trauma", "ptsd", "abuse"]
         if any(kw in first_msg for kw in therapeutic_keywords):
             category = "therapeutic_conversation"
         else:
@@ -84,9 +82,7 @@ def main():
     datasets = [
         (
             "Tier1 Priority",
-            Path(
-                "ai/training/ready_packages/datasets/cache/orchestrator_output/processed_s3_tier_datasets.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/orchestrator_output/processed_s3_tier_datasets.jsonl"),
         ),
         (
             "Mental Health Clean",
@@ -94,15 +90,11 @@ def main():
         ),
         (
             "Counseling",
-            Path(
-                "ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/training_v3_converted/stage1_foundation_counseling.jsonl"),
         ),
         (
             "Helios",
-            Path(
-                "ai/training/ready_packages/datasets/cache/training_v3_converted/heliosbrahma_converted.jsonl"
-            ),
+            Path("ai/training/ready_packages/datasets/cache/training_v3_converted/heliosbrahma_converted.jsonl"),
         ),
     ]
 

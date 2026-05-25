@@ -74,11 +74,15 @@ vi.mock('@/components/layout/Sidebar.astro', () => ({
 }))
 
 vi.mock('@/components/base/Head.astro', () => ({
-  default: (props: { title?: string; description?: string; ogImage?: string | boolean }) => `
+  default: (props: {
+    title?: string
+    description?: string
+    ogImage?: string | boolean
+  }) => `
     <mock-head
       title="${props.title ?? ''}"
       description="${props.description ?? ''}"
-      og-image="${props.ogImage === true ? '' : props.ogImage ?? ''}"
+      og-image="${props.ogImage === true ? '' : (props.ogImage ?? '')}"
     ></mock-head>
   `,
 }))
@@ -142,7 +146,9 @@ describe('DashboardLayout', () => {
       contentClassName: 'custom-content-class',
     })
 
-    expect(container.querySelector('main')?.className).toContain('custom-content-class')
+    expect(container.querySelector('main')?.className).toContain(
+      'custom-content-class',
+    )
   })
 
   it('renders with meta image and type', async () => {

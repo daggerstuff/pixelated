@@ -204,7 +204,7 @@ export function validateAndCreateDir(
 let _projectRoot: string | null = null
 
 function getCachedProjectRoot(): string {
-  _projectRoot ??= getProjectRoot();
+  _projectRoot ??= getProjectRoot()
   return _projectRoot
 }
 

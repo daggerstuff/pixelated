@@ -40,7 +40,7 @@ const service = new BlogPublishingService()
 
 // Parse command line arguments
 const args = process.argv.slice(2)
-const command = args[0] || 'status'
+const command = args[0] ?? 'status'
 
 // Execute the command
 ;void (async () => {

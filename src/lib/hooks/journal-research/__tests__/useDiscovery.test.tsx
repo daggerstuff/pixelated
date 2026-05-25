@@ -111,15 +111,15 @@ describe('useDiscovery hooks', () => {
     it('applies filters from store', async () => {
       vi.mocked(api.listSources).mockResolvedValue(mockSourceList)
       useDiscoveryStore.mockImplementation((selector) => {
-      const filteredFilters: MockJournalFilters = {
-        openAccessOnly: true,
-        sourceTypes: ['journal'],
-        keywords: ['test'],
-        sortBy: 'publication_date',
-        sortDirection: 'desc',
-      }
-      return withFilters(selector, filteredFilters)
-    })
+        const filteredFilters: MockJournalFilters = {
+          openAccessOnly: true,
+          sourceTypes: ['journal'],
+          keywords: ['test'],
+          sortBy: 'publication_date',
+          sortDirection: 'desc',
+        }
+        return withFilters(selector, filteredFilters)
+      })
 
       const { result } = renderHook(() => useDiscoveryListQuery('session-1'), {
         wrapper: createWrapper(),

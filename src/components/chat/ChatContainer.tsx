@@ -106,7 +106,7 @@ export function ChatContainer({
         )}
       >
         {messages.length === 0 ? (
-          <div className='flex h-full flex-col items-center justify-center space-y-4 text-center'>
+          <div className="flex h-full flex-col items-center justify-center space-y-4 text-center">
             <div
               className={
                 resolvedTheme === 'dark'
@@ -122,7 +122,7 @@ export function ChatContainer({
                 }
               />
             </div>
-            <div className='max-w-sm space-y-2'>
+            <div className="max-w-sm space-y-2">
               <h3
                 className={
                   resolvedTheme === 'dark'
@@ -198,9 +198,9 @@ export function ChatContainer({
               ? 'bg-blue-800 text-white hover:bg-blue-900'
               : 'bg-blue-600 text-white hover:bg-blue-700',
           )}
-          aria-label='Scroll to bottom'
+          aria-label="Scroll to bottom"
         >
-          <IconChevronDown className='h-5 w-5' />
+          <IconChevronDown className="h-5 w-5" />
         </button>
       )}
 

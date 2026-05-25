@@ -115,17 +115,17 @@ export const GET = async ({ url }) => {
     }
 
     // Return all presets with metadata
-    const categoryCounts = PRESET_SCENARIOS.reduce< Record<string, number>>(
+    const categoryCounts = PRESET_SCENARIOS.reduce<Record<string, number>>(
       (acc, scenario) => {
-        acc[scenario.category] = (acc[scenario.category] || 0) + 1
+        acc[scenario.category] = (acc[scenario.category] ?? 0) + 1
         return acc
       },
       {},
     )
 
-    const riskLevelCounts = PRESET_SCENARIOS.reduce< Record<string, number>>(
+    const riskLevelCounts = PRESET_SCENARIOS.reduce<Record<string, number>>(
       (acc, scenario) => {
-        acc[scenario.riskLevel] = (acc[scenario.riskLevel] || 0) + 1
+        acc[scenario.riskLevel] = (acc[scenario.riskLevel] ?? 0) + 1
         return acc
       },
       {},

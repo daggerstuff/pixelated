@@ -843,7 +843,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
         'ap-southeast-1': '13.228.456.78',
       }
 
-      return mockIPs[region] || '127.0.0.1'
+      return mockIPs[region] ?? '127.0.0.1'
     } catch (error: unknown) {
       this.logger.error(`Failed to get IP address for ${region}`, { error })
       throw error

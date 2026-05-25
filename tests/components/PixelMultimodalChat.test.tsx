@@ -83,7 +83,7 @@ describe('PixelMultimodalChat Component', () => {
     })
 
     it('should display session and context information', () => {
-      render(<PixelMultimodalChat {...defaultProps} sessionId='sess-456' />)
+      render(<PixelMultimodalChat {...defaultProps} sessionId="sess-456" />)
 
       expect(screen.getByText('Session: sess-456')).toBeInTheDocument()
       expect(screen.getByText('Context: therapeutic')).toBeInTheDocument()

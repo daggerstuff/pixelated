@@ -22,7 +22,7 @@ const WCAG_MAPPING: Record<string, string[]> = {
   'document-title': ['2.4.2'],
   'image-alt': ['1.1.1'],
   'link-name': ['2.4.4', '4.1.2'],
-  list: ['1.3.1'],
+  'list': ['1.3.1'],
   'meta-viewport': ['1.4.4'],
   'table-fake-caption': ['1.3.1'],
 
@@ -31,14 +31,14 @@ const WCAG_MAPPING: Record<string, string[]> = {
   'frame-title': ['2.4.1', '4.1.2'],
   'html-has-lang': ['3.1.1'],
   'html-lang-valid': ['3.1.1'],
-  keyboard: ['2.1.1'],
-  tabindex: ['2.4.3'],
+  'keyboard': ['2.1.1'],
+  'tabindex': ['2.4.3'],
 
   // Understandable
   'definition-list': ['1.3.1'],
-  dlitem: ['1.3.1'],
+  'dlitem': ['1.3.1'],
   'duplicate-id': ['4.1.1'],
-  label: ['1.3.1', '3.3.2', '4.1.2'],
+  'label': ['1.3.1', '3.3.2', '4.1.2'],
   'landmark-one-main': ['1.3.1', '2.4.1'],
 
   // Robust

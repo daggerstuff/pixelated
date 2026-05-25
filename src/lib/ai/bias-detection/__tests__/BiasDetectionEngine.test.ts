@@ -1373,6 +1373,468 @@ describe("BiasDetectionEngine", () => {
       expect(result.recommendations).toBeDefined();
     });
   });
+
+  // =======================
+  // TARGETED BRANCH & METHOD COVERAGE TESTS (inside outer describe, has access to mockConfig)
+  // =======================
+
+  describe("Engine Method Coverage", () => {
+    let engine: BiasDetectionEngine;
+
+    beforeEach(async () => {
+      vi.clearAllMocks();
+      mockPythonBridge.initialize.mockResolvedValue(undefined);
+      mockPythonBridge.checkHealth.mockResolvedValue({ status: "healthy", message: "OK" });
+      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult());
+      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
+      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
+      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
+      mockPythonBridge.dispose.mockResolvedValue(undefined);
+
+      engine = new BiasDetectionEngine(mockConfig);
+      await engine.initialize();
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();  // restores spies AND clears mock call data
+    });
+
+    describe("explainBiasDetection", () => {
+      it("should return explanation with highlights sorted by bias score descending", async () => {
+        // Set different layer scores to verify sorting
+        mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({ ...createDefaultAnalysisResult(), biasScore: 0.2 });
+        mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({ ...createModelLevelAnalysisResult(), biasScore: 0.8 });
+        mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({ ...createInteractiveAnalysisResult(), biasScore: 0.4 });
+        mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({ ...createEvaluationAnalysisResult(), biasScore: 0.6 });
+
+        const analysis = await engine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData));
+        const explanation = await engine.explainBiasDetection(analysis);
+
+        expect(explanation).toBeDefined();
+        expect(explanation.sessionId).toBe(mockSessionData.sessionId);
+        expect(typeof explanation.overallBiasScore).toBe("number");
+        expect(explanation.alertLevel).toMatch(/^(low|medium|high|critical)$/);
+        expect(explanation.highlights).toHaveLength(3);
+        // Highlights should be sorted desc by biasScore
+        expect(explanation.highlights[0]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[1]!.biasScore);
+        expect(explanation.highlights[1]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[2]!.biasScore);
+        expect(explanation.confidence).toBeDefined();
+      });
+
+      it("should handle layer with non-numeric biasScore gracefully", async () => {
+        const analysis = await engine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData));
+        // Corrupt one layer result to have a non-numeric biasScore
+        (analysis.layerResults.preprocessing as Record<string, unknown>)["biasScore"] = "not-a-number";
+
+        const explanation = await engine.explainBiasDetection(analysis);
+        // Method should not throw — it handles non-numeric by defaulting to 0
+        expect(explanation.highlights).toHaveLength(3);
+        // All highlights have numeric biasScores (non-numeric was safely coerced)
+        explanation.highlights.forEach((h) => {
+          expect(typeof h.biasScore).toBe("number");
+        });
+      });
+    });
+
+    describe("updateThresholds", () => {
+      it("should update thresholds with valid values", async () => {
+        const updated = await engine.updateThresholds({ warning: 0.1, high: 0.5, critical: 0.9 });
+        expect(updated.warning).toBe(0.1);
+        expect(updated.high).toBe(0.5);
+        expect(updated.critical).toBe(0.9);
+      });
+
+      it("should reject invalid threshold ordering", async () => {
+        await expect(engine.updateThresholds({ warning: 0.8, high: 0.6, critical: 0.9 })).rejects.toThrow(
+          "Invalid threshold configuration",
+        );
+      });
+    });
+
+    describe("getMetrics", () => {
+      it("should return metrics with alert distribution", async () => {
+        await engine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData));
+        const metrics = await engine.getMetrics();
+
+        expect(metrics).toBeDefined();
+        expect(typeof metrics.totalAnalyses).toBe("number");
+        expect(typeof metrics.averageBiasScore).toBe("number");
+        expect(metrics.alertDistribution).toBeDefined();
+        expect(typeof metrics.alertDistribution.low).toBe("number");
+        expect(typeof metrics.alertDistribution.medium).toBe("number");
+        expect(typeof metrics.alertDistribution.high).toBe("number");
+        expect(typeof metrics.alertDistribution.critical).toBe("number");
+      });
+
+      it("should throw if not initialized", async () => {
+        const uninitEngine = new BiasDetectionEngine(mockConfig);
+        await expect(uninitEngine.getMetrics()).rejects.toThrow("BiasDetectionEngine not initialized");
+      });
+    });
+
+    describe("getSessionAnalysis", () => {
+      it("should return null for non-existent session", async () => {
+        const result = await engine.getSessionAnalysis("non-existent-session");
+        expect(result).toBeNull();
+      });
+
+      it("should throw if not initialized", async () => {
+        const uninitEngine = new BiasDetectionEngine(mockConfig);
+        await expect(uninitEngine.getSessionAnalysis("test")).rejects.toThrow(
+          "BiasDetectionEngine not initialized",
+        );
+      });
+    });
+
+    describe("queueSessionAnalysis", () => {
+      it("should queue a session and return a job ID", async () => {
+        const jobId = await engine.queueSessionAnalysis(
+          sessionDataToTherapeuticSession(mockSessionData),
+          "medium",
+        );
+        expect(typeof jobId).toBe("string");
+        expect(jobId.length).toBeGreaterThan(0);
+      });
+
+      it("should accept low and high priority", async () => {
+        const lowId = await engine.queueSessionAnalysis(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "low-pri" }),
+          "low",
+        );
+        const highId = await engine.queueSessionAnalysis(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "high-pri" }),
+          "high",
+        );
+        expect(typeof lowId).toBe("string");
+        expect(typeof highId).toBe("string");
+      });
+    });
+
+    describe("batchAnalyzeSessions", () => {
+      it("should batch analyze multiple sessions", async () => {
+        const sessions = [1, 2, 3].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `batch-${i}` }),
+        );
+        const result = await engine.batchAnalyzeSessions(sessions, {
+          logProgress: false,
+          logErrors: false,
+        });
+
+        expect(result.results).toHaveLength(3);
+        expect(result.errors).toHaveLength(0);
+        expect(result.metrics.completed).toBe(3);
+        expect(result.metrics.total).toBe(3);
+      });
+
+      it("should invoke progress and error callbacks", async () => {
+        const sessions = [1, 2].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `cb-${i}` }),
+        );
+        const onProgress = vi.fn();
+        const onError = vi.fn();
+
+        const result = await engine.batchAnalyzeSessions(sessions, {
+          onProgress,
+          onError,
+          logProgress: false,
+          logErrors: false,
+        });
+
+        expect(result.results).toHaveLength(2);
+        // onProgress should have been called at least once
+        expect(onProgress).toHaveBeenCalled();
+        expect(onError).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("getPerformanceStats", () => {
+      it("should return performance statistics with expected structure", async () => {
+        const stats = await engine.getPerformanceStats();
+
+        expect(stats).toBeDefined();
+        expect(stats.connections).toBeDefined();
+        expect(stats.connections.http).toBeDefined();
+        expect(stats.cache).toBeDefined();
+        expect(typeof stats.cache.hitRate).toBe("number");
+        expect(stats.batch).toBeDefined();
+        expect(stats.memory).toBeDefined();
+        expect(typeof stats.memory.heapUsed).toBe("number");
+        expect(stats.performance).toBeDefined();
+      });
+    });
+
+    describe("getHealthStatus", () => {
+      it("should return healthy status when all components are working", async () => {
+        const health = await engine.getHealthStatus();
+
+        expect(health).toBeDefined();
+        expect(typeof health.overall).toBe("boolean");
+        expect(health.components).toBeDefined();
+        expect(typeof health.components.engine).toBe("boolean");
+        expect(typeof health.components.monitoring).toBe("boolean");
+        expect(health.components.pythonService).toBe(true);
+        expect(health.performance).toBeDefined();
+      });
+
+      it("should reflect failed python service health", async () => {
+        mockPythonBridge.checkHealth.mockResolvedValue({ status: "unhealthy", message: "Down" });
+        const health = await engine.getHealthStatus();
+
+        expect(health.overall).toBe(false);
+        expect(health.components.pythonService).toBe(false);
+      });
+    });
+
+    describe("getCacheStats", () => {
+      it("should return cache statistics", () => {
+        const stats = engine.getCacheStats();
+        expect(stats).toBeDefined();
+      });
+    });
+
+    describe("maskDemographics edge cases", () => {
+      it("should preserve PII when HIPAA and data masking are disabled", async () => {
+        const noMaskEngine = new BiasDetectionEngine({
+          ...mockConfig,
+          hipaaCompliant: false,
+          dataMaskingEnabled: false,
+        });
+        await noMaskEngine.initialize();
+
+        // Session with PII-like fields in participantDemographics
+        const sessionWithPii = sessionDataToTherapeuticSession({
+          ...mockSessionData,
+          participantDemographics: {
+            social_security: "123-45-6789",
+            phone_number: "555-1234",
+            email: "test@example.com",
+            age: "35",
+            gender: "male",
+          } as unknown as SessionData["participantDemographics"],
+        });
+
+        const result = await noMaskEngine.analyzeSession(sessionWithPii);
+        expect(result).toBeDefined();
+        // With masking disabled, demographics should still be populated
+        expect(result.demographics.age).toBe("35");
+      });
+
+      it("should return undefined demographics when input is undefined", async () => {
+        const masked = (engine as unknown as { maskDemographics: (input?: Record<string, unknown>) => Record<string, unknown> | undefined })
+          .maskDemographics(undefined);
+        expect(masked).toBeUndefined();
+      });
+    });
+
+    describe("computeAlertLevel branches", () => {
+      it("should return low for scores below warning threshold", async () => {
+        // All layers return 0.1, overall = 0.1, below warning=0.2
+        mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({ ...createDefaultAnalysisResult(), biasScore: 0.1 });
+        mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({ ...createModelLevelAnalysisResult(), biasScore: 0.1 });
+        mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({ ...createInteractiveAnalysisResult(), biasScore: 0.1 });
+        mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({ ...createEvaluationAnalysisResult(), biasScore: 0.1 });
+
+        const result = await engine.analyzeSession(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "low-alert" }),
+        );
+        expect(result.alertLevel).toBe("low");
+      });
+
+      it("should return medium for scores between warning and high", async () => {
+        // All layers return 0.3, overall = 0.3, between warning=0.2 and high=0.4
+        mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({ ...createDefaultAnalysisResult(), biasScore: 0.3 });
+        mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({ ...createModelLevelAnalysisResult(), biasScore: 0.3 });
+        mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({ ...createInteractiveAnalysisResult(), biasScore: 0.3 });
+        mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({ ...createEvaluationAnalysisResult(), biasScore: 0.3 });
+
+        const result = await engine.analyzeSession(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "medium-alert" }),
+        );
+        expect(result.alertLevel).toBe("medium");
+      });
+
+      it("should return critical for scores at or above critical threshold", async () => {
+        // All layers return 0.7, overall = 0.7, above critical=0.6
+        mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({ ...createDefaultAnalysisResult(), biasScore: 0.7 });
+        mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({ ...createModelLevelAnalysisResult(), biasScore: 0.7 });
+        mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({ ...createInteractiveAnalysisResult(), biasScore: 0.7 });
+        mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({ ...createEvaluationAnalysisResult(), biasScore: 0.7 });
+
+        const result = await engine.analyzeSession(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "critical-alert" }),
+        );
+        expect(result.alertLevel).toBe("critical");
+      });
+    });
+
+    describe("ensureInitialized guard", () => {
+      it("should throw for getMetrics when not initialized", async () => {
+        const uninitEngine = new BiasDetectionEngine(mockConfig);
+        await expect(uninitEngine.getMetrics()).rejects.toThrow("BiasDetectionEngine not initialized");
+      });
+
+      it("should throw for getHealthStatus when not initialized", async () => {
+        const uninitEngine = new BiasDetectionEngine(mockConfig);
+        await expect(uninitEngine.getHealthStatus()).rejects.toThrow("BiasDetectionEngine not initialized");
+      });
+
+      it("should throw for queueSessionAnalysis when not initialized", async () => {
+        const uninitEngine = new BiasDetectionEngine(mockConfig);
+        await expect(
+          uninitEngine.queueSessionAnalysis(sessionDataToTherapeuticSession(mockSessionData)),
+        ).rejects.toThrow("BiasDetectionEngine not initialized");
+      });
+    });
+
+    describe("getDashboardData default options", () => {
+      it("should work with no arguments", async () => {
+        const data = await engine.getDashboardData();
+        expect(data).toBeDefined();
+        expect(data.summary).toBeDefined();
+        expect(typeof data.summary.totalSessions).toBe("number");
+      });
+    });
+
+    describe("performanceOptimizer fallback paths", () => {
+      it("should return fallback performance stats when optimizer is null", async () => {
+        (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
+        const stats = await engine.getPerformanceStats();
+
+        expect(stats).toBeDefined();
+        expect(stats.connections).toBeDefined();
+        expect(stats.connections.http).toEqual({ total: 0, active: 0, idle: 0, queue: 0 });
+        expect(stats.cache.hitRate).toBe(0);
+        expect(stats.memory).toBeDefined();
+        expect(typeof stats.memory.heapUsed).toBe("number");
+      });
+
+      it("should process queueSessionAnalysis immediately when optimizer is null", async () => {
+        (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
+        const jobId = await engine.queueSessionAnalysis(
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: "immediate-session" }),
+        );
+        // Since optimizer is null, it processes immediately and returns 'immediate_<sessionId>_<timestamp>'
+        expect(jobId).toMatch(/^immediate_/);
+        expect(jobId).toContain("immediate-session");
+      });
+
+      it("should fall back to sequential batch processing when optimizer is null", async () => {
+        (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
+        const sessions = [1, 2].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `fallback-batch-${i}` }),
+        );
+        const result = await engine.batchAnalyzeSessions(sessions, {
+          logProgress: false,
+          logErrors: false,
+        });
+
+        expect(result.results).toHaveLength(2);
+        expect(result.errors).toHaveLength(0);
+        expect(result.metrics.completed).toBe(2);
+        expect(result.metrics.total).toBe(2);
+      });
+
+      it("should log progress during fallback batch processing when logProgress is not explicitly disabled", async () => {
+        const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
+        const sessions = [1, 2].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `progress-log-${i}` }),
+        );
+
+        const result = await engine.batchAnalyzeSessions(sessions, {
+          logErrors: false,
+          // logProgress defaults to true -> exercises the logging branch
+        });
+
+        expect(result.results).toHaveLength(2);
+        expect(result.errors).toHaveLength(0);
+        // Should have logged progress lines
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+          expect.stringContaining('[BatchAnalysis] Completed'),
+        );
+        expect(consoleLogSpy).toHaveBeenCalledWith(
+          expect.stringContaining('[BatchAnalysis] Average time per session'),
+        );
+        consoleLogSpy.mockRestore();
+      });
+
+      it("should log errors during fallback batch processing when errors occur", async () => {
+        const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+        (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
+
+        // Make the second session fail by rejecting the preprocessing analysis
+        // Since we can't easily target a specific session, mock the entire engine
+        const sessions = [1, 2].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `error-log-${i}` }),
+        );
+
+        // Mock analyzeSession to reject on the second call
+        const analyzeSpy = vi
+          .spyOn(engine, 'analyzeSession')
+          .mockResolvedValueOnce({
+            sessionId: 'error-log-1',
+            timestamp: new Date(),
+            overallBiasScore: 0.5,
+            alertLevel: 'medium',
+            layerResults: {
+              preprocessing: { biasScore: 0.5 } as any,
+              modelLevel: { biasScore: 0.5 } as any,
+              interactive: { biasScore: 0.5 } as any,
+              evaluation: { biasScore: 0.5 } as any,
+            },
+            recommendations: ['OK'],
+            confidence: 0.8,
+            demographics: { age: '', gender: '', ethnicity: '', primaryLanguage: '' },
+          } as unknown as Awaited<ReturnType<typeof engine.analyzeSession>>)
+          .mockRejectedValueOnce(new Error('Session processing failed'));
+
+        const result = await engine.batchAnalyzeSessions(sessions, {
+          logProgress: false,
+          // logErrors defaults to true -> exercises the error logging branch
+        });
+
+        expect(result.results).toHaveLength(1);
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors[0]!.error.message).toBe('Session processing failed');
+        // Should have logged the error
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          expect.stringContaining('[BatchError]'),
+        );
+        consoleErrorSpy.mockRestore();
+        analyzeSpy.mockRestore();
+      });
+    });
+
+    describe("generateBiasReport", () => {
+      it("should generate a report with valid sessions", async () => {
+        const sessions = [1, 2].map((i) =>
+          sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `report-session-${i}` }),
+        );
+        const report = await engine.generateBiasReport(sessions, {
+          start: new Date("2025-01-01"),
+          end: new Date("2025-12-31"),
+        });
+
+        expect(report).toBeDefined();
+        expect(report.summary).toBeDefined();
+        expect(report.summary.sessionCount).toBe(2);
+        expect(typeof report.summary.averageBiasScore).toBe("number");
+        expect(report.performance).toBeDefined();
+        expect(report.alerts).toBeDefined();
+      });
+
+      it("should generate report with no timeframe", async () => {
+        const session = sessionDataToTherapeuticSession(mockSessionData);
+        const report = await engine.generateBiasReport([session]);
+
+        expect(report).toBeDefined();
+        expect(report.summary.sessionCount).toBe(1);
+        expect(typeof report.summary.averageBiasScore).toBe("number");
+        expect(report.alerts).toBeDefined();
+        expect(report.performance).toBeDefined();
+      });
+    });
+  });
 });
 
 // Fix: Ensure all analyzeSession calls use TherapeuticSession type
@@ -1426,6 +1888,3 @@ function sessionDataToTherapeuticSession(data: SessionData): TherapeuticSession 
   };
 }
 
-// Replace all analyzeSession(sessionDataToTherapeuticSession(mockSessionData)) with analyzeSession(sessionDataToTherapeuticSession(mockSessionData))
-// Example:
-// const result = await biasEngine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData))

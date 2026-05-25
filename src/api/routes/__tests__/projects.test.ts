@@ -4,10 +4,10 @@
 // API Integration Tests for Projects Routes
 // Tests for full CRUD operations on projects
 
-import request from 'supertest'
-import { vi } from 'vitest'
 import type { Express } from 'express'
 import express from 'express'
+import request from 'supertest'
+import { vi } from 'vitest'
 
 import {
   createTestUserForTest,
@@ -51,26 +51,33 @@ const mockProjectState = vi.hoisted(() => ({
 }))
 
 vi.mock('../../services/project-service', async () => {
-  const { ValidationError, NotFoundError, ForbiddenError } = await import(
-    '../../middleware/error-handler'
-  )
+  const { ValidationError, NotFoundError, ForbiddenError } =
+    await import('../../middleware/error-handler')
 
   const cloneProject = (project: MockProject) => structuredClone(project)
 
   const toValidationError = (field: string) =>
-    new ValidationError(`${field} is invalid`, { [field]: `${field} is invalid` })
+    new ValidationError(`${field} is invalid`, {
+      [field]: `${field} is invalid`,
+    })
 
-  const toNotFound = (projectId: string) => new NotFoundError('project', projectId)
+  const toNotFound = (projectId: string) =>
+    new NotFoundError('project', projectId)
 
   const toForbidden = () => new ForbiddenError('Access denied')
 
   const findProject = (projectId: string, userId: string) => {
-    const project = mockProjectState.projects.find((entry) => entry.id === projectId)
+    const project = mockProjectState.projects.find(
+      (entry) => entry.id === projectId,
+    )
     if (!project) {
       throw toNotFound(projectId)
     }
 
-    if (project.owner !== userId && !project.permissions.view.includes(userId)) {
+    if (
+      project.owner !== userId &&
+      !project.permissions.view.includes(userId)
+    ) {
       throw toForbidden()
     }
 
@@ -78,7 +85,9 @@ vi.mock('../../services/project-service', async () => {
   }
 
   const findProjectForOwnerOnly = (projectId: string, ownerId: string) => {
-    const project = mockProjectState.projects.find((entry) => entry.id === projectId)
+    const project = mockProjectState.projects.find(
+      (entry) => entry.id === projectId,
+    )
     if (!project || project.owner !== ownerId) {
       throw toNotFound(projectId)
     }
@@ -86,152 +95,177 @@ vi.mock('../../services/project-service', async () => {
   }
 
   const findProjectForEditor = (projectId: string, userId: string) => {
-    const project = mockProjectState.projects.find((entry) => entry.id === projectId)
+    const project = mockProjectState.projects.find(
+      (entry) => entry.id === projectId,
+    )
     if (!project) {
       throw toNotFound(projectId)
     }
-    if (project.owner !== userId && !project.permissions.edit.includes(userId)) {
+    if (
+      project.owner !== userId &&
+      !project.permissions.edit.includes(userId)
+    ) {
       throw toForbidden()
     }
     return project
   }
 
   return {
-    createProject: vi.fn(async (data: {
-      name: string
-      description?: string
-      category?: string
-      ownerId: string
-      stakeholders?: string[]
-      budget?: number
-      status?: string
-    }) => {
-      if (data.budget !== undefined && data.budget < 0) {
-        throw toValidationError('budget')
-      }
+    createProject: vi.fn(
+      async (data: {
+        name: string
+        description?: string
+        category?: string
+        ownerId: string
+        stakeholders?: string[]
+        budget?: number
+        status?: string
+      }) => {
+        if (data.budget !== undefined && data.budget < 0) {
+          throw toValidationError('budget')
+        }
 
-      const projectId = `project-${++mockProjectState.nextProjectId}`
-      const now = new Date().toISOString()
-      const project: MockProject = {
-        id: projectId,
-        name: data.name,
-        description: data.description ?? '',
-        category: data.category ?? 'general',
-        owner: data.ownerId,
-        stakeholders: data.stakeholders ?? [data.ownerId],
-        budget: data.budget ?? 0,
-        status: data.status ?? 'active',
-        objectives: [],
-        permissions: {
-          view: [data.ownerId],
-          edit: [data.ownerId],
-          comment: [data.ownerId],
-        },
-        createdAt: now,
-        updatedAt: now,
-      }
-      mockProjectState.projects.push(project)
-      return cloneProject(project)
-    }),
+        const projectId = `project-${++mockProjectState.nextProjectId}`
+        const now = new Date().toISOString()
+        const project: MockProject = {
+          id: projectId,
+          name: data.name,
+          description: data.description ?? '',
+          category: data.category ?? 'general',
+          owner: data.ownerId,
+          stakeholders: data.stakeholders ?? [data.ownerId],
+          budget: data.budget ?? 0,
+          status: data.status ?? 'active',
+          objectives: [],
+          permissions: {
+            view: [data.ownerId],
+            edit: [data.ownerId],
+            comment: [data.ownerId],
+          },
+          createdAt: now,
+          updatedAt: now,
+        }
+        mockProjectState.projects.push(project)
+        return cloneProject(project)
+      },
+    ),
 
     getProject: vi.fn(async (projectId: string, userId: string) =>
       cloneProject(findProject(projectId, userId)),
     ),
 
-    updateProject: vi.fn(async (
-      projectId: string,
-      userId: string,
-      updates: {
-        name?: string
-        description?: string
-        category?: string
-        budget?: number | string
-        status?: string
-      },
-    ) => {
-      const project = findProjectForEditor(projectId, userId)
-      if (updates.budget !== undefined && typeof updates.budget !== 'number') {
-        throw toValidationError('budget')
-      }
-      if (updates.budget !== undefined && updates.budget < 0) {
-        throw toValidationError('budget')
-      }
-      if (updates.name !== undefined) {
-        project.name = updates.name
-      }
-      if (updates.description !== undefined) {
-        project.description = updates.description
-      }
-      if (updates.category !== undefined) {
-        project.category = updates.category
-      }
-      if (updates.budget !== undefined) {
-        project.budget = updates.budget
-      }
-      if (updates.status !== undefined) {
-        project.status = updates.status
-      }
-      project.updatedAt = new Date().toISOString()
-      return cloneProject(project)
-    }),
-
-    addObjective: vi.fn(async (
-      projectId: string,
-      userId: string,
-      objective: {
-        title: string
-        description?: string
-        successCriteria?: string[]
-        deadline?: string | Date
-      },
-    ) => {
-      const project = findProjectForEditor(projectId, userId)
-      const objectiveId = `objective-${project.objectives.length + 1}`
-      project.objectives.push({
-        id: objectiveId,
-        title: objective.title,
-        description: objective.description ?? '',
-        successCriteria: objective.successCriteria ?? [],
-      })
-      project.updatedAt = new Date().toISOString()
-      return cloneProject(project)
-    }),
-
-    listProjects: vi.fn(async (userId: string, options: MockQuery & {
-      page?: number
-      limit?: number
-    } = {}) => {
-      const page = options.page ?? 1
-      const limit = options.limit ?? 50
-      const skip = (page - 1) * limit
-      const filtered = mockProjectState.projects.filter((project) => {
-        if (project.owner !== userId && !project.permissions.view.includes(userId)) {
-          return false
-        }
-        if (options.category && project.category !== options.category) {
-          return false
-        }
-        if (options.status && project.status !== options.status) {
-          return false
-        }
-        return true
-      })
-
-      return {
-        data: filtered.slice(skip, skip + limit).map(cloneProject),
-        pagination: {
-          page,
-          limit,
-          total: filtered.length,
+    updateProject: vi.fn(
+      async (
+        projectId: string,
+        userId: string,
+        updates: {
+          name?: string
+          description?: string
+          category?: string
+          budget?: number | string
+          status?: string
         },
-      }
-    }),
+      ) => {
+        const project = findProjectForEditor(projectId, userId)
+        if (
+          updates.budget !== undefined &&
+          typeof updates.budget !== 'number'
+        ) {
+          throw toValidationError('budget')
+        }
+        if (updates.budget !== undefined && updates.budget < 0) {
+          throw toValidationError('budget')
+        }
+        if (updates.name !== undefined) {
+          project.name = updates.name
+        }
+        if (updates.description !== undefined) {
+          project.description = updates.description
+        }
+        if (updates.category !== undefined) {
+          project.category = updates.category
+        }
+        if (updates.budget !== undefined) {
+          project.budget = updates.budget
+        }
+        if (updates.status !== undefined) {
+          project.status = updates.status
+        }
+        project.updatedAt = new Date().toISOString()
+        return cloneProject(project)
+      },
+    ),
+
+    addObjective: vi.fn(
+      async (
+        projectId: string,
+        userId: string,
+        objective: {
+          title: string
+          description?: string
+          successCriteria?: string[]
+          deadline?: string | Date
+        },
+      ) => {
+        const project = findProjectForEditor(projectId, userId)
+        const objectiveId = `objective-${project.objectives.length + 1}`
+        project.objectives.push({
+          id: objectiveId,
+          title: objective.title,
+          description: objective.description ?? '',
+          successCriteria: objective.successCriteria ?? [],
+        })
+        project.updatedAt = new Date().toISOString()
+        return cloneProject(project)
+      },
+    ),
+
+    listProjects: vi.fn(
+      async (
+        userId: string,
+        options: MockQuery & {
+          page?: number
+          limit?: number
+        } = {},
+      ) => {
+        const page = options.page ?? 1
+        const limit = options.limit ?? 50
+        const skip = (page - 1) * limit
+        const filtered = mockProjectState.projects.filter((project) => {
+          if (
+            project.owner !== userId &&
+            !project.permissions.view.includes(userId)
+          ) {
+            return false
+          }
+          if (options.category && project.category !== options.category) {
+            return false
+          }
+          if (options.status && project.status !== options.status) {
+            return false
+          }
+          return true
+        })
+
+        return {
+          data: filtered.slice(skip, skip + limit).map(cloneProject),
+          pagination: {
+            page,
+            limit,
+            total: filtered.length,
+          },
+        }
+      },
+    ),
 
     searchProjects: vi.fn(async (query: string, userId: string) => {
       const normalized = query.toLowerCase()
       return mockProjectState.projects
         .filter((project) => {
-          if (project.owner !== userId && !project.permissions.view.includes(userId)) {
+          if (
+            project.owner !== userId &&
+            !project.permissions.view.includes(userId)
+          ) {
             return false
           }
           const text = `${project.name} ${project.description}`.toLowerCase()
@@ -240,36 +274,42 @@ vi.mock('../../services/project-service', async () => {
         .map(cloneProject)
     }),
 
-    shareProject: vi.fn(async (
-      projectId: string,
-      ownerId: string,
-      targetUserId: string,
-      permissionLevel: keyof MockProject['permissions'],
-    ) => {
-      const project = findProjectForOwnerOnly(projectId, ownerId)
-      if (!project.permissions[permissionLevel].includes(targetUserId)) {
-        project.permissions[permissionLevel].push(targetUserId)
-      }
-      return cloneProject(project)
-    }),
+    shareProject: vi.fn(
+      async (
+        projectId: string,
+        ownerId: string,
+        targetUserId: string,
+        permissionLevel: keyof MockProject['permissions'],
+      ) => {
+        const project = findProjectForOwnerOnly(projectId, ownerId)
+        if (!project.permissions[permissionLevel].includes(targetUserId)) {
+          project.permissions[permissionLevel].push(targetUserId)
+        }
+        return cloneProject(project)
+      },
+    ),
   }
 })
 
 vi.mock('../../../lib/auth/auth0-middleware', () => {
   return {
     authenticateRequest: vi.fn(async (request) => {
-      const authHeader = request.headers.get?.('authorization')
-        ?? request.headers.get?.('Authorization')
-        ?? request.headers.get?.('AUTHORIZATION')
+      const authHeader =
+        request.headers.get?.('authorization') ??
+        request.headers.get?.('Authorization') ??
+        request.headers.get?.('AUTHORIZATION')
 
       if (!authHeader?.startsWith('Bearer ')) {
         return {
           success: false,
           error: 'No authorization header',
-          response: new Response(JSON.stringify({ error: 'No authorization header' }), {
-            status: 401,
-            headers: { 'Content-Type': 'application/json' },
-          }),
+          response: new Response(
+            JSON.stringify({ error: 'No authorization header' }),
+            {
+              status: 401,
+              headers: { 'Content-Type': 'application/json' },
+            },
+          ),
         }
       }
 
@@ -352,15 +392,20 @@ describe('Projects API', () => {
         ) => {
           if (typeof error === 'object' && error !== null) {
             const statusCode =
-              'statusCode' in error && typeof (error as { statusCode?: unknown }).statusCode === 'number'
+              'statusCode' in error &&
+              typeof (error as { statusCode?: unknown }).statusCode === 'number'
                 ? (error as { statusCode: number }).statusCode
                 : 500
-            const message = 'message' in error && typeof (error as { message?: unknown }).message === 'string'
-              ? (error as { message: string }).message
-              : 'Internal Server Error'
-            const code = 'code' in error && typeof (error as { code?: unknown }).code === 'string'
-              ? (error as { code: string }).code
-              : 'APP_ERROR'
+            const message =
+              'message' in error &&
+              typeof (error as { message?: unknown }).message === 'string'
+                ? (error as { message: string }).message
+                : 'Internal Server Error'
+            const code =
+              'code' in error &&
+              typeof (error as { code?: unknown }).code === 'string'
+                ? (error as { code: string }).code
+                : 'APP_ERROR'
 
             res.status(statusCode).json({ error: { code, message } })
             return
@@ -634,10 +679,14 @@ describe('Projects API', () => {
 
       expect(response.body.success).toBe(true)
       expect(response.body.data).toHaveProperty('id')
-      const updatedProject = response.body.data as { objectives?: Array<{ title: string }> }
+      const updatedProject = response.body.data as {
+        objectives?: Array<{ title: string }>
+      }
       expect(updatedProject).toHaveProperty('objectives')
       expect(
-        updatedProject.objectives?.some((entry) => entry.title === objectiveData.title),
+        updatedProject.objectives?.some(
+          (entry) => entry.title === objectiveData.title,
+        ),
       ).toBe(true)
     })
 

@@ -294,7 +294,7 @@ export class AuditService {
 
     const cursor = this.auditCollection
       .find(filter)
-      .sort({ timestamp: -1, 'metadata.riskScore': -1 })
+      .sort({ 'timestamp': -1, 'metadata.riskScore': -1 })
 
     if (options?.skip) {
       cursor.skip(options.skip)

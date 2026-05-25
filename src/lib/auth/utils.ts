@@ -290,7 +290,7 @@ export function roleToDisplayName(role: string): string {
     guest: 'Guest',
   }
 
-  return roleMap[role] || role
+  return roleMap[role] ?? role
 }
 
 /**

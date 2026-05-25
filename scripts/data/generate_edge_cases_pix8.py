@@ -126,9 +126,7 @@ class PIX8EdgeCaseGenerator:
                         }
                     )
                 elif clean_line.startswith("Patient:"):
-                    messages.append(
-                        {"role": "user", "content": clean_line.replace("Patient:", "").strip()}
-                    )
+                    messages.append({"role": "user", "content": clean_line.replace("Patient:", "").strip()})
 
             if not messages:
                 logger.warning("Empty dialogue generated.")
@@ -168,9 +166,7 @@ class PIX8EdgeCaseGenerator:
             for i in range(0, count, chunk_size):
                 current_chunk = min(chunk_size, count - i)
                 chunk_prompt = prompt.replace(f"Generate {count}", f"Generate {current_chunk}")
-                res_text = self.llm_client.generate(
-                    chunk_prompt, system_prompt="You are a data architect."
-                )
+                res_text = self.llm_client.generate(chunk_prompt, system_prompt="You are a data architect.")
 
                 # Extract JSON
                 start = res_text.find("[")
@@ -220,8 +216,7 @@ class PIX8EdgeCaseGenerator:
         results = []
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_scenario = {
-                executor.submit(self._create_dialogue, s, is_nightmare, unwinnable): s
-                for s in scenarios
+                executor.submit(self._create_dialogue, s, is_nightmare, unwinnable): s for s in scenarios
             }
             for future in as_completed(future_to_scenario):
                 if result := future.result():
@@ -253,12 +248,8 @@ class PIX8EdgeCaseGenerator:
             for chunk_start in range(0, count, batch_size):
                 chunk_size = min(batch_size, count - chunk_start)
                 try:
-                    scenarios = self._generate_scenarios_chunk(
-                        edge_type, chunk_size, difficulty, unwinnable
-                    )
-                    chunk_results = self._process_scenarios_to_dialogues(
-                        scenarios, is_nightmare, unwinnable, edge_type
-                    )
+                    scenarios = self._generate_scenarios_chunk(edge_type, chunk_size, difficulty, unwinnable)
+                    chunk_results = self._process_scenarios_to_dialogues(scenarios, is_nightmare, unwinnable, edge_type)
                     all_results.extend(chunk_results)
 
                     # Log progress and save incrementally
@@ -314,9 +305,7 @@ class PIX8EdgeCaseGenerator:
                     count += 1
 
                 if count > 0:
-                    nightmare_all.extend(
-                        self.generate_batch(et, count, "extreme", is_nightmare=True)
-                    )
+                    nightmare_all.extend(self.generate_batch(et, count, "extreme", is_nightmare=True))
             self.save_results(nightmare_all, "nightmare_fuel.jsonl")
 
         # 2. Standard Edge Cases
@@ -338,9 +327,7 @@ class PIX8EdgeCaseGenerator:
                     count += 1
 
                 if count > 0:
-                    standard_all.extend(
-                        self.generate_batch(et, count, "advanced", is_nightmare=False)
-                    )
+                    standard_all.extend(self.generate_batch(et, count, "advanced", is_nightmare=False))
             self.save_results(standard_all, "standard_edge_cases.jsonl")
 
         # Final Stats

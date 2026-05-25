@@ -141,7 +141,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   const chartData =
     useBackend && backendData?.data
       ? backendData.data
-      : (fallbackData ?? defaultData[type]) ?? defaultData.line
+      : (fallbackData ?? defaultData[type] ?? defaultData.line)
 
   // Handle backend errors gracefully
   useEffect(() => {
@@ -253,11 +253,11 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   if (useBackend && backendLoading) {
     return (
       <div className={`flex h-64 items-center justify-center ${className}`}>
-        <div className='flex flex-col items-center'>
-          <div className='border-blue-500 mb-4 h-8 w-8 animate-spin rounded-full border-b-2'></div>
-          <span className='text-gray-600'>Loading chart data...</span>
+        <div className="flex flex-col items-center">
+          <div className="border-blue-500 mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+          <span className="text-gray-600">Loading chart data...</span>
           {dataConfig?.autoRefresh && (
-            <span className='text-gray-500 mt-1 text-xs'>
+            <span className="text-gray-500 mt-1 text-xs">
               Auto-refreshing every{' '}
               {(dataConfig.refreshInterval ?? 60000) / 1000}s
             </span>
@@ -284,13 +284,13 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   return (
     <div className={`relative ${className}`}>
       {/* Chart container */}
-      <div className='h-64 w-full'>{renderChart()}</div>
+      <div className="h-64 w-full">{renderChart()}</div>
 
       {/* Status indicators */}
-      <div className='text-gray-500 mt-2 flex items-center justify-between text-xs'>
-        <div className='flex items-center space-x-4'>
+      <div className="text-gray-500 mt-2 flex items-center justify-between text-xs">
+        <div className="flex items-center space-x-4">
           {/* Data source indicator */}
-          <div className='flex items-center space-x-1'>
+          <div className="flex items-center space-x-1">
             <div
               className={`h-2 w-2 rounded-full ${
                 useBackend && !backendError
@@ -313,20 +313,20 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
           {useBackend && (
             <button
               onClick={refreshBackendData}
-              className='hover:text-blue-600 flex items-center space-x-1 transition-colors'
-              title='Refresh data'
+              className="hover:text-blue-600 flex items-center space-x-1 transition-colors"
+              title="Refresh data"
             >
               <svg
-                className='h-3 w-3'
-                fill='none'
-                stroke='currentColor'
-                viewBox='0 0 24 24'
+                className="h-3 w-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
                 <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                   strokeWidth={2}
-                  d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
                 />
               </svg>
               <span>Refresh</span>
@@ -336,7 +336,7 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
 
         {/* Metadata display */}
         {useBackend && backendData?.metadata && (
-          <div className='text-right'>
+          <div className="text-right">
             <div>{backendData.metadata.totalDataPoints} data points</div>
             {backendData.metadata.timeRange && (
               <div>Range: {backendData.metadata.timeRange}</div>
@@ -347,19 +347,19 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
 
       {/* Error display */}
       {error && (
-        <div className='bg-yellow-50 border-yellow-200 text-yellow-800 mt-2 rounded border p-2 text-xs'>
-          <div className='flex items-center space-x-1'>
+        <div className="bg-yellow-50 border-yellow-200 text-yellow-800 mt-2 rounded border p-2 text-xs">
+          <div className="flex items-center space-x-1">
             <svg
-              className='h-4 w-4'
-              fill='none'
-              stroke='currentColor'
-              viewBox='0 0 24 24'
+              className="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
               <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeWidth={2}
-                d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z'
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
               />
             </svg>
             <span>{error}</span>

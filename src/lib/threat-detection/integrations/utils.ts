@@ -153,7 +153,9 @@ export async function calculateThreatScore(
     case 'low':
       score += 30
       break
-    case undefined: { throw new Error('Not implemented yet: undefined case') }
+    case undefined: {
+      throw new Error('Not implemented yet: undefined case')
+    }
   }
 
   // Add risk factor contributions
@@ -300,11 +302,11 @@ export async function checkSuspiciousIPWithIntelligence(
   try {
     const threatService = new ExternalThreatIntelligenceService({
       mongoUrl:
-        (config.mongoUrl ??
-        process.env.MONGODB_URL) ??
+        config.mongoUrl ??
+        process.env.MONGODB_URL ??
         'mongodb://localhost:27017',
       redisUrl:
-        (config.redisUrl ?? process.env.REDIS_URL) ?? 'redis://localhost:6379',
+        config.redisUrl ?? process.env.REDIS_URL ?? 'redis://localhost:6379',
       enabled: true,
       feeds: [],
       updateInterval: 3600000,
@@ -694,10 +696,10 @@ export function createThreatAction(
     actionId: _secureId('action_'),
     actionType,
     target,
-    parameters: (metadata!) || {},
+    parameters: metadata! || {},
     priority: 5, // Default priority
     timeout: 5000, // Default timeout
     timestamp: new Date().toISOString(),
-    metadata: (metadata!) || {},
+    metadata: metadata! || {},
   }
 }

@@ -103,25 +103,25 @@ describe('Rate Limiter Middleware', () => {
 
   describe('rateLimiter (IP-based)', () => {
     it('should call next when under rate limit', async () => {
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
+      mockIncr.mockResolvedValue(1)
+      mockExpire.mockResolvedValue('OK')
 
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+      })
     })
 
     it('should return 429 when rate limit exceeded', async () => {
-      mockMulti.mockResolvedValue([
-        [null, 1001],
-        [null, 1],
-      ])
+      mockIncr.mockResolvedValue(1001)
+      mockExpire.mockResolvedValue('OK')
 
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
-      expect(mockResponse.status).toHaveBeenCalledWith(429)
+      await vi.waitFor(() => {
+        expect(mockResponse.status).toHaveBeenCalledWith(429)
+      })
       const jsonPayload = vi.mocked(mockResponse.json).mock.calls[0]?.[0]
       expect(jsonPayload).toMatchObject({
         error: 'Too Many Requests',
@@ -145,40 +145,39 @@ describe('Rate Limiter Middleware', () => {
 
     it('should extract IP from x-forwarded-for header if present', async () => {
       mockRequest.headers['x-forwarded-for'] = '203.0.113.195'
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
+      mockIncr.mockResolvedValue(1)
+      mockExpire.mockResolvedValue('OK')
 
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
-      // Should use the forwarded IP
-      expect(mockNext).toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+      })
     })
 
     it('should handle multiple IPs in x-forwarded-for header', async () => {
       mockRequest.headers['x-forwarded-for'] = '203.0.113.195, 70.41.3.18'
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
+      mockIncr.mockResolvedValue(1)
+      mockExpire.mockResolvedValue('OK')
 
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+      })
     })
 
     it('should default to 127.0.0.1 when no IP available', async () => {
       mockRequest.ip = undefined
       mockRequest.headers = {}
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
+      mockIncr.mockResolvedValue(1)
+      mockExpire.mockResolvedValue('OK')
 
       await invokeRateLimiter(mockRequest, mockResponse, mockNext)
 
-      expect(mockNext).toHaveBeenCalled()
+      await vi.waitFor(() => {
+        expect(mockNext).toHaveBeenCalled()
+      })
     })
   })
 

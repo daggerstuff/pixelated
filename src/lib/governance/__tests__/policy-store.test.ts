@@ -49,14 +49,28 @@ describe('PolicyStore', () => {
     const v1: GovernancePolicy = {
       id: 'versioned',
       version: '1.0.0',
-      rules: [{ id: 'r1', action: 'encrypt', conditions: [], required: ['fhe_encryption'] }],
+      rules: [
+        {
+          id: 'r1',
+          action: 'encrypt',
+          conditions: [],
+          required: ['fhe_encryption'],
+        },
+      ],
     }
     await store.savePolicy(v1)
 
     const v2: GovernancePolicy = {
       id: 'versioned',
       version: '2.0.0',
-      rules: [{ id: 'r2', action: 'access', conditions: [], required: ['audit_logged'] }],
+      rules: [
+        {
+          id: 'r2',
+          action: 'access',
+          conditions: [],
+          required: ['audit_logged'],
+        },
+      ],
     }
     await store.savePolicy(v2)
 

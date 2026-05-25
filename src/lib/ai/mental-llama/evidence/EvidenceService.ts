@@ -479,7 +479,7 @@ export class EvidenceService {
       stress: ['stressed', 'overwhelmed', 'pressure', 'too much'],
     }
 
-    const keywords = fallbackKeywords[category] || []
+    const keywords = fallbackKeywords[category] ?? []
     const found: string[] = []
 
     keywords.forEach((keyword) => {

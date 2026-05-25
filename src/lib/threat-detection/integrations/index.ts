@@ -136,9 +136,9 @@ export function createThreatDetectionIntegration(
     bridge: threatDetectionService['rateLimitingBridge'],
 
     // Convenience methods
-    analyzeThreat:  async (threatData: unknown) =>
+    analyzeThreat: async (threatData: unknown) =>
       threatDetectionService.analyzeThreat(threatData as ThreatData),
-    checkRequest:  async (identifier: string, context: unknown) =>
+    checkRequest: async (identifier: string, context: unknown) =>
       threatDetectionService.checkRequest(
         identifier,
         context as {
@@ -150,8 +150,8 @@ export function createThreatDetectionIntegration(
           headers?: Record<string, string>
         },
       ),
-    getHealthStatus:  async () => threatDetectionService.getHealthStatus(),
-    getStatistics:  async () => threatDetectionService.getStatistics(),
+    getHealthStatus: async () => threatDetectionService.getHealthStatus(),
+    getStatistics: async () => threatDetectionService.getStatistics(),
   }
 }
 
@@ -263,7 +263,7 @@ export const expressMiddlewareConfig = {
         )
         .map(([key, value]) => [
           key,
-          Array.isArray(value) ? value.join(', ') : value ?? '',
+          Array.isArray(value) ? value.join(', ') : (value ?? ''),
         ]),
     ),
   }),

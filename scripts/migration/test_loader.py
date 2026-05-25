@@ -37,9 +37,7 @@ def main():
 
     # 1. Test Foundation (Professional)
     # CoT reasoning (Validation passes)
-    attempt_load(
-        "clinical_diagnosis_mental_health.json", stage="stage2_expertise", category="reasoning"
-    )
+    attempt_load("clinical_diagnosis_mental_health.json", stage="stage2_expertise", category="reasoning")
 
     # Test Curated
     # 'priority_1_FINAL.jsonl' in 'curated'

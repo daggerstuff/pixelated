@@ -76,9 +76,7 @@ export function processThreatData(rawData: unknown[]): ThreatData[] {
 export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
   const groups = threatData.reduce<Record<string, ThreatData[]>>((acc, t) => {
     const key = JSON.stringify({ type: t.type, source: t.source })
-    if (!acc[key]) {
-      acc[key] = []
-    }
+    acc[key] ??= []
     acc[key].push(t)
     return acc
   }, {})
@@ -221,9 +219,9 @@ export function aggregateThreatStats(threatData: ThreatData[]) {
     time_range: { earliest, latest },
   }
   threatData.forEach((t) => {
-    stats.by_type[t.type] = (stats.by_type[t.type] || 0) + 1
-    stats.by_severity[t.severity] = (stats.by_severity[t.severity] || 0) + 1
-    stats.by_source[t.source] = (stats.by_source[t.source] || 0) + 1
+    stats.by_type[t.type] = (stats.by_type[t.type] ?? 0) + 1
+    stats.by_severity[t.severity] = (stats.by_severity[t.severity] ?? 0) + 1
+    stats.by_source[t.source] = (stats.by_source[t.source] ?? 0) + 1
   })
   return stats
 }

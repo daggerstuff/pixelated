@@ -22,12 +22,12 @@ export interface SyncManagerOptions {
 
 class SyncManager {
   private readonly options: Required<SyncManagerOptions>
-  private isOnline: boolean =
-    navigator?.onLine
+  private isOnline: boolean = navigator?.onLine
   private isSyncing = false
   private backoffMultiplier = 1
   private syncTimeout: NodeJS.Timeout | null = null
-  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> = new Map()
+  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> =
+    new Map()
   private readonly onlineHandler: () => void
   private readonly offlineHandler: () => void
   private readonly visibilityChangeHandler: () => void

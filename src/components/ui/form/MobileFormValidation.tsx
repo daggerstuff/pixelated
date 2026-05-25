@@ -380,14 +380,14 @@ export function MobileFormValidation({
 
       {/* Hidden element for screen reader announcements */}
       <div
-        id='validation-error-summary'
-        className='sr-only'
-        aria-live='assertive'
+        id="validation-error-summary"
+        className="sr-only"
+        aria-live="assertive"
       />
 
       {/* Error summary for accessibility and mobile UX */}
       {showErrorSummary && formState.submitCount > 0 && !formState.isValid && (
-        <div className='validation-error-summary' role='alert'>
+        <div className="validation-error-summary" role="alert">
           <h3>Please correct the following errors:</h3>
           <ul>
             {Object.entries(formState.errors).map(([field, error]) => (

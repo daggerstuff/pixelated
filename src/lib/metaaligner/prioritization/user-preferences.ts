@@ -392,7 +392,7 @@ function applySupportStyleAdjustments(
   const styleAdjustments = adjustments[style] || {}
 
   return objectives.map((obj) => {
-    const multiplier = styleAdjustments[obj.key] || 1.0
+    const multiplier = styleAdjustments[obj.key] ?? 1.0
     return {
       ...obj,
       weight: Math.min(obj.weight * multiplier, 1),
@@ -446,7 +446,7 @@ function applyVerbosityAdjustments(
   const verbosityAdjustments = adjustments[verbosity] || {}
 
   return objectives.map((obj) => {
-    const multiplier = verbosityAdjustments[obj.key] || 1.0
+    const multiplier = verbosityAdjustments[obj.key] ?? 1.0
     return {
       ...obj,
       weight: Math.min(obj.weight * multiplier, 1),

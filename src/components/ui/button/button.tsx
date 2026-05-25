@@ -65,9 +65,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const loadingSpinner =
       loading && showSpinner ? (
         <span
-          className='border-current border-t-transparent inline-block h-4 w-4 animate-spin rounded-full border-2'
-          role='status'
-          aria-label='Loading'
+          className="border-current border-t-transparent inline-block h-4 w-4 animate-spin rounded-full border-2"
+          role="status"
+          aria-label="Loading"
         />
       ) : null
 

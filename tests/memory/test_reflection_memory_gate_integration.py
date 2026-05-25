@@ -1,5 +1,3 @@
-import pytest
-
 from ai.memory.reflection_memory import LocalReflectionMemoryClient
 from ai.memory.reflection_types import MemoryCategory, MemoryMetadata
 
@@ -26,13 +24,9 @@ class MockMemoryManager:
 
         memory_id = f"mem-{self.next_id}"
         self.next_id += 1
-        self.stored_memories.append({
-            "id": memory_id,
-            "content": content,
-            "user_id": user_id,
-            "metadata": metadata,
-            "category": category
-        })
+        self.stored_memories.append(
+            {"id": memory_id, "content": content, "user_id": user_id, "metadata": metadata, "category": category}
+        )
         return memory_id
 
     def get_memory(self, memory_id: str, user_id: str | None = None):
@@ -63,8 +57,9 @@ class MockMemoryManager:
         return [mem for mem in self.stored_memories if mem["user_id"] == user_id][:limit]
 
     def get_memories_by_category(self, user_id: str, category: str, limit: int = 100):
-        return [mem for mem in self.stored_memories
-                if mem["user_id"] == user_id and mem["category"] == category][:limit]
+        return [mem for mem in self.stored_memories if mem["user_id"] == user_id and mem["category"] == category][
+            :limit
+        ]
 
     def delete_memories(self, memory_ids: list[str], user_id: str | None = None) -> int:
         count = 0
@@ -91,10 +86,7 @@ def test_add_memory_passes_through_when_content_is_safe():
     import asyncio
 
     content = "This is a normal therapeutic conversation about coping strategies."
-    metadata = MemoryMetadata(
-        user_id="test-user",
-        category=MemoryCategory.GENERAL
-    )
+    metadata = MemoryMetadata(user_id="test-user", category=MemoryCategory.GENERAL)
 
     memory_id = asyncio.run(client.add_memory(content, metadata))
 
@@ -108,10 +100,7 @@ def test_add_memory_blocks_when_content_is_crisis():
     import asyncio
 
     content = "I want to end my life. I have a plan to do it tonight."
-    metadata = MemoryMetadata(
-        user_id="test-user",
-        category=MemoryCategory.GENERAL
-    )
+    metadata = MemoryMetadata(user_id="test-user", category=MemoryCategory.GENERAL)
 
     memory_id = asyncio.run(client.add_memory(content, metadata))
 
@@ -124,10 +113,7 @@ def test_add_memory_blocks_when_content_contains_pii():
     import asyncio
 
     content = "My name is John Doe and my SSN is 123-45-6789."
-    metadata = MemoryMetadata(
-        user_id="test-user",
-        category=MemoryCategory.GENERAL
-    )
+    metadata = MemoryMetadata(user_id="test-user", category=MemoryCategory.GENERAL)
 
     memory_id = asyncio.run(client.add_memory(content, metadata))
 
@@ -140,10 +126,7 @@ def test_add_memory_handles_empty_content():
     import asyncio
 
     content = ""
-    metadata = MemoryMetadata(
-        user_id="test-user",
-        category=MemoryCategory.GENERAL
-    )
+    metadata = MemoryMetadata(user_id="test-user", category=MemoryCategory.GENERAL)
 
     memory_id = asyncio.run(client.add_memory(content, metadata))
 
@@ -160,7 +143,7 @@ def test_add_memory_preserves_metadata_for_stored_content():
         user_id="test-user-123",
         category=MemoryCategory.THERAPEUTIC_INSIGHT,
         session_id="session-456",
-        tags=["anxiety", "coping-skills"]
+        tags=["anxiety", "coping-skills"],
     )
 
     memory_id = asyncio.run(client.add_memory(content, metadata))

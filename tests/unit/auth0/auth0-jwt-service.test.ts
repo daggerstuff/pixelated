@@ -106,9 +106,9 @@ describe('Auth0 JWT Service', () => {
   describe('validateToken', () => {
     it('should validate a valid access token', async () => {
       const mockPayload = withStandardClaims({
-        sub: 'auth0|123456',
-        exp: Math.floor(Date.now() / 1000) + 3600,
-        jti: 'token-id-123',
+        'sub': 'auth0|123456',
+        'exp': Math.floor(Date.now() / 1000) + 3600,
+        'jti': 'token-id-123',
         'https://pixelated.empathy/app_metadata': { roles: ['admin'] },
         'https://pixelated.empathy/user_metadata': { role: 'admin' },
       })
@@ -220,8 +220,8 @@ describe('Auth0 JWT Service', () => {
       }
 
       const mockUserResponse = {
-        sub: 'auth0|123456',
-        jti: 'new-token-id-456',
+        'sub': 'auth0|123456',
+        'jti': 'new-token-id-456',
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 
@@ -263,8 +263,8 @@ describe('Auth0 JWT Service', () => {
       }
 
       const mockUserResponse = {
-        sub: 'auth0|123456',
-        jti: 'new-token-id-456',
+        'sub': 'auth0|123456',
+        'jti': 'new-token-id-456',
         'https://pixelated.empathy/app_metadata': { roles: ['user'] },
       }
 

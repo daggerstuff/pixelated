@@ -1,5 +1,5 @@
-import { MemoryInventory } from './memory-inventory';
-import { MemoryBlock, ConsolidationPhase } from '../../../types/memory';
+import { MemoryBlock, ConsolidationPhase } from '../../../types/memory'
+import { MemoryInventory } from './memory-inventory'
 
 function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {
   return {
@@ -32,74 +32,122 @@ function makeMemory(overrides: Partial<MemoryBlock> = {}): MemoryBlock {
       remCycles: 3,
       schemaReferences: [],
     },
-  };
+  }
 }
 
 describe('MemoryInventory', () => {
-  let inventory: MemoryInventory;
+  let inventory: MemoryInventory
 
   beforeEach(() => {
-    inventory = new MemoryInventory();
-  });
+    inventory = new MemoryInventory()
+  })
 
   test('add and count memories', () => {
-    expect(inventory.count).toBe(0);
-    inventory.addMemory(makeMemory());
-    expect(inventory.count).toBe(1);
-    inventory.addMemories([makeMemory(), makeMemory()]);
-    expect(inventory.count).toBe(3);
-  });
+    expect(inventory.count).toBe(0)
+    inventory.addMemory(makeMemory())
+    expect(inventory.count).toBe(1)
+    inventory.addMemories([makeMemory(), makeMemory()])
+    expect(inventory.count).toBe(3)
+  })
 
   test('build catalog sorts by importance', () => {
-    inventory.addMemory(makeMemory({ id: 'low', importance: { raw: 0.2, recency: 0, relevance: 0, emotionalWeight: 1, actionability: 0 } }));
-    inventory.addMemory(makeMemory({ id: 'high', importance: { raw: 0.9, recency: 0, relevance: 0, emotionalWeight: 1, actionability: 0 } }));
-    inventory.addMemory(makeMemory({ id: 'mid', importance: { raw: 0.5, recency: 0, relevance: 0, emotionalWeight: 1, actionability: 0 } }));
+    inventory.addMemory(
+      makeMemory({
+        id: 'low',
+        importance: {
+          raw: 0.2,
+          recency: 0,
+          relevance: 0,
+          emotionalWeight: 1,
+          actionability: 0,
+        },
+      }),
+    )
+    inventory.addMemory(
+      makeMemory({
+        id: 'high',
+        importance: {
+          raw: 0.9,
+          recency: 0,
+          relevance: 0,
+          emotionalWeight: 1,
+          actionability: 0,
+        },
+      }),
+    )
+    inventory.addMemory(
+      makeMemory({
+        id: 'mid',
+        importance: {
+          raw: 0.5,
+          recency: 0,
+          relevance: 0,
+          emotionalWeight: 1,
+          actionability: 0,
+        },
+      }),
+    )
 
-    const catalog = inventory.buildCatalog();
-    expect(catalog.byImportance[0].id).toBe('high');
-    expect(catalog.byImportance[1].id).toBe('mid');
-    expect(catalog.byImportance[2].id).toBe('low');
-  });
+    const catalog = inventory.buildCatalog()
+    expect(catalog.byImportance[0].id).toBe('high')
+    expect(catalog.byImportance[1].id).toBe('mid')
+    expect(catalog.byImportance[2].id).toBe('low')
+  })
 
   test('groups by session', () => {
-    inventory.addMemory(makeMemory({ sessionId: 'sess_a' }));
-    inventory.addMemory(makeMemory({ sessionId: 'sess_a' }));
-    inventory.addMemory(makeMemory({ sessionId: 'sess_b' }));
+    inventory.addMemory(makeMemory({ sessionId: 'sess_a' }))
+    inventory.addMemory(makeMemory({ sessionId: 'sess_a' }))
+    inventory.addMemory(makeMemory({ sessionId: 'sess_b' }))
 
-    const catalog = inventory.buildCatalog();
-    expect(catalog.bySession['sess_a'].count).toBe(2);
-    expect(catalog.bySession['sess_b'].count).toBe(1);
-  });
+    const catalog = inventory.buildCatalog()
+    expect(catalog.bySession['sess_a'].count).toBe(2)
+    expect(catalog.bySession['sess_b'].count).toBe(1)
+  })
 
   test('groups by valence', () => {
-    inventory.addMemory(makeMemory({ emotions: { valence: -0.5, arousal: 0.5, categories: [] } }));
-    inventory.addMemory(makeMemory({ emotions: { valence: 0.0, arousal: 0.5, categories: [] } }));
-    inventory.addMemory(makeMemory({ emotions: { valence: 0.5, arousal: 0.5, categories: [] } }));
+    inventory.addMemory(
+      makeMemory({ emotions: { valence: -0.5, arousal: 0.5, categories: [] } }),
+    )
+    inventory.addMemory(
+      makeMemory({ emotions: { valence: 0.0, arousal: 0.5, categories: [] } }),
+    )
+    inventory.addMemory(
+      makeMemory({ emotions: { valence: 0.5, arousal: 0.5, categories: [] } }),
+    )
 
-    const catalog = inventory.buildCatalog();
-    expect(catalog.byValence['negative'].count).toBe(1);
-    expect(catalog.byValence['neutral'].count).toBe(1);
-    expect(catalog.byValence['positive'].count).toBe(1);
-  });
+    const catalog = inventory.buildCatalog()
+    expect(catalog.byValence['negative'].count).toBe(1)
+    expect(catalog.byValence['neutral'].count).toBe(1)
+    expect(catalog.byValence['positive'].count).toBe(1)
+  })
 
   test('tenant isolation', () => {
-    inventory.addMemory(makeMemory({ tenantId: 'tenant_a' }));
-    inventory.addMemory(makeMemory({ tenantId: 'tenant_b' }));
+    inventory.addMemory(makeMemory({ tenantId: 'tenant_a' }))
+    inventory.addMemory(makeMemory({ tenantId: 'tenant_b' }))
 
-    expect(inventory.getTenantMemories('tenant_a').length).toBe(1);
-    expect(inventory.getTenantMemories('tenant_b').length).toBe(1);
-  });
+    expect(inventory.getTenantMemories('tenant_a').length).toBe(1)
+    expect(inventory.getTenantMemories('tenant_b').length).toBe(1)
+  })
 
   test('crisis filtering', () => {
-    inventory.addMemory(makeMemory({ gating: { crisisFlag: true, piiStatus: 'absent', traumaIndicators: [], consentGate: 'open' } }));
-    inventory.addMemory(makeMemory());
+    inventory.addMemory(
+      makeMemory({
+        gating: {
+          crisisFlag: true,
+          piiStatus: 'absent',
+          traumaIndicators: [],
+          consentGate: 'open',
+        },
+      }),
+    )
+    inventory.addMemory(makeMemory())
 
-    expect(inventory.getCrisisMemories().length).toBe(1);
-  });
+    expect(inventory.getCrisisMemories().length).toBe(1)
+  })
 
   test('clear removes all', () => {
-    inventory.addMemories([makeMemory(), makeMemory()]);
-    inventory.clear();
-    expect(inventory.count).toBe(0);
-  });
-});
+    inventory.addMemories([makeMemory(), makeMemory()])
+    inventory.clear()
+    expect(inventory.count).toBe(0)
+  })
+})

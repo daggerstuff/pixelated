@@ -296,7 +296,9 @@ class DatabaseService:
                     json.dumps(analysis.keyword_analysis or {}),
                     json.dumps(analysis.contextual_analysis or {}),
                     json.dumps([rec.model_dump() for rec in analysis.recommendations]),
-                    json.dumps([cf.model_dump() for cf in analysis.counterfactual_scenarios]),
+                    json.dumps(
+                        [cf.model_dump() for cf in analysis.counterfactual_scenarios]
+                    ),
                     analysis.processing_time_ms,
                     analysis.model_version,
                     analysis.language_detected,

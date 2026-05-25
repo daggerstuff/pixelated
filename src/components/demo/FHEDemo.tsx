@@ -87,28 +87,28 @@ export const FHEDemo: FC<Props> = ({
   }, [])
 
   return (
-    <div className='space-y-4'>
-      <div className='bg-muted/30 rounded-lg border p-4'>
-        <p className='text-muted-foreground text-sm'>{defaultMessage}</p>
+    <div className="space-y-4">
+      <div className="bg-muted/30 rounded-lg border p-4">
+        <p className="text-muted-foreground text-sm">{defaultMessage}</p>
       </div>
 
-      <div className='grid gap-4 md:grid-cols-3'>
-        <div className='space-y-2 md:col-span-2'>
-          <label className='text-sm font-medium'>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-sm font-medium">
             Plaintext Message
             <textarea
-              className='mt-1 min-h-[120px] w-full rounded border bg-background p-3'
+              className="mt-1 min-h-[120px] w-full rounded border bg-background p-3"
               value={plainText}
               onChange={(e) => setPlainText(e.target.value)}
-              placeholder='Type text to process under FHE'
+              placeholder="Type text to process under FHE"
             />
           </label>
         </div>
-        <div className='space-y-2'>
-          <label className='text-sm font-medium'>
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
             Operation
             <select
-              className='mt-1 w-full rounded border bg-background p-2'
+              className="mt-1 w-full rounded border bg-background p-2"
               value={operation}
               onChange={(e) =>
                 setOperation(
@@ -125,7 +125,7 @@ export const FHEDemo: FC<Props> = ({
           </label>
 
           <button
-            className='bg-blue-600 text-white mt-4 w-full rounded py-2 disabled:opacity-60'
+            className="bg-blue-600 text-white mt-4 w-full rounded py-2 disabled:opacity-60"
             onClick={handleProcess}
             disabled={isLoading}
           >
@@ -133,7 +133,7 @@ export const FHEDemo: FC<Props> = ({
           </button>
 
           <button
-            className='mt-2 w-full rounded border py-2'
+            className="mt-2 w-full rounded border py-2"
             onClick={handleRotateKeys}
             disabled={isLoading}
           >
@@ -143,14 +143,14 @@ export const FHEDemo: FC<Props> = ({
       </div>
 
       {error && (
-        <div className='border-red-400 bg-red-50 text-red-700 rounded border p-3'>
+        <div className="border-red-400 bg-red-50 text-red-700 rounded border p-3">
           {error}
         </div>
       )}
 
-      <div className='rounded border p-4'>
-        <h3 className='mb-2 text-lg font-semibold'>Result</h3>
-        <pre className='overflow-auto text-sm'>
+      <div className="rounded border p-4">
+        <h3 className="mb-2 text-lg font-semibold">Result</h3>
+        <pre className="overflow-auto text-sm">
           {JSON.stringify(result, null, 2)}
         </pre>
       </div>

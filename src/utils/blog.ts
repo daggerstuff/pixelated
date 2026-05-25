@@ -129,9 +129,7 @@ export function filterBlogPosts(
   }
 
   if (filters.tag) {
-    filtered = filtered.filter(
-      (post) => post.data.tags?.includes(filters.tag),
-    )
+    filtered = filtered.filter((post) => post.data.tags?.includes(filters.tag))
   }
 
   // Sort by publication date (newest first)

@@ -110,9 +110,7 @@ export const getVisualRegressionData =
 
                 screenshots.push(screenshot)
 
-                if (!byPage[page]) {
-                  byPage[page] = []
-                }
+                byPage[page] ??= []
                 byPage[page].push(screenshot)
               }
             }

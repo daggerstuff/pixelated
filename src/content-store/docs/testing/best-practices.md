@@ -572,9 +572,9 @@ software.
 
 For more detailed information on specific testing patterns and setup, refer to:
 
-- [Test Patterns Documentation](/docs/api/test-patterns)
-- [Testing Setup Guides](/docs/testing/setup-guides)
-- [Debugging Guide](/docs/testing/debugging)
+- [Test Patterns Documentation](../api/test-patterns.md)
+- [Testing Setup Guides](./setup-guides.md)
+- [Debugging Guide](./debugging.md)
 
 If you have questions or need assistance with testing, please reach out to the
 development team or open an issue on GitHub.

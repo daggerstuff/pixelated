@@ -277,7 +277,7 @@ export class BiasMetricsCollector {
 
     metrics.forEach((metric) => {
       const level = metric.alert_level || 'low'
-      distribution[level] = (distribution[level] || 0) + 1
+      distribution[level] = (distribution[level] ?? 0) + 1
     })
 
     return distribution

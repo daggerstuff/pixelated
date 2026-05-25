@@ -361,8 +361,7 @@ export class DocumentVersioningService {
     const versionResult = await executor.execute(
       sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`,
     )
-    const newVersion =
-      (Number((versionResult.rows[0])?.max_version) || 0) + 1
+    const newVersion = (Number(versionResult.rows[0]?.max_version) || 0) + 1
 
     const versionId = uuidv4()
     await executor.execute(sql`

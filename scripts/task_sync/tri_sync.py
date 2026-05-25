@@ -6,8 +6,8 @@ import hashlib
 import json
 import os
 import re
-import shutil
 import shlex
+import shutil
 import subprocess
 import sys
 from collections.abc import Iterable, Mapping, Sequence
@@ -20,8 +20,8 @@ from typing import Any
 from scripts.task_sync.provider_bridge import (
     apply_provider_action,
     export_asana_tasks,
-    export_jira_issues,
     export_github_issues,
+    export_jira_issues,
     export_linear_issues,
     extract_provider_target_id,
 )
@@ -187,11 +187,7 @@ def _parse_updated_at(payload: Mapping[str, Any], *paths: str) -> datetime | Non
 
 
 def _parse_provider_ids(metadata: Mapping[str, str]) -> dict[str, str]:
-    return {
-        provider: external_id
-        for provider, external_id in metadata.items()
-        if provider in DEFAULT_PROVIDER_ORDER
-    }
+    return {provider: external_id for provider, external_id in metadata.items() if provider in DEFAULT_PROVIDER_ORDER}
 
 
 def task_body_without_sync_block(body: str) -> str:
@@ -279,9 +275,7 @@ def provider_ids_match(existing: Mapping[str, str], expected: Mapping[str, str])
     }
 
 
-def records_are_in_sync(
-    existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]
-) -> bool:
+def records_are_in_sync(existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]) -> bool:
     same_title = existing.title.strip() == canonical.title.strip()
     same_body = record_clean_body(existing) == record_clean_body(canonical)
     same_status = normalize_status(existing.status) == normalize_status(canonical.status)
@@ -293,8 +287,50 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     if not records:
         raise ValueError("Cannot select a canonical record from an empty sequence")
 
-    def sort_key(record: TaskRecord) -> tuple[datetime, int]:
-        return (record.updated_at, PROVIDER_PRIORITY.get(record.provider, 0))
+    def compute_strength_score(title: str, clean_body: str) -> float:
+        score = 0.0
+
+        # Base score is length
+        score += len(clean_body)
+
+        # Check if it is a migration stub
+        is_stub = False
+        if "migrated from" in clean_body.lower() and len(clean_body) < 250:
+            lines = [line.strip() for line in clean_body.splitlines() if line.strip()]
+            stub_keywords = {"migrated from", "source type", "source status", "source priority", "priority:", "status:"}
+            match_count = sum(1 for line in lines if any(k in line.lower() for k in stub_keywords))
+            if match_count >= len(lines) - 1:
+                is_stub = True
+
+        if is_stub:
+            score -= 5000.0
+
+        # Proper markdown headers check
+        header_count = len(re.findall(r"^#{1,6}\s+\S+", clean_body, re.MULTILINE))
+        score += header_count * 50.0
+
+        # Check for corrupted list headers, e.g. code blocks containing '1. ' or list-like headers
+        # like '1. Task Overview' or '  1. Implementation Checklist'
+        corrupted_headers = len(re.findall(r"```\s*\n\s*\d+\.\s+\S+", clean_body))
+        corrupted_headers += len(re.findall(r"^\s*\d+\.\s+(Task Overview|Implementation Checklist|Objective|Milestones|Success Metrics|Definition of Done|Verified Files|Path Notes|Dependencies|Status|Background|Target Release)", clean_body, re.MULTILINE | re.IGNORECASE))
+        score -= corrupted_headers * 100.0
+
+        # Checklist check
+        checklist_count = len(re.findall(r"-\s+\[\s*\]", clean_body))
+        score += checklist_count * 30.0
+
+        # Match words with title
+        title_words = set(re.findall(r"\w+", title.lower()))
+        body_words = set(re.findall(r"\w+", clean_body.lower()))
+        matching_words = title_words.intersection(body_words)
+        score += len(matching_words) * 10.0
+
+        return score
+
+    def sort_key(record: TaskRecord) -> tuple[float, datetime, int]:
+        clean_body = record.clean_body if record.clean_body is not None else task_body_without_sync_block(record.body)
+        score = compute_strength_score(record.title, clean_body)
+        return (score, record.updated_at, PROVIDER_PRIORITY.get(record.provider, 0))
 
     return max(records, key=sort_key)
 
@@ -372,9 +408,7 @@ def build_sync_action(
             source_provider=canonical.provider,
             source_id=canonical.external_id,
             provider_ids=known_provider_ids,
-            updated_at=canonical.updated_at.astimezone(timezone.utc)
-            .isoformat()
-            .replace("+00:00", "Z"),
+            updated_at=canonical.updated_at.astimezone(timezone.utc).isoformat().replace("+00:00", "Z"),
         ),
     )
 
@@ -403,15 +437,11 @@ def build_sync_plan(
 
     for sync_key, records in sorted(grouped.items()):
         provider_lookup = {
-            provider: select_provider_record(
-                [record for record in records if record.provider == provider]
-            )
+            provider: select_provider_record([record for record in records if record.provider == provider])
             for provider in {record.provider for record in records}
         }
         canonical_candidates = [
-            record
-            for record in provider_lookup.values()
-            if normalize_status(record.status) != "closed"
+            record for record in provider_lookup.values() if normalize_status(record.status) != "closed"
         ]
         canonical = select_canonical_record(canonical_candidates or list(provider_lookup.values()))
         provider_ids = merged_provider_ids(records)
@@ -427,9 +457,7 @@ def build_sync_plan(
             if action is not None:
                 plan.append(action)
 
-    plan.sort(
-        key=lambda action: (action.sync_key, provider_index.get(action.provider, 99), action.action)
-    )
+    plan.sort(key=lambda action: (action.sync_key, provider_index.get(action.provider, 99), action.action))
     return plan
 
 
@@ -441,11 +469,7 @@ def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
     }
     for record in records:
         provider_ids.update(
-            {
-                provider: external_id
-                for provider, external_id in record.provider_ids.items()
-                if external_id
-            }
+            {provider: external_id for provider, external_id in record.provider_ids.items() if external_id}
         )
     for provider, record in selected_by_provider.items():
         provider_ids[provider] = record.external_id
@@ -469,9 +493,7 @@ def find_beads_duplicate_groups(
         if len(sync_records) < 2:
             continue
         canonical = select_provider_record(sync_records)
-        stale_records = [
-            record for record in sync_records if record.external_id != canonical.external_id
-        ]
+        stale_records = [record for record in sync_records if record.external_id != canonical.external_id]
         if stale_records:
             duplicates.append((sync_key, canonical, stale_records))
     return duplicates
@@ -531,13 +553,11 @@ def _run_command(command: Sequence[str], *, input_text: str | None = None) -> st
             text=True,
         )
         return completed.stdout.strip()
-    except FileNotFoundError as exc:
+    except FileNotFoundError:
         return ""
 
 
-def _run_process(
-    command: Sequence[str], *, input_text: str | None = None
-) -> subprocess.CompletedProcess[str]:
+def _run_process(command: Sequence[str], *, input_text: str | None = None) -> subprocess.CompletedProcess[str]:
     executable = command[0] if command else "<unknown>"
     if not shutil.which(executable):
         return subprocess.CompletedProcess(
@@ -631,8 +651,7 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         body=body,
         status=status,
         updated_at=_jira_updated_at(payload, field_payload) or datetime.now(timezone.utc),
-        sync_key=_string_or_empty(_first_present(payload, "sync_key", "external_ref"))
-        or metadata.get("key"),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key", "external_ref")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
         raw=fields if isinstance(fields, Mapping) else payload,
@@ -650,7 +669,8 @@ def normalize_github_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         title=_string_or_empty(_first_present(payload, "title")),
         body=body,
         status=status,
-        updated_at=_parse_updated_at(payload, "updated_at", "updated", "created_at", "created") or datetime.now(timezone.utc),
+        updated_at=_parse_updated_at(payload, "updated_at", "updated", "created_at", "created")
+        or datetime.now(timezone.utc),
         sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
@@ -670,7 +690,8 @@ def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         title=_string_or_empty(_first_present(payload, "title")),
         body=body,
         status=status,
-        updated_at=_parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc),
+        updated_at=_parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created")
+        or datetime.now(timezone.utc),
         sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
@@ -785,15 +806,11 @@ _JIRA_ADF_NODE_HANDLERS: dict[str, Any] = {
 
 
 def _jira_status(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> Any:
-    return _first_present(payload, "status") or _first_present(
-        field_payload, "status.name", "status"
-    )
+    return _first_present(payload, "status") or _first_present(field_payload, "status.name", "status")
 
 
 def _jira_title(payload: Mapping[str, Any], field_payload: Mapping[str, Any]) -> str:
-    return _string_or_empty(
-        _first_present(payload, "title", "summary") or _first_present(field_payload, "summary")
-    )
+    return _string_or_empty(_first_present(payload, "title", "summary") or _first_present(field_payload, "summary"))
 
 
 def _jira_updated_at(
@@ -987,11 +1004,7 @@ def update_sync_state(
         if not isinstance(provider_ids, dict):
             provider_ids = {}
         provider_ids.update(
-            {
-                provider: external_id
-                for provider, external_id in action.provider_ids.items()
-                if external_id
-            }
+            {provider: external_id for provider, external_id in action.provider_ids.items() if external_id}
         )
         if result.success and result.target_id:
             provider_ids[action.provider] = result.target_id
@@ -1124,9 +1137,7 @@ def _apply_bridge_action(
     stdout = (getattr(completed, "stdout", "") or "").strip()
     payload = _parse_bridge_stdout_payload(stdout)
     target_id = (
-        extract_provider_target_id(action.provider, payload)
-        if isinstance(payload, Mapping)
-        else None
+        extract_provider_target_id(action.provider, payload) if isinstance(payload, Mapping) else None
     ) or action.target_id
     return SyncExecutionResult(
         provider=action.provider,
@@ -1184,9 +1195,7 @@ def apply_sync_action(
         return _apply_direct_provider_action(action)
 
     if not has_provider_command:
-        raise RuntimeError(
-            f"No sync execution path configured for provider '{action.provider}'."
-        )
+        raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
 
     return _apply_bridge_action(
         action,
@@ -1226,6 +1235,7 @@ def build_follow_up_plan(
     plan: Sequence[SyncAction],
     results: Sequence[SyncExecutionResult],
 ) -> list[SyncAction]:
+    enabled_providers = resolve_enabled_providers_from_env()
     grouped: dict[str, list[tuple[SyncAction, SyncExecutionResult]]] = {}
     for action, result in zip(plan, results):
         if not result.success or not result.target_id:
@@ -1241,11 +1251,7 @@ def build_follow_up_plan(
         current_provider_ids: dict[str, str] = {}
         for action, result in pairs:
             merged_provider_ids.update(
-                {
-                    provider: external_id
-                    for provider, external_id in action.provider_ids.items()
-                    if external_id
-                }
+                {provider: external_id for provider, external_id in action.provider_ids.items() if external_id}
             )
             if result.target_id:
                 merged_provider_ids[action.provider] = result.target_id
@@ -1253,6 +1259,8 @@ def build_follow_up_plan(
                     current_provider_ids[action.provider] = result.target_id
 
         for provider, target_id in sorted(merged_provider_ids.items()):
+            if provider not in enabled_providers:
+                continue
             current_ids = dict(template_action.provider_ids)
             if provider in current_provider_ids:
                 current_ids[provider] = current_provider_ids[provider]
@@ -1309,9 +1317,7 @@ def resolve_enabled_providers_from_env() -> tuple[str, ...]:
         return DEFAULT_PROVIDER_ORDER
 
     providers = tuple(
-        provider.strip().lower()
-        for provider in raw.split(",")
-        if provider.strip().lower() in DEFAULT_PROVIDER_ORDER
+        provider.strip().lower() for provider in raw.split(",") if provider.strip().lower() in DEFAULT_PROVIDER_ORDER
     )
     return providers or DEFAULT_PROVIDER_ORDER
 
@@ -1399,10 +1405,7 @@ def main(argv: Sequence[str] | None = None) -> int:
 
 def dataclass_to_dict(value: Any) -> Any:
     if hasattr(value, "__dataclass_fields__"):
-        return {
-            field_name: dataclass_to_dict(getattr(value, field_name))
-            for field_name in value.__dataclass_fields__
-        }
+        return {field_name: dataclass_to_dict(getattr(value, field_name)) for field_name in value.__dataclass_fields__}
     if isinstance(value, Mapping):
         return {key: dataclass_to_dict(item) for key, item in value.items()}
     if isinstance(value, list):

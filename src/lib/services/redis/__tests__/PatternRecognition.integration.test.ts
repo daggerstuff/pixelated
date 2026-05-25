@@ -4,7 +4,6 @@ import type {
   TherapySession,
 } from '../../../ai/services/pattern-recognition-types'
 import { createPatternRecognitionService } from '../../../ai/services/PatternRecognitionFactory'
-
 import type { IRedisService } from '../types'
 
 // Mock FHE service for testing
@@ -93,42 +92,42 @@ const mockRedisService: IRedisService = {
     idleConnections: 1,
     waitingClients: 0,
   }),
-  keys:  async function (_pattern: string): Promise<string[]> {
+  keys: async function (_pattern: string): Promise<string[]> {
     throw new Error('Function not implemented.')
   },
-  deletePattern:  async function (_pattern: string): Promise<void> {
+  deletePattern: async function (_pattern: string): Promise<void> {
     throw new Error('Function not implemented.')
   },
-  hset:  async function (
+  hset: async function (
     _key: string,
     _field: string,
     _value: string,
   ): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  hget:  async function (_key: string, _field: string): Promise<string | null> {
+  hget: async function (_key: string, _field: string): Promise<string | null> {
     throw new Error('Function not implemented.')
   },
-  hgetall:  async function (_key: string): Promise<Record<string, string>> {
+  hgetall: async function (_key: string): Promise<Record<string, string>> {
     throw new Error('Function not implemented.')
   },
-  hdel:  async function (_key: string, _field: string): Promise<number> {
+  hdel: async function (_key: string, _field: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  hlen:  async function (_key: string): Promise<number> {
+  hlen: async function (_key: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  zadd:  async function (
+  zadd: async function (
     _key: string,
     _score: number,
     _member: string,
   ): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  zrem:  async function (_key: string, _member: string): Promise<number> {
+  zrem: async function (_key: string, _member: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  zrange:  async function (
+  zrange: async function (
     _key: string,
     _start: number,
     _stop: number,
@@ -136,31 +135,34 @@ const mockRedisService: IRedisService = {
   ): Promise<string[] | import('../redis-operation-types').RedisZSetMember[]> {
     throw new Error('Function not implemented.')
   },
-  zpopmin:  async function (
+  zpopmin: async function (
     _key: string,
   ): Promise<import('../redis-operation-types').RedisZSetMember[]> {
     throw new Error('Function not implemented.')
   },
-  zcard:  async function (_key: string): Promise<number> {
+  zcard: async function (_key: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  lpush:  async function (_key: string, ..._elements: string[]): Promise<number> {
+  lpush: async function (
+    _key: string,
+    ..._elements: string[]
+  ): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  rpoplpush:  async function (
+  rpoplpush: async function (
     _source: string,
     _destination: string,
   ): Promise<string | null> {
     throw new Error('Function not implemented.')
   },
-  lrem:  async function (
+  lrem: async function (
     _key: string,
     _count: number,
     _value: string,
   ): Promise<number> {
     throw new Error('Function not implemented.')
   },
-  llen:  async function (_key: string): Promise<number> {
+  llen: async function (_key: string): Promise<number> {
     throw new Error('Function not implemented.')
   },
 }

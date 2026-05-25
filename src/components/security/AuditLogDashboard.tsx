@@ -131,9 +131,8 @@ export function AuditLogDashboard() {
         fetchedLogs = fetchedLogs.filter(
           (log) =>
             log.action.toLowerCase().includes(searchLower) ||
-            ((log.resource.type?.toLowerCase().includes(searchLower)) ??
-            (log.resource.id &&
-              log.resource.id.toLowerCase().includes(searchLower))) ||
+            (log.resource.type?.toLowerCase().includes(searchLower) ??
+              log.resource.id?.toLowerCase().includes(searchLower)) ||
             log.userId.toLowerCase().includes(searchLower),
         )
       }
@@ -150,14 +149,11 @@ export function AuditLogDashboard() {
   }, [fetchLogs])
 
   const getEventTypeStats = () => {
-    const stats = logs.reduce< Record<string, number>>(
-      (acc, log) => {
-        const type = log.action
-        acc[type] = (acc[type] ?? 0) + 1
-        return acc
-      },
-      {},
-    )
+    const stats = logs.reduce<Record<string, number>>((acc, log) => {
+      const type = log.action
+      acc[type] = (acc[type] ?? 0) + 1
+      return acc
+    }, {})
     return Object.entries(stats).map(([name, value]) => ({ name, value }))
   }
 
@@ -181,7 +177,7 @@ export function AuditLogDashboard() {
   ]
 
   return (
-    <div className='space-y-4'>
+    <div className="space-y-4">
       {/* Filters */}
       <Card>
         <CardHeader>
@@ -192,7 +188,7 @@ export function AuditLogDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Select
               value={filters.eventType}
               onValueChange={(value: string) =>
@@ -203,7 +199,7 @@ export function AuditLogDashboard() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=''>All Events</SelectItem>
+                <SelectItem value="">All Events</SelectItem>
                 {eventTypes.map((type) => (
                   <SelectItem key={type} value={type}>
                     {' '}
@@ -213,34 +209,34 @@ export function AuditLogDashboard() {
               </SelectContent>
             </Select>
             <Input
-              placeholder='User ID'
+              placeholder="User ID"
               value={filters.userId}
               onChange={(e) =>
                 setFilters({ ...filters, userId: e.target.value })
               }
             />
             <Input
-              type='date'
+              type="date"
               value={filters.startDate}
               onChange={(e) =>
                 setFilters({ ...filters, startDate: e.target.value })
               }
             />
             <Input
-              type='date'
+              type="date"
               value={filters.endDate}
               onChange={(e) =>
                 setFilters({ ...filters, endDate: e.target.value })
               }
             />
             <Input
-              placeholder='Search...'
+              placeholder="Search..."
               value={filters.searchTerm}
               onChange={(e) =>
                 setFilters({ ...filters, searchTerm: e.target.value })
               }
             />
-            <Button onClick={ async () => fetchLogs()}>Apply Filters</Button>
+            <Button onClick={async () => fetchLogs()}>Apply Filters</Button>
           </div>
         </CardContent>
       </Card>
@@ -254,14 +250,14 @@ export function AuditLogDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='h-[300px]'>
-            <ResponsiveContainer width='100%' height='100%'>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={getEventTypeStats()}>
-                <CartesianGrid strokeDasharray='3 3' />
-                <XAxis dataKey='name' />
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey='value' fill='#3b82f6' />
+                <Bar dataKey="value" fill="#3b82f6" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -275,7 +271,7 @@ export function AuditLogDashboard() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className='py-4 text-center'>Loading...</div>
+            <div className="py-4 text-center">Loading...</div>
           ) : (
             <Table>
               <TableHeader>

@@ -150,7 +150,7 @@ test.describe('Complete System Integration Tests', () => {
     })
 
     test('Health endpoints handle concurrent requests', async () => {
-      const requests = Array.from({ length: 5 },  async () =>
+      const requests = Array.from({ length: 5 }, async () =>
         request.get('/api/health/simple'),
       )
 
@@ -456,7 +456,7 @@ test.describe('Complete System Integration Tests', () => {
     })
 
     test('Concurrent requests are handled efficiently', async () => {
-      const concurrentRequests = Array.from({ length: 10 },  async (_, i) =>
+      const concurrentRequests = Array.from({ length: 10 }, async (_, i) =>
         request.post('/api/bias-analysis/analyze', {
           data: {
             text: `Concurrent test ${i}`,
@@ -495,7 +495,7 @@ test.describe('Complete System Integration Tests', () => {
 
     test('Rate limiting prevents abuse', async () => {
       // Make many rapid requests to trigger rate limiting
-      const requests = Array.from({ length: 70 },  async () =>
+      const requests = Array.from({ length: 70 }, async () =>
         request.get('/api/health/simple'),
       )
 

@@ -35,8 +35,8 @@ export async function monitoringMiddleware(
   const { method } = context.request
   const userAgent = context.request.headers.get('user-agent') ?? 'unknown'
   const ip =
-    (context.request.headers.get('x-forwarded-for') ??
-    context.request.headers.get('x-real-ip')) ??
+    context.request.headers.get('x-forwarded-for') ??
+    context.request.headers.get('x-real-ip') ??
     'unknown'
 
   // Extract user ID from session if available

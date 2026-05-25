@@ -87,10 +87,10 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
       [ATTR_HTTP_TARGET]: url.pathname + url.search,
       [ATTR_HTTP_ROUTE]: url.pathname,
       'http.user_agent': canAccessHeaders
-        ? req.headers.get('user-agent') ?? ''
+        ? (req.headers.get('user-agent') ?? '')
         : '',
       'http.request_id': canAccessHeaders
-        ? req.headers.get('x-request-id') ?? ''
+        ? (req.headers.get('x-request-id') ?? '')
         : '',
     },
   })

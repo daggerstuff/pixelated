@@ -22,7 +22,7 @@ vi.mock('../AIChatReact', () => {
       props: {
         'data-testid': 'ai-chat-react',
         'data-props': JSON.stringify(props),
-        children: [
+        'children': [
           {
             type: 'div',
             props: {

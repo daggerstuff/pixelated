@@ -72,7 +72,7 @@ export const FadeIn: FC<{ children: ReactNode; delay?: number }> = ({
   children,
   delay = 0,
 }) => (
-  <AnimationWrapper animation='fadeIn' delay={delay}>
+  <AnimationWrapper animation="fadeIn" delay={delay}>
     {children}
   </AnimationWrapper>
 )
@@ -81,7 +81,7 @@ export const SlideUp: FC<{ children: ReactNode; delay?: number }> = ({
   children,
   delay = 0,
 }) => (
-  <AnimationWrapper animation='slideUp' delay={delay}>
+  <AnimationWrapper animation="slideUp" delay={delay}>
     {children}
   </AnimationWrapper>
 )
@@ -90,7 +90,7 @@ export const SlideDown: FC<{ children: ReactNode; delay?: number }> = ({
   children,
   delay = 0,
 }) => (
-  <AnimationWrapper animation='slideDown' delay={delay}>
+  <AnimationWrapper animation="slideDown" delay={delay}>
     {children}
   </AnimationWrapper>
 )
@@ -99,7 +99,7 @@ export const ScaleIn: FC<{ children: ReactNode; delay?: number }> = ({
   children,
   delay = 0,
 }) => (
-  <AnimationWrapper animation='scale' delay={delay}>
+  <AnimationWrapper animation="scale" delay={delay}>
     {children}
   </AnimationWrapper>
 )
@@ -115,7 +115,7 @@ export const HoverLift: FC<{ children: ReactNode; lift?: number }> = ({
 
   return (
     <div
-      className='transition-transform duration-200 ease-out hover:translate-y-[-4px]'
+      className="transition-transform duration-200 ease-out hover:translate-y-[-4px]"
       style={hoverLiftStyle}
     >
       {children}
@@ -127,7 +127,7 @@ export const PressEffect: FC<{ children: ReactNode; scale?: number }> = ({
   children,
   scale: _scale = 0.98,
 }) => (
-  <div className='active:scale-98 transition-transform duration-75 ease-out'>
+  <div className="active:scale-98 transition-transform duration-75 ease-out">
     {children}
   </div>
 )
@@ -160,7 +160,7 @@ export const StaggerContainer: FC<{
   const childrenArray = React.Children.toArray(children)
 
   return (
-    <div className='stagger-container'>
+    <div className="stagger-container">
       {childrenArray.map((child, index) => (
         <AnimationWrapper
           key={index}
@@ -183,7 +183,7 @@ export const SkeletonLoader: FC<{ className?: string; lines?: number }> = ({
     {Array.from({ length: lines }).map((_, index) => (
       <div
         key={index}
-        className='bg-gray-200 dark:bg-gray-700 h-4 animate-pulse rounded'
+        className="bg-gray-200 dark:bg-gray-700 h-4 animate-pulse rounded"
         style={{ animationDelay: `${index * 200}ms` }}
       />
     ))}

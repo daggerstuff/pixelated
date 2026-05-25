@@ -1655,15 +1655,15 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     const typeMap: Partial<Record<string, ThreatIndicator['type']>> = {
       'ip-dst': 'ip',
       'ip-src': 'ip',
-      domain: 'domain',
-      hostname: 'domain',
-      url: 'url',
-      md5: 'hash',
-      sha1: 'hash',
-      sha256: 'hash',
+      'domain': 'domain',
+      'hostname': 'domain',
+      'url': 'url',
+      'md5': 'hash',
+      'sha1': 'hash',
+      'sha256': 'hash',
       'email-src': 'email',
       'email-dst': 'email',
-      filename: 'file',
+      'filename': 'file',
     }
 
     const mapped = typeMap[mispType]

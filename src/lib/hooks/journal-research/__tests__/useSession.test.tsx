@@ -125,7 +125,7 @@ describe('useSession hooks', () => {
 
     it('handles loading state', () => {
       vi.mocked(api.listSessions).mockImplementation(
-         async () => new Promise(() => {}), // Never resolves
+        async () => new Promise(() => {}), // Never resolves
       )
 
       const { result } = renderHook(() => useSessionListQuery(), {

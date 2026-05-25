@@ -74,9 +74,11 @@ export class ThreatCorrelationEngineCore
   private redis!: Redis
   private mongoClient!: MongoClient
   private db!: Db
-  private readonly correlationAlgorithms: Map<string, CorrelationAlgorithm> = new Map()
+  private readonly correlationAlgorithms: Map<string, CorrelationAlgorithm> =
+    new Map()
   private readonly activeCorrelations: Map<string, CorrelationData> = new Map()
-  private readonly correlationPatterns: Map<string, CorrelationPattern> = new Map()
+  private readonly correlationPatterns: Map<string, CorrelationPattern> =
+    new Map()
   private mlModel: tf.Sequential | null = null
 
   constructor(private readonly config: CorrelationConfig) {
@@ -678,12 +680,12 @@ export class ThreatCorrelationEngineCore
     }
 
     return (
-      ((attribution1.actor &&
+      (attribution1.actor &&
         attribution2.actor &&
         attribution1.actor === attribution2.actor) ??
       (attribution1.campaign &&
         attribution2.campaign &&
-        attribution1.campaign === attribution2.campaign)) ??
+        attribution1.campaign === attribution2.campaign) ??
       (attribution1.family &&
         attribution2.family &&
         attribution1.family === attribution2.family)
@@ -1364,7 +1366,7 @@ export class ThreatCorrelationEngineCore
       strong_multi_factor: 'behavioral',
     }
 
-    return mapping[correlationType] || 'general'
+    return mapping[correlationType] ?? 'general'
   }
 
   private async findMatchingPattern(

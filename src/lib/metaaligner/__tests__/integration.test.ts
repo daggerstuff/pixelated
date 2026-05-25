@@ -448,7 +448,7 @@ describe('MetaAligner Integration Tests', () => {
       }))
 
       const evaluations = await Promise.all(
-        requests.map( async (request) => metaAligner.evaluateResponse(request)),
+        requests.map(async (request) => metaAligner.evaluateResponse(request)),
       )
 
       expect(evaluations).toHaveLength(5)

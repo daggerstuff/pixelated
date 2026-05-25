@@ -54,7 +54,8 @@ export class ProductMemoryClient {
     if (!response.ok) {
       const rawError = (await response.json().catch(() => ({}))) as unknown
       const error = isRecord(rawError) ? rawError : {}
-      const errorMessage = typeof error['message'] === 'string' ? error['message'] : undefined
+      const errorMessage =
+        typeof error['message'] === 'string' ? error['message'] : undefined
       throw new Error(
         errorMessage ?? `Failed to add memory: ${response.statusText}`,
       )
@@ -63,7 +64,12 @@ export class ProductMemoryClient {
     const rawData = (await response.json()) as unknown
     const data = isRecord(rawData) ? rawData : {}
     // Support both legacy memory_id and new id format
-    const memoryId = typeof data['id'] === 'string' ? data['id'] : (typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined)
+    const memoryId =
+      typeof data['id'] === 'string'
+        ? data['id']
+        : typeof data['memory_id'] === 'string'
+          ? data['memory_id']
+          : undefined
     if (!memoryId) {
       throw new Error('Memory add response did not include an ID')
     }
@@ -171,8 +177,9 @@ export class ProductMemoryClient {
 
     const rawData = (await response.json()) as unknown
     const data = isRecord(rawData) ? rawData : {}
-    const totalMemories = typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
-    
+    const totalMemories =
+      typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
+
     let categoryCounts: Record<string, number> = {}
     if (isRecord(data['categoryCounts'])) {
       categoryCounts = {}
@@ -189,9 +196,14 @@ export class ProductMemoryClient {
         const act = isRecord(item) ? item : {}
         return {
           id: typeof act['id'] === 'string' ? act['id'] : 'unknown',
-          timestamp: typeof act['timestamp'] === 'string' ? act['timestamp'] : new Date().toISOString(),
-          operation: typeof act['operation'] === 'string' ? act['operation'] : 'unknown',
-          memoryId: typeof act['memoryId'] === 'string' ? act['memoryId'] : undefined,
+          timestamp:
+            typeof act['timestamp'] === 'string'
+              ? act['timestamp']
+              : new Date().toISOString(),
+          operation:
+            typeof act['operation'] === 'string' ? act['operation'] : 'unknown',
+          memoryId:
+            typeof act['memoryId'] === 'string' ? act['memoryId'] : undefined,
         }
       })
     }
@@ -250,10 +262,25 @@ function mapMemoryEntries(memories: unknown): MemoryEntry[] {
     const memory = isRecord(item) ? item : {}
     return {
       id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
-      content: typeof memory['content'] === 'string' ? memory['content'] : (typeof memory['memory'] === 'string' ? memory['memory'] : ''),
+      content:
+        typeof memory['content'] === 'string'
+          ? memory['content']
+          : typeof memory['memory'] === 'string'
+            ? memory['memory']
+            : '',
       metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
-      createdAt: typeof memory['createdAt'] === 'string' ? memory['createdAt'] : (typeof memory['created_at'] === 'string' ? memory['created_at'] : undefined),
-      updatedAt: typeof memory['updatedAt'] === 'string' ? memory['updatedAt'] : (typeof memory['updated_at'] === 'string' ? memory['updated_at'] : undefined),
+      createdAt:
+        typeof memory['createdAt'] === 'string'
+          ? memory['createdAt']
+          : typeof memory['created_at'] === 'string'
+            ? memory['created_at']
+            : undefined,
+      updatedAt:
+        typeof memory['updatedAt'] === 'string'
+          ? memory['updatedAt']
+          : typeof memory['updated_at'] === 'string'
+            ? memory['updated_at']
+            : undefined,
     }
   })
 }

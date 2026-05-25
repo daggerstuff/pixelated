@@ -448,7 +448,7 @@ class PrivacyEngine {
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
       stats.progressStd = Math.sqrt(
         progressValues.reduce(
-          (sum, p) => sum + Math.pow(p - (stats.progressMean || 0), 2),
+          (sum, p) => sum + Math.pow(p - (stats.progressMean ?? 0), 2),
           0,
         ) / progressValues.length,
       )

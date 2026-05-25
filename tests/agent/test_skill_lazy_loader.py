@@ -30,15 +30,11 @@ def load_loader(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, *, path_value: 
             }
         },
     }
-    (agent_root / "skills-index-compressed.json").write_text(
-        json.dumps(index), encoding="utf-8"
-    )
+    (agent_root / "skills-index-compressed.json").write_text(json.dumps(index), encoding="utf-8")
 
     monkeypatch.setenv("AGENT_ROOT", str(agent_root))
 
-    spec = importlib.util.spec_from_file_location(
-        f"skill_lazy_loader_{tmp_path.name}", LOADER_PATH
-    )
+    spec = importlib.util.spec_from_file_location(f"skill_lazy_loader_{tmp_path.name}", LOADER_PATH)
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -81,9 +77,7 @@ def test_loader_ignores_escape_paths_and_uses_canonical_location(
     assert module.get_skill_content("demo-skill") == skill_file.read_text(encoding="utf-8")
 
 
-def test_missing_skill_returns_none_and_handle_raises(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
+def test_missing_skill_returns_none_and_handle_raises(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     module, _ = load_loader(tmp_path, monkeypatch)
 
     assert module.get_skill_content("missing-skill") is None

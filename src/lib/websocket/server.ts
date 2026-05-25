@@ -48,7 +48,9 @@ class TherapyChatWebSocketServer {
           case 'status':
             this.handleStatusUpdate(clientId, message)
             break
-          case "error": { throw new Error('Not implemented yet: "error" case') }
+          case 'error': {
+            throw new Error('Not implemented yet: "error" case')
+          }
           default:
             logger.warn(`Unknown message type: ${message.type}`)
         }

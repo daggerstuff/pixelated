@@ -23,9 +23,9 @@ describe('TherapistProgressTracker', () => {
       activeTime: 3600,
       skillScores: {
         'Active Listening': 85,
-        Empathy: 78,
-        Questioning: 92,
-        Reflection: 71,
+        'Empathy': 78,
+        'Questioning': 92,
+        'Reflection': 71,
       },
       responseTime: 2.5,
       conversationFlow: 88,
@@ -169,7 +169,7 @@ describe('TherapistProgressTracker', () => {
     render(
       <TherapistProgressTracker
         session={mockSession}
-        className='custom-class'
+        className="custom-class"
       />,
     )
 

@@ -156,7 +156,7 @@ export class ErrorBoundary extends Component<Props, State> {
     window.location.reload()
   }
 
-  public override  async render() {
+  public override async render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
         return this.props.fallback
@@ -178,17 +178,17 @@ export class ErrorBoundary extends Component<Props, State> {
         normalizedError?.recoverable
 
       return (
-        <Card className='mx-auto my-8 max-w-lg p-6'>
+        <Card className="mx-auto my-8 max-w-lg p-6">
           <Alert
-            variant='error'
-            title='Something went wrong'
+            variant="error"
+            title="Something went wrong"
             description={userMessage}
           />
 
           {this.state.error && (
-            <details className='text-muted-foreground mt-4 text-xs'>
-              <summary className='cursor-pointer'>Technical details</summary>
-              <pre className='bg-muted mt-2 overflow-auto rounded p-2'>
+            <details className="text-muted-foreground mt-4 text-xs">
+              <summary className="cursor-pointer">Technical details</summary>
+              <pre className="bg-muted mt-2 overflow-auto rounded p-2">
                 {this.state.error.message}
                 {this.state.errorInfo?.componentStack && (
                   <>
@@ -201,9 +201,9 @@ export class ErrorBoundary extends Component<Props, State> {
             </details>
           )}
 
-          <div className='mt-4 flex justify-end gap-2'>
+          <div className="mt-4 flex justify-end gap-2">
             {canRetry && (
-              <Button onClick={this.handleReset} variant='outline'>
+              <Button onClick={this.handleReset} variant="outline">
                 Try Again ({MAX_RETRY_COUNT - this.state.retryCount} attempts
                 left)
               </Button>

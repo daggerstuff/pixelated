@@ -32,7 +32,7 @@ export function IntegrationPanel({
   if (!sessionId) {
     return (
       <div className={cn('text-center py-8', className)}>
-        <p className='text-muted-foreground'>
+        <p className="text-muted-foreground">
           Please select a session to view integration plans
         </p>
       </div>
@@ -42,16 +42,16 @@ export function IntegrationPanel({
   return (
     <div className={cn('space-y-6', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className='text-3xl font-bold'>Integration Planning</h1>
-          <p className='text-muted-foreground mt-1'>
+          <h1 className="text-3xl font-bold">Integration Planning</h1>
+          <p className="text-muted-foreground mt-1">
             Plan and visualize dataset integration strategies
           </p>
         </div>
         <button
           onClick={() => setIsInitiating(true)}
-          className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+          className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
           disabled={initiateMutation.isPending}
         >
           {initiateMutation.isPending
@@ -67,23 +67,23 @@ export function IntegrationPanel({
             <CardTitle>Configure Integration Planning</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className='space-y-4'>
-              <p className='text-muted-foreground text-sm'>
+            <div className="space-y-4">
+              <p className="text-muted-foreground text-sm">
                 Select sources to create integration plans for. Leave empty to
                 plan for all acquired sources.
               </p>
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Target Format</label>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Target Format</label>
                 <select
-                  className='border-input w-full rounded-md border bg-background px-3 py-2 text-sm'
-                  defaultValue='chatml'
+                  className="border-input w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  defaultValue="chatml"
                 >
-                  <option value='chatml'>ChatML</option>
-                  <option value='json'>JSON</option>
-                  <option value='csv'>CSV</option>
+                  <option value="chatml">ChatML</option>
+                  <option value="json">JSON</option>
+                  <option value="csv">CSV</option>
                 </select>
               </div>
-              <div className='flex gap-2'>
+              <div className="flex gap-2">
                 <button
                   onClick={() => {
                     initiateMutation.mutate(
@@ -95,13 +95,13 @@ export function IntegrationPanel({
                       },
                     )
                   }}
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium'
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium"
                 >
                   Plan for All Acquired
                 </button>
                 <button
                   onClick={() => setIsInitiating(false)}
-                  className='border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium'
+                  className="border-input hover:bg-accent rounded-md border bg-background px-4 py-2 text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -118,65 +118,65 @@ export function IntegrationPanel({
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               Loading integration plans...
             </div>
           ) : plans?.items.length === 0 ? (
-            <div className='text-muted-foreground py-8 text-center'>
+            <div className="text-muted-foreground py-8 text-center">
               No integration plans yet. Start integration planning to create
               plans.
             </div>
           ) : (
-            <div className='space-y-4'>
+            <div className="space-y-4">
               {plans?.items.map((plan) => (
                 <Card key={plan.planId}>
                   <CardHeader>
-                    <div className='flex items-center justify-between'>
-                      <CardTitle className='text-lg'>{plan.planId}</CardTitle>
-                      <span className='bg-muted rounded-md px-2 py-1 text-xs font-medium capitalize'>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{plan.planId}</CardTitle>
+                      <span className="bg-muted rounded-md px-2 py-1 text-xs font-medium capitalize">
                         {plan.complexity}
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className='grid gap-4 md:grid-cols-2'>
+                    <div className="grid gap-4 md:grid-cols-2">
                       <div>
-                        <p className='text-muted-foreground text-sm font-medium'>
+                        <p className="text-muted-foreground text-sm font-medium">
                           Source ID
                         </p>
-                        <p className='mt-1'>{plan.sourceId}</p>
+                        <p className="mt-1">{plan.sourceId}</p>
                       </div>
                       <div>
-                        <p className='text-muted-foreground text-sm font-medium'>
+                        <p className="text-muted-foreground text-sm font-medium">
                           Target Format
                         </p>
-                        <p className='mt-1'>{plan.targetFormat}</p>
+                        <p className="mt-1">{plan.targetFormat}</p>
                       </div>
                       <div>
-                        <p className='text-muted-foreground text-sm font-medium'>
+                        <p className="text-muted-foreground text-sm font-medium">
                           Estimated Effort
                         </p>
-                        <p className='mt-1'>
+                        <p className="mt-1">
                           {plan.estimatedEffortHours} hours
                         </p>
                       </div>
                       <div>
-                        <p className='text-muted-foreground text-sm font-medium'>
+                        <p className="text-muted-foreground text-sm font-medium">
                           Created Date
                         </p>
-                        <p className='mt-1'>
+                        <p className="mt-1">
                           {format(plan.createdDate, 'PPpp')}
                         </p>
                       </div>
                       {plan.requiredTransformations.length > 0 && (
-                        <div className='md:col-span-2'>
-                          <p className='text-muted-foreground text-sm font-medium'>
+                        <div className="md:col-span-2">
+                          <p className="text-muted-foreground text-sm font-medium">
                             Required Transformations
                           </p>
-                          <ul className='mt-1 list-inside list-disc space-y-1'>
+                          <ul className="mt-1 list-inside list-disc space-y-1">
                             {plan.requiredTransformations.map(
                               (transformation) => (
-                                <li key={transformation} className='text-sm'>
+                                <li key={transformation} className="text-sm">
                                   {transformation}
                                 </li>
                               ),
@@ -185,15 +185,15 @@ export function IntegrationPanel({
                         </div>
                       )}
                       {Object.keys(plan.schemaMapping).length > 0 && (
-                        <div className='md:col-span-2'>
-                          <p className='text-muted-foreground text-sm font-medium'>
+                        <div className="md:col-span-2">
+                          <p className="text-muted-foreground text-sm font-medium">
                             Schema Mapping
                           </p>
-                          <div className='mt-1 space-y-1'>
+                          <div className="mt-1 space-y-1">
                             {Object.entries(plan.schemaMapping).map(
                               ([key, value]) => (
-                                <div key={key} className='text-sm'>
-                                  <span className='font-medium'>{key}:</span>{' '}
+                                <div key={key} className="text-sm">
+                                  <span className="font-medium">{key}:</span>{' '}
                                   {value}
                                 </div>
                               ),

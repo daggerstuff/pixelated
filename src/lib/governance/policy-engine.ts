@@ -1,10 +1,10 @@
+import type { PolicyStore } from './policy-store'
 import type {
   GovernancePolicy,
   PolicyEvaluationResult,
   PolicyEvaluationContext,
   RequiredCondition,
 } from './types'
-import type { PolicyStore } from './policy-store'
 
 const logger = {
   info: (msg: string) => console.log(`[policy-engine] ${msg}`),
@@ -44,7 +44,7 @@ export class PolicyEngine {
   private readonly policies: Map<string, CompiledPolicy> = new Map()
   private loadedVersion: string | null = null
   private policyStore: PolicyStore | null = null
-  private policyIds: Set<string> = new Set()
+  private readonly policyIds: Set<string> = new Set()
 
   setPolicyStore(store: PolicyStore): void {
     this.policyStore = store
