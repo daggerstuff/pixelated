@@ -66,4 +66,7 @@
   `verifyAuthToken(authHeader)`), and enforce proper error handling for
   missing/invalid tokens.
 
-## 2024-05-24 - XSS in Warning Component | Vulnerability: Unsanitized raw HTML content passed to `set:html` in `Warning.astro`. | Learning: Reusable UI components that accept raw HTML props can be used in multiple places and pass unsanitized input to `set:html`, enabling XSS. | Prevention: Always sanitize raw HTML props using `DOMPurify` before injecting them via `set:html` in shared UI components.
+## 2024-05-24 - Missing Authentication on Dashboard API Endpoint
+- Vulnerability: Unauthenticated access to dashboard data endpoint.
+- Learning: Global middleware may not cover all API routes, exposing endpoints that erroneously rely on `request.user`.
+- Prevention: Ensure endpoints explicitly verify tokens or are covered by the global middleware pattern.

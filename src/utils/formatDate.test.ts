@@ -1,5 +1,5 @@
 /** @vitest-environment jsdom */
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 
 import { formatDate, isValidDate } from './formatDate'
 
@@ -24,12 +24,12 @@ describe('isValidDate', () => {
 
 describe('formatDate', () => {
   describe('relative formatting', () => {
-    beforeEach(() => {
+    beforeAll(() => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))
     })
 
-    afterEach(() => {
+    afterAll(() => {
       vi.useRealTimers()
     })
 

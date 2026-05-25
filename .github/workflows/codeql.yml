@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ matrix.language }}-${{ github.ref }}
+      group: codeql-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     strategy:
       fail-fast: false
@@ -64,7 +64,7 @@ jobs:
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
-          version: 11.3.0
+          version: 11.2.2
           run_install: false
 
       - name: Get pnpm store directory
