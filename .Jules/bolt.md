@@ -40,3 +40,7 @@ during React renders when rendering filter lists. Action: Replaced
 Learning: Repeated Date instantiation and toLocaleDateString() calls inside
 React map loops are an expensive performance bottleneck. Action: Memoized
 derived chart data in SessionChart to compute strings once per data change.
+
+## 2024-05-20 - Extract Map Lookups for Component State Colors
+- Learning: Repeated nested conditional ternaries creating string constants inside a .map array loop over data causes unnecessary allocations and blocks.
+- Action: Extracted RISK_DOT_COLORS, RISK_COLORS, and SEVERITY_COLORS dictionary maps to module scope, outside the dashboard component.
