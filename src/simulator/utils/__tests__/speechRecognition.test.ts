@@ -32,6 +32,21 @@ describe('analyzeTherapeuticTechniques', () => {
     )
     expect(result).toEqual({})
   })
+
+  it('detects single and multiple techniques with proper confidence scoring', () => {
+    // Tests reflection pattern: "it sounds like you're feeling"
+    // Plus open_question pattern: "how do you cope?"
+    const result = analyzeTherapeuticTechniques(
+      "It sounds like you're feeling anxious, how do you cope with that?",
+    )
+    expect(result).toHaveProperty('reflection')
+    // 0.7 base + 0.3 * (1/3 reflection patterns matched) = 0.8
+    expect(result['reflection']!).toBeCloseTo(0.8, 1)
+
+    expect(result).toHaveProperty('open_question')
+    // 0.7 base + 0.3 * (1/4 open_question patterns matched) = 0.775
+    expect(result['open_question']!).toBeCloseTo(0.775, 3)
+  })
 })
 
 describe('getTherapeuticPrompts', () => {
