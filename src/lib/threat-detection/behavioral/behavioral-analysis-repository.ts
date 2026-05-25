@@ -106,9 +106,12 @@ export class BehavioralAnalysisRepository {
     const match = timeframe.match(/^(\d+)([hdm])$/)
     if (!match) return 0
 
-    const value = parseInt(match[1], 10)
-    const unit = match[2]
+    const value = parseInt(match[1]!, 10)
+    const unit = match[2]!
 
+    // Switch is exhaustive: the regex guard on line ~106 ensures unit is
+    // one of 'h', 'd', or 'm', so the default branch is unreachable at
+    // runtime. The default exists only as a defensive fallback.
     switch (unit) {
       case 'm':
         return value * 60 * 1000 // minutes
@@ -116,9 +119,6 @@ export class BehavioralAnalysisRepository {
         return value * 60 * 60 * 1000 // hours
       case 'd':
         return value * 24 * 60 * 60 * 1000 // days
-      case undefined: {
-        throw new Error('Not implemented yet: undefined case')
-      }
       default:
         return 0
     }

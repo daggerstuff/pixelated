@@ -64,3 +64,7 @@
   reader announcements if not explicitly hidden.
 - Action: Added `aria-hidden="true"` to decorative SVGs inside links and an
   empty `alt=""` with `aria-hidden="true"` to the decorative brand logo image.
+## 2026-05-24 - Dynamic aria-labels for Alert Dismiss Buttons
+
+- Learning: Hardcoded `aria-label="Dismiss alert"` on dismiss buttons across multiple alerts makes it difficult for screen reader users to distinguish which specific alert they are dismissing.
+- Action: Updated `Alert.astro` dismiss button to dynamically use the alert's title via `aria-label={title ? \`Dismiss \${title} alert\` : "Dismiss alert"}`.

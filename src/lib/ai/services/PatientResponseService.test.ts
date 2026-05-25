@@ -16,7 +16,10 @@ import {
   PatientResponseService,
   type ResponseContext,
   type PatientResponseStyleConfig,
+  createPatientResponseService,
+  createTestPatientResponseService,
 } from './PatientResponseService'
+import { EmotionSynthesizer } from '../emotions/EmotionSynthesizer'
 import { KVStore } from '../../db/KVStore'
 
 type ProfileServiceSpy = MockInstance<
@@ -109,6 +112,7 @@ const createTestPatientProfile = (
 
 describe('PatientResponseService', () => {
   let responseService: PatientResponseService
+  let testEmotionSynthesizer: EmotionSynthesizer
 
   // Base style config for tests, specific tests will override parts of this
   const baseStyleConfig: PatientResponseStyleConfig = {
@@ -125,19 +129,25 @@ describe('PatientResponseService', () => {
     resistanceLevel: 2,
   }
 
+  let serviceProfileService: PatientProfileService
+  let serviceConsistencyService: BeliefConsistencyService
+
   beforeEach(() => {
     vi.restoreAllMocks()
-    mockProfileService = new PatientProfileService(new KVStore('test-profile-store'))
-    mockConsistencyService = new BeliefConsistencyService()
-    getProfileByIdSpy = vi.spyOn(mockProfileService, 'getProfileById')
+    serviceProfileService = new PatientProfileService(new KVStore('test-profile-store'))
+    serviceConsistencyService = new BeliefConsistencyService()
+    getProfileByIdSpy = vi.spyOn(serviceProfileService, 'getProfileById')
     checkBeliefConsistencySpy = vi.spyOn(
-      mockConsistencyService,
+      serviceConsistencyService,
       'checkBeliefConsistency',
     )
 
+    // Use a fresh test instance to avoid singleton state pollution
+    testEmotionSynthesizer = EmotionSynthesizer.createTestInstance()
     responseService = new PatientResponseService(
-      mockProfileService,
-      mockConsistencyService,
+      serviceProfileService,
+      serviceConsistencyService,
+      testEmotionSynthesizer,
     )
   })
 
@@ -480,6 +490,328 @@ describe('PatientResponseService', () => {
         'Include textual descriptions of non-verbal cues',
       )
       expect(prompt).not.toContain('You are currently employing')
+    })
+  })
+
+  describe('updateTherapeuticAllianceMetrics - Therapist Utterance Analysis', () => {
+    const testProfile = createTestPatientProfile('alliance1', 'Alliance User')
+
+    it('should boost trust/rapport on therapist validation', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'I understand how you feel, that makes sense.',
+        'Thank you.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeGreaterThan(5)
+      expect(
+        updated.cognitiveModel.therapeuticProgress.rapportScore,
+      ).toBeGreaterThan(5)
+    })
+
+    it('should penalize trust/rapport on dismissive therapist language', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        "Don't worry, it's not a big deal.",
+        'Okay...',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeLessThan(5)
+      expect(
+        updated.cognitiveModel.therapeuticProgress.rapportScore,
+      ).toBeLessThan(5)
+    })
+
+    it('should set therapist perception to dismissive on dismissive language', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        "Don't worry, it's not a big deal.",
+        'Okay.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.therapistPerception,
+      ).toBe('dismissive')
+    })
+
+    it('should detect confrontation language', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        "But isn't it true that you need to accept this?",
+        'I guess so.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.therapistPerception,
+      ).toBe('challenging')
+    })
+
+    it('should detect reflective statements', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        "So you're saying that things have been difficult.",
+        'Yes, exactly, that really resonates with me.',  // >= 15 chars to avoid short-response defensive penalty
+      )
+      // Reflective statements boost rapport
+      expect(
+        updated.cognitiveModel.therapeuticProgress.rapportScore,
+      ).toBeGreaterThan(5)
+    })
+
+    it('should detect gentle challenge', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Have you considered looking at it differently?',
+        'Not really.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeLessThan(5)
+    })
+  })
+
+  describe('updateTherapeuticAllianceMetrics - Patient Utterance Analysis', () => {
+    const testProfile = createTestPatientProfile('alliance2', 'Alliance Patient')
+
+    it('should boost trust/rapport on patient agreement', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'How does that sound?',
+        "That's right, I feel understood.",
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeGreaterThan(5)
+    })
+
+    it('should penalize trust on patient disagreement and change perception to confusing', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Do you agree?',
+        "No but I don't think so.",
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeLessThan(5)
+      expect(
+        updated.cognitiveModel.therapeuticProgress.therapistPerception,
+      ).toBe('confusing')
+    })
+
+    it('should penalize trust on defensive short response', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Can you tell me more?',
+        'Fine.', // Short response triggers defensiveness
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeLessThan(5)
+    })
+
+    it('should update perception to supportive when patient agrees with challenge', () => {
+      // First set perception to challenging
+      const afterChallenge = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Have you considered this might be a pattern?',
+        'I guess so.',
+      )
+      expect(
+        afterChallenge.cognitiveModel.therapeuticProgress.therapistPerception,
+      ).toBe('challenging')
+
+      // Now patient agrees, perception should become supportive
+      const afterAgreement = responseService['updateTherapeuticAllianceMetrics'](
+        afterChallenge,
+        'How does that make you feel?',
+        "I agree, that's right.",
+      )
+      expect(
+        afterAgreement.cognitiveModel.therapeuticProgress.therapistPerception,
+      ).toBe('supportive')
+    })
+  })
+
+  describe('updateTherapeuticAllianceMetrics - Transference State', () => {
+    const testProfile = createTestPatientProfile('trans1', 'Transference User')
+
+    it('should detect maternal transference trigger', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Tell me about your mother.',
+        "She's just like my mother.",
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.transferenceState,
+      ).toBe('maternal')
+    })
+
+    it('should detect paternal transference trigger', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'Tell me about your father.',
+        "He's just like my father.",
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.transferenceState,
+      ).toBe('paternal')
+    })
+
+    it('should detect positive-idealizing transference', () => {
+      // Set high trust, high rapport, supportive perception
+      const profileHigh = createTestPatientProfile('trans2', 'High Rapport')
+      profileHigh.cognitiveModel.therapeuticProgress.trustLevel = 8
+      profileHigh.cognitiveModel.therapeuticProgress.rapportScore = 9
+      profileHigh.cognitiveModel.therapeuticProgress.therapistPerception =
+        'supportive'
+
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        profileHigh,
+        'That was really helpful.',
+        'I feel so much better.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.transferenceState,
+      ).toBe('positive-idealizing')
+    })
+
+    it('should detect negative-critical transference', () => {
+      const profileLow = createTestPatientProfile('trans3', 'Low Trust')
+      profileLow.cognitiveModel.therapeuticProgress.trustLevel = 2
+      profileLow.cognitiveModel.therapeuticProgress.therapistPerception =
+        'dismissive'
+
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        profileLow,
+        'Good morning.',  // Neutral — doesn't match validation/confrontation/dismissive patterns
+        'Whatever.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.transferenceState,
+      ).toBe('negative-critical')
+    })
+
+    it('should keep transference as none when no triggers match', () => {
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        testProfile,
+        'How was your week?',
+        'It was okay.',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.transferenceState,
+      ).toBe('none')
+    })
+  })
+
+  describe('updateTherapeuticAllianceMetrics - NaN Handling', () => {
+    it('should handle unset trust level and rapport score', () => {
+      const profile = createTestPatientProfile('nan1', 'NaN User')
+      ;(profile.cognitiveModel.therapeuticProgress.trustLevel as unknown) =
+        undefined
+      ;(profile.cognitiveModel.therapeuticProgress.rapportScore as unknown) =
+        undefined
+
+      const updated = responseService['updateTherapeuticAllianceMetrics'](
+        profile,
+        'Hello',
+        'Hi',
+      )
+      expect(
+        updated.cognitiveModel.therapeuticProgress.trustLevel,
+      ).toBeGreaterThanOrEqual(0)
+      expect(
+        updated.cognitiveModel.therapeuticProgress.rapportScore,
+      ).toBeGreaterThanOrEqual(0)
+    })
+  })
+
+  describe('Basic Emotional State Methods', () => {
+    it('getDefaultEmotionalProfile should return a valid profile', () => {
+      const profile = responseService.getDefaultEmotionalProfile()
+      expect(profile).toHaveProperty('emotions')
+      expect(profile).toHaveProperty('id')
+      expect(profile.emotions.neutral).toBeGreaterThanOrEqual(0)
+    })
+
+    it('getCurrentEmotionalProfile should return null initially', () => {
+      const profile = responseService.getCurrentEmotionalProfile()
+      expect(profile).toBeNull()
+    })
+
+    it('resetEmotionalState should not throw', () => {
+      expect(() => responseService.resetEmotionalState()).not.toThrow()
+    })
+  })
+
+  describe('synthesizeEmotionalContext', () => {
+    it('should synthesize emotional context for subtle nuance', async () => {
+      const profile = createTestPatientProfile('synth1', 'Synth User')
+      const context: ResponseContext = {
+        profile,
+        styleConfig: { ...baseStyleConfig, emotionalNuance: 'subtle', emotionalIntensity: 0.5 },
+        sessionNumber: 1,
+      }
+      const result = await responseService.synthesizeEmotionalContext(
+        context,
+        'sadness',
+      )
+      expect(typeof result).toBe('string')
+      expect(result.length).toBeGreaterThan(0)
+    })
+
+    it('should synthesize emotional context for overt nuance', async () => {
+      const profile = createTestPatientProfile('synth2', 'Synth Overt')
+      const context: ResponseContext = {
+        profile,
+        styleConfig: {
+          ...baseStyleConfig,
+          emotionalNuance: 'overt',
+          emotionalIntensity: 0.8,
+          primaryEmotion: 'joy',
+        },
+        sessionNumber: 1,
+      }
+      const result = await responseService.synthesizeEmotionalContext(
+        context,
+        'joy',
+      )
+      expect(typeof result).toBe('string')
+    })
+
+    it('should synthesize emotional context for suppressed nuance', async () => {
+      const profile = createTestPatientProfile('synth3', 'Synth Suppressed')
+      const context: ResponseContext = {
+        profile,
+        styleConfig: { ...baseStyleConfig, emotionalNuance: 'suppressed', emotionalIntensity: 0.4 },
+        sessionNumber: 1,
+      }
+      const result = await responseService.synthesizeEmotionalContext(
+        context,
+        'anger',
+      )
+      expect(typeof result).toBe('string')
+    })
+  })
+
+  describe('Factory Functions', () => {
+    it('createPatientResponseService should throw without profileService', () => {
+      expect(() => createPatientResponseService()).toThrow('profileService')
+    })
+
+    it('createPatientResponseService should create service with dependencies', () => {
+      const ps = new PatientProfileService(new KVStore('factory-test'))
+      const svc = createPatientResponseService({ profileService: ps })
+      expect(svc).toBeInstanceOf(PatientResponseService)
+    })
+
+    it('createTestPatientResponseService should throw without profileService', () => {
+      expect(() => createTestPatientResponseService()).toThrow('profileService')
+    })
+
+    it('createTestPatientResponseService should create service with dependencies', () => {
+      const ps = new PatientProfileService(new KVStore('test-factory'))
+      const svc = createTestPatientResponseService({ profileService: ps })
+      expect(svc).toBeInstanceOf(PatientResponseService)
     })
   })
 })

@@ -183,7 +183,11 @@ export const BiasAnalyticsChart: React.FC<BiasAnalyticsChartProps> = ({
           ref={canvasRef}
           className="w-full"
           style={{ height: `${height}px` }}
-        />
+          role="img"
+          aria-label={`${title} chart showing bias score, sessions, and alerts`}
+        >
+          Your browser does not support the canvas element.
+        </canvas>
         {data.length === 0 && (
           <div className="text-gray-400 absolute inset-0 flex items-center justify-center">
             <div className="text-center">
