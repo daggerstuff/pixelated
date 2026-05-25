@@ -7,6 +7,7 @@ describe('toggleFadeEffect', () => {
     document.body.innerHTML = '<div id="test-el" class="hidden"></div>'
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
+      configurable: true,
       value: vi.fn().mockImplementation(query => ({
         matches: false,
         media: query,
