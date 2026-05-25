@@ -3,20 +3,38 @@ export const prerender = false
 import type { AuthenticatedRequest } from '@/lib/auth/auth0-middleware'
 
 import { createBuildSafeLogger } from '../../lib/logging/build-safe-logger'
+import { verifyAuthToken } from '../../utils/auth'
 
 const logger = createBuildSafeLogger('default')
 
 export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
   try {
-    // Authentication is handled by middleware, so we can safely access user data
-    // The user object is attached to the request by the middleware
-    const user = request.user
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authorization header required' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
 
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
+    const token = authHeader.startsWith('Bearer ')
+      ? authHeader.slice(7)
+      : authHeader
+
+    let user
+    try {
+      user = await verifyAuthToken(token)
+    } catch (error) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        {
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
 
     // Using mock data for beta launch - replace with database integration post-beta
@@ -42,7 +60,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
       ],
       securityLevel: 'hipaa',
       user: {
-        id: user.id,
+        id: user.userId,
         email: user.email,
         role: user.role,
       },
