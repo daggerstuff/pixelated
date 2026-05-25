@@ -77,6 +77,7 @@ minimumReleaseAgeExclude:
   - dompurify@3.4.0
   - axios@0.31.1
   - axios@0.30.3
+  - hono@4.12.23
 
 peerDependencyRules:
   ignoreMissing:
