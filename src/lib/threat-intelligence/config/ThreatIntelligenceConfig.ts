@@ -643,7 +643,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
   database: {
     mongodb: {
       uri:
-        process.env.MONGODB_URI ??
+        process.env['MONGODB_URI'] ??
         'mongodb://localhost:27017/threat_intelligence',
       database: 'threat_intelligence',
       collections: [
@@ -684,9 +684,9 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
       authEnabled: true,
     },
     redis: {
-      url: process.env.REDIS_URL ?? 'redis://localhost:6379',
+      url: process.env['REDIS_URL'] ?? 'redis://localhost:6379',
       cluster: false,
-      nodes: [process.env.REDIS_URL ?? 'redis://localhost:6379'],
+      nodes: [process.env['REDIS_URL'] ?? 'redis://localhost:6379'],
       db: 0,
       keyPrefix: 'threat_intel:',
       ttl: 3600, // 1 hour
@@ -751,7 +751,7 @@ export const DEFAULT_THREAT_INTELLIGENCE_CONFIG: ThreatIntelligenceConfig = {
         service: 'firewall',
         endpoint: 'https://firewall.internal/api/v1/block',
         authType: 'api_key',
-        credentials: { apiKey: process.env.FIREWALL_API_KEY ?? '' },
+        credentials: { apiKey: process.env['FIREWALL_API_KEY'] ?? '' },
         enabled: true,
         timeout: 30000,
         retryPolicy: {
@@ -1148,7 +1148,7 @@ export class ThreatIntelligenceConfigManager {
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for configuration manager')
     } catch (error: unknown) {
@@ -1160,7 +1160,7 @@ export class ThreatIntelligenceConfigManager {
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env.MONGODB_URI ??
+        process.env['MONGODB_URI'] ??
           'mongodb://localhost:27017/threat_intelligence',
       )
       await this.mongoClient.connect()

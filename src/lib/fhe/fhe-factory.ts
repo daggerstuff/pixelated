@@ -141,7 +141,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        encryptedData.metadata?.serializedCiphertext ??
+        encryptedData.metadata?.['serializedCiphertext'] ??
         (encryptedData.data as string)
 
       if (!ciphertext) {
@@ -166,8 +166,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
+      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -200,8 +200,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
+      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -234,8 +234,8 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.serializedCiphertext ?? (a.data as string)
-      const bCiphertext = b.metadata?.serializedCiphertext ?? (b.data as string)
+      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -261,7 +261,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        value.metadata?.serializedCiphertext ?? (value.data as string)
+        value.metadata?.['serializedCiphertext'] ?? (value.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -287,7 +287,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        value.metadata?.serializedCiphertext ?? (value.data as string)
+        value.metadata?.['serializedCiphertext'] ?? (value.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -310,7 +310,7 @@ const sealFHEService: FHEService = {
     try {
       // Extract serializedCiphertext from metadata if available
       const ciphertext =
-        vector.metadata?.serializedCiphertext ?? (vector.data as string)
+        vector.metadata?.['serializedCiphertext'] ?? (vector.data as string)
 
       if (!ciphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -555,11 +555,11 @@ export async function getTenantFHEService(
       if (
         encryptedData &&
         encryptedData.metadata &&
-        encryptedData.metadata.tenantId &&
-        encryptedData.metadata.tenantId !== tenantId
+        encryptedData.metadata['tenantId'] &&
+        encryptedData.metadata['tenantId'] !== tenantId
       ) {
         logger.warn(
-          `Tenant ${tenantId} attempted to decrypt data owned by tenant ${encryptedData.metadata.tenantId}`,
+          `Tenant ${tenantId} attempted to decrypt data owned by tenant ${encryptedData.metadata['tenantId']}`,
         )
         throw new Error(
           'Access denied: cannot decrypt data from another tenant',

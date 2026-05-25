@@ -70,7 +70,7 @@ function isNodeEnvironment(): boolean {
 // Use Node crypto via guarded require when available; fallback to runtime checks for browsers
 const nodeCrypto = tryRequireNode('crypto')
 const nodeCryptoRandomBytes = isNonNullObject(nodeCrypto)
-  ? nodeCrypto.randomBytes
+  ? nodeCrypto['randomBytes']
   : undefined
 
 /**

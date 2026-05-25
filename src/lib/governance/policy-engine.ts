@@ -146,13 +146,13 @@ export class PolicyEngine {
     for (const req of required) {
       switch (req) {
         case 'fhe_encryption':
-          if (!ctx.fheEncryptionActive) missing.push('FHE encryption')
+          if (!ctx['fheEncryptionActive']) missing.push('FHE encryption')
           break
         case 'audit_logged':
-          if (!ctx.auditEnabled) missing.push('audit logging')
+          if (!ctx['auditEnabled']) missing.push('audit logging')
           break
         case 'consent_verified':
-          if (!ctx.consentVerified) missing.push('consent verification')
+          if (!ctx['consentVerified']) missing.push('consent verification')
           break
       }
     }

@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   parseJsonSafely,
   validateAnalysisResults,
-  validateCrisisDetectionResponse,
+  _validateCrisisDetectionResponse,
   parseApiResponse,
 } from './json-validator'
 

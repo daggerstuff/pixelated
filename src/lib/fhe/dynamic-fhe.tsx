@@ -5,7 +5,7 @@
  * and address chunk size warnings.
  */
 
-import React, { useState, useEffect } from 'react'
+import _React, { useState, useEffect } from 'react'
 
 // Dynamic import for the main FHE module
 export const loadFHEModule = async () => {

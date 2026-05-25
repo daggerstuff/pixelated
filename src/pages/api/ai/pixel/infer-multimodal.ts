@@ -15,8 +15,8 @@ import { getSessionFromRequest } from '@/utils/auth'
 
 const logger = createBuildSafeLogger('pixel-infer-multimodal')
 
-const PIXEL_API_URL = process.env.PIXEL_API_URL ?? 'http://localhost:8001'
-const PIXEL_API_KEY = process.env.PIXEL_API_KEY ?? ''
+const PIXEL_API_URL = process.env['PIXEL_API_URL'] ?? 'http://localhost:8001'
+const PIXEL_API_KEY = process.env['PIXEL_API_KEY'] ?? ''
 const REQUEST_TIMEOUT_MS = 45000
 const MAX_AUDIO_BYTES = 25 * 1024 * 1024 // 25MB safety cap
 

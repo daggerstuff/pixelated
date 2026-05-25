@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { SkeletonProfile } from '@/components/ui/skeleton.tsx'
+import { SkeletonProfile } from '@/components/ui/skeleton'
 import type { User } from '@/types/user'
 
 interface ProfileComponentProps {

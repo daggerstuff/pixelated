@@ -316,9 +316,9 @@ export function isEncryptedData(obj: unknown): obj is EncryptedData {
     return false
   }
 
-  const id = obj.id
-  const dataType = obj.dataType
-  const data = obj.data
+  const id = obj['id']
+  const dataType = obj['dataType']
+  const data = obj['data']
 
   return (
     typeof id === 'string' && typeof dataType === 'string' && data !== undefined

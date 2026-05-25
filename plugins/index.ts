@@ -133,7 +133,7 @@ export const rehypePlugins: RehypePlugins = [
       properties: (el: Parameters<CreateProperties>[0]) => {
         let content = ''
         visit(el, 'text', (textNode) => {
-          content += textNode.value
+          content += textNode['value']
         })
         return {
           'class': 'header-anchor',

@@ -9,9 +9,9 @@ export async function getSession(sessionId: string) {
 
 export async function saveSession(sessionData: Record<string, unknown>) {
   // Save session by id
-  if (!('id' in sessionData) || typeof sessionData.id !== 'string') {
+  if (!('id' in sessionData) || typeof sessionData['id'] !== 'string') {
     throw new Error('Session data must have a string id')
   }
-  sessionStore[sessionData.id] = { ...sessionData }
+  sessionStore[sessionData['id']] = { ...sessionData }
   return { ...sessionData, saved: true }
 }

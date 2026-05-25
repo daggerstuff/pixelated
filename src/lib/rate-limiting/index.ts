@@ -130,7 +130,7 @@ export async function checkRateLimitHealth(): Promise<{
   }
 }> {
   try {
-    const redisHealthy = (await redis.ping()) === 'PONG'
+    const redisHealthy = (await redis['ping']()) === 'PONG'
 
     const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
 

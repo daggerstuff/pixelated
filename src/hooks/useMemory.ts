@@ -9,8 +9,8 @@ import {
 } from '../lib/memory/memory-client'
 
 const memoryManager =
-  process.env.NEXT_PUBLIC_USE_LOCAL_MEMORY === 'true' ||
-  process.env.NEXT_PUBLIC_USE_MCP_MEMORY === 'false'
+  process.env['NEXT_PUBLIC_USE_LOCAL_MEMORY'] === 'true' ||
+  process.env['NEXT_PUBLIC_USE_MCP_MEMORY'] === 'false'
     ? localMemoryManager
     : mcpMemoryManager
 

@@ -75,7 +75,7 @@ export class RedisService extends EventEmitter implements IRedisService {
             const urlObj = new URL(this.config.url)
 
             // ALWAYS use the file password if available, as it's the source of truth
-            this.config.password = password
+            this.config['password'] = password
             console.log(
               `[RedisService] Password loaded from ${redisPasswordFile}`,
             )
@@ -140,8 +140,8 @@ export class RedisService extends EventEmitter implements IRedisService {
         },
       }
 
-      if (this.config.password) {
-        redisOptions['password'] = this.config.password
+      if (this.config['password']) {
+        redisOptions['password'] = this.config['password']
       }
 
       if (this.config.keyPrefix) {

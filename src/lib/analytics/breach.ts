@@ -14,7 +14,7 @@ const logger = createBuildSafeLogger('breach-data')
 
 // Initialize MongoDB client
 const mongoUri = process.env['MONGODB_URI']
-const mongoDbName = process.env.MONGODB_DB_NAME
+const mongoDbName = process.env['MONGODB_DB_NAME']
 
 if (!mongoUri || !mongoDbName) {
   throw new Error(

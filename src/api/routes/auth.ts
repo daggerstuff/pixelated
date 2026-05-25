@@ -11,10 +11,10 @@ const router = Router()
  * for Express-based auth flows if needed.
  */
 router.get('/login', (_req: Request, res: Response) => {
-  const auth0Domain = process.env.AUTH0_DOMAIN
-  const clientId = process.env.AUTH0_CLIENT_ID
+  const auth0Domain = process.env['AUTH0_DOMAIN']
+  const clientId = process.env['AUTH0_CLIENT_ID']
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ??
+    process.env['AUTH0_CALLBACK_URL'] ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId) {
@@ -58,11 +58,11 @@ router.get('/callback', async (req: Request, res: Response) => {
     return
   }
 
-  const auth0Domain = process.env.AUTH0_DOMAIN
-  const clientId = process.env.AUTH0_CLIENT_ID
-  const clientSecret = process.env.AUTH0_CLIENT_SECRET
+  const auth0Domain = process.env['AUTH0_DOMAIN']
+  const clientId = process.env['AUTH0_CLIENT_ID']
+  const clientSecret = process.env['AUTH0_CLIENT_SECRET']
   const redirectUri =
-    process.env.AUTH0_CALLBACK_URL ??
+    process.env['AUTH0_CALLBACK_URL'] ??
     `${req.protocol}://${req.get('host')}/api/auth/callback`
 
   if (!auth0Domain || !clientId || !clientSecret) {
@@ -207,10 +207,10 @@ router.get('/callback', async (req: Request, res: Response) => {
  * Returns the Auth0 logout URL; the client must redirect to it.
  */
 router.post('/logout', (req: Request, res: Response) => {
-  const auth0Domain = process.env.AUTH0_DOMAIN
-  const clientId = process.env.AUTH0_CLIENT_ID
+  const auth0Domain = process.env['AUTH0_DOMAIN']
+  const clientId = process.env['AUTH0_CLIENT_ID']
   const returnTo =
-    process.env.AUTH0_LOGOUT_URL ?? `${req.protocol}://${req.get('host')}`
+    process.env['AUTH0_LOGOUT_URL'] ?? `${req.protocol}://${req.get('host')}`
 
   if (!auth0Domain || !clientId) {
     res.status(500).json({
@@ -284,9 +284,9 @@ router.post('/refresh', async (req: Request, res: Response) => {
     return
   }
 
-  const auth0Domain = process.env.AUTH0_DOMAIN
-  const clientId = process.env.AUTH0_CLIENT_ID
-  const clientSecret = process.env.AUTH0_CLIENT_SECRET
+  const auth0Domain = process.env['AUTH0_DOMAIN']
+  const clientId = process.env['AUTH0_CLIENT_ID']
+  const clientSecret = process.env['AUTH0_CLIENT_SECRET']
 
   if (!auth0Domain || !clientId || !clientSecret) {
     res.status(500).json({

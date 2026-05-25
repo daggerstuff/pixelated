@@ -91,50 +91,50 @@ export class Phase3IntegrationTester {
       // 1. Service Health Checks
       const healthStart = Date.now()
       results.serviceHealth = await this.testServiceHealth()
-      serviceTimings.serviceHealth = Date.now() - healthStart
+      serviceTimings['serviceHealth'] = Date.now() - healthStart
 
       // 2. Cross-Service Communication
       const commStart = Date.now()
       results.crossServiceCommunication =
         await this.testCrossServiceCommunication()
-      serviceTimings.crossServiceCommunication = Date.now() - commStart
+      serviceTimings['crossServiceCommunication'] = Date.now() - commStart
 
       // 3. Performance Benchmarks
       const perfStart = Date.now()
       const perfResults = await this.testPerformanceBenchmarks()
       results.performanceBenchmarks = perfResults.success
-      throughputMetrics.apiRequests = perfResults.apiThroughput
-      throughputMetrics.dataProcessing = perfResults.dataProcessingRate
-      serviceTimings.performanceBenchmarks = Date.now() - perfStart
+      throughputMetrics['apiRequests'] = perfResults.apiThroughput
+      throughputMetrics['dataProcessing'] = perfResults.dataProcessingRate
+      serviceTimings['performanceBenchmarks'] = Date.now() - perfStart
 
       // 4. Error Recovery
       const errorStart = Date.now()
       results.errorRecovery = await this.testErrorRecovery()
-      serviceTimings.errorRecovery = Date.now() - errorStart
+      serviceTimings['errorRecovery'] = Date.now() - errorStart
 
       // 5. Concurrency Handling
       const concurrencyStart = Date.now()
       const concurrencyResults = await this.testConcurrencyHandling()
       results.concurrencyHandling = concurrencyResults.success
-      throughputMetrics.concurrentOperations =
+      throughputMetrics['concurrentOperations'] =
         concurrencyResults.operationsPerSecond
-      serviceTimings.concurrencyHandling = Date.now() - concurrencyStart
+      serviceTimings['concurrencyHandling'] = Date.now() - concurrencyStart
 
       // 6. Memory Management
       const memoryStart = Date.now()
       const memoryResults = await this.testMemoryManagement()
       results.memoryManagement = memoryResults.success
-      memoryUsage.baseline = memoryResults.baselineMemory
-      memoryUsage.peak = memoryResults.peakMemory
-      memoryUsage.afterCleanup = memoryResults.afterCleanupMemory
-      serviceTimings.memoryManagement = Date.now() - memoryStart
+      memoryUsage['baseline'] = memoryResults.baselineMemory
+      memoryUsage['peak'] = memoryResults.peakMemory
+      memoryUsage['afterCleanup'] = memoryResults.afterCleanupMemory
+      serviceTimings['memoryManagement'] = Date.now() - memoryStart
 
       // 7. Production Readiness
       const prodStart = Date.now()
       const prodResults = await this.testProductionReadiness()
       results.productionReadiness = prodResults.success
       recommendations.push(...prodResults.recommendations)
-      serviceTimings.productionReadiness = Date.now() - prodStart
+      serviceTimings['productionReadiness'] = Date.now() - prodStart
     } catch (error: unknown) {
       errors.push(
         `Phase 3 integration test failed: ${error instanceof Error ? String(error) : String(error)}`,
@@ -146,17 +146,17 @@ export class Phase3IntegrationTester {
       Object.values(results).every((result) => result) && errors.length === 0
 
     // Generate performance recommendations
-    if (serviceTimings.crossServiceCommunication > 5000) {
+    if (serviceTimings['crossServiceCommunication'] > 5000) {
       recommendations.push(
         'Cross-service communication is slow (>5s). Consider optimizing API calls or adding caching.',
       )
     }
-    if (throughputMetrics.apiRequests < 100) {
+    if (throughputMetrics['apiRequests'] < 100) {
       recommendations.push(
         'API throughput is low (<100 req/s). Consider connection pooling and request optimization.',
       )
     }
-    if (memoryUsage.peak > memoryUsage.baseline * 3) {
+    if (memoryUsage['peak'] > memoryUsage['baseline'] * 3) {
       recommendations.push(
         'Memory usage spikes significantly. Implement better memory management and garbage collection.',
       )

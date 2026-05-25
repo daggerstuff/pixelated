@@ -846,14 +846,14 @@ export class BiasAnalysisCache {
     const tags: string[] = []
 
     // Match the tag format used in cacheSession: "participant:age:gender"
-    if (demographics.age && demographics.gender) {
-      tags.push(`participant:${demographics.age}:${demographics.gender}`)
+    if (demographics['age'] && demographics['gender']) {
+      tags.push(`participant:${demographics['age']}:${demographics['gender']}`)
     }
-    if (demographics.age && demographics.ethnicity) {
-      tags.push(`participant:${demographics.age}:${demographics.ethnicity}`)
+    if (demographics['age'] && demographics['ethnicity']) {
+      tags.push(`participant:${demographics['age']}:${demographics['ethnicity']}`)
     }
-    if (demographics.gender && demographics.ethnicity) {
-      tags.push(`participant:${demographics.gender}:${demographics.ethnicity}`)
+    if (demographics['gender'] && demographics['ethnicity']) {
+      tags.push(`participant:${demographics['gender']}:${demographics['ethnicity']}`)
     }
 
     // Also support partial matches by checking if any tag contains the demographic value
@@ -867,15 +867,15 @@ export class BiasAnalysisCache {
           if (tag.startsWith('participant:')) {
             const parts = tag.split(':')
             if (parts.length >= 2) {
-              if (demographics.age && parts.includes(demographics.age)) {
+              if (demographics['age'] && parts.includes(demographics['age'])) {
                 shouldInvalidate = true
               }
-              if (demographics.gender && parts.includes(demographics.gender)) {
+              if (demographics['gender'] && parts.includes(demographics['gender'])) {
                 shouldInvalidate = true
               }
               if (
-                demographics.ethnicity &&
-                parts.includes(demographics.ethnicity)
+                demographics['ethnicity'] &&
+                parts.includes(demographics['ethnicity'])
               ) {
                 shouldInvalidate = true
               }
@@ -910,18 +910,18 @@ export class BiasAnalysisCache {
               if (tag.startsWith('participant:')) {
                 const parts = tag.split(':')
                 if (parts.length >= 2) {
-                  if (demographics.age && parts.includes(demographics.age)) {
+                  if (demographics['age'] && parts.includes(demographics['age'])) {
                     shouldInvalidate = true
                   }
                   if (
-                    demographics.gender &&
-                    parts.includes(demographics.gender)
+                    demographics['gender'] &&
+                    parts.includes(demographics['gender'])
                   ) {
                     shouldInvalidate = true
                   }
                   if (
-                    demographics.ethnicity &&
-                    parts.includes(demographics.ethnicity)
+                    demographics['ethnicity'] &&
+                    parts.includes(demographics['ethnicity'])
                   ) {
                     shouldInvalidate = true
                   }

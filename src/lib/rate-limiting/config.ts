@@ -284,38 +284,38 @@ export const getEnvironmentConfig = (env: string) => {
 export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
   const config: Partial<RateLimitConfig> = {}
 
-  if (process.env.RATE_LIMIT_ENABLED) {
+  if (process.env['RATE_LIMIT_ENABLED']) {
     config.global = {
       ...config.global,
-      enabled: process.env.RATE_LIMIT_ENABLED === 'true',
+      enabled: process.env['RATE_LIMIT_ENABLED'] === 'true',
     }
   }
 
-  if (process.env.RATE_LIMIT_DEFAULT_WINDOW_MS) {
+  if (process.env['RATE_LIMIT_DEFAULT_WINDOW_MS']) {
     config.global = {
       ...config.global,
-      defaultWindowMs: parseInt(process.env.RATE_LIMIT_DEFAULT_WINDOW_MS),
+      defaultWindowMs: parseInt(process.env['RATE_LIMIT_DEFAULT_WINDOW_MS']),
     }
   }
 
-  if (process.env.RATE_LIMIT_ATTACK_DETECTION) {
+  if (process.env['RATE_LIMIT_ATTACK_DETECTION']) {
     config.global = {
       ...config.global,
-      enableAttackDetection: process.env.RATE_LIMIT_ATTACK_DETECTION === 'true',
+      enableAttackDetection: process.env['RATE_LIMIT_ATTACK_DETECTION'] === 'true',
     }
   }
 
-  if (process.env.RATE_LIMIT_ANALYTICS) {
+  if (process.env['RATE_LIMIT_ANALYTICS']) {
     config.global = {
       ...config.global,
-      enableAnalytics: process.env.RATE_LIMIT_ANALYTICS === 'true',
+      enableAnalytics: process.env['RATE_LIMIT_ANALYTICS'] === 'true',
     }
   }
 
-  if (process.env.RATE_LIMIT_REDIS_PREFIX) {
+  if (process.env['RATE_LIMIT_REDIS_PREFIX']) {
     config.redis = {
       ...config.redis,
-      keyPrefix: process.env.RATE_LIMIT_REDIS_PREFIX,
+      keyPrefix: process.env['RATE_LIMIT_REDIS_PREFIX'],
     }
   }
 
@@ -326,7 +326,7 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
  * Merge default configuration with environment-specific and env var configurations
  */
 export const getMergedConfig = (): RateLimitConfig => {
-  const env = process.env.NODE_ENV ?? 'development'
+  const env = process.env['NODE_ENV'] ?? 'development'
   const envConfig = getEnvironmentConfig(env)
   const envVarConfig = getConfigFromEnv()
 

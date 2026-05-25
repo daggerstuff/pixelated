@@ -180,7 +180,7 @@ export async function prepareForHuggingFace(sourceDir?: string, outputDir?: stri
           const hfRecord: HuggingFaceRecord = {
             conversations,
             source: record.source,
-            quality_score: (record.metadata?.quality_score as number) ?? 0.5,
+            quality_score: (record.metadata?.['quality_score'] as number) ?? 0.5,
           };
 
           writeStream.write(JSON.stringify(hfRecord) + "\n");

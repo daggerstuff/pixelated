@@ -38,12 +38,12 @@ function isPersistedMetrics(value: unknown): value is PersistedMetrics {
 
   const metrics = value as Record<string, unknown>
   return (
-    typeof metrics.sessionCount === 'number' &&
-    typeof metrics.averageScore === 'number' &&
-    isStringArray(metrics.skillsImproving) &&
-    isStringArray(metrics.skillsNeeding) &&
-    (metrics.lastSessionDate === null ||
-      typeof metrics.lastSessionDate === 'number')
+    typeof metrics['sessionCount'] === 'number' &&
+    typeof metrics['averageScore'] === 'number' &&
+    isStringArray(metrics['skillsImproving']) &&
+    isStringArray(metrics['skillsNeeding']) &&
+    (metrics['lastSessionDate'] === null ||
+      typeof metrics['lastSessionDate'] === 'number')
   )
 }
 

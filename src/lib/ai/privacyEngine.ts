@@ -444,11 +444,11 @@ class PrivacyEngine {
       .map((p) => p.progress)
       .filter((p): p is number => p !== undefined)
     if (progressValues.length > 0) {
-      stats.progressMean =
+      stats['progressMean'] =
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
-      stats.progressStd = Math.sqrt(
+      stats['progressStd'] = Math.sqrt(
         progressValues.reduce(
-          (sum, p) => sum + Math.pow(p - (stats.progressMean ?? 0), 2),
+          (sum, p) => sum + Math.pow(p - (stats['progressMean'] ?? 0), 2),
           0,
         ) / progressValues.length,
       )

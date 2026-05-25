@@ -877,7 +877,7 @@ export class BackupSecurityManager {
         const query: Record<string, unknown> = {}
 
         if (baselineTime && Model.schema.paths.updatedAt) {
-          query.updatedAt = { $gte: baselineTime }
+          query['updatedAt'] = { $gte: baselineTime }
         }
 
         if (!isFirstModel) {

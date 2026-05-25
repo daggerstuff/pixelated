@@ -76,7 +76,7 @@ export const POST = async ({
     headers.set('Content-Type', 'application/json')
 
     // Set access token cookie
-    const isProd = process.env.NODE_ENV === 'production'
+    const isProd = process.env['NODE_ENV'] === 'production'
     headers.append(
       'Set-Cookie',
       `auth-token=${token}; Path=/; HttpOnly; Secure=${isProd}; SameSite=Lax; Max-Age=3600`,

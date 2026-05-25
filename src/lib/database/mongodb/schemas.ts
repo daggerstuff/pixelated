@@ -817,14 +817,14 @@ export type SalesOpportunityDocument = mongoose.InferSchemaType<
 // ============================================================================
 
 export const BusinessDocument =
-  mongoose.models.BusinessDocument ??
+  mongoose.models['BusinessDocument'] ??
   mongoose.model<BusinessDocumentDocument>(
     'BusinessDocument',
     BusinessDocumentSchema,
   )
 export const Project = mongoose.model('Project', ProjectSchema)
 export const MarketResearch =
-  mongoose.models.MarketResearch ??
+  mongoose.models['MarketResearch'] ??
   mongoose.model<MarketResearchDocument>('MarketResearch', MarketResearchSchema)
 export const StrategicPlan = mongoose.model(
   'StrategicPlan',

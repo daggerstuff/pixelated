@@ -11,7 +11,7 @@ import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
 
-const shouldWarnAuth0Configuration = process.env.NODE_ENV !== 'test'
+const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
 // Initialize Auth0 management client
 let auth0Management: ManagementClient | null = null

@@ -68,7 +68,6 @@ export class EdgeThreatDetectionSystemCore
   private readonly models: Map<string, tf.GraphModel | tf.Sequential> =
     new Map()
   private readonly nodeStatus: Map<string, EdgeNodeStatus> = new Map()
-  private detectionThresholds: DetectionThresholds
   private readonly modelPerformance: Map<string, ModelPerformance> = new Map()
 
   constructor(private readonly config: EdgeDetectionConfig) {
@@ -105,7 +104,7 @@ export class EdgeThreatDetectionSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env.REDIS_URL ?? 'redis://localhost:6379')
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for edge detection')
     } catch (error: unknown) {

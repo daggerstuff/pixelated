@@ -121,8 +121,6 @@ export class EnhancedTechniqueClassificationService {
     TechniqueEffectivenessDatabase
   > = new Map()
   private readonly sessionTracking: Map<string, SessionToSessionTracking> = new Map()
-  private readonly classificationModel: unknown = null // Would be actual ML model in production
-  private isModelTrained = false
   private metrics: AdvancedClassificationMetrics | null = null
 
   private constructor() {

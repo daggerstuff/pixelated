@@ -63,7 +63,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
   private initialized = false
 
   constructor(private readonly config: StorageProviderConfig) {
-    this.bucketName = (config.bucket as string) || ''
+    this.bucketName = (config['bucket'] as string) || ''
     if (!this.bucketName) {
       throw new Error(
         'Bucket name is required for Google Cloud Storage provider',
@@ -78,10 +78,10 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       // Create Storage instance with provided credentials
       this.storage = new Storage({
-        credentials: this.config.credentials as GoogleCloudCredentials,
-        projectId: (this.config.credentials as GoogleCloudCredentials)
+        credentials: this.config['credentials'] as GoogleCloudCredentials,
+        projectId: (this.config['credentials'] as GoogleCloudCredentials)
           ?.project_id,
-        ...(this.config.options as GoogleCloudStorageOptions),
+        ...(this.config['options'] as GoogleCloudStorageOptions),
       })
 
       this.bucket = this.storage!.bucket(this.bucketName)

@@ -138,7 +138,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Extract AI preferences with type safety
-    const preferences = (user.preferences as Record<string, unknown>) || {}
+    const preferences = (user['preferences'] as Record<string, unknown>) || {}
     const aiPrefs =
       (preferences['ai'] as AIPreferences) ?? DEFAULT_AI_PREFERENCES
 
@@ -238,7 +238,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Safely update preferences with proper type handling
     const currentPreferences =
-      (user.preferences as Record<string, unknown>) || {}
+      (user['preferences'] as Record<string, unknown>) || {}
     const newPrefs = {
       ...currentPreferences,
       ai: body.preferences,
@@ -338,7 +338,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     // Safely reset preferences with proper type handling
     const currentPreferences =
-      (user.preferences as Record<string, unknown>) || {}
+      (user['preferences'] as Record<string, unknown>) || {}
     const newPrefs = {
       ...currentPreferences,
       ai: DEFAULT_AI_PREFERENCES,

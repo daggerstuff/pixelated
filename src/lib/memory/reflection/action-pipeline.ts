@@ -54,7 +54,6 @@ export interface ActionResult {
 
 export class ActionPipeline {
   private readonly notificationThreshold: number
-  private readonly minConfidence: number
   private readonly feedbackStore: Map<string, UserFeedback> = new Map()
   private counter = 0
 

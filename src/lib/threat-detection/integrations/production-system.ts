@@ -95,7 +95,7 @@ class ProductionThreatDetectionService {
   private async checkIPReputation(ip: string): Promise<number> {
     try {
       // Check against known bad IPs in Redis
-      const reputation = await redis.get(`ip_reputation:${ip}`)
+      const reputation = await redis['get'](`ip_reputation:${ip}`)
       if (reputation) {
         return parseFloat(reputation)
       }
@@ -105,7 +105,7 @@ class ProductionThreatDetectionService {
       const badIP = await db.collection('malicious_ips').findOne({ ip })
 
       if (badIP) {
-        await redis.setex(
+        await redis['setex'](
           `ip_reputation:${ip}`,
           3600,
           badIP.riskScore.toString(),
@@ -123,8 +123,8 @@ class ProductionThreatDetectionService {
   private async analyzeRequestFrequency(ip: string): Promise<number> {
     try {
       const key = `request_freq:${ip}`
-      const count = await redis.hincrby(key, 'count', 1)
-      await redis.expire(key, 60) // 1 minute window
+      const count = await redis['hincrby'](key, 'count', 1)
+      await redis['expire'](key, 60) // 1 minute window
 
       // Risk increases with frequency
       if (count > 100) return 0.8
@@ -215,7 +215,7 @@ class ProductionThreatDetectionService {
     const indicators: string[] = []
 
     if (request.ip) {
-      const reputation = await redis.get(`ip_reputation:${request.ip}`)
+      const reputation = await redis['get'](`ip_reputation:${request.ip}`)
       if (reputation && parseFloat(reputation) > 0.5) {
         indicators.push('malicious_ip')
       }
@@ -315,7 +315,6 @@ class ProductionMonitoringService extends EventEmitter {
     status: string
     timestamp: Date
   }> = []
-  private running = false
   private intervals: NodeJS.Timeout[] = []
 
   constructor(config: any = {}) {
@@ -485,7 +484,6 @@ class ProductionMonitoringService extends EventEmitter {
 // Production-ready hunting service
 class ProductionHuntingService extends EventEmitter {
   private readonly enabled: boolean
-  private running = false
   private readonly investigations: Map<string, any> = new Map()
 
   constructor(config: any = {}) {
@@ -620,7 +618,6 @@ class ProductionHuntingService extends EventEmitter {
 // Production-ready intelligence service
 class ProductionIntelligenceService extends EventEmitter {
   private readonly enabled: boolean
-  private running = false
   private readonly iocs: Array<any> = []
   private readonly cache: Map<string, any> = new Map()
   private intervals: NodeJS.Timeout[] = []
@@ -667,7 +664,7 @@ class ProductionIntelligenceService extends EventEmitter {
   }
 
   async updateFeeds(): Promise<void> {
-    const apiKey = process.env.ALIENVAULT_API_KEY
+    const apiKey = process.env['ALIENVAULT_API_KEY']
     if (!apiKey || apiKey === 'invalid_key') {
       throw new Error(
         'Invalid or missing API key for threat intelligence feeds',

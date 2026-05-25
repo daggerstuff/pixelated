@@ -4,14 +4,14 @@ import {
   ErrorMessage,
   FieldError,
 } from '@/components/journal-research/shared/ErrorMessage'
-import { Button } from '@/components/ui/button/button.tsx'
+import { Button } from '@/components/ui/button/button'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/card.tsx'
-import { Label } from '@/components/ui/label.tsx'
+} from '@/components/ui/card/card'
+import { Label } from '@/components/ui/label'
 import {
   EvaluationUpdatePayloadSchema,
   type EvaluationUpdatePayload,

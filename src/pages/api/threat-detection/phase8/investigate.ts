@@ -56,8 +56,8 @@ export const POST: APIRoute = async ({ request }) => {
       rateLimiter,
       {
         threatDetection: {
-          mongoUri: process.env.MONGODB_URI!,
-          redisUrl: process.env.REDIS_URL!,
+          mongoUri: process.env['MONGODB_URI']!,
+          redisUrl: process.env['REDIS_URL']!,
         },
       },
     )
@@ -151,8 +151,8 @@ export const GET: APIRoute = async ({ request, url }) => {
       rateLimiter,
       {
         threatDetection: {
-          mongoUri: process.env.MONGODB_URI!,
-          redisUrl: process.env.REDIS_URL!,
+          mongoUri: process.env['MONGODB_URI']!,
+          redisUrl: process.env['REDIS_URL']!,
         },
       },
     )

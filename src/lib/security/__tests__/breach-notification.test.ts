@@ -73,11 +73,11 @@ describe('breachNotificationSystem', () => {
     ;(sendEmail as unknown).mockResolvedValue(undefined)
 
     // Setup process.env
-    process.env.ORGANIZATION_NAME = 'Test Org'
-    process.env.SECURITY_CONTACT = 'security@test.org'
-    process.env.ORGANIZATION_ADDRESS = '123 Test St'
-    process.env.HHS_NOTIFICATION_EMAIL = 'hhs@example.com'
-    process.env.SECURITY_STAKEHOLDERS =
+    process.env['ORGANIZATION_NAME'] = 'Test Org'
+    process.env['SECURITY_CONTACT'] = 'security@test.org'
+    process.env['ORGANIZATION_ADDRESS'] = '123 Test St'
+    process.env['HHS_NOTIFICATION_EMAIL'] = 'hhs@example.com'
+    process.env['SECURITY_STAKEHOLDERS'] =
       'stakeholder1@test.org,stakeholder2@test.org'
   })
 
@@ -162,7 +162,7 @@ describe('breachNotificationSystem', () => {
 
       expect(sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: process.env.HHS_NOTIFICATION_EMAIL,
+          to: process.env['HHS_NOTIFICATION_EMAIL'],
           subject: expect.stringContaining('HIPAA Breach Notification'),
         }),
       )
@@ -178,7 +178,7 @@ describe('breachNotificationSystem', () => {
 
       expect(sendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: process.env.HHS_NOTIFICATION_EMAIL,
+          to: process.env['HHS_NOTIFICATION_EMAIL'],
         }),
       )
     })
@@ -188,7 +188,7 @@ describe('breachNotificationSystem', () => {
     it('should notify all internal stakeholders', async () => {
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
-      const stakeholders = process.env.SECURITY_STAKEHOLDERS!.split(',')
+      const stakeholders = process.env['SECURITY_STAKEHOLDERS']!.split(',')
       expect(sendEmail).toHaveBeenCalledTimes(
         stakeholders.length + mockBreachDetails.affectedUsers.length,
       )
@@ -203,7 +203,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle empty stakeholders list', async () => {
-      process.env.SECURITY_STAKEHOLDERS = ''
+      process.env['SECURITY_STAKEHOLDERS'] = ''
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
 
@@ -223,7 +223,7 @@ describe('breachNotificationSystem', () => {
         notificationStatus: 'completed',
       }
 
-      ;(redis.get as unknown).mockResolvedValue(
+      ;(redis['get'] as unknown).mockResolvedValue(
         JSON.stringify(mockStoredBreach),
       )
 
@@ -231,11 +231,11 @@ describe('breachNotificationSystem', () => {
         await BreachNotificationSystem.getBreachStatus('test_breach')
 
       expect(breach).toEqual(mockStoredBreach)
-      expect(redis.get).toHaveBeenCalledWith('breach:test_breach')
+      expect(redis['get']).toHaveBeenCalledWith('breach:test_breach')
     })
 
     it('should return null for non-existent breach', async () => {
-      ;(redis.get as unknown).mockResolvedValue(null)
+      ;(redis['get'] as unknown).mockResolvedValue(null)
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('non_existent')
@@ -244,7 +244,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis.get as unknown).mockRejectedValue(new Error('Redis error'))
+      ;(redis['get'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.getBreachStatus('test_breach'),
@@ -274,11 +274,11 @@ describe('breachNotificationSystem', () => {
         },
       ]
 
-      ;(redis.keys as unknown).mockResolvedValue([
+      ;(redis['keys'] as unknown).mockResolvedValue([
         'breach:breach1',
         'breach:breach2',
       ])
-      ;(redis.get as unknown)
+      ;(redis['get'] as unknown)
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[0]))
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[1]))
 
@@ -290,7 +290,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis.keys as unknown).mockRejectedValue(new Error('Redis error'))
+      ;(redis['keys'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.listRecentBreaches(),
@@ -303,11 +303,11 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should filter out invalid breach data', async () => {
-      ;(redis.keys as unknown).mockResolvedValue([
+      ;(redis['keys'] as unknown).mockResolvedValue([
         'breach:valid',
         'breach:invalid',
       ])
-      ;(redis.get as unknown)
+      ;(redis['get'] as unknown)
         .mockResolvedValueOnce(
           JSON.stringify({
             ...mockBreachDetails,

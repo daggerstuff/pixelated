@@ -13,20 +13,20 @@ import {
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-import { Badge } from '@/components/ui/badge/index.ts'
+import { Badge } from '@/components/ui/badge/index'
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card/index.ts'
-import { Progress } from '@/components/ui/progress.tsx'
+} from '@/components/ui/card/index'
+import { Progress } from '@/components/ui/progress'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs.tsx'
+} from '@/components/ui/tabs'
 
 interface PerformanceMetric {
   id: string
