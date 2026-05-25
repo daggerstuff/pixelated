@@ -2,24 +2,18 @@
 
 ## 2026-04-14 - createPrivacyHash edge case
 
-- Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing
-  describe blocks where testing gaps exist.
+- Pattern: Using `replace_with_git_merge_diff` to inject tests into pre-existing describe blocks where testing gaps exist.
 - Action: Ensure edge cases like empty inputs are systematically tested.
 
 ## 2026-04-15 - access-control testing
 
 - Pattern: Mocking internal dependencies to resolve vite config import errors.
-- Action: Use `vi.mock` with explicit relative path to replace module that has
-  broken aliased imports.
+- Action: Use `vi.mock` with explicit relative path to replace module that has broken aliased imports.
 
 ## 2026-04-17 - Express error-handler async tests
 
-- Pattern: When testing Express `asyncHandler` wrappers, the wrapped function
-  executes asynchronously but the wrapper itself may return a non-promise that
-  is not easily awaited in the test.
-- Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after
-  invoking the wrapped handler to ensure asynchronous errors are caught and
-  passed to `next` before making assertions.
+- Pattern: When testing Express `asyncHandler` wrappers, the wrapped function executes asynchronously but the wrapper itself may return a non-promise that is not easily awaited in the test.
+- Action: Use `await new Promise((resolve) => process.nextTick(resolve))` after invoking the wrapped handler to ensure asynchronous errors are caught and passed to `next` before making assertions.
 
 ## 2026-04-18 - template edge case
 
@@ -28,83 +22,55 @@
 
 ## 2026-04-19 - isPartialBiasDashboardSummary
 
-- Pattern: Finding untested utility functions like type guards and creating new
-  targeted test files specifically for them under `__tests__`.
-- Action: Ensure the new test file fully isolates its test logic, covers both
-  positive and negative cases, and passes verification using localized execution
-  `npx vitest run <file>`.
+- Pattern: Finding untested utility functions like type guards and creating new targeted test files specifically for them under `__tests__`.
+- Action: Ensure the new test file fully isolates its test logic, covers both positive and negative cases, and passes verification using localized execution `npx vitest run <file>`.
 
 ## 2026-04-26 - localStorage tests in jsdom
 
-- Pattern: When using jsdom in Vitest, spying on `window.localStorage` may fail
-  to intercept direct `localStorage` calls.
-- Action: Use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept
-  these methods.
+- Pattern: When using jsdom in Vitest, spying on `window.localStorage` may fail to intercept direct `localStorage` calls.
+- Action: Use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods.
 
 ## 2026-04-27 - analyzeTherapeuticTechniques edge case
 
-- Pattern: Finding untested utility functions lacking a test file and creating
-  isolated tests.
-- Action: Ensure the new test file fully isolates its test logic, covers an edge
-  case, and passes verification using localized execution
-  `npx vitest run <file>`.
+- Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
+- Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
 
 ## 2026-04-28 - getRecommendedScenario edge case
 
-- Pattern: Finding untested branches in utility functions and adding targeted
-  tests.
-- Action: Ensure both positive and negative branches for scenario recommendation
-  are systematically tested.
+- Pattern: Finding untested branches in utility functions and adding targeted tests.
+- Action: Ensure both positive and negative branches for scenario recommendation are systematically tested.
 
 ## 2026-04-29 - privacy test jsdom environment
 
-- Pattern: When a test uses browser globals like `window.localStorage` but the
-  test environment lacks jsdom, Vitest throws
-  `ReferenceError: window is not defined`. Spying on `window.localStorage` may
-  also fail to intercept direct calls.
-- Action: Add `/** @vitest-environment jsdom */` at the top of the test file and
-  use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these
-  methods.
+- Pattern: When a test uses browser globals like `window.localStorage` but the test environment lacks jsdom, Vitest throws `ReferenceError: window is not defined`. Spying on `window.localStorage` may also fail to intercept direct calls.
+- Action: Add `/** @vitest-environment jsdom */` at the top of the test file and use `vi.spyOn(Storage.prototype, 'getItem')` to properly intercept these methods.
 
 ## 2026-04-30 - checkBrowserCompatibility edge case
 
 - Pattern: Mocking `navigator` properties in Vitest with jsdom.
-- Action: Use `Object.defineProperty` to temporarily mock and restore
-  `navigator.mediaDevices`.
+- Action: Use `Object.defineProperty` to temporarily mock and restore `navigator.mediaDevices`.
 
 ## 2026-05-09 - formatDate relative edge case
 
-- Pattern: Use `vi.useFakeTimers()` with a fixed system time to make
-  relative-time assertions deterministic.
-- Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in
-  `beforeAll`, then assert `formatDate(date, { relative: true })` returns
-  expected strings like `5 minutes ago` or `1 day ago`. Restore with
-  `vi.useRealTimers()` in `afterAll`.
+- Pattern: Use `vi.useFakeTimers()` with a fixed system time to make relative-time assertions deterministic.
+- Action: Call `vi.setSystemTime(new Date('2023-05-15T10:00:00Z'))` in `beforeAll`, then assert `formatDate(date, { relative: true })` returns expected strings like `5 minutes ago` or `1 day ago`. Restore with `vi.useRealTimers()` in `afterAll`.
 
 ## 2026-05-17 - device edge case
 
-- Pattern: Finding untested utility functions lacking a test file and creating
-  isolated tests.
-- Action: Ensure the new test file fully isolates its test logic, covers an edge
-  case, and passes verification using localized execution
-  `npx vitest run <file>`.
+- Pattern: Finding untested utility functions lacking a test file and creating isolated tests.
+- Action: Ensure the new test file fully isolates its test logic, covers an edge case, and passes verification using localized execution `npx vitest run <file>`.
 
 ## 2026-05-18 - logger tests
-
 - Pattern: Creating an isolated test file for a standalone utility.
-- Action: Mock out console methods using `vi.spyOn` in `beforeEach` to capture
-  output reliably.
-
+- Action: Mock out console methods using `vi.spyOn` in `beforeEach` to capture output reliably.
 ## 2026-06-25 - processRecognizedSpeech edge cases
 
 - Pattern: Writing edge case tests for utility functions with text manipulation.
-- Action: Verify regex behavior matches expected text outputs, as sometimes
-  chained replaces don't remove multiple distinct occurrences.
+- Action: Verify regex behavior matches expected text outputs, as sometimes chained replaces don't remove multiple distinct occurrences.
 
-## 2026-06-26 - path utility testing
-- Pattern: Mocking `astro:config/server` in Vitest before importing the module under test.
-- Action: Use `vi.mock('astro:config/server', () => ({ base: '/mock-base' }))` to safely test functions depending on the Astro server base path.
+## 2026-05-19 - verifyAuthToken edge cases
 
-## 2026-07-01 - matchMedia jsdom environment
-- Pattern: When testing code that relies on `window.matchMedia` in a jsdom environment, Vitest may fail because it's not implemented.
-- Action: Use `Object.defineProperty(window, 'matchMedia', ...)` to provide a mock implementation before testing functions that rely on it.
+- Pattern: Testing header manipulation edge cases (e.g. prefix stripping) when wrapping third-party verification functions.
+- Action: Write tests that verify standard input (with 'Bearer ' prefix) and edge case input (without prefix), using `vi.mock` to mock the underlying wrapped auth verification service.
+
+## 2026-05-19 - verifyAuthToken edge cases | Pattern: Testing header manipulation edge cases (e.g. prefix stripping) when wrapping third-party verification functions. | Action: Write tests that verify standard input (with 'Bearer ' prefix) and edge case input (without prefix), using `vi.mock` to mock the underlying wrapped auth verification service.
