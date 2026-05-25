@@ -651,6 +651,95 @@ describe("BiasDetectionAuditLogger", () => {
       expect(result.archived).toBe(1);
       expect(result.deleted).toBe(0);
     });
+
+    it("should handle immediate-deletion retention policy", async () => {
+      const retentionPolicies: RetentionPolicy[] = [
+        {
+          dataType: "system-logs",
+          retentionPeriod: 1,
+          autoDelete: true,
+          archiveBeforeDelete: false,
+          approvalRequired: false,
+        },
+      ];
+
+      const auditLoggerWithRetention = new BiasDetectionAuditLogger(
+        mockStorage,
+        true,
+        retentionPolicies,
+      );
+
+      const oldDate = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
+      const action: AuditAction = {
+        type: "read",
+        category: "bias-analysis",
+        description: "Old action",
+        sensitivityLevel: "low",
+      };
+
+      await auditLoggerWithRetention.logAction(mockUser, action, "test", {}, mockRequest);
+      const entries = mockStorage.getEntries();
+      entries[0].timestamp = oldDate;
+
+      const result = await auditLoggerWithRetention.cleanupOldLogs();
+      expect(result.archived).toBe(0);
+      expect(result.deleted).toBe(0);
+    });
+  });
+
+  describe("High-Sensitivity Actions", () => {
+    it("should log high-sensitivity action without throwing", async () => {
+      const action: AuditAction = {
+        type: "read",
+        category: "user-data",
+        description: "Access critical data",
+        sensitivityLevel: "critical",
+      };
+
+      await expect(
+        auditLogger.logAction(mockUser, action, "critical-data", {}, mockRequest),
+      ).resolves.not.toThrow();
+
+      const entries = mockStorage.getEntries();
+      expect(entries).toHaveLength(1);
+      expect(entries[0].action.sensitivityLevel).toBe("critical");
+    });
+  });
+
+  describe("Log Action Catch Block", () => {
+    it("should throw when storage.store fails", async () => {
+      const failingStorage = new MockAuditStorage();
+      vi.spyOn(failingStorage, "store").mockRejectedValue(new Error("Storage failure"));
+
+      const logger = new BiasDetectionAuditLogger(failingStorage, true);
+
+      const action: AuditAction = {
+        type: "read",
+        category: "bias-analysis",
+        description: "Test",
+        sensitivityLevel: "low",
+      };
+
+      await expect(
+        logger.logAction(mockUser, action, "test", {}, mockRequest),
+      ).rejects.toThrow("Storage failure");
+    });
+  });
+
+  describe("Compliance Report Without Violations", () => {
+    it("should generate report with no violations when includeViolations is false", async () => {
+      const period = {
+        start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+        end: new Date(),
+      };
+
+      const report = await auditLogger.generateComplianceReport(period, false);
+
+      expect(report.violations).toHaveLength(0);
+      expect(report.dataRetentionStatus).toBeDefined();
+      expect(report.encryptionStatus).toBeDefined();
+      expect(report.auditTrail).toBeDefined();
+    });
   });
 });
 

@@ -195,6 +195,12 @@
       "skillPath": "scientific-skills/citation-management/SKILL.md",
       "computedHash": "5bf046b37002e89b36c70293bc33cfec3ac980f951c584e16dbfef6e8d23b9d5"
     },
+    "cline-sdk": {
+      "source": "cline/sdk-skill",
+      "sourceType": "github",
+      "skillPath": "skill/cline-sdk/SKILL.md",
+      "computedHash": "dd98b0cc325fa8674ba93f1aed2b75d232ca61e5a89394bf6efe6996392f3fc2"
+    },
     "clinical-decision-support": {
       "source": "K-Dense-AI/scientific-agent-skills",
       "sourceType": "github",

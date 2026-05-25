@@ -65,3 +65,5 @@
   or explicitly within the route handler (e.g., using
   `verifyAuthToken(authHeader)`), and enforce proper error handling for
   missing/invalid tokens.
+
+## 2024-05-24 - XSS in Warning Component | Vulnerability: Unsanitized raw HTML content passed to `set:html` in `Warning.astro`. | Learning: Reusable UI components that accept raw HTML props can be used in multiple places and pass unsanitized input to `set:html`, enabling XSS. | Prevention: Always sanitize raw HTML props using `DOMPurify` before injecting them via `set:html` in shared UI components.

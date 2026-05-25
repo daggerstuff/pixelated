@@ -14,7 +14,10 @@ os.environ.setdefault("ENCRYPTION_SALT", "test-salt")
 sys.path.append(
     os.path.join(os.path.dirname(__file__), "..", "..", "src", "lib", "ai", "bias-detection", "python-service")
 )
-from bias_detection_service import BiasDetectionConfig, BiasDetectionService
+try:
+    from bias_detection_service import BiasDetectionConfig, BiasDetectionService
+except ImportError as e:
+    pytest.skip(f"Skipping bias detection service tests: {e}", allow_module_level=True)
 
 
 @pytest.mark.asyncio

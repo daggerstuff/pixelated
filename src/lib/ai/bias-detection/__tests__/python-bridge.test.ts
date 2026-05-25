@@ -694,6 +694,94 @@ describe('analysis methods', () => {
       // Should not throw even when pool dispose fails
       await expect(poolBridge.dispose()).resolves.not.toThrow()
     })
+
+    it('should release connection in finally block when request fails', async () => {
+      const failPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'fail-conn' }),
+        releaseConnection: vi.fn(),
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        failPool,
+      )
+      ;(poolBridge as any).retryAttempts = 1
+      ;(poolBridge as any).retryDelay = 0
+
+      // Make fetch reject to trigger the finally block with a pooled connection
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Service down'))
+
+      const session: TherapeuticSession = {
+        sessionId: 'pool-error',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+
+      // Verify pool acquired and released despite error
+      expect(failPool.acquireConnection).toHaveBeenCalled()
+      expect(failPool.releaseConnection).toHaveBeenCalled()
+      // Should return fallback result
+      expect(result.fallbackMode).toBe(true)
+    })
+
+    it('should handle pool without releaseConnection method', async () => {
+      const partialPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'partial-conn' }),
+        // No releaseConnection method
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        partialPool,
+      )
+      ;(poolBridge as any).retryAttempts = 1
+      ;(poolBridge as any).retryDelay = 0
+
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Down'))
+
+      const session: TherapeuticSession = {
+        sessionId: 'partial-pool',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+
+      // Should not throw despite missing releaseConnection
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+      expect(result.fallbackMode).toBe(true)
+    })
+
+    it('should release pooled connection on retry exhaustion', async () => {
+      const retryPool = {
+        acquireConnection: vi.fn().mockResolvedValue({ id: 'retry-conn' }),
+        releaseConnection: vi.fn(),
+      }
+      const poolBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+        retryPool,
+      )
+      ;(poolBridge as any).retryAttempts = 2
+      ;(poolBridge as any).retryDelay = 0
+
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(new Error('Persistent failure'))
+
+      // Acquire the connection and run a failing analysis
+      const session: TherapeuticSession = {
+        sessionId: 'retry-pool',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await poolBridge.runPreprocessingAnalysis(session)
+
+      // For each retry attempt (2), acquireConnection is called, and for each
+      // attempt, releaseConnection is called in the finally block
+      expect(retryPool.releaseConnection).toHaveBeenCalled()
+      expect(result.fallbackMode).toBe(true)
+    })
   })
 
   describe('AbortController signal in non-test environment', () => {
@@ -1022,6 +1110,256 @@ describe('analysis methods', () => {
       expect(result.status).toBe('unhealthy')
       expect(result.message).toBe('Service unavailable')
       expect(result.timestamp).toBeDefined()
+    })
+  })
+
+  describe('interactive and evaluation error paths', () => {
+    it('should return fallback when runInteractiveAnalysis encounters a network error', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(
+        new Error('Interactive service down'),
+      )
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'interactive-error-test',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runInteractiveAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+
+    it('should return fallback when runEvaluationAnalysis encounters a network error', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(
+        new Error('Evaluation service down'),
+      )
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'evaluation-error-test',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runEvaluationAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+
+    it('should return fallback when runInteractiveAnalysis receives a non-ok response', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 500,
+        text: async () => 'Interactive error',
+      })
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'interactive-http-error',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runInteractiveAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+
+    it('should return fallback when runEvaluationAnalysis receives a non-ok response', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 503,
+        text: async () => 'Evaluation error',
+      })
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'evaluation-http-error',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runEvaluationAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+  })
+
+  describe('runModelLevelAnalysis error path', () => {
+    it('should return fallback when runModelLevelAnalysis encounters a network error', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockRejectedValue(
+        new Error('Model level service down'),
+      )
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'model-level-error-test',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runModelLevelAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+
+    it('should return fallback when runModelLevelAnalysis receives a non-ok response', async () => {
+      ;(global.fetch as any).mockReset()
+      ;(global.fetch as any).mockResolvedValue({
+        ok: false,
+        status: 502,
+        text: async () => 'Model level error',
+      })
+
+      const fbBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      ;(fbBridge as any).retryAttempts = 1
+      ;(fbBridge as any).retryDelay = 0
+
+      const session: TherapeuticSession = {
+        sessionId: 'model-level-http-error',
+        timestamp: new Date(),
+        content: { transcript: 'test' },
+      }
+      const result = await fbBridge.runModelLevelAnalysis(session)
+
+      expect(result.biasScore).toBe(0.5)
+      expect(result.detectedBiases).toContain('service_unavailable')
+    })
+  })
+
+  describe('startHealthMonitoring response paths', () => {
+    it('should set health status to degraded when checkHealth returns degraded', async () => {
+      const healthBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      healthBridge.stopHealthMonitoring()
+
+      // Mock checkHealth to return degraded
+      ;(healthBridge as any).checkHealth = vi.fn().mockResolvedValue({
+        status: 'degraded',
+        message: 'Service overloaded',
+        timestamp: new Date().toISOString(),
+      })
+
+      // Override interval for fast test
+      ;(healthBridge as any).healthCheckInterval = 10
+
+      ;(healthBridge as any).startHealthMonitoring()
+
+      // Wait for interval to fire
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      const status = healthBridge.getHealthStatus()
+      expect(status.status).toBe('degraded')
+      expect(status.consecutiveFailures).toBe(0)
+    })
+
+    it('should set health status to unhealthy when response has unknown status', async () => {
+      const healthBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      healthBridge.stopHealthMonitoring()
+
+      ;(healthBridge as any).checkHealth = vi.fn().mockResolvedValue({
+        status: 'unknown',
+        message: 'Unknown state',
+        timestamp: new Date().toISOString(),
+      })
+
+      ;(healthBridge as any).healthCheckInterval = 10
+      ;(healthBridge as any).startHealthMonitoring()
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      const status = healthBridge.getHealthStatus()
+      expect(status.status).toBe('unhealthy')
+      expect(status.consecutiveFailures).toBeGreaterThan(0)
+    })
+
+    it('should set health status to healthy when checkHealth returns healthy', async () => {
+      const healthBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      healthBridge.stopHealthMonitoring()
+
+      ;(healthBridge as any).checkHealth = vi.fn().mockResolvedValue({
+        status: 'healthy',
+        message: 'All systems operational',
+        timestamp: new Date().toISOString(),
+      })
+
+      ;(healthBridge as any).healthCheckInterval = 10
+      ;(healthBridge as any).startHealthMonitoring()
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      const status = healthBridge.getHealthStatus()
+      expect(status.status).toBe('healthy')
+      expect(status.consecutiveFailures).toBe(0)
+    })
+
+    it('should set health status to unhealthy when checkHealth throws', async () => {
+      const healthBridge = new PythonBiasDetectionBridge(
+        'http://localhost:5000',
+        30000,
+      )
+      healthBridge.stopHealthMonitoring()
+
+      ;(healthBridge as any).checkHealth = vi.fn().mockRejectedValue(
+        new Error('Connection error'),
+      )
+
+      ;(healthBridge as any).healthCheckInterval = 10
+      ;(healthBridge as any).startHealthMonitoring()
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      const status = healthBridge.getHealthStatus()
+      expect(status.status).toBe('unhealthy')
+      expect(status.consecutiveFailures).toBeGreaterThan(0)
     })
   })
 
