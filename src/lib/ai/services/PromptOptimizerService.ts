@@ -305,16 +305,16 @@ export class PromptOptimizerService {
       }
     }
 
-    const initial = emotionalMessages[0].emotions!
-    const final = emotionalMessages[emotionalMessages.length - 1].emotions!
+    const initial = emotionalMessages?.[0].emotions!
+    const final = emotionalMessages?.[emotionalMessages.length - 1].emotions!
 
     // Identify key emotional transitions
     const keyTransitions: ConversationSummary['emotionalJourney']['keyTransitions'] =
       []
 
     for (let i = 1; i < emotionalMessages.length; i++) {
-      const prev = emotionalMessages[i - 1].emotions!
-      const curr = emotionalMessages[i].emotions!
+      const prev = emotionalMessages?.[i - 1].emotions!
+      const curr = emotionalMessages?.[i].emotions!
 
       // Check for significant valence changes
       const valenceChange = curr.dimensions.valence - prev.dimensions.valence
@@ -512,7 +512,7 @@ export class PromptOptimizerService {
 
     if (effectiveInterventions.length > 0) {
       recommendations.push(
-        `Continue using ${effectiveInterventions[0].type} interventions - showed positive results`,
+        `Continue using ${effectiveInterventions?.[0].type} interventions - showed positive results`,
       )
     }
 
@@ -578,8 +578,8 @@ export class PromptOptimizerService {
     // Overall improvement based on emotional journey
     let overallImprovement = 0.5
     if (emotionalMessages.length >= 2) {
-      const initial = emotionalMessages[0].emotions!
-      const final = emotionalMessages[emotionalMessages.length - 1].emotions!
+      const initial = emotionalMessages?.[0].emotions!
+      const final = emotionalMessages?.[emotionalMessages.length - 1].emotions!
       overallImprovement =
         (final.dimensions.valence - initial.dimensions.valence + 1) / 2
     }

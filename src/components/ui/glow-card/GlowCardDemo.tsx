@@ -1,5 +1,4 @@
 import { Activity, Brain, Heart, TrendingUp } from 'lucide-react'
-import React from 'react'
 
 import { MentalHealthCard } from '../mental-health-card'
 

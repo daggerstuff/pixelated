@@ -408,7 +408,7 @@ describe('AdaptiveSelector', () => {
     // Normalize if they don't sum to 1 (they should)
     if (Math.abs(totalDefaultWeight - 1.0) > 0.001 && totalDefaultWeight > 0) {
       for (const id in defaultWeights) {
-        defaultWeights[id] /= totalDefaultWeight
+        defaultWeights?.[id] /= totalDefaultWeight
       }
     }
 

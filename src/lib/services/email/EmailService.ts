@@ -190,7 +190,7 @@ export class EmailService {
         }
 
         // Send email using Resend
-        const { data, error } = await this.resend.emails.send(emailOptions)
+        const { data, error } = await this?.resend.emails.send(emailOptions)
 
         if (error) {
           throw error

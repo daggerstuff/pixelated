@@ -180,7 +180,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       expect(alertSpy).toHaveBeenCalled()
-      const alert = alertSpy.mock.calls[0][0]
+      const alert = alertSpy?.mock.calls[0][0]
       expect(alert.severity).toBe('high')
       expect(alert.metric).toBe('failed_login_attempts')
     })

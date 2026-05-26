@@ -6,7 +6,7 @@ import {
   Target,
   ChevronRight,
 } from 'lucide-react'
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { Badge } from '@/components/ui/badge/index'
 import { Button } from '@/components/ui/button/index'

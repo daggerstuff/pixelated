@@ -395,19 +395,19 @@ export class AdvancedResponseOrchestrator
     // Determine response type based on severity
     if (
       analysis.severity === 'critical' ||
-      analysis.estimatedImpact > strategies['critical']
+      analysis.estimatedImpact > strategies?.['critical']
     ) {
       primaryType = 'block'
       escalationLevel = 4
     } else if (
       analysis.severity === 'high' ||
-      analysis.estimatedImpact > strategies['high']
+      analysis.estimatedImpact > strategies?.['high']
     ) {
       primaryType = 'rate_limit'
       escalationLevel = 3
     } else if (
       analysis.severity === 'medium' ||
-      analysis.estimatedImpact > strategies['medium']
+      analysis.estimatedImpact > strategies?.['medium']
     ) {
       primaryType = 'investigate'
       escalationLevel = 2
@@ -1064,7 +1064,7 @@ class MLDecisionEngine extends DecisionEngine {
     prediction.dispose()
 
     return {
-      riskScore: result[0] * 0.3 + result[1] * 0.6 + result[2] * 0.9, // Weighted average
+      riskScore: result?.[0] * 0.3 + result?.[1] * 0.6 + result?.[2] * 0.9, // Weighted average
       confidence: Math.max(...result),
       riskLevel: result.indexOf(Math.max(...result)),
     }

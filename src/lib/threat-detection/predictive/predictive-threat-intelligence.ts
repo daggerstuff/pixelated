@@ -1185,7 +1185,7 @@ export class AdvancedPredictiveThreatIntelligence
   ): Record<string, ThreatData[]> {
     return threats.reduce<Record<string, ThreatData[]>>((acc, threat) => {
       acc[threat.threatType] ??= []
-      acc[threat.threatType].push(threat)
+      acc?.[threat.threatType].push(threat)
       return acc
     }, {})
   }

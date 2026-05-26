@@ -60,14 +60,14 @@ export function TherapeuticGoalsTracker({
         if (data && data.length > 0) {
           setGoals(data)
           if (!activeGoalId) {
-            setActiveGoalId(data[0].id)
+            setActiveGoalId(data?.[0].id)
           }
         } else {
           // If no goals from API, generate initial ones
           const initialGoals = generateGoalsFromPatientModel(patientModel)
           setGoals(initialGoals)
           if (initialGoals.length > 0 && !activeGoalId) {
-            setActiveGoalId(initialGoals[0].id)
+            setActiveGoalId(initialGoals?.[0].id)
           }
         }
       })
@@ -77,7 +77,7 @@ export function TherapeuticGoalsTracker({
         const fallbackGoals = generateGoalsFromPatientModel(patientModel)
         setGoals(fallbackGoals)
         if (fallbackGoals.length > 0 && !activeGoalId) {
-          setActiveGoalId(fallbackGoals[0].id)
+          setActiveGoalId(fallbackGoals?.[0].id)
         }
       })
       .finally(() => setLoading(false))

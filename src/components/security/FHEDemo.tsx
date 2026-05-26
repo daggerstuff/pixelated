@@ -149,23 +149,22 @@ const FHEDemo: React.FC<FHEDemoProps> = ({
     // Simulate plaintext operation for comparison
     const plaintextStart = performance.now()
 
-    // Perform operation and store result to avoid dead code
-    let _result: number
+    // Perform operation for comparison timing
     switch (operation.operation) {
       case 'add':
-        _result = operation.input1 + (operation.input2 ?? 0)
+        operation.input1 + (operation.input2 ?? 0)
         break
       case 'multiply':
-        _result = operation.input1 * (operation.input2 ?? 1)
+        operation.input1 * (operation.input2 ?? 1)
         break
       case 'compare':
-        _result = operation.input1 > (operation.input2 ?? 0) ? 1 : 0
+        operation.input1 > (operation.input2 ?? 0) ? 1 : 0
         break
       case 'aggregate':
-        _result = Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
+        Math.round((operation.input1 + (operation.input2 ?? 0)) / 2)
         break
       default:
-        _result = 0
+        0
         break
     }
 

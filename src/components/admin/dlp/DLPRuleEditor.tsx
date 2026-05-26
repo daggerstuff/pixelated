@@ -70,14 +70,14 @@ const isEditorRule = (detail: unknown): detail is EditorRule => {
   }
 
   return (
-    (detail.id === undefined || typeof detail.id === 'string') &&
-    (detail.name === undefined || typeof detail.name === 'string') &&
-    (detail.matchPattern === undefined ||
-      typeof detail.matchPattern === 'string') &&
-    (detail.description === undefined ||
-      typeof detail.description === 'string') &&
-    (detail.action === undefined || isDLPAction(detail.action)) &&
-    (detail.isActive === undefined || typeof detail.isActive === 'boolean')
+    (detail['id'] === undefined || typeof detail['id'] === 'string') &&
+    (detail['name'] === undefined || typeof detail['name'] === 'string') &&
+    (detail['matchPattern'] === undefined ||
+      typeof detail['matchPattern'] === 'string') &&
+    (detail['description'] === undefined ||
+      typeof detail['description'] === 'string') &&
+    (detail['action'] === undefined || isDLPAction(detail['action'])) &&
+    (detail['isActive'] === undefined || typeof detail['isActive'] === 'boolean')
   )
 }
 
@@ -99,10 +99,10 @@ export default function DLPRuleEditor() {
       setCurrentRule({
         ...defaultRule,
         ...detail,
-        matchPattern: detail.matchPattern ?? '',
-        action: detail.action ?? DLPAction.REDACT,
-        isActive: detail.isActive ?? true,
-        description: detail.description ?? '',
+        matchPattern: detail['matchPattern'] ?? '',
+        action: detail['action'] ?? DLPAction.REDACT,
+        isActive: detail['isActive'] ?? true,
+        description: detail['description'] ?? '',
       })
       setIsEditing(true)
     }

@@ -69,7 +69,7 @@ export const PATCH = withAuth(async (request, session) => {
 
   const parseResult = PatchApiKeySchema.safeParse(body)
   if (!parseResult.success) {
-    return jsonError(400, 'Bad Request', parseResult.error.issues[0].message)
+    return jsonError(400, 'Bad Request', parseResult?.error.issues[0].message)
   }
 
   const { scopes } = parseResult.data

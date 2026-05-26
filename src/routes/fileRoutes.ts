@@ -387,7 +387,7 @@ export function createFileRoutes(db: Pool) {
         return res.status(404).json({ error: 'File not found' })
       }
 
-      if (fileResult.rows[0].uploaded_by !== userId) {
+      if (fileResult?.rows[0].uploaded_by !== userId) {
         return res.status(403).json({ error: 'Access denied' })
       }
 

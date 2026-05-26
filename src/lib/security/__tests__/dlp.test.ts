@@ -117,8 +117,8 @@ describe('DLP Service', () => {
 
       dlpService.addRule(updatedRule)
       expect(dlpService['rules'].length).toBe(1)
-      expect(dlpService['rules'][0].name).toBe('Updated Test Rule')
-      expect(dlpService['rules'][0].action).toBe(DLPAction.BLOCK)
+      expect(dlpService?.['rules'][0].name).toBe('Updated Test Rule')
+      expect(dlpService?.['rules'][0].action).toBe(DLPAction.BLOCK)
     })
 
     it('should remove rules correctly', () => {

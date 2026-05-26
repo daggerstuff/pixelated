@@ -214,7 +214,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Calculate average energy level (for demonstration)
       let sum = 0
       for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i]
+        sum += dataArray?.[i]
       }
       const averageEnergy = sum / bufferLength
 
@@ -309,7 +309,7 @@ export class WebRTCService implements WebRTCServiceInterface {
     this.peerConnection.ontrack = (event) => {
       if (this.remoteStream) {
         // Add remote tracks to the remote stream
-        event.streams[0].getTracks().forEach((track) => {
+        event?.streams[0].getTracks().forEach((track) => {
           this.remoteStream?.addTrack(track)
         })
 
