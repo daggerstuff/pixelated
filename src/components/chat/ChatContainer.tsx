@@ -1,5 +1,5 @@
 import type { ChangeEvent, FormEvent } from 'react'
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useTheme } from '@/components/theme/ThemeProvider'
 import { cn } from '@/lib/utils'

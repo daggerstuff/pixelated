@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { useWebSocket } from '@/hooks/useWebSocket'
 
 import { NotificationCenter } from '../NotificationCenter'
 

@@ -1,1 +1,413 @@
-/**\n * IndexedDB-backed Request Queue for Offline Support\n * Queues network requests when offline and processes them when back online\n * Uses IndexedDB for persistent storage to avoid blocking the main thread\n */\n\n\n\nimport IndexedDBStorage from '../storage/indexedDBStorage'\n\nexport interface QueuedRequest {\n  id: string\n  url: string\n  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'\n  headers: Record<string, string>\n  body?: unknown\n  timestamp: number\n  retryCount: number\n  maxRetries: number\n  priority: 'low' | 'normal' | 'high' | 'critical'\n}\n\nexport interface RequestQueueOptions {\n  maxQueueSize?: number\n  maxRetries?: number\n  retryDelay?: number\n  storageKey?: string\n  enablePersistence?: boolean\n}\n\n/**\n * Request Queue that persists to IndexedDB\n */\nclass IndexedDBRequestQueue {\n  private queue: QueuedRequest[] = []\n  private isProcessing = false\n  private readonly options: Required<RequestQueueOptions>\n  private db: IDBDatabase | null = null\n  private initialized = false\n  private lastTimestamp = 0\n\n  constructor(options: RequestQueueOptions = {}) {\n    this.options = {\n      maxQueueSize: 1000,\n      maxRetries: 3,\n      retryDelay: 1000,\n      storageKey: 'offline_request_queue_idb',\n      enablePersistence: true,\n      ...options,\n    }\n\n    if (this.options.enablePersistence) {\n      this.initDB()\n        .then(async () => this.loadFromStorage())\n        .catch((err) => {\n          console.warn('Failed to initialize IndexedDB for request queue:', err)\n          // Continue with empty queue\n        })\n    }\n  }\n\n  private async initDB(): Promise<void> {\n    if (this.initialized) return\n\n    if (typeof indexedDB?.open !== 'function') {\n      return\n    }\n\n    // Create a separate IndexedDBStorage instance for the queue\n    const queueStorage = new IndexedDBStorage({\n      dbName: 'pixelated_offline_queue',\n      version: 1,\n      storeName: this.options.storageKey,\n    })\n\n    // We'll store the instance for later use.\n    this.db = await this.initIndexedDB(queueStorage)\n  }\n\n  private async initIndexedDB(storage: any): Promise<IDBDatabase> {\n    return new Promise((resolve, reject) => {\n      const request = indexedDB.open(storage.dbName, storage.version)\n\n      request.onerror = () => reject(request.error)\n      request.onsuccess = () => {\n        try {\n          const db = request.result\n          // Ensure object store exists when available.\n          // In some mock environments, objectStoreNames may be undefined; this is not fatal.\n          if (\n            db.objectStoreNames &&\n            typeof db.objectStoreNames.contains === 'function' &&\n            !db.objectStoreNames.contains(storage.storeName)\n          ) {\n            console.warn(\n              `IndexedDB store "${storage.storeName}" not found after opening database`,\n            )\n          }\n          this.initialized = true\n          resolve(db)\n        } catch (error) {\n          reject(error)\n        }\n      }\n\n      request.onupgradeneeded = (event) => {\n        const db = (event.target as IDBOpenDBRequest).result\n        if (!db.objectStoreNames.contains(storage.storeName)) {\n          db.createObjectStore(storage.storeName, { keyPath: 'id' })\n        }\n      }\n    })\n  }\n\n  private async loadFromStorage(): Promise<void> {\n    if (!this.options.enablePersistence || !this.db) return\n\n    try {\n      const tx = this.db.transaction([this.options.storageKey], 'readonly')\n      const store = tx.objectStore(this.options.storageKey)\n      const request = store.get('queue') // We'll store the entire queue under key 'queue'\n\n      const result = await new Promise<any>((resolve, reject) => {\n        request.onerror = () => reject(request.error)\n        request.onsuccess = () => resolve(request.result)\n      })\n\n      if (result && Array.isArray(result.value)) {\n        const stored = result.value\n        // Filter out expired requests (older than 24 hours)\n        const maxAge = 24 * 60 * 60 * 1000 // 24 hours\n        const now = Date.now()\n        this.queue = stored.filter(\n          (req: QueuedRequest) => now - req.timestamp < maxAge,\n        )\n      } else {\n        this.queue = []\n      }\n    } catch (error) {\n      console.warn('Failed to load request queue from IndexedDB:', error)\n      this.queue = []\n    }\n  }\n\n  private async saveToStorage(): Promise<void> {\n    if (!this.options.enablePersistence || !this.db) return\n\n    try {\n      const tx = this.db.transaction([this.options.storageKey], 'readwrite')\n      const store = tx.objectStore(this.options.storageKey)\n      const request = store.put({ id: 'queue', value: this.queue })\n\n      await new Promise<void>((resolve, reject) => {\n        request.onerror = () => reject(request.error)\n        request.onsuccess = () => resolve()\n      })\n    } catch (error) {\n      console.warn('Failed to save request queue to IndexedDB:', error)\n    }\n  }\n\n  private generateId(): string {\n    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`\n  }\n\n  private getPriorityWeight(priority: QueuedRequest['priority']): number {\n    const weights = {\n      critical: 4,\n      high: 3,\n      normal: 2,\n      low: 1,\n    }\n    return weights[priority]\n  }\n\n  private sortQueue(): void {\n    this.queue.sort((a, b) => {\n      // Sort by priority first (higher priority first)\n      const priorityDiff =\n        this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)\n      if (priorityDiff !== 0) return priorityDiff\n\n      // Then by timestamp (older first)\n      return a.timestamp - b.timestamp\n    })\n  }\n\n  /**\n   * Add a request to the queue\n   * @returns true if successfully added, false if error\n   */\n  add(\n    request: Omit<QueuedRequest, 'id' | 'timestamp' | 'retryCount'>,\n  ): boolean {\n    try {\n      if (this.queue.length >= this.options.maxQueueSize) {\n        // Remove oldest low-priority requests to make room\n        const lowPriorityRequests = this.queue\n          .filter((req) => req.priority === 'low')\n          .sort((a, b) => a.timestamp - b.timestamp)\n\n        if (lowPriorityRequests.length > 0) {\n          this.queue = this.queue.filter(\n            (req) => req.id !== lowPriorityRequests[0].id,\n          )\n        } else {\n          console.warn('Request queue is full, dropping oldest request')\n          this.queue.shift()\n        }\n      }\n\n      const queuedRequest: QueuedRequest = {\n        ...request,\n        id: this.generateId(),\n        timestamp: this.getSafeTimestamp(),\n        retryCount: 0,\n      }\n\n      this.queue.push(queuedRequest)\n      this.sortQueue()\n\n      // Persist asynchronously (fire and forget)\n      if (this.options.enablePersistence) {\n        this.saveToStorage().catch((err) => {\n          console.warn('Failed to persist request queue:', err)\n        })\n      }\n\n      return true\n    } catch (error) {\n      console.warn('Failed to add request to queue:', error)\n      return false\n    }\n  }\n\n  /**\n   * Process the queue when back online\n   */\n  async processQueue(\n    onRequestSuccess?: (request: QueuedRequest) => void,\n  ): Promise<void> {\n    if (this.isProcessing || this.queue.length === 0) return\n\n    this.isProcessing = true\n\n    try {\n      while (this.queue.length > 0) {\n        const request = this.queue[0] // Get the highest priority request\n\n        try {\n          const response = await fetch(request.url, {\n            method: request.method,\n            headers: request.headers,\n            body: request.body\n              ? typeof request.body === 'string'\n                ? request.body\n                : JSON.stringify(request.body)\n              : undefined,\n          })\n\n          if (response.ok) {\n            // Request succeeded, remove from queue\n            this.queue.shift()\n            // Persist asynchronously\n            if (this.options.enablePersistence) {\n              this.saveToStorage().catch((err) => {\n                console.warn(\n                  'Failed to persist request queue after processing:',\n                  err,\n                )\n              })\n            }\n            onRequestSuccess?.(request)\n          } else {\n            throw new Error(`HTTP ${response.status}: ${response.statusText}`)\n          }\n        } catch {\n          // Request failed, increment retry count\n          request.retryCount++\n\n          if (request.retryCount > request.maxRetries) {\n            // Max retries reached, remove from queue\n            console.warn(\n              `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,\n            )\n            this.queue.shift()\n            // Persist asynchronously\n            if (this.options.enablePersistence) {\n              this.saveToStorage().catch((err) => {\n                console.warn(\n                  'Failed to persist request queue after max retries:',\n                  err,\n                )\n              })\n            }\n          } else {\n            // Wait before retrying\n            await new Promise((resolve) =>\n              setTimeout(resolve, this.options.retryDelay * request.retryCount),\n            )\n            // Continue to retry the same request (do not shift the queue)\n            continue\n          }\n        }\n      }\n    } finally {\n      this.isProcessing = false\n    }\n  }\n\n  /**\n   * Remove a request from the queue by ID\n   * @returns true if removed, false if not found\n   */\n  remove(id: string): boolean {\n    const initialLength = this.queue.length\n    this.queue = this.queue.filter((req) => req.id !== id)\n\n    if (this.queue.length < initialLength) {\n      // Persist asynchronously\n      if (this.options.enablePersistence) {\n        this.saveToStorage().catch((err) => {\n          console.warn('Failed to persist request queue after removal:', err)\n        })\n      }\n      return true\n    }\n    return false\n  }\n\n  /**\n   * Clear all requests from the queue\n   */\n  clear(): void {\n    this.queue = []\n    // Persist asynchronously\n    if (this.options.enablePersistence) {\n      this.saveToStorage().catch((err) => {\n        console.warn('Failed to persist request queue after clear:', err)\n      })\n    }\n  }\n\n  /**\n   * Get queue statistics\n   */\n  getStats(): {\n    total: number\n    byPriority: Record<QueuedRequest['priority'], number>\n    oldestRequest: number | null\n    newestRequest: number | null\n  } {\n    const byPriority = {\n      critical: 0,\n      high: 0,\n      normal: 0,\n      low: 0,\n    }\n\n    let oldestRequest: number | null = null\n    let newestRequest: number | null = null\n\n    this.queue.forEach((req) => {\n      byPriority[req.priority]++\n\n      if (oldestRequest === null || req.timestamp < oldestRequest) {\n        oldestRequest = req.timestamp\n      }\n      if (newestRequest === null || req.timestamp > newestRequest) {\n        newestRequest = req.timestamp\n      }\n    })\n\n    return {\n      total: this.queue.length,\n      byPriority,\n      oldestRequest,\n      newestRequest,\n    }\n  }\n\n  private getSafeTimestamp(): number {\n    const now = Date.now()\n    if (now <= this.lastTimestamp) {\n      this.lastTimestamp += 1\n      return this.lastTimestamp\n    }\n\n    this.lastTimestamp = now\n    return now\n  }\n\n  /**\n   * Get all queued requests (for debugging)\n   */\n  getQueue(): QueuedRequest[] {\n    return [...this.queue]\n  }\n\n  /**\n   * Check if there are requests waiting to be processed\n   */\n  hasPendingRequests(): boolean {\n    return this.queue.length > 0\n  }\n}\n\n// Export singleton instance\nexport const indexedDBRequestQueue = new IndexedDBRequestQueue()\n\n// Export class for custom instances\nexport { IndexedDBRequestQueue }\nexport default indexedDBRequestQueue\n
+/**
+ * IndexedDB-backed Request Queue for Offline Support
+ * Queues network requests when offline and processes them when back online
+ * Uses IndexedDB for persistent storage to avoid blocking the main thread
+ */
+
+
+
+import IndexedDBStorage from '../storage/indexedDBStorage'
+
+export interface QueuedRequest {
+  id: string
+  url: string
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+  headers: Record<string, string>
+  body?: unknown
+  timestamp: number
+  retryCount: number
+  maxRetries: number
+  priority: 'low' | 'normal' | 'high' | 'critical'
+}
+
+export interface RequestQueueOptions {
+  maxQueueSize?: number
+  maxRetries?: number
+  retryDelay?: number
+  storageKey?: string
+  enablePersistence?: boolean
+}
+
+/**
+ * Request Queue that persists to IndexedDB
+ */
+class IndexedDBRequestQueue {
+  private queue: QueuedRequest[] = []
+  private isProcessing = false
+  private readonly options: Required<RequestQueueOptions>
+  private db: IDBDatabase | null = null
+  private initialized = false
+  private lastTimestamp = 0
+
+  constructor(options: RequestQueueOptions = {}) {
+    this.options = {
+      maxQueueSize: 1000,
+      maxRetries: 3,
+      retryDelay: 1000,
+      storageKey: 'offline_request_queue_idb',
+      enablePersistence: true,
+      ...options,
+    }
+
+    if (this.options.enablePersistence) {
+      this.initDB()
+        .then(async () => this.loadFromStorage())
+        .catch((err) => {
+          console.warn('Failed to initialize IndexedDB for request queue:', err)
+          // Continue with empty queue
+        })
+    }
+  }
+
+  private async initDB(): Promise<void> {
+    if (this.initialized) return
+
+    if (typeof indexedDB?.open !== 'function') {
+      return
+    }
+
+    // Create a separate IndexedDBStorage instance for the queue
+    const queueStorage = new IndexedDBStorage({
+      dbName: 'pixelated_offline_queue',
+      version: 1,
+      storeName: this.options.storageKey,
+    })
+
+    // We'll store the instance for later use.
+    this.db = await this.initIndexedDB(queueStorage)
+  }
+
+  private async initIndexedDB(storage: any): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(storage.dbName, storage.version)
+
+      request.onerror = () => reject(request.error)
+      request.onsuccess = () => {
+        try {
+          const db = request.result
+          // Ensure object store exists when available.
+          // In some mock environments, objectStoreNames may be undefined; this is not fatal.
+          if (
+            db.objectStoreNames &&
+            typeof db.objectStoreNames.contains === 'function' &&
+            !db.objectStoreNames.contains(storage.storeName)
+          ) {
+            console.warn(
+              `IndexedDB store "${storage.storeName}" not found after opening database`,
+            )
+          }
+          this.initialized = true
+          resolve(db)
+        } catch (error) {
+          reject(error)
+        }
+      }
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+        if (!db.objectStoreNames.contains(storage.storeName)) {
+          db.createObjectStore(storage.storeName, { keyPath: 'id' })
+        }
+      }
+    })
+  }
+
+  private async loadFromStorage(): Promise<void> {
+    if (!this.options.enablePersistence || !this.db) return
+
+    try {
+      const tx = this.db.transaction([this.options.storageKey], 'readonly')
+      const store = tx.objectStore(this.options.storageKey)
+      const request = store.get('queue') // We'll store the entire queue under key 'queue'
+
+      const result = await new Promise<any>((resolve, reject) => {
+        request.onerror = () => reject(request.error)
+        request.onsuccess = () => resolve(request.result)
+      })
+
+      if (result && Array.isArray(result.value)) {
+        const stored = result.value
+        // Filter out expired requests (older than 24 hours)
+        const maxAge = 24 * 60 * 60 * 1000 // 24 hours
+        const now = Date.now()
+        this.queue = stored.filter(
+          (req: QueuedRequest) => now - req.timestamp < maxAge,
+        )
+      } else {
+        this.queue = []
+      }
+    } catch (error) {
+      console.warn('Failed to load request queue from IndexedDB:', error)
+      this.queue = []
+    }
+  }
+
+  private async saveToStorage(): Promise<void> {
+    if (!this.options.enablePersistence || !this.db) return
+
+    try {
+      const tx = this.db.transaction([this.options.storageKey], 'readwrite')
+      const store = tx.objectStore(this.options.storageKey)
+      const request = store.put({ id: 'queue', value: this.queue })
+
+      await new Promise<void>((resolve, reject) => {
+        request.onerror = () => reject(request.error)
+        request.onsuccess = () => resolve()
+      })
+    } catch (error) {
+      console.warn('Failed to save request queue to IndexedDB:', error)
+    }
+  }
+
+  private generateId(): string {
+    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  }
+
+  private getPriorityWeight(priority: QueuedRequest['priority']): number {
+    const weights = {
+      critical: 4,
+      high: 3,
+      normal: 2,
+      low: 1,
+    }
+    return weights[priority]
+  }
+
+  private sortQueue(): void {
+    this.queue.sort((a, b) => {
+      // Sort by priority first (higher priority first)
+      const priorityDiff =
+        this.getPriorityWeight(b.priority) - this.getPriorityWeight(a.priority)
+      if (priorityDiff !== 0) return priorityDiff
+
+      // Then by timestamp (older first)
+      return a.timestamp - b.timestamp
+    })
+  }
+
+  /**
+   * Add a request to the queue
+   * @returns true if successfully added, false if error
+   */
+  add(
+    request: Omit<QueuedRequest, 'id' | 'timestamp' | 'retryCount'>,
+  ): boolean {
+    try {
+      if (this.queue.length >= this.options.maxQueueSize) {
+        // Remove oldest low-priority requests to make room
+        const lowPriorityRequests = this.queue
+          .filter((req) => req.priority === 'low')
+          .sort((a, b) => a.timestamp - b.timestamp)
+
+        if (lowPriorityRequests.length > 0) {
+          this.queue = this.queue.filter(
+            (req) => req.id !== lowPriorityRequests[0].id,
+          )
+        } else {
+          console.warn('Request queue is full, dropping oldest request')
+          this.queue.shift()
+        }
+      }
+
+      const queuedRequest: QueuedRequest = {
+        ...request,
+        id: this.generateId(),
+        timestamp: this.getSafeTimestamp(),
+        retryCount: 0,
+      }
+
+      this.queue.push(queuedRequest)
+      this.sortQueue()
+
+      // Persist asynchronously (fire and forget)
+      if (this.options.enablePersistence) {
+        this.saveToStorage().catch((err) => {
+          console.warn('Failed to persist request queue:', err)
+        })
+      }
+
+      return true
+    } catch (error) {
+      console.warn('Failed to add request to queue:', error)
+      return false
+    }
+  }
+
+  /**
+   * Process the queue when back online
+   */
+  async processQueue(
+    onRequestSuccess?: (request: QueuedRequest) => void,
+  ): Promise<void> {
+    if (this.isProcessing || this.queue.length === 0) return
+
+    this.isProcessing = true
+
+    try {
+      while (this.queue.length > 0) {
+        const request = this.queue[0] // Get the highest priority request
+
+        try {
+          const response = await fetch(request.url, {
+            method: request.method,
+            headers: request.headers,
+            body: request.body
+              ? typeof request.body === 'string'
+                ? request.body
+                : JSON.stringify(request.body)
+              : undefined,
+          })
+
+          if (response.ok) {
+            // Request succeeded, remove from queue
+            this.queue.shift()
+            // Persist asynchronously
+            if (this.options.enablePersistence) {
+              this.saveToStorage().catch((err) => {
+                console.warn(
+                  'Failed to persist request queue after processing:',
+                  err,
+                )
+              })
+            }
+            onRequestSuccess?.(request)
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          }
+        } catch {
+          // Request failed, increment retry count
+          request.retryCount++
+
+          if (request.retryCount > request.maxRetries) {
+            // Max retries reached, remove from queue
+            console.warn(
+              `Request ${request.id} failed after ${request.maxRetries} retries, removing from queue`,
+            )
+            this.queue.shift()
+            // Persist asynchronously
+            if (this.options.enablePersistence) {
+              this.saveToStorage().catch((err) => {
+                console.warn(
+                  'Failed to persist request queue after max retries:',
+                  err,
+                )
+              })
+            }
+          } else {
+            // Wait before retrying
+            await new Promise((resolve) =>
+              setTimeout(resolve, this.options.retryDelay * request.retryCount),
+            )
+            // Continue to retry the same request (do not shift the queue)
+            continue
+          }
+        }
+      }
+    } finally {
+      this.isProcessing = false
+    }
+  }
+
+  /**
+   * Remove a request from the queue by ID
+   * @returns true if removed, false if not found
+   */
+  remove(id: string): boolean {
+    const initialLength = this.queue.length
+    this.queue = this.queue.filter((req) => req.id !== id)
+
+    if (this.queue.length < initialLength) {
+      // Persist asynchronously
+      if (this.options.enablePersistence) {
+        this.saveToStorage().catch((err) => {
+          console.warn('Failed to persist request queue after removal:', err)
+        })
+      }
+      return true
+    }
+    return false
+  }
+
+  /**
+   * Clear all requests from the queue
+   */
+  clear(): void {
+    this.queue = []
+    // Persist asynchronously
+    if (this.options.enablePersistence) {
+      this.saveToStorage().catch((err) => {
+        console.warn('Failed to persist request queue after clear:', err)
+      })
+    }
+  }
+
+  /**
+   * Get queue statistics
+   */
+  getStats(): {
+    total: number
+    byPriority: Record<QueuedRequest['priority'], number>
+    oldestRequest: number | null
+    newestRequest: number | null
+  } {
+    const byPriority = {
+      critical: 0,
+      high: 0,
+      normal: 0,
+      low: 0,
+    }
+
+    let oldestRequest: number | null = null
+    let newestRequest: number | null = null
+
+    this.queue.forEach((req) => {
+      byPriority[req.priority]++
+
+      if (oldestRequest === null || req.timestamp < oldestRequest) {
+        oldestRequest = req.timestamp
+      }
+      if (newestRequest === null || req.timestamp > newestRequest) {
+        newestRequest = req.timestamp
+      }
+    })
+
+    return {
+      total: this.queue.length,
+      byPriority,
+      oldestRequest,
+      newestRequest,
+    }
+  }
+
+  private getSafeTimestamp(): number {
+    const now = Date.now()
+    if (now <= this.lastTimestamp) {
+      this.lastTimestamp += 1
+      return this.lastTimestamp
+    }
+
+    this.lastTimestamp = now
+    return now
+  }
+
+  /**
+   * Get all queued requests (for debugging)
+   */
+  getQueue(): QueuedRequest[] {
+    return [...this.queue]
+  }
+
+  /**
+   * Check if there are requests waiting to be processed
+   */
+  hasPendingRequests(): boolean {
+    return this.queue.length > 0
+  }
+}
+
+// Export singleton instance
+export const indexedDBRequestQueue = new IndexedDBRequestQueue()
+
+// Export class for custom instances
+export { IndexedDBRequestQueue }
+export default indexedDBRequestQueue

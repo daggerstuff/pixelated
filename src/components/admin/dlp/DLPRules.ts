@@ -26,9 +26,9 @@ const isRuleUpdatedDetail = (detail: unknown): detail is RuleUpdatedDetail => {
     'id' in detail &&
     'name' in detail &&
     'isActive' in detail &&
-    typeof detail.id === 'string' &&
-    typeof detail.name === 'string' &&
-    typeof detail.isActive === 'boolean'
+    typeof detail['id'] === 'string' &&
+    typeof detail['name'] === 'string' &&
+    typeof detail['isActive'] === 'boolean'
   )
 }
 
@@ -37,7 +37,7 @@ const isRuleDeletedDetail = (detail: unknown): detail is RuleDeletedDetail => {
     return false
   }
 
-  return 'id' in detail && typeof detail.id === 'string'
+  return 'id' in detail && typeof detail['id'] === 'string'
 }
 
 // Function to handle rule updates

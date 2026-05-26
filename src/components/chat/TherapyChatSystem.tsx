@@ -25,7 +25,6 @@ import { Switch } from '@/components/ui/switch'
 import { useAIService } from '@/hooks/useAIService'
 import {
   useEmotionDetection,
-  type EmotionAnalysis,
 } from '@/hooks/useEmotionDetection'
 import { useMentalHealthAnalysis } from '@/hooks/useMentalHealthAnalysis'
 import { usePatientModel } from '@/hooks/usePatientModel'

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Play, Pause, Plus, Trash2, Zap, Send, Loader2, BarChart3, Download, RotateCcw } from 'lucide-react';
+import { Play, Pause, Plus, Trash2, Zap, Send, Loader2, Download, RotateCcw } from 'lucide-react';
 import { MultiAgentThoughtUI } from './MultiAgentThoughtUI';
 import { AgentPerformanceHeatmap, type AgentMetric } from './AgentPerformanceHeatmap';
 import { Button } from '@/components/ui';

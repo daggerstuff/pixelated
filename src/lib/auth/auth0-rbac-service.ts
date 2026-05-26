@@ -519,10 +519,10 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
 
         if (!existingRole) {
           // Create new role
-
-            name: roleName,
-            description: roleDef.description,
-          })
+            await auth0Management.roles.create({
+              name: roleName,
+              description: roleDef.description,
+            })
           console.log(`Created role: ${roleName}`)
         } else {
           console.log(`Role already exists: ${roleName}`)

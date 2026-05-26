@@ -1,5 +1,5 @@
 import { LightBulbIcon } from '@heroicons/react/24/outline'
-import React, { FC, memo } from 'react'
+import { FC, memo } from 'react'
 
 import { SlideUp } from '@/components/layout/AdvancedAnimations'
 
