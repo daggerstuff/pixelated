@@ -15,11 +15,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import {
-  type MindMirrorAnalysis,
-  type ArchetypeResult,
-  type MoodVector,
-} from '@/lib/mental-health/types'
+import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 interface MindMirrorDashboardProps {
   analysis?: MindMirrorAnalysis

@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { ContextType } from '../core/objectives'
-import type { ObjectivePriority } from './context-objective-mapping'
 import type {
   ContextEvent,
   ContextTransition,

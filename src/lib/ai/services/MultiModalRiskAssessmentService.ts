@@ -748,7 +748,7 @@ export class MultiModalRiskAssessmentService {
   ): IntegratedRiskProfile {
     const fallbackRisk =
       emotionalData.length > 0
-        ? Math.min(emotionalData.slice(-1)[0].intensity / 100, 0.8)
+        ? Math.min(emotionalData?.slice(-1)[0].intensity / 100, 0.8)
         : 0.5
 
     return {

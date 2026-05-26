@@ -163,7 +163,7 @@ export default function EmpathyMeter({
       // Draw trend arrow
       const lastTwoValues = history.slice(-2)
       if (lastTwoValues.length === 2) {
-        const trendDiff = lastTwoValues[1] - lastTwoValues[0]
+        const trendDiff = lastTwoValues?.[1] - lastTwoValues?.[0]
         const arrowX = historyRight + 5
         const arrowY = historyTop + historyHeight / 2
 

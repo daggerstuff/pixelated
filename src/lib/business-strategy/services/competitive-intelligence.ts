@@ -7,10 +7,7 @@
 
 import type { UserId } from '../types/common'
 import type {
-  CompetitorProfile,
-  CompetitorActivity,
-  MarketPosition,
-} from '../types/competitive-intelligence'
+  CompetitorProfile } from '../types/competitive-intelligence'
 import { BaseService } from './base-service'
 
 export class CompetitiveIntelligenceService extends BaseService {

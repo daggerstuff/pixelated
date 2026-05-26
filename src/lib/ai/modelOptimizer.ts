@@ -179,7 +179,7 @@ class ModelOptimizer {
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Ensemble")));
     }
 
-    if (this.currentMetrics.inferenceTime > 100) {
+    if (this?.currentMetrics.inferenceTime > 100) {
       // > 100ms
       bottlenecks.push("Slow inference - consider quantization or model compression");
       recommendations.push(
@@ -189,13 +189,13 @@ class ModelOptimizer {
       );
     }
 
-    if (this.currentMetrics.memoryUsage > 1000) {
+    if (this?.currentMetrics.memoryUsage > 1000) {
       // > 1GB
       bottlenecks.push("High memory usage - consider model compression or pruning");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Compression")));
     }
 
-    if (this.currentMetrics.privacyScore < 0.9) {
+    if (this?.currentMetrics.privacyScore < 0.9) {
       bottlenecks.push("Privacy concerns - consider federated learning approaches");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Federated")));
     }
@@ -223,8 +223,8 @@ class ModelOptimizer {
 
     // Determine primary optimization target based on current performance
     if (this.currentMetrics.accuracy < 0.8) return "accuracy";
-    if (this.currentMetrics.inferenceTime > 200) return "inferenceTime";
-    if (this.currentMetrics.memoryUsage > 1500) return "memoryUsage";
+    if (this?.currentMetrics.inferenceTime > 200) return "inferenceTime";
+    if (this?.currentMetrics.memoryUsage > 1500) return "memoryUsage";
 
     return "f1Score"; // Balanced metric
   }
@@ -251,7 +251,7 @@ class ModelOptimizer {
     Object.keys(improvements).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
       if (typeof optimizedMetrics[key] === "number") {
-        (optimizedMetrics[key]) *= 1 + improvements[key];
+        (optimizedMetrics[key]) *= 1 + improvements?.[key];
       }
     });
 

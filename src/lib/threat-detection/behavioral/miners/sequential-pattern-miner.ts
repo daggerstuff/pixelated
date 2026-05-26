@@ -236,7 +236,7 @@ export class SequentialPatternMiner implements PatternMiner {
     const minCount = Math.ceil(totalSequences * minSupport)
 
     for (const item of Object.keys(idLists)) {
-      const uniqueSequenceIds = new Set(idLists[item].map((entry) => entry[0]))
+      const uniqueSequenceIds = new Set(idLists?.[item].map((entry) => entry[0]))
       if (uniqueSequenceIds.size >= minCount) {
         frequentSequences.push([item])
       }

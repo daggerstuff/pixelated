@@ -6,7 +6,7 @@ export interface VNode {
 import { promises as fs } from 'node:fs'
 import { join } from 'node:path'
 
-import type { ProjectGroupsSchema, ProjectSchema } from '@/lib/schema'
+import type { ProjectGroupsSchema } from '@/lib/schema'
 
 import type { NavBarLayout } from '../types'
 
