@@ -7,8 +7,6 @@ description: >-
   technology
 ---
 
-[[toc]]
-
 Today, we're excited to introduce **Pixelated Empathy** - a new platform
 dedicated to advancing mental healthcare through cutting-edge technology,
 research, and compassionate innovation.

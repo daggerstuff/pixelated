@@ -6,9 +6,7 @@ description: >-
   Deep dive into the technical challenges and solutions for detecting emotions
   from text in mental health contexts
 
-
 ---
-[[toc]]
 
 Emotion detection is one of the core technologies powering modern mental health
 applications. In this post, we'll explore the technical challenges,
