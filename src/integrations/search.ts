@@ -25,7 +25,7 @@ interface SearchIntegrationOptions {
 }
 
 const defaultOptions: SearchIntegrationOptions = {
-  collections: ['blog', 'docs', 'guides'],
+  collections: ['blog', 'docs', 'guides', 'pages'],
   indexPath: 'search-index.js',
   autoInclude: true,
   generateTypes: true,
