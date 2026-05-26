@@ -388,7 +388,7 @@ export class FeedbackService implements FeedbackServiceInterface {
           },
         )
 
-        const firstChoice = response.choices[0]
+        const firstChoice = response.choices[0]!
         if (typeof firstChoice.message.content === 'string') {
           therapeuticSuggestions = firstChoice.message.content
         } else {
@@ -526,8 +526,8 @@ export class FeedbackService implements FeedbackServiceInterface {
     // Calculate zero-crossing rate (higher values often indicate higher-frequency content)
     let zeroCrossings = 0
     for (let i = 1; i < audioData.length; i++) {
-      const current = audioData[i]
-      const previous = audioData[i - 1]
+      const current = audioData[i]!
+      const previous = audioData[i - 1]!
       if ((current >= 0 && previous < 0) || (current < 0 && previous >= 0)) {
         zeroCrossings++
       }
@@ -711,7 +711,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     let sumXX = 0
 
     // Normalize timestamps relative to the first timestamp
-    const baseTime = recentTrends?.[0].timestamp
+    const baseTime = recentTrends[0]!.timestamp
 
     for (const trend of recentTrends) {
       const x = (trend.timestamp - baseTime) / 1000 // seconds
@@ -734,8 +734,8 @@ export class FeedbackService implements FeedbackServiceInterface {
     // Calculate energy change (volatility)
     let energyVolatility = 0
     for (let i = 1; i < recentTrends.length; i++) {
-      const current = recentTrends[i]
-      const previous = recentTrends[i - 1]
+      const current = recentTrends[i]!
+      const previous = recentTrends[i - 1]!
       energyVolatility += Math.abs(current.energy - previous.energy)
     }
     energyVolatility /= recentTrends.length - 1
@@ -815,7 +815,7 @@ export class FeedbackService implements FeedbackServiceInterface {
 
       // Find the technique with the highest probability
       let maxIndex = 0
-      let maxValue = predictionData[0]
+      let maxValue = predictionData[0]!
 
       for (let i = 1; i < predictionData.length; i++) {
         const currentValue = predictionData[i]

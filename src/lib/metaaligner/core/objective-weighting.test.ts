@@ -125,11 +125,11 @@ describe('ObjectiveWeightingEngine', () => {
 
       expect(result.strategy).toBe(WeightingStrategy.CONTEXTUAL)
       // In crisis context, safety and empathy should get higher weights
-      expect(result.weights['safety']).toBeGreaterThan(
-        result.weights['correctness'],
+      expect(result.weights['safety']!).toBeGreaterThan(
+        result.weights['correctness']!,
       )
-      expect(result.weights['empathy']).toBeGreaterThan(
-        result.weights['correctness'],
+      expect(result.weights['empathy']!).toBeGreaterThan(
+        result.weights['correctness']!,
       )
     })
 
@@ -227,18 +227,18 @@ describe('ObjectiveWeightingEngine', () => {
       // Ratio of empathy to an unadjusted objective (if one existed) would increase by ~1.5
       // Ratio of empathy to safety: (initialE * 1.5) / (initialS * 0.8)
       const empathySafetyRatioInitial =
-        initialWeights?.['empathy'] / initialWeights?.['safety']
+        initialWeights['empathy']! / initialWeights['safety']!
       const empathySafetyRatioFinal =
-        result?.weights['empathy'] / result?.weights['safety']
+        result.weights['empathy']! / result.weights['safety']!
       expect(empathySafetyRatioFinal).toBeCloseTo(
         empathySafetyRatioInitial * (1.5 / 0.8),
         1,
       )
 
       const correctnessSafetyRatioInitial =
-        initialWeights?.['correctness'] / initialWeights?.['safety']
+        initialWeights['correctness']! / initialWeights['safety']!
       const correctnessSafetyRatioFinal =
-        result?.weights['correctness'] / result?.weights['safety']
+        result.weights['correctness']! / result.weights['safety']!
       // Correctness boost (1+0.5) = 1.5; Safety reduction 0.8
       expect(correctnessSafetyRatioFinal).toBeCloseTo(
         correctnessSafetyRatioInitial * (1.5 / 0.8),
@@ -497,7 +497,7 @@ describe('ObjectiveBalancer', () => {
 
     test('should handle single objective', () => {
       const singleResult = {
-        correctness: mockEvaluationResults['correctness'],
+        correctness: mockEvaluationResults['correctness']!,
       }
       const singleWeight = { correctness: 1.0 }
 

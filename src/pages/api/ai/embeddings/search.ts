@@ -259,7 +259,7 @@ function generateMockSearchResults(
 
   // Generate matches with descending similarity scores
   for (let i = 0; i < Math.min(topK, mockKnowledge.length); i++) {
-    const item = mockKnowledge[i]
+    const item = mockKnowledge[i]!
     const similarity = 0.95 - i * 0.1 // Decreasing similarity
 
     if (similarity >= (request.minSimilarity ?? 0)) {
