@@ -36,6 +36,9 @@ import {
 } from '@/components/ui/tooltip'
 import { DisorderCategory } from '@/lib/ai/mental-arena/types'
 
+// ⚡ Bolt: Cache Object.values for enum outside component to avoid repeated array allocations on every render
+const DISORDER_CATEGORIES_LIST = Object.values(DisorderCategory) as string[]
+
 /**
  * Generate cryptographically secure random integer within a range
  * @param min - Minimum value (inclusive)
@@ -355,7 +358,7 @@ export default function SyntheticTherapyDemo() {
             <div className='space-y-2'>
               <Label>Disorders</Label>
               <div className='flex flex-wrap gap-2'>
-                {(Object.values(DisorderCategory) as string[])
+                {DISORDER_CATEGORIES_LIST
                   .slice(0, 5)
                   .map((disorder) => (
                     <Badge
