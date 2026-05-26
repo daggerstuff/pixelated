@@ -233,4 +233,7 @@ export const ALLOWED_DIRECTORIES = {
   get SCRIPTS() {
     return path.join(getCachedProjectRoot(), 'scripts')
   },
+  get SRC() {
+    return path.join(getCachedProjectRoot(), 'src')
+  },
 } as const
