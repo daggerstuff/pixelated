@@ -247,9 +247,9 @@ class PerformanceMonitor {
     const recommendations: string[] = []
 
     // Response time analysis
-    if (recent.responseTime > this.config.alertThresholds.responseTime) {
+    if (recent.responseTime! > this.config.alertThresholds.responseTime) {
       const degradation =
-        ((recent.responseTime - older.responseTime) / older.responseTime) * 100
+        ((recent.responseTime! - older.responseTime!) / older.responseTime!) * 100
       if (degradation > 10) {
         recommendations.push(
           `Response time degraded by ${degradation.toFixed(1)}% - consider caching optimization`,
@@ -258,19 +258,19 @@ class PerformanceMonitor {
     }
 
     // Memory usage analysis
-    if (recent.memoryUsage > this.config.alertThresholds.memoryUsage) {
+    if (recent.memoryUsage! > this.config.alertThresholds.memoryUsage) {
       recommendations.push(
         'Memory usage above threshold - consider garbage collection optimization',
       )
     }
 
     // CPU usage analysis
-    if (recent.cpuUsage > this.config.alertThresholds.cpuUsage) {
+    if (recent.cpuUsage! > this.config.alertThresholds.cpuUsage) {
       recommendations.push('High CPU usage detected - consider load balancing')
     }
 
     // Error rate analysis
-    if (recent.errorRate > this.config.alertThresholds.errorRate) {
+    if (recent.errorRate! > this.config.alertThresholds.errorRate) {
       recommendations.push('Elevated error rate - review recent deployments')
     }
 
@@ -289,10 +289,10 @@ class PerformanceMonitor {
     }
 
     recommendations.forEach((rec) => {
-      if (rec.includes('caching')) improvement?.['responseTime'] -= 20
-      if (rec.includes('garbage collection')) improvement?.['memoryUsage'] -= 15
-      if (rec.includes('load balancing')) improvement?.['cpuUsage'] -= 25
-      if (rec.includes('error rate')) improvement?.['errorRate'] -= 50
+      if (rec.includes('caching')) improvement['responseTime']! -= 20
+      if (rec.includes('garbage collection')) improvement['memoryUsage']! -= 15
+      if (rec.includes('load balancing')) improvement['cpuUsage']! -= 25
+      if (rec.includes('error rate')) improvement['errorRate']! -= 50
     })
 
     return improvement
@@ -304,46 +304,46 @@ class PerformanceMonitor {
     const latest = this.metrics[this.metrics.length - 1]
 
     // Check response time
-    if (latest.responseTime > this.config.alertThresholds.responseTime) {
+    if (latest!.responseTime > this.config.alertThresholds.responseTime) {
       this.createAlert(
         'warning',
         'responseTime',
-        latest.responseTime,
+        latest!.responseTime,
         this.config.alertThresholds.responseTime,
-        `Response time ${latest.responseTime.toFixed(1)}ms exceeds threshold ${this.config.alertThresholds.responseTime}ms`,
+        `Response time ${latest!.responseTime.toFixed(1)}ms exceeds threshold ${this.config.alertThresholds.responseTime}ms`,
       )
     }
 
     // Check memory usage
-    if (latest.memoryUsage > this.config.alertThresholds.memoryUsage) {
+    if (latest!.memoryUsage > this.config.alertThresholds.memoryUsage) {
       this.createAlert(
         'critical',
         'memoryUsage',
-        latest.memoryUsage,
+        latest!.memoryUsage,
         this.config.alertThresholds.memoryUsage,
-        `Memory usage ${latest.memoryUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.memoryUsage}%`,
+        `Memory usage ${latest!.memoryUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.memoryUsage}%`,
       )
     }
 
     // Check CPU usage
-    if (latest.cpuUsage > this.config.alertThresholds.cpuUsage) {
+    if (latest!.cpuUsage > this.config.alertThresholds.cpuUsage) {
       this.createAlert(
         'warning',
         'cpuUsage',
-        latest.cpuUsage,
+        latest!.cpuUsage,
         this.config.alertThresholds.cpuUsage,
-        `CPU usage ${latest.cpuUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.cpuUsage}%`,
+        `CPU usage ${latest!.cpuUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.cpuUsage}%`,
       )
     }
 
     // Check error rate
-    if (latest.errorRate > this.config.alertThresholds.errorRate) {
+    if (latest!.errorRate > this.config.alertThresholds.errorRate) {
       this.createAlert(
         'critical',
         'errorRate',
-        latest.errorRate,
+        latest!.errorRate,
         this.config.alertThresholds.errorRate,
-        `Error rate ${latest.errorRate.toFixed(2)}% exceeds threshold ${this.config.alertThresholds.errorRate}%`,
+        `Error rate ${latest!.errorRate.toFixed(2)}% exceeds threshold ${this.config.alertThresholds.errorRate}%`,
       )
     }
   }

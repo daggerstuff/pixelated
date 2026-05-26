@@ -82,12 +82,12 @@ export class RemDreamScheduler {
       for (let j = i + 1; j < memories.length; j++) {
         const sim = dedup.cosine(vectors[i], vectors[j])
         if (sim >= this.crosslinkThreshold) {
-          const sameEmotion = memories?.[i].emotions.categories.some((c) =>
-            memories?.[j].emotions.categories.includes(c),
+          const sameEmotion = memories[i]!.emotions.categories.some((c) =>
+            memories[j]!.emotions.categories.includes(c),
           )
           links.push({
-            memoryAId: memories?.[i].id,
-            memoryBId: memories?.[j].id,
+            memoryAId: memories[i]!.id,
+            memoryBId: memories[j]!.id,
             similarity: Math.round(sim * 10000) / 10000,
             linkType: sameEmotion
               ? 'emotional_co_occurrence'
@@ -155,6 +155,6 @@ export class RemDreamScheduler {
         m.emotions.categories.length > 0 ? m.emotions.categories : ['general'],
       ),
     )
-    return `Session with ${memories.length} memories. Key themes: ${[...topics].join(', ')}. Highest importance: ${top?.[0].content.slice(0, 100)}`
+    return `Session with ${memories.length} memories. Key themes: ${[...topics].join(', ')}. Highest importance: ${top[0]!.content.slice(0, 100)}`
   }
 }

@@ -94,8 +94,8 @@ function detectTrends(maps: DimensionalMap[]): MultidimensionalPattern[] {
         id: `trend-${i}-${Date.now()}`,
         type: 'trend',
         timeRange: {
-          start: window?.[0].timestamp,
-          end: window?.[window.length - 1].timestamp,
+          start: window[0]!.timestamp,
+          end: window[window.length - 1]!.timestamp,
         },
         description: describeTrend(valenceTrend, arousalTrend, dominanceTrend),
         dimensions: window.map((w) => w.dimensions),
@@ -135,8 +135,8 @@ function detectCycles(maps: DimensionalMap[]): MultidimensionalPattern[] {
         id: `cycle-${cycleLength}-${Date.now()}`,
         type: 'cycle',
         timeRange: {
-          start: maps?.[0].timestamp,
-          end: maps?.[maps.length - 1].timestamp,
+          start: maps[0]!.timestamp,
+          end: maps[maps.length - 1]!.timestamp,
         },
         description: `Cyclical pattern with period of ${cycleLength} data points`,
         dimensions: maps.map((m) => m.dimensions),
@@ -177,8 +177,8 @@ function detectShifts(maps: DimensionalMap[]): MultidimensionalPattern[] {
         id: `shift-${i}-${Date.now()}`,
         type: 'shift',
         timeRange: {
-          start: maps?.[i - 1].timestamp,
-          end: maps?.[i + 1].timestamp,
+          start: maps[i - 1]!.timestamp,
+          end: maps[i + 1]!.timestamp,
         },
         description: describeShift(prev, curr),
         dimensions: [prev, curr, next],
@@ -358,8 +358,8 @@ function calculateStabilityConfidence(window: DimensionalMap[]): number {
   for (let i = 1; i < window.length; i++) {
     changes.push(
       calculateDimensionalDistance(
-        window?.[i - 1].dimensions,
-        window?.[i].dimensions,
+        window[i - 1]!.dimensions,
+        window[i]!.dimensions,
       ),
     )
   }

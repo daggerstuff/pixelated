@@ -539,7 +539,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     const randomWeight = Math.random() * totalWeight
 
     let currentWeight = 0
-    let selectedTarget = weightedTargets[0]
+    let selectedTarget = weightedTargets[0]!
 
     for (const wt of weightedTargets) {
       currentWeight += wt.weight
@@ -718,7 +718,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
 
     if (!target) {
       // Use first available target
-      const firstTarget = Array.from(this.routeTargets.values())[0]
+      const firstTarget = Array.from(this.routeTargets.values())[0]!
       return {
         target: firstTarget,
         reason: 'Fallback to first available target',
@@ -801,7 +801,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       // Calculate error rates
       for (const region in this.metrics.errorRateByRegion) {
         const requests = this.metrics.requestsByRegion[region] ?? 0
-        const errors = this.metrics.errorRateByRegion[region]
+        const errors = this.metrics.errorRateByRegion[region]!
         this.metrics.errorRateByRegion[region] =
           requests > 0 ? errors / requests : 0
       }
