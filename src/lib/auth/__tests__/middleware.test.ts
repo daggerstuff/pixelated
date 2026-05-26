@@ -927,7 +927,7 @@ describe('Authentication Middleware', () => {
 
       await authenticateRequest(mockRequest)
 
-      const loggedData = vi?.mocked(logSecurityEvent).mock.calls[0][2]
+      const loggedData = vi.mocked(logSecurityEvent).mock.calls[0]![2]
 
       // Should not log full user agent or IP
       expect(JSON.stringify(loggedData)).not.toContain('Mozilla/5.0')
@@ -1016,7 +1016,7 @@ describe('Authentication Middleware', () => {
 
       await authenticateRequest(mockRequest)
 
-      const loggedData = vi?.mocked(logSecurityEvent).mock.calls[0][2]
+      const loggedData = vi.mocked(logSecurityEvent).mock.calls[0]![2]
 
       // Should not log medical record numbers or health data
       expect(JSON.stringify(loggedData)).not.toContain('MRN123456')
@@ -1066,7 +1066,7 @@ describe('Authentication Middleware', () => {
 
       await authenticateRequest(mockRequest)
 
-      const loggedData = vi?.mocked(logSecurityEvent).mock.calls[0][2] as {
+      const loggedData = vi.mocked(logSecurityEvent).mock.calls[0]![2] as {
         clientInfo?: { ip?: string }
       }
 

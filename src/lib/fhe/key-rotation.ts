@@ -1067,7 +1067,7 @@ export class KeyRotationService extends EventEmitter {
         .sort((a, b) => b.created - a.created)
 
       if (validKeys.length > 0) {
-        const newestKey = validKeys[0]
+        const newestKey = validKeys[0]!
         this.activeKeyId = newestKey.id
 
         // If SEAL service is available, load the keys
@@ -1183,7 +1183,7 @@ export class KeyRotationService extends EventEmitter {
           .sort((a, b) => b.created - a.created)
 
         if (validKeys.length > 0) {
-          const newestKey = validKeys[0]
+          const newestKey = validKeys[0]!
           this.activeKeyId = newestKey.id
 
           // If SEAL service is available, load the keys
@@ -1220,7 +1220,7 @@ export class KeyRotationService extends EventEmitter {
           .sort((a, b) => b.created - a.created)
 
         if (validKeys.length > 0) {
-          const newestKey = validKeys[0]
+          const newestKey = validKeys[0]!
           this.activeKeyId = newestKey.id
 
           // If SEAL service is available, load the keys

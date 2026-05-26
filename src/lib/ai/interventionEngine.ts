@@ -262,7 +262,7 @@ class InterventionEngine {
 
     // Select top interventions (max 3)
     for (let i = 0; i < Math.min(3, applicableRules.length); i++) {
-      const rule = applicableRules[i]
+      const rule = applicableRules[i]!
       selectedInterventions.push(...rule.suggestions)
 
       reasoning.push(
@@ -311,7 +311,7 @@ class InterventionEngine {
     }
 
     // Check medication adherence if applicable
-    if (patientProfile.medication && sessionData.medicationAdherence < 0.8) {
+    if (patientProfile.medication && (sessionData.medicationAdherence ?? 0) < 0.8) {
       recommendations.push(
         'Review medication adherence and address any concerns or side effects',
       )

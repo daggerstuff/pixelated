@@ -51,11 +51,11 @@ const createMockAIService = (enhancedResponse?: string): AIService => {
         provider: 'test',
         content: enhancedResponse ?? 'Enhanced response...',
       } as AICompletion),
-    createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
-    getModelInfo: vi.fn<() => Promise<unknown>>(),
-    dispose: vi.fn<() => void>(),
-    createChatCompletionWithTracking: vi.fn<() => Promise<unknown>>(),
-    generateCompletion: vi.fn<() => Promise<unknown>>(),
+    createStreamingChatCompletion: vi.fn(),
+    getModelInfo: vi.fn(),
+    dispose: vi.fn(),
+    createChatCompletionWithTracking: vi.fn(),
+    generateCompletion: vi.fn(),
   }
   return mockService as AIService
 }

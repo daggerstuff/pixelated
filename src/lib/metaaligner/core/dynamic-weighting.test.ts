@@ -146,8 +146,8 @@ describe('DynamicWeightingEngine', () => {
 
       // Weights should transition smoothly, not jump
       const empathyChange = Math.abs(
-        result2?.weights[ObjectiveId.EMPATHY] -
-          result1?.weights[ObjectiveId.EMPATHY],
+        result2!.weights[ObjectiveId.EMPATHY] -
+          result1!.weights[ObjectiveId.EMPATHY],
       )
 
       // With blending, change should be less than the full difference
@@ -245,11 +245,11 @@ describe('DynamicWeightingEngine', () => {
 
       // Check that no weight changed by more than 10%
       const history = customEngine.getWeightHistory()
-      const prevWeights = history?.[history.length - 2].weights
+      const prevWeights = history[history.length - 2]!.weights
       const newWeights = result.weights
 
       for (const key in newWeights) {
-        const change = Math.abs(newWeights?.[key] - prevWeights?.[key])
+        const change = Math.abs(newWeights[key]! - prevWeights[key]!)
         expect(change).toBeLessThanOrEqual(0.12) // 10% + small tolerance
       }
     })
@@ -474,11 +474,11 @@ describe('DynamicWeightingEngine', () => {
 
       // Check that transitions are smooth (no wild swings)
       for (let i = 1; i < results.length; i++) {
-        const prevWeights = results?.[i - 1].weights
-        const currWeights = results?.[i].weights
+        const prevWeights = results[i - 1]!.weights
+        const currWeights = results[i]!.weights
 
         for (const key in currWeights) {
-          const change = Math.abs(currWeights?.[key] - prevWeights?.[key])
+          const change = Math.abs(currWeights[key]! - prevWeights[key]!)
           // Change should be reasonable (< 40% due to blending and guards)
           expect(change).toBeLessThan(0.4)
         }
@@ -509,11 +509,11 @@ describe('DynamicWeightingEngine', () => {
 
         if (i > 0) {
           const history = engine.getWeightHistory()
-          const prevWeights = history?.[history.length - 2].weights
+          const prevWeights = history[history.length - 2]!.weights
           const currWeights = result.weights
 
           for (const key in currWeights) {
-            const change = Math.abs(currWeights?.[key] - prevWeights?.[key])
+            const change = Math.abs(currWeights[key]! - prevWeights[key]!)
             maxChange = Math.max(maxChange, change)
           }
         }

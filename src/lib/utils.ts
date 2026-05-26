@@ -116,7 +116,7 @@ function bytesToUint32BE(bytes: Uint8Array): number {
   if (bytes.length < 4) {
     throw new Error(ERRORS.BYTES_TO_UINT32BE_SHORT)
   }
-  return (bytes?.[0] << 24) | (bytes?.[1] << 16) | (bytes?.[2] << 8) | bytes?.[3]
+  return (bytes[0]! << 24) | (bytes[1]! << 16) | (bytes[2]! << 8) | bytes[3]!
 }
 
 /**
