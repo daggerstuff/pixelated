@@ -620,7 +620,7 @@ export class BiasAuditService {
         Math.floor(result.overallBiasScore * buckets),
         buckets - 1,
       )
-      counts?.[bucketIndex]++
+		counts[bucketIndex] += 1
     }
 
     for (let i = 0; i < buckets; i++) {
