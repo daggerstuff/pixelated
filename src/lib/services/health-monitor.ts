@@ -130,7 +130,7 @@ export class HealthMonitor {
       const cpuCount = os.cpus().length
 
       // Check if system load is reasonable (< 2x CPU cores)
-      const highLoad = loadAvg[0] > cpuCount * 2
+      const highLoad = loadAvg?.[0] > cpuCount * 2
 
       return {
         name: 'system',

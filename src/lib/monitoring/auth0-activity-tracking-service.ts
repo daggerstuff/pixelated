@@ -480,7 +480,7 @@ export class Auth0ActivityTrackingService {
       )
 
       const mostCommonEventType = Object.keys(eventTypes).reduce((a, b) =>
-        eventTypes[a] > eventTypes[b] ? a : b,
+        eventTypes?.[a] > eventTypes?.[b] ? a : b,
       )
 
       const ipAddresses = [...new Set(activities.map((a) => a.ipAddress))]
@@ -493,7 +493,7 @@ export class Auth0ActivityTrackingService {
       return {
         userId,
         totalActivities: activities.length,
-        lastActivity: activities[0].timestamp,
+        lastActivity: activities?.[0].timestamp,
         mostCommonEventType,
         activeDays,
         ipAddressCount: ipAddresses.length,

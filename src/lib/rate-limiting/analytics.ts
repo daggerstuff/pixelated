@@ -86,7 +86,7 @@ export class RateLimitAnalyticsService {
     const hourlyKey = `${this.analyticsPrefix}hourly:${rule.name}:${date}:${hour}`
 
     try {
-      const pipeline = redis['pipeline']()
+      const pipeline = redis?.['pipeline']()
 
       // Update daily analytics
       pipeline.hincrby(analyticsKey, `${eventType}_total`, 1)
@@ -135,7 +135,7 @@ export class RateLimitAnalyticsService {
         const dateStr = date.toISOString().slice(0, 10)
 
         const dailyKey = `${this.analyticsPrefix}${ruleName}:${dateStr}`
-        const dailyData = await redis['hgetall'](dailyKey)
+        const dailyData = await redis?.['hgetall'](dailyKey)
 
         if (Object.keys(dailyData).length > 0) {
           const analyticsEntry: RateLimitAnalytics = {
@@ -188,7 +188,7 @@ export class RateLimitAnalyticsService {
 
     for (let hour = 0; hour < 24; hour++) {
       const hourlyKey = `${this.analyticsPrefix}hourly:${ruleName}:${date}:${hour}`
-      const data = await redis['hgetall'](hourlyKey)
+      const data = await redis?.['hgetall'](hourlyKey)
 
       if (Object.keys(data).length > 0) {
         hourlyData.push({
@@ -220,7 +220,7 @@ export class RateLimitAnalyticsService {
       const today = now.toISOString().slice(0, 10)
 
       // Get today's data across all rules
-      const ruleKeys = await redis['keys'](`${this.analyticsPrefix}*:${today}`)
+      const ruleKeys = await redis?.['keys'](`${this.analyticsPrefix}*:${today}`)
       let totalRequests = 0
       let blockedRequests = 0
       let attackDetections = 0
@@ -229,7 +229,7 @@ export class RateLimitAnalyticsService {
       const identifierStats: Record<string, number> = {}
 
       for (const key of ruleKeys) {
-        const data = await redis['hgetall'](key)
+        const data = await redis?.['hgetall'](key)
         const ruleName = key.split(':')[1] ?? 'unknown'
 
         const requests = parseInt(data.request_total ?? '0')
@@ -434,7 +434,7 @@ export class RateLimitAnalyticsService {
    */
   async getRecentAlerts(limit = 50): Promise<RateLimitAlert[]> {
     try {
-      const alertKeys = await redis['keys'](`${this.alertPrefix}*`)
+      const alertKeys = await redis?.['keys'](`${this.alertPrefix}*`)
       const recentKeys = alertKeys
         .map((key) => ({ key, timestamp: parseInt(key.split(':')[1] ?? '0') }))
         .sort((a, b) => b.timestamp - a.timestamp)
@@ -443,7 +443,7 @@ export class RateLimitAnalyticsService {
 
       const alerts: RateLimitAlert[] = []
       for (const key of recentKeys) {
-        const alertData = await redis['get'](key)
+        const alertData = await redis?.['get'](key)
         if (alertData) {
           try {
             const parsed = this.parseJsonSafely(alertData)
@@ -606,7 +606,7 @@ export class RateLimitAnalyticsService {
       const cutoffDate = new Date(Date.now() - olderThanDays * 86400000)
       const cutoffStr = cutoffDate.toISOString().slice(0, 10)
 
-      const keys = await redis['keys'](`${this.analyticsPrefix}*`)
+      const keys = await redis?.['keys'](`${this.analyticsPrefix}*`)
       const keysToDelete = keys.filter((key) => {
         const keyDate = key.split(':').pop()
         return keyDate && keyDate < cutoffStr

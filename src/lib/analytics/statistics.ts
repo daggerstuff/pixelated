@@ -34,8 +34,8 @@ export const StatisticalAnalysis = {
     let denominator = 0
 
     for (let i = 0; i < n; i++) {
-      const xDiff = xValues[i] - xMean
-      const yDiff = dataPoints[i] - yMean
+      const xDiff = xValues?.[i] - xMean
+      const yDiff = dataPoints?.[i] - yMean
 
       numerator += xDiff * yDiff
       denominator += xDiff * xDiff

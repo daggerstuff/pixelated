@@ -1791,10 +1791,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     // Simple CSV parsing (in production, use a proper CSV parser)
     const lines = data.split('\n')
-    const headers = lines[0].split(',').map((h) => h.trim())
+    const headers = lines?.[0].split(',').map((h) => h.trim())
 
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map((v) => v.trim())
+      const values = lines?.[i].split(',').map((v) => v.trim())
       if (values.length === headers.length) {
         const item: Record<string, unknown> = {}
         headers.forEach((header, index) => {

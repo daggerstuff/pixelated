@@ -22,10 +22,10 @@ describe('generateToc', () => {
     const maxHeadingLevel: HeadingLevel = 3
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
     expect(toc).toHaveLength(2)
-    expect(toc[0].text).toBe('H2')
-    expect(toc[0].children).toHaveLength(1)
-    expect(toc[0].children[0].text).toBe('H3')
-    expect(toc[1].text).toBe('H2-2')
+    expect(toc?.[0].text).toBe('H2')
+    expect(toc?.[0].children).toHaveLength(1)
+    expect(toc?.[0].children[0].text).toBe('H3')
+    expect(toc?.[1].text).toBe('H2-2')
   })
 
   it('should handle skipped heading levels with fillers', () => {
@@ -37,9 +37,9 @@ describe('generateToc', () => {
     const maxHeadingLevel: HeadingLevel = 6
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
     expect(toc).toHaveLength(1)
-    expect(toc[0].children).toHaveLength(1)
-    expect(toc[0].children[0].slug).toBe('') // filler for level 3
-    expect(toc[0].children[0].children).toHaveLength(1)
-    expect(toc[0].children[0].children[0].text).toBe('H4')
+    expect(toc?.[0].children).toHaveLength(1)
+    expect(toc?.[0].children[0].slug).toBe('') // filler for level 3
+    expect(toc?.[0].children[0].children).toHaveLength(1)
+    expect(toc?.[0].children[0].children[0].text).toBe('H4')
   })
 })

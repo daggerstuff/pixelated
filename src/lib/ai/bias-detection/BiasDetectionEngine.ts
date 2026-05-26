@@ -18,11 +18,9 @@ import type {
   EvaluationAnalysisResult,
   InteractiveAnalysisResult,
   ModelLevelAnalysisResult,
-  ParticipantDemographics,
   PreprocessingAnalysisResult,
   TherapeuticSession as SessionData,
-  UserContext,
-} from "./types";
+  UserContext } from "./types";
 
 type LayerResults = import("./types").LayerResults;
 
@@ -741,7 +739,7 @@ export class BiasDetectionEngine {
     }
 
     if (batchResult?.errors.length) {
-      throw batchResult.errors[0].error;
+      throw batchResult?.errors[0].error;
     }
     const averageBias =
       results.length > 0

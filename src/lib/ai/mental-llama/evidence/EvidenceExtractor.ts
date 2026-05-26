@@ -807,7 +807,7 @@ Extract evidence that is clinically meaningful and specific to mental health ass
 
     evidenceItems.forEach((item) => {
       categorized[item.category] ??= [];
-      categorized[item.category].push(item)
+      categorized?.[item.category].push(item)
     })
 
     return categorized

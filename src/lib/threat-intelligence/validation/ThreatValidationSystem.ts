@@ -222,7 +222,7 @@ export class ThreatValidationSystemCore
         validation.results,
       )
       validation.overallScore = overallScore
-      validation.isValid = overallScore >= this.config.validationThreshold
+      validation.isValid = overallScore >= this?.config.validationThreshold
 
       // Step 9: Determine final status
       validation.status = validation.isValid ? 'valid' : 'invalid'

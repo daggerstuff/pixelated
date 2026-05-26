@@ -285,8 +285,8 @@ describe('breachNotificationSystem', () => {
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(2)
-      expect(breaches[0].id).toBe('breach2') // Most recent first
-      expect(breaches[1].id).toBe('breach1')
+      expect(breaches?.[0].id).toBe('breach2') // Most recent first
+      expect(breaches?.[1].id).toBe('breach1')
     })
 
     it('should handle Redis errors', async () => {
@@ -321,7 +321,7 @@ describe('breachNotificationSystem', () => {
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(1)
-      expect(breaches[0].id).toBe('valid')
+      expect(breaches?.[0].id).toBe('valid')
     })
   })
 })

@@ -165,7 +165,7 @@ class PrivacyEngine {
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
 
     const privateWeights = update.weights.map(
-      (weight, index) => weight + noise[index % noise.length],
+      (weight, index) => weight + noise?.[index % noise.length],
     )
 
     return {
@@ -258,14 +258,14 @@ class PrivacyEngine {
   private federatedAveraging(updates: ModelUpdate[]): ModelUpdate {
     const totalWeight = updates.length
     const averagedWeights = Array.from(
-      { length: updates[0].weights.length },
+      { length: updates?.[0].weights.length },
       () => 0,
     )
 
     // Simple averaging of model weights
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
-        averagedWeights[index] += weight / totalWeight
+        averagedWeights?.[index] += weight / totalWeight
       })
     })
 
@@ -282,7 +282,7 @@ class PrivacyEngine {
   private federatedProximal(updates: ModelUpdate[]): ModelUpdate {
     // FedProx: Federated learning with proximal regularization
     const mu = 0.01 // Proximal term weight
-    const globalWeights = this.globalModel?.weights ?? updates[0].weights
+    const globalWeights = this.globalModel?.weights ?? updates?.[0].weights
 
     const proximalWeights = Array.from(
       { length: globalWeights.length },
@@ -292,7 +292,7 @@ class PrivacyEngine {
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
         const proximal = weight + mu * (weight - globalWeights[index])
-        proximalWeights[index] += proximal / updates.length
+        proximalWeights?.[index] += proximal / updates.length
       })
     })
 
@@ -427,7 +427,7 @@ class PrivacyEngine {
 
     Object.keys(originalStats).forEach((key) => {
       if (sanitizedStats[key] !== undefined) {
-        const diff = Math.abs(originalStats[key] - sanitizedStats[key])
+        const diff = Math.abs(originalStats?.[key] - sanitizedStats[key])
         preservationScore += Math.max(0, 1 - diff)
         comparisons++
       }

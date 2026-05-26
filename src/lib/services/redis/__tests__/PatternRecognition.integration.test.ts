@@ -4,7 +4,7 @@ import type {
   TherapySession,
 } from '../../../ai/services/pattern-recognition-types'
 import { createPatternRecognitionService } from '../../../ai/services/PatternRecognitionFactory'
-import type { IRedisService } from '../types'
+
 
 // Mock FHE service for testing
 const mockFHEService: ExtendedFHEService = {
@@ -72,99 +72,6 @@ vi.mock('../../../fhe/pattern-recognition-factory', () => ({
   createPatternRecognitionFHEService: vi.fn(async () => mockFHEService),
 }))
 
-const mockRedisService: IRedisService = {
-  connect: async () => {},
-  disconnect: async () => {},
-  get: async (_: string) => null,
-  set: async (_key: string, _value: string, _ttlMs?: number) => {},
-  del: async (_: string) => {},
-  exists: async (_: string) => false,
-  ttl: async (_: string) => -1,
-  incr: async (_: string) => 1,
-  sadd: async (_key: string, _member: string) => 1,
-  srem: async (_key: string, _member: string) => 1,
-  smembers: async (_: string) => [] as string[],
-  isHealthy: async () => true,
-  getPoolStats: async () => ({
-    totalConnections: 1,
-    activeConnections: 0,
-    idleConnections: 1,
-    waitingClients: 0,
-  }),
-  keys: async function (_pattern: string): Promise<string[]> {
-    throw new Error('Function not implemented.')
-  },
-  deletePattern: async function (_pattern: string): Promise<void> {
-    throw new Error('Function not implemented.')
-  },
-  hset: async function (
-    _key: string,
-    _field: string,
-    _value: string,
-  ): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  hget: async function (_key: string, _field: string): Promise<string | null> {
-    throw new Error('Function not implemented.')
-  },
-  hgetall: async function (_key: string): Promise<Record<string, string>> {
-    throw new Error('Function not implemented.')
-  },
-  hdel: async function (_key: string, _field: string): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  hlen: async function (_key: string): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  zadd: async function (
-    _key: string,
-    _score: number,
-    _member: string,
-  ): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  zrem: async function (_key: string, _member: string): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  zrange: async function (
-    _key: string,
-    _start: number,
-    _stop: number,
-    _withScores?: string,
-  ): Promise<string[] | import('../redis-operation-types').RedisZSetMember[]> {
-    throw new Error('Function not implemented.')
-  },
-  zpopmin: async function (
-    _key: string,
-  ): Promise<import('../redis-operation-types').RedisZSetMember[]> {
-    throw new Error('Function not implemented.')
-  },
-  zcard: async function (_key: string): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  lpush: async function (
-    _key: string,
-    ..._elements: string[]
-  ): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  rpoplpush: async function (
-    _source: string,
-    _destination: string,
-  ): Promise<string | null> {
-    throw new Error('Function not implemented.')
-  },
-  lrem: async function (
-    _key: string,
-    _count: number,
-    _value: string,
-  ): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-  llen: async function (_key: string): Promise<number> {
-    throw new Error('Function not implemented.')
-  },
-}
 
 describe('patternRecognition Integration', () => {
   let patternService: PatternRecognitionService

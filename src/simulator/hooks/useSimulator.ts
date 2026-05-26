@@ -265,10 +265,10 @@ function generateFeedbackMessage(
 
   switch (feedbackType) {
     case FeedbackType.POSITIVE:
-      return `Great job using ${techniques[0].replace(/_/g, ' ')}! This is particularly effective for this client's ${scenario.domain} concerns. Your approach demonstrates attunement to the client's needs.`
+      return `Great job using ${techniques?.[0].replace(/_/g, ' ')}! This is particularly effective for this client's ${scenario.domain} concerns. Your approach demonstrates attunement to the client's needs.`
 
     case FeedbackType.DEVELOPMENTAL:
-      return `Your response shows good effort with ${techniques[0].replace(
+      return `Your response shows good effort with ${techniques?.[0].replace(
         /_/g,
         ' ',
       )}. For this type of ${
@@ -279,7 +279,7 @@ function generateFeedbackMessage(
       suggestedTechnique = (scenario.techniques ?? []).find(
         (t) => !techniques.includes(t),
       )
-      return `You're on the right track with ${techniques[0].replace(
+      return `You're on the right track with ${techniques?.[0].replace(
         /_/g,
         ' ',
       )}. For this scenario, you might also consider trying ${
@@ -289,7 +289,7 @@ function generateFeedbackMessage(
       } to address the client's ${scenario.domain} concerns more effectively.`
 
     case FeedbackType.ALTERNATIVE_APPROACH:
-      return `While your approach using ${techniques[0].replace(
+      return `While your approach using ${techniques?.[0].replace(
         /_/g,
         ' ',
       )} has merit, this client might benefit from a different strategy. Consider exploring alternative responses that focus specifically on their ${

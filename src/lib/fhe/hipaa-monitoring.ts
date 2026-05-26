@@ -731,8 +731,8 @@ export class HIPAAMonitoringService extends EventEmitter {
     const intervals: number[] = []
     for (let i = 1; i < sortedEvents.length; i++) {
       const interval =
-        new Date(sortedEvents[i].timestamp).getTime() -
-        new Date(sortedEvents[i - 1].timestamp).getTime()
+        new Date(sortedEvents?.[i].timestamp).getTime() -
+        new Date(sortedEvents?.[i - 1].timestamp).getTime()
       intervals.push(interval)
     }
 
