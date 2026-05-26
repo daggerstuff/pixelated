@@ -22,6 +22,7 @@ const appLogger = createBuildSafeLogger('ai-server')
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
 
 
+const providers = [
   'anthropic',
   'openai',
   'azure-openai',
@@ -168,9 +169,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIChatRequest {
     return {
-      messages: body.messages,
-      provider: body.provider,
-      options: body.options,
+      messages: body['messages'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -178,9 +179,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIEmotionRequest {
     return {
-      text: body.text,
-      provider: body.provider,
-      options: body.options,
+      text: body['text'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -188,9 +189,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIStreamRequest {
     return {
-      messages: body.messages,
-      provider: body.provider,
-      options: body.options,
+      messages: body['messages'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -508,9 +509,7 @@ Respond in JSON format with the following structure:
 `)
       }
 
-      res.write('data: [DONE]
-
-')
+      res.write('data: [DONE]\n\n')
       res.end()
      } catch (error: unknown) {
        appLogger.error('Streaming chat failed:', error)
