@@ -22,7 +22,7 @@ export async function rateLimiter(
     'unknown'
 
   // Use the first IP if x-forwarded-for returns a comma-separated list
-  const clientIp = ip.split(',')[0].trim()
+  const clientIp = ip?.split(',')[0].trim()
 
   // Check rate limit for this IP
   const result = await limiter.check(clientIp)

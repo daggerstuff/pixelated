@@ -109,9 +109,9 @@ export class DatasetPreparator {
     }
     for (const ex of examples) {
       const v = (ex.metadata['valence'] as number) ?? 0
-      if (v < -0.2) buckets['negative'].push(ex)
-      else if (v > 0.2) buckets['positive'].push(ex)
-      else buckets['neutral'].push(ex)
+      if (v < -0.2) buckets?.['negative'].push(ex)
+      else if (v > 0.2) buckets?.['positive'].push(ex)
+      else buckets?.['neutral'].push(ex)
     }
 
     const maxSize = Math.max(...Object.values(buckets).map((b) => b.length), 1)

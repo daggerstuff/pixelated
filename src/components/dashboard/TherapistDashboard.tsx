@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 
 import { useTherapistAnalytics } from '@/hooks/useTherapistAnalytics'
 import { cn } from '@/lib/utils'

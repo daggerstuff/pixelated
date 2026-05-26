@@ -108,7 +108,7 @@ export const GET: APIRoute = async () => {
     logs.forEach((log: AuditLog) => {
       // Increment hourly access count
       const hour = new Date(log.timestamp).getHours()
-      hourlyAccess[hour]++
+      hourlyAccess?.[hour]++
 
       // Count access types using the action property
       const type = log.action

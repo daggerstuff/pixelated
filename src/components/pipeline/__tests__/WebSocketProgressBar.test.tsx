@@ -2,7 +2,6 @@ import { render, screen, fireEvent, act } from '@testing-library/react'
 /**
  * @vitest-environment jsdom
  */
-import React from 'react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest'
 
 import {

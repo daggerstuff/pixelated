@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Clock, AlertTriangle, BarChart3 } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export interface AgentMetric {

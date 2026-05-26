@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import { authClient } from '@/lib/auth-client'
 
@@ -69,7 +69,7 @@ export function UserMenu({ className = '' }: UserMenuProps) {
           src={user.user_metadata?.avatar_url}
           initials={(() => {
             if (typeof user.email === 'string' && user.email.length > 0) {
-              return user.email[0].toUpperCase()
+              return user?.email[0].toUpperCase()
             }
             return 'U'
           })()}

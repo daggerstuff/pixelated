@@ -542,8 +542,8 @@ describe('ObjectiveMetricsEngine', () => {
       )
 
       expect(metrics.criteriaBreakdown).toHaveLength(1)
-      expect(metrics.criteriaBreakdown[0].score).toBe(0)
-      expect(metrics.criteriaBreakdown[0].contribution).toBe(0)
+      expect(metrics?.criteriaBreakdown[0].score).toBe(0)
+      expect(metrics?.criteriaBreakdown[0].contribution).toBe(0)
     })
   })
 })

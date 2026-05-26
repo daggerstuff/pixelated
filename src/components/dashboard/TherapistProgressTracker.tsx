@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import useSkillProgress, { SkillProgress } from '@/hooks/useSkillProgress'
 import { cn } from '@/lib/utils'

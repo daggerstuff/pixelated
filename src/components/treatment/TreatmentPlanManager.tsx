@@ -1,5 +1,5 @@
 import { format, addDays, differenceInDays } from 'date-fns'
-import { Target, Brain, Heart, Users, Dumbbell, Clipboard } from 'lucide-react'
+import { Target, Dumbbell } from 'lucide-react'
 import React, { useState, useEffect } from 'react'
 
 interface TreatmentGoal {

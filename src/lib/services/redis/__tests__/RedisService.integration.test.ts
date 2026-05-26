@@ -184,7 +184,7 @@ describeFn('RedisService Integration Tests', () => {
         )
 
         results.forEach((result, i) => {
-          expect(parseRedisRecord(result)).toEqual(sessions[i].data)
+          expect(parseRedisRecord(result)).toEqual(sessions?.[i].data)
         })
       })
     })

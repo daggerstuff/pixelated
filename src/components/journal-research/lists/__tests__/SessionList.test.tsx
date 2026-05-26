@@ -18,7 +18,7 @@ describe('SessionList', () => {
     render(<SessionList sessions={mockSessionList} />)
 
     expect(
-      screen.getByText(mockSessionList.items[0].sessionId),
+      screen.getByText(mockSessionList?.items[0].sessionId),
     ).toBeInTheDocument()
   })
 
@@ -28,7 +28,7 @@ describe('SessionList', () => {
       <SessionList sessions={mockSessionList} onSessionClick={handleClick} />,
     )
 
-    const sessionLink = screen.getByText(mockSessionList.items[0].sessionId)
+    const sessionLink = screen.getByText(mockSessionList?.items[0].sessionId)
     fireEvent.click(sessionLink)
 
     expect(handleClick).toHaveBeenCalledWith(

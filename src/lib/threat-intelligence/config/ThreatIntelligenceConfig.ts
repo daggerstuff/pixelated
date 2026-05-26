@@ -1413,7 +1413,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       // Don't allow removal of primary region
-      if (this.config.regions[regionIndex].primary) {
+      if (this?.config.regions[regionIndex].primary) {
         throw new Error('Cannot remove primary region')
       }
 

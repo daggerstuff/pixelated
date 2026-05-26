@@ -4,8 +4,8 @@
 # This script sets up tmux sessions to run AI agents persistently for task execution
 
 SESSION_NAME="ai-agents"
-CONDA_ENV="pixel"
-WORKSPACE_DIR="/workspaces/pixelated"
+# No conda; using uv virtualenv if present
+WORKSPACE_DIR="$(pwd)"
 
 # Colors for output
 RED='\033[0;31m'
@@ -34,9 +34,13 @@ setup_environment() {
     
     print_color $BLUE "🔧 Setting up environment in $window..."
     
-    # Activate conda environment
-    tmux send-keys -t "$session:$window" "conda activate $CONDA_ENV" C-m
-    sleep 2
+    # Activate virtual environment if it exists
+    if [ -d ".venv" ]; then
+      tmux send-keys -t "$session:$window" "source .venv/bin/activate" C-m
+    else
+      tmux send-keys -t "$session:$window" "echo '⚠️ No .venv found – skipping activation'" C-m
+    fi
+    sleep 1
     
     # Navigate to workspace
     tmux send-keys -t "$session:$window" "cd $WORKSPACE_DIR" C-m
