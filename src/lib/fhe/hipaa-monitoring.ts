@@ -416,7 +416,7 @@ export class HIPAAMonitoringService extends EventEmitter {
     // Create events with timestamps spread over the last hour
     for (let i = 0; i < 20; i++) {
       const randomEvent =
-        sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
+        sampleEvents[Math.floor(Math.random() * sampleEvents.length)]!
       const randomTime = oneHourAgo + Math.random() * 3600000
 
       events.push({
@@ -731,8 +731,8 @@ export class HIPAAMonitoringService extends EventEmitter {
     const intervals: number[] = []
     for (let i = 1; i < sortedEvents.length; i++) {
       const interval =
-        new Date(sortedEvents?.[i].timestamp).getTime() -
-        new Date(sortedEvents?.[i - 1].timestamp).getTime()
+        new Date(sortedEvents[i]!.timestamp).getTime() -
+        new Date(sortedEvents[i - 1]!.timestamp).getTime()
       intervals.push(interval)
     }
 
@@ -1149,7 +1149,7 @@ export class HIPAAMonitoringService extends EventEmitter {
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
         )
 
-        const latestEvent = sortedEvents[sortedEvents.length - 1]
+        const latestEvent = sortedEvents[sortedEvents.length - 1]!
         const latestEventTime = new Date(latestEvent.timestamp)
         const daysSinceLastRotation =
           (now.getTime() - latestEventTime.getTime()) / (1000 * 60 * 60 * 24)
