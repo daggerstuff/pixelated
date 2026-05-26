@@ -252,7 +252,7 @@ describe('HybridDeduplication', () => {
     }
 
     expect(warningFn).toHaveBeenCalled()
-    expect(warningFn.mock.calls[0][0]).toContain('approaching capacity')
+    expect(warningFn?.mock.calls[0][0]).toContain('approaching capacity')
   })
 
   it('should report memory usage correctly', () => {

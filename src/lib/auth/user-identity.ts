@@ -110,7 +110,7 @@ async function findUserByAuth0Sub(
     [sub, PROVIDER],
   )
   if (result.rows.length === 0) return null
-  return { internalId: result.rows[0].user_id, role: result.rows[0].role }
+  return { internalId: result?.rows[0].user_id, role: result?.rows[0].role }
 }
 
 async function createUserWithLink(
@@ -145,8 +145,8 @@ async function createUserWithLink(
     `SELECT id, role FROM users WHERE email = $1 LIMIT 1`,
     [profile.email],
   )
-  const actualId = upsertResult.rows[0].id
-  const actualRole = upsertResult.rows[0].role
+  const actualId = upsertResult?.rows[0].id
+  const actualRole = upsertResult?.rows[0].role
 
   // 2. Insert into auth_accounts (link sub → internal UUID)
   await client.query(

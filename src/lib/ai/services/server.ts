@@ -22,14 +22,6 @@ const appLogger = createBuildSafeLogger('ai-server')
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
 
 
-const providers = [
-  'anthropic',
-  'openai',
-  'azure-openai',
-  'llm',
-  'huggingface',
-  'local',
-]
 
 type HttpResponse = NodeServerResponse
 type HttpRequest = IncomingMessage
@@ -67,16 +59,6 @@ class AIServer {
    constructor() {
      // Initialize AI providers on startup
      initializeProviders()
-   }
-
-   /**
-    * Format error message for consistent error handling
-    * @param error - The error object to format
-    * @param fallback - Fallback message if error is not an Error instance
-    * @returns Formatted error message string
-    */
-   private formatErrorMessage(error: unknown, fallback: string): string {
-     return error instanceof Error ? error.message : fallback
    }
 
    private sendJsonResponse(

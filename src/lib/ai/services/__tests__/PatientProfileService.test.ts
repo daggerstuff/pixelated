@@ -177,7 +177,7 @@ describe('PatientProfileService', () => {
       )
       expect(mockKvStore.set).toHaveBeenCalledTimes(1)
 
-      const savedProfileArgument = mockKvStore.set.mock
+      const savedProfileArgument = mockKvStore?.set.mock
         .calls[0][1] as PatientProfile
       expect(savedProfileArgument.conversationHistory.length).toBe(1)
       const firstMessage = savedProfileArgument.conversationHistory[0]

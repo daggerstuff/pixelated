@@ -119,7 +119,7 @@ class RequestQueue {
 
         if (lowPriorityRequests.length > 0) {
           this.queue = this.queue.filter(
-            (req) => req.id !== lowPriorityRequests[0].id,
+            (req) => req.id !== lowPriorityRequests?.[0].id,
           )
         } else {
           console.warn('Request queue is full, dropping oldest request')

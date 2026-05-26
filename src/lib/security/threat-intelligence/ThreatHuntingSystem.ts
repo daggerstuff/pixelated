@@ -1183,7 +1183,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     const byType: Record<string, number> = {}
 
     for (const finding of findings) {
-      bySeverity[finding.severity]++
+      bySeverity?.[finding.severity]++
       byType[finding.type] = (byType[finding.type] ?? 0) + 1
     }
 

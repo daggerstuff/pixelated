@@ -195,7 +195,7 @@ describe('performance Tests', () => {
             'largest-contentful-paint',
           )
           const lcpStartTime =
-            lcpEntries.length > 0 ? lcpEntries[0].startTime : 0
+            lcpEntries.length > 0 ? lcpEntries?.[0].startTime : 0
           const isLayoutShiftEntry = (
             entry: PerformanceEntry,
           ): entry is PerformanceEntry & { value: number } =>
@@ -332,7 +332,7 @@ describe('performance Tests', () => {
             ])
 
             // Store result
-            results.pages[name].FID = inputDelay
+            results?.pages[name].FID = inputDelay
 
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)

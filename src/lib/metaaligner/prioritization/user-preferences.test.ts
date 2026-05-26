@@ -594,8 +594,8 @@ describe('applyUserPreferences', () => {
       const result = applyUserPreferences(objectives, {})
 
       // Should distribute equally when all weights are 0
-      expect(result[0].weight).toBeCloseTo(0.5, 4)
-      expect(result[1].weight).toBeCloseTo(0.5, 4)
+      expect(result?.[0].weight).toBeCloseTo(0.5, 4)
+      expect(result?.[1].weight).toBeCloseTo(0.5, 4)
     })
   })
 })

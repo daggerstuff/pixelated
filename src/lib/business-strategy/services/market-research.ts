@@ -7,12 +7,10 @@
 
 import type { UserId } from '../types/common'
 import type {
-  MarketAnalysis,
-  MarketSegment,
+  
+  
   MarketTrend,
-  Opportunity,
-  CompetitorAnalysis,
-} from '../types/market-research'
+  Opportunity } from '../types/market-research'
 import { BaseService } from './base-service'
 
 export class MarketResearchService extends BaseService {

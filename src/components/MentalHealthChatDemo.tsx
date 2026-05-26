@@ -22,13 +22,12 @@ import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   convertToMindMirrorAnalysis,
   createInterventionMessage,
   getInitialMessages,
 } from '@/lib/mental-health/chat-utils'
-import type { ChatMessage } from '@/lib/mental-health/chat-utils'
 import {
   type EnhancedMentalHealthAnalysis,
   type MindMirrorAnalysis,
@@ -48,7 +47,6 @@ interface MentalHealthService {
   isInitialized: boolean
 }
 
-const logger = createBuildSafeLogger('chat-demo')
 
 // Extended analysis result that might include additional fields
 interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {

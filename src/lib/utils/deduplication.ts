@@ -30,7 +30,7 @@ export class BloomFilter {
       const index = this.hash(item, i)
       const byteIndex = Math.floor(index / 8)
       const bitIndex = index % 8
-      this.bitArray[byteIndex] |= 1 << bitIndex
+      this?.bitArray[byteIndex] |= 1 << bitIndex
     }
   }
 
@@ -39,7 +39,7 @@ export class BloomFilter {
       const index = this.hash(item, i)
       const byteIndex = Math.floor(index / 8)
       const bitIndex = index % 8
-      if ((this.bitArray[byteIndex] & (1 << bitIndex)) === 0) {
+      if ((this?.bitArray[byteIndex] & (1 << bitIndex)) === 0) {
         return false
       }
     }

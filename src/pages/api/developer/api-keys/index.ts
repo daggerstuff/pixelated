@@ -33,7 +33,7 @@ export const POST = withAuth(async (request, session) => {
 
   const parseResult = CreateApiKeySchema.safeParse(body)
   if (!parseResult.success) {
-    return jsonError(400, 'Bad Request', parseResult.error.issues[0].message)
+    return jsonError(400, 'Bad Request', parseResult?.error.issues[0].message)
   }
 
   const { name, scopes, rate_limit, expires_in_days } = parseResult.data

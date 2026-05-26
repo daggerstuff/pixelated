@@ -340,13 +340,8 @@ export interface TabSyncConfig {
 export class SyncOrchestrator {
   private readonly stateVersions = new Map<string, number>()
   private readonly stateCache = new Map<string, any>()
-  private readonly enableVersioning: boolean
-  private readonly maxVersions: number
 
-  constructor(enableVersioning: boolean, maxVersions: number) {
-    this.enableVersioning = enableVersioning
-    this.maxVersions = maxVersions
-  }
+  constructor() {}
 
   /**
    * Get current version for a key
@@ -546,10 +541,7 @@ class TabSyncManager {
       this.config.heartbeatInterval,
       this.tabId,
     )
-    this.orchestrator = new SyncOrchestrator(
-      this.config.enableVersioning,
-      this.config.maxVersions,
-    )
+    this.orchestrator = new SyncOrchestrator()
   }
 
   private generateTabId(): string {

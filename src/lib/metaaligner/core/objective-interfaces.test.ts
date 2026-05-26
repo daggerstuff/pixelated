@@ -51,7 +51,7 @@ describe('Objective Interfaces', () => {
       expect(objective.description).toBe('A test objective for validation')
       expect(objective.weight).toBe(0.3)
       expect(objective.criteria).toHaveLength(1)
-      expect(objective.criteria[0].criterion).toBe('test-criterion')
+      expect(objective?.criteria[0].criterion).toBe('test-criterion')
       expect(objective.evaluationFunction).toBe(mockEvaluationFunction)
     })
 
@@ -351,7 +351,7 @@ describe('Objective Interfaces', () => {
       expect(objective.description).toBe('An objective created from template')
       expect(objective.weight).toBe(0.3)
       expect(objective.criteria).toHaveLength(1)
-      expect(objective.criteria[0].criterion).toBe('template-criterion')
+      expect(objective?.criteria[0].criterion).toBe('template-criterion')
       expect(typeof objective.evaluationFunction).toBe('function')
     })
   })

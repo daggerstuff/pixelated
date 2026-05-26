@@ -642,7 +642,7 @@ describe('Multi-Role Authentication System - Comprehensive Test Suite', () => {
       const auditTrail = await getRoleTransitionAuditTrail(mockUserId, 10)
 
       expect(auditTrail).toHaveLength(3)
-      expect(auditTrail[0].timestamp).toBeGreaterThan(auditTrail[1].timestamp) // Newest first
+      expect(auditTrail?.[0].timestamp).toBeGreaterThan(auditTrail?.[1].timestamp) // Newest first
     })
   })
 

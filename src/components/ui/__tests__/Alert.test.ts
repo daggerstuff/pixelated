@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/dom'
-import { afterEach, describe, expect, it } from 'vitest'
+import {  describe, expect, it } from 'vitest'
 
 import { renderAstro } from '@/test/utils/astro'
 

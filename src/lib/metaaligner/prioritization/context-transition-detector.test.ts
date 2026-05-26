@@ -374,7 +374,7 @@ describe('ContextTransitionDetector', () => {
 
       const recent = detector.getHistory(5)
       expect(recent.length).toBe(5)
-      expect(recent[4].turnId).toBe(9)
+      expect(recent?.[4].turnId).toBe(9)
     })
 
     it('should clear history and pending transitions', () => {
