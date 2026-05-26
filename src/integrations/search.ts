@@ -46,7 +46,7 @@ export default function flexsearchIntegration(
       'astro:config:setup': ({ injectScript, logger }) => {
         logger.info('Setting up FlexSearch integration')
 
-        // Inject search client initialization for browser - this is done in a way that's SSR-safe
+        // Inject search client initialization for browser - this is done in a way that's ssr-safe
         injectScript(
           'page',
           `
@@ -103,7 +103,7 @@ export default function flexsearchIntegration(
             `Search index generated with ${pages.length} pages at ${indexPath}`,
           )
 
-          // If auto-include is enabled, add the script tag to all HTML pages
+          // If auto-include is enabled, add the script tag to all html pages
           if (resolvedOptions.autoInclude) {
             logger.info('Adding search index script to HTML pages...')
 
