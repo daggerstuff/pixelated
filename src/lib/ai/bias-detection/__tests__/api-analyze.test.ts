@@ -232,49 +232,6 @@ describe("Session Analysis API Endpoint", () => {
     },
   };
 
-
-    sessionId: "123e4567-e89b-12d3-a456-426614174000",
-    timestamp: "2024-01-15T10:00:00Z",
-    participantDemographics: {
-      age: "25-35",
-      gender: "female",
-      ethnicity: "hispanic",
-      primaryLanguage: "en",
-    },
-    scenario: {
-      scenarioId: "scenario-1",
-      type: "anxiety",
-      complexity: "intermediate",
-      tags: ["anxiety", "therapy"],
-      description: "Anxiety therapy session",
-      learningObjectives: ["Identify triggers", "Develop coping strategies"],
-    },
-    content: {
-      patientPresentation: "Patient presents with anxiety symptoms",
-      therapeuticInterventions: ["CBT techniques", "Breathing exercises"],
-      patientResponses: ["Engaged well", "Showed improvement"],
-      sessionNotes: "Productive session with good outcomes",
-    },
-    aiResponses: [
-      {
-        responseId: "resp-1",
-        timestamp: "2024-01-15T10:05:00Z",
-        type: "diagnostic",
-        content: "Patient shows signs of generalized anxiety",
-        confidence: 0.85,
-        modelUsed: "gpt-4",
-      },
-    ],
-    expectedOutcomes: [],
-    transcripts: [],
-    metadata: {
-      trainingInstitution: "University Hospital",
-      traineeId: "trainee-123",
-      sessionDuration: 60,
-      completionStatus: "completed",
-    },
-  };
-
   // Simplified mock result to match actual API response format
   const mockAnalysisResult = {
     sessionId: "123e4567-e89b-12d3-a456-426614174000",
@@ -284,16 +241,6 @@ describe("Session Analysis API Endpoint", () => {
       "Consider cultural sensitivity in diagnostic approach",
       "Review intervention selection for demographic appropriateness",
     ],
-    layerAnalysis: [],
-    demographicAnalysis: {},
-  };
-
-  // Mock result for GET endpoint (slightly different from POST)
-
-    sessionId: "123e4567-e89b-12d3-a456-426614174000",
-    overallScore: 0.65,
-    riskLevel: "medium" as const,
-    recommendations: ["Review cultural considerations"],
     layerAnalysis: [],
     demographicAnalysis: {},
   };
@@ -532,7 +479,7 @@ describe("Session Analysis API Endpoint", () => {
       ): MockRequest => {
         const url = new URL("http://localhost:3000/api/bias-detection/analyze");
         // API requires therapistId
-        searchParams.therapistId ??= "test-therapist-123";
+        searchParams['therapistId'] ??= "test-therapist-123";
         Object.entries(searchParams).forEach(([key, value]) => {
           url.searchParams.set(key, value);
         });

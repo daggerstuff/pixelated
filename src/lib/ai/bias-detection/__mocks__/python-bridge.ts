@@ -4,7 +4,7 @@
 import type { TherapeuticSession } from '../types'
 
 function computeBiasScore(session: TherapeuticSession): number {
-  const content = (session.conversationHistory || [])
+  const content = (session['conversationHistory'] || [])
     .map((m) => String(m.content || '').toLowerCase())
     .join(' ')
 
