@@ -3,8 +3,7 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 import type { 
   MemoryObject, 
   SynthesisResult, 
-  StanceShift, 
-  EmotionalMetadata 
+  StanceShift 
 } from './types';
 
 const appLogger = createBuildSafeLogger('memory-synthesizer');

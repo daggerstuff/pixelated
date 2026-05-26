@@ -86,6 +86,7 @@ export function ConsentDialog({
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"

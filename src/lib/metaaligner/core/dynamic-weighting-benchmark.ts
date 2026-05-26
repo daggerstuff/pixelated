@@ -302,7 +302,7 @@ async function generateVisualizationData(): Promise<VisualizationData> {
       let totalChange = 0
 
       for (const key in result.weights) {
-        const change = result.weights[key] - previousWeights[key]
+        const change = result?.weights[key] - previousWeights?.[key]
         weightChanges[key] = change
         totalChange += Math.abs(change)
       }
@@ -347,7 +347,7 @@ function calculateBenchmarkStats(
   const p95Index = Math.floor(times.length * 0.95)
   const p99Index = Math.floor(times.length * 0.99)
 
-  const passedThreshold = sorted[p99Index] < thresholdMs
+  const passedThreshold = sorted?.[p99Index] < thresholdMs
 
   return {
     testName,
@@ -422,7 +422,7 @@ function printBenchmarkSummary(suite: BenchmarkSuite): void {
   console.log(`  Std Dev: ${dist.stdDev.toFixed(2)}ms`)
   console.log('\n  Distribution:')
   for (const bucket of dist.buckets) {
-    const percentage = (bucket.count / suite.results[0].iterations) * 100
+    const percentage = (bucket.count / suite?.results[0].iterations) * 100
     const barLength = Math.floor(percentage / 2)
     const bar = '█'.repeat(barLength)
     console.log(

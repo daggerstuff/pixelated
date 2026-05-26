@@ -10,32 +10,24 @@ import {
 } from 'lucide-react'
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
-import { MentalHealthInsights } from '@/components/MentalHealthInsights'
-import { Badge } from '@/components/ui/badge/index'
-import BrainVisualization from '@/components/ui/BrainVisualization'
-import { Button } from '@/components/ui/button/index'
 import { Card, CardContent } from '@/components/ui/card/index'
-import { Input } from '@/components/ui/input'
-import MindMirrorDashboard from '@/components/ui/MindMirrorDashboard'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
-import { createMentalLLaMAFromEnvSafe } from '@/lib/ai/mental-llama/client-adapter'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import {
   convertToMindMirrorAnalysis,
   createInterventionMessage,
   getInitialMessages,
 } from '@/lib/mental-health/chat-utils'
-import type { ChatMessage } from '@/lib/mental-health/chat-utils'
 import {
   type EnhancedMentalHealthAnalysis,
   type MindMirrorAnalysis,
@@ -55,7 +47,6 @@ interface MentalHealthService {
   isInitialized: boolean
 }
 
-const logger = createBuildSafeLogger('chat-demo')
 
 // Extended analysis result that might include additional fields
 interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {

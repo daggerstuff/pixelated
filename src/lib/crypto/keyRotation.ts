@@ -145,7 +145,7 @@ export class KeyRotationManager {
   ): Promise<string> {
     // Get the version from the encrypted data
     const version = Number.parseInt(
-      encryptedData.split(':')[0].substring(1),
+      encryptedData?.split(':')[0].substring(1),
       10,
     )
 

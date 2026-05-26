@@ -711,7 +711,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     let sumXX = 0
 
     // Normalize timestamps relative to the first timestamp
-    const baseTime = recentTrends[0].timestamp
+    const baseTime = recentTrends?.[0].timestamp
 
     for (const trend of recentTrends) {
       const x = (trend.timestamp - baseTime) / 1000 // seconds

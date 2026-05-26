@@ -56,7 +56,7 @@ describe('useConversationMemory', () => {
     })
 
     expect(result.current.memory.progressSnapshots).toHaveLength(1)
-    expect(result.current.memory.progressSnapshots[0].value).toBe(25)
+    expect(result?.current.memory.progressSnapshots[0].value).toBe(25)
   })
 
   it('updates skill scores', () => {

@@ -49,7 +49,7 @@ export class BaaDocumentGenerator {
     }
 
     // Set the documentId in auditTrail
-    document.auditTrail[0].documentId = document.id
+    document?.auditTrail[0].documentId = document.id
 
     return document
   }

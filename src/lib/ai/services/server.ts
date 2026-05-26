@@ -22,13 +22,6 @@ const appLogger = createBuildSafeLogger('ai-server')
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
 
 
-  'anthropic',
-  'openai',
-  'azure-openai',
-  'llm',
-  'huggingface',
-  'local',
-]
 
 type HttpResponse = NodeServerResponse
 type HttpRequest = IncomingMessage
@@ -66,16 +59,6 @@ class AIServer {
    constructor() {
      // Initialize AI providers on startup
      initializeProviders()
-   }
-
-   /**
-    * Format error message for consistent error handling
-    * @param error - The error object to format
-    * @param fallback - Fallback message if error is not an Error instance
-    * @returns Formatted error message string
-    */
-   private formatErrorMessage(error: unknown, fallback: string): string {
-     return error instanceof Error ? error.message : fallback
    }
 
    private sendJsonResponse(
@@ -168,9 +151,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIChatRequest {
     return {
-      messages: body.messages,
-      provider: body.provider,
-      options: body.options,
+      messages: body['messages'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -178,9 +161,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIEmotionRequest {
     return {
-      text: body.text,
-      provider: body.provider,
-      options: body.options,
+      text: body['text'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -188,9 +171,9 @@ class AIServer {
     body: AIServiceRequestBody,
   ): AIStreamRequest {
     return {
-      messages: body.messages,
-      provider: body.provider,
-      options: body.options,
+      messages: body['messages'],
+      provider: body['provider'],
+      options: body['options'],
     }
   }
 
@@ -508,9 +491,7 @@ Respond in JSON format with the following structure:
 `)
       }
 
-      res.write('data: [DONE]
-
-')
+      res.write('data: [DONE]\n\n')
       res.end()
      } catch (error: unknown) {
        appLogger.error('Streaming chat failed:', error)

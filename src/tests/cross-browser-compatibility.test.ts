@@ -61,9 +61,9 @@ if (!skipTests) {
         console.log(`  ✓ Testing feature: ${featureKey}`)
         const result = await page.evaluate((fn) => fn(), feature.detectionFn)
         compatibilityResults.browsers['chromium'] = {
-          pages: compatibilityResults.browsers['chromium'].pages,
+          pages: compatibilityResults?.browsers['chromium'].pages,
           features: {
-            ...compatibilityResults.browsers['chromium'].features,
+            ...compatibilityResults?.browsers['chromium'].features,
             [featureKey]: result,
           },
         }

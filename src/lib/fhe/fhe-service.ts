@@ -9,7 +9,6 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import homomorphicOps from './homomorphic-ops'
 import { SealResourceScope } from './seal-memory'
 import { SealService } from './seal-service'
-import type { SealCipherText } from './seal-service'
 import { EncryptionMode, FHEOperation } from './types'
 import type {
   FHEService,
@@ -144,7 +143,6 @@ export class RealFHEService implements FHEService {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      // 1. Re-create SealCipherText instance and load data
       const ciphertext = scope.track(seal.CipherText()) as any
       ciphertext.load(context, encryptedData.data)
 

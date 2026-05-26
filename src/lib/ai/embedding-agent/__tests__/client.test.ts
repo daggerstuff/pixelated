@@ -203,7 +203,7 @@ describe('EmbeddingAgentClient', () => {
       })
 
       expect(result.matches).toHaveLength(1)
-      expect(result.matches[0].similarityScore).toBe(0.95)
+      expect(result?.matches[0].similarityScore).toBe(0.95)
     })
   })
 

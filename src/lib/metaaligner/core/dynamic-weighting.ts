@@ -453,7 +453,7 @@ export class DynamicWeightingEngine {
       return null
     }
 
-    return this.weightHistory[this.weightHistory.length - 1].weights
+    return this?.weightHistory[this.weightHistory.length - 1].weights
   }
 
   /**
@@ -545,7 +545,7 @@ export class DynamicWeightingEngine {
     }
 
     for (const key of keys1) {
-      const diff = Math.abs(weights1[key] - weights2[key])
+      const diff = Math.abs(weights1?.[key] - weights2?.[key])
       if (diff > tolerance) {
         return false
       }

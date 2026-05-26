@@ -451,7 +451,7 @@ describe('Session Skills API', () => {
       expect(response.status).toBe(200)
       expect(responseBody.therapistId).toBe('therapist-123')
       expect(responseBody.skills).toHaveLength(2)
-      expect(responseBody.skills[0].skill_name).toBe('Active Listening')
+      expect(responseBody?.skills[0].skill_name).toBe('Active Listening')
     })
 
     it('should return 400 for missing parameters', async () => {

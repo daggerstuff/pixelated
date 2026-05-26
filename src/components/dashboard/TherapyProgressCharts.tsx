@@ -3,7 +3,6 @@
  * Displays therapist analytics and progress visualization
  */
 
-import React from 'react'
 
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
 

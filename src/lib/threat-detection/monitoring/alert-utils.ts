@@ -287,13 +287,13 @@ function generateRecommendations(
   }
 
   // Specific source recommendations
-  if (metrics.bySource['rate_limiting'] > 10) {
+  if (metrics?.bySource['rate_limiting'] > 10) {
     recommendations.push(
       'Multiple rate limiting alerts. Review API usage patterns and consider rate limit adjustments.',
     )
   }
 
-  if (metrics.bySource['behavioral_analysis'] > 5) {
+  if (metrics?.bySource['behavioral_analysis'] > 5) {
     recommendations.push(
       'Multiple behavioral analysis alerts. Consider enhancing user behavior monitoring.',
     )

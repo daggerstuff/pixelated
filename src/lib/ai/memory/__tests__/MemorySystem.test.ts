@@ -209,9 +209,9 @@ describe('MemorySystem', () => {
 
       // Phase 3: Archive to Ghost Node
       const archived = memorySystem.archive([linkedMemory]);
-      expect(archived[0].is_ghost).toBe(true);
-      expect(archived[0].content).toBe('[ARCHIVED_GHOST_NODE]');
-      expect(archived[0].gist).toBeDefined();
+      expect(archived?.[0].is_ghost).toBe(true);
+      expect(archived?.[0].content).toBe('[ARCHIVED_GHOST_NODE]');
+      expect(archived?.[0].gist).toBeDefined();
     });
   });
 });
