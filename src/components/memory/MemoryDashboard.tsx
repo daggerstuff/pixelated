@@ -226,7 +226,7 @@ export function MemoryDashboard({
       {/* Crisis Alert Banner */}
       {filteredMemories.some(
         (m) =>
-          m.metadata?.crisisSeverity && m.metadata.crisisSeverity !== 'none',
+          m.metadata?.['crisisSeverity'] && m.metadata['crisisSeverity'] !== 'none',
       ) && (
         <Card className="border-destructive bg-destructive/5">
           <CardHeader className="py-3">
@@ -444,23 +444,23 @@ export function MemoryDashboard({
                           </TableCell>
                           <TableCell>
                             <Badge variant="secondary">
-                              {mem.metadata?.category ?? 'general'}
+                              {mem.metadata?.['category'] ?? 'general'}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
-                            {formatTimestamp(mem.metadata?.timestamp)}
+                            {formatTimestamp(mem.metadata?.['timestamp'])}
                           </TableCell>
                           <TableCell>
                             <div className="flex flex-wrap gap-1.5">
                               {/* Scope Badge */}
-                              {mem.metadata?.scope === 'private' ? (
+                              {mem.metadata?.['scope'] === 'private' ? (
                                 <Badge
                                   variant="outline"
                                   className="border-amber-200 bg-amber-50 text-amber-700 gap-1 px-1.5 py-0 text-[10px]"
                                 >
                                   <Lock className="h-2.5 w-2.5" /> Private
                                 </Badge>
-                              ) : mem.metadata?.scope === 'global' ? (
+                              ) : mem.metadata?.['scope'] === 'global' ? (
                                 <Badge
                                   variant="outline"
                                   className="border-blue-200 bg-blue-50 text-blue-700 gap-1 px-1.5 py-0 text-[10px]"
@@ -477,19 +477,19 @@ export function MemoryDashboard({
                               )}
 
                               {/* Crisis Severity Badge */}
-                              {mem.metadata?.crisisSeverity &&
-                                mem.metadata.crisisSeverity !== 'none' && (
+                              {mem.metadata?.['crisisSeverity'] &&
+                                mem.metadata['crisisSeverity'] !== 'none' && (
                                   <Badge
                                     variant="destructive"
                                     className="animate-pulse gap-1 px-1.5 py-0 text-[10px]"
                                   >
                                     <AlertCircle className="h-2.5 w-2.5" />{' '}
-                                    {mem.metadata.crisisSeverity.toUpperCase()}
+                                    {mem.metadata['crisisSeverity'].toUpperCase()}
                                   </Badge>
                                 )}
 
                               {/* Speculation Badge */}
-                              {mem.metadata?.isSpeculative && (
+                              {mem.metadata?.['isSpeculative'] && (
                                 <Badge
                                   variant="outline"
                                   className="border-purple-200 bg-purple-50 text-purple-700 gap-1 px-1.5 py-0 text-[10px]"
@@ -499,7 +499,7 @@ export function MemoryDashboard({
                               )}
 
                               {/* PII Safe Badge */}
-                              {mem.metadata?.piiRemoved && (
+                              {mem.metadata?.['piiRemoved'] && (
                                 <Badge
                                   variant="outline"
                                   className="border-green-200 bg-green-50 text-green-700 gap-1 px-1.5 py-0 text-[10px]"

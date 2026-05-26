@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import React, { useMemo, useCallback, memo } from 'react'
+import { useMemo, useCallback, memo } from 'react'
 
 import { OfflineIndicator } from '@/components/layout/OfflineIndicator'
 import { ResponsiveContainer } from '@/components/layout/ResponsiveUtils'

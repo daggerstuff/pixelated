@@ -378,7 +378,7 @@ export function TrainingSessionComponent() {
     isAuthenticatedRef.current = false
 
     const wsUrl =
-      import.meta.env.PUBLIC_TRAINING_WS_URL ?? 'ws://localhost:8084'
+      import.meta.env['PUBLIC_TRAINING_WS_URL'] ?? 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 
