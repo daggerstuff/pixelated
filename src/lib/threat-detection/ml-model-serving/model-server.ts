@@ -439,7 +439,7 @@ export class ModelServingServer extends EventEmitter {
         const sumVec = Array.from({ length }, () => 0)
         outputs.forEach((out) => {
           ;(out as number[]).forEach((v, i) => {
-            sumVec[i] += v
+            sumVec?.[i] += v
           })
         })
         return sumVec.map((v) => v / outputs.length)
@@ -449,7 +449,7 @@ export class ModelServingServer extends EventEmitter {
       return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
     }
 
-    const firstOutput = predictions[0].output
+    const firstOutput = predictions?.[0].output
     if (Array.isArray(firstOutput)) {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]
@@ -469,7 +469,7 @@ export class ModelServingServer extends EventEmitter {
       // Weighted average for scalar outputs (regression)
       const weightedSum = predictions.reduce(
         (sum: number, pred: ModelPrediction, index: number) => {
-          return sum + (pred.output as number) * weights[index]
+          return sum + (pred.output as number) * weights?.[index]
         },
         0,
       )

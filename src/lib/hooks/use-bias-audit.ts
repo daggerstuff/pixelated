@@ -314,8 +314,8 @@ export function useBiasAuditDashboard() {
         config,
       })
       if (results.length > 0) {
-        setSelectedDatasetId(results[0].datasetId)
-        setSelectedAuditId(results[0].auditId)
+        setSelectedDatasetId(results?.[0].datasetId)
+        setSelectedAuditId(results?.[0].auditId)
       }
       return results
     },

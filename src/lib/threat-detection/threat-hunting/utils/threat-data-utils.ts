@@ -117,8 +117,8 @@ export function extractPatterns(threatData: ThreatData[]): ThreatPattern[] {
 
 function calculatePatternConfidence(threats: ThreatData[]): number {
   if (threats.length < 3) return 0
-  const first = new Date(threats[0].timestamp).getTime()
-  const last = new Date(threats[threats.length - 1].timestamp).getTime()
+  const first = new Date(threats?.[0].timestamp).getTime()
+  const last = new Date(threats?.[threats.length - 1].timestamp).getTime()
   const timeSpan = Math.max(0, last - first)
   const frequencyScore = Math.min(threats.length / 10, 1)
   const timeSpanScore =

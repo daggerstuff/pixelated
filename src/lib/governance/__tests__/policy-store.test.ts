@@ -76,9 +76,9 @@ describe('PolicyStore', () => {
 
     const history = await store.getPolicyHistory('versioned')
     expect(history.length).toBe(2)
-    expect(history[0].version).toBe('2.0.0')
-    expect(history[0].previousVersion).toBe('1.0.0')
-    expect(history[1].version).toBe('1.0.0')
-    expect(history[1].previousVersion).toBeNull()
+    expect(history?.[0].version).toBe('2.0.0')
+    expect(history?.[0].previousVersion).toBe('1.0.0')
+    expect(history?.[1].version).toBe('1.0.0')
+    expect(history?.[1].previousVersion).toBeNull()
   })
 })

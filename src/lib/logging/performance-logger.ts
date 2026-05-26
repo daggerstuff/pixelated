@@ -107,8 +107,8 @@ export class PerformanceLogger {
 
         const fileDate = file.replace('metrics-', '').replace('.jsonl', '')
         if (
-          fileDate >= timeRange['start'].toISOString().split('T')[0] &&
-          fileDate <= timeRange['end'].toISOString().split('T')[0]
+          fileDate >= timeRange?.['start'].toISOString().split('T')[0] &&
+          fileDate <= timeRange?.['end'].toISOString().split('T')[0]
         ) {
           const content = await fs.readFile(`${this.logDir}/${file}`, 'utf-8')
           const fileMetrics = content

@@ -19,7 +19,7 @@ describe('UnifiedMonitor', () => {
 
     const events = monitor.getEvents('fhe')
     expect(events.length).toBe(1)
-    expect(events[0].event).toBe('encryption_complete')
+    expect(events?.[0].event).toBe('encryption_complete')
   })
 
   it('tracks events from multiple sources', async () => {

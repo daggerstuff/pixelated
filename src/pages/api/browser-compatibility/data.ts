@@ -151,7 +151,7 @@ export const GET = async ({ request }) => {
       reports: reports,
       meta: {
         total: reports.length,
-        latest: reports.length > 0 ? reports[0].timestamp : null,
+        latest: reports.length > 0 ? reports?.[0].timestamp : null,
         hasNewIssues: reports.some(
           (report) => report.issues && report.issues.length > 0,
         ),

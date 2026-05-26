@@ -179,7 +179,7 @@ export const POST: APIRoute = async ({ request }) => {
         })
       }
 
-      const sessionOwnerId = sessionResult.rows[0].therapist_id
+      const sessionOwnerId = sessionResult?.rows[0].therapist_id
       const userId = session.user.id
       const userRole = session.user.role
 
@@ -292,7 +292,7 @@ export const GET: APIRoute = async ({ request }) => {
         })
       }
 
-      const sessionOwnerId = sessionResult.rows[0].therapist_id
+      const sessionOwnerId = sessionResult?.rows[0].therapist_id
       const userId = session.user.id
       const userRole = session.user.role
 

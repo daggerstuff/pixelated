@@ -1,4 +1,4 @@
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from 'astro'
 
 import { verifyAuthToken } from '../../../utils/auth'
 export const prerender = false

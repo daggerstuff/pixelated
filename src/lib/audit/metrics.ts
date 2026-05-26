@@ -12,7 +12,7 @@ function getAccessByTime(logs: AuditLog[]): {
 
   logs.forEach((log) => {
     const hour = new Date(log.timestamp).getHours()
-    hourCounts[hour]++
+    hourCounts?.[hour]++
   })
 
   return {

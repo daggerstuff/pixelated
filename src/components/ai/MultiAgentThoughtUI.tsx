@@ -3,7 +3,6 @@ import {
   Bot, 
   Brain, 
   Activity, 
-  CheckCircle2, 
   Loader2, 
   AlertCircle, 
   Search, 

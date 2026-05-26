@@ -545,7 +545,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         const patternMatch = pattern.match(/([a-zA-Z]+)\s*=\s*['"]([^'"]+)['"]/)
 
         if (patternMatch) {
-          iocType = patternMatch[1].toLowerCase()
+          iocType = patternMatch?.[1].toLowerCase()
           iocValue = patternMatch[2]
         }
       } else if (data['type'] === 'malware') {
