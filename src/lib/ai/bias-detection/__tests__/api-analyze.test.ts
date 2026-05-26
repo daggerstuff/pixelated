@@ -183,11 +183,6 @@ beforeEach(async () => {
   await loadHandlers();
 });
 
-// Helper function to serialize mock data like JSON.stringify does for dates
-function serializeForComparison(obj: unknown): unknown {
-  return JSON.parse(JSON.stringify(obj));
-}
-
 describe("Session Analysis API Endpoint", () => {
   const mockSession: TherapeuticSession = {
     sessionId: "123e4567-e89b-12d3-a456-426614174000",

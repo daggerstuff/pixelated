@@ -24,14 +24,6 @@ describe('IndexedDBStorage', () => {
     global.indexedDB = mockIndexedDB as any
 
     // Setup mock database objects
-    mockRequest = {
-      result: null,
-      error: null,
-      onsuccess: null,
-      onerror: null,
-      onupgradeneeded: null,
-    } as unknown as IDBRequest
-
     mockObjectStore = {
       put: vi.fn(),
       get: vi.fn(),

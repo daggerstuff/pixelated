@@ -438,11 +438,11 @@ describe("MentalLLaMAAdapter (Consolidated)", () => {
       expect(promptMessages[0]).toMatchObject({
         role: "system",
       });
-      expect(promptMessages[0].content).toContain("evaluates the quality of explanations");
+      expect(promptMessages?.[0].content).toContain("evaluates the quality of explanations");
       expect(promptMessages[1]).toMatchObject({
         role: "user",
       });
-      expect(promptMessages[1].content).toContain(explanation);
+      expect(promptMessages?.[1].content).toContain(explanation);
       expect(result.overall).toBe(0.8);
       expect(result.assessment).toBe("Good quality.");
     });

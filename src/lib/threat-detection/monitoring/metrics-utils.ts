@@ -146,10 +146,10 @@ export async function detectMetricAnomalies(
     return metrics
       .map((metric, index) => ({
         value: metric.value,
-        isAnomaly: anomalyResults[index].isAnomaly,
-        confidence: anomalyResults[index].confidence,
-        severity: anomalyResults[index].severity as 'low' | 'medium' | 'high',
-        reason: anomalyResults[index].isAnomaly
+        isAnomaly: anomalyResults?.[index].isAnomaly,
+        confidence: anomalyResults?.[index].confidence,
+        severity: anomalyResults?.[index].severity as 'low' | 'medium' | 'high',
+        reason: anomalyResults?.[index].isAnomaly
           ? 'Statistical anomaly detected'
           : undefined,
       }))

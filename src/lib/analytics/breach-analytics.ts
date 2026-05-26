@@ -205,7 +205,7 @@ async function calculateBasicMetrics(
 }
 
 async function calculateResponseTime(breach: Breach): Promise<number> {
-  const notifications = await redis['get'](
+  const notifications = await redis?.['get'](
     getAnalyticsKey('notifications', breach.timestamp),
   )
 

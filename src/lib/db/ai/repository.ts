@@ -1,5 +1,5 @@
 import type { EmotionAnalysis } from "../../ai/emotions/types";
-import type { Collection, Db, ObjectId as MongoObjectId } from "mongodb";
+import type { Collection, Db } from "mongodb";
 interface EmotionData {
   type: string;
   intensity: number;

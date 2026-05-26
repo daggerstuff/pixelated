@@ -6,8 +6,6 @@
  * and detailed bias analysis visualization including histograms.
  */
 
-import { format } from 'date-fns'
-import { useState } from 'react'
 
 import {
   Card,
@@ -71,64 +69,32 @@ function StatusBadge({ status }: { status: QuarantineStatus }) {
   )
 }
 
-// Bias score indicator
-function BiasScoreIndicator({
-  score,
-  size = 'md',
-}: {
-  score: number
-  size?: 'sm' | 'md' | 'lg'
-}) {
-  const getColor = (s: number) => {
-    if (s < 0.2) return 'text-green-400'
-    if (s < 0.4) return 'text-yellow-400'
-    if (s < 0.6) return 'text-orange-400'
-    return 'text-red-400'
-  }
+const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
+  className,
+}: BiasAuditDashboardProps) => {
+  const {
+    selectedDatasetId,
+    selectDataset,
+    summary,
+    summaryLoading,
+    datasets,
+    datasetsLoading,
+    selectedDataset,
+    selectedDatasetLoading,
+    selectedAudit,
+    selectedAuditLoading,
+    auditProgress,
+    initiateAudit,
+    initiateAuditLoading,
+    processQuarantineAction,
+    quarantineActionLoading,
+    setStatusFilter,
+    setPage,
+    statusFilter,
+    page,
+  } = useBiasAuditDashboard()
 
-  const sizeClasses = {
-    sm: 'text-sm',
-    md: 'text-lg font-semibold',
-    lg: 'text-2xl font-bold',
-  }
-
-  return (
-    <span className={cn(getColor(score), sizeClasses[size])}>
-      {(score * 100).toFixed(1)}%
-    </span>
-  )
-}
-
-// Simple histogram component for bias score distribution
-function BiasHistogram({
-  distribution,
-  height = 120,
-}: {
-  distribution: BiasScoreDistribution[]
-  height?: number
-}) {
-  const maxCount = Math.max(...distribution.map((d) => d.count), 1)
-
-  return (
-    <div className="w-full">
-      <div className="flex items-end justify-between gap-1" style={{ height }}>
-        {distribution.map((bucket, index) => {
-          const barHeight = (bucket.count / maxCount) * 100
-          return (
-            <div
-              key={index}
-              className="bg-primary/80 hover:bg-primary flex-1 rounded-t transition-colors"
-              style={{ height: `${barHeight}%` }}
-              title={`${bucket.label}: ${bucket.count} records`}
-            />
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-const statusOptions: { value: string; label: string }[] = [
+  const statusOptions: { value: string; label: string }[] = [
     { value: 'all', label: 'All Datasets' },
     { value: 'pending_review', label: 'Pending Review' },
     { value: 'under_audit', label: 'Under Audit' },

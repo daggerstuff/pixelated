@@ -26,8 +26,6 @@ class SyncManager {
   private isSyncing = false
   private backoffMultiplier = 1
   private syncTimeout: NodeJS.Timeout | null = null
-  private readonly listeners: Map<string, Set<(payload?: unknown) => void>> =
-    new Map()
   private readonly onlineHandler: () => void
   private readonly offlineHandler: () => void
   private readonly visibilityChangeHandler: () => void
@@ -99,14 +97,8 @@ class SyncManager {
     this.options.onSyncStart()
 
     try {
-      const pendingCount = indexedDBRequestQueue.hasPendingRequests()
-        ? 1
-        : 0 // We don't have a direct way to get length without exposing it, but we can use hasPendingRequests as a boolean
       // We'll call processQueue and then check if the queue is still pending
       await indexedDBRequestQueue.processQueue()
-      const stillPending = indexedDBRequestQueue.hasPendingRequests()
-        ? 1
-        : 0
 
       // Consider sync successful if we were able to process the queue and the queue is no longer pending
       // Note: This is a simplification because hasPendingRequests only tells us if there are any requests, not the count.

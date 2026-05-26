@@ -15,7 +15,7 @@ export function calculateTimeIntervals(timestamps: number[]): number[] {
   const intervals: number[] = []
 
   for (let i = 1; i < sorted.length; i++) {
-    intervals.push(sorted[i] - sorted[i - 1])
+    intervals.push(sorted?.[i] - sorted?.[i - 1])
   }
 
   return intervals

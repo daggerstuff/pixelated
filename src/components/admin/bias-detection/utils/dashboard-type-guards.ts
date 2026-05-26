@@ -3,7 +3,7 @@ import type {
   BiasDashboardSummary,
   BiasDashboardData,
 } from '@/lib/ai/bias-detection'
-import type { AlertItem, BiasScoreFilterLiteral } from '@/types/bias-detection'
+import type { AlertItem } from '@/types/bias-detection'
 
 interface TrendItem {
   date?: string

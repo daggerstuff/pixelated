@@ -893,7 +893,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
             indicators.push({
               type: 'ip_address',
               value: input.data['ip_address'],
-              confidence: modelResults['anomaly'].confidence,
+              confidence: modelResults?.['anomaly'].confidence,
               source: 'anomaly_detection',
             })
           }
@@ -903,7 +903,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
             indicators.push({
               type: 'user_id',
               value: input.data['user_id'],
-              confidence: modelResults['classification'].confidence,
+              confidence: modelResults?.['classification'].confidence,
               source: 'classification',
             })
           }
@@ -913,7 +913,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
             indicators.push({
               type: 'file_hash',
               value: input.data['hash'],
-              confidence: modelResults['clustering'].confidence,
+              confidence: modelResults?.['clustering'].confidence,
               source: 'clustering',
             })
           }
@@ -923,7 +923,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
             indicators.push({
               type: 'process_id',
               value: input.data['process_id'],
-              confidence: modelResults['prediction'].confidence,
+              confidence: modelResults?.['prediction'].confidence,
               source: 'prediction',
             })
           }
@@ -949,10 +949,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       explanation += `potential threat detected with high confidence. `
 
       // Add model-specific explanations
-      if (modelResults['anomaly'].confidence > 0.7) {
+      if (modelResults?.['anomaly'].confidence > 0.7) {
         explanation += `Anomaly detection identified unusual patterns. `
       }
-      if (modelResults['classification'].confidence > 0.7) {
+      if (modelResults?.['classification'].confidence > 0.7) {
         explanation += `Classification model confirmed threat category. `
       }
     } else {
