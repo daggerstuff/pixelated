@@ -453,7 +453,7 @@ export class DynamicWeightingEngine {
       return null
     }
 
-    return this?.weightHistory[this.weightHistory.length - 1].weights
+    return this.weightHistory[this.weightHistory.length - 1].weights
   }
 
   /**
