@@ -178,7 +178,69 @@ export async function buildSearchIndex(
     }
 
     // Process pages with frontmatter that should be indexed
-    // TODO: Add support for indexing static pages
+    // Index static Astro pages with frontmatter (e.g., src/pages/*.astro)
+    try {
+      const pagesDir = safeJoin(ALLOWED_DIRECTORIES.SRC, 'pages')
+      let pageFiles: string[] = []
+      try {
+        const files = await fs.readdir(pagesDir, { withFileTypes: true })
+        for (const file of files) {
+          if (file.isFile() && file.name.endsWith('.astro')) {
+            pageFiles.push(file.name)
+          }
+        }
+      } catch {
+        // No pages directory or no files
+      }
+
+      for (const filename of pageFiles) {
+        try {
+          const sanitizedFilename = sanitizeFilename(filename)
+          const filePath = safeJoin(pagesDir, sanitizedFilename)
+          const content = await fs.readFile(filePath, 'utf-8')
+
+          // Extract frontmatter
+          const frontmatterMatch = content.match(/---\n([\s\S]*?)\n---/)
+          if (!frontmatterMatch?.[1]) continue
+          const frontmatter = frontmatterMatch[1]
+
+          // Extract title, tags, category
+          const titleMatch = frontmatter.match(/title:\s*["']?(.*?)["']?\n/)
+          const tagsMatch = frontmatter.match(/tags:\s*\[(.*?)\]/)
+          const categoryMatch = frontmatter.match(/category:\s*["']?(.*?)["']?\n/)
+
+          const title = titleMatch?.[1]?.trim() ?? filename.replace(/\.astro$/, '')
+          const tags = tagsMatch?.[1]
+            ? tagsMatch[1].split(',').map((tag) => tag.trim().replace(/["']/g, ''))
+            : []
+          const category = categoryMatch?.[1]?.trim() ?? 'pages'
+
+          // Remove frontmatter and get body content
+          const body = content.replace(/---\n[\s\S]*?\n---/, '').trim()
+
+          // Create slug from filename (remove .astro)
+          const slug = filename.replace(/\.astro$/, '')
+          // URL: /slug/ (index.astro becomes /)
+          const url = slug === 'index' ? '/' : `/${slug}/`
+
+          // Create unique ID for document
+          const documentId = `page_${slug}`
+
+          documents.push({
+            id: documentId,
+            title,
+            content: body,
+            url,
+            tags,
+            category,
+          })
+        } catch (error) {
+          console.error(`Error indexing static page ${filename}:`, error)
+        }
+      }
+    } catch (error) {
+      console.error('Error indexing static pages:', error)
+    }
 
     console.log(`Total indexed documents: ${documents.length}`)
     return documents
