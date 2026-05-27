@@ -543,7 +543,7 @@ export const CrisisMonitoringDashboard: React.FC<
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
                       <div
-                        className={`h-4 w-4 rounded-full ${RISK_DOT_COLORS[patient.currentRisk as keyof typeof RISK_DOT_COLORS] || RISK_DOT_COLORS.minimal}`}
+                        className={`h-4 w-4 rounded-full ${RISK_DOT_COLORS[patient.currentRisk] || RISK_DOT_COLORS.minimal}`}
                       />
 
                       <div>

@@ -210,8 +210,8 @@ export function notFoundHandler(
  * Usage: router.get('/path', asyncHandler(async (req, res) => { ... }))
  */
 
-export function asyncHandler<TRes = any>(
-  fn: (req: unknown, res: TRes, next: NextFunction) => Promise<any>,
+export function asyncHandler(
+  fn: (req: unknown, res: unknown, next: NextFunction) => Promise<any>,
 ) {
   return (req: any, res: any, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next)
