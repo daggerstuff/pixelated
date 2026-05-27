@@ -92,3 +92,23 @@ test('runEscalation reports no delivery when no destination credentials are pres
   assert.match(result.body, /Rate limit reached/)
   assert.equal(result.errors.length, 0)
 })
+
+test('runEscalation treats unsuccessful Linear GraphQL payloads as delivery failures', async () => {
+  const result = await runEscalation({
+    env: {
+      ESCALATION_TRIGGER: 'workflow_failure',
+      ['LINEAR_' + 'API_KEY']: 'placeholder',
+      LINEAR_TEAM_ID: 'team-1',
+    },
+    fetchImpl: async () => ({
+      ok: true,
+      status: 200,
+      text: async () => JSON.stringify({ data: { issueCreate: { success: false } } }),
+    }),
+  })
+
+  assert.equal(result.delivered, false)
+  assert.deepEqual(result.destinations, [])
+  assert.equal(result.errors.length, 1)
+  assert.match(result.errors[0], /linear: Linear issueCreate did not succeed/)
+})

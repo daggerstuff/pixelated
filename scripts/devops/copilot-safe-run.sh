@@ -9,6 +9,9 @@ fi
 
 COMMAND=("$@")
 DEFAULT_NEMOTRON_MODEL="nvidia/llama-3.2-90b-instruct"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/../.." && pwd)"
+HUMAN_ESCALATION_SCRIPT="$REPO_ROOT/scripts/devops/human-escalation.mjs"
 
 _copilot_safe_is_forbidden_model() {
   local candidate="$1"
@@ -146,7 +149,7 @@ escalate_rate_limit_exhaustion() {
     return 0
   fi
 
-  if [[ ! -f "scripts/devops/human-escalation.mjs" ]]; then
+  if [[ ! -f "$HUMAN_ESCALATION_SCRIPT" ]]; then
     echo "copilot-safe-run: escalation helper not found; cannot notify humans." >&2
     return 0
   fi
@@ -160,7 +163,7 @@ ${last_output}}"
     ESCALATION_WHAT_WAS_TRIED="$what_was_tried" \
     ESCALATION_FAILURE_REASON="$failure_reason" \
     ESCALATION_NEXT_STEPS="$next_steps" \
-    node scripts/devops/human-escalation.mjs >&2 || true
+    node "$HUMAN_ESCALATION_SCRIPT" >&2 || true
 }
 
 for idx in "${!CANDIDATE_MODELS[@]}"; do

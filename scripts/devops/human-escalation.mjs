@@ -262,6 +262,9 @@ async function createLinearIssue({ env, fetchImpl, body, trigger }) {
   if (payload.errors?.length) {
     throw new Error(payload.errors.map((error) => error.message).join('; '))
   }
+  if (!payload.data?.issueCreate?.success || !payload.data?.issueCreate?.issue) {
+    throw new Error('Linear issueCreate did not succeed.')
+  }
 
   return { skipped: false, payload }
 }
