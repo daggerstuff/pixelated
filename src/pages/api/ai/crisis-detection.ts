@@ -3,7 +3,7 @@ import type { APIRoute, APIContext } from 'astro'
 import { CrisisProtocol } from '@/lib/ai/crisis/CrisisProtocol'
 import type { CrisisDetectionResult } from '@/lib/ai/crisis/types'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
-import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
+import { createAnomalyDetector } from '@/lib/ai/services/crisis-detection'
 import {
   createAuditLog,
   AuditEventType,
@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Get session for authentication
-    session = await getSession()
+    session = await getSession(request)
 
     // Check if user is authenticated
     if (!session?.user) {
@@ -64,6 +64,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         },
       )
     }
+    const authenticatedUserId = session.user.id
 
     // Parse request body
     const body = await request.json()
@@ -107,8 +108,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       )
     }
 
-    // Create crisis detection service
-    const crisisService = new CrisisDetectionService({
+    // Create anomaly detector using deployment-selected strategy
+    const anomalyDetector = createAnomalyDetector({
       aiService,
       sensitivityLevel: sensitivityLevel as 'low' | 'medium' | 'high',
     })
@@ -117,11 +118,15 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     let result: CrisisDetectionResult | CrisisDetectionResult[] | null = null
 
     if (batch) {
-      const batchResult = await crisisService.detectBatch(batch, {
-        sensitivityLevel: sensitivityLevel as 'low' | 'medium' | 'high',
-        userId: session.user.id,
-        source: 'api-batch-request',
-      })
+      const batchResult = await Promise.all(
+        batch.map((textItem: string) =>
+          anomalyDetector.detect(textItem, {
+            sensitivityLevel: sensitivityLevel as 'low' | 'medium' | 'high',
+            userId: authenticatedUserId,
+            source: 'api-batch-request',
+          }),
+        ),
+      )
 
       result = batchResult
 
@@ -133,7 +138,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
           // Call CrisisProtocol for each detected crisis in the batch
           try {
             await crisisProtocolInstance.handleCrisis(
-              session.user.id,
+              authenticatedUserId,
               session.session?.sessionId?.substring(0, 8) ??
                 `batch-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
               detection.content, // Text sample from CrisisDetectionResult
@@ -151,9 +156,9 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         }
       }
     } else {
-      const singleResult = await crisisService.detectCrisis(text, {
+      const singleResult = await anomalyDetector.detect(text, {
         sensitivityLevel: sensitivityLevel as 'low' | 'medium' | 'high',
-        userId: session.user.id,
+        userId: authenticatedUserId,
         source: 'api-request',
       })
 
@@ -165,7 +170,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         // Call CrisisProtocol for the detected crisis
         try {
           await CrisisProtocol.getInstance().handleCrisis(
-            session.user.id,
+            authenticatedUserId,
             session.session?.sessionId?.substring(0, 8) ??
               `single-item-session-${crypto.randomUUID()}`, // Use part of session ID or generate UUID
             singleResult.content, // Text sample from CrisisDetectionResult
@@ -191,7 +196,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       crisisDetected,
       sensitivityLevel,
       isBatch: !!batch,
-      userId: session.user.id,
+      userId: authenticatedUserId,
     })
 
     // Define audit resource
@@ -204,7 +209,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.crisis.request',
-      session.user.id,
+      authenticatedUserId,
       aiResource.id, // resource is a string
       {
         // details instead of metadata
@@ -221,7 +226,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.crisis.response',
-      session.user.id,
+      authenticatedUserId,
       aiResource.id, // resource is a string
       {
         // details instead of metadata

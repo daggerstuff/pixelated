@@ -19,9 +19,54 @@ export interface CrisisDetectionConfig {
   defaultPrompt?: string
 }
 
-export class CrisisDetectionService {
+export type AnomalyDetectionOptions = Partial<CrisisDetectionOptions>
+export type AnomalyResult = CrisisDetectionResult
+export type AnomalyDetectorKind = 'mental_health'
+
+export interface AnomalyDetectorFactoryConfig extends CrisisDetectionConfig {
+  detector?: string
+}
+
+export abstract class AnomalyDetector {
+  abstract detect(
+    content: string,
+    options?: AnomalyDetectionOptions,
+  ): Promise<AnomalyResult>
+}
+
+function getEnvVar(key: string): string | undefined {
+  const processEnv =
+    typeof process === 'undefined' ? undefined : process.env[key]
+  const metaEnv = import.meta.env as Record<string, string | undefined> | undefined
+  return processEnv ?? metaEnv?.[key]
+}
+
+export function resolveAnomalyDetectorKind(
+  detector = getEnvVar('ANOMALY_DETECTOR'),
+): AnomalyDetectorKind {
+  const normalized = (detector ?? 'mental_health')
+    .trim()
+    .toLowerCase()
+    .replaceAll('-', '_')
+
+  if (normalized === 'mental_health') {
+    return 'mental_health'
+  }
+
+  throw new Error(`Unsupported anomaly detector strategy: ${detector}`)
+}
+
+export function createAnomalyDetector(
+  config: AnomalyDetectorFactoryConfig,
+): AnomalyDetector {
+  resolveAnomalyDetectorKind(config.detector)
+  return new MentalHealthAnomalyDetector(config)
+}
+
+export class MentalHealthAnomalyDetector extends AnomalyDetector {
   private readonly aiService: AIService
   private readonly sensitivityLevel: 'low' | 'medium' | 'high'
+  private readonly model?: string
 
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
@@ -109,15 +154,27 @@ export class CrisisDetectionService {
   }
 
   constructor(config: CrisisDetectionConfig) {
+    super()
     this.aiService = config.aiService
     this.sensitivityLevel = config.sensitivityLevel
     this.model = config.model
-    this.defaultPrompt = config.defaultPrompt
+  }
+
+  async detect(
+    content: string,
+    options?: AnomalyDetectionOptions,
+  ): Promise<AnomalyResult> {
+    return this.detectCrisis(content, {
+      sensitivityLevel: options?.sensitivityLevel ?? this.sensitivityLevel,
+      userId: options?.userId ?? 'anonymous',
+      source: options?.source ?? 'anomaly_detector',
+      metadata: options?.metadata,
+    })
   }
 
   async detectCrisis(
     text: string,
-    _options: CrisisDetectionOptions,
+    options: CrisisDetectionOptions,
   ): Promise<CrisisDetectionResult> {
     try {
       // Perform keyword-based analysis first (fast check)
@@ -140,7 +197,9 @@ export class CrisisDetectionService {
       const finalScore = Math.max(keywordAnalysis.score, aiAnalysis?.score ?? 0)
 
       const thresholds =
-        CrisisDetectionService.SENSITIVITY_THRESHOLDS[this.sensitivityLevel]
+        MentalHealthAnomalyDetector.SENSITIVITY_THRESHOLDS[
+          options.sensitivityLevel ?? this.sensitivityLevel
+        ]
       const isCrisis = finalScore >= thresholds.crisis
 
       return {
@@ -208,7 +267,7 @@ export class CrisisDetectionService {
 
     // Check each category with different weights
     for (const [category, keywords] of Object.entries(
-      CrisisDetectionService.CRISIS_KEYWORDS,
+      MentalHealthAnomalyDetector.CRISIS_KEYWORDS,
     )) {
       const categoryWeight = this.getCategoryWeight(category)
       let categoryMatches = 0
@@ -233,7 +292,7 @@ export class CrisisDetectionService {
         if (matches) {
           // Apply idiom/cultural exclusions to prevent false positives
           const excluded =
-            CrisisDetectionService.SAFE_IDIOMATIC_EXCLUSIONS.some((re) =>
+            MentalHealthAnomalyDetector.SAFE_IDIOMATIC_EXCLUSIONS.some((re) =>
               re.test(text),
             )
 
@@ -314,6 +373,7 @@ export class CrisisDetectionService {
         {
           temperature: 0.1, // Low temperature for consistent results
           maxTokens: 500,
+          model: this.model,
         },
       )
 
@@ -383,28 +443,28 @@ export class CrisisDetectionService {
     // Determine category based on keywords
     if (
       keywords.some((k) =>
-        CrisisDetectionService.CRISIS_KEYWORDS.emergency.includes(k),
+        MentalHealthAnomalyDetector.CRISIS_KEYWORDS.emergency.includes(k),
       )
     ) {
       return 'emergency'
     }
     if (
       keywords.some((k) =>
-        CrisisDetectionService.CRISIS_KEYWORDS.suicide.includes(k),
+        MentalHealthAnomalyDetector.CRISIS_KEYWORDS.suicide.includes(k),
       )
     ) {
       return 'suicide_risk'
     }
     if (
       keywords.some((k) =>
-        CrisisDetectionService.CRISIS_KEYWORDS.self_harm.includes(k),
+        MentalHealthAnomalyDetector.CRISIS_KEYWORDS.self_harm.includes(k),
       )
     ) {
       return 'self_harm_risk'
     }
     if (
       keywords.some((k) =>
-        CrisisDetectionService.CRISIS_KEYWORDS.severe_depression.includes(k),
+        MentalHealthAnomalyDetector.CRISIS_KEYWORDS.severe_depression.includes(k),
       )
     ) {
       return 'severe_depression'
@@ -432,7 +492,7 @@ export class CrisisDetectionService {
     indicators: string[],
   ): 'low' | 'medium' | 'high' | 'immediate' {
     const hasEmergencyKeywords = indicators.some((ind) =>
-      CrisisDetectionService.CRISIS_KEYWORDS.emergency.includes(ind),
+      MentalHealthAnomalyDetector.CRISIS_KEYWORDS.emergency.includes(ind),
     )
 
     if (hasEmergencyKeywords || score >= 0.9) {
@@ -471,3 +531,5 @@ export class CrisisDetectionService {
     return actions
   }
 }
+
+export { MentalHealthAnomalyDetector as CrisisDetectionService }

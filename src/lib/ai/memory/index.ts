@@ -5,7 +5,7 @@ import { SocraticGate } from './gate';
 import { MemoryCrisisTagger } from './tagger';
 import { MemorySynthesizer } from './synthesizer';
 import { MemoryLinker } from './linker';
-import { CrisisDetectionService } from '../services/crisis-detection';
+import type { AnomalyDetector } from '../services/crisis-detection';
 
 const appLogger = createBuildSafeLogger('memory-system');
 
@@ -19,8 +19,8 @@ export class MemorySystem {
   private readonly synthesizer: MemorySynthesizer;
   private readonly linker: MemoryLinker;
 
-  constructor(crisisDetectionService: CrisisDetectionService) {
-    this.tagger = new MemoryCrisisTagger(crisisDetectionService);
+  constructor(anomalyDetector: AnomalyDetector) {
+    this.tagger = new MemoryCrisisTagger(anomalyDetector);
     this.gate = new SocraticGate(this.tagger);
     this.synthesizer = new MemorySynthesizer();
     this.linker = new MemoryLinker();

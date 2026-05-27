@@ -6,7 +6,7 @@ import type {
   CrisisDetectionOptions,
 } from '@/lib/ai/crisis/types'
 import { getAIServiceByProvider } from '@/lib/ai/providers'
-import { CrisisDetectionService } from '@/lib/ai/services/crisis-detection'
+import { createAnomalyDetector } from '@/lib/ai/services/crisis-detection'
 import {
   createAuditLog,
   AuditEventType,
@@ -96,8 +96,8 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       )
     }
 
-    // Initialize crisis detection service with required config
-    const crisisDetectionService = new CrisisDetectionService({
+    // Initialize anomaly detector using deployment-selected strategy
+    const anomalyDetector = createAnomalyDetector({
       aiService,
       sensitivityLevel: 'medium',
     })
@@ -110,7 +110,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       metadata: { sessionId, context },
     }
     const detectionResult: CrisisDetectionResult =
-      await crisisDetectionService.detectCrisis(text, crisisOptions)
+      await anomalyDetector.detect(text, crisisOptions)
 
     // Handle crisis protocol if detected
     if (detectionResult.isCrisis) {

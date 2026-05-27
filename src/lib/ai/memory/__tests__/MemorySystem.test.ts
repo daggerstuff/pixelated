@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemorySystem } from '../index';
-import { CrisisDetectionService } from '../../services/crisis-detection';
+import type { AnomalyDetector } from '../../services/crisis-detection';
 
 // Mock the dependencies
 vi.mock('../../services/crisis-detection');
@@ -55,13 +55,21 @@ describe('MemorySystem', () => {
 
   beforeEach(() => {
     mockCrisisService = {
-      detectCrisis: vi.fn(),
+      detect: vi.fn(),
     };
-    memorySystem = new MemorySystem(mockCrisisService as unknown as CrisisDetectionService);
+    mockCrisisService.detect.mockResolvedValue({
+      isCrisis: false,
+      confidence: 0.1,
+      category: 'general_concern',
+      riskLevel: 'low',
+      urgency: 'low',
+      detectedTerms: [],
+    });
+    memorySystem = new MemorySystem(mockCrisisService as unknown as AnomalyDetector);
   });
 
   it('should ingest normal content and return "auto" decision', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
+    mockCrisisService.detect.mockResolvedValue({
       isCrisis: false,
       confidence: 0.1,
       category: 'general_concern',
@@ -79,7 +87,7 @@ describe('MemorySystem', () => {
   });
 
   it('should detect crisis and return "active" decision', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
+    mockCrisisService.detect.mockResolvedValue({
       isCrisis: true,
       confidence: 0.9,
       category: 'suicide',
@@ -98,7 +106,7 @@ describe('MemorySystem', () => {
   });
 
   it('should flag "trait" scope memories for "active" confirmation', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
+    mockCrisisService.detect.mockResolvedValue({
       isCrisis: false,
       confidence: 0.1,
       category: 'general_concern',
@@ -115,7 +123,7 @@ describe('MemorySystem', () => {
   });
 
   it('should flag large content for "passive" confirmation', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
+    mockCrisisService.detect.mockResolvedValue({
       isCrisis: false,
       confidence: 0.1,
       category: 'general_concern',
@@ -209,9 +217,10 @@ describe('MemorySystem', () => {
 
       // Phase 3: Archive to Ghost Node
       const archived = memorySystem.archive([linkedMemory]);
-      expect(archived?.[0].is_ghost).toBe(true);
-      expect(archived?.[0].content).toBe('[ARCHIVED_GHOST_NODE]');
-      expect(archived?.[0].gist).toBeDefined();
+      const archivedMemory = archived[0];
+      expect(archivedMemory?.is_ghost).toBe(true);
+      expect(archivedMemory?.content).toBe('[ARCHIVED_GHOST_NODE]');
+      expect(archivedMemory?.gist).toBeDefined();
     });
   });
 });

@@ -5,7 +5,13 @@ import type {
   CrisisDetectionResult,
 } from '../../lib/ai/crisis/types'
 import type { AICompletion, AIModelInfo, AIService } from '../../lib/ai/models/ai-types'
-import { CrisisDetectionService } from '../../lib/ai/services/crisis-detection'
+import type { AnomalyDetector } from '../../lib/ai/services/crisis-detection'
+import {
+  CrisisDetectionService,
+  MentalHealthAnomalyDetector,
+  createAnomalyDetector,
+  resolveAnomalyDetectorKind,
+} from '../../lib/ai/services/crisis-detection'
 
 // Mock the logger first
 vi.mock('../../lib/logging/build-safe-logger', () => ({
@@ -39,7 +45,7 @@ describe('crisisDetectionService', () => {
     dispose: vi.fn(),
   }
 
-  let crisisService: CrisisDetectionService
+  let crisisService: MentalHealthAnomalyDetector
   let createChatCompletionSpy: MockInstance<AIService['createChatCompletion']>
 
   beforeEach(() => {
@@ -47,9 +53,84 @@ describe('crisisDetectionService', () => {
     vi.clearAllMocks()
 
     createChatCompletionSpy = vi.spyOn(mockAIService, 'createChatCompletion')
-    crisisService = new CrisisDetectionService({
+    crisisService = new MentalHealthAnomalyDetector({
       aiService: mockAIService,
       sensitivityLevel: 'high' as const,
+    })
+  })
+
+  describe('anomaly detector abstraction', () => {
+    it('uses the mental health detector through the domain-agnostic detect API', async () => {
+      const detector: AnomalyDetector = new MentalHealthAnomalyDetector({
+        aiService: mockAIService,
+        sensitivityLevel: 'high' as const,
+      })
+
+      createChatCompletionSpy.mockRejectedValue(new Error('AI service error'))
+
+      const result = await detector.detect('I want to end my life', {
+        sensitivityLevel: 'high',
+        userId: 'user123',
+        source: 'test',
+      })
+
+      expect(result.isCrisis).toBe(true)
+      expect(result.category).toBe('suicide_risk')
+    })
+
+    it('keeps CrisisDetectionService as a backwards-compatible alias', () => {
+      expect(CrisisDetectionService).toBe(MentalHealthAnomalyDetector)
+    })
+
+    it('selects the configured anomaly detector strategy', () => {
+      expect(resolveAnomalyDetectorKind()).toBe('mental_health')
+      expect(resolveAnomalyDetectorKind('mental_health')).toBe('mental_health')
+
+      const detector = createAnomalyDetector({
+        detector: 'mental_health',
+        aiService: mockAIService,
+        sensitivityLevel: 'medium' as const,
+      })
+
+      expect(detector).toBeInstanceOf(MentalHealthAnomalyDetector)
+    })
+
+    it('reads detector strategy from deployment configuration', () => {
+      const previousDetector = process.env['ANOMALY_DETECTOR']
+      process.env['ANOMALY_DETECTOR'] = 'mental-health'
+
+      try {
+        expect(resolveAnomalyDetectorKind()).toBe('mental_health')
+      } finally {
+        if (previousDetector === undefined) {
+          delete process.env['ANOMALY_DETECTOR']
+        } else {
+          process.env['ANOMALY_DETECTOR'] = previousDetector
+        }
+      }
+    })
+
+    it('rejects unsupported detector strategies', () => {
+      expect(() => resolveAnomalyDetectorKind('payments')).toThrow(
+        'Unsupported anomaly detector strategy',
+      )
+    })
+
+    it('honors per-call sensitivity overrides through detect', async () => {
+      const detector = new MentalHealthAnomalyDetector({
+        aiService: mockAIService,
+        sensitivityLevel: 'low' as const,
+      })
+      createChatCompletionSpy.mockRejectedValue(new Error('AI service error'))
+
+      const result = await detector.detect('I feel hopeless', {
+        sensitivityLevel: 'high',
+        userId: 'user123',
+        source: 'test',
+      })
+
+      expect(result.isCrisis).toBe(true)
+      expect(result.confidence).toBe(0.48)
     })
   })
 
@@ -216,8 +297,8 @@ describe('crisisDetectionService', () => {
       const results = await crisisService.detectBatch(texts, options)
 
       expect(results).toHaveLength(3)
-      expect(results?.[0].isCrisis).toBe(true) // 'kill myself' should be crisis
-      expect(results?.[1].isCrisis).toBe(false) // 'good day' should not be crisis
+      expect(results[0]?.isCrisis).toBe(true) // 'kill myself' should be crisis
+      expect(results[1]?.isCrisis).toBe(false) // 'good day' should not be crisis
     })
 
     it('should handle errors in batch processing', async () => {
@@ -244,7 +325,7 @@ describe('crisisDetectionService', () => {
 
   describe('constructor', () => {
     it('should create service with valid configuration', () => {
-      const service = new CrisisDetectionService({
+      const service = new MentalHealthAnomalyDetector({
         aiService: mockAIService,
         sensitivityLevel: 'medium' as const,
       })
@@ -254,7 +335,7 @@ describe('crisisDetectionService', () => {
 
     it('should accept custom configuration', () => {
       const customPrompt = 'Custom crisis detection prompt'
-      const service = new CrisisDetectionService({
+      const service = new MentalHealthAnomalyDetector({
         aiService: mockAIService,
         sensitivityLevel: 'medium' as const,
         defaultPrompt: customPrompt,
