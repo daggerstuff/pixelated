@@ -6,6 +6,8 @@ import os
 import sys
 from pathlib import Path
 
+from tests._collection_guards import should_ignore_optional_test
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PROJECT_ROOT_STR = str(PROJECT_ROOT)
 
@@ -17,3 +19,8 @@ if PROJECT_ROOT_STR not in sys.path:
 os.environ.setdefault("AI_DISABLE_SAFETY_ML_MODELS", "1")
 os.environ.setdefault("BIAS_DETECTION_DISABLE_LOCAL_ML_SERVICES", "1")
 os.environ.setdefault("BIAS_DETECTION_DISABLE_SENTRY", "1")
+
+
+def pytest_ignore_collect(collection_path: Path) -> bool:
+    """Avoid collecting tests for optional legacy assets not shipped in this checkout."""
+    return should_ignore_optional_test(collection_path, PROJECT_ROOT)
