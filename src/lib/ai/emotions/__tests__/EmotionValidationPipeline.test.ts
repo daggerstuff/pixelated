@@ -444,7 +444,7 @@ describe('EmotionValidationPipeline Monitoring Callbacks', () => {
     p.removeMonitoringCallback(callback)
     // No error should occur
     expect(true).toBe(true)
-    p.dispose()
+    void p.dispose()
   })
 
   it('should handle removing non-existent callback', () => {
@@ -452,7 +452,7 @@ describe('EmotionValidationPipeline Monitoring Callbacks', () => {
     const callback = vi.fn()
     // Should not throw even if callback was never added
     expect(() => p.removeMonitoringCallback(callback)).not.toThrow()
-    p.dispose()
+    void p.dispose()
   })
 })
 
