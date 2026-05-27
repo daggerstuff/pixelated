@@ -1,0 +1,66 @@
+name: Human Escalation
+description: Post a formatted human-in-the-loop escalation to GitHub, Slack, or Linear.
+
+inputs:
+  trigger:
+    description: Escalation trigger, such as rate_limit_reached or test_failure_after_fix.
+    required: true
+  what-was-tried:
+    description: Summary of the remediation attempts already made.
+    required: false
+    default: ''
+  failure-reason:
+    description: Explanation of why automation could not resolve the task.
+    required: false
+    default: ''
+  next-steps:
+    description: Concrete action a human should take next.
+    required: false
+    default: ''
+  confidence:
+    description: Optional fix confidence value, either 0-1 or 0-100.
+    required: false
+    default: ''
+  target-number:
+    description: Optional PR or issue number to comment on when event context does not provide one.
+    required: false
+    default: ''
+  github-token:
+    description: GitHub token used to post an issue or PR comment.
+    required: false
+    default: ''
+  slack-webhook-url:
+    description: Optional Slack incoming webhook URL for team notifications.
+    required: false
+    default: ''
+  linear-api-key:
+    description: Optional Linear API key used to create a tracking issue.
+    required: false
+    default: ''
+  linear-team-id:
+    description: Optional Linear team ID used when creating a tracking issue.
+    required: false
+    default: ''
+  fail-on-undelivered:
+    description: Set true to fail the step when no destination receives the escalation.
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Send human escalation
+      shell: bash
+      env:
+        ESCALATION_TRIGGER: ${{ inputs.trigger }}
+        ESCALATION_WHAT_WAS_TRIED: ${{ inputs.what-was-tried }}
+        ESCALATION_FAILURE_REASON: ${{ inputs.failure-reason }}
+        ESCALATION_NEXT_STEPS: ${{ inputs.next-steps }}
+        ESCALATION_CONFIDENCE: ${{ inputs.confidence }}
+        ESCALATION_TARGET_NUMBER: ${{ inputs.target-number }}
+        ESCALATION_GITHUB_TOKEN: ${{ inputs.github-token || github.token }}
+        ESCALATION_SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+        ESCALATION_LINEAR_API_KEY: ${{ inputs.linear-api-key }}
+        ESCALATION_LINEAR_TEAM_ID: ${{ inputs.linear-team-id }}
+        ESCALATION_REQUIRE_DELIVERY: ${{ inputs.fail-on-undelivered }}
+      run: node "$GITHUB_ACTION_PATH/../../../scripts/devops/human-escalation.mjs"

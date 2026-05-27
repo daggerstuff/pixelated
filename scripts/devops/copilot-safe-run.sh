@@ -135,6 +135,34 @@ is_rate_limit_error() {
   [[ "$lower" == *"rate limit"* ]] || [[ "$lower" == *"429"* ]] || [[ "$lower" == *"sessionmodelerror"* ]]
 }
 
+escalate_rate_limit_exhaustion() {
+  local last_output="$1"
+  local attempted_models="$2"
+  local what_was_tried
+  local failure_reason
+  local next_steps
+
+  if [[ "${COPILOT_SAFE_ESCALATE:-1}" == "0" ]]; then
+    return 0
+  fi
+
+  if [[ ! -f "scripts/devops/human-escalation.mjs" ]]; then
+    echo "copilot-safe-run: escalation helper not found; cannot notify humans." >&2
+    return 0
+  fi
+
+  what_was_tried="${ESCALATION_WHAT_WAS_TRIED:-Ran the Copilot command through copilot-safe-run across configured model fallbacks: ${attempted_models}.}"
+  failure_reason="${ESCALATION_FAILURE_REASON:-All retries ended in a rate-limit response. Last output:
+${last_output}}"
+  next_steps="${ESCALATION_NEXT_STEPS:-Review provider quota and model availability, choose a fallback model if needed, then rerun the workflow.}"
+
+  ESCALATION_TRIGGER="${ESCALATION_TRIGGER:-rate_limit_reached}" \
+    ESCALATION_WHAT_WAS_TRIED="$what_was_tried" \
+    ESCALATION_FAILURE_REASON="$failure_reason" \
+    ESCALATION_NEXT_STEPS="$next_steps" \
+    node scripts/devops/human-escalation.mjs >&2 || true
+}
+
 for idx in "${!CANDIDATE_MODELS[@]}"; do
   model="${CANDIDATE_MODELS[$idx]}"
   provider_model="${CANDIDATE_PROVIDER_MODELS[$idx]:-${CANDIDATE_PROVIDER_MODELS[0]}}"
@@ -142,9 +170,11 @@ for idx in "${!CANDIDATE_MODELS[@]}"; do
   attempts=0
   while [[ $attempts -lt $MAX_ATTEMPTS ]]; do
     attempts=$((attempts + 1))
+    set +e
     output="$(env COPILOT_MODEL="$model" COPILOT_PROVIDER_MODEL_ID="$provider_model" \
       "${COMMAND[@]}" 2>&1)"
     exit_code=$?
+    set -e
     if [[ ${exit_code} -eq 0 ]]; then
       echo "copilot-safe-run: success with model '$model' (provider id: '$provider_model')"
       printf '%s\n' "$output"
@@ -170,6 +200,7 @@ for idx in "${!CANDIDATE_MODELS[@]}"; do
     fi
 
     echo "copilot-safe-run: no fallback models left after rate-limit failures." >&2
+    escalate_rate_limit_exhaustion "$output" "${CANDIDATE_MODELS[*]}"
     printf '%s\n' "$output" >&2
     exit "$exit_code"
   done
