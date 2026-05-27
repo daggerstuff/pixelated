@@ -62,6 +62,24 @@ describe('BlockRegistry', () => {
     ).toThrow('Memory block schema charLimit must be greater than 0')
   })
 
+  it('rejects duplicate schema labels', () => {
+    const schema = {
+      label: 'custom_context',
+      description: 'Custom context for a focused workflow',
+      retentionPolicy: 'short_term',
+      mergeStrategy: 'append',
+      injectionPoint: 'system',
+      scope: 'session',
+      charLimit: 120,
+    } as const
+
+    registry.register(schema)
+
+    expect(() => registry.register(schema)).toThrow(
+      'Memory block schema already registered: custom_context',
+    )
+  })
+
   it('validates content against char limit and custom validators', () => {
     registry.register({
       label: 'short_context',

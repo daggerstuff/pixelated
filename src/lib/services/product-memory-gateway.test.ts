@@ -124,6 +124,82 @@ describe('ProductMemoryGateway', () => {
     )
   })
 
+  it('rejects attempts to override default block schemas from request metadata', async () => {
+    client.addMemory.mockResolvedValue({ memory_id: 'mem-override' })
+
+    await expect(
+      gateway.createMemory({
+        ...scope,
+        content: 'x'.repeat(12001),
+        metadata: {
+          blockLabel: 'core_directives',
+          blockSchema: {
+            label: 'core_directives',
+            description: 'Unsafe override',
+            retentionPolicy: 'short_term',
+            mergeStrategy: 'append',
+            injectionPoint: 'user',
+            scope: 'session',
+            charLimit: 20000,
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message: 'Memory block schema already registered: core_directives',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.addMemory).not.toHaveBeenCalled()
+  })
+
+  it('rejects malformed custom block schema metadata', async () => {
+    await expect(
+      gateway.createMemory({
+        ...scope,
+        content: 'custom content',
+        metadata: {
+          blockSchema: {
+            label: 'custom_context',
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message: 'Invalid memory block schema metadata',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.addMemory).not.toHaveBeenCalled()
+  })
+
+  it('supports snake_case custom block schema metadata', async () => {
+    client.addMemory.mockResolvedValue({ memory_id: 'mem-snake' })
+
+    await gateway.createMemory({
+      ...scope,
+      content: 'snake content',
+      metadata: {
+        block_label: 'snake_context',
+        block_schema: {
+          label: 'snake_context',
+          description: 'Custom snake case context block',
+          retention_policy: 'short_term',
+          merge_strategy: 'append',
+          injection_point: 'system',
+          scope: 'session',
+          char_limit: 20,
+        },
+      },
+    })
+
+    expect(client.addMemory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'snake_context',
+      }),
+    )
+  })
+
   it('maps shared-service records into product records', async () => {
     client.listMemories.mockResolvedValue({
       count: 1,
@@ -202,6 +278,29 @@ describe('ProductMemoryGateway', () => {
         memoryId: 'mem-3',
         content: 'x'.repeat(12001),
         metadata: { blockLabel: 'core_directives' },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message:
+        'Memory block content exceeds core_directives limit of 12000 characters',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.updateMemory).not.toHaveBeenCalled()
+  })
+
+  it('validates updates against existing block metadata when metadata is omitted', async () => {
+    client.getMemory.mockResolvedValue({
+      id: 'mem-3',
+      content: 'existing',
+      metadata: { blockLabel: 'core_directives', source: 'product' },
+    })
+
+    await expect(
+      gateway.updateMemory({
+        ...scope,
+        memoryId: 'mem-3',
+        content: 'x'.repeat(12001),
       }),
     ).rejects.toMatchObject({
       name: 'ProductMemoryGatewayError',

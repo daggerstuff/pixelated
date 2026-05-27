@@ -1,4 +1,5 @@
 import { InternalMemoryServiceClient } from '../server/internal-memory-service-client'
+import type { InternalMemoryRecord } from '../server/internal-memory-service-client'
 import {
   ProductMemoryGatewayError,
   type ProductMemoryDeleteInput,
@@ -14,7 +15,7 @@ type InternalMemoryServiceClientLike = Pick<
 export async function assertOwnedMemoryAccessible(
   client: InternalMemoryServiceClientLike,
   input: ProductMemoryDeleteInput | ProductMemoryUpdateInput,
-): Promise<void> {
+): Promise<InternalMemoryRecord> {
   const memory = await client.getMemory({
     memoryId: input.memoryId,
     ...toInternalScope(input),
@@ -23,4 +24,5 @@ export async function assertOwnedMemoryAccessible(
   if (!memory) {
     throw new ProductMemoryGatewayError('Memory not found', 404)
   }
+  return memory
 }

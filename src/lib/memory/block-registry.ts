@@ -73,6 +73,9 @@ export class BlockRegistry {
 
   register(schema: MemoryBlockSchema): void {
     validateSchema(schema)
+    if (this.schemas.has(schema.label)) {
+      throw new Error(`Memory block schema already registered: ${schema.label}`)
+    }
     this.schemas.set(schema.label, schema)
   }
 
@@ -166,11 +169,18 @@ export function registerSchemaFromMetadata(
   registry: BlockRegistry,
   metadata: Record<string, unknown>,
 ): void {
+  const hasSchemaMetadata =
+    Object.hasOwn(metadata, 'blockSchema') || Object.hasOwn(metadata, 'block_schema')
+  if (!hasSchemaMetadata) {
+    return
+  }
+
   const schemaInput = metadata['blockSchema'] ?? metadata['block_schema']
   const schema = parseMemoryBlockSchema(schemaInput)
-  if (schema) {
-    registry.register(schema)
+  if (!schema) {
+    throw new Error('Invalid memory block schema metadata')
   }
+  registry.register(schema)
 }
 
 export function getMemoryBlockLabel(

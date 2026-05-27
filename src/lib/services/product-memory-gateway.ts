@@ -7,7 +7,8 @@ import {
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
 import {
-  defaultBlockRegistry,
+  BlockRegistry,
+  defaultMemoryBlockSchemas,
   getMemoryBlockLabel,
   registerSchemaFromMetadata,
   validateMemoryBlockContent,
@@ -163,8 +164,13 @@ export class ProductMemoryGateway {
   async updateMemory(
     input: ProductMemoryUpdateInput,
   ): Promise<ProductMemoryRecord> {
-    const metadata = normalizeMetadata(input.metadata)
-    await assertOwnedMemoryAccessible(this.client, input)
+    const existingMemory = await assertOwnedMemoryAccessible(this.client, input)
+    const existingMetadata = normalizeMetadata(existingMemory.metadata)
+    const inputMetadata = normalizeMetadata(input.metadata)
+    const metadata =
+      input.metadata === undefined
+        ? existingMetadata
+        : { ...existingMetadata, ...inputMetadata }
     validateBlockMetadata(input.content, metadata)
     await this.withGatewayError(async () =>
       this.client.updateMemory({
@@ -249,8 +255,9 @@ function validateBlockMetadata(
   content: string,
   metadata: InternalMemoryMetadata,
 ): string | undefined {
+  const registry = new BlockRegistry(defaultMemoryBlockSchemas)
   try {
-    registerSchemaFromMetadata(defaultBlockRegistry, metadata)
+    registerSchemaFromMetadata(registry, metadata)
   } catch (error: unknown) {
     throw new ProductMemoryGatewayError(
       error instanceof Error
@@ -266,7 +273,7 @@ function validateBlockMetadata(
   }
 
   const validationError = validateMemoryBlockContent(
-    defaultBlockRegistry,
+    registry,
     blockLabel,
     content,
   )
