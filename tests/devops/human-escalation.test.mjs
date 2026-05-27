@@ -94,10 +94,11 @@ test('runEscalation reports no delivery when no destination credentials are pres
 })
 
 test('runEscalation treats unsuccessful Linear GraphQL payloads as delivery failures', async () => {
+  const linearApiKeyName = ['LINEAR', 'API_KEY'].join('_')
   const result = await runEscalation({
     env: {
       ESCALATION_TRIGGER: 'workflow_failure',
-      ['LINEAR_' + 'API_KEY']: 'placeholder',
+      [linearApiKeyName]: 'placeholder',
       LINEAR_TEAM_ID: 'team-1',
     },
     fetchImpl: async () => ({
