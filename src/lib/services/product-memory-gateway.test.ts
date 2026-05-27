@@ -69,6 +69,61 @@ describe('ProductMemoryGateway', () => {
     })
   })
 
+  it('validates labeled memory blocks before creating them', async () => {
+    await expect(
+      gateway.createMemory({
+        ...scope,
+        content: 'x'.repeat(8001),
+        metadata: { blockLabel: 'pending_items' },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message: 'Memory block content exceeds pending_items limit of 8000 characters',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.addMemory).not.toHaveBeenCalled()
+  })
+
+  it('registers custom block schemas supplied on creation metadata', async () => {
+    client.addMemory.mockResolvedValue({ memory_id: 'mem-custom' })
+
+    await gateway.createMemory({
+      ...scope,
+      content: 'custom content',
+      metadata: {
+        blockLabel: 'custom_context',
+        blockSchema: {
+          label: 'custom_context',
+          description: 'Custom context block',
+          retentionPolicy: 'short_term',
+          mergeStrategy: 'append',
+          injectionPoint: 'system',
+          scope: 'session',
+          charLimit: 20,
+        },
+      },
+    })
+
+    expect(client.addMemory).toHaveBeenCalledWith(
+      expect.objectContaining({
+        category: 'custom_context',
+        metadata: {
+          blockLabel: 'custom_context',
+          blockSchema: {
+            label: 'custom_context',
+            description: 'Custom context block',
+            retentionPolicy: 'short_term',
+            mergeStrategy: 'append',
+            injectionPoint: 'system',
+            scope: 'session',
+            charLimit: 20,
+          },
+        },
+      }),
+    )
+  })
+
   it('maps shared-service records into product records', async () => {
     client.listMemories.mockResolvedValue({
       count: 1,
@@ -132,6 +187,30 @@ describe('ProductMemoryGateway', () => {
       content: 'updated',
       metadata: { source: 'product' },
     })
+  })
+
+  it('validates labeled memory blocks before updating them', async () => {
+    client.getMemory.mockResolvedValue({
+      id: 'mem-3',
+      content: 'existing',
+      metadata: {},
+    })
+
+    await expect(
+      gateway.updateMemory({
+        ...scope,
+        memoryId: 'mem-3',
+        content: 'x'.repeat(12001),
+        metadata: { blockLabel: 'core_directives' },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message:
+        'Memory block content exceeds core_directives limit of 12000 characters',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.updateMemory).not.toHaveBeenCalled()
   })
 
   it('surfaces a 404 when updating a memory outside the caller scope', async () => {

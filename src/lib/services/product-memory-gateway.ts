@@ -6,6 +6,12 @@ import {
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
+import {
+  defaultBlockRegistry,
+  getMemoryBlockLabel,
+  registerSchemaFromMetadata,
+  validateMemoryBlockContent,
+} from '../memory/block-registry'
 import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
 export interface ProductMemoryRecord {
@@ -92,12 +98,15 @@ export class ProductMemoryGateway {
     input: ProductMemoryCreateInput,
   ): Promise<ProductMemoryRecord> {
     const metadata = normalizeMetadata(input.metadata)
+    const blockLabel = validateBlockMetadata(input.content, metadata)
     const response = await this.withGatewayError(async () =>
       this.client.addMemory({
         ...toInternalScope(input),
         content: input.content,
         category:
-          typeof metadata['category'] === 'string' ? metadata['category'] : undefined,
+          typeof metadata['category'] === 'string'
+            ? metadata['category']
+            : blockLabel,
         metadata,
       }),
     )
@@ -156,6 +165,7 @@ export class ProductMemoryGateway {
   ): Promise<ProductMemoryRecord> {
     const metadata = normalizeMetadata(input.metadata)
     await assertOwnedMemoryAccessible(this.client, input)
+    validateBlockMetadata(input.content, metadata)
     await this.withGatewayError(async () =>
       this.client.updateMemory({
         memoryId: input.memoryId,
@@ -233,6 +243,40 @@ function normalizeMetadata(
     }
   }
   return result
+}
+
+function validateBlockMetadata(
+  content: string,
+  metadata: InternalMemoryMetadata,
+): string | undefined {
+  try {
+    registerSchemaFromMetadata(defaultBlockRegistry, metadata)
+  } catch (error: unknown) {
+    throw new ProductMemoryGatewayError(
+      error instanceof Error
+        ? error.message
+        : 'Invalid memory block schema metadata',
+      400,
+    )
+  }
+
+  const blockLabel = getMemoryBlockLabel(metadata)
+  if (!blockLabel) {
+    return undefined
+  }
+
+  const validationError = validateMemoryBlockContent(
+    defaultBlockRegistry,
+    blockLabel,
+    content,
+  )
+  if (validationError) {
+    throw new ProductMemoryGatewayError(
+      validationError.message,
+      validationError.status,
+    )
+  }
+  return blockLabel
 }
 
 function toJsonValue(value: unknown): JsonValue | undefined {
