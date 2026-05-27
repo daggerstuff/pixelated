@@ -312,6 +312,70 @@ describe('ProductMemoryGateway', () => {
     expect(client.updateMemory).not.toHaveBeenCalled()
   })
 
+  it('rejects updates that replace existing block labels with invalid metadata', async () => {
+    client.getMemory.mockResolvedValue({
+      id: 'mem-3',
+      content: 'existing',
+      metadata: { blockLabel: 'core_directives', source: 'product' },
+    })
+
+    await expect(
+      gateway.updateMemory({
+        ...scope,
+        memoryId: 'mem-3',
+        content: 'x'.repeat(12001),
+        metadata: { blockLabel: '' },
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 400,
+      message: 'Memory block label must be a non-empty string',
+    } satisfies Partial<ProductMemoryGatewayError>)
+
+    expect(client.updateMemory).not.toHaveBeenCalled()
+  })
+
+  it('wraps ownership lookup failures during update', async () => {
+    client.getMemory.mockRejectedValue(
+      new InternalMemoryServiceError('ownership lookup failed', 503, {
+        error: 'service unavailable',
+      }),
+    )
+
+    await expect(
+      gateway.updateMemory({
+        ...scope,
+        memoryId: 'mem-3',
+        content: 'updated',
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 503,
+      message: 'ownership lookup failed',
+      details: { error: 'service unavailable' },
+    } satisfies Partial<ProductMemoryGatewayError>)
+  })
+
+  it('wraps ownership lookup failures during delete', async () => {
+    client.getMemory.mockRejectedValue(
+      new InternalMemoryServiceError('delete lookup failed', 503, {
+        error: 'service unavailable',
+      }),
+    )
+
+    await expect(
+      gateway.deleteMemory({
+        ...scope,
+        memoryId: 'mem-3',
+      }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 503,
+      message: 'delete lookup failed',
+      details: { error: 'service unavailable' },
+    } satisfies Partial<ProductMemoryGatewayError>)
+  })
+
   it('surfaces a 404 when updating a memory outside the caller scope', async () => {
     client.getMemory.mockResolvedValue(null)
 

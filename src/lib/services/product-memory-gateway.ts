@@ -164,13 +164,16 @@ export class ProductMemoryGateway {
   async updateMemory(
     input: ProductMemoryUpdateInput,
   ): Promise<ProductMemoryRecord> {
-    const existingMemory = await assertOwnedMemoryAccessible(this.client, input)
+    const existingMemory = await this.withGatewayError(async () =>
+      assertOwnedMemoryAccessible(this.client, input),
+    )
     const existingMetadata = normalizeMetadata(existingMemory.metadata)
     const inputMetadata = normalizeMetadata(input.metadata)
-    const metadata =
-      input.metadata === undefined
-        ? existingMetadata
-        : { ...existingMetadata, ...inputMetadata }
+    const metadata = mergeUpdateMetadata(
+      existingMetadata,
+      inputMetadata,
+      input.metadata !== undefined,
+    )
     validateBlockMetadata(input.content, metadata)
     await this.withGatewayError(async () =>
       this.client.updateMemory({
@@ -202,7 +205,9 @@ export class ProductMemoryGateway {
   }
 
   async deleteMemory(input: ProductMemoryDeleteInput): Promise<void> {
-    await assertOwnedMemoryAccessible(this.client, input)
+    await this.withGatewayError(async () =>
+      assertOwnedMemoryAccessible(this.client, input),
+    )
     await this.withGatewayError(async () =>
       this.client.deleteMemory({
         memoryId: input.memoryId,
@@ -251,10 +256,53 @@ function normalizeMetadata(
   return result
 }
 
+function mergeUpdateMetadata(
+  existingMetadata: InternalMemoryMetadata,
+  inputMetadata: InternalMemoryMetadata,
+  hasInputMetadata: boolean,
+): InternalMemoryMetadata {
+  if (!hasInputMetadata) {
+    return existingMetadata
+  }
+
+  const existingBlockLabel = getMemoryBlockLabel(existingMetadata)
+  const inputHasBlockLabel = hasBlockLabelMetadata(inputMetadata)
+  const inputBlockLabel = inputHasBlockLabel
+    ? getExplicitBlockLabel(inputMetadata)
+    : undefined
+
+  if (inputHasBlockLabel && !inputBlockLabel) {
+    throw new ProductMemoryGatewayError(
+      'Memory block label must be a non-empty string',
+      400,
+    )
+  }
+
+  if (
+    existingBlockLabel &&
+    inputBlockLabel &&
+    inputBlockLabel !== existingBlockLabel
+  ) {
+    throw new ProductMemoryGatewayError(
+      `Cannot change memory block label from ${existingBlockLabel} to ${inputBlockLabel}`,
+      400,
+    )
+  }
+
+  return { ...existingMetadata, ...inputMetadata }
+}
+
 function validateBlockMetadata(
   content: string,
   metadata: InternalMemoryMetadata,
 ): string | undefined {
+  if (hasBlockLabelMetadata(metadata) && !getExplicitBlockLabel(metadata)) {
+    throw new ProductMemoryGatewayError(
+      'Memory block label must be a non-empty string',
+      400,
+    )
+  }
+
   const registry = new BlockRegistry(defaultMemoryBlockSchemas)
   try {
     registerSchemaFromMetadata(registry, metadata)
@@ -284,6 +332,22 @@ function validateBlockMetadata(
     )
   }
   return blockLabel
+}
+
+function hasBlockLabelMetadata(metadata: InternalMemoryMetadata): boolean {
+  return (
+    Object.prototype.hasOwnProperty.call(metadata, 'blockLabel') ||
+    Object.prototype.hasOwnProperty.call(metadata, 'block_label')
+  )
+}
+
+function getExplicitBlockLabel(
+  metadata: InternalMemoryMetadata,
+): string | undefined {
+  const rawLabel = metadata['blockLabel'] ?? metadata['block_label']
+  return typeof rawLabel === 'string' && rawLabel.trim().length > 0
+    ? rawLabel.trim()
+    : undefined
 }
 
 function toJsonValue(value: unknown): JsonValue | undefined {
