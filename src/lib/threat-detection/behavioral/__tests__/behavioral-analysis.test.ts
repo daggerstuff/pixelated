@@ -191,7 +191,6 @@ describe('Behavioral Analysis Service', () => {
     mlEnabled: true,
     redisUrl: 'redis://localhost:6379',
     mongoUrl: 'mongodb://localhost:27017',
-    mlEnabled: true,
     modelPath: '/tmp/model',
     privacyConfig: {
       epsilon: 1,

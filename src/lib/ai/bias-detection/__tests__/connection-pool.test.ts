@@ -53,7 +53,7 @@ describe('ConnectionPool', () => {
 
       expect(cleanupSpy).toHaveBeenCalledTimes(1)
 
-      fpPool.dispose()
+      void fpPool.dispose()
       vi.useRealTimers()
     })
   })
