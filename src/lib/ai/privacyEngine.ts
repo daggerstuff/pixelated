@@ -426,7 +426,7 @@ class PrivacyEngine {
 
     Object.keys(originalStats).forEach((key) => {
       if (sanitizedStats[key] !== undefined) {
-        const diff = Math.abs(originalStats[key]! - sanitizedStats[key]!)
+        const diff = Math.abs(originalStats[key]! - sanitizedStats[key])
         preservationScore += Math.max(0, 1 - diff)
         comparisons++
       }

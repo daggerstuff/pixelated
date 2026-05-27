@@ -726,7 +726,7 @@ def _linear_issues_query(filter_by_team: str = "", filter_by_project: str = "") 
         "query($after: String) { "
         "issues(first: 100, after: $after"
         f"{filter_clause}"
-        ") { nodes { id title description state { id name type } updatedAt createdAt } pageInfo { hasNextPage endCursor } } }"
+        ") { nodes { id identifier title description project { id name } state { id name type } updatedAt createdAt } pageInfo { hasNextPage endCursor } } }"
     )
 
 

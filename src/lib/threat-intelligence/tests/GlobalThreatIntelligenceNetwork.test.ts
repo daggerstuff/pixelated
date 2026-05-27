@@ -336,10 +336,10 @@ const mockValidationSystem = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
   validateThreat: vi.fn<(threat: unknown) => Promise<any>>().mockImplementation(async (threat: any) => {
     return {
-      validationId: `validation-${threat.threatId || 'unknown'}`,
-      threatId: threat.threatId || 'unknown',
-      threatType: threat.threatType || 'malware',
-      severity: threat.severity || 'high',
+      validationId: `validation-${threat.threatId ?? 'unknown'}`,
+      threatId: threat.threatId ?? 'unknown',
+      threatType: threat.threatType ?? 'malware',
+      severity: threat.severity ?? 'high',
       confidence: threat.confidence ?? 0.9,
       status: 'valid',
       overallScore: 85,
