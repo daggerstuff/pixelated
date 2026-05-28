@@ -126,11 +126,16 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
         </button>
       </form>
 
-      <div className="mb-6 flex gap-2">
+      <div
+        className="mb-6 flex gap-2"
+        role="group"
+        aria-label="Filter recommendations by priority"
+      >
         <button
           type="button"
           className={`filter-btn${filter === 'all' ? ' active' : ''}`}
           onClick={() => setFilter('all')}
+          aria-pressed={filter === 'all'}
         >
           All
         </button>
@@ -138,6 +143,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'high' ? ' active' : ''}`}
           onClick={() => setFilter('high')}
+          aria-pressed={filter === 'high'}
         >
           High Priority
         </button>
@@ -145,6 +151,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'medium' ? ' active' : ''}`}
           onClick={() => setFilter('medium')}
+          aria-pressed={filter === 'medium'}
         >
           Medium
         </button>
@@ -152,6 +159,7 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'low' ? ' active' : ''}`}
           onClick={() => setFilter('low')}
+          aria-pressed={filter === 'low'}
         >
           Low
         </button>
