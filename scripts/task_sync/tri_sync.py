@@ -56,14 +56,115 @@ STATUS_ALIASES = {
     "canceled": "closed",
     "in progress": "in_progress",
     "under review": "in_progress",
-    "review": "in_progress",
+    "in review": "review",
+    "review": "review",
     "doing": "in_progress",
     "active": "in_progress",
     "open": "open",
     "todo": "open",
     "to do": "open",
     "backlog": "open",
+    "triage": "triage",
 }
+
+# Per-project status workflow overrides.
+# Key: project name (case-insensitive)
+# Value: dict mapping canonical statuses to allowed Linear state names
+PROJECT_STATUS_WORKFLOWS: dict[str, dict[str, set[str]]] = {
+    "discovery & backlog": {
+        "open": {"Backlog", "Todo"},
+        "triage": set(),
+        "in_progress": set(),
+        "review": set(),
+        "closed": {"Done", "Duplicate"},
+    },
+    "churnmeon reliability": {
+        "open": {"Backlog"},
+        "triage": set(),
+        "in_progress": set(),
+        "review": set(),
+        "closed": set(),
+    },
+    "autoreview workflow improvements": {
+        "open": {"Backlog", "Triage"},
+        "in_progress": {"In Progress"},
+        "review": set(),
+        "closed": {"Done"},
+    },
+    "memory may-hem expansion": {
+        "open": {"Todo", "Triage"},
+        "in_progress": set(),
+        "review": set(),
+        "closed": {"Done", "Duplicate"},
+    },
+}
+
+# Linear numeric priority → canonical priority label
+LINEAR_PRIORITY_MAP: dict[int | None, str] = {
+    0: "urgent",
+    1: "high",
+    2: "medium",
+    3: "low",
+    4: "none",
+    None: "none",
+}
+
+# Canonical priority → Jira ADHD priority name
+PRIORITY_TO_JIRA: dict[str, str] = {
+    "urgent": "Highest",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "none": "None",
+}
+
+# Jira ADHD priority name → canonical priority
+JIRA_PRIORITY_TO_CANONICAL: dict[str, str] = {
+    "Highest": "urgent",
+    "High": "high",
+    "Medium": "medium",
+    "Low": "low",
+    "None": "none",
+}
+
+# Canonical priority → Beads priority label
+PRIORITY_TO_BEADS: dict[str, str] = {
+    "urgent": "critical",
+    "high": "high",
+    "medium": "normal",
+    "low": "low",
+    "none": "none",
+}
+
+BEADS_VALID_STATUSES = frozenset({"open", "in_progress", "blocked", "deferred", "closed", "pinned", "hooked"})
+
+BEADS_STATUS_MAP: dict[str, str] = {
+    "todo": "open",
+    "unstarted": "open",
+    "started": "in_progress",
+    "active": "in_progress",
+    "done": "closed",
+    "cancelled": "closed",
+    "canceled": "closed",
+    "resolved": "closed",
+    "completed": "closed",
+    "complete": "closed",
+    "backlog": "open",
+    "triage": "open",
+    "in_review": "in_progress",
+    "review": "in_progress",
+    "testing": "in_progress",
+    "reopened": "open",
+}
+
+
+def map_status_for_beads(status: str) -> str:
+    """Map a normalized status to a valid Beads status."""
+    s = status.strip().lower().replace(" ", "_")
+    if s in BEADS_VALID_STATUSES:
+        return s
+    return BEADS_STATUS_MAP.get(s, "open")
+
 
 PROVIDER_PRIORITY = {
     "beads": 4,
@@ -103,6 +204,8 @@ class TaskRecord:
     provider_ids: Mapping[str, str] = field(default_factory=dict)
     clean_body: str | None = None
     raw: Mapping[str, Any] = field(default_factory=dict)
+    priority_label: str | None = None
+    labels: tuple[str, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
@@ -119,6 +222,8 @@ class SyncAction:
     body: str
     status: str
     provider_ids: Mapping[str, str]
+    priority_label: str | None = None
+    labels: tuple[str, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
@@ -134,15 +239,20 @@ class SyncExecutionResult:
     stderr: str = ""
 
 
+def normalize_status(value: str) -> str:
+    # If value is a dict-like string from Linear (e.g. "{'id': '...', 'name': 'todo', ...}"), extract name
+    if value.startswith("{") and "'name'" in value:
+        m = re.search(r"'name'\s*:\s*'([^']*)'", value)
+        if m:
+            value = m.group(1)
+    normalized = value.strip().lower().replace("_", " ")
+    return STATUS_ALIASES.get(normalized, normalized.replace(" ", "_"))
+
+
 def slugify(value: str) -> str:
     value = value.strip().lower()
     value = re.sub(r"[^a-z0-9]+", "-", value)
     return re.sub(r"-+", "-", value).strip("-")
-
-
-def normalize_status(value: str) -> str:
-    normalized = value.strip().lower().replace("_", " ")
-    return STATUS_ALIASES.get(normalized, normalized.replace(" ", "_"))
 
 
 def parse_iso8601(value: str) -> datetime:
@@ -287,6 +397,15 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
     if not records:
         raise ValueError("Cannot select a canonical record from an empty sequence")
 
+    # If there is a Linear record, it is ALWAYS canonical!
+    linear_records = [r for r in records if r.provider == "linear"]
+    if linear_records:
+        if len(linear_records) == 1:
+            return linear_records[0]
+        records_to_sort = linear_records
+    else:
+        records_to_sort = records
+
     def compute_strength_score(title: str, clean_body: str) -> float:
         score = 0.0
 
@@ -312,7 +431,13 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
         # Check for corrupted list headers, e.g. code blocks containing '1. ' or list-like headers
         # like '1. Task Overview' or '  1. Implementation Checklist'
         corrupted_headers = len(re.findall(r"```\s*\n\s*\d+\.\s+\S+", clean_body))
-        corrupted_headers += len(re.findall(r"^\s*\d+\.\s+(Task Overview|Implementation Checklist|Objective|Milestones|Success Metrics|Definition of Done|Verified Files|Path Notes|Dependencies|Status|Background|Target Release)", clean_body, re.MULTILINE | re.IGNORECASE))
+        corrupted_headers += len(
+            re.findall(
+                r"^\s*\d+\.\s+(Task Overview|Implementation Checklist|Objective|Milestones|Success Metrics|Definition of Done|Verified Files|Path Notes|Dependencies|Status|Background|Target Release)",
+                clean_body,
+                re.MULTILINE | re.IGNORECASE,
+            )
+        )
         score -= corrupted_headers * 100.0
 
         # Checklist check
@@ -332,7 +457,7 @@ def select_canonical_record(records: Sequence[TaskRecord]) -> TaskRecord:
         score = compute_strength_score(record.title, clean_body)
         return (score, record.updated_at, PROVIDER_PRIORITY.get(record.provider, 0))
 
-    return max(records, key=sort_key)
+    return max(records_to_sort, key=sort_key)
 
 
 def select_provider_record(records: Sequence[TaskRecord]) -> TaskRecord:
@@ -360,10 +485,7 @@ def group_records_by_key(
         for record in records:
             normalized_record = normalized_group_record(provider, record)
             if not normalized_record.sync_key:
-                print(
-                    f"Skipping {provider} record {record.external_id}: missing sync key",
-                    file=sys.stderr,
-                )
+                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
                 continue
             grouped.setdefault(normalized_record.sync_key, []).append(normalized_record)
     return grouped
@@ -423,6 +545,8 @@ def build_sync_action(
         body=merged_body,
         status=normalize_status(canonical.status),
         provider_ids=known_provider_ids,
+        priority_label=canonical.priority_label,
+        labels=canonical.labels,
     )
 
 
@@ -436,6 +560,10 @@ def build_sync_plan(
     plan: list[SyncAction] = []
 
     for sync_key, records in sorted(grouped.items()):
+        # If there is no Linear record in this group, skip generating any sync actions!
+        if not any(record.provider == "linear" for record in records):
+            continue
+
         provider_lookup = {
             provider: select_provider_record([record for record in records if record.provider == provider])
             for provider in {record.provider for record in records}
@@ -644,12 +772,23 @@ def normalize_jira_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
     raw_status = _jira_status(payload, field_payload)
     status = normalize_status(_string_or_empty(raw_status) or "open")
 
+    # Extract priority from Jira ADHD named priority
+    priority_field = field_payload.get("priority", {})
+    raw_priority_name = _string_or_empty(priority_field.get("name", "")) if isinstance(priority_field, Mapping) else ""
+    priority_label = JIRA_PRIORITY_TO_CANONICAL.get(raw_priority_name)
+
+    # Extract labels from Jira
+    raw_labels = field_payload.get("labels", [])
+    labels = tuple(str(lbl) for lbl in raw_labels if isinstance(lbl, str)) if isinstance(raw_labels, list) else ()
+
     return TaskRecord(
         provider="jira",
         external_id=_string_or_empty(_first_present(payload, "key", "id", "issueKey")),
         title=_jira_title(payload, field_payload),
         body=body,
         status=status,
+        priority_label=priority_label,
+        labels=labels,
         updated_at=_jira_updated_at(payload, field_payload) or datetime.now(timezone.utc),
         sync_key=_string_or_empty(_first_present(payload, "sync_key", "external_ref")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
@@ -682,7 +821,21 @@ def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
     body = _string_or_empty(_first_present(payload, "description", "body", "content"))
     clean_body, metadata = parse_sync_metadata(body)
     raw_state = _first_present(payload, "state", "state.name")
+    # Linear state may be a dict like {'id': '...', 'name': 'Todo', 'type': 'unstarted'}
+    if isinstance(raw_state, dict):
+        raw_state = raw_state.get("name") or raw_state.get("type") or "open"
     status = normalize_status(_string_or_empty(raw_state) or "open")
+
+    # Extract priority (Linear uses 0=urgent, 1=high, 2=medium, 3=low, 4=none)
+    raw_priority = payload.get("priority")
+    priority_label = LINEAR_PRIORITY_MAP.get(raw_priority) if isinstance(raw_priority, int) else None
+
+    # Extract labels
+    raw_labels = payload.get("labels", [])
+    if isinstance(raw_labels, list):
+        labels = tuple(lbl.get("name", "") for lbl in raw_labels if isinstance(lbl, dict) and lbl.get("name"))
+    else:
+        labels = ()
 
     return TaskRecord(
         provider="linear",
@@ -690,12 +843,14 @@ def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         title=_string_or_empty(_first_present(payload, "title")),
         body=body,
         status=status,
-        updated_at=_parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created")
-        or datetime.now(timezone.utc),
-        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
+        updated_at=(
+            _parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc)
+        ),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
         raw=payload,
+        priority_label=priority_label,
+        labels=labels,
     )
 
 
@@ -996,7 +1151,7 @@ def update_sync_state(
         next_state["records"] = records
 
     timestamp = applied_at or datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    for action, result in zip(plan, results):
+    for action, result in zip(plan, results, strict=True):
         existing_record = records.get(action.sync_key)
         record = dict(existing_record) if isinstance(existing_record, dict) else {}
 
@@ -1097,7 +1252,7 @@ def _apply_beads_action(
             "--description",
             action.body,
             "--status",
-            action.status,
+            map_status_for_beads(action.status),
             "--external-ref",
             action.sync_key,
         ]
@@ -1237,7 +1392,7 @@ def build_follow_up_plan(
 ) -> list[SyncAction]:
     enabled_providers = resolve_enabled_providers_from_env()
     grouped: dict[str, list[tuple[SyncAction, SyncExecutionResult]]] = {}
-    for action, result in zip(plan, results):
+    for action, result in zip(plan, results, strict=True):
         if not result.success or not result.target_id:
             continue
         grouped.setdefault(action.sync_key, []).append((action, result))
@@ -1396,10 +1551,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         apply_payload, exit_code = execute_apply_mode(plan)
         payload.update(apply_payload)
         if exit_code:
-            print(json.dumps(payload, indent=2))
+            sys.stdout.write(json.dumps(payload, indent=2) + "\n")
             return exit_code
 
-    print(json.dumps(payload, indent=2))
+    sys.stdout.write(json.dumps(payload, indent=2) + "\n")
     return 0
 
 
