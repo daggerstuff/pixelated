@@ -102,10 +102,7 @@
     "typescript/prefer-optional-chain": "warn",
     "typescript/prefer-readonly": "warn",
     "typescript/switch-exhaustiveness-check": "error",
-    "react/no-unstable-nested-components": [
-      "warn",
-      { "allowAsProps": true }
-    ],
+    "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }],
     "vitest/no-conditional-tests": "warn",
     "no-underscore-dangle": [
       "error",
