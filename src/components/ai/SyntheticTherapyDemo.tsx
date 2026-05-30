@@ -37,7 +37,7 @@ import {
 import { DisorderCategory } from '@/lib/ai/mental-arena/types'
 
 // ⚡ Bolt: Cache Object.values for enum outside component to avoid repeated array allocations on every render
-const DISORDER_CATEGORIES_LIST = Object.values(DisorderCategory) as string[]
+const DISORDER_CATEGORIES_LIST = Object.values(DisorderCategory) as DisorderCategory[]
 
 /**
  * Generate cryptographically secure random integer within a range
