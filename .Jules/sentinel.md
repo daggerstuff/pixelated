@@ -1,1 +1,16 @@
+<<<<<<< HEAD
 ## 2025-04-18 - Fix SQL injection in Bias Analytics Dashboard | Vulnerability: Unparameterized string interpolation of URL variables | Learning: Using template literals with SQL strings instead of parameterized arrays is an anti-pattern even if the input appears constrained by parseInt | Prevention: Always use the parameter array `[var]` syntax for database queries (e.g., `$1`) alongside server-side boundary validation.
+=======
+## 2025-03-24 - [Information Exposure] Prevent sending raw Error stacks in Mental Health Chat Endpoint
+
+| Vulnerability: The `src/pages/api/mental-health/chat.ts` endpoint was
+serializing standard `Error` objects (`String(error)`) into the `details` field
+of the HTTP 500 response, potentially leaking internal stack traces or internal
+implementation details. | Learning: Sending raw `error` objects or
+`String(error)` downstream, especially from untrusted or external AI/downstream
+services, exposes internal logic to the client. This is a classic CWE-209
+vulnerability. | Prevention: In generic error handling logic, log the full error
+context server-side (`console.error` or standard loggers), but always sanitize
+the response payload sent to the client to only include safe, generic error
+descriptions like `Internal server error`.
+>>>>>>> origin/staging

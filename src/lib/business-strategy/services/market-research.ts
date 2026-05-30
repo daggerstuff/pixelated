@@ -6,11 +6,15 @@
  */
 
 import type { UserId } from '../types/common'
+<<<<<<< HEAD
 import type {
 
 
   MarketTrend,
   Opportunity } from '../types/market-research'
+=======
+import type { MarketTrend, Opportunity } from '../types/market-research'
+>>>>>>> origin/staging
 import { BaseService } from './base-service'
 
 export class MarketResearchService extends BaseService {

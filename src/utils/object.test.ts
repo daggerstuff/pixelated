@@ -16,4 +16,18 @@ describe('deepEqual', () => {
     expect(deepEqual(undefined, null)).toBe(false)
     expect(deepEqual(null, {})).toBe(false)
   })
+<<<<<<< HEAD
+=======
+
+  it('handles nested objects and arrays', () => {
+    const obj1 = { a: 1, b: { c: [1, 2, 3], d: 'test' } }
+    const obj2 = { a: 1, b: { c: [1, 2, 3], d: 'test' } }
+    const obj3 = { a: 1, b: { c: [1, 2, 4], d: 'test' } }
+    const obj4 = { a: 1, b: { c: [1, 2, 3] } }
+
+    expect(deepEqual(obj1, obj2)).toBe(true)
+    expect(deepEqual(obj1, obj3)).toBe(false)
+    expect(deepEqual(obj1, obj4)).toBe(false)
+  })
+>>>>>>> origin/staging
 })

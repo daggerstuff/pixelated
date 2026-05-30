@@ -166,8 +166,11 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
             )}>
               {/* Header */}
               <button 
+                type="button"
                 onClick={() => toggleExpand(activity.id)}
                 className="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition-colors"
+                aria-expanded={!!expandedItems[activity.id]}
+                aria-controls={`activity-details-${activity.id}`}
               >
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
@@ -196,148 +199,152 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                 </div>
               </button>
 
-              {/* Expanded Content */}
-              {expandedItems[activity.id] && (
-                <div className="p-3 pt-0 border-t border-white/5 bg-black/20">
-                  <div className="mt-3 space-y-3">
-                    {activity.conflict && (
-                      <div className={cn(
-                        "p-3 rounded-lg border flex flex-col gap-2 mb-2",
-                        activity.conflict.severity === 'high' ? "bg-red-500/10 border-red-500/20" :
-                        activity.conflict.severity === 'medium' ? "bg-amber-500/10 border-amber-500/20" :
-                        "bg-blue-500/10 border-blue-500/20"
-                      )}>
+              {/* Expanded Content - always rendered in DOM for aria-controls to reference a valid element */}
+              <div
+                id={`activity-details-${activity.id}`}
+                className={cn(
+                  "p-3 pt-0 border-t border-white/5 bg-black/20 transition-all duration-200",
+                  expandedItems[activity.id] ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+                )}
+              >
+                <div className="mt-3 space-y-3">
+                  {activity.conflict && (
+                    <div className={cn(
+                      "p-3 rounded-lg border flex flex-col gap-2 mb-2",
+                      activity.conflict.severity === 'high' ? "bg-red-500/10 border-red-500/20" :
+                      activity.conflict.severity === 'medium' ? "bg-amber-500/10 border-amber-500/20" :
+                      "bg-blue-500/10 border-blue-500/20"
+                    )}>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-black uppercase tracking-tighter text-white/60">Disagreement Detected</span>
+                        <span className="text-[9px] font-bold text-white/40">VS {activity.conflict.withAgent}</span>
+                      </div>
+                      <p className="text-xs text-white/90 leading-tight">
+                        {activity.conflict.description}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {activity.thought && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Internal Thought</div>
+                      <div className="text-xs text-white/80 leading-relaxed italic bg-purple-500/5 p-2 rounded border border-purple-500/10">
+                        {activity.thought}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {activity.action && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Action Taken</div>
+                      <div className="text-xs font-mono text-green-300 bg-black/40 p-2 rounded border border-green-500/10">
+                        {activity.action}
+                      </div>
+                    </div>
+                  )}
+
+                  {activity.observation && (
+                    <div className="space-y-1">
+                      <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Observation</div>
+                      <div className="text-xs text-white/70 bg-white/5 p-2 rounded">
+                        {activity.observation}
+                      </div>
+                    </div>
+                  )}
+
+                  {activity.shared_state && (
+                    <StateInspector state={activity.shared_state} />
+                  )}
+
+                  <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-white/5">
+                    {showCorrectionInput[activity.id] && (
+                      <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
                         <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-black uppercase tracking-tighter text-white/60">Disagreement Detected</span>
-                          <span className="text-[9px] font-bold text-white/40">VS {activity.conflict.withAgent}</span>
+                          <span className="text-[10px] font-bold text-indigo-400 uppercase">Supervisor Correction</span>
+                          <button 
+                            onClick={() => setShowCorrectionInput(prev => ({ ...prev, [activity.id]: false }))}
+                            className="text-white/20 hover:text-white/40"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
                         </div>
-                        <p className="text-xs text-white/90 leading-tight">
-                          {activity.conflict.description}
-                        </p>
-                      </div>
-                    )}
-                    
-                    {activity.thought && (
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">Internal Thought</div>
-                        <div className="text-xs text-white/80 leading-relaxed italic bg-purple-500/5 p-2 rounded border border-purple-500/10">
-                          {activity.thought}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {activity.action && (
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-bold text-green-400 uppercase tracking-wider">Action Taken</div>
-                        <div className="text-xs font-mono text-green-300 bg-black/40 p-2 rounded border border-green-500/10">
-                          {activity.action}
-                        </div>
-                      </div>
-                    )}
-
-                    {activity.observation && (
-                      <div className="space-y-1">
-                        <div className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Observation</div>
-                        <div className="text-xs text-white/70 bg-white/5 p-2 rounded">
-                          {activity.observation}
+                        <div className="relative">
+                          <textarea 
+                            value={correctionText[activity.id] ?? ''}
+                            onChange={(e) => setCorrectionText(prev => ({ ...prev, [activity.id]: e.target.value }))}
+                            placeholder="Describe how the agent should have reasoned..."
+                            className="w-full bg-black/40 border border-indigo-500/30 rounded-md p-2 text-xs text-white focus:outline-none focus:border-indigo-500/60 min-h-[60px] resize-none"
+                          />
+                          <button 
+                            onClick={ async () => handleFeedbackClick(activity.id, 'correction')}
+                            disabled={isSubmitting[activity.id] ?? !correctionText[activity.id]?.trim()}
+                            className="absolute bottom-2 right-2 p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors disabled:opacity-50"
+                          >
+                            {isSubmitting[activity.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+                          </button>
                         </div>
                       </div>
                     )}
 
-                    {activity.shared_state && (
-                      <StateInspector state={activity.shared_state} />
-                    )}
-
-                    <div className="flex flex-col gap-3 mt-4 pt-4 border-t border-white/5">
-                      {showCorrectionInput[activity.id] && (
-                        <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold text-indigo-400 uppercase">Supervisor Correction</span>
-                            <button 
-                              onClick={() => setShowCorrectionInput(prev => ({ ...prev, [activity.id]: false }))}
-                              className="text-white/20 hover:text-white/40"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
-                          <div className="relative">
-                            <textarea 
-                              value={correctionText[activity.id] ?? ''}
-                              onChange={(e) => setCorrectionText(prev => ({ ...prev, [activity.id]: e.target.value }))}
-                              placeholder="Describe how the agent should have reasoned..."
-                              className="w-full bg-black/40 border border-indigo-500/30 rounded-md p-2 text-xs text-white focus:outline-none focus:border-indigo-500/60 min-h-[60px] resize-none"
-                            />
-                            <button 
-                              onClick={ async () => handleFeedbackClick(activity.id, 'correction')}
-                              disabled={isSubmitting[activity.id] ?? !correctionText[activity.id]?.trim()}
-                              className="absolute bottom-2 right-2 p-1.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md transition-colors disabled:opacity-50"
-                            >
-                              {isSubmitting[activity.id] ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
-                            </button>
-                          </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5 text-[10px] text-white/40">
+                        <Clock className="w-3 h-3" />
+                        {new Date(activity.timestamp).toLocaleTimeString()}
+                      </div>
+                      
+                      {onFeedback && (
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'positive'); }}
+                            disabled={isSubmitting[activity.id]}
+                            className={cn(
+                              "p-1.5 rounded-md transition-all",
+                              feedbackState[activity.id] === 'positive' 
+                                ? "bg-green-500/20 text-green-400 scale-110" 
+                                : "hover:bg-green-500/10 text-white/30 hover:text-green-400"
+                            )}
+                            title="Valid reasoning"
+                          >
+                            <ThumbsUp className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'negative'); }}
+                            disabled={isSubmitting[activity.id]}
+                            className={cn(
+                              "p-1.5 rounded-md transition-all",
+                              feedbackState[activity.id] === 'negative' 
+                                ? "bg-red-500/20 text-red-400 scale-110" 
+                                : "hover:bg-red-500/10 text-white/30 hover:text-red-400"
+                            )}
+                            title="Invalid/Hallucinated"
+                          >
+                            <ThumbsDown className="w-3 h-3" />
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'correction'); }}
+                            disabled={isSubmitting[activity.id]}
+                            className={cn(
+                              "flex items-center gap-1 px-2 py-1 rounded-md transition-all text-[10px] font-bold uppercase",
+                              feedbackState[activity.id] === 'correction' || showCorrectionInput[activity.id]
+                                ? "bg-indigo-500 text-white"
+                                : "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
+                            )}
+                          >
+                            <MessageSquarePlus className="w-3 h-3" />
+                            {isSubmitting[activity.id] ? 'Saving...' : 'Correct'}
+                          </button>
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-[10px] text-white/40">
-                          <Clock className="w-3 h-3" />
-                          {new Date(activity.timestamp).toLocaleTimeString()}
+                      {!onFeedback && activity.metadata && (
+                        <div className="text-[10px] text-indigo-300 font-medium">
+                          {Object.keys(activity.metadata).length} metadata fields
                         </div>
-                        
-                        {onFeedback && (
-                          <div className="flex items-center gap-2">
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'positive'); }}
-                              disabled={isSubmitting[activity.id]}
-                              className={cn(
-                                "p-1.5 rounded-md transition-all",
-                                feedbackState[activity.id] === 'positive' 
-                                  ? "bg-green-500/20 text-green-400 scale-110" 
-                                  : "hover:bg-green-500/10 text-white/30 hover:text-green-400"
-                              )}
-                              title="Valid reasoning"
-                            >
-                              <ThumbsUp className="w-3 h-3" />
-                            </button>
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'negative'); }}
-                              disabled={isSubmitting[activity.id]}
-                              className={cn(
-                                "p-1.5 rounded-md transition-all",
-                                feedbackState[activity.id] === 'negative' 
-                                  ? "bg-red-500/20 text-red-400 scale-110" 
-                                  : "hover:bg-red-500/10 text-white/30 hover:text-red-400"
-                              )}
-                              title="Invalid/Hallucinated"
-                            >
-                              <ThumbsDown className="w-3 h-3" />
-                            </button>
-                            <button 
-                              onClick={(e) => { e.stopPropagation(); void handleFeedbackClick(activity.id, 'correction'); }}
-                              disabled={isSubmitting[activity.id]}
-                              className={cn(
-                                "flex items-center gap-1 px-2 py-1 rounded-md transition-all text-[10px] font-bold uppercase",
-                                feedbackState[activity.id] === 'correction' || showCorrectionInput[activity.id]
-                                  ? "bg-indigo-500 text-white"
-                                  : "bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20"
-                              )}
-                            >
-                              <MessageSquarePlus className="w-3 h-3" />
-                              {isSubmitting[activity.id] ? 'Saving...' : 'Correct'}
-                            </button>
-                          </div>
-                        )}
-
-                        {!onFeedback && activity.metadata && (
-                          <div className="text-[10px] text-indigo-300 font-medium">
-                            {Object.keys(activity.metadata).length} metadata fields
-                          </div>
-                        )}
-                      </div>
+                      )}
                     </div>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         ))}

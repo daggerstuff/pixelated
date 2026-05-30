@@ -13,6 +13,13 @@ import {
 } from '@/components/ui/LazyChart'
 import { cn } from '@/lib/utils'
 
+// Extracted outside component to prevent unnecessary object allocations on every render
+const DIMENSION_LABELS: Record<string, string> = {
+  valence: 'Valence (Positive/Negative)',
+  arousal: 'Arousal (Calm/Excited)',
+  dominance: 'Dominance (Control)',
+}
+
 // Define types for our component
 
 type EmotionTimelineData = {
@@ -173,7 +180,7 @@ export default function EmotionTrackingChart({
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="timestamp"
-            tickFormatter={(tick) =>
+            tickFormatter={(tick: string | number | Date) =>
               new Date(tick).toLocaleTimeString([], {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -183,15 +190,10 @@ export default function EmotionTrackingChart({
 
           <YAxis domain={[0, 10]} />
           <Tooltip
-            formatter={(value, name) => {
-              const dimensionLabels: Record<string, string> = {
-                valence: 'Valence (Positive/Negative)',
-                arousal: 'Arousal (Calm/Excited)',
-                dominance: 'Dominance (Control)',
-              }
-              return [`${value}/10`, dimensionLabels[name] ?? name]
+            formatter={(value: number, name: string) => {
+              return [`${value}/10`, DIMENSION_LABELS[name] ?? name]
             }}
-            labelFormatter={(label) => new Date(label).toLocaleTimeString()}
+            labelFormatter={(label: string | number | Date) => new Date(label).toLocaleTimeString()}
           />
 
           <Legend />
