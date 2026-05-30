@@ -198,12 +198,12 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
                 </div>
               </button>
 
-              {/* Expanded Content - always rendered for aria-controls to reference a valid element */}
+              {/* Expanded Content - always rendered in DOM for aria-controls to reference a valid element */}
               <div
                 id={`activity-details-${activity.id}`}
                 className={cn(
-                  "p-3 pt-0 border-t border-white/5 bg-black/20",
-                  expandedItems[activity.id] ? "" : "hidden"
+                  "p-3 pt-0 border-t border-white/5 bg-black/20 transition-all duration-200",
+                  expandedItems[activity.id] ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
                 )}
               >
                 <div className="mt-3 space-y-3">
