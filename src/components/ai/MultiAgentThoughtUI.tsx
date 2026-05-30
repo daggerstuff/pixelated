@@ -166,6 +166,7 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
             )}>
               {/* Header */}
               <button 
+                type="button"
                 onClick={() => toggleExpand(activity.id)}
                 className="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition-colors"
                 aria-expanded={!!expandedItems[activity.id]}
