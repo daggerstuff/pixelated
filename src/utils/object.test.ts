@@ -18,12 +18,13 @@ describe('deepEqual', () => {
   })
 
   it('handles nested objects and arrays', () => {
-    const objA = { id: 1, items: [1, 2, { name: 'test' }] }
-    const objB = { id: 1, items: [1, 2, { name: 'test' }] }
-    const objC = { id: 1, items: [1, 2, { name: 'different' }] }
+    const obj1 = { a: 1, b: { c: [1, 2, 3], d: 'test' } }
+    const obj2 = { a: 1, b: { c: [1, 2, 3], d: 'test' } }
+    const obj3 = { a: 1, b: { c: [1, 2, 4], d: 'test' } }
+    const obj4 = { a: 1, b: { c: [1, 2, 3] } }
 
-    expect(deepEqual(objA, objB)).toBe(true)
-    expect(deepEqual(objA, objC)).toBe(false)
-    expect(deepEqual(objA, { ...objA, extra: true } as any)).toBe(false)
+    expect(deepEqual(obj1, obj2)).toBe(true)
+    expect(deepEqual(obj1, obj3)).toBe(false)
+    expect(deepEqual(obj1, obj4)).toBe(false)
   })
 })
