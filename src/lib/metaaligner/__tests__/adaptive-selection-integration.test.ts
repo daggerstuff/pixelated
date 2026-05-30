@@ -14,18 +14,15 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import type { AIService } from '../../ai/models/types'
+import type { AIService, AICompletion } from '../../ai/models/types'
 import { ContextType } from '../core/objectives'
 import { AdaptiveSelector } from '../prioritization/adaptive-selector'
-import {
-  ContextDetector,
-  type _ContextDetectionResult,
-} from '../prioritization/context-detector'
+import { ContextDetector } from '../prioritization/context-detector'
 import {
   ContextTransitionDetector,
   type ContextEvent,
 } from '../prioritization/context-transition-detector'
-import { ObjectiveSwitcher } from '../prioritization/objective-switcher'
+import { ObjectiveSwitcher, type ObjectiveSwitchObserver } from '../prioritization/objective-switcher'
 
 // Mock AI Service
 const createMockAIService = (): AIService => {
@@ -149,6 +146,11 @@ const createMockAIService = (): AIService => {
             totalTokens: 30,
           },
           provider: 'test',
+          content: JSON.stringify({
+            detectedContext: detectedContext,
+            confidence: confidence,
+            urgency: urgency,
+          }),
         }
       }),
     createStreamingChatCompletion: vi.fn<() => Promise<unknown>>(),
@@ -306,7 +308,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       for (let i = 0; i < conversation.length; i++) {
         const turn = conversation[i]
-        const detection = await contextDetector.detectContext(turn.text)
+        const detection = await contextDetector.detectContext(turn!.text)
 
         // Context detection may vary based on mock, so we'll be flexible
         const event: ContextEvent = {
@@ -397,7 +399,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
   describe('Observer Pattern Integration', () => {
     it('should notify observers across the pipeline', async () => {
-      const switchObserver = vi.fn<(event: ContextEvent) => void>()
+      const switchObserver = vi.fn<ObjectiveSwitchObserver>()
       objectiveSwitcher.addObserver(switchObserver)
 
       // Simulate context change
@@ -430,8 +432,8 @@ describe('Adaptive Selection Integration Tests', () => {
 
         expect(switchObserver).toHaveBeenCalled()
         const callArgs = switchObserver.mock.calls[0]
-        expect(callArgs[0]).toBeInstanceOf(Array) // objectives
-        expect(callArgs[1]).toHaveProperty('toContext')
+        expect(callArgs![0]).toBeInstanceOf(Array) // objectives
+        expect(callArgs![1]).toHaveProperty('toContext')
       }
     })
   })
@@ -449,7 +451,7 @@ describe('Adaptive Selection Integration Tests', () => {
       ]
 
       for (let i = 0; i < queries.length; i++) {
-        const detection = await contextDetector.detectContext(queries[i])
+        const detection = await contextDetector.detectContext(queries[i]!)
 
         const event: ContextEvent = {
           turnId: i + 1,

@@ -198,8 +198,8 @@ describe("BiasDetectionAuditLogger", () => {
       expect(entries).toHaveLength(2);
       expect(entries[0]).toBeDefined();
       expect(entries[1]).toBeDefined();
-      expect(entries[0].id).not.toBe(entries[1].id);
-      expect(entries[0].id).toMatch(/^audit_\d+_[a-z0-9]+$/);
+      expect(entries[0]!.id).not.toBe(entries[1]!.id);
+      expect(entries[0]!.id).toMatch(/^audit_\d+_[a-z0-9]+$/);
     });
   });
 
@@ -248,7 +248,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
       expect(entries[0]).toBeDefined();
-      expect(entries[0].action.sensitivityLevel).toBe("critical"); // >100 session records
+      expect(entries[0]!.action.sensitivityLevel).toBe("critical"); // >100 session records
 
       mockStorage.clear();
 
@@ -264,7 +264,7 @@ describe("BiasDetectionAuditLogger", () => {
       const newEntries = mockStorage.getEntries();
       expect(newEntries).toHaveLength(1);
       expect(newEntries[0]).toBeDefined();
-      expect(newEntries[0].action.sensitivityLevel).toBe("medium"); // 50 analysis records
+      expect(newEntries[0]!.action.sensitivityLevel).toBe("medium"); // 50 analysis records
     });
   });
 
@@ -473,7 +473,7 @@ describe("BiasDetectionAuditLogger", () => {
     it("should filter logs by action type", async () => {
       const logs = await auditLogger.getAuditLogs({ actionType: "create" });
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.type).toBe("create");
+      expect(logs[0]!.action.type).toBe("create");
     });
 
     it("should apply pagination", async () => {
@@ -521,7 +521,7 @@ describe("BiasDetectionAuditLogger", () => {
       expect(report.period).toEqual(period);
       expect(report.complianceScore).toBeLessThan(100); // Should be reduced due to violations
       expect(report.violations).toHaveLength(1); // Should detect failed login violation
-      expect(report.violations[0].type).toBe("unauthorized-access");
+      expect(report.violations[0]!.type).toBe("unauthorized-access");
       expect(report.recommendations).toHaveLength(1); // Should have recommendations
       expect(report.auditTrail).toHaveLength(16); // 15 failed logins + 1 successful action
     });
@@ -645,7 +645,7 @@ describe("BiasDetectionAuditLogger", () => {
 
       // Manually set timestamp to old date
       const entries = mockStorage.getEntries();
-      entries[0].timestamp = oldDate;
+      entries[0]!.timestamp = oldDate;
 
       const result = await auditLoggerWithRetention.cleanupOldLogs();
       expect(result.archived).toBe(1);
@@ -679,7 +679,7 @@ describe("BiasDetectionAuditLogger", () => {
 
       await auditLoggerWithRetention.logAction(mockUser, action, "test", {}, mockRequest);
       const entries = mockStorage.getEntries();
-      entries[0].timestamp = oldDate;
+      entries[0]!.timestamp = oldDate;
 
       const result = await auditLoggerWithRetention.cleanupOldLogs();
       expect(result.archived).toBe(0);
@@ -702,7 +702,7 @@ describe("BiasDetectionAuditLogger", () => {
 
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
-      expect(entries[0].action.sensitivityLevel).toBe("critical");
+      expect(entries[0]!.action.sensitivityLevel).toBe("critical");
     });
   });
 
@@ -783,9 +783,9 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: "session-123" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.type).toBe("create");
-      expect(logs[0].action.category).toBe("bias-analysis");
-      expect(logs[0].sessionId).toBe("session-123");
+      expect(logs[0]!.action.type).toBe("create");
+      expect(logs[0]!.action.category).toBe("bias-analysis");
+      expect(logs[0]!.sessionId).toBe("session-123");
     });
 
     it("should log export action with critical sensitivity", async () => {
@@ -801,8 +801,8 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: "session-456" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.type).toBe("export");
-      expect(logs[0].action.sensitivityLevel).toBe("critical");
+      expect(logs[0]!.action.type).toBe("export");
+      expect(logs[0]!.action.sensitivityLevel).toBe("critical");
     });
 
     it("should log view action with medium sensitivity", async () => {
@@ -818,8 +818,8 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ sessionId: "session-789" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.type).toBe("read");
-      expect(logs[0].action.sensitivityLevel).toBe("medium");
+      expect(logs[0]!.action.type).toBe("read");
+      expect(logs[0]!.action.sensitivityLevel).toBe("medium");
     });
   });
 
@@ -831,9 +831,9 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ actionType: "export" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.sensitivityLevel).toBe("low"); // <100 records
-      expect(logs[0].details["exportType"]).toBe("json");
-      expect(logs[0].details["recordCount"]).toBe(50);
+      expect(logs[0]!.action.sensitivityLevel).toBe("low"); // <100 records
+      expect(logs[0]!.details["exportType"]).toBe("json");
+      expect(logs[0]!.details["recordCount"]).toBe(50);
     });
 
     it("should log medium data export with medium sensitivity", async () => {
@@ -843,7 +843,7 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ actionType: "export" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.sensitivityLevel).toBe("medium"); // 100-1000 records
+      expect(logs[0]!.action.sensitivityLevel).toBe("medium"); // 100-1000 records
     });
 
     it("should log large data export with high sensitivity", async () => {
@@ -853,7 +853,7 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ actionType: "export" });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].action.sensitivityLevel).toBe("high"); // >1000 records
+      expect(logs[0]!.action.sensitivityLevel).toBe("high"); // >1000 records
     });
 
     it("should log failed export with error message", async () => {
@@ -863,8 +863,8 @@ describe("Convenience Functions", () => {
       const logs = await auditLogger.getAuditLogs({ success: false });
 
       expect(logs).toHaveLength(1);
-      expect(logs[0].success).toBe(false);
-      expect(logs[0].errorMessage).toBe("Export service unavailable");
+      expect(logs[0]!.success).toBe(false);
+      expect(logs[0]!.errorMessage).toBe("Export service unavailable");
     });
   });
 

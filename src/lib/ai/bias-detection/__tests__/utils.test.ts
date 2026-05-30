@@ -310,8 +310,8 @@ describe('Demographic Processing', () => {
 
       const representation = calculateDemographicRepresentation(sessions)
 
-      expect(representation['gender']['male']).toBeCloseTo(0.333, 2)
-      expect(representation['gender']['female']).toBeCloseTo(0.667, 2)
+      expect(representation?.['gender']['male']).toBeCloseTo(0.333, 2)
+      expect(representation?.['gender']['female']).toBeCloseTo(0.667, 2)
     })
 
     it('should handle empty sessions array', () => {

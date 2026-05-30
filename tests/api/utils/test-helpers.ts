@@ -1,6 +1,4 @@
 import type { Express } from 'express'
-// Test utilities for API integration tests
-import request from 'supertest'
 
 interface TestUser {
   email: string
@@ -22,13 +20,6 @@ export async function createTestUserForTest(
   app: Express,
   userData?: Partial<TestUser>,
 ): Promise<CreateTestUserResult> {
-  const defaultUser: TestUser = {
-    email: `test-${Date.now()}@test.com`,
-    password: 'TestPassword123!',
-    name: 'Test User',
-  }
-  const user = { ...defaultUser, ...userData }
-
   // For OAuth-based auth, we simulate an authenticated session
   // by generating a mock token. In real tests, you'd use actual OAuth tokens.
   const mockToken = `mock-token-${Date.now()}-${Math.random().toString(36).substring(7)}`

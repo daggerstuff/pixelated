@@ -13,17 +13,17 @@ vi.mock('../../../lib/auth/auth0-middleware', () => ({
 }))
 
 import { authMiddleware, requirePermissions, requireRoles } from '../auth'
+import type { Response } from 'express'
 import {
   createMockAuthRequest,
   createMockAuthResponse,
   createMockAuthUser,
   type MockAuthRequest,
-  type MockAuthResponse,
 } from './auth-test-helpers'
 
 describe('Authentication Middleware', () => {
   let mockRequest: MockAuthRequest
-  let mockResponse: MockAuthResponse
+  let mockResponse: Response
   let mockNext: NextFunction
   let statusSpy: ReturnType<typeof vi.fn>
   let jsonSpy: ReturnType<typeof vi.fn>
@@ -33,7 +33,7 @@ describe('Authentication Middleware', () => {
 
     const responseMock = createMockAuthResponse()
     mockRequest = createMockAuthRequest()
-    mockResponse = responseMock.response
+    mockResponse = responseMock.response as unknown as Response
     statusSpy = responseMock.statusSpy
     jsonSpy = responseMock.jsonSpy
 

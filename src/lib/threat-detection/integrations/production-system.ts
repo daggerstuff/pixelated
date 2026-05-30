@@ -95,7 +95,7 @@ class ProductionThreatDetectionService {
   private async checkIPReputation(ip: string): Promise<number> {
     try {
       // Check against known bad IPs in Redis
-      const reputation = await redis['get'](`ip_reputation:${ip}`)
+      const reputation = await redis?.['get'](`ip_reputation:${ip}`)
       if (reputation) {
         return parseFloat(reputation)
       }
@@ -123,7 +123,7 @@ class ProductionThreatDetectionService {
   private async analyzeRequestFrequency(ip: string): Promise<number> {
     try {
       const key = `request_freq:${ip}`
-      const count = await redis['hincrby'](key, 'count', 1)
+      const count = await redis?.['hincrby'](key, 'count', 1)
       await redis['expire'](key, 60) // 1 minute window
 
       // Risk increases with frequency
@@ -215,7 +215,7 @@ class ProductionThreatDetectionService {
     const indicators: string[] = []
 
     if (request.ip) {
-      const reputation = await redis['get'](`ip_reputation:${request.ip}`)
+      const reputation = await redis?.['get'](`ip_reputation:${request.ip}`)
       if (reputation && parseFloat(reputation) > 0.5) {
         indicators.push('malicious_ip')
       }
@@ -425,7 +425,7 @@ class ProductionMonitoringService extends EventEmitter {
           metric: name,
           average: avg,
           count: values.length,
-          trend: values[values.length - 1] > avg ? 'increasing' : 'stable',
+          trend: values?.[values.length - 1] > avg ? 'increasing' : 'stable',
         })
       }
     }

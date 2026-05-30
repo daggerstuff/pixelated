@@ -222,7 +222,7 @@ export class ThreatValidationSystemCore
         validation.results,
       )
       validation.overallScore = overallScore
-      validation.isValid = overallScore >= this.config.validationThreshold
+      validation.isValid = overallScore >= this.config.validationThreshold!
 
       // Step 9: Determine final status
       validation.status = validation.isValid ? 'valid' : 'invalid'
@@ -370,7 +370,7 @@ export class ThreatValidationSystemCore
       let validIndicators = 0
 
       for (let i = 0; i < indicators.length; i++) {
-        const indicator = indicators[i]
+        const indicator = indicators[i]!
         const indicatorIssues: string[] = []
 
         // Check required fields

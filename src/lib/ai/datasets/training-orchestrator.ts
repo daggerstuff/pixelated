@@ -46,7 +46,7 @@ const DEFAULTS: Required<Pick<FineTuningConfig, "nEpochs" | "batchSize" | "learn
 export class FineTuningOrchestrator {
   private readonly apiKey: string | null;
   private readonly baseUrl: string;
-  private jobs: FineTuningJob[] = [];
+  private readonly jobs: FineTuningJob[] = [];
 
   constructor(opts?: { openaiApiKey?: string; baseUrl?: string }) {
     this.apiKey =

@@ -74,15 +74,15 @@ export class RateLimiter {
   check(
     key: string,
     role: string,
-    limits: Record<string, number> = rateLimitConfigs[2].limits,
-    windowMs: number = rateLimitConfigs[2].windowMs,
+    limits: Record<string, number> = rateLimitConfigs?.[2].limits,
+    windowMs: number = rateLimitConfigs?.[2].windowMs,
   ): {
     allowed: boolean
     limit: number
     remaining: number
     reset: number
   } {
-    const limit = (limits[role] ?? limits['anonymous']) || 10
+    const limit = (limits[role] ?? limits['anonymous']) ?? 10
     const now = Date.now()
     const resetTime = now + windowMs
 

@@ -890,7 +890,7 @@ export class EdgeThreatDetectionSystemCore
 
     // Sort by load (ascending) and select the first one
     nodes.sort((a, b) => a.load - b.load)
-    return nodes[0].nodeId
+    return nodes[0]!.nodeId
   }
 
   private async cacheDetectionResult(

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState, type FC } from 'react'
+import { useCallback, useMemo, useState, type FC } from 'react'
 
 import type { FHEOperation } from '@/lib/fhe/types'
 import { fetchJSONWithRetry } from '@/lib/net/index'

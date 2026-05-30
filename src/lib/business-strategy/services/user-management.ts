@@ -7,11 +7,7 @@
 
 import type { UserId } from '../types/common'
 import type {
-  User,
-  UserRole,
-  Permission,
-  Session,
-} from '../types/user-management'
+  User } from '../types/user-management'
 import { BaseService } from './base-service'
 
 export class UserManagementService extends BaseService {

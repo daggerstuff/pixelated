@@ -37,7 +37,7 @@ export class DistributedRateLimiter {
 
     try {
       // Get current count
-      const current = await redis['get'](windowKey)
+      const current = await redis['get']!(windowKey)
       const count = current ? parseInt(current) : 0
 
       // Check if limit exceeded
@@ -53,7 +53,7 @@ export class DistributedRateLimiter {
       }
 
       // Increment counter
-      const pipeline = redis['pipeline']()
+      const pipeline = redis['pipeline']!()
       pipeline.incr(windowKey)
       pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
       await pipeline.exec()
@@ -111,7 +111,7 @@ export class DistributedRateLimiter {
       await redis['zremrangebyscore'](attackKey, 0, oneHourAgo)
 
       // Get recent request pattern
-      const recentRequests = await redis['zrangebyscore'](
+      const recentRequests = await redis['zrangebyscore']!(
         attackKey,
         oneHourAgo,
         now,
@@ -147,7 +147,7 @@ export class DistributedRateLimiter {
     // Calculate intervals
     const intervals: number[] = []
     for (let i = 1; i < timestamps.length; i++) {
-      intervals.push(timestamps[i] - timestamps[i - 1])
+      intervals.push(timestamps[i]! - timestamps[i - 1]!)
     }
 
     // Check for regular intervals (bot behavior)
@@ -248,7 +248,7 @@ export class DistributedRateLimiter {
     const date = new Date().toISOString().slice(0, 10)
     const analyticsKey = `${this.analyticsPrefix}usage:${rule.name}:${date}`
 
-    const pipeline = redis['pipeline']()
+    const pipeline = redis['pipeline']!()
     pipeline.hincrby(analyticsKey, 'total_requests', 1)
     pipeline.hincrby(analyticsKey, 'unique_identifiers', 1)
     pipeline.hset(analyticsKey, 'last_request', Date.now())
@@ -293,7 +293,7 @@ export class DistributedRateLimiter {
    */
   async isBlocked(identifier: string): Promise<boolean> {
     const blockKey = `${this.prefix}blocked:${identifier}`
-    const blocked = await redis['get'](blockKey)
+    const blocked = await redis?.['get'](blockKey)
     return blocked !== null
   }
 
@@ -338,7 +338,7 @@ export class DistributedRateLimiter {
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
 
     try {
-      const current = await redis['get'](windowKey)
+      const current = await redis?.['get'](windowKey)
       const count = current ? parseInt(current) : 0
 
       return {
@@ -372,7 +372,7 @@ export class DistributedRateLimiter {
   ): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-    const pipeline = redis['pipeline']()
+    const pipeline = redis['pipeline']!()
     pipeline.incr(windowKey)
     pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
     await pipeline.exec()

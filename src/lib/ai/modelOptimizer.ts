@@ -251,7 +251,7 @@ class ModelOptimizer {
     Object.keys(improvements).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
       if (typeof optimizedMetrics[key] === "number") {
-        (optimizedMetrics[key]) *= 1 + improvements[key];
+        optimizedMetrics[key] *= 1 + (improvements[key] ?? 0);
       }
     });
 
@@ -339,10 +339,10 @@ class ModelOptimizer {
       };
     }
 
-    let bestAccuracy = this.optimizationHistory[0];
-    let bestSpeed = this.optimizationHistory[0];
-    let bestMemory = this.optimizationHistory[0];
-    let mostBalanced = this.optimizationHistory[0];
+    let bestAccuracy = this.optimizationHistory[0]!;
+    let bestSpeed = this.optimizationHistory[0]!;
+    let bestMemory = this.optimizationHistory[0]!;
+    let mostBalanced = this.optimizationHistory[0]!;
 
     this.optimizationHistory.forEach((result) => {
       if ((result.improvements.accuracy ?? 0) > (bestAccuracy.improvements.accuracy ?? 0)) {

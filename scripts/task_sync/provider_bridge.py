@@ -3,15 +3,24 @@
 from __future__ import annotations
 
 import base64
+import contextlib
 import json
 import os
 import re
+import sys
+import time
 from collections.abc import Mapping
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 from urllib import parse, request
 from urllib.error import HTTPError
+
+
+def print_out(msg: str = "", file=sys.stdout) -> None:
+    file.write(f"{msg}\n")
+    file.flush()
+
 
 DEFAULT_CONFIG_PATH = Path(".agent/internal/config.json")
 DEFAULT_RUNTIME_STATE_PATH = Path(".agent/internal/task-sync-state.json")
@@ -726,7 +735,7 @@ def _linear_issues_query(filter_by_team: str = "", filter_by_project: str = "") 
         "query($after: String) { "
         "issues(first: 100, after: $after"
         f"{filter_clause}"
-        ") { nodes { id title description state { id name type } updatedAt createdAt } pageInfo { hasNextPage endCursor } } }"
+        ") { nodes { id identifier title description project { id name } state { id name type } updatedAt createdAt } pageInfo { hasNextPage endCursor } } }"
     )
 
 
@@ -843,15 +852,45 @@ def _json_request(
     if payload is not None:
         data = json.dumps(payload).encode("utf-8")
     req = request.Request(url, data=data, headers=dict(headers), method=method)
-    try:
-        with request.urlopen(req) as response:
-            body = response.read().decode("utf-8")
-    except HTTPError as exc:
-        error_body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(f"{method} {url} failed with HTTP {exc.code}: {error_body}") from exc
-    if not body:
-        return {}
-    return json.loads(body)
+
+    max_retries = 5
+    backoff = 2.0
+
+    for attempt in range(max_retries):
+        try:
+            with request.urlopen(req) as response:
+                body = response.read().decode("utf-8")
+                if not body:
+                    return {}
+                return json.loads(body)
+        except HTTPError as exc:
+            if exc.code in (429, 500, 502, 503, 504) and attempt < max_retries - 1:
+                retry_after = exc.headers.get("Retry-After")
+                sleep_time = backoff**attempt
+                if retry_after:
+                    with contextlib.suppress(ValueError):
+                        sleep_time = max(sleep_time, float(retry_after))
+                print_out(
+                    f"Warning: {method} {url} failed with HTTP {exc.code} (attempt {attempt + 1}/{max_retries}). "
+                    f"Retrying in {sleep_time:.2f} seconds...",
+                    file=sys.stderr,
+                )
+                time.sleep(sleep_time)
+                continue
+            error_body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"{method} {url} failed with HTTP {exc.code}: {error_body}") from exc
+        except Exception as exc:
+            if attempt < max_retries - 1:
+                sleep_time = backoff**attempt
+                print_out(
+                    f"Warning: {method} {url} encountered transient error {exc} (attempt {attempt + 1}/{max_retries}). "
+                    f"Retrying in {sleep_time:.2f} seconds...",
+                    file=sys.stderr,
+                )
+                time.sleep(sleep_time)
+                continue
+            raise
+    return {}
 
 
 def export_asana_tasks() -> list[dict[str, Any]]:
@@ -879,7 +918,10 @@ def export_asana_tasks() -> list[dict[str, Any]]:
                     tasks.append(task)
     if failures:
         failed_projects = "; ".join(failures)
-        raise RuntimeError(f"Failed to export tasks from Asana projects: {failed_projects}")
+        print_out(
+            f"Warning: Failed to export tasks from some Asana projects (gracefully skipping): {failed_projects}",
+            file=sys.stderr,
+        )
     return tasks
 
 
@@ -953,7 +995,17 @@ def apply_asana_action(action: Mapping[str, Any]) -> dict[str, Any]:
 
     if action_type == "create":
         return _create_asana_task(action_view, headers)
-    return _update_asana_task(action_view, target_id, headers)
+    try:
+        return _update_asana_task(action_view, target_id, headers)
+    except Exception as exc:
+        if any(code in str(exc) for code in ("403", "404")):
+            print_out(
+                f"Warning: Asana task update for {target_id} failed with access/not-found error ({exc}). "
+                f"Gracefully falling back to creating a new task.",
+                file=sys.stderr,
+            )
+            return _create_asana_task(action_view, headers)
+        raise
 
 
 def _create_asana_task(action: Any, headers: Mapping[str, str]) -> dict[str, Any]:
@@ -1045,13 +1097,37 @@ def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
         if not target_id:
             raise RuntimeError("Jira update requires target_id.")
         payload = jira_update_payload(_object_view(action))
-        _json_request(
-            "PUT",
-            f"{site_url}/rest/api/3/issue/{target_id}",
-            headers=headers,
-            payload=payload,
-        )
-        response = {"key": target_id}
+        try:
+            _json_request(
+                "PUT",
+                f"{site_url}/rest/api/3/issue/{target_id}",
+                headers=headers,
+                payload=payload,
+            )
+            response = {"key": target_id}
+        except Exception as exc:
+            if any(code in str(exc) for code in ("403", "404")):
+                print_out(
+                    f"Warning: Jira issue update for {target_id} failed with access/not-found error ({exc}). "
+                    f"Gracefully falling back to creating a new issue.",
+                    file=sys.stderr,
+                )
+                project_key = resolve_jira_project_key(create_if_missing=True)
+                if not project_key:
+                    raise RuntimeError("No accessible Jira project key found for tri-sync.") from exc
+                create_payload = jira_create_payload(
+                    _object_view(action),
+                    project_key,
+                    resolve_jira_issue_type(project_key),
+                )
+                response = _json_request(
+                    "POST",
+                    f"{site_url}/rest/api/3/issue",
+                    headers=headers,
+                    payload=create_payload,
+                )
+            else:
+                raise
     issue_key = str(response.get("key") or target_id or "").strip()
     desired_status = str(action.get("status") or "open").strip()
     if issue_key:
@@ -1115,13 +1191,31 @@ def apply_github_action(action: Mapping[str, Any]) -> dict[str, Any]:
 
     if not target_id:
         raise RuntimeError("GitHub update requires target_id.")
-    _json_request(
-        "PATCH",
-        f"{api_url}/repos/{owner}/{repo}/issues/{target_id}",
-        headers=headers,
-        payload=payload,
-    )
-    return {"id": target_id}
+    try:
+        _json_request(
+            "PATCH",
+            f"{api_url}/repos/{owner}/{repo}/issues/{target_id}",
+            headers=headers,
+            payload=payload,
+        )
+        return {"id": target_id}
+    except Exception as exc:
+        if any(code in str(exc) for code in ("403", "404")):
+            print_out(
+                f"Warning: GitHub issue update for {target_id} failed with access/not-found error ({exc}). "
+                f"Gracefully falling back to creating a new issue.",
+                file=sys.stderr,
+            )
+            response = _json_request(
+                "POST",
+                f"{api_url}/repos/{owner}/{repo}/issues",
+                headers=headers,
+                payload=payload,
+            )
+            if not isinstance(response, Mapping):
+                return {}
+            return dict(response)
+        raise
 
 
 def export_linear_issues() -> list[dict[str, Any]]:

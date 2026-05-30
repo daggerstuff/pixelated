@@ -51,7 +51,6 @@ import {
   isAlertItem,
   isAlertItemArray,
   isAlertLevel,
-  isBiasAnalysisItem,
   isBiasAnalysisItemArray,
   isBiasAnalysisResult,
   isExportFormat,
@@ -104,9 +103,7 @@ import type {
   BiasDashboardData,
   BiasAnalysisResult,
   DashboardRecommendation,
-  BiasDashboardSummary,
-  BiasAlert,
-} from '@/lib/ai/bias-detection'
+  BiasAlert } from '@/lib/ai/bias-detection'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { cn, isObject } from '@/lib/utils'
 

@@ -44,7 +44,7 @@ function rateLimit(req, res, next) {
   recentRequests.push(now)
   ipRequests.set(ip, recentRequests)
 
-  next()
+  return next()
 }
 
 app.use(rateLimit)
@@ -187,7 +187,7 @@ app.post('/webhook', async (req, res) => {
       }
     }
 
-    res.json({ status: 'ok', processed: alerts.length })
+    return res.json({ status: 'ok', processed: alerts.length })
   } catch (error) {
     console.error('Error processing alert:', {
       error: error.message,

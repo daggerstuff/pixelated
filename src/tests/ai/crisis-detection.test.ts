@@ -216,8 +216,8 @@ describe('crisisDetectionService', () => {
       const results = await crisisService.detectBatch(texts, options)
 
       expect(results).toHaveLength(3)
-      expect(results[0].isCrisis).toBe(true) // 'kill myself' should be crisis
-      expect(results[1].isCrisis).toBe(false) // 'good day' should not be crisis
+      expect(results?.[0].isCrisis).toBe(true) // 'kill myself' should be crisis
+      expect(results?.[1].isCrisis).toBe(false) // 'good day' should not be crisis
     })
 
     it('should handle errors in batch processing', async () => {

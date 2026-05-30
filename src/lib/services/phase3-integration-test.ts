@@ -146,17 +146,17 @@ export class Phase3IntegrationTester {
       Object.values(results).every((result) => result) && errors.length === 0
 
     // Generate performance recommendations
-    if (serviceTimings['crossServiceCommunication'] > 5000) {
+    if (serviceTimings?.['crossServiceCommunication'] > 5000) {
       recommendations.push(
         'Cross-service communication is slow (>5s). Consider optimizing API calls or adding caching.',
       )
     }
-    if (throughputMetrics['apiRequests'] < 100) {
+    if (throughputMetrics?.['apiRequests'] < 100) {
       recommendations.push(
         'API throughput is low (<100 req/s). Consider connection pooling and request optimization.',
       )
     }
-    if (memoryUsage['peak'] > memoryUsage['baseline'] * 3) {
+    if (memoryUsage?.['peak'] > memoryUsage?.['baseline'] * 3) {
       recommendations.push(
         'Memory usage spikes significantly. Implement better memory management and garbage collection.',
       )

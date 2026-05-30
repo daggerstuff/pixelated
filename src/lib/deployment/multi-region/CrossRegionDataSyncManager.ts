@@ -37,7 +37,6 @@ type MongoDbConfig = {
   [key: string]: unknown
 }
 
-type MongoDbSecrets = Record<string, unknown>
 
 type RedisDbSecrets = {
   url?: string
@@ -84,6 +83,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
     string,
     () => Promise<{ status: 'healthy' | 'unhealthy'; message: string }>
   > = new Map()
+  private isInitialized = false
 
   constructor(config: ConfigurationManager, healthMonitor: HealthMonitor) {
     super()
@@ -456,6 +456,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Initialize the data sync manager
    */
   async initialize(): Promise<void> {
+    if (this.isInitialized) return
     try {
       this.logger.info('Initializing CrossRegionDataSyncManager...')
 
@@ -1834,9 +1835,11 @@ export class CrossRegionDataSyncManager extends EventEmitter {
       const result = await this.getCockroachClient().query(query, [region])
       if (result.rows.length > 0) {
         const row = result.rows[0]
-        const lagSeconds = this.getRecordValueAsString(row, 'lag_seconds')
-        if (typeof lagSeconds === 'string') {
-          return parseFloat(lagSeconds)
+        if (row !== undefined) {
+          const lagSeconds = this.getRecordValueAsString(row, 'lag_seconds')
+          if (typeof lagSeconds === 'string') {
+            return parseFloat(lagSeconds)
+          }
         }
       }
 
@@ -1853,6 +1856,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
    * Shutdown the data sync manager
    */
   async shutdown(): Promise<void> {
+    if (!this.isInitialized) return
     try {
       this.logger.info('Shutting down CrossRegionDataSyncManager...')
 

@@ -307,7 +307,7 @@ export async function getBreachStatus(
   id: string,
 ): Promise<BreachDetails | null> {
   try {
-    const breach = await redis['get'](getBreachKey(id))
+    const breach = await redis?.['get'](getBreachKey(id))
     return breach ? (JSON.parse(breach) as BreachDetails) : null
   } catch (error: unknown) {
     logger.error('Failed to get breach status:', error)
@@ -317,10 +317,10 @@ export async function getBreachStatus(
 
 export async function listRecentBreaches(): Promise<BreachDetails[]> {
   try {
-    const keys = await redis['keys'](`${BREACH_KEY_PREFIX}*`)
+    const keys = await redis?.['keys'](`${BREACH_KEY_PREFIX}*`)
     const breaches = await Promise.all(
       keys.map(async (key: string) => {
-        const breach = await redis['get'](key)
+        const breach = await redis?.['get'](key)
         if (!breach) return null
 
         try {

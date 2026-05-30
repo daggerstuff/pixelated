@@ -419,7 +419,7 @@ export class BiasDetectionDatabaseService {
       Object.entries(aggregation).forEach(([dimension, values]) => {
         result[dimension] = {}
         Object.entries(values).forEach(([value, stats]) => {
-          result[dimension][value] = {
+          result?.[dimension][value] = {
             count: stats.count,
             averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
           }

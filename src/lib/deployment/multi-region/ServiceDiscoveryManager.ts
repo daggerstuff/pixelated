@@ -7,7 +7,6 @@ import ZooKeeper from 'zookeeper'
 
 import { Logger } from '../../utils/logger'
 import { ConfigurationManager } from './ConfigurationManager'
-import { DNSClient } from './DNSClient'
 import { HealthMonitor } from './HealthMonitor'
 
 type ConsulClient = {
@@ -102,13 +101,6 @@ type ServiceDiscoveryConfig = {
   cleanupInterval?: number
 }
 
-type ServiceDiscoveryAppConfig = {
-  deployment?: {
-    services?: unknown
-  }
-  services?: unknown
-  serviceDiscovery?: ServiceDiscoveryConfig
-}
 
 const DEFAULT_SERVICE_DISCOVERY_CONFIG: ServiceDiscoveryConfig = {
   heartbeatInterval: 30000,
@@ -293,13 +285,13 @@ export class ServiceDiscoveryManager extends EventEmitter {
   private cleanupInterval: NodeJS.Timeout | null = null
   private readonly serviceCache: Map<string, ServiceCacheEntry> = new Map()
   private readonly loadBalancers: Map<string, LoadBalancer> = new Map()
+  private isInitialized = false
 
   constructor(config: ConfigurationManager, healthMonitor: HealthMonitor) {
     super()
     this.config = config
     this.healthMonitor = healthMonitor
     this.logger = new Logger({ prefix: 'ServiceDiscoveryManager' })
-    this.dnsClient = new DNSClient(config)
   }
 
   private getRegions(): string[] {
@@ -344,6 +336,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Initialize the service discovery manager
    */
   async initialize(): Promise<void> {
+    if (this.isInitialized) return
     try {
       this.logger.info('Initializing ServiceDiscoveryManager...')
 
@@ -1104,8 +1097,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
         const parts = key.split('/')
         const parsed = toDiscoveredServiceInstance(
           serviceName,
-          parts[parts.length - 2],
-          parts[parts.length - 1],
+          parts[parts.length - 2]!,
+          parts[parts.length - 1]!,
           JSON.parse(value),
         )
 
@@ -1619,6 +1612,7 @@ export class ServiceDiscoveryManager extends EventEmitter {
    * Shutdown the service discovery manager
    */
   async shutdown(): Promise<void> {
+    if (!this.isInitialized) return
     try {
       this.logger.info('Shutting down ServiceDiscoveryManager...')
 
@@ -1689,10 +1683,7 @@ class LoadBalancer {
   private readonly instanceWeights: Map<string, number> = new Map()
 
   constructor(config: LoadBalancerConfig) {
-    this.serviceName = config.serviceName
     this.algorithm = config.algorithm
-    this.healthCheck = config.healthCheck
-    this.circuitBreaker = config.circuitBreaker
   }
 
   selectInstance(
@@ -1722,12 +1713,12 @@ class LoadBalancer {
         return this.geoProximity(healthyInstances, options.clientRegion)
 
       default:
-        return healthyInstances[0]
+        return healthyInstances[0] ?? null
     }
   }
 
   private roundRobin(instances: ServiceInstance[]): ServiceInstance {
-    const instance = instances[this.currentIndex % instances.length]
+    const instance = instances[this.currentIndex % instances.length]!
     this.currentIndex++
     return instance
   }
@@ -1741,25 +1732,25 @@ class LoadBalancer {
   private leastConnections(instances: ServiceInstance[]): ServiceInstance {
     // Return instance with least connections
     // This would typically use connection metrics
-    return instances[0]
+    return instances[0]!
   }
 
   private random(instances: ServiceInstance[]): ServiceInstance {
     const index = Math.floor(Math.random() * instances.length)
-    return instances[index]
+    return instances[index]!
   }
 
   private geoProximity(
     instances: ServiceInstance[],
     clientRegion?: string,
   ): ServiceInstance {
-    if (!clientRegion) return instances[0]
+    if (!clientRegion) return instances[0]!
 
     // Find instance in same region or closest region
     const sameRegion = instances.find((i) => i.region === clientRegion)
     if (sameRegion) return sameRegion
 
-    return instances[0]
+    return instances[0]!
   }
 
   updateInstances(instances: ServiceInstance[]): void {
@@ -1822,11 +1813,6 @@ interface DiscoveryOptions {
   clientRegion?: string
 }
 
-interface DiscoveryBackend {
-  type: 'consul' | 'etcd' | 'zookeeper'
-  client: any
-  region: string
-}
 
 interface ServiceCacheEntry {
   instances: ServiceInstance[]

@@ -588,15 +588,15 @@ const generateBrowserRandomValues = (array: Uint32Array): void => {
     }
     browserCrypto.getRandomValues.call(browserCrypto, byteArray)
     array[0] =
-      byteArray[0] * 16777216 +
-      byteArray[1] * 65536 +
-      byteArray[2] * 256 +
-      byteArray[3]
+      byteArray[0]! * 16777216 +
+      byteArray[1]! * 65536 +
+      byteArray[2]! * 256 +
+      byteArray[3]!
     array[1] =
-      byteArray[4] * 16777216 +
-      byteArray[5] * 65536 +
-      byteArray[6] * 256 +
-      byteArray[7]
+      byteArray[4]! * 16777216 +
+      byteArray[5]! * 65536 +
+      byteArray[6]! * 256 +
+      byteArray[7]!
   }
 }
 
@@ -642,9 +642,9 @@ const generateNodeRandomValues = (array: Uint32Array): void => {
     return
   }
   array[0] =
-    buffer[0] * 16777216 + buffer[1] * 65536 + buffer[2] * 256 + buffer[3]
+    buffer[0]! * 16777216 + buffer[1]! * 65536 + buffer[2]! * 256 + buffer[3]!
   array[1] =
-    buffer[4] * 16777216 + buffer[5] * 65536 + buffer[6] * 256 + buffer[7]
+    buffer[4]! * 16777216 + buffer[5]! * 65536 + buffer[6]! * 256 + buffer[7]!
 }
 
 /**
@@ -662,6 +662,6 @@ export function generateSessionId(): string {
     array[0] = Math.floor(Math.random() * 0xffffffff)
     array[1] = Math.floor(Math.random() * 0xffffffff)
   }
-  const randomStr = array[0].toString(36) + array[1].toString(36)
+  const randomStr = array[0]!.toString(36) + array[1]!.toString(36)
   return 'demo_' + Date.now() + '_' + randomStr.slice(0, 9)
 }

@@ -148,15 +148,15 @@ export class MemorySystemEvaluator {
     return {
       appropriatenessScore:
         Math.round(
-          (scores.reduce((s, v) => s + v[0], 0) / scores.length) * 1000,
+          (scores.reduce((s, v) => s + (v[0] ?? 0), 0) / scores.length) * 1000,
         ) / 1000,
       personalizationScore:
         Math.round(
-          (scores.reduce((s, v) => s + v[1], 0) / scores.length) * 1000,
+          (scores.reduce((s, v) => s + (v[1] ?? 0), 0) / scores.length) * 1000,
         ) / 1000,
       continuityScore:
         Math.round(
-          (scores.reduce((s, v) => s + v[2], 0) / scores.length) * 1000,
+          (scores.reduce((s, v) => s + (v[2] ?? 0), 0) / scores.length) * 1000,
         ) / 1000,
     }
   }
@@ -207,9 +207,9 @@ export class MemorySystemEvaluator {
     latencies.sort((a, b) => a - b)
     const n = latencies.length
     return {
-      p50LatencyMs: Math.round(latencies[Math.floor(n * 0.5)] * 100) / 100,
-      p95LatencyMs: Math.round(latencies[Math.floor(n * 0.95)] * 100) / 100,
-      p99LatencyMs: Math.round(latencies[Math.floor(n * 0.99)] * 100) / 100,
+      p50LatencyMs: Math.round((latencies[Math.floor(n * 0.5)] ?? 0) * 100) / 100,
+      p95LatencyMs: Math.round((latencies[Math.floor(n * 0.95)] ?? 0) * 100) / 100,
+      p99LatencyMs: Math.round((latencies[Math.floor(n * 0.99)] ?? 0) * 100) / 100,
       throughputPerSec:
         Math.round((n / (latencies.reduce((s, v) => s + v, 0) / 1000)) * 10) /
         10,

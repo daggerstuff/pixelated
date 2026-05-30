@@ -993,13 +993,13 @@ export class MentalArenaAdapter {
         estimatedDisorder &&
         totalByDisorder[estimatedDisorder] !== undefined
       ) {
-        totalByDisorder[estimatedDisorder]++
+		totalByDisorder[estimatedDisorder] += 1
         if (
           conv.accuracyScore &&
           conv.accuracyScore > 70 &&
           coverage[estimatedDisorder] !== undefined
         ) {
-          coverage[estimatedDisorder]++
+		coverage[estimatedDisorder] += 1
         }
       }
     })

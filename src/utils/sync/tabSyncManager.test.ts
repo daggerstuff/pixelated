@@ -35,7 +35,7 @@ describe('MessagingTransport', () => {
       'MessagingTransport: Failed to initialize',
       expect.any(Error),
     )
-    expect(consoleErrorSpy.mock.calls[0][1].message).toBe(
+    expect(consoleErrorSpy?.mock.calls[0][1].message).toBe(
       'Simulated BroadcastChannel failure',
     )
   })

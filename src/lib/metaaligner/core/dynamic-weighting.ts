@@ -545,7 +545,7 @@ export class DynamicWeightingEngine {
     }
 
     for (const key of keys1) {
-      const diff = Math.abs(weights1[key] - weights2[key])
+      const diff = Math.abs(weights1?.[key] - weights2?.[key])
       if (diff > tolerance) {
         return false
       }

@@ -78,7 +78,7 @@ export class DatasetPreparator {
     const examples: TrainingExample[] = []
     for (const [sessionId, sessionMemories] of Object.entries(sessionGroups)) {
       for (let i = 0; i < sessionMemories.length; i++) {
-        const memory = sessionMemories[i]
+        const memory = sessionMemories[i]!
         const priorContext = sessionMemories
           .slice(0, i)
           .map((m) => m.content)
