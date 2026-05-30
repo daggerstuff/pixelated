@@ -1,0 +1,1 @@
+## 2024-05-15 - Cache Object.values for enums in render | Learning: Extracting Object.values to a module-level constant avoids unnecessary array allocations during renders. | Action: Cached DisorderCategory values in SyntheticTherapyDemo.tsx.
