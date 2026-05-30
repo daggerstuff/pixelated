@@ -52,8 +52,9 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
         </p>
       </div>
       <button
+        type="button"
         onClick={onRetry}
-        className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors"
+        className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
       >
         Retry
       </button>
@@ -93,7 +94,7 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
             role="radio"
             onClick={() => onChange(option.value)}
             aria-checked={value === option.value}
-            className={`rounded px-3 py-1 text-sm transition-colors ${
+            className={`rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 ${
               value === option.value
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
