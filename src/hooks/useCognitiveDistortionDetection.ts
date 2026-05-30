@@ -2,7 +2,8 @@ import { useCallback, useState } from 'react'
 
 import type {
   CognitiveDistortionResult,
-  DetectedDistortion } from '../lib/ai/types/CognitiveDistortions'
+  DetectedDistortion,
+} from '../lib/ai/types/CognitiveDistortions'
 import { cognitiveDistortionConfigs } from '../lib/ai/types/CognitiveDistortions'
 
 interface UseCognitiveDistortionDetectionOptions {

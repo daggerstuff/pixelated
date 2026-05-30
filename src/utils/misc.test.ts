@@ -1,23 +1,41 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
 import { lockScroll, unlockScroll, toggleFadeEffect } from './misc'
 
 describe('misc utils', () => {
   beforeEach(() => {
     document.body.style.cssText = ''
     document.body.innerHTML = ''
-    vi.stubGlobal('matchMedia', vi.fn().mockImplementation((query) => ({
-      matches: false, media: query, onchange: null, addListener: vi.fn(), removeListener: vi.fn(),
-      addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
-    })))
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockImplementation((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
+      })),
+    )
   })
 
   afterEach(() => vi.restoreAllMocks())
 
   describe('scroll lock', () => {
     beforeEach(() => {
-      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1024 })
-      Object.defineProperty(document.body, 'clientWidth', { writable: true, configurable: true, value: 1000 })
+      Object.defineProperty(window, 'innerWidth', {
+        writable: true,
+        configurable: true,
+        value: 1024,
+      })
+      Object.defineProperty(document.body, 'clientWidth', {
+        writable: true,
+        configurable: true,
+        value: 1000,
+      })
     })
 
     it('lockScroll/unlockScroll should toggle overflow and paddingRight', () => {

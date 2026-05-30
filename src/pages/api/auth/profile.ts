@@ -196,7 +196,8 @@ export const PUT = async ({
     const auth0Updates: Record<string, any> = {}
     if (updates.fullName) auth0Updates['name'] = updates.fullName
     if (updates.avatarUrl) auth0Updates['picture'] = updates.avatarUrl
-    if (updates.userMetadata) auth0Updates['user_metadata'] = updates.userMetadata
+    if (updates.userMetadata)
+      auth0Updates['user_metadata'] = updates.userMetadata
 
     // Legacy support for 'preferences'
     if (updates.preferences) {

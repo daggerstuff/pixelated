@@ -7,8 +7,9 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-import { AdvancedBehavioralAnalysisService } from '../behavioral-analysis-service'
+import type { IRedisClient, IMongoClient } from '../../threat-hunting/types'
 import { BehavioralAnalysisRepository } from '../behavioral-analysis-repository'
+import { AdvancedBehavioralAnalysisService } from '../behavioral-analysis-service'
 import {
   detectAnomalies,
   calculateBehavioralScore,
@@ -17,7 +18,6 @@ import {
   detectPatternChanges,
   getBehavioralInsights,
 } from '../behavioral-utils'
-import type { IRedisClient, IMongoClient } from '../../threat-hunting/types'
 
 // Type-safe test interfaces
 interface TestBehavioralEvent {
@@ -175,7 +175,11 @@ vi.mock('@tensorflow/tfjs', () => {
     tensor2d: vi.fn(() => ({
       dispose: vi.fn(),
     })),
-    mean: vi.fn(() => ({ dataSync: () => [0.1], data: () => Promise.resolve(new Float32Array([0.1])), dispose: vi.fn() })),
+    mean: vi.fn(() => ({
+      dataSync: () => [0.1],
+      data: () => Promise.resolve(new Float32Array([0.1])),
+      dispose: vi.fn(),
+    })),
     abs: vi.fn(),
     sub: vi.fn(),
   }

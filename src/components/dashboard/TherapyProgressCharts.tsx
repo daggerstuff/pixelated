@@ -3,7 +3,6 @@
  * Displays therapist analytics and progress visualization
  */
 
-
 import type { TherapistAnalyticsChartData } from '@/types/analytics'
 
 import { AnalyticsCharts } from './AnalyticsCharts'

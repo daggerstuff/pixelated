@@ -249,7 +249,8 @@ class PerformanceMonitor {
     // Response time analysis
     if (recent.responseTime! > this.config.alertThresholds.responseTime) {
       const degradation =
-        ((recent.responseTime! - older.responseTime!) / older.responseTime!) * 100
+        ((recent.responseTime! - older.responseTime!) / older.responseTime!) *
+        100
       if (degradation > 10) {
         recommendations.push(
           `Response time degraded by ${degradation.toFixed(1)}% - consider caching optimization`,

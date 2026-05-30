@@ -166,8 +166,10 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
-      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
+      const aCiphertext =
+        a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext =
+        b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -200,8 +202,10 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
-      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
+      const aCiphertext =
+        a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext =
+        b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')
@@ -234,8 +238,10 @@ const sealFHEService: FHEService = {
       }
 
       // Extract serializedCiphertext from metadata if available
-      const aCiphertext = a.metadata?.['serializedCiphertext'] ?? (a.data as string)
-      const bCiphertext = b.metadata?.['serializedCiphertext'] ?? (b.data as string)
+      const aCiphertext =
+        a.metadata?.['serializedCiphertext'] ?? (a.data as string)
+      const bCiphertext =
+        b.metadata?.['serializedCiphertext'] ?? (b.data as string)
 
       if (!aCiphertext || !bCiphertext) {
         throw new Error('Invalid encrypted data: missing ciphertext')

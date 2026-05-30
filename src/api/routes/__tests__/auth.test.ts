@@ -10,7 +10,6 @@ import {
 import { app } from '../../../server'
 
 describe('Authentication API', () => {
-
   afterAll(async () => {
     // No cleanup needed - no test user created in these tests
   })
