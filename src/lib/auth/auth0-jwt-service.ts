@@ -47,7 +47,8 @@ function getRuntimeAuth0Config(): Auth0RuntimeConfig {
   return {
     domain: process.env['AUTH0_DOMAIN'] ?? auth0Config.domain,
     clientId: process.env['AUTH0_CLIENT_ID'] ?? auth0Config.clientId,
-    clientSecret: process.env['AUTH0_CLIENT_SECRET'] ?? auth0Config.clientSecret,
+    clientSecret:
+      process.env['AUTH0_CLIENT_SECRET'] ?? auth0Config.clientSecret,
     audience: process.env['AUTH0_AUDIENCE'] ?? auth0Config.audience,
   }
 }
@@ -280,11 +281,17 @@ function isAuth0TokenClaims(payload: unknown): payload is Auth0TokenClaims {
   }
   const tokenClaims = payload
 
-  if (tokenClaims['iss'] !== undefined && typeof tokenClaims['iss'] !== 'string') {
+  if (
+    tokenClaims['iss'] !== undefined &&
+    typeof tokenClaims['iss'] !== 'string'
+  ) {
     return false
   }
 
-  if (tokenClaims['sub'] !== undefined && typeof tokenClaims['sub'] !== 'string') {
+  if (
+    tokenClaims['sub'] !== undefined &&
+    typeof tokenClaims['sub'] !== 'string'
+  ) {
     return false
   }
 
@@ -587,7 +594,8 @@ export async function refreshAccessToken(
       throw new AuthenticationError('Invalid user payload')
     }
     const userPayload = userResponseData
-    const userId = typeof userPayload['sub'] === 'string' ? userPayload['sub'] : ''
+    const userId =
+      typeof userPayload['sub'] === 'string' ? userPayload['sub'] : ''
     const accessTokenId = userPayload['jti']
     const role = extractRoleFromPayload(userPayload)
 

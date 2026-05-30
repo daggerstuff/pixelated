@@ -5,7 +5,6 @@ import type {
 } from '../../../ai/services/pattern-recognition-types'
 import { createPatternRecognitionService } from '../../../ai/services/PatternRecognitionFactory'
 
-
 // Mock FHE service for testing
 const mockFHEService: ExtendedFHEService = {
   encrypt: async (_: unknown) => 'encrypted_data',
@@ -71,7 +70,6 @@ const mockFHEService: ExtendedFHEService = {
 vi.mock('../../../fhe/pattern-recognition-factory', () => ({
   createPatternRecognitionFHEService: vi.fn(async () => mockFHEService),
 }))
-
 
 describe('patternRecognition Integration', () => {
   let patternService: PatternRecognitionService
