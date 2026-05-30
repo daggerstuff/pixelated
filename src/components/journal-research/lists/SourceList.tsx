@@ -2,12 +2,12 @@ import { format } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
+import { Table } from '@/components/ui/table'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
 } from '@/components/ui/table-types'
-import { Table } from '@/components/ui/table'
 import type {
   Source,
   SourceList as SourceListType,

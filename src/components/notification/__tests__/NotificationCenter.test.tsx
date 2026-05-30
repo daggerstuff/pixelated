@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-
 import { NotificationCenter } from '../NotificationCenter'
 
 vi.mock('../../../lib/services/notification/NotificationService', () => ({

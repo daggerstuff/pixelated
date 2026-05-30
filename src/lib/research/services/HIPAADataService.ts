@@ -129,7 +129,8 @@ export class HIPAADataService {
    * Initialize encryption keys for field-level encryption
    */
   private initializeEncryptionKeys(): void {
-    const masterKey = process.env['HIPAA_MASTER_KEY'] ?? this.generateMasterKey()
+    const masterKey =
+      process.env['HIPAA_MASTER_KEY'] ?? this.generateMasterKey()
     this.encryptionKeys.set('master', Buffer.from(masterKey, 'hex'))
 
     // Generate data-specific keys

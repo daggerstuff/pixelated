@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { verifyAuthToken } from './auth'
+
 import * as auth0Service from '../services/auth0.service'
+import { verifyAuthToken } from './auth'
 
 vi.mock('../services/auth0.service', () => ({
   verifyToken: vi.fn(),
@@ -15,7 +16,7 @@ describe('verifyAuthToken', () => {
     vi.mocked(auth0Service.verifyToken).mockResolvedValue({
       userId: 'user-123',
       email: 'test@example.com',
-      role: 'client'
+      role: 'client',
     } as any) // suppress since auth0Service typing is complex and we're mocking it
 
     await verifyAuthToken('Bearer my-token')
@@ -27,7 +28,7 @@ describe('verifyAuthToken', () => {
     vi.mocked(auth0Service.verifyToken).mockResolvedValue({
       userId: 'user-123',
       email: 'test@example.com',
-      role: 'client'
+      role: 'client',
     } as any) // suppress since auth0Service typing is complex and we're mocking it
 
     await verifyAuthToken('my-token')
