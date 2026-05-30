@@ -28,17 +28,11 @@
         "github": {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": ["pass", "fail", "warning", "skipped"]
-            },
+            "status": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] },
             "pipelineUrl": { "type": "string" },
             "checks": {
               "type": "object",
-              "additionalProperties": {
-                "type": "string",
-                "enum": ["pass", "fail", "warning", "skipped"]
-              }
+              "additionalProperties": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] }
             }
           },
           "required": ["status"]
@@ -46,17 +40,11 @@
         "gitlab": {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": ["pass", "fail", "warning", "skipped"]
-            },
+            "status": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] },
             "pipelineUrl": { "type": "string" },
             "checks": {
               "type": "object",
-              "additionalProperties": {
-                "type": "string",
-                "enum": ["pass", "fail", "warning", "skipped"]
-              }
+              "additionalProperties": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] }
             }
           },
           "required": ["status"]
@@ -64,17 +52,11 @@
         "bitbucket": {
           "type": "object",
           "properties": {
-            "status": {
-              "type": "string",
-              "enum": ["pass", "fail", "warning", "skipped"]
-            },
+            "status": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] },
             "pipelineUrl": { "type": "string" },
             "checks": {
               "type": "object",
-              "additionalProperties": {
-                "type": "string",
-                "enum": ["pass", "fail", "warning", "skipped"]
-              }
+              "additionalProperties": { "type": "string", "enum": ["pass", "fail", "warning", "skipped"] }
             }
           },
           "required": ["status"]
@@ -105,13 +87,5 @@
       }
     }
   },
-  "required": [
-    "releaseId",
-    "commit",
-    "timestamp",
-    "overallStatus",
-    "overallScore",
-    "providers",
-    "qualityGates"
-  ]
+  "required": ["releaseId", "commit", "timestamp", "overallStatus", "overallScore", "providers", "qualityGates"]
 }

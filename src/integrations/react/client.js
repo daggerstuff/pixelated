@@ -12,6 +12,7 @@ function isAlreadyHydrated(element) {
       return key
     }
   }
+  return undefined;
 }
 
 function createReactElementFromDOMElement(element) {
@@ -43,9 +44,17 @@ function createReactElementFromDOMElement(element) {
 
 function getChildren(childString, experimentalReactChildren) {
   if (experimentalReactChildren && childString) {
+<<<<<<< HEAD
+    let children = [];
+    let template = document.createElement("template");
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(childString, "text/html");
+    template.content.append(...doc.body.childNodes);
+=======
     let children = []
     let template = document.createElement('template')
     template.innerHTML = childString
+>>>>>>> origin/staging
     for (let child of template.content.children) {
       children.push(createReactElementFromDOMElement(child))
     }
