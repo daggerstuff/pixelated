@@ -1,1 +1,1 @@
-## 2024-05-15 - Cache Object.values for enums in render | Learning: Extracting Object.values to a module-level constant avoids unnecessary array allocations during renders. | Action: Cached DisorderCategory values in SyntheticTherapyDemo.tsx.
+## 2024-05-28 - Extract static object mappings | Learning: Moving static object definitions outside the React component or render functions prevents unnecessary memory allocations. | Action: Extracted dimensionLabels in EmotionTrackingChart.
