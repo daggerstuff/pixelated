@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { filterDrafts, sortByDate, sortPosts, filterDraftPosts } from './post'
 
 describe('post utils', () => {

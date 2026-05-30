@@ -368,7 +368,7 @@ export class SequentialPatternMiner implements PatternMiner {
 
     const [firstMap, ...rest] = maps
     if (!firstMap) return []
-    
+
     const sequenceIds: number[] = []
 
     for (const sequenceId of firstMap.keys()) {

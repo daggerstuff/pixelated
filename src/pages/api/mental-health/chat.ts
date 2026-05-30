@@ -735,7 +735,6 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error during chat processing',
-        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

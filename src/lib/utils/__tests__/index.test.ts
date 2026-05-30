@@ -1,11 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import {
-  generateId,
-  memoize,
-  validateFilename,
-  tryRequireNode,
-} from '../index'
+import { generateId, memoize, validateFilename, tryRequireNode } from '../index'
 
 describe('generateId', () => {
   it('generates a unique ID string', () => {
@@ -63,13 +58,9 @@ describe('memoize', () => {
 describe('validateFilename', () => {
   it('accepts valid filenames', () => {
     expect(validateFilename('report.pdf')).toBe('report.pdf')
-    expect(validateFilename('my-file_v2.test.js')).toBe(
-      'my-file_v2.test.js',
-    )
+    expect(validateFilename('my-file_v2.test.js')).toBe('my-file_v2.test.js')
     expect(validateFilename('README.md')).toBe('README.md')
-    expect(validateFilename('data_2026_01.json')).toBe(
-      'data_2026_01.json',
-    )
+    expect(validateFilename('data_2026_01.json')).toBe('data_2026_01.json')
   })
 
   it('rejects filenames with invalid characters', () => {
@@ -95,12 +86,10 @@ describe('validateFilename', () => {
 
   it('accepts custom allowed patterns', () => {
     const customPattern = /^[a-zA-Z0-9_-]+$/
-    expect(validateFilename('custom_name', customPattern)).toBe(
-      'custom_name',
+    expect(validateFilename('custom_name', customPattern)).toBe('custom_name')
+    expect(() => validateFilename('file.txt', customPattern)).toThrow(
+      'Filename contains invalid characters',
     )
-    expect(() =>
-      validateFilename('file.txt', customPattern),
-    ).toThrow('Filename contains invalid characters')
   })
 })
 

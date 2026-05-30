@@ -6,9 +6,7 @@
  */
 
 import type { UserId, DocumentId } from '../types/common'
-import type {
-  
-  WorkflowExecution } from '../types/workflow-engine'
+import type { WorkflowExecution } from '../types/workflow-engine'
 import { BaseService } from './base-service'
 
 export class WorkflowEngineService extends BaseService {
