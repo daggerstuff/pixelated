@@ -1,4 +1,3 @@
-
 import { authClient } from '@/lib/auth-client'
 // Remove AuthProvider wrapper dependency if possible, but keep structure for now if needed
 

@@ -207,11 +207,16 @@ export async function buildSearchIndex(
           // Extract title, tags, category
           const titleMatch = frontmatter.match(/title:\s*["']?(.*?)["']?\n/)
           const tagsMatch = frontmatter.match(/tags:\s*\[(.*?)\]/)
-          const categoryMatch = frontmatter.match(/category:\s*["']?(.*?)["']?\n/)
+          const categoryMatch = frontmatter.match(
+            /category:\s*["']?(.*?)["']?\n/,
+          )
 
-          const title = titleMatch?.[1]?.trim() ?? filename.replace(/\.astro$/, '')
+          const title =
+            titleMatch?.[1]?.trim() ?? filename.replace(/\.astro$/, '')
           const tags = tagsMatch?.[1]
-            ? tagsMatch[1].split(',').map((tag) => tag.trim().replace(/["']/g, ''))
+            ? tagsMatch[1]
+                .split(',')
+                .map((tag) => tag.trim().replace(/["']/g, ''))
             : []
           const category = categoryMatch?.[1]?.trim() ?? 'pages'
 

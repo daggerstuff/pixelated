@@ -60,12 +60,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { useMemory, useUserPreferences } from '@/hooks/useMemory'
 import type { MemoryEntry } from '@/lib/memory/memory-client'
@@ -226,7 +221,8 @@ export function MemoryDashboard({
       {/* Crisis Alert Banner */}
       {filteredMemories.some(
         (m) =>
-          m.metadata?.['crisisSeverity'] && m.metadata['crisisSeverity'] !== 'none',
+          m.metadata?.['crisisSeverity'] &&
+          m.metadata['crisisSeverity'] !== 'none',
       ) && (
         <Card className="border-destructive bg-destructive/5">
           <CardHeader className="py-3">
@@ -484,7 +480,9 @@ export function MemoryDashboard({
                                     className="animate-pulse gap-1 px-1.5 py-0 text-[10px]"
                                   >
                                     <AlertCircle className="h-2.5 w-2.5" />{' '}
-                                    {mem.metadata['crisisSeverity'].toUpperCase()}
+                                    {mem.metadata[
+                                      'crisisSeverity'
+                                    ].toUpperCase()}
                                   </Badge>
                                 )}
 

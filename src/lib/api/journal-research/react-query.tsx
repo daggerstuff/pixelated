@@ -92,7 +92,7 @@ export const journalResearchQueryClient = createJournalResearchQueryClient()
 type QueryKeyFactory = (...args: unknown[]) => QueryKey
 type MutationKeyFactory = (...args: unknown[]) => MutationKey
 
-  (...parts: unknown[]): QueryKeyFactory =>
+;(...parts: unknown[]): QueryKeyFactory =>
   (...args) => [...parts, ...args]
 
 const buildMutationKey =

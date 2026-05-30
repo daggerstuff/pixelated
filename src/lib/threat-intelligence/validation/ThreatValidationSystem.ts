@@ -110,7 +110,9 @@ export class ThreatValidationSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
+      this.redis = new Redis(
+        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
+      )
       await this.redis.ping()
       logger.info('Redis connection established for threat validation')
     } catch (error: unknown) {
@@ -1377,7 +1379,8 @@ export class ThreatValidationSystemCore
       let totalTime = 0
       for (const validation of completedValidations) {
         const timeDiff =
-          validation['completedAt'].getTime() - validation['createdAt'].getTime()
+          validation['completedAt'].getTime() -
+          validation['createdAt'].getTime()
         totalTime += timeDiff
       }
 
