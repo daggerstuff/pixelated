@@ -168,6 +168,8 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
               <button 
                 onClick={() => toggleExpand(activity.id)}
                 className="w-full flex items-center justify-between p-3 text-left hover:bg-white/5 transition-colors"
+                aria-expanded={!!expandedItems[activity.id]}
+                aria-controls={`activity-details-${activity.id}`}
               >
                 <div className="flex flex-col gap-0.5">
                   <div className="flex items-center gap-2">
@@ -198,7 +200,10 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
 
               {/* Expanded Content */}
               {expandedItems[activity.id] && (
-                <div className="p-3 pt-0 border-t border-white/5 bg-black/20">
+                <div
+                  id={`activity-details-${activity.id}`}
+                  className="p-3 pt-0 border-t border-white/5 bg-black/20"
+                >
                   <div className="mt-3 space-y-3">
                     {activity.conflict && (
                       <div className={cn(
