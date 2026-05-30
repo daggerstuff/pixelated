@@ -40,6 +40,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
   private readonly failoverHistory: FailoverEvent[] = []
   private currentPrimaryRegion: string
   private readonly backupRegions: string[] = []
+  private isActive = false
 
   constructor(
     config: ConfigurationManager,
@@ -78,6 +79,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
    * Initialize the failover orchestrator
    */
   async initialize(): Promise<void> {
+    if (this.isActive) return
     try {
       this.logger.info('Initializing AutomatedFailoverOrchestrator...')
 
@@ -469,7 +471,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       regionScores.sort((a, b) => b.score - a.score)
 
       this.logger.info('Backup region scores', { regionScores })
-      return regionScores?.[0].region
+      return regionScores[0]!.region
     } catch (error: unknown) {
       this.logger.error('Failed to select best backup region', { error })
       return null
@@ -1439,6 +1441,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
    * Shutdown the failover orchestrator
    */
   async shutdown(): Promise<void> {
+    if (!this.isActive) return
     try {
       this.logger.info('Shutting down AutomatedFailoverOrchestrator...')
 
@@ -1486,7 +1489,6 @@ class CircuitBreaker {
     this.name = config.name
     this.failureThreshold = config.failureThreshold
     this.resetTimeout = config.resetTimeout
-    this.monitoringPeriod = config.monitoringPeriod
     this.onStateChange = config.onStateChange
   }
 

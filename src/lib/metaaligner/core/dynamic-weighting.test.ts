@@ -146,8 +146,8 @@ describe('DynamicWeightingEngine', () => {
 
       // Weights should transition smoothly, not jump
       const empathyChange = Math.abs(
-        result2!.weights[ObjectiveId.EMPATHY] -
-          result1!.weights[ObjectiveId.EMPATHY],
+        result2.weights[ObjectiveId.EMPATHY] -
+          result1.weights[ObjectiveId.EMPATHY],
       )
 
       // With blending, change should be less than the full difference

@@ -397,7 +397,7 @@ async function generateSessionChartData(params: {
   endDate: Date
   dataPoints: number
 }): Promise<ChartDataResponse> {
-  const {} = params
+  void params
 
   const sessionMetrics = [
     { metric: 'Engagement', value: 85 },

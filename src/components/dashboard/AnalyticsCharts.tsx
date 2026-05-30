@@ -261,7 +261,7 @@ const SummaryStats: FC<SummaryStatsProps> = ({ data, isLoading }) => {
     if (color === undefined) {
       throw new Error('Not implemented yet: undefined case')
     }
-    return COLOR_CLASSES_MAP[color] || 'text-gray-600'
+    return COLOR_CLASSES_MAP[color] ?? 'text-gray-600'
   }
 
   return (
