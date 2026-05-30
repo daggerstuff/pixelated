@@ -623,7 +623,10 @@ export class PatternDiscoveryService {
 
     centroids.forEach((centroid, index) => {
       const distance = Math.sqrt(
-        vector.reduce((sum, val, i) => sum + Math.pow(val - centroid[i]!, 2), 0),
+        vector.reduce(
+          (sum, val, i) => sum + Math.pow(val - centroid[i]!, 2),
+          0,
+        ),
       )
       if (distance < minDistance) {
         minDistance = distance

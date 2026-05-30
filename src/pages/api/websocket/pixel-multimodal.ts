@@ -71,8 +71,10 @@ function ensureServer(): WebSocketServer {
         switch (type) {
           case 'text': {
             state.text = (message['text'] as string) || ''
-            state.contextType = (message['contextType'] as string) || 'therapeutic'
-            state.sessionId = (message['sessionId'] as string) || state.sessionId
+            state.contextType =
+              (message['contextType'] as string) || 'therapeutic'
+            state.sessionId =
+              (message['sessionId'] as string) || state.sessionId
             ws.send(
               JSON.stringify({
                 type: 'status',
@@ -114,7 +116,8 @@ function ensureServer(): WebSocketServer {
             const contextType =
               ((message['contextType'] as string) || state.contextType) ??
               'therapeutic'
-            const sessionId = (message['sessionId'] as string) || state.sessionId
+            const sessionId =
+              (message['sessionId'] as string) || state.sessionId
             await handleComplete(ws, state, { text, contextType, sessionId })
             break
           }

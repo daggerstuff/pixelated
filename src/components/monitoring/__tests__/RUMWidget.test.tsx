@@ -1,5 +1,5 @@
 import { render, screen, act } from '@testing-library/react'
-import {  beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the hooks FIRST
 vi.mock('../../../lib/monitoring/hooks', () => ({
