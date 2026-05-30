@@ -543,8 +543,7 @@ export class ConfigurationManager extends EventEmitter {
           process.env['AWS_SECRET_ACCESS_KEY']
       }
       if (process.env['AWS_REGION']) {
-        this.config.secrets.cloudProviders.aws.region =
-          process.env['AWS_REGION']
+        this.config.secrets.cloudProviders.aws.region = process.env['AWS_REGION']
       }
 
       // GCP credentials

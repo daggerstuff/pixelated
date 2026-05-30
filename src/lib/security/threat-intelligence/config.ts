@@ -57,13 +57,10 @@ const baseConfig = {
     secondary: (
       process.env['SECONDARY_REGIONS'] ?? 'eu-west-1,ap-southeast-1'
     ).split(','),
-    edge_locations: (process.env['EDGE_LOCATIONS'] ?? '50')
-      .split(',')
-      .map(Number),
+    edge_locations: (process.env['EDGE_LOCATIONS'] ?? '50').split(',').map(Number),
   },
   security: {
-    jwt_secret:
-      process.env['JWT_SECRET'] ?? generateFallbackSecret('JWT_SECRET'),
+    jwt_secret: process.env['JWT_SECRET'] ?? generateFallbackSecret('JWT_SECRET'),
     encryption_key:
       process.env['ENCRYPTION_KEY'] ?? generateFallbackSecret('ENCRYPTION_KEY'),
     rate_limiting: {
@@ -91,9 +88,7 @@ export const threatIntelDatabaseConfig: ThreatIntelligenceDatabaseConfig = {
   data_retention: {
     indicators_days: parseInt(process.env['INDICATOR_RETENTION_DAYS'] ?? '365'),
     events_days: parseInt(process.env['EVENT_RETENTION_DAYS'] ?? '730'),
-    audit_logs_days: parseInt(
-      process.env['AUDIT_LOG_RETENTION_DAYS'] ?? '2555',
-    ), // 7 years
+    audit_logs_days: parseInt(process.env['AUDIT_LOG_RETENTION_DAYS'] ?? '2555'), // 7 years
   },
   encryption: {
     enabled: process.env['ENCRYPTION_ENABLED'] !== 'false',
@@ -175,15 +170,12 @@ export const edgeThreatDetectionConfig: EdgeThreatDetectionSystemConfig = {
       model_path:
         process.env['ANOMALY_MODEL_PATH'] ?? '/models/anomaly_detection.tf',
       threshold: parseFloat(process.env['ANOMALY_THRESHOLD'] ?? '0.7'),
-      update_frequency: parseInt(
-        process.env['ANOMALY_UPDATE_FREQ'] ?? '86400000',
-      ), // 24 hours
+      update_frequency: parseInt(process.env['ANOMALY_UPDATE_FREQ'] ?? '86400000'), // 24 hours
     },
     threat_classification: {
       enabled: process.env['THREAT_CLASSIFICATION_ENABLED'] !== 'false',
       model_path:
-        process.env['CLASSIFICATION_MODEL_PATH'] ??
-        '/models/threat_classifier.tf',
+        process.env['CLASSIFICATION_MODEL_PATH'] ?? '/models/threat_classifier.tf',
       confidence_threshold: parseFloat(
         process.env['CLASSIFICATION_THRESHOLD'] ?? '0.8',
       ),
@@ -211,9 +203,7 @@ export const edgeThreatDetectionConfig: EdgeThreatDetectionSystemConfig = {
     critical: parseFloat(process.env['DETECTION_THRESHOLD_CRITICAL'] ?? '0.9'),
   },
   performance: {
-    max_processing_time_ms: parseInt(
-      process.env['MAX_PROCESSING_TIME'] ?? '1000',
-    ),
+    max_processing_time_ms: parseInt(process.env['MAX_PROCESSING_TIME'] ?? '1000'),
     cache_ttl_ms: parseInt(process.env['CACHE_TTL'] ?? '300000'), // 5 minutes
     batch_size: parseInt(process.env['EDGE_BATCH_SIZE'] ?? '100'),
   },
@@ -239,9 +229,7 @@ export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
       pattern_similarity_threshold: parseFloat(
         process.env['BEHAVIORAL_SIMILARITY'] ?? '0.8',
       ),
-      learning_rate: parseFloat(
-        process.env['BEHAVIORAL_LEARNING_RATE'] ?? '0.01',
-      ),
+      learning_rate: parseFloat(process.env['BEHAVIORAL_LEARNING_RATE'] ?? '0.01'),
     },
     attribution: {
       enabled: process.env['ATTRIBUTION_CORRELATION_ENABLED'] !== 'false',
@@ -257,8 +245,7 @@ export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
     similarity_detection: {
       enabled: process.env['SIMILARITY_DETECTION_ENABLED'] !== 'false',
       model_path:
-        process.env['SIMILARITY_MODEL_PATH'] ??
-        '/models/similarity_detection.tf',
+        process.env['SIMILARITY_MODEL_PATH'] ?? '/models/similarity_detection.tf',
       threshold: parseFloat(process.env['SIMILARITY_THRESHOLD'] ?? '0.75'),
     },
     pattern_recognition: {
@@ -269,9 +256,7 @@ export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
     },
     statistical_analysis: {
       enabled: process.env['STATISTICAL_ANALYSIS_ENABLED'] !== 'false',
-      significance_level: parseFloat(
-        process.env['SIGNIFICANCE_LEVEL'] ?? '0.05',
-      ),
+      significance_level: parseFloat(process.env['SIGNIFICANCE_LEVEL'] ?? '0.05'),
       correlation_methods: (
         process.env['CORRELATION_METHODS'] ?? 'pearson,spearman,kendall'
       ).split(','),
@@ -284,9 +269,7 @@ export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
   },
   output: {
     max_correlations: parseInt(process.env['MAX_CORRELATIONS'] ?? '100'),
-    min_confidence: parseFloat(
-      process.env['MIN_CORRELATION_CONFIDENCE'] ?? '0.5',
-    ),
+    min_confidence: parseFloat(process.env['MIN_CORRELATION_CONFIDENCE'] ?? '0.5'),
     format: process.env['CORRELATION_OUTPUT_FORMAT'] ?? 'json',
   },
 }
@@ -302,9 +285,7 @@ export const threatResponseConfig: AutomatedThreatResponseOrchestratorConfig = {
       severity_levels: (
         process.env['AUTO_RESPONSE_SEVERITIES'] ?? 'critical,high'
       ).split(','),
-      max_response_time_ms: parseInt(
-        process.env['MAX_RESPONSE_TIME'] ?? '30000',
-      ), // 30 seconds
+      max_response_time_ms: parseInt(process.env['MAX_RESPONSE_TIME'] ?? '30000'), // 30 seconds
     },
     semi_automatic: {
       enabled: process.env['SEMI_AUTO_RESPONSE_ENABLED'] !== 'false',
@@ -325,12 +306,10 @@ export const threatResponseConfig: AutomatedThreatResponseOrchestratorConfig = {
     },
   },
   integration_apis: {
-    firewall_api:
-      process.env['FIREWALL_API'] ?? 'https://firewall.internal/api',
+    firewall_api: process.env['FIREWALL_API'] ?? 'https://firewall.internal/api',
     siem_api: process.env['SIEM_API'] ?? 'https://siem.internal/api',
     edr_api: process.env['EDR_API'] ?? 'https://edr.internal/api',
-    ticketing_api:
-      process.env['TICKETING_API'] ?? 'https://tickets.internal/api',
+    ticketing_api: process.env['TICKETING_API'] ?? 'https://tickets.internal/api',
     notification_api:
       process.env['NOTIFICATION_API'] ?? 'https://notify.internal/api',
   },
@@ -442,8 +421,7 @@ export const threatHuntingConfig: ThreatHuntingSystemConfig = {
     siem_api: process.env['HUNTING_SIEM_API'] ?? 'https://siem.internal/api',
     edr_api: process.env['HUNTING_EDR_API'] ?? 'https://edr.internal/api',
     network_monitoring_api:
-      process.env['HUNTING_NETWORK_API'] ??
-      'https://network-monitor.internal/api',
+      process.env['HUNTING_NETWORK_API'] ?? 'https://network-monitor.internal/api',
     log_aggregation_api:
       process.env['HUNTING_LOG_API'] ?? 'https://logs.internal/api',
   },
@@ -459,8 +437,7 @@ export const externalFeedConfig: ExternalThreatFeedIntegrationConfig = {
       type: 'misp',
       provider: 'MISP Project',
       endpoint:
-        process.env['MISP_ENDPOINT'] ??
-        'https://www.circl.lu/doc/misp/feed-osint',
+        process.env['MISP_ENDPOINT'] ?? 'https://www.circl.lu/doc/misp/feed-osint',
       authentication: {
         type: 'none',
         credentials: {},
@@ -495,8 +472,7 @@ export const externalFeedConfig: ExternalThreatFeedIntegrationConfig = {
       description: 'Open Threat Exchange platform',
       type: 'open_source',
       provider: 'AlienVault',
-      endpoint:
-        process.env['OTX_ENDPOINT'] ?? 'https://otx.alienvault.com/api/v1',
+      endpoint: process.env['OTX_ENDPOINT'] ?? 'https://otx.alienvault.com/api/v1',
       authentication: {
         type: 'api_key',
         credentials: {
@@ -544,8 +520,7 @@ export const externalFeedConfig: ExternalThreatFeedIntegrationConfig = {
   integration_apis: {
     stix_taxii_client:
       process.env['STIX_TAXII_CLIENT_API'] ?? 'https://taxii.example.com/api',
-    misp_client:
-      process.env['MISP_CLIENT_API'] ?? 'https://misp.example.com/api',
+    misp_client: process.env['MISP_CLIENT_API'] ?? 'https://misp.example.com/api',
     threat_intel_platform:
       process.env['THREAT_INTEL_PLATFORM_API'] ??
       'https://platform.example.com/api',

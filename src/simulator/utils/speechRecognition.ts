@@ -225,7 +225,7 @@ export function getKeywordPatterns(domain: string): RegExp[] {
     ],
   }
 
-  return patterns[domain] ?? patterns['general'] ?? []
+  return (patterns[domain] ?? patterns['general']) ?? []
 }
 
 /**

@@ -271,20 +271,8 @@ describe('IndexedDBRequestQueue', () => {
   describe('clear', () => {
     it('should clear all requests', () => {
       // Add some requests
-      queue.add({
-        url: '/test1',
-        method: 'GET',
-        headers: {},
-        priority: 'normal' as const,
-        maxRetries: 3,
-      })
-      queue.add({
-        url: '/test2',
-        method: 'POST',
-        headers: {},
-        priority: 'normal' as const,
-        maxRetries: 3,
-      })
+      queue.add({ url: '/test1', method: 'GET', headers: {}, priority: 'normal' as const, maxRetries: 3 })
+      queue.add({ url: '/test2', method: 'POST', headers: {}, priority: 'normal' as const, maxRetries: 3 })
 
       // Clear queue
       queue.clear()
@@ -303,13 +291,7 @@ describe('IndexedDBRequestQueue', () => {
         priority: 'critical',
         maxRetries: 3,
       })
-      queue.add({
-        url: '/high',
-        method: 'GET',
-        headers: {},
-        priority: 'high',
-        maxRetries: 3,
-      })
+      queue.add({ url: '/high', method: 'GET', headers: {}, priority: 'high', maxRetries: 3 })
       queue.add({
         url: '/normal1',
         method: 'GET',
@@ -324,13 +306,7 @@ describe('IndexedDBRequestQueue', () => {
         priority: 'normal',
         maxRetries: 3,
       })
-      queue.add({
-        url: '/low',
-        method: 'GET',
-        headers: {},
-        priority: 'low',
-        maxRetries: 3,
-      })
+      queue.add({ url: '/low', method: 'GET', headers: {}, priority: 'low', maxRetries: 3 })
 
       const stats = queue.getStats()
 
@@ -346,13 +322,7 @@ describe('IndexedDBRequestQueue', () => {
 
   describe('hasPendingRequests', () => {
     it('should return true when queue has items', () => {
-      queue.add({
-        url: '/test',
-        method: 'GET',
-        headers: {},
-        priority: 'normal' as const,
-        maxRetries: 3,
-      })
+      queue.add({ url: '/test', method: 'GET', headers: {}, priority: 'normal' as const, maxRetries: 3 })
       expect(queue.hasPendingRequests()).toBe(true)
     })
 

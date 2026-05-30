@@ -179,9 +179,7 @@ export class ExternalThreatFeedIntegrationCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(
-        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
-      )
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for feed integration')
     } catch (error: unknown) {
@@ -576,10 +574,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Apply confidence filter
-      if (
-        filters['minConfidence'] &&
-        item.confidence < filters['minConfidence']
-      ) {
+      if (filters['minConfidence'] && item.confidence < filters['minConfidence']) {
         return false
       }
 
@@ -592,10 +587,7 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Apply custom filter function if provided
-      if (
-        filters['customFilter'] &&
-        typeof filters['customFilter'] === 'function'
-      ) {
+      if (filters['customFilter'] && typeof filters['customFilter'] === 'function') {
         return filters['customFilter'](item)
       }
 

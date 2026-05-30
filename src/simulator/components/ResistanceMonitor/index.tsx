@@ -19,13 +19,7 @@
  * @see GestaltClient (src/lib/services/ai/GestaltClient.ts)
  */
 
-import _React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import _React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type {
   CrisisLevel,
@@ -563,11 +557,7 @@ export function ResistanceMonitor({
   // ---------------------------------------------------------------------------
 
   const isAcute = payload?.crisis_level === 'acute'
-  const panelClass = [
-    styles['panel'],
-    isAcute ? styles['panelAcute'] : '',
-    className,
-  ]
+  const panelClass = [styles['panel'], isAcute ? styles['panelAcute'] : '', className]
     .filter(Boolean)
     .join(' ')
 

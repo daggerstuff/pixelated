@@ -901,9 +901,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
           logEntry.message = `Successfully escalated to: ${action.parameters['escalation_target']}`
           executionLog.push(logEntry)
 
-          result.escalations_triggered.push(
-            action.parameters['escalation_target'],
-          )
+          result.escalations_triggered.push(action.parameters['escalation_target'])
         } catch (error: any) {
           const logEntry: ExecutionLogEntry = {
             timestamp: new Date(),

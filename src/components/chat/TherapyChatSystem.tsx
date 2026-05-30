@@ -23,7 +23,9 @@ import { Label } from '@/components/ui/label'
 // Removed unused import: SecurityBadge
 import { Switch } from '@/components/ui/switch'
 import { useAIService } from '@/hooks/useAIService'
-import { useEmotionDetection } from '@/hooks/useEmotionDetection'
+import {
+  useEmotionDetection,
+} from '@/hooks/useEmotionDetection'
 import { useMentalHealthAnalysis } from '@/hooks/useMentalHealthAnalysis'
 import { usePatientModel } from '@/hooks/usePatientModel'
 import { useRiskAssessment } from '@/hooks/useRiskAssessment'

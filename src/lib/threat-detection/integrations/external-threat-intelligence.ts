@@ -453,9 +453,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const data = item as Record<string, unknown>
 
       // Extract basic fields
-      const iocValue = String(
-        data['value'] ?? data['ioc'] ?? data['indicator'] ?? '',
-      )
+      const iocValue = String(data['value'] ?? data['ioc'] ?? data['indicator'] ?? '')
       const iocType = String(data['type'] ?? data['ioc_type'] ?? 'unknown')
       const threatType = String(
         data['threat_type'] ?? data['malware_family'] ?? 'unknown',
@@ -501,17 +499,14 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         attribution: data['attribution']
           ? {
               actor:
-                ((data['attribution'] as Record<string, unknown>)[
-                  'actor'
-                ] as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['actor'] as string) || 'unknown',
               campaign:
-                ((data['attribution'] as Record<string, unknown>)[
-                  'campaign'
-                ] as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['campaign'] as string) || 'unknown',
               family:
-                ((data['attribution'] as Record<string, unknown>)[
-                  'family'
-                ] as string) ?? 'unknown',
+                ((data['attribution'] as Record<string, unknown>)
+                  ['family'] as string) ?? 'unknown',
             }
           : undefined,
       }
@@ -876,11 +871,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         .toArray()
 
       const sources = Array.from(
-        new Set(
-          intelligence.map(
-            (i: Record<string, unknown>) => i.feedName as string,
-          ),
-        ),
+        new Set(intelligence.map((i: Record<string, unknown>) => i.feedName as string)),
       )
 
       return {
@@ -1043,16 +1034,10 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       // Extract from actions
       for (const action of threatResponse.actions) {
         if (action.actionType === 'ip_block' && action.parameters['sourceIp']) {
-          iocs.push({
-            type: 'ip',
-            value: action.parameters['sourceIp'] as string,
-          })
+          iocs.push({ type: 'ip', value: action.parameters['sourceIp'] as string })
         }
 
-        if (
-          action.actionType === 'domain_block' &&
-          action.parameters['domain']
-        ) {
+        if (action.actionType === 'domain_block' && action.parameters['domain']) {
           iocs.push({
             type: 'domain',
             value: action.parameters['domain'] as string,
@@ -1062,10 +1047,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
 
       // Extract from metadata
       if (threatResponse.metadata?.['ip']) {
-        iocs.push({
-          type: 'ip',
-          value: threatResponse.metadata['ip'] as string,
-        })
+        iocs.push({ type: 'ip', value: threatResponse.metadata['ip'] as string })
       }
 
       if (threatResponse.metadata?.['userAgent']) {
@@ -1150,10 +1132,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   ): Promise<
     Record<string, { total: number; active: number; lastUpdate: Date }>
   > {
-    const feedStats: Record<
-      string,
-      { total: number; active: number; lastUpdate: Date }
-    > = {}
+    const feedStats: Record<string, { total: number; active: number; lastUpdate: Date }> = {}
 
     for (const feed of this.config.feeds) {
       if (!feed.enabled) {

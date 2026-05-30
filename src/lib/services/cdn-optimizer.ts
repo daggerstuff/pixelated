@@ -71,8 +71,7 @@ export class CDNEdgeOptimizer {
   constructor(config: Partial<CDNConfig> = {}) {
     this.config = {
       provider: 'cloudflare',
-      baseUrl:
-        process.env['CDN_BASE_URL'] ?? 'https://cdn.pixelatedempathy.com',
+      baseUrl: process.env['CDN_BASE_URL'] ?? 'https://cdn.pixelatedempathy.com',
       edgeCache: {
         enabled: true,
         defaultTTL: 3600, // 1 hour

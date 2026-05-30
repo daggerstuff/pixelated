@@ -1,5 +1,6 @@
 import React from '@/lib/esm-compat/react'
 
+
 // Simple simulator components
 export function SimulatorProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>

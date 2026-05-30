@@ -22,9 +22,7 @@
 
 ### ✅ Always
 
-- **No Project-level Littering**: Keep all agent-specific configurations,
-  skills, and dotfiles at the global level (`~/.gemini`). Do not create or
-  commit project-level agent configuration files/folders.
+- **No Project-level Littering**: Keep all agent-specific configurations, skills, and dotfiles at the global level (`~/.gemini`). Do not create or commit project-level agent configuration files/folders.
 - Follow root `AGENTS.md` and the continuity stack first.
 - Apply root behavioral defaults: assumptions-first, simplicity, surgical edits,
   and explicit success criteria.

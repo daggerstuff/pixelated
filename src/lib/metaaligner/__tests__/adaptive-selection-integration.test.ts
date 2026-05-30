@@ -22,10 +22,7 @@ import {
   ContextTransitionDetector,
   type ContextEvent,
 } from '../prioritization/context-transition-detector'
-import {
-  ObjectiveSwitcher,
-  type ObjectiveSwitchObserver,
-} from '../prioritization/objective-switcher'
+import { ObjectiveSwitcher, type ObjectiveSwitchObserver } from '../prioritization/objective-switcher'
 
 // Mock AI Service
 const createMockAIService = (): AIService => {

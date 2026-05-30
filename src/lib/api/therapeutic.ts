@@ -147,6 +147,5 @@ export class TherapeuticClient {
 // In production, use env var: import.meta.env.PUBLIC_THERAPEUTIC_API_URL
 // For now, defaulting to the known IP
 export const therapeuticClient = new TherapeuticClient(
-  import.meta.env?.['PUBLIC_THERAPEUTIC_API_URL'] ??
-    'http://3.137.216.156:5000',
+  import.meta.env?.['PUBLIC_THERAPEUTIC_API_URL'] ?? 'http://3.137.216.156:5000',
 )

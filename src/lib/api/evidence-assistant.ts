@@ -88,9 +88,7 @@ function normalizeEvidenceAssistantResponse(
     query: typeof payload['query'] === 'string' ? payload['query'] : '',
     answer: typeof payload['answer'] === 'string' ? payload['answer'] : null,
     providerUsed:
-      typeof payload['providerUsed'] === 'string'
-        ? payload['providerUsed']
-        : null,
+      typeof payload['providerUsed'] === 'string' ? payload['providerUsed'] : null,
     results: Array.isArray(payload['results'])
       ? payload['results'].filter(isEvidenceSearchResult)
       : [],

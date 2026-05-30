@@ -1,3 +1,4 @@
+
 import { AuthController } from '../controllers/auth.controller'
 
 export function createAuthRoutes(router: typeof import('express').Router) {

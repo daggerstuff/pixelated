@@ -53,8 +53,7 @@ export const AUTH0_CONFIG = {
     process.env['AUTH0_CLIENT_SECRET'] ??
     import.meta.env['AUTH0_CLIENT_SECRET'] ??
     '',
-  audience:
-    process.env['AUTH0_AUDIENCE'] ?? import.meta.env['AUTH0_AUDIENCE'] ?? '',
+  audience: process.env['AUTH0_AUDIENCE'] ?? import.meta.env['AUTH0_AUDIENCE'] ?? '',
   callbackUrl:
     process.env['AUTH0_CALLBACK_URL'] ??
     import.meta.env['AUTH0_CALLBACK_URL'] ??
@@ -102,9 +101,9 @@ export const RATE_LIMIT_CONFIG = {
 // Security Configuration
 export const SECURITY_CONFIG = {
   cors: {
-    origin: (
-      process.env['CORS_ORIGIN'] ?? import.meta.env['CORS_ORIGIN']
-    )?.split(',') ?? ['http://localhost:4321'],
+    origin: (process.env['CORS_ORIGIN'] ?? import.meta.env['CORS_ORIGIN'])?.split(
+      ',',
+    ) ?? ['http://localhost:4321'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
@@ -235,8 +234,7 @@ export function getAuthConfig() {
 export function validateAuthConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
-  const isProd =
-    process.env['NODE_ENV'] === 'production' || import.meta.env.PROD
+  const isProd = process.env['NODE_ENV'] === 'production' || import.meta.env.PROD
 
   // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
   try {

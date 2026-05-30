@@ -21,7 +21,12 @@ import {
   CardTitle,
 } from '@/components/ui/card/index'
 import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
 
 interface PerformanceMetric {
   id: string

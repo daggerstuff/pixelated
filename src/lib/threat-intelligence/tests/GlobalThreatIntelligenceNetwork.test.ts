@@ -334,32 +334,30 @@ vi.mock('../feeds/ExternalThreatFeedIntegration', () => ({
 
 const mockValidationSystem = vi.hoisted(() => ({
   initialize: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
-  validateThreat: vi
-    .fn<(threat: unknown) => Promise<any>>()
-    .mockImplementation(async (threat: any) => {
-      return {
-        validationId: `validation-${threat.threatId ?? 'unknown'}`,
-        threatId: threat.threatId ?? 'unknown',
-        threatType: threat.threatType ?? 'malware',
-        severity: threat.severity ?? 'high',
-        confidence: threat.confidence ?? 0.9,
-        status: 'valid',
-        overallScore: 85,
-        isValid: true,
-        results: [
-          {
-            ruleId: 'structure_validation',
-            ruleName: 'Structure Validation',
-            passed: true,
-            score: 100,
-            issues: [],
-            details: {},
-          },
-        ],
-        createdAt: new Date(),
-        completedAt: new Date(),
-      } as ThreatValidation
-    }),
+  validateThreat: vi.fn<(threat: unknown) => Promise<any>>().mockImplementation(async (threat: any) => {
+    return {
+      validationId: `validation-${threat.threatId ?? 'unknown'}`,
+      threatId: threat.threatId ?? 'unknown',
+      threatType: threat.threatType ?? 'malware',
+      severity: threat.severity ?? 'high',
+      confidence: threat.confidence ?? 0.9,
+      status: 'valid',
+      overallScore: 85,
+      isValid: true,
+      results: [
+        {
+          ruleId: 'structure_validation',
+          ruleName: 'Structure Validation',
+          passed: true,
+          score: 100,
+          issues: [],
+          details: {},
+        },
+      ],
+      createdAt: new Date(),
+      completedAt: new Date(),
+    } as ThreatValidation
+  }),
   getValidationMetrics: vi.fn<() => Promise<any>>().mockResolvedValue({
     totalValidations: 1,
     validThreats: 1,

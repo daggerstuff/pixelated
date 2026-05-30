@@ -8,7 +8,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/index'
-import { IconRefresh, IconDownload, IconFilter } from '@/components/ui/icons'
+import {
+  IconRefresh,
+  IconDownload,
+  IconFilter,
+} from '@/components/ui/icons'
 import {
   Select,
   SelectContent,
@@ -16,7 +20,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
 import { AnalyticsService } from '@/lib/analytics'
 
 // Types

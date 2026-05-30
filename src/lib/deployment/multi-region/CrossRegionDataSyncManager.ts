@@ -37,6 +37,7 @@ type MongoDbConfig = {
   [key: string]: unknown
 }
 
+
 type RedisDbSecrets = {
   url?: string
   host?: string
@@ -1463,10 +1464,7 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           // Update retry count
           await this.getCockroachClient().query(
             'UPDATE sync_log SET retry_count = retry_count + 1, error_message = $1, updated_at = now() WHERE id = $2',
-            [
-              error instanceof Error ? error.message : 'Unknown error',
-              log['id'],
-            ],
+            [error instanceof Error ? error.message : 'Unknown error', log['id']],
           )
         }
       }
@@ -1610,21 +1608,13 @@ export class CrossRegionDataSyncManager extends EventEmitter {
           const userId = this.normalizeRecordId(analytic['userId'])
           const sessionId = this.normalizeRecordId(analytic['sessionId'])
           const eventType =
-            typeof analytic['eventType'] === 'string'
-              ? analytic['eventType']
-              : ''
+            typeof analytic['eventType'] === 'string' ? analytic['eventType'] : ''
           const ipAddress =
-            typeof analytic['ipAddress'] === 'string'
-              ? analytic['ipAddress']
-              : ''
+            typeof analytic['ipAddress'] === 'string' ? analytic['ipAddress'] : ''
           const userAgent =
-            typeof analytic['userAgent'] === 'string'
-              ? analytic['userAgent']
-              : ''
+            typeof analytic['userAgent'] === 'string' ? analytic['userAgent'] : ''
           const eventData =
-            typeof analytic['eventData'] === 'object'
-              ? analytic['eventData']
-              : {}
+            typeof analytic['eventData'] === 'object' ? analytic['eventData'] : {}
 
           analytics.push({
             timestamp:

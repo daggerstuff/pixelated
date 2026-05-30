@@ -6,7 +6,8 @@
  */
 
 import type { UserId } from '../types/common'
-import type { CompetitorProfile } from '../types/competitive-intelligence'
+import type {
+  CompetitorProfile } from '../types/competitive-intelligence'
 import { BaseService } from './base-service'
 
 export class CompetitiveIntelligenceService extends BaseService {

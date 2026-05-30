@@ -61,10 +61,7 @@ export function isDiffMonth(currentTime: string, preTime?: string): boolean {
   }
   const current = new Date(currentTime)
   const previous = new Date(preTime)
-  return (
-    current.getMonth() !== previous.getMonth() ||
-    current.getFullYear() !== previous.getFullYear()
-  )
+  return current.getMonth() !== previous.getMonth() || current.getFullYear() !== previous.getFullYear()
 }
 
 export function isValidDate(date: unknown): date is Date {

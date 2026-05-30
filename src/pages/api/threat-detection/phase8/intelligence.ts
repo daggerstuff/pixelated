@@ -1,3 +1,5 @@
+
+
 import type { APIRoute } from 'astro'
 
 import { authenticateRequest } from '../../../../lib/auth/index'

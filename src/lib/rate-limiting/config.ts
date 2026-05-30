@@ -301,8 +301,7 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
   if (process.env['RATE_LIMIT_ATTACK_DETECTION']) {
     config.global = {
       ...config.global,
-      enableAttackDetection:
-        process.env['RATE_LIMIT_ATTACK_DETECTION'] === 'true',
+      enableAttackDetection: process.env['RATE_LIMIT_ATTACK_DETECTION'] === 'true',
     }
   }
 

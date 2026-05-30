@@ -1,5 +1,6 @@
 import indexedDBRequestQueue from './indexedDBRequestQueue'
 
+
 /**
  * Sync Manager with exponential backoff for offline-first synchronization.
  * Manages syncing queued requests when online with retry logic and exponential backoff.

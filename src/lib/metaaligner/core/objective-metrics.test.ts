@@ -152,8 +152,7 @@ describe('ObjectiveMetricsEngine', () => {
   describe('calculateObjectiveMetrics', () => {
     test('should calculate basic objective metrics correctly', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -175,8 +174,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should calculate criteria breakdown correctly', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -199,8 +197,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should calculate trend information', () => {
       const objective = mockObjectives[0] // correctness
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
@@ -344,8 +341,7 @@ describe('ObjectiveMetricsEngine', () => {
       engine.setBaseline('correctness', 0.6)
 
       const objective = mockObjectives[0]
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,
@@ -408,8 +404,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const correctnessObjective = mockObjectives[0] // correctness
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         correctnessObjective,
         evaluationResult,
@@ -439,8 +434,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const objective = mockObjectives[0]
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,
@@ -470,8 +464,7 @@ describe('ObjectiveMetricsEngine', () => {
       }
 
       const objective = mockObjectives[0]
-      const evaluationResult =
-        mockEvaluationResult.objectiveResults['correctness']
+      const evaluationResult = mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         objective,
         evaluationResult,

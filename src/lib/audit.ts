@@ -49,20 +49,14 @@ const isAuditLogEntry = (value: unknown): value is AuditLogEntry => {
     typeof value['resource'] === 'string' &&
     isAuditEventType(value['eventType']) &&
     isAuditEventStatus(value['status']) &&
-    (value['userRole'] === undefined ||
-      typeof value['userRole'] === 'string') &&
-    (value['resourceId'] === undefined ||
-      typeof value['resourceId'] === 'string') &&
-    (value['ipAddress'] === undefined ||
-      typeof value['ipAddress'] === 'string') &&
-    (value['userAgent'] === undefined ||
-      typeof value['userAgent'] === 'string') &&
-    (value['sessionId'] === undefined ||
-      typeof value['sessionId'] === 'string') &&
+    (value['userRole'] === undefined || typeof value['userRole'] === 'string') &&
+    (value['resourceId'] === undefined || typeof value['resourceId'] === 'string') &&
+    (value['ipAddress'] === undefined || typeof value['ipAddress'] === 'string') &&
+    (value['userAgent'] === undefined || typeof value['userAgent'] === 'string') &&
+    (value['sessionId'] === undefined || typeof value['sessionId'] === 'string') &&
     (value['organizationId'] === undefined ||
       typeof value['organizationId'] === 'string') &&
-    (value['patientId'] === undefined ||
-      typeof value['patientId'] === 'string') &&
+    (value['patientId'] === undefined || typeof value['patientId'] === 'string') &&
     (value['notes'] === undefined || typeof value['notes'] === 'string')
   )
 }

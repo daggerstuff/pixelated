@@ -6,7 +6,8 @@
  */
 
 import type { UserId } from '../types/common'
-import type { User } from '../types/user-management'
+import type {
+  User } from '../types/user-management'
 import { BaseService } from './base-service'
 
 export class UserManagementService extends BaseService {

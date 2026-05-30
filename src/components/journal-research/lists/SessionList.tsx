@@ -1,12 +1,12 @@
 import { format } from 'date-fns'
 import { useState, useMemo } from 'react'
 
-import { Table } from '@/components/ui/table'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
 } from '@/components/ui/table-types'
+import { Table } from '@/components/ui/table'
 import type {
   Session,
   SessionList as SessionListType,

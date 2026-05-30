@@ -689,8 +689,7 @@ export async function authenticateRequest(
 
     // Check scopes if required
     if (requiredScopes.length > 0) {
-      const permissions =
-        (validation.payload?.['permissions'] as string[]) || []
+      const permissions = (validation.payload?.['permissions'] as string[]) || []
       const hasAllScopes = requiredScopes.every((scope) =>
         permissions.includes(scope),
       )

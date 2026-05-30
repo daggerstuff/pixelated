@@ -298,9 +298,7 @@ export class ThreatHuntingSystemCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(
-        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
-      )
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for threat hunting')
     } catch (error: unknown) {
@@ -312,8 +310,7 @@ export class ThreatHuntingSystemCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env['MONGODB_URI'] ??
-          'mongodb://localhost:27017/threat_hunting',
+        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_hunting',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_hunting')
@@ -2024,9 +2021,7 @@ export class ThreatHuntingSystemCore
           if (this.toStringValue(sig.data['sourceIp']) === behavioralSourceIp) {
             return true
           }
-          return (
-            this.toStringValue(sig.data['processId']) === behavioralProcessId
-          )
+          return this.toStringValue(sig.data['processId']) === behavioralProcessId
         })
 
         if (relatedSignatures.length > 0) {

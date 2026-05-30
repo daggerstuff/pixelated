@@ -3,6 +3,7 @@
  * Implements bulk user import/export capabilities for administrators
  */
 
+
 import { ManagementClient } from 'auth0'
 import { parse } from 'csv-parse'
 import { createObjectCsvWriter } from 'csv-writer'
@@ -162,8 +163,8 @@ export class Auth0BulkImportExportService {
       const batchSize = 50
       for (let i = 0; i < users.length; i += batchSize) {
         const batch = users.slice(i, i + batchSize)
-        // Process batch
-        for (let j = 0; j < batch.length; j++) {
+      // Process batch
+      for (let j = 0; j < batch.length; j++) {
           const user = batch[j]!
           const rowIndex = i + j + 1
 

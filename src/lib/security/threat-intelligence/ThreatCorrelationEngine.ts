@@ -1706,8 +1706,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       if (query.startDate || query.endDate) {
         filter['timestamp'] = {}
         if (query.startDate)
-          (filter['timestamp'] as Record<string, Date>)['$gte'] =
-            query.startDate
+          (filter['timestamp'] as Record<string, Date>)['$gte'] = query.startDate
         if (query.endDate)
           (filter['timestamp'] as Record<string, Date>)['$lte'] = query.endDate
       }

@@ -775,8 +775,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       // Step 2: Global network processing
       const globalNetwork = this.components.get('global')
       if (globalNetwork) {
-        pipelineResults['global'] =
-          await globalNetwork.processThreat(threatData)
+        pipelineResults['global'] = await globalNetwork.processThreat(threatData)
       }
 
       // Step 3: Correlation analysis

@@ -111,9 +111,7 @@ export class ThreatInvestigationManager extends EventEmitter {
 
         case 'query_threat_intel':
           if (this.aiService) {
-            const intel = await this.aiService.getThreatIntel(
-              params['indicator'],
-            )
+            const intel = await this.aiService.getThreatIntel(params['indicator'])
             stepFindings = intel ? [intel] : []
           }
           break

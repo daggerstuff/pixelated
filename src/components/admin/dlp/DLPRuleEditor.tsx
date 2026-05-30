@@ -77,8 +77,7 @@ const isEditorRule = (detail: unknown): detail is EditorRule => {
     (detail['description'] === undefined ||
       typeof detail['description'] === 'string') &&
     (detail['action'] === undefined || isDLPAction(detail['action'])) &&
-    (detail['isActive'] === undefined ||
-      typeof detail['isActive'] === 'boolean')
+    (detail['isActive'] === undefined || typeof detail['isActive'] === 'boolean')
   )
 }
 

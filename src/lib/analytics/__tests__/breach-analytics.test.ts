@@ -115,6 +115,7 @@ describe('breachAnalytics', () => {
     },
   ]
 
+
   beforeEach(() => {
     vi.clearAllMocks()
 

@@ -358,8 +358,7 @@ export class AdminService {
           string
         >
         authHeader =
-          localsHeaders['authorization'] ??
-          localsHeaders['Authorization'] ??
+          (localsHeaders['authorization'] ?? localsHeaders['Authorization']) ??
           null
       }
 

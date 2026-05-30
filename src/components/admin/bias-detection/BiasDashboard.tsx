@@ -93,13 +93,17 @@ import {
   Radar,
 } from '@/components/ui/LazyChart'
 import { Progress } from '@/components/ui/progress'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
 import type {
   BiasDashboardData,
   BiasAnalysisResult,
   DashboardRecommendation,
-  BiasAlert,
-} from '@/lib/ai/bias-detection'
+  BiasAlert } from '@/lib/ai/bias-detection'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { cn, isObject } from '@/lib/utils'
 

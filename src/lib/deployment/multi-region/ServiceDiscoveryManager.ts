@@ -101,6 +101,7 @@ type ServiceDiscoveryConfig = {
   cleanupInterval?: number
 }
 
+
 const DEFAULT_SERVICE_DISCOVERY_CONFIG: ServiceDiscoveryConfig = {
   heartbeatInterval: 30000,
   cleanupInterval: 300000,
@@ -110,9 +111,7 @@ function isServiceLoadBalancerConfig(
   value: unknown,
 ): value is ServiceLoadBalancerConfig {
   return (
-    isRecord(value) &&
-    typeof value['name'] === 'string' &&
-    value['name'].length > 0
+    isRecord(value) && typeof value['name'] === 'string' && value['name'].length > 0
   )
 }
 
@@ -197,9 +196,7 @@ function toDiscoveredServiceInstance(
     return null
   }
 
-  const metadataCandidate = isRecord(payload['metadata'])
-    ? payload['metadata']
-    : {}
+  const metadataCandidate = isRecord(payload['metadata']) ? payload['metadata'] : {}
   const statusCandidate = asString(payload['status'])
   const status =
     statusCandidate === 'healthy' || statusCandidate === 'unhealthy'
@@ -251,19 +248,13 @@ function isConsulServiceDiscoveryEntry(
 }
 
 function isConsulClient(value: unknown): value is ConsulClient {
-  if (
-    !isRecord(value) ||
-    !isRecord(value['agent']) ||
-    !isRecord(value['health'])
-  ) {
+  if (!isRecord(value) || !isRecord(value['agent']) || !isRecord(value['health'])) {
     return false
   }
 
   const agent = value['agent']
   const health = value['health']
-  const consulService = isRecord(agent['service'])
-    ? agent['service']
-    : undefined
+  const consulService = isRecord(agent['service']) ? agent['service'] : undefined
 
   return (
     typeof agent['self'] === 'function' &&
@@ -1821,6 +1812,7 @@ interface DiscoveryOptions {
   watchInterval?: number
   clientRegion?: string
 }
+
 
 interface ServiceCacheEntry {
   instances: ServiceInstance[]

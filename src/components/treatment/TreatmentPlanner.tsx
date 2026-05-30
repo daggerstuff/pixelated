@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, FC } from 'react'
 
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 import RecommendationDisplay from '../ai/RecommendationDisplay'
@@ -126,17 +126,11 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
         </button>
       </form>
 
-      <div
-        className="mb-6 flex gap-2"
-        role="radiogroup"
-        aria-label="Filter recommendations by priority"
-      >
+      <div className="mb-6 flex gap-2">
         <button
           type="button"
           className={`filter-btn${filter === 'all' ? ' active' : ''}`}
           onClick={() => setFilter('all')}
-          role="radio"
-          aria-checked={filter === 'all'}
         >
           All
         </button>
@@ -144,8 +138,6 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'high' ? ' active' : ''}`}
           onClick={() => setFilter('high')}
-          role="radio"
-          aria-checked={filter === 'high'}
         >
           High Priority
         </button>
@@ -153,8 +145,6 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'medium' ? ' active' : ''}`}
           onClick={() => setFilter('medium')}
-          role="radio"
-          aria-checked={filter === 'medium'}
         >
           Medium
         </button>
@@ -162,8 +152,6 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
           type="button"
           className={`filter-btn${filter === 'low' ? ' active' : ''}`}
           onClick={() => setFilter('low')}
-          role="radio"
-          aria-checked={filter === 'low'}
         >
           Low
         </button>

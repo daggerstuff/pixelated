@@ -449,8 +449,7 @@ export class ModelServingServer extends EventEmitter {
 
       // Scalar outputs: simple mean
       return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
-    }
-    const firstOutput = predictions[0]!.output
+    }      const firstOutput = predictions[0]!.output
     if (Array.isArray(firstOutput)) {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]

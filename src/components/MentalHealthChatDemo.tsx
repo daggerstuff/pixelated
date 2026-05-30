@@ -11,12 +11,18 @@ import {
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react'
 
 import { Card, CardContent } from '@/components/ui/card/index'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
 import { ClinicalKnowledgeBase } from '@/lib/ai/mental-llama/ClinicalKnowledgeBase'
 import type {
   MentalHealthAnalysisResult,
   RoutingContext,
 } from '@/lib/ai/mental-llama/types/mentalLLaMATypes'
+
 import {
   convertToMindMirrorAnalysis,
   createInterventionMessage,
@@ -40,6 +46,7 @@ interface MentalHealthService {
   clinicalKnowledge: ClinicalKnowledgeBase
   isInitialized: boolean
 }
+
 
 // Extended analysis result that might include additional fields
 interface ExtendedMentalHealthAnalysisResult extends MentalHealthAnalysisResult {

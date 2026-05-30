@@ -697,9 +697,7 @@ function calculateConversationQuality(request: ConversationRequest): void {
   // Simulate quality calculation based on knowledge integration
   const baseScore = 80
   const kb = request.knowledgeBase as { dsm5Criteria?: unknown[] }
-  const cp = request['conversationParameters'] as {
-    targetTechniques?: unknown[]
-  }
+  const cp = request['conversationParameters'] as { targetTechniques?: unknown[] }
   const knowledgeIntegration = Math.min(
     95,
     baseScore + (kb.dsm5Criteria?.length ?? 0) * 2,

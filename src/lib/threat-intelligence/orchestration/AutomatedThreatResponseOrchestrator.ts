@@ -137,9 +137,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(
-        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
-      )
+      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
       await this.redis.ping()
       logger.info('Redis connection established for response orchestrator')
     } catch (error: unknown) {
@@ -151,8 +149,7 @@ export class AutomatedThreatResponseOrchestratorCore
   private async initializeMongoDB(): Promise<void> {
     try {
       this.mongoClient = new MongoClient(
-        process.env['MONGODB_URI'] ??
-          'mongodb://localhost:27017/threat_response',
+        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_response',
       )
       await this.mongoClient.connect()
       this.db = this.mongoClient.db('threat_response')
@@ -1531,8 +1528,7 @@ export class AutomatedThreatResponseOrchestratorCore
       let totalTime = 0
       for (const response of completedResponses) {
         const timeDiff =
-          response['completedTime'].getTime() -
-          response['executionTime'].getTime()
+          response['completedTime'].getTime() - response['executionTime'].getTime()
         totalTime += timeDiff
       }
 

@@ -220,9 +220,7 @@ export class RateLimitAnalyticsService {
       const today = now.toISOString().slice(0, 10)
 
       // Get today's data across all rules
-      const ruleKeys = await redis?.['keys'](
-        `${this.analyticsPrefix}*:${today}`,
-      )
+      const ruleKeys = await redis?.['keys'](`${this.analyticsPrefix}*:${today}`)
       let totalRequests = 0
       let blockedRequests = 0
       let attackDetections = 0

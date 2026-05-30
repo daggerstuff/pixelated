@@ -75,8 +75,7 @@ export function createBusinessIntelligenceRoutes(db: Pool) {
       userId,
       revenue: parseNumber(value['revenue']) ?? 0,
       growthRate: parseNumber(value['growthRate']) ?? 0,
-      customerAcquisitionCost:
-        parseNumber(value['customerAcquisitionCost']) ?? 0,
+      customerAcquisitionCost: parseNumber(value['customerAcquisitionCost']) ?? 0,
       customerLifetimeValue: parseNumber(value['customerLifetimeValue']) ?? 0,
       churnRate: parseNumber(value['churnRate']) ?? 0,
       netPromoterScore: parseNumber(value['netPromoterScore']) ?? 0,

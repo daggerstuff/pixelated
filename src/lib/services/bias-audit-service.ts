@@ -620,7 +620,7 @@ export class BiasAuditService {
         Math.floor(result.overallBiasScore * buckets),
         buckets - 1,
       )
-      counts[bucketIndex] += 1
+		counts[bucketIndex] += 1
     }
 
     for (let i = 0; i < buckets; i++) {
@@ -629,8 +629,7 @@ export class BiasAuditService {
       distribution.push({
         range: `${rangeStart}-${rangeEnd}`,
         count: counts[i],
-        percentage:
-          results.length > 0 ? (counts?.[i] / results.length) * 100 : 0,
+        percentage: results.length > 0 ? (counts?.[i] / results.length) * 100 : 0,
       })
     }
 

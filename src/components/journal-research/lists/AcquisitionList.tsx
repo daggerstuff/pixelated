@@ -3,12 +3,12 @@ import { CheckCircle2, Loader2, Play } from 'lucide-react'
 import { useState, useMemo } from 'react'
 
 import { Button } from '@/components/ui/button/button'
-import { Table } from '@/components/ui/table'
 import type {
   TableColumn,
   TableState,
   TableDataSource,
 } from '@/components/ui/table-types'
+import { Table } from '@/components/ui/table'
 import type {
   Acquisition,
   AcquisitionList as AcquisitionListType,

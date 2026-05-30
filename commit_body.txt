@@ -1,4 +1,4 @@
-💡 What: Add keyboard focus indicators to interactive buttons in AnalyticsCharts.
-🎯 Why: To ensure keyboard users can clearly identify which element has focus.
-📸 Before/After: Interactive buttons previously lacked visual focus states. They now have visible focus rings.
-♿ Accessibility: Added `focus-visible` ring classes and `type="button"` to ensure robust keyboard accessibility.
+💡 What: Memoize date formatting for alert timestamps and patient last contact/assessments.
+🎯 Why: Creating new `Date` objects inside `.map()` arrays causes O(N) re-renders.
+📊 Impact: Prevents expensive allocations on every render for large arrays.
+🔬 Measurement: Profiler.

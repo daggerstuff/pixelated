@@ -322,9 +322,7 @@ describe('notificationService', () => {
         error: null,
       }
 
-      vi?.mocked(redis['hget']).mockResolvedValueOnce(
-        JSON.stringify(notification),
-      )
+      vi?.mocked(redis['hget']).mockResolvedValueOnce(JSON.stringify(notification))
 
       await notificationService.markAsRead('test-user', 'test-id')
 
