@@ -172,9 +172,12 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
   private async initializeServices(): Promise<void> {
     try {
-      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
+      this.redis = new Redis(
+        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
+      )
       this.mongoClient = new MongoClient(
-        process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_detection',
+        process.env['MONGODB_URI'] ??
+          'mongodb://localhost:27017/threat_detection',
       )
 
       await this.mongoClient.connect()

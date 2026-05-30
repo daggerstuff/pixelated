@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'vitest'
-import { DatasetPreparator } from './dataset-preparation'
-import type { MemoryBlock } from '../../../types/memory'
 
-function makeMemory(overrides: Partial<Record<string, unknown>> = {}): MemoryBlock {
+import type { MemoryBlock } from '../../../types/memory'
+import { DatasetPreparator } from './dataset-preparation'
+
+function makeMemory(
+  overrides: Partial<Record<string, unknown>> = {},
+): MemoryBlock {
   return {
     id: (overrides['id'] as string) ?? 'mem_001',
     tenantId: (overrides['tenantId'] as string) ?? 't1',
@@ -118,27 +121,21 @@ describe('DatasetPreparator', () => {
   describe('PII detection', () => {
     test('detects email addresses', () => {
       const preparator = new DatasetPreparator()
-      const memories = [
-        makeMemory({ content: 'my email is user@example.com' }),
-      ]
+      const memories = [makeMemory({ content: 'my email is user@example.com' })]
       const [, stats] = preparator.prepare(memories)
       expect(stats.piiLeakDetected).toBe(true)
     })
 
     test('detects phone numbers', () => {
       const preparator = new DatasetPreparator()
-      const memories = [
-        makeMemory({ content: 'call me at 555-123-4567' }),
-      ]
+      const memories = [makeMemory({ content: 'call me at 555-123-4567' })]
       const [, stats] = preparator.prepare(memories)
       expect(stats.piiLeakDetected).toBe(true)
     })
 
     test('detects SSN patterns', () => {
       const preparator = new DatasetPreparator()
-      const memories = [
-        makeMemory({ content: 'my SSN is 123-45-6789' }),
-      ]
+      const memories = [makeMemory({ content: 'my SSN is 123-45-6789' })]
       const [, stats] = preparator.prepare(memories)
       expect(stats.piiLeakDetected).toBe(true)
     })
@@ -208,11 +205,7 @@ describe('DatasetPreparator', () => {
         }),
       ]
       const [split] = preparator.prepare(memories)
-      const allExamples = [
-        ...split.train,
-        ...split.val,
-        ...split.test,
-      ]
+      const allExamples = [...split.train, ...split.val, ...split.test]
       expect(allExamples.length).toBeGreaterThanOrEqual(3)
     })
   })

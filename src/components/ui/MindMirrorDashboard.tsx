@@ -9,12 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card/index'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { MindMirrorAnalysis } from '@/lib/mental-health/types'
 
 interface MindMirrorDashboardProps {
