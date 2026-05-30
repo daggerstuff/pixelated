@@ -14,7 +14,8 @@ export const securityHeaders: MiddlewareHandler = async (
 
   const nonce = context.locals.cspNonce
   const isRelaxedScriptEnv =
-    process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test'
+    process.env['NODE_ENV'] === 'development' ||
+    process.env['NODE_ENV'] === 'test'
   const scriptSourceList = [
     "'self'",
     "'unsafe-inline'",

@@ -123,7 +123,8 @@ export class AdvancedResponseOrchestrator
   private async initializeServices(): Promise<void> {
     this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
     this.mongoClient = new MongoClient(
-      process.env['MONGODB_URI'] ?? 'mongodb://localhost:27017/threat_detection',
+      process.env['MONGODB_URI'] ??
+        'mongodb://localhost:27017/threat_detection',
     )
 
     this.responseExecutor = new ConcurrentResponseExecutor(this.config)
@@ -1064,7 +1065,10 @@ class MLDecisionEngine extends DecisionEngine {
     prediction.dispose()
 
     return {
-      riskScore: (result[0] ?? 0) * 0.3 + (result[1] ?? 0) * 0.6 + (result[2] ?? 0) * 0.9, // Weighted average
+      riskScore:
+        (result[0] ?? 0) * 0.3 +
+        (result[1] ?? 0) * 0.6 +
+        (result[2] ?? 0) * 0.9, // Weighted average
       confidence: Math.max(...result),
       riskLevel: result.indexOf(Math.max(...result)),
     }

@@ -17,7 +17,8 @@ export interface AuthRequestConfig {
 
 const readAudience = (): string | undefined => {
   return (
-    import.meta.env['PUBLIC_AUTH0_AUDIENCE'] ?? import.meta.env['VITE_AUTH0_AUDIENCE']
+    import.meta.env['PUBLIC_AUTH0_AUDIENCE'] ??
+    import.meta.env['VITE_AUTH0_AUDIENCE']
   )
 }
 

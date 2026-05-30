@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, FC } from 'react'
 
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 import RecommendationDisplay from '../ai/RecommendationDisplay'
