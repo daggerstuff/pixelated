@@ -22,12 +22,7 @@ import {
   CardTitle,
 } from '@/components/ui/card/index'
 import { Progress } from '@/components/ui/progress'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { CrisisPrediction } from '@/lib/ai/services/PredictiveCrisisModelingService'
 
 export interface PatientRiskData {
@@ -164,7 +159,9 @@ export const CrisisMonitoringDashboard: React.FC<
   }, [memoizedAlerts])
 
   const criticalUnacknowledgedAlerts = useMemo(() => {
-    return memoizedAlerts.filter((a) => a.severity === 'critical' && !a.acknowledged)
+    return memoizedAlerts.filter(
+      (a) => a.severity === 'critical' && !a.acknowledged,
+    )
   }, [memoizedAlerts])
 
   // Performance optimization: Compute formatted date strings once to avoid expensive O(N) Date creations during render
@@ -172,7 +169,9 @@ export const CrisisMonitoringDashboard: React.FC<
     return patients.map((patient) => ({
       ...patient,
       lastContactString: new Date(patient.lastContact).toLocaleDateString(),
-      lastAssessmentString: new Date(patient.lastAssessment).toLocaleDateString(),
+      lastAssessmentString: new Date(
+        patient.lastAssessment,
+      ).toLocaleDateString(),
     }))
   }, [patients])
 
@@ -206,7 +205,10 @@ export const CrisisMonitoringDashboard: React.FC<
 
   // Get severity color for alerts
   const getSeverityColor = (severity: string): string => {
-    return SEVERITY_COLORS[severity as keyof typeof SEVERITY_COLORS] || SEVERITY_COLORS.low
+    return (
+      SEVERITY_COLORS[severity as keyof typeof SEVERITY_COLORS] ||
+      SEVERITY_COLORS.low
+    )
   }
 
   // Handle alert acknowledgment
@@ -400,8 +402,7 @@ export const CrisisMonitoringDashboard: React.FC<
                       <div>
                         <div className="font-medium">{patient.name}</div>
                         <div className="text-gray-500 text-sm">
-                          Last contact:{' '}
-                          {patient.lastContactString}
+                          Last contact: {patient.lastContactString}
                         </div>
                       </div>
                     </div>
@@ -569,16 +570,12 @@ export const CrisisMonitoringDashboard: React.FC<
 
                       <div className="text-gray-500 text-right text-sm">
                         <div>Last assessment:</div>
-                        <div>
-                          {patient.lastAssessmentString}
-                        </div>
+                        <div>{patient.lastAssessmentString}</div>
                       </div>
 
                       <div className="text-gray-500 text-right text-sm">
                         <div>Last contact:</div>
-                        <div>
-                          {patient.lastContactString}
-                        </div>
+                        <div>{patient.lastContactString}</div>
                       </div>
 
                       {patient.escalationStatus && (

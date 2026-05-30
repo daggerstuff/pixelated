@@ -81,7 +81,9 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null
 
 const hasErrorResponseShape = (value: unknown): value is ErrorResponse => {
-  return isObject(value) && 'error' in value && typeof value['error'] === 'string'
+  return (
+    isObject(value) && 'error' in value && typeof value['error'] === 'string'
+  )
 }
 
 const hasProgressMetricsShape = (
