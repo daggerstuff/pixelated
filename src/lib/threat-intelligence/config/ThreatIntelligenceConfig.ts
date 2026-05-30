@@ -1148,7 +1148,9 @@ export class ThreatIntelligenceConfigManager {
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis(process.env['REDIS_URL'] ?? 'redis://localhost:6379')
+      this.redis = new Redis(
+        process.env['REDIS_URL'] ?? 'redis://localhost:6379',
+      )
       await this.redis.ping()
       logger.info('Redis connection established for configuration manager')
     } catch (error: unknown) {

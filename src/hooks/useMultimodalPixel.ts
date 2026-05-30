@@ -222,7 +222,8 @@ export function useMultimodalPixel(options: UseMultimodalPixelOptions = {}) {
             if (type === 'status') {
               setState((prev) => ({
                 ...prev,
-                streamStatus: (payload['status'] as string) || prev.streamStatus,
+                streamStatus:
+                  (payload['status'] as string) || prev.streamStatus,
               }))
             } else if (type === 'result') {
               const data = payload['data'] as MultimodalInferenceResponse

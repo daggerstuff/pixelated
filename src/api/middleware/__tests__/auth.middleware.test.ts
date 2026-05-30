@@ -12,8 +12,9 @@ vi.mock('../../../lib/auth/auth0-middleware', () => ({
   authenticateRequest: mockAuthenticateRequest,
 }))
 
-import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 import type { Response } from 'express'
+
+import { authMiddleware, requirePermissions, requireRoles } from '../auth'
 import {
   createMockAuthRequest,
   createMockAuthResponse,

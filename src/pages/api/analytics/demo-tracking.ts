@@ -73,7 +73,8 @@ export const POST = async ({ request }) => {
 
     // Log which analytics integrations will be attempted
     const hasGA = Boolean(
-      import.meta.env['PUBLIC_GA_MEASUREMENT_ID'] && import.meta.env['GA_API_SECRET'],
+      import.meta.env['PUBLIC_GA_MEASUREMENT_ID'] &&
+      import.meta.env['GA_API_SECRET'],
     )
     const hasMixpanel = Boolean(import.meta.env['MIXPANEL_TOKEN'])
     const hasCustom = Boolean(

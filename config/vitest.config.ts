@@ -262,9 +262,7 @@ export default defineConfig({
                   'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
                   'src/tests/auth.test.ts',
                 ],
-          exclude: [
-            ...cpuBoundNodeTestExcludes,
-          ],
+          exclude: [...cpuBoundNodeTestExcludes],
           environment: 'node',
           isolate: true,
         },

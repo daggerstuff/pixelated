@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { getRecommendedScenario } from './scenarios'
+
 import { ScenarioDifficulty } from '../types'
+import { getRecommendedScenario } from './scenarios'
 
 describe('scenarios utilities', () => {
   describe('getRecommendedScenario', () => {
