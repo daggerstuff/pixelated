@@ -1,5 +1,5 @@
 {
-  "buildCommand": "DEPLOY_TARGET=vercel astro build",
+  "buildCommand": "DEPLOY_TARGET=vercel pnpm exec astro build",
   "outputDirectory": ".vercel/output",
   "installCommand": "pnpm install --frozen-lockfile",
   "framework": "astro",

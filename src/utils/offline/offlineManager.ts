@@ -104,7 +104,7 @@ export function createOfflineFetch(config: OfflineManagerConfig = {}) {
 class OfflineManager {
   private readonly config: Required<OfflineManagerConfig>
   private syncInterval: NodeJS.Timeout | null = null
-  private networkState: OfflineState | null = null
+  private readonly networkState: OfflineState | null = null
   private readonly listeners: Map<string, Set<(payload?: unknown) => void>> =
     new Map()
 

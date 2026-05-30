@@ -506,7 +506,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
                   ['campaign'] as string) || 'unknown',
               family:
                 ((data['attribution'] as Record<string, unknown>)
-                  ['family'] as string) || 'unknown',
+                  ['family'] as string) ?? 'unknown',
             }
           : undefined,
       }
@@ -871,7 +871,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         .toArray()
 
       const sources = Array.from(
-        new Set(intelligence.map((i) => (i as any).feedName as string)),
+        new Set(intelligence.map((i: Record<string, unknown>) => i.feedName as string)),
       )
 
       return {
@@ -1132,10 +1132,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
   ): Promise<
     Record<string, { total: number; active: number; lastUpdate: Date }>
   > {
-    const feedStats: Record<
-      string,
-      { total: number; active: number; lastUpdate: Date }
-    > = {}
+    const feedStats: Record<string, { total: number; active: number; lastUpdate: Date }> = {}
 
     for (const feed of this.config.feeds) {
       if (!feed.enabled) {
