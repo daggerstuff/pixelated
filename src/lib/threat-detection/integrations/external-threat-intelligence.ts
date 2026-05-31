@@ -499,14 +499,11 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
         attribution: data['attribution']
           ? {
               actor:
-                ((data['attribution'] as Record<string, unknown>)
-                  ['actor'] as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)['actor'] as string) || 'unknown',
               campaign:
-                ((data['attribution'] as Record<string, unknown>)
-                  ['campaign'] as string) || 'unknown',
+                ((data['attribution'] as Record<string, unknown>)['campaign'] as string) || 'unknown',
               family:
-                ((data['attribution'] as Record<string, unknown>)
-                  ['family'] as string) ?? 'unknown',
+                ((data['attribution'] as Record<string, unknown>)['family'] as string) ?? 'unknown',
             }
           : undefined,
       }

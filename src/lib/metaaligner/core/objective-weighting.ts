@@ -239,7 +239,7 @@ export class ObjectiveWeightingEngine {
           // For example, map 0-1 strength to a 1.0-2.0 multiplier range, or use it to blend.
           // Simple example: treat strength as a direct boost factor (1 + strength).
           // This interpretation may need refinement based on desired behavior.
-          weights?.[pref.objectiveId] *= 1 + pref.preferenceStrength
+          weights[pref.objectiveId] *= 1 + pref.preferenceStrength
         }
       }
     }
@@ -312,7 +312,7 @@ export class ObjectiveWeightingEngine {
 
         // Increase weight for consistently underperforming objectives
         if (avgScore < 0.7) {
-          weights?.[objective.id] *= 1.2
+          weights[objective.id] *= 1.2
         }
       }
     }

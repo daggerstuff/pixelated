@@ -18,8 +18,8 @@ import type {
   QuarantineStatus,
   DatasetForAudit,
   DatasetAuditResult,
-  BiasScoreDistribution,
-  DemographicBiasBreakdown,
+  AuditSummary,
+  PaginatedDatasetsForAudit,
 } from '@/lib/api/journal-research/bias-audit-types'
 import { useBiasAuditDashboard } from '@/lib/hooks/use-bias-audit'
 import { cn } from '@/lib/utils'
@@ -69,7 +69,279 @@ function StatusBadge({ status }: { status: QuarantineStatus }) {
   )
 }
 
+/** Summary card showing audit statistics */
+function SummaryCard({
+  summary,
+  isLoading,
+}: {
+  summary: AuditSummary | undefined
+  isLoading: boolean
+}) {
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Audit Summary</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="bg-muted h-4 w-20 animate-pulse rounded" />
+                <div className="bg-muted h-8 w-16 animate-pulse rounded" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  const stats = [
+    { label: 'Total Datasets', value: summary?.totalDatasets ?? 0 },
+    { label: 'Pending Review', value: summary?.pendingReview ?? 0 },
+    { label: 'Under Audit', value: summary?.underAudit ?? 0 },
+    { label: 'Approved', value: summary?.approved ?? 0 },
+    { label: 'Quarantined', value: summary?.quarantined ?? 0 },
+    { label: 'Avg Bias Score', value: summary?.averageBiasScore?.toFixed(3) ?? '—' },
+  ]
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Audit Summary</CardTitle>
+        {summary?.lastAuditDate && (
+          <CardDescription>
+            Last audit: {new Date(summary.lastAuditDate).toLocaleDateString()}
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+          {stats.map((stat) => (
+            <div key={stat.label} className="space-y-1">
+              <p className="text-muted-foreground text-xs font-medium">
+                {stat.label}
+              </p>
+              <p className="text-2xl font-bold">{stat.value}</p>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+/** Dataset list panel */
+function DatasetList({
+  datasets,
+  selectedId,
+  onSelect,
+  isLoading,
+}: {
+  datasets: PaginatedDatasetsForAudit | undefined
+  selectedId: string | null
+  onSelect: (id: string) => void
+  isLoading: boolean
+}) {
+  if (isLoading) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="bg-muted h-12 animate-pulse rounded" />
+        ))}
+      </div>
+    )
+  }
+
+  if (!datasets || datasets.items.length === 0) {
+    return (
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        No datasets found
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-1">
+      {datasets.items.map((dataset) => (
+        <button
+          key={dataset.datasetId}
+          onClick={() => onSelect(dataset.datasetId)}
+          className={cn(
+            'flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors',
+            selectedId === dataset.datasetId
+              ? 'bg-primary/10 border-primary/30 border'
+              : 'hover:bg-muted border border-transparent',
+          )}
+        >
+          <div className="min-w-0 flex-1 truncate">
+            <p className="font-medium truncate">{dataset.name}</p>
+            <p className="text-muted-foreground text-xs">
+              {dataset.recordCount.toLocaleString()} records ·{' '}
+              {dataset.format}
+            </p>
+          </div>
+          <StatusBadge status={dataset.quarantineStatus} />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** Audit detail panel */
+function AuditDetailPanel({
+  audit,
+  dataset,
+  isLoading,
+  onAction,
+  actionLoading,
+}: {
+  audit: DatasetAuditResult | null | undefined
+  dataset: DatasetForAudit | null | undefined
+  isLoading: boolean
+  onAction: (action: string, reason?: string) => Promise<void>
+  actionLoading: boolean
+}) {
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="bg-muted h-8 w-48 animate-pulse rounded" />
+        <div className="bg-muted h-24 animate-pulse rounded" />
+        <div className="bg-muted h-24 animate-pulse rounded" />
+      </div>
+    )
+  }
+
+  if (!dataset) {
+    return (
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        Select a dataset to view audit details
+      </p>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Dataset info */}
+      <div>
+        <h3 className="text-lg font-semibold">{dataset.name}</h3>
+        <div className="text-muted-foreground mt-1 grid grid-cols-2 gap-2 text-sm">
+          <div>Format: <span className="font-medium">{dataset.format}</span></div>
+          <div>Records: <span className="font-medium">{dataset.recordCount.toLocaleString()}</span></div>
+          <div>Size: <span className="font-medium">{(dataset.fileSize / 1024 / 1024).toFixed(1)} MB</span></div>
+          <div>Uploaded: <span className="font-medium">{new Date(dataset.uploadedAt).toLocaleDateString()}</span></div>
+        </div>
+      </div>
+
+      {/* Audit results */}
+      {audit ? (
+        <>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Overall Bias Score</span>
+              <span
+                className={cn(
+                  'text-lg font-bold',
+                  audit.overallBiasScore < 0.3
+                    ? 'text-green-500'
+                    : audit.overallBiasScore < 0.6
+                      ? 'text-yellow-500'
+                      : 'text-red-500',
+                )}
+              >
+                {(audit.overallBiasScore * 100).toFixed(1)}%
+              </span>
+            </div>
+            <div className="bg-muted h-2 overflow-hidden rounded-full">
+              <div
+                className={cn(
+                  'h-full transition-all',
+                  audit.overallBiasScore < 0.3
+                    ? 'bg-green-500'
+                    : audit.overallBiasScore < 0.6
+                      ? 'bg-yellow-500'
+                      : 'bg-red-500',
+                )}
+                style={{ width: `${audit.overallBiasScore * 100}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Metrics */}
+          {audit.metrics.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium">Bias Metrics</h4>
+              {audit.metrics.map((metric) => (
+                <div
+                  key={metric.metricName}
+                  className={cn(
+                    'flex items-center justify-between rounded-md px-3 py-2 text-sm',
+                    metric.passed
+                      ? 'bg-green-500/10 text-green-400'
+                      : 'bg-red-500/10 text-red-400',
+                  )}
+                >
+                  <span>{metric.metricName}</span>
+                  <span className="font-medium">
+                    {(metric.score * 100).toFixed(1)}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Recommendations */}
+          {audit.recommendations.length > 0 && (
+            <div className="space-y-1">
+              <h4 className="text-sm font-medium">Recommendations</h4>
+              <ul className="text-muted-foreground list-inside list-disc space-y-1 text-sm">
+                {audit.recommendations.map((rec, i) => (
+                  <li key={i}>{rec}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Actions */}
+          {dataset.quarantineStatus !== 'approved' &&
+            dataset.quarantineStatus !== 'rejected' && (
+              <div className="flex flex-wrap gap-2 pt-2">
+                <button
+                  onClick={() => onAction('approve')}
+                  disabled={actionLoading}
+                  className="bg-green-600 hover:bg-green-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  {actionLoading ? 'Processing...' : 'Approve'}
+                </button>
+                <button
+                  onClick={() => onAction('quarantine')}
+                  disabled={actionLoading}
+                  className="bg-yellow-600 hover:bg-yellow-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  Quarantine
+                </button>
+                <button
+                  onClick={() => onAction('reject')}
+                  disabled={actionLoading}
+                  className="bg-red-600 hover:bg-red-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                >
+                  Reject
+                </button>
+              </div>
+            )}
+        </>
+      ) : (
+        <p className="text-muted-foreground py-4 text-center text-sm">
+          No audit results available for this dataset
+        </p>
+      )}
+    </div>
+  )
+}
+
 const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
+
   className,
 }: BiasAuditDashboardProps) => {
   const {
