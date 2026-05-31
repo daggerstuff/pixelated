@@ -72,6 +72,15 @@ const dashboardTabs: DashboardTab[] = [
   { id: 'compliance', label: 'Compliance', icon: 'compliance' },
 ]
 
+// ⚡ Bolt Performance Optimization: Extracted static tabIcons to module scope to prevent re-creating this object on every render
+const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
+  chart: <ChartBar className="h-5 w-5" />,
+  therapist: <Stethoscope className="h-5 w-5" />,
+  institution: <Building className="h-5 w-5" />,
+  system: <Settings className="h-5 w-5" />,
+  compliance: <Clipboard className="h-5 w-5" />,
+}
+
 function getHighRiskCount(
   riskLevelDistribution: Record<string, number>,
 ): number {
