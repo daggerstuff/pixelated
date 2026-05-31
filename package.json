@@ -170,7 +170,7 @@
     "@ai-sdk/anthropic": "latest",
     "@ai-sdk/mcp": "latest",
     "@ai-sdk/openai": "^3.0.67",
-    "@astrojs/node": "^9.1.0",
+    "@astrojs/node": "^10.0.5",
     "@astrojs/react": "latest",
     "@astrojs/vercel": "latest",
     "@auth0/auth0-react": "latest",
