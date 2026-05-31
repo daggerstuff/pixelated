@@ -1,6 +1,16 @@
 import { describe, it, expect } from 'vitest'
 
-import { deepEqual } from './object'
+import { deepEqual, mergeValues } from './object'
+
+describe('mergeValues', () => {
+  it('deep merges objects handling primitives and nesting', () => {
+    const local = { a: 1, b: { c: 2, d: 3 } }
+    const remote = { b: { c: 9, e: 4 }, f: 5 }
+    expect(mergeValues<any>(local, remote)).toEqual({ a: 1, b: { c: 9, d: 3, e: 4 }, f: 5 })
+    expect(mergeValues(1, 2)).toBe(2)
+    expect(mergeValues('x', 'y')).toBe('y')
+  })
+})
 
 describe('deepEqual', () => {
   it('handles empty inputs', () => {
@@ -16,8 +26,6 @@ describe('deepEqual', () => {
     expect(deepEqual(undefined, null)).toBe(false)
     expect(deepEqual(null, {})).toBe(false)
   })
-<<<<<<< HEAD
-=======
 
   it('handles nested objects and arrays', () => {
     const obj1 = { a: 1, b: { c: [1, 2, 3], d: 'test' } }
@@ -29,5 +37,4 @@ describe('deepEqual', () => {
     expect(deepEqual(obj1, obj3)).toBe(false)
     expect(deepEqual(obj1, obj4)).toBe(false)
   })
->>>>>>> origin/staging
 })
