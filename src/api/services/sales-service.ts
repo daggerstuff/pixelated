@@ -11,6 +11,37 @@ import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 /**
  * Create a new sales opportunity
  */
+export interface ISalesOpportunity {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  owner: string
+  status: string
+  stage: string
+  closeDate: Date
+  amount: number
+  probability: number
+  accountName: string
+  activity: any[]
+  contacts: any[]
+  competitors: any[]
+  permissions: {
+    view: string[]
+    edit: string[]
+    comment: string[]
+  }
+  createdAt: Date
+  updatedAt: Date
+  save(): Promise<ISalesOpportunity>
+}
+
+const getSalesOpportunityModel = (): any =>
+  getMongoConnection().model<ISalesOpportunity>('SalesOpportunity')
+
+/**
+ * Create a new sales opportunity
+ */
 export async function createSalesOpportunity(data: {
   title: string
   description?: string
@@ -21,7 +52,7 @@ export async function createSalesOpportunity(data: {
   stage?: string
   closeDate?: Date
 }) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunityId = uuid()
@@ -78,7 +109,7 @@ export async function getSalesOpportunity(
   opportunityId: string,
   userId: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -105,7 +136,7 @@ export async function updateStage(
   userId: string,
   newStage: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
@@ -164,7 +195,7 @@ export async function updateSalesOpportunity(
     status?: string
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -201,7 +232,7 @@ export async function deleteSalesOpportunity(
   opportunityId: string,
   userId: string,
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const pool = getPostgresPool()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
@@ -238,7 +269,7 @@ export async function addActivity(
     metadata?: any
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -284,7 +315,7 @@ export async function addContact(
     role?: string
   },
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 
@@ -329,7 +360,7 @@ export async function listSalesOpportunities(
     status?: string
   } = {},
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
   const page = options.page ?? 1
   const limit = options.limit ?? 50
 
@@ -362,7 +393,7 @@ export async function listSalesOpportunities(
  * Calculate sales forecast
  */
 export async function calculateForecast(userId: string) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunities = await SalesOpportunityModel.find({
     $or: [{ owner: userId }, { 'permissions.view': userId }],
@@ -398,7 +429,7 @@ export async function shareSalesOpportunity(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const SalesOpportunityModel = getMongoConnection().model('SalesOpportunity')
+  const SalesOpportunityModel = getSalesOpportunityModel()
 
   const opportunity = await SalesOpportunityModel.findById(opportunityId)
 

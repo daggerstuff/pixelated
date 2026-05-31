@@ -122,6 +122,7 @@ export class EnhancedTechniqueClassificationService {
   > = new Map()
   private readonly sessionTracking: Map<string, SessionToSessionTracking> = new Map()
   private metrics: AdvancedClassificationMetrics | null = null
+  private isModelTrained: boolean = false
 
   private constructor() {
     logger.info('EnhancedTechniqueClassificationService initialized')
@@ -472,7 +473,7 @@ export class EnhancedTechniqueClassificationService {
 
   private async applyAdvancedClassification(
     emotion: EmotionAnalysis,
-    _context: any,
+    context: any,
     _emotionalContext: any,
     _historicalData: any,
   ): Promise<{
@@ -755,9 +756,9 @@ export class EnhancedTechniqueClassificationService {
       matrix[i] = []
       for (let j = 0; j < size; j++) {
         if (i === j) {
-          matrix?.[i][j] = Math.random() * 20 + 80 // True positives: 80-100
+          matrix[i][j] = Math.random() * 20 + 80 // True positives: 80-100
         } else {
-          matrix?.[i][j] = Math.random() * 10 // False positives: 0-10
+          matrix[i][j] = Math.random() * 10 // False positives: 0-10
         }
       }
     }

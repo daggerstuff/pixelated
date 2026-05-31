@@ -145,23 +145,25 @@ export class MLAnomalyDetector implements AnomalyDetector {
       })
 
       const reconstructionErrorData = await reconstructionErrorTensor.data()
-      const reconstructionError = reconstructionErrorData[0]
+      const reconstructionError = reconstructionErrorData[0] ?? 0
       reconstructionErrorTensor.dispose()
 
-      const anomalyScore = isolationForest.predict([featureVector])[0]
+      const anomalyScore = isolationForest.predict([featureVector])[0] ?? 0
 
       const reconstructionThreshold = this.getReconstructionThreshold(profile)
 
       if (reconstructionError > reconstructionThreshold) {
         anomalies.push({
+          type: 'ml_anomaly',
+          detail: 'reconstruction_error',
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
           patternId: 'ml_reconstruction_error',
-          anomalyType: 'novelty',
+          anomalyType: 'novelty' as const,
           severity:
             reconstructionError > reconstructionThreshold * 2
-              ? 'high'
-              : 'medium',
+              ? ('high' as const)
+              : ('medium' as const),
           deviationScore: reconstructionError,
           confidence: 0.85,
           context: {
@@ -177,11 +179,13 @@ export class MLAnomalyDetector implements AnomalyDetector {
 
       if (anomalyScore > isolationThreshold) {
         anomalies.push({
+          type: 'ml_anomaly',
+          detail: 'isolation_forest',
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
           patternId: 'ml_isolation_forest',
-          anomalyType: 'outlier',
-          severity: anomalyScore > 0.8 ? 'critical' : 'high',
+          anomalyType: 'outlier' as const,
+          severity: anomalyScore > 0.8 ? ('critical' as const) : ('high' as const),
           deviationScore: anomalyScore,
           confidence: 0.9,
           context: {
@@ -221,11 +225,13 @@ export class MLAnomalyDetector implements AnomalyDetector {
       const baseline = baselineValues[index]
       if (baseline && value > baseline * 2) {
         anomalies.push({
+          type: 'ml_anomaly',
+          detail: 'statistical',
           anomalyId: this.generateAnomalyId(),
           userId: profile.userId,
           patternId: `statistical_${index}`,
-          anomalyType: 'deviation',
-          severity: value > baseline * 3 ? 'critical' : 'high',
+          anomalyType: 'deviation' as const,
+          severity: value > baseline * 3 ? ('critical' as const) : ('high' as const),
           deviationScore: value / baseline,
           confidence: 0.75,
           context: {
@@ -251,48 +257,53 @@ export class MLAnomalyDetector implements AnomalyDetector {
     const timePref = features.temporal.timeOfDayPreference
     const baselineTimeThreshold =
       profile.baselineMetrics.timeOfDayThreshold ?? 0.5
-
     if (timePref > 0.8) {
-      anomalies.push({
-        anomalyId: this.generateAnomalyId(),
-        userId: profile.userId,
-        patternId: 'temporal_unusual_time',
-        anomalyType: 'novelty',
-        severity: timePref > 0.9 ? 'high' : 'medium',
-        deviationScore: timePref,
-        confidence: 0.8,
-        context: {
-          type: 'temporal',
-          timeOfDayPreference: timePref,
-          baselineThreshold: baselineTimeThreshold,
-        },
-        timestamp: new Date(),
-      })
-    } else if (timePref > baselineTimeThreshold) {
-      anomalies.push({
-        anomalyId: this.generateAnomalyId(),
-        userId: profile.userId,
-        patternId: 'temporal_time_deviation',
-        anomalyType: 'deviation',
-        severity: 'low',
-        deviationScore: timePref / baselineTimeThreshold,
-        confidence: 0.65,
-        context: {
-          type: 'temporal',
-          timeOfDayPreference: timePref,
-          baselineThreshold: baselineTimeThreshold,
-        },
-        timestamp: new Date(),
-      })
+        anomalies.push({
+          type: 'ml_anomaly',
+          detail: 'temporal_unusual_time',
+          anomalyId: this.generateAnomalyId(),
+          userId: profile.userId,
+          patternId: 'temporal_unusual_time',
+          anomalyType: 'novelty' as const,
+          severity: timePref > 0.9 ? ('high' as const) : ('medium' as const),
+          deviationScore: timePref,
+          confidence: 0.8,
+          context: {
+            type: 'temporal',
+            timeOfDayPreference: timePref,
+            baselineThreshold: baselineTimeThreshold,
+          },
+          timestamp: new Date(),
+        })
+      } else if (timePref > baselineTimeThreshold) {
+        anomalies.push({
+          type: 'ml_anomaly',
+          detail: 'temporal_time_deviation',
+          anomalyId: this.generateAnomalyId(),
+          userId: profile.userId,
+          patternId: 'temporal_time_deviation',
+          anomalyType: 'deviation' as const,
+          severity: 'low' as const,
+          deviationScore: timePref / baselineTimeThreshold,
+          confidence: 0.65,
+          context: {
+            type: 'temporal',
+            timeOfDayPreference: timePref,
+            baselineThreshold: baselineTimeThreshold,
+          },
+          timestamp: new Date(),
+        })
     }
 
     if (features.temporal.sessionRegularity < 0.3) {
       anomalies.push({
+        type: 'ml_anomaly',
+        detail: 'temporal_irregular_sessions',
         anomalyId: this.generateAnomalyId(),
         userId: profile.userId,
         patternId: 'temporal_irregular_sessions',
-        anomalyType: 'deviation',
-        severity: 'low',
+        anomalyType: 'deviation' as const,
+        severity: 'low' as const,
         deviationScore: 1 - features.temporal.sessionRegularity,
         confidence: 0.7,
         context: {

@@ -4,10 +4,7 @@ import { slug } from '@/utils/common'
 
 // Market Research Service Layer
 import { getPostgresPool } from '../../lib/database/connection'
-import {
-  _MarketResearchDocument,
-  MarketResearch as MarketResearchModel,
-} from '../../lib/database/mongodb/schemas'
+import { MarketResearch as MarketResearchModel } from '../../lib/database/mongodb/schemas'
 import { ForbiddenError, NotFoundError } from '../middleware/error-handler'
 
 type MarketResearchPermissionLevel = 'view' | 'edit' | 'comment'
@@ -109,7 +106,7 @@ export async function getMarketResearch(researchId: string, userId: string) {
   }
 
   // Check permissions
-  const researchDoc = research as any
+  const researchDoc = research as { owner: string; permissions?: MarketResearchPermissions | null }
   if (
     !hasPermission(research.permissions, 'view', userId) &&
     researchDoc.owner !== userId

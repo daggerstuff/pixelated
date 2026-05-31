@@ -40,7 +40,7 @@ export class BiasDetectionDatabaseService {
       return db
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error)
+        error instanceof Error ? error.message : String(error)
       logger.error('Database connection failed', {
         error: errorMessage,
         timestamp: new Date().toISOString(),
@@ -79,7 +79,7 @@ export class BiasDetectionDatabaseService {
       })
     } catch (error: unknown) {
       logger.error('Failed to store analysis result', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         sessionId: result.sessionId,
       })
       throw error
@@ -112,7 +112,7 @@ export class BiasDetectionDatabaseService {
       })
     } catch (error: unknown) {
       logger.error('Failed to store alert', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         alertId: alert.alertId,
       })
       throw error
@@ -167,7 +167,7 @@ export class BiasDetectionDatabaseService {
       }
     } catch (error: unknown) {
       logger.error('Failed to get dashboard data', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         timeRange: options?.timeRange,
       })
       throw error
@@ -240,7 +240,7 @@ export class BiasDetectionDatabaseService {
       }
     } catch (error: unknown) {
       logger.error('Failed to get summary stats', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
       })
       throw error
     }
@@ -276,7 +276,7 @@ export class BiasDetectionDatabaseService {
       }))
     } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
       })
       return []
     }
@@ -352,7 +352,7 @@ export class BiasDetectionDatabaseService {
       return trends
     } catch (error: unknown) {
       logger.error('Failed to get trend data', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         timeRange,
       })
       return []
@@ -419,7 +419,7 @@ export class BiasDetectionDatabaseService {
       Object.entries(aggregation).forEach(([dimension, values]) => {
         result[dimension] = {}
         Object.entries(values).forEach(([value, stats]) => {
-          result?.[dimension][value] = {
+          result[dimension][value] = {
             count: stats.count,
             averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
           }
@@ -429,7 +429,7 @@ export class BiasDetectionDatabaseService {
       return result
     } catch (error: unknown) {
       logger.error('Failed to get demographic breakdown', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
       })
       // Return empty structure on error
       return {}
@@ -466,7 +466,7 @@ export class BiasDetectionDatabaseService {
       }))
     } catch (error: unknown) {
       logger.error('Failed to get recent analyses', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
       })
       return []
     }
@@ -567,7 +567,7 @@ export class BiasDetectionDatabaseService {
       }
     } catch (error: unknown) {
       logger.error('Failed to get session analysis', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         sessionId,
       })
       return null
@@ -653,7 +653,7 @@ export class BiasDetectionDatabaseService {
       })
     } catch (error: unknown) {
       logger.error('Failed to record audit log', {
-        error: error instanceof Error ? String(error) : String(error),
+        error: String(error),
         action: entry.action,
       })
       // Don't throw - audit logging should not break the main flow

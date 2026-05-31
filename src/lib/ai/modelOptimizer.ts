@@ -57,8 +57,12 @@ class ModelOptimizer {
           precision: 0.12,
           recall: 0.1,
           f1Score: 0.13,
+          auc: 0,
+          loss: 0,
+          epoch: 0,
           inferenceTime: -0.2,
           memoryUsage: 0.3,
+          privacyScore: 0,
         },
         tradeoffs: ["Increased computational cost", "Higher memory usage"],
         implementationComplexity: "high",
@@ -136,12 +140,17 @@ class ModelOptimizer {
           "Anytime prediction",
         ],
         expectedImprovement: {
-          accuracy: 0.05,
-          precision: 0.03,
-          recall: 0.04,
-          f1Score: 0.04,
-          inferenceTime: 0.4,
-          memoryUsage: 0.25,
+          accuracy: 0.15,
+          precision: 0.12,
+          recall: 0.1,
+          f1Score: 0.13,
+          auc: 0,
+          loss: 0,
+          epoch: 0,
+          inferenceTime: -0.2,
+          memoryUsage: 0.3,
+          privacyScore: 0,
+          timestamp: 0,
         },
         tradeoffs: ["Adaptive performance", "Implementation complexity"],
         implementationComplexity: "medium",
@@ -168,18 +177,19 @@ class ModelOptimizer {
     if (!this.currentMetrics) {
       throw new Error("Baseline metrics not set");
     }
+    const metrics = this.currentMetrics!;
 
     const bottlenecks: string[] = [];
     const recommendations: OptimizationStrategy[] = [];
     const priorityOrder: OptimizationStrategy[] = [];
 
     // Identify bottlenecks
-    if (this.currentMetrics.accuracy < 0.85) {
+    if (metrics.accuracy < 0.85) {
       bottlenecks.push("Low accuracy - consider ensemble methods or more training data");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Ensemble")));
     }
 
-    if (this.currentMetrics.inferenceTime > 100) {
+    if (metrics.inferenceTime > 100) {
       // > 100ms
       bottlenecks.push("Slow inference - consider quantization or model compression");
       recommendations.push(
@@ -189,13 +199,13 @@ class ModelOptimizer {
       );
     }
 
-    if (this.currentMetrics.memoryUsage > 1000) {
+    if (metrics.memoryUsage > 1000) {
       // > 1GB
       bottlenecks.push("High memory usage - consider model compression or pruning");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Compression")));
     }
 
-    if (this.currentMetrics.privacyScore < 0.9) {
+    if (metrics.privacyScore < 0.9) {
       bottlenecks.push("Privacy concerns - consider federated learning approaches");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Federated")));
     }
@@ -211,7 +221,7 @@ class ModelOptimizer {
     );
 
     return {
-      currentMetrics: this.currentMetrics,
+      currentMetrics: metrics,
       bottlenecks,
       recommendations,
       priorityOrder,

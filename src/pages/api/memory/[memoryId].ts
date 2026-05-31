@@ -15,7 +15,7 @@ function resolveMemoryId(
 export const GET = withAuthenticatedMemoryRoute(
   'fetching memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params)
+    const memoryId = resolveMemoryId(params ?? {})
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
@@ -38,13 +38,15 @@ export const GET = withAuthenticatedMemoryRoute(
 const handlePatch = withAuthenticatedMemoryRoute(
   'updating memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params)
+    const memoryId = resolveMemoryId(params ?? {})
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
 
-    const body = await request.json()
-    const content = typeof body.content === 'string' ? body.content : body.text
+    const body: Record<string, unknown> = await request.json() as Record<string, unknown>
+    const contentBody = body['content']
+    const textBody = body['text']
+    const content: string = typeof contentBody === 'string' ? contentBody : typeof textBody === 'string' ? textBody : ''
     if (!content) {
       return jsonError(400, 'Bad Request', 'content parameter is required')
     }
@@ -53,7 +55,7 @@ const handlePatch = withAuthenticatedMemoryRoute(
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       memoryId,
       content,
-      metadata: body.metadata,
+      metadata: body['metadata'] as Record<string, unknown> | undefined,
     })
 
     return jsonResponse({
@@ -68,7 +70,7 @@ export const PATCH = handlePatch
 export const DELETE = withAuthenticatedMemoryRoute(
   'deleting memory',
   async ({ params, request }, user) => {
-    const memoryId = resolveMemoryId(params)
+    const memoryId = resolveMemoryId(params ?? {})
     if (!memoryId) {
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }

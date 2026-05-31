@@ -1444,6 +1444,8 @@ def build_follow_up_plan(
                     body=follow_up_body,
                     status=template_action.status,
                     provider_ids=merged_provider_ids,
+                    priority_label=template_action.priority_label,
+                    labels=template_action.labels,
                 )
             )
 
