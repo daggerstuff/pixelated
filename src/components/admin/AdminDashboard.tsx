@@ -161,13 +161,7 @@ export const AdminDashboard: FC = () => {
     errorRate: 0.02,
     uptime: 99.9,
   }
-  const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
-    chart: <ChartBar className="h-5 w-5" />,
-    therapist: <Stethoscope className="h-5 w-5" />,
-    institution: <Building className="h-5 w-5" />,
-    system: <Settings className="h-5 w-5" />,
-    compliance: <Clipboard className="h-5 w-5" />,
-  }
+
 
   return (
     <ResponsiveContainer size="full">
