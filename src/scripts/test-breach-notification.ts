@@ -11,15 +11,6 @@ import { BreachNotificationSystem } from '../lib/security/breach-notification'
 // Load environment variables
 dotenv.config()
 
-// Type declarations for functions defined later in this file
-declare function promptForConfirmation(message: string): Promise<boolean>
-declare function getSeverityColor(
-  severity: 'low' | 'medium' | 'high' | 'critical',
-): (text: string) => string
-declare function getStatusColor(
-  status: 'pending' | 'in_progress' | 'completed',
-): (text: string) => string
-
 const program = new Command()
 
 program
@@ -187,9 +178,9 @@ program
 
         console.log(chalk.blue('\nBreak details:'))
         console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
-        console.log(`- Type: ${chalk.yellow(type)}`)
+        console.log(`- Type: ${chalk.yellow(options.type)}`)
         console.log(
-          `- Severity: ${getSeverityColor(severity)(severity)}`,
+          `- Severity: ${getSeverityColor(options.severity)(options.severity)}`,
         )
         console.log(`- Affected Users: ${chalk.yellow(userCount.toString())}`)
         console.log(`- Description: ${chalk.gray(options.description)}`)
@@ -221,8 +212,8 @@ program
         }
 
         const breachId = await BreachNotificationSystem.reportBreach({
-          type: type satisfies BreachDetails['type'],
-          severity: severity satisfies BreachDetails['severity'],
+          type: options.type as BreachDetails['type'],
+          severity: options.severity as BreachDetails['severity'],
           description: options.description,
           affectedUsers: options.users.split(','),
           affectedData: options['affected-data'].split(','),
@@ -346,7 +337,7 @@ program
 
 function getSeverityColor(
   severity: 'low' | 'medium' | 'high' | 'critical',
-): void {
+): (text: string) => string {
   switch (severity) {
     case 'critical':
       return chalk.red.bold
@@ -361,7 +352,7 @@ function getSeverityColor(
   }
 }
 
-function getStatusColor(status: 'pending' | 'in_progress' | 'completed'): void {
+function getStatusColor(status: 'pending' | 'in_progress' | 'completed'): (text: string) => string {
   switch (status) {
     case 'pending':
       return chalk.yellow

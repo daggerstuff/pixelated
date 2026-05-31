@@ -332,13 +332,13 @@ describe('performance Tests', () => {
             ])
 
             // Store result
-            results?.pages[name].FID = inputDelay
+            results.pages[name].FID = inputDelay
 
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)
           } catch (error: unknown) {
             console.warn(
-              `Failed to measure FID on ${name}: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : String(error)}`,
+              `Failed to measure FID on ${name}: ${error instanceof Error ? error.message : String(error)}`,
             )
           }
         } else {

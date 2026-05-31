@@ -202,6 +202,13 @@ export interface Anomaly {
   severity: 'low' | 'medium' | 'high' | 'critical'
   confidence: number
   timestamp: Date
+  /** Extended fields used by ML anomaly detector */
+  anomalyId?: string
+  userId?: string
+  patternId?: string
+  anomalyType?: string
+  deviationScore?: number
+  context?: Record<string, unknown>
 }
 
 export interface BehaviorProfile {
@@ -211,6 +218,16 @@ export interface BehaviorProfile {
   typicalIPs: string[]
   typicalLoginHours: number[]
   riskScore?: number
+  baselineMetrics: {
+    frequencyThreshold: number
+    geographicThreshold: number
+    sequentialThreshold: number
+    reconstructionThreshold: number
+    timeOfDayThreshold: number
+  }
+  anomalyThresholds: {
+    sequential: number
+  }
 }
 
 export interface BehavioralFeatures {
@@ -218,6 +235,28 @@ export interface BehavioralFeatures {
   ipFeatures: number[]
   actionFeatures: number[]
   metadataFeatures: number[]
+  temporal: {
+    avgSessionDuration: number
+    timeOfDayPreference: number
+    activityFrequency: number
+    sessionRegularity: number
+  }
+  spatial: {
+    ipDiversity: number
+    geographicSpread: number
+  }
+  sequential: {
+    sequenceEntropy: number
+  }
+  frequency: {
+    eventFrequency: number
+    endpointFrequency: Record<string, number>
+  }
+  contextual: {
+    deviceCharacteristics: {
+      deviceType: string
+    }
+  }
 }
 
 export interface AnomalyDetector {

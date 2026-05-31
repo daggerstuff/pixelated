@@ -34,7 +34,7 @@ export function redactPotentialPhi(text: string | undefined | null): string {
  */
 export function sanitizeMessagesForLogging(
   messages:
-    | Array<{ role: string; content: string } | unknown>
+    | Array<Record<string, unknown>>
     | undefined
     | null,
 ): string {

@@ -11,6 +11,14 @@ from urllib import parse
 from .config import _load_internal_config, _strip_env, _write_internal_config
 from .utils import _json_request, _object_view
 
+PRIORITY_TO_JIRA: dict[str, str] = {
+    "urgent": "Highest",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "none": "None",
+}
+
 DEFAULT_JIRA_PROJECT_NAME = "Pixelated Empathy"
 DEFAULT_JIRA_PROJECT_TYPE = "business"
 DEFAULT_JIRA_PROJECT_TEMPLATES = (
@@ -226,23 +234,33 @@ def jira_search_jql(project_key: str) -> str:
 
 
 def jira_create_payload(action: Any, project_key: str, issue_type: str) -> dict[str, Any]:
-    return {
-        "fields": {
-            "project": {"key": project_key},
-            "issuetype": {"name": issue_type},
-            "summary": action.title,
-            "description": jira_adf_document(action.body),
-        }
+    fields: dict[str, Any] = {
+        "project": {"key": project_key},
+        "issuetype": {"name": issue_type},
+        "summary": action.title,
+        "description": jira_adf_document(action.body),
     }
+    priority_label = getattr(action, "priority_label", None)
+    if priority_label and priority_label in PRIORITY_TO_JIRA:
+        fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
+    raw_labels = getattr(action, "labels", None)
+    if raw_labels:
+        fields["labels"] = list(raw_labels)
+    return {"fields": fields}
 
 
 def jira_update_payload(action: Any) -> dict[str, Any]:
-    return {
-        "fields": {
-            "summary": action.title,
-            "description": jira_adf_document(action.body),
-        }
+    fields: dict[str, Any] = {
+        "summary": action.title,
+        "description": jira_adf_document(action.body),
     }
+    priority_label = getattr(action, "priority_label", None)
+    if priority_label and priority_label in PRIORITY_TO_JIRA:
+        fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
+    raw_labels = getattr(action, "labels", None)
+    if raw_labels:
+        fields["labels"] = list(raw_labels)
+    return {"fields": fields}
 
 
 def jira_adf_document(text: str) -> dict[str, Any]:

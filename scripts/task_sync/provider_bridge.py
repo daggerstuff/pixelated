@@ -9,7 +9,7 @@ import os
 import re
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
@@ -36,6 +36,25 @@ DEFAULT_JIRA_PROJECT_TEMPLATES = (
 )
 _JIRA_PROJECT_EXISTS_CACHE: dict[str, bool] = {}
 _JIRA_ISSUE_TYPE_CACHE: dict[str, dict[str, str]] = {}
+_LINEAR_LABEL_IDS_CACHE: dict[str, str] = {}
+
+# Canonical priority label → Jira ADHD priority name
+PRIORITY_TO_JIRA: dict[str, str] = {
+    "urgent": "Highest",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "none": "None",
+}
+
+# Canonical priority label → Linear numeric priority (0=urgent, 1=high, 2=medium, 3=low, 4=none)
+PRIORITY_TO_LINEAR: dict[str, int] = {
+    "urgent": 0,
+    "high": 1,
+    "medium": 2,
+    "low": 3,
+    "none": 4,
+}
 
 
 def _strip_env(name: str) -> str:
@@ -805,23 +824,31 @@ def jira_create_payload(
     project_key: str,
     issue_type: Mapping[str, str],
 ) -> dict[str, Any]:
-    return {
-        "fields": {
-            "project": {"key": project_key},
-            "issuetype": dict(issue_type),
-            "summary": action.title,
-            "description": jira_adf_document(action.body),
-        }
+    fields: dict[str, Any] = {
+        "project": {"key": project_key},
+        "issuetype": dict(issue_type),
+        "summary": action.title,
+        "description": jira_adf_document(action.body),
     }
+    priority_label = action.priority_label
+    if priority_label and priority_label in PRIORITY_TO_JIRA:
+        fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
+    if action.labels:
+        fields["labels"] = list(action.labels)
+    return {"fields": fields}
 
 
 def jira_update_payload(action: Any) -> dict[str, Any]:
-    return {
-        "fields": {
-            "summary": action.title,
-            "description": jira_adf_document(action.body),
-        }
+    fields: dict[str, Any] = {
+        "summary": action.title,
+        "description": jira_adf_document(action.body),
     }
+    priority_label = action.priority_label
+    if priority_label and priority_label in PRIORITY_TO_JIRA:
+        fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
+    if action.labels:
+        fields["labels"] = list(action.labels)
+    return {"fields": fields}
 
 
 def jira_adf_document(text: str) -> dict[str, Any]:
@@ -1173,11 +1200,15 @@ def apply_github_action(action: Mapping[str, Any]) -> dict[str, Any]:
 
     action_type = str(action.get("action") or "").strip()
     target_id = str(action.get("target_id") or "").strip()
-    payload = {
+    raw_labels = action.get("labels")
+    labels = list(raw_labels) if isinstance(raw_labels, (list, tuple)) else []
+    payload: dict[str, Any] = {
         "title": str(action.get("title") or ""),
         "body": str(action.get("body") or ""),
         "state": "closed" if str(action.get("status") or "").strip() == "closed" else "open",
     }
+    if labels:
+        payload["labels"] = labels
     if action_type == "create":
         response = _json_request(
             "POST",
@@ -1247,6 +1278,43 @@ def export_linear_issues() -> list[dict[str, Any]]:
     return issues
 
 
+def _resolve_linear_label_ids(label_names: Sequence[str]) -> list[str]:
+    """Resolve Linear label names to their GraphQL IDs for the configured team.
+
+    Results are cached in `_LINEAR_LABEL_IDS_CACHE` to avoid repeated lookups.
+    Only returns IDs for label names that exist in the team's label set.
+    """
+    if not label_names:
+        return []
+
+    team_id = resolve_linear_team_id()
+    if not team_id:
+        return []
+
+    if not _LINEAR_LABEL_IDS_CACHE:
+        query = "query($teamId: String!) { team(id: $teamId) { labels { nodes { id name } } } }"
+        response = _extract_graphql_payload(_linear_graphql_query(query, {"teamId": team_id}))
+        team = response.get("team") if isinstance(response, Mapping) else None
+        label_nodes: list[Any] = []
+        if isinstance(team, Mapping):
+            labels_container = team.get("labels")
+            if isinstance(labels_container, Mapping):
+                label_nodes = labels_container.get("nodes") or []
+        for node in label_nodes:
+            if isinstance(node, Mapping):
+                label_id = str(node.get("id") or "")
+                label_name = str(node.get("name") or "").strip()
+                if label_id and label_name:
+                    _LINEAR_LABEL_IDS_CACHE[label_name.lower()] = label_id
+
+    resolved: list[str] = []
+    for name in label_names:
+        label_id = _LINEAR_LABEL_IDS_CACHE.get(name.strip().lower())
+        if label_id:
+            resolved.append(label_id)
+    return resolved
+
+
 def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
     action_type = str(action.get("action") or "").strip()
     target_id = _coerce_provider_target_id(action.get("target_id"))
@@ -1258,6 +1326,16 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         "title": str(action.get("title") or ""),
         "description": str(action.get("body") or ""),
     }
+    raw_priority_label = str(action.get("priority_label") or "").strip().lower()
+    if raw_priority_label and raw_priority_label in PRIORITY_TO_LINEAR:
+        input_payload["priority"] = PRIORITY_TO_LINEAR[raw_priority_label]
+
+    raw_labels = action.get("labels")
+    if raw_labels:
+        label_names = [str(lbl).strip() for lbl in raw_labels if lbl]
+        label_ids = _resolve_linear_label_ids(label_names)
+        if label_ids:
+            input_payload["labelIds"] = label_ids
 
     mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
     key = "issueCreate"
@@ -1422,6 +1500,9 @@ class _ObjectView:
         self.title = str(payload.get("title") or "")
         self.body = str(payload.get("body") or "")
         self.status = str(payload.get("status") or "open")
+        self.priority_label = str(payload["priority_label"]) if payload.get("priority_label") else None
+        labels_raw = payload.get("labels")
+        self.labels = list(labels_raw) if isinstance(labels_raw, (list, tuple)) else []
 
 
 def _object_view(payload: Mapping[str, Any]) -> _ObjectView:

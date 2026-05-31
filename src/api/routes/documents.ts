@@ -37,8 +37,11 @@ const ensureString = (param: unknown): string => {
       const firstValue = values[0]
       return typeof firstValue === 'string'
         ? firstValue
-        : String(firstValue ?? '')
+        : typeof firstValue === 'object' && firstValue !== null
+          ? String(firstValue)
+          : String(firstValue ?? '')
     }
+    return ''
   }
   return param !== undefined && param !== null ? String(param) : ''
 }
@@ -51,8 +54,10 @@ const router: Router = express.Router()
 router.post(
   '/',
   requirePermission('edit'),
-  asyncHandler(async (req: Request, res: Response) => {
-    const { title, type, category, content, description } = req.body
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const { title, type, category, content, description } = expressReq.body
 
     // Validation
     if (!title || !type || !category) {
@@ -69,12 +74,12 @@ router.post(
         category,
         content,
         description,
-        owner: req.user!.id,
+        owner: expressReq.user!.id,
       },
-      req.user!.id,
+      expressReq.user!.id,
     )
 
-    res.status(201).json({
+    expressRes.status(201).json({
       success: true,
       data: document,
     })
@@ -87,7 +92,9 @@ router.post(
 
 router.get(
   '/',
-  asyncHandler(async (req: Request, res: Response) => {
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
     const {
       page: pageQuery,
       limit: limitQuery,
@@ -95,7 +102,7 @@ router.get(
       type,
       category,
       search: searchQuery,
-    } = req.query
+    } = expressReq.query
 
     const page = ensureString(pageQuery)
     const limit = ensureString(limitQuery)
@@ -108,9 +115,9 @@ router.get(
     // Build query filter
     const filter: any = {
       $or: [
-        { owner: req.user!.id },
-        { 'permissions.view': req.user!.id },
-        { 'permissions.edit': req.user!.id },
+        { owner: expressReq.user!.id },
+        { 'permissions.view': expressReq.user!.id },
+        { 'permissions.edit': expressReq.user!.id },
       ],
     }
 
@@ -131,7 +138,7 @@ router.get(
 
     const total = await BusinessDocument.countDocuments(filter)
 
-    res.json({
+    expressRes.json({
       success: true,
       data: documents,
       pagination: {
@@ -150,16 +157,18 @@ router.get(
 
 router.get(
   '/:documentId',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
 
-    const document = await documentService.getDocument(documentId, req.user!.id)
+    const document = await documentService.getDocument(documentId, expressReq.user!.id)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
 
-    res.json({
+    expressRes.json({
       success: true,
       data: document,
     })
@@ -173,9 +182,11 @@ router.get(
 router.put(
   '/:documentId',
   requirePermission('edit'),
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
-    const { title, content, status, description } = req.body
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { title, content, status, description } = expressReq.body
 
     const document = await documentService.updateDocument(
       documentId,
@@ -185,14 +196,14 @@ router.put(
         status,
         description,
       },
-      req.user!.id,
+      expressReq.user!.id,
     )
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
 
-    res.json({
+    expressRes.json({
       success: true,
       data: document,
     })
@@ -206,19 +217,21 @@ router.put(
 router.delete(
   '/:documentId',
   requireRole(['admin', 'manager']),
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
 
     const deleted = await documentService.deleteDocument(
       documentId,
-      req.user!.id,
+      expressReq.user!.id,
     )
 
     if (!deleted) {
       throw new NotFoundError('Document', documentId)
     }
 
-    res.json({
+    expressRes.json({
       success: true,
       message: 'Document deleted successfully',
     })
@@ -231,9 +244,11 @@ router.delete(
 
 router.post(
   '/:documentId/share',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
-    const { sharedWith, permissionLevel } = req.body
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { sharedWith, permissionLevel } = expressReq.body
 
     if (!sharedWith || !permissionLevel) {
       throw new ValidationError(
@@ -245,10 +260,10 @@ router.post(
       documentId,
       sharedWith,
       permissionLevel,
-      req.user!.id,
+      expressReq.user!.id,
     )
 
-    res.json({
+    expressRes.json({
       success: true,
       data: document,
     })
@@ -261,9 +276,11 @@ router.post(
 
 router.post(
   '/:documentId/comments',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
-    const { content, parentCommentId } = req.body
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { content, parentCommentId } = expressReq.body
 
     if (!content) {
       throw new ValidationError('Comment content is required')
@@ -274,10 +291,10 @@ router.post(
       `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, content, author_id, created_at`,
-      [documentId, req.user!.id, content, parentCommentId ?? null],
+      [documentId, expressReq.user!.id, content, parentCommentId ?? null],
     )
 
-    res.status(201).json({
+    expressRes.status(201).json({
       success: true,
       data: result.rows[0],
     })
@@ -290,8 +307,10 @@ router.post(
 
 router.get(
   '/:documentId/comments',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -303,7 +322,7 @@ router.get(
       [documentId],
     )
 
-    res.json({
+    expressRes.json({
       success: true,
       data: result.rows,
     })
@@ -316,8 +335,10 @@ router.get(
 
 router.get(
   '/:documentId/versions',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -328,7 +349,7 @@ router.get(
       [documentId],
     )
 
-    res.json({
+    expressRes.json({
       success: true,
       data: result.rows,
     })
@@ -341,20 +362,22 @@ router.get(
 
 router.get(
   '/:documentId/export',
-  asyncHandler(async (req: Request, res: Response) => {
-    const documentId = ensureString(req.params['documentId'])
-    const { format: formatQuery = 'json' } = req.query
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { format: formatQuery = 'json' } = expressReq.query
     const format = ensureString(formatQuery)
 
-    const document = await documentService.getDocument(documentId, req.user!.id)
+    const document = await documentService.getDocument(documentId, expressReq.user!.id)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
 
     if (format === 'md') {
-      res.setHeader('Content-Type', 'text/markdown')
-      res.setHeader(
+      expressRes.setHeader('Content-Type', 'text/markdown')
+      expressRes.setHeader(
         'Content-Disposition',
         `attachment; filename="${document.slug}.md"`,
       )
@@ -362,14 +385,14 @@ router.get(
       if (!markdownContent) {
         throw new NotFoundError('Document content', documentId)
       }
-      res.send(markdownContent)
+      expressRes.send(markdownContent)
     } else {
-      res.setHeader('Content-Type', 'application/json')
-      res.setHeader(
+      expressRes.setHeader('Content-Type', 'application/json')
+      expressRes.setHeader(
         'Content-Disposition',
         `attachment; filename="${document.slug}.json"`,
       )
-      res.json(document)
+      expressRes.json(document)
     }
   }),
 )
