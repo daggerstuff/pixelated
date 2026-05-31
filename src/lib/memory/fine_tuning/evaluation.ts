@@ -46,7 +46,6 @@ export class MemorySystemEvaluator {
   }
 
   evaluate(memories: MemoryBlock[], testQueries?: string[]): EvaluationReport {
-
     const retrieval = this.evaluateRetrieval(memories, testQueries)
     const response = this.evaluateResponse(memories)
     const safety = this.evaluateSafety(memories)
@@ -207,9 +206,12 @@ export class MemorySystemEvaluator {
     latencies.sort((a, b) => a - b)
     const n = latencies.length
     return {
-      p50LatencyMs: Math.round((latencies[Math.floor(n * 0.5)] ?? 0) * 100) / 100,
-      p95LatencyMs: Math.round((latencies[Math.floor(n * 0.95)] ?? 0) * 100) / 100,
-      p99LatencyMs: Math.round((latencies[Math.floor(n * 0.99)] ?? 0) * 100) / 100,
+      p50LatencyMs:
+        Math.round((latencies[Math.floor(n * 0.5)] ?? 0) * 100) / 100,
+      p95LatencyMs:
+        Math.round((latencies[Math.floor(n * 0.95)] ?? 0) * 100) / 100,
+      p99LatencyMs:
+        Math.round((latencies[Math.floor(n * 0.99)] ?? 0) * 100) / 100,
       throughputPerSec:
         Math.round((n / (latencies.reduce((s, v) => s + v, 0) / 1000)) * 10) /
         10,

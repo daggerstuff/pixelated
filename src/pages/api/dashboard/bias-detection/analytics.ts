@@ -9,7 +9,8 @@ export const GET: APIRoute = async ({ url }) => {
     initializeDatabase()
 
     const { searchParams } = url
-    const days = parseInt(searchParams.get('days') ?? '30')
+    const parsedDays = parseInt(searchParams.get('days') ?? '30')
+    const days = isNaN(parsedDays) || parsedDays < 1 || parsedDays > 365 ? 30 : parsedDays
     const cache = getCache()
 
     // Try to get cached analytics data first
@@ -42,12 +43,12 @@ export const GET: APIRoute = async ({ url }) => {
         MIN(overall_bias_score) as min_bias,
         MAX(overall_bias_score) as max_bias
       FROM bias_analyses
-      WHERE created_at >= NOW() - INTERVAL '${days} days'
+      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
       GROUP BY DATE(created_at)
       ORDER BY DATE(created_at)
     `
 
-    const historicalResult = await query(historicalQuery)
+    const historicalResult = await query(historicalQuery, [days])
 
     // Get demographic breakdown
     const demographicQuery = `
@@ -58,12 +59,12 @@ export const GET: APIRoute = async ({ url }) => {
         COUNT(*) as count,
         AVG(overall_bias_score) as avg_bias
       FROM bias_analyses
-      WHERE created_at >= NOW() - INTERVAL '${days} days'
+      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
       GROUP BY demographics->>'gender', demographics->>'ethnicity', demographics->>'age'
       ORDER BY count DESC
     `
 
-    const demographicResult = await query(demographicQuery)
+    const demographicResult = await query(demographicQuery, [days])
 
     // Get bias distribution by score ranges
     const distributionQuery = `
@@ -77,7 +78,7 @@ export const GET: APIRoute = async ({ url }) => {
         END as bias_range,
         COUNT(*) as count
       FROM bias_analyses
-      WHERE created_at >= NOW() - INTERVAL '${days} days'
+      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
       GROUP BY
         CASE
           WHEN overall_bias_score < 0.2 THEN 'Very Low (0-20%)'
@@ -89,7 +90,7 @@ export const GET: APIRoute = async ({ url }) => {
       ORDER BY count DESC
     `
 
-    const distributionResult = await query(distributionQuery)
+    const distributionResult = await query(distributionQuery, [days])
 
     // Get top bias patterns
     const patternsQuery = `
@@ -98,14 +99,14 @@ export const GET: APIRoute = async ({ url }) => {
         AVG((layer_results->'preprocessing'->>'bias_score')::float) as avg_score,
         COUNT(*) as occurrences
       FROM bias_analyses
-      WHERE created_at >= NOW() - INTERVAL '${days} days'
+      WHERE created_at >= NOW() - INTERVAL '1 day' * $1
         AND (layer_results->'preprocessing'->>'bias_score')::float > 0.3
       GROUP BY layer_results->'preprocessing'->>'layer'
       ORDER BY avg_score DESC
       LIMIT 5
     `
 
-    const patternsResult = await query(patternsQuery)
+    const patternsResult = await query(patternsQuery, [days])
 
     // Cache the computed data
     const computedData = {

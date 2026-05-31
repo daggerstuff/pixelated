@@ -129,7 +129,8 @@ export async function createPatternRecognitionFHEService(
     logger.info('Creating pattern recognition FHE service', { config })
 
     // Determine if we should use mock or real implementation
-    const useMock = config?.['useMock'] === true || config?.['mode'] === 'development'
+    const useMock =
+      config?.['useMock'] === true || config?.['mode'] === 'development'
 
     if (useMock) {
       logger.info('Using mock FHE service for pattern recognition')

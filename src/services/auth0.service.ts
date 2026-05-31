@@ -610,7 +610,9 @@ export class Auth0UserService {
         ttl_sec: 3600, // 1 hour
       })
       const ticket = this.toRecord(ticketRes.data)
-      return ticket ? (this.toStringOrUndefined(ticket['ticket']) ?? null) : null
+      return ticket
+        ? (this.toStringOrUndefined(ticket['ticket']) ?? null)
+        : null
     } catch (error: unknown) {
       console.error('Auth0 create password reset ticket error:', error)
       throw new Error('Failed to create password reset ticket')
