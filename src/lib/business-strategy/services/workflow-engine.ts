@@ -5,18 +5,16 @@
  * workflows, approvals, and automated tasks.
  */
 
-import type { UserId, DocumentId } from '../types/common'
-import type {
-  
-  WorkflowExecution } from '../types/workflow-engine'
-import { BaseService } from './base-service'
+import type { UserId, DocumentId } from "../types/common";
+import type { WorkflowExecution } from "../types/workflow-engine";
+import { BaseService } from "./base-service";
 
 export class WorkflowEngineService extends BaseService {
-  private readonly tableNames: any
+  private readonly tableNames: any;
 
   constructor() {
-    super()
-    this.tableNames = this.db.postgresql.tables
+    super();
+    this.tableNames = this.db.postgresql.tables;
   }
 
   /**
@@ -27,17 +25,17 @@ export class WorkflowEngineService extends BaseService {
     workflowId: string,
     documentId: DocumentId,
   ): Promise<WorkflowExecution> {
-    await this.validatePermissions(userId, 'workflow', 'start')
+    await this.validatePermissions(userId, "workflow", "start");
 
-    const timestamp = new Date()
-    const executionId = this.generateId()
+    const timestamp = new Date();
+    const executionId = this.generateId();
 
     const execution: WorkflowExecution = {
       id: executionId,
       workflowId,
       documentId,
-      status: 'running',
-      currentStepId: 'step-1', // Default first step
+      status: "running",
+      currentStepId: "step-1", // Default first step
       startedAt: timestamp,
       startedBy: userId,
       context: {
@@ -46,31 +44,31 @@ export class WorkflowEngineService extends BaseService {
       },
       history: [
         {
-          stepId: 'start',
-          action: 'triggered',
+          stepId: "start",
+          action: "triggered",
           userId,
           timestamp,
           details: { workflowId },
         },
       ],
-    }
+    };
 
     try {
       await this.db.mongodb.database
         .collection(this.db.mongodb.collections.workflows)
-        .insertOne(execution)
+        .insertOne(execution);
 
       await this.logAudit({
         userId,
-        action: 'start-workflow',
-        entityType: 'workflow',
+        action: "start-workflow",
+        entityType: "workflow",
         entityId: executionId,
-        result: 'success',
-      })
+        result: "success",
+      });
 
-      return execution
+      return execution;
     } catch (error: unknown) {
-      return this.handleError(error, 'startWorkflow')
+      return this.handleError(error, "startWorkflow");
     }
   }
 
@@ -84,25 +82,23 @@ export class WorkflowEngineService extends BaseService {
     feedback?: string,
   ): Promise<void> {
     try {
-      const timestamp = new Date()
+      const timestamp = new Date();
 
       // Update MongoDB execution record
-      await this.db.mongodb.database
-        .collection(this.db.mongodb.collections.workflows)
-        .updateOne(
-          { id: executionId },
-          {
-            $push: {
-              history: {
-                stepId,
-                action: 'approved',
-                userId,
-                timestamp,
-                details: { feedback },
-              },
+      await this.db.mongodb.database.collection(this.db.mongodb.collections.workflows).updateOne(
+        { id: executionId },
+        {
+          $push: {
+            history: {
+              stepId,
+              action: "approved",
+              userId,
+              timestamp,
+              details: { feedback },
             },
           },
-        )
+        },
+      );
 
       // Update PostgreSQL approval record if any
       await this.db.postgresql.pool.query(
@@ -110,18 +106,18 @@ export class WorkflowEngineService extends BaseService {
                  SET status = 'approved', decision = 'approve', feedback = $1, decided_at = $2
                  WHERE workflow_execution_id = $3 AND step_id = $4 AND approver_id = $5`,
         [feedback, timestamp, executionId, stepId, userId],
-      )
+      );
 
       await this.logAudit({
         userId,
-        action: 'approve-step',
-        entityType: 'workflow',
+        action: "approve-step",
+        entityType: "workflow",
         entityId: executionId,
-        result: 'success',
+        result: "success",
         details: { stepId },
-      })
+      });
     } catch (error: unknown) {
-      return this.handleError(error, 'approveStep')
+      return this.handleError(error, "approveStep");
     }
   }
 }

@@ -472,7 +472,8 @@ export function getPerformanceConfig(): PerformanceConfig {
       pool: {
         ...config.database.pool,
         max: parseInt(
-          process.env['DB_MAX_CONNECTIONS'] ?? config.database.pool.max.toString(),
+          process.env['DB_MAX_CONNECTIONS'] ??
+            config.database.pool.max.toString(),
         ),
       },
     },

@@ -746,7 +746,9 @@ export class ResearchPlatform {
         this.toRecord(consentData['metaData']) ??
         undefined
       const reason =
-        typeof consentData['reason'] === 'string' ? consentData['reason'] : undefined
+        typeof consentData['reason'] === 'string'
+          ? consentData['reason']
+          : undefined
       const immediate = this.toBoolean(consentData['immediate'])
       const update: ConsentUpdate = {
         clientId,
@@ -1064,14 +1066,18 @@ export class ResearchPlatform {
       sessionId: entry['sessionId'],
       timestamp,
       emotionScores: this.toNumberRecord(entry['emotionScores']),
-      techniqueEffectiveness: this.toNumberRecord(entry['techniqueEffectiveness']),
+      techniqueEffectiveness: this.toNumberRecord(
+        entry['techniqueEffectiveness'],
+      ),
       sessionDuration,
       age: this.asString(entry['age']),
       gender: this.asString(entry['gender']),
       location: this.asString(entry['location']),
       therapeuticApproach: this.asString(entry['therapeuticApproach']),
       outcomeScore:
-        typeof entry['outcomeScore'] === 'number' ? entry['outcomeScore'] : undefined,
+        typeof entry['outcomeScore'] === 'number'
+          ? entry['outcomeScore']
+          : undefined,
       metadata: this.toRecord(entry['metadata']),
     }
   }

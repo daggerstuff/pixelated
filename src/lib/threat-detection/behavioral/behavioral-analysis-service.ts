@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events'
+
 import * as tf from '@tensorflow/tfjs'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
