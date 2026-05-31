@@ -42,6 +42,21 @@ interface TreatmentPlanManagerProps {
   readOnly?: boolean
 }
 
+// Performance optimization: Extract static maps outside component to prevent recreation on every render and enable O(1) lookups
+const PRIORITY_COLORS_MAP: Record<TreatmentGoal['priority'], string> = {
+  urgent: 'bg-red-500 text-white',
+  high: 'bg-orange-500 text-white',
+  medium: 'bg-yellow-500 text-white',
+  low: 'bg-green-500 text-white',
+}
+
+const STATUS_COLORS_MAP: Record<TreatmentGoal['status'], string> = {
+  'completed': 'bg-green-100 text-green-800',
+  'in-progress': 'bg-blue-100 text-blue-800',
+  'on-hold': 'bg-yellow-100 text-yellow-800',
+  'not-started': 'bg-gray-100 text-gray-800',
+}
+
 const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   plan,
   onSave,
@@ -141,33 +156,11 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   }, [plan, defaultPlan])
 
   const getPriorityColor = (priority: TreatmentGoal['priority']) => {
-    switch (priority) {
-      case 'urgent':
-        return 'bg-red-500 text-white'
-      case 'high':
-        return 'bg-orange-500 text-white'
-      case 'medium':
-        return 'bg-yellow-500 text-white'
-      case 'low':
-        return 'bg-green-500 text-white'
-      default:
-        return 'bg-gray-500 text-white'
-    }
+    return PRIORITY_COLORS_MAP[priority] ?? 'bg-gray-500 text-white'
   }
 
   const getStatusColor = (status: TreatmentGoal['status']) => {
-    switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800'
-      case 'in-progress':
-        return 'bg-blue-100 text-blue-800'
-      case 'on-hold':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'not-started':
-        return 'bg-gray-100 text-gray-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+    return STATUS_COLORS_MAP[status] ?? 'bg-gray-100 text-gray-800'
   }
 
   const getCategoryIcon = (category: TreatmentGoal['category']) => {

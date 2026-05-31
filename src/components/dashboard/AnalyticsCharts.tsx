@@ -186,8 +186,10 @@ const SkillProgress: FC<SkillProgressProps> = ({ data, isLoading }) => {
     return <LoadingSkeleton />
   }
 
-  const getTrendIcon = (trend: 'up' | 'down' | 'stable') => TREND_ICONS[trend] ?? TREND_ICONS.stable
-  const getTrendColor = (trend: 'up' | 'down' | 'stable') => TREND_COLORS[trend] ?? TREND_COLORS.stable
+  const getTrendIcon = (trend: 'up' | 'down' | 'stable') =>
+    TREND_ICONS[trend] ?? TREND_ICONS.stable
+  const getTrendColor = (trend: 'up' | 'down' | 'stable') =>
+    TREND_COLORS[trend] ?? TREND_COLORS.stable
 
   return (
     <div className="bg-white rounded-lg p-6 shadow">

@@ -1,16 +1,18 @@
 import { useState, useEffect, useMemo, useCallback } from 'react'
 import type { FC } from 'react'
 
+// Performance optimization: Extract static mapping to module level to avoid recreation
+const EMOTION_COLORS: Record<string, string> = {
+  joy: '#FFC107',
+  anxiety: '#F44336',
+  calm: '#4CAF50',
+  excitement: '#FF9800',
+  sadness: '#2196F3',
+  anger: '#F44336',
+}
+
 const getEmotionColor = (emotion: string): string => {
-  const colors: Record<string, string> = {
-    joy: '#FFC107',
-    anxiety: '#F44336',
-    calm: '#4CAF50',
-    excitement: '#FF9800',
-    sadness: '#2196F3',
-    anger: '#F44336',
-  }
-  return colors[emotion] ?? '#9E9E9E'
+  return EMOTION_COLORS[emotion] ?? '#9E9E9E'
 }
 
 interface EmotionPoint {

@@ -5,28 +5,24 @@
  * and opportunity identification.
  */
 
-import type { UserId } from '../types/common'
-import type {
-  
-  
-  MarketTrend,
-  Opportunity } from '../types/market-research'
-import { BaseService } from './base-service'
+import type { UserId } from "../types/common";
+import type { MarketTrend, Opportunity } from "../types/market-research";
+import { BaseService } from "./base-service";
 
 export class MarketResearchService extends BaseService {
-  private readonly collectionName: string
+  private readonly collectionName: string;
 
   constructor() {
-    super()
-    this.collectionName = this.db.mongodb.collections.marketAnalysis
+    super();
+    this.collectionName = this.db.mongodb.collections.marketAnalysis;
   }
 
   /**
    * Create a new market analysis
    */
   async createAnalysis(userId: UserId, data: any): Promise<any> {
-    await this.validatePermissions(userId, 'market-analysis', 'create')
-    this.validateRequired(data, ['marketId', 'analysisType'])
+    await this.validatePermissions(userId, "market-analysis", "create");
+    this.validateRequired(data, ["marketId", "analysisType"]);
 
     const analysis = {
       id: this.generateId(),
@@ -34,24 +30,22 @@ export class MarketResearchService extends BaseService {
       createdBy: userId,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
     try {
-      await this.db.mongodb.database
-        .collection(this.collectionName)
-        .insertOne(analysis)
+      await this.db.mongodb.database.collection(this.collectionName).insertOne(analysis);
 
       await this.logAudit({
         userId,
-        action: 'create',
-        entityType: 'market-analysis',
+        action: "create",
+        entityType: "market-analysis",
         entityId: analysis.id,
-        result: 'success',
-      })
+        result: "success",
+      });
 
-      return analysis
+      return analysis;
     } catch (error: unknown) {
-      return this.handleError(error, 'createAnalysis')
+      return this.handleError(error, "createAnalysis");
     }
   }
 
@@ -61,12 +55,12 @@ export class MarketResearchService extends BaseService {
   async getMarketTrends(marketId: string): Promise<MarketTrend[]> {
     try {
       return await this.db.mongodb.database
-        .collection<MarketTrend>('market_trends')
+        .collection<MarketTrend>("market_trends")
         .find({ marketId })
         .sort({ date: -1 })
-        .toArray()
+        .toArray();
     } catch (error: unknown) {
-      return this.handleError(error, 'getMarketTrends')
+      return this.handleError(error, "getMarketTrends");
     }
   }
 
@@ -78,11 +72,11 @@ export class MarketResearchService extends BaseService {
       // Complex logic would go here to identify opportunities
       // from market analysis data
       return await this.db.mongodb.database
-        .collection<Opportunity>('market_opportunities')
-        .find({ marketId, status: 'open' })
-        .toArray()
+        .collection<Opportunity>("market_opportunities")
+        .find({ marketId, status: "open" })
+        .toArray();
     } catch (error: unknown) {
-      return this.handleError(error, 'identifyOpportunities')
+      return this.handleError(error, "identifyOpportunities");
     }
   }
 }
