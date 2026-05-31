@@ -29,15 +29,18 @@ function toWebAuthnCredentialInput(
     id: typeof value['id'] === 'string' ? value['id'] : undefined,
     name: typeof value['name'] === 'string' ? value['name'] : undefined,
     type:
-      value['type'] === 'webauthn-roaming' || value['type'] === 'webauthn-platform'
+      value['type'] === 'webauthn-roaming' ||
+      value['type'] === 'webauthn-platform'
         ? value['type']
         : undefined,
     publicKey:
       typeof value['publicKey'] === 'string' ? value['publicKey'] : undefined,
-    counter: typeof value['counter'] === 'number' ? value['counter'] : undefined,
+    counter:
+      typeof value['counter'] === 'number' ? value['counter'] : undefined,
     deviceType:
       typeof value['deviceType'] === 'string' ? value['deviceType'] : undefined,
-    backedUp: typeof value['backedUp'] === 'boolean' ? value['backedUp'] : undefined,
+    backedUp:
+      typeof value['backedUp'] === 'boolean' ? value['backedUp'] : undefined,
   }
 }
 

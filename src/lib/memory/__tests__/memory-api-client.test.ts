@@ -9,7 +9,9 @@ import { MemoryApiClient, MemoryApiError } from '../memory-api-client'
 
 // ─── Mock fetch factory ───────────────────────────────────────────────────────
 
-type MockFetch = ReturnType<typeof vi.fn<Promise<Response>, [RequestInfo, RequestInit?]>>
+type MockFetch = ReturnType<
+  typeof vi.fn<Promise<Response>, [RequestInfo, RequestInit?]>
+>
 
 function createMockClient(mockFetch: MockFetch) {
   return new MemoryApiClient({

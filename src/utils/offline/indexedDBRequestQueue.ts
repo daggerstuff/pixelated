@@ -4,8 +4,6 @@
  * Uses IndexedDB for persistent storage to avoid blocking the main thread
  */
 
-
-
 import IndexedDBStorage from '../storage/indexedDBStorage'
 
 export interface QueuedRequest {

@@ -6,12 +6,7 @@ import { Card, CardContent } from '@/components/ui/card/index'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { MentalHealthAnalysis } from '@/lib/chat'
 import { createMentalHealthChat } from '@/lib/chat'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'

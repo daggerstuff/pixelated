@@ -241,7 +241,7 @@ export function usePixelCrisisDetection(
   riskLevel: string
   signals: Array<{ type: string; severity: number }>
 } {
-  const {crisisStatus} = usePixelConversationIntegration({
+  const { crisisStatus } = usePixelConversationIntegration({
     sessionId,
     userId,
     autoInitialize: true,
