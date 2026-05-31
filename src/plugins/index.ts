@@ -4,23 +4,38 @@
 
 import type { AstroIntegration } from 'astro'
 
+// Minimal AST node type for rehype/remark processing
+interface AstNode {
+  type: string
+  children?: AstNode[]
+  value?: string
+  data?: Record<string, unknown>
+}
+
+function hasChildren(node: AstNode): node is AstNode & { children: AstNode[] } {
+  return Array.isArray(node.children) && node.children.length > 0
+}
+
 // Simple rehype heading IDs implementation
 function rehypeHeadingIds() {
-  return (tree: any) => {
+  return (tree: AstNode) => {
     // Simple implementation - add IDs to headings
-    function walk(node: any) {
-      if (node.type === 'heading' && node.children) {
+    function walk(node: AstNode) {
+      if (node.type === 'heading' && hasChildren(node)) {
         const text = node.children
-          .map((child: any) => child.value ?? '')
+          .map((child: AstNode) => child.value ?? '')
           .join('')
         if (text) {
           node.data = node.data ?? {}
-          node.data.hProperties = node.data.hProperties ?? {}
-          node.data.hProperties.id = text.toLowerCase().replace(/\s+/g, '-')
+          const hProperties = (node.data['hProperties'] as Record<string, string>) ?? {}
+          hProperties['id'] = text.toLowerCase().replace(/\s+/g, '-')
+          node.data['hProperties'] = hProperties
         }
       }
-      if (node.children) {
-        node.children.forEach(walk)
+      if (hasChildren(node)) {
+        for (const child of node.children) {
+          walk(child)
+        }
       }
     }
     walk(tree)
@@ -45,15 +60,15 @@ export function rehypeHeadingIdsPlugin(): AstroIntegration {
 }
 
 // Placeholder for unist-util-visit functionality
-export function visit(tree: any, type: string, callback: (node: any) => void) {
-  if (!tree?.children) return
+export function visit(tree: AstNode, type: string, callback: (node: AstNode) => void) {
+  if (!hasChildren(tree)) return
 
   for (const child of tree.children) {
     if (child.type === type) {
       callback(child)
     }
     // Recursively visit children
-    if (child.children) {
+    if (hasChildren(child)) {
       visit(child, type, callback)
     }
   }

@@ -11,6 +11,36 @@ import { NotFoundError, ForbiddenError } from '../middleware/error-handler'
 /**
  * Create a new strategic plan
  */
+export interface IStrategicPlan {
+  _id: string
+  title: string
+  slug: string
+  description: string
+  owner: string
+  status: string
+  objectives: any[]
+  keyResults: any[]
+  budget: number
+  timeline: { startDate: Date; endDate: Date }
+  kpis: any[]
+  approvals: any[]
+  riskManagement: any[]
+  permissions: {
+    view: string[]
+    edit: string[]
+    comment: string[]
+  }
+  createdAt: Date
+  updatedAt: Date
+  save(): Promise<IStrategicPlan>
+}
+
+const getStrategicPlanModel = (): any =>
+  getMongoConnection().model<IStrategicPlan>('StrategicPlan')
+
+/**
+ * Create a new strategic plan
+ */
 export async function createStrategicPlan(data: {
   title: string
   description?: string
@@ -20,7 +50,7 @@ export async function createStrategicPlan(data: {
   budget?: number
   timeline?: { startDate: Date; endDate: Date }
 }) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
   const pool = getPostgresPool()
 
   const planId = uuid()
@@ -68,7 +98,7 @@ export async function createStrategicPlan(data: {
  * Get strategic plan by ID
  */
 export async function getStrategicPlan(planId: string, userId: string) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
 
   const plan = await StrategicPlanModel.findById(planId)
 
@@ -92,7 +122,7 @@ export async function updateStrategicPlan(
   userId: string,
   updates: Partial<any>,
 ) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
 
   const plan = await StrategicPlanModel.findById(planId)
 
@@ -132,7 +162,7 @@ export async function addKPI(
     deadline?: Date
   },
 ) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
 
   const plan = await StrategicPlanModel.findById(planId)
 
@@ -174,7 +204,7 @@ export async function submitForApproval(
   userId: string,
   approvers: string[],
 ) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
   const pool = getPostgresPool()
 
   const plan = await StrategicPlanModel.findById(planId)
@@ -226,7 +256,7 @@ export async function listStrategicPlans(
     status?: string
   } = {},
 ) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
   const page = options.page ?? 1
   const limit = options.limit ?? 50
 
@@ -260,7 +290,7 @@ export async function shareStrategicPlan(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
 
   const plan = await StrategicPlanModel.findById(planId)
 
@@ -287,7 +317,7 @@ export async function shareStrategicPlan(
  * Delete strategic plan
  */
 export async function deleteStrategicPlan(planId: string, userId: string) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
   const pool = getPostgresPool()
 
   const plan = await StrategicPlanModel.findById(planId)
@@ -316,7 +346,7 @@ export async function alignProjectToPlan(data: {
   okrId?: string
   userId: string
 }) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
 
   const plan = await StrategicPlanModel.findById(data.planId)
 
@@ -373,7 +403,7 @@ export async function updatePlanStatus(data: {
   reason?: string
   userId: string
 }) {
-  const StrategicPlanModel = getMongoConnection().model('StrategicPlan')
+  const StrategicPlanModel = getStrategicPlanModel()
   const pool = getPostgresPool()
 
   const plan = await StrategicPlanModel.findById(data.planId)

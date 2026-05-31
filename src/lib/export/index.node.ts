@@ -12,6 +12,27 @@ import { Buffer } from 'buffer'
 import archiver from 'archiver'
 import PDFDocument from 'pdfkit'
 
+// Augment PDFKit types for methods used in this file
+interface PDFDocumentWithMethods extends PDFDocument {
+  on(event: string, callback: (...args: unknown[]) => void): this
+  save(): this
+  restore(): this
+  rotate(angle: number, options?: { origin?: [number, number] }): this
+  fillColor(color: string, opacity?: number): this
+  fontSize(size: number): this
+  font(font: string): this
+  text(text: string, options?: Record<string, unknown>): this
+  text(text: string, x?: number, y?: number, options?: Record<string, unknown>): this
+  moveTo(x: number, y: number): this
+  lineTo(x: number, y: number): this
+  stroke(): this
+  moveDown(lines?: number): this
+  page: { width: number; height: number; y?: number }
+  y: number
+  bufferedPageRange(): { count: number }
+  switchToPage(pageNumber: number): this
+}
+
 import type { ChatMessage } from '../../types/chat'
 // Import only the EncryptionMode from fhe types
 import { EncryptionMode } from '../fhe/types'
@@ -353,16 +374,18 @@ export class ExportService {
           contentAccessibility: true,
           documentAssembly: false,
         },
-      })
+      }) as unknown as PDFDocumentWithMethods
 
       // Set up error handling for PDF generation
       doc.on('error', (err: Error) => {
-        throw new Error(`PDF generation error: ${err?.message || String(err)}`)
+        console.error(`PDF generation error: ${err?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout
       const chunks: Buffer[] = []
-      doc.on('data', (chunk: Buffer) => chunks.push(chunk))
+      doc.on('data', (chunk: Buffer) => {
+        chunks.push(chunk)
+      })
 
       // Add watermark to each page with error handling
       doc.on('pageAdded', () => {

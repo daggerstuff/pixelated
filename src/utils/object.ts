@@ -101,7 +101,7 @@ function mergeArrayElements(
   remote: any[],
   depth: number,
   visited: WeakSet<object>,
-): unknown {
+): unknown[] {
   // Phase 1: build result from local items only — indices become stable here.
   const result: any[] = []
   const seenKeys = new Set<string>()
@@ -157,7 +157,7 @@ function mergeArrayElements(
     result.push(item)
   }
 
-  return result as unknown
+  return result
 }
 
 /**
@@ -203,7 +203,7 @@ export function mergeValues<T>(
   visited.add(remote as object)
 
   if (Array.isArray(local) && Array.isArray(remote)) {
-    return mergeArrayElements<T>(local, remote, depth, visited)
+    return mergeArrayElements(local, remote, depth, visited) as unknown as T
   }
 
   // Both sides are non-null, non-array objects (the early primitive check

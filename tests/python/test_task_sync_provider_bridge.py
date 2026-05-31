@@ -156,6 +156,8 @@ def test_jira_create_payload_defaults_issue_type_and_description() -> None:
     action = SimpleNamespace(
         title="Tri-sync rollout",
         body="Ship the sync bridge",
+        priority_label=None,
+        labels=[],
     )
 
     payload = jira_create_payload(action, "PIX", {"id": "10043"})
@@ -164,6 +166,8 @@ def test_jira_create_payload_defaults_issue_type_and_description() -> None:
     assert payload["fields"]["issuetype"] == {"id": "10043"}
     assert payload["fields"]["summary"] == "Tri-sync rollout"
     assert payload["fields"]["description"] == jira_adf_document("Ship the sync bridge")
+    assert "priority" not in payload["fields"]
+    assert "labels" not in payload["fields"]
 
 
 def test_resolve_jira_issue_type_prefers_project_issue_type_id(monkeypatch) -> None:
@@ -193,6 +197,8 @@ def test_jira_update_payload_updates_summary_and_description_only() -> None:
     action = SimpleNamespace(
         title="Tri-sync rollout",
         body="Ship the sync bridge",
+        priority_label=None,
+        labels=[],
     )
 
     payload = jira_update_payload(action)
@@ -759,6 +765,242 @@ def test_jira_project_exists_returns_none_on_transient_failure(monkeypatch) -> N
     )
 
     assert jira_project_exists("FLAKY") is None
+
+
+def test_jira_create_payload_includes_priority_and_labels() -> None:
+    action = SimpleNamespace(
+        title="Critical bug",
+        body="Must fix",
+        priority_label="high",
+        labels=["bug", "frontend"],
+    )
+
+    payload = jira_create_payload(action, "PIX", {"id": "10043"})
+
+    assert payload["fields"]["priority"] == {"name": "High"}
+    assert payload["fields"]["labels"] == ["bug", "frontend"]
+
+
+def test_jira_update_payload_includes_priority_and_labels() -> None:
+    action = SimpleNamespace(
+        title="Critical bug",
+        body="Must fix",
+        priority_label="high",
+        labels=["bug", "frontend"],
+    )
+
+    payload = jira_update_payload(action)
+
+    assert payload["fields"]["priority"] == {"name": "High"}
+    assert payload["fields"]["labels"] == ["bug", "frontend"]
+
+
+def test_apply_github_action_sends_labels_on_create(monkeypatch) -> None:
+    monkeypatch.setenv("GITHUB_TOKEN", "token")
+    monkeypatch.setenv("GITHUB_OWNER", "pixelated")
+    monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
+    sent_payloads: list[dict[str, object]] = []
+
+    def fake_json_request(method, url, *, headers, payload=None):
+        assert payload is not None
+        sent_payloads.append(payload)
+        return {"number": 42, "title": payload["title"], "body": payload["body"]}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._json_request", fake_json_request)
+
+    apply_github_action(
+        {
+            "action": "create",
+            "title": "Labeled issue",
+            "body": "Has labels",
+            "status": "open",
+            "labels": ["bug", "enhancement"],
+        }
+    )
+
+    assert sent_payloads[0]["labels"] == ["bug", "enhancement"]
+
+
+def test_apply_github_action_sends_labels_on_update(monkeypatch) -> None:
+    monkeypatch.setenv("GITHUB_TOKEN", "token")
+    monkeypatch.setenv("GITHUB_OWNER", "pixelated")
+    monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
+    sent_payloads: list[dict[str, object]] = []
+
+    def fake_json_request(method, url, *, headers, payload=None):
+        assert payload is not None
+        sent_payloads.append(payload)
+        return {}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._json_request", fake_json_request)
+
+    apply_github_action(
+        {
+            "action": "update",
+            "target_id": "99",
+            "title": "Labeled issue",
+            "body": "Has labels",
+            "status": "open",
+            "labels": ["bug"],
+        }
+    )
+
+    assert sent_payloads[0]["labels"] == ["bug"]
+
+
+def test_apply_linear_action_includes_priority(monkeypatch) -> None:
+    monkeypatch.setenv("LINEAR_API_KEY", "token")
+    monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
+    monkeypatch.setenv("LINEAR_PROJECT_ID", "proj-1")
+    sent_variables: list[dict[str, object]] = []
+
+    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        sent_variables.append(dict(variables or {}))
+        return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1", "enhancement": "label-uuid-2"},
+    )
+
+    apply_linear_action(
+        {
+            "action": "create",
+            "title": "Priority issue",
+            "body": "High priority",
+            "status": "open",
+            "priority_label": "high",
+        }
+    )
+
+    assert sent_variables[0]["input"]["priority"] == 1
+
+
+def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
+    monkeypatch.setenv("LINEAR_API_KEY", "token")
+    monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
+    monkeypatch.setenv("LINEAR_PROJECT_ID", "proj-1")
+    sent_variables: list[dict[str, object]] = []
+
+    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        sent_variables.append(dict(variables or {}))
+        return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1", "enhancement": "label-uuid-2"},
+    )
+
+    apply_linear_action(
+        {
+            "action": "create",
+            "title": "Labeled issue",
+            "body": "Has labels",
+            "status": "open",
+            "labels": ["bug", "enhancement"],
+        }
+    )
+
+    assert sent_variables[0]["input"]["labelIds"] == ["label-uuid-1", "label-uuid-2"]
+
+
+def test_resolve_linear_label_ids_populates_cache_on_first_call(monkeypatch) -> None:
+    from scripts.task_sync.provider_bridge import (
+        _LINEAR_LABEL_IDS_CACHE,
+        _resolve_linear_label_ids,
+    )
+
+    monkeypatch.setenv("LINEAR_API_KEY", "token")
+    monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
+    monkeypatch.setenv("LINEAR_LABEL_IDS_CACHE", "")
+    _LINEAR_LABEL_IDS_CACHE.clear()
+
+    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        return {
+            "data": {
+                "team": {
+                    "labels": {
+                        "nodes": [
+                            {"id": "uuid-bug", "name": "bug"},
+                            {"id": "uuid-feature", "name": "feature"},
+                        ]
+                    }
+                }
+            }
+        }
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+
+    result = _resolve_linear_label_ids(["bug", "feature", "nonexistent"])
+
+    assert result == ["uuid-bug", "uuid-feature"]
+    assert _LINEAR_LABEL_IDS_CACHE["bug"] == "uuid-bug"
+    assert _LINEAR_LABEL_IDS_CACHE["feature"] == "uuid-feature"
+    assert "nonexistent" not in _LINEAR_LABEL_IDS_CACHE
+
+
+def test_resolve_linear_label_ids_returns_empty_without_team_id(monkeypatch) -> None:
+    from scripts.task_sync.provider_bridge import _resolve_linear_label_ids
+
+    monkeypatch.setenv("LINEAR_TEAM_ID", "")
+
+    assert _resolve_linear_label_ids(["bug"]) == []
+
+
+def test_legacy_jira_create_payload_includes_priority_and_labels() -> None:
+    from scripts.task_sync.jira import PRIORITY_TO_JIRA, jira_create_payload
+
+    action = SimpleNamespace(
+        title="Critical bug",
+        body="Must fix",
+        priority_label="high",
+        labels=["bug", "frontend"],
+    )
+
+    payload = jira_create_payload(action, "PIX", "Task")
+
+    assert payload["fields"]["priority"] == {"name": PRIORITY_TO_JIRA["high"]}
+    assert payload["fields"]["labels"] == ["bug", "frontend"]
+
+
+def test_legacy_jira_update_payload_includes_priority_and_labels() -> None:
+    from scripts.task_sync.jira import PRIORITY_TO_JIRA, jira_update_payload
+
+    action = SimpleNamespace(
+        title="Critical bug",
+        body="Must fix",
+        priority_label="high",
+        labels=["bug", "frontend"],
+    )
+
+    payload = jira_update_payload(action)
+
+    assert payload["fields"]["priority"] == {"name": PRIORITY_TO_JIRA["high"]}
+    assert payload["fields"]["labels"] == ["bug", "frontend"]
+
+
+def test_legacy_jira_create_payload_skips_priority_and_labels_when_missing() -> None:
+    from scripts.task_sync.jira import jira_create_payload
+
+    action = SimpleNamespace(title="No extras", body="Just body")
+
+    payload = jira_create_payload(action, "PIX", "Task")
+
+    assert "priority" not in payload["fields"]
+    assert "labels" not in payload["fields"]
+
+
+def test_legacy_jira_update_payload_skips_priority_and_labels_when_missing() -> None:
+    from scripts.task_sync.jira import jira_update_payload
+
+    action = SimpleNamespace(title="No extras", body="Just body")
+
+    payload = jira_update_payload(action)
+
+    assert "priority" not in payload["fields"]
+    assert "labels" not in payload["fields"]
 
 
 def test_jira_project_exists_uses_cache(monkeypatch) -> None:

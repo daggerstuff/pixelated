@@ -24,7 +24,7 @@ describe('generateToc', () => {
     expect(toc).toHaveLength(2)
     expect(toc[0]!.text).toBe('H2')
     expect(toc[0]!.children).toHaveLength(1)
-    expect(toc[0]!.children[0].text).toBe('H3')
+    expect(toc[0]!.children![0]!.text).toBe('H3')
     expect(toc[1]!.text).toBe('H2-2')
   })
 
@@ -38,8 +38,8 @@ describe('generateToc', () => {
     const toc = generateToc(headings, minHeadingLevel, maxHeadingLevel)
     expect(toc).toHaveLength(1)
     expect(toc[0]!.children).toHaveLength(1)
-    expect(toc[0]!.children[0].slug).toBe('') // filler for level 3
-    expect(toc[0]!.children[0].children).toHaveLength(1)
-    expect(toc[0]!.children[0].children[0].text).toBe('H4')
+    expect(toc[0]!.children![0]!.slug).toBe('') // filler for level 3
+    expect(toc[0]!.children![0]!.children).toHaveLength(1)
+    expect(toc[0]!.children![0]!.children![0]!.text).toBe('H4')
   })
 })
