@@ -43,7 +43,7 @@ PROVIDER_APPLY_COMMAND_ENV_VARS = {
     "github": "PIXELATED_GITHUB_APPLY_COMMAND",
     "linear": "PIXELATED_LINEAR_APPLY_COMMAND",
 }
-DEFAULT_APPLY_MAX_WORKERS = 8
+DEFAULT_APPLY_MAX_WORKERS = 10
 DEFAULT_APPLY_MAX_PASSES = 2
 
 STATUS_ALIASES = {
@@ -480,14 +480,63 @@ def record_clean_body(record: TaskRecord) -> str:
 def group_records_by_key(
     records_by_provider: Mapping[str, Sequence[TaskRecord]],
 ) -> dict[str, list[TaskRecord]]:
-    grouped: dict[str, list[TaskRecord]] = {}
+    # 1. Normalize all records first
+    normalized_by_provider: dict[str, list[TaskRecord]] = {}
     for provider, records in records_by_provider.items():
+        normalized_list = []
         for record in records:
             normalized_record = normalized_group_record(provider, record)
             if not normalized_record.sync_key:
                 sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
                 continue
-            grouped.setdefault(normalized_record.sync_key, []).append(normalized_record)
+            normalized_list.append(normalized_record)
+        normalized_by_provider[provider] = normalized_list
+
+    # 2. Build the reverse-lookup map: (provider, external_id) -> canonical sync_key
+    # We do two passes to prioritize keys from records that have explicit provider_ids mappings.
+    id_to_key: dict[tuple[str, str], str] = {}
+
+    # Pass A: populate from records that have explicit cross-system provider_ids mappings
+    for provider, records in normalized_by_provider.items():
+        for record in records:
+            if record.provider_ids:
+                key = record.sync_key
+                id_to_key[(provider, record.external_id)] = key
+                for other_provider, other_id in record.provider_ids.items():
+                    if other_id:
+                        id_to_key[(other_provider, other_id)] = key
+
+    # Pass B: populate any remaining records that don't have cross-system mappings
+    for provider, records in normalized_by_provider.items():
+        for record in records:
+            rec_id = (provider, record.external_id)
+            if rec_id not in id_to_key:
+                id_to_key[rec_id] = record.sync_key
+
+    # 3. Group records, forcing matching records to adopt the mapped canonical key
+    grouped: dict[str, list[TaskRecord]] = {}
+    for provider, records in normalized_by_provider.items():
+        for record in records:
+            rec_id = (provider, record.external_id)
+            canonical_key = id_to_key.get(rec_id, record.sync_key)
+
+            # Create a copy/update of the record with the aligned canonical key
+            updated_record = TaskRecord(
+                provider=record.provider,
+                external_id=record.external_id,
+                title=record.title,
+                body=record.body,
+                status=record.status,
+                updated_at=record.updated_at,
+                sync_key=canonical_key,
+                provider_ids=record.provider_ids,
+                clean_body=record.clean_body,
+                raw=record.raw,
+                priority_label=record.priority_label,
+                labels=record.labels,
+            )
+            grouped.setdefault(canonical_key, []).append(updated_record)
+
     return grouped
 
 
@@ -504,6 +553,8 @@ def normalized_group_record(provider: str, record: TaskRecord) -> TaskRecord:
         provider_ids=record.provider_ids,
         clean_body=record_clean_body(record),
         raw=record.raw,
+        priority_label=record.priority_label,
+        labels=record.labels,
     )
 
 
@@ -1337,26 +1388,34 @@ def apply_sync_action(
 ) -> SyncExecutionResult:
     provider_commands = provider_commands or {}
 
+    sys.stderr.write(f"[{action.provider}] Starting {action.action} for '{action.sync_key}'\n")
+    sys.stderr.flush()
+
     if action.provider == "beads":
-        return _apply_beads_action(
+        res = _apply_beads_action(
             action,
             run_process=run_process,
         )
+    else:
+        has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
+        has_provider_command = action.provider in provider_commands
 
-    has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
-    has_provider_command = action.provider in provider_commands
+        if has_direct_applier and not has_provider_command:
+            res = _apply_direct_provider_action(action)
+        elif not has_provider_command:
+            raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
+        else:
+            res = _apply_bridge_action(
+                action,
+                provider_commands=provider_commands,
+                run_process=run_process,
+            )
 
-    if has_direct_applier and not has_provider_command:
-        return _apply_direct_provider_action(action)
-
-    if not has_provider_command:
-        raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
-
-    return _apply_bridge_action(
-        action,
-        provider_commands=provider_commands,
-        run_process=run_process,
+    sys.stderr.write(
+        f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n"
     )
+    sys.stderr.flush()
+    return res
 
 
 def apply_sync_plan(
@@ -1511,7 +1570,10 @@ def execute_apply_mode(
             break
         current_plan = build_follow_up_plan(current_plan, results)
 
-    beads_cleanup_results = cleanup_beads_duplicates(beads_export())
+    enabled_providers = resolve_enabled_providers_from_env()
+    beads_cleanup_results = []
+    if "beads" in enabled_providers:
+        beads_cleanup_results = cleanup_beads_duplicates(beads_export())
 
     payload: dict[str, Any] = {
         "passes": pass_summaries,
@@ -1528,7 +1590,7 @@ def execute_apply_mode(
     exit_code = 0
     if not all(result.success for result in all_results):
         exit_code = 1
-    if not all(result.success for result in beads_cleanup_results):
+    if beads_cleanup_results and not all(result.success for result in beads_cleanup_results):
         exit_code = 1
     return payload, exit_code
 

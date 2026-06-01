@@ -3,7 +3,9 @@
   "ignorePatterns": [
     "scripts/**/*.js",
     "scripts/**/*.mjs",
-    "public/polyfills/**/*.js"
+    "public/polyfills/**/*.js",
+    ".github/cookbook/**/*.ts",
+    ".github/cookbook/**/*.tsx"
   ],
   "env": {
     "browser": true,

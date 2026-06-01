@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SOURCE_DIR="${SOURCE_DIR:-/home/vivi}"
-RCLONE_TARGET="${RCLONE_TARGET:-HetznerS3:vivi-home-backups}"
+RCLONE_TARGET="${RCLONE_TARGET:-azureblob:vivi-home-backups}"
 RCLONE_SYNC_PATH="${RCLONE_SYNC_PATH:-}"
 LOCK_FILE_BASE="${HOME:-/home/vivi}"
 BACKUP_MODE="${BACKUP_MODE:-incremental}"

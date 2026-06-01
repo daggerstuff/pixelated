@@ -1,0 +1,1444 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "description": "Compressed skill metadata for low-token startup context. Load full SKILL.md on-demand.",
+  "generated_at_utc": "2026-04-07T02:50:08+00:00",
+  "generator": "pixelated/.agent/scripts/build_compressed_index.py",
+  "repo_root": "/home/vivi/pixelated",
+  "skills": {
+    "ab-test-setup": {
+      "category": "testing",
+      "description": "Structured guide for setting up A/B tests with mandatory gates for hypothesis, metrics, and execution readiness.",
+      "name": "ab-test-setup",
+      "path": ".agents/skills/ab-test-setup/SKILL.md",
+      "status": "populated",
+      "summary": "Structured guide for setting up A/B tests with mandatory gates for hypothesis, metrics, and execution readiness.",
+      "version": "4.1.0-fractal"
+    },
+    "accessibility-compliance-accessibility-audit": {
+      "category": "frontend",
+      "description": "You are an accessibility expert specializing in WCAG compliance, inclusive design, and assistive technology compatibility. Conduct audits, identify barriers, and provide remediation guidance.",
+      "name": "accessibility-compliance-accessibility-audit",
+      "path": ".agents/skills/accessibility-compliance-accessibility-audit/SKILL.md",
+      "status": "populated",
+      "summary": "You are an accessibility expert specializing in WCAG compliance, inclusive design, and assistive technology compatibility. Conduct audits...",
+      "version": "4.1.0-fractal"
+    },
+    "address-github-comments": {
+      "category": "general",
+      "description": "Use when you need to address review or issue comments on an open GitHub Pull Request using the gh CLI.",
+      "name": "address-github-comments",
+      "path": ".agents/skills/address-github-comments/SKILL.md",
+      "status": "populated",
+      "summary": "Use when you need to address review or issue comments on an open GitHub Pull Request using the gh CLI.",
+      "version": "4.1.0-fractal"
+    },
+    "agent-development": {
+      "category": "ai",
+      "description": "Comprehensive guide for developing Letta agents, including architecture selection, memory design, model selection, and tool configuration. Use when building or troubleshooting Letta agents.",
+      "name": "agent-development",
+      "path": ".agents/skills/agent-development/SKILL.md",
+      "status": "populated",
+      "summary": "Comprehensive guide for developing Letta agents, including architecture selection, memory design, model selection, and tool configuration..."
+    },
+    "agent-manager-skill": {
+      "category": "ai",
+      "description": "Manage multiple local CLI agents via tmux sessions (start/stop/monitor/assign) with cron-friendly scheduling.",
+      "name": "agent-manager-skill",
+      "path": ".agents/skills/agent-manager-skill/SKILL.md",
+      "status": "populated",
+      "summary": "Manage multiple local CLI agents via tmux sessions (start/stop/monitor/assign) with cron-friendly scheduling."
+    },
+    "agent-memory-mcp": {
+      "category": "ai",
+      "description": "A hybrid memory system that provides persistent, searchable knowledge management for AI agents (Architecture, Patterns, Decisions).",
+      "name": "agent-memory-mcp",
+      "path": ".agents/skills/agent-memory-mcp/SKILL.md",
+      "status": "populated",
+      "summary": "A hybrid memory system that provides persistent, searchable knowledge management for AI agents (Architecture, Patterns, Decisions)."
+    },
+    "agent-orchestration": {
+      "category": "ai",
+      "description": "Multi-agent orchestration and state management.",
+      "name": "agent-orchestration",
+      "path": ".agents/skills/agent-orchestration/SKILL.md",
+      "status": "populated",
+      "summary": "Multi-agent orchestration and state management.",
+      "version": "4.1.0-fractal"
+    },
+    "agent-tool-builder": {
+      "category": "frontend",
+      "description": "Tools are how AI agents interact with the world. A well-designed tool is the difference between an agent that works and one that hallucinates, fails silently, or costs 10x more tokens than necessary.  This skill covers tool design from schema to error handling. JSON Schema best practices, description writing that actually helps the LLM, validation, and the emerging MCP standard that's becoming the lingua franca for AI tools.  Key insight: Tool descriptions are more important than tool implementa",
+      "name": "agent-tool-builder",
+      "path": ".agents/skills/agent-tool-builder/SKILL.md",
+      "status": "populated",
+      "summary": "Tools are how AI agents interact with the world. A well-designed tool is the difference between an agent that works and one that hallucin..."
+    },
+    "agents-sdk": {
+      "category": "ai",
+      "description": "Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket apps, scheduled tasks, MCP servers, or chat applications. Covers Agent class, state management, callable RPC, Workflows integration, and React hooks. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
+      "name": "agents-sdk",
+      "path": ".agents/skills/agents-sdk/SKILL.md",
+      "status": "populated",
+      "summary": "Build AI agents on Cloudflare Workers using the Agents SDK. Load when creating stateful agents, durable workflows, real-time WebSocket ap..."
+    },
+    "ai-engineer": {
+      "category": "ai",
+      "description": ">",
+      "name": "ai-engineer",
+      "path": ".agents/skills/ai-engineer/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "ai-product": {
+      "category": "ai",
+      "description": "Every product will be AI-powered. The question is whether you'll build it right or ship a demo that falls apart in production.  This skill covers LLM integration patterns, RAG architecture-patterns, prompt engineering that scales, AI UX that users trust, and cost optimization that doesn't bankrupt you. Use when: keywords, file_patterns, code_patterns.",
+      "name": "ai-product",
+      "path": ".agents/skills/ai-product/SKILL.md",
+      "status": "populated",
+      "summary": "Every product will be AI-powered. The question is whether you'll build it right or ship a demo that falls apart in production.  This skil..."
+    },
+    "api-design-principles": {
+      "category": "backend",
+      "description": "Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when designing new APIs, reviewing API specifications, or establishing API design standards.",
+      "name": "api-design-principles",
+      "path": ".agents/skills/api-design-principles/SKILL.md",
+      "status": "populated",
+      "summary": "Master REST and GraphQL API design principles to build intuitive, scalable, and maintainable APIs that delight developers. Use when desig...",
+      "version": "4.1.0-fractal"
+    },
+    "api-documenter": {
+      "category": "backend",
+      "description": ">",
+      "name": "api-documenter",
+      "path": ".agents/skills/api-documenter/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "api-fuzzing-bug-bounty": {
+      "category": "backend",
+      "description": "This skill should be used when the user asks to \"test API security\", \"fuzz APIs\", \"find IDOR vulnerabilities\", \"test REST API\", \"test GraphQL\", \"API penetration testing\", \"bug bounty API testing\", or needs guidance on API security assessment techniques.",
+      "name": "api-fuzzing-bug-bounty",
+      "path": ".agents/skills/api-fuzzing-bug-bounty/SKILL.md",
+      "status": "populated",
+      "summary": "This skill should be used when the user asks to \"test API security\", \"fuzz APIs\", \"find IDOR vulnerabilities\", \"test REST API\", \"test Gra...",
+      "version": "4.1.0-fractal"
+    },
+    "api-patterns": {
+      "category": "backend",
+      "description": "API design principles and decision-making.",
+      "name": "api-patterns",
+      "path": ".agents/skills/api-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "API design principles and decision-making.",
+      "version": "4.1.0-fractal"
+    },
+    "appinsights-instrumentation": {
+      "category": "general",
+      "description": "Guidance for instrumenting webapps with Azure Application Insights. Provides telemetry patterns, SDK setup, and configuration references. WHEN: how to instrument app, App Insights SDK, telemetry patterns, what is App Insights, Application Insights guidance, instrumentation examples, APM best practices.",
+      "name": "appinsights-instrumentation",
+      "path": ".agents/skills/appinsights-instrumentation/SKILL.md",
+      "status": "populated",
+      "summary": "Guidance for instrumenting webapps with Azure Application Insights. Provides telemetry patterns, SDK setup, and configuration references....",
+      "version": "1.0.2"
+    },
+    "architecture-decision-records": {
+      "category": "devops",
+      "description": "Write and maintain Architecture Decision Records (ADRs) following best practices for technical decision documentation. Use when documenting significant technical decisions, reviewing past architectural choices, or establishing decision processes.",
+      "name": "architecture-decision-records",
+      "path": ".agents/skills/architecture-decision-records/SKILL.md",
+      "status": "populated",
+      "summary": "Write and maintain Architecture Decision Records (ADRs) following best practices for technical decision documentation. Use when documenti...",
+      "version": "4.1.0-fractal"
+    },
+    "architecture-patterns": {
+      "category": "general",
+      "description": "Implement proven backend architecture-patterns patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design. Use when architecting complex backend systems or refactoring existing applications for better maintainability.",
+      "name": "architecture-patterns",
+      "path": ".agents/skills/architecture-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Implement proven backend architecture-patterns patterns including Clean Architecture, Hexagonal Architecture, and Domain-Driven Design. U...",
+      "version": "4.1.0-fractal"
+    },
+    "auth-implementation-patterns": {
+      "category": "backend",
+      "description": "Master authentication and authorization patterns including JWT, OAuth2, session management, and RBAC to build secure, scalable access control systems. Use when implementing auth systems, securing APIs, or debugging security issues.",
+      "name": "auth-implementation-patterns",
+      "path": ".agents/skills/auth-implementation-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master authentication and authorization patterns including JWT, OAuth2, session management, and RBAC to build secure, scalable access con...",
+      "version": "4.1.0-fractal"
+    },
+    "azure-ai": {
+      "category": "ai",
+      "description": "Use for Azure AI: Search, Speech, OpenAI, Document Intelligence. Helps with search, vector/hybrid search, speech-to-text, text-to-speech, transcription, OCR. WHEN: AI Search, query search, vector search, hybrid search, semantic search, speech-to-text, text-to-speech, transcribe, OCR, convert text to speech.",
+      "name": "azure-ai",
+      "path": ".agents/skills/azure-ai/SKILL.md",
+      "status": "populated",
+      "summary": "Use for Azure AI: Search, Speech, OpenAI, Document Intelligence. Helps with search, vector/hybrid search, speech-to-text, text-to-speech,...",
+      "version": "1.0.1"
+    },
+    "azure-aigateway": {
+      "category": "ai",
+      "description": "Configure Azure API Management as an AI Gateway for AI models, MCP tools, and agents. WHEN: semantic caching, token limit, content safety, load balancing, AI model governance, MCP rate limiting, jailbreak detection, add Azure OpenAI backend, add AI Foundry model, test AI gateway, LLM policies, configure AI backend, token metrics, AI cost control, convert API to MCP, import OpenAPI to gateway.",
+      "name": "azure-aigateway",
+      "path": ".agents/skills/azure-aigateway/SKILL.md",
+      "status": "populated",
+      "summary": "Configure Azure API Management as an AI Gateway for AI models, MCP tools, and agents. WHEN: semantic caching, token limit, content safety...",
+      "version": "3.0.1"
+    },
+    "azure-cloud-migrate": {
+      "category": "general",
+      "description": "Assess and migrate cross-cloud workloads to Azure with migration reports and code conversion guidance. Supports AWS, GCP, and other providers. WHEN: migrate Lambda to Azure Functions, migrate AWS to Azure, Lambda migration assessment, convert AWS serverless to Azure, migration readiness report, migrate from AWS, migrate from GCP, cross-cloud migration.",
+      "name": "azure-cloud-migrate",
+      "path": ".agents/skills/azure-cloud-migrate/SKILL.md",
+      "status": "populated",
+      "summary": "Assess and migrate cross-cloud workloads to Azure with migration reports and code conversion guidance. Supports AWS, GCP, and other provi...",
+      "version": "1.0.1"
+    },
+    "azure-compliance": {
+      "category": "security",
+      "description": "Run Azure compliance and security audits with azqr plus Key Vault expiration checks. Covers best-practice assessment, resource review, policy/compliance validation, and security posture checks. WHEN: compliance scan, security audit, BEFORE running azqr (compliance cli tool), Azure best practices, Key Vault expiration check, expired certificates, expiring secrets, orphaned resources, compliance assessment.",
+      "name": "azure-compliance",
+      "path": ".agents/skills/azure-compliance/SKILL.md",
+      "status": "populated",
+      "summary": "Run Azure compliance and security audits with azqr plus Key Vault expiration checks. Covers best-practice assessment, resource review, po...",
+      "version": "1.0.3"
+    },
+    "azure-compute": {
+      "category": "general",
+      "description": "Azure VM and VMSS router for recommendations, pricing, autoscale, orchestration, and connectivity troubleshooting. WHEN: Azure VM, VMSS, scale set, recommend, compare, server, website, burstable, lightweight, VM family, workload, GPU, learning, simulation, dev/test, backend, autoscale, load balancer, Flexible orchestration, Uniform orchestration, cost estimate, connect, refused, Linux, black screen, reset password, reach VM, port 3389, NSG, troubleshoot.",
+      "name": "azure-compute",
+      "path": ".agents/skills/azure-compute/SKILL.md",
+      "status": "populated",
+      "summary": "Azure VM and VMSS router for recommendations, pricing, autoscale, orchestration, and connectivity troubleshooting. WHEN: Azure VM, VMSS,...",
+      "version": "2.0.0"
+    },
+    "azure-cost-optimization": {
+      "category": "general",
+      "description": "Identify Azure cost savings from usage and spending data. USE FOR: optimize Azure costs, reduce Azure spending/expenses, analyze Azure costs, find cost savings, generate cost optimization report, identify orphaned resources to delete, rightsize VMs, reduce waste, optimize Redis costs, optimize storage costs, AKS cost analysis add-on, namespace cost, cost spike, anomaly, budget alert, AKS cost visibility. DO NOT USE FOR: deploying resources (use azure-deploy), general Azure diagnostics (use azure-diagnostics), security issues (use azure-security)",
+      "name": "azure-cost-optimization",
+      "path": ".agents/skills/azure-cost-optimization/SKILL.md",
+      "status": "populated",
+      "summary": "Identify Azure cost savings from usage and spending data. USE FOR: optimize Azure costs, reduce Azure spending/expenses, analyze Azure co...",
+      "version": "1.0.2"
+    },
+    "azure-deploy": {
+      "category": "devops",
+      "description": "Execute Azure deployments for ALREADY-PREPARED applications that have existing .azure/deployment-plan.md and infrastructure files. DO NOT use this skill when the user asks to CREATE a new application — use azure-prepare instead. This skill runs azd up, azd deploy, terraform apply, and az deployment commands with built-in error recovery. Requires .azure/deployment-plan.md from azure-prepare and validated status from azure-validate. WHEN: \\\"run azd up\\\", \\\"run azd deploy\\\", \\\"execute deployment\\\", \\\"push to production\\\", \\\"push to cloud\\\", \\\"go live\\\", \\\"ship it\\\", \\\"bicep deploy\\\", \\\"terraform apply\\\", \\\"publish to Azure\\\", \\\"launch on Azure\\\". DO NOT USE WHEN: \\\"create and deploy\\\", \\\"build and deploy\\\", \\\"create a new app\\\", \\\"set up infrastructure\\\", \\\"create and deploy to Azure using Terraform\\\" — use azure-prepare for these.",
+      "name": "azure-deploy",
+      "path": ".agents/skills/azure-deploy/SKILL.md",
+      "status": "populated",
+      "summary": "Execute Azure deployments for ALREADY-PREPARED applications that have existing .azure/deployment-plan.md and infrastructure files. DO NOT...",
+      "version": "1.0.10"
+    },
+    "azure-diagnostics": {
+      "category": "general",
+      "description": "Debug Azure production issues on Azure using AppLens, Azure Monitor, resource health, and safe triage. WHEN: debug production issues, troubleshoot container apps, troubleshoot functions, troubleshoot AKS, kubectl cannot connect, kube-system/CoreDNS failures, pod pending, crashloop, node not ready, upgrade failures, analyze logs, KQL, insights, image pull failures, cold start issues, health probe failures, resource health, root cause of errors.",
+      "name": "azure-diagnostics",
+      "path": ".agents/skills/azure-diagnostics/SKILL.md",
+      "status": "populated",
+      "summary": "Debug Azure production issues on Azure using AppLens, Azure Monitor, resource health, and safe triage. WHEN: debug production issues, tro...",
+      "version": "1.0.4"
+    },
+    "azure-enterprise-infra-planner": {
+      "category": "general",
+      "description": "Architect and provision enterprise Azure infrastructure from workload descriptions. For cloud architects and platform engineers planning networking, identity, security, compliance, and multi-resource topologies with WAF alignment. Generates Bicep or Terraform directly (no azd). WHEN: 'plan Azure infrastructure', 'architect Azure landing zone', 'design hub-spoke network', 'plan multi-region DR topology', 'set up VNets firewalls and private endpoints', 'subscription-scope Bicep deployment'. PREFER azure-prepare FOR app-centric workflows.",
+      "name": "azure-enterprise-infra-planner",
+      "path": ".agents/skills/azure-enterprise-infra-planner/SKILL.md",
+      "status": "populated",
+      "summary": "Architect and provision enterprise Azure infrastructure from workload descriptions. For cloud architects and platform engineers planning...",
+      "version": "1.0.1"
+    },
+    "azure-hosted-copilot-sdk": {
+      "category": "general",
+      "description": "Build and deploy GitHub Copilot SDK apps to Azure. WHEN: build copilot app, create copilot app, copilot SDK, @github/copilot-sdk, scaffold copilot project, copilot-powered app, deploy copilot app, host on azure, azure model, BYOM, bring your own model, use my own model, azure openai model, DefaultAzureCredential, self-hosted model, copilot SDK service, chat app with copilot, copilot-sdk-service template, azd init copilot, CopilotClient, createSession, sendAndWait, GitHub Models API.",
+      "name": "azure-hosted-copilot-sdk",
+      "path": ".agents/skills/azure-hosted-copilot-sdk/SKILL.md",
+      "status": "populated",
+      "summary": "Build and deploy GitHub Copilot SDK apps to Azure. WHEN: build copilot app, create copilot app, copilot SDK, @github/copilot-sdk, scaffol...",
+      "version": "1.0.1"
+    },
+    "azure-kubernetes": {
+      "category": "devops",
+      "description": "Plan, create, and configure production-ready Azure Kubernetes Service (AKS) clusters. Covers Day-0 checklist, SKU selection (Automatic vs Standard), networking options (private API server, Azure CNI Overlay, egress configuration), security, and operations (autoscaling, upgrade strategy, cost analysis). WHEN: create AKS environment, provision AKS environment, enable AKS observability, design AKS networking, choose AKS SKU, secure AKS.",
+      "name": "azure-kubernetes",
+      "path": ".agents/skills/azure-kubernetes/SKILL.md",
+      "status": "populated",
+      "summary": "Plan, create, and configure production-ready Azure Kubernetes Service (AKS) clusters. Covers Day-0 checklist, SKU selection (Automatic vs...",
+      "version": "1.0.2"
+    },
+    "azure-kusto": {
+      "category": "general",
+      "description": "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQL for log analytics, telemetry, and time series analysis. WHEN: KQL queries, Kusto database queries, Azure Data Explorer, ADX clusters, log analytics, time series data, IoT telemetry, anomaly detection.",
+      "name": "azure-kusto",
+      "path": ".agents/skills/azure-kusto/SKILL.md",
+      "status": "populated",
+      "summary": "Query and analyze data in Azure Data Explorer (Kusto/ADX) using KQL for log analytics, telemetry, and time series analysis. WHEN: KQL que...",
+      "version": "1.0.1"
+    },
+    "azure-messaging": {
+      "category": "general",
+      "description": "Troubleshoot and resolve issues with Azure Messaging SDKs for Event Hubs and Service Bus. Covers connection failures, authentication errors, message processing issues, and SDK configuration problems. WHEN: event hub SDK error, service bus SDK issue, messaging connection failure, AMQP error, event processor host issue, message lock lost, message lock expired, lock renewal, lock renewal batch, send timeout, receiver disconnected, SDK troubleshooting, azure messaging SDK, event hub consumer, service bus queue issue, topic subscription error, enable logging event hub, service bus logging, eventhub python, servicebus java, eventhub javascript, servicebus dotnet, event hub checkpoint, event hub not receiving messages, service bus dead letter, batch processing lock, session lock expired, idle timeout, connection inactive, link detach, slow reconnect, session error, duplicate events, offset reset, receive batch.",
+      "name": "azure-messaging",
+      "path": ".agents/skills/azure-messaging/SKILL.md",
+      "status": "populated",
+      "summary": "Troubleshoot and resolve issues with Azure Messaging SDKs for Event Hubs and Service Bus. Covers connection failures, authentication erro...",
+      "version": "1.0.4"
+    },
+    "azure-prepare": {
+      "category": "general",
+      "description": "Prepare Azure apps for deployment (infra Bicep/Terraform, azure.yaml, Dockerfiles). Use for create/modernize or create+deploy; not cross-cloud migration (use azure-cloud-migrate). WHEN: \\\"create app\\\", \\\"build web app\\\", \\\"create API\\\", \\\"create serverless HTTP API\\\", \\\"create frontend\\\", \\\"create back end\\\", \\\"build a service\\\", \\\"modernize application\\\", \\\"update application\\\", \\\"add authentication\\\", \\\"add caching\\\", \\\"host on Azure\\\", \\\"create and deploy\\\", \\\"deploy to Azure\\\", \\\"deploy to Azure using Terraform\\\", \\\"deploy to Azure App Service\\\", \\\"deploy to Azure App Service using Terraform\\\", \\\"deploy to Azure Container Apps\\\", \\\"deploy to Azure Container Apps using Terraform\\\", \\\"generate Terraform\\\", \\\"generate Bicep\\\", \\\"function app\\\", \\\"timer trigger\\\", \\\"service bus trigger\\\", \\\"event-driven function\\\", \\\"containerized Node.js app\\\", \\\"social media app\\\", \\\"static portfolio website\\\", \\\"todo list with frontend and API\\\", \\\"prepare my Azure application to use Key Vault\\\", \\\"managed identity\\\".",
+      "name": "azure-prepare",
+      "path": ".agents/skills/azure-prepare/SKILL.md",
+      "status": "populated",
+      "summary": "Prepare Azure apps for deployment (infra Bicep/Terraform, azure.yaml, Dockerfiles). Use for create/modernize or create+deploy; not cross-...",
+      "version": "1.1.1"
+    },
+    "azure-quotas": {
+      "category": "general",
+      "description": "Check/manage Azure quotas and usage across providers. For deployment planning, capacity validation, region selection. WHEN: \\\"check quotas\\\", \\\"service limits\\\", \\\"current usage\\\", \\\"request quota increase\\\", \\\"quota exceeded\\\", \\\"validate capacity\\\", \\\"regional availability\\\", \\\"provisioning limits\\\", \\\"vCPU limit\\\", \\\"how many vCPUs available in my subscription\\\".",
+      "name": "azure-quotas",
+      "path": ".agents/skills/azure-quotas/SKILL.md",
+      "status": "populated",
+      "summary": "Check/manage Azure quotas and usage across providers. For deployment planning, capacity validation, region selection. WHEN: \\\"check quota...",
+      "version": "1.0.6"
+    },
+    "azure-rbac": {
+      "category": "general",
+      "description": "Helps users find the right Azure RBAC role for an identity with least privilege access, then generate CLI commands and Bicep code to assign it. Also provides guidance on permissions required to grant roles. WHEN: bicep for role assignment, what role should I assign, least privilege role, RBAC role for, role to read blobs, role for managed identity, custom role definition, assign role to identity, what role do I need to grant access, permissions to assign roles.",
+      "name": "azure-rbac",
+      "path": ".agents/skills/azure-rbac/SKILL.md",
+      "status": "populated",
+      "summary": "Helps users find the right Azure RBAC role for an identity with least privilege access, then generate CLI commands and Bicep code to assi...",
+      "version": "1.0.2"
+    },
+    "azure-resource-lookup": {
+      "category": "general",
+      "description": "List, find, and show Azure resources across subscriptions or resource groups. Handles prompts like \\\"list websites\\\", \\\"list virtual machines\\\", \\\"list my VMs\\\", \\\"show storage accounts\\\", \\\"find container apps\\\", and \\\"what resources do I have\\\". USE FOR: resource inventory, find resources by tag, tag analysis, orphaned resource discovery (not for cost analysis), unattached disks, count resources by type, cross-subscription lookup, and Azure Resource Graph queries. DO NOT USE FOR: deploying/changing resources, cost optimization, or non-Azure clouds.",
+      "name": "azure-resource-lookup",
+      "path": ".agents/skills/azure-resource-lookup/SKILL.md",
+      "status": "populated",
+      "summary": "List, find, and show Azure resources across subscriptions or resource groups. Handles prompts like \\\"list websites\\\", \\\"list virtual mach...",
+      "version": "1.0.1"
+    },
+    "azure-resource-visualizer": {
+      "category": "general",
+      "description": "Analyze Azure resource groups and generate detailed Mermaid architecture diagrams showing the relationships between individual resources. WHEN: create architecture diagram, visualize Azure resources, show resource relationships, generate Mermaid diagram, analyze resource group, diagram my resources, architecture visualization, resource topology, map Azure infrastructure.",
+      "name": "azure-resource-visualizer",
+      "path": ".agents/skills/azure-resource-visualizer/SKILL.md",
+      "status": "populated",
+      "summary": "Analyze Azure resource groups and generate detailed Mermaid architecture diagrams showing the relationships between individual resources....",
+      "version": "1.0.1"
+    },
+    "azure-storage": {
+      "category": "ai",
+      "description": "Azure Storage Services including Blob Storage, File Shares, Queue Storage, Table Storage, and Data Lake. Provides object storage, SMB file shares, async messaging, NoSQL key-value, and big data analytics capabilities. Includes access tiers (hot, cool, archive) and lifecycle management. USE FOR: blob storage, file shares, queue storage, table storage, data lake, upload files, download blobs, storage accounts, access tiers, lifecycle management. DO NOT USE FOR: SQL databases, Cosmos DB (use azure-prepare), messaging with Event Hubs or Service Bus (use azure-messaging).",
+      "name": "azure-storage",
+      "path": ".agents/skills/azure-storage/SKILL.md",
+      "status": "populated",
+      "summary": "Azure Storage Services including Blob Storage, File Shares, Queue Storage, Table Storage, and Data Lake. Provides object storage, SMB fil...",
+      "version": "1.0.0"
+    },
+    "azure-upgrade": {
+      "category": "general",
+      "description": "Assess and upgrade Azure workloads between plans, tiers, or SKUs within Azure. Generates assessment reports and automates upgrade steps. WHEN: upgrade Consumption to Flex Consumption, upgrade Azure Functions plan, migrate hosting plan, upgrade Functions SKU, move to Flex Consumption, upgrade Azure service tier, change hosting plan, upgrade function app plan, migrate App Service to Container Apps.",
+      "name": "azure-upgrade",
+      "path": ".agents/skills/azure-upgrade/SKILL.md",
+      "status": "populated",
+      "summary": "Assess and upgrade Azure workloads between plans, tiers, or SKUs within Azure. Generates assessment reports and automates upgrade steps....",
+      "version": "1.0.0"
+    },
+    "azure-validate": {
+      "category": "general",
+      "description": "Pre-deployment validation for Azure readiness. Run deep checks on configuration, infrastructure (Bicep or Terraform), RBAC role assignments, managed identity permissions, and prerequisites before deploying. WHEN: validate my app, check deployment readiness, run preflight checks, verify configuration, check if ready to deploy, validate azure.yaml, validate Bicep, test before deploying, troubleshoot deployment errors, validate Azure Functions, validate function app, validate serverless deployment, verify RBAC roles, check role assignments, review managed identity permissions, what-if analysis.",
+      "name": "azure-validate",
+      "path": ".agents/skills/azure-validate/SKILL.md",
+      "status": "populated",
+      "summary": "Pre-deployment validation for Azure readiness. Run deep checks on configuration, infrastructure (Bicep or Terraform), RBAC role assignmen...",
+      "version": "1.0.3"
+    },
+    "backend-dev-guidelines": {
+      "category": "frontend",
+      "description": "Opinionated backend development standards for Node.js + Express + TypeScript microservices. Covers layered architecture-patterns, BaseController pattern, dependency injection, Prisma repositories, Zod validation, unifiedConfig, Sentry error tracking, async safety, and testing discipline.",
+      "name": "backend-dev-guidelines",
+      "path": ".agents/skills/backend-dev-guidelines/SKILL.md",
+      "status": "populated",
+      "summary": "Opinionated backend development standards for Node.js + Express + TypeScript microservices. Covers layered architecture-patterns, BaseCon...",
+      "version": "4.1.0-fractal"
+    },
+    "bash-defensive-patterns": {
+      "category": "language",
+      "description": "Master defensive Bash programming techniques for production-grade scripts. Use when writing robust shell scripts, CI/CD pipelines, or system utilities requiring fault tolerance and safety.",
+      "name": "bash-defensive-patterns",
+      "path": ".agents/skills/bash-defensive-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master defensive Bash programming techniques for production-grade scripts. Use when writing robust shell scripts, CI/CD pipelines, or sys...",
+      "version": "4.1.0-fractal"
+    },
+    "bash-linux": {
+      "category": "frontend",
+      "description": "Bash/Linux terminal patterns and critical commands.",
+      "name": "bash-linux",
+      "path": ".agents/skills/bash-linux/SKILL.md",
+      "status": "populated",
+      "summary": "Bash/Linux terminal patterns and critical commands.",
+      "version": "4.1.0-fractal"
+    },
+    "building-ai-agent-on-cloudflare": {
+      "category": "frontend",
+      "description": "|",
+      "name": "building-ai-agent-on-cloudflare",
+      "path": ".agents/skills/building-ai-agent-on-cloudflare/SKILL.md",
+      "status": "populated",
+      "summary": "|"
+    },
+    "clean-code": {
+      "category": "general",
+      "description": "Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments",
+      "name": "clean-code",
+      "path": ".agents/skills/clean-code/SKILL.md",
+      "status": "populated",
+      "summary": "Pragmatic coding standards - concise, direct, no over-engineering, no unnecessary comments",
+      "version": "4.1.0-fractal"
+    },
+    "cloud-architect": {
+      "category": "general",
+      "description": "Expert cloud architect specializing in AWS/Azure/GCP multi-cloud",
+      "model": "opus",
+      "name": "cloud-architect",
+      "path": ".agents/skills/cloud-architect/SKILL.md",
+      "status": "populated",
+      "summary": "Expert cloud architect specializing in AWS/Azure/GCP multi-cloud",
+      "version": "4.1.0-fractal"
+    },
+    "cloudflare": {
+      "category": "general",
+      "description": "Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), networking (Tunnel, Spectrum), security (WAF, DDoS), and infrastructure-as-code (Terraform, Pulumi). Use for any Cloudflare development task. Biases towards retrieval from Cloudflare docs over pre-trained knowledge.",
+      "name": "cloudflare",
+      "path": ".agents/skills/cloudflare/SKILL.md",
+      "status": "populated",
+      "summary": "Comprehensive Cloudflare platform skill covering Workers, Pages, storage (KV, D1, R2), AI (Workers AI, Vectorize, Agents SDK), networking..."
+    },
+    "code-review-checklist": {
+      "category": "general",
+      "description": "Code review guidelines covering quality, security, and best practices.",
+      "name": "code-review-checklist",
+      "path": ".agents/skills/code-review-checklist/SKILL.md",
+      "status": "populated",
+      "summary": "Code review guidelines covering quality, security, and best practices.",
+      "version": "4.1.0-fractal"
+    },
+    "code-review-excellence": {
+      "category": "general",
+      "description": "Master effective code review practices to provide constructive feedback, catch bugs early, and foster knowledge sharing while maintaining team morale. Use when reviewing pull requests, establishing review standards, or mentoring developers.",
+      "name": "code-review-excellence",
+      "path": ".agents/skills/code-review-excellence/SKILL.md",
+      "status": "populated",
+      "summary": "Master effective code review practices to provide constructive feedback, catch bugs early, and foster knowledge sharing while maintaining...",
+      "version": "4.1.0-fractal"
+    },
+    "context7-auto-research": {
+      "category": "general",
+      "description": "Automatically fetch latest library/framework documentation for Claude Code via Context7 API",
+      "name": "context7-auto-research",
+      "path": ".agents/skills/context7-auto-research/SKILL.md",
+      "status": "populated",
+      "summary": "Automatically fetch latest library/framework documentation for Claude Code via Context7 API",
+      "version": "4.1.0-fractal"
+    },
+    "crewai": {
+      "category": "ai",
+      "description": "Expert in CrewAI - the leading role-based multi-agent framework used by 60% of Fortune 500 companies. Covers agent design with roles and goals, task definition, crew orchestration, process types (sequential, hierarchical, parallel), memory systems, and flows for complex workflows. Essential for building collaborative AI agent teams. Use when: crewai, multi-agent team, agent roles, crew of agents, role-based agents.",
+      "name": "crewai",
+      "path": ".agents/skills/crewai/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in CrewAI - the leading role-based multi-agent framework used by 60% of Fortune 500 companies. Covers agent design with roles and..."
+    },
+    "database-design": {
+      "category": "data",
+      "description": "Database design principles and decision-making.",
+      "name": "database-design",
+      "path": ".agents/skills/database-design/SKILL.md",
+      "status": "populated",
+      "summary": "Database design principles and decision-making.",
+      "version": "4.1.0-fractal"
+    },
+    "database-migration": {
+      "category": "data",
+      "description": ">",
+      "name": "database-migration",
+      "path": ".agents/skills/database-migration/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "debugging-strategies": {
+      "category": "testing",
+      "description": "Master systematic debugging techniques, profiling tools, and root cause analysis to efficiently track down bugs across any codebase or technology stack. Use when investigating bugs, performance issues, or unexpected behavior.",
+      "name": "debugging-strategies",
+      "path": ".agents/skills/debugging-strategies/SKILL.md",
+      "status": "populated",
+      "summary": "Master systematic debugging techniques, profiling tools, and root cause analysis to efficiently track down bugs across any codebase or te...",
+      "version": "4.1.0-fractal"
+    },
+    "devops-troubleshooter": {
+      "category": "devops",
+      "description": "Expert DevOps troubleshooter specializing in rapid incident",
+      "model": "sonnet",
+      "name": "devops-troubleshooter",
+      "path": ".agents/skills/devops-troubleshooter/SKILL.md",
+      "status": "populated",
+      "summary": "Expert DevOps troubleshooter specializing in rapid incident",
+      "version": "4.1.0-fractal"
+    },
+    "distributed-debugging-debug-trace": {
+      "category": "testing",
+      "description": "You are a debugging expert specializing in setting up comprehensive debugging environments, distributed tracing, and diagnostic tools. Configure debugging workflows, implement tracing solutions, and establish troubleshooting practices for development and production environments.",
+      "name": "distributed-debugging-debug-trace",
+      "path": ".agents/skills/distributed-debugging-debug-trace/SKILL.md",
+      "status": "populated",
+      "summary": "You are a debugging expert specializing in setting up comprehensive debugging environments, distributed tracing, and diagnostic tools. Co...",
+      "version": "4.1.0-fractal"
+    },
+    "docker-expert": {
+      "category": "devops",
+      "description": "Docker containerization expert with deep knowledge of multi-stage builds, image optimization, container security, Docker Compose orchestration, and production deployment patterns. Use PROACTIVELY for Dockerfile optimization, container issues, image size problems, security hardening, networking, and orchestration challenges.",
+      "name": "docker-expert",
+      "path": ".agents/skills/docker-expert/SKILL.md",
+      "status": "populated",
+      "summary": "Docker containerization expert with deep knowledge of multi-stage builds, image optimization, container security, Docker Compose orchestr...",
+      "version": "4.1.0-fractal"
+    },
+    "documentation-templates": {
+      "category": "documentation",
+      "description": "Documentation templates and structure guidelines. README, API docs, code comments.",
+      "name": "documentation-templates",
+      "path": ".agents/skills/documentation-templates/SKILL.md",
+      "status": "populated",
+      "summary": "Documentation templates and structure guidelines. README, API docs, code comments.",
+      "version": "4.1.0-fractal"
+    },
+    "e2e-testing-patterns": {
+      "category": "testing",
+      "description": "Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast deployment. Use when implementing E2E tests, debugging flaky tests, or establishing testing standards.",
+      "name": "e2e-testing-patterns",
+      "path": ".agents/skills/e2e-testing-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master end-to-end testing with Playwright and Cypress to build reliable test suites that catch bugs, improve confidence, and enable fast...",
+      "version": "4.1.0-fractal"
+    },
+    "entra-app-registration": {
+      "category": "general",
+      "description": "Guides Microsoft Entra ID app registration, OAuth 2.0 authentication, and MSAL integration. USE FOR: create app registration, register Azure AD app, configure OAuth, set up authentication, add API permissions, generate service principal, MSAL example, console app auth, Entra ID setup, Azure AD authentication. DO NOT USE FOR: Azure RBAC or role assignments (use azure-rbac), Key Vault secrets (use azure-keyvault-expiration-audit), Azure resource security (use azure-security).",
+      "name": "entra-app-registration",
+      "path": ".agents/skills/entra-app-registration/SKILL.md",
+      "status": "populated",
+      "summary": "Guides Microsoft Entra ID app registration, OAuth 2.0 authentication, and MSAL integration. USE FOR: create app registration, register Az...",
+      "version": "1.0.0"
+    },
+    "error-handling-patterns": {
+      "category": "general",
+      "description": "Master error handling patterns across languages including exceptions, Result types, error propagation, and graceful degradation to build resilient applications. Use when implementing error handling, designing APIs, or improving application reliability.",
+      "name": "error-handling-patterns",
+      "path": ".agents/skills/error-handling-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master error handling patterns across languages including exceptions, Result types, error propagation, and graceful degradation to build...",
+      "version": "4.1.0-fractal"
+    },
+    "exa-search": {
+      "category": "general",
+      "description": "Semantic search, similar content discovery, and structured research using Exa API",
+      "name": "exa-search",
+      "path": ".agents/skills/exa-search/SKILL.md",
+      "status": "populated",
+      "summary": "Semantic search, similar content discovery, and structured research using Exa API"
+    },
+    "fastapi-templates": {
+      "category": "backend",
+      "description": "Create production-ready FastAPI projects with async patterns, dependency injection, and comprehensive error handling. Use when building new FastAPI applications or setting up backend API projects.",
+      "name": "fastapi-templates",
+      "path": ".agents/skills/fastapi-templates/SKILL.md",
+      "status": "populated",
+      "summary": "Create production-ready FastAPI projects with async patterns, dependency injection, and comprehensive error handling. Use when building n...",
+      "version": "4.1.0-fractal"
+    },
+    "frontend-design": {
+      "category": "frontend",
+      "description": "Design thinking and decision-making for web UI.",
+      "name": "frontend-design",
+      "path": ".agents/skills/frontend-design/SKILL.md",
+      "status": "populated",
+      "summary": "Design thinking and decision-making for web UI.",
+      "version": "4.1.0-fractal"
+    },
+    "frontend-dev-guidelines": {
+      "category": "frontend",
+      "description": "Opinionated frontend development standards for modern React + TypeScript applications. Covers Suspense-first data fetching, lazy loading, feature-based architecture-patterns, MUI v7 styling, TanStack Router, performance optimization, and strict TypeScript practices.",
+      "name": "frontend-dev-guidelines",
+      "path": ".agents/skills/frontend-dev-guidelines/SKILL.md",
+      "status": "populated",
+      "summary": "Opinionated frontend development standards for modern React + TypeScript applications. Covers Suspense-first data fetching, lazy loading,...",
+      "version": "4.1.0-fractal"
+    },
+    "frontend-mobile-development-component-scaffold": {
+      "category": "frontend",
+      "description": "You are a React component architecture-patterns expert specializing in scaffolding production-ready, accessible, and performant components. Generate complete component implementations with TypeScript, tests, s",
+      "name": "frontend-mobile-development-component-scaffold",
+      "path": ".agents/skills/frontend-mobile-development-component-scaffold/SKILL.md",
+      "status": "populated",
+      "summary": "You are a React component architecture-patterns expert specializing in scaffolding production-ready, accessible, and performant component...",
+      "version": "4.1.0-fractal"
+    },
+    "frontend-slides": {
+      "category": "frontend",
+      "description": "Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a presentation, convert a PPT/PPTX to web, or create slides for a talk/pitch. Helps non-designers discover their aesthetic through visual exploration rather than abstract choices.",
+      "name": "frontend-slides",
+      "path": ".agents/skills/frontend-slides/SKILL.md",
+      "status": "populated",
+      "summary": "Create stunning, animation-rich HTML presentations from scratch or by converting PowerPoint files. Use when the user wants to build a pre..."
+    },
+    "git-advanced-workflows": {
+      "category": "devops",
+      "description": "Master advanced Git workflows including rebasing, cherry-picking, bisect, worktrees, and reflog to maintain clean history and recover from any situation. Use when managing complex Git histories, collaborating on feature branches, or troubleshooting repository issues.",
+      "name": "git-advanced-workflows",
+      "path": ".agents/skills/git-advanced-workflows/SKILL.md",
+      "status": "populated",
+      "summary": "Master advanced Git workflows including rebasing, cherry-picking, bisect, worktrees, and reflog to maintain clean history and recover fro...",
+      "version": "4.1.0-fractal"
+    },
+    "git-collaboration-master": {
+      "category": "general",
+      "description": ">",
+      "name": "git-collaboration-master",
+      "path": ".agents/skills/git-collaboration-master/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "github-mcp": {
+      "category": "automation",
+      "description": "Official GitHub Model Context Protocol Server for repository management.",
+      "name": "github-mcp",
+      "path": ".agents/skills/github-mcp/SKILL.md",
+      "status": "populated",
+      "summary": "Official GitHub Model Context Protocol Server for repository management.",
+      "version": "4.1.0-fractal"
+    },
+    "github-workflow-automation": {
+      "category": "devops",
+      "description": "Automate GitHub workflows with AI assistance. Includes PR reviews, issue triage, CI/CD integration, and Git operations. Use when automating GitHub workflows, setting up PR review automation, creating GitHub Actions, or triaging issues.",
+      "name": "github-workflow-automation",
+      "path": ".agents/skills/github-workflow-automation/SKILL.md",
+      "status": "populated",
+      "summary": "Automate GitHub workflows with AI assistance. Includes PR reviews, issue triage, CI/CD integration, and Git operations. Use when automati...",
+      "version": "4.1.0-fractal"
+    },
+    "grafana-dashboards": {
+      "category": "data",
+      "description": "Create and manage production Grafana dashboards for real-time visualization of system and application metrics. Use when building monitoring dashboards, visualizing metrics, or creating operational observability interfaces.",
+      "name": "grafana-dashboards",
+      "path": ".agents/skills/grafana-dashboards/SKILL.md",
+      "status": "populated",
+      "summary": "Create and manage production Grafana dashboards for real-time visualization of system and application metrics. Use when building monitori..."
+    },
+    "hybrid-search-implementation": {
+      "category": "general",
+      "description": "Combine vector and keyword search for improved retrieval. Use when implementing RAG systems, building search engines, or when neither approach alone provides sufficient recall.",
+      "name": "hybrid-search-implementation",
+      "path": ".agents/skills/hybrid-search-implementation/SKILL.md",
+      "status": "populated",
+      "summary": "Combine vector and keyword search for improved retrieval. Use when implementing RAG systems, building search engines, or when neither app..."
+    },
+    "incident-responder": {
+      "category": "devops",
+      "description": ">",
+      "name": "incident-responder",
+      "path": ".agents/skills/incident-responder/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "javascript-typescript-typescript-scaffold": {
+      "category": "language",
+      "description": "You are a TypeScript project architecture-patterns expert specializing in scaffolding production-ready Node.js and frontend applications. Generate complete project structures with modern tooling (pnpm, Vite, N",
+      "name": "javascript-typescript-typescript-scaffold",
+      "path": ".agents/skills/javascript-typescript-typescript-scaffold/SKILL.md",
+      "status": "populated",
+      "summary": "You are a TypeScript project architecture-patterns expert specializing in scaffolding production-ready Node.js and frontend applications....",
+      "version": "4.1.0-fractal"
+    },
+    "k8s-security-policies": {
+      "category": "devops",
+      "description": "Implement Kubernetes security policies including NetworkPolicy, PodSecurityPolicy, and RBAC for production-grade security. Use when securing Kubernetes clusters, implementing network isolation, or enforcing pod security standards.",
+      "name": "k8s-security-policies",
+      "path": ".agents/skills/k8s-security-policies/SKILL.md",
+      "status": "populated",
+      "summary": "Implement Kubernetes security policies including NetworkPolicy, PodSecurityPolicy, and RBAC for production-grade security. Use when secur...",
+      "version": "4.1.0-fractal"
+    },
+    "langgraph": {
+      "category": "ai",
+      "description": "Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state management, cycles and branches, persistence with checkpointers, human-in-the-loop patterns, and the ReAct agent pattern. Used in production at LinkedIn, Uber, and 400+ companies. This is LangChain's recommended approach for building agents. Use when: langgraph, langchain agent, stateful agent, agent graph, react agent.",
+      "name": "langgraph",
+      "path": ".agents/skills/langgraph/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in LangGraph - the production-grade framework for building stateful, multi-actor AI applications. Covers graph construction, state..."
+    },
+    "lint-and-validate": {
+      "category": "general",
+      "description": "Automatic quality control, linting, and static analysis procedures. Use after every code modification to ensure syntax correctness and project standards. Triggers onKeywords: lint, format, check, validate, types, static analysis.",
+      "name": "lint-and-validate",
+      "path": ".agents/skills/lint-and-validate/SKILL.md",
+      "status": "populated",
+      "summary": "Automatic quality control, linting, and static analysis procedures. Use after every code modification to ensure syntax correctness and pr..."
+    },
+    "linux-shell-scripting": {
+      "category": "frontend",
+      "description": "This skill should be used when the user asks to \"create bash scripts\", \"automate Linux tasks\", \"monitor system resources\", \"backup files\", \"manage users\", or \"write production shell scripts\". It provides ready-to-use shell script templates for system administration.",
+      "name": "linux-shell-scripting",
+      "path": ".agents/skills/linux-shell-scripting/SKILL.md",
+      "status": "populated",
+      "summary": "This skill should be used when the user asks to \"create bash scripts\", \"automate Linux tasks\", \"monitor system resources\", \"backup files\"...",
+      "version": "1.1"
+    },
+    "machine-learning-ops-ml-pipeline": {
+      "category": "ai",
+      "description": "Design and implement a complete ML pipeline for: $ARGUMENTS",
+      "name": "machine-learning-ops-ml-pipeline",
+      "path": ".agents/skills/machine-learning-ops-ml-pipeline/SKILL.md",
+      "status": "populated",
+      "summary": "Design and implement a complete ML pipeline for: $ARGUMENTS"
+    },
+    "mcp-builder": {
+      "category": "frontend",
+      "description": "MCP (Model Context Protocol) server building principles. Tool design, resource patterns, best practices.",
+      "name": "mcp-builder",
+      "path": ".agents/skills/mcp-builder/SKILL.md",
+      "status": "populated",
+      "summary": "MCP (Model Context Protocol) server building principles. Tool design, resource patterns, best practices."
+    },
+    "memory-systems": {
+      "category": "ai",
+      "description": "Design short-term, long-term, and graph-based memory architectures",
+      "name": "memory-systems",
+      "path": ".agents/skills/memory-systems/SKILL.md",
+      "status": "populated",
+      "summary": "Design short-term, long-term, and graph-based memory architectures"
+    },
+    "mermaid-expert": {
+      "category": "ai",
+      "description": "Create Mermaid diagrams for flowcharts, sequences, ERDs, and",
+      "model": "haiku",
+      "name": "mermaid-expert",
+      "path": ".agents/skills/mermaid-expert/SKILL.md",
+      "status": "populated",
+      "summary": "Create Mermaid diagrams for flowcharts, sequences, ERDs, and"
+    },
+    "microsoft-foundry": {
+      "category": "general",
+      "description": "Deploy, evaluate, and manage Foundry agents end-to-end: Docker build, ACR push, hosted/prompt agent create, container start, batch eval, prompt optimization, prompt optimizer workflows, agent.yaml, dataset curation from traces. USE FOR: deploy agent to Foundry, hosted agent, create agent, invoke agent, evaluate agent, run batch eval, optimize prompt, improve prompt, prompt optimization, prompt optimizer, improve agent instructions, optimize agent instructions, optimize system prompt, deploy model, Foundry project, RBAC, role assignment, permissions, quota, capacity, region, troubleshoot agent, deployment failure, create dataset from traces, dataset versioning, eval trending, create AI Services, Cognitive Services, create Foundry resource, provision resource, knowledge index, agent monitoring, customize deployment, onboard, availability. DO NOT USE FOR: Azure Functions, App Service, general Azure deploy (use azure-deploy), general Azure prep (use azure-prepare).",
+      "name": "microsoft-foundry",
+      "path": ".agents/skills/microsoft-foundry/SKILL.md",
+      "status": "populated",
+      "summary": "Deploy, evaluate, and manage Foundry agents end-to-end: Docker build, ACR push, hosted/prompt agent create, container start, batch eval,...",
+      "version": "1.0.7"
+    },
+    "ml-engineer": {
+      "category": "ai",
+      "description": "Build production ML systems with PyTorch 2.x, TensorFlow, and",
+      "model": "inherit",
+      "name": "ml-engineer",
+      "path": ".agents/skills/ml-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "Build production ML systems with PyTorch 2.x, TensorFlow, and"
+    },
+    "ml-pipeline-workflow": {
+      "category": "devops",
+      "description": "Build end-to-end MLOps pipelines from data preparation through model training, validation, and production deployment. Use when creating ML pipelines, implementing MLOps practices, or automating model training and deployment workflows.",
+      "name": "ml-pipeline-workflow",
+      "path": ".agents/skills/ml-pipeline-workflow/SKILL.md",
+      "status": "populated",
+      "summary": "Build end-to-end MLOps pipelines from data preparation through model training, validation, and production deployment. Use when creating M...",
+      "version": "4.1.0-fractal"
+    },
+    "mlops-engineer": {
+      "category": "ai",
+      "description": "Build comprehensive ML pipelines, experiment tracking, and model",
+      "model": "inherit",
+      "name": "mlops-engineer",
+      "path": ".agents/skills/mlops-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "Build comprehensive ML pipelines, experiment tracking, and model"
+    },
+    "modern-web-performance": {
+      "category": "general",
+      "description": "High-Performance Web Engineering.",
+      "name": "modern-web-performance",
+      "path": ".agents/skills/modern-web-performance/SKILL.md",
+      "status": "populated",
+      "summary": "High-Performance Web Engineering.",
+      "version": "4.1.0-fractal"
+    },
+    "monorepo-architect": {
+      "category": "devops",
+      "description": "Expert in monorepo architecture, build systems, and dependency management at scale. Masters Nx, Turborepo, Bazel, and Lerna for efficient multi-project development. Use PROACTIVELY for monorepo setup,",
+      "name": "monorepo-architect",
+      "path": ".agents/skills/monorepo-architect/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in monorepo architecture, build systems, and dependency management at scale. Masters Nx, Turborepo, Bazel, and Lerna for efficient..."
+    },
+    "monorepo-management": {
+      "category": "devops",
+      "description": "Master monorepo management with Turborepo, Nx, and pnpm workspaces to build efficient, scalable multi-package repositories with optimized builds and dependency management. Use when setting up monorepos, optimizing builds, or managing shared dependencies.",
+      "name": "monorepo-management",
+      "path": ".agents/skills/monorepo-management/SKILL.md",
+      "status": "populated",
+      "summary": "Master monorepo management with Turborepo, Nx, and pnpm workspaces to build efficient, scalable multi-package repositories with optimized..."
+    },
+    "multi-agent-patterns": {
+      "category": "ai",
+      "description": "Master orchestrator, peer-to-peer, and hierarchical multi-agent architectures",
+      "name": "multi-agent-patterns",
+      "path": ".agents/skills/multi-agent-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master orchestrator, peer-to-peer, and hierarchical multi-agent architectures"
+    },
+    "neon-postgres": {
+      "category": "data",
+      "description": "Expert patterns for Neon serverless Postgres, branching, connection pooling, and Prisma/Drizzle integration Use when: neon database, serverless postgres, database branching, neon postgres, postgres serverless.",
+      "name": "neon-postgres",
+      "path": ".agents/skills/neon-postgres/SKILL.md",
+      "status": "populated",
+      "summary": "Expert patterns for Neon serverless Postgres, branching, connection pooling, and Prisma/Drizzle integration Use when: neon database, serv..."
+    },
+    "nextjs-app-router-patterns": {
+      "category": "frontend",
+      "description": "Master Next.js 14+ App Router with Server Components, streaming, parallel routes, and advanced data fetching. Use when building Next.js applications, implementing SSR/SSG, or optimizing React Server Components.",
+      "name": "nextjs-app-router-patterns",
+      "path": ".agents/skills/nextjs-app-router-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master Next.js 14+ App Router with Server Components, streaming, parallel routes, and advanced data fetching. Use when building Next.js a...",
+      "version": "4.1.0-fractal"
+    },
+    "nextjs-best-practices": {
+      "category": "frontend",
+      "description": "Next.js App Router principles. Server Components, data fetching, routing patterns.",
+      "name": "nextjs-best-practices",
+      "path": ".agents/skills/nextjs-best-practices/SKILL.md",
+      "status": "populated",
+      "summary": "Next.js App Router principles. Server Components, data fetching, routing patterns.",
+      "version": "4.1.0-fractal"
+    },
+    "nodejs-backend-patterns": {
+      "category": "backend",
+      "description": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, database integration, and API design best practices. Use when creating Node.js servers, REST APIs, GraphQL backends, or microservices architectures.",
+      "name": "nodejs-backend-patterns",
+      "path": ".agents/skills/nodejs-backend-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Build production-ready Node.js backend services with Express/Fastify, implementing middleware patterns, error handling, authentication, d...",
+      "version": "4.1.0-fractal"
+    },
+    "nodejs-best-practices": {
+      "category": "backend",
+      "description": "Node.js development principles and decision-making.",
+      "name": "nodejs-best-practices",
+      "path": ".agents/skills/nodejs-best-practices/SKILL.md",
+      "status": "populated",
+      "summary": "Node.js development principles and decision-making.",
+      "version": "4.1.0-fractal"
+    },
+    "observability-engineer": {
+      "category": "data",
+      "description": "Build production-ready monitoring, logging, and tracing systems.",
+      "model": "inherit",
+      "name": "observability-engineer",
+      "path": ".agents/skills/observability-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "Build production-ready monitoring, logging, and tracing systems."
+    },
+    "openapi-spec-generation": {
+      "category": "backend",
+      "description": "Generate and maintain OpenAPI 3.1 specifications from code, design-first specs, and validation patterns. Use when creating API documentation, generating SDKs, or ensuring API contract compliance.",
+      "name": "openapi-spec-generation",
+      "path": ".agents/skills/openapi-spec-generation/SKILL.md",
+      "status": "populated",
+      "summary": "Generate and maintain OpenAPI 3.1 specifications from code, design-first specs, and validation patterns. Use when creating API documentat...",
+      "version": "4.1.0-fractal"
+    },
+    "performance-engineer": {
+      "category": "general",
+      "description": ">",
+      "name": "performance-engineer",
+      "path": ".agents/skills/performance-engineer/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "performance-profiling": {
+      "category": "general",
+      "description": "Performance profiling principles. Measurement, analysis, and optimization techniques.",
+      "name": "performance-profiling",
+      "path": ".agents/skills/performance-profiling/SKILL.md",
+      "status": "populated",
+      "summary": "Performance profiling principles. Measurement, analysis, and optimization techniques.",
+      "version": "4.1.0-fractal"
+    },
+    "performance-testing-review-ai-review": {
+      "category": "testing",
+      "description": "You are an expert AI-powered code review specialist combining automated static analysis, intelligent pattern recognition, and modern DevOps practices. Leverage AI tools (GitHub Copilot, Qodo, GPT-5, C",
+      "name": "performance-testing-review-ai-review",
+      "path": ".agents/skills/performance-testing-review-ai-review/SKILL.md",
+      "status": "populated",
+      "summary": "You are an expert AI-powered code review specialist combining automated static analysis, intelligent pattern recognition, and modern DevO...",
+      "version": "4.1.0-fractal"
+    },
+    "performance-testing-review-multi-agent-review": {
+      "category": "testing",
+      "description": "Use when working with performance testing review multi agent review",
+      "name": "performance-testing-review-multi-agent-review",
+      "path": ".agents/skills/performance-testing-review-multi-agent-review/SKILL.md",
+      "status": "populated",
+      "summary": "Use when working with performance testing review multi agent review",
+      "version": "4.1.0-fractal"
+    },
+    "personal-tool-builder": {
+      "category": "frontend",
+      "description": "Expert in building custom tools that solve your own problems first. The best products often start as personal tools - scratch your own itch, build for yourself, then discover others have the same itch. Covers rapid prototyping, local-first apps, CLI tools, scripts that grow into products, and the art of dogfooding. Use when: build a tool, personal tool, scratch my itch, solve my problem, CLI tool.",
+      "name": "personal-tool-builder",
+      "path": ".agents/skills/personal-tool-builder/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in building custom tools that solve your own problems first. The best products often start as personal tools - scratch your own it..."
+    },
+    "planning-with-files": {
+      "category": "documentation",
+      "description": "Implements Manus-style file-based planning for complex tasks. Creates task_plan.md, findings.md, and progress.md. Use when starting complex multi-step tasks, research projects, or any task requiring >5 tool calls.",
+      "name": "planning-with-files",
+      "path": ".agents/skills/planning-with-files/SKILL.md",
+      "status": "populated",
+      "summary": "Implements Manus-style file-based planning for complex tasks. Creates task_plan.md, findings.md, and progress.md. Use when starting compl...",
+      "version": "4.1.0-fractal"
+    },
+    "playwright-skill": {
+      "category": "testing",
+      "description": "Complete browser automation with Playwright. Auto-detects dev servers, writes clean test scripts to /tmp. Test pages, fill forms, take screenshots, check responsive design, validate UX, test login flows, check links, automate any browser task. Use when user wants to test websites, automate browser interactions, validate web functionality, or perform any browser-based testing.",
+      "name": "playwright-skill",
+      "path": ".agents/skills/playwright-skill/SKILL.md",
+      "status": "populated",
+      "summary": "Complete browser automation with Playwright. Auto-detects dev servers, writes clean test scripts to /tmp. Test pages, fill forms, take sc..."
+    },
+    "postgres-best-practices": {
+      "category": "data",
+      "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations.",
+      "name": "postgres-best-practices",
+      "path": ".agents/skills/postgres-best-practices/SKILL.md",
+      "status": "populated",
+      "summary": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres querie...",
+      "version": "1.0.0"
+    },
+    "prometheus-configuration": {
+      "category": "data",
+      "description": "Set up Prometheus for comprehensive metric collection, storage, and monitoring of infrastructure and applications. Use when implementing metrics collection, setting up monitoring infrastructure, or configuring alerting systems.",
+      "name": "prometheus-configuration",
+      "path": ".agents/skills/prometheus-configuration/SKILL.md",
+      "status": "populated",
+      "summary": "Set up Prometheus for comprehensive metric collection, storage, and monitoring of infrastructure and applications. Use when implementing..."
+    },
+    "prompt-caching": {
+      "category": "ai",
+      "description": "Caching strategies for LLM prompts including Anthropic prompt caching, response caching, and CAG (Cache Augmented Generation) Use when: prompt caching, cache prompt, response cache, cag, cache augmented.",
+      "name": "prompt-caching",
+      "path": ".agents/skills/prompt-caching/SKILL.md",
+      "status": "populated",
+      "summary": "Caching strategies for LLM prompts including Anthropic prompt caching, response caching, and CAG (Cache Augmented Generation) Use when: p..."
+    },
+    "prompt-engineering": {
+      "category": "ai",
+      "description": "Expert guide on prompt engineering patterns, best practices, and optimization techniques. Use when user wants to improve prompts, learn prompting strategies, or debug agent behavior.",
+      "name": "prompt-engineering",
+      "path": ".agents/skills/prompt-engineering/SKILL.md",
+      "status": "populated",
+      "summary": "Expert guide on prompt engineering patterns, best practices, and optimization techniques. Use when user wants to improve prompts, learn p..."
+    },
+    "python-patterns": {
+      "category": "language",
+      "description": "Python development principles and decision-making.",
+      "name": "python-patterns",
+      "path": ".agents/skills/python-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Python development principles and decision-making.",
+      "version": "4.1.0-fractal"
+    },
+    "python-performance-optimization": {
+      "category": "language",
+      "description": "Profile and optimize Python code using cProfile, memory profilers, and performance best practices. Use when debugging slow Python code, optimizing bottlenecks, or improving application performance.",
+      "name": "python-performance-optimization",
+      "path": ".agents/skills/python-performance-optimization/SKILL.md",
+      "status": "populated",
+      "summary": "Profile and optimize Python code using cProfile, memory profilers, and performance best practices. Use when debugging slow Python code, o...",
+      "version": "4.1.0-fractal"
+    },
+    "radix-ui-design-system": {
+      "category": "frontend",
+      "description": "Build accessible design systems with Radix UI primitives. Headless component customization, theming strategies, and compound component patterns for production-grade UI libraries.",
+      "name": "radix-ui-design-system",
+      "path": ".agents/skills/radix-ui-design-system/SKILL.md",
+      "status": "populated",
+      "summary": "Build accessible design systems with Radix UI primitives. Headless component customization, theming strategies, and compound component pa..."
+    },
+    "rag-engineer": {
+      "category": "ai",
+      "description": "Expert in building Retrieval-Augmented Generation systems. Masters embedding models, vector databases, chunking strategies, and retrieval optimization for LLM applications. Use when: building RAG, vector search, embeddings, semantic search, document retrieval.",
+      "name": "rag-engineer",
+      "path": ".agents/skills/rag-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in building Retrieval-Augmented Generation systems. Masters embedding models, vector databases, chunking strategies, and retrieval...",
+      "version": "4.1.0-fractal"
+    },
+    "rag-implementation": {
+      "category": "ai",
+      "description": "Build Retrieval-Augmented Generation (RAG) systems for LLM applications with vector databases and semantic search. Use when implementing knowledge-grounded AI, building document Q&A systems, or integrating LLMs with external knowledge bases.",
+      "name": "rag-implementation",
+      "path": ".agents/skills/rag-implementation/SKILL.md",
+      "status": "populated",
+      "summary": "Build Retrieval-Augmented Generation (RAG) systems for LLM applications with vector databases and semantic search. Use when implementing..."
+    },
+    "react-best-practices": {
+      "category": "frontend",
+      "description": "React & Next.js engineering standards.",
+      "name": "react-best-practices",
+      "path": ".agents/skills/react-best-practices/SKILL.md",
+      "status": "populated",
+      "summary": "React & Next.js engineering standards.",
+      "version": "4.1.0-fractal"
+    },
+    "react-patterns": {
+      "category": "frontend",
+      "description": "Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices.",
+      "name": "react-patterns",
+      "path": ".agents/skills/react-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Modern React patterns and principles. Hooks, composition, performance, TypeScript best practices.",
+      "version": "4.1.0-fractal"
+    },
+    "react-state-management": {
+      "category": "frontend",
+      "description": "Master modern React state management with Redux Toolkit, Zustand, Jotai, and React Query. Use when setting up global state, managing server state, or choosing between state management solutions.",
+      "name": "react-state-management",
+      "path": ".agents/skills/react-state-management/SKILL.md",
+      "status": "populated",
+      "summary": "Master modern React state management with Redux Toolkit, Zustand, Jotai, and React Query. Use when setting up global state, managing serv...",
+      "version": "4.1.0-fractal"
+    },
+    "reference-builder": {
+      "category": "frontend",
+      "description": "Creates exhaustive technical references and API documentation.",
+      "model": "haiku",
+      "name": "reference-builder",
+      "path": ".agents/skills/reference-builder/SKILL.md",
+      "status": "populated",
+      "summary": "Creates exhaustive technical references and API documentation."
+    },
+    "research-engineer": {
+      "category": "general",
+      "description": "An uncompromising Academic Research Engineer. Operates with absolute scientific rigor, objective criticism, and zero flair. Focuses on theoretical correctness, formal verification, and optimal implementation across any required technology.",
+      "name": "research-engineer",
+      "path": ".agents/skills/research-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "An uncompromising Academic Research Engineer. Operates with absolute scientific rigor, objective criticism, and zero flair. Focuses on th..."
+    },
+    "saga-orchestration": {
+      "category": "automation",
+      "description": "Implement saga patterns for distributed transactions and cross-aggregate workflows. Use when coordinating multi-step business processes, handling compensating transactions, or managing long-running workflows.",
+      "name": "saga-orchestration",
+      "path": ".agents/skills/saga-orchestration/SKILL.md",
+      "status": "populated",
+      "summary": "Implement saga patterns for distributed transactions and cross-aggregate workflows. Use when coordinating multi-step business processes,..."
+    },
+    "screen-reader-testing": {
+      "category": "testing",
+      "description": "Test web applications with screen readers including VoiceOver, NVDA, and JAWS. Use when validating screen reader compatibility, debugging accessibility issues, or ensuring assistive technology support.",
+      "name": "screen-reader-testing",
+      "path": ".agents/skills/screen-reader-testing/SKILL.md",
+      "status": "populated",
+      "summary": "Test web applications with screen readers including VoiceOver, NVDA, and JAWS. Use when validating screen reader compatibility, debugging...",
+      "version": "4.1.0-fractal"
+    },
+    "search-specialist": {
+      "category": "devops",
+      "description": "Expert web researcher using advanced search techniques and",
+      "model": "haiku",
+      "name": "search-specialist",
+      "path": ".agents/skills/search-specialist/SKILL.md",
+      "status": "populated",
+      "summary": "Expert web researcher using advanced search techniques and",
+      "version": "4.1.0-fractal"
+    },
+    "security-auditor": {
+      "category": "security",
+      "description": ">",
+      "name": "security-auditor",
+      "path": ".agents/skills/security-auditor/SKILL.md",
+      "status": "populated",
+      "summary": ">"
+    },
+    "security-compliance-compliance-check": {
+      "category": "security",
+      "description": "You are a compliance expert specializing in regulatory requirements for software systems including GDPR, HIPAA, SOC2, PCI-DSS, and other industry standards. Perform compliance audits and provide implementation guidance.",
+      "name": "security-compliance-compliance-check",
+      "path": ".agents/skills/security-compliance-compliance-check/SKILL.md",
+      "status": "populated",
+      "summary": "You are a compliance expert specializing in regulatory requirements for software systems including GDPR, HIPAA, SOC2, PCI-DSS, and other...",
+      "version": "4.1.0-fractal"
+    },
+    "security-requirement-extraction": {
+      "category": "frontend",
+      "description": "Derive security requirements from threat models and business context. Use when translating threats into actionable requirements, creating security user stories, or building security test cases.",
+      "name": "security-requirement-extraction",
+      "path": ".agents/skills/security-requirement-extraction/SKILL.md",
+      "status": "populated",
+      "summary": "Derive security requirements from threat models and business context. Use when translating threats into actionable requirements, creating...",
+      "version": "4.1.0-fractal"
+    },
+    "security-scanning-security-dependencies": {
+      "category": "devops",
+      "description": "You are a security expert specializing in dependency vulnerability analysis, SBOM generation, and supply chain security. Scan project dependencies across ecosystems to identify vulnerabilities, assess risks, and recommend remediation.",
+      "name": "security-scanning-security-dependencies",
+      "path": ".agents/skills/security-scanning-security-dependencies/SKILL.md",
+      "status": "populated",
+      "summary": "You are a security expert specializing in dependency vulnerability analysis, SBOM generation, and supply chain security. Scan project dep...",
+      "version": "4.1.0-fractal"
+    },
+    "security-scanning-security-hardening": {
+      "category": "security",
+      "description": "Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls.",
+      "name": "security-scanning-security-hardening",
+      "path": ".agents/skills/security-scanning-security-hardening/SKILL.md",
+      "status": "populated",
+      "summary": "Coordinate multi-layer security scanning and hardening across application, infrastructure, and compliance controls.",
+      "version": "4.1.0-fractal"
+    },
+    "security-scanning-security-sast": {
+      "category": "security",
+      "description": "Static Application Security Testing (SAST) for code vulnerability",
+      "name": "security-scanning-security-sast",
+      "path": ".agents/skills/security-scanning-security-sast/SKILL.md",
+      "status": "populated",
+      "summary": "Static Application Security Testing (SAST) for code vulnerability",
+      "version": "4.1.0-fractal"
+    },
+    "shellcheck-configuration": {
+      "category": "language",
+      "description": "Master ShellCheck static analysis configuration and usage for shell script quality. Use when setting up linting infrastructure, fixing code issues, or ensuring script portability.",
+      "name": "shellcheck-configuration",
+      "path": ".agents/skills/shellcheck-configuration/SKILL.md",
+      "status": "populated",
+      "summary": "Master ShellCheck static analysis configuration and usage for shell script quality. Use when setting up linting infrastructure, fixing co..."
+    },
+    "similarity-search-patterns": {
+      "category": "general",
+      "description": "Implement efficient similarity search with vector databases. Use when building semantic search, implementing nearest neighbor queries, or optimizing retrieval performance.",
+      "name": "similarity-search-patterns",
+      "path": ".agents/skills/similarity-search-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Implement efficient similarity search with vector databases. Use when building semantic search, implementing nearest neighbor queries, or...",
+      "version": "4.1.0-fractal"
+    },
+    "slo-implementation": {
+      "category": "general",
+      "description": "Define and implement Service Level Indicators (SLIs) and Service Level Objectives (SLOs) with error budgets and alerting. Use when establishing reliability targets, implementing SRE practices, or measuring service performance.",
+      "name": "slo-implementation",
+      "path": ".agents/skills/slo-implementation/SKILL.md",
+      "status": "populated",
+      "summary": "Define and implement Service Level Indicators (SLIs) and Service Level Objectives (SLOs) with error budgets and alerting. Use when establ..."
+    },
+    "software-architecture": {
+      "category": "general",
+      "description": "Guide for quality focused software architecture. This skill should be used when users want to write code, design architecture, analyze code, in any case that relates to software development.",
+      "name": "software-architecture",
+      "path": ".agents/skills/software-architecture/SKILL.md",
+      "status": "populated",
+      "summary": "Guide for quality focused software architecture. This skill should be used when users want to write code, design architecture, analyze co...",
+      "version": "4.1.0-fractal"
+    },
+    "sql-optimization-patterns": {
+      "category": "data",
+      "description": "Master SQL query optimization, indexing strategies, and EXPLAIN analysis to dramatically improve database performance and eliminate slow queries. Use when debugging slow queries, designing database schemas, or optimizing application performance.",
+      "name": "sql-optimization-patterns",
+      "path": ".agents/skills/sql-optimization-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Master SQL query optimization, indexing strategies, and EXPLAIN analysis to dramatically improve database performance and eliminate slow...",
+      "version": "4.1.0-fractal"
+    },
+    "stitch-ui-design": {
+      "category": "frontend",
+      "description": "Expert guide for creating effective prompts for Google Stitch AI UI design tool. Use when user wants to design UI/UX in Stitch, create app interfaces, generate mobile/web designs, or needs help crafting Stitch prompts. Covers prompt structure, specificity techniques, iteration strategies, and design-to-code workflows for Stitch by Google.",
+      "name": "stitch-ui-design",
+      "path": ".agents/skills/stitch-ui-design/SKILL.md",
+      "status": "populated",
+      "summary": "Expert guide for creating effective prompts for Google Stitch AI UI design tool. Use when user wants to design UI/UX in Stitch, create ap..."
+    },
+    "strategic-planning": {
+      "category": "documentation",
+      "description": "Analyzes the founder's business context to deliver the 3 highest-impact next moves for growth (marketing or sales). Asks up to 10 diagnostic questions when needed to uncover bottlenecks, struggles, and opportunities. Use when user needs strategic guidance, next steps, growth planning, or actionable business strategy.",
+      "name": "strategic-planning",
+      "path": ".agents/skills/strategic-planning/SKILL.md",
+      "status": "populated",
+      "summary": "Analyzes the founder's business context to deliver the 3 highest-impact next moves for growth (marketing or sales). Asks up to 10 diagnos..."
+    },
+    "subagent-driven-development": {
+      "category": "ai",
+      "description": "Use when executing implementation plans with independent tasks in the current session",
+      "name": "subagent-driven-development",
+      "path": ".agents/skills/subagent-driven-development/SKILL.md",
+      "status": "populated",
+      "summary": "Use when executing implementation plans with independent tasks in the current session"
+    },
+    "systematic-debugging": {
+      "category": "testing",
+      "description": "4-phase systematic debugging methodology with root cause analysis and evidence-based verification.",
+      "name": "systematic-debugging",
+      "path": ".agents/skills/systematic-debugging/SKILL.md",
+      "status": "populated",
+      "summary": "4-phase systematic debugging methodology with root cause analysis and evidence-based verification.",
+      "version": "4.1.0-fractal"
+    },
+    "tailwind-design-system": {
+      "category": "frontend",
+      "description": "Build scalable design systems with Tailwind CSS, design tokens, component libraries, and responsive patterns. Use when creating component libraries, implementing design systems, or standardizing UI patterns.",
+      "name": "tailwind-design-system",
+      "path": ".agents/skills/tailwind-design-system/SKILL.md",
+      "status": "populated",
+      "summary": "Build scalable design systems with Tailwind CSS, design tokens, component libraries, and responsive patterns. Use when creating component...",
+      "version": "4.1.0-fractal"
+    },
+    "tailwind-patterns": {
+      "category": "frontend",
+      "description": "Tailwind CSS v4 principles and modern design tokens.",
+      "name": "tailwind-patterns",
+      "path": ".agents/skills/tailwind-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Tailwind CSS v4 principles and modern design tokens.",
+      "version": "4.1.0-fractal"
+    },
+    "tdd-workflow": {
+      "category": "devops",
+      "description": "Test-Driven Development workflow principles. RED-GREEN-REFACTOR cycle.",
+      "name": "tdd-workflow",
+      "path": ".agents/skills/tdd-workflow/SKILL.md",
+      "status": "populated",
+      "summary": "Test-Driven Development workflow principles. RED-GREEN-REFACTOR cycle.",
+      "version": "4.1.0-fractal"
+    },
+    "terraform-specialist": {
+      "category": "devops",
+      "description": "Expert Terraform/OpenTofu specialist mastering advanced IaC",
+      "model": "opus",
+      "name": "terraform-specialist",
+      "path": ".agents/skills/terraform-specialist/SKILL.md",
+      "status": "populated",
+      "summary": "Expert Terraform/OpenTofu specialist mastering advanced IaC",
+      "version": "4.1.0-fractal"
+    },
+    "test-fixing": {
+      "category": "testing",
+      "description": "Run tests and systematically fix all failing tests using smart error grouping. Use when user asks to fix failing tests, mentions test failures, runs test suite and failures occur, or requests to make tests pass.",
+      "name": "test-fixing",
+      "path": ".agents/skills/test-fixing/SKILL.md",
+      "status": "populated",
+      "summary": "Run tests and systematically fix all failing tests using smart error grouping. Use when user asks to fix failing tests, mentions test fai...",
+      "version": "4.1.0-fractal"
+    },
+    "testing-patterns": {
+      "category": "testing",
+      "description": "Testing patterns and principles. Unit, integration, mocking strategies.",
+      "name": "testing-patterns",
+      "path": ".agents/skills/testing-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Testing patterns and principles. Unit, integration, mocking strategies.",
+      "version": "4.1.0-fractal"
+    },
+    "typescript-advanced-types": {
+      "category": "language",
+      "description": "Master TypeScript's advanced type system including generics, conditional types, mapped types, template literals, and utility types for building type-safe applications. Use when implementing complex type logic, creating reusable type utilities, or ensuring compile-time type safety in TypeScript projects.",
+      "name": "typescript-advanced-types",
+      "path": ".agents/skills/typescript-advanced-types/SKILL.md",
+      "status": "populated",
+      "summary": "Master TypeScript's advanced type system including generics, conditional types, mapped types, template literals, and utility types for bu...",
+      "version": "4.1.0-fractal"
+    },
+    "typescript-expert": {
+      "category": "language",
+      "description": ">-",
+      "name": "typescript-expert",
+      "path": ".agents/skills/typescript-expert/SKILL.md",
+      "status": "populated",
+      "summary": ">-",
+      "version": "4.1.0-fractal"
+    },
+    "ui-skills": {
+      "category": "frontend",
+      "description": "Opinionated, evolving constraints to guide agents when building interfaces",
+      "name": "ui-skills",
+      "path": ".agents/skills/ui-skills/SKILL.md",
+      "status": "populated",
+      "summary": "Opinionated, evolving constraints to guide agents when building interfaces"
+    },
+    "ui-ux-designer": {
+      "category": "frontend",
+      "description": "Create interface designs, wireframes, and design systems. Masters",
+      "model": "sonnet",
+      "name": "ui-ux-designer",
+      "path": ".agents/skills/ui-ux-designer/SKILL.md",
+      "status": "populated",
+      "summary": "Create interface designs, wireframes, and design systems. Masters",
+      "version": "4.1.0-fractal"
+    },
+    "ui-ux-pro-max": {
+      "category": "frontend",
+      "description": "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Native, Flutter, Tailwind, shadcn/ui). Actions: plan, build, create, design, implement, review, fix, improve, optimize, enhance, refactor, check UI/UX code. Projects: website, landing page, dashboard, admin panel, e-commerce, SaaS, portfolio, blog, mobile app, .html, .tsx, .vue, .svelte. Elements: button, modal, navbar, sidebar, card, table, form, chart. Styles: glassmorphism, claymorphism, minimalism, brutalism, neumorphism, bento grid, dark mode, responsive, skeuomorphism, flat design. Topics: color palette, accessibility, animation, layout, typography, font pairing, spacing, hover, shadow, gradient. Integrations: shadcn/ui MCP for component search and examples.",
+      "name": "ui-ux-pro-max",
+      "path": ".agents/skills/ui-ux-pro-max/SKILL.md",
+      "status": "populated",
+      "summary": "UI/UX design intelligence. 50 styles, 21 palettes, 50 font pairings, 20 charts, 9 stacks (React, Next.js, Vue, Svelte, SwiftUI, React Nat..."
+    },
+    "ui-visual-validator": {
+      "category": "frontend",
+      "description": "Rigorous visual validation expert specializing in UI testing,",
+      "model": "sonnet",
+      "name": "ui-visual-validator",
+      "path": ".agents/skills/ui-visual-validator/SKILL.md",
+      "status": "populated",
+      "summary": "Rigorous visual validation expert specializing in UI testing,"
+    },
+    "using-git-worktrees": {
+      "category": "general",
+      "description": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated git worktrees with smart directory selection and safety verification",
+      "name": "using-git-worktrees",
+      "path": ".agents/skills/using-git-worktrees/SKILL.md",
+      "status": "populated",
+      "summary": "Use when starting feature work that needs isolation from current workspace or before executing implementation plans - creates isolated gi...",
+      "version": "4.1.0-fractal"
+    },
+    "uv-package-manager": {
+      "category": "general",
+      "description": "Master the uv package manager for fast Python dependency management, virtual environments, and modern Python project workflows. Use when setting up Python projects, managing dependencies, or optimizing Python development workflows with uv.",
+      "name": "uv-package-manager",
+      "path": ".agents/skills/uv-package-manager/SKILL.md",
+      "status": "populated",
+      "summary": "Master the uv package manager for fast Python dependency management, virtual environments, and modern Python project workflows. Use when..."
+    },
+    "vector-database-engineer": {
+      "category": "ai",
+      "description": "Expert in vector databases, embedding strategies, and semantic search implementation. Masters Pinecone, Weaviate, Qdrant, Milvus, and pgvector for RAG applications, recommendation systems, and similar",
+      "name": "vector-database-engineer",
+      "path": ".agents/skills/vector-database-engineer/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in vector databases, embedding strategies, and semantic search implementation. Masters Pinecone, Weaviate, Qdrant, Milvus, and pgv...",
+      "version": "4.1.0-fractal"
+    },
+    "vector-index-tuning": {
+      "category": "ai",
+      "description": "Optimize vector index performance for latency, recall, and memory. Use when tuning HNSW parameters, selecting quantization strategies, or scaling vector search infrastructure.",
+      "name": "vector-index-tuning",
+      "path": ".agents/skills/vector-index-tuning/SKILL.md",
+      "status": "populated",
+      "summary": "Optimize vector index performance for latency, recall, and memory. Use when tuning HNSW parameters, selecting quantization strategies, or..."
+    },
+    "vercel-deploy-claimable": {
+      "category": "devops",
+      "description": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as 'Deploy my app', 'Deploy this to production', 'Create a preview deployment', 'Deploy and give me the link', or 'Push this live'. No authentication required - returns preview URL and claimable deployment link.",
+      "name": "vercel-deploy-claimable",
+      "path": ".agents/skills/vercel-deploy-claimable/SKILL.md",
+      "status": "populated",
+      "summary": "Deploy applications and websites to Vercel. Use this skill when the user requests deployment actions such as 'Deploy my app', 'Deploy thi..."
+    },
+    "verification-before-completion": {
+      "category": "testing",
+      "description": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always",
+      "name": "verification-before-completion",
+      "path": ".agents/skills/verification-before-completion/SKILL.md",
+      "status": "populated",
+      "summary": "Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands a..."
+    },
+    "voice-ai-development": {
+      "category": "ai",
+      "description": "Expert in building voice AI applications - from real-time voice agents to voice-enabled apps. Covers OpenAI Realtime API, Vapi for voice agents, Deepgram for transcription, ElevenLabs for synthesis, LiveKit for real-time infrastructure, and WebRTC fundamentals. Knows how to build low-latency, production-ready voice experiences. Use when: voice ai, voice agent, speech to text, text to speech, realtime voice.",
+      "name": "voice-ai-development",
+      "path": ".agents/skills/voice-ai-development/SKILL.md",
+      "status": "populated",
+      "summary": "Expert in building voice AI applications - from real-time voice agents to voice-enabled apps. Covers OpenAI Realtime API, Vapi for voice..."
+    },
+    "wcag-audit-patterns": {
+      "category": "frontend",
+      "description": "Conduct WCAG 2.2 accessibility audits with automated testing, manual verification, and remediation guidance. Use when auditing websites for accessibility, fixing WCAG violations, or implementing accessible design patterns.",
+      "name": "wcag-audit-patterns",
+      "path": ".agents/skills/wcag-audit-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Conduct WCAG 2.2 accessibility audits with automated testing, manual verification, and remediation guidance. Use when auditing websites f...",
+      "version": "4.1.0-fractal"
+    },
+    "web-artifacts-builder": {
+      "category": "frontend",
+      "description": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind CSS, shadcn/ui). Use for complex artifacts requiring state management, routing, or shadcn/ui components - not for simple single-file HTML/JSX artifacts.",
+      "name": "web-artifacts-builder",
+      "path": ".agents/skills/web-artifacts-builder/SKILL.md",
+      "status": "populated",
+      "summary": "Suite of tools for creating elaborate, multi-component claude.ai HTML artifacts using modern frontend web technologies (React, Tailwind C..."
+    },
+    "web-design-guidelines": {
+      "category": "frontend",
+      "description": "Review UI code for Web Interface Guidelines compliance.",
+      "name": "web-design-guidelines",
+      "path": ".agents/skills/web-design-guidelines/SKILL.md",
+      "status": "populated",
+      "summary": "Review UI code for Web Interface Guidelines compliance.",
+      "version": "4.1.0-fractal"
+    },
+    "web-performance-optimization": {
+      "category": "general",
+      "description": "Optimize website and web application performance including loading speed, Core Web Vitals, bundle size, caching strategies, and runtime performance",
+      "name": "web-performance-optimization",
+      "path": ".agents/skills/web-performance-optimization/SKILL.md",
+      "status": "populated",
+      "summary": "Optimize website and web application performance including loading speed, Core Web Vitals, bundle size, caching strategies, and runtime p...",
+      "version": "4.1.0-fractal"
+    },
+    "workflow-orchestration-patterns": {
+      "category": "devops",
+      "description": "Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management, and determinism constraints. Use when building long-running processes, distributed transactions, or microservice orchestration.",
+      "name": "workflow-orchestration-patterns",
+      "path": ".agents/skills/workflow-orchestration-patterns/SKILL.md",
+      "status": "populated",
+      "summary": "Design durable workflows with Temporal for distributed systems. Covers workflow vs activity separation, saga patterns, state management,...",
+      "version": "4.1.0-fractal"
+    }
+  },
+  "startup": {
+    "default_load": [
+      ".agents/skills-index-compressed.json"
+    ],
+    "defer_load": [
+      ".agents/skills/*/SKILL.md"
+    ],
+    "estimated_index_tokens": 22184,
+    "mode": "lazy",
+    "target_startup_tokens_max": 20000,
+    "within_target": false
+  },
+  "stats": {
+    "categories": {
+      "ai": 26,
+      "automation": 2,
+      "backend": 9,
+      "data": 8,
+      "devops": 18,
+      "documentation": 3,
+      "frontend": 30,
+      "general": 41,
+      "language": 7,
+      "security": 5,
+      "testing": 12
+    },
+    "errors": 0,
+    "missing": 0,
+    "populated": 161,
+    "total": 161
+  },
+  "version": "2.0"
+}
