@@ -7,6 +7,8 @@ export interface CollaborationSession {
   createdAt: Date
   updatedAt: Date
   isActive: boolean
+  status?: 'active' | 'ended'
+  settings?: Record<string, unknown>
 }
 
 export interface Participant {
@@ -50,7 +52,7 @@ export interface UserProfile {
 export interface Notification {
   id: string
   userId: string
-  type: 'mention' | 'assignment' | 'comment' | 'update' | 'alert'
+  type: 'mention' | 'assignment' | 'comment' | 'update' | 'alert' | 'collaboration_invite' | 'collaboration_accepted'
   title: string
   message: string
   read: boolean

@@ -3,12 +3,12 @@
  * Secure multi-user collaboration with real-time synchronization
  */
 
-import type {
-  UserProfile,
-  CollaborationSession,
-  Notification,
-  Participant,
+import {
   ParticipantPermission,
+  type UserProfile,
+  type CollaborationSession,
+  type Notification,
+  type Participant,
 } from "@/types/collaboration";
 
 export interface CollaborationConfig {
@@ -93,6 +93,10 @@ const participant: Participant = {
       isActive: true,
     }
 
+    this.activeSessions.set(sessionId, session)
+    return session
+  }
+
   /**
    * Invite user to collaboration session
    */
@@ -129,11 +133,12 @@ const participant: Participant = {
     // Send notification to invited user
     await this.sendNotification(invitedUser, {
       id: `notif_${Date.now()}`,
+      userId: invitedUser,
       type: "collaboration_invite",
       title: "Collaboration Session Invitation",
       message: `You have been invited to join a collaboration session by ${invitedBy}`,
-      data: { sessionId, inviteId },
-      createdAt: new Date(),
+      metadata: { sessionId, inviteId },
+      timestamp: new Date(),
       read: false,
     });
 
@@ -149,7 +154,7 @@ const participant: Participant = {
       admin: ["read", "write", "comment", "upload", "manage_users", "delete"],
     };
 
-    return permissions[role] ?? permissions["viewer"];
+    return (permissions[role] ?? permissions["viewer"]) as string[];
   }
 
   /**
@@ -182,7 +187,14 @@ const participant: Participant = {
     }
 
     // Add user to session
-    session.participants.push(userId);
+    session.participants.push({
+      id: userId,
+      userId,
+      userName: userId,
+      joinedAt: new Date(),
+      lastActiveAt: new Date(),
+      permissions: [ParticipantPermission.READ],
+    });
     this.addUserToSession(userId, invitation.sessionId);
     invitation.accepted = true;
     invitation.acceptedAt = new Date();
@@ -190,11 +202,12 @@ const participant: Participant = {
     // Send notification to session creator
     await this.sendNotification(invitation.invitedBy, {
       id: `notif_${Date.now()}`,
+      userId: invitation.invitedBy,
       type: "collaboration_accepted",
       title: "Invitation Accepted",
       message: `${userId} has accepted your collaboration invitation`,
-      data: { sessionId: invitation.sessionId },
-      createdAt: new Date(),
+      metadata: { sessionId: invitation.sessionId },
+      timestamp: new Date(),
       read: false,
     });
 
@@ -227,7 +240,7 @@ const participant: Participant = {
       throw new Error(`Session not found: ${sessionId}`);
     }
 
-    if (!session.participants.includes(senderId)) {
+    if (!session.participants.some((p) => p.id === senderId)) {
       throw new Error("User not participant in session");
     }
 
@@ -248,6 +261,7 @@ const participant: Participant = {
       timestamp: new Date(),
       encrypted: options.encrypt ?? this.config.encryptionRequired,
       readBy: [senderId],
+      edited: false,
     };
 
     this.addMessage(sessionId, message);
@@ -286,7 +300,7 @@ const participant: Participant = {
     if (!session) return false;
 
     // Remove user from participants
-    session.participants = session.participants.filter((id) => id !== userId);
+    session.participants = session.participants.filter((p) => p.id !== userId);
 
     // Remove from user sessions
     const userSessionSet = this.userSessions.get(userId);
@@ -376,7 +390,7 @@ const participant: Participant = {
       throw new Error(`Session not found: ${sessionId}`);
     }
 
-    if (!session.participants.includes(userId)) {
+    if (!session.participants.some((p) => p.id === userId)) {
       throw new Error("User not authorized to view messages");
     }
 
