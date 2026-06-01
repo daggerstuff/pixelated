@@ -166,7 +166,9 @@ def backfill_path(
 
     total = BackfillStats()
     for path in iter_jsonl_paths(root):
-        total = total.add(backfill_file(path, source_type=source_type, acquired_at=acquired_at, dry_run=dry_run))
+        total = total.add(
+            backfill_file(path, source_type=source_type, acquired_at=acquired_at, dry_run=dry_run)
+        )
     return total
 
 

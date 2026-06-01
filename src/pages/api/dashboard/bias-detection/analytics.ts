@@ -10,7 +10,8 @@ export const GET: APIRoute = async ({ url }) => {
 
     const { searchParams } = url
     const parsedDays = parseInt(searchParams.get('days') ?? '30')
-    const days = isNaN(parsedDays) || parsedDays < 1 || parsedDays > 365 ? 30 : parsedDays
+    const days =
+      isNaN(parsedDays) || parsedDays < 1 || parsedDays > 365 ? 30 : parsedDays
     const cache = getCache()
 
     // Try to get cached analytics data first

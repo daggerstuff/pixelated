@@ -44,7 +44,7 @@ PRIORITY_TO_JIRA: dict[str, str] = {
     "high": "High",
     "medium": "Medium",
     "low": "Low",
-    "none": "None",
+    "none": "Lowest",
 }
 
 # Canonical priority label → Linear numeric priority (0=urgent, 1=high, 2=medium, 3=low, 4=none)
@@ -1091,28 +1091,29 @@ def export_jira_issues() -> list[dict[str, Any]]:
     headers = build_jira_auth_header(resolve_jira_user(), resolve_jira_token())
     project_key = resolve_jira_project_key(create_if_missing=True)
     jql = jira_search_jql(project_key)
-
+    
     issues: list[dict[str, Any]] = []
-    start_at = 0
+    next_page_token = None
     max_results = 100
-
+    
     while True:
         params = {
             "jql": jql,
             "fields": "summary,description,status,updated",
             "maxResults": str(max_results),
-            "startAt": str(start_at),
         }
+        if next_page_token:
+            params["nextPageToken"] = next_page_token
+            
         url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(params)}"
         payload = _json_request("GET", url, headers=headers)
         batch = payload.get("issues", [])
-        if not batch:
-            break
         issues.extend(batch)
-        if len(batch) < max_results:
+        
+        if payload.get("isLast") or not payload.get("nextPageToken"):
             break
-        start_at += len(batch)
-
+        next_page_token = payload.get("nextPageToken")
+        
     return issues
 
 

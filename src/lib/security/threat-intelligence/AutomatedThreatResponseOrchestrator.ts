@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -145,7 +145,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
   private isProcessing = false
   private readonly activeResponses = new Map<string, ThreatResponse>()
 
-  constructor(private readonly config: ResponseOrchestratorConfig) {
+  constructor(private readonly _config: ResponseOrchestratorConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -158,9 +158,9 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
       logger.info('Initializing Automated Threat Response Orchestrator')
 
       // Initialize MongoDB connection
-      this.mongoClient = new MongoClient(this.config.mongodb.url)
+      this.mongoClient = new MongoClient(this._config.mongodb.url)
       await this.mongoClient.connect()
-      this.db = this.mongoClient.db(this.config.mongodb.database)
+      this.db = this.mongoClient.db(this._config.mongodb.database)
 
       // Initialize collections
       this.responsesCollection =
@@ -170,8 +170,8 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
       await this.createIndexes()
 
       // Initialize Redis connection
-      this.redis = new Redis(this.config.redis.url, {
-        password: this.config.redis.password,
+      this.redis = new Redis(this._config.redis.url, {
+        password: this._config.redis.password,
         enableReadyCheck: true,
         maxRetriesPerRequest: 3,
       })
@@ -302,7 +302,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
    * Find applicable response strategies
    */
   private findApplicableStrategies(threatData: any): ResponseStrategy[] {
-    return this.config.response_strategies.filter((strategy) => {
+    return this._config.response_strategies.filter((strategy) => {
       if (!strategy.enabled) return false
 
       // Check threat type
@@ -478,7 +478,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
     try {
       const batchSize = Math.min(
         this.executionQueue.length,
-        this.config.execution_limits.max_concurrent_responses,
+        this._config.execution_limits.max_concurrent_responses,
       )
 
       const responseIds = this.executionQueue.splice(0, batchSize)
@@ -1520,7 +1520,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
    * Get current configuration
    */
   get config(): ResponseOrchestratorConfig {
-    return this.config
+    return this._config
   }
 }
 

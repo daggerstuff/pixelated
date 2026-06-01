@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Memory May-Hem Expansion",
+    "id": "022b75fa-d681-4070-b3e3-0d152d7daf1e",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Training Pipeline Improvements",
+    "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Churnmeon Reliability",
+    "id": "7fb7fc08-8b19-4210-8215-f73f3b559a46",
+    "team": "Pixelated"
+  },
+  {
+    "name": "AutoReview Workflow Improvements",
+    "id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Discovery & Backlog",
+    "id": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Checkmate",
+    "id": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Foresight Memory Architecture",
+    "id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Modern Dataset Project",
+    "id": "dd29a94c-6283-4c13-9eef-0f7546321f1d",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Data Governance & Compliance",
+    "id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Test Coverage & Security Baseline",
+    "id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Hybrid App Architecture Migration",
+    "id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "team": "Pixelated"
+  },
+  {
+    "name": "CI Federation & Release Readiness",
+    "id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Platform Foundations & Operations",
+    "id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "team": "Pixelated"
+  },
+  {
+    "name": "Data Pipeline Recovery & External Integrations",
+    "id": "07810eff-50bb-4518-974a-07b4938f3264",
+    "team": "Pixelated"
+  }
+]
