@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 

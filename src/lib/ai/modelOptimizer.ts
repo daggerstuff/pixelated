@@ -177,7 +177,7 @@ class ModelOptimizer {
     if (!this.currentMetrics) {
       throw new Error("Baseline metrics not set");
     }
-    const metrics = this.currentMetrics!;
+    const metrics = this.currentMetrics;
 
     const bottlenecks: string[] = [];
     const recommendations: OptimizationStrategy[] = [];

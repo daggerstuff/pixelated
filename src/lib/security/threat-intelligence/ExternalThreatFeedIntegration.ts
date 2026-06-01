@@ -13,7 +13,7 @@ import axios, {
   AxiosInstance,
   AxiosResponse,
 } from 'axios'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -298,6 +298,9 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   private syncQueue: string[] = []
   private isProcessing = false
   private readonly activeSyncs = new Map<string, Promise<FeedSyncResult>>()
+  private _requestsThisMinute = 0
+  private _requestsThisHour = 0
+  private _requestsThisDay = 0
 
   constructor(private readonly _config: ExternalThreatFeedIntegrationConfig) {
     super()
@@ -676,16 +679,16 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     // Reset counters periodically
     setInterval(() => {
-      _requestsThisMinute = 0
+      this._requestsThisMinute = 0
       processQueue()
     }, 60000) // Every minute
 
     setInterval(() => {
-      _requestsThisHour = 0
+      this._requestsThisHour = 0
     }, 3600000) // Every hour
 
     setInterval(() => {
-      _requestsThisDay = 0
+      this._requestsThisDay = 0
     }, 86400000) // Every day
   }
 

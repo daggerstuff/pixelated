@@ -47,10 +47,65 @@ export interface MarketSector {
   marketCap: number
 }
 
+interface QuoteResult {
+  symbol?: unknown
+  regularMarketPrice?: unknown
+  regularMarketChange?: unknown
+  regularMarketChangePercent?: unknown
+  regularMarketVolume?: unknown
+  marketCap?: unknown
+  regularMarketDayHigh?: unknown
+  regularMarketDayLow?: unknown
+  fiftyTwoWeekHigh?: unknown
+  fiftyTwoWeekLow?: unknown
+  longName?: unknown
+  shortName?: unknown
+  industry?: unknown
+  sector?: unknown
+  fullTimeEmployees?: unknown
+  revenue?: unknown
+  profitMargins?: unknown
+  beta?: unknown
+  trailingPE?: unknown
+  trailingAnnualDividendYield?: unknown
+  [key: string]: unknown
+}
+
+interface QuoteResponse {
+  quoteResponse?: {
+    result?: QuoteResult[]
+  }
+}
+
+interface ChartQuote {
+  open?: number[]
+  high?: number[]
+  low?: number[]
+  close?: number[]
+  volume?: number[]
+  [key: string]: unknown
+}
+
+interface ChartResult {
+  timestamp?: number[]
+  indicators?: {
+    quote?: ChartQuote[]
+    adjclose?: Array<{ adjclose?: number[] }>
+    [key: string]: unknown
+  }
+  [key: string]: unknown
+}
+
+interface ChartResponse {
+  chart?: {
+    result?: ChartResult[]
+  }
+}
+
 export class YahooFinanceService {
   private readonly logger: Logger
   private readonly client: AxiosInstance
-  private readonly cache: Map<string, { data: any; timestamp: number }> =
+  private readonly cache: Map<string, { data: unknown; timestamp: number }> =
     new Map()
   private readonly CACHE_TTL =
     (process.env['CACHE_TTL_SECONDS'] &&
@@ -79,11 +134,11 @@ export class YahooFinanceService {
   async getQuote(symbol: string): Promise<YahooFinanceQuote | null> {
     try {
       const cacheKey = `quote_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<YahooFinanceQuote>(cacheKey)
       if (cached) return cached
 
       const response = await this.client.get(`/quote/${symbol}`)
-      const result = response.data.quoteResponse?.result?.[0]
+      const result = (response.data as QuoteResponse).quoteResponse?.result?.[0]
 
       if (!result) {
         this.logger.warn('No quote data found', { symbol })
@@ -135,7 +190,7 @@ export class YahooFinanceService {
   ): Promise<YahooFinanceHistoricalData[]> {
     try {
       const cacheKey = `historical_${symbol}_${period}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<YahooFinanceHistoricalData[]>(cacheKey)
       if (cached) return cached
 
       const interval = period === '1d' ? '1m' : '1d'
@@ -149,7 +204,7 @@ export class YahooFinanceService {
         },
       })
 
-      const result = response.data.chart?.result?.[0]
+      const result = (response.data as ChartResponse).chart?.result?.[0]
       if (!result?.timestamp || !result.indicators?.quote?.[0]) {
         this.logger.warn('No historical data found', { symbol, period })
         return []
@@ -191,11 +246,11 @@ export class YahooFinanceService {
   async getCompanyProfile(symbol: string): Promise<CompanyProfile | null> {
     try {
       const cacheKey = `profile_${symbol}`
-      const cached = this.getFromCache(cacheKey)
+      const cached = this.getFromCache<CompanyProfile>(cacheKey)
       if (cached) return cached
 
       const response = await this.client.get(`/quote/${symbol}`)
-      const result = response.data.quoteResponse?.result?.[0]
+      const result = (response.data as QuoteResponse).quoteResponse?.result?.[0]
 
       if (!result) {
         this.logger.warn('No company data found', { symbol })
@@ -270,10 +325,13 @@ export class YahooFinanceService {
         }
       }),
     )
-    return results.filter((result): result is any => result !== null)
+    return results.filter(
+      (result): result is NonNullable<(typeof results)[number]> =>
+        result !== null,
+    )
   }
 
-  private getFromCache(key: string): any {
+  private getFromCache(key: string): unknown | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
       return cached.data
@@ -281,7 +339,7 @@ export class YahooFinanceService {
     return null
   }
 
-  private setCache(key: string, data: any): void {
+  private setCache(key: string, data: unknown): void {
     this.cache.set(key, { data, timestamp: Date.now() })
   }
 

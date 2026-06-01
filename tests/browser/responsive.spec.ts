@@ -104,7 +104,9 @@ for (const bp of breakpoints) {
       })
     } catch (e) {
       // Log error for debugging but don't fail the test if we can't access dashboard
-      console.error(`Could not test dashboard at ${bp.name} breakpoint: ${e}`)
+      console.error(
+        `Could not test dashboard at ${bp.name} breakpoint: ${String(e)}`,
+      )
       test.skip(
         true,
         'Could not access dashboard - authentication may be required',
