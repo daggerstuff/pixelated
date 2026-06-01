@@ -12,7 +12,7 @@ function isAlreadyHydrated(element) {
       return key
     }
   }
-  return undefined;
+  return undefined
 }
 
 function createReactElementFromDOMElement(element) {

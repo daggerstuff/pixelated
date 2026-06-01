@@ -126,6 +126,10 @@ export interface TechnicalIndicator {
   symbol: string
   date: string
   value: number
+  /** MACD-specific: the MACD signal line value */
+  macdSignal?: number
+  /** MACD-specific: the MACD histogram value */
+  macdHistogram?: number
 }
 
 export interface EconomicIndicator {
@@ -369,13 +373,24 @@ export class AlphaVantageService {
             isRecord(values) ? (values[valueKey] ?? fallbackValue) : undefined,
           )
 
+          const macdSignal = isRecord(values)
+            ? parseNumber(values['MACD_Signal'])
+            : undefined
+          const macdHistogram = isRecord(values)
+            ? parseNumber(values['MACD_Histogram'])
+            : undefined
+
+          if (value === undefined) return null
+
           return {
             symbol: symbol.toUpperCase(),
             date,
             value,
+            macdSignal,
+            macdHistogram,
           }
         })
-        .filter((item): item is TechnicalIndicator => item !== null)
+        .filter((item) => item !== null) as TechnicalIndicator[]
 
       this.setCache(cacheKey, indicators)
       return indicators.slice(0, 50) // Return last 50 data points
@@ -504,7 +519,10 @@ export class AlphaVantageService {
       const data = Array.isArray(rawData) ? rawData : []
       const earnings = data.filter(isRecord).map(
         (item): QuarterlyEarnings => ({
-          fiscalDateEnding: String(item['fiscalDateEnding'] ?? ''),
+          fiscalDateEnding:
+            typeof item['fiscalDateEnding'] === 'string'
+              ? item['fiscalDateEnding']
+              : '',
           reportedEPS: parseNumber(item['reportedEPS']),
           estimatedEPS: parseNumber(item['estimatedEPS']),
           surprise: parseNumber(item['surprise']),
@@ -576,10 +594,10 @@ export class AlphaVantageService {
     }
   }
 
-  private getFromCache(key: string): unknown | null {
+  private getFromCache<T>(key: string): T | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data
+      return cached.data as T
     }
     return null
   }

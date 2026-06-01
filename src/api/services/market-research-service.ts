@@ -106,7 +106,10 @@ export async function getMarketResearch(researchId: string, userId: string) {
   }
 
   // Check permissions
-  const researchDoc = research as { owner: string; permissions?: MarketResearchPermissions | null }
+  const researchDoc = research as {
+    owner: string
+    permissions?: MarketResearchPermissions | null
+  }
   if (
     !hasPermission(research.permissions, 'view', userId) &&
     researchDoc.owner !== userId

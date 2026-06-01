@@ -156,8 +156,11 @@ export class MarketDataService {
 
       // Get the latest values
       const latestRSI = rsiData[rsiData.length - 1]?.value ?? 0
-      const latestMACD = macdData[macdData.length - 1]?.MACD ?? 0
-      const latestMACDSignal = macdData[macdData.length - 1]?.MACD_Signal ?? 0
+      const latestMACD = macdData[macdData.length - 1]?.value ?? 0
+      const latestMACDSignal =
+        macdData[macdData.length - 1]?.macdSignal ??
+        macdData[macdData.length - 1]?.value ??
+        0
       const latestSMA20 = sma20Data[sma20Data.length - 1]?.value ?? 0
       const latestSMA50 = sma50Data[sma50Data.length - 1]?.value ?? 0
 

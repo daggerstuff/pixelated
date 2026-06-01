@@ -60,24 +60,24 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
 minimumReleaseAgeExclude:
-- '@iconify-json/lucide@1.2.111'
-- path-to-regexp@6.3.0
-- yaml@2.8.3
-- axios@0.28.0
-- jsonwebtoken@8.5.2
-- jsonwebtoken@9.0.0
-- dompurify@3.2.4
-- axios@0.30.0
-- '@tootallnate/once@3.0.1'
-- nodemailer@8.0.4
-- dompurify@3.3.2
-- nodemailer@8.0.5
-- dompurify@3.3.4
-- axios@0.31.0
-- dompurify@3.4.0
-- axios@0.31.1
-- axios@0.30.3
-- hono@4.12.23
+  - '@iconify-json/lucide@1.2.111'
+  - path-to-regexp@6.3.0
+  - yaml@2.8.3
+  - axios@0.28.0
+  - jsonwebtoken@8.5.2
+  - jsonwebtoken@9.0.0
+  - dompurify@3.2.4
+  - axios@0.30.0
+  - '@tootallnate/once@3.0.1'
+  - nodemailer@8.0.4
+  - dompurify@3.3.2
+  - nodemailer@8.0.5
+  - dompurify@3.3.4
+  - axios@0.31.0
+  - dompurify@3.4.0
+  - axios@0.31.1
+  - axios@0.30.3
+  - hono@4.12.23
 peerDependencyRules:
   ignoreMissing:
   - '@capacitor/core'

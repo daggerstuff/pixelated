@@ -185,7 +185,8 @@ export class MLAnomalyDetector implements AnomalyDetector {
           userId: profile.userId,
           patternId: 'ml_isolation_forest',
           anomalyType: 'outlier' as const,
-          severity: anomalyScore > 0.8 ? ('critical' as const) : ('high' as const),
+          severity:
+            anomalyScore > 0.8 ? ('critical' as const) : ('high' as const),
           deviationScore: anomalyScore,
           confidence: 0.9,
           context: {
@@ -231,7 +232,8 @@ export class MLAnomalyDetector implements AnomalyDetector {
           userId: profile.userId,
           patternId: `statistical_${index}`,
           anomalyType: 'deviation' as const,
-          severity: value > baseline * 3 ? ('critical' as const) : ('high' as const),
+          severity:
+            value > baseline * 3 ? ('critical' as const) : ('high' as const),
           deviationScore: value / baseline,
           confidence: 0.75,
           context: {
@@ -258,41 +260,41 @@ export class MLAnomalyDetector implements AnomalyDetector {
     const baselineTimeThreshold =
       profile.baselineMetrics.timeOfDayThreshold ?? 0.5
     if (timePref > 0.8) {
-        anomalies.push({
-          type: 'ml_anomaly',
-          detail: 'temporal_unusual_time',
-          anomalyId: this.generateAnomalyId(),
-          userId: profile.userId,
-          patternId: 'temporal_unusual_time',
-          anomalyType: 'novelty' as const,
-          severity: timePref > 0.9 ? ('high' as const) : ('medium' as const),
-          deviationScore: timePref,
-          confidence: 0.8,
-          context: {
-            type: 'temporal',
-            timeOfDayPreference: timePref,
-            baselineThreshold: baselineTimeThreshold,
-          },
-          timestamp: new Date(),
-        })
-      } else if (timePref > baselineTimeThreshold) {
-        anomalies.push({
-          type: 'ml_anomaly',
-          detail: 'temporal_time_deviation',
-          anomalyId: this.generateAnomalyId(),
-          userId: profile.userId,
-          patternId: 'temporal_time_deviation',
-          anomalyType: 'deviation' as const,
-          severity: 'low' as const,
-          deviationScore: timePref / baselineTimeThreshold,
-          confidence: 0.65,
-          context: {
-            type: 'temporal',
-            timeOfDayPreference: timePref,
-            baselineThreshold: baselineTimeThreshold,
-          },
-          timestamp: new Date(),
-        })
+      anomalies.push({
+        type: 'ml_anomaly',
+        detail: 'temporal_unusual_time',
+        anomalyId: this.generateAnomalyId(),
+        userId: profile.userId,
+        patternId: 'temporal_unusual_time',
+        anomalyType: 'novelty' as const,
+        severity: timePref > 0.9 ? ('high' as const) : ('medium' as const),
+        deviationScore: timePref,
+        confidence: 0.8,
+        context: {
+          type: 'temporal',
+          timeOfDayPreference: timePref,
+          baselineThreshold: baselineTimeThreshold,
+        },
+        timestamp: new Date(),
+      })
+    } else if (timePref > baselineTimeThreshold) {
+      anomalies.push({
+        type: 'ml_anomaly',
+        detail: 'temporal_time_deviation',
+        anomalyId: this.generateAnomalyId(),
+        userId: profile.userId,
+        patternId: 'temporal_time_deviation',
+        anomalyType: 'deviation' as const,
+        severity: 'low' as const,
+        deviationScore: timePref / baselineTimeThreshold,
+        confidence: 0.65,
+        context: {
+          type: 'temporal',
+          timeOfDayPreference: timePref,
+          baselineThreshold: baselineTimeThreshold,
+        },
+        timestamp: new Date(),
+      })
     }
 
     if (features.temporal.sessionRegularity < 0.3) {

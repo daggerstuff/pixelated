@@ -43,12 +43,12 @@ RETRY_BACKOFF = 4.0  # seconds for first retry, doubles each time
 def extract_video_id(url: str) -> str | None:
     """Extract YouTube video ID from various URL formats."""
     if "youtu.be/" in url:
-        return url.split("youtu.be/")[1].split("?", maxsplit=1)[0].split("#", maxsplit=1)[0]
+        return url.split("youtu.be/")[1].split("?")[0].split("#")[0]
     if "youtube.com/watch" in url:
         qs = parse_qs(urlparse(url).query)
         return qs.get("v", [None])[0]
     if "youtube.com/embed/" in url:
-        return url.split("youtube.com/embed/")[1].split("?", maxsplit=1)[0]
+        return url.split("youtube.com/embed/")[1].split("?")[0]
     return None
 
 
@@ -103,8 +103,8 @@ def supadata_transcript(
 
     Retries on rate-limit (403/429) with exponential backoff.
     """
-    import urllib.error
     import urllib.request
+    import urllib.error
 
     url = f"https://api.supadata.ai/v1/transcript?url=https://youtu.be/{video_id}&text={str(text).lower()}&lang={lang}"
 
