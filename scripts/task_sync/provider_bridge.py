@@ -1089,14 +1089,31 @@ def apply_provider_action(provider: str, action: Mapping[str, Any]) -> dict[str,
 def export_jira_issues() -> list[dict[str, Any]]:
     site_url = resolve_jira_site_url()
     headers = build_jira_auth_header(resolve_jira_user(), resolve_jira_token())
-    params = {
-        "jql": jira_search_jql(resolve_jira_project_key(create_if_missing=True)),
-        "fields": "summary,description,status,updated",
-        "maxResults": "100",
-    }
-    url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(params)}"
-    payload = _json_request("GET", url, headers=headers)
-    return payload.get("issues", [])
+    project_key = resolve_jira_project_key(create_if_missing=True)
+    jql = jira_search_jql(project_key)
+
+    issues: list[dict[str, Any]] = []
+    start_at = 0
+    max_results = 100
+
+    while True:
+        params = {
+            "jql": jql,
+            "fields": "summary,description,status,updated",
+            "maxResults": str(max_results),
+            "startAt": str(start_at),
+        }
+        url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(params)}"
+        payload = _json_request("GET", url, headers=headers)
+        batch = payload.get("issues", [])
+        if not batch:
+            break
+        issues.extend(batch)
+        if len(batch) < max_results:
+            break
+        start_at += len(batch)
+
+    return issues
 
 
 def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
