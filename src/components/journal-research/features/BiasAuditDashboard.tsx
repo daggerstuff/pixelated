@@ -102,7 +102,10 @@ function SummaryCard({
     { label: 'Under Audit', value: summary?.underAudit ?? 0 },
     { label: 'Approved', value: summary?.approved ?? 0 },
     { label: 'Quarantined', value: summary?.quarantined ?? 0 },
-    { label: 'Avg Bias Score', value: summary?.averageBiasScore?.toFixed(3) ?? '—' },
+    {
+      label: 'Avg Bias Score',
+      value: summary?.averageBiasScore?.toFixed(3) ?? '—',
+    },
   ]
 
   return (
@@ -175,10 +178,9 @@ function DatasetList({
           )}
         >
           <div className="min-w-0 flex-1 truncate">
-            <p className="font-medium truncate">{dataset.name}</p>
+            <p className="truncate font-medium">{dataset.name}</p>
             <p className="text-muted-foreground text-xs">
-              {dataset.recordCount.toLocaleString()} records ·{' '}
-              {dataset.format}
+              {dataset.recordCount.toLocaleString()} records · {dataset.format}
             </p>
           </div>
           <StatusBadge status={dataset.quarantineStatus} />
@@ -199,7 +201,7 @@ function AuditDetailPanel({
   audit: DatasetAuditResult | null | undefined
   dataset: DatasetForAudit | null | undefined
   isLoading: boolean
-  onAction: (action: string, reason?: string) => Promise<void>
+  onAction: (action: string, reason?: string) => Promise<unknown>
   actionLoading: boolean
 }) {
   if (isLoading) {
@@ -226,10 +228,27 @@ function AuditDetailPanel({
       <div>
         <h3 className="text-lg font-semibold">{dataset.name}</h3>
         <div className="text-muted-foreground mt-1 grid grid-cols-2 gap-2 text-sm">
-          <div>Format: <span className="font-medium">{dataset.format}</span></div>
-          <div>Records: <span className="font-medium">{dataset.recordCount.toLocaleString()}</span></div>
-          <div>Size: <span className="font-medium">{(dataset.fileSize / 1024 / 1024).toFixed(1)} MB</span></div>
-          <div>Uploaded: <span className="font-medium">{new Date(dataset.uploadedAt).toLocaleDateString()}</span></div>
+          <div>
+            Format: <span className="font-medium">{dataset.format}</span>
+          </div>
+          <div>
+            Records:{' '}
+            <span className="font-medium">
+              {dataset.recordCount.toLocaleString()}
+            </span>
+          </div>
+          <div>
+            Size:{' '}
+            <span className="font-medium">
+              {(dataset.fileSize / 1024 / 1024).toFixed(1)} MB
+            </span>
+          </div>
+          <div>
+            Uploaded:{' '}
+            <span className="font-medium">
+              {new Date(dataset.uploadedAt).toLocaleDateString()}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -309,21 +328,21 @@ function AuditDetailPanel({
                 <button
                   onClick={() => onAction('approve')}
                   disabled={actionLoading}
-                  className="bg-green-600 hover:bg-green-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  className="bg-green-600 hover:bg-green-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
                 >
                   {actionLoading ? 'Processing...' : 'Approve'}
                 </button>
                 <button
                   onClick={() => onAction('quarantine')}
                   disabled={actionLoading}
-                  className="bg-yellow-600 hover:bg-yellow-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
                 >
                   Quarantine
                 </button>
                 <button
                   onClick={() => onAction('reject')}
                   disabled={actionLoading}
-                  className="bg-red-600 hover:bg-red-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm font-medium disabled:opacity-50"
                 >
                   Reject
                 </button>
@@ -340,7 +359,6 @@ function AuditDetailPanel({
 }
 
 const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
-
   className,
 }: BiasAuditDashboardProps) => {
   const {
@@ -499,7 +517,7 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
               audit={selectedAudit}
               dataset={selectedDataset}
               isLoading={selectedDatasetLoading || selectedAuditLoading}
-              onAction={processQuarantineAction}
+              onAction={processQuarantineAction as (action: string, reason?: string) => Promise<unknown>}
               actionLoading={quarantineActionLoading}
             />
           </CardContent>

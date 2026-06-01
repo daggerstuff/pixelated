@@ -22,7 +22,12 @@ interface PDFDocumentWithMethods extends PDFDocument {
   fontSize(size: number): this
   font(font: string): this
   text(text: string, options?: Record<string, unknown>): this
-  text(text: string, x?: number, y?: number, options?: Record<string, unknown>): this
+  text(
+    text: string,
+    x?: number,
+    y?: number,
+    options?: Record<string, unknown>,
+  ): this
   moveTo(x: number, y: number): this
   lineTo(x: number, y: number): this
   stroke(): this

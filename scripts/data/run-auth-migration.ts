@@ -2,6 +2,7 @@ import { readFile } from 'fs/promises'
 import { resolve } from 'path'
 
 import dotenv from 'dotenv'
+import type { QueryResultRow } from 'pg'
 import { Pool } from 'pg'
 
 // Load environment variables
@@ -44,7 +45,7 @@ async function runAuthMigration() {
     `)
     console.log(
       'Current tables:',
-      tables.rows.map((row) => row.table_name),
+      tables.rows.map((row: QueryResultRow) => row.table_name),
     )
 
     // Show users table structure
@@ -55,7 +56,7 @@ async function runAuthMigration() {
       ORDER BY ordinal_position
     `)
     console.log('Users table columns:')
-    usersColumns.rows.forEach((row) => {
+    usersColumns.rows.forEach((row: QueryResultRow) => {
       console.log(`  - ${row.column_name} (${row.data_type})`)
     })
 

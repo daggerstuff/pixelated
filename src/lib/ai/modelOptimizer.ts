@@ -15,7 +15,7 @@ export interface OptimizationStrategy {
   name: string;
   description: string;
   techniques: string[];
-  expectedImprovement: Record<keyof ModelMetrics, number>;
+  expectedImprovement: Partial<Record<keyof ModelMetrics, number>>;
   tradeoffs: string[];
   implementationComplexity: "low" | "medium" | "high";
 }
@@ -177,7 +177,7 @@ class ModelOptimizer {
     if (!this.currentMetrics) {
       throw new Error("Baseline metrics not set");
     }
-    const metrics = this.currentMetrics!;
+    const metrics = this.currentMetrics;
 
     const bottlenecks: string[] = [];
     const recommendations: OptimizationStrategy[] = [];
@@ -189,7 +189,7 @@ class ModelOptimizer {
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Ensemble")));
     }
 
-    if (metrics.inferenceTime > 100) {
+    if ((metrics.inferenceTime ?? 0) > 100) {
       // > 100ms
       bottlenecks.push("Slow inference - consider quantization or model compression");
       recommendations.push(
@@ -199,13 +199,13 @@ class ModelOptimizer {
       );
     }
 
-    if (metrics.memoryUsage > 1000) {
+    if ((metrics.memoryUsage ?? 0) > 1000) {
       // > 1GB
       bottlenecks.push("High memory usage - consider model compression or pruning");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Compression")));
     }
 
-    if (metrics.privacyScore < 0.9) {
+    if ((metrics.privacyScore ?? 1) < 0.9) {
       bottlenecks.push("Privacy concerns - consider federated learning approaches");
       recommendations.push(...this.strategies.filter((s) => s.name.includes("Federated")));
     }
@@ -233,8 +233,8 @@ class ModelOptimizer {
 
     // Determine primary optimization target based on current performance
     if (this.currentMetrics.accuracy < 0.8) return "accuracy";
-    if (this.currentMetrics.inferenceTime > 200) return "inferenceTime";
-    if (this.currentMetrics.memoryUsage > 1500) return "memoryUsage";
+    if ((this.currentMetrics.inferenceTime ?? 0) > 200) return "inferenceTime";
+    if ((this.currentMetrics.memoryUsage ?? 0) > 1500) return "memoryUsage";
 
     return "f1Score"; // Balanced metric
   }
@@ -257,13 +257,18 @@ class ModelOptimizer {
     const appliedTechniques = this.selectTechniques(strategy);
 
     // Apply improvements to current metrics
-    const optimizedMetrics: ModelMetrics = { ...this.currentMetrics };
-    Object.keys(improvements).forEach((metric) => {
+    let optimizedMetrics: ModelMetrics = { ...this.currentMetrics };
+    for (const [metric, improvement] of Object.entries(improvements)) {
+      if (typeof improvement !== "number") continue;
       const key = metric as keyof ModelMetrics;
-      if (typeof optimizedMetrics[key] === "number") {
-        optimizedMetrics[key] *= 1 + (improvements[key] ?? 0);
+      const currentVal = optimizedMetrics[key];
+      if (typeof currentVal === "number") {
+        optimizedMetrics = {
+          ...optimizedMetrics,
+          [key]: currentVal * (1 + improvement),
+        };
       }
-    });
+    }
 
     const result: OptimizationResult = {
       strategy,
@@ -285,6 +290,7 @@ class ModelOptimizer {
     Object.keys(strategy.expectedImprovement).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
       const expectedChange = strategy.expectedImprovement[key];
+      if (expectedChange === undefined) return;
 
       // Add some randomness to simulate real optimization results
       const variance = 0.1; // 10% variance
