@@ -5,9 +5,10 @@
  * Essential for HIPAA compliance and ensuring psychological safety in training sessions.
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../src/lib/logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('PIIScrubber')
+const logger: ReturnType<typeof createBuildSafeLogger> =
+  createBuildSafeLogger('PIIScrubber')
 
 export interface ScrubberOptions {
   maskType?: 'placeholder' | 'redacted' | 'randomized'

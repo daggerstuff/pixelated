@@ -16,7 +16,7 @@ PRIORITY_TO_JIRA: dict[str, str] = {
     "high": "High",
     "medium": "Medium",
     "low": "Low",
-    "none": "None",
+    "none": "Lowest",
 }
 
 DEFAULT_JIRA_PROJECT_NAME = "Pixelated Empathy"
@@ -287,22 +287,25 @@ def export_jira_issues() -> list[dict[str, Any]]:
     jql = jira_search_jql(project_key)
     fields = "summary,description,status,updated"
 
-    start_at = 0
     issues: list[dict[str, Any]] = []
+    next_page_token = None
+    max_results = 50
     while True:
         query = {
             "jql": jql,
             "fields": fields,
-            "startAt": str(start_at),
-            "maxResults": "50",
+            "maxResults": str(max_results),
         }
-        url = f"{site_url}/rest/api/3/search?{parse.urlencode(query)}"
+        if next_page_token:
+            query["nextPageToken"] = next_page_token
+            
+        url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(query)}"
         payload = _json_request("GET", url, headers=headers)
         batch = payload.get("issues", [])
         issues.extend(batch)
-        if len(batch) < 50:
+        if payload.get("isLast") or not payload.get("nextPageToken"):
             break
-        start_at += len(batch)
+        next_page_token = payload.get("nextPageToken")
     return issues
 
 

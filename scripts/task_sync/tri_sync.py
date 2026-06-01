@@ -115,7 +115,7 @@ PRIORITY_TO_JIRA: dict[str, str] = {
     "high": "High",
     "medium": "Medium",
     "low": "Low",
-    "none": "None",
+    "none": "Lowest",
 }
 
 # Jira ADHD priority name → canonical priority
@@ -519,7 +519,7 @@ def group_records_by_key(
         for record in records:
             rec_id = (provider, record.external_id)
             canonical_key = id_to_key.get(rec_id, record.sync_key)
-
+            
             # Create a copy/update of the record with the aligned canonical key
             updated_record = TaskRecord(
                 provider=record.provider,
@@ -536,7 +536,7 @@ def group_records_by_key(
                 labels=record.labels,
             )
             grouped.setdefault(canonical_key, []).append(updated_record)
-
+            
     return grouped
 
 
@@ -1411,9 +1411,7 @@ def apply_sync_action(
                 run_process=run_process,
             )
 
-    sys.stderr.write(
-        f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n"
-    )
+    sys.stderr.write(f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n")
     sys.stderr.flush()
     return res
 

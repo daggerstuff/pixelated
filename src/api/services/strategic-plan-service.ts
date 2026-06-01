@@ -137,7 +137,7 @@ export async function updateStrategicPlan(
 
   Object.keys(updates).forEach((key) => {
     if (key !== '_id' && key !== 'owner' && key !== 'createdAt') {
-      ;(plan as any)[key] = updates[key]
+      ;(plan)[key] = updates[key]
     }
   })
 

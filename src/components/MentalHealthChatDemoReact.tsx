@@ -287,14 +287,14 @@ export default function MentalHealthChatDemoReact({
                   aria-live="polite"
                 >
                   <div className="bg-muted max-w-[80%] rounded-lg px-4 py-3">
-                    <div className="flex space-x-1.5 h-4 items-center">
-                      <div className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"></div>
+                    <div className="flex h-4 items-center space-x-1.5">
+                      <div className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"></div>
                       <div
-                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"
                         style={{ animationDelay: '0.2s' }}
                       ></div>
                       <div
-                        className="bg-foreground/50 h-2 w-2 animate-bounce rounded-full"
+                        className="h-2 w-2 animate-bounce rounded-full bg-foreground/50"
                         style={{ animationDelay: '0.4s' }}
                       ></div>
                       <span className="sr-only">Assistant is typing...</span>

@@ -151,9 +151,7 @@ export class ModelServingServer extends EventEmitter {
 
     // Initialize model registry
     this.modelRegistry = new MongoModelRegistry(this.mongoClient)
-    this.monitoring = new ComprehensiveModelMonitoring(
-      this.mongoClient,
-    )
+    this.monitoring = new ComprehensiveModelMonitoring(this.mongoClient)
 
     await this.mongoClient.connect()
     this.emit('services_initialized')
@@ -211,7 +209,10 @@ export class ModelServingServer extends EventEmitter {
 
       // Run prediction in tf.tidy for automatic memory management
       const resultTensor = tf.tidy(() => {
-        const inputTensor = tf.tensor(processedInput as tf.TensorLike, [1, ...config.inputShape])
+        const inputTensor = tf.tensor(processedInput as tf.TensorLike, [
+          1,
+          ...config.inputShape,
+        ])
         const outputTensor = model.predict(inputTensor) as tf.Tensor
         return outputTensor
       })
@@ -413,22 +414,28 @@ export class ModelServingServer extends EventEmitter {
     }
   }
 
-  private callMinMaxNormalize(_data: unknown, _params?: Record<string, number>): unknown {
-    return _data
-  }
-
-  private callZScoreNormalize(_data: unknown, _params?: Record<string, number>): unknown {
-    return _data
-  }
-
-  private callRobustNormalize(_data: unknown, _params?: Record<string, number>): unknown {
-    return _data
-  }
-
-  private applyPolynomialFeatures(
+  private callMinMaxNormalize(
     _data: unknown,
-    _degree?: number,
+    _params?: Record<string, number>,
   ): unknown {
+    return _data
+  }
+
+  private callZScoreNormalize(
+    _data: unknown,
+    _params?: Record<string, number>,
+  ): unknown {
+    return _data
+  }
+
+  private callRobustNormalize(
+    _data: unknown,
+    _params?: Record<string, number>,
+  ): unknown {
+    return _data
+  }
+
+  private applyPolynomialFeatures(_data: unknown, _degree?: number): unknown {
     return _data
   }
 
@@ -436,10 +443,7 @@ export class ModelServingServer extends EventEmitter {
     return _data
   }
 
-  private applyBinnedFeatures(
-    _data: unknown,
-    _bins?: number,
-  ): unknown {
+  private applyBinnedFeatures(_data: unknown, _bins?: number): unknown {
     return _data
   }
 
@@ -734,9 +738,7 @@ class MongoModelRegistry implements ModelRegistry {
 }
 
 class ComprehensiveModelMonitoring implements ModelMonitoring {
-  constructor(
-    private readonly mongoClient: MongoClient,
-  ) {}
+  constructor(private readonly mongoClient: MongoClient) {}
 
   async trackPrediction(prediction: ModelPrediction): Promise<void> {
     const db = this.mongoClient.db('threat_detection')
