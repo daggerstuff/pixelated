@@ -121,11 +121,11 @@ function remarkDirectiveSugar() {
             d,
           )
         } else if (youtubeId) {
-          src = VIDEO_PLATFORMS['youtubeId'](youtubeId)
+          src = VIDEO_PLATFORMS['youtubeId']?.(youtubeId) ?? ''
         } else if (bilibiliId) {
-          src = VIDEO_PLATFORMS['bilibiliId'](bilibiliId)
+          src = VIDEO_PLATFORMS['bilibiliId']?.(bilibiliId) ?? ''
         } else if (vimeoId) {
-          src = VIDEO_PLATFORMS['vimeoId'](vimeoId)
+          src = VIDEO_PLATFORMS['vimeoId']?.(vimeoId) ?? ''
         }
 
         if (!src && iframeSrc) {
@@ -261,8 +261,10 @@ function remarkDirectiveSugar() {
 
         if (badgeId && VALID_BADGES.has(badgeId)) {
           const badge = CONFIG.badge.preset[badgeId]
-          resolvedBadgeText = badge.text
-          resolvedBadgeColor = badge.color
+          if (badge) {
+            resolvedBadgeText = badge.text
+            resolvedBadgeColor = badge.color
+          }
         } else if (!badgeId) {
           file.fail(
             'Invalid `badge` directive. The text in the `[]` of `:badge[]{}` is required if `id` attribute is not specified.',

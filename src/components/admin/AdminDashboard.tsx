@@ -171,7 +171,6 @@ export const AdminDashboard: FC = () => {
     uptime: 99.9,
   }
 
-
   return (
     <ResponsiveContainer size="full">
       <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">

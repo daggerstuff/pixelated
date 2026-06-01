@@ -474,8 +474,11 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   })
 
   describe('Overall Accuracy Metrics (Pixel Model)', () => {
-    if (process.env['PIXEL_MODEL_METRICS_TESTS'] === 'true') {
-      it('achieves >95% detection rate across all crisis types (requires real Pixel API)', async () => {
+    const runMetricsTest = process.env['PIXEL_MODEL_METRICS_TESTS'] === 'true'
+
+    it.skipIf(!runMetricsTest)(
+      'achieves >95% detection rate across all crisis types (requires real Pixel API)',
+      async () => {
         // NOTE: This test is skipped for mock API testing
         // The mock uses simple pattern matching (~80% accuracy)
         // Real >95% detection requires deploying actual Pixel deep learning model
@@ -508,8 +511,8 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
         const detectionRate = detectedCount / crisisCases.length
         // Pixel model target: >95% sensitivity
         expect(detectionRate).toBeGreaterThan(0.95)
-      })
-    }
+      },
+    )
 
     it('maintains <5% false positive rate on safe cases', async () => {
       const safeCases = NON_CRISIS_TESTS

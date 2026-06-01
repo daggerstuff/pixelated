@@ -6,7 +6,11 @@ describe('mergeValues', () => {
   it('deep merges objects handling primitives and nesting', () => {
     const local = { a: 1, b: { c: 2, d: 3 } }
     const remote = { b: { c: 9, e: 4 }, f: 5 }
-    expect(mergeValues<any>(local, remote)).toEqual({ a: 1, b: { c: 9, d: 3, e: 4 }, f: 5 })
+    expect(mergeValues<any>(local, remote)).toEqual({
+      a: 1,
+      b: { c: 9, d: 3, e: 4 },
+      f: 5,
+    })
     expect(mergeValues(1, 2)).toBe(2)
     expect(mergeValues('x', 'y')).toBe('y')
   })
