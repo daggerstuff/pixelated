@@ -85,7 +85,6 @@ export default defineConfig({
     noExternal: ['msw'],
   },
   resolve: {
-    tsconfigPaths: true,
     alias: [
       { find: '@/', replacement: `${path.resolve(process.cwd(), 'src')}/` },
       {
@@ -152,7 +151,6 @@ export default defineConfig({
       {
         plugins: [react(), ...astroPlugins],
         resolve: {
-          tsconfigPaths: true,
           alias: [
             {
               find: '@/',
@@ -240,7 +238,6 @@ export default defineConfig({
       },
       {
         resolve: {
-          tsconfigPaths: true,
           alias: [
             {
               find: '@/',

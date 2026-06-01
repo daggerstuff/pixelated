@@ -193,7 +193,9 @@ export default function EmotionTrackingChart({
             formatter={(value: number, name: string) => {
               return [`${value}/10`, DIMENSION_LABELS[name] ?? name]
             }}
-            labelFormatter={(label: string | number | Date) => new Date(label).toLocaleTimeString()}
+            labelFormatter={(label: string | number | Date) =>
+              new Date(label).toLocaleTimeString()
+            }
           />
 
           <Legend />

@@ -27,7 +27,8 @@ function rehypeHeadingIds() {
           .join('')
         if (text) {
           node.data = node.data ?? {}
-          const hProperties = (node.data['hProperties'] as Record<string, string>) ?? {}
+          const hProperties =
+            (node.data['hProperties'] as Record<string, string>) ?? {}
           hProperties['id'] = text.toLowerCase().replace(/\s+/g, '-')
           node.data['hProperties'] = hProperties
         }
@@ -60,7 +61,11 @@ export function rehypeHeadingIdsPlugin(): AstroIntegration {
 }
 
 // Placeholder for unist-util-visit functionality
-export function visit(tree: AstNode, type: string, callback: (node: AstNode) => void) {
+export function visit(
+  tree: AstNode,
+  type: string,
+  callback: (node: AstNode) => void,
+) {
   if (!hasChildren(tree)) return
 
   for (const child of tree.children) {

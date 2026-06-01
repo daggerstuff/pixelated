@@ -162,7 +162,10 @@ router.get(
     const expressRes = res as Response
     const documentId = ensureString(expressReq.params['documentId'])
 
-    const document = await documentService.getDocument(documentId, expressReq.user!.id)
+    const document = await documentService.getDocument(
+      documentId,
+      expressReq.user!.id,
+    )
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
@@ -369,7 +372,10 @@ router.get(
     const { format: formatQuery = 'json' } = expressReq.query
     const format = ensureString(formatQuery)
 
-    const document = await documentService.getDocument(documentId, expressReq.user!.id)
+    const document = await documentService.getDocument(
+      documentId,
+      expressReq.user!.id,
+    )
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
