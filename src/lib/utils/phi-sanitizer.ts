@@ -33,10 +33,7 @@ export function redactPotentialPhi(text: string | undefined | null): string {
  *          Each message's content will be redacted.
  */
 export function sanitizeMessagesForLogging(
-  messages:
-    | Array<Record<string, unknown>>
-    | undefined
-    | null,
+  messages: Array<Record<string, unknown>> | undefined | null,
 ): string {
   if (!messages || messages.length === 0) {
     return '[NO_MESSAGES]'

@@ -1,7 +1,1 @@
-{
-  "asana": {
-    "oauthClientId": "1215114468828894",
-    "auth": { "redirectPort": 3000 },
-    "oauthPublicClient": "1215114468828894"
-  }
-}
+{}

@@ -1,0 +1,2286 @@
+[
+  {
+    "id": "fa11e610-c584-4d38-b0d4-98c27f1e25ad",
+    "identifier": "PIX-1896",
+    "title": "FHE Emotional Intelligence Integration - execution backlog",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "fhe"
+        },
+        {
+          "name": "privacy"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "fhe",
+      "privacy"
+    ]
+  },
+  {
+    "id": "7e6a8db1-8d04-475d-bdc5-1bcbe73770b2",
+    "identifier": "PIX-487",
+    "title": "35.0 Final checkpoint \u2014 All complete",
+    "priority": 2,
+    "state": {
+      "name": "Backlog"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-7-integration"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-7-integration"
+    ]
+  },
+  {
+    "id": "b8f2439b-22eb-4809-978f-39f2676a5b85",
+    "identifier": "PIX-485",
+    "title": "33.0 Full pipeline dry run",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:execution"
+        },
+        {
+          "name": "phase-7-integration"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:execution",
+      "phase-7-integration"
+    ]
+  },
+  {
+    "id": "8ad9d82a-7fbd-4ff6-9523-e5ad92a1e1f8",
+    "identifier": "PIX-484",
+    "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-6-eval"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-6-eval"
+    ]
+  },
+  {
+    "id": "8e3d596d-4999-492e-8835-9b93e5479c71",
+    "identifier": "PIX-483",
+    "title": "31.0 Integration test \u2014 eval suite end-to-end",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "phase-6-eval"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:test",
+      "phase-6-eval"
+    ]
+  },
+  {
+    "id": "37891f12-af9a-4fc0-ae6a-6ec4a21192ef",
+    "identifier": "PIX-481",
+    "title": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "safety-critical"
+        },
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "phase-6-eval"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "safety-critical",
+      "type:test",
+      "phase-6-eval"
+    ]
+  },
+  {
+    "id": "61a2b8b9-4371-44de-99b5-7439e0cb370b",
+    "identifier": "PIX-480",
+    "title": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)",
+    "priority": 2,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "phase-6-eval"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:test",
+      "phase-6-eval"
+    ]
+  },
+  {
+    "id": "5259d312-30c6-4528-a8bd-da0d88cdc120",
+    "identifier": "PIX-479",
+    "title": "30.0 Implement mental health evaluation suite",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "phase-6-eval"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "phase-6-eval"
+    ]
+  },
+  {
+    "id": "37bcbb71-4a2a-4551-a2a2-1b01c850faed",
+    "identifier": "PIX-470",
+    "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-4-dpo"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-4-dpo"
+    ]
+  },
+  {
+    "id": "20926591-8da0-4385-847a-a519bf747a13",
+    "identifier": "PIX-469",
+    "title": "25.0 Integration test \u2014 DPO end-to-end",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "phase-4-dpo"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:test",
+      "phase-4-dpo"
+    ]
+  },
+  {
+    "id": "79c3628a-2d20-4872-8cfd-cac2cea7dcba",
+    "identifier": "PIX-464",
+    "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-3-sdg"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-3-sdg"
+    ]
+  },
+  {
+    "id": "3130adac-76dc-4d3d-a3bd-40f625bccf9a",
+    "identifier": "PIX-454",
+    "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-2-data"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-2-data"
+    ]
+  },
+  {
+    "id": "613e1692-40f5-4deb-ad05-234d7a000854",
+    "identifier": "PIX-452",
+    "title": "16.0 Implement data audit script",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "phase-2-data"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "phase-2-data"
+    ]
+  },
+  {
+    "id": "eb8bb194-223f-4d59-9068-ba53afb74a5f",
+    "identifier": "PIX-446",
+    "title": "\u202114.0 Execute book conversion \u2014 remaining titles",
+    "priority": 4,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:execution"
+        },
+        {
+          "name": "phase-2-data"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:execution",
+      "phase-2-data"
+    ]
+  },
+  {
+    "id": "ae25cd39-18c6-4ff9-82cc-39c68093c388",
+    "identifier": "PIX-445",
+    "title": "\u202113.0 Execute book conversion \u2014 priority titles",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:execution"
+        },
+        {
+          "name": "phase-2-data"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:execution",
+      "phase-2-data"
+    ]
+  },
+  {
+    "id": "80d9eb20-2ee3-4a1b-a87f-833bb31834af",
+    "identifier": "PIX-430",
+    "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:checkpoint"
+        },
+        {
+          "name": "phase-1-infra"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "type:checkpoint",
+      "phase-1-infra"
+    ]
+  },
+  {
+    "id": "2a179a25-5405-4e78-b04a-009e86d8f1a4",
+    "identifier": "PIX-420",
+    "title": "*1.1 Property test \u2014 token length stats correctness (Prop 6)",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "safety-critical"
+        },
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "phase-1-infra"
+        }
+      ]
+    },
+    "_project_name": "Training Pipeline Improvements",
+    "_project_id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+    "_label_names": [
+      "safety-critical",
+      "type:test",
+      "phase-1-infra"
+    ]
+  },
+  {
+    "id": "8be811a2-a5aa-4ebb-a8f8-301ffde23bff",
+    "identifier": "PIX-352",
+    "title": "C6: Dashboard integration \u2014 live workflow status",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "783d0417-51b4-4ab9-b6ff-d737ed69c602",
+    "identifier": "PIX-351",
+    "title": "C5: Learning loop \u2014 improve decisions from historical outcomes",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "15690d2d-d706-4dc3-8cdf-2f2680f3ce3b",
+    "identifier": "PIX-350",
+    "title": "C2: Post processing summary comment on each PR",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "0a5f7710-2d6d-49b0-ade4-314693fe04bd",
+    "identifier": "PIX-349",
+    "title": "C3: Human-in-the-loop escalation",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "4405080a-ca04-4296-967b-b291281851f0",
+    "identifier": "PIX-345",
+    "title": "B3: Smart bot comment filtering (pattern-based, not hardcoded)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "17a2d93b-7e88-48e5-ab72-61eead1e72c6",
+    "identifier": "PIX-344",
+    "title": "A4: Fix comment resolution \u2014 track processed comments locally",
+    "priority": 2,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "14cb97fe-3d89-40af-acfa-0c6c0d3242c0",
+    "identifier": "PIX-343",
+    "title": "B2: LLM timeout handling and fallback for large files",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "38d7a030-dae5-49ad-9be5-f7ad46eab53c",
+    "identifier": "PIX-342",
+    "title": "B1: Test suite validation in E2B sandbox before merge",
+    "priority": 1,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "b3d51d0b-d154-4a02-8b85-6fa7c38dd397",
+    "identifier": "PIX-341",
+    "title": "B4: Smart conflict resolution strategy per PR type",
+    "priority": 1,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "caf4a513-f936-4753-895e-cc510ef4c3af",
+    "identifier": "PIX-337",
+    "title": "A3: Fast-path for clean PRs (no actionable comments \u2192 immediate merge)",
+    "priority": 0,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "811d8a84-509b-4016-a370-8f1a941a8d25",
+    "identifier": "PIX-335",
+    "title": "AutoReview AI \u2014 Workflow Expansion & Improvement",
+    "priority": 0,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "4bb24102-f73d-4171-9d3a-78170a25a0db",
+    "identifier": "PIX-330",
+    "title": "Phase 1: Fix the Bleeding \u2014 Auto-rebase, fast-path, commit messages, error recovery",
+    "priority": 0,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "AutoReview Workflow Improvements",
+    "_project_id": "2889fe87-ad71-4edf-99c5-75224ee3f18f",
+    "_label_names": []
+  },
+  {
+    "id": "a23b769a-4e73-4281-9736-d3c463338420",
+    "identifier": "PIX-1877",
+    "title": "Document idea archival policy and backlog cleanup workflow",
+    "priority": 4,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Discovery"
+        }
+      ]
+    },
+    "_project_name": "Discovery & Backlog",
+    "_project_id": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+    "_label_names": [
+      "Discovery"
+    ]
+  },
+  {
+    "id": "952f5e61-50fc-49fc-9217-9c474f4ed1ab",
+    "identifier": "PIX-1876",
+    "title": "Discovery: define waiting list experience improvements",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Discovery"
+        }
+      ]
+    },
+    "_project_name": "Discovery & Backlog",
+    "_project_id": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+    "_label_names": [
+      "Discovery"
+    ]
+  },
+  {
+    "id": "b66198d3-02e8-4952-8924-8a994f5b1ed2",
+    "identifier": "PIX-235",
+    "title": "Explore VR travel features",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Discovery & Backlog",
+    "_project_id": "4a928f0c-ef75-4bfc-9598-bddd3490b06c",
+    "_label_names": []
+  },
+  {
+    "id": "b0c2fe79-da49-46ac-8069-08db4e709922",
+    "identifier": "PIX-379",
+    "title": "[Checkmate] CM-001: Establish current-truth baseline",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Checkmate",
+    "_project_id": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+    "_label_names": []
+  },
+  {
+    "id": "07167f35-e2b8-4339-b473-6078059e1bad",
+    "identifier": "PIX-378",
+    "title": "[Checkmate] CM-002: Restore clean backend build",
+    "priority": 2,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Checkmate",
+    "_project_id": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+    "_label_names": []
+  },
+  {
+    "id": "61ea6aee-544b-44c9-9403-d54dce5d81f1",
+    "identifier": "PIX-370",
+    "title": "Checkmate: establish a current-truth baseline and launch-ready execution path",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Checkmate",
+    "_project_id": "97b72bac-e84b-46e4-a82e-dc657030dcb9",
+    "_label_names": []
+  },
+  {
+    "id": "e40d4e26-4a17-4996-ab49-c2a6cb08a4e3",
+    "identifier": "PIX-1908",
+    "title": "Define the canonical public memory API contract",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "architecture"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "architecture"
+    ]
+  },
+  {
+    "id": "66635a08-aae2-4aed-a4ba-482ffa0d773a",
+    "identifier": "PIX-1920",
+    "title": "Remove browser-direct internal memory service usage",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": []
+  },
+  {
+    "id": "614a844f-6d75-4c64-9fb5-7a58a9fbe64d",
+    "identifier": "PIX-1921",
+    "title": "Workstream E: Build evidence-based reprioritization engine",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": []
+  },
+  {
+    "id": "6b796510-abeb-4bbc-8e52-90e842780886",
+    "identifier": "PIX-1914",
+    "title": "Sprint 4: Reflection & Learning (June 23 \u2013 July 6)",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Component: Memory Architecture (Foresight)"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "Component: Memory Architecture (Foresight)"
+    ]
+  },
+  {
+    "id": "72508cc9-5c83-4aee-a1ad-18e51f786ccf",
+    "identifier": "PIX-1915",
+    "title": "Sprint 3: Dreaming & Consolidation (June 9 \u2013 June 22)",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Component: Memory Architecture (Foresight)"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "Component: Memory Architecture (Foresight)"
+    ]
+  },
+  {
+    "id": "6cf9e34f-f840-42e4-bd9b-082f4132eff4",
+    "identifier": "PIX-1916",
+    "title": "Sprint 2: Gating & Ingestion (May 26 \u2013 June 8)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Component: Memory Architecture (Foresight)"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "Component: Memory Architecture (Foresight)"
+    ]
+  },
+  {
+    "id": "b0d0f784-ebf8-48dc-a28f-9ec42bb2b55f",
+    "identifier": "PIX-1903",
+    "title": "Sprint 1: Memory Schema & Unification (May 12 \u2013 May 25)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Component: Memory Architecture (Foresight)"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "Component: Memory Architecture (Foresight)"
+    ]
+  },
+  {
+    "id": "90c06cbd-d789-4d0a-8735-d79c3ccc1aff",
+    "identifier": "PIX-358",
+    "title": "Create TypeScript SDK with complete type safety",
+    "priority": 0,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": []
+  },
+  {
+    "id": "499c1b30-7d12-41bb-9614-2473500650e4",
+    "identifier": "PIX-355",
+    "title": "Implement composable memory block schemas",
+    "priority": 0,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Feature"
+        }
+      ]
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": [
+      "Feature"
+    ]
+  },
+  {
+    "id": "e994a866-0426-4f86-b977-eb1b77fcf89f",
+    "identifier": "PIX-328",
+    "title": "Rewire product `/api/memory/*` routes to the gateway and retire app-local production memory",
+    "priority": 3,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": []
+  },
+  {
+    "id": "dff990d9-723b-46de-9667-45cc4793c2da",
+    "identifier": "PIX-317",
+    "title": "Introduce explicit account and workspace memory scoping",
+    "priority": 3,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Foresight Memory Architecture",
+    "_project_id": "8f9aad1c-fd4c-4cf6-9a3b-2ceb267ef133",
+    "_label_names": []
+  },
+  {
+    "id": "cf2958c4-1d08-4b04-b909-d623eea9ed7e",
+    "identifier": "PIX-1909",
+    "title": "Data Governance - Task 4.1: Retention policies",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        },
+        {
+          "name": "Component: Data Governance & Compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance",
+      "Component: Data Governance & Compliance"
+    ]
+  },
+  {
+    "id": "27991ec2-410a-49ef-90bd-748dc37cc839",
+    "identifier": "PIX-1911",
+    "title": "Data Governance - Task 3.2: Slack webhook notifications",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        },
+        {
+          "name": "Component: Data Governance & Compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance",
+      "Component: Data Governance & Compliance"
+    ]
+  },
+  {
+    "id": "3211d331-d1f5-46d2-a293-0b8e5bb8b9c6",
+    "identifier": "PIX-1912",
+    "title": "Data Governance - Task 2.2: FHE integration tests",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        },
+        {
+          "name": "fhe"
+        },
+        {
+          "name": "Component: Data Governance & Compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance",
+      "fhe",
+      "Component: Data Governance & Compliance"
+    ]
+  },
+  {
+    "id": "174fbbe9-25f0-4d10-9e8e-28ba8855e438",
+    "identifier": "PIX-1910",
+    "title": "Data Governance - Task 2.3: Audit integration",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        },
+        {
+          "name": "Component: Data Governance & Compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance",
+      "Component: Data Governance & Compliance"
+    ]
+  },
+  {
+    "id": "627bda52-1d76-42a2-9f20-c21d472ec858",
+    "identifier": "PIX-1923",
+    "title": "Data Governance - Task 1.1: Governance directory structure and types",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        },
+        {
+          "name": "Component: Data Governance & Compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance",
+      "Component: Data Governance & Compliance"
+    ]
+  },
+  {
+    "id": "97aa7f5d-a269-4cbf-92d1-1915a36961b0",
+    "identifier": "PIX-197",
+    "title": "Data Governance - Task 4.2: Crypto-shred secure deletion",
+    "priority": 4,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance"
+    ]
+  },
+  {
+    "id": "885f5e5d-a096-4f3b-94dc-357d37a9b8e4",
+    "identifier": "PIX-190",
+    "title": "Data Governance - Task 1.3: MongoDB policy storage with versioning",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance"
+    ]
+  },
+  {
+    "id": "1b0ef398-ad14-41ed-bb68-a3339b586c3f",
+    "identifier": "PIX-189",
+    "title": "Data Governance - Task 1.2: Core policy engine",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "compliance"
+        }
+      ]
+    },
+    "_project_name": "Data Governance & Compliance",
+    "_project_id": "0aa3ad95-f694-4633-88c9-e127865a0ba1",
+    "_label_names": [
+      "compliance"
+    ]
+  },
+  {
+    "id": "d1eed1fe-8260-4a22-b053-b0e6e1192848",
+    "identifier": "PIX-1901",
+    "title": "Test Coverage Baseline (Plan 02)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "qa"
+        },
+        {
+          "name": "security"
+        },
+        {
+          "name": "type:test"
+        }
+      ]
+    },
+    "_project_name": "Test Coverage & Security Baseline",
+    "_project_id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "_label_names": [
+      "qa",
+      "security",
+      "type:test"
+    ]
+  },
+  {
+    "id": "b17743a8-c463-4753-a89d-e68b036a168a",
+    "identifier": "PIX-223",
+    "title": "Test Coverage & Security Baseline",
+    "priority": 2,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "security"
+        },
+        {
+          "name": "type:test"
+        },
+        {
+          "name": "Component: Infrastructure & DevOps"
+        }
+      ]
+    },
+    "_project_name": "Test Coverage & Security Baseline",
+    "_project_id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "_label_names": [
+      "security",
+      "type:test",
+      "Component: Infrastructure & DevOps"
+    ]
+  },
+  {
+    "id": "9b2838e6-f7c0-4118-ab33-557c3ffe6841",
+    "identifier": "PIX-164",
+    "title": "Test Coverage Baseline - HIPAA Tests (TypeScript)",
+    "priority": 3,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "security"
+        },
+        {
+          "name": "type:test"
+        }
+      ]
+    },
+    "_project_name": "Test Coverage & Security Baseline",
+    "_project_id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "_label_names": [
+      "security",
+      "type:test"
+    ]
+  },
+  {
+    "id": "4fe71a3d-572b-4b31-a924-a06c09c43fb4",
+    "identifier": "PIX-160",
+    "title": "Test Coverage Baseline - Coverage Audit",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "type:test"
+        }
+      ]
+    },
+    "_project_name": "Test Coverage & Security Baseline",
+    "_project_id": "97409cfb-e01c-4094-9728-577c79bf53ae",
+    "_label_names": [
+      "type:test"
+    ]
+  },
+  {
+    "id": "697b21c6-55d1-4c28-b766-472a465cb49b",
+    "identifier": "PIX-1922",
+    "title": "Phase 3: Auth Consolidation (Sprint 4)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "architecture"
+        }
+      ]
+    },
+    "_project_name": "Hybrid App Architecture Migration",
+    "_project_id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "_label_names": [
+      "architecture"
+    ]
+  },
+  {
+    "id": "81fb1f59-d178-4913-9491-fc7a05296a87",
+    "identifier": "PIX-1886",
+    "title": "Phase 4: API Extraction (Sprint 5)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "architecture"
+        }
+      ]
+    },
+    "_project_name": "Hybrid App Architecture Migration",
+    "_project_id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "_label_names": [
+      "architecture"
+    ]
+  },
+  {
+    "id": "1baff21a-558f-4a89-9147-f792ab2997f6",
+    "identifier": "PIX-1888",
+    "title": "Phase 1: Foundation (Sprint 1)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "architecture"
+        }
+      ]
+    },
+    "_project_name": "Hybrid App Architecture Migration",
+    "_project_id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "_label_names": [
+      "architecture"
+    ]
+  },
+  {
+    "id": "a273b124-62bb-4d06-848a-fe9cdffb760a",
+    "identifier": "PIX-1887",
+    "title": "Phase 5: Cleanup & Optimization (Sprint 6)",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "architecture"
+        }
+      ]
+    },
+    "_project_name": "Hybrid App Architecture Migration",
+    "_project_id": "732c7ac7-4db7-4959-8bc8-bc1ab497a8e0",
+    "_label_names": [
+      "architecture"
+    ]
+  },
+  {
+    "id": "f73088f5-14c8-41c2-9c11-fdeef296aa1a",
+    "identifier": "PIX-1879",
+    "title": "Write runbook and escalation map",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        },
+        {
+          "name": "operations"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release",
+      "operations"
+    ]
+  },
+  {
+    "id": "093eb651-fac8-469c-a683-b0e195d641b0",
+    "identifier": "PIX-1898",
+    "title": "Wire readiness check into Azure pre-deploy stage",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        },
+        {
+          "name": "operations"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release",
+      "operations"
+    ]
+  },
+  {
+    "id": "0d04b376-0346-4b84-918c-20d15ca44faa",
+    "identifier": "PIX-1882",
+    "title": "Standardize command contract",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "001c84d6-3748-4360-bb08-b76fdb910a37",
+    "identifier": "PIX-1913",
+    "title": "Run dry-run promotion tests (staging)",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "af1147d1-8a44-4a22-b7b7-5002b20bbbfd",
+    "identifier": "PIX-1884",
+    "title": "Publish CI operating model RFC",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "be9aa435-ce32-4087-a3d3-00f7ec89dcaf",
+    "identifier": "PIX-1889",
+    "title": "Map capability ownership matrix",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "927db1f5-f23d-4f4f-ab5e-9427516fc2c1",
+    "identifier": "PIX-1873",
+    "title": "Implement readiness aggregator endpoint/script",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "949139ac-bf9a-4b73-a218-651a8d29cf0e",
+    "identifier": "PIX-1894",
+    "title": "Kickoff: CI Federation Initiative",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "CI federation"
+        },
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "CI federation",
+      "release"
+    ]
+  },
+  {
+    "id": "f24a4b32-929a-4146-bf17-d4a4e364e825",
+    "identifier": "PIX-1875",
+    "title": "Final acceptance review",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "cb69a1e8-9c7e-47cb-b949-58a676d7fff4",
+    "identifier": "PIX-1891",
+    "title": "Disable duplicate non-owner jobs",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "d47d9e48-dcd7-454a-b616-ba7b184aa1ea",
+    "identifier": "PIX-1878",
+    "title": "Design release-readiness schema",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "13ea9191-119a-4267-99f4-122a102d1f51",
+    "identifier": "PIX-1902",
+    "title": "Create pipeline inventory across providers",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "73952b73-f117-49bd-88d1-8fed705f5148",
+    "identifier": "PIX-1892",
+    "title": "Approval checkpoint: ownership and RFC",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "6d1a5712-7d14-43a1-b697-e0b3d666755d",
+    "identifier": "PIX-1893",
+    "title": "Consolidate Bitbucket AI validation lane",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "CI/CD"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "CI/CD"
+    ]
+  },
+  {
+    "id": "8d286a84-a12c-4f21-8dc5-faedf9ee8a37",
+    "identifier": "PIX-1881",
+    "title": "Consolidate GitHub security lane",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "CI/CD"
+        },
+        {
+          "name": "security"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "CI/CD",
+      "security"
+    ]
+  },
+  {
+    "id": "93574858-91a4-4e71-8173-8b471aef2863",
+    "identifier": "PIX-1925",
+    "title": "Add branch and path trigger policy",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "fccc9612-9243-4627-b73e-74d31e6a49a1",
+    "identifier": "PIX-1924",
+    "title": "Build CI operations dashboard",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "release"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "release"
+    ]
+  },
+  {
+    "id": "f6f4b7ad-02f3-4fa1-b5f2-698ade21736c",
+    "identifier": "PIX-200",
+    "title": "Define weekly operating review",
+    "priority": 2,
+    "state": {
+      "name": "Backlog"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "CI federation"
+        },
+        {
+          "name": "release"
+        },
+        {
+          "name": "Component: AI / ML Training Pipeline"
+        }
+      ]
+    },
+    "_project_name": "CI Federation & Release Readiness",
+    "_project_id": "f7dda0b0-c075-4fe7-a17e-8046a850f6b6",
+    "_label_names": [
+      "CI federation",
+      "release",
+      "Component: AI / ML Training Pipeline"
+    ]
+  },
+  {
+    "id": "1df2860a-f031-45b3-aee2-703d5564d454",
+    "identifier": "PIX-1890",
+    "title": "Home Directory Backup System Redesign - implementation",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "platform"
+        }
+      ]
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": [
+      "platform"
+    ]
+  },
+  {
+    "id": "923056d6-8883-4727-ad04-2749c0d76e7e",
+    "identifier": "PIX-1899",
+    "title": "Tri-sync bootstrap sentinel (completed)",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "platform"
+        }
+      ]
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": [
+      "platform"
+    ]
+  },
+  {
+    "id": "dc3c84f5-1cd3-4942-af4e-905d96feb505",
+    "identifier": "PIX-314",
+    "title": "Implement context optimization architecture",
+    "priority": 3,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": []
+  },
+  {
+    "id": "f46c7022-9a3a-4bd6-9787-dbd25411c4ff",
+    "identifier": "PIX-240",
+    "title": "Tri-sync bootstrap sentinel",
+    "priority": 3,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": []
+  },
+  {
+    "id": "87837ee5-a0b5-4ec8-8908-342e00c7f6c8",
+    "identifier": "PIX-231",
+    "title": "Prepare the developer API and SDK rollout after gateway stabilization",
+    "priority": 4,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": []
+  },
+  {
+    "id": "c4840884-16a0-401e-845b-57d9406e81ec",
+    "identifier": "PIX-230",
+    "title": "Rewrite public memory docs and onboarding around the real product contract",
+    "priority": 3,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": []
+  },
+  {
+    "id": "2014d8ec-4106-42df-a9eb-774f72ea1161",
+    "identifier": "PIX-227",
+    "title": "Data Governance - Task 3.1: Unified event aggregation",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": []
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": []
+  },
+  {
+    "id": "56ceabd3-0420-4035-8a80-c1d487369d13",
+    "identifier": "PIX-224",
+    "title": "Public Memory Product Transition Program",
+    "priority": 1,
+    "state": {
+      "name": "Done"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "Component: Product & Strategy"
+        }
+      ]
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": [
+      "Component: Product & Strategy"
+    ]
+  },
+  {
+    "id": "101c94e9-4347-4500-b93f-358dad782b5f",
+    "identifier": "PIX-215",
+    "title": "Refactor user profile data model and migration plan",
+    "priority": 2,
+    "state": {
+      "name": "In Progress"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "platform"
+        }
+      ]
+    },
+    "_project_name": "Platform Foundations & Operations",
+    "_project_id": "f5dc528d-c1ff-447b-9626-b11813f0dc6e",
+    "_label_names": [
+      "platform"
+    ]
+  },
+  {
+    "id": "2837a8d0-8f1c-48bb-8a16-db01c126972f",
+    "identifier": "PIX-1917",
+    "title": "Run controlled pixel-data reconciliation build",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "data-pipeline"
+        }
+      ]
+    },
+    "_project_name": "Data Pipeline Recovery & External Integrations",
+    "_project_id": "07810eff-50bb-4518-974a-07b4938f3264",
+    "_label_names": [
+      "data-pipeline"
+    ]
+  },
+  {
+    "id": "e08a1251-5b03-45f6-ac4d-b6092ffca00d",
+    "identifier": "PIX-1883",
+    "title": "Promote recovered feeders into live pixel-data source config",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "data-pipeline"
+        }
+      ]
+    },
+    "_project_name": "Data Pipeline Recovery & External Integrations",
+    "_project_id": "07810eff-50bb-4518-974a-07b4938f3264",
+    "_label_names": [
+      "data-pipeline"
+    ]
+  },
+  {
+    "id": "5abf1ea4-1417-4ebc-85b6-1aca8d3168a2",
+    "identifier": "PIX-170",
+    "title": "Blocking gaps remediation: training pipeline blockers",
+    "priority": 2,
+    "state": {
+      "name": "Todo"
+    },
+    "assignee": {
+      "id": "8f0b6612-9fd8-4930-9685-b5c07d14f0eb",
+      "name": "Chad"
+    },
+    "labels": {
+      "nodes": [
+        {
+          "name": "data-pipeline"
+        },
+        {
+          "name": "Component: Memory Architecture (Foresight)"
+        }
+      ]
+    },
+    "_project_name": "Data Pipeline Recovery & External Integrations",
+    "_project_id": "07810eff-50bb-4518-974a-07b4938f3264",
+    "_label_names": [
+      "data-pipeline",
+      "Component: Memory Architecture (Foresight)"
+    ]
+  }
+]

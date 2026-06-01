@@ -63,6 +63,8 @@ export default function vitePluginFlexsearchSSR() {
       if (id === virtualModuleId) {
         return resolvedVirtualModuleId
       }
+
+      return null
     },
 
     load(id) {
@@ -129,6 +131,8 @@ export default function vitePluginFlexsearchSSR() {
           export const registerFilter = flexsearchStub.registerFilter;
         `
       }
+
+      return null
     },
   }
 }

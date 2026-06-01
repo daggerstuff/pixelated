@@ -43,10 +43,18 @@ const handlePatch = withAuthenticatedMemoryRoute(
       return jsonError(400, 'Bad Request', 'memoryId parameter is required')
     }
 
-    const body: Record<string, unknown> = await request.json() as Record<string, unknown>
+    const body: Record<string, unknown> = (await request.json()) as Record<
+      string,
+      unknown
+    >
     const contentBody = body['content']
     const textBody = body['text']
-    const content: string = typeof contentBody === 'string' ? contentBody : typeof textBody === 'string' ? textBody : ''
+    const content: string =
+      typeof contentBody === 'string'
+        ? contentBody
+        : typeof textBody === 'string'
+          ? textBody
+          : ''
     if (!content) {
       return jsonError(400, 'Bad Request', 'content parameter is required')
     }
