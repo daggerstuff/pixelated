@@ -15,6 +15,12 @@ daemon.*
 # Push state (runtime, per-machine)
 push-state.json
 
+# Dolt backup state (runtime, per-machine)
+# dolt-backup.json contains the local backup_url (e.g. file:///path/to/.beads/backup)
+# which is machine-specific and breaks for other clones.
+dolt-backup.json
+dolt-backup-state.json
+
 # Lock files (various runtime locks)
 *.lock
 
