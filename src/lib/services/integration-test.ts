@@ -10,7 +10,7 @@ import { fheService } from '../fhe'
 import { EncryptionMode } from '../fhe/types'
 import type { EncryptedData } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { MemoryService } from '../memory'
+import { InProcessMemoryService } from '../memory/__tests__/in-process-memory-service'
 
 const logger = createBuildSafeLogger('service-integration-test')
 
@@ -31,12 +31,12 @@ export interface ServiceIntegrationTestResult {
 }
 
 export class ServiceIntegrationTester {
-  private readonly memoryService: MemoryService
+  private readonly memoryService: InProcessMemoryService
   private readonly biasEngine: BiasDetectionEngine
   private readonly emotionMapper: MultidimensionalEmotionMapper
 
   constructor() {
-    this.memoryService = new MemoryService()
+    this.memoryService = new InProcessMemoryService()
     this.biasEngine = new BiasDetectionEngine()
     this.emotionMapper = new MultidimensionalEmotionMapper()
   }
