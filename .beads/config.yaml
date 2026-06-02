@@ -1,0 +1,68 @@
+# Beads Configuration — Pixelated Empathy
+# Source of truth: .beads/config.yaml
+# All settings can also be set via environment variables (BD_* prefix)
+# or overridden with command-line flags.
+
+# ─── Identity ────────────────────────────────────────────────────────────────
+# Issue prefix: issues are named pixelated-1, pixelated-2, …
+# (Set at bd init, stored in the database; kept here for documentation)
+# issue-prefix: pixelated
+
+# ─── Output & Formatting ──────────────────────────────────────────────────────
+output:
+  title-length: 255    # Truncate displayed titles to N chars (0 = hide)
+
+# ─── Actor ────────────────────────────────────────────────────────────────────
+# Default actor for audit trails; override with BEADS_ACTOR env or --actor flag
+actor: "Chadisfaction"
+
+# ─── Validation ───────────────────────────────────────────────────────────────
+# Enforce quality standards on issue creation and closure.
+# Modes: none | warn | error
+validation:
+  on-create: "warn"     # Warn if description is missing required sections
+  on-close: "warn"      # Warn if acceptance criteria not met before closing
+  on-sync: "none"       # Don't block syncs with validation errors
+
+# ─── Events / Audit Trail ─────────────────────────────────────────────────────
+# Export a full audit trail to .beads/events.jsonl on each flush/sync.
+# Use 'bd export --events' to trigger manually.
+events-export: true
+
+# ─── JSONL Backup ─────────────────────────────────────────────────────────────
+# Periodic export for off-machine recovery and interchange.
+# Auto-enabled when a git remote exists; configured explicitly here.
+backup:
+  enabled: true         # Export .beads/issues.jsonl periodically
+  interval: 15m         # Minimum time between auto-exports
+  git-push: true        # Auto-commit + push the JSONL export to origin
+
+# ─── Sync / Dolt Remote ───────────────────────────────────────────────────────
+# The Dolt remote for bd dolt push / bd dolt pull.
+# Uses the same GitHub origin; issue history lives under refs/dolt/data.
+# Configured via: bd dolt remote add origin <url>
+# (stored in the embedded Dolt repo, not in this file)
+
+# ─── Compaction ───────────────────────────────────────────────────────────────
+# Compact old issue history to keep the database lean.
+# Disabled by default; enable when issue count grows large (>500).
+# compaction_enabled: false
+
+# ─── GitHub Integration ───────────────────────────────────────────────────────
+# Store non-secret keys in the database via: bd config set github.org daggerstuff
+# Secret keys should use env vars:
+#   GITHUB_TOKEN   → GitHub Personal Access Token (for bd github sync)
+# github:
+#   org: daggerstuff
+#   repo: pixelated
+
+# ─── Multi-repo (experimental) ────────────────────────────────────────────────
+# Route writes to the correct database when hydrating from multiple repos.
+# repos:
+#   primary: "."
+#   additional:
+#     - ~/beads-planning
+
+# ─── Hooks ────────────────────────────────────────────────────────────────────
+# Set no-hooks: true to disable all git hooks temporarily (e.g. for CI)
+# no-hooks: false
