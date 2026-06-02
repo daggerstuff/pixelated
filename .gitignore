@@ -368,4 +368,4 @@ package/bundle/
 .codegraph/
 aws
 scratch
-sliced_output
+sliced_output.worktrees/
