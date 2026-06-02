@@ -1,0 +1,1 @@
+{"id":"int-68721722","kind":"field_change","created_at":"2026-06-02T21:38:05.9034793Z","actor":"Chadisfaction","issue_id":"pixelated-e47","extra":{"field":"status","new_value":"closed","old_value":"in_progress","reason":"Successfully configured Dolt remote sync with git+ssh origin refs/dolt/data, restored 34 issues from historical backups, and pushed local Dolt database refs"}}
