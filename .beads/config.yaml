@@ -66,3 +66,5 @@ backup:
 # ─── Hooks ────────────────────────────────────────────────────────────────────
 # Set no-hooks: true to disable all git hooks temporarily (e.g. for CI)
 # no-hooks: false
+
+sync.remote: "git+ssh://git@github.com/daggerstuff/pixelated.git"
