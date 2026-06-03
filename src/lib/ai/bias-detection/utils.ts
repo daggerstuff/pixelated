@@ -84,7 +84,7 @@ const TherapeuticSessionSchema = z.object({
 export { TherapeuticSessionSchema }
 
 // Validate participant demographics data
-export function validateParticipantDemographics(demographics: any): void {
+export function validateParticipantDemographics(demographics: Record<string, unknown>): void {
   const requiredFields = ['age', 'gender', 'ethnicity', 'primaryLanguage']
   for (const field of requiredFields) {
     if (!(field in demographics)) {
@@ -93,66 +93,66 @@ export function validateParticipantDemographics(demographics: any): void {
   }
   // Example valid values for gender
   const validGenders = ['male', 'female', 'non-binary', 'prefer-not-to-say']
-  if (!validGenders.includes(demographics.gender)) {
+  if (!validGenders.includes(demographics['gender'] as string)) {
     throw new Error('Invalid participant demographics data')
   }
   // Additional validation can be added as needed
-  return demographics
 }
 
 // Validate Therapeutic Session with basic checks used in tests
-export function validateTherapeuticSession(session: any): TherapeuticSession {
+export function validateTherapeuticSession(session: Record<string, unknown>): TherapeuticSession {
   if (!session || typeof session !== 'object') {
     throw new Error('Invalid therapeutic session data')
   }
   const uuidV4 =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  if (!uuidV4.test(String(session.sessionId))) {
+  if (!uuidV4.test(String(session['sessionId'] as string))) {
     throw new Error('Invalid therapeutic session data')
   }
   // Convert timestamps if needed
-  const normalizeDate = (d: any) => (typeof d === 'string' ? new Date(d) : d)
-  const aiResponses = Array.isArray(session.aiResponses)
-    ? session.aiResponses.map((r: any) => ({
+  const normalizeDate = (d: unknown) => (typeof d === 'string' ? new Date(d) : d)
+  const rawAiResponses = session['aiResponses'] as Record<string, unknown>[] | undefined
+  const aiResponses = Array.isArray(rawAiResponses)
+    ? rawAiResponses.map((r: Record<string, unknown>) => ({
         ...r,
-        timestamp: normalizeDate(r.timestamp),
+        timestamp: normalizeDate(r['timestamp'] as string | Date),
       }))
     : []
   const normalized: TherapeuticSession = {
-    ...session,
-    timestamp: normalizeDate(session.timestamp),
-    aiResponses,
+    ...session as unknown as TherapeuticSession,
+    timestamp: normalizeDate(session['timestamp']) as Date,
+    aiResponses: aiResponses as TherapeuticSession['aiResponses'],
   }
   return normalized
 }
 
 // Validate Bias Detection configuration used in tests
-export function validateBiasDetectionConfig(config: any): void {
+export function validateBiasDetectionConfig(config: Record<string, unknown>): void {
   if (!config || typeof config !== 'object') {
     throw new Error('Invalid bias detection configuration')
   }
-  const t = config.thresholds ?? {}
+  const thresholds = config['thresholds'] as Record<string, unknown> | undefined
+  const t = thresholds ?? {}
   if (
-    !(t.warningLevel ?? t.warning) ||
-    !(t.highLevel ?? t.high) ||
-    !(t.criticalLevel ?? t.critical)
+    !(t['warningLevel'] ?? t['warning']) ||
+    !(t['highLevel'] ?? t['high']) ||
+    !(t['criticalLevel'] ?? t['critical'])
   ) {
     throw new Error('Invalid bias detection configuration')
   }
-  const warning = Number(t.warningLevel ?? t.warning)
-  const high = Number(t.highLevel ?? t.high)
-  const critical = Number(t.criticalLevel ?? t.critical)
+  const warning = Number(t['warningLevel'] ?? t['warning'])
+  const high = Number(t['highLevel'] ?? t['high'])
+  const critical = Number(t['criticalLevel'] ?? t['critical'])
   if (!(warning < high && high < critical)) {
     throw new Error('Invalid bias detection configuration')
   }
-  const w = config.layerWeights ?? {}
+  const w = config['layerWeights'] as Record<string, unknown> | undefined ?? {}
   const sum = ['preprocessing', 'modelLevel', 'interactive', 'evaluation']
     .map((k) => Number(w[k] ?? 0))
     .reduce((a, b) => a + b, 0)
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Invalid bias detection configuration')
   }
-  return config
 }
 
 // Data sanitization
@@ -324,7 +324,7 @@ export function calculateFairnessMetrics(
   const tprs: number[] = []
   const fprs: number[] = []
   for (const g of groups) {
-    const m = groupMetrics[g]
+    const m = groupMetrics[g]!
     const { tp, fp, tn, fn } = m
     const total = tp + fp + tn + fn
     const pr = total > 0 ? (tp + fp) / total : 0
@@ -397,7 +397,7 @@ export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
     (typeof err === 'object' &&
       err !== null &&
       'name' in err &&
-      (err as any).name === 'BiasDetectionError')
+      (err as Record<string, unknown>)['name'] === 'BiasDetectionError')
   )
 }
 
@@ -415,7 +415,7 @@ export function handleBiasDetectionError(
 }
 
 // Data transformation to/from Python
-export function transformSessionForPython(session: TherapeuticSession): any {
+export function transformSessionForPython(session: TherapeuticSession): Record<string, unknown> {
   return {
     session_id: session.sessionId,
     timestamp: (session.timestamp ?? new Date()).toISOString(),
@@ -450,12 +450,12 @@ export function transformSessionForPython(session: TherapeuticSession): any {
   }
 }
 
-export function transformPythonResponse(response: any): any {
+export function transformPythonResponse(response: Record<string, unknown>): Record<string, unknown> {
   return {
-    overallBiasScore: response.overall_bias_score,
-    confidence: response.confidence,
-    alertLevel: response.alert_level,
-    recommendations: response.recommendations,
+    overallBiasScore: response['overall_bias_score'],
+    confidence: response['confidence'],
+    alertLevel: response['alert_level'],
+    recommendations: response['recommendations'],
   }
 }
 
@@ -657,7 +657,7 @@ export function deepClone<T>(obj: T): T {
 /**
  * Debounce function to limit function calls
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
 ): (...args: Parameters<T>) => void {
