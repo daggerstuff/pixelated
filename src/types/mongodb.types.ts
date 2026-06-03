@@ -72,18 +72,68 @@ export interface BiasDetection {
   timestamp: Date
 }
 
+export interface TreatmentPlanMilestone {
+  id: string
+  title: string
+  completed: boolean
+  completedDate?: string
+  notes?: string
+  dueDate?: string
+}
+
+export interface TreatmentPlanGoalMetrics {
+  sessionsCompleted: number
+  exercisesAssigned: number
+  exercisesCompleted: number
+  lastActivityDate?: string
+}
+
+export interface TreatmentPlanGoal {
+  id: string
+  title: string
+  description: string
+  targetDate: string
+  priority: 'low' | 'medium' | 'high' | 'urgent'
+  status: 'not-started' | 'in-progress' | 'completed' | 'on-hold'
+  progress: number
+  category: 'behavioral' | 'cognitive' | 'emotional' | 'social' | 'physical'
+  milestones: TreatmentPlanMilestone[]
+  metrics?: TreatmentPlanGoalMetrics
+}
+
+export interface TreatmentPlanInterventionHistoryEntry {
+  date: string
+  intervention: string
+  outcome: string
+  effectiveness: number
+}
+
+export interface TreatmentPlanMetadata {
+  totalSessions: number
+  completedSessions: number
+  overallProgress: number
+  nextSessionDate?: string
+  riskLevel: 'low' | 'medium' | 'high'
+  interventionHistory: TreatmentPlanInterventionHistoryEntry[]
+}
+
 export interface TreatmentPlan {
   _id?: MongoObjectId
   id?: string
-  userId: MongoObjectId
-  therapistId: MongoObjectId
+  clientId: string
+  therapistId: string
+  clientName: string
+  therapistName: string
   title: string
   description: string
-  goals: string[]
+  goals: TreatmentPlanGoal[]
   interventions: string[]
-  status: 'active' | 'completed' | 'paused'
+  status: 'active' | 'completed' | 'paused' | 'draft'
   startDate: Date
   endDate?: Date
+  duration?: number
+  notes?: string
+  metadata?: TreatmentPlanMetadata
   createdAt: Date
   updatedAt: Date
 }
