@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ensure the correct Node version from nvm is available in the hook environment
+export NVM_DIR="${NVM_DIR:-$HOME/.config/nvm}"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
 # Colors
 YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
