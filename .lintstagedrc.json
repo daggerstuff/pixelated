@@ -2,6 +2,6 @@
   ".Jules/**/*.md": ["pnpm run format:jules-markdown"],
   ".Jules/**/*.mdx": ["pnpm run format:jules-markdown"],
   "*.{js,ts,jsx,tsx,astro}": ["oxlint -c .oxlintrc.json"],
-  "*.{md,mdx}": ["markdownlint --config .markdownlint.json"],
+  "*.{md,mdx}": ["markdownlint --config .markdownlint.json --ignore \".agents/**\""],
   "*.py": ["ruff check --fix --exit-zero", "ruff format"]
 }

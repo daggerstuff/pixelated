@@ -84,7 +84,7 @@ const TherapeuticSessionSchema = z.object({
 export { TherapeuticSessionSchema }
 
 // Validate participant demographics data
-export function validateParticipantDemographics(demographics: Record<string, unknown>): void {
+export function validateParticipantDemographics(demographics: Record<string, unknown>): ParticipantDemographics {
   const requiredFields = ['age', 'gender', 'ethnicity', 'primaryLanguage']
   for (const field of requiredFields) {
     if (!(field in demographics)) {
@@ -97,6 +97,7 @@ export function validateParticipantDemographics(demographics: Record<string, unk
     throw new Error('Invalid participant demographics data')
   }
   // Additional validation can be added as needed
+  return demographics as unknown as ParticipantDemographics
 }
 
 // Validate Therapeutic Session with basic checks used in tests
@@ -127,7 +128,7 @@ export function validateTherapeuticSession(session: Record<string, unknown>): Th
 }
 
 // Validate Bias Detection configuration used in tests
-export function validateBiasDetectionConfig(config: Record<string, unknown>): void {
+export function validateBiasDetectionConfig(config: Record<string, unknown>): Record<string, unknown> {
   if (!config || typeof config !== 'object') {
     throw new Error('Invalid bias detection configuration')
   }
@@ -153,6 +154,7 @@ export function validateBiasDetectionConfig(config: Record<string, unknown>): vo
   if (Math.abs(sum - 1) > 1e-6) {
     throw new Error('Invalid bias detection configuration')
   }
+  return config
 }
 
 // Data sanitization

@@ -169,6 +169,8 @@ scan_file() {
   case "$filepath" in
     *.lock|package-lock.json|yarn.lock|pnpm-lock.yaml|Cargo.lock|go.sum|*.sum)
       return 0 ;;
+    *"/references/"*)
+      return 0 ;;
   esac
 
   for entry in "${PATTERNS[@]}"; do
