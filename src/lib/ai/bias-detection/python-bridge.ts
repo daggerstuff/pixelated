@@ -249,10 +249,10 @@ export class PythonBiasDetectionBridge {
         // Acquire a pooled connection for this request if the pool supports it
         if (
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).acquireConnection === 'function'
+          typeof (this.connectionPool).acquireConnection === 'function'
         ) {
           pooledConnection = await (
-            this.connectionPool as ConnectionPool
+            this.connectionPool
           ).acquireConnection()
         }
         // Simplified signal handling for test compatibility
@@ -273,7 +273,7 @@ export class PythonBiasDetectionBridge {
           }, this.timeout)
 
           // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as RequestInit).signal = controller.signal
+          ;(fetchOptions).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -318,9 +318,9 @@ export class PythonBiasDetectionBridge {
         if (
           pooledConnection &&
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).releaseConnection === 'function'
+          typeof (this.connectionPool).releaseConnection === 'function'
         ) {
-          ;(this.connectionPool as ConnectionPool).releaseConnection(pooledConnection)
+          ;(this.connectionPool).releaseConnection(pooledConnection)
           pooledConnection = null
         }
         // Clear timeout on error
@@ -883,9 +883,9 @@ export class PythonBiasDetectionBridge {
       this.stopHealthMonitoring()
       if (
         this.connectionPool &&
-        typeof (this.connectionPool as ConnectionPool).dispose === 'function'
+        typeof (this.connectionPool).dispose === 'function'
       ) {
-        await (this.connectionPool as ConnectionPool).dispose()
+        await (this.connectionPool).dispose()
       }
       logger.info('PythonBiasDetectionBridge disposed')
     } catch (e) {
