@@ -272,15 +272,15 @@ export class ContextDetector {
         return {
           ...result,
           detectedContext: ContextType.EDUCATIONAL,
-          confidence: (result['confidence']) ?? 0.85,
-          contextualIndicators: (result['contextualIndicators'])?.length
-            ? (result['contextualIndicators'])
+          confidence: (result['confidence'] as number) ?? 0.85,
+          contextualIndicators: (result['contextualIndicators'] as ContextualIndicator[])?.length
+            ? (result['contextualIndicators'] as ContextualIndicator[])
             : [
                 {
                   type: 'educational_pattern',
                   description:
                     'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: (result['confidence']) ?? 0.8,
+                  confidence: (result['confidence'] as number) ?? 0.8,
                 },
               ],
           needsSpecialHandling: false,
@@ -332,7 +332,7 @@ export class ContextDetector {
 
       logger.info('Context detected', {
         context: result['detectedContext'] as string,
-        confidence: result['confidence'],
+        confidence: result['confidence'] as number,
         urgency: result['urgency'] as string,
       })
 

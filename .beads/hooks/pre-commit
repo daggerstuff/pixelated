@@ -8,6 +8,25 @@ GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+# Ensure the correct Node version from nvm is available in the hook environment
+if [ -z "${NVM_DIR:-}" ]; then
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.nvm"
+  elif [ -s "$HOME/.config/nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.config/nvm"
+  fi
+fi
+
+if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+  if [ -f .nvmrc ]; then
+    if ! nvm use --silent >/dev/null; then
+      echo -e "${YELLOW}⚠️  [Hook] Unable to activate Node from .nvmrc; install it with 'nvm install'.${NC}"
+      exit 1
+    fi
+  fi
+fi
+
 echo -e "${BLUE}🔍 [Hook] Running pre-commit checks...${NC}"
 
 # A. Secret scanning (Catch potential leaks before they leave)
@@ -24,12 +43,12 @@ fi
 # Delegate content-level secret scanning to the dedicated scanner
 # Allowlist suppresses false positives: env-var reads, docs examples, function-call returns.
 SECRETS_ALLOWLIST="_strip_env,os.getenv,process.env,rootroot,secure_password,localhost,APIFY_TOKEN,\
-wJalr,user:pass@host,prod-server/myapp,192.168.1.1:8080,redis:6379/0,\
+wJalr,user:pass@host,user:pass@remote,prod-server/myapp,192.168.1.1:8080,redis:6379/0,\
 line.split,get_supadata_api_key,resolve_asana_token,resolve_github_token,\
 \"type\": \"service_account\",user:password@postgres,<USERNAME>,<CLUSTER>,\
 this.API_KEY,resolve_jira_token,extractTokenFromRequest,\
 next_page_token,os.environ.get,payload.get,= getString,\
-.redis.password,credentials.client_secret" \
+.redis.password,credentials.client_secret,subscription.apiKey,this.config.redis.password,redis://localhost:6379,mongodb://localhost:27017/threat_feeds" \
   SCAN_MODE=block SCAN_SCOPE=staged bash .github/hooks/secrets-scanner/scan-secrets.sh
 
 # B. Check lockfile synchronization
@@ -69,27 +88,3 @@ if [ -s "$MARKDOWNLINT_VIOLATIONS" ]; then
 fi
 
 rm -f "$MD_FILES" "$MARKDOWNLINT_VIOLATIONS"
-
-# --- BEGIN BEADS INTEGRATION v1.0.4 ---
-# This section is managed by beads. Do not remove these markers.
-if command -v bd >/dev/null 2>&1; then
-  export BD_GIT_HOOK=1
-  _bd_timeout=${BEADS_HOOK_TIMEOUT:-300}
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$_bd_timeout" bd hooks run pre-commit "$@"
-    _bd_exit=$?
-    if [ $_bd_exit -eq 124 ]; then
-      echo >&2 "beads: hook 'pre-commit' timed out after ${_bd_timeout}s — continuing without beads"
-      _bd_exit=0
-    fi
-  else
-    bd hooks run pre-commit "$@"
-    _bd_exit=$?
-  fi
-  if [ $_bd_exit -eq 3 ]; then
-    echo >&2 "beads: database not initialized — skipping hook 'pre-commit'"
-    _bd_exit=0
-  fi
-  if [ $_bd_exit -ne 0 ]; then exit $_bd_exit; fi
-fi
-# --- END BEADS INTEGRATION v1.0.4 ---

@@ -594,7 +594,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const conn of suspiciousConnections) {
-        const c = conn
+        const c = conn as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_network_connection',
@@ -680,7 +680,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const proc of suspiciousProcesses) {
-        const p = proc
+        const p = proc as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_process',
@@ -750,7 +750,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const anomalousBehaviors = this.analyzeUserBehavior(userData, hunt.query)
 
       for (const beh of anomalousBehaviors) {
-        const b = beh
+        const b = beh as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'anomalous_user_behavior',
@@ -823,7 +823,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const ind of malwareIndicators) {
-        const mal = ind
+        const mal = ind as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'malware_indicator',
@@ -893,7 +893,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const lateralMovements = this.analyzeLateralMovement(authData, hunt.query)
 
       for (const mov of lateralMovements) {
-        const m = mov
+        const m = mov as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'lateral_movement',
@@ -1015,27 +1015,27 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private analyzeNetworkConnections(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate network connection analysis
-    return data.filter((connection) => (connection)['confidence'] as number > 0.5)
+    return data.filter((connection) => (connection as Record<string, unknown>)['confidence'] as number > 0.5)
   }
 
   private analyzeProcesses(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate process analysis
-    return data.filter((process) => (process)['confidence'] as number > 0.7)
+    return data.filter((process) => (process as Record<string, unknown>)['confidence'] as number > 0.7)
   }
 
   private analyzeUserBehavior(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate user behavior analysis
-    return data.filter((behavior) => (behavior)['confidence'] as number > 0.6)
+    return data.filter((behavior) => (behavior as Record<string, unknown>)['confidence'] as number > 0.6)
   }
 
   private analyzeMalwareIndicators(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate malware indicator analysis
-    return data.filter((indicator) => (indicator)['confidence'] as number > 0.8)
+    return data.filter((indicator) => (indicator as Record<string, unknown>)['confidence'] as number > 0.8)
   }
 
   private analyzeLateralMovement(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate lateral movement analysis
-    return data.filter((movement) => (movement)['confidence'] as number > 0.7)
+    return data.filter((movement) => (movement as Record<string, unknown>)['confidence'] as number > 0.7)
   }
 
   /**

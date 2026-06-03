@@ -207,7 +207,7 @@ export class Phase3IntegrationTester {
         result.status === 'fulfilled' ? result.value : false,
       )
 
-      const allHealthy = healthResults.every((result) =>  result)
+      const allHealthy = healthResults.every((result) => result === true)
 
       if (!allHealthy) {
         logger.warn('Some services are unhealthy', { healthResults })

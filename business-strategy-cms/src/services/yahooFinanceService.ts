@@ -333,10 +333,10 @@ export class YahooFinanceService {
     )
   }
 
-  private getFromCache(key: string): unknown | null {
+  private getFromCache<T>(key: string): T | null {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data as unknown
+      return cached.data as T
     }
     return null
   }

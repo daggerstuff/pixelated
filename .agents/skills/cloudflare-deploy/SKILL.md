@@ -112,8 +112,9 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 ## Product Index
 
 ### Compute & Runtime
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Workers | `references/workers/` |
 | Pages | `references/pages/` |
 | Pages Functions | `references/pages-functions/` |
@@ -121,14 +122,14 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | Workflows | `references/workflows/` |
 | Containers | `references/containers/` |
 | Workers for Platforms | `references/workers-for-platforms/` |
-| Cron Triggers | `references/cron-triggers/` |
 | Tail Workers | `references/tail-workers/` |
 | Snippets | `references/snippets/` |
 | Smart Placement | `references/smart-placement/` |
 
 ### Storage & Data
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | KV | `references/kv/` |
 | D1 | `references/d1/` |
 | R2 | `references/r2/` |
@@ -141,8 +142,9 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | R2 SQL | `references/r2-sql/` |
 
 ### AI & Machine Learning
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Workers AI | `references/workers-ai/` |
 | Vectorize | `references/vectorize/` |
 | Agents SDK | `references/agents-sdk/` |
@@ -150,8 +152,9 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | AI Search | `references/ai-search/` |
 
 ### Networking & Connectivity
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Tunnel | `references/tunnel/` |
 | Spectrum | `references/spectrum/` |
 | TURN | `references/turn/` |
@@ -160,8 +163,9 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | Workers VPC | `references/workers-vpc/` |
 
 ### Security
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | WAF | `references/waf/` |
 | DDoS Protection | `references/ddos/` |
 | Bot Management | `references/bot-management/` |
@@ -169,22 +173,25 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | Turnstile | `references/turnstile/` |
 
 ### Media & Content
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Images | `references/images/` |
 | Stream | `references/stream/` |
 | Browser Rendering | `references/browser-rendering/` |
 | Zaraz | `references/zaraz/` |
 
 ### Real-Time Communication
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | RealtimeKit | `references/realtimekit/` |
 | Realtime SFU | `references/realtime-sfu/` |
 
 ### Developer Tools
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Wrangler | `references/wrangler/` |
 | Miniflare | `references/miniflare/` |
 | C3 | `references/c3/` |
@@ -196,15 +203,17 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 | Workers Playground | `references/workers-playground/` |
 
 ### Infrastructure as Code
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Pulumi | `references/pulumi/` |
 | Terraform | `references/terraform/` |
 | API | `references/api/` |
 
 ### Other Services
+
 | Product | Reference |
-|---------|-----------|
+| --- | --- |
 | Email Routing | `references/email-routing/` |
 | Email Workers | `references/email-workers/` |
 | Static Assets | `references/static-assets/` |
@@ -215,7 +224,8 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 
 ### Escalated Network Access
 
-If deployment fails due to network issues (timeouts, DNS errors, connection resets), rerun the deploy with escalated permissions (use `sandbox_permissions=require_escalated`). The deploy requires escalated network access when sandbox networking blocks outbound requests.
+If deployment fails due to network issues (timeouts, DNS errors, connection resets), rerun the deploy with escalated permissions
+(use `sandbox_permissions=require_escalated`). The deploy requires escalated network access when sandbox networking blocks outbound requests.
 
 Example guidance to the user:
 
