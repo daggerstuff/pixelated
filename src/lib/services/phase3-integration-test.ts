@@ -279,7 +279,7 @@ export class Phase3IntegrationTester {
       )
 
       // 5. Track analytics event
-      const biasScoreValue = (biasResult as unknown as Record<string, number | undefined>)['biasScore']
+      const biasScoreValue = (biasResult as unknown as Record<string, number | undefined>)['overallBiasScore']
 
       await this.analyticsService.trackEvent({
         type: EventType.CUSTOM,
