@@ -167,14 +167,14 @@ export function ConsentDialog({
           <div className="flex justify-end gap-3 border-t p-4">
             <button
               onClick={handleDeclineClick}
-              className="text-gray-700 bg-white hover:bg-gray-50 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors rounded-md border px-4 py-2 text-sm font-medium"
+              className="text-gray-700 bg-white hover:bg-gray-50 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 transition-colors rounded-md border px-4 py-2 text-sm font-medium"
             >
               Decline
             </button>
             <button
               onClick={handleConsentClick}
               disabled={!checked}
-              className={`text-white rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+              className={`text-white rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 transition-colors ${
                 checked
                   ? 'bg-blue-600 hover:bg-blue-700'
                   : 'bg-blue-300 cursor-not-allowed'
