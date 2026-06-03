@@ -87,7 +87,7 @@ export const GET = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in GET /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
@@ -195,7 +195,7 @@ export const POST = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in POST /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
@@ -295,7 +295,7 @@ export const PUT = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in PUT /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
