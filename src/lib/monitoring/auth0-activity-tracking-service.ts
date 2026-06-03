@@ -629,7 +629,7 @@ export class Auth0ActivityTrackingService {
       // Get user's sessions from Auth0
       const sessions = await (auth0Management as unknown as Auth0ManagementExtended).getUserSessions({ id: userId })
 
-      return (sessions as Auth0Session[]).map((session): SessionInfo => ({
+      return (sessions).map((session): SessionInfo => ({
         id: session.id,
         clientId: session.client_id,
         ipAddress: session.ip,

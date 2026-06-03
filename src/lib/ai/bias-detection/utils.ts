@@ -106,7 +106,7 @@ export function validateTherapeuticSession(session: Record<string, unknown>): Th
   }
   const uuidV4 =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  if (!uuidV4.test(String(session['sessionId'] as string))) {
+  if (!uuidV4.test((session['sessionId'] as string))) {
     throw new Error('Invalid therapeutic session data')
   }
   // Convert timestamps if needed
