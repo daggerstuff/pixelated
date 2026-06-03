@@ -93,7 +93,7 @@ export const GET = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
@@ -201,7 +201,7 @@ export const POST = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
@@ -301,7 +301,7 @@ export const PUT = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
