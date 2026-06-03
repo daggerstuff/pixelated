@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+import tempfile
 from pathlib import Path
 
 from hypothesis import given, settings, strategies as st
+
+from scripts.data.quality_scoring.pipeline_integration import score_jsonl_file
 
 
 def _load_quality_scoring_module():
@@ -26,6 +30,8 @@ compute_signals = quality_scoring.compute_signals
 
 UNSAFE_TOKENS = ("kill", "suicide", "harm yourself", "hate")
 TEXT = st.text(max_size=400)
+DATASET_TEXTS = st.lists(st.text(min_size=1, max_size=400), min_size=1, max_size=5)
+EVAL_METRIC_FIELDS = ("empathy", "fidelity", "domain", "harm", "safety", "composite")
 SCORE = st.floats(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False)
 WEIGHT = st.floats(min_value=0.0, max_value=5.0, allow_nan=False, allow_infinity=False)
 HARM_MONOTONIC_CASE = st.tuples(SCORE, SCORE, SCORE, SCORE, SCORE, WEIGHT, WEIGHT, WEIGHT, WEIGHT)
@@ -41,6 +47,29 @@ def test_unsafe_response_safety_score_stays_bounded(text: str) -> None:
     safety_score = _unsafe_response_safety_score(text)
 
     assert 0.0 <= safety_score <= 1.0
+
+
+@settings(deadline=None)
+@given(texts=DATASET_TEXTS)
+def test_scored_dataset_includes_complete_non_negative_eval_metrics(texts: list[str]) -> None:
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        input_path = Path(tmp_dir) / "dataset.jsonl"
+        output_path = Path(tmp_dir) / "scored.jsonl"
+        input_path.write_text(
+            "\n".join(json.dumps({"id": f"sample-{index}", "text": text}) for index, text in enumerate(texts)),
+            encoding="utf-8",
+        )
+
+        scored_count = score_jsonl_file(input_path, output_path)
+        scored_rows = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines()]
+
+    assert scored_count == len(texts)
+    assert len(scored_rows) == len(texts)
+    for row in scored_rows:
+        assert tuple(row["metrics"]) == EVAL_METRIC_FIELDS
+        for field in EVAL_METRIC_FIELDS:
+            assert isinstance(row["metrics"][field], float)
+            assert row["metrics"][field] >= 0.0
 
 
 @settings(deadline=None)

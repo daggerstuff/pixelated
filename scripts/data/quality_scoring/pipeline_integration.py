@@ -45,6 +45,7 @@ def score_conversation_text(
 
     signals = compute_signals(text)
     result = compose_score(signals, weights, thresholds)
+    safety = 1.0 - signals.harm
 
     return {
         "signals": {
@@ -52,6 +53,14 @@ def score_conversation_text(
             "fidelity": signals.fidelity,
             "domain": signals.domain,
             "harm": signals.harm,
+        },
+        "metrics": {
+            "empathy": signals.empathy,
+            "fidelity": signals.fidelity,
+            "domain": signals.domain,
+            "harm": signals.harm,
+            "safety": safety,
+            "composite": result.composite,
         },
         "composite": result.composite,
         "decision": result.decision,
@@ -116,6 +125,7 @@ def score_jsonl_file(
                 output_obj = {
                     "id": item_id,
                     "signals": score_result["signals"],
+                    "metrics": score_result["metrics"],
                     "composite": score_result["composite"],
                     "decision": score_result["decision"],
                 }
