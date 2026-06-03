@@ -5,7 +5,9 @@ import { z } from 'zod'
 
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { protectRoute } from '@/lib/auth/serverAuth'
+import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { treatmentPlanDAO } from '@/services/mongodb.dao'
 
 const logger = createBuildSafeLogger('enhanced-treatment-plans-api')
 
@@ -131,6 +133,33 @@ interface TreatmentPlanEnhanced {
 }
 
 /**
+ * Convert a database TreatmentPlan document to the enhanced API response shape.
+ * The DB stores dates as Date objects and uses `_id`; the API returns ISO strings and `id`.
+ */
+function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
+  return {
+    id: plan.id ?? plan._id?.toString() ?? '',
+    clientName: plan.clientName,
+    therapistName: plan.therapistName,
+    clientId: plan.clientId,
+    therapistId: plan.therapistId,
+    createdDate:
+      plan.createdAt instanceof Date
+        ? plan.createdAt.toISOString()
+        : new Date().toISOString(),
+    lastModified:
+      plan.updatedAt instanceof Date
+        ? plan.updatedAt.toISOString()
+        : new Date().toISOString(),
+    duration: plan.duration ?? 0,
+    status: plan.status as TreatmentPlanEnhanced['status'],
+    goals: (plan.goals as TreatmentPlanEnhanced['goals']) ?? [],
+    notes: plan.notes ?? '',
+    metadata: plan.metadata as TreatmentPlanEnhanced['metadata'] | undefined,
+  }
+}
+
+/**
  * Enhanced Treatment Plans API
  * GET /api/components/treatment-plans/enhanced
  *
@@ -158,224 +187,34 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
     const status = url.searchParams.get('status')
     const includeMetrics = url.searchParams.get('includeMetrics') === 'true'
 
-    // TODO: Replace with actual database queries
-    const mockPlans: TreatmentPlanEnhanced[] = [
-      {
-        id: 'plan-1',
-        clientName: 'Sarah Johnson',
-        therapistName: 'Dr. Emily Chen',
-        clientId: clientId ?? 'client-1',
-        therapistId: user.id,
-        createdDate: new Date(
-          Date.now() - 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        lastModified: new Date().toISOString(),
-        duration: 12,
-        status: 'active',
-        notes:
-          'Patient shows excellent engagement and motivation. Responding well to CBT interventions.',
-        goals: [
-          {
-            id: 'goal-1',
-            title: 'Reduce Anxiety Symptoms',
-            description:
-              'Learn and practice anxiety management techniques to reduce daily anxiety levels from 8/10 to 4/10',
-            targetDate: new Date(
-              Date.now() + 30 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            priority: 'high',
-            status: 'in-progress',
-            progress: 65,
-            category: 'emotional',
-            milestones: [
-              {
-                id: 'm1',
-                title: 'Learn deep breathing techniques',
-                completed: true,
-                completedDate: new Date(
-                  Date.now() - 5 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-                notes: 'Mastered 4-7-8 breathing technique',
-              },
-              {
-                id: 'm2',
-                title: 'Practice daily meditation (10 min)',
-                completed: true,
-                completedDate: new Date(
-                  Date.now() - 3 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-                notes: 'Consistently practicing for 2 weeks',
-              },
-              {
-                id: 'm3',
-                title: 'Identify personal anxiety triggers',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 7 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-              {
-                id: 'm4',
-                title: 'Develop coping strategy toolkit',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 14 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-            ],
-            metrics: {
-              sessionsCompleted: 6,
-              exercisesAssigned: 12,
-              exercisesCompleted: 8,
-              lastActivityDate: new Date(
-                Date.now() - 1 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
-            },
-          },
-          {
-            id: 'goal-2',
-            title: 'Improve Sleep Quality',
-            description:
-              'Establish healthy sleep patterns and achieve 7-8 hours of quality sleep nightly',
-            targetDate: new Date(
-              Date.now() + 21 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            priority: 'medium',
-            status: 'in-progress',
-            progress: 40,
-            category: 'physical',
-            milestones: [
-              {
-                id: 'm5',
-                title: 'Create consistent bedtime routine',
-                completed: true,
-                completedDate: new Date(
-                  Date.now() - 4 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-                notes: 'Established 9 PM routine',
-              },
-              {
-                id: 'm6',
-                title: 'Limit screen time 1 hour before bed',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 10 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-              {
-                id: 'm7',
-                title: 'Track sleep patterns for 2 weeks',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 14 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-            ],
-            metrics: {
-              sessionsCompleted: 3,
-              exercisesAssigned: 8,
-              exercisesCompleted: 4,
-              lastActivityDate: new Date(
-                Date.now() - 2 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
-            },
-          },
-          {
-            id: 'goal-3',
-            title: 'Enhance Social Connections',
-            description:
-              'Build and maintain meaningful relationships and expand social support network',
-            targetDate: new Date(
-              Date.now() + 45 * 24 * 60 * 60 * 1000,
-            ).toISOString(),
-            priority: 'medium',
-            status: 'not-started',
-            progress: 0,
-            category: 'social',
-            milestones: [
-              {
-                id: 'm8',
-                title: 'Join local support group',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 14 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-              {
-                id: 'm9',
-                title: 'Reconnect with 2 old friends',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 21 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-              {
-                id: 'm10',
-                title: 'Practice social skills in low-pressure settings',
-                completed: false,
-                dueDate: new Date(
-                  Date.now() + 35 * 24 * 60 * 60 * 1000,
-                ).toISOString(),
-              },
-            ],
-            metrics: {
-              sessionsCompleted: 0,
-              exercisesAssigned: 0,
-              exercisesCompleted: 0,
-            },
-          },
-        ],
-        metadata: {
-          totalSessions: 12,
-          completedSessions: 6,
-          overallProgress: 35,
-          nextSessionDate: new Date(
-            Date.now() + 3 * 24 * 60 * 60 * 1000,
-          ).toISOString(),
-          riskLevel: 'low',
-          interventionHistory: [
-            {
-              date: new Date(
-                Date.now() - 7 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
-              intervention: 'Cognitive Behavioral Therapy - Anxiety Module',
-              outcome: 'Reduced anxiety from 8/10 to 6/10',
-              effectiveness: 4,
-            },
-            {
-              date: new Date(
-                Date.now() - 14 * 24 * 60 * 60 * 1000,
-              ).toISOString(),
-              intervention: 'Mindfulness-Based Stress Reduction',
-              outcome: 'Improved stress coping mechanisms',
-              effectiveness: 5,
-            },
-          ],
-        },
-      },
-    ]
-
-    // Filter plans based on query parameters
-    let filteredPlans = mockPlans
+    // Fetch treatment plans from the database
+    let plans: TreatmentPlanDB[]
 
     if (planId) {
-      filteredPlans = filteredPlans.filter((plan) => plan.id === planId)
+      // Fetch a specific plan by ID
+      const plan = await treatmentPlanDAO.findById(planId)
+      plans = plan ? [plan] : []
+    } else if (clientId) {
+      // Fetch plans for a specific client, optionally filtered by status
+      plans = await treatmentPlanDAO.findByClientId(clientId, {
+        status: status ?? undefined,
+      })
+    } else {
+      // Default: fetch plans for the authenticated therapist
+      plans = await treatmentPlanDAO.findByTherapistId(user.id, {
+        status: status ?? undefined,
+      })
     }
 
-    if (clientId) {
-      filteredPlans = filteredPlans.filter((plan) => plan.clientId === clientId)
-    }
-
-    if (status) {
-      filteredPlans = filteredPlans.filter((plan) => plan.status === status)
-    }
+    // Convert to enhanced response format
+    let filteredPlans = plans.map(toEnhancedResponse)
 
     // Remove metrics if not requested
     if (!includeMetrics) {
       filteredPlans = filteredPlans.map((plan) => ({
         ...plan,
         goals: plan.goals.map((goal) => {
-          const { _metrics, ...goalWithoutMetrics } = goal
+          const { metrics: _metrics, ...goalWithoutMetrics } = goal
           return goalWithoutMetrics
         }),
         metadata: plan.metadata
@@ -409,11 +248,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       JSON.stringify({
         error: 'Internal server error',
         message:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -451,14 +286,13 @@ export const POST: APIRoute = protectRoute()(async (
       return new Response(
         JSON.stringify({
           error: 'Invalid treatment plan data',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
     }
 
     const planData = validationResult.data
-    const currentTime = new Date().toISOString()
 
     // Calculate overall progress
     const totalGoals = planData.goals.length
@@ -469,23 +303,19 @@ export const POST: APIRoute = protectRoute()(async (
     const overallProgress =
       totalGoals > 0 ? Math.round(totalProgress / totalGoals) : 0
 
-    const newPlan: TreatmentPlanEnhanced = {
-      id: planData.id ?? `plan-${Date.now()}`,
-      clientName: planData.clientName,
-      therapistName: planData.therapistName,
+    // Persist to database
+    const createdPlan = await treatmentPlanDAO.create({
       clientId: planData.clientId,
       therapistId: planData.therapistId,
-      createdDate: planData.createdDate ?? currentTime,
-      lastModified: currentTime,
-      duration: planData.duration,
+      clientName: planData.clientName,
+      therapistName: planData.therapistName,
+      title: planData.goals[0]?.title ?? 'Treatment Plan',
+      description: planData.notes,
+      goals: planData.goals,
+      interventions: [],
       status: planData.status,
-      goals: planData.goals.map((goal) => ({
-        ...goal,
-        milestones: goal.milestones.map((milestone) => ({
-          ...milestone,
-          id: milestone.id || `milestone-${Date.now()}-${Math.random()}`,
-        })),
-      })),
+      startDate: new Date(),
+      duration: planData.duration,
       notes: planData.notes,
       metadata: {
         totalSessions: planData.metadata?.totalSessions ?? 0,
@@ -495,11 +325,9 @@ export const POST: APIRoute = protectRoute()(async (
         riskLevel: planData.metadata?.riskLevel ?? 'low',
         interventionHistory: planData.metadata?.interventionHistory ?? [],
       },
-    }
+    })
 
-    // TODO: Save to database
-    // const repository = new TreatmentPlanRepository()
-    // await repository.saveTreatmentPlan(newPlan)
+    const newPlan = toEnhancedResponse(createdPlan)
 
     logger.info('Created/updated enhanced treatment plan', {
       planId: newPlan.id,
@@ -520,11 +348,7 @@ export const POST: APIRoute = protectRoute()(async (
       JSON.stringify({
         error: 'Internal server error',
         message:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -567,19 +391,60 @@ export const PATCH: APIRoute = protectRoute()(async (
       )
     }
 
-    // TODO: Implement actual database update
-    // const repository = new TreatmentPlanRepository()
-    // const updatedPlan = await repository.updateTreatmentPlan(planId, goalId, milestoneId, updates)
-
-    // For now, return success response
-    const response = {
-      success: true,
-      planId,
-      goalId,
-      milestoneId,
-      updates,
-      lastModified: new Date().toISOString(),
+    // Verify the plan exists
+    const existingPlan = await treatmentPlanDAO.findById(planId)
+    if (!existingPlan) {
+      return new Response(
+        JSON.stringify({ error: 'Treatment plan not found' }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
     }
+
+    // Perform the appropriate update based on the level of granularity
+    let updatedPlan
+
+    if (milestoneId && goalId) {
+      // Update a specific milestone within a goal
+      updatedPlan = await treatmentPlanDAO.updateMilestone(
+        planId,
+        goalId,
+        milestoneId,
+        updates,
+      )
+    } else if (goalId) {
+      // Update a specific goal
+      updatedPlan = await treatmentPlanDAO.updateGoal(
+        planId,
+        goalId,
+        updates,
+      )
+    } else {
+      // Update the plan-level fields
+      updatedPlan = await treatmentPlanDAO.update(planId, updates)
+    }
+
+    const response = updatedPlan
+      ? {
+          success: true,
+          plan: toEnhancedResponse(updatedPlan),
+          planId,
+          goalId,
+          milestoneId,
+          updates,
+          lastModified: updatedPlan.updatedAt
+            ? updatedPlan.updatedAt instanceof Date
+              ? updatedPlan.updatedAt.toISOString()
+              : String(updatedPlan.updatedAt)
+            : new Date().toISOString(),
+        }
+      : {
+          success: false,
+          error: 'Plan not found after update',
+          planId,
+        }
 
     logger.info('Updated treatment plan component', {
       planId,
@@ -590,7 +455,7 @@ export const PATCH: APIRoute = protectRoute()(async (
     })
 
     return new Response(JSON.stringify(response), {
-      status: 200,
+      status: updatedPlan ? 200 : 404,
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
@@ -600,11 +465,7 @@ export const PATCH: APIRoute = protectRoute()(async (
       JSON.stringify({
         error: 'Internal server error',
         message:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

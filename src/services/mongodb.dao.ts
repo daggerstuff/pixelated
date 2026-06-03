@@ -369,20 +369,53 @@ export class TreatmentPlanDAO {
     return { ...createdPlan, id: createdPlan._id?.toString() }
   }
 
-  async findByUserId(userId: string): Promise<TreatmentPlan[]> {
+  async findById(id: string): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
+    const plan = await collection.findOne({ _id: new ObjectId!(id) })
+
+    return plan ? { ...plan, id: plan._id?.toString() } : null
+  }
+
+  async findByClientId(
+    clientId: string,
+    filters?: { status?: string },
+  ): Promise<TreatmentPlan[]> {
+    const collection = await this.getCollection()
+    const filter: Record<string, unknown> = { clientId }
+    if (filters?.status) {
+      filter['status'] = filters.status
+    }
+
     const plans = await collection
-      .find({ userId: new ObjectId!(userId) })
+      .find(filter)
       .sort({ createdAt: -1 })
       .toArray()
 
     return plans.map((plan) => ({ ...plan, id: plan._id?.toString() }))
   }
 
-  async findByTherapistId(therapistId: string): Promise<TreatmentPlan[]> {
+  async findByTherapistId(
+    therapistId: string,
+    filters?: { status?: string },
+  ): Promise<TreatmentPlan[]> {
+    const collection = await this.getCollection()
+    const filter: Record<string, unknown> = { therapistId }
+    if (filters?.status) {
+      filter['status'] = filters.status
+    }
+
+    const plans = await collection
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    return plans.map((plan) => ({ ...plan, id: plan._id?.toString() }))
+  }
+
+  async findByUserId(userId: string): Promise<TreatmentPlan[]> {
     const collection = await this.getCollection()
     const plans = await collection
-      .find({ therapistId: new ObjectId!(therapistId) })
+      .find({ clientId: userId })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -403,6 +436,95 @@ export class TreatmentPlanDAO {
     )
 
     return result ? { ...result, id: result._id?.toString() } : null
+  }
+
+  async updateGoal(
+    planId: string,
+    goalId: string,
+    goalUpdates: Partial<
+      Omit<
+        import('../types/mongodb.types').TreatmentPlanGoal,
+        'id' | 'milestones' | 'metrics'
+      >
+    > & { milestones?: import('../types/mongodb.types').TreatmentPlanMilestone[]; metrics?: import('../types/mongodb.types').TreatmentPlanGoalMetrics },
+  ): Promise<TreatmentPlan | null> {
+    const collection = await this.getCollection()
+    const plan = await collection.findOne({ _id: new ObjectId!(planId) })
+
+    if (!plan) {
+      return null
+    }
+
+    const updatedGoals = plan.goals.map((goal) => {
+      if (goal.id === goalId) {
+        return { ...goal, ...goalUpdates }
+      }
+      return goal
+    })
+
+    const result = await collection.findOneAndUpdate(
+      { _id: new ObjectId!(planId) },
+      {
+        $set: {
+          goals: updatedGoals,
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: 'after' },
+    )
+
+    return result ? { ...result, id: result._id?.toString() } : null
+  }
+
+  async updateMilestone(
+    planId: string,
+    goalId: string,
+    milestoneId: string,
+    milestoneUpdates: Partial<
+      Omit<import('../types/mongodb.types').TreatmentPlanMilestone, 'id'>
+    >,
+  ): Promise<TreatmentPlan | null> {
+    const collection = await this.getCollection()
+    const plan = await collection.findOne({ _id: new ObjectId!(planId) })
+
+    if (!plan) {
+      return null
+    }
+
+    const updatedGoals = plan.goals.map((goal) => {
+      if (goal.id === goalId) {
+        return {
+          ...goal,
+          milestones: goal.milestones.map((milestone) => {
+            if (milestone.id === milestoneId) {
+              return { ...milestone, ...milestoneUpdates }
+            }
+            return milestone
+          }),
+        }
+      }
+      return goal
+    })
+
+    const result = await collection.findOneAndUpdate(
+      { _id: new ObjectId!(planId) },
+      {
+        $set: {
+          goals: updatedGoals,
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: 'after' },
+    )
+
+    return result ? { ...result, id: result._id?.toString() } : null
+  }
+
+  async deleteById(id: string): Promise<boolean> {
+    const collection = await this.getCollection()
+    const result = await collection.deleteOne({ _id: new ObjectId!(id) })
+
+    return result.deletedCount > 0
   }
 }
 
