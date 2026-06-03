@@ -1,17 +1,18 @@
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import type { AIService, AICompletion, AIStreamChunk } from './models/ai-types'
+import type { AIService, AICompletion, AIStreamChunk, AIMessage, AIServiceOptions } from './models/ai-types'
 import { createLLMService } from './services/llm-provider'
 
 const appLogger = createBuildSafeLogger('ai-providers')
 
 // Available AI providers
 export type AIProviderType =
-  | 'anthropic'
-  | 'openai'
-  | 'azure-openai'
-  | 'llm'
-  | 'huggingface'
-  | 'local'
+ | 'anthropic'
+ | 'openai'
+ | 'azure-openai'
+ | 'llm'
+ | 'nvidia'
+ | 'huggingface'
+ | 'local';
 
 // Provider configuration interface
 export interface AIProviderConfig {
@@ -56,11 +57,17 @@ const defaultConfigs: Record<AIProviderType, Partial<AIProviderConfig>> = {
     defaultModel: 'gpt-4',
     capabilities: ['chat', 'analysis', 'crisis-detection'],
   },
-  llm: {
-    name: 'LLM API',
-    defaultModel: 'minimaxai/minimax-m2.7',
-    capabilities: ['chat', 'analysis', 'crisis-detection'],
-  },
+    llm: {
+      name: 'LLM API',
+      defaultModel: 'minimaxai/minimax-m2.7',
+      capabilities: ['chat', 'analysis', 'crisis-detection'],
+    },
+    nvidia: {
+      name: 'NVIDIA NIM',
+      baseUrl: 'https://integrate.api.nvidia.com/v1',
+      defaultModel: 'openai/gpt-oss-120b',
+      capabilities: ['chat', 'analysis', 'crisis-detection'],
+    },
   huggingface: {
     name: 'Hugging Face',
     baseUrl: 'https://api-inference.huggingface.co',
@@ -114,7 +121,17 @@ export function initializeProviders() {
         ...(providerBaseUrl ? { baseUrl: providerBaseUrl } : {}),
       } as AIProviderConfig)
     }
-
+    // NVIDIA NIM via OpenAI-compatible endpoint
+    const nvidiaApiKey = getEnvVar('NVIDIA_API_KEY') ?? getEnvVar('NIM_API_KEY') ?? getEnvVar('NVIDIA_TOKEN')
+    const nvidiaBaseUrl = getEnvVar('NVIDIA_BASE_URL') ?? getEnvVar('NVIDIA_OPENAI_BASE_URL') ?? getEnvVar('NIM_BASE_URL') ?? getEnvVar('OPENAI_BASE_URL') ?? 'https://integrate.api.nvidia.com/v1'
+    if (nvidiaApiKey && nvidiaBaseUrl) {
+      providers.set('nvidia', {
+        ...defaultConfigs.nvidia,
+        apiKey: nvidiaApiKey,
+        baseUrl: nvidiaBaseUrl,
+        defaultModel: getEnvVar('NVIDIA_MODEL') ?? defaultConfigs.nvidia.defaultModel,
+      } as AIProviderConfig)
+    }
     // OpenAI
     const openaiApiKey = getEnvVar('OPENAI_API_KEY')
     if (openaiApiKey) {
@@ -123,7 +140,6 @@ export function initializeProviders() {
         apiKey: openaiApiKey,
       } as AIProviderConfig)
     }
-
     // Anthropic
     const anthropicApiKey = getEnvVar('ANTHROPIC_API_KEY')
     if (anthropicApiKey) {
@@ -132,7 +148,6 @@ export function initializeProviders() {
         apiKey: anthropicApiKey,
       } as AIProviderConfig)
     }
-
     // Azure OpenAI
     const azureOpenAiKey = getEnvVar('AZURE_OPENAI_API_KEY')
     const azureOpenAiEndpoint = getEnvVar('AZURE_OPENAI_ENDPOINT')
@@ -143,7 +158,6 @@ export function initializeProviders() {
         baseUrl: azureOpenAiEndpoint,
       } as AIProviderConfig)
     }
-
     // Hugging Face
     const hfApiKey = getEnvVar('HUGGINGFACE_API_KEY')
     if (hfApiKey) {
@@ -152,7 +166,6 @@ export function initializeProviders() {
         apiKey: hfApiKey,
       } as AIProviderConfig)
     }
-
     // Local GGUF Inference
     const localAiBaseUrl = getEnvVar('LOCAL_AI_BASE_URL') ?? 'http://localhost:8000/v1'
     providers.set('local', {
@@ -160,7 +173,6 @@ export function initializeProviders() {
       apiKey: 'local-no-key',
       baseUrl: localAiBaseUrl,
     } as AIProviderConfig)
-
     appLogger.info(`Initialized ${providers.size} AI providers`)
   } catch (error: unknown) {
     appLogger.error('Failed to initialize AI providers:', {
@@ -190,6 +202,9 @@ export function getAIServiceByProvider(
     let service: AIService | null = null
     switch (providerType) {
       case 'llm':
+        service = createLLMServiceAdapter(config)
+        break
+      case 'nvidia':
         service = createLLMServiceAdapter(config)
         break
       case 'anthropic':
