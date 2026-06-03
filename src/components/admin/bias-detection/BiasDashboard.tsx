@@ -211,6 +211,24 @@ interface TooltipProps {
   label?: string
 }
 
+// ⚡ Bolt Performance Optimization: Extracted static options to module scope to prevent re-allocating them on every render
+const timeRangeOptions = [
+  { value: '1h', label: 'Last Hour' },
+  { value: '6h', label: 'Last 6 Hours' },
+  { value: '24h', label: 'Last 24 Hours' },
+  { value: '7d', label: 'Last 7 Days' },
+  { value: '30d', label: 'Last 30 Days' },
+  { value: '90d', label: 'Last 90 Days' },
+  { value: 'custom', label: 'Custom Range' },
+]
+
+const demographicFilterOptions = [
+  { value: 'all', label: 'All Demographics' },
+  { value: 'age', label: 'Filter by Age' },
+  { value: 'gender', label: 'Filter by Gender' },
+  { value: 'ethnicity', label: 'Filter by Ethnicity' },
+]
+
 export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   className = '',
   refreshInterval = 30000, // 30 seconds
@@ -327,25 +345,6 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   // Focus management refs
   const skipLinkRef = useRef<HTMLButtonElement>(null)
   const mainContentRef = useRef<HTMLDivElement>(null)
-
-  // Time range options
-  const timeRangeOptions = [
-    { value: '1h', label: 'Last Hour' },
-    { value: '6h', label: 'Last 6 Hours' },
-    { value: '24h', label: 'Last 24 Hours' },
-    { value: '7d', label: 'Last 7 Days' },
-    { value: '30d', label: 'Last 30 Days' },
-    { value: '90d', label: 'Last 90 Days' },
-    { value: 'custom', label: 'Custom Range' },
-  ]
-
-  // Demographic filter options
-  const demographicFilterOptions = [
-    { value: 'all', label: 'All Demographics' },
-    { value: 'age', label: 'Filter by Age' },
-    { value: 'gender', label: 'Filter by Gender' },
-    { value: 'ethnicity', label: 'Filter by Ethnicity' },
-  ]
 
   // Accessibility helpers
   const announceToScreenReader = useCallback((message: string) => {
