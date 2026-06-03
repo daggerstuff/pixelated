@@ -14,6 +14,16 @@ describe('mergeValues', () => {
     expect(mergeValues(1, 2)).toBe(2)
     expect(mergeValues('x', 'y')).toBe('y')
   })
+
+  it('merges arrays by identity key, preserving local order and updating/appending remote items', () => {
+    const local = [{ id: 1, val: 'a' }, { id: 2, val: 'b' }]
+    const remote = [{ id: 2, val: 'b-new' }, { id: 3, val: 'c' }]
+    expect(mergeValues(local, remote)).toEqual([
+      { id: 1, val: 'a' },
+      { id: 2, val: 'b-new' },
+      { id: 3, val: 'c' },
+    ])
+  })
 })
 
 describe('deepEqual', () => {
