@@ -5,7 +5,17 @@
 
 import { createHash } from 'crypto'
 
-import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg'
+import { Pool, PoolClient } from 'pg'
+
+// pg does not export these types; define locally
+export interface DbQueryResult<T = Record<string, unknown>> {
+  rows: T[]
+  rowCount: number
+  command?: string
+  oid?: number
+  fields?: Array<{ name: string; dataTypeID: number }>
+}
+type QueryResultRow = Record<string, unknown>
 
 // Database configuration
 export interface DatabaseConfig {
@@ -50,12 +60,13 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   pool = new Pool(finalConfig)
 
   // Handle pool errors
-  pool.on('error', (err: Error) => {
+  pool.on('error', (err: unknown) => {
     console.error('Unexpected error on idle client', err)
-    process.exit(-1)
+    void process.exit(-1)
   })
 
-  pool.on('connect', (_client: PoolClient) => {
+  // 'connect' is not in Pool's type definition but pool does emit it at runtime
+  ;(pool as any).on('connect', (_client: PoolClient) => {
     console.log('New client connected to database')
   })
 
@@ -83,10 +94,10 @@ export function getPool(): Pool {
 export async function query<T extends QueryResultRow = QueryResultRow>(
   text: string,
   params?: unknown[],
-): Promise<QueryResult<T>> {
+): Promise<DbQueryResult<T>> {
   const client = await getPool().connect()
   try {
-    return await client.query<T>(text, params)
+    return await client.query<T>(text, params) as unknown as DbQueryResult<T>
   } finally {
     client.release()
   }
@@ -238,7 +249,7 @@ export class DatabaseMigration {
     const result = await query<{ name: string }>(
       'SELECT name FROM schema_migrations ORDER BY executed_at',
     )
-    return result.rows.map((row) => row.name)
+    return result.rows.map((row: { name: string }) => row.name)
   }
 
   /**

@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { Document, MongoClient, Db, WithId } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'

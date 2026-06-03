@@ -33,7 +33,7 @@ export interface ContextDetectionResult {
       complexity: string
       topicArea: string
     }
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 
@@ -112,7 +112,7 @@ export class ContextDetector {
   ): Promise<ContextDetectionResult> {
     try {
       // First, check for crisis if integration is enabled
-      let crisisResult: any = null
+      let crisisResult: Record<string, unknown> | null = null
       if (this.enableCrisisIntegration && this.crisisDetectionService) {
         const crisisOptions = {
           sensitivityLevel: 'medium' as const,
@@ -126,17 +126,17 @@ export class ContextDetector {
         if (crisisResult?.['isCrisis']) {
           return {
             detectedContext: ContextType.CRISIS,
-            confidence: crisisResult['confidence'],
+            confidence: crisisResult['confidence'] as number,
             contextualIndicators: [
               {
                 type: 'crisis_detection',
-                description: crisisResult['category'] ?? 'Crisis detected',
-                confidence: crisisResult['confidence'],
-                severity: this.mapRiskLevelToNumber(crisisResult['riskLevel']),
+                description: (crisisResult['category'] as string) ?? 'Crisis detected',
+                confidence: crisisResult['confidence'] as number,
+                severity: this.mapRiskLevelToNumber(crisisResult['riskLevel'] as string),
               },
             ],
             needsSpecialHandling: true,
-            urgency: this.mapUrgencyFromCrisis(crisisResult['urgency']),
+            urgency: this.mapUrgencyFromCrisis(crisisResult['urgency'] as string),
             metadata: {
               crisisResult,
               suggestedActions: crisisResult['suggestedActions'],
@@ -150,7 +150,7 @@ export class ContextDetector {
         return this.buildInformationalResult()
       }
 
-      let educationalResult: any = null
+      let educationalResult: Record<string, unknown> | null = null
       if (
         this.enableEducationalRecognition &&
         this.educationalContextRecognizer
@@ -163,20 +163,20 @@ export class ContextDetector {
           )
         if (
           educationalResult?.['isEducational'] &&
-          educationalResult['confidence'] > 0.8
+          (educationalResult['confidence'] as number) > 0.8
         ) {
           return {
             detectedContext: ContextType.EDUCATIONAL,
-            confidence: educationalResult['confidence'],
+            confidence: educationalResult['confidence'] as number,
             contextualIndicators: [
               {
                 type: 'educational_recognition',
-                description: `Educational ${educationalResult['educationalType']} about ${educationalResult['topicArea']}`,
-                confidence: educationalResult['confidence'],
+                description: `Educational ${educationalResult['educationalType'] as string} about ${educationalResult['topicArea'] as string}`,
+                confidence: educationalResult['confidence'] as number,
               },
             ],
             needsSpecialHandling:
-              educationalResult['complexity'] === 'advanced',
+              (educationalResult['complexity'] as string) === 'advanced',
             urgency: 'low',
             metadata: {
               educationalResult,
@@ -220,9 +220,9 @@ export class ContextDetector {
         },
       ]
 
-      const response = (await this.aiService.createChatCompletion(messages, {
+      const response = await this.aiService.createChatCompletion(messages, {
         model: this.model,
-      })) as any
+      }) as Record<string, unknown>
 
       // Support multiple provider response shapes
       // 1) Minimal: { content: string }
@@ -232,13 +232,13 @@ export class ContextDetector {
       if (typeof response === 'string') {
         content = response
       } else if (response && typeof response === 'object') {
-        if ('content' in response && typeof response.content === 'string') {
-          content = response.content
+        if ('content' in response && typeof response['content'] === 'string') {
+          content = response['content']
         } else if (
-          Array.isArray(response.choices) &&
-          response.choices[0]?.message?.content
+          Array.isArray(response['choices']) &&
+          (response['choices'] as Array<Record<string, unknown>>)[0]?.['message']?.['content']
         ) {
-          content = String(response.choices[0].message.content)
+          content = String((response['choices'] as Array<Record<string, unknown>>)[0]?.['message']?.['content'])
         }
       }
 
@@ -246,19 +246,19 @@ export class ContextDetector {
 
       // Merge crisis detection data if available
       if (crisisResult && !crisisResult['isCrisis']) {
-        result['metadata']['crisisAnalysis'] = {
-          confidence: crisisResult['confidence'],
-          riskLevel: crisisResult['riskLevel'],
+        (result['metadata'] as Record<string, unknown>)['crisisAnalysis'] = {
+          confidence: crisisResult['confidence'] as number,
+          riskLevel: crisisResult['riskLevel'] as string,
         }
       }
 
       // Merge educational analysis if available
       if (educationalResult?.['isEducational']) {
-        result['metadata']['educationalAnalysis'] = {
-          confidence: educationalResult['confidence'],
-          type: educationalResult['educationalType'],
-          complexity: educationalResult['complexity'],
-          topicArea: educationalResult['topicArea'],
+        (result['metadata'] as Record<string, unknown>)['educationalAnalysis'] = {
+          confidence: educationalResult['confidence'] as number,
+          type: educationalResult['educationalType'] as string,
+          complexity: educationalResult['complexity'] as string,
+          topicArea: educationalResult['topicArea'] as string,
         }
       }
 
@@ -272,15 +272,15 @@ export class ContextDetector {
         return {
           ...result,
           detectedContext: ContextType.EDUCATIONAL,
-          confidence: result.confidence ?? 0.85,
-          contextualIndicators: result.contextualIndicators?.length
-            ? result.contextualIndicators
+          confidence: (result['confidence'] as number) ?? 0.85,
+          contextualIndicators: (result['contextualIndicators'] as ContextualIndicator[])?.length
+            ? (result['contextualIndicators'] as ContextualIndicator[])
             : [
                 {
                   type: 'educational_pattern',
                   description:
                     'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: result.confidence ?? 0.8,
+                  confidence: (result['confidence'] as number) ?? 0.8,
                 },
               ],
           needsSpecialHandling: false,
@@ -331,9 +331,9 @@ export class ContextDetector {
       }
 
       logger.info('Context detected', {
-        context: result['detectedContext'],
-        confidence: result['confidence'],
-        urgency: result['urgency'],
+        context: result['detectedContext'] as string,
+        confidence: result['confidence'] as number,
+        urgency: result['urgency'] as string,
       })
 
       return result
@@ -449,7 +449,7 @@ export class ContextDetector {
       if (typeof value === 'string') {
         const v = value.toUpperCase()
         if (v in ContextType) {
-          return (ContextType as any)[v] as ContextType
+          return ContextType[v as keyof typeof ContextType] as ContextType
         }
       }
       return ContextType.GENERAL
@@ -469,14 +469,14 @@ export class ContextDetector {
         case 'medium':
         case 'high':
         case 'critical':
-          return u as any
+          return u as 'low' | 'medium' | 'high' | 'critical'
         default:
           return 'low'
       }
     }
 
     const safeObject = (v: unknown): Record<string, unknown> =>
-      v && typeof v === 'object' && !Array.isArray(v) ? (v as any) : {}
+      v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {}
 
     const safeIndicators = (v: unknown): ContextualIndicator[] => {
       if (!Array.isArray(v)) return []
