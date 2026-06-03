@@ -174,11 +174,16 @@ export class BiasMetricsCollector {
       })
 
       // Map Python service response to expected TypeScript structure
+      const resp = response as Record<string, unknown>
+      const summary = resp['summary'] as Record<string, unknown> | undefined
+      const trends = resp['trends'] as Record<string, unknown> | undefined
+      const demo = resp['demographics'] as Record<string, unknown> | undefined
+
       return {
         overall_stats: {
-          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
-          average_bias_score: response.summary?.average_bias_score ?? 0,
-          alert_distribution: response.summary?.alert_distribution ?? {
+          total_sessions: (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          average_bias_score: (summary?.['average_bias_score'] as number) ?? 0,
+          alert_distribution: (summary?.['alert_distribution'] as Record<string, number>) ?? {
             low: 0,
             medium: 0,
             high: 0,
@@ -188,26 +193,26 @@ export class BiasMetricsCollector {
         trend_data: [],
         recent_alerts: [],
         summary: {
-          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
-          average_bias_score: response.summary?.average_bias_score ?? 0,
-          alert_distribution: response.summary?.alert_distribution ?? {
+          total_sessions: (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          average_bias_score: (summary?.['average_bias_score'] as number) ?? 0,
+          alert_distribution: (summary?.['alert_distribution'] as Record<string, number>) ?? {
             low: 0,
             medium: 0,
             high: 0,
             critical: 0,
           },
           total_sessions_analyzed:
-            response.summary?.total_sessions_analyzed ?? 0,
-          high_risk_sessions: response.summary?.high_risk_sessions ?? 0,
-          critical_alerts: response.summary?.critical_alerts ?? 0,
+            (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          high_risk_sessions: (summary?.['high_risk_sessions'] as number) ?? 0,
+          critical_alerts: (summary?.['critical_alerts'] as number) ?? 0,
         },
         trends: {
-          daily_bias_scores: response.trends?.daily_bias_scores ?? [],
-          alert_counts: response.trends?.alert_counts ?? [],
+          daily_bias_scores: (trends?.['daily_bias_scores'] as number[]) ?? [],
+          alert_counts: (trends?.['alert_counts'] as number[]) ?? [],
         },
         demographics: {
-          bias_by_age_group: response.demographics?.bias_by_age_group ?? {},
-          bias_by_gender: response.demographics?.bias_by_gender ?? {},
+          bias_by_age_group: (demo?.['bias_by_age_group'] as Record<string, number>) ?? {},
+          bias_by_gender: (demo?.['bias_by_gender'] as Record<string, number>) ?? {},
         },
         system_metrics: {
           cpu_usage: 0,
@@ -307,14 +312,17 @@ export class BiasMetricsCollector {
   ): Promise<DashboardMetrics> {
     try {
       // Use GET method since Python service expects GET for /dashboard endpoint
-      const response = await this.pythonBridge.getDashboardMetrics()
+      const resp = (await this.pythonBridge.getDashboardMetrics()) as Record<string, unknown>
+      const summary = resp['summary'] as Record<string, unknown> | undefined
+      const trends = resp['trends'] as Record<string, unknown> | undefined
+      const demo = resp['demographics'] as Record<string, unknown> | undefined
 
       // Map Python service response to expected TypeScript structure
       return {
         overall_stats: {
-          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
-          average_bias_score: response.summary?.average_bias_score ?? 0,
-          alert_distribution: response.summary?.alert_distribution ?? {
+          total_sessions: (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          average_bias_score: (summary?.['average_bias_score'] as number) ?? 0,
+          alert_distribution: (summary?.['alert_distribution'] as Record<string, number>) ?? {
             low: 0,
             medium: 0,
             high: 0,
@@ -327,26 +335,26 @@ export class BiasMetricsCollector {
         alerts: [],
         recommendations: [],
         summary: {
-          total_sessions: response.summary?.total_sessions_analyzed ?? 0,
-          average_bias_score: response.summary?.average_bias_score ?? 0,
-          alert_distribution: response.summary?.alert_distribution ?? {
+          total_sessions: (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          average_bias_score: (summary?.['average_bias_score'] as number) ?? 0,
+          alert_distribution: (summary?.['alert_distribution'] as Record<string, number>) ?? {
             low: 0,
             medium: 0,
             high: 0,
             critical: 0,
           },
           total_sessions_analyzed:
-            response.summary?.total_sessions_analyzed ?? 0,
-          high_risk_sessions: response.summary?.high_risk_sessions ?? 0,
-          critical_alerts: response.summary?.critical_alerts ?? 0,
+            (summary?.['total_sessions_analyzed'] as number) ?? 0,
+          high_risk_sessions: (summary?.['high_risk_sessions'] as number) ?? 0,
+          critical_alerts: (summary?.['critical_alerts'] as number) ?? 0,
         },
         trends: {
-          daily_bias_scores: response.trends?.daily_bias_scores ?? [],
-          alert_counts: response.trends?.alert_counts ?? [],
+          daily_bias_scores: (trends?.['daily_bias_scores'] as number[]) ?? [],
+          alert_counts: (trends?.['alert_counts'] as number[]) ?? [],
         },
         demographics: {
-          bias_by_age_group: response.demographics?.bias_by_age_group ?? {},
-          bias_by_gender: response.demographics?.bias_by_gender ?? {},
+          bias_by_age_group: (demo?.['bias_by_age_group'] as Record<string, number>) ?? {},
+          bias_by_gender: (demo?.['bias_by_gender'] as Record<string, number>) ?? {},
         },
         system_metrics: {
           cpu_usage: 0,
@@ -502,8 +510,8 @@ export class BiasMetricsCollector {
     try {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
-        timestamp: (result as any)?.timestamp
-          ? new Date((result as any).timestamp).toISOString()
+        timestamp: ('timestamp' in result ? result['timestamp'] : undefined)
+          ? new Date(result['timestamp'] as string).toISOString()
           : new Date().toISOString(),
         session_id: result.sessionId,
         overall_bias_score: result.overallBiasScore,
@@ -523,8 +531,8 @@ export class BiasMetricsCollector {
       try {
         await this.pythonBridge.storeMetrics([
           {
-            timestamp: (result as any)?.timestamp
-              ? new Date((result as any).timestamp).toISOString()
+            timestamp: ('timestamp' in result ? result['timestamp'] : undefined)
+              ? new Date(result['timestamp'] as string).toISOString()
               : new Date().toISOString(),
             session_id: result.sessionId,
             overall_bias_score: result.overallBiasScore,

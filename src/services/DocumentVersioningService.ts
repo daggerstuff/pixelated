@@ -52,8 +52,8 @@ export class DocumentVersioningService {
         const currentVersionResult = await tx.execute(
           sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${originalFileId}`,
         )
-        newVersion =
-          (Number((currentVersionResult.rows[0] as any)?.max_version) || 0) + 1
+        const maxRow = currentVersionResult.rows[0] as Record<string, unknown> | undefined
+        newVersion = (Number(maxRow?.['max_version']) || 0) + 1
         fileId = originalFileId
 
         // Update the original file record
@@ -107,7 +107,7 @@ export class DocumentVersioningService {
    * Internal helper to fetch file version using either transaction or pool
    */
   private async getFileVersionInternal(
-    executor: { execute: (s: any) => Promise<any> },
+    executor: { execute: (s: { text: string; values?: unknown[] }) => Promise<{ rows: Record<string, unknown>[] }> },
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
@@ -115,22 +115,22 @@ export class DocumentVersioningService {
       sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
     )
 
-    const row = result.rows[0]
+    const row = result.rows[0] as Record<string, unknown> | undefined
     if (!row) return null
 
     return {
-      id: row.id as string,
-      fileId: row.file_id as string,
-      version: row.version as number,
-      fileName: row.file_name as string,
-      size: row.size as number,
-      url: row.url as string,
-      s3Key: row.s3_key as string,
-      uploadedAt: row.uploaded_at as Date,
-      uploadedBy: row.uploaded_by as string,
-      changes: row.changes as string | undefined,
-      checksum: row.checksum as string | undefined,
-      isCurrent: row.is_current as boolean,
+      id: row['id'] as string,
+      fileId: row['file_id'] as string,
+      version: row['version'] as number,
+      fileName: row['file_name'] as string,
+      size: row['size'] as number,
+      url: row['url'] as string,
+      s3Key: row['s3_key'] as string,
+      uploadedAt: row['uploaded_at'] as Date,
+      uploadedBy: row['uploaded_by'] as string,
+      changes: row['changes'] as string | undefined,
+      checksum: row['checksum'] as string | undefined,
+      isCurrent: row['is_current'] as boolean,
     }
   }
 
@@ -147,22 +147,22 @@ export class DocumentVersioningService {
       sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND is_current = true LIMIT 1`,
     )
 
-    const row = result.rows[0] as any
+    const row = result.rows[0] as Record<string, unknown> | undefined
     if (!row) return null
 
     return {
-      id: row.id as string,
-      fileId: row.file_id as string,
-      version: row.version as number,
-      fileName: row.file_name as string,
-      size: row.size as number,
-      url: row.url as string,
-      s3Key: row.s3_key as string,
-      uploadedAt: row.uploaded_at as Date,
-      uploadedBy: row.uploaded_by as string,
-      changes: row.changes as string | undefined,
-      checksum: row.checksum as string | undefined,
-      isCurrent: row.is_current as boolean,
+      id: row['id'] as string,
+      fileId: row['file_id'] as string,
+      version: row['version'] as number,
+      fileName: row['file_name'] as string,
+      size: row['size'] as number,
+      url: row['url'] as string,
+      s3Key: row['s3_key'] as string,
+      uploadedAt: row['uploaded_at'] as Date,
+      uploadedBy: row['uploaded_by'] as string,
+      changes: row['changes'] as string | undefined,
+      checksum: row['checksum'] as string | undefined,
+      isCurrent: row['is_current'] as boolean,
     }
   }
 
@@ -172,46 +172,46 @@ export class DocumentVersioningService {
     const fileResult = await db.execute(
       sql`SELECT * FROM files WHERE id = ${fileId} LIMIT 1`,
     )
-    const fileRow = fileResult.rows[0] as any
+    const fileRow = fileResult.rows[0] as Record<string, unknown>
 
     if (!fileRow) {
       throw new Error('File not found')
     }
 
     const file: FileMetadata = {
-      id: fileRow.id as string,
-      originalName: fileRow.original_name as string,
-      fileName: fileRow.file_name as string,
-      mimeType: fileRow.mime_type as string,
-      size: fileRow.size as number,
-      url: fileRow.url as string,
-      thumbnailUrl: fileRow.thumbnail_url as string | undefined,
-      uploadedBy: fileRow.uploaded_by as string,
-      uploadedAt: fileRow.uploaded_at as Date,
-      folderId: fileRow.folder_id as string | undefined,
-      version: fileRow.version as number,
-      isPublic: fileRow.is_public as boolean,
-      tags: (fileRow.tags as string[]) || [],
-      metadata: (fileRow.metadata as Record<string, any>) || {},
+      id: fileRow['id'] as string,
+      originalName: fileRow['original_name'] as string,
+      fileName: fileRow['file_name'] as string,
+      mimeType: fileRow['mime_type'] as string,
+      size: fileRow['size'] as number,
+      url: fileRow['url'] as string,
+      thumbnailUrl: fileRow['thumbnail_url'] as string | undefined,
+      uploadedBy: fileRow['uploaded_by'] as string,
+      uploadedAt: fileRow['uploaded_at'] as Date,
+      folderId: fileRow['folder_id'] as string | undefined,
+      version: fileRow['version'] as number,
+      isPublic: fileRow['is_public'] as boolean,
+      tags: (fileRow['tags'] as string[]) || [],
+      metadata: (fileRow['metadata'] as Record<string, unknown>) || {},
     }
 
     const versionsResult = await db.execute(
       sql`SELECT * FROM file_versions WHERE file_id = ${fileId} ORDER BY version DESC`,
     )
 
-    const versions: DocumentVersion[] = versionsResult.rows.map((row: any) => ({
-      id: row.id as string,
-      fileId: row.file_id as string,
-      version: row.version as number,
-      fileName: row.file_name as string,
-      size: row.size as number,
-      url: row.url as string,
-      s3Key: row.s3_key as string,
-      uploadedAt: row.uploaded_at as Date,
-      uploadedBy: row.uploaded_by as string,
-      changes: row.changes as string | undefined,
-      checksum: row.checksum as string | undefined,
-      isCurrent: row.is_current as boolean,
+    const versions: DocumentVersion[] = versionsResult.rows.map((r: Record<string, unknown>) => ({
+      id: r['id'] as string,
+      fileId: r['file_id'] as string,
+      version: r['version'] as number,
+      fileName: r['file_name'] as string,
+      size: r['size'] as number,
+      url: r['url'] as string,
+      s3Key: r['s3_key'] as string,
+      uploadedAt: r['uploaded_at'] as Date,
+      uploadedBy: r['uploaded_by'] as string,
+      changes: r['changes'] as string | undefined,
+      checksum: r['checksum'] as string | undefined,
+      isCurrent: r['is_current'] as boolean,
     }))
 
     const currentVersion = versions.find((v) => v.isCurrent) ?? versions[0]
@@ -235,7 +235,7 @@ export class DocumentVersioningService {
       const result = await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${targetVersion} LIMIT 1`,
       )
-      const targetVersionRow = result.rows[0] as any
+      const targetVersionRow = result.rows[0] as Record<string, unknown>
 
       if (!targetVersionRow) {
         throw new Error('Target version not found')
@@ -259,7 +259,7 @@ export class DocumentVersioningService {
       const result = await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
       )
-      const versionRow = result.rows[0] as any
+      const versionRow = result.rows[0] as Record<string, unknown>
 
       if (!versionRow) {
         throw new Error('Version not found')
@@ -311,21 +311,21 @@ export class DocumentVersioningService {
       ORDER BY f.uploaded_at DESC
     `)
 
-    const files: FileMetadata[] = filesResult.rows.map((row: any) => ({
-      id: row.id as string,
-      originalName: row.original_name as string,
-      fileName: row.file_name as string,
-      mimeType: row.mime_type as string,
-      size: row.size as number,
-      url: row.url as string,
-      thumbnailUrl: row.thumbnail_url as string | undefined,
-      uploadedBy: row.uploaded_by as string,
-      uploadedAt: row.uploaded_at as Date,
-      folderId: row.folder_id as string | undefined,
-      version: row.version as number,
-      isPublic: row.is_public as boolean,
-      tags: (row.tags as string[]) || [],
-      metadata: (row.metadata as Record<string, any>) || {},
+    const files: FileMetadata[] = filesResult.rows.map((r: Record<string, unknown>) => ({
+      id: r['id'] as string,
+      originalName: r['original_name'] as string,
+      fileName: r['file_name'] as string,
+      mimeType: r['mime_type'] as string,
+      size: r['size'] as number,
+      url: r['url'] as string,
+      thumbnailUrl: r['thumbnail_url'] as string | undefined,
+      uploadedBy: r['uploaded_by'] as string,
+      uploadedAt: r['uploaded_at'] as Date,
+      folderId: r['folder_id'] as string | undefined,
+      version: r['version'] as number,
+      isPublic: r['is_public'] as boolean,
+      tags: (r['tags'] as string[]) || [],
+      metadata: (r['metadata'] as Record<string, unknown>) || {},
     }))
 
     // Get subfolders
@@ -338,7 +338,7 @@ export class DocumentVersioningService {
       ORDER BY f.name
     `)
 
-    const folders = foldersResult.rows.map((row: any) => ({
+    const folders = foldersResult.rows.map((row: Record<string, unknown>) => ({
       id: row.id as string,
       name: row.name as string,
       fileCount: parseInt(row.file_count as string),
@@ -352,7 +352,7 @@ export class DocumentVersioningService {
   }
 
   private async createFileVersionFromExisting(
-    executor: { execute: (s: any) => Promise<any> },
+    executor: { execute: (s: { text: string; values?: unknown[] }) => Promise<{ rows: Record<string, unknown>[] }> },
     fileId: string,
     s3Key: string,
     userId: string,

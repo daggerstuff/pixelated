@@ -147,14 +147,13 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       },
     )
   } catch (error: unknown) {
-    logger.error('Multimodal inference failed', {
-      error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
-    })
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    logger.error('Multimodal inference failed', { error: errorMessage })
 
     return new Response(
       JSON.stringify({
         error: 'Multimodal inference failed',
-        message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Unknown error',
+        message: errorMessage,
       }),
       {
         status: 500,

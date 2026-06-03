@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events'
 
 import * as tf from '@tensorflow/tfjs'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {

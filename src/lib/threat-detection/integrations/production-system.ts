@@ -21,9 +21,9 @@ class ProductionThreatDetectionService {
     critical: number
   }
 
-  constructor(config: any = {}) {
-    this.enabled = config.enabled ?? true
-    this.riskThresholds = config.riskThresholds ?? {
+  constructor(config: Record<string, unknown> = {}) {
+    this.enabled = (config['enabled'] as boolean) ?? true
+    this.riskThresholds = (config['riskThresholds'] as typeof this.riskThresholds) ?? {
       low: 0.2,
       medium: 0.5,
       high: 0.7,
@@ -31,7 +31,7 @@ class ProductionThreatDetectionService {
     }
   }
 
-  async processRequest(request: any): Promise<any> {
+  async processRequest(request: Record<string, unknown>): Promise<Record<string, unknown>> {
     if (!this.enabled) {
       return { success: true, threat: null, action: 'allow', riskScore: 0 }
     }
@@ -66,27 +66,28 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async calculateRiskScore(request: any): Promise<number> {
+  private async calculateRiskScore(request: Record<string, unknown>): Promise<number> {
     let score = 0
 
     // IP reputation check
-    if (request.ip) {
-      score += await this.checkIPReputation(request.ip)
+    // IP reputation check
+    if (request['ip']) {
+      score += await this.checkIPReputation(request['ip'] as string)
     }
 
     // Rate limiting analysis
-    if (request.ip) {
-      score += await this.analyzeRequestFrequency(request.ip)
+    if (request['ip']) {
+      score += await this.analyzeRequestFrequency(request['ip'] as string)
     }
 
     // Payload analysis
-    if (request.body || request.query) {
-      score += await this.analyzePayload(request.body ?? request.query)
+    if (request['body'] || request['query']) {
+      score += await this.analyzePayload((request['body'] ?? request['query']) as Record<string, unknown>)
     }
 
     // User agent analysis
-    if (request.userAgent) {
-      score += await this.analyzeUserAgent(request.userAgent)
+    if (request['userAgent']) {
+      score += await this.analyzeUserAgent(request['userAgent'] as string)
     }
 
     return Math.min(score, 1.0) // Cap at 1.0
@@ -95,22 +96,24 @@ class ProductionThreatDetectionService {
   private async checkIPReputation(ip: string): Promise<number> {
     try {
       // Check against known bad IPs in Redis
-      const reputation = await redis?.['get'](`ip_reputation:${ip}`)
+      const reputation = redis ? await redis?.['get']?.(`ip_reputation:${ip}`) : null
       if (reputation) {
         return parseFloat(reputation)
       }
 
       // Check against MongoDB threat intelligence
-      const db = await mongoClient.db('threat_intelligence')
+      const db = mongoClient.db
       const badIP = await db.collection('malicious_ips').findOne({ ip })
 
       if (badIP) {
-        await redis['setex'](
-          `ip_reputation:${ip}`,
-          3600,
-          badIP.riskScore.toString(),
-        )
-        return badIP.riskScore
+        if (redis) {
+          await redis?.['setex']?.(
+            `ip_reputation:${ip}`,
+            3600,
+            (badIP['riskScore'] as number)?.toString() ?? '',
+          )
+        }
+        return (badIP['riskScore'] as number) ?? 0
       }
 
       return 0
@@ -123,8 +126,12 @@ class ProductionThreatDetectionService {
   private async analyzeRequestFrequency(ip: string): Promise<number> {
     try {
       const key = `request_freq:${ip}`
-      const count = await redis?.['hincrby'](key, 'count', 1)
-      await redis['expire'](key, 60) // 1 minute window
+      let count = 0
+      if (redis) {
+        const result = await redis?.['hincrby']?.(key, 'count', 1)
+        count = typeof result === 'number' ? result : 0
+        redis?.['expire']?.(key, 60) // 1 minute window
+      }
 
       // Risk increases with frequency
       if (count > 100) return 0.8
@@ -137,7 +144,7 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async analyzePayload(payload: any): Promise<number> {
+  private async analyzePayload(payload: Record<string, unknown>): Promise<number> {
     if (!payload) return 0
 
     const payloadStr = JSON.stringify(payload).toLowerCase()
@@ -211,11 +218,11 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async getIndicators(request: any): Promise<string[]> {
+  private async getIndicators(request: Record<string, unknown>): Promise<string[]> {
     const indicators: string[] = []
 
-    if (request.ip) {
-      const reputation = await redis?.['get'](`ip_reputation:${request.ip}`)
+    if (request['ip'] && redis) {
+      const reputation = await redis?.['get']?.(`ip_reputation:${request['ip']}`)
       if (reputation && parseFloat(reputation) > 0.5) {
         indicators.push('malicious_ip')
       }
@@ -225,26 +232,26 @@ class ProductionThreatDetectionService {
   }
 
   private async logThreatDetection(
-    request: any,
+    request: Record<string, unknown>,
     riskScore: number,
     threatLevel: string,
     action: string,
   ) {
     try {
-      const db = await mongoClient.db('security_logs')
+      const db = mongoClient.db
       await db.collection('threat_detections').insertOne({
         timestamp: new Date(),
-        ip: request.ip,
-        userAgent: request.userAgent,
-        endpoint: request.path,
-        method: request.method,
+        ip: request['ip'] as string,
+        userAgent: request['userAgent'] as string,
+        endpoint: request['path'] as string,
+        method: request['method'] as string,
         riskScore,
         threatLevel,
         action,
         request: {
-          headers: request.headers,
-          query: request.query,
-          body: request.body,
+          headers: request['headers'],
+          query: request['query'],
+          body: request['body'],
         },
       })
     } catch (error: unknown) {
@@ -252,7 +259,7 @@ class ProductionThreatDetectionService {
     }
   }
 
-  async getHealthStatus(): Promise<any> {
+  async getHealthStatus(): Promise<Record<string, unknown>> {
     return {
       healthy: this.enabled,
       service: 'threat-detection',
@@ -260,9 +267,9 @@ class ProductionThreatDetectionService {
     }
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<Record<string, unknown>> {
     try {
-      const db = await mongoClient.db('security_logs')
+      const db = mongoClient.db
       const stats = await db
         .collection('threat_detections')
         .aggregate([
@@ -317,9 +324,9 @@ class ProductionMonitoringService extends EventEmitter {
   }> = []
   private intervals: NodeJS.Timeout[] = []
 
-  constructor(config: any = {}) {
+  constructor(config: Record<string, unknown> = {}) {
     super()
-    this.enabled = config.enabled ?? true
+    this.enabled = (config['enabled'] as boolean) ?? true
   }
 
   async initializeServices(): Promise<void> {
@@ -327,11 +334,10 @@ class ProductionMonitoringService extends EventEmitter {
   }
 
   async start(): Promise<void> {
-    this.running = true
+    // Service started
   }
 
   async stop(): Promise<void> {
-    this.running = false
     for (const interval of this.intervals) {
       clearInterval(interval)
     }
@@ -386,20 +392,20 @@ class ProductionMonitoringService extends EventEmitter {
   }
 
   async generateInsights(): Promise<{
-    insights: any[]
-    alerts: any[]
-    trends?: any[]
-    predictions?: any[]
-    recommendations?: any[]
+    insights: Record<string, unknown>[]
+    alerts: Record<string, unknown>[]
+    trends?: Record<string, unknown>[]
+    predictions?: Record<string, unknown>[]
+    recommendations?: string[]
   }> {
     // Call getMetrics first to propagate any database errors
     await this.getMetrics()
 
-    const insights = []
-    const alerts = []
-    const trends = []
-    const predictions = []
-    const recommendations = []
+    const insights: Record<string, unknown>[] = []
+    const alerts: Record<string, unknown>[] = []
+    const trends: Record<string, unknown>[] = []
+    const predictions: Record<string, unknown>[] = []
+    const recommendations: string[] = []
 
     // Analyze threat patterns
     const highRiskMetrics = this.metrics.filter((m) => m.value > 10)
@@ -416,16 +422,17 @@ class ProductionMonitoringService extends EventEmitter {
     // Trend analysis
     const metricNames = [...new Set(this.metrics.map((m) => m.name))]
     for (const name of metricNames) {
-      const values = this.metrics
+      const values: number[] = this.metrics
         .filter((m) => m.name === name)
         .map((m) => m.value)
-      if (values.length > 1) {
+      if (values && values.length > 1) {
         const avg = values.reduce((a, b) => a + b, 0) / values.length
+        const lastValue = values[values.length - 1]
         trends.push({
           metric: name,
           average: avg,
           count: values.length,
-          trend: values?.[values.length - 1] > avg ? 'increasing' : 'stable',
+          trend: lastValue !== undefined && lastValue > avg ? 'increasing' : 'stable',
         })
       }
     }
@@ -447,7 +454,7 @@ class ProductionMonitoringService extends EventEmitter {
     return { insights, alerts, trends, predictions, recommendations }
   }
 
-  async getHealthStatus(): Promise<any> {
+  async getHealthStatus(): Promise<Record<string, unknown>> {
     return {
       healthy: this.enabled,
       service: 'monitoring',
@@ -455,7 +462,7 @@ class ProductionMonitoringService extends EventEmitter {
     }
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<Record<string, unknown>> {
     return {
       totalInsights: 0,
       totalAlerts: this.alerts.length,
@@ -484,30 +491,30 @@ class ProductionMonitoringService extends EventEmitter {
 // Production-ready hunting service
 class ProductionHuntingService extends EventEmitter {
   private readonly enabled: boolean
-  private readonly investigations: Map<string, any> = new Map()
+  private readonly investigations: Map<string, Record<string, unknown>> = new Map()
 
-  constructor(config: any = {}) {
+  constructor(config: Record<string, unknown> = {}) {
     super()
-    this.enabled = config.enabled ?? true
+    this.enabled = (config['enabled'] as boolean) ?? true
   }
 
   async initializeServices(): Promise<void> {}
 
   async start(): Promise<void> {
-    this.running = true
+    // Service started
   }
 
   async stop(): Promise<void> {
-    this.running = false
+    // Service stopped
   }
 
-  async triggerHunt(huntRequest: any): Promise<any> {
+  async triggerHunt(huntRequest: Record<string, unknown>): Promise<Record<string, unknown>> {
     if (!this.enabled) return { success: false, message: 'Hunting disabled' }
 
     logger.info('Threat hunt triggered:', huntRequest)
 
     try {
-      const db = await mongoClient.db('security_logs')
+      const db = mongoClient.db
       await db.collection('hunt_requests').insertOne({
         ...huntRequest,
         timestamp: new Date(),
@@ -530,7 +537,7 @@ class ProductionHuntingService extends EventEmitter {
     severity: string
     templateId?: string
     description?: string
-  }): Promise<any> {
+  }): Promise<Record<string, unknown>> {
     const sanitize = (str: string) => str.replace(/<[^>]*>/g, '')
     const investigation = {
       id: `inv_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
@@ -553,11 +560,11 @@ class ProductionHuntingService extends EventEmitter {
 
     setTimeout(() => {
       const inv = this.investigations.get(investigation.id)
-      if (inv?.status === 'running') {
-        inv.status = 'completed'
-        inv.result = {
+      if ((inv as Record<string, unknown>)?.['status'] === 'running') {
+        (inv as Record<string, unknown>)['status'] = 'completed'
+        ;(inv as Record<string, unknown>)['result'] = {
           findings: [],
-          riskLevel: inv.severity,
+          riskLevel: (inv as Record<string, unknown>)['severity'],
           completedAt: new Date(),
         }
       }
@@ -566,23 +573,23 @@ class ProductionHuntingService extends EventEmitter {
     return investigation
   }
 
-  async getInvestigationResult(investigationId: string): Promise<any> {
+  async getInvestigationResult(investigationId: string): Promise<Record<string, unknown> | null> {
     return this.investigations.get(investigationId) ?? null
   }
 
-  async getActiveInvestigations(): Promise<any[]> {
+  async getActiveInvestigations(): Promise<Record<string, unknown>[]> {
     return [...this.investigations.values()].filter(
       (inv) => inv.status === 'running',
     )
   }
 
-  async analyzePatterns(params: {
+  async analyzePatterns(_params: {
     type: string
     timeWindow?: number
-  }): Promise<any> {
+  }): Promise<Record<string, unknown>> {
     const suspiciousIPs: string[] = []
 
-    if (params.type === 'ip_analysis') {
+    if (_params.type === 'ip_analysis') {
       suspiciousIPs.push('192.168.1.100')
     }
 
@@ -594,11 +601,11 @@ class ProductionHuntingService extends EventEmitter {
     }
   }
 
-  async analyzeWithML(params: any): Promise<any> {
+  async analyzeWithML(_params: Record<string, unknown>): Promise<Record<string, unknown>> {
     throw new Error('ML model not available')
   }
 
-  async getHealthStatus(): Promise<any> {
+  async getHealthStatus(): Promise<Record<string, unknown>> {
     return {
       healthy: this.enabled,
       service: 'hunting',
@@ -606,7 +613,7 @@ class ProductionHuntingService extends EventEmitter {
     }
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<Record<string, unknown>> {
     return {
       totalHunts: 0,
       totalFindings: 0,
@@ -618,22 +625,20 @@ class ProductionHuntingService extends EventEmitter {
 // Production-ready intelligence service
 class ProductionIntelligenceService extends EventEmitter {
   private readonly enabled: boolean
-  private readonly iocs: Array<any> = []
-  private readonly cache: Map<string, any> = new Map()
+  private readonly iocs: Array<Record<string, unknown>> = []
+  private readonly cache: Map<string, Record<string, unknown>[]> = new Map()
   private intervals: NodeJS.Timeout[] = []
 
-  constructor(config: any = {}) {
+  constructor(config: Record<string, unknown> = {}) {
     super()
-    this.enabled = config.enabled ?? true
+    this.enabled = (config['enabled'] as boolean) ?? true
   }
 
   async start(): Promise<void> {
-    this.running = true
     this.emit('service:started', { service: 'intelligence' })
   }
 
   async stop(): Promise<void> {
-    this.running = false
     for (const interval of this.intervals) {
       clearInterval(interval)
     }
@@ -641,14 +646,14 @@ class ProductionIntelligenceService extends EventEmitter {
     this.emit('service:stopped', { service: 'intelligence' })
   }
 
-  async lookupIOC(indicator: string, type: string): Promise<any[]> {
+  async lookupIOC(indicator: string, type: string): Promise<Record<string, unknown>[]> {
     const cacheKey = `${type}:${indicator}`
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey)
     }
 
     try {
-      const db = await mongoClient.db('threat_intelligence')
+      const db = mongoClient.db
       const intelligence = await db.collection('indicators').findOne({
         indicator: indicator.toLowerCase(),
         type,
@@ -694,11 +699,11 @@ class ProductionIntelligenceService extends EventEmitter {
         if (!response.ok) {
           throw new Error(`Feed ${feed.name} returned HTTP ${response.status}`)
         }
-        const data = await response.json()
-        const indicators = data.data ?? data.results ?? []
+        const data = (await response.json()) as Record<string, unknown>
+        const indicators = (data['data'] ?? data['results'] ?? []) as Record<string, unknown>[]
         for (const indicator of indicators) {
           this.iocs.push({
-            ...indicator,
+            ...indicator as Record<string, unknown>,
             source: feed.name,
             timestamp: new Date(),
           })
@@ -716,36 +721,36 @@ class ProductionIntelligenceService extends EventEmitter {
     this.emit('feeds:updated', { count: this.iocs.length, successCount })
   }
 
-  async addIOC(ioc: any): Promise<void> {
+  async addIOC(ioc: Record<string, unknown>): Promise<void> {
     const encryptedIOC = {
       ...ioc,
-      metadata: this._encryptSensitive(ioc.metadata),
+      metadata: this._encryptSensitive(ioc['metadata'] as Record<string, unknown>),
       addedAt: new Date(),
     }
     this.iocs.push(encryptedIOC)
-    this.emit('ioc:added', { indicator: ioc.indicator })
+    this.emit('ioc:added', { indicator: ioc['indicator'] })
   }
 
-  async getRawIOCs(): Promise<any[]> {
+  async getRawIOCs(): Promise<Record<string, unknown>[]> {
     return this.iocs.map((ioc) => ({
       ...ioc,
-      metadata: this._encryptSensitive(ioc.metadata),
+      metadata: this._encryptSensitive(ioc['metadata'] as Record<string, unknown>),
     }))
   }
 
-  private _encryptSensitive(metadata: any): string {
+  private _encryptSensitive(metadata: Record<string, unknown>): string {
     if (!metadata) return ''
     const jsonStr = JSON.stringify(metadata)
     return Buffer.from(jsonStr).toString('base64')
   }
 
-  async queryThreat(indicator: string): Promise<any> {
+  async queryThreat(indicator: string): Promise<Record<string, unknown>> {
     if (!this.enabled) {
       return { found: false, intelligence: [], sources: [] }
     }
 
     try {
-      const db = await mongoClient.db('threat_intelligence')
+      const db = mongoClient.db
       const intelligence = await db.collection('indicators').findOne({
         indicator: indicator.toLowerCase(),
       })
@@ -754,7 +759,7 @@ class ProductionIntelligenceService extends EventEmitter {
         return {
           found: true,
           intelligence: [intelligence],
-          sources: [intelligence.source ?? 'internal'],
+          sources: [intelligence['source'] ?? 'internal'],
         }
       }
 
@@ -765,7 +770,7 @@ class ProductionIntelligenceService extends EventEmitter {
     }
   }
 
-  async getHealthStatus(): Promise<any> {
+  async getHealthStatus(): Promise<Record<string, unknown>> {
     return {
       healthy: this.enabled,
       service: 'intelligence',
@@ -773,7 +778,7 @@ class ProductionIntelligenceService extends EventEmitter {
     }
   }
 
-  async getStatistics(): Promise<any> {
+  async getStatistics(): Promise<Record<string, unknown>> {
     return {
       totalIndicators: 0,
       activeFeedCount: 0,
@@ -790,10 +795,10 @@ export function createCompleteThreatDetectionSystem(
   orchestrator: unknown,
   rateLimiter: unknown,
   options?: {
-    threatDetection?: any
-    monitoring?: any
-    hunting?: any
-    intelligence?: any
+    threatDetection?: Record<string, unknown>
+    monitoring?: Record<string, unknown>
+    hunting?: Record<string, unknown>
+    intelligence?: Record<string, unknown>
   },
 ) {
   // Create production services
@@ -816,49 +821,50 @@ export function createCompleteThreatDetectionSystem(
     // Wire orchestrator events to services
     _wireEvents() {
       // Security events → monitoring
-      if (orchestrator && typeof (orchestrator as any).on === 'function') {
-        ;(orchestrator as any).on('security:event', (event: any) => {
+      const orch = orchestrator as Record<string, unknown>
+      if (orchestrator && typeof orch['on'] === 'function') {
+        ;(orch as Record<string, unknown>)['on']('security:event', (event: Record<string, unknown>) => {
           void monitoringService.recordMetric({
-            name: event.type ?? 'security_event',
-            value: event.success === false ? 1 : 0,
-            timestamp: new Date(event.timestamp ?? Date.now()),
-            tags: { userId: event.userId ?? '', ip: event.ip ?? '' },
+            name: (event['type'] as string) ?? 'security_event',
+            value: (event['success'] as boolean) === false ? 1 : 0,
+            timestamp: new Date((event['timestamp'] as number) ?? Date.now()),
+            tags: { userId: (event['userId'] as string) ?? '', ip: (event['ip'] as string) ?? '' },
           })
         })
 
         // Threat detected → hunting
-        ;(orchestrator as any).on('threat:detected', async (threat: any) => {
+        ;(orch as Record<string, unknown>)['on']('threat:detected', async (threat: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: 'threats_detected',
             value: 1,
-            timestamp: new Date(threat.timestamp ?? Date.now()),
+            timestamp: new Date((threat['timestamp'] as number) ?? Date.now()),
             tags: {
-              severity: threat.severity ?? '',
-              threatId: threat.threatId ?? '',
+              severity: (threat['severity'] as string) ?? '',
+              threatId: (threat['threatId'] as string) ?? '',
             },
           })
 
-          if (threat.severity === 'high' || threat.severity === 'critical') {
+          if ((threat['severity'] as string) === 'high' || (threat['severity'] as string) === 'critical') {
             void huntingService.startInvestigation({
-              threatId: threat.threatId,
-              userId: threat.userId,
-              severity: threat.severity,
-              description: `Auto-investigation for ${threat.type ?? 'threat'}`,
+              threatId: (threat['threatId'] as string) ?? '',
+              userId: (threat['userId'] as string) ?? '',
+              severity: (threat['severity'] as string) ?? 'medium',
+              description: `Auto-investigation for ${(threat['type'] as string) ?? 'threat'}`,
             })
           }
         })
       }
 
       // Service audit logs → orchestrator
-      monitoringService.on('audit:log', (log: any) => {
-        if (orchestrator && typeof (orchestrator as any).emit === 'function') {
-          ;(orchestrator as any).emit('audit:log', log)
+      monitoringService.on('audit:log', (log: Record<string, unknown>) => {
+        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
+          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
         }
       })
 
-      huntingService.on('audit:log', (log: any) => {
-        if (orchestrator && typeof (orchestrator as any).emit === 'function') {
-          ;(orchestrator as any).emit('audit:log', log)
+      huntingService.on('audit:log', (log: Record<string, unknown>) => {
+        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
+          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
         }
       })
     },
@@ -868,9 +874,7 @@ export function createCompleteThreatDetectionSystem(
       try {
         const threatResult =
           await threatDetectionService.processRequest(request)
-        const insights = await monitoringService.generateInsights([
-          threatResult,
-        ])
+        const insights = await monitoringService.generateInsights()
 
         // Trigger hunting for high-risk requests
         if (threatResult.riskScore > 0.7) {
@@ -893,10 +897,8 @@ export function createCompleteThreatDetectionSystem(
           success: false,
           error:
             error instanceof Error
-              ? error instanceof Error
                 ? error.message
-                : 'Unknown error'
-              : 'Unknown error',
+                : 'Unknown error',
           timestamp: new Date(),
         }
       }
@@ -915,23 +917,28 @@ export function createCompleteThreatDetectionSystem(
         intelligenceService.getHealthStatus(),
       ])
 
+      const th = threatHealth as Record<string, unknown>
+      const mh = monitoringHealth as Record<string, unknown>
+      const hh = huntingHealth as Record<string, unknown>
+      const ih = intelligenceHealth as Record<string, unknown>
+
       return {
         healthy:
-          threatHealth.healthy &&
-          monitoringHealth.healthy &&
-          huntingHealth.healthy &&
-          intelligenceHealth.healthy,
+          (th['healthy'] as boolean) &&
+          (mh['healthy'] as boolean) &&
+          (hh['healthy'] as boolean) &&
+          (ih['healthy'] as boolean),
         services: {
-          threatDetection: threatHealth.healthy,
-          monitoring: monitoringHealth.healthy,
-          hunting: huntingHealth.healthy,
-          intelligence: intelligenceHealth.healthy,
+          threatDetection: th['healthy'] as boolean,
+          monitoring: mh['healthy'] as boolean,
+          hunting: hh['healthy'] as boolean,
+          intelligence: ih['healthy'] as boolean,
         },
         details: {
-          threatDetection: threatHealth,
-          monitoring: monitoringHealth,
-          hunting: huntingHealth,
-          intelligence: intelligenceHealth,
+          threatDetection: th,
+          monitoring: mh,
+          hunting: hh,
+          intelligence: ih,
         },
         timestamp: new Date(),
       }
@@ -946,27 +953,32 @@ export function createCompleteThreatDetectionSystem(
           intelligenceService.getStatistics(),
         ])
 
+      const ts = threatStats as Record<string, unknown>
+      const ms = monitoringStats as Record<string, unknown>
+      const hs = huntingStats as Record<string, unknown>
+      const isc = intelligenceStats as Record<string, unknown>
+
       return {
         threats: {
-          total: threatStats.totalThreats,
-          blocked: threatStats.blockedRequests,
-          averageResponseTime: threatStats.averageResponseTime ?? 0,
-          distribution: threatStats.threatDistribution ?? {},
+          total: ts['totalThreats'] as number,
+          blocked: ts['blockedRequests'] as number,
+          averageResponseTime: (ts['averageResponseTime'] as number) ?? 0,
+          distribution: (ts['threatDistribution'] as Record<string, number>) ?? {},
         },
         monitoring: {
-          insights: monitoringStats.totalInsights,
-          alerts: monitoringStats.totalAlerts,
-          anomalies: monitoringStats.anomaliesDetected,
+          insights: ms['totalInsights'] as number,
+          alerts: ms['totalAlerts'] as number,
+          anomalies: ms['anomaliesDetected'] as number,
         },
         hunting: {
-          hunts: huntingStats.totalHunts,
-          findings: huntingStats.totalFindings,
-          investigations: huntingStats.activeInvestigations,
+          hunts: hs['totalHunts'] as number,
+          findings: hs['totalFindings'] as number,
+          investigations: hs['activeInvestigations'] as number,
         },
         intelligence: {
-          indicators: intelligenceStats.totalIndicators,
-          feeds: intelligenceStats.activeFeedCount,
-          lastUpdate: intelligenceStats.lastUpdateTime,
+          indicators: isc['totalIndicators'] as number,
+          feeds: isc['activeFeedCount'] as number,
+          lastUpdate: isc['lastUpdateTime'] as Date,
         },
         timestamp: new Date(),
       }
