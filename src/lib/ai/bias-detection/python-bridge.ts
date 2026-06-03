@@ -249,10 +249,10 @@ export class PythonBiasDetectionBridge {
         // Acquire a pooled connection for this request if the pool supports it
         if (
           this.connectionPool &&
-          typeof (this.connectionPool as any).acquireConnection === 'function'
+          typeof (this.connectionPool as ConnectionPool).acquireConnection === 'function'
         ) {
           pooledConnection = await (
-            this.connectionPool as any
+            this.connectionPool as ConnectionPool
           ).acquireConnection()
         }
         // Simplified signal handling for test compatibility
@@ -273,7 +273,7 @@ export class PythonBiasDetectionBridge {
           }, this.timeout)
 
           // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as any).signal = controller.signal
+          ;(fetchOptions as RequestInit).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -318,9 +318,9 @@ export class PythonBiasDetectionBridge {
         if (
           pooledConnection &&
           this.connectionPool &&
-          typeof (this.connectionPool as any).releaseConnection === 'function'
+          typeof (this.connectionPool as ConnectionPool).releaseConnection === 'function'
         ) {
-          ;(this.connectionPool as any).releaseConnection(pooledConnection)
+          ;(this.connectionPool as ConnectionPool).releaseConnection(pooledConnection)
           pooledConnection = null
         }
         // Clear timeout on error
@@ -353,27 +353,27 @@ export class PythonBiasDetectionBridge {
         // Defensively hydrate all intermediate metric objects to avoid undefined access errors
         const metrics =
           typeof layerResult.metrics === 'object' && layerResult.metrics
-            ? (layerResult.metrics as Record<string, any>)
+            ? (layerResult.metrics as Record<string, unknown>)
             : {}
         const ling =
           typeof metrics['linguistic_bias'] === 'object' &&
           metrics['linguistic_bias']
-            ? (metrics['linguistic_bias'] as Record<string, any>)
+            ? (metrics['linguistic_bias'] as Record<string, unknown>)
             : {}
         const sentiment =
           typeof ling['sentiment_analysis'] === 'object' &&
           ling['sentiment_analysis']
-            ? (ling['sentiment_analysis'] as Record<string, any>)
+            ? (ling['sentiment_analysis'] as Record<string, unknown>)
             : {}
         const rep =
           typeof metrics['representation_analysis'] === 'object' &&
           metrics['representation_analysis']
-            ? (metrics['representation_analysis'] as Record<string, any>)
+            ? (metrics['representation_analysis'] as Record<string, unknown>)
             : {}
         const dq =
           typeof metrics['data_quality_metrics'] === 'object' &&
           metrics['data_quality_metrics']
-            ? (metrics['data_quality_metrics'] as Record<string, any>)
+            ? (metrics['data_quality_metrics'] as Record<string, unknown>)
             : {}
         return {
           biasScore:
@@ -510,17 +510,17 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
         const fairness = (metrics['fairness_metrics'] ?? {}) as Record<
           string,
-          any
+          unknown
         >
         const performance = (metrics['performance_metrics'] ?? {}) as Record<
           string,
-          any
+          unknown
         >
         const groupComp = (metrics['group_performance_comparison'] ??
-          []) as any[]
+          []) as Record<string, unknown>[]
 
         return {
           biasScore:
@@ -569,11 +569,11 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
         const counterfactual = (metrics['counterfactual_analysis'] ??
-          {}) as Record<string, any>
-        const featureImp = (metrics['feature_importance'] ?? []) as any[]
-        const whatIf = (metrics['what_if_scenarios'] ?? []) as any[]
+          {}) as Record<string, unknown>
+        const featureImp = (metrics['feature_importance'] ?? []) as Record<string, unknown>[]
+        const whatIf = (metrics['what_if_scenarios'] ?? []) as Record<string, unknown>[]
 
         return {
           biasScore:
@@ -612,15 +612,15 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, any>)
+        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
         const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<
           string,
-          any
+          unknown
         >
-        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, any>
+        const custom = (metrics['custom_metrics'] ?? {}) as Record<string, unknown>
         const temporal = (metrics['temporal_analysis'] ?? {}) as Record<
           string,
-          any
+          unknown
         >
 
         return {
@@ -803,77 +803,77 @@ export class PythonBiasDetectionBridge {
   // permissive in types (unknown/any) and should be tightened as we reconcile
   // TypeScript interfaces with the Python responses.
 
-  async sendMetricsBatch(payload: unknown): Promise<any> {
+  async sendMetricsBatch(payload: unknown): Promise<unknown> {
     return this.makeRequest('/metrics/batch', 'POST', payload)
   }
 
-  async sendAnalysisMetric(payload: unknown): Promise<any> {
+  async sendAnalysisMetric(payload: unknown): Promise<unknown> {
     return this.makeRequest('/metrics/analysis', 'POST', payload)
   }
 
-  async getDashboardMetrics(query?: Record<string, unknown>): Promise<any> {
+  async getDashboardMetrics(query?: Record<string, unknown>): Promise<unknown> {
     // For simplicity keep using POST for complex queries; GET can be added if needed
     return this.makeRequest('/metrics/dashboard', 'POST', query ?? {})
   }
 
-  async recordReportMetric(payload: unknown): Promise<any> {
+  async recordReportMetric(payload: unknown): Promise<unknown> {
     return this.makeRequest('/metrics/report', 'POST', payload)
   }
 
-  async getPerformanceMetrics(params?: Record<string, unknown>): Promise<any> {
+  async getPerformanceMetrics(params?: Record<string, unknown>): Promise<unknown> {
     return this.makeRequest('/metrics/performance', 'POST', params ?? {})
   }
 
-  async getSessionData(sessionId: string): Promise<any> {
+  async getSessionData(sessionId: string): Promise<unknown> {
     return this.makeRequest(`/session/${encodeURIComponent(sessionId)}`, 'GET')
   }
 
-  async storeMetrics(payload: unknown): Promise<any> {
+  async storeMetrics(payload: unknown): Promise<unknown> {
     return this.makeRequest('/metrics/store', 'POST', payload)
   }
 
   // Alert system shims
-  async registerAlertSystem(config: unknown): Promise<any> {
+  async registerAlertSystem(config: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/register', 'POST', config)
   }
 
-  async checkAlerts(payload: unknown): Promise<any> {
+  async checkAlerts(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/check', 'POST', payload)
   }
 
-  async storeAlerts(payload: unknown): Promise<any> {
+  async storeAlerts(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/store', 'POST', payload)
   }
 
-  async escalateAlert(payload: unknown): Promise<any> {
+  async escalateAlert(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/escalate', 'POST', payload)
   }
 
-  async sendNotification(payload: unknown): Promise<any> {
+  async sendNotification(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/notify', 'POST', payload)
   }
 
-  async getActiveAlerts(): Promise<any> {
+  async getActiveAlerts(): Promise<unknown> {
     return this.makeRequest('/alerts/active', 'GET')
   }
 
-  async acknowledgeAlert(payload: unknown): Promise<any> {
+  async acknowledgeAlert(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/ack', 'POST', payload)
   }
 
-  async sendSystemNotification(payload: unknown): Promise<any> {
+  async sendSystemNotification(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/system-notify', 'POST', payload)
   }
 
-  async getRecentAlerts(params?: Record<string, unknown>): Promise<any> {
+  async getRecentAlerts(params?: Record<string, unknown>): Promise<unknown> {
     return this.makeRequest('/alerts/recent', 'POST', params ?? {})
   }
 
-  async getAlertStatistics(params?: Record<string, unknown>): Promise<any> {
+  async getAlertStatistics(params?: Record<string, unknown>): Promise<unknown> {
     return this.makeRequest('/alerts/stats', 'POST', params ?? {})
   }
 
-  async unregisterAlertSystem(payload: unknown): Promise<any> {
+  async unregisterAlertSystem(payload: unknown): Promise<unknown> {
     return this.makeRequest('/alerts/unregister', 'POST', payload)
   }
 
@@ -883,9 +883,9 @@ export class PythonBiasDetectionBridge {
       this.stopHealthMonitoring()
       if (
         this.connectionPool &&
-        typeof (this.connectionPool as any).dispose === 'function'
+        typeof (this.connectionPool as ConnectionPool).dispose === 'function'
       ) {
-        await (this.connectionPool as any).dispose()
+        await (this.connectionPool as ConnectionPool).dispose()
       }
       logger.info('PythonBiasDetectionBridge disposed')
     } catch (e) {

@@ -25,7 +25,7 @@ export interface AnonymizedRecord {
   anonymizationLevel: 'basic' | 'enhanced' | 'maximum'
   timestamp: string
   retentionExpiry: string
-  dataFields: Record<string, any>
+  dataFields: Record<string, unknown>
   qualityMetrics: {
     informationLoss: number // 0-1 scale
     kAnonymityLevel: number
@@ -76,13 +76,13 @@ export class AnonymizationPipelineService {
   }
 
   private readonly privacyBudgetUsed: Map<string, number> = new Map()
-  private readonly kAnonymityGroups: Map<string, any[]> = new Map()
+  private readonly kAnonymityGroups: Map<string, Record<string, unknown>[]> = new Map()
 
   /**
    * Anonymize therapeutic session data for research use
    */
   async anonymizeTherapeuticData(
-    rawData: any[],
+    rawData: Record<string, unknown>[],
     researchPurpose: string,
     config: Partial<AnonymizationConfig> = {},
   ): Promise<{
@@ -156,7 +156,7 @@ export class AnonymizationPipelineService {
   /**
    * Apply k-anonymity to ensure minimum group sizes
    */
-  private async applyKAnonymity(data: any[], k: number): Promise<any[]> {
+  private async applyKAnonymity(data: Record<string, unknown>[], k: number): Promise<Record<string, unknown>[]> {
     // Identify quasi-identifiers (age, location, demographic info)
     const quasiIdentifiers = [
       'age_group',
@@ -166,7 +166,7 @@ export class AnonymizationPipelineService {
     ]
 
     // Group records by quasi-identifier combinations
-    const groups = new Map<string, any[]>()
+    const groups = new Map<string, Record<string, unknown>[]>()
 
     for (const record of data) {
       const groupKey = quasiIdentifiers
@@ -180,7 +180,7 @@ export class AnonymizationPipelineService {
     }
 
     // Ensure each group has at least k members
-    const kAnonymizedData: any[] = []
+    const kAnonymizedData: Record<string, unknown>[] = []
 
     for (const [groupKey, groupRecords] of groups) {
       if (groupRecords.length >= k) {
@@ -205,7 +205,7 @@ export class AnonymizationPipelineService {
     }
 
     // Store k-anonymity groups for audit
-    this.kAnonymityGroups.set('current', Array.from(groups.values()))
+    this.kAnonymityGroups.set('current', Array.from(groups.values()).flat())
 
     return kAnonymizedData
   }
@@ -214,10 +214,10 @@ export class AnonymizationPipelineService {
    * Apply differential privacy noise injection
    */
   private async applyDifferentialPrivacy(
-    data: any[],
+    data: Record<string, unknown>[],
     dpConfig: AnonymizationConfig['differentialPrivacy'],
     purpose: string,
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     const { epsilon, delta, sensitivity } = dpConfig
 
     // Check privacy budget
@@ -248,11 +248,11 @@ export class AnonymizationPipelineService {
 
       for (const field of categoricalFields) {
         if (record[field]) {
-          noisyRecord[field] = this.addCategoricalNoise(record[field], epsilon)
+          noisyRecord[field] = this.addCategoricalNoise(record[field] as string, epsilon)
         }
       }
 
-      noisyRecord.differential_privacy = {
+      ;(noisyRecord as Record<string, unknown>)['differential_privacy'] = {
         epsilon_used: epsilon,
         noise_added: true,
         privacy_guarantee: `(${epsilon}, ${delta})-differential privacy`,
@@ -271,40 +271,40 @@ export class AnonymizationPipelineService {
    * Apply temporal obfuscation to prevent timing attacks
    */
   private async applyTemporalObfuscation(
-    data: any[],
+    data: Record<string, unknown>[],
     temporalConfig: AnonymizationConfig['temporalObfuscation'],
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     const { timeJitter, dateGranularity, seasonalMasking } = temporalConfig
 
     return data.map((record) => {
       const obfuscatedRecord = { ...record }
 
       // Apply time jitter
-      if (record.timestamp) {
-        const originalTime = new Date(record.timestamp)
+      if (record['timestamp']) {
+        const originalTime = new Date(record['timestamp'] as string)
         const jitterHours = (Math.random() - 0.5) * 2 * timeJitter
         const jitteredTime = new Date(
           originalTime.getTime() + jitterHours * 60 * 60 * 1000,
         )
 
-        obfuscatedRecord.obfuscated_timestamp = this.reduceTemporalGranularity(
+        ;(obfuscatedRecord as Record<string, unknown>)['obfuscated_timestamp'] = this.reduceTemporalGranularity(
           jitteredTime,
           dateGranularity,
         )
       }
 
       // Apply seasonal masking
-      if (seasonalMasking && record.date) {
-        obfuscatedRecord.temporal_period = this.getTemporalPeriod(record.date)
-        delete obfuscatedRecord.date // Remove exact date
+      if (seasonalMasking && record['date']) {
+        ;(obfuscatedRecord as Record<string, unknown>)['temporal_period'] = this.getTemporalPeriod(record['date'] as string)
+        delete (obfuscatedRecord as Record<string, unknown>)['date'] // Remove exact date
       }
 
       // Prevent sequence analysis
-      if (record.session_sequence) {
-        obfuscatedRecord.session_sequence_range = this.getRangeFromSequence(
-          record.session_sequence,
+      if (record['session_sequence']) {
+        ;(obfuscatedRecord as Record<string, unknown>)['session_sequence_range'] = this.getRangeFromSequence(
+          record['session_sequence'] as number,
         )
-        delete obfuscatedRecord.session_sequence
+        delete (obfuscatedRecord as Record<string, unknown>)['session_sequence']
       }
 
       return obfuscatedRecord
@@ -315,7 +315,7 @@ export class AnonymizationPipelineService {
    * Prevent cross-session linkage attacks
    */
   private async preventCrossSessionLinkage(
-    data: any[],
+    data: Record<string, unknown>[],
     linkageConfig: AnonymizationConfig['linkagePrevention'],
   ): Promise<AnonymizedRecord[]> {
     const {
@@ -327,7 +327,7 @@ export class AnonymizationPipelineService {
     return data.map((record) => {
       // Generate new anonymized ID
       const anonymizedId = this.generateAnonymizedId(
-        record.original_id ?? record.id,
+        (record['original_id'] ?? record['id']) as string,
       )
 
       // Hash session identifiers
@@ -350,7 +350,7 @@ export class AnonymizationPipelineService {
       }
 
       return {
-        originalId: record.original_id ?? record.id,
+        originalId: (record['original_id'] ?? record['id']) as string,
         anonymizedId,
         anonymizationLevel: 'enhanced',
         timestamp: new Date().toISOString(),
@@ -361,8 +361,8 @@ export class AnonymizationPipelineService {
             record,
             processedRecord,
           ),
-          kAnonymityLevel: record.k_anonymity_level ?? 0,
-          privacyBudgetUsed: record.differential_privacy?.epsilon_used ?? 0,
+          kAnonymityLevel: (record['k_anonymity_level'] as number) ?? 0,
+          privacyBudgetUsed: (record['differential_privacy'] as Record<string, unknown> | undefined)?.['epsilon_used'] as number ?? 0,
         },
       } as AnonymizedRecord
     })
@@ -372,9 +372,9 @@ export class AnonymizationPipelineService {
    * Assess the quality of anonymization
    */
   private async assessAnonymizationQuality(
-    originalData: any[],
+    originalData: Record<string, unknown>[],
     anonymizedData: AnonymizedRecord[],
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     const totalRecords = originalData.length
     const processedRecords = anonymizedData.length
 
@@ -417,17 +417,17 @@ export class AnonymizationPipelineService {
 
   // Helper methods for anonymization techniques
 
-  private async preprocessData(rawData: any[]): Promise<any[]> {
+  private async preprocessData(rawData: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
     return Promise.resolve(
       rawData.map((record) => ({
         ...record,
-        original_id: record.id ?? this.generateId(),
+        original_id: record['id'] ?? this.generateId(),
         processed_timestamp: new Date().toISOString(),
       })),
     )
   }
 
-  private generalizeQuasiIdentifier(value: any, identifier: string): string {
+  private generalizeQuasiIdentifier(value: unknown, identifier: string): string {
     switch (identifier) {
       case 'age_group':
         if (typeof value === 'number') {
@@ -437,26 +437,26 @@ export class AnonymizationPipelineService {
 
       case 'location_region':
         // Generalize to broader regions
-        return typeof value === 'string' ? value.split(',')[0] : 'unknown'
+        return typeof value === 'string' ? value.split(',')[0] ?? 'unknown' : 'unknown'
 
       case 'gender':
-        return value ?? 'not_specified'
+        return typeof value === 'string' ? value : 'not_specified'
 
       case 'occupation_category':
         // Generalize to broad categories
-        return this.generalizeOccupation(value)
+        return this.generalizeOccupation(value as string)
 
       default:
-        return String(value ?? 'unknown')
+        return typeof value === 'string' ? value : 'unknown'
     }
   }
 
   private async mergeOrSuppressGroup(
-    smallGroup: any[],
-    allGroups: Map<string, any[]>,
+    smallGroup: Record<string, unknown>[],
+    allGroups: Map<string, Record<string, unknown>[]>,
     k: number,
     quasiIdentifiers: string[],
-  ): Promise<any[]> {
+  ): Promise<Record<string, unknown>[]> {
     // Try to find similar groups to merge with
     const similarGroups = this.findSimilarGroups(
       smallGroup,
@@ -466,7 +466,8 @@ export class AnonymizationPipelineService {
 
     if (similarGroups.length > 0) {
       // Merge with most similar group
-      const mergedGroup = [...smallGroup, ...similarGroups[0]]
+      const similar = similarGroups[0]
+      const mergedGroup = similar ? [...smallGroup, ...similar] : smallGroup
       return mergedGroup.map((record) => ({
         ...record,
         anonymization_group: 'merged',
@@ -482,10 +483,10 @@ export class AnonymizationPipelineService {
   }
 
   private findSimilarGroups(
-    targetGroup: any[],
-    allGroups: Map<string, any[]>,
+    targetGroup: Record<string, unknown>[],
+    allGroups: Map<string, Record<string, unknown>[]>,
     _quasiIdentifiers: string[],
-  ): any[][] {
+  ): Record<string, unknown>[][] {
     // Simplified similarity calculation - would be more sophisticated in practice
     return Array.from(allGroups.values())
       .filter(
@@ -511,17 +512,17 @@ export class AnonymizationPipelineService {
   private getRandomCategory(_originalValue: string): string {
     // Simplified random category selection
     const categories = ['happy', 'sad', 'anxious', 'calm', 'angry', 'neutral']
-    return categories[Math.floor(Math.random() * categories.length)]
+    return categories[Math.floor(Math.random() * categories.length)]!
   }
 
   private reduceTemporalGranularity(date: Date, granularity: string): string {
     switch (granularity) {
       case 'day':
-        return date.toISOString().split('T')[0]
+        return date.toISOString().split('T')[0] ?? ''
       case 'week':
         const weekStart = new Date(date)
         weekStart.setDate(date.getDate() - date.getDay())
-        return weekStart.toISOString().split('T')[0]
+        return weekStart.toISOString().split('T')[0] ?? ''
       case 'month':
         return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
       case 'quarter':
@@ -556,7 +557,7 @@ export class AnonymizationPipelineService {
       .substring(0, 16)
   }
 
-  private hashSessionIdentifiers(record: any): any {
+  private hashSessionIdentifiers(record: Record<string, unknown>): Record<string, unknown> {
     const hashableFields = ['session_id', 'therapist_id', 'patient_id']
     const hashedRecord = { ...record }
 
@@ -564,7 +565,7 @@ export class AnonymizationPipelineService {
       if (record[field]) {
         hashedRecord[`${field}_hash`] = crypto
           .createHash('sha256')
-          .update(String(record[field]))
+          .update(typeof record[field] === 'string' ? record[field] : String(record[field]))
           .digest('hex')
           .substring(0, 12)
         delete hashedRecord[field]
@@ -575,9 +576,9 @@ export class AnonymizationPipelineService {
   }
 
   private suppressQuasiIdentifiers(
-    record: any,
+    record: Record<string, unknown>,
     fieldsToSuppress: string[],
-  ): any {
+  ): Record<string, unknown> {
     const suppressedRecord = { ...record }
 
     for (const field of fieldsToSuppress) {
@@ -590,7 +591,7 @@ export class AnonymizationPipelineService {
     return suppressedRecord
   }
 
-  private blockCrossReferences(record: any): any {
+  private blockCrossReferences(record: Record<string, unknown>): Record<string, unknown> {
     // Remove or hash fields that could enable cross-referencing
     const blockedRecord = { ...record }
 
@@ -616,11 +617,11 @@ export class AnonymizationPipelineService {
     return expiryDate.toISOString()
   }
 
-  private calculateInformationLoss(original: any, anonymized: any): number {
+  private calculateInformationLoss(original: Record<string, unknown>, anonymized: Record<string, unknown>): number {
     // Simplified information loss calculation
     const originalFields = Object.keys(original).length
     const anonymizedFields = Object.keys(
-      anonymized.dataFields ?? anonymized,
+      anonymized['dataFields'] ?? anonymized,
     ).length
 
     return Math.max(0, 1 - anonymizedFields / originalFields)
@@ -658,7 +659,7 @@ export class AnonymizationPipelineService {
     processId: string,
     recordCount: number,
     config: AnonymizationConfig,
-    quality: any,
+    quality: Record<string, unknown>,
   ): AnonymizationAudit {
     return {
       processId,
@@ -670,11 +671,37 @@ export class AnonymizationPipelineService {
         differentialPrivacy: config.differentialPrivacy.epsilon,
         linkageProtection: true,
       },
-      qualityAssessment: quality,
+      qualityAssessment: quality as AnonymizationAudit['qualityAssessment'],
       complianceStatus: {
-        hipaaCompliant: quality.riskAssessment !== 'high',
+        hipaaCompliant: quality['riskAssessment'] !== 'high',
         gdprCompliant: config.kAnonymity >= 5,
         localRegulationsCompliant: true,
+      },
+    }
+  }
+
+  /**
+   * Anonymize a single session data record (convenience wrapper for anonymizeTherapeuticData)
+   */
+  async anonymizeSessionData(
+    record: Record<string, unknown>,
+    config: Partial<AnonymizationConfig>,
+    purpose: string,
+  ): Promise<{ anonymizedRecord: AnonymizedRecord }> {
+    const result = await this.anonymizeTherapeuticData([record], purpose, config)
+    return {
+      anonymizedRecord: result.anonymizedData[0] ?? {
+        originalId: '',
+        anonymizedId: this.generateAnonymizedId(''),
+        anonymizationLevel: 'enhanced',
+        timestamp: new Date().toISOString(),
+        retentionExpiry: this.calculateRetentionExpiry(),
+        dataFields: record,
+        qualityMetrics: {
+          informationLoss: 0,
+          kAnonymityLevel: 1,
+          privacyBudgetUsed: 0,
+        },
       },
     }
   }
