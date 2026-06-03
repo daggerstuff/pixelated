@@ -5,14 +5,14 @@
 
 import * as crypto from 'crypto'
 
-import { AutomatedThreatResponseOrchestratorConfig } from './AutomatedThreatResponseOrchestrator'
-import { EdgeThreatDetectionSystemConfig } from './EdgeThreatDetectionSystem'
-import { ExternalThreatFeedIntegrationConfig } from './ExternalThreatFeedIntegration'
-import { GlobalThreatIntelligenceNetworkConfig } from './GlobalThreatIntelligenceNetwork'
-import { ThreatCorrelationEngineConfig } from './ThreatCorrelationEngine'
-import { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
-import { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
-import { ThreatValidationSystemConfig } from './ThreatValidationSystem'
+import type { ResponseOrchestratorConfig } from './AutomatedThreatResponseOrchestrator'
+import type { EdgeDetectionConfig } from './EdgeThreatDetectionSystem'
+import type { ExternalThreatFeedIntegrationConfig } from './ExternalThreatFeedIntegration'
+import type { GlobalThreatNetworkConfig } from './GlobalThreatIntelligenceNetwork'
+import type { CorrelationEngineConfig } from './ThreatCorrelationEngine'
+import type { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
+import type { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
+import type { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
 /**
  * Generates a dynamic fallback secret for non-production environments.
@@ -108,7 +108,7 @@ export const threatIntelDatabaseConfig: ThreatIntelligenceDatabaseConfig = {
   },
 }
 
-export const globalThreatIntelConfig: GlobalThreatIntelligenceNetworkConfig = {
+export const globalThreatIntelConfig: GlobalThreatNetworkConfig = {
   ...baseConfig,
   regions: {
     us_east_1: {
@@ -157,7 +157,7 @@ export const globalThreatIntelConfig: GlobalThreatIntelligenceNetworkConfig = {
   },
 }
 
-export const edgeThreatDetectionConfig: EdgeThreatDetectionSystemConfig = {
+export const edgeThreatDetectionConfig: EdgeDetectionConfig = {
   ...baseConfig,
   edge_locations: baseConfig.regions.edge_locations.map((location, index) => ({
     id: `edge-${index + 1}`,
@@ -219,7 +219,7 @@ export const edgeThreatDetectionConfig: EdgeThreatDetectionSystemConfig = {
   },
 }
 
-export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
+export const threatCorrelationConfig: CorrelationEngineConfig = {
   ...baseConfig,
   correlation_algorithms: {
     temporal: {
@@ -291,7 +291,7 @@ export const threatCorrelationConfig: ThreatCorrelationEngineConfig = {
   },
 }
 
-export const threatResponseConfig: AutomatedThreatResponseOrchestratorConfig = {
+export const threatResponseConfig: ResponseOrchestratorConfig = {
   ...baseConfig,
   response_strategies: {
     automatic: {

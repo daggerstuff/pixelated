@@ -33,50 +33,65 @@ export interface PatientContact {
 // Patient profile for clinical use
 export interface PatientProfile {
   id: string
-  patientId: string
-  demographics: {
-    age: number
-    gender: string
-    ethnicity?: string
-    language?: string
+  name: string
+  age: number
+  gender?: string
+  contact?: {
+    email?: string
+    phone?: string
+    address?: string
   }
-  medicalHistory: string[]
-  currentMedications: string[]
-  allergies: string[]
-  diagnoses: string[]
-  riskFactors: string[]
-  lastVisit?: Date
-  nextAppointment?: Date
+  emergencyContact?: {
+    name: string
+    phone: string
+    relationship: string
+  }
+  therapistId?: string
+  diagnosis: string[]
+  riskLevel: 'low' | 'medium' | 'high' | 'critical'
+  treatmentStatus: 'active' | 'inactive' | 'completed' | 'discharged'
+  progress: number
+  sessionHistory?: Array<{
+    date: Date
+    type: string
+    duration: number
+    emotionAnalysis?: {
+      moodScore: number
+      dominantEmotion: string
+    }
+  }>
+  notes?: string
+  milestones?: string[]
+  achievements?: string[]
+  barriers?: string[]
+  observations?: string[]
+  followUpSchedule?: string[]
+  supportResources?: string[]
+  warningSigns?: string[]
+  customFields?: Record<string, any>
+  treatmentPlan?: TreatmentPlan
+  encryptedFields: string[]
+  createdAt: Date
+  updatedAt: Date
+  lastSeen?: Date
 }
 
 // Treatment plan
 export interface TreatmentPlan {
-  id: string
-  patientId: string
-  diagnosis: string
   goals: string[]
-  interventions: string[]
-  medications?: string[]
-  therapyType?: string
-  frequency?: string
-  duration?: string
-  startDate: Date
+  interventions?: string[]
+  startDate?: Date
   endDate?: Date
-  status: 'active' | 'completed' | 'discontinued'
-  notes?: string[]
+  status?: 'active' | 'completed' | 'discontinued'
 }
 
 // Progress metrics
 export interface ProgressMetrics {
-  id: string
-  patientId: string
-  treatmentPlanId: string
-  timestamp: Date
-  symptoms: Record<string, number>
-  functioning: number
+  overallProgress: number
+  sessionAttendance: number
+  homeworkCompletion: number
+  goalAchievement: number
+  symptomImprovement: number
+  functionalImprovement: number
   qualityOfLife: number
-  adherence: number
-  sessionCount: number
-  improvements: string[]
-  concerns: string[]
 }

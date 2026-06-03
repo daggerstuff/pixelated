@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -24,8 +24,8 @@ export interface ThreatValidationSystem {
   initialize(): Promise<void>
   validateThreat(threat: GlobalThreatIntelligence): Promise<ThreatValidation>
   validateIndicators(indicators: ThreatIndicator[]): Promise<ValidationResult>
-  validateAttribution(attribution: any): Promise<ValidationResult>
-  validateMetadata(metadata: any): Promise<ValidationResult>
+  validateAttribution(attribution: Record<string, unknown>): Promise<ValidationResult>
+  validateMetadata(metadata: Record<string, unknown>): Promise<ValidationResult>
   getValidationHistory(
     threatId: string,
     limit?: number,
@@ -102,7 +102,7 @@ export class ThreatValidationSystemCore
       this.emit('validation_system_initialized')
       logger.info('Threat Validation System initialized successfully')
     } catch (error: unknown) {
-      logger.error('Failed to initialize Threat Validation System:', { error })
+      logger.error('Failed to initialize Threat Validation System:', { error: error instanceof Error ? error.message : String(error) })
       this.emit('initialization_error', { error })
       throw error
     }
@@ -572,7 +572,7 @@ export class ThreatValidationSystemCore
     return duplicates
   }
 
-  async validateAttribution(attribution: any): Promise<ValidationResult> {
+  async validateAttribution(attribution: Record<string, unknown>): Promise<ValidationResult> {
     try {
       const issues: string[] = []
       let score = 100
@@ -647,7 +647,7 @@ export class ThreatValidationSystemCore
     }
   }
 
-  async validateMetadata(metadata: any): Promise<ValidationResult> {
+  async validateMetadata(metadata: Record<string, unknown>): Promise<ValidationResult> {
     try {
       const issues: string[] = []
       let score = 100
@@ -800,7 +800,7 @@ export class ThreatValidationSystemCore
   }
 
   private async evaluateValidationCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): Promise<{ passed: boolean; message: string }> {
     try {
@@ -831,43 +831,43 @@ export class ThreatValidationSystemCore
   }
 
   private evaluateFieldExistsCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
     const exists = value !== undefined && value !== null
 
     return {
-      passed: condition.required ? exists : !exists,
-      message: condition.required
-        ? `Field ${condition.field} must exist`
-        : `Field ${condition.field} must not exist`,
+      passed: (condition['required'] as boolean) ? exists : !exists,
+      message: (condition['required'] as boolean)
+        ? `Field ${condition['field'] as string} must exist`
+        : `Field ${condition['field'] as string} must not exist`,
     }
   }
 
   private evaluateFieldValueCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
 
-    if (condition.operator === 'equals') {
-      const passed = value === condition.value
+    if (condition['operator'] === 'equals') {
+      const passed = value === condition['value']
       return {
         passed,
         message: passed
           ? ''
-          : `Field ${condition.field} must equal ${condition.value}`,
+          : `Field ${condition['field'] as string} must equal ${condition['value']}`,
       }
     }
 
-    if (condition.operator === 'not_equals') {
-      const passed = value !== condition.value
+    if (condition['operator'] === 'not_equals') {
+      const passed = value !== condition['value']
       return {
         passed,
         message: passed
           ? ''
-          : `Field ${condition.field} must not equal ${condition.value}`,
+          : `Field ${condition['field'] as string} must not equal ${condition['value']}`,
       }
     }
 
@@ -875,54 +875,54 @@ export class ThreatValidationSystemCore
   }
 
   private evaluateRegexMatchCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
 
     if (typeof value !== 'string') {
       return {
         passed: false,
-        message: `Field ${condition.field} must be a string for regex matching`,
+        message: `Field ${condition['field'] as string} must be a string for regex matching`,
       }
     }
 
-    const regex = new RegExp(condition.pattern)
+    const regex = new RegExp(condition['pattern'] as string)
     const passed = regex.test(value)
 
     return {
       passed,
       message: passed
         ? ''
-        : `Field ${condition.field} must match pattern ${condition.pattern}`,
+        : `Field ${condition['field'] as string} must match pattern ${condition['pattern'] as string}`,
     }
   }
 
   private evaluateRangeCheckCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
     const numValue = Number(value)
 
     if (isNaN(numValue)) {
       return {
         passed: false,
-        message: `Field ${condition.field} must be a number for range check`,
+        message: `Field ${condition['field'] as string} must be a number for range check`,
       }
     }
 
-    if (condition.min !== undefined && numValue < condition.min) {
+    if (condition['min'] !== undefined && numValue < (condition['min'] as number)) {
       return {
         passed: false,
-        message: `Field ${condition.field} must be >= ${condition.min}`,
+        message: `Field ${condition['field'] as string} must be >= ${condition['min'] as number}`,
       }
     }
 
-    if (condition.max !== undefined && numValue > condition.max) {
+    if (condition['max'] !== undefined && numValue > (condition['max'] as number)) {
       return {
         passed: false,
-        message: `Field ${condition.field} must be <= ${condition.max}`,
+        message: `Field ${condition['field'] as string} must be <= ${condition['max'] as number}`,
       }
     }
 
@@ -930,15 +930,16 @@ export class ThreatValidationSystemCore
   }
 
   private evaluateWhitelistCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
+    const values = condition['values'] as unknown[]
 
-    if (!condition.values.includes(value)) {
+    if (!values.includes(value)) {
       return {
         passed: false,
-        message: `Field ${condition.field} must be one of: ${condition.values.join(', ')}`,
+        message: `Field ${condition['field'] as string} must be one of: ${(values as string[]).join(', ')}`,
       }
     }
 
@@ -946,15 +947,16 @@ export class ThreatValidationSystemCore
   }
 
   private evaluateBlacklistCondition(
-    condition: any,
+    condition: Record<string, unknown>,
     threat: GlobalThreatIntelligence,
   ): { passed: boolean; message: string } {
-    const value = this.getNestedValue(threat, condition.field)
+    const value = this.getNestedValue(threat, condition['field'] as string)
+    const values = condition['values'] as unknown[]
 
-    if (condition.values.includes(value)) {
+    if (values.includes(value)) {
       return {
         passed: false,
-        message: `Field ${condition.field} must not be one of: ${condition.values.join(', ')}`,
+        message: `Field ${condition['field'] as string} must not be one of: ${(values as string[]).join(', ')}`,
       }
     }
 
