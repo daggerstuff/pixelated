@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, beforeEach } from 'vitest'
 
-import { setupContainment } from './performance-optimization'
+import { setupContainment, optimizeCLS } from './performance-optimization'
 
 describe('performance-optimization', () => {
   beforeEach(() => {
@@ -25,6 +25,35 @@ describe('performance-optimization', () => {
       // Assertions
       expect(el1.style.contain).toBe('strict')
       expect(el2.style.contain).toBe('strict')
+    })
+  })
+
+  describe('optimizeCLS', () => {
+    it('should set aspect ratio on images and iframes without dimensions', () => {
+      // Setup DOM
+      const imgNoDims = document.createElement('img')
+      const imgWithDims = document.createElement('img')
+      imgWithDims.width = 100
+      imgWithDims.height = 100
+
+      const iframeNoDims = document.createElement('iframe')
+      const iframeWithDims = document.createElement('iframe')
+      iframeWithDims.width = '200'
+      iframeWithDims.height = '200'
+
+      document.body.appendChild(imgNoDims)
+      document.body.appendChild(imgWithDims)
+      document.body.appendChild(iframeNoDims)
+      document.body.appendChild(iframeWithDims)
+
+      // Call function
+      optimizeCLS()
+
+      // Assertions
+      expect(imgNoDims.style.aspectRatio).toBe('16/9')
+      expect(iframeNoDims.style.aspectRatio).toBe('16/9')
+      expect(imgWithDims.style.aspectRatio).toBe('')
+      expect(iframeWithDims.style.aspectRatio).toBe('')
     })
   })
 })

@@ -87,13 +87,13 @@ export const GET = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in GET /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
@@ -195,13 +195,13 @@ export const POST = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in POST /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
@@ -295,13 +295,13 @@ export const PUT = async ({ request }: APIContext) => {
     })
   } catch (error: unknown) {
     logger.error('Error in PUT /api/crisis/session-flags', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error : error,
     })
 
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,

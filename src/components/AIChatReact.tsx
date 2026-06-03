@@ -161,7 +161,7 @@ export default function AIChatReact({
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setInputValue(e.target.value)
           }
-          className="border-gray-300 dark:border-gray-600 focus:ring-blue-500 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2"
+          className="border-gray-300 dark:border-gray-600 focus:ring-blue-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white flex-1 rounded-l-lg border px-4 py-2 focus:outline-none focus:ring-2"
           placeholder="Type your message..."
           disabled={isLoading}
           aria-label="Type a message to the AI assistant"
@@ -170,7 +170,7 @@ export default function AIChatReact({
         <button
           type="submit"
           disabled={isLoading || !inputValue.trim()}
-          className="bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-500 disabled:bg-blue-300 dark:disabled:bg-blue-800 rounded-r-lg px-4 py-2 focus:outline-none focus:ring-2"
+          className="bg-blue-500 text-white hover:bg-blue-600 focus:ring-blue-700 disabled:bg-blue-300 dark:disabled:bg-blue-800 rounded-r-lg px-4 py-2 focus:outline-none focus:ring-2"
           aria-label={isLoading ? 'Sending message...' : 'Send message'}
         >
           Send
