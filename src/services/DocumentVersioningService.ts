@@ -3,7 +3,8 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 import { v4 as uuidv4 } from 'uuid'
 
-import { FileStorageService, FileMetadata } from './FileStorageService.js'
+import type { FileMetadata } from './FileStorageService.js'
+import { FileStorageService } from './FileStorageService.js'
 
 export interface DocumentVersion {
   id: string
@@ -26,6 +27,11 @@ export interface VersionHistory {
   currentVersion: DocumentVersion
 }
 
+interface SqlExecutor {
+  execute(query: unknown): Promise<{ rows: Record<string, unknown>[] }>;
+  transaction<T>(cb: (tx: SqlExecutor) => Promise<T>): Promise<T>;
+}
+
 export class DocumentVersioningService {
   private readonly db: Pool
   private readonly fileStorage: FileStorageService
@@ -41,7 +47,7 @@ export class DocumentVersioningService {
     originalFileId?: string,
     changes?: string,
   ): Promise<{ file: FileMetadata; version: DocumentVersion }> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     return await db.transaction(async (tx) => {
       let fileId: string
@@ -107,7 +113,7 @@ export class DocumentVersioningService {
    * Internal helper to fetch file version using either transaction or pool
    */
   private async getFileVersionInternal(
-    executor: { execute: (s: { text: string; values?: unknown[] }) => Promise<{ rows: Record<string, unknown>[] }> },
+    executor: { execute: (s: unknown) => Promise<{ rows: Record<string, unknown>[] }> },
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
@@ -138,11 +144,11 @@ export class DocumentVersioningService {
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
-    return this.getFileVersionInternal(drizzle(this.db), fileId, version)
+    return this.getFileVersionInternal(drizzle(this.db) as unknown as SqlExecutor, fileId, version)
   }
 
   async getCurrentVersion(fileId: string): Promise<DocumentVersion | null> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
     const result = await db.execute(
       sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND is_current = true LIMIT 1`,
     )
@@ -167,7 +173,7 @@ export class DocumentVersioningService {
   }
 
   async getVersionHistory(fileId: string): Promise<VersionHistory> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     const fileResult = await db.execute(
       sql`SELECT * FROM files WHERE id = ${fileId} LIMIT 1`,
@@ -219,7 +225,7 @@ export class DocumentVersioningService {
     return {
       file,
       versions,
-      currentVersion: currentVersion,
+      currentVersion: currentVersion as DocumentVersion,
     }
   }
 
@@ -228,7 +234,7 @@ export class DocumentVersioningService {
     targetVersion: number,
     userId: string,
   ): Promise<DocumentVersion> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     return await db.transaction(async (tx) => {
       // Get the target version
@@ -245,7 +251,7 @@ export class DocumentVersioningService {
       return await this.createFileVersionFromExisting(
         tx,
         fileId,
-        targetVersionRow.s3_key as string,
+        targetVersionRow['s3_key'] as string,
         userId,
         `Rolled back to version ${targetVersion}`,
       )
@@ -253,19 +259,19 @@ export class DocumentVersioningService {
   }
 
   async deleteFileVersion(fileId: string, version: number): Promise<void> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     await db.transaction(async (tx) => {
       const result = await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
-      )
+      ) as unknown as { rows: Record<string, unknown>[] }
       const versionRow = result.rows[0] as Record<string, unknown>
 
       if (!versionRow) {
         throw new Error('Version not found')
       }
 
-      const s3Key = versionRow.s3_key as string
+      const s3Key = versionRow['s3_key'] as string
 
       // Delete from S3
       await this.fileStorage.deleteFile(s3Key)
@@ -283,7 +289,7 @@ export class DocumentVersioningService {
     parentId?: string,
   ): Promise<string> {
     const folderId = uuidv4()
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     await db.execute(sql`
       INSERT INTO folders (id, name, parent_id, owner_id)
@@ -300,7 +306,7 @@ export class DocumentVersioningService {
     files: FileMetadata[]
     folders: Array<{ id: string; name: string; fileCount: number }>
   }> {
-    const db = drizzle(this.db)
+    const db = drizzle(this.db) as unknown as SqlExecutor
 
     // Get files in folder
     const filesResult = await db.execute(sql`
@@ -309,7 +315,7 @@ export class DocumentVersioningService {
       LEFT JOIN file_permissions fp ON f.id = fp.file_id AND fp.user_id = ${userId}
       WHERE f.folder_id = ${folderId} AND (f.is_public = TRUE OR f.uploaded_by = ${userId} OR fp.permission_type IS NOT NULL)
       ORDER BY f.uploaded_at DESC
-    `)
+    `) as unknown as { rows: Record<string, unknown>[] }
 
     const files: FileMetadata[] = filesResult.rows.map((r: Record<string, unknown>) => ({
       id: r['id'] as string,
@@ -336,12 +342,12 @@ export class DocumentVersioningService {
       WHERE f.parent_id = ${folderId} AND f.owner_id = ${userId}
       GROUP BY f.id, f.name
       ORDER BY f.name
-    `)
+    `) as unknown as { rows: Record<string, unknown>[] }
 
     const folders = foldersResult.rows.map((row: Record<string, unknown>) => ({
-      id: row.id as string,
-      name: row.name as string,
-      fileCount: parseInt(row.file_count as string),
+      id: row['id'] as string,
+      name: row['name'] as string,
+      fileCount: parseInt(row['file_count'] as string, 10),
     }))
 
     return { files, folders }
@@ -352,7 +358,7 @@ export class DocumentVersioningService {
   }
 
   private async createFileVersionFromExisting(
-    executor: { execute: (s: { text: string; values?: unknown[] }) => Promise<{ rows: Record<string, unknown>[] }> },
+    executor: { execute: (s: unknown) => Promise<{ rows: Record<string, unknown>[] }> },
     fileId: string,
     s3Key: string,
     userId: string,
@@ -361,7 +367,8 @@ export class DocumentVersioningService {
     const versionResult = await executor.execute(
       sql`SELECT MAX(version) as max_version FROM file_versions WHERE file_id = ${fileId}`,
     )
-    const newVersion = (Number(versionResult.rows[0]?.max_version) || 0) + 1
+    const versionRow0 = versionResult.rows[0] as Record<string, unknown> | undefined
+    const newVersion = (Number(versionRow0?.['max_version']) || 0) + 1
 
     const versionId = uuidv4()
     await executor.execute(sql`

@@ -59,21 +59,7 @@ export class DeveloperApiKeyManager {
       ? new Date(Date.now() + input.expires_in_days * 24 * 60 * 60 * 1000)
       : null
 
-    const result = await query<{
-      id: string
-      user_id: string
-      key_hash: string
-      key_prefix: string
-      name: string
-      scopes: string[]
-      rate_limit: number
-      is_active: boolean
-      last_used_at: Date | null
-      last_failed_at: Date | null
-      expires_at: Date | null
-      created_at: Date
-      updated_at: Date
-    }>(
+    const result = await query(
       `INSERT INTO developer_api_keys (
         user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, expires_at
       ) VALUES ($1, $2, $3, $4, $5, $6, true, $7)
@@ -89,12 +75,12 @@ export class DeveloperApiKeyManager {
       ],
     )
 
-    const apiKey = result.rows[0]
+    const apiKey = result.rows[0] as Record<string, unknown> | undefined
     return {
       api_key: {
         ...apiKey,
         key_hash: '',
-        scopes: (apiKey.scopes as ApiKeyScope[]) || DEFAULT_SCOPES,
+        scopes: (apiKey?.['scopes'] as ApiKeyScope[]) || DEFAULT_SCOPES,
       } as DeveloperApiKey,
       plain_key: rawKey,
     }
@@ -108,14 +94,14 @@ export class DeveloperApiKeyManager {
     const keyHash = this.hashKey(rawKey)
     const keyPrefix = rawKey.substring(0, 8)
 
-    const result = await query<DeveloperApiKey>(
+    const result = await query(
       `SELECT id, user_id, key_hash, key_prefix, name, scopes, rate_limit, is_active, last_used_at, last_failed_at, expires_at, created_at, updated_at
        FROM developer_api_keys
        WHERE key_prefix = $1 AND key_hash = $2 AND is_active = true`,
       [keyPrefix, keyHash],
     )
 
-    const apiKey = result.rows[0]
+    const apiKey = result.rows[0] as unknown as DeveloperApiKey | undefined
 
     if (!apiKey) {
       return { valid: false, error: 'Invalid API key' }

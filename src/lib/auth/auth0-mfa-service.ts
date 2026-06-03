@@ -528,7 +528,8 @@ export class Auth0MFAService {
    */
   async getUserPreferredFactor(userId: string): Promise<MFAFactor | null> {
     const factors = await this.getUserFactors(userId)
-    return factors.length > 0 ? factors[0] : null
+    return (factors.length > 0 ? factors[0] : null) as MFAFactor | null
+
   }
 
   /**

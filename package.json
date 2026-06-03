@@ -354,13 +354,8 @@
     "@unocss/astro": "^66.7.0",
     "@unocss/core": "^66.7.0",
     "@unocss/reset": "^66.7.0",
-<<<<<<< HEAD
     "@vitejs/plugin-react": "^6.0.2",
-    "@vitest/coverage-v8": "^4.1.7",
-=======
-    "@vitejs/plugin-react": "^5.1.4",
     "@vitest/coverage-v8": "^4.1.8",
->>>>>>> origin/staging
     "@vitest/eslint-plugin": "latest",
     "astro": "^6.4.3",
     "astro-eslint-parser": "latest",

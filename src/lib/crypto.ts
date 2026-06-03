@@ -48,7 +48,11 @@ export function createCryptoSystem(options: CryptoSystemOptions): CryptoSystem {
           throw new Error('Invalid encrypted data')
         }
 
-        const dataArray = parts?.[2].split(',').map(Number)
+        const thirdPart = parts?.[2]
+        if (thirdPart === undefined) {
+          throw new Error('Invalid encrypted data')
+        }
+        const dataArray = thirdPart.split(',').map(Number)
         const decoder = new TextDecoder()
         return decoder.decode(new Uint8Array(dataArray))
       } catch (error: unknown) {

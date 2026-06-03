@@ -413,8 +413,8 @@ export function shuffle<T>(input: readonly T[]): T[] {
     const j = secureRandomInt(i + 1)
     // No need for bounds check: arr is dense (checked above)
     // The preceding assertDense() guarantees no holes, safe to non-null '!'.
-    const temp: T = denseArr[i]
-    denseArr[i] = denseArr[j]!
+    const temp: T = denseArr[i] as T
+    denseArr[i] = denseArr[j] as T
     denseArr[j] = temp
   }
   return denseArr
