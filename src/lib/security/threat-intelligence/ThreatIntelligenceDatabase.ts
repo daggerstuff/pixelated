@@ -6,13 +6,13 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection, ObjectId } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
 import { logger } from '../../logger'
 import { auditLog } from '../audit-logging'
-import { encrypt, decrypt } from '../encryption'
+import { encrypt, decrypt } from '../../encryption'
 
 // STIX 2.1 Types
 export interface STIXObject {
@@ -165,12 +165,12 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
   private db!: Db
   private stixCollection!: Collection<DatabaseThreatIntelligence>
   private collectionsCollection!: Collection<DatabaseCollection>
-  private manifestCollection: Collection<TAXIIManifestEntry>
+  private manifestCollection!: Collection<TAXIIManifestEntry>
   private redis!: Redis
   private isInitialized = false
   private indexingInterval: NodeJS.Timeout | null = null
 
-  constructor(private readonly config: ThreatIntelligenceDatabaseConfig) {
+  constructor(private readonly _config: ThreatIntelligenceDatabaseConfig) {
     super()
     this.setMaxListeners(0)
   }
@@ -183,9 +183,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       logger.info('Initializing Threat Intelligence Database')
 
       // Initialize MongoDB connection
-      this.mongoClient = new MongoClient(this.config.mongodb.url)
+      this.mongoClient = new MongoClient(this._config.mongodb.url)
       await this.mongoClient.connect()
-      this.db = this.mongoClient.db(this.config.mongodb.database)
+      this.db = this.mongoClient.db(this._config.mongodb.database)
 
       // Initialize collections
       this.stixCollection =
@@ -199,14 +199,14 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       await this.createIndexes()
 
       // Initialize Redis connection
-      this.redis = new Redis(this.config.redis.url, {
-        password: this.config.redis.password,
+      this.redis = new Redis(this._config.redis.url, {
+        password: this._config.redis.password,
         enableReadyCheck: true,
         maxRetriesPerRequest: 3,
       })
 
       // Initialize TAXII collections if enabled
-      if (this.config.taxii.enabled) {
+      if (this._config.taxii.enabled) {
         await this.initializeTAXIICollections()
       }
 
@@ -276,7 +276,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
    */
   private async initializeTAXIICollections(): Promise<void> {
     try {
-      for (const collection of this.config.taxii.collections) {
+      for (const collection of this._config.taxii.collections) {
         const existing = await this.collectionsCollection.findOne({
           collection_id: collection.id,
         })
@@ -361,10 +361,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Encrypt sensitive data if enabled
-      if (this.config.encryption.enabled) {
+      if (this._config.encryption.enabled) {
         const encryptedData = await encrypt(
           JSON.stringify(stixObject),
-          this.config.encryption.key,
         )
         dataToStore = {
           ...dataToStore,
@@ -375,9 +374,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Calculate expiration date
       const ttl =
-        this.config.retention.stix_types[stixObject.type] ??
-        this.config.retention.default_ttl
-      if (this.config.retention.enabled && ttl > 0) {
+        this._config.retention.stix_types[stixObject.type] ??
+        this._config.retention.default_ttl
+      if (this._config.retention.enabled && ttl > 0) {
         dataToStore.expires_at = new Date(Date.now() + ttl * 1000)
       }
 
@@ -389,14 +388,14 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       )
 
       // Update TAXII manifest
-      if (this.config.taxii.enabled && metadata.collection_id) {
+      if (this._config.taxii.enabled && metadata.collection_id) {
         await this.updateTAXIIManifest(stixObject.id, metadata.collection_id)
       }
 
       // Cache the result
       await this.redis.setex(
         cacheKey,
-        this.config.performance.cache_ttl,
+        this._config.performance.cache_ttl,
         JSON.stringify({ stix_id: stixObject.id, cached: true }),
       )
 
@@ -544,10 +543,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Decrypt if necessary
-      if (result.encrypted_data && this.config.encryption.enabled) {
+      if (result.encrypted_data && this._config.encryption.enabled) {
         const decryptedData = await decrypt(
           result.encrypted_data,
-          this.config.encryption.key,
         )
         return JSON.parse(decryptedData)
       }
@@ -613,9 +611,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Decrypt and return objects
       const decryptedObjects = objects.map((obj) => {
-        if (obj.encrypted_data && this.config.encryption.enabled) {
+        if (obj.encrypted_data && this._config.encryption.enabled) {
           return JSON.parse(
-            decrypt(obj.encrypted_data, this.config.encryption.key),
+            decrypt(obj.encrypted_data),
           )
         }
         return obj.stix_object
@@ -748,7 +746,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       const limit = Math.min(
         options.limit ?? 100,
-        this.config.taxii.max_page_size,
+        this._config.taxii.max_page_size,
       )
       const offset = options.offset ?? 0
 
@@ -769,9 +767,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Decrypt and return objects
       const decryptedObjects = objects.map((obj) => {
-        if (obj.encrypted_data && this.config.encryption.enabled) {
+        if (obj.encrypted_data && this._config.encryption.enabled) {
           return JSON.parse(
-            decrypt(obj.encrypted_data, this.config.encryption.key),
+            decrypt(obj.encrypted_data),
           )
         }
         return obj.stix_object
@@ -840,10 +838,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Get the actual STIX object
       let stixObject = obj.stix_object
-      if (obj.encrypted_data && this.config.encryption.enabled) {
+      if (obj.encrypted_data && this._config.encryption.enabled) {
         const decryptedData = await decrypt(
           obj.encrypted_data,
-          this.config.encryption.key,
         )
         stixObject = JSON.parse(decryptedData)
       }
@@ -861,10 +858,10 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       // Additional validation rules
       if (
         stixObject.spec_version &&
-        stixObject.spec_version !== this.config.stix.spec_version
+        stixObject.spec_version !== this._config.stix.spec_version
       ) {
         warnings.push(
-          `STIX spec version mismatch: ${stixObject.spec_version} vs ${this.config.stix.spec_version}`,
+          `STIX spec version mismatch: ${stixObject.spec_version} vs ${this._config.stix.spec_version}`,
         )
       }
 
@@ -905,10 +902,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Get the actual STIX object
       let stixObject = obj.stix_object
-      if (obj.encrypted_data && this.config.encryption.enabled) {
+      if (obj.encrypted_data && this._config.encryption.enabled) {
         const decryptedData = await decrypt(
           obj.encrypted_data,
-          this.config.encryption.key,
         )
         stixObject = JSON.parse(decryptedData)
       }
@@ -938,10 +934,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Update processed data
       const updatedData = stixObject
-      if (this.config.encryption.enabled && obj.encrypted_data) {
+      if (this._config.encryption.enabled && obj.encrypted_data) {
         const encryptedData = await encrypt(
           JSON.stringify(updatedData),
-          this.config.encryption.key,
         )
         await this.stixCollection.updateOne(
           { stix_id: stixId },
@@ -1004,7 +999,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Add default labels if missing
       if (!indicator.labels || indicator.labels.length === 0) {
-        indicator.labels = this.config.stix.default_labels
+        indicator.labels = this._config.stix.default_labels
         enrichments.push('default_labels_added')
       }
 
@@ -1080,7 +1075,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
    * Validate kill chain phase
    */
   private isValidKillChainPhase(phase: KillChainPhase): boolean {
-    return this.config.stix.kill_chain_phases.some(
+    return this._config.stix.kill_chain_phases.some(
       (validPhase) =>
         validPhase.kill_chain_name === phase.kill_chain_name &&
         validPhase.phase_name === phase.phase_name,
@@ -1093,7 +1088,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
   private startIndexingService(): void {
     this.indexingInterval = setInterval(async () => {
       await this.performIndexing()
-    }, this.config.performance.indexing_interval)
+    }, this._config.performance.indexing_interval)
   }
 
   /**
@@ -1113,7 +1108,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
         const unprocessed = await this.stixCollection
           .find({ 'metadata.processed': false })
-          .limit(this.config.performance.batch_size)
+          .limit(this._config.performance.batch_size)
           .toArray()
 
         for (const obj of unprocessed) {
@@ -1129,7 +1124,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Clean up expired objects
-      if (this.config.retention.enabled) {
+      if (this._config.retention.enabled) {
         const expiredCount = await this.stixCollection.countDocuments({
           expires_at: { $lt: new Date() },
         })
@@ -1235,9 +1230,9 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
 
       // Decrypt objects
       const decryptedObjects = objects.map((obj) => {
-        if (obj.encrypted_data && this.config.encryption.enabled) {
+        if (obj.encrypted_data && this._config.encryption.enabled) {
           return JSON.parse(
-            decrypt(obj.encrypted_data, this.config.encryption.key),
+            decrypt(obj.encrypted_data),
           )
         }
         return obj.stix_object
@@ -1247,7 +1242,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       const bundle = {
         type: 'bundle',
         id: `bundle--${uuidv4()}`,
-        spec_version: this.config.stix.spec_version,
+        spec_version: this._config.stix.spec_version,
         objects: decryptedObjects,
       }
 
@@ -1342,7 +1337,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
    * Get configuration
    */
   get config(): ThreatIntelligenceDatabaseConfig {
-    return this.config
+    return this._config
   }
 }
 

@@ -23,9 +23,9 @@ export interface ISalesOpportunity {
   amount: number
   probability: number
   accountName: string
-  activity: any[]
-  contacts: any[]
-  competitors: any[]
+  activity: Array<Record<string, unknown>>
+  contacts: Array<Record<string, unknown>>
+  competitors: Array<Record<string, unknown>>
   permissions: {
     view: string[]
     edit: string[]
@@ -36,8 +36,8 @@ export interface ISalesOpportunity {
   save(): Promise<ISalesOpportunity>
 }
 
-const getSalesOpportunityModel = (): any =>
-  getMongoConnection().model<ISalesOpportunity>('SalesOpportunity')
+const getSalesOpportunityModel = () =>
+  getMongoConnection().model('SalesOpportunity')
 
 /**
  * Create a new sales opportunity
@@ -189,7 +189,7 @@ export async function updateSalesOpportunity(
     title?: string
     value?: number
     stage?: string
-    contacts?: any[]
+    contacts?: Array<Record<string, unknown>>
     expectedCloseDate?: Date
     probability?: number
     status?: string
@@ -266,7 +266,7 @@ export async function addActivity(
   activity: {
     type: 'call' | 'email' | 'meeting' | 'note'
     description: string
-    metadata?: any
+    metadata?: Record<string, unknown>
   },
 ) {
   const SalesOpportunityModel = getSalesOpportunityModel()
@@ -363,8 +363,7 @@ export async function listSalesOpportunities(
   const SalesOpportunityModel = getSalesOpportunityModel()
   const page = options.page ?? 1
   const limit = options.limit ?? 50
-
-  let query: any = {
+  const query: Record<string, unknown> = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }
 
@@ -403,7 +402,7 @@ export async function calculateForecast(userId: string) {
   let weightedForecast = 0
   let opportunityCount = 0
 
-  opportunities.forEach((opp: any) => {
+  opportunities.forEach((opp: ISalesOpportunity) => {
     if (opp.status === 'active') {
       opportunityCount++
       totalForecast += opp.amount ?? 0
