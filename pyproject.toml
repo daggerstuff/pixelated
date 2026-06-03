@@ -125,6 +125,7 @@ dependencies = [
   "selenium>=4.43.0",
   "undetected-chromedriver>=3.5.5",
   "localstack>=2026.5.0",
+  "python-telegram-bot>=22.7",
 ]
 [project.optional-dependencies]
 test = [
