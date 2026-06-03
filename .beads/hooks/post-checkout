@@ -2,8 +2,20 @@
 set -euo pipefail
 
 # Ensure the correct Node version from nvm is available in the hook environment
-export NVM_DIR="${NVM_DIR:-$HOME/.config/nvm}"
-[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+if [ -z "${NVM_DIR:-}" ]; then
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.nvm"
+  elif [ -s "$HOME/.config/nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.config/nvm"
+  fi
+fi
+
+if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+  if [ -f .nvmrc ]; then
+    nvm use --silent >/dev/null 2>&1 || nvm use || true
+  fi
+fi
 
 # Colors
 GREEN='\033[0;32m'
