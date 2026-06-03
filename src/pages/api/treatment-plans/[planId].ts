@@ -2,7 +2,9 @@ import type { APIRoute, APIContext } from 'astro'
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { treatmentPlanDAO } from '@/services/mongodb.dao'
 import type { TreatmentPlan } from '@/types/treatment'
+import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
 
 export const prerender = false
 
@@ -67,21 +69,75 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
 
     logger.info('Fetching treatment plan', { planId, userId: user.id })
 
-    // TODO: Replace with actual database implementation
-    // For now, return a mock plan to prevent build errors
+    // Fetch the treatment plan from the database
+    const dbPlan = await treatmentPlanDAO.findById(planId)
+
+    if (!dbPlan) {
+      return new Response(
+        JSON.stringify({ error: 'Treatment plan not found' }),
+        { status: 404 },
+      )
+    }
+
+    // Convert DB plan to the TreatmentPlan type expected by the API
     const plan: TreatmentPlan = {
-      id: planId,
-      clientId: user.id,
-      therapistId: user.id,
-      title: 'Mock Treatment Plan',
-      diagnosis: null,
-      startDate: new Date().toISOString(),
-      endDate: null,
-      status: 'Draft',
-      generalNotes: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      goals: [],
+      id: dbPlan.id ?? String(dbPlan._id),
+      clientId: dbPlan.clientId,
+      therapistId: dbPlan.therapistId,
+      title: dbPlan.title,
+      diagnosis: dbPlan.description,
+      startDate:
+        dbPlan.startDate instanceof Date
+          ? dbPlan.startDate.toISOString()
+          : String(dbPlan.startDate),
+      endDate: dbPlan.endDate
+        ? dbPlan.endDate instanceof Date
+          ? dbPlan.endDate.toISOString()
+          : String(dbPlan.endDate)
+        : null,
+      status: (dbPlan.status === 'paused'
+        ? 'Discontinued'
+        : dbPlan.status === 'draft'
+          ? 'Draft'
+          : dbPlan.status === 'active'
+            ? 'Active'
+            : 'Completed') as TreatmentPlan['status'],
+      generalNotes: dbPlan.notes,
+      createdAt:
+        dbPlan.createdAt instanceof Date
+          ? dbPlan.createdAt.toISOString()
+          : String(dbPlan.createdAt),
+      updatedAt:
+        dbPlan.updatedAt instanceof Date
+          ? dbPlan.updatedAt.toISOString()
+          : String(dbPlan.updatedAt),
+      goals: (dbPlan.goals as Array<{
+        id: string
+        title: string
+        description: string
+        targetDate: string
+        priority: string
+        status: string
+        progress: number
+        category: string
+        milestones: Array<unknown>
+        metrics?: unknown
+      }>)?.map((goal) => ({
+        id: goal.id,
+        treatmentPlanId: dbPlan.id ?? String(dbPlan._id),
+        description: goal.description,
+        targetDate: goal.targetDate ?? null,
+        status: goal.status as TreatmentPlan['goals'][number]['status'],
+        createdAt:
+          dbPlan.createdAt instanceof Date
+            ? dbPlan.createdAt.toISOString()
+            : String(dbPlan.createdAt),
+        updatedAt:
+          dbPlan.updatedAt instanceof Date
+            ? dbPlan.updatedAt.toISOString()
+            : String(dbPlan.updatedAt),
+        objectives: [],
+      })) ?? [],
     }
 
     return new Response(JSON.stringify(plan), { status: 200 })
@@ -136,21 +192,64 @@ export const PUT: APIRoute = async ({
 
     logger.info('Updating treatment plan', { planId, userId: user.id, updates })
 
-    // TODO: Replace with actual database implementation
-    // For now, return success to prevent build errors
+    // Map enhanced status to DB-compatible status
+    const statusMap: Record<string, string> = {
+      Draft: 'draft',
+      Active: 'active',
+      Completed: 'completed',
+      Discontinued: 'paused',
+      Archived: 'draft',
+    }
+
+    // Build the update object for the DAO
+    const dbUpdates: Partial<TreatmentPlanDB> = {
+      updatedAt: new Date(),
+    }
+
+    if (updates.title !== undefined) dbUpdates['title'] = updates.title
+    if (updates.diagnosis !== undefined) dbUpdates['description'] = updates.diagnosis ?? ''
+    if (updates.startDate !== undefined) dbUpdates['startDate'] = new Date(updates.startDate)
+    if (updates.endDate !== undefined) dbUpdates['endDate'] = updates.endDate ? new Date(updates.endDate) : undefined
+    if (updates.status !== undefined) dbUpdates['status'] = (statusMap[updates.status] ?? updates.status.toLowerCase()) as TreatmentPlanDB['status']
+    if (updates.generalNotes !== undefined) dbUpdates['notes'] = updates.generalNotes ?? ''
+
+    // Update in database
+    const updatedDbPlan = await treatmentPlanDAO.update(planId, dbUpdates)
+
+    if (!updatedDbPlan) {
+      return new Response(
+        JSON.stringify({ error: 'Treatment plan not found' }),
+        { status: 404 },
+      )
+    }
+
+    // Convert back to API response type
     const updatedPlan: TreatmentPlan = {
-      id: planId,
-      clientId: user.id,
-      therapistId: user.id,
-      title: updates.title ?? 'Updated Treatment Plan',
-      diagnosis: updates.diagnosis ?? null,
-      startDate: updates.startDate ?? new Date().toISOString(),
-      endDate: updates.endDate ?? null,
+      id: updatedDbPlan.id ?? String(updatedDbPlan._id),
+      clientId: updatedDbPlan.clientId,
+      therapistId: updatedDbPlan.therapistId,
+      title: updatedDbPlan.title,
+      diagnosis: updatedDbPlan.description,
+      startDate:
+        updatedDbPlan.startDate instanceof Date
+          ? updatedDbPlan.startDate.toISOString()
+          : String(updatedDbPlan.startDate),
+      endDate: updatedDbPlan.endDate
+        ? updatedDbPlan.endDate instanceof Date
+          ? updatedDbPlan.endDate.toISOString()
+          : String(updatedDbPlan.endDate)
+        : null,
       status: updates.status ?? 'Draft',
-      generalNotes: updates.generalNotes ?? null,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      goals: (updates.goals as any) ?? [],
+      generalNotes: updatedDbPlan.notes,
+      createdAt:
+        updatedDbPlan.createdAt instanceof Date
+          ? updatedDbPlan.createdAt.toISOString()
+          : String(updatedDbPlan.createdAt),
+      updatedAt:
+        updatedDbPlan.updatedAt instanceof Date
+          ? updatedDbPlan.updatedAt.toISOString()
+          : String(updatedDbPlan.updatedAt),
+      goals: (updates.goals as TreatmentPlan['goals']) ?? [],
     }
 
     return new Response(JSON.stringify(updatedPlan), { status: 200 })

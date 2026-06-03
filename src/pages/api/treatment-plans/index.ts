@@ -2,6 +2,7 @@
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { treatmentPlanDAO } from '@/services/mongodb.dao'
 
 import type { TreatmentPlan } from '../../../types/treatment'
 
@@ -57,9 +58,8 @@ export const GET = async ({ locals }) => {
 
     logger.info('Fetching treatment plans', { userId: user.id })
 
-    // TODO: Replace with actual database implementation
-    // For now, return empty array to prevent build errors
-    const plans: TreatmentPlan[] = []
+    // Fetch treatment plans from the database
+    const plans = await treatmentPlanDAO.findByUserId(user.id)
 
     return new Response(JSON.stringify(plans), { status: 200 })
   } catch (error: unknown) {
@@ -92,7 +92,7 @@ export const POST = async ({ request, locals }) => {
       return new Response(
         JSON.stringify({
           error: 'Invalid request data',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         }),
         { status: 400 },
       )
@@ -105,33 +105,93 @@ export const POST = async ({ request, locals }) => {
       title: planData.title,
     })
 
-    // TODO: Replace with actual database implementation
-    // For now, return a mock created plan
-    const planId = `plan-${Date.now()}`
-    const currentTime = new Date().toISOString()
+    // Map the enhanced status enum to the DB-compatible status
+    const statusMap: Record<string, string> = {
+      Draft: 'draft',
+      Active: 'active',
+      Completed: 'completed',
+      Discontinued: 'paused',
+      Archived: 'draft',
+    }
+    const dbStatus =
+      (statusMap[planData.status] as 'active' | 'completed' | 'paused' | 'draft') ?? 'draft'
 
-    const newPlan: TreatmentPlan = {
-      id: planId,
+    // Persist to database
+    const createdPlan = await treatmentPlanDAO.create({
       clientId: user.id,
       therapistId: user.id,
+      clientName: user.fullName ?? user.id,
+      therapistName: user.fullName ?? user.id,
       title: planData.title,
-      diagnosis: planData.diagnosis ?? null,
-      startDate: planData.startDate ?? currentTime,
-      endDate: planData.endDate ?? null,
+      description: planData.generalNotes ?? '',
+      goals: planData.goals.map((goal, index) => ({
+        id: `goal-${Date.now()}-${index}`,
+        title: goal.description,
+        description: goal.description,
+        targetDate: goal.targetDate ?? new Date().toISOString(),
+        priority: 'medium' as const,
+        status: 'not-started' as const,
+        progress: 0,
+        category: 'behavioral' as const,
+        milestones: goal.objectives.map((obj, objIndex) => ({
+          id: `milestone-${Date.now()}-${index}-${objIndex}`,
+          title: obj.description,
+          completed: obj.status === 'Completed',
+          completedDate: obj.status === 'Completed' ? new Date().toISOString() : undefined,
+          notes: obj.progressNotes ?? undefined,
+          dueDate: obj.targetDate ?? undefined,
+        })),
+        metrics: {
+          sessionsCompleted: 0,
+          exercisesAssigned: 0,
+          exercisesCompleted: 0,
+        },
+      })),
+      interventions: planData.goals.flatMap((g) =>
+        g.objectives.flatMap((o) => o.interventions),
+      ),
+      status: dbStatus,
+      startDate: planData.startDate ? new Date(planData.startDate) : new Date(),
+      endDate: planData.endDate ? new Date(planData.endDate) : undefined,
+      notes: planData.generalNotes ?? '',
+    })
+
+    // Convert DB plan to the TreatmentPlan type expected by the API
+    const newPlan: TreatmentPlan = {
+      id: createdPlan.id ?? String(createdPlan._id),
+      clientId: createdPlan.clientId,
+      therapistId: createdPlan.therapistId,
+      title: createdPlan.title,
+      diagnosis: createdPlan.description,
+      startDate:
+        createdPlan.startDate instanceof Date
+          ? createdPlan.startDate.toISOString()
+          : String(createdPlan.startDate),
+      endDate: createdPlan.endDate
+        ? createdPlan.endDate instanceof Date
+          ? createdPlan.endDate.toISOString()
+          : String(createdPlan.endDate)
+        : null,
       status: planData.status,
-      generalNotes: planData.generalNotes ?? null,
-      createdAt: currentTime,
-      updatedAt: currentTime,
+      generalNotes: createdPlan.notes,
+      createdAt:
+        createdPlan.createdAt instanceof Date
+          ? createdPlan.createdAt.toISOString()
+          : String(createdPlan.createdAt),
+      updatedAt:
+        createdPlan.updatedAt instanceof Date
+          ? createdPlan.updatedAt.toISOString()
+          : String(createdPlan.updatedAt),
       goals: planData.goals.map((goal, index) => {
         const goalId = `goal-${Date.now()}-${index}`
         return {
           id: goalId,
-          treatmentPlanId: planId,
+          treatmentPlanId: createdPlan.id ?? String(createdPlan._id),
           description: goal.description,
           targetDate: goal.targetDate ?? null,
           status: goal.status,
-          createdAt: currentTime,
-          updatedAt: currentTime,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           objectives: goal.objectives.map((objective, objIndex) => ({
             id: `obj-${Date.now()}-${index}-${objIndex}`,
             treatmentGoalId: goalId,
@@ -140,8 +200,8 @@ export const POST = async ({ request, locals }) => {
             status: objective.status,
             interventions: objective.interventions,
             progressNotes: objective.progressNotes ?? null,
-            createdAt: currentTime,
-            updatedAt: currentTime,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
           })),
         }
       }),
