@@ -150,10 +150,10 @@ export class RealFHEService implements FHEService {
       const decryptedNumbers = await sealService.decrypt(ciphertext)
 
       // 3. Decode number[] back to T
-      const result = this.decodeValue<T>(
+      const result = this.decodeValue(
         decryptedNumbers,
         encryptedData.dataType,
-      )
+      ) as T
       return result
     } catch (error: unknown) {
       logger.error('Decryption failed in RealFHEService', { error })

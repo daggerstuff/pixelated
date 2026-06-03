@@ -211,7 +211,7 @@ export function notFoundHandler(
  */
 
 export function asyncHandler(
-  fn: (req: unknown, res: unknown, next: NextFunction) => Promise<any>,
+  fn: (req: any, res: any, next: NextFunction) => Promise<any>,
 ) {
   return (req: any, res: any, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next)
