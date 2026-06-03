@@ -369,3 +369,5 @@ package/bundle/
 aws
 scratch
 sliced_output.worktrees/
+scripts/devops/hooks/templates/pre-commit.tmpl
+scripts/devops/hooks/templates/pre-push.tmpl
