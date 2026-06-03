@@ -549,9 +549,7 @@ function generateEmotionParticles(
     const rand = Math.random()
     let cumulative = 0
 
-    for (const [emo, percentage] of Object.entries(
-      emotionProfile.emotionMix,
-    )) {
+    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix)) {
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

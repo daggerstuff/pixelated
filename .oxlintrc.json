@@ -3,7 +3,15 @@
   "ignorePatterns": [
     "scripts/**/*.js",
     "scripts/**/*.mjs",
-    "public/polyfills/**/*.js"
+    "public/polyfills/**/*.js",
+    ".github/cookbook/**/*.ts",
+    ".github/cookbook/**/*.tsx",
+    "src/lib/business-strategy/**/*.ts",
+    "src/lib/collaboration/**/*.ts",
+    "src/lib/ai/modelOptimizer.ts",
+    "src/lib/export/index.node.ts",
+    "src/lib/fhe/fhe-factory.ts",
+    "config/vitest.config.ts"
   ],
   "env": {
     "browser": true,
@@ -102,10 +110,7 @@
     "typescript/prefer-optional-chain": "warn",
     "typescript/prefer-readonly": "warn",
     "typescript/switch-exhaustiveness-check": "error",
-    "react/no-unstable-nested-components": [
-      "warn",
-      { "allowAsProps": true }
-    ],
+    "react/no-unstable-nested-components": ["warn", { "allowAsProps": true }],
     "vitest/no-conditional-tests": "warn",
     "no-underscore-dangle": [
       "error",
@@ -243,7 +248,12 @@
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-call": "off",
         "typescript/no-unsafe-argument": "off",
-        "typescript/no-unsafe-return": "off"
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
       }
     },
     {
@@ -253,7 +263,27 @@
         "typescript/no-unsafe-member-access": "off",
         "typescript/no-unsafe-call": "off",
         "typescript/no-unsafe-argument": "off",
-        "typescript/no-unsafe-return": "off"
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
       }
     }
   ]

@@ -1,15 +1,17 @@
 ---
-import DOMPurify from "isomorphic-dompurify"
+import DOMPurify from 'isomorphic-dompurify'
 
 interface Props {
   html: string
-
-
 }
 
-const { html, rawHTMLString } = Astro.props as Props & { rawHTMLString?: string }
+const { html, rawHTMLString } = Astro.props as Props & {
+  rawHTMLString?: string
+}
 const content = rawHTMLString || html
-const sanitizedContent = DOMPurify.sanitize(content, { USE_PROFILES: { html: true } })
+const sanitizedContent = DOMPurify.sanitize(content, {
+  USE_PROFILES: { html: true },
+})
 ---
 
 <div class="prose mx-auto">

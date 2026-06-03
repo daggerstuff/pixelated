@@ -3,12 +3,13 @@
  * Comprehensive patient data management with privacy and security
  */
 
-import encryptionManager from '@/lib/security/encryptionManager'
+import encryptionManager from '../../lib/security/encryptionManager'
+import type { EncryptedData } from '../../lib/security/encryptionManager'
 import type {
   PatientProfile,
   TreatmentPlan,
   ProgressMetrics,
-} from '@/types/patient'
+} from '../../types/patient'
 
 export interface PatientSearchCriteria {
   name?: string
@@ -24,6 +25,7 @@ export interface PatientUpdateData {
   contact?: Partial<PatientProfile['contact']>
   emergencyContact?: Partial<PatientProfile['emergencyContact']>
   treatmentPlan?: Partial<TreatmentPlan>
+  therapistId?: string
   notes?: string
   customFields?: Record<string, any>
 }
@@ -81,17 +83,19 @@ class PatientManager {
 
     // Encrypt sensitive fields
     if (patientData['contact']?.email) {
+      const encrypted = await encryptionManager.encrypt(patientData['contact'].email)
       patientProfile.contact = {
         ...patientData['contact'],
-        email: await encryptionManager.encrypt(patientData['contact'].email),
+        email: JSON.stringify(encrypted),
       }
       patientProfile.encryptedFields.push('contact.email')
     }
 
     if (patientData['contact']?.phone) {
+      const encrypted = await encryptionManager.encrypt(patientData['contact'].phone)
       patientProfile.contact = {
         ...patientProfile.contact,
-        phone: await encryptionManager.encrypt(patientData['contact'].phone),
+        phone: JSON.stringify(encrypted),
       }
       patientProfile.encryptedFields.push('contact.phone')
     }
@@ -167,15 +171,15 @@ class PatientManager {
       if (!patient) continue
 
       // Apply date filters
-      if (criteria.lastSeenBefore && patient.lastSeen > criteria.lastSeenBefore)
+      if (criteria.lastSeenBefore && patient.lastSeen && patient.lastSeen > criteria.lastSeenBefore)
         continue
-      if (criteria.lastSeenAfter && patient.lastSeen < criteria.lastSeenAfter)
+      if (criteria.lastSeenAfter && patient.lastSeen && patient.lastSeen < criteria.lastSeenAfter)
         continue
 
       // Apply diagnosis filter
       if (criteria.diagnosis && criteria.diagnosis.length > 0) {
-        const hasMatchingDiagnosis = criteria.diagnosis.some((diag) =>
-          patient.diagnosis.some((pDiag) =>
+        const hasMatchingDiagnosis = criteria.diagnosis.some((diag: string) =>
+          patient.diagnosis.some((pDiag: string) =>
             pDiag.toLowerCase().includes(diag.toLowerCase()),
           ),
         )
@@ -239,15 +243,23 @@ class PatientManager {
     }
 
     if (updateData.emergencyContact) {
+      const base: PatientProfile['emergencyContact'] = patient.emergencyContact ?? {
+        name: '',
+        phone: '',
+        relationship: '',
+      }
       patient.emergencyContact = {
-        ...patient.emergencyContact,
+        ...base,
         ...updateData.emergencyContact,
       }
     }
 
     if (updateData.treatmentPlan) {
+      const base: TreatmentPlan = patient.treatmentPlan ?? {
+        goals: [],
+      }
       patient.treatmentPlan = {
-        ...patient.treatmentPlan,
+        ...base,
         ...updateData.treatmentPlan,
       }
     }
@@ -659,9 +671,10 @@ class PatientManager {
       patient.encryptedFields.includes('contact.email') &&
       patient.contact?.email
     ) {
+      const encryptedData: EncryptedData = JSON.parse(patient.contact.email)
       decrypted.contact = {
         ...decrypted.contact,
-        email: await encryptionManager.decrypt(patient.contact.email as any),
+        email: await encryptionManager.decrypt(encryptedData),
       }
     }
 
@@ -669,9 +682,10 @@ class PatientManager {
       patient.encryptedFields.includes('contact.phone') &&
       patient.contact?.phone
     ) {
+      const encryptedData: EncryptedData = JSON.parse(patient.contact.phone)
       decrypted.contact = {
         ...decrypted.contact,
-        phone: await encryptionManager.decrypt(patient.contact.phone as any),
+        phone: await encryptionManager.decrypt(encryptedData),
       }
     }
 

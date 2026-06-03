@@ -42,7 +42,6 @@ function initializeAuth0Management() {
     clientId: AUTH0_CONFIG.managementClientId,
     clientSecret: AUTH0_CONFIG.managementClientSecret,
     audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-    scope: 'read:users create:users update:users create:user_tickets',
   })
 }
 
@@ -92,8 +91,8 @@ export interface UserImportData {
   name?: string
   user_id?: string
   email_verified?: boolean
-  app_metadata?: any
-  user_metadata?: any
+  app_metadata?: Record<string, unknown>
+  user_metadata?: Record<string, unknown>
   password?: string
   connection?: string
   roles?: string[]
@@ -110,11 +109,28 @@ export interface UserExportData {
   updated_at: string
   last_login?: string
   logins_count: number
-  app_metadata?: any
-  user_metadata?: any
-  identities?: any[]
+  app_metadata?: Record<string, unknown>
+  user_metadata?: Record<string, unknown>
+  identities?: Record<string, unknown>[]
   roles?: string[]
   permissions?: string[]
+}
+
+interface Auth0ManagementExtended {
+  createUser(data: Record<string, unknown>): Promise<{ user_id: string; email?: string }>
+  getUsers(params: Auth0UserQueryParams): Promise<{ users: UserExportData[]; total: number }>
+}
+
+interface Auth0UserServiceExtended {
+  assignRoleToUser(userId: string, role: string): Promise<void>
+}
+
+interface Auth0UserQueryParams {
+  per_page: number
+  page: number
+  include_totals: boolean
+  q?: string
+  sort?: string
 }
 
 /**
@@ -169,7 +185,8 @@ export class Auth0BulkImportExportService {
 
           try {
             // Create user in Auth0
-            const auth0User = await auth0Management.createUser({
+            const mgmt = auth0Management as unknown as Auth0ManagementExtended
+            const auth0User = await mgmt.createUser({
               email: user.email,
               name: user.name,
               user_id: user.user_id,
@@ -189,9 +206,10 @@ export class Auth0BulkImportExportService {
               // Map roles to Auth0 roles and assign them
               for (const role of user.roles) {
                 try {
-                  await auth0UserService.assignRoleToUser(
+                  const userService = auth0UserService as unknown as Auth0UserServiceExtended
+                  await userService.assignRoleToUser(
                     auth0User.user_id,
-                    role as any,
+                    role,
                   )
                 } catch (roleError) {
                   console.warn(
@@ -297,7 +315,7 @@ export class Auth0BulkImportExportService {
   ): Promise<ImportResult> {
     try {
       // Parse CSV data
-      const records = await new Promise<any[]>((resolve, reject) => {
+      const records = await new Promise<Array<Record<string, string>>>((resolve, reject) => {
         parse(
           csvData,
           {
@@ -313,21 +331,21 @@ export class Auth0BulkImportExportService {
 
       // Convert CSV records to UserImportData format
       const users: UserImportData[] = records.map((record) => ({
-        email: record.email,
-        name: record.name,
-        user_id: record.user_id,
+        email: record['email'],
+        name: record['name'],
+        user_id: record['user_id'],
         email_verified:
-          record.email_verified === 'true' || record.email_verified === true,
-        app_metadata: record.app_metadata
-          ? JSON.parse(record.app_metadata)
+          record['email_verified'] === 'true' || record['email_verified'] === true,
+        app_metadata: record['app_metadata']
+          ? JSON.parse(record['app_metadata'])
           : undefined,
-        user_metadata: record.user_metadata
-          ? JSON.parse(record.user_metadata)
+        user_metadata: record['user_metadata']
+          ? JSON.parse(record['user_metadata'])
           : undefined,
-        password: record.password,
-        connection: record.connection,
-        roles: record.roles
-          ? record.roles.split(',').map((role: string) => role.trim())
+        password: record['password'],
+        connection: record['connection'],
+        roles: record['roles']
+          ? record['roles'].split(',').map((role: string) => role.trim())
           : undefined,
       }))
 
@@ -358,7 +376,7 @@ export class Auth0BulkImportExportService {
    * Export users to JSON format
    */
   async exportUsersToJson(
-    options: BulkExportOptions = {},
+    options: BulkExportOptions = { format: 'json' } as BulkExportOptions,
     initiatedBy: string,
   ): Promise<ExportResult> {
     try {
@@ -367,7 +385,7 @@ export class Auth0BulkImportExportService {
       }
 
       // Build query parameters
-      const queryParams: any = {
+      const queryParams: Auth0UserQueryParams = {
         per_page: 100,
         page: 0,
         include_totals: true,
@@ -388,10 +406,11 @@ export class Auth0BulkImportExportService {
 
       do {
         queryParams.page = page
-        const response = await auth0Management.getUsers(queryParams)
+        const mgmt = auth0Management as unknown as Auth0ManagementExtended
+        const response = await mgmt.getUsers(queryParams)
 
         // Transform users to export format
-        const users = response.users.map((user) => ({
+        const users: UserExportData[] = response.users.map((user: UserExportData) => ({
           user_id: user.user_id,
           email: user.email,
           email_verified: user.email_verified,
@@ -467,7 +486,7 @@ export class Auth0BulkImportExportService {
    * Export users to CSV format
    */
   async exportUsersToCsv(
-    options: BulkExportOptions = {},
+    options: BulkExportOptions = { format: 'csv' } as BulkExportOptions,
     initiatedBy: string,
   ): Promise<ExportResult> {
     try {
@@ -476,7 +495,7 @@ export class Auth0BulkImportExportService {
       }
 
       // Build query parameters
-      const queryParams: any = {
+      const queryParams: Auth0UserQueryParams = {
         per_page: 100,
         page: 0,
         include_totals: true,
@@ -497,10 +516,11 @@ export class Auth0BulkImportExportService {
 
       do {
         queryParams.page = page
-        const response = await auth0Management.getUsers(queryParams)
+        const mgmt = auth0Management as unknown as Auth0ManagementExtended
+        const response = await mgmt.getUsers(queryParams)
 
         // Transform users to export format
-        const users = response.users.map((user) => ({
+        const users: UserExportData[] = response.users.map((user: UserExportData) => ({
           user_id: user.user_id,
           email: user.email,
           email_verified: user.email_verified,
@@ -617,7 +637,7 @@ export class Auth0BulkImportExportService {
   /**
    * Get import job status
    */
-  async getImportJobStatus(jobId: string, initiatedBy: string): Promise<any> {
+  async getImportJobStatus(jobId: string, initiatedBy: string): Promise<{ status: string; jobId: string; progress: number; summary: { total: number; completed: number; failed: number } }> {
     try {
       if (!auth0Management) {
         throw new Error('Auth0 management client not initialized')
@@ -792,7 +812,7 @@ user2@example.com,User Two,false,"{""department"": ""HR""}","{""age"": 25, ""loc
   /**
    * Get export history
    */
-  async getExportHistory(limit: number = 50): Promise<any[]> {
+  async getExportHistory(limit: number = 50): Promise<Array<Record<string, unknown>>> {
     try {
       // Connect to database
       const db = await this.connectToDatabase()

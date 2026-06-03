@@ -4,7 +4,7 @@ import { slug } from '@/utils/common'
 
 // Market Research Service Layer
 import { getPostgresPool } from '../../lib/database/connection'
-import { MarketResearch as MarketResearchModel } from '../../lib/database/mongodb/schemas'
+import { MarketResearch as ResearchModel } from '../../lib/database/mongodb/schemas'
 import { ForbiddenError, NotFoundError } from '../middleware/error-handler'
 
 type MarketResearchPermissionLevel = 'view' | 'edit' | 'comment'
@@ -58,7 +58,7 @@ export async function createMarketResearch(data: {
   const researchId = uuid()
   const researchSlug = slug(data.title)
 
-  const research = new MarketResearchModel({
+  const research = new ResearchModel({
     _id: researchId,
     title: data.title,
     slug: researchSlug,
@@ -99,14 +99,17 @@ export async function createMarketResearch(data: {
  * Get market research document
  */
 export async function getMarketResearch(researchId: string, userId: string) {
-  const research = await MarketResearchModel.findById(researchId)
+  const research = await ResearchModel.findById(researchId)
 
   if (!research) {
     throw new NotFoundError('market research', researchId)
   }
 
   // Check permissions
-  const researchDoc = research as { owner: string; permissions?: MarketResearchPermissions | null }
+  const researchDoc = research as {
+    owner: string
+    permissions?: MarketResearchPermissions | null
+  }
   if (
     !hasPermission(research.permissions, 'view', userId) &&
     researchDoc.owner !== userId
@@ -127,11 +130,11 @@ export async function addFinding(
     title: string
     description?: string
     impactLevel?: 'high' | 'medium' | 'low'
-    supportingData?: any
+    supportingData?: Record<string, unknown>
     source?: string
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId)
+  const research = await ResearchModel.findById(researchId)
 
   if (!research) {
     throw new NotFoundError('market research', researchId)
@@ -179,7 +182,7 @@ export async function addCompetitiveAnalysis(
     marketShare?: number
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId)
+  const research = await ResearchModel.findById(researchId)
 
   if (!research) {
     throw new NotFoundError('market research', researchId)
@@ -226,7 +229,7 @@ export async function addRecommendation(
     expectedImpact?: string
   },
 ) {
-  const research = await MarketResearchModel.findById(researchId)
+  const research = await ResearchModel.findById(researchId)
 
   if (!research) {
     throw new NotFoundError('market research', researchId)
@@ -275,24 +278,24 @@ export async function listMarketResearch(
   const page = options.page ?? 1
   const limit = options.limit ?? 50
 
-  let query: any = {
+  let query: Record<string, unknown> = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }
 
   if (options.researchType) {
-    query.researchType = options.researchType
+    query['researchType'] = options.researchType
   }
 
   if (options.status) {
-    query.status = options.status
+    query['status'] = options.status
   }
 
-  const research = await MarketResearchModel.find(query)
+  const research = await ResearchModel.find(query)
     .limit(limit)
     .skip((page - 1) * limit)
     .sort({ createdAt: -1 })
 
-  const total = await MarketResearchModel.countDocuments(query)
+  const total = await ResearchModel.countDocuments(query)
 
   return {
     data: research,
@@ -308,7 +311,7 @@ export async function searchMarketResearch(
   userId: string,
   limit: number = 50,
 ) {
-  return await MarketResearchModel.find({
+  return await ResearchModel.find({
     $text: { $search: query },
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }).limit(limit)
@@ -323,7 +326,7 @@ export async function shareMarketResearch(
   targetUserId: string,
   permissionLevel: 'view' | 'edit' | 'comment',
 ) {
-  const research = await MarketResearchModel.findById(researchId)
+  const research = await ResearchModel.findById(researchId)
 
   if (!research) {
     throw new NotFoundError('market research', researchId)

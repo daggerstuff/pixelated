@@ -127,6 +127,15 @@ export enum AuditEventType {
   SYSTEM_ERROR = 'system_error',
   SESSION_ANALYTICS_SAVED = 'session_analytics_saved',
   SESSION_ANALYTICS_FETCHED = 'session_analytics_fetched',
+  ADMIN_USER_LIST = 'admin_user_list',
+  ADMIN_USER_UPDATE = 'admin_user_update',
+  ANALYTICS_CHARTS_ACCESS = 'analytics_charts_access',
+  TREATMENT_PLANS_ACCESS = 'treatment_plans_access',
+  TREATMENT_PLAN_CREATED = 'treatment_plan_created',
+  TREATMENT_PLAN_UPDATED = 'treatment_plan_updated',
+  EMOTION_MAP_ACCESS = 'emotion_map_access',
+  EMOTION_PATTERNS_ACCESS = 'emotion_patterns_access',
+  PARTICLE_SYSTEM_ACCESS = 'particle_system_access',
 }
 
 // Audit log status
