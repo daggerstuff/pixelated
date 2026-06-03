@@ -1200,11 +1200,11 @@ export class RedisService extends EventEmitter implements IRedisService {
       info.split('\n').forEach((line: string) => {
         if (line.startsWith('connected_clients:')) {
           const value = line.split(':')[1]
-          stats.totalConnections = Number.parseInt(value, 10)
+          stats.totalConnections = Number.parseInt(value ?? '', 10)
         }
         if (line.startsWith('blocked_clients:')) {
           const value = line.split(':')[1]
-          stats.waitingClients = Number.parseInt(value, 10)
+          stats.waitingClients = Number.parseInt(value ?? '', 10)
         }
       })
 
@@ -1418,8 +1418,8 @@ export class RedisService extends EventEmitter implements IRedisService {
             typeof result[i + 1] === 'string'
           ) {
             arr.push({
-              value: result[i],
-              score: Number(result[i + 1]),
+              value: result[i] as string,
+              score: Number(result[i + 1] as string),
             })
           } else {
             logger.debug(

@@ -58,7 +58,7 @@ export class Phase3IntegrationTester {
     this.analyticsService = new AnalyticsService()
     const redisHost = process.env['REDIS_HOST'] ?? 'localhost'
     const redisPort = parseInt(process.env['REDIS_PORT'] ?? '6379')
-    const redisScheme = 'redis' + '://'
+    const redisScheme = 'redis://'
     this.redisService = new RedisService({
       url: process.env['REDIS_URL'] ?? `${redisScheme}${redisHost}:${redisPort}`,
       host: redisHost,
@@ -207,7 +207,7 @@ export class Phase3IntegrationTester {
         result.status === 'fulfilled' ? result.value : false,
       )
 
-      const allHealthy = healthResults.every((result) => result === true)
+      const allHealthy = healthResults.every((result) => result)
 
       if (!allHealthy) {
         logger.warn('Some services are unhealthy', { healthResults })
@@ -323,7 +323,7 @@ export class Phase3IntegrationTester {
         biasMemory['id'] !== undefined &&
         (emotionResult as { primary?: unknown })['primary'] !== undefined &&
         biasScoreValue !== undefined &&
-        String(encryptedData) !== sessionText
+        String(encryptedData as any) !== sessionText
       )
     } catch (error: unknown) {
       logger.error('Cross-service communication test failed:', {

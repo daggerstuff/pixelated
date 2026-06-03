@@ -10,7 +10,7 @@ const router = Router()
  * or through frontend-initiated OAuth flows. This is a placeholder
  * for Express-based auth flows if needed.
  */
-router.get('/login', (_req: Request, res: Response) => {
+router.get('/login', (req: Request, res: Response) => {
   const auth0Domain = process.env['AUTH0_DOMAIN']
   const clientId = process.env['AUTH0_CLIENT_ID']
   const redirectUri =
@@ -89,7 +89,7 @@ router.get('/callback', async (req: Request, res: Response) => {
     })
 
     if (!tokenEndpointRes.ok) {
-      const errorBody = await tokenEndpointRes.json().catch(() => ({}))
+      const errorBody = await tokenEndpointRes.json().catch(() => ({})) as Record<string, unknown>
       res.status(502).json({
         error: 'Failed to exchange authorization code',
         code: 'TOKEN_EXCHANGE_FAILED',
@@ -118,9 +118,10 @@ router.get('/callback', async (req: Request, res: Response) => {
       // Lightweight base64 decode of the JWT payload section.
       // Full cryptographic signature verification of the *access* token
       // happens inside validateToken() on each subsequent API request.
-      const [, payloadB64] = tokens.id_token.split('.')
+      const idTokenParts = tokens.id_token.split('.')
+      const [, payloadB64] = idTokenParts.length >= 2 ? idTokenParts : ['', '']
       const rawPayload = Buffer.from(
-        payloadB64.replace(/-/g, '+').replace(/_/g, '/'),
+        (payloadB64 ?? '').replace(/-/g, '+').replace(/_/g, '/'),
         'base64',
       ).toString('utf8')
 
@@ -237,8 +238,19 @@ router.post('/logout', (req: Request, res: Response) => {
  * Returns the authenticated user. `id` is the **internal platform UUID**,
  * not the Auth0 sub. The sub never surfaces outside the auth layer.
  */
+interface StagedUser {
+  id: string
+  email: string
+  name: string
+  picture: string
+  emailVerified: boolean
+  role: string
+  roles?: string[]
+  permissions?: string[]
+}
+
 router.get('/me', (req: Request, res: Response) => {
-  const user = (req as any).user
+  const user = (req as unknown as { user?: unknown }).user as StagedUser | undefined
 
   if (!user) {
     res.status(401).json({
@@ -309,7 +321,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     })
 
     if (!tokenEndpointRes.ok) {
-      const errorBody = await tokenEndpointRes.json().catch(() => ({}))
+      const errorBody = await tokenEndpointRes.json().catch(() => ({})) as Record<string, unknown>
       res.status(401).json({
         error:
           'Token refresh failed — the refresh token may be expired or revoked',
