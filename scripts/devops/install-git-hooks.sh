@@ -26,6 +26,13 @@ if [ -z "$GIT_DIR" ]; then
 fi
 
 HOOKS_DIR="$GIT_DIR/hooks"
+HOOKS_PATH=$(git config --get core.hooksPath || true)
+if [ -n "$HOOKS_PATH" ]; then
+  case "$HOOKS_PATH" in
+    /*) HOOKS_DIR="$HOOKS_PATH" ;;
+    *) HOOKS_DIR="$(git rev-parse --show-toplevel)/$HOOKS_PATH" ;;
+  esac
+fi
 TEMPLATES_DIR="$(dirname "${BASH_SOURCE[0]}")/hooks/templates"
 mkdir -p "$HOOKS_DIR"
 

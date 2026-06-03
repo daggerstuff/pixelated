@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { BiasDetectionEngine } from '../../ai/bias-detection/BiasDetectionEngine'
 import { logger } from '../../logger'
-import auditLog from '../../middleware/audit-logging'
+import { auditLog } from '../audit-logging'
 
 // Types
 export interface EdgeDetectionConfig {

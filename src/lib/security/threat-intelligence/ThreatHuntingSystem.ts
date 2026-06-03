@@ -6,7 +6,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -50,7 +50,7 @@ export interface HuntScope {
 export interface HuntQuery {
   type: 'sql' | 'kql' | 'yara' | 'sigma' | 'custom'
   query: string
-  parameters?: Record<string, any>
+  parameters?: Record<string, unknown>
   expected_output?: string[]
 }
 
@@ -94,7 +94,7 @@ export interface Evidence {
     | 'registry_key'
     | 'process'
     | 'user_activity'
-  data: Record<string, any>
+  data: Record<string, unknown>
   source: string
   timestamp: Date
   confidence: number
@@ -129,7 +129,7 @@ export interface ExecutionLogEntry {
   timestamp: Date
   level: 'info' | 'warn' | 'error' | 'debug'
   message: string
-  details?: Record<string, any>
+  details?: Record<string, unknown>
 }
 
 export interface ThreatHuntingSystemConfig {
@@ -329,7 +329,7 @@ export class ThreatHuntingSystem extends EventEmitter {
             id: template.id,
             name: template.name,
             description: template.description,
-            hunt_type: template.category as any,
+            hunt_type: template.category as ThreatHunt['hunt_type'],
             status: template.enabled ? 'active' : 'paused',
             priority: 'medium',
             scope: template.scope,
@@ -593,37 +593,38 @@ export class ThreatHuntingSystem extends EventEmitter {
         hunt.query,
       )
 
-      for (const connection of suspiciousConnections) {
+      for (const conn of suspiciousConnections) {
+        const c = conn as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_network_connection',
-          severity: this.determineNetworkFindingSeverity(connection),
-          confidence: connection.confidence ?? 0.7,
-          description: `Suspicious network connection detected: ${connection.source_ip} -> ${connection.dest_ip}`,
+          severity: this.determineNetworkFindingSeverity(c),
+          confidence: (c['confidence'] as number) ?? 0.7,
+          description: `Suspicious network connection detected: ${c['source_ip'] as string} -> ${c['dest_ip'] as string}`,
           evidence: [
             {
               type: 'network_connection',
-              data: connection,
+              data: c,
               source: 'network_monitoring',
               timestamp: new Date(),
-              confidence: connection.confidence ?? 0.7,
+              confidence: (c['confidence'] as number) ?? 0.7,
             },
           ],
           indicators: [
             {
-              type: 'ip',
-              value: connection.source_ip,
-              confidence: connection.confidence ?? 0.7,
+              type: 'ip' as const,
+              value: c['source_ip'] as string,
+              confidence: (c['confidence'] as number) ?? 0.7,
               source: 'network_hunt',
             },
             {
-              type: 'ip',
-              value: connection.dest_ip,
-              confidence: connection.confidence ?? 0.7,
+              type: 'ip' as const,
+              value: c['dest_ip'] as string,
+              confidence: (c['confidence'] as number) ?? 0.7,
               source: 'network_hunt',
             },
           ],
-          affected_systems: [connection.source_system, connection.dest_system],
+          affected_systems: [c['source_system'] as string, c['dest_system'] as string],
           remediation_suggested: [
             'Block suspicious IP addresses',
             'Investigate source system',
@@ -633,14 +634,12 @@ export class ThreatHuntingSystem extends EventEmitter {
         }
 
         findings.push(finding)
-      }
-
-      executionLog.push({
+      }        executionLog.push({
         timestamp: new Date(),
         level: 'info',
-        message: `Network hunt completed with ${findings.length} findings`,
+        message: `Network hunt completed with ${String(findings.length)} findings`,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -680,31 +679,32 @@ export class ThreatHuntingSystem extends EventEmitter {
         hunt.query,
       )
 
-      for (const process of suspiciousProcesses) {
+      for (const proc of suspiciousProcesses) {
+        const p = proc as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_process',
-          severity: this.determineProcessFindingSeverity(process),
-          confidence: process.confidence ?? 0.8,
-          description: `Suspicious process detected: ${process.name} (PID: ${process.pid})`,
+          severity: this.determineProcessFindingSeverity(p),
+          confidence: (p['confidence'] as number) ?? 0.8,
+          description: `Suspicious process detected: ${p['name'] as string} (PID: ${p['pid'] as string})`,
           evidence: [
             {
               type: 'process',
-              data: process,
+              data: p,
               source: 'endpoint_detection',
               timestamp: new Date(),
-              confidence: process.confidence ?? 0.8,
+              confidence: (p['confidence'] as number) ?? 0.8,
             },
           ],
           indicators: [
             {
-              type: 'hash',
-              value: process.hash,
-              confidence: process.confidence ?? 0.8,
+              type: 'hash' as const,
+              value: p['hash'] as string,
+              confidence: (p['confidence'] as number) ?? 0.8,
               source: 'endpoint_hunt',
             },
           ],
-          affected_systems: [process.system_id],
+          affected_systems: [p['system_id'] as string],
           remediation_suggested: [
             'Isolate affected endpoint',
             'Quarantine suspicious files',
@@ -715,7 +715,7 @@ export class ThreatHuntingSystem extends EventEmitter {
 
         findings.push(finding)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -749,31 +749,32 @@ export class ThreatHuntingSystem extends EventEmitter {
       // Analyze for anomalous behavior
       const anomalousBehaviors = this.analyzeUserBehavior(userData, hunt.query)
 
-      for (const behavior of anomalousBehaviors) {
+      for (const beh of anomalousBehaviors) {
+        const b = beh as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'anomalous_user_behavior',
-          severity: this.determineBehaviorFindingSeverity(behavior),
-          confidence: behavior.confidence ?? 0.6,
-          description: `Anomalous user behavior detected for user: ${behavior.user_id}`,
+          severity: this.determineBehaviorFindingSeverity(b),
+          confidence: (b['confidence'] as number) ?? 0.6,
+          description: `Anomalous user behavior detected for user: ${b['user_id'] as string}`,
           evidence: [
             {
               type: 'user_activity',
-              data: behavior,
+              data: b,
               source: 'user_behavior_analytics',
               timestamp: new Date(),
-              confidence: behavior.confidence ?? 0.6,
+              confidence: (b['confidence'] as number) ?? 0.6,
             },
           ],
           indicators: [
             {
-              type: 'behavior',
-              value: behavior.activity_type,
-              confidence: behavior.confidence ?? 0.6,
+              type: 'behavior' as const,
+              value: b['activity_type'] as string,
+              confidence: (b['confidence'] as number) ?? 0.6,
               source: 'user_behavior_hunt',
             },
           ],
-          affected_systems: behavior.affected_systems ?? [],
+          affected_systems: (b['affected_systems'] as string[]) ?? [],
           remediation_suggested: [
             'Review user access permissions',
             'Investigate unusual activity',
@@ -784,7 +785,7 @@ export class ThreatHuntingSystem extends EventEmitter {
 
         findings.push(finding)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -821,31 +822,32 @@ export class ThreatHuntingSystem extends EventEmitter {
         hunt.query,
       )
 
-      for (const indicator of malwareIndicators) {
+      for (const ind of malwareIndicators) {
+        const mal = ind as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'malware_indicator',
-          severity: this.determineMalwareFindingSeverity(indicator),
-          confidence: indicator.confidence ?? 0.9,
-          description: `Malware indicator detected: ${indicator.description}`,
+          severity: this.determineMalwareFindingSeverity(mal),
+          confidence: (mal['confidence'] as number) ?? 0.9,
+          description: `Malware indicator detected: ${mal['description'] as string}`,
           evidence: [
             {
               type: 'file',
-              data: indicator,
+              data: mal,
               source: 'malware_detection',
               timestamp: new Date(),
-              confidence: indicator.confidence ?? 0.9,
+              confidence: (mal['confidence'] as number) ?? 0.9,
             },
           ],
           indicators: [
             {
-              type: 'hash',
-              value: indicator.file_hash,
-              confidence: indicator.confidence ?? 0.9,
+              type: 'hash' as const,
+              value: mal['file_hash'] as string,
+              confidence: (mal['confidence'] as number) ?? 0.9,
               source: 'malware_hunt',
             },
           ],
-          affected_systems: indicator.affected_systems ?? [],
+          affected_systems: (mal['affected_systems'] as string[]) ?? [],
           remediation_suggested: [
             'Quarantine affected files',
             'Run antivirus scan',
@@ -856,7 +858,7 @@ export class ThreatHuntingSystem extends EventEmitter {
 
         findings.push(finding)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -890,31 +892,32 @@ export class ThreatHuntingSystem extends EventEmitter {
       // Analyze for lateral movement patterns
       const lateralMovements = this.analyzeLateralMovement(authData, hunt.query)
 
-      for (const movement of lateralMovements) {
+      for (const mov of lateralMovements) {
+        const m = mov as Record<string, unknown>
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'lateral_movement',
-          severity: this.determineLateralMovementSeverity(movement),
-          confidence: movement.confidence ?? 0.8,
-          description: `Potential lateral movement detected: ${movement.user_id} accessing ${movement.target_system}`,
+          severity: this.determineLateralMovementSeverity(m),
+          confidence: (m['confidence'] as number) ?? 0.8,
+          description: `Potential lateral movement detected: ${m['user_id'] as string} accessing ${m['target_system'] as string}`,
           evidence: [
             {
               type: 'user_activity',
-              data: movement,
+              data: m,
               source: 'authentication_logs',
               timestamp: new Date(),
-              confidence: movement.confidence ?? 0.8,
+              confidence: (m['confidence'] as number) ?? 0.8,
             },
           ],
           indicators: [
             {
-              type: 'behavior',
+              type: 'behavior' as const,
               value: 'unusual_access_pattern',
-              confidence: movement.confidence ?? 0.8,
+              confidence: (m['confidence'] as number) ?? 0.8,
               source: 'lateral_movement_hunt',
             },
           ],
-          affected_systems: [movement.source_system, movement.target_system],
+          affected_systems: [m['source_system'] as string, m['target_system'] as string],
           remediation_suggested: [
             'Review user access patterns',
             'Investigate unusual authentication',
@@ -925,7 +928,7 @@ export class ThreatHuntingSystem extends EventEmitter {
 
         findings.push(finding)
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -940,7 +943,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Data collection methods (simulated)
    */
-  private async collectNetworkData(_scope: HuntScope): Promise<any[]> {
+  private async collectNetworkData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
     // Simulate network data collection
     return [
       {
@@ -954,7 +957,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectEndpointData(_scope: HuntScope): Promise<any[]> {
+  private async collectEndpointData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
     // Simulate endpoint data collection
     return [
       {
@@ -968,7 +971,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectUserActivityData(_scope: HuntScope): Promise<any[]> {
+  private async collectUserActivityData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
     // Simulate user activity data collection
     return [
       {
@@ -981,7 +984,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectFileData(_scope: HuntScope): Promise<any[]> {
+  private async collectFileData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
     // Simulate file data collection
     return [
       {
@@ -994,7 +997,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectAuthenticationData(_scope: HuntScope): Promise<any[]> {
+  private async collectAuthenticationData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
     // Simulate authentication data collection
     return [
       {
@@ -1010,76 +1013,81 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Analysis methods
    */
-  private analyzeNetworkConnections(data: any[], _query: HuntQuery): any[] {
+  private analyzeNetworkConnections(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate network connection analysis
-    return data.filter((connection) => connection.confidence > 0.5)
+    return data.filter((connection) => (connection as Record<string, unknown>)['confidence'] as number > 0.5)
   }
 
-  private analyzeProcesses(data: any[], _query: HuntQuery): any[] {
+  private analyzeProcesses(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate process analysis
-    return data.filter((process) => process.confidence > 0.7)
+    return data.filter((process) => (process as Record<string, unknown>)['confidence'] as number > 0.7)
   }
 
-  private analyzeUserBehavior(data: any[], _query: HuntQuery): any[] {
+  private analyzeUserBehavior(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate user behavior analysis
-    return data.filter((behavior) => behavior.confidence > 0.6)
+    return data.filter((behavior) => (behavior as Record<string, unknown>)['confidence'] as number > 0.6)
   }
 
-  private analyzeMalwareIndicators(data: any[], _query: HuntQuery): any[] {
+  private analyzeMalwareIndicators(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate malware indicator analysis
-    return data.filter((indicator) => indicator.confidence > 0.8)
+    return data.filter((indicator) => (indicator as Record<string, unknown>)['confidence'] as number > 0.8)
   }
 
-  private analyzeLateralMovement(data: any[], _query: HuntQuery): any[] {
+  private analyzeLateralMovement(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate lateral movement analysis
-    return data.filter((movement) => movement.confidence > 0.7)
+    return data.filter((movement) => (movement as Record<string, unknown>)['confidence'] as number > 0.7)
   }
 
   /**
    * Severity determination methods
    */
   private determineNetworkFindingSeverity(
-    connection: any,
+    connection: Record<string, unknown>,
   ): 'low' | 'medium' | 'high' | 'critical' {
-    if (connection.confidence > 0.9) return 'critical'
-    if (connection.confidence > 0.7) return 'high'
-    if (connection.confidence > 0.5) return 'medium'
+    const conf = connection['confidence'] as number
+    if (conf > 0.9) return 'critical'
+    if (conf > 0.7) return 'high'
+    if (conf > 0.5) return 'medium'
     return 'low'
   }
 
   private determineProcessFindingSeverity(
-    process: any,
+    process: Record<string, unknown>,
   ): 'low' | 'medium' | 'high' | 'critical' {
-    if (process.confidence > 0.9) return 'critical'
-    if (process.confidence > 0.7) return 'high'
-    if (process.confidence > 0.5) return 'medium'
+    const conf = process['confidence'] as number
+    if (conf > 0.9) return 'critical'
+    if (conf > 0.7) return 'high'
+    if (conf > 0.5) return 'medium'
     return 'low'
   }
 
   private determineBehaviorFindingSeverity(
-    behavior: any,
+    behavior: Record<string, unknown>,
   ): 'low' | 'medium' | 'high' | 'critical' {
-    if (behavior.confidence > 0.9) return 'critical'
-    if (behavior.confidence > 0.7) return 'high'
-    if (behavior.confidence > 0.5) return 'medium'
+    const conf = behavior['confidence'] as number
+    if (conf > 0.9) return 'critical'
+    if (conf > 0.7) return 'high'
+    if (conf > 0.5) return 'medium'
     return 'low'
   }
 
   private determineMalwareFindingSeverity(
-    indicator: any,
+    indicator: Record<string, unknown>,
   ): 'low' | 'medium' | 'high' | 'critical' {
-    if (indicator.confidence > 0.9) return 'critical'
-    if (indicator.confidence > 0.7) return 'high'
-    if (indicator.confidence > 0.5) return 'medium'
+    const conf = indicator['confidence'] as number
+    if (conf > 0.9) return 'critical'
+    if (conf > 0.7) return 'high'
+    if (conf > 0.5) return 'medium'
     return 'low'
   }
 
   private determineLateralMovementSeverity(
-    movement: any,
+    movement: Record<string, unknown>,
   ): 'low' | 'medium' | 'high' | 'critical' {
-    if (movement.confidence > 0.9) return 'critical'
-    if (movement.confidence > 0.7) return 'high'
-    if (movement.confidence > 0.5) return 'medium'
+    const conf = movement['confidence'] as number
+    if (conf > 0.9) return 'critical'
+    if (conf > 0.7) return 'high'
+    if (conf > 0.5) return 'medium'
     return 'low'
   }
 
@@ -1112,7 +1120,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           }
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       executionLog.push({
         timestamp: new Date(),
         level: 'error',
@@ -1124,7 +1132,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Simulate AI analysis (replace with actual AI integration)
    */
-  private async simulateAIAnalysis(_finding: HuntFinding): Promise<any> {
+  private async simulateAIAnalysis(_finding: HuntFinding): Promise<Record<string, unknown>> {
     // Simulate AI processing delay
     await new Promise((resolve) => setTimeout(resolve, 100))
 
@@ -1248,7 +1256,7 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Handle new data availability
    */
-  private async handleNewDataAvailable(dataInfo: any): Promise<void> {
+  private async handleNewDataAvailable(dataInfo: Record<string, unknown>): Promise<void> {
     try {
       // Find hunts that might be interested in this data
       const relevantHunts = await this.huntsCollection
@@ -1274,11 +1282,11 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Determine if hunt should execute on new data
    */
-  private shouldExecuteHuntOnData(hunt: ThreatHunt, dataInfo: any): boolean {
+  private shouldExecuteHuntOnData(hunt: ThreatHunt, dataInfo: Record<string, unknown>): boolean {
     // Simple logic - execute if hunt is active and data is relevant
     return (
       hunt.status === 'active' &&
-      hunt.scope.data_sources.includes(dataInfo.data_source)
+      hunt.scope.data_sources.includes(dataInfo['data_source'] as string)
     )
   }
 
