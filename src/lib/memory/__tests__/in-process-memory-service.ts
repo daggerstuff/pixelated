@@ -26,6 +26,9 @@ export interface InProcessMemory {
   content: string
   createdAt: Date
   updatedAt: Date
+  isLatest: boolean
+  validFrom: Date
+  validUntil?: Date
   tags?: string[]
   metadata?: Record<string, unknown>
 }
@@ -37,6 +40,7 @@ export interface InProcessListMemoriesOptions {
   sortOrder?: 'asc' | 'desc'
   tags?: string[]
   search?: string
+  includeHistory?: boolean
 }
 
 export interface InProcessCreateMemoryOptions {
@@ -63,12 +67,15 @@ export class InProcessMemoryService {
     content: string,
     options: InProcessCreateMemoryOptions,
   ): Promise<InProcessMemory> {
+    const now = new Date()
     const memory: InProcessMemory = {
       id: crypto.randomUUID(),
       userId: options.userId,
       content,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
+      isLatest: true,
+      validFrom: now,
       tags: options.tags ?? [],
       metadata: options.metadata ?? {},
     }
@@ -82,19 +89,34 @@ export class InProcessMemoryService {
     options: InProcessUpdateMemoryOptions,
   ): Promise<InProcessMemory | null> {
     const memoryIndex = this.memories.findIndex(
-      (m) => m.id === id && m.userId === userId,
+      (m) => m.id === id && m.userId === userId && m.isLatest,
     )
     if (memoryIndex === -1) return null
 
     const memory = this.memories[memoryIndex]!
+    const updateTime = new Date()
+
+    // Archive the current latest version
     this.memories[memoryIndex] = {
+      ...memory,
+      isLatest: false,
+      validUntil: updateTime,
+      updatedAt: updateTime,
+    }
+
+    // Insert new version as latest
+    const updatedMemory: InProcessMemory = {
       ...memory,
       content: options.content ?? memory.content,
       tags: options.tags ?? memory.tags,
       metadata: { ...memory.metadata, ...options.metadata },
-      updatedAt: new Date(),
+      updatedAt: updateTime,
+      isLatest: true,
+      validFrom: updateTime,
+      validUntil: undefined,
     }
-    return this.memories[memoryIndex]
+    this.memories.push(updatedMemory)
+    return updatedMemory
   }
 
   async deleteMemory(id: string, userId: string): Promise<boolean> {
@@ -109,14 +131,20 @@ export class InProcessMemoryService {
     id: string,
     userId: string,
   ): Promise<InProcessMemory | null> {
-    return this.memories.find((m) => m.id === id && m.userId === userId) ?? null
+    return (
+      this.memories.find(
+        (m) => m.id === id && m.userId === userId && m.isLatest,
+      ) ?? null
+    )
   }
 
   async listMemories(
     userId: string,
     options: InProcessListMemoriesOptions = {},
   ): Promise<InProcessMemory[]> {
-    let filtered = this.memories.filter((m) => m.userId === userId)
+    let filtered = this.memories.filter(
+      (m) => m.userId === userId && (options.includeHistory || m.isLatest),
+    )
 
     if (options.tags && options.tags.length > 0) {
       filtered = filtered.filter((m) =>
@@ -158,8 +186,10 @@ export class InProcessMemoryService {
     return this.listMemories(userId, { ...options, search: query })
   }
 
-  async getMemoryCount(userId: string): Promise<number> {
-    return this.memories.filter((m) => m.userId === userId).length
+  async getMemoryCount(
+    userId: string,
+  ): Promise<number> {
+    return this.memories.filter((m) => m.userId === userId && m.isLatest).length
   }
 }
 

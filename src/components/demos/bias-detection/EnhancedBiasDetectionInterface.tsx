@@ -49,6 +49,14 @@ type BiasCategoryFilter =
   | 'linguistic'
   | 'intersectional'
 
+// Performance optimization: Extract static tabIcons out of component to prevent recreation on every render
+const TAB_ICONS: Record<TabItem['icon'], JSX.Element> = {
+  chart: <ChartBar className="h-5 w-5" />,
+  search: <Search className="h-5 w-5" />,
+  trending: <TrendingUp className="h-5 w-5" />,
+  save: <Save className="h-5 w-5" />,
+}
+
 export const EnhancedBiasDetectionInterface: React.FC<
   EnhancedBiasDetectionInterfaceProps
 > = ({ className = '' }) => {
@@ -88,12 +96,6 @@ export const EnhancedBiasDetectionInterface: React.FC<
   const [selectedPreset, setSelectedPreset] = useState<PresetScenario | null>(
     null,
   )
-  const tabIcons: Record<TabItem['icon'], JSX.Element> = {
-    chart: <ChartBar className="h-5 w-5" />,
-    search: <Search className="h-5 w-5" />,
-    trending: <TrendingUp className="h-5 w-5" />,
-    save: <Save className="h-5 w-5" />,
-  }
 
   // Simulate analysis progress
   useEffect(() => {
@@ -754,7 +756,7 @@ export const EnhancedBiasDetectionInterface: React.FC<
                           : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
-                      {tabIcons[tab.icon]}
+                      {TAB_ICONS[tab.icon]}
                       <span>{tab.label}</span>
                       {tab.badge && (
                         <span className="bg-blue-100 text-blue-800 rounded-full px-2 py-0.5 text-xs">

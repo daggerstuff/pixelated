@@ -3327,7 +3327,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                             ? new Date(analysis.timestamp).toLocaleString()
                             : 'Unknown time'}
                         </p>
-                        <Button size="sm" variant="outline" className="mt-2">
+                        <Button size="sm" variant="outline" className="mt-2" aria-label={`View details for session ${analysis['sessionId']}`}>
                           View Details
                         </Button>
                       </div>
@@ -3362,10 +3362,10 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                           {rec.description}
                         </p>
                         <div className="flex items-center space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button size="sm" variant="outline" aria-label={`View details for recommendation: ${rec.title}`}>
                             View Details
                           </Button>
-                          <Button size="sm">Implement</Button>
+                          <Button size="sm" aria-label={`Implement recommendation: ${rec.title}`}>Implement</Button>
                         </div>
                       </div>
                     </div>
