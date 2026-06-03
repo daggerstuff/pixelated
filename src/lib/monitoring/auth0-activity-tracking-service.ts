@@ -10,6 +10,40 @@ import { mongodb } from '../../config/mongodb.config'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 
+// Extended Auth0 management client interface (since some methods aren't typed)
+interface Auth0ManagementExtended {
+  getUserSessions(params: { id: string }): Promise<Auth0Session[]>
+  deleteUserSessions(params: { id: string; session_id: string }): Promise<void>
+}
+
+interface Auth0Session {
+  id: string
+  client_id: string
+  ip: string
+  user_agent: string
+  started_at: string
+  last_updated_at: string
+  expires_at: string
+  location?: {
+    country_name: string
+    city_name: string
+  }
+}
+
+interface SessionInfo {
+  id: string
+  clientId: string
+  ipAddress: string
+  userAgent: string
+  startedAt: Date
+  lastUpdatedAt: Date
+  expiresAt: Date
+  location?: {
+    country: string
+    city: string
+  }
+}
+
 // Auth0 Log interface (since Auth0's Log type is not exported)
 interface Auth0Log {
   log_id: string
@@ -76,7 +110,7 @@ export interface UserActivity {
     country?: string
     city?: string
   }
-  details?: any
+  details?: Record<string, unknown>
 }
 
 export interface ActivityFilter {
@@ -113,7 +147,7 @@ export interface SecurityEvent {
   description: string
   ipAddress?: string
   userAgent?: string
-  details?: any
+  details?: Record<string, unknown>
 }
 
 /**
@@ -200,7 +234,7 @@ export class Auth0ActivityTrackingService {
       }
 
       // Build query parameters
-      const queryParams: any = {
+      const queryParams: Record<string, unknown> = {
         per_page: this.config.batchSize,
         sort: 'date:1', // Sort by date ascending
         include_totals: false,
@@ -223,7 +257,7 @@ export class Auth0ActivityTrackingService {
       this.lastLogId = lastLog.log_id
 
       // Transform and store logs
-      const activities: UserActivity[] = (logs as Auth0Log[])
+      const rawActivities = (logs as Auth0Log[])
         .filter((log) => log.user_id) // Only logs with user ID
         .map((log) => ({
           userId: log.user_id!,
@@ -246,6 +280,7 @@ export class Auth0ActivityTrackingService {
             audience: log.audience,
           },
         }))
+      const activities: UserActivity[] = rawActivities as UserActivity[]
 
       // Store activities in database
       if (activities.length > 0) {
@@ -280,7 +315,7 @@ export class Auth0ActivityTrackingService {
   /**
    * Process security events from Auth0 logs
    */
-  private async processSecurityEvents(logs: any[]): Promise<void> {
+  private async processSecurityEvents(logs: Auth0Log[]): Promise<void> {
     try {
       // Connect to database
       const db = await this.connectToDatabase()
@@ -427,7 +462,7 @@ export class Auth0ActivityTrackingService {
       const collection = db.collection<UserActivity>(this.collectionName)
 
       // Build query
-      const query: any = {}
+      const query: Record<string, unknown> = {}
 
       if (filter.userId) {
         query.userId = filter.userId
@@ -438,17 +473,17 @@ export class Auth0ActivityTrackingService {
       }
 
       if (filter.startDate || filter.endDate) {
-        query.timestamp = {}
+        query.timestamp = {} as Record<string, unknown>
         if (filter.startDate) {
-          query.timestamp.$gte = filter.startDate
+          ;(query.timestamp as Record<string, unknown>).$gte = filter.startDate
         }
         if (filter.endDate) {
-          query.timestamp.$lte = filter.endDate
+          ;(query.timestamp as Record<string, unknown>).$lte = filter.endDate
         }
       }
 
       // Build options
-      const options: any = {}
+      const options: Record<string, unknown> = {}
 
       if (filter.limit) {
         options.limit = filter.limit
@@ -500,7 +535,7 @@ export class Auth0ActivityTrackingService {
       )
 
       const mostCommonEventType = Object.keys(eventTypes).reduce((a, b) =>
-        eventTypes?.[a] > eventTypes?.[b] ? a : b,
+        (eventTypes[a] ?? 0) > (eventTypes[b] ?? 0) ? a : b,
       )
 
       const ipAddresses = [...new Set(activities.map((a) => a.ipAddress))]
@@ -513,7 +548,7 @@ export class Auth0ActivityTrackingService {
       return {
         userId,
         totalActivities: activities.length,
-        lastActivity: activities?.[0].timestamp,
+        lastActivity: activities[0]?.timestamp ?? new Date(),
         mostCommonEventType,
         activeDays,
         ipAddressCount: ipAddresses.length,
@@ -539,7 +574,7 @@ export class Auth0ActivityTrackingService {
       )
 
       // Build query
-      const query: any = {}
+      const query: Record<string, unknown> = {}
 
       if (severity) {
         query.severity = severity
@@ -585,16 +620,16 @@ export class Auth0ActivityTrackingService {
   /**
    * Get user session information
    */
-  async getUserSessions(userId: string): Promise<any[]> {
+  async getUserSessions(userId: string): Promise<SessionInfo[]> {
     try {
       if (!auth0Management) {
         throw new Error('Auth0 management client not initialized')
       }
 
       // Get user's sessions from Auth0
-      const sessions = await auth0Management.getUserSessions({ id: userId })
+      const sessions = await (auth0Management as unknown as Auth0ManagementExtended).getUserSessions({ id: userId })
 
-      return sessions.map((session) => ({
+      return (sessions as Auth0Session[]).map((session): SessionInfo => ({
         id: session.id,
         clientId: session.client_id,
         ipAddress: session.ip,
@@ -628,7 +663,7 @@ export class Auth0ActivityTrackingService {
       }
 
       // Terminate session in Auth0
-      await auth0Management.deleteUserSessions({
+      await (auth0Management as unknown as Auth0ManagementExtended).deleteUserSessions({
         id: userId,
         session_id: sessionId,
       })

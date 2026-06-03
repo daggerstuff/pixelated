@@ -5,42 +5,53 @@
 
 import { EventEmitter } from 'events'
 
+import Redis from 'ioredis'
+
 import { logger } from '../../logger'
-import AutomatedThreatResponseOrchestrator, {
-  AutomatedThreatResponseOrchestratorConfig,
-} from './AutomatedThreatResponseOrchestrator'
+import { AutomatedThreatResponseOrchestrator } from './AutomatedThreatResponseOrchestrator'
+import type { ResponseOrchestratorConfig } from './AutomatedThreatResponseOrchestrator'
 // Import configuration
 import { getCurrentConfig } from './config'
-import EdgeThreatDetectionSystem, {
-  EdgeThreatDetectionSystemConfig,
-} from './EdgeThreatDetectionSystem'
-import ExternalThreatFeedIntegration, {
+import { EdgeThreatDetectionSystem } from './EdgeThreatDetectionSystem'
+import type { EdgeDetectionConfig } from './EdgeThreatDetectionSystem'
+import {
+  ExternalThreatFeedIntegration,
   ExternalThreatFeedIntegrationConfig,
 } from './ExternalThreatFeedIntegration'
 // Import all threat intelligence components
-import GlobalThreatIntelligenceNetwork, {
-  GlobalThreatIntelligenceNetworkConfig,
-} from './GlobalThreatIntelligenceNetwork'
-import ThreatCorrelationEngine, {
-  ThreatCorrelationEngineConfig,
-} from './ThreatCorrelationEngine'
-import ThreatHuntingSystem, {
-  ThreatHuntingSystemConfig,
-} from './ThreatHuntingSystem'
-import ThreatIntelligenceDatabase, {
-  ThreatIntelligenceDatabaseConfig,
-} from './ThreatIntelligenceDatabase'
-import ThreatValidationSystem, {
-  ThreatValidationSystemConfig,
-} from './ThreatValidationSystem'
+import { GlobalThreatIntelligenceNetwork } from './GlobalThreatIntelligenceNetwork'
+import type { GlobalThreatNetworkConfig } from './GlobalThreatIntelligenceNetwork'
+import { ThreatCorrelationEngine } from './ThreatCorrelationEngine'
+import type { CorrelationEngineConfig } from './ThreatCorrelationEngine'
+import { ThreatHuntingSystem } from './ThreatHuntingSystem'
+import type { ThreatHuntingSystemConfig } from './ThreatHuntingSystem'
+import { ThreatIntelligenceDatabase } from './ThreatIntelligenceDatabase'
+import type { ThreatIntelligenceDatabaseConfig } from './ThreatIntelligenceDatabase'
+import { ThreatValidationSystem } from './ThreatValidationSystem'
+import type { ThreatValidationSystemConfig } from './ThreatValidationSystem'
 
 // Types
+interface ComponentMethods {
+  on: EventEmitter['on']
+  correlateThreat(id: string): Promise<unknown>
+  requestValidation(data: unknown, types: string[], priority?: string): Promise<unknown>
+  processThreat(data: unknown): Promise<unknown>
+  processValidatedThreat(id: string): Promise<unknown>
+  orchestrateResponse(data: unknown): Promise<unknown>
+  getValidationStats(): Promise<unknown>
+  getThreatIndicators(opts: Record<string, unknown>): Promise<unknown[]>
+  getHuntResults(id: string, limit: number): Promise<unknown[]>
+  analyzeThreat(data: unknown): Promise<unknown>
+  shutdown(): Promise<void>
+  isReady: boolean
+}
+
 export interface ThreatIntelligenceNetworkConfig {
-  global: GlobalThreatIntelligenceNetworkConfig
-  edge: EdgeThreatDetectionSystemConfig
-  correlation: ThreatCorrelationEngineConfig
+  global: GlobalThreatNetworkConfig
+  edge: EdgeDetectionConfig
+  correlation: CorrelationEngineConfig
   database: ThreatIntelligenceDatabaseConfig
-  response: AutomatedThreatResponseOrchestratorConfig
+  response: ResponseOrchestratorConfig
   hunting: ThreatHuntingSystemConfig
   feeds: ExternalThreatFeedIntegrationConfig
   validation: ThreatValidationSystemConfig
@@ -68,12 +79,12 @@ export interface ThreatIntelligenceEvent {
     | 'system_alert'
   timestamp: Date
   severity: 'low' | 'medium' | 'high' | 'critical'
-  data: Record<string, any>
+  data: Record<string, unknown>
   source: string
 }
 
 export class ThreatIntelligenceNetwork extends EventEmitter {
-  private readonly components: Map<string, any> = new Map()
+  private readonly components: Map<string, unknown> = new Map()
   private isInitialized = false
   private readonly metrics: ThreatIntelligenceMetrics
   private readonly networkConfig: ThreatIntelligenceNetworkConfig
@@ -138,11 +149,12 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       this.emit('initialized', { timestamp: new Date() })
     } catch (error: unknown) {
+      const errMsg = error instanceof Error ? error.message : String(error)
       logger.error('Failed to initialize Threat Intelligence Network', {
-        error: (error as Error).message,
+        error: errMsg,
       })
       throw new Error(
-        `Failed to initialize threat intelligence network: ${(error as Error).message}`,
+        `Failed to initialize threat intelligence network: ${errMsg}`,
         { cause: error },
       )
     }
@@ -162,7 +174,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Threat Intelligence Database initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize database', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -182,7 +194,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Global Threat Intelligence Network initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize global network', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -194,15 +206,18 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   private async initializeEdgeDetection(): Promise<void> {
     try {
       logger.info('Initializing Edge Threat Detection System')
+      const redisUrl = process.env['REDIS_URL'] ?? 'redis://localhost:6379'
+      const redis = new Redis(redisUrl)
       const edgeDetection = new EdgeThreatDetectionSystem(
         this.networkConfig.edge,
+        redis,
       )
       await edgeDetection.initialize()
       this.components.set('edge', edgeDetection)
       logger.info('Edge Threat Detection System initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize edge detection', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -222,7 +237,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Threat Correlation Engine initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize correlation engine', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -242,7 +257,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Automated Threat Response Orchestrator initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize response orchestrator', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -260,7 +275,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Threat Hunting System initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize hunting system', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -280,7 +295,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('External Threat Feed Integration initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize feed integration', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -300,7 +315,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Threat Validation System initialized')
     } catch (error: unknown) {
       logger.error('Failed to initialize validation system', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -324,7 +339,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       logger.info('Component integration setup completed')
     } catch (error: unknown) {
       logger.error('Failed to setup component integration', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -334,45 +349,44 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
    * Set up event listeners for cross-component communication
    */
   private setupEventListeners(): void {
-    const globalNetwork = this.components.get('global')
-    const edgeDetection = this.components.get('edge')
-
-    const responseOrchestrator = this.components.get('response')
-    const huntingSystem = this.components.get('hunting')
-    const feedIntegration = this.components.get('feeds')
-    const validationSystem = this.components.get('validation')
+    const globalNetwork = this.components.get('global') as EventEmitter
+    const edgeDetection = this.components.get('edge') as EventEmitter
+    const responseOrchestrator = this.components.get('response') as EventEmitter
+    const huntingSystem = this.components.get('hunting') as EventEmitter
+    const feedIntegration = this.components.get('feeds') as EventEmitter
+    const validationSystem = this.components.get('validation') as EventEmitter
 
     // Global network events
-    globalNetwork.on('threat:detected', async (event) => {
+    globalNetwork.on('threat:detected', async (event: Record<string, unknown>) => {
       await this.handleThreatDetected(event)
     })
 
-    globalNetwork.on('threat:correlated', async (event) => {
+    globalNetwork.on('threat:correlated', async (event: Record<string, unknown>) => {
       await this.handleThreatCorrelated(event)
     })
 
     // Edge detection events
-    edgeDetection.on('threat:detected', async (event) => {
+    edgeDetection.on('threat:detected', async (event: Record<string, unknown>) => {
       await this.handleEdgeThreatDetected(event)
     })
 
     // Feed integration events
-    feedIntegration.on('feed:sync_completed', async (event) => {
+    feedIntegration.on('feed:sync_completed', async (event: Record<string, unknown>) => {
       await this.handleFeedSyncCompleted(event)
     })
 
     // Validation events
-    validationSystem.on('validation:completed', async (event) => {
+    validationSystem.on('validation:completed', async (event: Record<string, unknown>) => {
       await this.handleValidationCompleted(event)
     })
 
     // Hunting events
-    huntingSystem.on('hunt:completed', async (event) => {
+    huntingSystem.on('hunt:completed', async (event: Record<string, unknown>) => {
       await this.handleHuntCompleted(event)
     })
 
     // Response orchestrator events
-    responseOrchestrator.on('response:triggered', async (event) => {
+    responseOrchestrator.on('response:triggered', async (event: Record<string, unknown>) => {
       await this.handleResponseTriggered(event)
     })
   }
@@ -389,42 +403,44 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle threat detected event
    */
-  private async handleThreatDetected(event: any): Promise<void> {
+  private async handleThreatDetected(event: Record<string, unknown>): Promise<void> {
     try {
+      const tid = event['threat_id'] as string | undefined
       logger.info('Handling threat detected event', {
-        threat_id: event.threat_id,
+        threat_id: tid,
       })
 
       // Update metrics
       this.metrics.totalThreatsProcessed++
-      this.metrics.threatsBySeverity[event.severity] =
-        (this.metrics.threatsBySeverity[event.severity] ?? 0) + 1
+      const severity = event['severity'] as string
+      this.metrics.threatsBySeverity[severity] =
+        (this.metrics.threatsBySeverity[severity] ?? 0) + 1
 
       // Emit system event
       this.emit('threat:detected', {
         type: 'threat_detected',
         timestamp: new Date(),
-        severity: event.severity,
+        severity,
         data: event,
         source: 'global_network',
       })
 
       // Trigger correlation analysis
-      const correlationEngine = this.components.get('correlation')
+      const correlationEngine = this.components.get('correlation') as ComponentMethods
       if (correlationEngine) {
-        await correlationEngine.correlateThreat(event.threat_id)
+        await correlationEngine.correlateThreat(tid)
       }
 
       // Validate threat data
-      const validationSystem = this.components.get('validation')
+      const validationSystem = this.components.get('validation') as ComponentMethods
       if (validationSystem) {
         await validationSystem.requestValidation(
           {
-            id: event.threat_id,
+            id: tid,
             type: 'indicator',
             data: event,
             source: 'global_network',
-            confidence: event.confidence ?? 0.5,
+            confidence: (event['confidence'] as number) ?? 0.5,
             timestamp: new Date(),
             metadata: {},
           },
@@ -433,7 +449,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error handling threat detected event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -441,20 +457,20 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle edge threat detected event
    */
-  private async handleEdgeThreatDetected(event: any): Promise<void> {
+  private async handleEdgeThreatDetected(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling edge threat detected event', {
-        threat_id: event.threat_id,
+        threat_id: event['threat_id'],
       })
 
       // Forward to global network for processing
-      const globalNetwork = this.components.get('global')
+      const globalNetwork = this.components.get('global') as ComponentMethods
       if (globalNetwork) {
         await globalNetwork.processThreat(event)
       }
     } catch (error: unknown) {
       logger.error('Error handling edge threat detected event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -462,21 +478,21 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle threat correlated event
    */
-  private async handleThreatCorrelated(event: any): Promise<void> {
+  private async handleThreatCorrelated(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling threat correlated event', {
-        correlation_id: event.correlation_id,
+        correlation_id: event['correlation_id'],
       })
 
       // Trigger response orchestration if correlation confidence is high
-      if (event.confidence > 0.8) {
-        const responseOrchestrator = this.components.get('response')
+      if ((event['confidence'] as number) > 0.8) {
+        const responseOrchestrator = this.components.get('response') as ComponentMethods
         if (responseOrchestrator) {
           await responseOrchestrator.orchestrateResponse({
-            threat_id: event.threat_id,
-            severity: event.severity,
-            confidence: event.confidence,
-            affected_regions: event.affected_regions,
+            threat_id: event['threat_id'],
+            severity: event['severity'],
+            confidence: event['confidence'],
+            affected_regions: event['affected_regions'],
             correlation_data: event,
           })
         }
@@ -486,13 +502,13 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       this.emit('threat:correlated', {
         type: 'threat_correlated',
         timestamp: new Date(),
-        severity: event.severity,
+        severity: event['severity'],
         data: event,
         source: 'correlation_engine',
       })
     } catch (error: unknown) {
       logger.error('Error handling threat correlated event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -500,34 +516,34 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle feed sync completed event
    */
-  private async handleFeedSyncCompleted(event: any): Promise<void> {
+  private async handleFeedSyncCompleted(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling feed sync completed event', {
-        feed_id: event.feed_id,
-        indicators_processed: event.indicators_processed,
+        feed_id: event['feed_id'],
+        indicators_processed: event['indicators_processed'],
       })
 
       // Process new indicators through the pipeline
-      const feedIntegration = this.components.get('feeds')
-      if (feedIntegration && event.indicators_processed > 0) {
-        const indicators = await feedIntegration.getThreatIndicators({
-          feed_id: event.feed_id,
+      const feedIntegration = this.components.get('feeds') as ComponentMethods
+      if (feedIntegration && (event['indicators_processed'] as number) > 0) {
+        const indicators = (await feedIntegration.getThreatIndicators({
+          feed_id: event['feed_id'],
           limit: 100,
-        })
+        })) as Record<string, unknown>[]
 
         for (const indicator of indicators) {
           // Validate new indicators
-          const validationSystem = this.components.get('validation')
+          const validationSystem = this.components.get('validation') as ComponentMethods
           if (validationSystem) {
             await validationSystem.requestValidation(
               {
-                id: indicator.id,
-                type: indicator.type,
+                id: indicator['id'],
+                type: indicator['type'],
                 data: indicator,
-                source: indicator.feed_id,
-                confidence: indicator.confidence,
+                source: indicator['feed_id'],
+                confidence: indicator['confidence'],
                 timestamp: new Date(),
-                metadata: indicator.attributes,
+                metadata: indicator['attributes'],
               },
               ['accuracy', 'reliability'],
             )
@@ -536,7 +552,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error handling feed sync completed event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -544,23 +560,23 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle validation completed event
    */
-  private async handleValidationCompleted(event: any): Promise<void> {
+  private async handleValidationCompleted(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling validation completed event', {
-        validation_id: event.validation_id,
-        status: event.status,
+        validation_id: event['validation_id'],
+        status: event['status'],
       })
 
       // If validation passed, proceed with threat processing
-      if (event.status === 'validated' && event.score > 0.7) {
-        const globalNetwork = this.components.get('global')
+      if (event['status'] === 'validated' && (event['score'] as number) > 0.7) {
+        const globalNetwork = this.components.get('global') as ComponentMethods
         if (globalNetwork) {
-          await globalNetwork.processValidatedThreat(event.threat_id)
+          await globalNetwork.processValidatedThreat(event['threat_id'])
         }
       }
 
       // Update metrics
-      if (event.status === 'validated') {
+      if (event['status'] === 'validated') {
         this.metrics.detectionAccuracy =
           (this.metrics.detectionAccuracy * this.metrics.totalThreatsProcessed +
             1) /
@@ -568,7 +584,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error handling validation completed event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -576,37 +592,35 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle hunt completed event
    */
-  private async handleHuntCompleted(event: any): Promise<void> {
+  private async handleHuntCompleted(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling hunt completed event', {
-        hunt_id: event.hunt_id,
-        findings_count: event.findings_count,
+        hunt_id: event['hunt_id'],
+        findings_count: event['findings_count'],
       })
 
-      if (event.findings_count > 0) {
-        // Process hunt findings
-        const huntingSystem = this.components.get('hunting')
+      if ((event['findings_count'] as number) > 0) {
+        const huntingSystem = this.components.get('hunting') as ComponentMethods
         if (huntingSystem) {
-          const results = await huntingSystem.getHuntResults(event.hunt_id, 10)
+          const results = (await huntingSystem.getHuntResults(event['hunt_id'], 10)) as Record<string, unknown>[]
 
           for (const result of results) {
-            for (const finding of result.findings) {
-              // Create threat data from finding
+            const findings = result['findings'] as Record<string, unknown>[]
+            for (const finding of findings) {
               const threatData = {
-                id: finding.id,
-                type: finding.type,
+                id: finding['id'],
+                type: finding['type'],
                 data: finding,
                 source: 'threat_hunt',
-                confidence: finding.confidence,
-                timestamp: finding.timestamp,
+                confidence: finding['confidence'],
+                timestamp: finding['timestamp'],
                 metadata: {
-                  hunt_id: event.hunt_id,
-                  finding_type: finding.type,
+                  hunt_id: event['hunt_id'],
+                  finding_type: finding['type'],
                 },
               }
 
-              // Process as new threat
-              const globalNetwork = this.components.get('global')
+              const globalNetwork = this.components.get('global') as ComponentMethods
               if (globalNetwork) {
                 await globalNetwork.processThreat(threatData)
               }
@@ -616,7 +630,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error handling hunt completed event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -624,29 +638,29 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Handle response triggered event
    */
-  private async handleResponseTriggered(event: any): Promise<void> {
+  private async handleResponseTriggered(event: Record<string, unknown>): Promise<void> {
     try {
       logger.info('Handling response triggered event', {
-        response_id: event.response_id,
-        action: event.action,
+        response_id: event['response_id'],
+        action: event['action'],
       })
 
       // Update response time metrics
-      if (event.response_time) {
-        this.metrics.responseTime = event.response_time
+      if (event['response_time']) {
+        this.metrics.responseTime = event['response_time'] as number
       }
 
       // Emit system alert
       this.emit('system_alert', {
         type: 'response_triggered',
         timestamp: new Date(),
-        severity: event.severity ?? 'medium',
+        severity: (event['severity'] as string) ?? 'medium',
         data: event,
         source: 'response_orchestrator',
       })
     } catch (error: unknown) {
       logger.error('Error handling response triggered event', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -675,7 +689,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       for (const [name, component] of this.components) {
         try {
-          if (component.isReady) {
+          if ((component as { isReady: boolean })?.isReady) {
             healthStatus[name] = 'up'
           } else {
             healthStatus[name] = 'warning'
@@ -683,7 +697,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
         } catch (error: unknown) {
           healthStatus[name] = 'down'
           logger.error(`Component ${name} health check failed`, {
-            error: (error as Error).message,
+            error: error instanceof Error ? error.message : String(error),
           })
         }
       }
@@ -715,7 +729,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Error checking system health', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -726,12 +740,12 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   private async updateMetrics(): Promise<void> {
     try {
       // Calculate detection accuracy
-      const validationSystem = this.components.get('validation')
+      const validationSystem = this.components.get('validation') as ComponentMethods
       if (validationSystem) {
-        const stats = await validationSystem.getValidationStats()
-        this.metrics.detectionAccuracy = stats.average_score
+        const stats = (await validationSystem.getValidationStats()) as Record<string, unknown>
+        this.metrics.detectionAccuracy = stats['average_score'] as number
         this.metrics.falsePositiveRate =
-          stats.rejected_threats / Math.max(1, stats.total_validations)
+          (stats['rejected_threats'] as number) / Math.max(1, stats['total_validations'] as number)
       }
 
       // Emit metrics update
@@ -741,7 +755,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       })
     } catch (error: unknown) {
       logger.error('Error updating metrics', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
     }
   }
@@ -749,79 +763,71 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Process threat through the complete pipeline
    */
-  async processThreat(threatData: any): Promise<{
+  async processThreat(threatData: Record<string, unknown>): Promise<{
     threat_id: string
     status: string
-    pipeline_results: Record<string, any>
+    pipeline_results: Record<string, unknown>
   }> {
     if (!this.isInitialized) {
       throw new Error('Threat Intelligence Network not initialized')
     }
 
     try {
-      const threatId = threatData.id ?? `threat-${Date.now()}`
-      const pipelineResults: Record<string, any> = {}
+      const threatId = (threatData['id'] as string) ?? `threat-${Date.now()}`
+      const pipelineResults: Record<string, unknown> = {}
 
       logger.info('Processing threat through complete pipeline', {
         threat_id: threatId,
       })
 
-      // Step 1: Edge detection (if applicable)
-      const edgeDetection = this.components.get('edge')
-      if (edgeDetection && threatData.source === 'edge') {
+      const edgeDetection = this.components.get('edge') as ComponentMethods
+      if (edgeDetection && threatData['source'] === 'edge') {
         pipelineResults['edge'] = await edgeDetection.analyzeThreat(threatData)
       }
 
-      // Step 2: Global network processing
-      const globalNetwork = this.components.get('global')
+      const globalNetwork = this.components.get('global') as ComponentMethods
       if (globalNetwork) {
-        pipelineResults['global'] =
-          await globalNetwork.processThreat(threatData)
+        pipelineResults['global'] = await globalNetwork.processThreat(threatData)
       }
 
-      // Step 3: Correlation analysis
-      const correlationEngine = this.components.get('correlation')
+      const correlationEngine = this.components.get('correlation') as ComponentMethods
       if (correlationEngine) {
-        pipelineResults['correlation'] =
-          await correlationEngine.correlateThreat(threatId)
+        pipelineResults['correlation'] = await correlationEngine.correlateThreat(threatId)
       }
 
-      // Step 4: Validation
-      const validationSystem = this.components.get('validation')
+      const validationSystem = this.components.get('validation') as ComponentMethods
       if (validationSystem) {
-        const validationId = await validationSystem.requestValidation(
+        const validationId = (await validationSystem.requestValidation(
           {
             id: threatId,
-            type: threatData.type ?? 'unknown',
+            type: (threatData['type'] as string) ?? 'unknown',
             data: threatData,
-            source: threatData.source ?? 'unknown',
-            confidence: threatData.confidence ?? 0.5,
+            source: (threatData['source'] as string) ?? 'unknown',
+            confidence: (threatData['confidence'] as number) ?? 0.5,
             timestamp: new Date(),
-            metadata: threatData.metadata ?? {},
+            metadata: (threatData['metadata'] as Record<string, unknown>) ?? {},
           },
           ['accuracy', 'completeness', 'reliability'],
-        )
+        )) as string
         pipelineResults['validation'] = {
           validation_id: validationId,
           status: 'pending',
         }
       }
 
-      // Step 5: Response orchestration (if high confidence)
       if (
-        threatData.confidence > 0.8 ||
-        pipelineResults['correlation']?.confidence > 0.8
+        (threatData['confidence'] as number) > 0.8 ||
+        (pipelineResults['correlation'] as Record<string, unknown>)?.['confidence'] > 0.8
       ) {
-        const responseOrchestrator = this.components.get('response')
+        const responseOrchestrator = this.components.get('response') as ComponentMethods
         if (responseOrchestrator) {
-          pipelineResults['response'] =
-            await responseOrchestrator.orchestrateResponse({
-              threat_id: threatId,
-              severity: threatData.severity ?? 'medium',
-              confidence: threatData.confidence ?? 0.5,
-              affected_regions: threatData.regions ?? ['global'],
-              correlation_data: pipelineResults['correlation'],
-            })
+          pipelineResults['response'] = await responseOrchestrator.orchestrateResponse({
+            threat_id: threatId,
+            severity: (threatData['severity'] as string) ?? 'medium',
+            confidence: (threatData['confidence'] as number) ?? 0.5,
+            affected_regions: (threatData['regions'] as string[]) ?? ['global'],
+            correlation_data: pipelineResults['correlation'],
+          })
         }
       }
 
@@ -832,7 +838,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
     } catch (error: unknown) {
       logger.error('Error processing threat through pipeline', {
-        error: (error as Error).message,
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -862,7 +868,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
   /**
    * Get all components
    */
-  getComponents(): Map<string, any> {
+  getComponents(): Map<string, unknown> {
     return new Map(this.components)
   }
 
@@ -887,9 +893,10 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       for (const componentName of shutdownOrder) {
         const component = this.components.get(componentName)
-        if (component?.shutdown) {
+        const comp = component as { shutdown?: () => Promise<void> } | undefined
+        if (comp?.shutdown) {
           logger.info(`Shutting down ${componentName} component`)
-          await component.shutdown()
+          await comp.shutdown()
         }
       }
 
@@ -899,7 +906,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       this.emit('shutdown', { timestamp: new Date() })
       logger.info('Threat Intelligence Network shutdown completed')
     } catch (error: unknown) {
-      logger.error('Error during shutdown', { error: (error as Error).message })
+      logger.error('Error during shutdown', { error: error instanceof Error ? error.message : String(error) })
       throw error
     }
   }
@@ -931,15 +938,104 @@ export {
   ThreatValidationSystem,
 }
 
-// Export types
-export * from './GlobalThreatIntelligenceNetwork'
-export * from './EdgeThreatDetectionSystem'
-export * from './ThreatCorrelationEngine'
-export * from './ThreatIntelligenceDatabase'
-export * from './AutomatedThreatResponseOrchestrator'
-export * from './ThreatHuntingSystem'
-export * from './ExternalThreatFeedIntegration'
-export * from './ThreatValidationSystem'
+// Export types - explicitly re-export each type to avoid ambiguous re-export errors.
+// Types like ThreatIndicator exist in 5 modules, ExecutionLogEntry in 2, and ThreatData in 2,
+// so export * cannot be used safely. Each type is listed from its canonical module.
+export type {
+  ThreatIntelligence,
+  ThreatAttribution,
+  ThreatSharingConfig,
+  GlobalThreatNetworkConfig,
+} from './GlobalThreatIntelligenceNetwork'
+export type {
+  EdgeDetectionConfig,
+  ModelConfig,
+  ThreatDetection,
+  DetectionInput,
+  ModelResult,
+  BiasAnalysis,
+  DetectionResult,
+} from './EdgeThreatDetectionSystem'
+export type {
+  ThreatCorrelation,
+  CorrelatedThreat,
+  ThreatPattern,
+  CorrelationAnalysis,
+  MLInsight,
+  CorrelationEngineConfig,
+  AlgorithmConfig,
+  TimeGroup,
+  SpatialGroup,
+  BehavioralGroup,
+  AttributionGroup,
+  SpatialCorrelationResult,
+} from './ThreatCorrelationEngine'
+export type {
+  STIXObject,
+  STIXIndicator,
+  STIXMalware,
+  STIXThreatActor,
+  STIXAttackPattern,
+  STIXVulnerability,
+  KillChainPhase,
+  TAXIICollection,
+  TAXIIManifestEntry,
+  ThreatIntelligenceDatabaseConfig,
+  DatabaseThreatIntelligence,
+  DatabaseCollection,
+} from './ThreatIntelligenceDatabase'
+export type {
+  ThreatResponse,
+  ResponseTarget,
+  ResponseAction,
+  ResponseCondition,
+  ExecutionLogEntry,
+  ResponseResult,
+  ResponseOrchestratorConfig,
+  ResponseStrategy,
+  EscalationRule,
+} from './AutomatedThreatResponseOrchestrator'
+export type {
+  ThreatHunt,
+  HuntScope,
+  HuntQuery,
+  HuntSchedule,
+  HuntResult,
+  HuntFinding,
+  Evidence,
+  HuntStatistics,
+  FalsePositive,
+  ThreatHuntingSystemConfig,
+  HuntTemplate,
+} from './ThreatHuntingSystem'
+export type {
+  ThreatFeed,
+  FeedAuthentication,
+  FeedConfiguration,
+  FeedFilters,
+  DataTransformation,
+  DeduplicationRule,
+  RateLimitConfig,
+  DataQualityMetrics,
+  ThreatRelationship,
+  FeedSyncResult,
+  SyncError,
+  SyncPerformanceMetrics,
+  ExternalThreatFeedIntegrationConfig,
+  OAuth2Credentials,
+} from './ExternalThreatFeedIntegration'
+export type {
+  ThreatValidation,
+  ValidationCriteria,
+  ValidationRule,
+  ValidationResult,
+  ValidationFinding,
+  ValidationEvidence,
+  ValidationHistoryEntry,
+  ThreatValidationSystemConfig,
+  QualityGate,
+  NotificationConfig,
+} from './ThreatValidationSystem'
 export * from './config'
 
 export default ThreatIntelligenceNetwork

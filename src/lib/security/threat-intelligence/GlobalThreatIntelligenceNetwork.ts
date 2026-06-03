@@ -6,12 +6,12 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 
 import { logger } from '../../logger'
 import { auditLog } from '../audit-logging'
-import { encrypt, decrypt } from '../encryption'
+import { encrypt, decrypt } from '../../encryption'
 
 // Types
 export interface ThreatIntelligence {
@@ -538,7 +538,6 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
     try {
       const encryptedData = await encrypt(
         JSON.stringify(threat),
-        this.config.encryption.key,
       )
       return {
         ...threat,
@@ -564,7 +563,6 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       if (threat.data?.['encrypted']) {
         const decryptedData = await decrypt(
           threat.data['encrypted'],
-          this.config.encryption.key,
         )
         return JSON.parse(decryptedData)
       }
