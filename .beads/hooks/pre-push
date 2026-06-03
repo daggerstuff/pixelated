@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Colors
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
 # Ensure the correct Node version from nvm is available in the hook environment
 if [ -z "${NVM_DIR:-}" ]; then
   if [ -s "$HOME/.nvm/nvm.sh" ]; then
@@ -13,15 +19,12 @@ fi
 if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
   . "$NVM_DIR/nvm.sh"
   if [ -f .nvmrc ]; then
-    nvm use --silent >/dev/null 2>&1 || nvm use || true
+    if ! nvm use --silent >/dev/null; then
+      echo -e "${YELLOW}⚠️  [Hook] Unable to activate Node from .nvmrc; install it with 'nvm install'.${NC}"
+      exit 1
+    fi
   fi
 fi
-
-# Colors
-YELLOW='\033[1;33m'
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-NC='\033[0m'
 
 if [ "${SKIP_PUSH_CHECKS:-}" = "true" ]; then
   echo -e "${YELLOW}⏩ [Hook] Skipping push checks (SKIP_PUSH_CHECKS is true)${NC}"
@@ -38,27 +41,3 @@ else
     # Run a subset or quick test if possible, fallback to full suite
     pnpm test
 fi
-
-# --- BEGIN BEADS INTEGRATION v1.0.4 ---
-# This section is managed by beads. Do not remove these markers.
-if command -v bd >/dev/null 2>&1; then
-  export BD_GIT_HOOK=1
-  _bd_timeout=${BEADS_HOOK_TIMEOUT:-300}
-  if command -v timeout >/dev/null 2>&1; then
-    timeout "$_bd_timeout" bd hooks run pre-push "$@"
-    _bd_exit=$?
-    if [ $_bd_exit -eq 124 ]; then
-      echo >&2 "beads: hook 'pre-push' timed out after ${_bd_timeout}s — continuing without beads"
-      _bd_exit=0
-    fi
-  else
-    bd hooks run pre-push "$@"
-    _bd_exit=$?
-  fi
-  if [ $_bd_exit -eq 3 ]; then
-    echo >&2 "beads: database not initialized — skipping hook 'pre-push'"
-    _bd_exit=0
-  fi
-  if [ $_bd_exit -ne 0 ]; then exit $_bd_exit; fi
-fi
-# --- END BEADS INTEGRATION v1.0.4 ---
