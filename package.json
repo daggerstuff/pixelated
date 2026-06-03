@@ -357,7 +357,7 @@
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-v8": "^4.1.8",
     "@vitest/eslint-plugin": "latest",
-    "astro": "^6.4.3",
+    "astro": "^6.4.4",
     "astro-eslint-parser": "latest",
     "astro-robots-txt": "latest",
     "autoprefixer": "latest",
