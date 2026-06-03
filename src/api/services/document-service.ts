@@ -38,7 +38,7 @@ export async function createDocument(
     title: string
     type: string
     category: string
-    content?: any
+    content?: Record<string, unknown>
     description?: string
     owner: string
   },
@@ -119,7 +119,7 @@ export async function updateDocument(
   documentId: string,
   updates: {
     title?: string
-    content?: any
+    content?: Record<string, unknown>
     status?: DocumentStatus
     description?: string
   },
@@ -142,7 +142,7 @@ export async function updateDocument(
   }
 
   // Track changes for version history
-  const changes: any = {}
+  const changes: Record<string, unknown> = {}
   if (updates.title && updates.title !== document.title) {
     changes.title = { old: document.title, new: updates.title }
     document.title = updates.title
@@ -292,7 +292,7 @@ export async function searchDocuments(
     status?: string
   },
 ) {
-  const searchFilter: any = {
+  const searchFilter: Record<string, unknown> = {
     $or: [
       { owner: userId },
       { 'permissions.view': userId },

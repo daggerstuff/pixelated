@@ -5,7 +5,7 @@
 
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -43,11 +43,11 @@ export interface ThreatIntelligenceDatabase {
   getActiveThreatCount(region?: string): Promise<number>
   getCorrelationCount(region?: string): Promise<number>
   storeCorrelationData(correlation: CorrelationData): Promise<void>
-  getSTIXObjects(objectType: string, filters?: any): Promise<any[]>
-  getTAXIICollections(): Promise<any[]>
-  getTAXIIObjects(collectionId: string, filters?: any): Promise<any[]>
+  getSTIXObjects(objectType: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]>
+  getTAXIICollections(): Promise<Record<string, unknown>[]>
+  getTAXIIObjects(collectionId: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]>
   searchThreats(
-    query: any,
+    query: Record<string, unknown>,
     pagination: PaginationParams,
   ): Promise<ApiResponse<GlobalThreatIntelligence[]>>
   getHealthStatus(): Promise<HealthStatus>
@@ -78,8 +78,8 @@ export interface STIXObject {
   created_by_ref?: string
   labels?: string[]
   object_marking_refs?: string[]
-  granular_markings?: any[]
-  [key: string]: any
+  granular_markings?: Record<string, unknown>[]
+  [key: string]: unknown
 }
 
 export interface TAXIICollection {
@@ -688,7 +688,7 @@ export class ThreatIntelligenceDatabaseCore
   async getThreatsByRegion(region?: string): Promise<Record<string, number>> {
     try {
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const pipeline: any[] = []
+      const pipeline: Record<string, unknown>[] = []
 
       if (region) {
         pipeline.push({ $match: { regions: region } })
@@ -719,7 +719,7 @@ export class ThreatIntelligenceDatabaseCore
       const threatsCollection = this.db.collection('global_threat_intelligence')
       const matchStage = region ? { $match: { regions: region } } : null
 
-      const pipeline: any[] = [
+      const pipeline: Record<string, unknown>[] = [
         { $group: { _id: '$severity', count: { $sum: 1 } } },
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
@@ -778,7 +778,7 @@ export class ThreatIntelligenceDatabaseCore
   async getActiveThreatCount(region?: string): Promise<number> {
     try {
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const query: any = {
+      const query: Record<string, unknown> = {
         $or: [
           { expirationDate: { $exists: false } },
           { expirationDate: { $gt: new Date() } },
@@ -799,7 +799,7 @@ export class ThreatIntelligenceDatabaseCore
   async getCorrelationCount(region?: string): Promise<number> {
     try {
       const correlationsCollection = this.db.collection('correlation_data')
-      let query: any = {}
+      let query: Record<string, unknown> = {}
 
       if (region) {
         // Find correlations that involve the specified region
@@ -841,7 +841,7 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  async getSTIXObjects(objectType: string, filters?: any): Promise<any[]> {
+  async getSTIXObjects(objectType: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]> {
     try {
       if (!this.stixConfig.enabled) {
         throw new Error('STIX support is not enabled')
@@ -860,7 +860,7 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  async getTAXIICollections(): Promise<any[]> {
+  async getTAXIICollections(): Promise<Record<string, unknown>[]> {
     try {
       if (!this.taxiiConfig.enabled) {
         throw new Error('TAXII support is not enabled')
@@ -876,7 +876,7 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  async getTAXIIObjects(collectionId: string, filters?: any): Promise<any[]> {
+  async getTAXIIObjects(collectionId: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]> {
     try {
       if (!this.taxiiConfig.enabled) {
         throw new Error('TAXII support is not enabled')
@@ -903,7 +903,7 @@ export class ThreatIntelligenceDatabaseCore
   }
 
   async searchThreats(
-    query: any,
+    query: Record<string, unknown>,
     pagination: PaginationParams,
   ): Promise<ApiResponse<GlobalThreatIntelligence[]>> {
     try {
@@ -953,8 +953,8 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private buildSearchQuery(query: any): any {
-    const searchQuery: any = {}
+  private buildSearchQuery(query: Record<string, unknown>): Record<string, unknown> {
+    const searchQuery: Record<string, unknown> = {}
 
     if (query.threatId) {
       searchQuery.threatId = query.threatId

@@ -6,7 +6,7 @@
 import { EventEmitter } from 'events'
 
 import axios, { AxiosInstance } from 'axios'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -82,7 +82,7 @@ export class ExternalThreatFeedIntegrationCore
   private readonly feedProcessors: Map<string, FeedProcessor> = new Map()
   private readonly activeTimers: Map<string, NodeJS.Timeout> = new Map()
 
-  constructor(private readonly config: FeedConfig) {
+  constructor(_config: FeedConfig) {
     super()
     this.initializeHttpClient()
     this.initializeFeedProcessors()
@@ -512,28 +512,29 @@ export class ExternalThreatFeedIntegrationCore
 
   private async buildFeedRequestConfig(
     subscription: FeedSubscription,
-  ): Promise<any> {
+  ): Promise<Record<string, unknown>> {
     const subConfig: Partial<FeedConfig> & FeedSubscriptionRequestConfig =
       subscription.config ?? {}
-    const config: any = {
+    const headers = {
+      ...subConfig.headers,
+    } as Record<string, string>
+    const config: Record<string, unknown> = {
       method: subConfig.method ?? 'GET',
       url: subscription.endpoint,
-      headers: {
-        ...subConfig.headers,
-      },
+      headers,
     }
 
     // Add authentication
     if (subscription.apiKey) {
       switch (subConfig.authType) {
         case 'api_key':
-          config.headers['X-API-Key'] = subscription.apiKey
+          headers['X-API-Key'] = subscription.apiKey
           break
         case 'bearer':
-          config.headers['Authorization'] = `Bearer ${subscription.apiKey}`
+          headers['Authorization'] = `Bearer ${subscription.apiKey}`
           break
         case 'basic':
-          config.auth = {
+          config['auth'] = {
             username: subConfig.username ?? '',
             password: subscription.apiKey,
           }
@@ -546,12 +547,12 @@ export class ExternalThreatFeedIntegrationCore
 
     // Add query parameters
     if (subConfig.queryParams) {
-      config.params = subConfig.queryParams
+      config['params'] = subConfig.queryParams
     }
 
     // Add request body for POST requests
-    if (config.method === 'POST' && subConfig.requestBody) {
-      config.data = subConfig.requestBody
+    if (config['method'] === 'POST' && subConfig.requestBody) {
+      config['data'] = subConfig.requestBody
     }
 
     return config
@@ -563,7 +564,7 @@ export class ExternalThreatFeedIntegrationCore
 
   private filterFeedItems(
     items: FeedItem[],
-    filters: Record<string, any>,
+    filters: Record<string, unknown>,
   ): FeedItem[] {
     if (!filters || Object.keys(filters).length === 0) {
       return items
@@ -629,7 +630,9 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Set expiration on the deduplication set (24 hours)
-      await this.redis.expire(cacheKey, 24 * 60 * 60)
+      if (this.redis && typeof this.redis['expire'] === 'function') {
+        await this.redis.expire(cacheKey, 24 * 60 * 60)
+      }
 
       return deduplicatedItems
     } catch (error: unknown) {
@@ -1213,7 +1216,7 @@ export class ExternalThreatFeedIntegrationCore
 
 // Feed Processor Interface and Implementations
 export interface FeedProcessor {
-  parseFeed(data: any, subscription: FeedSubscription): Promise<FeedItem[]>
+  parseFeed(data: Record<string, unknown>, subscription: FeedSubscription): Promise<FeedItem[]>
   convertToThreat(
     item: FeedItem,
     subscription: FeedSubscription,
@@ -1270,29 +1273,30 @@ function defaultGlobalThreatFields(
 // STIX Feed Processor
 class STIXFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
       const items: FeedItem[] = []
 
       // Parse STIX 2.x format
-      if (data.objects) {
-        for (const obj of data.objects) {
-          if (obj.type === 'indicator') {
+      const objects = (data as Record<string, unknown>)['objects'] as Record<string, unknown>[] | undefined
+      if (objects) {
+        for (const obj of objects) {
+          if ((obj as Record<string, unknown>)['type'] === 'indicator') {
             items.push({
-              itemId: obj.id,
-              indicator: obj.pattern,
-              indicatorType: this.extractIndicatorType(obj.pattern),
-              severity: this.mapSTIXThreatLevel(obj.labels),
-              confidence: obj.confidence ?? 0.5,
-              timestamp: new Date(obj.created),
-              description: obj.description ?? '',
+              itemId: (obj as Record<string, unknown>)['id'] as string,
+              indicator: (obj as Record<string, unknown>)['pattern'] as string,
+              indicatorType: this.extractIndicatorType((obj as Record<string, unknown>)['pattern'] as string),
+              severity: this.mapSTIXThreatLevel((obj as Record<string, unknown>)['labels'] as string[]),
+              confidence: ((obj as Record<string, unknown>)['confidence'] as number) ?? 0.5,
+              timestamp: new Date((obj as Record<string, unknown>)['created'] as string),
+              description: ((obj as Record<string, unknown>)['description'] as string) ?? '',
               source: subscription.provider,
               metadata: {
-                stixVersion: data.spec_version,
-                objectType: obj.type,
-                labels: obj.labels,
+                stixVersion: (data as Record<string, unknown>)['spec_version'] as string,
+                objectType: (obj as Record<string, unknown>)['type'],
+                labels: (obj as Record<string, unknown>)['labels'],
               },
             })
           }
@@ -1335,7 +1339,7 @@ class STIXFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
@@ -1381,33 +1385,35 @@ class STIXFeedProcessor implements FeedProcessor {
 // TAXII Feed Processor
 class TAXIIFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
       const items: FeedItem[] = []
 
       // Parse TAXII 2.x format
-      if (data.objects) {
-        for (const obj of data.objects) {
+      const objects = data['objects'] as Record<string, unknown>[] | undefined
+      if (objects) {
+        for (const obj of objects) {
+          const o = obj as Record<string, unknown>
           if (
-            obj.type === 'indicator' ||
-            obj.type === 'malware' ||
-            obj.type === 'attack-pattern'
+            o['type'] === 'indicator' ||
+            o['type'] === 'malware' ||
+            o['type'] === 'attack-pattern'
           ) {
             items.push({
-              itemId: obj.id,
-              indicator: this.extractIndicatorFromTAXII(obj),
-              indicatorType: this.extractIndicatorTypeFromTAXII(obj),
-              severity: this.mapTAXIIThreatLevel(obj),
-              confidence: obj.confidence ?? 0.5,
-              timestamp: new Date(obj.created),
-              description: obj.description ?? '',
+              itemId: o['id'] as string,
+              indicator: this.extractIndicatorFromTAXII(o),
+              indicatorType: this.extractIndicatorTypeFromTAXII(o),
+              severity: this.mapTAXIIThreatLevel(o),
+              confidence: (o['confidence'] as number) ?? 0.5,
+              timestamp: new Date(o['created'] as string),
+              description: (o['description'] as string) ?? '',
               source: subscription.provider,
               metadata: {
-                taxiiVersion: data.spec_version,
-                objectType: obj.type,
-                labels: obj.labels ?? [],
+                taxiiVersion: data['spec_version'] as string,
+                objectType: o['type'],
+                labels: (o['labels'] as string[]) ?? [],
               },
             })
           }
@@ -1421,30 +1427,33 @@ class TAXIIFeedProcessor implements FeedProcessor {
     }
   }
 
-  private extractIndicatorFromTAXII(obj: any): string {
-    if (obj.pattern) return obj.pattern
-    if (obj.name) return obj.name
-    if (obj.external_references && obj.external_references.length > 0) {
+  private extractIndicatorFromTAXII(obj: Record<string, unknown>): string {
+    if (obj['pattern']) return obj['pattern'] as string
+    if (obj['name']) return obj['name'] as string
+    const extRefs = obj['external_references'] as Record<string, unknown>[] | undefined
+    if (extRefs && extRefs.length > 0) {
       return (
-        obj.external_references[0].url ?? obj.external_references[0].external_id
+        (extRefs[0] as Record<string, unknown>)['url'] as string ?? (extRefs[0] as Record<string, unknown>)['external_id'] as string
       )
     }
-    return obj.id
+    return obj['id'] as string
   }
 
-  private extractIndicatorTypeFromTAXII(obj: any): string {
-    if (obj.pattern) {
-      if (obj.pattern.includes('file:hashes')) return 'file_hash'
-      if (obj.pattern.includes('ipv4-addr')) return 'ip'
-      if (obj.pattern.includes('domain-name')) return 'domain'
-      if (obj.pattern.includes('url')) return 'url'
+  private extractIndicatorTypeFromTAXII(obj: Record<string, unknown>): string {
+    const pattern = obj['pattern'] as string
+    if (pattern) {
+      if (pattern.includes('file:hashes')) return 'file_hash'
+      if (pattern.includes('ipv4-addr')) return 'ip'
+      if (pattern.includes('domain-name')) return 'domain'
+      if (pattern.includes('url')) return 'url'
     }
     return 'unknown'
   }
 
-  private mapTAXIIThreatLevel(obj: any): string {
-    if (obj.labels?.includes('malicious-activity')) return 'high'
-    if (obj.labels?.includes('suspicious-activity')) return 'medium'
+  private mapTAXIIThreatLevel(obj: Record<string, unknown>): string {
+    const labels = obj['labels'] as string[] | undefined
+    if (labels?.includes('malicious-activity')) return 'high'
+    if (labels?.includes('suspicious-activity')) return 'medium'
     return 'low'
   }
 
@@ -1463,7 +1472,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
@@ -1508,31 +1517,35 @@ class TAXIIFeedProcessor implements FeedProcessor {
 // MISP Feed Processor
 class MISPFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
       const items: FeedItem[] = []
 
       // Parse MISP format
-      if (data.response) {
-        for (const event of data.response) {
-          if (event.Event?.Attribute) {
-            for (const attribute of event.Event.Attribute) {
+      const response = data['response'] as Record<string, unknown>[] | undefined
+      if (response) {
+        for (const evt of response) {
+          const event = evt as Record<string, unknown>
+          const attr = (event['Event'] as Record<string, unknown>)?.['Attribute'] as Record<string, unknown>[] | undefined
+          if (attr) {
+            for (const att of attr) {
+              const attribute = att as Record<string, unknown>
               items.push({
-                itemId: attribute.id,
-                indicator: attribute.value,
-                indicatorType: this.mapMISPType(attribute.type),
-                severity: this.mapMISPSeverity(attribute.comment),
-                confidence: this.mapMISPConfidence(attribute.comment),
-                timestamp: new Date(attribute.timestamp * 1000),
-                description: attribute.comment ?? '',
+                itemId: attribute['id'] as string,
+                indicator: attribute['value'] as string,
+                indicatorType: this.mapMISPType(attribute['type'] as string),
+                severity: this.mapMISPSeverity(attribute['comment'] as string),
+                confidence: this.mapMISPConfidence(attribute['comment'] as string),
+                timestamp: new Date((attribute['timestamp'] as number) * 1000),
+                description: (attribute['comment'] as string) ?? '',
                 source: subscription.provider,
                 metadata: {
-                  eventId: event.Event.id,
-                  eventInfo: event.Event.info,
-                  category: attribute.category,
-                  type: attribute.type,
+                  eventId: (event['Event'] as Record<string, unknown>)['id'] as string,
+                  eventInfo: (event['Event'] as Record<string, unknown>)['info'] as string,
+                  category: attribute['category'] as string,
+                  type: attribute['type'],
                 },
               })
             }
@@ -1592,7 +1605,7 @@ class MISPFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
@@ -1640,32 +1653,36 @@ class MISPFeedProcessor implements FeedProcessor {
 // OTX (AlienVault Open Threat Exchange) Feed Processor
 class OTXFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
       const items: FeedItem[] = []
 
       // Parse OTX format
-      if (data.results) {
-        for (const pulse of data.results) {
-          if (pulse.indicators) {
-            for (const indicator of pulse.indicators) {
+      const results = data['results'] as Record<string, unknown>[] | undefined
+      if (results) {
+        for (const p of results) {
+          const pulse = p as Record<string, unknown>
+          const indicators = pulse['indicators'] as Record<string, unknown>[] | undefined
+          if (indicators) {
+            for (const ind of indicators) {
+              const indicator = ind as Record<string, unknown>
               items.push({
-                itemId: indicator.id,
-                indicator: indicator.indicator,
-                indicatorType: this.mapOTXType(indicator.type),
-                severity: this.mapOTXSeverity(pulse.tlp),
+                itemId: indicator['id'] as string,
+                indicator: indicator['indicator'] as string,
+                indicatorType: this.mapOTXType(indicator['type'] as string),
+                severity: this.mapOTXSeverity(pulse['tlp'] as string),
                 confidence: 0.7, // OTX default confidence
-                timestamp: new Date(indicator.created),
-                description: pulse.description ?? '',
+                timestamp: new Date(indicator['created'] as string),
+                description: (pulse['description'] as string) ?? '',
                 source: subscription.provider,
                 metadata: {
-                  pulseId: pulse.id,
-                  pulseName: pulse.name,
-                  pulseAuthor: pulse.author_name,
-                  tlp: pulse.tlp,
-                  tags: pulse.tags ?? [],
+                  pulseId: pulse['id'] as string,
+                  pulseName: pulse['name'] as string,
+                  pulseAuthor: pulse['author_name'] as string,
+                  tlp: pulse['tlp'],
+                  tags: (pulse['tags'] as string[]) ?? [],
                 },
               })
             }
@@ -1721,7 +1738,7 @@ class OTXFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
@@ -1769,42 +1786,46 @@ class OTXFeedProcessor implements FeedProcessor {
 // VirusTotal Feed Processor
 class VirusTotalFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
       const items: FeedItem[] = []
 
       // Parse VirusTotal format
-      if (data.data) {
-        for (const file of data.data) {
-          if (file.attributes?.last_analysis_stats) {
-            const stats = file.attributes.last_analysis_stats
-            const maliciousCount = stats.malicious ?? 0
+      const vtData = data['data'] as Record<string, unknown>[] | undefined
+      if (vtData) {
+        for (const f of vtData) {
+          const file = f as Record<string, unknown>
+          const attrs = file['attributes'] as Record<string, unknown> | undefined
+          const stats = attrs?.['last_analysis_stats'] as Record<string, unknown> | undefined
+          if (stats) {
+            const maliciousCount = (stats['malicious'] as number) ?? 0
             const totalCount =
-              stats.malicious +
-              stats.suspicious +
-              stats.undetected +
-              stats.harmless
+              (stats['malicious'] as number) +
+              (stats['suspicious'] as number) +
+              (stats['undetected'] as number) +
+              (stats['harmless'] as number)
 
             if (maliciousCount > 0) {
+              const fileId = file['id'] as string
               items.push({
-                itemId: file.id,
-                indicator: file.id, // File hash
-                indicatorType: this.detectHashType(file.id),
+                itemId: fileId,
+                indicator: fileId, // File hash
+                indicatorType: this.detectHashType(fileId),
                 severity: this.mapVTSeverity(maliciousCount, totalCount),
                 confidence: maliciousCount / totalCount,
-                timestamp: new Date(file.attributes.last_analysis_date * 1000),
+                timestamp: new Date((attrs?.['last_analysis_date'] as number) * 1000),
                 description:
-                  file.attributes.meaningful_name ?? 'Malicious file',
+                  (attrs?.['meaningful_name'] as string) ?? 'Malicious file',
                 source: subscription.provider,
                 metadata: {
-                  fileName: file.attributes.meaningful_name,
-                  fileSize: file.attributes.size,
-                  fileType: file.attributes.type_description,
+                  fileName: attrs?.['meaningful_name'] as string,
+                  fileSize: attrs?.['size'] as number,
+                  fileType: attrs?.['type_description'] as string,
                   maliciousCount,
                   totalCount,
-                  vtLink: `https://www.virustotal.com/gui/file/${file.id}`,
+                  vtLink: `https://www.virustotal.com/gui/file/${fileId}`,
                 },
               })
             }
@@ -1849,7 +1870,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
@@ -1886,7 +1907,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
 // Generic Feed Processor
 class GenericFeedProcessor implements FeedProcessor {
   async parseFeed(
-    data: any,
+    data: Record<string, unknown>,
     subscription: FeedSubscription,
   ): Promise<FeedItem[]> {
     try {
@@ -1894,16 +1915,17 @@ class GenericFeedProcessor implements FeedProcessor {
 
       // Handle generic JSON format
       if (Array.isArray(data)) {
-        for (const item of data) {
-          if (item.indicator || item.value || item.ioc) {
+        for (const it of data) {
+          const item = it as Record<string, unknown>
+          if (item['indicator'] || item['value'] || item['ioc']) {
             items.push({
-              itemId: item.id ?? item.indicator ?? item.value ?? item.ioc,
-              indicator: item.indicator ?? item.value ?? item.ioc,
-              indicatorType: item.type ?? item.indicator_type ?? 'unknown',
-              severity: item.severity ?? item.threat_level ?? 'medium',
-              confidence: item.confidence ?? item.reliability ?? 0.5,
-              timestamp: new Date(item.timestamp ?? item.created ?? Date.now()),
-              description: item.description ?? item.notes ?? '',
+              itemId: (item['id'] ?? item['indicator'] ?? item['value'] ?? item['ioc']) as string,
+              indicator: (item['indicator'] ?? item['value'] ?? item['ioc']) as string,
+              indicatorType: (item['type'] ?? item['indicator_type'] ?? 'unknown') as string,
+              severity: (item['severity'] ?? item['threat_level'] ?? 'medium') as string,
+              confidence: (item['confidence'] ?? item['reliability'] ?? 0.5) as number,
+              timestamp: new Date((item['timestamp'] ?? item['created'] ?? Date.now()) as number),
+              description: (item['description'] ?? item['notes'] ?? '') as string,
               source: subscription.provider,
               metadata: {
                 rawData: item,
@@ -1912,23 +1934,27 @@ class GenericFeedProcessor implements FeedProcessor {
             })
           }
         }
-      } else if (data.indicators) {
-        // Handle nested indicator format
-        for (const indicator of data.indicators) {
-          items.push({
-            itemId: indicator.id ?? indicator.value,
-            indicator: indicator.value,
-            indicatorType: indicator.type ?? 'unknown',
-            severity: indicator.severity ?? 'medium',
-            confidence: indicator.confidence ?? 0.5,
-            timestamp: new Date(indicator.timestamp ?? Date.now()),
-            description: indicator.description ?? '',
-            source: subscription.provider,
-            metadata: {
-              rawData: indicator,
-              sourceFormat: 'generic_nested',
-            },
-          })
+      } else {
+        const indicators = data['indicators'] as Record<string, unknown>[] | undefined
+        if (indicators) {
+          // Handle nested indicator format
+          for (const ind of indicators) {
+            const indicator = ind as Record<string, unknown>
+            items.push({
+              itemId: (indicator['id'] ?? indicator['value']) as string,
+              indicator: indicator['value'] as string,
+              indicatorType: (indicator['type'] ?? 'unknown') as string,
+              severity: (indicator['severity'] ?? 'medium') as string,
+              confidence: (indicator['confidence'] ?? 0.5) as number,
+              timestamp: new Date((indicator['timestamp'] ?? Date.now()) as number),
+              description: (indicator['description'] ?? '') as string,
+              source: subscription.provider,
+              metadata: {
+                rawData: indicator,
+                sourceFormat: 'generic_nested',
+              },
+            })
+          }
         }
       }
 
@@ -1954,7 +1980,7 @@ class GenericFeedProcessor implements FeedProcessor {
         confidence: item.confidence,
         indicators: [
           {
-            indicatorType: item.indicatorType as any,
+            indicatorType: item.indicatorType,
             value: item.indicator,
             confidence: item.confidence,
             firstSeen: new Date(item.timestamp),
