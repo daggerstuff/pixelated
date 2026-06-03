@@ -298,6 +298,13 @@ export function getRedisClient() {
   return redis
 }
 
+interface StrictRedisClient {
+  get(key: string): Promise<string | null>
+  set(key: string, value: string, ...args: any[]): Promise<unknown>
+  del(key: string): Promise<number>
+  ping(): Promise<string>
+}
+
 /**
  * Wrapper function for Redis get with error handling
  */
@@ -305,7 +312,8 @@ export async function getFromCache<T = unknown>(
   key: string,
 ): Promise<T | null> {
   try {
-    const raw: string | null = await redis['get'](key)
+    const client = redis as unknown as StrictRedisClient
+    const raw: string | null = await client.get(key)
     if (raw === null) {
       return null
     }
@@ -342,10 +350,11 @@ export async function setInCache(
 ): Promise<boolean> {
   try {
     const serialized = typeof value === 'string' ? value : JSON.stringify(value)
+    const client = redis as unknown as StrictRedisClient
     if (expirationSeconds) {
-      await redis['set'](key, serialized, 'EX', expirationSeconds)
+      await client.set(key, serialized, 'EX', expirationSeconds)
     } else {
-      await redis['set'](key, serialized)
+      await client.set(key, serialized)
     }
     return true
   } catch (error: unknown) {
@@ -359,8 +368,9 @@ export async function setInCache(
  */
 export async function removeFromCache(key: string): Promise<boolean> {
   try {
-    const deletedCount = await redis['del'](key)
-    return Number(deletedCount) > 0
+    const client = redis as unknown as StrictRedisClient
+    const deletedCount = await client.del(key)
+    return deletedCount > 0
   } catch (error: unknown) {
     console.error(`Error removing key ${key} from Redis:`, error)
     return false
@@ -390,7 +400,8 @@ attachRedisErrorHandling()
  */
 export async function checkRedisConnection(): Promise<boolean> {
   try {
-    const pingResult = await redis['ping']()
+    const client = redis as unknown as StrictRedisClient
+    const pingResult = await client.ping()
     return pingResult === 'PONG'
   } catch (error: unknown) {
     console.error('Redis connectivity check failed:', error)

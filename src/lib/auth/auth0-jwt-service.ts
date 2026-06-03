@@ -336,7 +336,11 @@ function decodeAuth0JwtPayload(token: string): Auth0TokenClaims | null {
     return null
   }
 
-  const payload = decodeJwtPayloadSegment(tokenParts[1])
+  const secondPart = tokenParts[1]
+  if (secondPart === undefined) {
+    return null
+  }
+  const payload = decodeJwtPayloadSegment(secondPart)
   if (!isAuth0TokenClaims(payload)) {
     return null
   }

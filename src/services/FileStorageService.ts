@@ -82,7 +82,7 @@ export class FileStorageService {
     this.validateFile(file, config)
 
     // Upload to S3
-    const uploadParams = {
+    const uploadParams: Record<string, unknown> = {
       Bucket: this.bucketName,
       Key: key,
       Body: file.buffer,
@@ -99,7 +99,7 @@ export class FileStorageService {
       uploadParams['ACL'] = 'public-read'
     }
 
-    await this.s3Client.send(new PutObjectCommand(uploadParams))
+    await this.s3Client.send(new PutObjectCommand(uploadParams as any))
 
     const url = this.cloudFrontDomain
       ? `https://${this.cloudFrontDomain}/${key}`

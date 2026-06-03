@@ -9,7 +9,6 @@ import {
   ManagementClient,
   AuthenticationClient,
   UserInfoClient,
-  type _AuthenticationClientOptions,
 } from 'auth0'
 
 import type { AuthRole } from '../config/auth.config'
@@ -105,8 +104,6 @@ interface Auth0ServiceConfig {
   managementClientSecret?: string
 }
 
-type UnknownRecord = Record<string, unknown>
-
 type Auth0UserRecord = {
   'sub'?: unknown
   'user_id'?: unknown
@@ -120,10 +117,6 @@ type Auth0UserRecord = {
   'user_metadata'?: unknown
   'https://pixelated-empathy.com/app_metadata'?: unknown
   'https://pixelated-empathy.com/user_metadata'?: unknown
-}
-
-interface Auth0RoleClaim extends UnknownRecord {
-  roles?: unknown
 }
 
 export type AuthenticatedUser = {
@@ -403,6 +396,9 @@ export class Auth0UserService {
       }
 
       const auth0User = users[0]
+      if (!auth0User) {
+        return null
+      }
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
       console.error('Auth0 find user error:', error)
@@ -848,7 +844,10 @@ export class Auth0UserService {
     )
     const appMetadataRoles = appMetadata?.['roles']
     if (this.isStringArray(appMetadataRoles) && appMetadataRoles.length > 0) {
-      return this.mapAuth0RoleToRole(appMetadataRoles[0])
+      const firstRole = appMetadataRoles[0]
+      if (firstRole) {
+        return this.mapAuth0RoleToRole(firstRole)
+      }
     }
 
     const userMetadata = this.toRecord(

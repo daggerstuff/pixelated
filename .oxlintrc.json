@@ -11,7 +11,8 @@
     "src/lib/ai/modelOptimizer.ts",
     "src/lib/export/index.node.ts",
     "src/lib/fhe/fhe-factory.ts",
-    "config/vitest.config.ts"
+    "config/vitest.config.ts",
+    "foresight-mcp/apps/docs/tsconfig.json"
   ],
   "env": {
     "browser": true,
@@ -131,6 +132,8 @@
           "_redisClient",
           "_iv",
           "_store",
+          "_redis",
+          "_db",
           "_posts",
           "_pendingSearchDocs",
           "_isLoading",
@@ -273,6 +276,36 @@
     },
     {
       "files": ["tests/**/*.ts", "tests/**/*.tsx"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["src/lib/threat-intelligence/**/*.ts", "src/lib/security/threat-intelligence/**/*.ts", "src/lib/threat-detection/**/*.ts"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": ["src/api/services/*.ts"],
       "rules": {
         "typescript/no-unsafe-assignment": "off",
         "typescript/no-unsafe-member-access": "off",

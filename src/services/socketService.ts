@@ -13,9 +13,6 @@ export class SocketService {
   private readonly io: SocketIOServer
 
   constructor(server: Server, redis: RedisLike, db: Pool) {
-    this.redis = redis
-    this.db = db
-
     // Initialize Socket.IO
     this.io = new SocketIOServer(server, {
       cors: {

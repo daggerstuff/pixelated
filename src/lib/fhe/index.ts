@@ -53,7 +53,8 @@ export function createFHESystem(options: FHEOptions = {}): FHESystem {
     async decrypt(encryptedData: string): Promise<string> {
       logger.debug(`Decrypting FHE data`)
       const parts = encryptedData.split(':')
-      return parts[parts.length - 1]
+      const lastPart = parts[parts.length - 1]
+      return lastPart ?? ''
     },
 
     async verifySender(
