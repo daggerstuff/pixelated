@@ -3,7 +3,7 @@
  * Centralized configuration for the global threat intelligence network
  */
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'

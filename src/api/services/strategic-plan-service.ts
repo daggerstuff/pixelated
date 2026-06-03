@@ -18,13 +18,13 @@ export interface IStrategicPlan {
   description: string
   owner: string
   status: string
-  objectives: any[]
-  keyResults: any[]
+  objectives: Array<Record<string, unknown>>
+  keyResults: Array<Record<string, unknown>>
   budget: number
   timeline: { startDate: Date; endDate: Date }
-  kpis: any[]
-  approvals: any[]
-  riskManagement: any[]
+  kpis: Array<Record<string, unknown>>
+  approvals: Array<Record<string, unknown>>
+  riskManagement: Array<Record<string, unknown>>
   permissions: {
     view: string[]
     edit: string[]
@@ -35,8 +35,8 @@ export interface IStrategicPlan {
   save(): Promise<IStrategicPlan>
 }
 
-const getStrategicPlanModel = (): any =>
-  getMongoConnection().model<IStrategicPlan>('StrategicPlan')
+const getStrategicPlanModel = () =>
+  getMongoConnection().model('StrategicPlan')
 
 /**
  * Create a new strategic plan
@@ -45,8 +45,8 @@ export async function createStrategicPlan(data: {
   title: string
   description?: string
   ownerId: string
-  objectives?: any[]
-  keyResults?: any[]
+  objectives?: Array<Record<string, unknown>>
+  keyResults?: Array<Record<string, unknown>>
   budget?: number
   timeline?: { startDate: Date; endDate: Date }
 }) {
@@ -120,7 +120,7 @@ export async function getStrategicPlan(planId: string, userId: string) {
 export async function updateStrategicPlan(
   planId: string,
   userId: string,
-  updates: Partial<any>,
+  updates: Partial<IStrategicPlan>,
 ) {
   const StrategicPlanModel = getStrategicPlanModel()
 
@@ -260,7 +260,7 @@ export async function listStrategicPlans(
   const page = options.page ?? 1
   const limit = options.limit ?? 50
 
-  let query: any = {
+  const query: Record<string, unknown> = {
     $or: [{ owner: userId }, { 'permissions.view': userId }],
   }
 
