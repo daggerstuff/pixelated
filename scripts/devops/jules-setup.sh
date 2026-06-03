@@ -1,0 +1,92 @@
+#!/bin/bash
+set -e
+
+# Pixelated Empathy: Jules Environment Initialization Script
+# --------------------------------------------------------
+# This script prepares the short-lived Jules VM for working on the Pixelated Empathy repository.
+# It ensures the correct Node.js and Python versions and installs all necessary dependencies.
+
+echo "🚀 Starting Jules Setup: Pixelated Empathy"
+echo "--------------------------------------------------------"
+
+# 1. Ensure Node.js Version (NVM is preinstalled in Jules)
+# Project requires Node.js >=24
+if command -v nvm &> /dev/null; then
+    echo "🟢 Using NVM to set Node.js version..."
+    nvm install 24 --silent
+    nvm use 24 --silent
+else
+    echo "⚠️ NVM not found, checking node version..."
+    NODE_V=$(node -v)
+    echo "Current Node: $NODE_V"
+fi
+
+# 2. Initialize Environment Variables
+if [ ! -f ".env" ]; then
+    echo "🟡 .env not found. Initializing from .env.example..."
+    cp .env.example .env
+    # Adjust some defaults for the short-lived VM environment if needed
+    sed -i 's/NODE_ENV=production/NODE_ENV=development/' .env
+    echo "✅ .env initialized with defaults (Developer: Update secrets if needed for specific tests)."
+fi
+
+# 3. Configure pnpm and Install Node dependencies
+echo "🟢 Configuring pnpm..."
+npm install -g pnpm@11.3.0
+pnpm install --frozen-lockfile || pnpm install
+bash scripts/devops/install-git-hooks.sh
+
+# 4. Configure Python with uv (Preinstalled in Jules)
+echo "🟢 Configuring Python environment with uv..."
+# Check for root pyproject.toml
+if [ -f "pyproject.toml" ]; then
+    echo "🐍 Installing Root Python dependencies..."
+    # uv sync is the standard way with uv for project management
+    uv sync
+    
+    # 4.1 Update .autoswitch_venv for zsh-autoswitch-venv plugin
+    # This ensures the prompt shows the project name instead of .venv
+    echo "🟢 Ensuring .autoswitch_venv matches pyproject.toml name..."
+    if command -v grep &> /dev/null; then
+        PROJECT_NAME=$(grep -m 1 "^name =" pyproject.toml | cut -d '"' -f 2)
+        if [ -n "$PROJECT_NAME" ]; then
+            echo "$PROJECT_NAME" > .autoswitch_venv
+            echo "✅ .autoswitch_venv set to '$PROJECT_NAME'"
+        fi
+    fi
+fi
+
+# AI Engine (Submodule/Sub-directory) setup
+if [ -d "ai" ] && [ -f "ai/pyproject.toml" ]; then
+    echo "🧠 Setting up AI engine dependencies (ai/)..."
+    cd ai
+    uv sync
+    
+    # Update AI subdirectory's .autoswitch_venv
+    if command -v grep &> /dev/null; then
+        AI_PROJECT_NAME=$(grep -m 1 "^name =" pyproject.toml | cut -d '"' -f 2)
+        if [ -n "$AI_PROJECT_NAME" ]; then
+            echo "$AI_PROJECT_NAME" > .autoswitch_venv
+        fi
+    fi
+    cd ..
+fi
+
+# 5. Final Verification and Sanity Check
+echo "🟢 Running basic diagnostics..."
+# Using the project's own check script if possible, or just pnpm check:all
+# pnpm check:all || echo "⚠️ Post-setup check reported warnings/errors. Proceeding for task execution."
+# Fail fast if core requirements aren't met
+node -v | grep -q "v24" || echo "⚠️ Node version is not 24. Some Astro features may be unstable."
+
+# Check tool versions one last time
+echo "🛠️ Tool Versions Summarized:"
+echo "Node: $(node -v)"
+echo "pnpm: $(pnpm -v)"
+echo "Python: $(python3 --version)"
+echo "uv: $(uv --version)"
+
+echo "--------------------------------------------------------"
+echo "✅ Jules Environment Initialization Complete!"
+echo "Ready to architect empathy."
+echo "--------------------------------------------------------"
