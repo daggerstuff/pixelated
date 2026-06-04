@@ -20,6 +20,10 @@ describe('isValidDate', () => {
     expect(isValidDate('not-a-date')).toBe(false)
     expect(isValidDate(null as unknown as string)).toBe(false)
   })
+
+  it('handles object input', () => {
+    expect(isValidDate({} as unknown as string)).toBe(false)
+  })
 })
 
 describe('formatDate', () => {
