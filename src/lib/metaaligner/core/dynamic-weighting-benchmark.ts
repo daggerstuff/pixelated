@@ -136,7 +136,7 @@ async function benchmarkContextTransitions(): Promise<BenchmarkResult> {
   ]
 
   for (let i = 0; i < iterations; i++) {
-    const contextType = contexts[i % contexts.length]
+    const contextType = contexts[i % contexts.length]!
     const context: AlignmentContext = {
       userQuery: `Query ${i}`,
       detectedContext: contextType,
@@ -156,7 +156,7 @@ async function benchmarkRapidOscillations(): Promise<BenchmarkResult> {
   const times: number[] = []
 
   for (let i = 0; i < iterations; i++) {
-    const contextType =
+    const contextType: ContextType =
       i % 2 === 0 ? ContextType.EDUCATIONAL : ContextType.SUPPORT
     const context: AlignmentContext = {
       userQuery: `Oscillation test ${i}`,
@@ -240,7 +240,7 @@ async function benchmarkAllContexts(): Promise<BenchmarkResult> {
   const iterations = 500
 
   for (let i = 0; i < iterations; i++) {
-    const contextType = allContexts[i % allContexts.length]
+    const contextType = allContexts[i % allContexts.length]!
     const context: AlignmentContext = {
       userQuery: `Query for ${contextType}`,
       detectedContext: contextType,
@@ -275,7 +275,7 @@ async function generateVisualizationData(): Promise<VisualizationData> {
   let previousWeights: Record<string, number> | null = null
 
   for (let i = 0; i < contexts.length; i++) {
-    const contextType = contexts[i]
+    const contextType = contexts[i]!
     const context: AlignmentContext = {
       userQuery: `Visualization query ${i}`,
       detectedContext: contextType,
@@ -312,14 +312,14 @@ async function generateVisualizationData(): Promise<VisualizationData> {
         : 0
 
       weightTransitions.push({
-        fromContext: previousContext,
-        toContext: contextType,
+        fromContext: previousContext!,
+        toContext: contextType!,
         weightChanges,
         smoothingEffect,
       })
     }
 
-    previousContext = contextType
+    previousContext = contextType ?? null
     previousWeights = { ...result.weights }
   }
 
@@ -352,11 +352,11 @@ function calculateBenchmarkStats(
     testName,
     iterations: times.length,
     avgTimeMs: avg,
-    minTimeMs: sorted[0],
-    maxTimeMs: sorted[sorted.length - 1],
-    p50TimeMs: sorted[p50Index],
-    p95TimeMs: sorted[p95Index],
-    p99TimeMs: sorted[p99Index],
+    minTimeMs: sorted[0]!,
+    maxTimeMs: sorted[sorted.length - 1]!,
+    p50TimeMs: sorted[p50Index]!,
+    p95TimeMs: sorted[p95Index]!,
+    p99TimeMs: sorted[p99Index]!,
     passedThreshold,
     thresholdMs,
   }
@@ -456,7 +456,8 @@ export function exportVisualizationDataForGraphing(
 }
 
 // Run benchmark if executed directly
-if (require.main === module) {
+const isMainModule = typeof require !== 'undefined' && (require('module') as unknown as { main: unknown })['main'] === module
+if (isMainModule) {
   runBenchmarkSuite()
     .then((suite) => {
       console.log('\n📁 Visualization data available (JSON):')
