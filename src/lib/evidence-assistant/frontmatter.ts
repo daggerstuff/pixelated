@@ -23,7 +23,7 @@ function normalizeTags(value: unknown): string[] {
 
   if (typeof value === 'string') {
     const bracketList = value.match(/^\[(.*)\]$/)
-    const source = bracketList ? bracketList[1] : value
+    const source = bracketList ? bracketList[1]! : value
     return source
       .split(',')
       .map((tag) => normalizeString(tag))

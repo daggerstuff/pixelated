@@ -455,11 +455,11 @@ export class BiasMetricsCollector {
       const response = await this.pythonBridge.getPerformanceMetrics()
       const resp = response as Record<string, unknown>
       return {
-        responseTime: (resp.average_response_time as number) ?? 0,
-        throughput: (resp.requests_per_second as number) ?? 0,
-        errorRate: (resp.error_rate as number) ?? 0,
-        uptime: (resp.uptime_seconds as number) ?? 0,
-        systemHealth: (resp.health_status as string) ?? 'unknown',
+        responseTime: (resp['average_response_time'] as number) ?? 0,
+        throughput: (resp['requests_per_second'] as number) ?? 0,
+        errorRate: (resp['error_rate'] as number) ?? 0,
+        uptime: (resp['uptime_seconds'] as number) ?? 0,
+        systemHealth: (resp['health_status'] as string) ?? 'unknown',
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch performance metrics', { error })

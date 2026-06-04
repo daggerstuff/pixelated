@@ -211,7 +211,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate()
+      const subscriber = this.redis['duplicate']()
       await subscriber.connect()
 
       // Subscribe to global threat intelligence channel
@@ -536,9 +536,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
     threat: ThreatIntelligence,
   ): Promise<ThreatIntelligence> {
     try {
-      const encryptedData = await encrypt(
-        JSON.stringify(threat),
-      )
+      const encryptedData = await encrypt(JSON.stringify(threat))
       return {
         ...threat,
         data: { encrypted: encryptedData },
@@ -561,9 +559,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
   ): Promise<ThreatIntelligence> {
     try {
       if (threat.data?.['encrypted']) {
-        const decryptedData = await decrypt(
-          threat.data['encrypted'],
-        )
+        const decryptedData = await decrypt(threat.data['encrypted'])
         return JSON.parse(decryptedData)
       }
       return threat

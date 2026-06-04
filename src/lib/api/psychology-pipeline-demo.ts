@@ -627,10 +627,11 @@ function generateKnowledgeBasedOpening(approach: string): string {
 }
 
 function generateClientResponse(profile: ClientProfile): string {
+  const pp = profile.presentingProblem?.toLowerCase() ?? 'this issue'
   const responses = {
-    low: `I've been dealing with ${profile.presentingProblem?.toLowerCase()}, and while it's manageable most days, I'd like to develop better ways to handle it.`,
-    medium: `${profile.presentingProblem} has been really affecting my daily life. Some days are better than others, but I'm finding it harder to cope lately.`,
-    high: `I'm really struggling with ${profile.presentingProblem.toLowerCase()}. It feels overwhelming most of the time, and I'm not sure how to manage it anymore.`,
+    low: `I've been dealing with ${pp}, and while it's manageable most days, I'd like to develop better ways to handle it.`,
+    medium: `${profile.presentingProblem!} has been really affecting my daily life. Some days are better than others, but I'm finding it harder to cope lately.`,
+    high: `I'm really struggling with ${profile.presentingProblem!.toLowerCase()}. It feels overwhelming most of the time, and I'm not sure how to manage it anymore.`,
   }
   return (
     responses[profile.severity as keyof typeof responses] || responses['medium']

@@ -278,7 +278,10 @@ export class DocumentService {
     await this.redis.del(`session:${sessionId}`)
   }
 
-  private mapDocumentRow(row: DocumentRow): Document {
+  private mapDocumentRow(row: DocumentRow | undefined): Document {
+    if (!row) {
+      throw new Error('Document row is undefined')
+    }
     const collaborators = Array.isArray(row.collaborators)
       ? row.collaborators
       : []

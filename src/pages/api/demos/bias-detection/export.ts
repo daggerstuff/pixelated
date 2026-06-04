@@ -91,7 +91,7 @@ export const POST = async ({ request }) => {
         })
 
       case 'csv': {
-        const csvData = convertToCSV(filteredExportData)
+        const csvData = convertToCSV(filteredExportData as ExportData)
         return new Response(csvData, {
           status: 200,
           headers: {
@@ -102,7 +102,7 @@ export const POST = async ({ request }) => {
       }
 
       case 'txt': {
-        const txtData = convertToText(filteredExportData)
+        const txtData = convertToText(filteredExportData as ExportData)
         return new Response(txtData, {
           status: 200,
           headers: {

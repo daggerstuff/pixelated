@@ -1,4 +1,4 @@
-import type { Redis } from 'ioredis'
+import Redis from 'ioredis'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { RedisService } from '../services/redis/RedisService'
@@ -32,7 +32,7 @@ export class CacheInvalidation {
     if (!redisClient) {
       throw new Error('Redis client is not initialized')
     }
-    this.redis = redisClient
+    this.redis = redisClient as Redis
     this.prefix = options.prefix ?? 'cache:'
     this.defaultTTL = options.defaultTTL ?? 3600 // 1 hour
   }
@@ -50,7 +50,8 @@ export class CacheInvalidation {
   }
 
   private formatErrorMessage(operation: string, error: unknown): string {
-    return `Failed to ${operation}: ${error instanceof Error ? String(error) : String(error)}`
+    const message = error instanceof Error ? error.message : 'Unknown error'
+    return `Failed to ${operation}: ${message}`
   }
 
   async set(
@@ -67,14 +68,14 @@ export class CacheInvalidation {
 
       // Set the cache value with TTL
       const ttl = rule?.ttl ?? this.defaultTTL
-      multi.setex(cacheKey, ttl, serializedValue)
+      void multi.setex(cacheKey, ttl, serializedValue)
 
       // Add tags if specified
       if (rule?.tags?.length) {
         for (const tag of rule.tags) {
           const tagKey = this.getTagKey(tag)
-          multi.sadd(tagKey, cacheKey)
-          multi.expire(tagKey, ttl)
+          void multi.sadd(tagKey, cacheKey)
+          multi['expire'](tagKey, ttl)
         }
       }
 
@@ -82,13 +83,13 @@ export class CacheInvalidation {
       if (rule?.dependencies?.length) {
         for (const dependency of rule.dependencies) {
           const depKey = this.getDependencyKey(dependency)
-          multi.sadd(depKey, cacheKey)
-          multi.expire(depKey, ttl)
+          void multi.sadd(depKey, cacheKey)
+          multi['expire'](depKey, ttl)
         }
       }
 
       // Execute the transaction
-      await multi.exec()
+      await multi['exec']()
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('set cache', error))
       throw error
@@ -135,9 +136,9 @@ export class CacheInvalidation {
 
       if (keys.length) {
         const multi = this.redis.multi()
-        multi.del(...keys)
-        multi.del(tagKey)
-        await multi.exec()
+        void multi.del(...keys)
+        void multi.del(tagKey)
+        await multi['exec']()
       }
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('invalidate cache tag', error))
@@ -152,9 +153,9 @@ export class CacheInvalidation {
 
       if (keys.length) {
         const multi = this.redis.multi()
-        multi.del(...keys)
-        multi.del(depKey)
-        await multi.exec()
+        void multi.del(...keys)
+        void multi.del(depKey)
+        await multi['exec']()
       }
     } catch (error: unknown) {
       logger.error(

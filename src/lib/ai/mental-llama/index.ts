@@ -119,7 +119,7 @@ export async function createMentalLLaMAFactory(
 
   if (config.enablePythonBridge || env.MENTALLAMA_ENABLE_PYTHON_BRIDGE) {
     try {
-      pythonBridge =  createMentalLLaMAPythonBridge(
+      pythonBridge = await createMentalLLaMAPythonBridge(
         config.pythonBridgeScriptPath,
       )
       // Initialize the bridge. In a real scenario, you might want to ensure this completes
