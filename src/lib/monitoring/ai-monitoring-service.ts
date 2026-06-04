@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events'
 
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { OpenAI } from 'openai'
 
 export interface Alert {
@@ -75,17 +75,18 @@ export class AIMonitoringService extends EventEmitter {
     void this.monitoringLoop()
 
     // Subscribe to Redis pub/sub for real-time metrics
-    this.redis.subscribe('metrics:updates', (err) => {
-      if (err) {
-        this.emit('error', err)
-      }
+    this.redis.subscribe('metrics:updates').catch((err: unknown) => {
+      this.emit('error', err)
     })
 
-    this.redis.on('message', (channel, message) => {
+    const messageHandler = (...args: unknown[]): void => {
+      const channel = args[0] as string
+      const message = args[1] as string
       if (channel === 'metrics:updates') {
         void this.handleMetricUpdate(JSON.parse(message))
       }
-    })
+    }
+    this.redis.on('message', messageHandler as (...args: unknown[]) => void)
   }
 
   async stop(): Promise<void> {
@@ -156,7 +157,7 @@ export class AIMonitoringService extends EventEmitter {
       )
 
       // Check for anomalies
-      const latestValue = history[history.length - 1]
+      const latestValue = history[history.length - 1]!
       const zScore = Math.abs((latestValue - avg) / stdDev)
 
       if (zScore > this.config.anomalyDetection.threshold) {
@@ -420,7 +421,7 @@ export class AIMonitoringService extends EventEmitter {
   }
 
   private checkEscalation(alert: Alert): void {
-    const escalationTime = this.config.alerting.escalation[alert.severity]
+    const escalationTime = this.config.alerting.escalation[alert.severity as 'critical' | 'high' | 'medium']
     if (escalationTime > 0) {
       setTimeout(
         () => {

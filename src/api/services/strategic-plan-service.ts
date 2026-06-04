@@ -107,7 +107,7 @@ export async function getStrategicPlan(planId: string, userId: string) {
   }
 
   // Check permissions
-  if (!plan.permissions.view.includes(userId) && plan.owner !== userId) {
+  if (!plan['permissions']['view'].includes(userId) && plan['owner'] !== userId) {
     throw new ForbiddenError('Cannot access this plan')
   }
 
@@ -131,17 +131,17 @@ export async function updateStrategicPlan(
   }
 
   // Check edit permission
-  if (!plan.permissions.edit.includes(userId) && plan.owner !== userId) {
+  if (!plan['permissions']['edit'].includes(userId) && plan['owner'] !== userId) {
     throw new ForbiddenError('Cannot edit this plan')
   }
 
   Object.keys(updates).forEach((key) => {
     if (key !== '_id' && key !== 'owner' && key !== 'createdAt') {
-      ;(plan)[key] = updates[key]
+      ;(plan as Record<string, unknown>)[key] = updates[key as keyof IStrategicPlan]
     }
   })
 
-  plan.updatedAt = new Date()
+  plan['updatedAt'] = new Date()
   await plan.save()
 
   return plan
@@ -171,13 +171,13 @@ export async function addKPI(
   }
 
   // Check edit permission
-  if (!plan.permissions.edit.includes(userId) && plan.owner !== userId) {
+  if (!plan['permissions']['edit'].includes(userId) && plan['owner'] !== userId) {
     throw new ForbiddenError('Cannot edit this plan')
   }
 
   const kpiId = uuid()
 
-  plan.kpis.push({
+  plan['kpis'].push({
     _id: kpiId,
     name: kpi.name,
     target: kpi.target,
@@ -190,7 +190,7 @@ export async function addKPI(
     updatedAt: new Date(),
   })
 
-  plan.updatedAt = new Date()
+  plan['updatedAt'] = new Date()
   await plan.save()
 
   return plan
@@ -214,7 +214,7 @@ export async function submitForApproval(
   }
 
   // Check ownership
-  if (plan.owner !== userId) {
+  if (plan['owner'] !== userId) {
     throw new ForbiddenError('Only plan owner can submit for approval')
   }
 
@@ -238,8 +238,8 @@ export async function submitForApproval(
     )
   }
 
-  plan.status = 'pending_approval'
-  plan.updatedAt = new Date()
+  plan['status'] = 'pending_approval'
+  plan['updatedAt'] = new Date()
   await plan.save()
 
   return plan
@@ -265,7 +265,7 @@ export async function listStrategicPlans(
   }
 
   if (options.status) {
-    query.status = options.status
+    query['status'] = options.status
   }
 
   const plans = await StrategicPlanModel.find(query)
@@ -299,14 +299,14 @@ export async function shareStrategicPlan(
   }
 
   // Check ownership
-  if (plan.owner !== ownerId) {
+  if (plan['owner'] !== ownerId) {
     throw new ForbiddenError('Only plan owner can share')
   }
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
-  if (!plan.permissions[permissionKey].includes(targetUserId)) {
-    plan.permissions[permissionKey].push(targetUserId)
+  if (!plan['permissions'][permissionKey].includes(targetUserId)) {
+    plan['permissions'][permissionKey].push(targetUserId)
     await plan.save()
   }
 
@@ -327,7 +327,7 @@ export async function deleteStrategicPlan(planId: string, userId: string) {
   }
 
   // Check edit permission
-  if (!plan.permissions.edit.includes(userId) && plan.owner !== userId) {
+  if (!plan['permissions']['edit'].includes(userId) && plan['owner'] !== userId) {
     throw new ForbiddenError('Cannot delete this plan')
   }
 
@@ -356,14 +356,14 @@ export async function alignProjectToPlan(data: {
 
   // Check edit permission
   if (
-    !plan.permissions.edit.includes(data.userId) &&
-    plan.owner !== data.userId
+    !plan['permissions']['edit'].includes(data.userId) &&
+    plan['owner'] !== data.userId
   ) {
     throw new ForbiddenError('Cannot align to this plan')
   }
 
   if (data.projectId) {
-    plan.objectives.push({
+    plan['objectives'].push({
       _id: uuid(),
       title: `Project: ${data.projectId}`,
       description: 'Aligned project',
@@ -375,7 +375,7 @@ export async function alignProjectToPlan(data: {
   }
 
   if (data.okrId) {
-    plan.keyResults.push({
+    plan['keyResults'].push({
       _id: uuid(),
       title: `OKR: ${data.okrId}`,
       targetValue: 100,
@@ -388,7 +388,7 @@ export async function alignProjectToPlan(data: {
     })
   }
 
-  plan.updatedAt = new Date()
+  plan['updatedAt'] = new Date()
   await plan.save()
 
   return plan
@@ -414,14 +414,14 @@ export async function updatePlanStatus(data: {
 
   // Check edit permission
   if (
-    !plan.permissions.edit.includes(data.userId) &&
-    plan.owner !== data.userId
+    !plan['permissions']['edit'].includes(data.userId) &&
+    plan['owner'] !== data.userId
   ) {
     throw new ForbiddenError('Cannot update status of this plan')
   }
 
-  plan.status = data.status
-  plan.updatedAt = new Date()
+  plan['status'] = data.status
+  plan['updatedAt'] = new Date()
   await plan.save()
 
   // Update PostgreSQL

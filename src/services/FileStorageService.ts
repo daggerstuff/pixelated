@@ -94,9 +94,9 @@ export class FileStorageService {
     }
 
     if (!config.isPublic) {
-      uploadParams['ACL'] = 'private'
+      ;(uploadParams as Record<string, unknown>)['ACL'] = 'private'
     } else {
-      uploadParams['ACL'] = 'public-read'
+      ;(uploadParams as Record<string, unknown>)['ACL'] = 'public-read'
     }
 
     await this.s3Client.send(new PutObjectCommand(uploadParams as any))

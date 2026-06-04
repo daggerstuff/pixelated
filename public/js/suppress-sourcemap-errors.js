@@ -7,6 +7,8 @@ window.addEventListener(
       event.preventDefault()
       return false
     }
+    // Let other errors propagate normally
+    return true
   },
   true,
 )

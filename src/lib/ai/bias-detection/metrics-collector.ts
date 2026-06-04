@@ -167,14 +167,13 @@ export class BiasMetricsCollector {
 
   async getMetrics(options?: DashboardOptions): Promise<DashboardMetrics> {
     try {
-      const response = await this.pythonBridge.getDashboardMetrics({
+      const resp = await this.pythonBridge.getDashboardMetrics({
         time_range: options?.time_range ?? '24h',
         include_details: options?.include_details ?? false,
         aggregation_type: options?.aggregation_type ?? 'hourly',
-      })
+      }) as Record<string, unknown>
 
       // Map Python service response to expected TypeScript structure
-      const resp = response as Record<string, unknown>
       const summary = resp['summary'] as Record<string, unknown> | undefined
       const trends = resp['trends'] as Record<string, unknown> | undefined
       const demo = resp['demographics'] as Record<string, unknown> | undefined
@@ -312,7 +311,7 @@ export class BiasMetricsCollector {
   ): Promise<DashboardMetrics> {
     try {
       // Use GET method since Python service expects GET for /dashboard endpoint
-      const resp = (await this.pythonBridge.getDashboardMetrics()) as Record<string, unknown>
+      const resp = await this.pythonBridge.getDashboardMetrics() as Record<string, unknown>
       const summary = resp['summary'] as Record<string, unknown> | undefined
       const trends = resp['trends'] as Record<string, unknown> | undefined
       const demo = resp['demographics'] as Record<string, unknown> | undefined
@@ -453,12 +452,13 @@ export class BiasMetricsCollector {
   async getPerformanceMetrics(): Promise<Record<string, unknown>> {
     try {
       const response = await this.pythonBridge.getPerformanceMetrics()
+      const respRecord = response as Record<string, unknown>
       return {
-        responseTime: response.average_response_time ?? 0,
-        throughput: response.requests_per_second ?? 0,
-        errorRate: response.error_rate ?? 0,
-        uptime: response.uptime_seconds ?? 0,
-        systemHealth: response.health_status ?? 'unknown',
+        responseTime: (respRecord['average_response_time'] as number) ?? 0,
+        throughput: (respRecord['requests_per_second'] as number) ?? 0,
+        errorRate: (respRecord['error_rate'] as number) ?? 0,
+        uptime: (respRecord['uptime_seconds'] as number) ?? 0,
+        systemHealth: (respRecord['health_status'] as string) ?? 'unknown',
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch performance metrics', { error })
@@ -511,7 +511,7 @@ export class BiasMetricsCollector {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
         timestamp: ('timestamp' in result ? result['timestamp'] : undefined)
-          ? new Date(result['timestamp'] as string).toISOString()
+          ? new Date(result['timestamp'] as unknown as string).toISOString()
           : new Date().toISOString(),
         session_id: result.sessionId,
         overall_bias_score: result.overallBiasScore,

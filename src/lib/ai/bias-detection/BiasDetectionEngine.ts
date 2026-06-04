@@ -530,9 +530,13 @@ export class BiasDetectionEngine {
 
     // If any tool returned an explicit fallback flag, note limited analysis
     const anyFallback = [layerResults.preprocessing, layerResults.modelLevel, layerResults.interactive, layerResults.evaluation].some(
-      (r) =>
-        isRecordValue(r) &&
-        r["fallback"] === true,
+      (r): boolean => {
+        if (isRecordValue(r)) {
+          const fallbackVal = r["fallback"]
+          return fallbackVal === true
+        }
+        return false
+      },
     );
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
@@ -738,8 +742,11 @@ export class BiasDetectionEngine {
       }
     }
 
-    if (batchResult?.errors.length) {
-      throw batchResult?.errors[0].error;
+    if (batchResult && batchResult.errors.length > 0) {
+      const firstError = batchResult.errors[0];
+      if (firstError) {
+        throw firstError.error;
+      }
     }
     const averageBias =
       results.length > 0

@@ -411,7 +411,7 @@ export const ValidationRules = {
   }),
   match: (fieldName: string, message: string): ValidationRule => ({
     test: (value) => {
-      const matchField = document.querySelector(`[name="${fieldName}"]`)!
+      const matchField = document.querySelector(`[name="${fieldName}"]`) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
       return matchField?.value === value
     },
     message,

@@ -234,19 +234,19 @@ export class Auth0ActivityTrackingService {
       }
 
       // Build query parameters
-      const queryParams: Record<string, unknown> = {
+      const queryParams = {
         per_page: this.config.batchSize,
         sort: 'date:1', // Sort by date ascending
         include_totals: false,
-      }
+      } as Record<string, unknown>
 
       // If we have a last log ID, fetch logs after that ID
       if (this.lastLogId) {
-        queryParams.from = this.lastLogId
+        queryParams['from'] = this.lastLogId
       }
 
       // Fetch logs from Auth0
-      const logs = await auth0Management.getLogs(queryParams)
+      const logs = await auth0Management.getLogs(queryParams as Parameters<typeof auth0Management.getLogs>[0])
 
       if (logs.length === 0) {
         return
@@ -257,7 +257,8 @@ export class Auth0ActivityTrackingService {
       this.lastLogId = lastLog.log_id
 
       // Transform and store logs
-      const rawActivities = (logs as Auth0Log[])
+      const auth0Logs = logs as Auth0Log[]
+      const rawActivities = auth0Logs
         .filter((log) => log.user_id) // Only logs with user ID
         .map((log) => ({
           userId: log.user_id!,
@@ -288,7 +289,7 @@ export class Auth0ActivityTrackingService {
       }
 
       // Process security events
-      await this.processSecurityEvents(logs)
+      await this.processSecurityEvents(auth0Logs)
     } catch (error: unknown) {
       console.error('Failed to fetch and store recent activities:', error)
     }
@@ -333,15 +334,15 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-              userId: log.user_id,
+              userId: log.user_id ?? undefined,
               timestamp: new Date(log.date),
               severity: 'medium',
               description: log.description ?? 'Failed login attempt',
-              ipAddress: log.ip,
-              userAgent: log.user_agent,
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
-                connection: log.connection,
-                client_id: log.client_id,
+                connection: log.connection ?? undefined,
+                client_id: log.client_id ?? undefined,
               },
             }
             break
@@ -350,15 +351,15 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-              userId: log.user_id,
+              userId: log.user_id ?? undefined,
               timestamp: new Date(log.date),
               severity: 'medium',
               description: log.description ?? 'Failed password login attempt',
-              ipAddress: log.ip,
-              userAgent: log.user_agent,
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
-                connection: log.connection,
-                client_id: log.client_id,
+                connection: log.connection ?? undefined,
+                client_id: log.client_id ?? undefined,
               },
             }
             break
@@ -367,15 +368,15 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-              userId: log.user_id,
+              userId: log.user_id ?? undefined,
               timestamp: new Date(log.date),
               severity: 'medium',
               description: log.description ?? 'Failed signup attempt',
-              ipAddress: log.ip,
-              userAgent: log.user_agent,
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
-                connection: log.connection,
-                client_id: log.client_id,
+                connection: log.connection ?? undefined,
+                client_id: log.client_id ?? undefined,
               },
             }
             break
@@ -384,15 +385,15 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.RATE_LIMIT_EXCEEDED,
-              userId: log.user_id,
+              userId: log.user_id ?? undefined,
               timestamp: new Date(log.date),
               severity: 'high',
               description: log.description ?? 'Rate limit exceeded',
-              ipAddress: log.ip,
-              userAgent: log.user_agent,
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
-                connection: log.connection,
-                client_id: log.client_id,
+                connection: log.connection ?? undefined,
+                client_id: log.client_id ?? undefined,
               },
             }
             break
@@ -401,15 +402,15 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.RATE_LIMIT_EXCEEDED,
-              userId: log.user_id,
+              userId: log.user_id ?? undefined,
               timestamp: new Date(log.date),
               severity: 'high',
               description: log.description ?? 'Signup rate limit exceeded',
-              ipAddress: log.ip,
-              userAgent: log.user_agent,
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
-                connection: log.connection,
-                client_id: log.client_id,
+                connection: log.connection ?? undefined,
+                client_id: log.client_id ?? undefined,
               },
             }
             break
@@ -465,35 +466,36 @@ export class Auth0ActivityTrackingService {
       const query: Record<string, unknown> = {}
 
       if (filter.userId) {
-        query.userId = filter.userId
+        query['userId'] = filter.userId
       }
 
       if (filter.eventType) {
-        query.eventType = filter.eventType
+        query['eventType'] = filter.eventType
       }
 
       if (filter.startDate || filter.endDate) {
-        query.timestamp = {} as Record<string, unknown>
+        const timestampFilter: Record<string, unknown> = {}
         if (filter.startDate) {
-          ;(query.timestamp as Record<string, unknown>).$gte = filter.startDate
+          timestampFilter['$gte'] = filter.startDate
         }
         if (filter.endDate) {
-          ;(query.timestamp as Record<string, unknown>).$lte = filter.endDate
+          timestampFilter['$lte'] = filter.endDate
         }
+        query['timestamp'] = timestampFilter
       }
 
       // Build options
       const options: Record<string, unknown> = {}
 
       if (filter.limit) {
-        options.limit = filter.limit
+        options['limit'] = filter.limit
       }
 
       if (filter.offset) {
-        options.skip = filter.offset
+        options['skip'] = filter.offset
       }
 
-      options.sort = { timestamp: -1 } // Sort by timestamp descending
+      options['sort'] = { timestamp: -1 } // Sort by timestamp descending
 
       // Execute query
       const activities = await collection.find(query, options).toArray()
@@ -577,7 +579,7 @@ export class Auth0ActivityTrackingService {
       const query: Record<string, unknown> = {}
 
       if (severity) {
-        query.severity = severity
+        query['severity'] = severity
       }
 
       // Execute query
@@ -688,11 +690,7 @@ export class Auth0ActivityTrackingService {
       logSecurityEvent(SecurityEventType.SESSION_TERMINATION_ERROR, userId, {
         sessionId: sessionId,
         error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
+          error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       })
 

@@ -9,9 +9,7 @@ import { MemoryApiClient, MemoryApiError } from '../memory-api-client'
 
 // ─── Mock fetch factory ───────────────────────────────────────────────────────
 
-type MockFetch = ReturnType<
-  typeof vi.fn<Promise<Response>, [RequestInfo, RequestInit?]>
->
+type MockFetch = ReturnType<typeof vi.fn>
 
 function createMockClient(mockFetch: MockFetch) {
   return new MemoryApiClient({
@@ -127,7 +125,7 @@ describe('search()', () => {
       offset: 5,
     })
 
-    const call = mockFetch.mock.calls[0]
+    const call = mockFetch.mock.calls[0]!
     const url = call[0] as string
     expect(url).toContain('tenant_id=t1')
     expect(url).toContain('min_importance=0.5')
@@ -181,7 +179,7 @@ describe('get()', () => {
     const result = await client.get('mem_123', 't1')
 
     expect(result.id).toBe('mem_123')
-    const call = mockFetch.mock.calls[0]
+    const call = mockFetch.mock.calls[0]!
     const url = call[0] as string
     expect(url).toContain('mem_123')
     expect(url).toContain('tenant_id=t1')
@@ -197,7 +195,7 @@ describe('delete()', () => {
 
     await client.delete('mem_123', 't1')
 
-    const call = mockFetch.mock.calls[0]
+    const call = mockFetch.mock.calls[0]!
     expect((call[1] as RequestInit).method).toBe('DELETE')
   })
 
