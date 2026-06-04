@@ -81,6 +81,27 @@ const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
   compliance: <Clipboard className="h-5 w-5" />,
 }
 
+// ⚡ Bolt Performance Optimization: Extracted static severity styles to module scope to prevent re-creating this object on every render of SystemTab
+const ISSUE_SEVERITY_STYLES: Record<DiagnosticIssueSeverity, { wrapper: string; label: string }> = {
+  critical: {
+    wrapper:
+      'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
+    label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
+  },
+  warning: {
+    wrapper:
+      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
+    label:
+      'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
+  },
+  info: {
+    wrapper:
+      'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
+    label:
+      'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
+  },
+}
+
 function getHighRiskCount(
   riskLevelDistribution: Record<string, number>,
 ): number {
@@ -890,38 +911,6 @@ const SystemTab: FC<{
     setIsRunningDiagnostics(false)
   }, [health])
 
-  const getIssueClasses = (severity: DiagnosticIssueSeverity) => {
-    switch (severity) {
-      case 'critical': {
-        return {
-          wrapper:
-            'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
-          label: 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-100',
-        }
-      }
-      case 'warning': {
-        return {
-          wrapper:
-            'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 text-yellow-700 dark:text-yellow-100',
-          label:
-            'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-100',
-        }
-      }
-      case 'info': {
-        return {
-          wrapper:
-            'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
-          label:
-            'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
-        }
-      }
-      default: {
-        const exhaustiveCheck: never = severity
-        throw new Error(`Unhandled severity: ${String(exhaustiveCheck)}`)
-      }
-    }
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -1032,7 +1021,7 @@ const SystemTab: FC<{
         ) : (
           <div className="space-y-3">
             {diagnosticIssues.map((issue) => {
-              const styles = getIssueClasses(issue.severity)
+              const styles = ISSUE_SEVERITY_STYLES[issue.severity]
               return (
                 <div
                   key={issue.id}
