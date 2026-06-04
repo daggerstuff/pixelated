@@ -34,7 +34,7 @@ const initiateExportSchema = z.object({
   urgencyLevel: z.enum(['standard', 'urgent']).default('standard'),
 })
 
-export const POST = async ({ request, cookies }) => {
+export const POST = async ({ request, cookies }: { request: Request; cookies: any }) => {
   try {
     // Get current user - use cookies instead of request
     const user = await getCurrentUser(cookies)
@@ -46,15 +46,17 @@ export const POST = async ({ request, cookies }) => {
       )
     }
 
+    const userRecord = user as Record<string, unknown>
+    const userPermissions = userRecord['permissions'] as string[] | undefined
     // Check permissions
     const hasPermission =
-      user.permissions?.includes('data:export:create') ??
-      user.permissions?.includes('admin:patient-rights')
+      userPermissions?.includes('data:export:create') ??
+      userPermissions?.includes('admin:patient-rights')
 
     if (!hasPermission) {
       logger.warn('Permission denied for initiating export', {
-        userId: user.id,
-        permissions: user.permissions,
+        userId: userRecord['id'],
+        permissions: userPermissions,
       })
 
       return new Response(
@@ -74,14 +76,14 @@ export const POST = async ({ request, cookies }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export request data', {
-        errors: validationResult.error.errors,
+        errors: (validationResult.error as any)?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: validationResult.error.errors,
+          errors: (validationResult.error as any)?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

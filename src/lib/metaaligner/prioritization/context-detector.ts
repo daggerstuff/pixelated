@@ -119,10 +119,10 @@ export class ContextDetector {
           userId: userId ?? 'anonymous',
           source: 'context-detection',
         }
-        crisisResult = await this.crisisDetectionService.detectCrisis(
+        crisisResult = (await this.crisisDetectionService.detectCrisis(
           userInput,
           crisisOptions,
-        )
+        )) as unknown as Record<string, unknown>
         if (crisisResult?.['isCrisis']) {
           return {
             detectedContext: ContextType.CRISIS,
@@ -156,11 +156,11 @@ export class ContextDetector {
         this.educationalContextRecognizer
       ) {
         educationalResult =
-          await this.educationalContextRecognizer.recognizeEducationalContext(
+          (await this.educationalContextRecognizer.recognizeEducationalContext(
             userInput,
             undefined, // userProfile - would need to be passed through
             conversationHistory,
-          )
+          )) as unknown as Record<string, unknown>
         if (
           educationalResult?.['isEducational'] &&
           (educationalResult['confidence'] as number) > 0.8
@@ -220,9 +220,9 @@ export class ContextDetector {
         },
       ]
 
-      const response = await this.aiService.createChatCompletion(messages, {
+      const response = (await this.aiService.createChatCompletion(messages, {
         model: this.model,
-      }) as Record<string, unknown>
+      })) as unknown as Record<string, unknown>
 
       // Support multiple provider response shapes
       // 1) Minimal: { content: string }
@@ -232,13 +232,16 @@ export class ContextDetector {
       if (typeof response === 'string') {
         content = response
       } else if (response && typeof response === 'object') {
-        if ('content' in response && typeof response['content'] === 'string') {
-          content = response['content']
+        const r = response as Record<string, unknown>
+        if (typeof r['content'] === 'string') {
+          content = r['content'] as string
         } else if (
-          Array.isArray(response['choices']) &&
-          (response['choices'] as Array<Record<string, unknown>>)[0]?.['message']?.['content']
+          Array.isArray(r['choices']) &&
+          (r['choices'] as any)[0]?.['message']?.['content']
         ) {
-          content = String((response['choices'] as Array<Record<string, unknown>>)[0]?.['message']?.['content'])
+          content = String(
+            (r['choices'] as any)[0]?.['message']?.['content'],
+          )
         }
       }
 
@@ -272,15 +275,15 @@ export class ContextDetector {
         return {
           ...result,
           detectedContext: ContextType.EDUCATIONAL,
-          confidence: (result['confidence'] as number) ?? 0.85,
-          contextualIndicators: (result['contextualIndicators'] as ContextualIndicator[])?.length
-            ? (result['contextualIndicators'] as ContextualIndicator[])
+          confidence: (result['confidence']) ?? 0.85,
+          contextualIndicators: (result['contextualIndicators'])?.length
+            ? (result['contextualIndicators'])
             : [
                 {
                   type: 'educational_pattern',
                   description:
                     'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: (result['confidence'] as number) ?? 0.8,
+                  confidence: (result['confidence']) ?? 0.8,
                 },
               ],
           needsSpecialHandling: false,
@@ -332,7 +335,7 @@ export class ContextDetector {
 
       logger.info('Context detected', {
         context: result['detectedContext'] as string,
-        confidence: result['confidence'] as number,
+        confidence: result['confidence'],
         urgency: result['urgency'] as string,
       })
 
