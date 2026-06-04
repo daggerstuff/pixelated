@@ -107,10 +107,7 @@ export class DeveloperApiKeyManager {
       return { valid: false, error: 'Invalid API key' }
     }
 
-    if (
-      apiKey['expires_at'] &&
-      new Date() > new Date(apiKey['expires_at'] as unknown as string)
-    ) {
+    if (apiKey['expires_at'] && new Date() > new Date(apiKey['expires_at'] as unknown as string)) {
       await this.recordFailedAttempt(apiKey['id'], 'expired')
       return { valid: false, error: 'API key has expired' }
     }
