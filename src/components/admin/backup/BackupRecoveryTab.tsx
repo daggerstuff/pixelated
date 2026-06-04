@@ -140,7 +140,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
         }),
       })
 
-      const data = await response.json()
+      const data = await response.json() as { error?: string } & RecoveryTest
 
       if (!response.ok) {
         throw new Error(data.error ?? 'Failed to run recovery test.')
@@ -175,7 +175,7 @@ const BackupRecoveryTab: FC<BackupRecoveryTabProps> = ({
   }
 
   const availableBackups = backups.filter(
-    (b) => b.status === 'completed' || b.status === 'verified',
+    (b) => b.status === ('completed' as BackupStatus) || b.status === ('verified' as BackupStatus),
   )
 
   return (

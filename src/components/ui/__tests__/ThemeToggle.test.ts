@@ -97,7 +97,7 @@ function ThemeToggle(props: ThemeToggleProps = {}) {
         }
       }
 
-      applyTheme(current)
+      applyTheme(current as 'system' | 'dark' | 'light')
 
       const toggle = () => {
         if (current === 'system') {
@@ -110,7 +110,7 @@ function ThemeToggle(props: ThemeToggleProps = {}) {
           current = 'system'
           localStorage.removeItem('theme')
         }
-        applyTheme(current)
+        applyTheme(current as 'system' | 'dark' | 'light')
       }
 
       button?.addEventListener('click', toggle)

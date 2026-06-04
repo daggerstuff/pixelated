@@ -1,4 +1,4 @@
-import twilio, { _type } from 'twilio'
+import twilio from 'twilio'
 
 import { config } from '../../../config/env.config'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
@@ -31,7 +31,7 @@ export function initializeTwilioClient(): ReturnType<typeof twilio> | null {
 /**
  * Get the Twilio client, initializing it if necessary
  */
-export function getTwilioClient(): Twilio | null {
+export function getTwilioClient(): ReturnType<typeof twilio> | null {
   if (!twilioClient) {
     return initializeTwilioClient()
   }

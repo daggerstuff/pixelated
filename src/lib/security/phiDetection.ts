@@ -388,7 +388,8 @@ export class PresidioPHIDetector {
     const entities: PHIEntity[] = []
 
     // Common PHI regex patterns
-    const patterns: Record<PHIEntityType, RegExp> = {
+    // Partial record - only providing the subset of patterns we actually use
+    const patterns: Partial<Record<PHIEntityType, RegExp>> = {
       [PHIEntityType.EMAIL_ADDRESS]: new RegExp(
         '\\b[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}\\b',
         'gi',

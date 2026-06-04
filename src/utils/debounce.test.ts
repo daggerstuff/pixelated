@@ -12,7 +12,7 @@ describe('debounce', () => {
   })
 
   it('should debounce a function', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc()
@@ -27,7 +27,7 @@ describe('debounce', () => {
   })
 
   it('should call immediately if immediate is true', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc()
@@ -42,7 +42,7 @@ describe('debounce', () => {
   })
 
   it('should call again after timeout if immediate is true', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc()
@@ -55,7 +55,7 @@ describe('debounce', () => {
   })
 
   it('should pass arguments to the debounced function', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc('test', 123)
@@ -71,7 +71,7 @@ describe('debounce', () => {
   })
 
   it('should forward arguments from the most recent call', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100)
 
     debouncedFunc('first', 1)
@@ -85,7 +85,7 @@ describe('debounce', () => {
   })
 
   it('should pass arguments when immediate is true', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100, true)
 
     debouncedFunc('immediate', { ok: true })
@@ -98,7 +98,7 @@ describe('debounce', () => {
   })
 
   it('should handle complex argument types correctly', () => {
-    const func = vi.fn<any>()
+    const func = vi.fn<any>() as (...args: unknown[]) => unknown
     const debouncedFunc = debounce(func, 100)
 
     const obj = { nested: { value: 1 } }

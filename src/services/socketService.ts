@@ -11,6 +11,8 @@ type RedisLike = {
 
 export class SocketService {
   private readonly io: SocketIOServer
+  private readonly redis!: RedisLike
+  private readonly db!: Pool
 
   constructor(server: Server, redis: RedisLike, db: Pool) {
     // Initialize Socket.IO
@@ -22,6 +24,8 @@ export class SocketService {
       },
       transports: ['websocket', 'polling'],
     })
+    this.redis = redis
+    this.db = db
 
     this.setupSocketHandlers()
   }
