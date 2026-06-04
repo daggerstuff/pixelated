@@ -664,7 +664,7 @@ export function getReducedMotionVariant(variants: Variants): Variants {
   const reducedVariants: Variants = {}
 
   Object.keys(variants).forEach((key) => {
-    const variant = variants[key]
+    const variant = variants[key]!
     if (typeof variant === 'function') {
       return
     }

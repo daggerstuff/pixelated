@@ -878,7 +878,7 @@ export class ExternalThreatIntelligenceService extends EventEmitter {
       const sources = Array.from(
         new Set(
           intelligence.map(
-            (i: Record<string, unknown>) => i.feedName as string,
+            (i: Record<string, unknown>) => i['feedName'] as string,
           ),
         ),
       )

@@ -619,7 +619,7 @@ export class BiasAlertSystem {
         )
       }
 
-      const serverAlerts = ((serverAlertsResponse as Record<string, unknown>)?.alerts as AlertInstance[] | undefined) ?? []
+      const serverAlerts = ((serverAlertsResponse as Record<string, unknown>)?.['alerts'] as AlertInstance[] | undefined) ?? []
 
       // Process local alert rules
       const localAlerts: AlertInstance[] = this.evaluateAnalysisAlerts(result)
@@ -1043,11 +1043,11 @@ export class BiasAlertSystem {
 
       const resp = response as Record<string, unknown>
       return {
-        total: (resp.total_alerts as number) ?? 0,
-        byLevel: (resp.alerts_by_level as Record<string, number>) ?? {},
+        total: (resp['total_alerts'] as number) ?? 0,
+        byLevel: (resp['alerts_by_level'] as Record<string, number>) ?? {},
         acknowledged: 0, // Would need to be calculated
         escalated: 0, // Would need to be calculated
-        averageResponseTime: (resp.average_response_time as number) ?? 0,
+        averageResponseTime: (resp['average_response_time'] as number) ?? 0,
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch alert statistics', { error })

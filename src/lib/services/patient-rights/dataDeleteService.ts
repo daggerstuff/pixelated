@@ -72,7 +72,7 @@ export async function createDataDeletionRequest(
     return deletionRequest
   } catch (error: unknown) {
     logger.error('Error in createDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       params,
     })
     throw error
@@ -93,7 +93,7 @@ export async function getDataDeletionRequest(
     return request as DataDeletionRequest | null
   } catch (error: unknown) {
     logger.error('Error in getDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       id,
     })
     throw error
@@ -131,7 +131,7 @@ export async function getAllDataDeletionRequests(filters?: {
     return requests as DataDeletionRequest[]
   } catch (error: unknown) {
     logger.error('Error in getAllDataDeletionRequests', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       filters,
     })
     throw error
@@ -177,20 +177,20 @@ export async function updateDataDeletionRequest(
     void auditLogger.logAction(
       {
         userId: params.processedBy,
-        email: 'system@pixelated-empathy.local',
+        email: 'system@pixelated.local',
         role: {
           id: 'system',
           name: 'system',
           description: 'System process',
-          level: 100,
+          level: 0,
         },
         permissions: [],
       },
       {
-        type: 'update_deletion_request',
-        category: 'patient_data_deletion',
-        description: 'Update data deletion request status',
-        sensitivityLevel: 'high',
+        type: 'update',
+        category: 'patient-data',
+        description: 'Update deletion request status',
+        sensitivityLevel: 'high' as const,
       },
       'patient_data',
       {
@@ -209,7 +209,7 @@ export async function updateDataDeletionRequest(
     return updatedRequest
   } catch (error: unknown) {
     logger.error('Error in updateDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       params,
     })
     throw error
@@ -259,20 +259,20 @@ async function executeDataDeletion(
     void auditLogger.logAction(
       {
         userId: processedBy,
-        email: 'system@pixelated-empathy.local',
+        email: 'system@pixelated.local',
         role: {
           id: 'system',
           name: 'system',
           description: 'System process',
-          level: 100,
+          level: 0,
         },
         permissions: [],
       },
       {
-        type: 'execute_data_deletion',
-        category: 'patient_data_deletion',
-        description: 'Execute patient data deletion',
-        sensitivityLevel: 'critical',
+        type: 'delete',
+        category: 'patient-data',
+        description: 'Execute data deletion',
+        sensitivityLevel: 'high' as const,
       },
       'patient_data',
       {
@@ -285,7 +285,7 @@ async function executeDataDeletion(
     )
   } catch (error: unknown) {
     logger.error('Error executing data deletion', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       requestId: request.id,
       patientId: request.patientId,
     })
@@ -297,27 +297,30 @@ async function executeDataDeletion(
     void auditLogger.logAction(
       {
         userId: processedBy,
-        email: 'system@pixelated-empathy.local',
+        email: 'system@pixelated.local',
         role: {
           id: 'system',
           name: 'system',
           description: 'System process',
-          level: 100,
+          level: 0,
         },
         permissions: [],
       },
       {
-        type: 'data_deletion_error',
-        category: 'patient_data_deletion',
-        description: 'Error executing data deletion request',
-        sensitivityLevel: 'critical',
+        type: 'delete',
+        category: 'patient-data',
+        description: 'Data deletion error',
+        sensitivityLevel: 'high' as const,
       },
       'patient_data',
       {
         requestId: request.id,
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { ipAddress: '::1', userAgent: 'system' },
+      undefined,
+      false,
+      error instanceof Error ? error.message : 'Unknown error',
     )
   }
 }

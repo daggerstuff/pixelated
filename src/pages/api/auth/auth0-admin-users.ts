@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -60,7 +60,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        AuditEventType.SECURITY,
         'auth.admin.users.forbidden',
         user.id,
         'auth-admin-users',
@@ -120,7 +120,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'admin_user_list',
+      AuditEventType.ACCESS,
       'auth.admin.users.list',
       user.id,
       'auth-admin-users',
@@ -156,7 +156,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.admin.users.error',
       'anonymous',
       'auth-admin-users',
@@ -231,7 +231,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     if (admin.role !== 'admin' && admin.role !== 'superadmin') {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        AuditEventType.SECURITY,
         'auth.admin.users.forbidden',
         admin.id,
         'auth-admin-users',
@@ -272,7 +272,7 @@ export const PATCH: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'admin_user_update',
+      AuditEventType.MODIFY,
       'auth.admin.users.update',
       admin.id,
       'auth-admin-users',
@@ -302,7 +302,7 @@ export const PATCH: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.admin.users.error',
       'anonymous',
       'auth-admin-users',

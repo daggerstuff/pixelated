@@ -55,6 +55,9 @@ const rateLimitConfigs: RateLimitConfig[] = [
  */
 export class RateLimiter {
   private readonly storage: Map<string, number>
+  private readonly defaultLimit: number
+  private readonly windowMs: number
+  private readonly userLimits: Record<string, number>
 
   constructor(defaultLimit = 30, windowMs = 60 * 1000) {
     this.defaultLimit = defaultLimit
@@ -149,8 +152,8 @@ export const rateLimitMiddleware = defineMiddleware(
       const rateLimitResult = rateLimit.check(
         clientIp,
         role,
-        config.limits,
-        config.windowMs,
+        config!.limits,
+        config!.windowMs,
       )
 
       if (!rateLimitResult.allowed) {
