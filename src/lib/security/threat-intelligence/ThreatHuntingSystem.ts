@@ -280,11 +280,10 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate()
-      await subscriber.connect()
+      const subscriber = (this.redis as any).duplicate()
 
       // Subscribe to hunt execution requests
-      await subscriber.subscribe('hunt:execute', async (message) => {
+      await subscriber.subscribe('hunt:execute', async (message: string) => {
         try {
           const huntData = JSON.parse(message)
           await this.executeHunt(huntData.hunt_id)
@@ -296,7 +295,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       })
 
       // Subscribe to new data availability events
-      await subscriber.subscribe('data:available', async (message) => {
+      await subscriber.subscribe('data:available', async (message: string) => {
         try {
           const dataInfo = JSON.parse(message)
           await this.handleNewDataAvailable(dataInfo)
@@ -594,7 +593,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const conn of suspiciousConnections) {
-        const c = conn as Record<string, unknown>
+        const c = conn
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_network_connection',
@@ -680,7 +679,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const proc of suspiciousProcesses) {
-        const p = proc as Record<string, unknown>
+        const p = proc
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'suspicious_process',
@@ -750,7 +749,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const anomalousBehaviors = this.analyzeUserBehavior(userData, hunt.query)
 
       for (const beh of anomalousBehaviors) {
-        const b = beh as Record<string, unknown>
+        const b = beh
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'anomalous_user_behavior',
@@ -823,7 +822,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       )
 
       for (const ind of malwareIndicators) {
-        const mal = ind as Record<string, unknown>
+        const mal = ind
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'malware_indicator',
@@ -832,7 +831,7 @@ export class ThreatHuntingSystem extends EventEmitter {
           description: `Malware indicator detected: ${mal['description'] as string}`,
           evidence: [
             {
-              type: 'file',
+              type: 'file_hash',
               data: mal,
               source: 'malware_detection',
               timestamp: new Date(),
@@ -893,7 +892,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const lateralMovements = this.analyzeLateralMovement(authData, hunt.query)
 
       for (const mov of lateralMovements) {
-        const m = mov as Record<string, unknown>
+        const m = mov
         const finding: HuntFinding = {
           id: uuidv4(),
           type: 'lateral_movement',
@@ -1015,27 +1014,27 @@ export class ThreatHuntingSystem extends EventEmitter {
    */
   private analyzeNetworkConnections(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate network connection analysis
-    return data.filter((connection) => (connection as Record<string, unknown>)['confidence'] as number > 0.5)
+    return data.filter((connection) => (connection)['confidence'] as number > 0.5)
   }
 
   private analyzeProcesses(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate process analysis
-    return data.filter((process) => (process as Record<string, unknown>)['confidence'] as number > 0.7)
+    return data.filter((process) => (process)['confidence'] as number > 0.7)
   }
 
   private analyzeUserBehavior(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate user behavior analysis
-    return data.filter((behavior) => (behavior as Record<string, unknown>)['confidence'] as number > 0.6)
+    return data.filter((behavior) => (behavior)['confidence'] as number > 0.6)
   }
 
   private analyzeMalwareIndicators(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate malware indicator analysis
-    return data.filter((indicator) => (indicator as Record<string, unknown>)['confidence'] as number > 0.8)
+    return data.filter((indicator) => (indicator)['confidence'] as number > 0.8)
   }
 
   private analyzeLateralMovement(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
     // Simulate lateral movement analysis
-    return data.filter((movement) => (movement as Record<string, unknown>)['confidence'] as number > 0.7)
+    return data.filter((movement) => (movement)['confidence'] as number > 0.7)
   }
 
   /**
@@ -1107,16 +1106,16 @@ export class ThreatHuntingSystem extends EventEmitter {
 
       for (const finding of findings) {
         // Simulate AI analysis
-        const aiAnalysis = await this.simulateAIAnalysis(finding)
+        const aiAnalysis = (await this.simulateAIAnalysis(finding)) as Record<string, number | string | ThreatIndicator[]>
 
         if (
-          aiAnalysis.confidence > this.config.ai_assistance.confidence_threshold
+          (aiAnalysis['confidence'] as number) > this.config.ai_assistance.confidence_threshold
         ) {
           finding.confidence = Math.min(finding.confidence + 0.1, 1.0)
-          finding.description += ` | AI Analysis: ${aiAnalysis.insight}`
+          finding.description += ` | AI Analysis: ${aiAnalysis['insight'] as string}`
 
-          if (aiAnalysis.additional_indicators) {
-            finding.indicators.push(...aiAnalysis.additional_indicators)
+          if (aiAnalysis['additional_indicators']) {
+            finding.indicators.push(...(aiAnalysis['additional_indicators'] as ThreatIndicator[]))
           }
         }
       }
@@ -1191,7 +1190,7 @@ export class ThreatHuntingSystem extends EventEmitter {
     const byType: Record<string, number> = {}
 
     for (const finding of findings) {
-      bySeverity[finding.severity]++
+      bySeverity[finding.severity] = (bySeverity[finding.severity] ?? 0) + 1
       byType[finding.type] = (byType[finding.type] ?? 0) + 1
     }
 
@@ -1262,7 +1261,7 @@ export class ThreatHuntingSystem extends EventEmitter {
       const relevantHunts = await this.huntsCollection
         .find({
           'status': 'active',
-          'scope.data_sources': dataInfo.data_source,
+          'scope.data_sources': dataInfo['data_source'] as string,
         })
         .toArray()
 

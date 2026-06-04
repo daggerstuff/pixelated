@@ -1,7 +1,6 @@
-import type { APIRoute } from 'astro'
-export const prerender = false
-
 import { z } from 'zod'
+
+export const prerender = false
 
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { protectRoute } from '@/lib/auth/serverAuth'
@@ -152,7 +151,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
         ? plan.updatedAt.toISOString()
         : new Date().toISOString(),
     duration: plan.duration ?? 0,
-    status: plan.status as TreatmentPlanEnhanced['status'],
+    status: plan.status,
     goals: (plan.goals as TreatmentPlanEnhanced['goals']) ?? [],
     notes: plan.notes ?? '',
     metadata: plan.metadata as TreatmentPlanEnhanced['metadata'] | undefined,
@@ -165,7 +164,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
  *
  * Provides comprehensive treatment plan data for the TreatmentPlanManager component
  */
-export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
+export const GET = protectRoute()(async (context: AuthAPIContext) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -261,7 +260,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for creating/updating treatment plans
  */
-export const POST: APIRoute = protectRoute()(async (
+export const POST = protectRoute()(async (
   context: AuthAPIContext,
 ) => {
   try {
@@ -361,7 +360,7 @@ export const POST: APIRoute = protectRoute()(async (
 /**
  * PATCH endpoint for updating specific goals or milestones
  */
-export const PATCH: APIRoute = protectRoute()(async (
+export const PATCH = protectRoute()(async (
   context: AuthAPIContext,
 ) => {
   try {

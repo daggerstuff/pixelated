@@ -18,7 +18,7 @@ declare module '../../../lib/auth' {
   }
 }
 
-export const GET = async ({ request, cookies }) => {
+export const GET = async ({ request, cookies }: { request: Request; cookies: any }) => {
   try {
     // Extract query parameters from the URL
     const url = new URL(request.url)
@@ -29,14 +29,14 @@ export const GET = async ({ request, cookies }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export status request', {
-        errors: validationResult.error.errors,
+        errors: (validationResult.error as any)?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid export ID',
-          errors: validationResult.error.errors,
+          errors: (validationResult.error as any)?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
@@ -52,16 +52,18 @@ export const GET = async ({ request, cookies }) => {
       )
     }
 
+    const userRecord = user as Record<string, unknown>
+    const userPermissions = userRecord['permissions'] as string[] | undefined
     // Check permissions
     const hasPermission =
-      user.permissions?.includes('data:export:read') ??
-      user.permissions?.includes('admin:patient-rights')
+      userPermissions?.includes('data:export:read') ??
+      userPermissions?.includes('admin:patient-rights')
 
     if (!hasPermission) {
       logger.warn('Permission denied for checking export status', {
-        userId: user.id,
+        userId: userRecord['id'],
         exportId: validationResult.data.exportId,
-        permissions: user.permissions,
+        permissions: userPermissions,
       })
 
       return new Response(
@@ -87,7 +89,7 @@ export const GET = async ({ request, cookies }) => {
     if (validatedExportId.includes('complete')) {
       status = 'completed'
       progress = 100
-      downloadUrl = `/api/patient-rights/download-export?exportId=${validatedExportId}&token=mock-secure-token`
+      downloadUrl = `/api/patient-rights/download-export?exportId=${validatedExportId}&token=mock-dummy-token`
     } else if (validatedExportId.includes('fail')) {
       status = 'failed'
       progress = 50

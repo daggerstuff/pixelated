@@ -11,6 +11,7 @@
     "src/lib/ai/modelOptimizer.ts",
     "src/lib/export/index.node.ts",
     "src/lib/fhe/fhe-factory.ts",
+    "src/scripts/task-manager-cli.ts",
     "config/vitest.config.ts",
     "foresight-mcp/apps/docs/tsconfig.json"
   ],

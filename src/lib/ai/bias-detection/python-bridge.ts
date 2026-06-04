@@ -16,11 +16,13 @@ import {
   PooledConnection,
 } from './connection-pool'
 import type {
+  BiasedTerm,
   TherapeuticSession,
   PreprocessingLayerResult,
   ModelLevelLayerResult,
   InteractiveLayerResult,
   EvaluationLayerResult,
+  GroupPerformanceComparison,
 } from './types'
 
 const logger = createBuildSafeLogger('PythonBiasDetectionBridge')
@@ -249,10 +251,10 @@ export class PythonBiasDetectionBridge {
         // Acquire a pooled connection for this request if the pool supports it
         if (
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).acquireConnection === 'function'
+          typeof (this.connectionPool).acquireConnection === 'function'
         ) {
           pooledConnection = await (
-            this.connectionPool as ConnectionPool
+            this.connectionPool
           ).acquireConnection()
         }
         // Simplified signal handling for test compatibility
@@ -273,7 +275,7 @@ export class PythonBiasDetectionBridge {
           }, this.timeout)
 
           // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as RequestInit).signal = controller.signal
+          ;(fetchOptions).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -318,9 +320,9 @@ export class PythonBiasDetectionBridge {
         if (
           pooledConnection &&
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).releaseConnection === 'function'
+          typeof (this.connectionPool).releaseConnection === 'function'
         ) {
-          ;(this.connectionPool as ConnectionPool).releaseConnection(pooledConnection)
+          ;(this.connectionPool).releaseConnection(pooledConnection)
           pooledConnection = null
         }
         // Clear timeout on error
@@ -381,39 +383,39 @@ export class PythonBiasDetectionBridge {
               ? layerResult.bias_score
               : 0.5,
           linguisticBias: {
-            genderBiasScore: ling['gender_bias_score'] ?? 0.5,
-            racialBiasScore: ling['racial_bias_score'] ?? 0.5,
-            ageBiasScore: ling['age_bias_score'] ?? 0.5,
-            culturalBiasScore: ling['cultural_bias_score'] ?? 0.5,
-            overallBiasScore: ling['overall_bias_score'] ?? 0.5,
-            biasedTerms: ling['biased_terms'] ?? [],
+            genderBiasScore: (ling['gender_bias_score'] as number) ?? 0.5,
+            racialBiasScore: (ling['racial_bias_score'] as number) ?? 0.5,
+            ageBiasScore: (ling['age_bias_score'] as number) ?? 0.5,
+            culturalBiasScore: (ling['cultural_bias_score'] as number) ?? 0.5,
+            overallBiasScore: (ling['overall_bias_score'] as number) ?? 0.5,
+            biasedTerms: (ling['biased_terms'] as Array<BiasedTerm>) ?? [],
             sentimentAnalysis: {
-              positive: sentiment['positive'] ?? 0,
-              neutral: sentiment['neutral'] ?? 1,
-              negative: sentiment['negative'] ?? 0,
-              overallSentiment: sentiment['overallSentiment'] ?? 0,
-              emotionalValence: sentiment['emotionalValence'] ?? 0,
-              subjectivity: sentiment['subjectivity'] ?? 0,
-              demographicVariations: sentiment['demographicVariations'] ?? {},
+              positive: (sentiment['positive'] as number) ?? 0,
+              neutral: (sentiment['neutral'] as number) ?? 1,
+              negative: (sentiment['negative'] as number) ?? 0,
+              overallSentiment: (sentiment['overallSentiment'] as number) ?? 0,
+              emotionalValence: (sentiment['emotionalValence'] as number) ?? 0,
+              subjectivity: (sentiment['subjectivity'] as number) ?? 0,
+              demographicVariations: (sentiment['demographicVariations'] as Record<string, number>) ?? {},
             },
           },
           representationAnalysis: {
-            representationParity: rep['representation_parity'] ?? 0.5,
-            minorityGroupScore: rep['minority_group_score'] ?? 0.5,
-            demographicDistribution: rep['demographic_distribution'] ?? {},
-            underrepresentedGroups: rep['underrepresented_groups'] ?? [],
-            overrepresentedGroups: rep['overrepresented_groups'] ?? [],
-            diversityIndex: rep['diversity_index'] ?? 0,
-            intersectionalityAnalysis: rep['intersectionality_analysis'] ?? [],
+            representationParity: (rep['representation_parity'] as number) ?? 0.5,
+            minorityGroupScore: (rep['minority_group_score'] as number) ?? 0.5,
+            demographicDistribution: (rep['demographic_distribution'] as Record<string, number>) ?? {},
+            underrepresentedGroups: (rep['underrepresented_groups'] as string[]) ?? [],
+            overrepresentedGroups: (rep['overrepresented_groups'] as string[]) ?? [],
+            diversityIndex: (rep['diversity_index'] as number) ?? 0,
+            intersectionalityAnalysis: (rep['intersectionality_analysis'] as any[]) ?? [],
           },
           dataQualityMetrics: {
-            completeness: dq['completeness'] ?? 1,
-            consistency: dq['consistency'] ?? 1,
-            coverage: dq['coverage'] ?? 1,
-            accuracy: dq['accuracy'] ?? 1,
-            timeliness: dq['timeliness'] ?? 1,
-            validity: dq['validity'] ?? 1,
-            missingDataByDemographic: dq['missingDataByDemographic'] ?? {},
+            completeness: (dq['completeness'] as number) ?? 1,
+            consistency: (dq['consistency'] as number) ?? 1,
+            coverage: (dq['coverage'] as number) ?? 1,
+            accuracy: (dq['accuracy'] as number) ?? 1,
+            timeliness: (dq['timeliness'] as number) ?? 1,
+            validity: (dq['validity'] as number) ?? 1,
+            missingDataByDemographic: (dq['missingDataByDemographic'] as Record<string, number>) ?? {},
           },
           detectedBiases: layerResult.detected_biases ?? ['service_unavailable'],
           recommendations: layerResult.recommendations ?? [
@@ -425,7 +427,7 @@ export class PythonBiasDetectionBridge {
             (sessionData)?.sessionId || 'unknown',
           fallbackMode: false,
           serviceError: undefined,
-        } as PreprocessingLayerResult
+        }
       }
       // Fallback: construct and return PreprocessingAnalysisResult with neutral values
       return this.createFallbackPreprocessingResult(sessionData)
@@ -496,7 +498,7 @@ export class PythonBiasDetectionBridge {
             : error
               ? String(error)
               : 'Python service unavailable',
-    } as PreprocessingLayerResult
+    }
   }
 
   async runModelLevelAnalysis(
@@ -510,7 +512,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const fairness = (metrics['fairness_metrics'] ?? {}) as Record<
           string,
           unknown
@@ -528,23 +530,23 @@ export class PythonBiasDetectionBridge {
               ? layerResult.bias_score
               : 0.5,
           fairnessMetrics: {
-            demographicParity: fairness['demographic_parity'] ?? 0.5,
-            equalizedOdds: fairness['equalized_odds'] ?? 0.5,
-            equalOpportunity: fairness['equal_opportunity'] ?? 0.5,
-            calibration: fairness['calibration'] ?? 0.5,
-            individualFairness: fairness['individual_fairness'] ?? 0.5,
-            counterfactualFairness: fairness['counterfactual_fairness'] ?? 0.5,
+            demographicParity: (fairness['demographic_parity'] as number) ?? 0.5,
+            equalizedOdds: (fairness['equalized_odds'] as number) ?? 0.5,
+            equalOpportunity: (fairness['equal_opportunity'] as number) ?? 0.5,
+            calibration: (fairness['calibration'] as number) ?? 0.5,
+            individualFairness: (fairness['individual_fairness'] as number) ?? 0.5,
+            counterfactualFairness: (fairness['counterfactual_fairness'] as number) ?? 0.5,
           },
           performanceMetrics: {
-            accuracy: performance['accuracy'] ?? 0.5,
-            precision: performance['precision'] ?? 0.5,
-            recall: performance['recall'] ?? 0.5,
-            f1Score: performance['f1_score'] ?? 0.5,
-            auc: performance['auc'] ?? 0.5,
-            calibrationError: performance['calibration_error'] ?? 0.1,
-            demographicBreakdown: performance['demographic_breakdown'] ?? {},
+            accuracy: (performance['accuracy'] as number) ?? 0.5,
+            precision: (performance['precision'] as number) ?? 0.5,
+            recall: (performance['recall'] as number) ?? 0.5,
+            f1Score: (performance['f1_score'] as number) ?? 0.5,
+            auc: (performance['auc'] as number) ?? 0.5,
+            calibrationError: (performance['calibration_error'] as number) ?? 0.1,
+            demographicBreakdown: (performance['demographic_breakdown'] as Record<string, number>) ?? {},
           },
-          groupPerformanceComparison: groupComp,
+          groupPerformanceComparison: groupComp as unknown as GroupPerformanceComparison[],
           detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         }
@@ -569,7 +571,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const counterfactual = (metrics['counterfactual_analysis'] ??
           {}) as Record<string, unknown>
         const featureImp = (metrics['feature_importance'] ?? []) as Record<string, unknown>[]
@@ -581,10 +583,10 @@ export class PythonBiasDetectionBridge {
               ? layerResult.bias_score
               : 0.5,
           counterfactualAnalysis: {
-            scenariosAnalyzed: counterfactual['scenarios_analyzed'] ?? 0,
-            biasDetected: counterfactual['bias_detected'] ?? false,
-            consistencyScore: counterfactual['consistency_score'] ?? 0.5,
-            problematicScenarios: counterfactual['problematic_scenarios'] ?? [],
+            scenariosAnalyzed: (counterfactual['scenarios_analyzed'] as number) ?? 0,
+            biasDetected: (counterfactual['bias_detected'] as boolean) ?? false,
+            consistencyScore: (counterfactual['consistency_score'] as number) ?? 0.5,
+            problematicScenarios: (counterfactual['problematic_scenarios'] as any[]) ?? [],
           },
           featureImportance: featureImp,
           whatIfScenarios: whatIf,
@@ -612,7 +614,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
       if (layerResult) {
-        const metrics = layerResult.metrics || ({} as Record<string, unknown>)
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<
           string,
           unknown
@@ -629,24 +631,24 @@ export class PythonBiasDetectionBridge {
               ? layerResult.bias_score
               : 0.5,
           huggingFaceMetrics: {
-            toxicity: huggingFace['toxicity'] ?? 0.1,
-            bias: huggingFace['bias'] ?? 0.2,
-            regard: huggingFace['regard'] ?? {},
-            stereotype: huggingFace['stereotype'] ?? 0.1,
-            fairness: huggingFace['fairness'] ?? 0.8,
+            toxicity: (huggingFace['toxicity'] as number) ?? 0.1,
+            bias: (huggingFace['bias'] as number) ?? 0.2,
+            regard: (huggingFace['regard'] as Record<string, number>) ?? {},
+            stereotype: (huggingFace['stereotype'] as number) ?? 0.1,
+            fairness: (huggingFace['fairness'] as number) ?? 0.8,
           },
           customMetrics: {
-            therapeuticBias: custom['therapeutic_bias'] ?? 0.1,
-            culturalSensitivity: custom['cultural_sensitivity'] ?? 0.1,
-            professionalEthics: custom['professional_ethics'] ?? 0.1,
-            patientSafety: custom['patient_safety'] ?? 0.1,
+            therapeuticBias: (custom['therapeutic_bias'] as number) ?? 0.1,
+            culturalSensitivity: (custom['cultural_sensitivity'] as number) ?? 0.1,
+            professionalEthics: (custom['professional_ethics'] as number) ?? 0.1,
+            patientSafety: (custom['patient_safety'] as number) ?? 0.1,
           },
           temporalAnalysis: {
-            trendDirection: temporal['trend_direction'] ?? 'stable',
-            changeRate: temporal['change_rate'] ?? 0,
-            seasonalPatterns: temporal['seasonal_patterns'] ?? [],
+            trendDirection: (temporal['trend_direction'] as EvaluationLayerResult['temporalAnalysis']['trendDirection']) ?? 'stable',
+            changeRate: (temporal['change_rate'] as number) ?? 0,
+            seasonalPatterns: (temporal['seasonal_patterns'] as any[]) ?? [],
             interventionEffectiveness:
-              temporal['intervention_effectiveness'] ?? [],
+              (temporal['intervention_effectiveness'] as any[]) ?? [],
           },
           detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
@@ -883,9 +885,9 @@ export class PythonBiasDetectionBridge {
       this.stopHealthMonitoring()
       if (
         this.connectionPool &&
-        typeof (this.connectionPool as ConnectionPool).dispose === 'function'
+        typeof (this.connectionPool).dispose === 'function'
       ) {
-        await (this.connectionPool as ConnectionPool).dispose()
+        await (this.connectionPool).dispose()
       }
       logger.info('PythonBiasDetectionBridge disposed')
     } catch (e) {

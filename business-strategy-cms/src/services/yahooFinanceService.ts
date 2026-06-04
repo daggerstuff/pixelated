@@ -134,7 +134,7 @@ export class YahooFinanceService {
   async getQuote(symbol: string): Promise<YahooFinanceQuote | null> {
     try {
       const cacheKey = `quote_${symbol}`
-      const cached = this.getFromCache<YahooFinanceQuote>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as YahooFinanceQuote | null
       if (cached) return cached
 
       const response = await this.client.get(`/quote/${symbol}`)
@@ -190,7 +190,7 @@ export class YahooFinanceService {
   ): Promise<YahooFinanceHistoricalData[]> {
     try {
       const cacheKey = `historical_${symbol}_${period}`
-      const cached = this.getFromCache<YahooFinanceHistoricalData[]>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as YahooFinanceHistoricalData[] | null
       if (cached) return cached
 
       const interval = period === '1d' ? '1m' : '1d'
@@ -248,7 +248,7 @@ export class YahooFinanceService {
   async getCompanyProfile(symbol: string): Promise<CompanyProfile | null> {
     try {
       const cacheKey = `profile_${symbol}`
-      const cached = this.getFromCache<CompanyProfile>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as CompanyProfile | null
       if (cached) return cached
 
       const response = await this.client.get(`/quote/${symbol}`)
@@ -333,10 +333,10 @@ export class YahooFinanceService {
     )
   }
 
-  private getFromCache<T>(key: string): T | null {
+  private getFromCache(key: string): unknown {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data as T
+      return cached.data
     }
     return null
   }
