@@ -51,8 +51,6 @@ function buildEnabledExportTypes(dataTypes: ExportDataTypes): ExportDataType[] {
   return getEnabledExportTypes(dataTypes)
 }
 
-type TimeRange = '24h' | '7d' | '30d' | '90d' | 'custom'
-
 type BiasLevel = 'all' | 'low' | 'medium' | 'high' | 'critical'
 
 type ExportOptions = {
@@ -60,7 +58,7 @@ type ExportOptions = {
   exportDateRange: DateRangeFilter
   exportDataTypes: ExportDataTypes
   exportFilters: ExportDateFilter
-  selectedTimeRange: TimeRange | string
+  selectedTimeRange: string
   biasScoreFilter:
     | { min: number; max: number }
     | 'all'

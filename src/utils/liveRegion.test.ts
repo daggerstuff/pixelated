@@ -3,12 +3,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import {
-  announceStatus,
-  _announceAlert,
-  _log,
-  _announceProgress,
-} from './liveRegion'
+import { announceStatus } from './liveRegion'
 
 describe('liveRegion utilities', () => {
   beforeEach(() => {

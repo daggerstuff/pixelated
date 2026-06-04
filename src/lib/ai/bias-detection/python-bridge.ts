@@ -356,27 +356,27 @@ export class PythonBiasDetectionBridge {
         const metrics =
           typeof layerResult.metrics === 'object' && layerResult.metrics
             ? (layerResult.metrics as Record<string, unknown>)
-            : {}
+            : ({} as Record<string, unknown>)
         const ling =
           typeof metrics['linguistic_bias'] === 'object' &&
           metrics['linguistic_bias']
             ? (metrics['linguistic_bias'] as Record<string, unknown>)
-            : {}
+            : ({} as Record<string, unknown>)
         const sentiment =
           typeof ling['sentiment_analysis'] === 'object' &&
           ling['sentiment_analysis']
             ? (ling['sentiment_analysis'] as Record<string, unknown>)
-            : {}
+            : ({} as Record<string, unknown>)
         const rep =
           typeof metrics['representation_analysis'] === 'object' &&
           metrics['representation_analysis']
             ? (metrics['representation_analysis'] as Record<string, unknown>)
-            : {}
+            : ({} as Record<string, unknown>)
         const dq =
           typeof metrics['data_quality_metrics'] === 'object' &&
           metrics['data_quality_metrics']
             ? (metrics['data_quality_metrics'] as Record<string, unknown>)
-            : {}
+            : ({} as Record<string, unknown>)
         return {
           biasScore:
             typeof layerResult.bias_score === 'number'
@@ -492,7 +492,7 @@ export class PythonBiasDetectionBridge {
       fallbackMode: true,
       serviceError:
         error instanceof Error
-          ? (error instanceof Error ? error.message : "Unknown error")
+          ? error.message
           : error && typeof error === 'object'
             ? JSON.stringify(error)
             : error
@@ -588,8 +588,8 @@ export class PythonBiasDetectionBridge {
             consistencyScore: (counterfactual['consistency_score'] as number) ?? 0.5,
             problematicScenarios: (counterfactual['problematic_scenarios'] as any[]) ?? [],
           },
-          featureImportance: featureImp,
-          whatIfScenarios: whatIf,
+          featureImportance: featureImp as any[],
+          whatIfScenarios: whatIf as any[],
           detectedBiases: layerResult.detected_biases ?? [],
           recommendations: layerResult.recommendations ?? [],
         }

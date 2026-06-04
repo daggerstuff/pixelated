@@ -78,18 +78,18 @@ export async function resolveUserIdFromRequest(
   const authHeader = request.headers.get('Authorization')
   if (authHeader) {
     const { userId } = await verifyAuthToken(authHeader)
-    return userId
+    return userId ?? null
   }
 
   const cookieToken = request.headers
     .get('cookie')
     ?.split(';')
     .find((c) => c.trim().startsWith('auth-token='))
-    ?.split('=')[1]
+    ?.split('=')[1] ?? null
 
   if (cookieToken) {
     const { userId } = await verifyAuthToken(cookieToken)
-    return userId
+    return userId ?? null
   }
 
   return null

@@ -11,7 +11,7 @@ export async function getAssetUrl(path: string): Promise<string> {
   // Try to import the asset map, fallback to empty object if not available
   let assetMap: Record<string, string> = {}
   try {
-    const mapModule = (await import('../cdn-asset-map.json')) as AssetMapModule
+    const mapModule = (await import('../cdn-asset-map.json')) as unknown as AssetMapModule
     assetMap = mapModule.default
   } catch {
     // Asset map not found, use fallback
