@@ -225,17 +225,17 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       })
 
       expect(investigation).toBeDefined()
-      expect(investigation.id).toBeDefined()
-      expect(investigation.status).toBe('running')
+      expect(investigation['id']).toBeDefined()
+      expect(investigation['status']).toBe('running')
 
       // Wait for investigation to complete
       await new Promise((resolve) => setTimeout(resolve, 5000))
 
       const result = await huntingService.getInvestigationResult(
-        investigation.id,
+        investigation['id'],
       )
       expect(result).toBeDefined()
-      expect(result.status).toBe('completed')
+      expect(result['status']).toBe('completed')
     }, 15000)
 
     it('should update threat intelligence feeds', async () => {
@@ -317,7 +317,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       // Verify hunting service initiated investigation (check all, not just active)
       const allInvestigations = await huntingService.getActiveInvestigations()
       const relatedInvestigation = allInvestigations.find(
-        (inv) => inv.threatId === threatData.threatId,
+        (inv) => inv['threatId'] === threatData.threatId,
       )
       expect(relatedInvestigation).toBeDefined()
 
@@ -357,7 +357,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       })
 
       expect(investigation).toBeDefined()
-      expect(investigation.status).toBe('running')
+      expect(investigation['status']).toBe('running')
 
       // Restore original method
       monitoringService.getMetrics = originalGetMetrics
@@ -437,9 +437,9 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
         await huntingService.startInvestigation(maliciousInput)
 
       // Verify inputs were sanitized
-      expect(investigation.threatId).not.toContain('<script>')
-      expect(investigation.userId).not.toContain('<img')
-      expect(investigation.description).not.toContain('<script>')
+      expect(investigation['threatId']).not.toContain('<script>')
+      expect(investigation['userId']).not.toContain('<img')
+      expect(investigation['description']).not.toContain('<script>')
     })
 
     it('should validate API keys and credentials', async () => {
@@ -524,7 +524,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       })
 
       expect(result).toBeDefined()
-      expect(result.analysisType).toBe('rule_based')
+      expect(result['analysisType']).toBe('rule_based')
 
       // Restore original method
       huntingService.analyzeWithML = originalAnalyze
@@ -606,8 +606,8 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
 
       // Verify data is encrypted when stored
       const storedData = await intelligenceService.getRawIOCs()
-      expect(storedData[0].metadata).not.toContain('confidential_data')
-      expect(storedData[0].metadata).not.toContain('sensitive_information')
+      expect(storedData[0]['metadata']).not.toContain('confidential_data')
+      expect(storedData[0]['metadata']).not.toContain('sensitive_information')
     })
   })
 })

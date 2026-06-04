@@ -105,8 +105,8 @@ export class EnhancedCacheService implements CacheClient {
 
       return allKeys
         .map((key: string) =>
-          (key as string).startsWith(memoryService.prefix)
-            ? (key as string).substring(memoryService.prefix.length)
+          key.startsWith(memoryService.prefix)
+            ? key.substring(memoryService.prefix.length)
             : key,
         )
         .filter((key) => regex.test(key))

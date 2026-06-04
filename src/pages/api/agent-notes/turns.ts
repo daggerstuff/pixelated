@@ -179,7 +179,9 @@ export const GET: APIRoute = async ({ url, locals }) => {
   }
 
   const ledger = getLedger()
-  const actorContext = resolveActorIdentity(locals)
+  const actorContext = resolveActorIdentity(
+    locals as Partial<{ user?: { id?: string | null; role?: string | null } }>,
+  )
 
   let turns: NoteTurn[]
   if (query.artifactId) {
@@ -199,7 +201,9 @@ export const GET: APIRoute = async ({ url, locals }) => {
         'You are not authorized to query this artifact.',
       )
     }
-    turns = await ledger.list(queryParams)
+    turns = await ledger.list(
+      queryParams as TurnQueryParams & Record<string, unknown>,
+    )
   } else {
     if (!actorContext.actorId && !actorContext.hasPrivilege) {
       return createErrorResponse(
@@ -250,7 +254,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const ledger = getLedger()
-    const actorContext = resolveActorIdentity(locals)
+    const actorContext = resolveActorIdentity(
+      locals as Partial<{
+        user?: { id?: string | null; role?: string | null }
+      }>,
+    )
     const submitPayload =
       actorContext.actorId && !actorContext.hasPrivilege
         ? { ...parsed.data, agentId: actorContext.actorId }

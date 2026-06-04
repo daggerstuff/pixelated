@@ -383,7 +383,7 @@ export class HIPAADataService {
       return undefined
     }
 
-    const rolePermissions = this.config.accessControlMatrix.roles[role]
+    const rolePermissions = this.config.accessControlMatrix.roles[role]!
     if (
       !Array.isArray(rolePermissions.permissions) ||
       !Array.isArray(rolePermissions.restrictions)

@@ -165,7 +165,9 @@ export class AutomatedThreatResponseOrchestratorCore
   private async loadResponseStrategies(): Promise<void> {
     try {
       const strategiesCollection = this.db.collection('response_strategies')
-      const strategies = (await strategiesCollection.find({}).toArray()) as unknown as ResponseStrategy[]
+      const strategies = (await strategiesCollection
+        .find({})
+        .toArray()) as unknown as ResponseStrategy[]
 
       for (const strategy of strategies) {
         this.responseStrategies.set(strategy.strategyId, strategy)
@@ -626,7 +628,7 @@ export class AutomatedThreatResponseOrchestratorCore
       switch (action.actionType) {
         case 'block':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...action.parameters,
             threatId: threat.threatId,
             severity: threat.severity,
             confidence: threat.confidence,
@@ -635,7 +637,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'rate_limit':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...action.parameters,
             severity: threat.severity,
             confidence: threat.confidence,
             regions: threat.regions,
@@ -644,7 +646,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'alert':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...action.parameters,
             threatId: threat.threatId,
             severity: threat.severity,
             indicators: threat.indicators.length,
@@ -653,7 +655,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'investigate':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...action.parameters,
             threatId: threat.threatId,
             severity: threat.severity,
             regions: threat.regions,
@@ -922,7 +924,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement blocking logic (e.g., IP blocking, domain blocking)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const sourceIp = parameters['sourceIp']
       const duration = parameters['duration']
 
@@ -952,7 +954,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement isolation logic (e.g., network isolation, user isolation)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const userId = parameters['userId']
       const systemId = parameters['systemId']
 
@@ -976,7 +978,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement alerting logic (e.g., email, Slack, webhook)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const recipients = parameters['recipients']
       const priority = parameters['priority']
 
@@ -1002,7 +1004,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement investigation logic (e.g., log analysis, forensic collection)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const depth = parameters['depth']
       const scope = parameters['scope']
       const dataSources = parameters['dataSources']
@@ -1028,7 +1030,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement mitigation logic (e.g., patch deployment, configuration changes)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const mitigationType = parameters['mitigationType']
       const targetSystem = parameters['targetSystem']
 
@@ -1314,7 +1316,7 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const sourceIp = parameters['sourceIp']
 
       if (!sourceIp) {
@@ -1340,7 +1342,7 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = action.parameters || {}
       const userId = parameters['userId']
 
       // Implement remove rate limit logic
@@ -1368,7 +1370,9 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Query database
       const responsesCollection = this.db.collection('threat_responses')
-      const response = (await responsesCollection.findOne({ responseId })) as unknown as ThreatResponse | null
+      const response = (await responsesCollection.findOne({
+        responseId,
+      })) as unknown as ThreatResponse | null
 
       if (response) {
         this.activeResponses.set(responseId, response)
@@ -1543,8 +1547,7 @@ export class AutomatedThreatResponseOrchestratorCore
       let totalTime = 0
       for (const response of completedResponses) {
         const timeDiff =
-          response.completedTime!.getTime() -
-          response.executionTime.getTime()
+          response.completedTime!.getTime() - response.executionTime.getTime()
         totalTime += timeDiff
       }
 
@@ -1563,7 +1566,9 @@ export class AutomatedThreatResponseOrchestratorCore
         { $project: { responseType: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = (await responsesCollection.aggregate(pipeline).toArray()) as unknown as Array<{ responseType: string; count: number }>
+      const results = (await responsesCollection
+        .aggregate(pipeline)
+        .toArray()) as unknown as Array<{ responseType: string; count: number }>
 
       const responsesByType: Record<string, number> = {}
       for (const result of results) {
@@ -1585,7 +1590,9 @@ export class AutomatedThreatResponseOrchestratorCore
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = (await responsesCollection.aggregate(pipeline).toArray()) as unknown as Array<{ severity: string; count: number }>
+      const results = (await responsesCollection
+        .aggregate(pipeline)
+        .toArray()) as unknown as Array<{ severity: string; count: number }>
 
       const responsesBySeverity: Record<string, number> = {}
       for (const result of results) {

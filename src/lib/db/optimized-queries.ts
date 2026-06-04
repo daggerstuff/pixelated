@@ -3,12 +3,12 @@
  * High-performance queries with proper indexing, connection pooling, and query optimization
  */
 
-import { PoolClient, QueryResult } from 'pg'
+import type { PoolClient, QueryResult } from 'pg'
 
 import { getLogger } from '../logging'
 import { getPool } from './index'
 
-const logger = getLogger('optimized-queries')
+const logger = getLogger({ prefix: 'optimized-queries' })
 
 // Query performance configuration
 const QUERY_CONFIG = {
@@ -95,7 +95,7 @@ export async function executeQuery<T = unknown>(
 
       return result
     } catch (error: unknown) {
-      lastError = error instanceof Error ? error : new Error(String(error))
+      lastError = error instanceof Error ? error : new Error('Unknown error')
 
       logger.warn(`Query attempt ${attempt} failed`, {
         queryName,
@@ -161,11 +161,7 @@ export async function executeTransaction<T>(
 
     const executionTime = Date.now() - startTime
     const errorMessage =
-      error instanceof Error
-        ? error instanceof Error
-          ? error.message
-          : 'Unknown error'
-        : String(error)
+      error instanceof Error ? error.message : 'Unknown error'
 
     logger.error('Transaction failed', {
       transactionName,
@@ -353,7 +349,7 @@ export class OptimizedBiasQueries {
         COUNT(CASE WHEN ba.alert_level IN ('high', 'critical') THEN 1 END) as high_alerts
       FROM bias_analyses ba
       WHERE ba.therapist_id = $1 
-        AND ba.created_at >= NOW() - INTERVAL '${days} days'
+        AND ba.created_at >= NOW() - INTERVAL '${String(days)} days'
       GROUP BY DATE(ba.created_at)
       ORDER BY date DESC
     `
@@ -453,7 +449,7 @@ export class OptimizedBiasQueries {
         ) as fast_queries_pct,
         COUNT(CASE WHEN ba.processing_time_ms > 5000 THEN 1 END) as slow_queries
       FROM bias_analyses ba
-      WHERE ba.created_at >= NOW() - INTERVAL '${days} days'
+      WHERE ba.created_at >= NOW() - INTERVAL '${String(days)} days'
     `
 
     const result = await executeQuery(query, [], {
@@ -476,9 +472,10 @@ export class OptimizedBiasQueries {
     const cacheResult = await executeQuery(cacheHitQuery, [], {
       name: 'getCacheHitRate',
     })
-    const cacheHitRate =
-      (cacheResult.rows[0] as { cache_hit_rate: string } | {}).cache_hit_rate ??
-      0
+    const cacheHitRow = cacheResult.rows[0] as
+      | { cache_hit_rate?: string }
+      | undefined
+    const cacheHitRate = cacheHitRow?.cache_hit_rate ?? '0'
 
     return {
       total_analyses: parseInt(

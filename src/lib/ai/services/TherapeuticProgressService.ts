@@ -194,7 +194,7 @@ export class TherapeuticProgressService {
 
     if (existingSkillIndex !== -1) {
       // Skill already exists, update proficiency and context if provided
-      const existingSkill = skills[existingSkillIndex]
+      const existingSkill = skills[existingSkillIndex]!
       skills[existingSkillIndex] = {
         ...existingSkill,
         // We take the higher of existing or new initial proficiency if skill exists

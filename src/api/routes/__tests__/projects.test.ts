@@ -518,9 +518,9 @@ describe('Projects API', () => {
 
     it('should list projects with pagination', async () => {
       const response = await request(app)
-        .get<ApiResponseEnvelope<ProjectListItem[]>>(
-          '/api/projects?page=1&limit=10',
-        )
+        .get<
+          ApiResponseEnvelope<ProjectListItem[]>
+        >('/api/projects?page=1&limit=10')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -534,9 +534,9 @@ describe('Projects API', () => {
 
     it('should filter projects by category', async () => {
       const response = await request(app)
-        .get<ApiResponseEnvelope<ProjectListItem[]>>(
-          '/api/projects?category=Technology',
-        )
+        .get<
+          ApiResponseEnvelope<ProjectListItem[]>
+        >('/api/projects?category=Technology')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -548,9 +548,9 @@ describe('Projects API', () => {
 
     it('should filter projects by status', async () => {
       const response = await request(app)
-        .get<ApiResponseEnvelope<ProjectListItem[]>>(
-          '/api/projects?status=Active',
-        )
+        .get<
+          ApiResponseEnvelope<ProjectListItem[]>
+        >('/api/projects?status=Active')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -568,9 +568,9 @@ describe('Projects API', () => {
   describe('GET /api/projects/:projectId', () => {
     it('should get project details by id', async () => {
       const response = await request(app)
-        .get<ApiResponseEnvelope<ProjectResponse>>(
-          `/api/projects/${testProjectId}`,
-        )
+        .get<
+          ApiResponseEnvelope<ProjectResponse>
+        >(`/api/projects/${testProjectId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
@@ -589,7 +589,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -617,9 +617,9 @@ describe('Projects API', () => {
       }
 
       const response = await request(app)
-        .put<ApiResponseEnvelope<ProjectResponse>>(
-          `/api/projects/${testProjectId}`,
-        )
+        .put<
+          ApiResponseEnvelope<ProjectResponse>
+        >(`/api/projects/${testProjectId}`)
         .set('Authorization', `Bearer ${authToken}`)
         .send(updateData)
         .expect(200)
@@ -654,7 +654,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -670,9 +670,9 @@ describe('Projects API', () => {
       }
 
       const response = await request(app)
-        .post<ApiResponseEnvelope<ProjectObjectiveResponse>>(
-          `/api/projects/${testProjectId}/objectives`,
-        )
+        .post<
+          ApiResponseEnvelope<ProjectObjectiveResponse>
+        >(`/api/projects/${testProjectId}/objectives`)
         .set('Authorization', `Bearer ${authToken}`)
         .send(objectiveData)
         .expect(200)
@@ -736,7 +736,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('permission')
     })
@@ -745,9 +745,9 @@ describe('Projects API', () => {
   describe('GET /api/projects/search/:query', () => {
     it('should search projects by query', async () => {
       const response = await request(app)
-        .get<ApiResponseEnvelope<ProjectListItem[]>>(
-          '/api/projects/search/Test',
-        )
+        .get<
+          ApiResponseEnvelope<ProjectListItem[]>
+        >('/api/projects/search/Test')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200)
 
