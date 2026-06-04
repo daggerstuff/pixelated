@@ -536,10 +536,10 @@ describe('Data Transformation', () => {
     it('should transform session to Python format', () => {
       const result = transformSessionForPython(sampleSession)
 
-      expect(result.session_id).toBe(sampleSession.sessionId)
-      expect(result.participant_demographics.age).toBe('25-35')
-      expect(result.ai_responses[0].response_id).toBe('resp-1')
-      expect(result.transcripts[0].speaker_id).toBe('therapist')
+      expect(result['session_id']).toBe(sampleSession.sessionId)
+      expect(result['participant_demographics'].age).toBe('25-35')
+      expect(result['ai_responses'][0].response_id).toBe('resp-1')
+      expect(result['transcripts'][0].speaker_id).toBe('therapist')
     })
   })
 
@@ -554,10 +554,10 @@ describe('Data Transformation', () => {
 
       const result = transformPythonResponse(pythonResponse)
 
-      expect(result.overallBiasScore).toBe(0.4)
-      expect(result.confidence).toBe(0.8)
-      expect(result.alertLevel).toBe('medium')
-      expect(result.recommendations).toEqual(['Improve data diversity'])
+      expect(result['overallBiasScore']).toBe(0.4)
+      expect(result['confidence']).toBe(0.8)
+      expect(result['alertLevel']).toBe('medium')
+      expect(result['recommendations']).toEqual(['Improve data diversity'])
     })
   })
 })

@@ -349,19 +349,19 @@ export function useMultiPipelineWebSocket({
           stage?: string,
           data?: unknown,
         ) => {
-          onProgressUpdate?.(executionId, progress, stage, data)
+          onProgressUpdate?.(executionId!, progress, stage, data)
         },
         onStatusChange: (status: string, message?: string) => {
-          onStatusChange?.(executionId, status, message)
+          onStatusChange?.(executionId!, status, message)
         },
         onError: (error: Error) => {
-          onError?.(executionId, error)
+          onError?.(executionId!, error)
         },
         onConnect: () => {
-          onConnect?.(executionId)
+          onConnect?.(executionId!)
         },
         onDisconnect: () => {
-          onDisconnect?.(executionId)
+          onDisconnect?.(executionId!)
         },
       }
 

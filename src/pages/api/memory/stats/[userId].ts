@@ -9,7 +9,7 @@ import {
 export const GET = withAuthenticatedMemoryRoute(
   'retrieving memory stats',
   async ({ params }, user) => {
-    const requestedUserId = params['userId']
+    const requestedUserId = params!['userId']
     const userError = assertRequestedUser(user.id, requestedUserId)
     if (userError) {
       return userError

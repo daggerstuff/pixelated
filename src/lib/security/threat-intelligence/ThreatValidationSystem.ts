@@ -287,35 +287,43 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']() as Redis
+      const subscriber = (this.redis as unknown as Record<string, () => Redis>)[
+        'duplicate'
+      ]()
       await subscriber.connect()
 
       // Subscribe to validation requests
-      await subscriber.subscribe('validation:request', async (message: string) => {
-        try {
-          const validationData = JSON.parse(message)
-          await this.requestValidation(
-            validationData.threat_data,
-            validationData.validation_types,
-          )
-        } catch (error: unknown) {
-          logger.error('Failed to process validation request', {
-            error: (error as Error).message,
-          })
-        }
-      })
+      await subscriber.subscribe(
+        'validation:request',
+        async (message: string) => {
+          try {
+            const validationData = JSON.parse(message)
+            await this.requestValidation(
+              validationData.threat_data,
+              validationData.validation_types,
+            )
+          } catch (error: unknown) {
+            logger.error('Failed to process validation request', {
+              error: (error as Error).message,
+            })
+          }
+        },
+      )
 
       // Subscribe to validation completion events
-      await subscriber.subscribe('validation:completed', async (message: string) => {
-        try {
-          const completionData = JSON.parse(message)
-          await this.handleValidationCompletion(completionData)
-        } catch (error: unknown) {
-          logger.error('Failed to process validation completion', {
-            error: (error as Error).message,
-          })
-        }
-      })
+      await subscriber.subscribe(
+        'validation:completed',
+        async (message: string) => {
+          try {
+            const completionData = JSON.parse(message)
+            await this.handleValidationCompletion(completionData)
+          } catch (error: unknown) {
+            logger.error('Failed to process validation completion', {
+              error: (error as Error).message,
+            })
+          }
+        },
+      )
 
       logger.info('Redis pub/sub setup completed')
     } catch (error: unknown) {
@@ -500,7 +508,10 @@ export class ThreatValidationSystem extends EventEmitter {
       const validation: ThreatValidation = {
         id: validationId,
         threat_id: queueItem.threat_data.id,
-        validation_type: (queueItem.validation_types[0] as ThreatValidation['validation_type']) ?? 'accuracy',
+        validation_type:
+          (queueItem
+            .validation_types[0] as ThreatValidation['validation_type']) ??
+          'accuracy',
         validation_types: queueItem.validation_types,
         status: 'in_progress',
         validator_type: this.determineValidatorType(queueItem),
@@ -789,7 +800,8 @@ export class ThreatValidationSystem extends EventEmitter {
       }
 
       // Cross-reference with external sources
-      const crossRefCheck = await this.crossReferenceExternalSources(_threatData)
+      const crossRefCheck =
+        await this.crossReferenceExternalSources(_threatData)
       if (!crossRefCheck.is_verified) {
         score -= 0.2
         findings.push({

@@ -6,7 +6,7 @@
 import type { APIRoute } from 'astro'
 import { ObjectId } from 'mongodb'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { todoDAO } from '@/services/mongodb.dao'
@@ -48,7 +48,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'todos_access',
+      AuditEventType.ACCESS,
       'auth.todos.access',
       validation.userId!,
       'auth-todos',
@@ -70,7 +70,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.todos.error',
       'anonymous',
       'auth-todos',
@@ -149,11 +149,11 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'todo_create',
+      AuditEventType.CREATE,
       'auth.todos.create',
       validation.userId!,
       'auth-todos',
-      { action: 'create_todo', todoId: todo._id.toString() },
+      { action: 'create_todo', todoId: todo._id!.toString() },
     )
 
     return new Response(
@@ -171,7 +171,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.todos.error',
       'anonymous',
       'auth-todos',

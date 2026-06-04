@@ -78,8 +78,8 @@ export const GET: APIRoute = async ({ request, url }) => {
       rateLimiter,
       {
         threatDetection: {
-          mongoUri: process.env.MONGODB_URI!,
-          redisUrl: process.env.REDIS_URL!,
+          mongoUri: process.env['MONGODB_URI']!,
+          redisUrl: process.env['REDIS_URL']!,
         },
       },
     )
@@ -161,8 +161,8 @@ export const POST: APIRoute = async ({ request }) => {
         )
       }
       const candidate = item as Record<string, unknown>
-      const rawIndicator = candidate.indicator
-      const rawType = candidate.type
+      const rawIndicator = candidate['indicator']
+      const rawType = candidate['type']
 
       if (typeof rawIndicator !== 'string' || typeof rawType !== 'string') {
         throw new Error(
@@ -196,8 +196,8 @@ export const POST: APIRoute = async ({ request }) => {
       rateLimiter,
       {
         threatDetection: {
-          mongoUri: process.env.MONGODB_URI!,
-          redisUrl: process.env.REDIS_URL!,
+          mongoUri: process.env['MONGODB_URI']!,
+          redisUrl: process.env['REDIS_URL']!,
         },
       },
     )
@@ -322,8 +322,8 @@ export const PUT: APIRoute = async ({ request }) => {
       rateLimiter,
       {
         threatDetection: {
-          mongoUri: process.env.MONGODB_URI!,
-          redisUrl: process.env.REDIS_URL!,
+          mongoUri: process.env['MONGODB_URI']!,
+          redisUrl: process.env['REDIS_URL']!,
         },
         intelligence: {
           feeds,

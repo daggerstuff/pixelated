@@ -500,7 +500,7 @@ export class BaaTemplateService {
       ) {
         return false
       }
-      if (criteria.tag && !template.tags.includes(criteria.tag)) {
+      if (criteria.tag && !(template.tags ?? []).includes(criteria.tag)) {
         return false
       }
       return true

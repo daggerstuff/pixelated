@@ -8,7 +8,7 @@ import type { APIRoute } from 'astro'
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
 import type { EmotionAnalysis as TypesEmotionAnalysis } from '@/lib/ai/emotions/types'
 import { analyzeMultidimensionalPatterns } from '@/lib/ai/temporal/TemporalAnalysisAlgorithm'
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -169,7 +169,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'emotion_map_access',
+        AuditEventType.ACCESS,
         'auth.emotions.map.access',
         user.id,
         'auth-emotions',
@@ -198,7 +198,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'emotion_patterns_access',
+        AuditEventType.ACCESS,
         'auth.emotions.patterns.access',
         user.id,
         'auth-emotions',
@@ -228,7 +228,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.emotions.error',
       'anonymous',
       'auth-emotions',
