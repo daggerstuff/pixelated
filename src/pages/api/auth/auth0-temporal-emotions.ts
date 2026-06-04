@@ -13,7 +13,7 @@ import {
   type EmotionProgression,
   type EmotionCorrelation,
 } from '@/lib/ai/temporal/EmotionTemporalAnalyzer'
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -213,7 +213,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
 
     // Create audit log
     await createAuditLog(
-      'temporal_emotions_access',
+      AuditEventType.ACCESS,
       'auth.temporal.emotions.access',
       user.id,
       'auth-temporal-emotions',
@@ -248,7 +248,7 @@ export const GET: APIRoute = async ({ params, request }): Promise<Response> => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.temporal.emotions.error',
       'anonymous',
       'auth-temporal-emotions',

@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { getUserById, updateUser } from '@/services/auth0.service'
@@ -144,7 +144,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'preferences_access',
+      AuditEventType.ACCESS,
       'auth.preferences.access',
       user.id,
       'auth-preferences',
@@ -160,7 +160,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.preferences.error',
       'anonymous',
       'auth-preferences',
@@ -249,7 +249,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'preferences_update',
+      AuditEventType.MODIFY,
       'auth.preferences.update',
       user.id,
       'auth-preferences',
@@ -265,7 +265,7 @@ export const PUT: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.preferences.error',
       'anonymous',
       'auth-preferences',
@@ -349,7 +349,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'preferences_reset',
+      AuditEventType.MODIFY,
       'auth.preferences.reset',
       user.id,
       'auth-preferences',
@@ -365,7 +365,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.preferences.error',
       'anonymous',
       'auth-preferences',
