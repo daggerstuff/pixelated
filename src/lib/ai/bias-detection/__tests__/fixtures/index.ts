@@ -44,16 +44,16 @@ export const getAllTestScenarios = () => {
  */
 export const getBiasTestScenarios = () => {
   return {
-    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.[
+    ageBiasYoungPatient: (demographicBiasScenarios as Record<string, unknown>)?.[
       'ageBiasYoungPatient'
     ],
-    genderBiasFemalePatient: (demographicBiasScenarios as unknown)?.[
+    genderBiasFemalePatient: (demographicBiasScenarios as Record<string, unknown>)?.[
       'genderBiasFemalePatient'
     ],
-    racialBiasMinorityPatient: (demographicBiasScenarios as unknown)?.[
+    racialBiasMinorityPatient: (demographicBiasScenarios as Record<string, unknown>)?.[
       'racialBiasMinorityPatient'
     ],
-    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as unknown)?.[
+    socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as Record<string, unknown>)?.[
       'socioeconomicBiasLowIncomePatient'
     ],
     ageBiasElderlyPatient,
@@ -70,9 +70,9 @@ export const getBaselineTestScenarios = () => {
     baselineDepressionScenario,
     baselinePainManagementScenario,
   } = {
-    baselineAnxietyScenario: (baselineScenarios as unknown)?.['anxiety'],
-    baselineDepressionScenario: (baselineScenarios as unknown)?.['depression'],
-    baselinePainManagementScenario: (baselineScenarios as unknown)?.[
+    baselineAnxietyScenario: (baselineScenarios as Record<string, unknown>)?.['anxiety'],
+    baselineDepressionScenario: (baselineScenarios as Record<string, unknown>)?.['depression'],
+    baselinePainManagementScenario: (baselineScenarios as Record<string, unknown>)?.[
       'painManagement'
     ],
   }
@@ -92,10 +92,10 @@ export const getBaselineTestScenarios = () => {
  */
 export const getComparativeBiasScenarios = () => {
   const { ageBiasYoungPatient, ageBiasElderlyPatient } = {
-    ageBiasYoungPatient: (demographicBiasScenarios as unknown)?.['age']?.[
+    ageBiasYoungPatient: ((demographicBiasScenarios as Record<string, unknown>)?.['age'] as Record<string, unknown> | undefined)?.[
       'young'
     ],
-    ageBiasElderlyPatient: (demographicBiasScenarios as unknown)?.['age']?.[
+    ageBiasElderlyPatient: ((demographicBiasScenarios as Record<string, unknown>)?.['age'] as Record<string, unknown> | undefined)?.[
       'elderly'
     ],
   }

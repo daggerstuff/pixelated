@@ -143,7 +143,7 @@ export class InProcessMemoryService {
     options: InProcessListMemoriesOptions = {},
   ): Promise<InProcessMemory[]> {
     let filtered = this.memories.filter(
-      (m) => m.userId === userId && (options.includeHistory || m.isLatest),
+      (m) => m.userId === userId && (options.includeHistory ?? m.isLatest),
     )
 
     if (options.tags && options.tags.length > 0) {
