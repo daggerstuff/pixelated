@@ -44,7 +44,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
-          version: 11.5.0
+          version: 11.5.1
 
       - name: Get pnpm store path
         id: pnpm-store
