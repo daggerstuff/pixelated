@@ -176,7 +176,7 @@ export const baselinePainManagementScenario: TherapeuticSession = {
   },
 }
 
-export const baselineScenarios = {
+export const baselineScenarios: Record<string, TherapeuticSession> = {
   anxiety: baselineAnxietyScenario,
   depression: baselineDepressionScenario,
   painManagement: baselinePainManagementScenario,

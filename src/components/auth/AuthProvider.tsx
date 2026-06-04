@@ -1,3 +1,5 @@
+/// <reference types="astro/client" />
+
 import { Auth0Provider } from '@auth0/auth0-react'
 import React from 'react'
 
@@ -90,7 +92,11 @@ export const PixelatedAuthProvider = ({
         ...(audience ? { audience } : {}),
       }}
       useRefreshTokens={true}
-      cacheLocation="localstorage"
+      // Use in-memory cache to prevent cross-tab refresh token reuse.
+      // localStorage shares the token across tabs which causes Auth0 to detect
+      // "refresh token already used" and revoke the entire token family.
+      cacheLocation="memory"
+      useRefreshTokensFallback={true}
       onRedirectCallback={onRedirectCallback}
     >
       {children}
