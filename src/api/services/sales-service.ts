@@ -119,8 +119,8 @@ export async function getSalesOpportunity(
 
   // Check permissions
   if (
-    !opportunity.permissions.view.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['view'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot access this opportunity')
   }
@@ -147,20 +147,20 @@ export async function updateStage(
 
   // Check edit permission
   if (
-    !opportunity.permissions.edit.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['edit'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this opportunity')
   }
 
-  const oldStage = opportunity.stage
-  opportunity.stage = newStage
-  opportunity.updatedAt = new Date()
+  const oldStage = opportunity['stage']
+  opportunity['stage'] = newStage
+  opportunity['updatedAt'] = new Date()
   await opportunity.save()
 
   // Log activity
   const activityId = uuid()
-  opportunity.activity.push({
+  opportunity['activity'].push({
     _id: activityId,
     type: 'stage_change',
     description: `Moved from ${oldStage} to ${newStage}`,
@@ -205,21 +205,21 @@ export async function updateSalesOpportunity(
 
   // Check edit permission
   if (
-    !opportunity.permissions.edit.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['edit'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this opportunity')
   }
 
-  if (data.title) opportunity.title = data.title
-  if (data.value !== undefined) opportunity.amount = data.value
-  if (data.stage) opportunity.stage = data.stage
-  if (data.contacts) opportunity.contacts = data.contacts
-  if (data.expectedCloseDate) opportunity.closeDate = data.expectedCloseDate
-  if (data.probability !== undefined) opportunity.probability = data.probability
-  if (data.status) opportunity.status = data.status
+  if (data.title) opportunity['title'] = data.title
+  if (data.value !== undefined) opportunity['amount'] = data.value
+  if (data.stage) opportunity['stage'] = data.stage
+  if (data.contacts) opportunity['contacts'] = data.contacts
+  if (data.expectedCloseDate) opportunity['closeDate'] = data.expectedCloseDate
+  if (data.probability !== undefined) opportunity['probability'] = data.probability
+  if (data.status) opportunity['status'] = data.status
 
-  opportunity.updatedAt = new Date()
+  opportunity['updatedAt'] = new Date()
   await opportunity.save()
 
   return opportunity
@@ -243,8 +243,8 @@ export async function deleteSalesOpportunity(
 
   // Check edit permission
   if (
-    !opportunity.permissions.edit.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['edit'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot delete this opportunity')
   }
@@ -279,15 +279,15 @@ export async function addActivity(
 
   // Check edit permission
   if (
-    !opportunity.permissions.edit.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['edit'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this opportunity')
   }
 
   const activityId = uuid()
 
-  opportunity.activity.push({
+  opportunity['activity'].push({
     _id: activityId,
     type: activity.type,
     description: activity.description,
@@ -325,15 +325,15 @@ export async function addContact(
 
   // Check edit permission
   if (
-    !opportunity.permissions.edit.includes(userId) &&
-    opportunity.owner !== userId
+    !opportunity['permissions']['edit'].includes(userId) &&
+    opportunity['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this opportunity')
   }
 
   const contactId = uuid()
 
-  opportunity.contacts.push({
+  opportunity['contacts'].push({
     _id: contactId,
     name: contact.name,
     email: contact.email ?? '',
@@ -403,10 +403,10 @@ export async function calculateForecast(userId: string) {
   let opportunityCount = 0
 
   opportunities.forEach((opp: ISalesOpportunity) => {
-    if (opp.status === 'active') {
+    if (opp['status'] === 'active') {
       opportunityCount++
-      totalForecast += opp.amount ?? 0
-      weightedForecast += (opp.amount ?? 0) * (opp.probability ?? 0.5)
+      totalForecast += opp['amount'] ?? 0
+      weightedForecast += (opp['amount'] ?? 0) * (opp['probability'] ?? 0.5)
     }
   })
 
@@ -437,14 +437,14 @@ export async function shareSalesOpportunity(
   }
 
   // Check ownership
-  if (opportunity.owner !== ownerId) {
+  if (opportunity['owner'] !== ownerId) {
     throw new ForbiddenError('Only opportunity owner can share')
   }
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
-  if (!opportunity.permissions[permissionKey].includes(targetUserId)) {
-    opportunity.permissions[permissionKey].push(targetUserId)
+  if (!opportunity['permissions'][permissionKey].includes(targetUserId)) {
+    opportunity['permissions'][permissionKey].push(targetUserId)
     await opportunity.save()
   }
 

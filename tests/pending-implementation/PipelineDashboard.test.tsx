@@ -8,29 +8,29 @@ import { WebSocketProvider } from '@/contexts/WebSocketContext'
 import { PipelineDashboard } from '../PipelineDashboard'
 
 // Mock the hooks and contexts
-jest.mock('@/hooks/usePipelineWebSocket', () => ({
-  usePipelineWebSocket: jest.fn(() => ({
+vi.mock('@/hooks/usePipelineWebSocket', () => ({
+  usePipelineWebSocket: vi.fn(() => ({
     socket: null,
     connectionStatus: 'disconnected',
     lastMessage: null,
     connectionAttempts: 0,
     isReconnecting: false,
-    connect: jest.fn(),
-    disconnect: jest.fn(),
-    sendMessage: jest.fn(),
-    sendProgressRequest: jest.fn(),
-    sendStatusRequest: jest.fn(),
+    connect: vi.fn(),
+    disconnect: vi.fn(),
+    sendMessage: vi.fn(),
+    sendProgressRequest: vi.fn(),
+    sendStatusRequest: vi.fn(),
   })),
 }))
 
-jest.mock('@/hooks/usePipelineAPI', () => ({
-  usePipelineAPI: jest.fn(() => ({
+vi.mock('@/hooks/usePipelineAPI', () => ({
+  usePipelineAPI: vi.fn(() => ({
     isLoading: false,
     error: null,
-    startExecution: jest.fn(),
-    getExecutionStatus: jest.fn(),
-    getAvailableDatasets: jest.fn(async () => Promise.resolve([])),
-    healthCheck: jest.fn(async () =>
+    startExecution: vi.fn(),
+    getExecutionStatus: vi.fn(),
+    getAvailableDatasets: vi.fn(async () => Promise.resolve([])),
+    healthCheck: vi.fn(async () =>
       Promise.resolve({
         status: 'healthy',
         timestamp: new Date().toISOString(),
@@ -40,20 +40,20 @@ jest.mock('@/hooks/usePipelineAPI', () => ({
 }))
 
 // Mock WebSocket
-global.WebSocket = jest.fn(() => ({
-  send: jest.fn(),
-  close: jest.fn(),
-  addEventListener: jest.fn(),
-  removeEventListener: jest.fn(),
+global.WebSocket = vi.fn(() => ({
+  send: vi.fn(),
+  close: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
   readyState: WebSocket.CONNECTING,
 })) as any
 
 describe('PipelineDashboard', () => {
   const mockProps = {
     className: 'test-class',
-    onExecutionStart: jest.fn(),
-    onExecutionComplete: jest.fn(),
-    onError: jest.fn(),
+    onExecutionStart: vi.fn(),
+    onExecutionComplete: vi.fn(),
+    onError: vi.fn(),
   }
 
   const renderComponent = (props = {}) => {
@@ -67,7 +67,7 @@ describe('PipelineDashboard', () => {
   }
 
   beforeEach(() => {
-    jest.clearAllMocks()
+    vi.clearAllMocks()
   })
 
   describe('Rendering', () => {
@@ -159,18 +159,18 @@ describe('PipelineDashboard', () => {
 
     it('shows connection attempts when reconnecting', () => {
       // Mock reconnecting state
-      jest.mock('@/hooks/usePipelineWebSocket', () => ({
-        usePipelineWebSocket: jest.fn(() => ({
+      vi.mock('@/hooks/usePipelineWebSocket', () => ({
+        usePipelineWebSocket: vi.fn(() => ({
           socket: null,
           connectionStatus: 'connecting',
           lastMessage: null,
           connectionAttempts: 2,
           isReconnecting: true,
-          connect: jest.fn(),
-          disconnect: jest.fn(),
-          sendMessage: jest.fn(),
-          sendProgressRequest: jest.fn(),
-          sendStatusRequest: jest.fn(),
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+          sendMessage: vi.fn(),
+          sendProgressRequest: vi.fn(),
+          sendStatusRequest: vi.fn(),
         })),
       }))
 
@@ -182,14 +182,14 @@ describe('PipelineDashboard', () => {
 
   describe('Error Handling', () => {
     it('displays API errors', () => {
-      jest.mock('@/hooks/usePipelineAPI', () => ({
-        usePipelineAPI: jest.fn(() => ({
+      vi.mock('@/hooks/usePipelineAPI', () => ({
+        usePipelineAPI: vi.fn(() => ({
           isLoading: false,
           error: new Error('API connection failed'),
-          startExecution: jest.fn(),
-          getExecutionStatus: jest.fn(),
-          getAvailableDatasets: jest.fn(async () => Promise.resolve([])),
-          healthCheck: jest.fn(async () =>
+          startExecution: vi.fn(),
+          getExecutionStatus: vi.fn(),
+          getAvailableDatasets: vi.fn(async () => Promise.resolve([])),
+          healthCheck: vi.fn(async () =>
             Promise.resolve({
               status: 'healthy',
               timestamp: new Date().toISOString(),
@@ -204,16 +204,16 @@ describe('PipelineDashboard', () => {
     })
 
     it('calls onError callback when errors occur', async () => {
-      const mockOnError = jest.fn()
+      const mockOnError = vi.fn()
 
-      jest.mock('@/hooks/usePipelineAPI', () => ({
-        usePipelineAPI: jest.fn(() => ({
+      vi.mock('@/hooks/usePipelineAPI', () => ({
+        usePipelineAPI: vi.fn(() => ({
           isLoading: false,
           error: new Error('Test error'),
-          startExecution: jest.fn(),
-          getExecutionStatus: jest.fn(),
-          getAvailableDatasets: jest.fn(async () => Promise.resolve([])),
-          healthCheck: jest.fn(async () =>
+          startExecution: vi.fn(),
+          getExecutionStatus: vi.fn(),
+          getAvailableDatasets: vi.fn(async () => Promise.resolve([])),
+          healthCheck: vi.fn(async () =>
             Promise.resolve({
               status: 'healthy',
               timestamp: new Date().toISOString(),
@@ -285,7 +285,7 @@ describe('PipelineDashboard', () => {
     it('does not re-render unnecessarily', () => {
       const { rerender } = renderComponent()
 
-      const initialRenderCount = jest.fn()
+      const initialRenderCount = vi.fn()
       rerender(
         <WebSocketProvider>
           <PipelineAPIProvider>
@@ -354,18 +354,18 @@ describe('PipelineDashboard Integration', () => {
 
 describe('PipelineDashboard Error Scenarios', () => {
   it('handles WebSocket connection failures gracefully', () => {
-    jest.mock('@/hooks/usePipelineWebSocket', () => ({
-      usePipelineWebSocket: jest.fn(() => ({
+    vi.mock('@/hooks/usePipelineWebSocket', () => ({
+      usePipelineWebSocket: vi.fn(() => ({
         socket: null,
         connectionStatus: 'error',
         lastMessage: null,
         connectionAttempts: 3,
         isReconnecting: false,
-        connect: jest.fn(),
-        disconnect: jest.fn(),
-        sendMessage: jest.fn(),
-        sendProgressRequest: jest.fn(),
-        sendStatusRequest: jest.fn(),
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        sendMessage: vi.fn(),
+        sendProgressRequest: vi.fn(),
+        sendStatusRequest: vi.fn(),
       })),
     }))
 
@@ -375,16 +375,16 @@ describe('PipelineDashboard Error Scenarios', () => {
   })
 
   it('handles API unavailability', () => {
-    jest.mock('@/hooks/usePipelineAPI', () => ({
-      usePipelineAPI: jest.fn(() => ({
+    vi.mock('@/hooks/usePipelineAPI', () => ({
+      usePipelineAPI: vi.fn(() => ({
         isLoading: false,
         error: new Error('API service unavailable'),
-        startExecution: jest.fn(),
-        getExecutionStatus: jest.fn(),
-        getAvailableDatasets: jest.fn(async () =>
+        startExecution: vi.fn(),
+        getExecutionStatus: vi.fn(),
+        getAvailableDatasets: vi.fn(async () =>
           Promise.reject(new Error('API unavailable')),
         ),
-        healthCheck: jest.fn(async () =>
+        healthCheck: vi.fn(async () =>
           Promise.reject(new Error('API unavailable')),
         ),
       })),
@@ -397,30 +397,30 @@ describe('PipelineDashboard Error Scenarios', () => {
 
   it('handles malformed WebSocket messages', () => {
     const mockWebSocket = {
-      send: jest.fn(),
-      close: jest.fn(),
-      addEventListener: jest.fn((event, handler) => {
+      send: vi.fn(),
+      close: vi.fn(),
+      addEventListener: vi.fn((event, handler) => {
         if (event === 'message') {
           // Simulate malformed message
           handler({ data: 'invalid json' })
         }
       }),
-      removeEventListener: jest.fn(),
+      removeEventListener: vi.fn(),
       readyState: WebSocket.OPEN,
     }
 
-    jest.mock('@/hooks/usePipelineWebSocket', () => ({
-      usePipelineWebSocket: jest.fn(() => ({
+    vi.mock('@/hooks/usePipelineWebSocket', () => ({
+      usePipelineWebSocket: vi.fn(() => ({
         socket: mockWebSocket,
         connectionStatus: 'connected',
         lastMessage: null,
         connectionAttempts: 0,
         isReconnecting: false,
-        connect: jest.fn(),
-        disconnect: jest.fn(),
-        sendMessage: jest.fn(),
-        sendProgressRequest: jest.fn(),
-        sendStatusRequest: jest.fn(),
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+        sendMessage: vi.fn(),
+        sendProgressRequest: vi.fn(),
+        sendStatusRequest: vi.fn(),
       })),
     }))
 

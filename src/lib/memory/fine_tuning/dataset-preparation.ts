@@ -54,7 +54,9 @@ export class DatasetPreparator {
     const result = [...array]
     for (let i = result.length - 1; i > 0; i--) {
       const j = Math.floor(this.nextRandom() * (i + 1))
-      ;[result[i], result[j]] = [result[j], result[i]]
+      const tmp = result[i]!
+      result[i] = result[j]!
+      result[j] = tmp
     }
     return result
   }
@@ -109,9 +111,9 @@ export class DatasetPreparator {
     }
     for (const ex of examples) {
       const v = (ex.metadata['valence'] as number) ?? 0
-      if (v < -0.2) buckets['negative'].push(ex)
-      else if (v > 0.2) buckets['positive'].push(ex)
-      else buckets['neutral'].push(ex)
+      if (v < -0.2) buckets['negative']!.push(ex)
+      else if (v > 0.2) buckets['positive']!.push(ex)
+      else buckets['neutral']!.push(ex)
     }
 
     const maxSize = Math.max(...Object.values(buckets).map((b) => b.length), 1)

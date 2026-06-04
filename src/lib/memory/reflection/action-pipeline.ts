@@ -57,9 +57,8 @@ export class ActionPipeline {
   private readonly feedbackStore: Map<string, UserFeedback> = new Map()
   private counter = 0
 
-  constructor(notificationThreshold = 0.8, minConfidence = 0.6) {
+  constructor(notificationThreshold = 0.8, _minConfidence = 0.6) {
     this.notificationThreshold = notificationThreshold
-    this.minConfidence = minConfidence
   }
 
   execute(

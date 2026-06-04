@@ -286,7 +286,7 @@ describe('Simple Accessibility Tests', () => {
     const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBeGreaterThan(0)
 
-    expect(buttons.some((button) => !button.disabled)).toBe(true)
+    expect(buttons.some((button) => !(button as HTMLButtonElement).disabled)).toBe(true)
   })
 
   it('provides sufficient time limits', () => {
@@ -427,7 +427,7 @@ describe('Simple Accessibility Tests', () => {
     // Verify first button can receive focus via keyboard
     await userEvent.tab()
     expect(document.activeElement).toBe(
-      buttons.find((button) => !button.disabled),
+      buttons.find((button) => !(button as HTMLButtonElement).disabled),
     )
   })
 

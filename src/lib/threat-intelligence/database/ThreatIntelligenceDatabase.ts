@@ -21,6 +21,26 @@ import {
 
 const logger = createBuildSafeLogger('threat-intelligence-database')
 
+export interface SearchQuery {
+  threatId?: string
+  intelligenceId?: string
+  globalThreatId?: string
+  regions?: string[]
+  severity?: string
+  confidence?: {
+    min?: number
+    max?: number
+  }
+  timeRange?: {
+    start?: string | Date
+    end?: string | Date
+  }
+  indicators?: {
+    types?: string[]
+    values?: string[]
+  }
+}
+
 export interface ThreatIntelligenceDatabase {
   initialize(): Promise<void>
   storeThreatIntelligence(threat: GlobalThreatIntelligence): Promise<void>
@@ -47,7 +67,7 @@ export interface ThreatIntelligenceDatabase {
   getTAXIICollections(): Promise<Record<string, unknown>[]>
   getTAXIIObjects(collectionId: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]>
   searchThreats(
-    query: Record<string, unknown>,
+    query: SearchQuery,
     pagination: PaginationParams,
   ): Promise<ApiResponse<GlobalThreatIntelligence[]>>
   getHealthStatus(): Promise<HealthStatus>
@@ -170,12 +190,13 @@ export class ThreatIntelligenceDatabaseCore
 
   private async initializeRedis(): Promise<void> {
     try {
-      this.redis = new Redis({
-        host: process.env['REDIS_HOST'] ?? 'localhost',
-        port: parseInt(process.env['REDIS_PORT'] ?? '6379'),
-        password: process.env['REDIS_PASSWORD'],
-        db: 1, // Use database 1 for threat intelligence cache
-      })
+      const redisHost = process.env['REDIS_HOST'] ?? 'localhost'
+      const redisPort = process.env['REDIS_PORT'] ?? '6379'
+      const redisPassword = process.env['REDIS_PASSWORD']
+      const redisUrl = redisPassword
+        ? `redis://:${redisPassword}@${redisHost}:${redisPort}/1`
+        : `redis://${redisHost}:${redisPort}/1`
+      this.redis = new Redis(redisUrl)
 
       await this.redis.ping()
       logger.info(
@@ -607,12 +628,12 @@ export class ThreatIntelligenceDatabaseCore
       const cached = await this.redis.get(cacheKey)
 
       if (cached) {
-        return JSON.parse(cached)
+        return JSON.parse(cached) as GlobalThreatIntelligence
       }
 
       // Query database
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const threat = await threatsCollection.findOne({ threatId })
+      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({ threatId })
 
       // Cache the result
       if (threat) {
@@ -635,12 +656,12 @@ export class ThreatIntelligenceDatabaseCore
       const cached = await this.redis.get(cacheKey)
 
       if (cached) {
-        return JSON.parse(cached)
+        return JSON.parse(cached) as GlobalThreatIntelligence
       }
 
       // Query database
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const threat = await threatsCollection.findOne({ intelligenceId })
+      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({ intelligenceId })
 
       // Cache the result
       if (threat) {
@@ -664,7 +685,7 @@ export class ThreatIntelligenceDatabaseCore
     try {
       // First find the indicator
       const indicatorsCollection = this.db.collection('threat_indicators')
-      const indicator = await indicatorsCollection.findOne({
+      const indicator = await indicatorsCollection.findOne<{ threatId: string }>({
         indicatorType,
         value: indicatorValue,
       })
@@ -674,7 +695,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       // Then get the associated threat
-      return await this.getThreatById(indicator['threatId'])
+      return await this.getThreatById(indicator.threatId)
     } catch (error: unknown) {
       logger.error('Failed to get threat by indicator:', {
         error,
@@ -700,11 +721,11 @@ export class ThreatIntelligenceDatabaseCore
         { $project: { region: '$_id', count: 1, _id: 0 } },
       )
 
-      const results = await threatsCollection.aggregate(pipeline).toArray()
+      const results = await threatsCollection.aggregate<{ region: string; count: number }>(pipeline).toArray()
 
       const threatsByRegion: Record<string, number> = {}
       for (const result of results) {
-        threatsByRegion[result['region']] = result['count']
+        threatsByRegion[result.region] = result.count
       }
 
       return threatsByRegion
@@ -728,11 +749,11 @@ export class ThreatIntelligenceDatabaseCore
         pipeline.unshift(matchStage)
       }
 
-      const results = await threatsCollection.aggregate(pipeline).toArray()
+      const results = await threatsCollection.aggregate<{ severity: string; count: number }>(pipeline).toArray()
 
       const threatsBySeverity: Record<string, number> = {}
       for (const result of results) {
-        threatsBySeverity[result['severity']] = result['count']
+        threatsBySeverity[result.severity] = result.count
       }
 
       return threatsBySeverity
@@ -751,7 +772,7 @@ export class ThreatIntelligenceDatabaseCore
       const query = region ? { regions: region } : {}
 
       const threats = await threatsCollection
-        .find(query)
+        .find<GlobalThreatIntelligence>(query)
         .sort({ firstSeen: -1 })
         .limit(limit)
         .toArray()
@@ -786,7 +807,7 @@ export class ThreatIntelligenceDatabaseCore
       }
 
       if (region) {
-        query.regions = region
+        query['regions'] = region
       }
 
       return await threatsCollection.countDocuments(query)
@@ -804,12 +825,14 @@ export class ThreatIntelligenceDatabaseCore
       if (region) {
         // Find correlations that involve the specified region
         const threatsInRegion = await this.db
-          .collection('global_threat_intelligence')
+          .collection<GlobalThreatIntelligence>('global_threat_intelligence')
           .find({ regions: region })
           .project({ threatId: 1 })
           .toArray()
 
-        const threatIds = threatsInRegion.map((t) => t['threatId'])
+        const threatIds = threatsInRegion
+          .map((t) => t['threatId'])
+          .filter((id): id is string => typeof id === 'string')
 
         query = {
           correlatedThreats: { $in: threatIds },
@@ -903,7 +926,7 @@ export class ThreatIntelligenceDatabaseCore
   }
 
   async searchThreats(
-    query: Record<string, unknown>,
+    query: SearchQuery,
     pagination: PaginationParams,
   ): Promise<ApiResponse<GlobalThreatIntelligence[]>> {
     try {
@@ -916,7 +939,7 @@ export class ThreatIntelligenceDatabaseCore
 
       // Get paginated results
       const threats = await threatsCollection
-        .find(searchQuery)
+        .find<GlobalThreatIntelligence>(searchQuery)
         .sort({
           [pagination.sortBy ?? 'firstSeen']:
             pagination.sortOrder === 'desc' ? -1 : 1,
@@ -939,11 +962,7 @@ export class ThreatIntelligenceDatabaseCore
       return {
         success: false,
         error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Search failed',
+          error instanceof Error ? error.message : 'Search failed',
         metadata: {
           timestamp: new Date(),
           requestId: `search_${Date.now()}`,
@@ -953,69 +972,73 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  private buildSearchQuery(query: Record<string, unknown>): Record<string, unknown> {
+  private buildSearchQuery(query: SearchQuery): Record<string, unknown> {
     const searchQuery: Record<string, unknown> = {}
 
     if (query.threatId) {
-      searchQuery.threatId = query.threatId
+      searchQuery['threatId'] = query.threatId
     }
 
     if (query.intelligenceId) {
-      searchQuery.intelligenceId = query.intelligenceId
+      searchQuery['intelligenceId'] = query.intelligenceId
     }
 
     if (query.globalThreatId) {
-      searchQuery.globalThreatId = query.globalThreatId
+      searchQuery['globalThreatId'] = query.globalThreatId
     }
 
     if (query.regions && query.regions.length > 0) {
-      searchQuery.regions = { $in: query.regions }
+      searchQuery['regions'] = { $in: query.regions }
     }
 
     if (query.severity) {
-      searchQuery.severity = query.severity
+      searchQuery['severity'] = query.severity
     }
 
     if (
       query.confidence &&
       (query.confidence.min !== undefined || query.confidence.max !== undefined)
     ) {
-      searchQuery.confidence = {}
+      const confidenceFilter: Record<string, number> = {}
       if (query.confidence.min !== undefined) {
-        searchQuery.confidence.$gte = query.confidence.min
+        confidenceFilter['$gte'] = query.confidence.min
       }
       if (query.confidence.max !== undefined) {
-        searchQuery.confidence.$lte = query.confidence.max
+        confidenceFilter['$lte'] = query.confidence.max
       }
+      searchQuery['confidence'] = confidenceFilter
     }
 
     if (query.timeRange) {
-      searchQuery.firstSeen = {}
+      const firstSeenFilter: Record<string, Date> = {}
       if (query.timeRange.start) {
-        searchQuery.firstSeen.$gte = new Date(query.timeRange.start)
+        firstSeenFilter['$gte'] = new Date(query.timeRange.start)
       }
       if (query.timeRange.end) {
-        searchQuery.firstSeen.$lte = new Date(query.timeRange.end)
+        firstSeenFilter['$lte'] = new Date(query.timeRange.end)
       }
+      searchQuery['firstSeen'] = firstSeenFilter
     }
 
     if (
       query.indicators &&
       (query.indicators.types || query.indicators.values)
     ) {
-      searchQuery.$or = []
+      const orConditions: Record<string, unknown>[] = []
 
       if (query.indicators.types && query.indicators.types.length > 0) {
-        searchQuery.$or.push({
+        orConditions.push({
           'indicators.indicatorType': { $in: query.indicators.types },
         })
       }
 
       if (query.indicators.values && query.indicators.values.length > 0) {
-        searchQuery.$or.push({
+        orConditions.push({
           'indicators.value': { $in: query.indicators.values },
         })
       }
+
+      searchQuery['$or'] = orConditions
     }
 
     return searchQuery
@@ -1058,7 +1081,7 @@ export class ThreatIntelligenceDatabaseCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${String(error)}`,
       }
     }
   }

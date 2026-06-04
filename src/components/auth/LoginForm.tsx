@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 
 import { Input } from '@/components/ui/input'
+
 import { toast } from '@/components/ui/toast'
 import { authClient } from '@/lib/auth-client'
-
-import '@/styles/login-form-responsive.css'
 
 interface LoginFormProps {
   readonly redirectTo?: string
