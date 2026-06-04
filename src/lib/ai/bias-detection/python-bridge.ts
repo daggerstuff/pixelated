@@ -16,6 +16,7 @@ import {
   PooledConnection,
 } from './connection-pool'
 import type {
+  BiasedTerm,
   TherapeuticSession,
   PreprocessingLayerResult,
   ModelLevelLayerResult,
@@ -250,10 +251,10 @@ export class PythonBiasDetectionBridge {
         // Acquire a pooled connection for this request if the pool supports it
         if (
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).acquireConnection === 'function'
+          typeof (this.connectionPool).acquireConnection === 'function'
         ) {
           pooledConnection = await (
-            this.connectionPool as ConnectionPool
+            this.connectionPool
           ).acquireConnection()
         }
         // Simplified signal handling for test compatibility
@@ -274,7 +275,7 @@ export class PythonBiasDetectionBridge {
           }, this.timeout)
 
           // Attach the signal to fetch options for this attempt
-          ;(fetchOptions as RequestInit).signal = controller.signal
+          ;(fetchOptions).signal = controller.signal
         }
         logger.debug(
           `Making request to ${url} (attempt ${attempt}/${this.retryAttempts})`,
@@ -319,9 +320,9 @@ export class PythonBiasDetectionBridge {
         if (
           pooledConnection &&
           this.connectionPool &&
-          typeof (this.connectionPool as ConnectionPool).releaseConnection === 'function'
+          typeof (this.connectionPool).releaseConnection === 'function'
         ) {
-          ;(this.connectionPool as ConnectionPool).releaseConnection(pooledConnection)
+          ;(this.connectionPool).releaseConnection(pooledConnection)
           pooledConnection = null
         }
         // Clear timeout on error
@@ -387,7 +388,7 @@ export class PythonBiasDetectionBridge {
             ageBiasScore: (ling['age_bias_score'] as number) ?? 0.5,
             culturalBiasScore: (ling['cultural_bias_score'] as number) ?? 0.5,
             overallBiasScore: (ling['overall_bias_score'] as number) ?? 0.5,
-            biasedTerms: (ling['biased_terms'] as Array<string | { term: string; context: string; biasType: string; severity: string; suggestedAlternative: string }>) ?? [],
+            biasedTerms: (ling['biased_terms'] as Array<BiasedTerm>) ?? [],
             sentimentAnalysis: {
               positive: (sentiment['positive'] as number) ?? 0,
               neutral: (sentiment['neutral'] as number) ?? 1,
@@ -426,7 +427,7 @@ export class PythonBiasDetectionBridge {
             (sessionData)?.sessionId || 'unknown',
           fallbackMode: false,
           serviceError: undefined,
-        } as unknown as PreprocessingLayerResult
+        }
       }
       // Fallback: construct and return PreprocessingAnalysisResult with neutral values
       return this.createFallbackPreprocessingResult(sessionData)
@@ -494,8 +495,10 @@ export class PythonBiasDetectionBridge {
           ? error.message
           : error && typeof error === 'object'
             ? JSON.stringify(error)
-            : String(error ?? 'Python service unavailable'),
-    } as unknown as PreprocessingLayerResult
+            : error
+              ? String(error)
+              : 'Python service unavailable',
+    }
   }
 
   async runModelLevelAnalysis(
@@ -509,7 +512,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.model_level
       if (layerResult) {
-        const metrics = (layerResult.metrics || {}) as Record<string, unknown>
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const fairness = (metrics['fairness_metrics'] ?? {}) as Record<
           string,
           unknown
@@ -568,7 +571,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.interactive
       if (layerResult) {
-        const metrics = (layerResult.metrics || {}) as Record<string, unknown>
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const counterfactual = (metrics['counterfactual_analysis'] ??
           {}) as Record<string, unknown>
         const featureImp = (metrics['feature_importance'] ?? []) as Record<string, unknown>[]
@@ -611,7 +614,7 @@ export class PythonBiasDetectionBridge {
       )) as PythonAnalysisResult
       const layerResult = result?.layer_results?.evaluation
       if (layerResult) {
-        const metrics = (layerResult.metrics || {}) as Record<string, unknown>
+        const metrics = (layerResult.metrics ?? {}) as Record<string, unknown>
         const huggingFace = (metrics['hugging_face_metrics'] ?? {}) as Record<
           string,
           unknown
@@ -641,7 +644,7 @@ export class PythonBiasDetectionBridge {
             patientSafety: (custom['patient_safety'] as number) ?? 0.1,
           },
           temporalAnalysis: {
-            trendDirection: (temporal['trend_direction'] as 'stable' | 'increasing' | 'decreasing' | 'worsening') ?? 'stable',
+            trendDirection: (temporal['trend_direction'] as EvaluationLayerResult['temporalAnalysis']['trendDirection']) ?? 'stable',
             changeRate: (temporal['change_rate'] as number) ?? 0,
             seasonalPatterns: (temporal['seasonal_patterns'] as any[]) ?? [],
             interventionEffectiveness:
@@ -882,9 +885,9 @@ export class PythonBiasDetectionBridge {
       this.stopHealthMonitoring()
       if (
         this.connectionPool &&
-        typeof (this.connectionPool as ConnectionPool).dispose === 'function'
+        typeof (this.connectionPool).dispose === 'function'
       ) {
-        await (this.connectionPool as ConnectionPool).dispose()
+        await (this.connectionPool).dispose()
       }
       logger.info('PythonBiasDetectionBridge disposed')
     } catch (e) {

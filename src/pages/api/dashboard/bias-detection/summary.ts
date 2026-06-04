@@ -61,24 +61,24 @@ export const GET: APIRoute = async () => {
 
     const uptimeResult = await query(uptimeQuery)
 
-    const metrics = metricsResult.rows[0] ?? {}
-    const uptime = uptimeResult.rows[0]?.['uptime_hours'] ?? 0
+    const metrics = metricsResult.rows[0] as Record<string, unknown> | undefined ?? {}
+    const uptime = Number((uptimeResult.rows[0] as Record<string, unknown> | undefined)?.['uptime_hours'] ?? 0)
 
     // Format response
     const response = {
       metrics: {
         'total-sessions': metrics['total_sessions'] ?? 0,
         'avg-bias-score':
-          ((Number(metrics['avg_bias_score']) || 0) * 100).toFixed(1) + '%',
+          (Number(metrics['avg_bias_score'] ?? 0) * 100).toFixed(1) + '%',
         'active-alerts': metrics['active_alerts'] ?? 0,
-        'system-uptime': Number(uptime) > 24 ? '99.7%' : '98.5%',
+        'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },
       recentAnalyses: recentAnalysesResult.rows.map((row: Record<string, unknown>) => ({
         sessionId: row['session_id'],
-        biasScore: Number(row['bias_score']) || 0,
+        biasScore: parseFloat((row['bias_score'] as string) ?? '0'),
         alertLevel: row['alert_level'],
         timestamp: row['created_at'],
-        sessionType: row['session_type'] ?? 'Unknown',
+        sessionType: (row['session_type'] as string) ?? 'Unknown',
       })),
       activeAlerts: alertsResult.rows.map((row: Record<string, unknown>) => ({
         id: row['id'],
@@ -95,7 +95,7 @@ export const GET: APIRoute = async () => {
       headers: { 'Content-Type': 'application/json' },
     })
   } catch (error: unknown) {
-    console.error('Dashboard summary API error:', String(error))
+    console.error('Dashboard summary API error:', error)
     return new Response(
       JSON.stringify({
         error: 'Failed to fetch dashboard data',
