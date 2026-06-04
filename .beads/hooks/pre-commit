@@ -89,7 +89,8 @@ next_page_token,os.environ.get,payload.get,= getString,\
 .redis.password,credentials.client_secret,subscription.apiKey,this.config.redis.password,redis://localhost:6379,mongodb://localhost:27017/threat_feeds,\
 client_secret: clientSecret,token: refreshToken,token = authHeader.substring,api_key: DeveloperApiKey,\
 password: restToken,password = fs.readFileSync,password = password,password: password,\
-token: tokenResponse.access_token,password: newPassword" \
+token: tokenResponse.access_token,password: newPassword,\
+newErrors.password,password: undefined" \
   SCAN_MODE=block SCAN_SCOPE=staged bash .github/hooks/secrets-scanner/scan-secrets.sh
 
 # B. Check lockfile synchronization
