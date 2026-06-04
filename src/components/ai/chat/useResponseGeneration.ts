@@ -214,7 +214,7 @@ export function useResponseGeneration({
         clearTimeout(timeoutId)
 
         if (!response.ok) {
-          const errorData = await response.json()
+          const errorData = await response.json() as { error?: string }
           throw new Error(
             errorData.error ?? `API request failed: ${response.status}`,
           )
@@ -230,33 +230,26 @@ export function useResponseGeneration({
   )
 
   const processResponseData = (
-    data: unknown,
+    data: Record<string, unknown>,
     generatedResponse: string,
   ): void => {
-    const responseData = data as {
-      therapeuticInsights?: unknown
-      [key: string]: unknown
-    }
-    if (responseData.therapeuticInsights && responseType === 'therapeutic') {
+    if (data['therapeuticInsights'] && responseType === 'therapeutic') {
       // Validate that therapeuticInsights has the required properties
-      const insights =
-        responseData.therapeuticInsights as Partial<TherapeuticResponse>
+      const insights = data['therapeuticInsights'] as Record<string, unknown>
       if (
         insights &&
         typeof insights === 'object' &&
-        'content' in insights &&
-        typeof insights.content === 'string' &&
-        'confidence' in insights &&
-        typeof insights.confidence === 'number'
+        typeof insights['content'] === 'string' &&
+        typeof insights['confidence'] === 'number'
       ) {
         const validatedInsights: TherapeuticResponse = {
-          content: insights.content,
-          confidence: insights.confidence,
-          ...(insights.intervention !== undefined && {
-            intervention: insights.intervention,
+          content: typeof insights['content'] === 'string' ? insights['content'] : '',
+          confidence: typeof insights['confidence'] === 'number' ? insights['confidence'] : 0,
+          ...(typeof insights['intervention'] !== 'undefined' && {
+            intervention: Boolean(insights['intervention']),
           }),
-          ...(insights.techniques && { techniques: insights.techniques }),
-          ...(insights.usage && { usage: insights.usage }),
+          ...(Array.isArray(insights['techniques']) && { techniques: insights['techniques'] as string[] }),
+          ...(typeof insights['usage'] === 'object' && insights['usage'] !== null && { usage: insights['usage'] as TherapeuticResponse['usage'] }),
         }
         setTherapeuticInsights(validatedInsights)
         if (onTherapeuticInsights) {
@@ -293,10 +286,8 @@ export function useResponseGeneration({
     while (retries < MAX_RETRIES) {
       try {
         const response = await makeRequest(requestData)
-        const data = await response.json()
-        const generatedResponse = ((data.response ??
-          data.content) ??
-          '') as string
+        const data = await response.json() as Record<string, unknown>
+        const generatedResponse = typeof data['response'] === 'string' ? data['response'] : typeof data['content'] === 'string' ? data['content'] : ''
         setResponse(generatedResponse)
         setProgress(100)
         processResponseData(data, generatedResponse)
@@ -388,14 +379,14 @@ export function useResponseGeneration({
 
       try {
         const response = await makeRequest(requestData)
-        const data = await response.json()
+        const data = await response.json() as Record<string, unknown>
 
         const therapeuticResponse: TherapeuticResponse = {
-          content: (data.response ?? data.content) ?? '',
-          confidence: data.confidence ?? 0.8,
-          intervention: data.intervention ?? false,
-          techniques: data.techniques ?? [],
-          usage: data.usage,
+          content: typeof data['response'] === 'string' ? data['response'] : typeof data['content'] === 'string' ? data['content'] : '',
+          confidence: Number(data['confidence'] ?? 0.8),
+          intervention: Boolean(data['intervention'] ?? false),
+          techniques: (data['techniques'] ?? []) as string[],
+          usage: data['usage'] as TherapeuticResponse['usage'],
         }
 
         setResponse(therapeuticResponse.content)

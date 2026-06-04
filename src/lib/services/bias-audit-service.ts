@@ -599,7 +599,7 @@ export class BiasAuditService {
       }
 
       groups[key] ??= []
-      groups?.[key].push(result)
+      groups[key]?.push(result)
     }
 
     return groups
@@ -626,11 +626,12 @@ export class BiasAuditService {
     for (let i = 0; i < buckets; i++) {
       const rangeStart = (i / buckets).toFixed(1)
       const rangeEnd = ((i + 1) / buckets).toFixed(1)
+      const count: number = counts[i] ?? 0
       distribution.push({
         range: `${rangeStart}-${rangeEnd}`,
-        count: counts[i],
+        count,
         percentage:
-          results.length > 0 ? (counts?.[i] / results.length) * 100 : 0,
+          results.length > 0 ? (counts[i] ?? 0 / results.length) * 100 : 0,
       })
     }
 

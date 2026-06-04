@@ -323,7 +323,7 @@ export function useCrisisDetection({
         clearTimeout(timeoutId)
 
         if (!response.ok) {
-          const errorData = await response.json()
+          const errorData = await response.json() as { error?: string }
           throw new Error(
             errorData.error ?? `API request failed: ${response.status}`,
           )

@@ -138,11 +138,11 @@ export class ThreatValidationSystemCore
 
   private async loadValidationRules(): Promise<void> {
     try {
-      const rulesCollection = this.db.collection('validation_rules')
+      const rulesCollection = this.db.collection<ValidationRule>('validation_rules')
       const rules = await rulesCollection.find({ enabled: true }).toArray()
 
       for (const rule of rules) {
-        this.validationRules.set(rule['ruleId'], rule)
+        this.validationRules.set(rule.ruleId, rule)
       }
 
       logger.info(`Loaded ${rules.length} validation rules from database`)
@@ -199,7 +199,7 @@ export class ThreatValidationSystemCore
       // Step 4: Validate attribution
       if (threat.attribution) {
         const attributionValidation = await this.validateAttribution(
-          threat.attribution,
+          threat.attribution as unknown as Record<string, unknown>,
         )
         validation.results.push(attributionValidation)
       }
@@ -274,6 +274,7 @@ export class ThreatValidationSystemCore
       confidence: threat.confidence,
       status: 'pending',
       overallScore: 0,
+      isValid: false,
       results: [],
       createdAt: new Date(),
       completedAt: undefined,
@@ -589,29 +590,30 @@ export class ThreatValidationSystemCore
       }
 
       // Validate attribution fields
-      if (attribution.family && typeof attribution.family !== 'string') {
+      if (attribution['family'] && typeof attribution['family'] !== 'string') {
         issues.push('Attribution family must be a string')
         score -= 20
       }
 
-      if (attribution.campaign && typeof attribution.campaign !== 'string') {
+      if (attribution['campaign'] && typeof attribution['campaign'] !== 'string') {
         issues.push('Attribution campaign must be a string')
         score -= 20
       }
 
-      if (attribution.confidence !== undefined) {
-        if (attribution.confidence < 0 || attribution.confidence > 1) {
+      if (attribution['confidence'] !== undefined) {
+        const conf = Number(attribution['confidence'])
+        if (isNaN(conf) || conf < 0 || conf > 1) {
           issues.push('Attribution confidence must be between 0 and 1')
           score -= 20
         }
       }
 
-      if (attribution.actor && typeof attribution.actor !== 'string') {
+      if (attribution['actor'] && typeof attribution['actor'] !== 'string') {
         issues.push('Attribution actor must be a string')
         score -= 15
       }
 
-      if (attribution.country && typeof attribution.country !== 'string') {
+      if (attribution['country'] && typeof attribution['country'] !== 'string') {
         issues.push('Attribution country must be a string')
         score -= 15
       }
@@ -624,11 +626,11 @@ export class ThreatValidationSystemCore
         issues,
         details: {
           hasAttribution: true,
-          hasFamily: !!attribution.family,
-          hasCampaign: !!attribution.campaign,
-          hasConfidence: attribution.confidence !== undefined,
-          hasActor: !!attribution.actor,
-          hasCountry: !!attribution.country,
+          hasFamily: !!attribution['family'],
+          hasCampaign: !!attribution['campaign'],
+          hasConfidence: attribution['confidence'] !== undefined,
+          hasActor: !!attribution['actor'],
+          hasCountry: !!attribution['country'],
         },
       }
     } catch (error: unknown) {
@@ -678,12 +680,12 @@ export class ThreatValidationSystemCore
       }
 
       // Validate specific metadata fields if present
-      if (metadata.source && typeof metadata.source !== 'string') {
+      if (metadata['source'] && typeof metadata['source'] !== 'string') {
         issues.push('Metadata source must be a string')
         score -= 10
       }
 
-      if (metadata.tags && !Array.isArray(metadata.tags)) {
+      if (metadata['tags'] && !Array.isArray(metadata['tags'])) {
         issues.push('Metadata tags must be an array')
         score -= 10
       }
@@ -697,8 +699,8 @@ export class ThreatValidationSystemCore
         details: {
           hasMetadata: true,
           metadataSize: metadataStr.length,
-          hasSource: !!metadata.source,
-          hasTags: !!metadata.tags,
+          hasSource: !!metadata['source'],
+          hasTags: !!metadata['tags'],
         },
       }
     } catch (error: unknown) {
@@ -759,7 +761,7 @@ export class ThreatValidationSystemCore
       // Apply rule conditions
       for (const condition of rule.conditions) {
         const conditionResult = await this.evaluateValidationCondition(
-          condition,
+          condition as unknown as Record<string, unknown>,
           threat,
         )
         if (!conditionResult.passed) {
@@ -804,7 +806,11 @@ export class ThreatValidationSystemCore
     threat: GlobalThreatIntelligence,
   ): Promise<{ passed: boolean; message: string }> {
     try {
-      switch (condition.type) {
+      const conditionType = condition['type']
+      if (typeof conditionType !== 'string') {
+        return { passed: true, message: 'Unknown condition type' }
+      }
+      switch (conditionType) {
         case 'field_exists':
           return this.evaluateFieldExistsCondition(condition, threat)
         case 'field_value':
@@ -1263,7 +1269,7 @@ export class ThreatValidationSystemCore
     try {
       const validationsCollection = this.db.collection('threat_validations')
       const validations = await validationsCollection
-        .find({ threatId })
+        .find<ThreatValidation>({ threatId })
         .sort({ createdAt: -1 })
         .limit(limit)
         .toArray()
@@ -1441,11 +1447,11 @@ export class ThreatValidationSystemCore
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await validationsCollection.aggregate(pipeline).toArray()
+      const results = await validationsCollection.aggregate<{ severity: string; count: number }>(pipeline).toArray()
 
       const validationsBySeverity: Record<string, number> = {}
       for (const result of results) {
-        validationsBySeverity[result['severity']] = result['count']
+        validationsBySeverity[result.severity] = result.count
       }
 
       return validationsBySeverity
@@ -1463,11 +1469,11 @@ export class ThreatValidationSystemCore
         { $project: { threatType: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await validationsCollection.aggregate(pipeline).toArray()
+      const results = await validationsCollection.aggregate<{ threatType: string; count: number }>(pipeline).toArray()
 
       const validationsByType: Record<string, number> = {}
       for (const result of results) {
-        validationsByType[result['threatType']] = result['count']
+        validationsByType[result.threatType] = result.count
       }
 
       return validationsByType
@@ -1559,7 +1565,7 @@ export class ThreatValidationSystemCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${String(error)}`,
       }
     }
   }
@@ -1586,6 +1592,24 @@ export class ThreatValidationSystemCore
 
   private generateValidationId(): string {
     return `validation_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`
+  }
+
+  private getNestedValue(obj: unknown, path: string): unknown {
+    if (!this.isRecord(obj)) {
+      return undefined
+    }
+
+    return path.split('.').reduce<unknown>((current, key) => {
+      if (!this.isRecord(current)) {
+        return undefined
+      }
+
+      return current[key]
+    }, obj)
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value)
   }
 
   async shutdown(): Promise<void> {

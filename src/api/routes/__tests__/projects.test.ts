@@ -385,32 +385,32 @@ describe('Projects API', () => {
       app.use('/api/projects', projectsRoutes)
       app.use(
         (
-          error: unknown,
-          _req: Parameters<Express['use']>[0],
-          res: any,
-          next: Parameters<Express['use']>[1],
+          err: unknown,
+          _req: express.Request,
+          res: express.Response,
+          _next: express.NextFunction,
         ) => {
-          if (typeof error === 'object' && error !== null) {
+          if (typeof err === 'object' && err !== null) {
             const statusCode =
-              'statusCode' in error &&
-              typeof (error as { statusCode?: unknown }).statusCode === 'number'
-                ? (error as { statusCode: number }).statusCode
+              'statusCode' in err &&
+              typeof (err as { statusCode?: unknown }).statusCode === 'number'
+                ? (err as { statusCode: number }).statusCode
                 : 500
             const message =
-              'message' in error &&
-              typeof (error as { message?: unknown }).message === 'string'
-                ? (error as { message: string }).message
+              'message' in err &&
+              typeof (err as { message?: unknown }).message === 'string'
+                ? (err as { message: string }).message
                 : 'Internal Server Error'
             const code =
-              'code' in error &&
-              typeof (error as { code?: unknown }).code === 'string'
-                ? (error as { code: string }).code
+              'code' in err &&
+              typeof (err as { code?: unknown }).code === 'string'
+                ? (err as { code: string }).code
                 : 'APP_ERROR'
 
             res.status(statusCode).json({ error: { code, message } })
             return
           }
-          next(error as Parameters<Express['use']>[0])
+          _next(err as Parameters<Express['use']>[0])
         },
       )
     }
@@ -493,7 +493,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body.error === 'string'
           ? response.body.error
-          : (response.body.error as { message?: string })?.message
+          : (response.body.error as unknown as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('budget')
     })
@@ -589,7 +589,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as { message?: string })?.message
+          : (response.body['error'] as unknown as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -654,7 +654,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as { message?: string })?.message
+          : (response.body['error'] as unknown as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -736,7 +736,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as { message?: string })?.message
+          : (response.body['error'] as unknown as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('permission')
     })

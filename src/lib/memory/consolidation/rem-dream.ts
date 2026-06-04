@@ -80,7 +80,7 @@ export class RemDreamScheduler {
     const links: CrossLink[] = []
     for (let i = 0; i < memories.length; i++) {
       for (let j = i + 1; j < memories.length; j++) {
-        const sim = dedup.cosine(vectors[i], vectors[j])
+        const sim = dedup.cosine(vectors[i]!, vectors[j]!)
         if (sim >= this.crosslinkThreshold) {
           const sameEmotion = memories[i]!.emotions.categories.some((c) =>
             memories[j]!.emotions.categories.includes(c),
