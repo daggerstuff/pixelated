@@ -128,12 +128,12 @@ export const GET: APIRoute = async ({ url }) => {
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row['bias_range'],
-        count: parseInt((row['count'] as string | undefined ?? '0').toString()),
+        count: parseInt((row['count'] as string | undefined ?? '0')),
       })),
       patterns: patternsResult.rows.map((row) => ({
         layer: row['layer'] ?? 'Unknown',
         avgScore: parseFloat((row['avg_score'] as number | undefined ?? 0).toString()),
-        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0').toString()),
+        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0')),
       })),
       metadata: {
         days,
@@ -171,12 +171,12 @@ export const GET: APIRoute = async ({ url }) => {
       })),
       distribution: distributionResult.rows.map((row) => ({
         range: row['bias_range'],
-        count: parseInt((row['count'] as string | undefined ?? '0').toString()),
+        count: parseInt((row['count'] as string | undefined ?? '0')),
       })),
       patterns: patternsResult.rows.map((row) => ({
         layer: row['layer'] ?? 'Unknown',
         avgScore: parseFloat((row['avg_score'] as number | undefined ?? 0).toString()),
-        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0').toString()),
+        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0')),
       })),
       metadata: {
         days,
