@@ -45,7 +45,7 @@ async function runAuthMigration() {
     `)
     console.log(
       'Current tables:',
-      tables.rows.map((row: QueryResultRow) => row.table_name),
+      tables.rows.map((row: Record<string, unknown>) => String(row['table_name'])),
     )
 
     // Show users table structure
@@ -56,15 +56,18 @@ async function runAuthMigration() {
       ORDER BY ordinal_position
     `)
     console.log('Users table columns:')
-    usersColumns.rows.forEach((row: QueryResultRow) => {
-      console.log(`  - ${row.column_name} (${row.data_type})`)
+    usersColumns.rows.forEach((row: Record<string, unknown>) => {
+      const columnName = String(row['column_name'])
+      const dataType = String(row['data_type'])
+      console.log(`  - ${columnName} (${dataType})`)
     })
 
     client.release()
     await pool.end()
     console.log('✅ Database connection closed')
-  } catch (error) {
-    console.error('❌ Migration failed:', error)
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('❌ Migration failed:', errorMessage)
     process.exit(1)
   }
 }

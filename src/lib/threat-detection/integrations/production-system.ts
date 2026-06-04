@@ -579,7 +579,7 @@ class ProductionHuntingService extends EventEmitter {
 
   async getActiveInvestigations(): Promise<Record<string, unknown>[]> {
     return [...this.investigations.values()].filter(
-      (inv) => (inv as Record<string, unknown>)['status'] === 'running',
+      (inv) => (inv)['status'] === 'running',
     )
   }
 
@@ -953,7 +953,7 @@ export function createCompleteThreatDetectionSystem(
           intelligenceService.getStatistics(),
         ])
 
-      const ts = threatStats as Record<string, unknown>
+      const ts = threatStats
       const ms = monitoringStats
       const hs = huntingStats
       const isc = intelligenceStats

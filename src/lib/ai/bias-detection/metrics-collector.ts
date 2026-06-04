@@ -453,12 +453,13 @@ export class BiasMetricsCollector {
   async getPerformanceMetrics(): Promise<Record<string, unknown>> {
     try {
       const response = await this.pythonBridge.getPerformanceMetrics()
+      const resp = response as Record<string, unknown>
       return {
-        responseTime: response.average_response_time ?? 0,
-        throughput: response.requests_per_second ?? 0,
-        errorRate: response.error_rate ?? 0,
-        uptime: response.uptime_seconds ?? 0,
-        systemHealth: response.health_status ?? 'unknown',
+        responseTime: (resp.average_response_time as number) ?? 0,
+        throughput: (resp.requests_per_second as number) ?? 0,
+        errorRate: (resp.error_rate as number) ?? 0,
+        uptime: (resp.uptime_seconds as number) ?? 0,
+        systemHealth: (resp.health_status as string) ?? 'unknown',
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch performance metrics', { error })
@@ -510,7 +511,7 @@ export class BiasMetricsCollector {
     try {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
-        timestamp: ('timestamp' in result ? result['timestamp'] : undefined)
+        timestamp: 'timestamp' in result && result['timestamp']
           ? new Date(result['timestamp'] as string).toISOString()
           : new Date().toISOString(),
         session_id: result.sessionId,

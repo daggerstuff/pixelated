@@ -40,9 +40,11 @@ test.describe('User Experience Features', () => {
       }
 
       // Override appendChild with a function that calls the original and then checks for transitions
-      Element.prototype.appendChild = function (element) {
+      Element.prototype.appendChild = function (element: Node) {
         const result = originalAppendChild.call(this, element)
-        window._checkTransition(element)
+        if (element instanceof Element) {
+          window._checkTransition(element)
+        }
         return result
       }
     })

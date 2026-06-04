@@ -50,26 +50,7 @@ declare global {
   }
 }
 
-interface ImportMetaEnv {
-  readonly PUBLIC_AUTH0_DOMAIN: string
-  readonly PUBLIC_AUTH0_CLIENT_ID: string
-  readonly VITE_AUTH0_DOMAIN?: string
-  readonly VITE_AUTH0_CLIENT_ID?: string
-  readonly VITE_AUTH0_AUDIENCE?: string
-  readonly GRAFANA_URL: string
-  readonly GRAFANA_API_KEY: string
-  readonly GRAFANA_ORG_ID: string
-  readonly SLACK_WEBHOOK: string
-  readonly MONITORING_EMAIL_RECIPIENTS: string
-  readonly APP_VERSION: string
-  readonly PUBLIC_TRAINING_WS_URL?: string
-  readonly PUBLIC_RYBBIT_SCRIPT_URL?: string
-  readonly PUBLIC_RYBBIT_SITE_ID?: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
+// ImportMetaEnv and ImportMeta are declared in .astro-env.d.ts to avoid interface merging issues
 
 interface NetworkInformation extends EventTarget {
   readonly effectiveType: string
