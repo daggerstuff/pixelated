@@ -589,7 +589,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -654,7 +654,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('not found')
     })
@@ -736,7 +736,7 @@ describe('Projects API', () => {
       const errorMessage =
         typeof response.body['error'] === 'string'
           ? response.body['error']
-          : (response.body['error'] as unknown as { message?: string })?.message
+          : (response.body['error'] as { message?: string })?.message
       expect(typeof errorMessage).toBe('string')
       expect(errorMessage).toContain('permission')
     })

@@ -626,7 +626,7 @@ export class AutomatedThreatResponseOrchestratorCore
       switch (action.actionType) {
         case 'block':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...(action.parameters),
             threatId: threat.threatId,
             severity: threat.severity,
             confidence: threat.confidence,
@@ -635,7 +635,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'rate_limit':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...(action.parameters),
             severity: threat.severity,
             confidence: threat.confidence,
             regions: threat.regions,
@@ -644,7 +644,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'alert':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...(action.parameters),
             threatId: threat.threatId,
             severity: threat.severity,
             indicators: threat.indicators.length,
@@ -653,7 +653,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'investigate':
           customizedAction.parameters = {
-            ...(action.parameters as Record<string, unknown>),
+            ...(action.parameters),
             threatId: threat.threatId,
             severity: threat.severity,
             regions: threat.regions,
@@ -922,7 +922,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement blocking logic (e.g., IP blocking, domain blocking)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const sourceIp = parameters['sourceIp']
       const duration = parameters['duration']
 
@@ -952,7 +952,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement isolation logic (e.g., network isolation, user isolation)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const userId = parameters['userId']
       const systemId = parameters['systemId']
 
@@ -976,7 +976,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement alerting logic (e.g., email, Slack, webhook)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const recipients = parameters['recipients']
       const priority = parameters['priority']
 
@@ -1002,7 +1002,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement investigation logic (e.g., log analysis, forensic collection)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const depth = parameters['depth']
       const scope = parameters['scope']
       const dataSources = parameters['dataSources']
@@ -1028,7 +1028,7 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement mitigation logic (e.g., patch deployment, configuration changes)
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const mitigationType = parameters['mitigationType']
       const targetSystem = parameters['targetSystem']
 
@@ -1314,7 +1314,7 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const sourceIp = parameters['sourceIp']
 
       if (!sourceIp) {
@@ -1340,7 +1340,7 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const parameters = (action.parameters || {})
       const userId = parameters['userId']
 
       // Implement remove rate limit logic

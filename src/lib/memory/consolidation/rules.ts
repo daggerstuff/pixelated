@@ -130,7 +130,7 @@ export class ConsolidationTriggerEngine {
     return (
       this.crisisReflectionPrompts[context] ??
       this.crisisReflectionPrompts['immediate']!
-    )!
+    )
   }
 
   shouldTrigger(memories: MemoryBlock[]): boolean {

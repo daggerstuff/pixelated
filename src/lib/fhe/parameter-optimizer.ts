@@ -493,7 +493,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 1032193
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -529,7 +529,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 65537 // Prime and power of 2 + 1
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -567,7 +567,7 @@ export class FHEParameterOptimizer {
       }
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -599,7 +599,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 40961 // Smaller plain modulus
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -779,7 +779,7 @@ export class FHEParameterOptimizer {
       params.plainModulus = 65537 // Smaller prime for simple operations
     }
 
-    return params as SealEncryptionParamsOptions
+    return params
   }
 
   /**
