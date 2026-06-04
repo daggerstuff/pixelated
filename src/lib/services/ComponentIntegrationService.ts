@@ -28,7 +28,12 @@ export class ComponentIntegrationService {
     dataPoints?: number
   }) {
     try {
-      const queryParams = new URLSearchParams(params as Record<string, string>)
+      const queryParams = new URLSearchParams()
+      for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined) {
+          queryParams.append(key, String(value))
+        }
+      }
       const response = await fetch(
         `${this.baseUrl}/api/components/analytics/charts?${queryParams}`,
         {

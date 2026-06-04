@@ -292,7 +292,7 @@ export class SequentialPatternMiner implements PatternMiner {
           const key = candidate.join('\u0001')
           if (!candidateSet.has(key)) {
             candidateSet.add(key)
-            candidates.push(candidate)
+            candidates.push(candidate.filter(Boolean) as string[])
             if (candidates.length >= this.maxCandidatesPerIteration) {
               return candidates
             }
@@ -343,11 +343,11 @@ export class SequentialPatternMiner implements PatternMiner {
   private buildSequencePositionMap(idList: number[][]): Map<number, number[]> {
     const map = new Map<number, number[]>()
     for (const [sequenceId, itemIndex] of idList) {
-      const positions = map.get(sequenceId)
+      const positions = map.get(sequenceId!)
       if (positions) {
-        positions.push(itemIndex)
+        positions.push(itemIndex!)
       } else {
-        map.set(sequenceId, [itemIndex])
+        map.set(sequenceId!, [itemIndex!])
       }
     }
 

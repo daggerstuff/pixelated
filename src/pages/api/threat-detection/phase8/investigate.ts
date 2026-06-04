@@ -80,10 +80,10 @@ export const POST: APIRoute = async ({ request }) => {
 
     return new Response(
       JSON.stringify({
-        investigationId: investigation.id,
-        status: investigation.status,
-        startedAt: investigation.startedAt,
-        estimatedDuration: investigation.estimatedDuration,
+        investigationId: investigation['id'],
+        status: investigation['status'],
+        startedAt: investigation['startedAt'],
+        estimatedDuration: investigation['estimatedDuration'],
         message: 'Threat investigation started successfully',
       }),
       {

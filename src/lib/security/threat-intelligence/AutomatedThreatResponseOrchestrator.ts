@@ -241,7 +241,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate()
+      const subscriber = this.redis['duplicate']()
       await subscriber.connect()
 
       // Subscribe to events
@@ -536,10 +536,10 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
         throw new Error(`Response not found: ${responseId}`)
       }
 
-      if (response.status !== 'pending') {
+      if (response['status'] !== 'pending') {
         logger.debug('Response already executed or in progress', {
           response_id: responseId,
-          status: response.status,
+          status: response['status'],
         })
         return
       }
@@ -1161,7 +1161,7 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
 
           const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
           const threatSeverity =
-            severityOrder[threat.severity as keyof typeof severityOrder] || 0
+            severityOrder[threat['severity'] as keyof typeof severityOrder] || 0
           const conditionSeverity =
             severityOrder[condition.value as keyof typeof severityOrder] || 0
 
@@ -1265,10 +1265,10 @@ export class AutomatedThreatResponseOrchestrator extends EventEmitter {
         throw new Error(`Response not found: ${responseId}`)
       }
 
-      if (response.status !== 'completed') {
+      if (response['status'] !== 'completed') {
         logger.debug('Cannot rollback response that is not completed', {
           response_id: responseId,
-          status: response.status,
+          status: response['status'],
         })
         return
       }

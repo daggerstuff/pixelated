@@ -80,7 +80,9 @@ export class BackupVerificationService extends EventEmitter {
           results.push({
             file,
             isValid: false,
-            error: String((error as Record<string, unknown>)['message'] ?? 'Unknown error'),
+            error: String(
+              (error as Record<string, unknown>)['message'] ?? 'Unknown error',
+            ),
           })
         }
       }
@@ -378,7 +380,10 @@ export class BackupVerificationService extends EventEmitter {
     const existingMetadata = await this.getBackupMetadata(backupFile)
     if (existingMetadata) {
       existingMetadata['status'] = 'verified'
-      await this.saveBackupMetadata(backupFile, existingMetadata as unknown as BackupMetadata)
+      await this.saveBackupMetadata(
+        backupFile,
+        existingMetadata as unknown as BackupMetadata,
+      )
     } else {
       await this.saveBackupMetadata(backupFile, metadata)
     }
@@ -407,7 +412,7 @@ export class BackupVerificationService extends EventEmitter {
 
     for (const backup of backups) {
       const metadata = await this.getBackupMetadata(backup)
-      if (metadata && now - metadata.timestamp > retentionMs) {
+      if (metadata && now - metadata['timestamp'] > retentionMs) {
         await this.deleteBackup(backup)
       }
     }
