@@ -14,6 +14,14 @@ describe('IndexedDBStorage', () => {
   let storage: IndexedDBStorage
   let mockDb: IDBPDatabase<any>
   let mockTransaction: IDBTransaction
+  let mockPut: ReturnType<typeof vi.fn>
+  let mockGet: ReturnType<typeof vi.fn>
+  let mockDelete: ReturnType<typeof vi.fn>
+  let mockClear: ReturnType<typeof vi.fn>
+  let mockGetAllKeys: ReturnType<typeof vi.fn>
+  let mockCount: ReturnType<typeof vi.fn>
+  let mockTransactionFn: ReturnType<typeof vi.fn>
+  let mockObjectStoreFn: ReturnType<typeof vi.fn>
   let mockObjectStore: IDBObjectStore
 
   beforeEach(() => {
@@ -23,24 +31,34 @@ describe('IndexedDBStorage', () => {
     // Setup mock indexedDB
     global.indexedDB = mockIndexedDB as any
 
+    // Setup mock functions separately to preserve mock methods through type casts
+    mockPut = vi.fn()
+    mockGet = vi.fn()
+    mockDelete = vi.fn()
+    mockClear = vi.fn()
+    mockGetAllKeys = vi.fn()
+    mockCount = vi.fn()
+    mockTransactionFn = vi.fn(() => mockTransaction)
+    mockObjectStoreFn = vi.fn(() => mockObjectStore)
+
     // Setup mock database objects
     mockObjectStore = {
-      put: vi.fn(),
-      get: vi.fn(),
-      delete: vi.fn(),
-      clear: vi.fn(),
-      getAllKeys: vi.fn(),
-      count: vi.fn(),
+      put: mockPut,
+      get: mockGet,
+      delete: mockDelete,
+      clear: mockClear,
+      getAllKeys: mockGetAllKeys,
+      count: mockCount,
     } as unknown as IDBObjectStore
 
     mockTransaction = {
-      objectStore: vi.fn(() => mockObjectStore),
+      objectStore: mockObjectStoreFn,
       oncomplete: null,
       onerror: null,
     } as unknown as IDBTransaction
 
     mockDb = {
-      transaction: vi.fn(() => mockTransaction),
+      transaction: mockTransactionFn,
       createObjectStore: vi.fn(),
       close: vi.fn(),
     } as unknown as IDBPDatabase<any>
@@ -81,7 +99,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -106,7 +124,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -136,7 +154,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -151,26 +169,26 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest
 
-      mockObjectStore.put.mockReturnValue(putRequest)
+      mockPut.mockReturnValue(putRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        putRequest.onsuccess?.()
+        (putRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.set(testKey, testValue)
 
       // Verify transaction was created
-      expect(mockDb.transaction).toHaveBeenCalledWith(
+      expect(mockTransactionFn).toHaveBeenCalledWith(
         ['test_store'],
         'readwrite',
       )
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
-      expect(mockObjectStore.put).toHaveBeenCalledWith({
+      expect(mockObjectStoreFn).toHaveBeenCalledWith('test_store')
+      expect(mockPut).toHaveBeenCalledWith({
         id: testKey,
         value: testValue,
       })
-      expect(mockObjectStore.put).toHaveBeenCalled()
+      expect(mockPut).toHaveBeenCalled()
     })
 
     it('should reject if database is not initialized', async () => {
@@ -201,7 +219,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -216,17 +234,17 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest
 
-      mockObjectStore.get.mockReturnValue(getRequest)
+      mockGet.mockReturnValue(getRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getRequest.onsuccess?.()
+        (getRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.get(testKey)
 
       expect(result).toEqual(testValue)
-      expect(mockObjectStore.get).toHaveBeenCalledWith(testKey)
+      expect(mockGet).toHaveBeenCalledWith(testKey)
     })
 
     it('should return undefined for non-existent key', async () => {
@@ -241,7 +259,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -256,11 +274,11 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest
 
-      mockObjectStore.get.mockReturnValue(getRequest)
+      mockGet.mockReturnValue(getRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getRequest.onsuccess?.()
+        (getRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.get('non-existent-key')
@@ -284,7 +302,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -299,22 +317,22 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest
 
-      mockObjectStore.delete.mockReturnValue(deleteRequest)
+      mockDelete.mockReturnValue(deleteRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        deleteRequest.onsuccess?.()
+        (deleteRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.remove(testKey)
 
-      expect(mockDb.transaction).toHaveBeenCalledWith(
+      expect(mockTransactionFn).toHaveBeenCalledWith(
         ['test_store'],
         'readwrite',
       )
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
-      expect(mockObjectStore.delete).toHaveBeenCalledWith(testKey)
-      expect(mockObjectStore.delete).toHaveBeenCalled()
+      expect(mockObjectStoreFn).toHaveBeenCalledWith('test_store')
+      expect(mockDelete).toHaveBeenCalledWith(testKey)
+      expect(mockDelete).toHaveBeenCalled()
     })
   })
 
@@ -331,7 +349,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -346,22 +364,22 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest
 
-      mockObjectStore.clear.mockReturnValue(clearRequest)
+      mockClear.mockReturnValue(clearRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        clearRequest.onsuccess?.()
+        (clearRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.clear()
 
-      expect(mockDb.transaction).toHaveBeenCalledWith(
+      expect(mockTransactionFn).toHaveBeenCalledWith(
         ['test_store'],
         'readwrite',
       )
-      expect(mockTransaction.objectStore).toHaveBeenCalledWith('test_store')
-      expect(mockObjectStore.clear).toHaveBeenCalled()
-      expect(mockObjectStore.clear).toHaveBeenCalled()
+      expect(mockObjectStoreFn).toHaveBeenCalledWith('test_store')
+      expect(mockClear).toHaveBeenCalled()
+      expect(mockClear).toHaveBeenCalled()
     })
   })
 
@@ -380,7 +398,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -395,17 +413,17 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest<IDBValidKey[]>
 
-      mockObjectStore.getAllKeys.mockReturnValue(getAllKeysRequest)
+      mockGetAllKeys.mockReturnValue(getAllKeysRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        getAllKeysRequest.onsuccess?.()
+        (getAllKeysRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.getAllKeys()
 
       expect(result).toEqual(testKeys)
-      expect(mockObjectStore.getAllKeys).toHaveBeenCalled()
+      expect(mockGetAllKeys).toHaveBeenCalled()
     })
   })
 
@@ -424,7 +442,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -439,17 +457,17 @@ describe('IndexedDBStorage', () => {
         onerror: null,
       } as unknown as IDBRequest<number>
 
-      mockObjectStore.count.mockReturnValue(countRequest)
+      mockCount.mockReturnValue(countRequest)
 
       // Trigger success after a short delay
       setTimeout(() => {
-        countRequest.onsuccess?.()
+        (countRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.count()
 
       expect(result).toBe(testCount)
-      expect(mockObjectStore.count).toHaveBeenCalled()
+      expect(mockCount).toHaveBeenCalled()
     })
   })
 })

@@ -180,7 +180,7 @@ export const memoryManager = {
 
     if (tags.length) {
       results = results.filter((m) =>
-        tags.every((t) => m.metadata.tags.includes(t)),
+        tags.every((t) => m.metadata.tags?.includes(t)),
       )
     }
 
@@ -204,7 +204,7 @@ export const memoryManager = {
     ensureUser(userId)
     return store
       .get(userId)!
-      .filter((m) => tags.every((t) => m.metadata.tags.includes(t)))
+      .filter((m) => tags.every((t) => m.metadata.tags?.includes(t)))
   },
 
   async getMemoryStats(userId = 'default'): Promise<MemoryStats> {

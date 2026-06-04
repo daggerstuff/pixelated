@@ -28,6 +28,8 @@ export default function convert(children) {
       // 0-length text gets omitted in JSX
       return node.value.trim() ? node.value : undefined
     }
+    // Unrecognized node type
+    return undefined
   }
 
   const root = createReactElementFromNode(doc)

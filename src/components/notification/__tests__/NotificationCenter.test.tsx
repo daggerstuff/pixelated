@@ -78,7 +78,10 @@ describe('notificationCenter', () => {
     render(<NotificationCenter />)
 
     fireEvent.click(screen.getByRole('button'))
-    fireEvent.click(screen.getAllByRole('button')[1])
+    const buttons = screen.getAllByRole('button')
+    if (buttons[1]) {
+      fireEvent.click(buttons[1])
+    }
 
     expect(screen.queryByText('Notifications')).not.toBeInTheDocument()
   })

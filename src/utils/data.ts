@@ -46,7 +46,7 @@ export function matchLogo(
 export function extractPackageName(tagName: string): string {
   const match = tagName.match(/(^@?[^@]+)@/)
   if (match) {
-    return match[1]
+    return match[1] ?? tagName
   }
   return tagName
 }
@@ -58,7 +58,7 @@ export function extractVersionNum(tagName: string): string {
   // Use a more specific pattern to avoid backtracking
   const match = tagName.match(/^\D*(\d+\.\d+\.\d+(?:-[a-z0-9.]+)?)/i)
   if (match) {
-    return match[1]
+    return match[1] ?? tagName
   }
   return tagName
 }
@@ -75,7 +75,7 @@ export function processVersion(
 
   for (let i = parts.length - 1; i >= 0; i--) {
     const part = parts[i]
-    if (part && part !== '.') {
+    if (part && part !== '.' && part !== undefined) {
       const num = +part
       if (!Number.isNaN(num) && num > 0) {
         highlightedIndex = i
@@ -94,8 +94,8 @@ export function processVersion(
     versionType = 'pre'
   }
 
-  const nonHighlightedPart = parts.slice(0, highlightedIndex).join('')
-  const highlightedPart = parts.slice(highlightedIndex).join('')
+  const nonHighlightedPart = parts.slice(0, highlightedIndex === -1 ? 0 : highlightedIndex).join('')
+  const highlightedPart = parts.slice(highlightedIndex === -1 ? 0 : highlightedIndex).join('')
 
   return [versionType, nonHighlightedPart, highlightedPart]
 }

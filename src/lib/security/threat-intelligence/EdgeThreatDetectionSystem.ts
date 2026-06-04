@@ -276,13 +276,17 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate() as Redis
+      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']?.() ?? this.redis
       await subscriber.connect()
 
       // Subscribe to detection requests
       await subscriber.subscribe(
         `edge-detection-${this.config.location}`,
-        async (message) => {
+      )
+      const onMessage = subscriber['on'] as unknown as (event: string, listener: (...args: string[]) => void) => void
+      onMessage('message', (channel: string, message: string) => {
+        if (channel !== `edge-detection-${this.config.location}`) return
+        void (async () => {
           try {
             const request = JSON.parse(message)
             await this.processDetectionRequest(request)
@@ -292,20 +296,24 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
               location: this.config.location,
             })
           }
-        },
-      )
+        })()
+      })
 
       // Subscribe to model updates
-      await subscriber.subscribe('model-updates', async (message) => {
-        try {
-          const update = JSON.parse(message)
-          await this.handleModelUpdate(update)
-        } catch (error: unknown) {
-          logger.error('Failed to handle model update', {
-            error: error instanceof Error ? error.message : 'Unknown error',
-            location: this.config.location,
-          })
-        }
+      await subscriber.subscribe('model-updates')
+      onMessage('message', (channel: string, message: string) => {
+        if (channel !== 'model-updates') return
+        void (async () => {
+          try {
+            const update = JSON.parse(message)
+            await this.handleModelUpdate(update)
+          } catch (error: unknown) {
+            logger.error('Failed to handle model update', {
+              error: error instanceof Error ? error.message : 'Unknown error',
+              location: this.config.location,
+            })
+          }
+        })()
       })
 
       logger.info('Redis pub/sub setup completed', {
@@ -470,15 +478,15 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    * Extract network-related features
    */
   private extractNetworkFeatures(data: Record<string, unknown>): number[] {
-    const features = [
-      data['packet_count'] ?? 0,
-      data['bytes_transferred'] ?? 0,
-      data['unique_destinations'] ?? 0,
-      data['connection_duration'] ?? 0,
-      data['protocol_type'] ?? 0,
-      data['port_number'] ?? 0,
-      data['flag_count'] ?? 0,
-      data['error_rate'] ?? 0,
+    const features: number[] = [
+      (data['packet_count'] as number) ?? 0,
+      (data['bytes_transferred'] as number) ?? 0,
+      (data['unique_destinations'] as number) ?? 0,
+      (data['connection_duration'] as number) ?? 0,
+      (data['protocol_type'] as number) ?? 0,
+      (data['port_number'] as number) ?? 0,
+      (data['flag_count'] as number) ?? 0,
+      (data['error_rate'] as number) ?? 0,
     ]
 
     return features.slice(0, 10) // Ensure consistent length
@@ -488,15 +496,15 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    * Extract behavioral features
    */
   private extractBehavioralFeatures(data: Record<string, unknown>): number[] {
-    const features = [
-      data['login_attempts'] ?? 0,
-      data['failed_logins'] ?? 0,
-      data['access_frequency'] ?? 0,
-      data['time_of_access'] ?? 0,
-      data['resource_access_count'] ?? 0,
-      data['privilege_escalation_attempts'] ?? 0,
-      data['anomalous_actions'] ?? 0,
-      data['session_duration'] ?? 0,
+    const features: number[] = [
+      (data['login_attempts'] as number) ?? 0,
+      (data['failed_logins'] as number) ?? 0,
+      (data['access_frequency'] as number) ?? 0,
+      (data['time_of_access'] as number) ?? 0,
+      (data['resource_access_count'] as number) ?? 0,
+      (data['privilege_escalation_attempts'] as number) ?? 0,
+      (data['anomalous_actions'] as number) ?? 0,
+      (data['session_duration'] as number) ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -506,15 +514,15 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    * Extract content features
    */
   private extractContentFeatures(data: Record<string, unknown>): number[] {
-    const features = [
-      data['content_length'] ?? 0,
-      data['keyword_density'] ?? 0,
-      data['suspicious_keywords'] ?? 0,
-      data['encoding_type'] ?? 0,
-      data['attachment_count'] ?? 0,
-      data['link_count'] ?? 0,
-      data['script_count'] ?? 0,
-      data['obfuscation_level'] ?? 0,
+    const features: number[] = [
+      (data['content_length'] as number) ?? 0,
+      (data['keyword_density'] as number) ?? 0,
+      (data['suspicious_keywords'] as number) ?? 0,
+      (data['encoding_type'] as number) ?? 0,
+      (data['attachment_count'] as number) ?? 0,
+      (data['link_count'] as number) ?? 0,
+      (data['script_count'] as number) ?? 0,
+      (data['obfuscation_level'] as number) ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -524,15 +532,15 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    * Extract system features
    */
   private extractSystemFeatures(data: Record<string, unknown>): number[] {
-    const features = [
-      data['cpu_usage'] ?? 0,
-      data['memory_usage'] ?? 0,
-      data['disk_io'] ?? 0,
-      data['network_io'] ?? 0,
-      data['process_count'] ?? 0,
-      data['thread_count'] ?? 0,
-      data['handle_count'] ?? 0,
-      data['error_count'] ?? 0,
+    const features: number[] = [
+      (data['cpu_usage'] as number) ?? 0,
+      (data['memory_usage'] as number) ?? 0,
+      (data['disk_io'] as number) ?? 0,
+      (data['network_io'] as number) ?? 0,
+      (data['process_count'] as number) ?? 0,
+      (data['thread_count'] as number) ?? 0,
+      (data['handle_count'] as number) ?? 0,
+      (data['error_count'] as number) ?? 0,
     ]
 
     return features.slice(0, 10)
@@ -561,8 +569,8 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     const results: Record<string, ModelResult> = {}
 
     for (const [modelName, model] of this.models) {
+      const startTime = Date.now()
       try {
-        const startTime = Date.now()
 
         // Prepare input tensor
         const inputTensor = tf.tensor2d([features])
@@ -615,7 +623,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       }
     }
 
-    return results
+    return results as unknown as { anomaly: ModelResult; classification: ModelResult; clustering: ModelResult; prediction: ModelResult }
   }
 
   /**
@@ -689,7 +697,20 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         (result: ModelResult) => result.predictions || [],
       )
 
-      const biasResult = await this.biasDetector.analyze({
+      const biasAnalyze = (this.biasDetector as unknown as Record<string, Function>)['analyze']
+      if (typeof biasAnalyze !== 'function') {
+        logger.warn('Bias detection engine analyze method unavailable, skipping bias analysis', {
+          location: this.config.location,
+        })
+        return {
+          detected: false,
+          score: 0,
+          types: [],
+          explanation: 'Bias analysis unavailable',
+          mitigation_suggested: [],
+        }
+      }
+      const biasResult = await biasAnalyze({
         input: input.data,
         predictions: allPredictions,
         context: input.context,
@@ -895,7 +916,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           if (input.data['ip_address']) {
             indicators.push({
               type: 'ip_address',
-              value: input.data['ip_address'],
+              value: input.data['ip_address'] as string,
               confidence: modelResults['anomaly']!.confidence,
               source: 'anomaly_detection',
             })
@@ -905,7 +926,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           if (input.data['user_id']) {
             indicators.push({
               type: 'user_id',
-              value: input.data['user_id'],
+              value: input.data['user_id'] as string,
               confidence: modelResults['classification']!.confidence,
               source: 'classification',
             })
@@ -915,7 +936,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           if (input.data['hash']) {
             indicators.push({
               type: 'file_hash',
-              value: input.data['hash'],
+              value: input.data['hash'] as string,
               confidence: modelResults['clustering']!.confidence,
               source: 'clustering',
             })
@@ -925,7 +946,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
           if (input.data['process_id']) {
             indicators.push({
               type: 'process_id',
-              value: input.data['process_id'],
+              value: input.data['process_id'] as string,
               confidence: modelResults['prediction']!.confidence,
               source: 'prediction',
             })
@@ -1055,8 +1076,10 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
   private cacheResult(cacheKey: string, detection: ThreatDetection): void {
     if (this.cache.size >= this.config.performance.cache_size) {
       // Remove oldest entry
-      const firstKey = this.cache.keys().next().value
-      this.cache.delete(firstKey)
+      const firstEntry = this.cache.keys().next()
+      if (firstEntry.value !== undefined) {
+        this.cache.delete(firstEntry.value)
+      }
     }
     this.cache.set(cacheKey, detection)
   }
@@ -1102,7 +1125,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
 
       const processingPromises = batch.map(async (input) => {
         try {
-          return await this.processDetectionRequest({ input })
+          return await this.processDetectionRequest({ id: uuidv4(), input })
         } catch (error: unknown) {
           logger.error('Queue processing failed for input', {
             error: error instanceof Error ? error.message : 'Unknown error',
@@ -1221,14 +1244,14 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
 
     this.processingQueue.push({
       ...input,
-      metadata: { ...input.context, priority, requestId },
+      context: { ...input.context, priority, requestId },
     })
 
     // Sort queue by priority
     this.processingQueue.sort((a, b) => {
-      const priorityOrder = { high: 3, medium: 2, low: 1 }
-      const aPriority = priorityOrder[a.metadata?.priority ?? 'medium']
-      const bPriority = priorityOrder[b.metadata?.priority ?? 'medium']
+      const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 }
+      const aPriority = priorityOrder[(a.context?.['priority'] as string) ?? 'medium'] ?? 2
+      const bPriority = priorityOrder[(b.context?.['priority'] as string) ?? 'medium'] ?? 2
       return bPriority - aPriority
     })
 
@@ -1260,7 +1283,7 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       }
 
       // Shutdown bias detector
-      await this.biasDetector.shutdown()
+      await (this.biasDetector as unknown as Record<string, Function>)['shutdown']?.()
 
       this.isInitialized = false
       this.emit('shutdown', {

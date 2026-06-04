@@ -112,28 +112,28 @@ export const GET: APIRoute = async ({ url }) => {
     // Cache the computed data
     const computedData = {
       historical: historicalResult.rows.map((row) => ({
-        date: row.date,
-        biasScore: parseFloat(row.avg_bias_score ?? '0'),
-        sessionCount: parseInt(row.session_count ?? '0'),
-        alertCount: parseInt(row.alert_count ?? '0'),
-        minBias: parseFloat(row.min_bias ?? '0'),
-        maxBias: parseFloat(row.max_bias ?? '0'),
+        date: row['date'],
+        biasScore: Number(row['avg_bias_score']) || 0,
+        sessionCount: parseInt(row['session_count'] as string ?? '0'),
+        alertCount: parseInt(row['alert_count'] as string ?? '0'),
+        minBias: Number(row['min_bias']) || 0,
+        maxBias: Number(row['max_bias']) || 0,
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender ?? 'Unknown',
-        ethnicity: row.ethnicity ?? 'Unknown',
-        ageGroup: row.age_group ?? 'Unknown',
-        count: parseInt(row.count ?? '0'),
-        avgBias: parseFloat(row.avg_bias ?? '0'),
+        gender: row['gender'] ?? 'Unknown',
+        ethnicity: row['ethnicity'] ?? 'Unknown',
+        ageGroup: row['age_group'] ?? 'Unknown',
+        count: parseInt(row['count'] as string ?? '0'),
+        avgBias: Number(row['avg_bias']) || 0,
       })),
       distribution: distributionResult.rows.map((row) => ({
-        range: row.bias_range,
-        count: parseInt(row.count ?? '0'),
+        range: row['bias_range'],
+        count: parseInt((row['count'] as string | undefined ?? '0').toString()),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer ?? 'Unknown',
-        avgScore: parseFloat(row.avg_score ?? '0'),
-        occurrences: parseInt(row.occurrences ?? '0'),
+        layer: row['layer'] ?? 'Unknown',
+        avgScore: parseFloat((row['avg_score'] as number | undefined ?? 0).toString()),
+        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0').toString()),
       })),
       metadata: {
         days,
@@ -155,28 +155,28 @@ export const GET: APIRoute = async ({ url }) => {
     // Format response
     const response = {
       historical: historicalResult.rows.map((row) => ({
-        date: row.date,
-        biasScore: parseFloat(row.avg_bias_score ?? '0'),
-        sessionCount: parseInt(row.session_count ?? '0'),
-        alertCount: parseInt(row.alert_count ?? '0'),
-        minBias: parseFloat(row.min_bias ?? '0'),
-        maxBias: parseFloat(row.max_bias ?? '0'),
+        date: row['date'],
+        biasScore: Number(row['avg_bias_score']) || 0,
+        sessionCount: parseInt(row['session_count'] as string ?? '0'),
+        alertCount: parseInt(row['alert_count'] as string ?? '0'),
+        minBias: Number(row['min_bias']) || 0,
+        maxBias: Number(row['max_bias']) || 0,
       })),
       demographics: demographicResult.rows.map((row) => ({
-        gender: row.gender ?? 'Unknown',
-        ethnicity: row.ethnicity ?? 'Unknown',
-        ageGroup: row.age_group ?? 'Unknown',
-        count: parseInt(row.count ?? '0'),
-        avgBias: parseFloat(row.avg_bias ?? '0'),
+        gender: row['gender'] ?? 'Unknown',
+        ethnicity: row['ethnicity'] ?? 'Unknown',
+        ageGroup: row['age_group'] ?? 'Unknown',
+        count: parseInt(row['count'] as string ?? '0'),
+        avgBias: Number(row['avg_bias']) || 0,
       })),
       distribution: distributionResult.rows.map((row) => ({
-        range: row.bias_range,
-        count: parseInt(row.count ?? '0'),
+        range: row['bias_range'],
+        count: parseInt((row['count'] as string | undefined ?? '0').toString()),
       })),
       patterns: patternsResult.rows.map((row) => ({
-        layer: row.layer ?? 'Unknown',
-        avgScore: parseFloat(row.avg_score ?? '0'),
-        occurrences: parseInt(row.occurrences ?? '0'),
+        layer: row['layer'] ?? 'Unknown',
+        avgScore: parseFloat((row['avg_score'] as number | undefined ?? 0).toString()),
+        occurrences: parseInt((row['occurrences'] as string | undefined ?? '0').toString()),
       })),
       metadata: {
         days,
@@ -195,7 +195,7 @@ export const GET: APIRoute = async ({ url }) => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Analytics API error:', error)
     return new Response(
       JSON.stringify({

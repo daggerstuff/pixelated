@@ -76,8 +76,8 @@ export async function createDocument(
     [
       documentId,
       1,
-      document.title,
-      JSON.stringify(document.content),
+      document['title'],
+      JSON.stringify(document['content']),
       userId,
       'Initial version',
     ],
@@ -100,7 +100,7 @@ export async function getDocument(documentId: string, userId: string) {
   // Check permissions
   const permissions = getDocumentPermissions(document)
   const hasAccess =
-    document.owner.toString() === userId ||
+    document['owner'].toString() === userId ||
     permissions.view.some((id) => id.toString() === userId) ||
     permissions.edit.some((id) => id.toString() === userId)
 
@@ -134,7 +134,7 @@ export async function updateDocument(
   // Check edit permission
   const permissions = getDocumentPermissions(document)
   const canEdit =
-    document.owner.toString() === userId ||
+    document['owner'].toString() === userId ||
     permissions.edit.some((id) => id.toString() === userId)
 
   if (!canEdit) {
@@ -143,35 +143,35 @@ export async function updateDocument(
 
   // Track changes for version history
   const changes: Record<string, unknown> = {}
-  if (updates.title && updates.title !== document.title) {
-    changes.title = { old: document.title, new: updates.title }
-    document.title = updates.title
+  if (updates.title && updates.title !== document['title']) {
+    changes['title'] = { old: document['title'], new: updates.title }
+    document['title'] = updates.title
   }
   if (updates.content) {
-    changes.content = { updated: true }
-    document.content = updates.content
+    changes['content'] = { updated: true }
+    document['content'] = updates.content
   }
-  if (updates.description && updates.description !== document.description) {
-    changes.description = {
-      old: document.description,
+  if (updates.description && updates.description !== document['description']) {
+    changes['description'] = {
+      old: document['description'],
       new: updates.description,
     }
-    document.description = updates.description
+    document['description'] = updates.description
   }
-  if (updates.status && updates.status !== document.status) {
-    changes.status = { old: document.status, new: updates.status }
-    document.status = updates.status
+  if (updates.status && updates.status !== document['status']) {
+    changes['status'] = { old: document['status'], new: updates.status }
+    document['status'] = updates.status
   }
 
   // Update version
-  document.version += 1
-  document.revisions.push({
+  document['version'] += 1
+  document['revisions'].push({
     revisionId: uuidv4(),
-    version: document.version,
+    version: document['version'],
     timestamp: new Date(),
     author: userId,
     changes: JSON.stringify(changes),
-    content: JSON.stringify(document.content),
+    content: JSON.stringify(document['content']),
   })
 
   await document.save()
@@ -183,9 +183,9 @@ export async function updateDocument(
      VALUES ($1, $2, $3, $4, $5, $6)`,
     [
       documentId,
-      document.version,
-      document.title,
-      JSON.stringify(document.content),
+      document['version'],
+      document['title'],
+      JSON.stringify(document['content']),
       userId,
       JSON.stringify(changes),
     ],
@@ -213,7 +213,7 @@ export async function deleteDocument(documentId: string, userId: string) {
   }
 
   // Soft delete - archive instead
-  document.status = 'archived'
+  document['status'] = 'archived'
   await document.save()
 
   return true
@@ -244,7 +244,7 @@ export async function shareDocument(
   const permissions = getDocumentPermissions(document)
   const sharedWithUserObjectId = toObjectId(sharedWithUserId)
 
-  document.permissions ??= permissions
+  document['permissions'] ??= permissions
 
   if (
     permissionLevel === 'view' &&
@@ -301,9 +301,9 @@ export async function searchDocuments(
     $text: { $search: query },
   }
 
-  if (filters?.type) searchFilter.type = filters.type
-  if (filters?.category) searchFilter.category = filters.category
-  if (filters?.status) searchFilter.status = filters.status
+  if (filters?.type) searchFilter['type'] = filters.type
+  if (filters?.category) searchFilter['category'] = filters.category
+  if (filters?.status) searchFilter['status'] = filters.status
 
   return await BusinessDocument.find(searchFilter).limit(50).lean()
 }

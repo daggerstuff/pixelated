@@ -111,7 +111,7 @@ export async function getMarketResearch(researchId: string, userId: string) {
     permissions?: MarketResearchPermissions | null
   }
   if (
-    !hasPermission(research.permissions, 'view', userId) &&
+    !hasPermission(research['permissions'], 'view', userId) &&
     researchDoc.owner !== userId
   ) {
     throw new ForbiddenError('Cannot access this research')
@@ -142,15 +142,15 @@ export async function addFinding(
 
   // Check edit permission
   if (
-    !hasPermission(research.permissions, 'edit', userId) &&
-    research.owner !== userId
+    !hasPermission(research['permissions'], 'edit', userId) &&
+    research['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
 
   const findingId = uuid()
 
-  research.findings.push({
+  research['findings'].push({
     _id: findingId,
     title: finding.title,
     description: finding.description ?? '',
@@ -161,7 +161,7 @@ export async function addFinding(
     updatedAt: new Date(),
   })
 
-  research.updatedAt = new Date()
+  research['updatedAt'] = new Date()
   await research.save()
 
   return research
@@ -190,15 +190,15 @@ export async function addCompetitiveAnalysis(
 
   // Check edit permission
   if (
-    !hasPermission(research.permissions, 'edit', userId) &&
-    research.owner !== userId
+    !hasPermission(research['permissions'], 'edit', userId) &&
+    research['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
 
   const analysisId = uuid()
 
-  research.competitiveAnalysis.push({
+  research['competitiveAnalysis'].push({
     _id: analysisId,
     competitorName: analysis.competitorName,
     strengths: analysis.strengths ?? [],
@@ -210,7 +210,7 @@ export async function addCompetitiveAnalysis(
     updatedAt: new Date(),
   })
 
-  research.updatedAt = new Date()
+  research['updatedAt'] = new Date()
   await research.save()
 
   return research
@@ -237,15 +237,15 @@ export async function addRecommendation(
 
   // Check edit permission
   if (
-    !hasPermission(research.permissions, 'edit', userId) &&
-    research.owner !== userId
+    !hasPermission(research['permissions'], 'edit', userId) &&
+    research['owner'] !== userId
   ) {
     throw new ForbiddenError('Cannot edit this research')
   }
 
   const recommendationId = uuid()
 
-  research.recommendations.push({
+  research['recommendations'].push({
     _id: recommendationId,
     title: recommendation.title,
     description: recommendation.description ?? '',
@@ -256,7 +256,7 @@ export async function addRecommendation(
     updatedAt: new Date(),
   })
 
-  research.updatedAt = new Date()
+  research['updatedAt'] = new Date()
   await research.save()
 
   return research
@@ -333,13 +333,13 @@ export async function shareMarketResearch(
   }
 
   // Check ownership
-  if (research.owner !== ownerId) {
+  if (research['owner'] !== ownerId) {
     throw new ForbiddenError('Only research owner can share')
   }
 
   // Add to appropriate permission array
   const permissionKey = permissionLevel
-  const normalizedPermissions = normalizePermissions(research.permissions)
+  const normalizedPermissions = normalizePermissions(research['permissions'])
   const permissionList = getPermissionLevel(
     normalizedPermissions,
     permissionKey,

@@ -9,8 +9,6 @@ import {
   EMOTION_MULTIPLIER,
   PLUTCHIK_PRIMARY,
   EmotionClassifier,
-  type _EmotionClassificationResult,
-  type _EmotionTrajectory,
 } from '../emotion-classifier'
 
 // ─── VAD scorer ──────────────────────────────────────────────────────────────
@@ -80,7 +78,7 @@ describe('EmotionClassifier', () => {
   let clf: EmotionClassifier
 
   beforeEach(() => {
-    clf = new EmotionClassifier('lexicon')
+    clf = new EmotionClassifier()
   })
 
   describe('classify()', () => {
@@ -171,7 +169,7 @@ describe('sessionTrajectory', () => {
   let clf: EmotionClassifier
 
   beforeEach(() => {
-    clf = new EmotionClassifier('lexicon')
+    clf = new EmotionClassifier()
   })
 
   it('stable trajectory for neutral session', () => {

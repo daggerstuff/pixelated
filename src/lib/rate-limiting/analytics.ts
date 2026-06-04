@@ -94,18 +94,18 @@ export class RateLimitAnalyticsService {
       const pipeline = redisClient['pipeline']!()
 
       // Update daily analytics
-      pipeline.hincrby(analyticsKey, `${eventType}_total`, 1)
-      pipeline.hincrby(analyticsKey, 'total_events', 1)
-      pipeline.hset(analyticsKey, 'last_updated', timestamp)
+      pipeline['hincrby'](analyticsKey, `${eventType}_total`, 1)
+      pipeline['hincrby'](analyticsKey, 'total_events', 1)
+      pipeline['hset'](analyticsKey, 'last_updated', String(timestamp))
 
       // Update hourly analytics
-      pipeline.hincrby(hourlyKey, `${eventType}_total`, 1)
-      pipeline.hincrby(hourlyKey, 'total_events', 1)
-      pipeline.hset(hourlyKey, 'last_updated', timestamp)
+      pipeline['hincrby'](hourlyKey, `${eventType}_total`, 1)
+      pipeline['hincrby'](hourlyKey, 'total_events', 1)
+      pipeline['hset'](hourlyKey, 'last_updated', String(timestamp))
 
       // Set expiration (30 days for daily, 7 days for hourly)
-      pipeline.expire(analyticsKey, 86400 * 30)
-      pipeline.expire(hourlyKey, 86400 * 7)
+      pipeline['expire'](analyticsKey, 86400 * 30)
+      pipeline['expire'](hourlyKey, 86400 * 7)
 
       await pipeline.exec()
 
@@ -115,7 +115,7 @@ export class RateLimitAnalyticsService {
       }
     } catch (error: unknown) {
       logger.error('Failed to record rate limit event:', {
-        error,
+        error: String(error),
         eventType,
         rule: rule.name,
         identifier,
@@ -166,7 +166,7 @@ export class RateLimitAnalyticsService {
         }
       }
     } catch (error: unknown) {
-      logger.error('Failed to get analytics:', { error, ruleName, days })
+      logger.error('Failed to get analytics:', { error: String(error), ruleName, days })
     }
 
     return analytics
@@ -281,7 +281,7 @@ export class RateLimitAnalyticsService {
           .map(([identifier, requests]) => ({ identifier, requests })),
       }
     } catch (error: unknown) {
-      logger.error('Failed to get real-time metrics:', { error })
+      logger.error('Failed to get real-time metrics:', { error: String(error) })
       return {
         totalRequests: 0,
         blockedRequests: 0,
@@ -381,7 +381,7 @@ export class RateLimitAnalyticsService {
                 await handler(alert)
               } catch (handlerError) {
                 logger.error('Monitor handler failed:', {
-                  error: handlerError,
+                  error: String(handlerError),
                   monitor: monitor.name,
                 })
               }
@@ -389,15 +389,15 @@ export class RateLimitAnalyticsService {
           }
         } catch (monitorError) {
           logger.error('Monitor check failed:', {
-            error: monitorError,
+            error: String(monitorError),
             monitor: monitor.name,
           })
         }
       }
 
-      logger.warn('Rate limit alert triggered:', alert)
+      logger.warn('Rate limit alert triggered:', { alert })
     } catch (error: unknown) {
-      logger.error('Failed to trigger alert:', { error, alert })
+      logger.error('Failed to trigger alert:', { error: String(error), alert })
     }
   }
 
@@ -488,7 +488,7 @@ export class RateLimitAnalyticsService {
             }
           } catch (parseError) {
             logger.error('Failed to parse alert data:', {
-              error: parseError,
+              error: String(parseError),
               key,
             })
           }
@@ -497,7 +497,7 @@ export class RateLimitAnalyticsService {
 
       return alerts
     } catch (error: unknown) {
-      logger.error('Failed to get recent alerts:', { error })
+      logger.error('Failed to get recent alerts:', { error: String(error) })
       return []
     }
   }
@@ -624,7 +624,7 @@ export class RateLimitAnalyticsService {
           })
         }
       } catch (error: unknown) {
-        logger.error('Monitoring check failed:', { error })
+        logger.error('Monitoring check failed:', { error: String(error) })
       }
     }, 30000) // 30 seconds
 
@@ -658,7 +658,7 @@ export class RateLimitAnalyticsService {
         })
       }
     } catch (error: unknown) {
-      logger.error('Failed to cleanup analytics data:', { error })
+      logger.error('Failed to cleanup analytics data:', { error: String(error) })
     }
   }
 }

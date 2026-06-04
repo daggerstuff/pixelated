@@ -57,7 +57,7 @@ export function useBiasDashboardWebSocket({
 
   useEffect(() => {
     if (!enableRealTimeUpdates) {
-      return
+      return undefined
     }
 
     let reconnectAttempts = 0

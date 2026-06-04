@@ -193,7 +193,7 @@ app.post('/webhook', async (req, res) => {
       error: error.message,
       stack: error.stack,
     })
-    res.status(500).json({ error: 'Failed to process alert' })
+    return res.status(500).json({ error: 'Failed to process alert' })
   }
 })
 

@@ -7,6 +7,11 @@ type RedirectState = {
   returnTo?: string
 }
 
+function getEnvVariable(name: string): string | undefined {
+  const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env
+  return env[name]
+}
+
 const hasAuth0DomainShape = (value: string): boolean => {
   return (
     value.includes('.auth0.com') ||
@@ -37,14 +42,14 @@ export const PixelatedAuthProvider = ({
   children: React.ReactNode
 }) => {
   const domain =
-    import.meta.env['PUBLIC_AUTH0_DOMAIN'] ??
-    import.meta.env['AUTH0_DOMAIN'] ??
-    import.meta.env['VITE_AUTH0_DOMAIN']
+    getEnvVariable('PUBLIC_AUTH0_DOMAIN') ??
+    getEnvVariable('AUTH0_DOMAIN') ??
+    getEnvVariable('VITE_AUTH0_DOMAIN')
   const clientId =
-    import.meta.env['PUBLIC_AUTH0_CLIENT_ID'] ??
-    import.meta.env['AUTH0_CLIENT_ID'] ??
-    import.meta.env['VITE_AUTH0_CLIENT_ID']
-  const audience = import.meta.env['PUBLIC_AUTH0_AUDIENCE']
+    getEnvVariable('PUBLIC_AUTH0_CLIENT_ID') ??
+    getEnvVariable('AUTH0_CLIENT_ID') ??
+    getEnvVariable('VITE_AUTH0_CLIENT_ID')
+  const audience = getEnvVariable('PUBLIC_AUTH0_AUDIENCE')
   const redirectUri =
     typeof window !== 'undefined'
       ? `${window.location.origin}${AUTH0_CALLBACK_PATH}`
