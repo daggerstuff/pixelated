@@ -60,14 +60,20 @@ export function TherapeuticGoalsTracker({
         if (data && data.length > 0) {
           setGoals(data)
           if (!activeGoalId) {
-            setActiveGoalId(data?.[0].id)
+            const firstGoal = data[0]
+            if (firstGoal) {
+              setActiveGoalId(firstGoal.id)
+            }
           }
         } else {
           // If no goals from API, generate initial ones
           const initialGoals = generateGoalsFromPatientModel(patientModel)
           setGoals(initialGoals)
           if (initialGoals.length > 0 && !activeGoalId) {
-            setActiveGoalId(initialGoals?.[0].id)
+            const firstGoal = initialGoals[0]
+            if (firstGoal) {
+              setActiveGoalId(firstGoal.id)
+            }
           }
         }
       })
@@ -77,7 +83,10 @@ export function TherapeuticGoalsTracker({
         const fallbackGoals = generateGoalsFromPatientModel(patientModel)
         setGoals(fallbackGoals)
         if (fallbackGoals.length > 0 && !activeGoalId) {
-          setActiveGoalId(fallbackGoals?.[0].id)
+          const firstGoal = fallbackGoals[0]
+          if (firstGoal) {
+            setActiveGoalId(firstGoal.id)
+          }
         }
       })
       .finally(() => setLoading(false))
@@ -292,7 +301,7 @@ export function TherapeuticGoalsTracker({
         <div className="text-gray-600 text-sm">
           Session #
           {patientModel?.therapeuticProgress?.sessionProgressLog?.length
-            ? patientModel.therapeuticProgress.sessionProgressLog.length + 1
+            ? (patientModel.therapeuticProgress.sessionProgressLog.length ?? 0) + 1
             : 1}
         </div>
       </div>
@@ -607,7 +616,7 @@ export function TherapeuticGoalsTracker({
                   {checkpoint.isCompleted && checkpoint.completedAt && (
                     <p className="text-gray-500 mt-0.5 text-xs">
                       Completed on{' '}
-                      {new Date(checkpoint.completedAt).toLocaleDateString()}
+                      {checkpoint.completedAt ? new Date(checkpoint.completedAt).toLocaleDateString() : ''}
                     </p>
                   )}
                   {checkpoint.notes && (
@@ -682,12 +691,12 @@ export function TherapeuticGoalsTracker({
           )}
 
           {/* Notes */}
-          {activeGoal.notes && (
+          {activeGoal.notes ? (
             <>
               <h5 className="mb-2 mt-4 text-sm font-medium">Notes</h5>
               <p className="text-gray-700 text-sm">{activeGoal.notes}</p>
             </>
-          )}
+          ) : null}
         </Card>
       )}
     </div>
@@ -926,7 +935,7 @@ function generateCheckpoints(
   // Random selection of count checkpoints
   for (let i = 0; i < count; i++) {
     const randomIndex = Math.floor(Math.random() * possibleCheckpoints.length)
-    const description = possibleCheckpoints[randomIndex]
+    const description = possibleCheckpoints[randomIndex] ?? ''
     possibleCheckpoints = possibleCheckpoints.filter(
       (_, index) => index !== randomIndex,
     )
@@ -997,7 +1006,10 @@ function generateInterventionTypes(_topic: string): string[] {
 
   for (let i = 0; i < count; i++) {
     const randomIndex = Math.floor(Math.random() * commonInterventions.length)
-    interventions.push(commonInterventions[randomIndex])
+    const intervention = commonInterventions[randomIndex]
+    if (intervention) {
+      interventions.push(intervention)
+    }
     commonInterventions.splice(randomIndex, 1) // Ensure unique interventions
   }
 

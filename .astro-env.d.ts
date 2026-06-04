@@ -68,7 +68,8 @@ declare namespace astroHTML.JSX {
 }
 
 declare module '*.astro' {
-  type AstroComponent = unknown
-  const Component: AstroComponent
+  const Component: unknown
   export default Component
 }
+
+declare module '*.css' {}

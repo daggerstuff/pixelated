@@ -52,15 +52,15 @@ export class SemanticDeduplicator {
 
     for (let i = 0; i < memories.length; i++) {
       if (used.has(i)) continue
-      const clusterMembers = [memories[i]]
+      const clusterMembers: MemoryBlock[] = [memories[i]!]
       const clusterScores = [1.0]
       used.add(i)
 
       for (let j = i + 1; j < memories.length; j++) {
         if (used.has(j)) continue
-        const sim = this.cosine(vectors[i], vectors[j])
+        const sim = this.cosine(vectors[i]!, vectors[j]!)
         if (sim >= this.threshold) {
-          clusterMembers.push(memories[j])
+          clusterMembers.push(memories[j]!)
           clusterScores.push(sim)
           used.add(j)
         }
@@ -68,8 +68,8 @@ export class SemanticDeduplicator {
 
       if (clusterMembers.length > 1) {
         const rep = clusterMembers.reduce((a, b) =>
-          b.importance.raw > a.importance.raw ? b : a,
-        )
+          b!.importance.raw > a!.importance.raw ? b : a,
+        )!
         clusters.push({
           clusterId: `cluster_${clusters.length}`,
           members: clusterMembers,
@@ -77,9 +77,10 @@ export class SemanticDeduplicator {
           similarityScores: clusterScores,
           provenance: clusterMembers.map((m) => m.id),
         })
-        unique.push(this.mergeCluster(clusters[clusters.length - 1]))
+        const lastCluster = clusters[clusters.length - 1]!
+        unique.push(this.mergeCluster(lastCluster))
       } else {
-        unique.push(memories[i])
+        unique.push(memories[i]!)
       }
     }
 
@@ -114,7 +115,6 @@ export class SemanticDeduplicator {
       }
     }
     const n = memories.length
-    this.vocabulary = [...allTerms].sort()
     this.idf = new Map()
     for (const [term, df] of docFreq) {
       this.idf.set(term, Math.log((n + 1) / (df + 1)) + 1)

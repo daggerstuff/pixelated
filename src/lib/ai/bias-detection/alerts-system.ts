@@ -620,7 +620,7 @@ export class BiasAlertSystem {
       }
 
       const serverAlerts =
-        (serverAlertsResponse as { alerts?: AlertInstance[] })?.alerts ?? []
+        (serverAlertsResponse as { alerts?: AlertInstance[] } | null)?.alerts ?? []
 
       // Process local alert rules
       const localAlerts: AlertInstance[] = this.evaluateAnalysisAlerts(result)
@@ -943,7 +943,8 @@ export class BiasAlertSystem {
       const serverAlerts = await this.pythonBridge.getActiveAlerts()
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const serverInstances: AlertInstance[] = (serverAlerts ?? []).map(
+      const serverAlertsList = (serverAlerts ?? []) as AlertLike[]
+      const serverInstances: AlertInstance[] = serverAlertsList.map(
         alertDataToInstance,
       )
 
@@ -1015,7 +1016,8 @@ export class BiasAlertSystem {
       })
 
       // Convert AlertData[] or AlertInstance[] to AlertInstance[]
-      const recentInstances: AlertInstance[] = (response ?? []).map(
+      const responseList = (response ?? []) as AlertLike[]
+      const recentInstances: AlertInstance[] = responseList.map(
         alertDataToInstance,
       )
 
@@ -1042,12 +1044,13 @@ export class BiasAlertSystem {
         end: new Date().toISOString(),
       })
 
+      const respRecord = response as Record<string, unknown>
       return {
-        total: response.total_alerts,
-        byLevel: response.alerts_by_level,
-        acknowledged: 0, // Would need to be calculated
-        escalated: 0, // Would need to be calculated
-        averageResponseTime: response.average_response_time,
+        total: respRecord['total_alerts'] as number,
+        byLevel: respRecord['alerts_by_level'] as Record<string, number>,
+        acknowledged: 0,
+        escalated: 0,
+        averageResponseTime: respRecord['average_response_time'] as number,
       }
     } catch (error: unknown) {
       logger.error('Failed to fetch alert statistics', { error })

@@ -797,7 +797,7 @@ class TabSyncManager {
       onConflict?: (key: string, localValue: T, remoteValue: T) => T
     },
   ): { value: T; shouldUpdate: boolean } {
-    const { strategy = false, onConflict } = options ?? {}
+    const { strategy: strategyOpt, onConflict } = options ?? {}
 
     // If values are identical (using deep equality for objects/arrays), no action needed
     if (this.conflictResolver.areEqual(localValue, remoteValue)) {
@@ -814,7 +814,7 @@ class TabSyncManager {
       key,
       localValue,
       remoteValue,
-      strategy,
+      strategyOpt,
       effectiveOnConflict,
     )
     // Use deep equality to check if update is needed (handles objects/arrays correctly)
@@ -829,7 +829,7 @@ class TabSyncManager {
       localValue,
       remoteValue,
       resolvedValue,
-      strategy: strategy ?? this.config.conflictStrategy,
+      strategy:      strategyOpt ?? this.config.conflictStrategy,
       tabId,
     })
 

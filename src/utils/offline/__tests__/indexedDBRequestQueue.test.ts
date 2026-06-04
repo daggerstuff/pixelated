@@ -26,14 +26,6 @@ describe('IndexedDBRequestQueue', () => {
     mockIndexedDB.open.mockReset()
 
     // Setup mock database objects
-    mockRequest = {
-      result: null,
-      error: null,
-      onsuccess: null,
-      onerror: null,
-      onupgradeneeded: null,
-    } as unknown as IDBRequest
-
     mockObjectStore = {
       put: vi.fn(),
       get: vi.fn(),
@@ -86,7 +78,7 @@ describe('IndexedDBRequestQueue', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          openRequest.onsuccess?.()
+          (openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })

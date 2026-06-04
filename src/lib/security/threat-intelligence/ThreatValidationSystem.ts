@@ -287,11 +287,11 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate()
+      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']() as Redis
       await subscriber.connect()
 
       // Subscribe to validation requests
-      await subscriber.subscribe('validation:request', async (message) => {
+      await subscriber.subscribe('validation:request', async (message: string) => {
         try {
           const validationData = JSON.parse(message)
           await this.requestValidation(
@@ -306,7 +306,7 @@ export class ThreatValidationSystem extends EventEmitter {
       })
 
       // Subscribe to validation completion events
-      await subscriber.subscribe('validation:completed', async (message) => {
+      await subscriber.subscribe('validation:completed', async (message: string) => {
         try {
           const completionData = JSON.parse(message)
           await this.handleValidationCompletion(completionData)
@@ -500,7 +500,7 @@ export class ThreatValidationSystem extends EventEmitter {
       const validation: ThreatValidation = {
         id: validationId,
         threat_id: queueItem.threat_data.id,
-        validation_type: queueItem.validation_types[0] ?? 'accuracy',
+        validation_type: (queueItem.validation_types[0] as ThreatValidation['validation_type']) ?? 'accuracy',
         validation_types: queueItem.validation_types,
         status: 'in_progress',
         validator_type: this.determineValidatorType(queueItem),
@@ -771,7 +771,7 @@ export class ThreatValidationSystem extends EventEmitter {
 
     try {
       // Check data consistency
-      const consistencyCheck = await this.checkDataConsistency(threatData)
+      const consistencyCheck = await this.checkDataConsistency(_threatData)
       if (!consistencyCheck.is_consistent) {
         score -= 0.3
         findings.push({
@@ -789,7 +789,7 @@ export class ThreatValidationSystem extends EventEmitter {
       }
 
       // Cross-reference with external sources
-      const crossRefCheck = await this.crossReferenceExternalSources(threatData)
+      const crossRefCheck = await this.crossReferenceExternalSources(_threatData)
       if (!crossRefCheck.is_verified) {
         score -= 0.2
         findings.push({
@@ -808,7 +808,7 @@ export class ThreatValidationSystem extends EventEmitter {
       }
 
       // Validate against known patterns
-      const patternCheck = await this.validateAgainstPatterns(threatData)
+      const patternCheck = await this.validateAgainstPatterns(_threatData)
       if (!patternCheck.is_valid) {
         score -= 0.1
         findings.push({

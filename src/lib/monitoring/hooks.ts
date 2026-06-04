@@ -13,8 +13,8 @@ export function useMonitoring() {
 
   const trackEvent = useCallback(
     (eventName: string, properties?: Record<string, unknown>) => {
-      if (window.faro) {
-        window.faro.api.pushEvent(eventName, properties)
+      if ((window as any).faro) {
+        (window as any).faro.api.pushEvent(eventName, properties)
       }
     },
     [],
@@ -22,8 +22,8 @@ export function useMonitoring() {
 
   const trackError = useCallback(
     (error: Error, context?: Record<string, unknown>) => {
-      if (window.faro) {
-        window.faro.api.pushError(error, context)
+      if ((window as any).faro) {
+        (window as any).faro.api.pushError(error, context)
       }
     },
     [],
@@ -31,8 +31,8 @@ export function useMonitoring() {
 
   const trackMetric = useCallback(
     (name: string, value: number, unit?: string) => {
-      if (window.faro) {
-        window.faro.api.pushMeasurement(name, {
+      if ((window as any).faro) {
+        (window as any).faro.api.pushMeasurement(name, {
           value,
           unit,
         })

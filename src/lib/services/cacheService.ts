@@ -104,12 +104,12 @@ export class EnhancedCacheService implements CacheClient {
       )
 
       return allKeys
-        .map((key) =>
-          key.startsWith(memoryService.prefix)
-            ? key.substring(memoryService.prefix.length)
-            : key,
+        .map((key: string) =>
+          (key as string).startsWith(memoryService.prefix)
+            ? (key as string).substring(memoryService.prefix.length)
+            : (key as string),
         )
-        .filter((key) => regex.test(key))
+        .filter((key: string) => regex.test(key))
     }
 
     // For Vercel KV, we can't easily implement keys without Redis SCAN

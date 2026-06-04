@@ -65,10 +65,14 @@ export default function BackupLocationTab() {
     })
   }
 
+  /**
+   * @param {React.ChangeEvent<HTMLInputElement | HTMLSelectElement>} e
+   */
   const handleInputChange = (e) => {
-    const { name, value, type } = e.target
+    const target = e.target
+    const { name, value, type } = target
     if (type === 'checkbox') {
-      const { checked } = e.target
+      const { checked } = target
       setNewLocation({
         ...newLocation,
         [name]: checked,
@@ -81,6 +85,9 @@ export default function BackupLocationTab() {
     }
   }
 
+  /**
+   * @param {React.FormEvent<HTMLFormElement>} e
+   */
   const handleSubmit = (e) => {
     e.preventDefault()
     setIsFormLoading(true)

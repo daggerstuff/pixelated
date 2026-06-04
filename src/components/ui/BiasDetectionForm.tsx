@@ -172,7 +172,7 @@ export const BiasDetectionForm: React.FC<BiasDetectionFormProps> = ({
 
       if (!validateForm()) {
         // Focus first error field
-        const firstErrorField = Object.keys(errors)[0]
+        const firstErrorField = Object.keys(errors)[0] ?? ''
         if (firstErrorField === 'text' && textAreaRef.current) {
           textAreaRef.current.focus()
         }

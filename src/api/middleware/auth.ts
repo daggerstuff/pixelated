@@ -32,7 +32,7 @@ export function authMiddleware(
     const headers = Object.entries(req.headers).reduce<Record<string, string>>(
       (acc, [key, value]) => {
         if (value !== undefined) {
-          acc[key] = value
+          acc[key] = Array.isArray(value) ? value.join(', ') : value
         }
         return acc
       },
