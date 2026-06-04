@@ -27,9 +27,11 @@ export const GET: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
+    const authData = (authResult as unknown) as Record<string, unknown>
+    const userData = authData['user'] as Record<string, unknown> | undefined
     const userKey =
-      authResult['authenticated'] && authResult['user']?.['id']
-        ? `user:${authResult['user']['id']}`
+      authData['authenticated'] && userData?.['id']
+        ? `user:${userData['id']}`
         : `ip:${request.headers.get('x-forwarded-for') ?? request.headers.get('cf-connecting-ip') ?? request.headers.get('x-real-ip') ?? 'unknown'}`
     const now = Date.now()
     let entry = rateLimitMap.get(userKey)
@@ -52,16 +54,16 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Check user permissions (must be admin)
-    if (!authResult['user']?.['isAdmin']) {
+    if (!(userData?.['isAdmin'] as boolean)) {
       // Create audit log for unauthorized access attempt
       await createAuditLog(
         AuditEventType.SECURITY,
         'validation-pipeline-results-unauthorized',
-        authResult['user']?.['id'] ?? 'unknown',
+        (userData?.['id'] as string) ?? 'unknown',
         'validation-api',
-        {
-          userId: authResult['user']?.['id'],
-          email: authResult['user']?.['email'],
+      {
+        userId: (userData?.['id'] as string) ?? undefined,
+        email: (userData?.['email'] as string) ?? undefined,
         },
         AuditEventStatus.FAILURE,
       )
@@ -93,10 +95,10 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'validation-pipeline-results',
-      authResult['user']?.['id'] ?? 'system',
+      (userData?.['id'] as string) ?? 'system',
       'validation-api',
       {
-        userId: authResult['user']?.['id'],
+        userId: (userData?.['id'] as string) ?? undefined,
         resultsCount: validationResults.length,
       },
       AuditEventStatus.SUCCESS,
@@ -132,7 +134,7 @@ export const GET: APIRoute = async ({ request }) => {
       'validation-api',
       {
         error: errorMessage,
-      },
+      } as any,
       AuditEventStatus.FAILURE,
     )
 

@@ -26,6 +26,25 @@ if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
   fi
 fi
 
+# Defensive PATH normalization: see pre-commit hook for the rationale.
+# Prevents the global pnpm shim (a /bin/sh wrapper around `exec node`)
+# from picking up a system Node v20, which breaks pnpm >= 11.3.0.
+if [ -n "${NVM_DIR:-}" ]; then
+  _nvm_node_dir="$(nvm which current 2>/dev/null | xargs -r dirname || true)"
+  if [ -n "${_nvm_node_dir:-}" ] && [ -x "${_nvm_node_dir}/node" ]; then
+    _clean_path=""
+    IFS=':' read -r -a _path_parts <<< "$PATH"
+    for _p in "${_path_parts[@]}"; do
+      case ":${_p}:" in
+        *":${PNPM_HOME:-/nonexistent}/bin:"*) continue ;;
+      esac
+      _clean_path="${_clean_path:+${_clean_path}:}${_p}"
+    done
+    export PATH="${_nvm_node_dir}:${_clean_path}"
+    unset _nvm_node_dir _clean_path _path_parts _p
+  fi
+fi
+
 if [ "${SKIP_PUSH_CHECKS:-}" = "true" ]; then
   echo -e "${YELLOW}⏩ [Hook] Skipping push checks (SKIP_PUSH_CHECKS is true)${NC}"
   exit 0
