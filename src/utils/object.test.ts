@@ -51,4 +51,17 @@ describe('deepEqual', () => {
     expect(deepEqual(obj1, obj3)).toBe(false)
     expect(deepEqual(obj1, obj4)).toBe(false)
   })
+
+  it('handles edge cases like different types, array lengths, and key names', () => {
+    // Type mismatches
+    expect(deepEqual(1, '1' as any)).toBe(false)
+    expect(deepEqual(true, false)).toBe(false)
+
+    // Different array lengths
+    expect(deepEqual([1, 2], [1])).toBe(false)
+    expect(deepEqual([1], [1, 2])).toBe(false)
+
+    // Objects with different keys but same key count
+    expect(deepEqual({ a: 1 }, { b: 1 })).toBe(false)
+  })
 })
