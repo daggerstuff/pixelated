@@ -1280,23 +1280,23 @@ class STIXFeedProcessor implements FeedProcessor {
       const items: FeedItem[] = []
 
       // Parse STIX 2.x format
-      const objects = (data as Record<string, unknown>)['objects'] as Record<string, unknown>[] | undefined
+      const objects = (data)['objects'] as Record<string, unknown>[] | undefined
       if (objects) {
         for (const obj of objects) {
-          if ((obj as Record<string, unknown>)['type'] === 'indicator') {
+          if ((obj)['type'] === 'indicator') {
             items.push({
-              itemId: (obj as Record<string, unknown>)['id'] as string,
-              indicator: (obj as Record<string, unknown>)['pattern'] as string,
-              indicatorType: this.extractIndicatorType((obj as Record<string, unknown>)['pattern'] as string),
-              severity: this.mapSTIXThreatLevel((obj as Record<string, unknown>)['labels'] as string[]),
-              confidence: ((obj as Record<string, unknown>)['confidence'] as number) ?? 0.5,
-              timestamp: new Date((obj as Record<string, unknown>)['created'] as string),
-              description: ((obj as Record<string, unknown>)['description'] as string) ?? '',
+              itemId: (obj)['id'] as string,
+              indicator: (obj)['pattern'] as string,
+              indicatorType: this.extractIndicatorType((obj)['pattern'] as string),
+              severity: this.mapSTIXThreatLevel((obj)['labels'] as string[]),
+              confidence: ((obj)['confidence'] as number) ?? 0.5,
+              timestamp: new Date((obj)['created'] as string),
+              description: ((obj)['description'] as string) ?? '',
               source: subscription.provider,
               metadata: {
-                stixVersion: (data as Record<string, unknown>)['spec_version'] as string,
-                objectType: (obj as Record<string, unknown>)['type'],
-                labels: (obj as Record<string, unknown>)['labels'],
+                stixVersion: (data)['spec_version'] as string,
+                objectType: (obj)['type'],
+                labels: (obj)['labels'],
               },
             })
           }
@@ -1395,7 +1395,7 @@ class TAXIIFeedProcessor implements FeedProcessor {
       const objects = data['objects'] as Record<string, unknown>[] | undefined
       if (objects) {
         for (const obj of objects) {
-          const o = obj as Record<string, unknown>
+          const o = obj
           if (
             o['type'] === 'indicator' ||
             o['type'] === 'malware' ||
@@ -1527,11 +1527,11 @@ class MISPFeedProcessor implements FeedProcessor {
       const response = data['response'] as Record<string, unknown>[] | undefined
       if (response) {
         for (const evt of response) {
-          const event = evt as Record<string, unknown>
+          const event = evt
           const attr = (event['Event'] as Record<string, unknown>)?.['Attribute'] as Record<string, unknown>[] | undefined
           if (attr) {
             for (const att of attr) {
-              const attribute = att as Record<string, unknown>
+              const attribute = att
               items.push({
                 itemId: attribute['id'] as string,
                 indicator: attribute['value'] as string,
@@ -1663,11 +1663,11 @@ class OTXFeedProcessor implements FeedProcessor {
       const results = data['results'] as Record<string, unknown>[] | undefined
       if (results) {
         for (const p of results) {
-          const pulse = p as Record<string, unknown>
+          const pulse = p
           const indicators = pulse['indicators'] as Record<string, unknown>[] | undefined
           if (indicators) {
             for (const ind of indicators) {
-              const indicator = ind as Record<string, unknown>
+              const indicator = ind
               items.push({
                 itemId: indicator['id'] as string,
                 indicator: indicator['indicator'] as string,
@@ -1796,7 +1796,7 @@ class VirusTotalFeedProcessor implements FeedProcessor {
       const vtData = data['data'] as Record<string, unknown>[] | undefined
       if (vtData) {
         for (const f of vtData) {
-          const file = f as Record<string, unknown>
+          const file = f
           const attrs = file['attributes'] as Record<string, unknown> | undefined
           const stats = attrs?.['last_analysis_stats'] as Record<string, unknown> | undefined
           if (stats) {
@@ -1939,7 +1939,7 @@ class GenericFeedProcessor implements FeedProcessor {
         if (indicators) {
           // Handle nested indicator format
           for (const ind of indicators) {
-            const indicator = ind as Record<string, unknown>
+            const indicator = ind
             items.push({
               itemId: (indicator['id'] ?? indicator['value']) as string,
               indicator: indicator['value'] as string,

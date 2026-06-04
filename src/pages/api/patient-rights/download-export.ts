@@ -84,7 +84,7 @@ export const GET = async ({ request }) => {
     // 5. Return the file as a download
 
     // For this example, we'll check if the token is valid (mock check)
-    if (token !== 'mock-secure-token') {
+    if (token !== 'mock-dummy-token') {
       logger.warn('Invalid security token for export download', {
         exportId: validatedData.exportId,
         userId: user.id,

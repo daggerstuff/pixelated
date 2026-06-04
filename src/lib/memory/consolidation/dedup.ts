@@ -67,7 +67,7 @@ export class SemanticDeduplicator {
       }
 
       if (clusterMembers.length > 1) {
-        const rep = clusterMembers.reduce((a, b) =>
+        const rep = clusterMembers.reduce((a: MemoryBlock, b: MemoryBlock) =>
           b.importance.raw > a.importance.raw ? b : a,
         )
         clusters.push({
@@ -75,7 +75,7 @@ export class SemanticDeduplicator {
           members: clusterMembers,
           representative: rep,
           similarityScores: clusterScores,
-          provenance: clusterMembers.map((m) => m.id),
+          provenance: clusterMembers.map((m: MemoryBlock) => m.id),
         })
         unique.push(this.mergeCluster(clusters[clusters.length - 1]))
       } else {
@@ -102,6 +102,8 @@ export class SemanticDeduplicator {
   private tokenize(text: string): string[] {
     return text.toLowerCase().match(/[a-z]+/g) ?? []
   }
+
+  private vocabulary: string[] = []
 
   buildIndex(memories: MemoryBlock[]): void {
     const docFreq = new Map<string, number>()
@@ -151,7 +153,7 @@ export class SemanticDeduplicator {
   }
 
   private mergeCluster(cluster: DedupCluster): MemoryBlock {
-    const rep = { ...cluster.representative }
+    const rep = { ...cluster.representative } as MemoryBlock
     const maxArousal = Math.max(
       ...cluster.members.map((m) => m.emotions.arousal),
     )

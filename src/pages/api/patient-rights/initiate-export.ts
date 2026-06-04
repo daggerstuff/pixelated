@@ -46,15 +46,17 @@ export const POST = async ({ request, cookies }) => {
       )
     }
 
+    const userRecord = user as Record<string, unknown>
+    const userPermissions = userRecord['permissions'] as string[] | undefined
     // Check permissions
     const hasPermission =
-      user.permissions?.includes('data:export:create') ??
-      user.permissions?.includes('admin:patient-rights')
+      userPermissions?.includes('data:export:create') ??
+      userPermissions?.includes('admin:patient-rights')
 
     if (!hasPermission) {
       logger.warn('Permission denied for initiating export', {
-        userId: user.id,
-        permissions: user.permissions,
+        userId: userRecord['id'],
+        permissions: userPermissions,
       })
 
       return new Response(
