@@ -27,6 +27,35 @@ if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
   fi
 fi
 
+# Defensive PATH normalization: nvm's `use` prepends its bin to PATH, but
+# user-level shell configs (e.g. `export PATH="$PNPM_HOME/bin:$PATH"` in
+# ~/.bashrc / ~/.zshrc) commonly re-prepend a global pnpm shim ahead of it.
+# That shim is a /bin/sh wrapper that `exec node`, which can resolve to a
+# system Node v20 missing `node:sqlite` — breaking pnpm >= 11.3.0 (which
+# requires Node >= 22.13). Re-pin the nvm-resolved node + pnpm to the front
+# of PATH and override PNPM_HOME for child processes so the correct toolchain
+# is always used by `pnpm` invocations in this hook and any subprocesses
+# (e.g. `pnpm exec lint-staged`, `bash scripts/devops/check-lockfiles-pre-commit.sh`).
+if [ -n "${NVM_DIR:-}" ]; then
+  _nvm_node_dir="$(nvm which current 2>/dev/null | xargs -r dirname || true)"
+  if [ -n "${_nvm_node_dir:-}" ] && [ -x "${_nvm_node_dir}/node" ]; then
+    # Drop any other pnpm-bearing bins so the nvm-resolved pnpm wins.
+    _clean_path=""
+    IFS=':' read -r -a _path_parts <<< "$PATH"
+    for _p in "${_path_parts[@]}"; do
+      case ":${_p}:" in
+        *":${PNPM_HOME:-/nonexistent}/bin:"*) continue ;;
+      esac
+      _clean_path="${_clean_path:+${_clean_path}:}${_p}"
+    done
+    export PATH="${_nvm_node_dir}:${_clean_path}"
+    # Force the global pnpm shim (if any) to resolve to the nvm node, so
+    # pnpm/PnP/lockfile scripts don't fall back to a system node.
+    export npm_config_node="${_nvm_node_dir}/node"
+    unset _nvm_node_dir _clean_path _path_parts _p
+  fi
+fi
+
 echo -e "${BLUE}🔍 [Hook] Running pre-commit checks...${NC}"
 
 # A. Secret scanning (Catch potential leaks before they leave)
@@ -51,7 +80,7 @@ next_page_token,os.environ.get,payload.get,= getString,\
 .redis.password,credentials.client_secret,subscription.apiKey,this.config.redis.password,redis://localhost:6379,mongodb://localhost:27017/threat_feeds,\
 client_secret: clientSecret,token: refreshToken,token = authHeader.substring,api_key: DeveloperApiKey,\
 password: restToken,password = fs.readFileSync,password = password,password: password,\
-token: tokenResponse.access_token,password: newPassword" \
+token: tokenResponse.access_token,password: newPassword,token: z.string,token = url.searchParams" \
   SCAN_MODE=block SCAN_SCOPE=staged bash .github/hooks/secrets-scanner/scan-secrets.sh
 
 # B. Check lockfile synchronization

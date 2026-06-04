@@ -4,9 +4,11 @@ import { existsSync } from 'fs'
 
 import { Command } from 'commander'
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 
-import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
+import process from 'process'
+
+import { validatePath, ALLOWED_DIRECTORIES } from '../utils/path-security'
 import OllamaCheckInService from '../lib/services/OllamaCheckInService'
 import TaskListManager from '../lib/services/TaskListManager'
 
@@ -304,8 +306,10 @@ alwaysApply: false
   })
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
-  logger.error('Unhandled Rejection', { promise, reason })
+process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+  const errorDetail =
+    reason instanceof Error ? reason.message : String(reason)
+  logger.error('Unhandled Rejection', { promise, reason: errorDetail })
   process.exit(1)
 })
 
