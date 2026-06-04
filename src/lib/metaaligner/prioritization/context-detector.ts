@@ -232,9 +232,9 @@ export class ContextDetector {
       if (typeof response === 'string') {
         content = response
       } else if (response && typeof response === 'object') {
-        const r = response as Record<string, unknown>
+        const r = response
         if (typeof r['content'] === 'string') {
-          content = r['content'] as string
+          content = r['content']
         } else if (
           Array.isArray(r['choices']) &&
           (r['choices'] as any)[0]?.['message']?.['content']

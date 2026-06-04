@@ -26,8 +26,9 @@ export default function convert(children) {
       )
     } else if (node.type === TEXT_NODE) {
       // 0-length text gets omitted in JSX
-      return node.value.trim() ? node.value : undefined
+      return node.value.trim() ? node.value : null
     }
+    return null
   }
 
   const root = createReactElementFromNode(doc)

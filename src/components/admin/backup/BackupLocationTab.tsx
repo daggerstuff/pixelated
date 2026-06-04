@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 // Helper function for string concatenation
-const formatStorageLocation = (type, bucket) => {
+const formatStorageLocation = (type: string, bucket: string): string => {
   switch (type) {
     case 's3':
       return `s3://${bucket}`
@@ -65,10 +65,10 @@ export default function BackupLocationTab() {
     })
   }
 
-  const handleInputChange = (e) => {
-    const { name, value, type } = e.target
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target as HTMLInputElement
     if (type === 'checkbox') {
-      const { checked } = e.target
+      const { checked } = e.target as HTMLInputElement
       setNewLocation({
         ...newLocation,
         [name]: checked,
@@ -81,7 +81,7 @@ export default function BackupLocationTab() {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsFormLoading(true)
     // Simulate API call
@@ -89,12 +89,12 @@ export default function BackupLocationTab() {
       const id = Math.random().toString(36).substring(7)
       // Handle default location changes
       setLocations((prev) => {
-        let updatedLocations = [...prev]
+        const updatedLocations = [...prev]
         if (newLocation.isDefault) {
-          updatedLocations = updatedLocations.map((loc) => ({
-            ...loc,
-            isDefault: false,
-          }))
+          for (let i = 0; i < updatedLocations.length; i++) {
+            const item = updatedLocations[i]
+            updatedLocations[i] = { ...item, isDefault: false }
+          }
         }
         const createdLocation = {
           id,
@@ -123,7 +123,7 @@ export default function BackupLocationTab() {
     }, 1000)
   }
 
-  const setDefaultLocation = (id) => {
+  const setDefaultLocation = (id: string): void => {
     setLocations((prev) =>
       prev.map((location) => ({
         ...location,
@@ -132,7 +132,7 @@ export default function BackupLocationTab() {
     )
   }
 
-  const removeLocation = (id) => {
+  const removeLocation = (id: string): void => {
     // Don't allow removing the default location
     const locationToRemove = locations.find((loc) => loc.id === id)
     if (locationToRemove?.isDefault) {
@@ -141,7 +141,7 @@ export default function BackupLocationTab() {
     setLocations((prev) => prev.filter((location) => location.id !== id))
   }
 
-  const testConnection = (id) => {
+  const testConnection = (id: string): void => {
     setLocations((prev) =>
       prev.map((location) =>
         location.id === id ? { ...location, status: 'configuring' } : location,

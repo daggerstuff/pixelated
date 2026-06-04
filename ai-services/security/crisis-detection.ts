@@ -9,7 +9,8 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('CrisisDetectionService')
+type BuildSafeLogger = ReturnType<typeof createBuildSafeLogger>
+const logger: BuildSafeLogger = createBuildSafeLogger('CrisisDetectionService')
 
 export type CrisisRiskLevel =
   | 'minimal'
@@ -113,10 +114,8 @@ export function detectCrisisSignals(text: string): CrisisAnalysisResult {
   }
 
   if (actionRequired) {
-    logger.warn('Crisis signal detected', {
-      riskLevel,
-      signalCount: signals.length,
-    })
+    const signalCount = signals.length
+    logger.warn(`Crisis signal detected - risk: ${riskLevel}, signals: ${String(signalCount)}`)
   }
 
   return result

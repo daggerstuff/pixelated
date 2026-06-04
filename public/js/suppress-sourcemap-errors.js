@@ -5,8 +5,8 @@ window.addEventListener(
     if (event?.filename?.includes('.map')) {
       // Suppress source map loading errors
       event.preventDefault()
-      return false
     }
+    return false
   },
   true,
 )

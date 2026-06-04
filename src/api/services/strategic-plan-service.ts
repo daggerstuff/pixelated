@@ -137,7 +137,7 @@ export async function updateStrategicPlan(
 
   Object.keys(updates).forEach((key) => {
     if (key !== '_id' && key !== 'owner' && key !== 'createdAt') {
-      ;(plan)[key] = updates[key]
+      ;(plan)[key] = (updates as Record<string, unknown>)[key]
     }
   })
 
@@ -265,7 +265,7 @@ export async function listStrategicPlans(
   }
 
   if (options.status) {
-    query.status = options.status
+    query['status'] = options.status
   }
 
   const plans = await StrategicPlanModel.find(query)

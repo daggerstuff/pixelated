@@ -368,11 +368,11 @@ export async function listSalesOpportunities(
   }
 
   if (options.stage) {
-    query.stage = options.stage
+    query['stage'] = options.stage
   }
 
   if (options.status) {
-    query.status = options.status
+    query['status'] = options.status
   }
 
   const opportunities = await SalesOpportunityModel.find(query)

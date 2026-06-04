@@ -579,7 +579,7 @@ export class ExternalThreatFeedIntegrationCore
       // Apply confidence filter
       if (
         filters['minConfidence'] &&
-        (item.confidence as number) < (filters['minConfidence'] as number)
+        (item.confidence) < (filters['minConfidence'] as number)
       ) {
         return false
       }
@@ -631,7 +631,7 @@ export class ExternalThreatFeedIntegrationCore
 
       // Set expiration on the deduplication set (24 hours)
       if (this.redis && typeof this.redis['expire'] === 'function') {
-        await (this.redis['expire'] as Function)(cacheKey, 24 * 60 * 60)
+        await (this.redis['expire'])(cacheKey, 24 * 60 * 60)
       }
 
       return deduplicatedItems

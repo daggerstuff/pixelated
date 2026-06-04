@@ -195,7 +195,7 @@ export function createSecureToken(
   // Use Base64 encoding for the payload
   const encodedData =
     typeof window === 'undefined'
-      ? Buffer.from(dataString).toString('base64')
+      ? Buffer.from(dataString, 'utf-8').toString('base64')
       : btoa(dataString)
 
   const signature = createSignature(encodedData)
@@ -219,7 +219,7 @@ export function verifySecureToken(token: string): unknown | null {
     // Decode and parse the data
     const dataString =
       typeof window === 'undefined'
-        ? Buffer.from(encodedData, 'base64').toString('utf8')
+        ? Buffer.from(encodedData, 'base64').toString('utf-8')
         : atob(encodedData)
 
     const payload = JSON.parse(dataString)

@@ -114,8 +114,8 @@ export class RateLimitAnalyticsService {
         await this.checkAlertConditions(rule, identifier, eventType, metadata)
       }
     } catch (error: unknown) {
-      logger.error('Failed to record rate limit event:', {
-        error,
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to record rate limit event: ${errorMessage}`, {
         eventType,
         rule: rule.name,
         identifier,
@@ -166,7 +166,8 @@ export class RateLimitAnalyticsService {
         }
       }
     } catch (error: unknown) {
-      logger.error('Failed to get analytics:', { error, ruleName, days })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to get analytics: ${errorMessage}`, { ruleName, days })
     }
 
     return analytics
@@ -281,7 +282,8 @@ export class RateLimitAnalyticsService {
           .map(([identifier, requests]) => ({ identifier, requests })),
       }
     } catch (error: unknown) {
-      logger.error('Failed to get real-time metrics:', { error })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to get real-time metrics: ${errorMessage}`)
       return {
         totalRequests: 0,
         blockedRequests: 0,
@@ -379,25 +381,26 @@ export class RateLimitAnalyticsService {
             for (const handler of monitor.handlers) {
               try {
                 await handler(alert)
-              } catch (handlerError) {
-                logger.error('Monitor handler failed:', {
-                  error: handlerError,
+              } catch (handlerError: unknown) {
+                const errorMessage = handlerError instanceof Error ? handlerError.message : String(handlerError)
+                logger.error(`Monitor handler failed: ${errorMessage}`, {
                   monitor: monitor.name,
                 })
               }
             }
           }
-        } catch (monitorError) {
-          logger.error('Monitor check failed:', {
-            error: monitorError,
+        } catch (monitorError: unknown) {
+          const errorMessage = monitorError instanceof Error ? monitorError.message : String(monitorError)
+          logger.error(`Monitor check failed: ${errorMessage}`, {
             monitor: monitor.name,
           })
         }
       }
 
-      logger.warn('Rate limit alert triggered:', alert)
+      logger.warn(`Rate limit alert triggered: ${alert.type} - ${alert.message}`)
     } catch (error: unknown) {
-      logger.error('Failed to trigger alert:', { error, alert })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to trigger alert: ${errorMessage}`, { alertType: alert.type })
     }
   }
 
@@ -486,18 +489,17 @@ export class RateLimitAnalyticsService {
             if (this.isRateLimitAlert(parsed)) {
               alerts.push(parsed)
             }
-          } catch (parseError) {
-            logger.error('Failed to parse alert data:', {
-              error: parseError,
-              key,
-            })
+          } catch (parseError: unknown) {
+            const errorMessage = parseError instanceof Error ? parseError.message : String(parseError)
+            logger.error(`Failed to parse alert data: ${errorMessage}`, { key })
           }
         }
       }
 
       return alerts
     } catch (error: unknown) {
-      logger.error('Failed to get recent alerts:', { error })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to get recent alerts: ${errorMessage}`)
       return []
     }
   }
@@ -624,7 +626,8 @@ export class RateLimitAnalyticsService {
           })
         }
       } catch (error: unknown) {
-        logger.error('Monitoring check failed:', { error })
+        const errorMessage = error instanceof Error ? error.message : String(error)
+        logger.error(`Monitoring check failed: ${errorMessage}`)
       }
     }, 30000) // 30 seconds
 
@@ -658,7 +661,8 @@ export class RateLimitAnalyticsService {
         })
       }
     } catch (error: unknown) {
-      logger.error('Failed to cleanup analytics data:', { error })
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      logger.error(`Failed to cleanup analytics data: ${errorMessage}`)
     }
   }
 }
