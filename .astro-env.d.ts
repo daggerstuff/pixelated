@@ -1,6 +1,66 @@
 /// <reference types="astro/client" />
+/// <reference types="vitest/globals" />
 
 import './src/env.d.ts'
+
+// Override Vite's ImportMetaEnv to avoid index signature issues
+// Vite's types use Record<ImportMetaEnvFallbackKey, any> which creates an index signature
+// that causes TS4111 errors when using dot notation on explicitly declared properties
+declare module 'vite/client' {
+  interface ImportMetaEnv {
+    // Auth0
+    readonly PUBLIC_AUTH0_DOMAIN?: string
+    readonly PUBLIC_AUTH0_CLIENT_ID?: string
+    readonly PUBLIC_AUTH0_AUDIENCE?: string
+    readonly AUTH0_DOMAIN?: string
+    readonly AUTH0_CLIENT_ID?: string
+    readonly AUTH0_CLIENT_SECRET?: string
+    readonly AUTH0_AUDIENCE?: string
+    readonly VITE_AUTH0_DOMAIN?: string
+    readonly VITE_AUTH0_CLIENT_ID?: string
+    readonly VITE_AUTH0_AUDIENCE?: string
+    // API URLs
+    readonly API_BASE_URL?: string
+    readonly PUBLIC_JOURNAL_RESEARCH_API_URL?: string
+    readonly PUBLIC_ANALYTICS_ENDPOINT?: string
+    readonly PUBLIC_ACADEMIC_API_URL?: string
+    readonly PUBLIC_THERAPEUTIC_API_URL?: string
+    readonly PUBLIC_TRAINING_WS_URL?: string
+    readonly PUBLIC_RYBBIT_SCRIPT_URL?: string
+    readonly PUBLIC_RYBBIT_SITE_ID?: string
+    readonly PUBLIC_ANALYTICS_API_KEY?: string
+    readonly EMBEDDING_AGENT_URL?: string
+    readonly CORS_ORIGIN?: string
+    // Database & Auth
+    readonly MONGODB_URI?: string
+    readonly JWT_SECRET?: string
+    readonly JWT_AUDIENCE?: string
+    readonly JWT_ISSUER?: string
+    // Tracing
+    readonly TRACING_SERVICE_NAME?: string
+    readonly TRACING_SERVICE_VERSION?: string
+    readonly TRACING_EXPORTER_ENDPOINT?: string
+    readonly TRACING_SAMPLING_RATIO?: string
+    readonly TRACING_EXPORTER_HEADERS?: string
+    // Monitoring
+    readonly GRAFANA_URL?: string
+    readonly GRAFANA_API_KEY?: string
+    readonly GRAFANA_ORG_ID?: string
+    readonly SLACK_WEBHOOK?: string
+    readonly MONITORING_EMAIL_RECIPIENTS?: string
+    readonly APP_VERSION?: string
+    // Vite built-ins
+    readonly PROD: boolean
+    readonly DEV: boolean
+    readonly MODE: string
+    readonly SSR: boolean
+    readonly BASE_URL: string
+  }
+
+  interface ImportMeta {
+    readonly env: ImportMetaEnv
+  }
+}
 
 declare module 'astro-icon/components' {
   interface IconProps {

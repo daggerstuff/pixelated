@@ -233,18 +233,20 @@ export function calculateDemographicRepresentation(
   }
   for (const s of sessions) {
     const d = s.participantDemographics
-    add('age', d.age)
-    add('gender', d.gender)
-    add('ethnicity', d.ethnicity)
-    add('language', d.primaryLanguage)
-    if (d.socioeconomicStatus) {
-      add('socioeconomic', d.socioeconomicStatus)
-    }
-    if (d.education) {
-      add('education', d.education)
-    }
-    if (d.region) {
-      add('region', d.region)
+    if (d) {
+      add('age', d['age'])
+      add('gender', d['gender'])
+      add('ethnicity', d['ethnicity'])
+      add('language', d['primaryLanguage'])
+      if (d['socioeconomicStatus']) {
+        add('socioeconomic', d['socioeconomicStatus'])
+      }
+      if (d['education']) {
+        add('education', d['education'])
+      }
+      if (d['region']) {
+        add('region', d['region'])
+      }
     }
   }
   // Convert to proportions

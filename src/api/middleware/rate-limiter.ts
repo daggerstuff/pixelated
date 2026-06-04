@@ -28,12 +28,6 @@ interface RateLimitStore {
 const store: RateLimitStore = {}
 let redisAvailable = true
 
-type RedisTransaction = {
-  incr: (key: string) => void
-  expire: (key: string, seconds: number) => void
-  exec: () => Promise<unknown[] | null>
-}
-
 const tooManyRequestsPayload = {
   error: 'Too Many Requests',
   message: 'Rate limit exceeded. Please try again later.',
@@ -84,54 +78,20 @@ const getClientIp = (req: RateLimiterRequest): string => {
 export async function incrementRedisCounter(
   key: string,
   windowSeconds: number,
-) {
+): Promise<number> {
   try {
     const redis = getRedisClient()
-    const tx = redis.multi()
-    if (tx && typeof (tx as Promise<unknown>).then === 'function') {
-      const txResults = tx
-      if (
-        Array.isArray(txResults) &&
-        txResults.length > 0 &&
-        Array.isArray(txResults[0]) &&
-        txResults[0]?.length >= 2
-      ) {
-        return parseCount(txResults[0][1])
-      }
+
+    // Use Redis incr directly
+    if (typeof redis['incr'] !== 'function') {
+      return 0
     }
 
-    const hasTransactionMethods =
-      tx &&
-      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).incr ===
-        'function' &&
-      typeof (tx as { incr: unknown; expire: unknown; exec: unknown })
-        .expire === 'function' &&
-      typeof (tx as { incr: unknown; expire: unknown; exec: unknown }).exec ===
-        'function'
-
-    if (hasTransactionMethods) {
-      const redisTx = tx as any
-      redisTx.incr(key)
-      redisTx.expire(key, windowSeconds)
-      const txResults = await redisTx.exec()
-      if (
-        !Array.isArray(txResults) ||
-        txResults.length === 0 ||
-        !Array.isArray(txResults[0])
-      ) {
-        return 0
-      }
-      return parseCount(txResults[0][1])
-    } else {
-      if (typeof redis['incr'] !== 'function') {
-        return 0
-      }
-      const rawCount = await redis['incr'](key)
-      if (typeof redis['expire'] === 'function') {
-        await redis['expire'](key, windowSeconds)
-      }
-      return parseCount(rawCount)
+    const rawCount = await redis['incr'](key)
+    if (typeof redis['expire'] === 'function') {
+      await redis['expire'](key, windowSeconds)
     }
+    return parseCount(rawCount)
   } catch (error: unknown) {
     console.error('Rate limiter Redis error:', error)
     redisAvailable = false

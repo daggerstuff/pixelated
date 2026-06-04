@@ -1,7 +1,5 @@
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-const logger = createBuildSafeLogger('analyze-performance')
-
 // Note: PerformanceLogger import removed - may need to be replaced with alternative implementation
 
 // ... rest of the script ...
@@ -84,7 +82,7 @@ async function generateReport(days = 7): Promise<PerformanceReport> {
 
 async function main() {
   try {
-    logger.info('Generating performance report...')
+    console.info('Generating performance report...')
     const report = await generateReport()
 
     console.log('\nPerformance Report')
@@ -113,16 +111,18 @@ async function main() {
 
     // TODO: Replace with proper cleanup implementation
     // await PerformanceLogger.getInstance().cleanup()
-    logger.info('Performance report generation completed')
+    console.info('Performance report generation completed')
   } catch (error: unknown) {
-    logger.error('Failed to generate performance report:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Failed to generate performance report:', errorMessage)
     process.exit(1)
   }
 }
 
 if (require.main === module) {
-  main().catch((error) => {
-    logger.error('Script failed:', error)
+  main().catch((error: unknown) => {
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Script failed:', errorMessage)
     process.exit(1)
   })
 }
