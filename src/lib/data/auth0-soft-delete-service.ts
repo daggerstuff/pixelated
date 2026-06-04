@@ -7,10 +7,7 @@ import { ManagementClient } from 'auth0'
 import { Db, ObjectId } from 'mongodb'
 
 import { mongodb } from '../../config/mongodb.config'
-import {
-  updatePhase6AuthenticationProgress,
-  type AuthenticationEvent,
-} from '../mcp/phase6-integration'
+import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 
 // Auth0 Configuration
@@ -134,9 +131,8 @@ export class Auth0SoftDeleteService {
       }
 
       // Get user information before deletion
-      const user = (await (
-        auth0Management as unknown as Record<string, Function>
-      )['getUser']({ id: deleteRequest.userId })) as Record<string, unknown>
+      const userResponse = (await auth0Management.users.get({ id: deleteRequest.userId })).data
+      const user = userResponse as Record<string, unknown>
       if (!user) {
         throw new Error('User not found')
       }
@@ -193,21 +189,17 @@ export class Auth0SoftDeleteService {
 
       // Update user in Auth0 to mark as deleted
       // We don't actually delete the user from Auth0, but mark them as inactive
-      await (auth0Management as unknown as Record<string, Function>)[
-        'updateUser'
-      ](
-        { id: deleteRequest.userId },
-        {
-          blocked: true,
-          app_metadata: {
-            ...((user['app_metadata'] as Record<string, unknown>) ?? {}),
-            deleted: true,
-            deleted_at: now.toISOString(),
-            deleted_by: deleteRequest.deletedBy,
-            deletion_reason: deleteRequest.reason,
-          },
+      const existingAppMeta = (user['app_metadata'] as Record<string, unknown>) ?? {}
+      await auth0Management.users.update(deleteRequest.userId, {
+        blocked: true,
+        app_metadata: {
+          ...existingAppMeta,
+          deleted: true,
+          deleted_at: now.toISOString(),
+          deleted_by: deleteRequest.deletedBy,
+          deletion_reason: deleteRequest.reason,
         },
-      )
+      })
 
       // Log soft delete event
       logSecurityEvent(
@@ -225,7 +217,7 @@ export class Auth0SoftDeleteService {
       // Update Phase 6 MCP server with soft delete progress
       await updatePhase6AuthenticationProgress(
         deleteRequest.userId,
-        'user_soft_deleted' as AuthenticationEvent,
+        'user_soft_deleted',
       )
 
       return true
@@ -275,21 +267,17 @@ export class Auth0SoftDeleteService {
       }
 
       // Restore user in Auth0
-      await (auth0Management as unknown as Record<string, Function>)[
-        'updateUser'
-      ](
-        { id: userId },
-        {
-          blocked: false,
-          app_metadata: {
-            ...(deletedUserRecord.userData.app_metadata ?? {}),
-            deleted: undefined,
-            deleted_at: undefined,
-            deleted_by: undefined,
-            deletion_reason: undefined,
-          },
+      const deletedAppMeta = (deletedUserRecord.userData?.app_metadata as Record<string, unknown>) ?? {}
+      await auth0Management.users.update(userId, {
+        blocked: false,
+        app_metadata: {
+          ...deletedAppMeta,
+          deleted: undefined,
+          deleted_at: undefined,
+          deleted_by: undefined,
+          deletion_reason: undefined,
         },
-      )
+      })
 
       // Remove deleted user record
       await collection.deleteOne({ auth0UserId: userId })
@@ -301,10 +289,7 @@ export class Auth0SoftDeleteService {
       })
 
       // Update Phase 6 MCP server with restore progress
-      await updatePhase6AuthenticationProgress(
-        userId,
-        'user_restored' as AuthenticationEvent,
-      )
+      await updatePhase6AuthenticationProgress(userId, 'user_restored')
 
       return true
     } catch (error: unknown) {
@@ -450,9 +435,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Completely delete user from Auth0
-      await (auth0Management as unknown as Record<string, Function>)[
-        'deleteUser'
-      ]({ id: userId })
+      await auth0Management.users.delete({ id: userId })
 
       // Log user purge event
       logSecurityEvent(SecurityEventType.USER_PURGED, userId, {
@@ -462,10 +445,7 @@ export class Auth0SoftDeleteService {
       })
 
       // Update Phase 6 MCP server with purge progress
-      await updatePhase6AuthenticationProgress(
-        userId,
-        'user_purged' as AuthenticationEvent,
-      )
+      await updatePhase6AuthenticationProgress(userId, 'user_purged')
 
       return true
     } catch (error: unknown) {
@@ -519,7 +499,7 @@ export class Auth0SoftDeleteService {
       // Update Phase 6 MCP server with notification progress
       await updatePhase6AuthenticationProgress(
         userRecord.auth0UserId,
-        'user_purge_notification_sent' as AuthenticationEvent,
+        'user_purge_notification_sent',
       )
     } catch (error: unknown) {
       console.error('Failed to notify user before purge:', error)
@@ -638,7 +618,7 @@ export class Auth0SoftDeleteService {
       // Update Phase 6 MCP server with retention extension progress
       await updatePhase6AuthenticationProgress(
         userId,
-        `user_retention_extended_${additionalDays}_days` as AuthenticationEvent,
+        `user_retention_extended_${additionalDays}_days`,
       )
 
       return true

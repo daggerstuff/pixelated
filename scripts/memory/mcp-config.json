@@ -1,0 +1,14 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "foresight": {
+      "type": "local",
+      "command": ["/home/vivi/pixelated/scripts/memory/foresight-mcp-server.sh"],
+      "enabled": true,
+      "environment": {
+        "FORESIGHT_DB_PATH": "/home/vivi/pixelated/.foresight/memory.db",
+        "FORESIGHT_USER_ID": "vivi"
+      }
+    }
+  }
+}
