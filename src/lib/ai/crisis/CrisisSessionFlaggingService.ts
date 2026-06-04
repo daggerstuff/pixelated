@@ -395,6 +395,93 @@ export class CrisisSessionFlaggingService {
     }
   }
 
+  /**
+   * Get all pending crisis flags (for admin/therapist review)
+   */
+  async getPendingCrisisFlags(): Promise<CrisisSessionFlag[]> {
+    try {
+      const db = await mongodb.connect()
+
+      const flags = await db
+        .collection('crisis_session_flags')
+        .find({ status: 'pending' })
+        .sort({ flagged_at: -1 })
+        .toArray()
+
+      return flags.map((flag) => this.mapFlagFromDb(flag as CrisisSessionFlagDbData))
+    } catch (error: unknown) {
+      logger.error('Error getting pending crisis flags', {
+        error: error instanceof Error ? String(error) : String(error),
+      })
+      throw error
+    }
+  }
+
+  /**
+   * Get user session status summary
+   */
+  async getUserSessionStatus(userId: string): Promise<UserSessionStatus> {
+    try {
+      const db = await mongodb.connect()
+
+      if (typeof userId !== 'string' || !/^[a-zA-Z0-9-_]+$/.test(userId)) {
+        throw new Error('Invalid userId provided.')
+      }
+
+      const allFlags = await db
+        .collection('crisis_session_flags')
+        .find({ user_id: userId })
+        .toArray()
+
+      const activeFlags = allFlags.filter(
+        (f) => !['resolved', 'dismissed'].includes(f['status']),
+      )
+      const resolvedFlags = allFlags.filter(
+        (f) => f['status'] === 'resolved' || f['status'] === 'dismissed',
+      )
+
+      const riskLevels = ['low', 'medium', 'high', 'critical'] as const
+      const currentRiskLevel =
+        activeFlags.length > 0
+          ? activeFlags.reduce((highest, f) => {
+              const idx = riskLevels.indexOf(f['severity'])
+              const highestIdx = riskLevels.indexOf(highest)
+              return idx > highestIdx ? f['severity'] : highest
+            }, 'low' as (typeof riskLevels)[number])
+          : 'low'
+
+      const lastCrisisEvent =
+        allFlags.length > 0
+          ? allFlags.reduce((latest, f) => {
+              const flaggedAt = f['flagged_at']
+              return flaggedAt > latest ? flaggedAt : latest
+            }, '')
+          : undefined
+
+      const now = new Date().toISOString()
+
+      return {
+        id: userId,
+        userId,
+        isFlaggedForReview: activeFlags.length > 0,
+        currentRiskLevel,
+        lastCrisisEventAt: lastCrisisEvent,
+        totalCrisisFlags: allFlags.length,
+        activeCrisisFlags: activeFlags.length,
+        resolvedCrisisFlags: resolvedFlags.length,
+        metadata: {},
+        createdAt: now,
+        updatedAt: now,
+      }
+    } catch (error: unknown) {
+      logger.error('Error getting user session status', {
+        error: error instanceof Error ? String(error) : String(error),
+        userId,
+      })
+      throw error
+    }
+  }
+
   private mapFlagFromDb(flagData: CrisisSessionFlagDbData): CrisisSessionFlag {
     return {
       id: flagData.id ?? (flagData._id ? flagData._id.toString() : ''),

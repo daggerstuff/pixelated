@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -167,7 +167,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'analytics_charts_access',
+      AuditEventType.ACCESS,
       'auth.components.analytics.charts.access',
       user.id,
       'auth-components-analytics',
@@ -198,7 +198,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.components.analytics.charts.error',
       'anonymous',
       'auth-components-analytics',
