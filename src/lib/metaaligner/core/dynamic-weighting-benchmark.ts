@@ -312,7 +312,7 @@ async function generateVisualizationData(): Promise<VisualizationData> {
         : 0
 
       weightTransitions.push({
-        fromContext: previousContext as ContextType,
+        fromContext: previousContext,
         toContext: contextType,
         weightChanges,
         smoothingEffect,

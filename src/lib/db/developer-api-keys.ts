@@ -108,16 +108,16 @@ export class DeveloperApiKeyManager {
     }
 
     if (apiKey['expires_at'] && new Date() > new Date(apiKey['expires_at'] as unknown as string)) {
-      await this.recordFailedAttempt(apiKey['id'] as string, 'expired')
+      await this.recordFailedAttempt(apiKey['id'], 'expired')
       return { valid: false, error: 'API key has expired' }
     }
 
     const rateLimitResult = await this.checkRateLimit(
-      apiKey['id'] as string,
-      apiKey['rate_limit'] as number,
+      apiKey['id'],
+      apiKey['rate_limit'],
     )
     if (!rateLimitResult.allowed) {
-      await this.recordFailedAttempt(apiKey['id'] as string, 'rate_limited')
+      await this.recordFailedAttempt(apiKey['id'], 'rate_limited')
       return {
         valid: false,
         error: 'Rate limit exceeded',
@@ -127,7 +127,7 @@ export class DeveloperApiKeyManager {
       }
     }
 
-    await this.recordSuccessfulAttempt(apiKey['id'] as string)
+    await this.recordSuccessfulAttempt(apiKey['id'])
 
     return {
       valid: true,

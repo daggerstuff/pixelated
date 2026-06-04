@@ -39,7 +39,6 @@ function initializeAuth0Management() {
     clientId: AUTH0_CONFIG.managementClientId,
     clientSecret: AUTH0_CONFIG.managementClientSecret,
     audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-    scope: 'read:users update:users delete:users',
   })
 }
 
@@ -132,7 +131,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Get user information before deletion
-      const user = await auth0Management.getUser({ id: deleteRequest.userId })
+      const user = (await auth0Management.users.get({ id: deleteRequest.userId })).data
       if (!user) {
         throw new Error('User not found')
       }
@@ -189,7 +188,7 @@ export class Auth0SoftDeleteService {
 
       // Update user in Auth0 to mark as deleted
       // We don't actually delete the user from Auth0, but mark them as inactive
-      await auth0Management.updateUser(
+      await auth0Management.users.update(
         { id: deleteRequest.userId },
         {
           blocked: true,
@@ -269,7 +268,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Restore user in Auth0
-      await auth0Management.updateUser(
+      await auth0Management.users.update(
         { id: userId },
         {
           blocked: false,
@@ -439,7 +438,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Completely delete user from Auth0
-      await auth0Management.deleteUser({ id: userId })
+      await auth0Management.users.delete({ id: userId })
 
       // Log user purge event
       logSecurityEvent(SecurityEventType.USER_PURGED, userId, {

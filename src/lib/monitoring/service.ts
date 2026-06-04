@@ -174,7 +174,7 @@ export class MonitoringService {
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize ?? 0,
       navigation: performance.getEntriesByType(
         'navigation',
-      )![0]! as PerformanceNavigationTiming,
+      )[0]! as PerformanceNavigationTiming,
       resources: performance.getEntriesByType(
         'resource',
       ) as PerformanceResourceTiming[],
