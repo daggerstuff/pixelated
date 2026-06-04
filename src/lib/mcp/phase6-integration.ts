@@ -25,6 +25,12 @@ export type AuthenticationEvent =
   | 'session_destroyed'
   | 'all_sessions_destroyed'
   | 'rate_limit_exceeded'
+  | 'user_logged_in'
+  | 'user_soft_deleted'
+  | 'user_restored'
+  | 'user_purged'
+  | 'user_purge_notification_sent'
+  | `user_retention_extended_${number}_days`
   | 'permission_denied'
   | 'account_locked'
   | '2fa_setup_initiated'

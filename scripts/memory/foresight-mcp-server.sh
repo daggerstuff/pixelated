@@ -6,10 +6,20 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 FORESIGHT_ROOT="${REPO_ROOT}/foresight-mcp"
 
 load_env() {
+  local -A _pre
+  while IFS=$'\n' read -r line; do
+    [[ -z "$line" ]] && continue
+    _pre["${line%%=*}"]="${line#*=}"
+  done < <(env | grep '^FORESIGHT_' || true)
+
   set -a
   [[ -f "${REPO_ROOT}/.env" ]] && source "${REPO_ROOT}/.env"
   [[ -f "${REPO_ROOT}/.env.local" ]] && source "${REPO_ROOT}/.env.local"
   set +a
+
+  for key in "${!_pre[@]}"; do
+    export "${key}=${_pre[$key]}"
+  done
 }
 
 find_uv() {

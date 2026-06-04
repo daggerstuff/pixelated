@@ -287,7 +287,7 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']() as Redis
+      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']()
       await subscriber.connect()
 
       // Subscribe to validation requests

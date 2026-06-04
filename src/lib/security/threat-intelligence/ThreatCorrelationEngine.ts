@@ -1101,10 +1101,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
     for (let i = 0; i < sortedThreats.length - 1; i++) {
       const sequence = [sortedThreats[i]]
-      let currentSeverity = severityOrder[sortedThreats[i]!.severity] || 0
+      let currentSeverity = severityOrder[sortedThreats[i]!.severity] ?? 0
 
       for (let j = i + 1; j < sortedThreats.length; j++) {
-        const nextSeverity = severityOrder[sortedThreats[j]!.severity] || 0
+        const nextSeverity = severityOrder[sortedThreats[j]!.severity] ?? 0
 
         if (nextSeverity > currentSeverity) {
           sequence.push(sortedThreats[j])
@@ -1403,8 +1403,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
     let totalIncrease = 0
 
     for (let i = 1; i < threats.length; i++) {
-      const prevSeverity = severityOrder[threats[i - 1]!.severity] || 0
-      const currSeverity = severityOrder[threats[i]!.severity] || 0
+      const prevSeverity = severityOrder[threats[i - 1]!.severity] ?? 0
+      const currSeverity = severityOrder[threats[i]!.severity] ?? 0
       totalIncrease += Math.max(0, currSeverity - prevSeverity)
     }
 
