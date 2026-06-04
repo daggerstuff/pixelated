@@ -703,7 +703,7 @@ class ProductionIntelligenceService extends EventEmitter {
         const indicators = (data['data'] ?? data['results'] ?? []) as Record<string, unknown>[]
         for (const indicator of indicators) {
           this.iocs.push({
-            ...indicator as Record<string, unknown>,
+            ...indicator,
             source: feed.name,
             timestamp: new Date(),
           })
@@ -823,17 +823,17 @@ export function createCompleteThreatDetectionSystem(
       // Security events → monitoring
       const orch = orchestrator as Record<string, unknown>
       if (orchestrator && typeof orch['on'] === 'function') {
-        ;(orch as Record<string, unknown>)['on']('security:event', (event: Record<string, unknown>) => {
+        ;(orch)['on']('security:event', (event: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: (event['type'] as string) ?? 'security_event',
-            value: (event['success'] as boolean) === false ? 1 : 0,
+            value: ! (event['success'] as boolean) ? 1 : 0,
             timestamp: new Date((event['timestamp'] as number) ?? Date.now()),
             tags: { userId: (event['userId'] as string) ?? '', ip: (event['ip'] as string) ?? '' },
           })
         })
 
         // Threat detected → hunting
-        ;(orch as Record<string, unknown>)['on']('threat:detected', async (threat: Record<string, unknown>) => {
+        ;(orch)['on']('threat:detected', async (threat: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: 'threats_detected',
             value: 1,
@@ -857,14 +857,14 @@ export function createCompleteThreatDetectionSystem(
 
       // Service audit logs → orchestrator
       monitoringService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
-          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
+        if (orchestrator && typeof (orch)['emit'] === 'function') {
+          ;(orch)['emit']('audit:log', log)
         }
       })
 
       huntingService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
-          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
+        if (orchestrator && typeof (orch)['emit'] === 'function') {
+          ;(orch)['emit']('audit:log', log)
         }
       })
     },
@@ -917,10 +917,10 @@ export function createCompleteThreatDetectionSystem(
         intelligenceService.getHealthStatus(),
       ])
 
-      const th = threatHealth as Record<string, unknown>
-      const mh = monitoringHealth as Record<string, unknown>
-      const hh = huntingHealth as Record<string, unknown>
-      const ih = intelligenceHealth as Record<string, unknown>
+      const th = threatHealth
+      const mh = monitoringHealth
+      const hh = huntingHealth
+      const ih = intelligenceHealth
 
       return {
         healthy:
@@ -953,10 +953,10 @@ export function createCompleteThreatDetectionSystem(
           intelligenceService.getStatistics(),
         ])
 
-      const ts = threatStats as Record<string, unknown>
-      const ms = monitoringStats as Record<string, unknown>
-      const hs = huntingStats as Record<string, unknown>
-      const isc = intelligenceStats as Record<string, unknown>
+      const ts = threatStats
+      const ms = monitoringStats
+      const hs = huntingStats
+      const isc = intelligenceStats
 
       return {
         threats: {
