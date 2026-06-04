@@ -152,7 +152,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
         ? plan.updatedAt.toISOString()
         : new Date().toISOString(),
     duration: plan.duration ?? 0,
-    status: plan.status as TreatmentPlanEnhanced['status'],
+    status: plan.status,
     goals: (plan.goals as TreatmentPlanEnhanced['goals']) ?? [],
     notes: plan.notes ?? '',
     metadata: plan.metadata as TreatmentPlanEnhanced['metadata'] | undefined,

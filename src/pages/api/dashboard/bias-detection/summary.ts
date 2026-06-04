@@ -61,31 +61,31 @@ export const GET: APIRoute = async () => {
 
     const uptimeResult = await query(uptimeQuery)
 
-    const metrics = metricsResult.rows[0] ?? {}
-    const uptime = uptimeResult.rows[0]?.uptime_hours ?? 0
+    const metrics = metricsResult.rows[0] as Record<string, unknown> | undefined ?? {}
+    const uptime = (uptimeResult.rows[0] as Record<string, unknown> | undefined)?.uptime_hours ?? 0
 
     // Format response
     const response = {
       metrics: {
-        'total-sessions': metrics.total_sessions ?? 0,
+        'total-sessions': metrics['total_sessions'] ?? 0,
         'avg-bias-score':
-          ((metrics.avg_bias_score ?? 0) * 100).toFixed(1) + '%',
-        'active-alerts': metrics.active_alerts ?? 0,
+          ((metrics['avg_bias_score'] ?? 0) * 100).toFixed(1) + '%',
+        'active-alerts': metrics['active_alerts'] ?? 0,
         'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },
-      recentAnalyses: recentAnalysesResult.rows.map((row) => ({
-        sessionId: row.session_id,
-        biasScore: parseFloat(row.bias_score ?? '0'),
-        alertLevel: row.alert_level,
-        timestamp: row.created_at,
-        sessionType: row.session_type ?? 'Unknown',
+      recentAnalyses: recentAnalysesResult.rows.map((row: Record<string, unknown>) => ({
+        sessionId: row['session_id'],
+        biasScore: parseFloat((row['bias_score'] as string) ?? '0'),
+        alertLevel: row['alert_level'],
+        timestamp: row['created_at'],
+        sessionType: (row['session_type'] as string) ?? 'Unknown',
       })),
-      activeAlerts: alertsResult.rows.map((row) => ({
-        id: row.id,
-        title: row.title,
-        description: row.description,
-        severity: row.severity,
-        timestamp: row.created_at,
+      activeAlerts: alertsResult.rows.map((row: Record<string, unknown>) => ({
+        id: row['id'],
+        title: row['title'],
+        description: row['description'],
+        severity: row['severity'],
+        timestamp: row['created_at'],
       })),
       timestamp: new Date().toISOString(),
     }
@@ -94,7 +94,7 @@ export const GET: APIRoute = async () => {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Dashboard summary API error:', error)
     return new Response(
       JSON.stringify({

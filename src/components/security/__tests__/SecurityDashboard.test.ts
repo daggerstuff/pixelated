@@ -1,11 +1,12 @@
 // Vitest is imported via globals
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { screen, fireEvent, waitFor } from '@testing-library/dom'
 
 import { renderAstro } from '@/test/utils/astro'
 
 // Mock data for testing
 
-function SecurityDashboard() {
+function SecurityDashboard(): { html: string } {
   return {
     html: `
       <div>
