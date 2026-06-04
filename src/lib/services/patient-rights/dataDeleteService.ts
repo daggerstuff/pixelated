@@ -65,7 +65,7 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     await collection.insertOne(deletionRequest)
 
@@ -86,7 +86,7 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const request = await collection.findOne({ id })
 
@@ -124,7 +124,7 @@ export async function getAllDataDeletionRequests(filters?: {
   }
 
   try {
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const requests = await collection.find(query).toArray()
 
@@ -156,7 +156,7 @@ export async function updateDataDeletionRequest(
       updateData.dateProcessed = new Date().toISOString()
     }
 
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
 
     // Update the request in the database
@@ -175,8 +175,23 @@ export async function updateDataDeletionRequest(
 
     // Log the action for audit purposes
     void auditLogger.logAction(
-      { userId: params.processedBy, role: 'system' as const },
-      'update_deletion_request',
+      {
+        userId: params.processedBy,
+        email: 'system@pixelated-empathy.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 100,
+        },
+        permissions: [],
+      },
+      {
+        type: 'update_deletion_request',
+        category: 'patient_data_deletion',
+        description: 'Update data deletion request status',
+        sensitivityLevel: 'high',
+      },
       'patient_data',
       {
         requestId: params.id,
@@ -242,8 +257,23 @@ async function executeDataDeletion(
 
     // Log the deletion action for audit purposes
     void auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'execute_data_deletion',
+      {
+        userId: processedBy,
+        email: 'system@pixelated-empathy.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 100,
+        },
+        permissions: [],
+      },
+      {
+        type: 'execute_data_deletion',
+        category: 'patient_data_deletion',
+        description: 'Execute patient data deletion',
+        sensitivityLevel: 'critical',
+      },
       'patient_data',
       {
         requestId: request.id,
@@ -265,8 +295,23 @@ async function executeDataDeletion(
 
     // Log the failure for audit purposes
     void auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'data_deletion_error',
+      {
+        userId: processedBy,
+        email: 'system@pixelated-empathy.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 100,
+        },
+        permissions: [],
+      },
+      {
+        type: 'data_deletion_error',
+        category: 'patient_data_deletion',
+        description: 'Error executing data deletion request',
+        sensitivityLevel: 'critical',
+      },
       'patient_data',
       {
         requestId: request.id,
@@ -298,7 +343,7 @@ async function deleteAllPatientData(patientId: string): Promise<void> {
     'media_files',
   ]
 
-  const db = mongoClient.getDb()
+  const db = mongoClient.db
   const { client } = db
   const session = client.startSession()
 
@@ -343,7 +388,7 @@ async function deleteSpecificPatientData(
       continue
     }
 
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
 
     // Delete from each table for this category
     for (const table of tables) {
