@@ -287,35 +287,40 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']()
+      const subscriber = (this.redis as unknown as { duplicate?: () => Redis }).duplicate?.()
+      if (!subscriber) {
+        logger.warn('Redis duplicate() not available, skipping pub/sub setup')
+        return
+      }
       await subscriber.connect()
 
-      // Subscribe to validation requests
-      await subscriber.subscribe('validation:request', async (message: string) => {
-        try {
-          const validationData = JSON.parse(message)
-          await this.requestValidation(
-            validationData.threat_data,
-            validationData.validation_types,
-          )
-        } catch (error: unknown) {
-          logger.error('Failed to process validation request', {
-            error: (error as Error).message,
-          })
-        }
-      })
+      // Subscribe to channels (ioredis v5 subscribe() takes one channel at a time)
+      await subscriber.subscribe('validation:request')
+      await subscriber.subscribe('validation:completed')
 
-      // Subscribe to validation completion events
-      await subscriber.subscribe('validation:completed', async (message: string) => {
-        try {
-          const completionData = JSON.parse(message)
-          await this.handleValidationCompletion(completionData)
-        } catch (error: unknown) {
-          logger.error('Failed to process validation completion', {
-            error: (error as Error).message,
-          })
-        }
-      })
+      // Handle incoming messages via event listener
+      // ioredis v5 has strict typing for message event, use addListener with cast
+      const messageHandler = (channel: string, message: string): void => {
+        void (async () => {
+          try {
+            if (channel === 'validation:request') {
+              const validationData = JSON.parse(message)
+              await this.requestValidation(
+                validationData.threat_data,
+                validationData.validation_types,
+              )
+            } else if (channel === 'validation:completed') {
+              const completionData = JSON.parse(message)
+              await this.handleValidationCompletion(completionData)
+            }
+          } catch (error: unknown) {
+            logger.error('Failed to process message from channel ' + channel, {
+              error: (error as Error).message,
+            })
+          }
+        })()
+      }
+      subscriber.on('message', messageHandler as unknown as Parameters<typeof subscriber.on>[1])
 
       logger.info('Redis pub/sub setup completed')
     } catch (error: unknown) {
