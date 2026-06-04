@@ -76,8 +76,8 @@ export async function createDocument(
     [
       documentId,
       1,
-      document.title,
-      JSON.stringify(document.content),
+      document['title'],
+      JSON.stringify(document['content']),
       userId,
       'Initial version',
     ],
@@ -143,24 +143,24 @@ export async function updateDocument(
 
   // Track changes for version history
   const changes: Record<string, unknown> = {}
-  if (updates.title && updates.title !== document.title) {
-    changes.title = { old: document.title, new: updates.title }
-    document.title = updates.title
+  if (updates.title && updates.title !== document['title']) {
+    changes['title'] = { old: document['title'], new: updates.title }
+    document['title'] = updates.title
   }
   if (updates.content) {
-    changes.content = { updated: true }
-    document.content = updates.content
+    changes['content'] = { updated: true }
+    document['content'] = updates.content
   }
-  if (updates.description && updates.description !== document.description) {
-    changes.description = {
-      old: document.description,
+  if (updates.description && updates.description !== document['description']) {
+    changes['description'] = {
+      old: document['description'],
       new: updates.description,
     }
-    document.description = updates.description
+    document['description'] = updates.description
   }
-  if (updates.status && updates.status !== document.status) {
-    changes.status = { old: document.status, new: updates.status }
-    document.status = updates.status
+  if (updates.status && updates.status !== document['status']) {
+    changes['status'] = { old: document['status'], new: updates.status }
+    document['status'] = updates.status
   }
 
   // Update version
@@ -184,8 +184,8 @@ export async function updateDocument(
     [
       documentId,
       document.version,
-      document.title,
-      JSON.stringify(document.content),
+      document['title'],
+      JSON.stringify(document['content']),
       userId,
       JSON.stringify(changes),
     ],
@@ -301,9 +301,9 @@ export async function searchDocuments(
     $text: { $search: query },
   }
 
-  if (filters?.type) searchFilter.type = filters.type
-  if (filters?.category) searchFilter.category = filters.category
-  if (filters?.status) searchFilter.status = filters.status
+  if (filters?.type) searchFilter['type'] = filters.type
+  if (filters?.category) searchFilter['category'] = filters.category
+  if (filters?.status) searchFilter['status'] = filters.status
 
   return await BusinessDocument.find(searchFilter).limit(50).lean()
 }

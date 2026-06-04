@@ -250,7 +250,17 @@ export interface TherapeuticSession {
   [key: string]: unknown
 }
 
-export type ParticipantDemographics = any
+export interface ParticipantDemographics {
+  age?: string
+  gender?: string
+  ethnicity?: string
+  primaryLanguage?: string
+  socioeconomicStatus?: string
+  education?: string
+  region?: string
+  culturalBackground?: string[]
+  disabilityStatus?: string
+}
 
 export interface TrainingScenario {
   scenarioId: string

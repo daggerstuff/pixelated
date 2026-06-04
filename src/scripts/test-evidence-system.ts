@@ -22,7 +22,8 @@ async function main() {
     console.log('✅ Caching and metrics tracking active')
     console.log('✅ LLM-enhanced evidence extraction ready')
   } catch (error: unknown) {
-    console.error('\n❌ Evidence system test failed:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('\n❌ Evidence system test failed:', errorMessage)
     process.exit(1)
   }
 }
