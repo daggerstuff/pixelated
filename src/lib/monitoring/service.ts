@@ -90,7 +90,7 @@ export class MonitoringService {
         'https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js'
       script.async = true
       script.onload = () => {
-        (window as any).faro.init({
+        ;(window as any).faro.init({
           url: this.config.grafana.url,
           apiKey,
           app: {
@@ -161,7 +161,7 @@ export class MonitoringService {
 
   private reportWebVital(metric: string, entry: PerformanceEntry): void {
     if ((window as any).faro) {
-      (window as any).faro.api.pushMeasurement(metric, {
+      ;(window as any).faro.api.pushMeasurement(metric, {
         value: entry.startTime,
         unit: 'ms',
       })
@@ -174,14 +174,14 @@ export class MonitoringService {
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize ?? 0,
       navigation: performance.getEntriesByType(
         'navigation',
-      )![0]! as PerformanceNavigationTiming,
+      )[0]! as PerformanceNavigationTiming,
       resources: performance.getEntriesByType(
         'resource',
       ) as PerformanceResourceTiming[],
     }
 
     if ((window as any).faro) {
-      (window as any).faro.api.pushMeasurement('performance', {
+      ;(window as any).faro.api.pushMeasurement('performance', {
         value: metrics,
       })
     }
@@ -265,7 +265,7 @@ export class MonitoringService {
     try {
       // Send to Grafana
       if ((window as any).faro) {
-        (window as any).faro.api.pushError(new Error(data.message), {
+        ;(window as any).faro.api.pushError(new Error(data.message), {
           type,
           level: data.level,
           context: data,

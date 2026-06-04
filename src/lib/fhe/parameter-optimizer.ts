@@ -473,7 +473,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with high security preset
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-security'] } as SealEncryptionParamsOptions
+    const baseParams = {
+      ...SEAL_PARAMETER_PRESETS['high-security'],
+    } as SealEncryptionParamsOptions
 
     // For very complex operations, increase security further
     if (complexity > 7) {
@@ -493,7 +495,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 1032193
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -505,7 +507,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with high performance preset
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-performance'] } as SealEncryptionParamsOptions
+    const baseParams = {
+      ...SEAL_PARAMETER_PRESETS['high-performance'],
+    } as SealEncryptionParamsOptions
 
     // For very complex operations, we may need to trade some performance for functionality
     if (complexity > 8) {
@@ -529,7 +533,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 65537 // Prime and power of 2 + 1
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -543,8 +547,12 @@ export class FHEParameterOptimizer {
     // Start with CKKS default or an appropriate preset
     const baseParams: SealEncryptionParamsOptions =
       scheme === SealSchemeType.CKKS
-        ? { ...SEAL_PARAMETER_PRESETS['ckks-default'] } as SealEncryptionParamsOptions
-        : { ...SEAL_PARAMETER_PRESETS[basePreset] } as SealEncryptionParamsOptions
+        ? ({
+            ...SEAL_PARAMETER_PRESETS['ckks-default'],
+          } as SealEncryptionParamsOptions)
+        : ({
+            ...SEAL_PARAMETER_PRESETS[basePreset],
+          } as SealEncryptionParamsOptions)
 
     if (scheme === SealSchemeType.CKKS) {
       // For CKKS, increase precision by using larger scale and coefficient modulus
@@ -567,7 +575,7 @@ export class FHEParameterOptimizer {
       }
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -579,7 +587,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with low-security preset which has smaller parameters
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['low-security'] } as SealEncryptionParamsOptions
+    const baseParams = {
+      ...SEAL_PARAMETER_PRESETS['low-security'],
+    } as SealEncryptionParamsOptions
 
     // For high complexity, we still need adequate parameters
     if (complexity > 8) {
@@ -599,7 +609,7 @@ export class FHEParameterOptimizer {
       baseParams.plainModulus = 40961 // Smaller plain modulus
     }
 
-    return baseParams as SealEncryptionParamsOptions
+    return baseParams
   }
 
   /**
@@ -611,7 +621,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with the default preset for the scheme
-    const baseParams = { ...SEAL_PARAMETER_PRESETS[basePreset] } as SealEncryptionParamsOptions
+    const baseParams = {
+      ...SEAL_PARAMETER_PRESETS[basePreset],
+    } as SealEncryptionParamsOptions
 
     // Adjust based on complexity
     if (complexity > 7) {
@@ -727,7 +739,9 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with base preset
-    const params = { ...SEAL_PARAMETER_PRESETS[basePreset] } as SealEncryptionParamsOptions
+    const params = {
+      ...SEAL_PARAMETER_PRESETS[basePreset],
+    } as SealEncryptionParamsOptions
 
     // Adjust polynomial modulus degree based on complexity
     if (complexity >= 9) {
@@ -779,7 +793,7 @@ export class FHEParameterOptimizer {
       params.plainModulus = 65537 // Smaller prime for simple operations
     }
 
-    return params as SealEncryptionParamsOptions
+    return params
   }
 
   /**

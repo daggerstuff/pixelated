@@ -65,7 +65,9 @@ export default function BackupLocationTab() {
     })
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value, type } = e.target as HTMLInputElement
     if (type === 'checkbox') {
       const { checked } = e.target as HTMLInputElement
@@ -93,7 +95,7 @@ export default function BackupLocationTab() {
         if (newLocation.isDefault) {
           for (let i = 0; i < updatedLocations.length; i++) {
             const item = updatedLocations[i]
-            updatedLocations[i] = { ...item, isDefault: false }
+            if (item) updatedLocations[i] = { ...item, isDefault: false }
           }
         }
         const createdLocation = {
@@ -105,10 +107,10 @@ export default function BackupLocationTab() {
           region: newLocation.region,
           credentialsValid: true,
           isDefault: newLocation.isDefault || false,
-          status: 'active',
+          status: 'active' as const,
           lastSync: new Date().toISOString(),
         }
-        return [...updatedLocations, createdLocation]
+        return [...updatedLocations, createdLocation] as typeof prev
       })
       setIsAddingLocation(false)
       setIsFormLoading(false)
@@ -247,11 +249,11 @@ export default function BackupLocationTab() {
                   <td className="text-gray-500 dark:text-gray-300 whitespace-nowrap px-6 py-4 text-sm">
                     {location.type === 'local' && location.path}
                     {location.type === 's3' &&
-                      formatStorageLocation('s3', location.bucket)}
+                      formatStorageLocation('s3', location.bucket!)}
                     {location.type === 'azure' &&
-                      formatStorageLocation('azure', location.bucket)}
+                      formatStorageLocation('azure', location.bucket!)}
                     {location.type === 'gcp' &&
-                      formatStorageLocation('gcp', location.bucket)}
+                      formatStorageLocation('gcp', location.bucket!)}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     {location.status === 'active' && (
