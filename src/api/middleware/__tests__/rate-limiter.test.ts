@@ -63,9 +63,6 @@ import {
   rateLimitByUser,
   incrementRedisCounter,
 } from '../rate-limiter'
-type RateLimiterRequest = Parameters<typeof rateLimiter>[0]
-type RateLimiterResponse = Parameters<typeof rateLimiter>[1]
-
 describe('Rate Limiter Middleware', () => {
   let mockRequest: MockRateRequest
   let mockResponse: MockResponse

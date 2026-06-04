@@ -4,9 +4,9 @@ import { existsSync } from 'fs'
 
 import { Command } from 'commander'
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 
-import { validatePath, ALLOWED_DIRECTORIES } from '../../utils/path-security'
+import { validatePath, ALLOWED_DIRECTORIES } from '../utils/path-security'
 import OllamaCheckInService from '../lib/services/OllamaCheckInService'
 import TaskListManager from '../lib/services/TaskListManager'
 
@@ -88,23 +88,30 @@ program
       )
 
       console.log('\n✅ Check-in completed!')
-      console.log(`Decision: ${result.checkInResult.decision.toUpperCase()}`)
+      const checkInResultRecord = (result as Record<string, unknown>)['checkInResult'] as Record<string, unknown> | undefined
+      console.log(`Decision: ${String(checkInResultRecord?.['decision'] ?? '').toUpperCase() || 'UNKNOWN'}`)
       console.log(
         `Should continue: ${result.shouldContinue ? '✅ YES' : '❌ NO'}`,
       )
 
-      if (result.checkInResult.improvements.length > 0) {
-        console.log('\n💡 Improvement suggestions:')
-        result.checkInResult.improvements.forEach((improvement, index) => {
-          console.log(`   ${index + 1}. ${improvement.suggestion}`)
-          console.log(`      Category: ${improvement.category}`)
-          console.log(`      Priority: ${improvement.priority}`)
-        })
-
+      const checkInResult = (result as Record<string, unknown>)['checkInResult'] as Record<string, unknown> | undefined
+      if (checkInResult) {
+        const improvements = checkInResult['improvements'] as Array<Record<string, unknown>> | undefined
+        if (improvements && improvements.length > 0) {
+          console.log('\n💡 Improvement suggestions:')
+          improvements.forEach((improvement: Record<string, unknown>, index: number) => {
+            console.log(`   ${index + 1}. ${String(improvement['suggestion'])}`)
+            console.log(`      Category: ${String(improvement['category'])}`)
+            console.log(`      Priority: ${String(improvement['priority'])}`)
+          })
+        }
         console.log('\n🤔 Reasoning:')
-        result.checkInResult.reasoningLog.forEach((reasoning, index) => {
-          console.log(`   ${index + 1}. ${reasoning}`)
-        })
+        const reasoningLog = checkInResult['reasoningLog'] as unknown[] | undefined
+        if (reasoningLog) {
+          reasoningLog.forEach((reasoning: unknown, index: number) => {
+            console.log(`   ${index + 1}. ${String(reasoning)}`)
+          })
+        }
       }
 
       console.log('\n📊 Updated task list status:')
@@ -117,9 +124,9 @@ program
         console.log(`   Next task: ${updatedSummary.nextTask.content}`)
       }
 
-      if (verbose) {
+      if (verbose && checkInResult) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.checkInResult.rawResponse)
+        console.log(String(checkInResult['rawResponse']))
       }
     } catch (error: unknown) {
       console.error(
@@ -150,28 +157,32 @@ program
       const result = await ollamaService.performCheckIn(summary)
 
       console.log('\n✅ Ollama test completed!')
-      console.log(`Decision: ${result.decision.toUpperCase()}`)
+      const resultRecord = result as Record<string, unknown>
+      console.log(`Decision: ${String(resultRecord['decision']).toUpperCase()}`)
       console.log(
-        `Should continue: ${result.shouldContinue ? '✅ YES' : '❌ NO'}`,
+        `Should continue: ${resultRecord['shouldContinue'] ? '✅ YES' : '❌ NO'}`,
       )
 
-      if (result.improvements.length > 0) {
+      const improvements = resultRecord['improvements'] as Array<Record<string, unknown>> | undefined
+      if (improvements && improvements.length > 0) {
         console.log('\n💡 Improvement suggestions:')
-        result.improvements.forEach((improvement, index) => {
-          console.log(`   ${index + 1}. ${improvement.suggestion}`)
-          console.log(`      Category: ${improvement.category}`)
-          console.log(`      Priority: ${improvement.priority}`)
+        improvements.forEach((improvement: Record<string, unknown>, index: number) => {
+          console.log(`   ${index + 1}. ${String(improvement['suggestion'])}`)
+          console.log(`      Category: ${String(improvement['category'])}`)
+          console.log(`      Priority: ${String(improvement['priority'])}`)
         })
-
-        console.log('\n🤔 Reasoning:')
-        result.reasoningLog.forEach((reasoning, index) => {
-          console.log(`   ${index + 1}. ${reasoning}`)
+      }
+      console.log('\n🤔 Reasoning:')
+      const reasoningLog = resultRecord['reasoningLog'] as unknown[] | undefined
+      if (reasoningLog) {
+        reasoningLog.forEach((reasoning: unknown, index: number) => {
+          console.log(`   ${index + 1}. ${String(reasoning)}`)
         })
       }
 
       if (verbose) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.rawResponse)
+        console.log(String(resultRecord['rawResponse']))
       }
     } catch (error: unknown) {
       console.error(

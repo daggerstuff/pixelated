@@ -17,9 +17,8 @@ describe('SessionList', () => {
   it('displays sessions in table', () => {
     render(<SessionList sessions={mockSessionList} />)
 
-    expect(
-      screen.getByText(mockSessionList?.items[0].sessionId),
-    ).toBeInTheDocument()
+    const firstSessionId = mockSessionList.items[0]?.sessionId ?? ''
+    expect(screen.getByText(firstSessionId)).toBeInTheDocument()
   })
 
   it('calls onSessionClick when session is clicked', () => {
@@ -28,25 +27,29 @@ describe('SessionList', () => {
       <SessionList sessions={mockSessionList} onSessionClick={handleClick} />,
     )
 
-    const sessionLink = screen.getByText(mockSessionList?.items[0].sessionId)
+    const firstItem = mockSessionList.items[0]
+    const sessionLink = screen.getByText(firstItem?.sessionId ?? '')
     fireEvent.click(sessionLink)
 
     expect(handleClick).toHaveBeenCalledWith(
-      expect.objectContaining(mockSessionList.items[0]),
+      expect.objectContaining(firstItem ?? {}),
     )
   })
 
   it('filters sessions by search term', async () => {
+    const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: [
-        mockSessionList.items[0],
-        {
-          ...mockSessionList.items[0],
-          sessionId: 'test-session-2',
-          targetSources: ['Different Source'],
-        },
-      ],
+      items: (
+        firstItem
+          ? [firstItem,
+            {
+              ...firstItem,
+              sessionId: 'test-session-2',
+              targetSources: ['Different Source'],
+            }]
+          : []
+      ) as typeof mockSessionList['items'],
       total: 2,
     }
 
@@ -62,16 +65,19 @@ describe('SessionList', () => {
   })
 
   it('filters sessions by phase', async () => {
+    const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: [
-        mockSessionList.items[0],
-        {
-          ...mockSessionList.items[0],
-          sessionId: 'test-session-2',
-          currentPhase: 'evaluation',
-        },
-      ],
+      items: (
+        firstItem
+          ? [firstItem,
+            {
+              ...firstItem,
+              sessionId: 'test-session-2',
+              currentPhase: 'evaluation',
+            }]
+          : []
+      ) as typeof mockSessionList['items'],
       total: 2,
     }
 
@@ -101,18 +107,21 @@ describe('SessionList', () => {
   })
 
   it('sorts sessions by sessionId', async () => {
+    const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: [
-        {
-          ...mockSessionList.items[0],
-          sessionId: 'z-session',
-        },
-        {
-          ...mockSessionList.items[0],
-          sessionId: 'a-session',
-        },
-      ],
+      items: (
+        firstItem
+          ? [{
+              ...firstItem,
+              sessionId: 'z-session',
+            },
+            {
+              ...firstItem,
+              sessionId: 'a-session',
+            }]
+          : []
+      ) as typeof mockSessionList['items'],
       total: 2,
     }
 

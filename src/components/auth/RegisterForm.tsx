@@ -106,7 +106,8 @@ export function RegisterForm({
         return
       }
 
-      if (response.data?.user || response.success) {
+      const responseData = response.data as { user?: unknown } | undefined
+      if (responseData?.user) {
         setIsSuccessful(true)
       }
     } catch (error: unknown) {

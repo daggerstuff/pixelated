@@ -75,7 +75,7 @@ describe('request utilities', () => {
       // This tests the SSR fallback path when window is strictly undefined but the test environment behaves differently
       // It simulates what the original issue was asking for (testing the branch when navigator is undefined)
       const originalWindow = global.window
-      global.window = {}
+      global.window = {} as Window & typeof globalThis
       let error
       try {
         getBrowserLanguage()

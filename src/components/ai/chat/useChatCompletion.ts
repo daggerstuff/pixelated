@@ -305,7 +305,7 @@ export function useChatCompletion({
         clearTimeout(timeoutId)
 
         if (!response.ok) {
-          const errorData = await response.json()
+          const errorData = await response.json() as { error?: string }
           throw new Error(
             errorData.error ?? `Failed to get AI response: ${response.status}`,
           )
@@ -454,13 +454,13 @@ export function useChatCompletion({
             }
           } else {
             // Handle non-streaming response
-            const data = await response.json()
+            const data = await response.json() as { choices?: Array<{ message?: { content?: string } }> }
             const assistantMessage = data.choices?.[0]?.message?.content ?? ''
 
             setMessages((prev) => [
               ...prev,
               {
-                role: 'assistant',
+                role: 'assistant' as const,
                 content: assistantMessage,
                 name: '',
               },

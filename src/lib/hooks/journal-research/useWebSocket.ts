@@ -260,6 +260,8 @@ export const useJournalResearchWebSocket = ({
         return
       }
 
+      // Convert data to string or ArrayBuffer for WebSocket send
+      // ArrayBufferView (e.g. Uint8Array) is narrowed to ArrayBuffer
       const payload: string | ArrayBuffer = (() => {
         if (typeof data === 'string') {
           return data

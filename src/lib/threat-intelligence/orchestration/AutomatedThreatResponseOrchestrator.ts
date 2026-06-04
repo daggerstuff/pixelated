@@ -16,7 +16,6 @@ import {
   ResponseCondition,
   IntegrationEndpoint,
   GlobalThreatIntelligence,
-  ThreatResponse,
 } from '../global/types'
 
 const logger = createBuildSafeLogger('automated-threat-response-orchestrator')
@@ -166,10 +165,10 @@ export class AutomatedThreatResponseOrchestratorCore
   private async loadResponseStrategies(): Promise<void> {
     try {
       const strategiesCollection = this.db.collection('response_strategies')
-      const strategies = await strategiesCollection.find({}).toArray()
+      const strategies = (await strategiesCollection.find({}).toArray()) as unknown as ResponseStrategy[]
 
       for (const strategy of strategies) {
-        this.responseStrategies.set(strategy['strategyId'], strategy)
+        this.responseStrategies.set(strategy.strategyId, strategy)
       }
 
       logger.info(
@@ -297,7 +296,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Select the best matching strategy based on priority and conditions
       matchingStrategies.sort((a, b) => b.priority - a.priority)
-      return matchingStrategies[0]
+      return matchingStrategies[0]!
     } catch (error: unknown) {
       logger.error('Failed to select response strategy:', { error })
       return this.getDefaultStrategy(threat)
@@ -592,7 +591,7 @@ export class AutomatedThreatResponseOrchestratorCore
       },
     }
 
-    return defaultStrategies[severity] ?? defaultStrategies['medium']
+    return defaultStrategies[severity] ?? defaultStrategies['medium']!
   }
 
   private async generateResponseActions(
@@ -627,7 +626,7 @@ export class AutomatedThreatResponseOrchestratorCore
       switch (action.actionType) {
         case 'block':
           customizedAction.parameters = {
-            ...action.parameters,
+            ...(action.parameters as Record<string, unknown>),
             threatId: threat.threatId,
             severity: threat.severity,
             confidence: threat.confidence,
@@ -636,7 +635,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'rate_limit':
           customizedAction.parameters = {
-            ...action.parameters,
+            ...(action.parameters as Record<string, unknown>),
             severity: threat.severity,
             confidence: threat.confidence,
             regions: threat.regions,
@@ -645,7 +644,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'alert':
           customizedAction.parameters = {
-            ...action.parameters,
+            ...(action.parameters as Record<string, unknown>),
             threatId: threat.threatId,
             severity: threat.severity,
             indicators: threat.indicators.length,
@@ -654,7 +653,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
         case 'investigate':
           customizedAction.parameters = {
-            ...action.parameters,
+            ...(action.parameters as Record<string, unknown>),
             threatId: threat.threatId,
             severity: threat.severity,
             regions: threat.regions,
@@ -923,7 +922,9 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement blocking logic (e.g., IP blocking, domain blocking)
-      const { sourceIp, duration } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const sourceIp = parameters['sourceIp']
+      const duration = parameters['duration']
 
       if (!sourceIp) {
         logger.error('Missing source IP for block action')
@@ -951,7 +952,9 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement isolation logic (e.g., network isolation, user isolation)
-      const { userId, systemId } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const userId = parameters['userId']
+      const systemId = parameters['systemId']
 
       logger.info('Executing isolate action', {
         responseId: response.responseId,
@@ -973,7 +976,9 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement alerting logic (e.g., email, Slack, webhook)
-      const { recipients, priority } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const recipients = parameters['recipients']
+      const priority = parameters['priority']
 
       logger.info('Executing alert action', {
         responseId: response.responseId,
@@ -997,7 +1002,10 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement investigation logic (e.g., log analysis, forensic collection)
-      const { depth, scope, dataSources } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const depth = parameters['depth']
+      const scope = parameters['scope']
+      const dataSources = parameters['dataSources']
 
       logger.info('Executing investigate action', {
         responseId: response.responseId,
@@ -1020,7 +1028,9 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<boolean> {
     try {
       // Implement mitigation logic (e.g., patch deployment, configuration changes)
-      const { mitigationType, targetSystem } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const mitigationType = parameters['mitigationType']
+      const targetSystem = parameters['targetSystem']
 
       logger.info('Executing mitigate action', {
         responseId: response.responseId,
@@ -1236,7 +1246,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       for (let i = response.actions.length - 1; i >= 0; i--) {
         const action = response.actions[i]
-        if (action.rollbackStrategy) {
+        if (action?.rollbackStrategy) {
           const result = await this.executeRollbackAction(action, response)
           rollbackResults.push(result)
         }
@@ -1304,7 +1314,8 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const { sourceIp } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const sourceIp = parameters['sourceIp']
 
       if (!sourceIp) {
         logger.error('Missing source IP for rollback')
@@ -1329,7 +1340,8 @@ export class AutomatedThreatResponseOrchestratorCore
     response: ThreatResponse,
   ): Promise<boolean> {
     try {
-      const { userId } = action.parameters
+      const parameters = (action.parameters || {}) as Record<string, unknown>
+      const userId = parameters['userId']
 
       // Implement remove rate limit logic
       logger.info('Rolling back rate limit action', {
@@ -1356,7 +1368,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Query database
       const responsesCollection = this.db.collection('threat_responses')
-      const response = await responsesCollection.findOne({ responseId })
+      const response = (await responsesCollection.findOne({ responseId })) as unknown as ThreatResponse | null
 
       if (response) {
         this.activeResponses.set(responseId, response)
@@ -1419,11 +1431,11 @@ export class AutomatedThreatResponseOrchestratorCore
   ): Promise<ThreatResponse[]> {
     try {
       const responsesCollection = this.db.collection('threat_responses')
-      const responses = await responsesCollection
+      const responses = (await responsesCollection
         .find({ threatId })
         .sort({ executionTime: -1 })
         .limit(limit)
-        .toArray()
+        .toArray()) as unknown as ThreatResponse[]
 
       return responses
     } catch (error: unknown) {
@@ -1514,7 +1526,7 @@ export class AutomatedThreatResponseOrchestratorCore
   private async calculateAverageResponseTime(): Promise<number> {
     try {
       const responsesCollection = this.db.collection('threat_responses')
-      const completedResponses = await responsesCollection
+      const completedResponses = (await responsesCollection
         .find({
           status: 'completed',
           executionTime: { $exists: true },
@@ -1522,7 +1534,7 @@ export class AutomatedThreatResponseOrchestratorCore
         })
         .project({ executionTime: 1, completedTime: 1 })
         .limit(100)
-        .toArray()
+        .toArray()) as unknown as ThreatResponse[]
 
       if (completedResponses.length === 0) {
         return 0
@@ -1531,8 +1543,8 @@ export class AutomatedThreatResponseOrchestratorCore
       let totalTime = 0
       for (const response of completedResponses) {
         const timeDiff =
-          response['completedTime'].getTime() -
-          response['executionTime'].getTime()
+          response.completedTime!.getTime() -
+          response.executionTime.getTime()
         totalTime += timeDiff
       }
 
@@ -1551,11 +1563,11 @@ export class AutomatedThreatResponseOrchestratorCore
         { $project: { responseType: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await responsesCollection.aggregate(pipeline).toArray()
+      const results = (await responsesCollection.aggregate(pipeline).toArray()) as unknown as Array<{ responseType: string; count: number }>
 
       const responsesByType: Record<string, number> = {}
       for (const result of results) {
-        responsesByType[result['responseType']] = result['count']
+        responsesByType[result.responseType] = result.count
       }
 
       return responsesByType
@@ -1573,11 +1585,11 @@ export class AutomatedThreatResponseOrchestratorCore
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await responsesCollection.aggregate(pipeline).toArray()
+      const results = (await responsesCollection.aggregate(pipeline).toArray()) as unknown as Array<{ severity: string; count: number }>
 
       const responsesBySeverity: Record<string, number> = {}
       for (const result of results) {
-        responsesBySeverity[result['severity']] = result['count']
+        responsesBySeverity[result.severity] = result.count
       }
 
       return responsesBySeverity
@@ -1629,7 +1641,7 @@ export class AutomatedThreatResponseOrchestratorCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${String(error)}`,
       }
     }
   }

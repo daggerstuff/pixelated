@@ -473,7 +473,7 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with high security preset
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-security'] }
+    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-security'] } as SealEncryptionParamsOptions
 
     // For very complex operations, increase security further
     if (complexity > 7) {
@@ -505,7 +505,7 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with high performance preset
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-performance'] }
+    const baseParams = { ...SEAL_PARAMETER_PRESETS['high-performance'] } as SealEncryptionParamsOptions
 
     // For very complex operations, we may need to trade some performance for functionality
     if (complexity > 8) {
@@ -541,10 +541,10 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with CKKS default or an appropriate preset
-    const baseParams =
+    const baseParams: SealEncryptionParamsOptions =
       scheme === SealSchemeType.CKKS
-        ? { ...SEAL_PARAMETER_PRESETS['ckks-default'] }
-        : { ...SEAL_PARAMETER_PRESETS[basePreset] }
+        ? { ...SEAL_PARAMETER_PRESETS['ckks-default'] } as SealEncryptionParamsOptions
+        : { ...SEAL_PARAMETER_PRESETS[basePreset] } as SealEncryptionParamsOptions
 
     if (scheme === SealSchemeType.CKKS) {
       // For CKKS, increase precision by using larger scale and coefficient modulus
@@ -579,7 +579,7 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with low-security preset which has smaller parameters
-    const baseParams = { ...SEAL_PARAMETER_PRESETS['low-security'] }
+    const baseParams = { ...SEAL_PARAMETER_PRESETS['low-security'] } as SealEncryptionParamsOptions
 
     // For high complexity, we still need adequate parameters
     if (complexity > 8) {
@@ -727,7 +727,7 @@ export class FHEParameterOptimizer {
     scheme: SealSchemeType,
   ): SealEncryptionParamsOptions {
     // Start with base preset
-    const params = { ...SEAL_PARAMETER_PRESETS[basePreset] }
+    const params = { ...SEAL_PARAMETER_PRESETS[basePreset] } as SealEncryptionParamsOptions
 
     // Adjust polynomial modulus degree based on complexity
     if (complexity >= 9) {

@@ -67,6 +67,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_RYBBIT_SITE_ID?: string
 }
 
+declare module '*.css' {}
+
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
