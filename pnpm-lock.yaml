@@ -136,40 +136,40 @@ importers:
         version: 3.0.67(zod@4.4.3)
       '@astrojs/node':
         specifier: ^10.1.3
-        version: 10.1.3(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 10.1.3(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@astrojs/react':
         specifier: latest
         version: 5.0.7(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       '@astrojs/vercel':
         specifier: '>=10.0.2'
-        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.47)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.0)(vue@3.5.35(typescript@6.0.3))
+        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.48)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.0)(vue@3.5.35(typescript@6.0.3))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@aws-sdk/client-dynamodb':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-ec2':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-eks':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-kms':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-rds':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/client-s3':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@aws-sdk/lib-dynamodb':
         specifier: latest
-        version: 3.1061.0(@aws-sdk/client-dynamodb@3.1061.0)
+        version: 3.1062.0(@aws-sdk/client-dynamodb@3.1062.0)
       '@aws-sdk/s3-request-presigner':
         specifier: latest
-        version: 3.1061.0
+        version: 3.1062.0
       '@azure/storage-blob':
         specifier: latest
         version: 12.31.0
@@ -265,7 +265,7 @@ importers:
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sentry/astro':
         specifier: latest
-        version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)
+        version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)
       '@sentry/node':
         specifier: latest
         version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))
@@ -283,7 +283,7 @@ importers:
         version: 5.3.0(rollup@4.61.0)
       '@spotlightjs/astro':
         specifier: latest
-        version: 3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@tanstack/react-query':
         specifier: latest
         version: 5.101.0(react@19.2.7)
@@ -499,7 +499,7 @@ importers:
         version: 17.0.8(i18next@26.3.1(typescript@6.0.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)
       react-router-dom:
         specifier: latest
-        version: 7.16.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       recharts:
         specifier: latest
         version: 3.8.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react-is@17.0.2)(react@19.2.7)(redux@5.0.1)
@@ -581,7 +581,7 @@ importers:
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
       '@astrojs/markdoc':
         specifier: latest
-        version: 1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)
+        version: 1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)
       '@astrojs/rss':
         specifier: latest
         version: 4.0.18
@@ -692,7 +692,7 @@ importers:
         version: 1.6.19(@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.8)
       astro:
         specifier: ^6.4.4
-        version: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       astro-eslint-parser:
         specifier: latest
         version: 1.4.0
@@ -1168,28 +1168,28 @@ packages:
     resolution: {integrity: sha512-DFCtlisEuWzw7rESV65jHK7De1QsJZRZgUNJ8ovpmdVaayPrxvmlsAlW8hka9E7f9B31d1T7lHG9oozZf6Bp6w==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-dynamodb@3.1061.0':
-    resolution: {integrity: sha512-GbmTQ1OgqYaB39rrJCZuX/zaS2Yc0fQnF1chdXJXzERfnsUJMBfQgzM/gyh0Xg8vyVSk1CvsOnlfRhMa2L6X4Q==}
+  '@aws-sdk/client-dynamodb@3.1062.0':
+    resolution: {integrity: sha512-phKhzMJz2EOt7atfjo1Zc6nuB9wIaRESlenzVfYK4IVLjX78iH6lI9AkVajpn6/k9usEbOvUAgdhXVS9VIOU5g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-ec2@3.1061.0':
-    resolution: {integrity: sha512-YzYmU7YQwKlYs6chrySsZOIgQNkOnWGAsEbFzoMh6T6ofH1J0UUvU2zHbZGU2cRxDs23HLgCyVWMT4wS3Iu4Pg==}
+  '@aws-sdk/client-ec2@3.1062.0':
+    resolution: {integrity: sha512-OkuvnknC0CwLmlVthI0daFxE/IrMbsUcKXZ8wvxM8x6rCfBrIV5ZnLd7NomqMk9zjVfg5t1Q7sixE3ZuHFJ7fQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-eks@3.1061.0':
-    resolution: {integrity: sha512-6r+8p1SiCilLzo8rW97NxbHkpzY0ws4gOLs93O/5Bs5lrmAHE49bGpT3JE6H7SvZ8onKhRwoMuS0fq3gxKmiaw==}
+  '@aws-sdk/client-eks@3.1062.0':
+    resolution: {integrity: sha512-WExoQvbCsQui5BGSIGvrXVzqvkzxUvw+gkazFTB/y3l5sTwvBc+3fCU+PFHFgMIMSgATL283FKpZXMIp7TrnQw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-kms@3.1061.0':
-    resolution: {integrity: sha512-dykv0pbdem4jBtAcVtZu1PcXSrKQBcY8GoF8EvDItTuUCMSStwYNXcEASw3/hjGGxhcLeuMd+D+IyNG99xbzoQ==}
+  '@aws-sdk/client-kms@3.1062.0':
+    resolution: {integrity: sha512-Fii0+X9hIqp24labw9FflFkR04inz0oTe6fvPRvDPFceVQXf9org/TndgvnyDmB+IieaEU/3c1N9HwneRUr2bA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-rds@3.1061.0':
-    resolution: {integrity: sha512-49ZkITiTF2dobU0I4p50VyKA8+oQwTlYC6OacZFXNhZVOzYNuqC42mh5vzvtjupCuEfPfzTVDe9ee3XNeeiDlQ==}
+  '@aws-sdk/client-rds@3.1062.0':
+    resolution: {integrity: sha512-yML/es405S28Okd5IFkD3LVJAUZ0vzeGUnLdJ93boDiF+VMhG6GlaD6VnPbzvU0N7VL744UbtfF5NtfAKdZbkQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-s3@3.1061.0':
-    resolution: {integrity: sha512-ygyRCIkktaDz4/kNzsxhbZqocLwCJV5absi/k7Xd3LThPOmVkid7Nghm/xTW2Yg+vSQIL0yq99oV7u3T+4ZbAQ==}
+  '@aws-sdk/client-s3@3.1062.0':
+    resolution: {integrity: sha512-fb+qr6Jql36rJwlOEgkzaC85PGZ1sQ1pTd5YlpwPbOoN54gpVBaSLsDp8GXMToymJzpDHd8GeSDalUak1W9gLw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/core@3.974.17':
@@ -1204,28 +1204,28 @@ packages:
     resolution: {integrity: sha512-w9PuOoKCt6+xoESvY+zlV0u3PKQ0mVL259PcsVR6a3S/uYJJHnIi4r1NxdJHEcNldUVRIciltWnFMGBR4YEm3g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-ini@3.972.48':
-    resolution: {integrity: sha512-+6BQ6Lrnc+EyAGElLRW6j+Sa+RirPHnIJsobvYO6nnyK+oGKmz1ne/ieclbLWyjyDKEU3/JVJWcWY3VLFPvGtQ==}
+  '@aws-sdk/credential-provider-ini@3.972.49':
+    resolution: {integrity: sha512-83r5MK+PERv9irzky1o5aNbXiLuaLfeB7N8MrktB9USpoebdNtuG0Ek9ieIxpGH1aZ9a0nIaDaLjEr3EmOV3Ng==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-login@3.972.47':
-    resolution: {integrity: sha512-Iy2ebWVgrZBH05464uJiQYu6HSSiROnwVZptthEFXx2gWjo1ORCxEAFZB5Cr2MdfrSnZ+0QUPkZ1ZpCqpkUrLQ==}
+  '@aws-sdk/credential-provider-login@3.972.48':
+    resolution: {integrity: sha512-amPGeF6fcvLInK4Pu2k2Y2jHFR6MpaIKrZrbaf0QUnV3tjzjWh442eifZ2+KcmzFdsqyvyjBqAhq2JNLt1C5gA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-node@3.972.50':
-    resolution: {integrity: sha512-b05Aelq5cqAvCCDQjCYacl0XmR8QhBNSqLbsdISkQmlQBa5oPS66zYPteWcSp5LswbpoIe552EUGjluKiadBig==}
+  '@aws-sdk/credential-provider-node@3.972.51':
+    resolution: {integrity: sha512-mbhSY3ytXIGMuBoJsWCivk+63dtVlenT6wstUra07Lar4Ln2MVL8/j5zCTIOog+ig5/FlFJ8gcFU4nQZV+Jh4Q==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/credential-provider-process@3.972.43':
     resolution: {integrity: sha512-GPokLNyvTfCmuaHk+v3GKVs4ZT3cMu5kgS2a+NPkOMt96cq6fSIK0g+mZHpGS6Cd4QGrPKesANEaLUKgOskTzg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-sso@3.972.47':
-    resolution: {integrity: sha512-0AzvLrzlvJs0DzbeWGvNj+bX3Uzd7VNS6vDqCOdZzBlCGKGd78uxctJSW9iK/Rt/nxiJqpTvrYQlVJ4guVM2Dw==}
+  '@aws-sdk/credential-provider-sso@3.972.48':
+    resolution: {integrity: sha512-tf0sD47SeTgCDfOWYssctzGgwAuk8/ECjb7bom4wZ7P1om0qE8i2yjniUdvysmANm5haARr35O8vZnTe/UEtpQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-web-identity@3.972.47':
-    resolution: {integrity: sha512-eksfbUErOejUAGWBAcNqaP7IX21oUOEo73d9R56k9Ua4d57qS90NEYkWJsuSGzTXMFulCu17qXJI/qGmM7hvoA==}
+  '@aws-sdk/credential-provider-web-identity@3.972.48':
+    resolution: {integrity: sha512-YYsumc2oe09gl4l+fjfmR64JDn6+0o4Ql5HMBkMuhFazO1tZlE5NjSnZM3oXHwenPjh2qow0TFgSIVjfWfsojg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/dynamodb-codec@3.973.17':
@@ -1236,30 +1236,18 @@ packages:
     resolution: {integrity: sha512-itVdge0NozgtgmtbZ25FVwWU3vGlE7x7feE/aOEJNkQfEpbkrF8Rj1QmnK+2blFfYE1xWt/iU+6/jUp/pv1+MA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/lib-dynamodb@3.1061.0':
-    resolution: {integrity: sha512-Pebj3QbKJ3OIhrihHQ4LzZ1gRXqtl8pSrQB7xs5THGLsdPfs1hKcxsliB/MPtPNDOYzRHBzUCvMd/xnpp5MIEA==}
+  '@aws-sdk/lib-dynamodb@3.1062.0':
+    resolution: {integrity: sha512-RoLG7LLo+y5i4ND5tsetGal5mIeyADRCa/hVYPbAm2udb10d49cZ8XAP7PxwsZ5yc0WRyAHAlF07Or7mxDJ9gw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-dynamodb': ^3.1061.0
-
-  '@aws-sdk/middleware-bucket-endpoint@3.972.20':
-    resolution: {integrity: sha512-D35MfedGvTTzK1oygFPjm7DViSJwj9cuPV26ElHKwZqEz2rWag1hzYeAQ7st0jlCIAAihQgOyQ0/JwmqLOOinw==}
-    engines: {node: '>=20.0.0'}
+      '@aws-sdk/client-dynamodb': ^3.1062.0
 
   '@aws-sdk/middleware-endpoint-discovery@3.972.16':
     resolution: {integrity: sha512-ULfU47WcHvfjzk5CeJcHAwoYSIIBjNKQnGrs3/jJhyHqbx/A+zGOIsnZt0MxKS64SAComc0CIlBGugSTSaZOYw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-expect-continue@3.972.16':
-    resolution: {integrity: sha512-S52iw+M9zJC+7uxRdvvKeiR0s2PDeYEmbNZQkWE6OJf8upIs+r4WQY0TER+6akVitEMeRdwS0DrBUhKkmpsyng==}
-    engines: {node: '>=20.0.0'}
-
   '@aws-sdk/middleware-flexible-checksums@3.974.26':
     resolution: {integrity: sha512-WndRXQV8wAU/bW3GH8THumEOSV7FpS0AtoluT2M7lYaaDUyG0gOCD+DppB+IWQ4TPmzuTtFcCedh9xCzM4Zv4g==}
-    engines: {node: '>=20.0.0'}
-
-  '@aws-sdk/middleware-location-constraint@3.972.13':
-    resolution: {integrity: sha512-Yh0MmpADMsSR7ExRM/2w85D26i/U2aDC/pC7fMwhUpmOl6sebGpmBPoRL/uJRDhqRrwX/tvXWWZrsbsPM/O9FQ==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/middleware-sdk-ec2@3.972.31':
@@ -1274,24 +1262,20 @@ packages:
     resolution: {integrity: sha512-fzVBvGib8P1G6RFV3qVTPlXy9bMFAy5nxhdhA7LwyhWjRkJufNfJIPiloZq2mt36YAXSlLsEa4s3Kgcw6cv3+g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-ssec@3.972.13':
-    resolution: {integrity: sha512-M+dDhWp2zv9u92I4/4rgUFdiF8jSIk5PIj5ktyBdhvR/dkmKSYMo07nuh+3g8/59HnizwkcRC3glcLMX5GhyaQ==}
+  '@aws-sdk/nested-clients@3.997.16':
+    resolution: {integrity: sha512-bGvfDgC2KQePjEmZdltScPPLKFoyjPElAXeZcLfvZ58J1AO283//WGtvp9GdnryLHTi7gis0UoCezqh0vl/nig==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/nested-clients@3.997.15':
-    resolution: {integrity: sha512-Fpri1/PXKMKveORZ7E00VLTlWS5DkfZkW70PUE+bOnpWpAeHAQLoiDHhkzN3kNWbbSsGg64+IZYiq/EZgME3Mg==}
-    engines: {node: '>=20.0.0'}
-
-  '@aws-sdk/s3-request-presigner@3.1061.0':
-    resolution: {integrity: sha512-unGsJZSKQWD4KjokNs5QATLPaNt3u0YoIch7KIomfNy1UB6YaRngsAeArDGAnbrrx2LMOb9l2+4sa+yRn8rkbw==}
+  '@aws-sdk/s3-request-presigner@3.1062.0':
+    resolution: {integrity: sha512-AE/LWvZWNBDbtx/29KdIAs3NKOvMi3xm22icENTwTDSlaRzsckTCb3xjaVB8ahKNylOhNbSLFSqgc0HtAax45A==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/signature-v4-multi-region@3.996.31':
     resolution: {integrity: sha512-Kn2up9SlG1KC6wRtwf0d7waTGF6rvp9DxYqB54x6UCKdQ6kyaXCqHL4WGb5vUJga5kS8FxnjhY0LqM28aMvnNQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/token-providers@3.1060.0':
-    resolution: {integrity: sha512-6NZaMKkFhpaNiwLpHi1sZaYjidL/lCJE6ME6NxwA8gv9vQna+Kr0j4OFwVoz6tANRWM3WbGz6jiPsGX/Vkjwow==}
+  '@aws-sdk/token-providers@3.1062.0':
+    resolution: {integrity: sha512-fvHh53zSm2FoQPgkw9thH5D7sd13bC0nPyuZb+mQJ85l5v7lQnsZ97u6e6YkJJN/LU1Mxm1/DLGrIIRR2L7tZw==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/types@3.973.10':
@@ -8879,15 +8863,15 @@ packages:
     resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
     engines: {node: '>=0.10.0'}
 
-  react-router-dom@7.16.0:
-    resolution: {integrity: sha512-kMUAbimWB5FVbF4Bce4bJsiKJWLIUHq/mEG8+CFDnCSgltptBiG5nguducmsJeGKytlCvQud9Qhzpn49iduTlA==}
+  react-router-dom@7.17.0:
+    resolution: {integrity: sha512-fyU2yjGups/hE6Xz0I5ZYbVL8Gx29eCjgpHaRaTaVU+OOAdfRX05KsvyRm0GO8YQwOkhpU3MurW1jyMUJn+zSw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: ^19.2.4
       react-dom: ^19.2.4
 
-  react-router@7.16.0:
-    resolution: {integrity: sha512-wArC8lVyJb3+jM9OpDyW6hLCizACWkvQR/sSGqSs+o5uEXEtGlqdZ4v8hENR3Jad6i+LRkK93q/+bQAcvl6V1A==}
+  react-router@7.17.0:
+    resolution: {integrity: sha512-FDELK7rTMlCHO5+reyXsPlmfr7N1F91lPHsWYfMEGQm/KQ+F4JFM8jGoeQDmDvdTs93Fw9aSilH+uKRb4/jXvQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: ^19.2.4
@@ -10795,12 +10779,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)':
+  '@astrojs/markdoc@1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/prism': 4.0.2
       '@markdoc/markdoc': 0.5.7(@types/react@19.2.16)(react@19.2.7)
-      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.0
       github-slugger: 2.0.0
       htmlparser2: 10.1.0
@@ -10830,10 +10814,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@10.1.3(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@astrojs/node@10.1.3(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
-      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -10882,14 +10866,14 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.47)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.0)(vue@3.5.35(typescript@6.0.3))':
+  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.48)(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.0)(vue@3.5.35(typescript@6.0.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@vercel/analytics': 1.6.1(react@19.2.7)(vue@3.5.35(typescript@6.0.3))
-      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)
+      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
       '@vercel/nft': 1.10.2(rollup@4.61.0)
       '@vercel/routing-utils': 6.2.0
-      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.0
       tinyglobby: 0.2.17
     transitivePeerDependencies:
@@ -10985,12 +10969,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-dynamodb@3.1061.0':
+  '@aws-sdk/client-dynamodb@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/dynamodb-codec': 3.973.17
       '@aws-sdk/middleware-endpoint-discovery': 3.972.16
       '@aws-sdk/types': 3.973.10
@@ -11000,12 +10984,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-ec2@3.1061.0':
+  '@aws-sdk/client-ec2@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/middleware-sdk-ec2': 3.972.31
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
@@ -11014,12 +10998,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-eks@3.1061.0':
+  '@aws-sdk/client-eks@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
@@ -11027,12 +11011,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-kms@3.1061.0':
+  '@aws-sdk/client-kms@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
@@ -11040,12 +11024,12 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-rds@3.1061.0':
+  '@aws-sdk/client-rds@3.1062.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/middleware-sdk-rds': 3.972.31
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
@@ -11054,19 +11038,15 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-s3@3.1061.0':
+  '@aws-sdk/client-s3@3.1062.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.50
-      '@aws-sdk/middleware-bucket-endpoint': 3.972.20
-      '@aws-sdk/middleware-expect-continue': 3.972.16
+      '@aws-sdk/credential-provider-node': 3.972.51
       '@aws-sdk/middleware-flexible-checksums': 3.974.26
-      '@aws-sdk/middleware-location-constraint': 3.972.13
       '@aws-sdk/middleware-sdk-s3': 3.972.47
-      '@aws-sdk/middleware-ssec': 3.972.13
       '@aws-sdk/signature-v4-multi-region': 3.996.31
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
@@ -11104,39 +11084,39 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.972.48':
+  '@aws-sdk/credential-provider-ini@3.972.49':
     dependencies:
       '@aws-sdk/core': 3.974.17
       '@aws-sdk/credential-provider-env': 3.972.43
       '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-login': 3.972.47
+      '@aws-sdk/credential-provider-login': 3.972.48
       '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.47
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/credential-provider-sso': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-login@3.972.47':
+  '@aws-sdk/credential-provider-login@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-node@3.972.50':
+  '@aws-sdk/credential-provider-node@3.972.51':
     dependencies:
       '@aws-sdk/credential-provider-env': 3.972.43
       '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-ini': 3.972.48
+      '@aws-sdk/credential-provider-ini': 3.972.49
       '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.47
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
+      '@aws-sdk/credential-provider-sso': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.7
@@ -11151,20 +11131,20 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.972.47':
+  '@aws-sdk/credential-provider-sso@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
-      '@aws-sdk/token-providers': 3.1060.0
+      '@aws-sdk/nested-clients': 3.997.16
+      '@aws-sdk/token-providers': 3.1062.0
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-web-identity@3.972.47':
+  '@aws-sdk/credential-provider-web-identity@3.972.48':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
@@ -11182,18 +11162,13 @@ snapshots:
       mnemonist: 0.38.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-dynamodb@3.1061.0(@aws-sdk/client-dynamodb@3.1061.0)':
+  '@aws-sdk/lib-dynamodb@3.1062.0(@aws-sdk/client-dynamodb@3.1062.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1061.0
+      '@aws-sdk/client-dynamodb': 3.1062.0
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/util-dynamodb': 3.996.2(@aws-sdk/client-dynamodb@3.1061.0)
+      '@aws-sdk/util-dynamodb': 3.996.2(@aws-sdk/client-dynamodb@3.1062.0)
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
-      tslib: 2.8.1
-
-  '@aws-sdk/middleware-bucket-endpoint@3.972.20':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
       tslib: 2.8.1
 
   '@aws-sdk/middleware-endpoint-discovery@3.972.16':
@@ -11204,19 +11179,9 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-expect-continue@3.972.16':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      tslib: 2.8.1
-
   '@aws-sdk/middleware-flexible-checksums@3.974.26':
     dependencies:
       '@aws-sdk/checksums': 3.1000.1
-      tslib: 2.8.1
-
-  '@aws-sdk/middleware-location-constraint@3.972.13':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
       tslib: 2.8.1
 
   '@aws-sdk/middleware-sdk-ec2@3.972.31':
@@ -11246,12 +11211,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-ssec@3.972.13':
-    dependencies:
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      tslib: 2.8.1
-
-  '@aws-sdk/nested-clients@3.997.15':
+  '@aws-sdk/nested-clients@3.997.16':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -11264,7 +11224,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/s3-request-presigner@3.1061.0':
+  '@aws-sdk/s3-request-presigner@3.1062.0':
     dependencies:
       '@aws-sdk/core': 3.974.17
       '@aws-sdk/signature-v4-multi-region': 3.996.31
@@ -11280,10 +11240,10 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.1060.0':
+  '@aws-sdk/token-providers@3.1062.0':
     dependencies:
       '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.15
+      '@aws-sdk/nested-clients': 3.997.16
       '@aws-sdk/types': 3.973.10
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
@@ -11294,9 +11254,9 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/util-dynamodb@3.996.2(@aws-sdk/client-dynamodb@3.1061.0)':
+  '@aws-sdk/util-dynamodb@3.996.2(@aws-sdk/client-dynamodb@3.1062.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1061.0
+      '@aws-sdk/client-dynamodb': 3.1062.0
       tslib: 2.8.1
 
   '@aws-sdk/util-locate-window@3.965.5':
@@ -13734,13 +13694,13 @@ snapshots:
     dependencies:
       '@sentry/core': 10.56.0
 
-  '@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)':
+  '@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)':
     dependencies:
       '@sentry/browser': 10.56.0
       '@sentry/core': 10.56.0
       '@sentry/node': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))
       '@sentry/vite-plugin': 5.3.0(rollup@4.61.0)
-      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@opentelemetry/exporter-trace-otlp-http'
       - encoding
@@ -14060,11 +14020,11 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
-      '@sentry/astro': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)
+      '@sentry/astro': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.0)
       '@spotlightjs/spotlight': 3.0.2
-      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -14773,11 +14733,11 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)':
+  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)':
     dependencies:
       '@vercel/oidc': 3.6.0
     optionalDependencies:
-      '@aws-sdk/credential-provider-web-identity': 3.972.47
+      '@aws-sdk/credential-provider-web-identity': 3.972.48
 
   '@vercel/nft@1.10.2(rollup@4.61.0)':
     dependencies:
@@ -15282,7 +15242,7 @@ snapshots:
       valid-filename: 4.0.0
       zod: 4.4.3
 
-  astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
+  astro@6.4.4(@azure/storage-blob@12.31.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.61.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
       '@astrojs/internal-helpers': 0.10.0
@@ -15332,7 +15292,7 @@ snapshots:
       ultrahtml: 1.6.0
       unifont: 0.7.4
       unist-util-visit: 5.1.0
-      unstorage: 1.17.5(@azure/storage-blob@12.31.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0)
+      unstorage: 1.17.5(@azure/storage-blob@12.31.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0)
       vfile: 6.0.3
       vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -19354,13 +19314,13 @@ snapshots:
 
   react-refresh@0.18.0: {}
 
-  react-router-dom@7.16.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-router-dom@7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
-      react-router: 7.16.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react-router: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
 
-  react-router@7.16.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-router@7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       cookie: 1.1.1
       react: 19.2.7
@@ -20802,7 +20762,7 @@ snapshots:
       picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.17.5(@azure/storage-blob@12.31.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47))(ioredis@5.11.0):
+  unstorage@1.17.5(@azure/storage-blob@12.31.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.0):
     dependencies:
       anymatch: 3.1.3
       chokidar: 5.0.0
@@ -20815,7 +20775,7 @@ snapshots:
     optionalDependencies:
       '@azure/storage-blob': 12.31.0
       '@upstash/redis': 1.38.0
-      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.47)
+      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
       ioredis: 5.11.0
 
   until-async@3.0.2: {}
