@@ -414,7 +414,7 @@ importers:
         specifier: latest
         version: 3.0.3
       i18next:
-        specifier: latest
+        specifier: '>=24.2.3'
         version: 26.3.1(typescript@6.0.3)
       idb:
         specifier: ^8.0.3
@@ -450,7 +450,7 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       nanoid:
-        specifier: latest
+        specifier: '>=5.0.9'
         version: 5.1.11
       node-cron:
         specifier: latest
@@ -531,7 +531,7 @@ importers:
         specifier: 3.36.0
         version: 3.36.0
       slug:
-        specifier: latest
+        specifier: '>=8.0.4'
         version: 11.0.1
       socket.io:
         specifier: ^4.8.3
@@ -558,7 +558,7 @@ importers:
         specifier: latest
         version: 6.0.2
       uuid:
-        specifier: latest
+        specifier: '>=11.1.0'
         version: 14.0.0
       vue:
         specifier: latest
@@ -709,7 +709,7 @@ importers:
         specifier: latest
         version: 5.6.2
       class-transformer:
-        specifier: latest
+        specifier: '>=0.5.1'
         version: 0.5.1
       class-validator:
         specifier: ^0.15.1
@@ -829,7 +829,7 @@ importers:
         specifier: 6.3.0
         version: 6.3.0
       postcss:
-        specifier: latest
+        specifier: '>=8.5.10'
         version: 8.5.15
       postcss-import:
         specifier: latest
