@@ -5,14 +5,11 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { MetaAlignerAPI } from '../api/alignment-api'
-import {
-  AlignmentContext,
-  ObjectiveDefinition,
-} from '../core/objectives'
 import type {
   AlignmentEvaluationResult,
   AlignmentMetrics,
 } from '../core/objective-interfaces'
+import { AlignmentContext, ObjectiveDefinition } from '../core/objectives'
 
 const logger = createBuildSafeLogger('enhancement-pipeline')
 

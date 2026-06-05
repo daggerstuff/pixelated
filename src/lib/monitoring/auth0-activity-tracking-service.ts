@@ -333,12 +333,12 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-          userId: log.user_id ?? undefined,
-          timestamp: new Date(log.date),
-          severity: 'medium',
-          description: log.description ?? 'Failed login attempt',
-          ipAddress: log.ip ?? undefined,
-          userAgent: log.user_agent ?? undefined,
+              userId: log.user_id ?? undefined,
+              timestamp: new Date(log.date),
+              severity: 'medium',
+              description: log.description ?? 'Failed login attempt',
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
                 connection: log.connection,
                 client_id: log.client_id,
@@ -350,12 +350,12 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-          userId: log.user_id ?? undefined,
-          timestamp: new Date(log.date),
-          severity: 'medium',
-          description: log.description ?? 'Failed password login attempt',
-          ipAddress: log.ip ?? undefined,
-          userAgent: log.user_agent ?? undefined,
+              userId: log.user_id ?? undefined,
+              timestamp: new Date(log.date),
+              severity: 'medium',
+              description: log.description ?? 'Failed password login attempt',
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
                 connection: log.connection,
                 client_id: log.client_id,
@@ -367,12 +367,12 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.AUTHENTICATION_FAILED,
-          userId: log.user_id ?? undefined,
-          timestamp: new Date(log.date),
-          severity: 'medium',
-          description: log.description ?? 'Failed signup attempt',
-          ipAddress: log.ip ?? undefined,
-          userAgent: log.user_agent ?? undefined,
+              userId: log.user_id ?? undefined,
+              timestamp: new Date(log.date),
+              severity: 'medium',
+              description: log.description ?? 'Failed signup attempt',
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
                 connection: log.connection,
                 client_id: log.client_id,
@@ -384,12 +384,12 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.RATE_LIMIT_EXCEEDED,
-          userId: log.user_id ?? undefined,
-          timestamp: new Date(log.date),
-          severity: 'high',
-          description: log.description ?? 'Rate limit exceeded',
-          ipAddress: log.ip ?? undefined,
-          userAgent: log.user_agent ?? undefined,
+              userId: log.user_id ?? undefined,
+              timestamp: new Date(log.date),
+              severity: 'high',
+              description: log.description ?? 'Rate limit exceeded',
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
                 connection: log.connection,
                 client_id: log.client_id,
@@ -401,12 +401,12 @@ export class Auth0ActivityTrackingService {
             securityEvent = {
               id: log.log_id,
               type: SecurityEventType.RATE_LIMIT_EXCEEDED,
-          userId: log.user_id ?? undefined,
-          timestamp: new Date(log.date),
-          severity: 'high',
-          description: log.description ?? 'Signup rate limit exceeded',
-          ipAddress: log.ip ?? undefined,
-          userAgent: log.user_agent ?? undefined,
+              userId: log.user_id ?? undefined,
+              timestamp: new Date(log.date),
+              severity: 'high',
+              description: log.description ?? 'Signup rate limit exceeded',
+              ipAddress: log.ip ?? undefined,
+              userAgent: log.user_agent ?? undefined,
               details: {
                 connection: log.connection,
                 client_id: log.client_id,
@@ -475,10 +475,12 @@ export class Auth0ActivityTrackingService {
       if (filter.startDate || filter.endDate) {
         query['timestamp'] = {} as Record<string, unknown>
         if (filter.startDate) {
-          ;(query['timestamp'] as Record<string, unknown>)['$gte'] = filter.startDate
+          ;(query['timestamp'] as Record<string, unknown>)['$gte'] =
+            filter.startDate
         }
         if (filter.endDate) {
-          ;(query['timestamp'] as Record<string, unknown>)['$lte'] = filter.endDate
+          ;(query['timestamp'] as Record<string, unknown>)['$lte'] =
+            filter.endDate
         }
       }
 
@@ -627,23 +629,27 @@ export class Auth0ActivityTrackingService {
       }
 
       // Get user's sessions from Auth0
-      const sessions = await (auth0Management as unknown as Auth0ManagementExtended).getUserSessions({ id: userId })
+      const sessions = await (
+        auth0Management as unknown as Auth0ManagementExtended
+      ).getUserSessions({ id: userId })
 
-      return (sessions).map((session): SessionInfo => ({
-        id: session.id,
-        clientId: session.client_id,
-        ipAddress: session.ip,
-        userAgent: session.user_agent,
-        startedAt: new Date(session.started_at),
-        lastUpdatedAt: new Date(session.last_updated_at),
-        expiresAt: new Date(session.expires_at),
-        location: session.location
-          ? {
-              country: session.location.country_name,
-              city: session.location.city_name,
-            }
-          : undefined,
-      }))
+      return sessions.map(
+        (session): SessionInfo => ({
+          id: session.id,
+          clientId: session.client_id,
+          ipAddress: session.ip,
+          userAgent: session.user_agent,
+          startedAt: new Date(session.started_at),
+          lastUpdatedAt: new Date(session.last_updated_at),
+          expiresAt: new Date(session.expires_at),
+          location: session.location
+            ? {
+                country: session.location.country_name,
+                city: session.location.city_name,
+              }
+            : undefined,
+        }),
+      )
     } catch (error: unknown) {
       console.error('Failed to get user sessions:', error)
       return []
@@ -663,7 +669,9 @@ export class Auth0ActivityTrackingService {
       }
 
       // Terminate session in Auth0
-      await (auth0Management as unknown as Auth0ManagementExtended).deleteUserSessions({
+      await (
+        auth0Management as unknown as Auth0ManagementExtended
+      ).deleteUserSessions({
         id: userId,
         session_id: sessionId,
       })

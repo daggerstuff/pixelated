@@ -1,6 +1,7 @@
 # Cloudflare Vectorize
 
-Globally distributed vector database for AI applications. Store and query vector embeddings for semantic search, recommendations, RAG, and classification.
+Globally distributed vector database for AI applications. Store and query vector
+embeddings for semantic search, recommendations, RAG, and classification.
 
 **Status:** Generally Available (GA) | **Last Updated:** 2026-01-27
 
@@ -14,7 +15,7 @@ Globally distributed vector database for AI applications. Store and query vector
 // { "vectorize": [{ "binding": "VECTORIZE", "index_name": "my-index" }] }
 
 // 3. Query vectors
-const matches = await env.VECTORIZE.query(queryVector, { topK: 5 });
+const matches = await env.VECTORIZE.query(queryVector, { topK: 5 })
 ```
 
 ## Key Features
@@ -29,14 +30,14 @@ const matches = await env.VECTORIZE.query(queryVector, { topK: 5 });
 
 ## Reading Order
 
-| Task | Files to Read |
-|------|---------------|
-| New to Vectorize | README only |
-| Implement feature | README + api + patterns |
-| Setup/configure | README + configuration |
-| Debug issues | gotchas |
-| Integrate with AI | README + patterns |
-| RAG implementation | README + patterns |
+| Task               | Files to Read           |
+| ------------------ | ----------------------- |
+| New to Vectorize   | README only             |
+| Implement feature  | README + api + patterns |
+| Setup/configure    | README + configuration  |
+| Debug issues       | gotchas                 |
+| Integrate with AI  | README + patterns       |
+| RAG implementation | README + patterns       |
 
 ## File Guide
 
@@ -58,13 +59,14 @@ What are you building?
 └─ Pre-normalized vectors → dot-product
 ```
 
-| Metric | Best For | Score Interpretation |
-|--------|----------|---------------------|
-| `cosine` | Text embeddings, semantic similarity | Higher = closer (1.0 = identical) |
-| `euclidean` | Absolute distance, spatial data | Lower = closer (0.0 = identical) |
-| `dot-product` | Recommendations, normalized vectors | Higher = closer |
+| Metric        | Best For                             | Score Interpretation              |
+| ------------- | ------------------------------------ | --------------------------------- |
+| `cosine`      | Text embeddings, semantic similarity | Higher = closer (1.0 = identical) |
+| `euclidean`   | Absolute distance, spatial data      | Lower = closer (0.0 = identical)  |
+| `dot-product` | Recommendations, normalized vectors  | Higher = closer                   |
 
-**Note:** Index configuration is immutable. Cannot change dimensions or metric after creation.
+**Note:** Index configuration is immutable. Cannot change dimensions or metric
+after creation.
 
 ## Multi-Tenancy Strategy
 
@@ -86,33 +88,37 @@ How many tenants?
 
 ```typescript
 // 1. Generate embedding
-const result = await env.AI.run("@cf/baai/bge-base-en-v1.5", { text: [query] });
+const result = await env.AI.run('@cf/baai/bge-base-en-v1.5', { text: [query] })
 
 // 2. Query Vectorize
 const matches = await env.VECTORIZE.query(result.data[0], {
   topK: 5,
-  returnMetadata: "indexed"
-});
+  returnMetadata: 'indexed',
+})
 ```
 
 ### RAG Pattern
 
 ```typescript
 // 1. Generate query embedding
-const embedding = await env.AI.run("@cf/baai/bge-base-en-v1.5", { text: [query] });
+const embedding = await env.AI.run('@cf/baai/bge-base-en-v1.5', {
+  text: [query],
+})
 
 // 2. Search Vectorize
-const matches = await env.VECTORIZE.query(embedding.data[0], { topK: 5 });
+const matches = await env.VECTORIZE.query(embedding.data[0], { topK: 5 })
 
 // 3. Fetch full documents from R2/D1/KV
-const docs = await Promise.all(matches.matches.map(m => 
-  env.R2.get(m.metadata.key).then(obj => obj?.text())
-));
+const docs = await Promise.all(
+  matches.matches.map((m) =>
+    env.R2.get(m.metadata.key).then((obj) => obj?.text()),
+  ),
+)
 
 // 4. Generate LLM response with context
-const answer = await env.AI.run("@cf/meta/llama-3-8b-instruct", {
-  prompt: `Context: ${docs.join("\n\n")}\n\nQuestion: ${query}\n\nAnswer:`
-});
+const answer = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+  prompt: `Context: ${docs.join('\n\n')}\n\nQuestion: ${query}\n\nAnswer:`,
+})
 ```
 
 ## Critical Gotchas
@@ -122,7 +128,8 @@ See `gotchas.md` for details. Most important:
 1. **Async mutations**: Inserts take 5-10s to be queryable
 2. **500 batch limit**: Workers API enforces 500 vectors per call (undocumented)
 3. **Metadata truncation**: `"indexed"` returns first 64 bytes only
-4. **topK with metadata**: Max 20 (not 100) when using returnValues or returnMetadata: "all"
+4. **topK with metadata**: Max 20 (not 100) when using returnValues or
+   returnMetadata: "all"
 5. **Metadata indexes first**: Must create before inserting vectors
 
 ## Resources
