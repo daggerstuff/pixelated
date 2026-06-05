@@ -1,3 +1,0 @@
-## 2025-02-14 - Deep Equality Testing | Pattern: Testing deeply nested structures is critical for utilities claiming recursive deep equal capabilities. | Action: Ensure deep equality utility tests cover nested objects, arrays, and missing keys to validate structural comparison robustness.
-
-## 2025-02-14 - deepEqual edge cases | Pattern: Avoid asserting buggy behavior when source cannot be modified | Action: When adding tests, if a function behaves incorrectly for an edge case (e.g., deepEqual([], {}) returns true), do not write a test that blindly asserts the buggy output just to pass. Omit the test for the broken logic and focus on valid edge cases.
