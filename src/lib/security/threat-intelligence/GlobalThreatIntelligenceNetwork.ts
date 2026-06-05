@@ -9,9 +9,9 @@ import { EventEmitter } from 'events'
 import Redis from 'ioredis'
 import { MongoClient, Db, Collection } from 'mongodb'
 
+import { encrypt, decrypt } from '../../encryption'
 import { logger } from '../../logger'
 import { auditLog } from '../audit-logging'
-import { encrypt, decrypt } from '../../encryption'
 
 // Types
 export interface ThreatIntelligence {

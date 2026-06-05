@@ -107,7 +107,8 @@ class PerformanceMonitor {
     console.log('Performance monitoring stopped')
   }
 
-  private async collectMetrics(): Promise<void> {    const metrics: PerformanceMetrics = {
+  private async collectMetrics(): Promise<void> {
+    const metrics: PerformanceMetrics = {
       timestamp: new Date(),
       responseTime: await this.measureResponseTime(),
       memoryUsage: await this.measureMemoryUsage(),
@@ -428,9 +429,15 @@ class PerformanceMonitor {
         firstAvg.responseTime ?? 0,
         secondAvg.responseTime ?? 0,
       ),
-      memoryUsage: calculateTrend(firstAvg.memoryUsage ?? 0, secondAvg.memoryUsage ?? 0),
+      memoryUsage: calculateTrend(
+        firstAvg.memoryUsage ?? 0,
+        secondAvg.memoryUsage ?? 0,
+      ),
       cpuUsage: calculateTrend(firstAvg.cpuUsage ?? 0, secondAvg.cpuUsage ?? 0),
-      errorRate: calculateTrend(firstAvg.errorRate ?? 0, secondAvg.errorRate ?? 0),
+      errorRate: calculateTrend(
+        firstAvg.errorRate ?? 0,
+        secondAvg.errorRate ?? 0,
+      ),
     }
   }
 

@@ -190,7 +190,9 @@ export class YahooFinanceService {
   ): Promise<YahooFinanceHistoricalData[]> {
     try {
       const cacheKey = `historical_${symbol}_${period}`
-      const cached = this.getFromCache(cacheKey) as YahooFinanceHistoricalData[] | null
+      const cached = this.getFromCache(cacheKey) as
+        | YahooFinanceHistoricalData[]
+        | null
       if (cached) return cached
 
       const interval = period === '1d' ? '1m' : '1d'

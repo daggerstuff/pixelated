@@ -18,7 +18,13 @@ declare module '../../../lib/auth' {
   }
 }
 
-export const GET = async ({ request, cookies }: { request: Request; cookies: any }) => {
+export const GET = async ({
+  request,
+  cookies,
+}: {
+  request: Request
+  cookies: any
+}) => {
   try {
     // Extract query parameters from the URL
     const url = new URL(request.url)

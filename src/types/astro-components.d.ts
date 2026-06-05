@@ -80,7 +80,6 @@ declare module '../../types/audit' {
   }
 }
 
-
 // UI component declarations
 declare module './input' {
   export interface InputProps {

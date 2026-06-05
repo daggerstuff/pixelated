@@ -13,32 +13,31 @@ npx wrangler vectorize create my-index --dimensions=768 --metric=cosine
 ```jsonc
 // wrangler.jsonc
 {
-  "vectorize": [
-    { "binding": "VECTORIZE", "index_name": "my-index" }
-  ]
+  "vectorize": [{ "binding": "VECTORIZE", "index_name": "my-index" }],
 }
 ```
 
 ```typescript
 interface Env {
-  VECTORIZE: Vectorize;
+  VECTORIZE: Vectorize
 }
 ```
 
 ## Metadata Indexes
 
-**Must create BEFORE inserting vectors** - existing vectors not retroactively indexed.
+**Must create BEFORE inserting vectors** - existing vectors not retroactively
+indexed.
 
 ```bash
 wrangler vectorize create-metadata-index my-index --property-name=category --type=string
 wrangler vectorize create-metadata-index my-index --property-name=price --type=number
 ```
 
-| Type | Use For |
-|------|---------|
-| `string` | Categories, tags (first 64 bytes indexed) |
-| `number` | Prices, timestamps |
-| `boolean` | Flags |
+| Type      | Use For                                   |
+| --------- | ----------------------------------------- |
+| `string`  | Categories, tags (first 64 bytes indexed) |
+| `number`  | Prices, timestamps                        |
+| `boolean` | Flags                                     |
 
 ## CLI Commands
 
@@ -70,12 +69,17 @@ wrangler vectorize delete-metadata-index <index-name> --property-name=field
 ## Cardinality Best Practice
 
 Bucket high-cardinality data:
+
 ```typescript
 // ❌ Millisecond timestamps
-metadata: { timestamp: Date.now() }
+metadata: {
+  timestamp: Date.now()
+}
 
 // ✅ 5-minute buckets
-metadata: { timestamp_bucket: Math.floor(Date.now() / 300000) * 300000 }
+metadata: {
+  timestamp_bucket: Math.floor(Date.now() / 300000) * 300000
+}
 ```
 
 ## Production Checklist
