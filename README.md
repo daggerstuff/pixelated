@@ -103,3 +103,4 @@ Built with: Astro, React, Node.js, TypeScript, MongoDB, Redis, and modern test
 and browser tooling.
 
 © 2026 Pixelated Empathy. Engineered with purpose.
+# Test change
