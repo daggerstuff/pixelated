@@ -11,7 +11,11 @@ import { fheService } from '../fhe'
 import { EncryptionMode } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { InProcessMemoryService } from '../memory/__tests__/in-process-memory-service'
-import { AnalyticsService, EventType, EventPriority } from './analytics/AnalyticsService'
+import {
+  AnalyticsService,
+  EventType,
+  EventPriority,
+} from './analytics/AnalyticsService'
 import { ContactService } from './contact/ContactService'
 import { EmailService } from './email/EmailService'
 import { NotificationService } from './notification/NotificationService'
@@ -60,7 +64,8 @@ export class Phase3IntegrationTester {
     const redisPort = parseInt(process.env['REDIS_PORT'] ?? '6379')
     const redisScheme = 'redis://'
     this.redisService = new RedisService({
-      url: process.env['REDIS_URL'] ?? `${redisScheme}${redisHost}:${redisPort}`,
+      url:
+        process.env['REDIS_URL'] ?? `${redisScheme}${redisHost}:${redisPort}`,
       host: redisHost,
       port: redisPort,
       retryAttempts: 3,
@@ -195,12 +200,32 @@ export class Phase3IntegrationTester {
 
       // Test core services
       const healthChecks = await Promise.allSettled([
-        (this.memoryService as unknown as { healthCheck?: () => Promise<boolean> }).healthCheck?.() ?? Promise.resolve(true),
+        (
+          this.memoryService as unknown as {
+            healthCheck?: () => Promise<boolean>
+          }
+        ).healthCheck?.() ?? Promise.resolve(true),
         this.redisService.isHealthy(),
-        (this.analyticsService as unknown as { healthCheck?: () => Promise<boolean> }).healthCheck?.() ?? Promise.resolve(true),
-        (this.notificationService as unknown as { healthCheck?: () => Promise<boolean> }).healthCheck?.() ?? Promise.resolve(true),
-        (this.contactService as unknown as { healthCheck?: () => Promise<boolean> }).healthCheck?.() ?? Promise.resolve(true),
-        (this.emailService as unknown as { healthCheck?: () => Promise<boolean> }).healthCheck?.() ?? Promise.resolve(true),
+        (
+          this.analyticsService as unknown as {
+            healthCheck?: () => Promise<boolean>
+          }
+        ).healthCheck?.() ?? Promise.resolve(true),
+        (
+          this.notificationService as unknown as {
+            healthCheck?: () => Promise<boolean>
+          }
+        ).healthCheck?.() ?? Promise.resolve(true),
+        (
+          this.contactService as unknown as {
+            healthCheck?: () => Promise<boolean>
+          }
+        ).healthCheck?.() ?? Promise.resolve(true),
+        (
+          this.emailService as unknown as {
+            healthCheck?: () => Promise<boolean>
+          }
+        ).healthCheck?.() ?? Promise.resolve(true),
       ])
 
       const healthResults = healthChecks.map((result) =>
@@ -279,7 +304,9 @@ export class Phase3IntegrationTester {
       )
 
       // 5. Track analytics event
-      const biasScoreValue = (biasResult as unknown as Record<string, number | undefined>)['overallBiasScore']
+      const biasScoreValue = (
+        biasResult as unknown as Record<string, number | undefined>
+      )['overallBiasScore']
 
       await this.analyticsService.trackEvent({
         type: EventType.CUSTOM,
@@ -296,7 +323,11 @@ export class Phase3IntegrationTester {
 
       // 6. Send notification if high bias detected
       if ((biasScoreValue ?? 0) > 0.7) {
-        await (this.notificationService as unknown as { sendNotification: (opts: unknown) => Promise<unknown> }).sendNotification({
+        await (
+          this.notificationService as unknown as {
+            sendNotification: (opts: unknown) => Promise<unknown>
+          }
+        ).sendNotification({
           type: 'bias_alert',
           userId,
           title: 'High Bias Detected',

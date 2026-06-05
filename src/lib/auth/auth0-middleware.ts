@@ -28,11 +28,13 @@ export interface ClientInfo {
  */
 export function extractTokenFromRequest(req: Request): string | null {
   // Check Authorization header first (Web API Request uses headers.get())
-  const authHeader = (
-    req.headers.get?.('Authorization') ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['authorization'] ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['Authorization']
-  ) as string | null | undefined
+  const authHeader = (req.headers.get?.('Authorization') ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'authorization'
+    ] ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'Authorization'
+    ]) as string | null | undefined
 
   if (
     authHeader &&
@@ -54,10 +56,10 @@ export function extractTokenFromRequest(req: Request): string | null {
   }
 
   // Check cookie for fallback
-  const cookieHeader = (
-    req.headers.get?.('cookie') ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['cookie']
-  ) as string | null | undefined
+  const cookieHeader = (req.headers.get?.('cookie') ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'cookie'
+    ]) as string | null | undefined
   if (cookieHeader) {
     const cookies = cookieHeader.split(';').map((c: string) => c.trim())
     for (const cookie of cookies) {
@@ -76,19 +78,23 @@ export function extractTokenFromRequest(req: Request): string | null {
  * Works with Web API Request type
  */
 export function getClientIp(req: Request): string {
-  const xForwardedFor = (
-    req.headers.get?.('x-forwarded-for') ??
+  const xForwardedFor = (req.headers.get?.('x-forwarded-for') ??
     req.headers.get?.('X-Forwarded-For') ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['x-forwarded-for'] ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['X-Forwarded-For']
-  ) as string | null | undefined
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'x-forwarded-for'
+    ] ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'X-Forwarded-For'
+    ]) as string | null | undefined
 
-  const xRealIp = (
-    req.headers.get?.('x-real-ip') ??
+  const xRealIp = (req.headers.get?.('x-real-ip') ??
     req.headers.get?.('X-Real-Ip') ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['x-real-ip'] ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['X-Real-Ip']
-  ) as string | null | undefined
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'x-real-ip'
+    ] ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'X-Real-Ip'
+    ]) as string | null | undefined
 
   return (
     ((req as unknown as { ip?: unknown }).ip as string | undefined) ??
@@ -106,13 +112,15 @@ export function getClientIp(req: Request): string {
 export function getClientInfo(req: Request): { ip: string; userAgent: string } {
   const ip = getClientIp(req)
 
-  const userAgent = (
-    req.headers.get?.('user-agent') ??
+  const userAgent = (req.headers.get?.('user-agent') ??
     req.headers.get?.('User-Agent') ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['user-agent'] ??
-    (req.headers as unknown as Record<string, unknown> | undefined)?.['User-Agent'] ??
-    'unknown'
-  ) as string
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'user-agent'
+    ] ??
+    (req.headers as unknown as Record<string, unknown> | undefined)?.[
+      'User-Agent'
+    ] ??
+    'unknown') as string
 
   return { ip, userAgent }
 }
@@ -283,12 +291,14 @@ export async function csrfProtection(request: Request): Promise<{
   }
 
   // For other methods, check for CSRF token
-  const csrfToken = (
-    request.headers?.get?.('X-CSRF-Token') ??
+  const csrfToken = (request.headers?.get?.('X-CSRF-Token') ??
     request.headers?.get?.('x-csrf-token') ??
-    (request.headers as unknown as Record<string, unknown> | undefined)?.['X-CSRF-Token'] ??
-    (request.headers as unknown as Record<string, unknown> | undefined)?.['x-csrf-token']
-  ) as string | undefined
+    (request.headers as unknown as Record<string, unknown> | undefined)?.[
+      'X-CSRF-Token'
+    ] ??
+    (request.headers as unknown as Record<string, unknown> | undefined)?.[
+      'x-csrf-token'
+    ]) as string | undefined
 
   if (!csrfToken) {
     const { logSecurityEvent, SecurityEventType } = await import('../security')
@@ -446,12 +456,14 @@ export async function securityHeaders(
   headers.set('Expires', '0')
 
   // Add CORS headers for API requests
-  const origin = (
-    request.headers?.get?.('Origin') ??
+  const origin = (request.headers?.get?.('Origin') ??
     request.headers?.get?.('origin') ??
-    (request.headers as unknown as Record<string, unknown> | undefined)?.['Origin'] ??
-    (request.headers as unknown as Record<string, unknown> | undefined)?.['origin']
-  ) as string | undefined
+    (request.headers as unknown as Record<string, unknown> | undefined)?.[
+      'Origin'
+    ] ??
+    (request.headers as unknown as Record<string, unknown> | undefined)?.[
+      'origin'
+    ]) as string | undefined
 
   // Allow CORS if origin is explicitly allowed OR if API key is valid
   let corsAllowed = false
@@ -533,10 +545,10 @@ export async function authenticateRequest(
 
   // Check for API Key first if strategy allows it
   if (strategy === 'apiKeyOnly' || strategy === 'either') {
-    const apiKey = (
-      request.headers?.get?.('X-API-Key') ??
-      (request.headers as unknown as Record<string, unknown> | undefined)?.['X-API-Key']
-    ) as string | undefined
+    const apiKey = (request.headers?.get?.('X-API-Key') ??
+      (request.headers as unknown as Record<string, unknown> | undefined)?.[
+        'X-API-Key'
+      ]) as string | undefined
     if (apiKey) {
       const validation = await developerApiKeyManager.validateApiKey(apiKey)
       if (validation.valid && validation.api_key) {
@@ -619,13 +631,17 @@ export async function authenticateRequest(
   // Fall through to JWT if strategy is 'jwtOnly' or 'either'
   if (strategy === 'jwtOnly' || strategy === 'either') {
     // Extract authorization header - use comprehensive extraction
-    const authHeader = (
-      request.headers?.get?.('Authorization') ??
+    const authHeader = (request.headers?.get?.('Authorization') ??
       request.headers?.get?.('authorization') ??
-      (request.headers as unknown as Record<string, unknown> | undefined)?.['Authorization'] ??
-      (request.headers as unknown as Record<string, unknown> | undefined)?.['authorization'] ??
-      (request.headers as unknown as { get?: (name: string) => string | null })?.get?.('Authorization')
-    ) as string | undefined
+      (request.headers as unknown as Record<string, unknown> | undefined)?.[
+        'Authorization'
+      ] ??
+      (request.headers as unknown as Record<string, unknown> | undefined)?.[
+        'authorization'
+      ] ??
+      (
+        request.headers as unknown as { get?: (name: string) => string | null }
+      )?.get?.('Authorization')) as string | undefined
 
     if (!authHeader) {
       const { logSecurityEvent, SecurityEventType } =

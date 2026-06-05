@@ -78,7 +78,7 @@ describe('IndexedDBRequestQueue', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })

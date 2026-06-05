@@ -24,7 +24,8 @@ Concise repository guidance for GitHub Copilot in this project.
 
 ## 3) NVIDIA NIM Setup
 
-This project is pre-configured to use NVIDIA NIM (NVIDIA Inference Microservices) as a custom model provider for GitHub Copilot CLI.
+This project is pre-configured to use NVIDIA NIM (NVIDIA Inference
+Microservices) as a custom model provider for GitHub Copilot CLI.
 
 ### Quick Start
 
@@ -35,8 +36,10 @@ source .github/copilot/nim-byok.sh
 ```
 
 This script sets the following environment variables:
+
 - `COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"`
-- `COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"` (requires NVIDIA_API_KEY to be set)
+- `COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"` (requires NVIDIA_API_KEY to be
+  set)
 - `COPILOT_PROVIDER_TYPE="openai"`
 - `COPILOT_MODEL="openai/gpt-oss-120b"` (default)
 - `COPILOT_PROVIDER_MODEL_ID="openai/gpt-oss-120b"` (default)
@@ -44,16 +47,17 @@ This script sets the following environment variables:
 
 ### Available NIM Models
 
-You can switch between different NVIDIA NIM models by setting the `COPILOT_MODEL` environment variable:
+You can switch between different NVIDIA NIM models by setting the
+`COPILOT_MODEL` environment variable:
 
-| Model ID | Context Length | Best For |
-|----------|----------------|----------|
-| `openai/gpt-oss-120b` | 128K+ | General coding and reasoning |
-| `nvidia/llama-3.3-nemotron-super-49b-v1.5` | 256K+ | Complex coding and therapeutic reasoning |
-| `z-ai/glm-5.1` | 128K | General purpose tasks |
-| `deepseek-ai/deepseek-v3.2` | 128K | Code + mathematical reasoning |
-| `moonshotai/kimi-k2.6` | 256K | Long context tasks |
-| `minimaxai/minimax-2.7` | 128K | Multi-step reasoning |
+| Model ID                                   | Context Length | Best For                                 |
+| ------------------------------------------ | -------------- | ---------------------------------------- |
+| `openai/gpt-oss-120b`                      | 128K+          | General coding and reasoning             |
+| `nvidia/llama-3.3-nemotron-super-49b-v1.5` | 256K+          | Complex coding and therapeutic reasoning |
+| `z-ai/glm-5.1`                             | 128K           | General purpose tasks                    |
+| `deepseek-ai/deepseek-v3.2`                | 128K           | Code + mathematical reasoning            |
+| `moonshotai/kimi-k2.6`                     | 256K           | Long context tasks                       |
+| `minimaxai/minimax-2.7`                    | 128K           | Multi-step reasoning                     |
 
 ### Switching Models
 
@@ -65,13 +69,15 @@ copilot <your-command>
 ```
 
 Or make it persistent by adding to your shell profile:
+
 ```bash
 echo 'export COPILOT_MODEL="openai/gpt-oss-120b"' >> ~/.bashrc
 ```
 
 ### Rate Limit Handling
 
-The project includes a `copilot-safe-run.sh` script that provides automatic fallback and retry logic for handling rate limits:
+The project includes a `copilot-safe-run.sh` script that provides automatic
+fallback and retry logic for handling rate limits:
 
 ```bash
 # Instead of running copilot directly, use:
@@ -79,6 +85,7 @@ scripts/devops/copilot-safe-run.sh copilot <args>
 ```
 
 This script will:
+
 1. Try the primary model with retry logic
 2. Automatically fall back to alternative models on rate limit errors
 3. Use exponential backoff for retries

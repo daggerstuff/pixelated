@@ -76,5 +76,5 @@ python <filename>.py
 
 ## Status
 
-Cookbook structure is complete with 7 recipes across Node.js and Python.
-Each recipe includes both markdown documentation and runnable examples.
+Cookbook structure is complete with 7 recipes across Node.js and Python. Each
+recipe includes both markdown documentation and runnable examples.
