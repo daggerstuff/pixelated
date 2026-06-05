@@ -22,6 +22,7 @@ const baseNodeTestGlobs = [
   'src/lib/redis.test.ts',
   'src/lib/services/notification/__tests__/NotificationService.test.ts',
   'src/lib/__tests__/security-implementation.test.ts',
+  'src/lib/__tests__/security.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -224,6 +225,7 @@ const vitestConfig = {
             'src/lib/redis.test.ts',
             'src/lib/services/notification/__tests__/NotificationService.test.ts',
             'src/lib/__tests__/security-implementation.test.ts',
+            'src/lib/__tests__/security.test.ts',
             'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
