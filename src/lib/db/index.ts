@@ -4,6 +4,8 @@
  */
 
 import { createHash } from 'crypto'
+import { readFile, readdir } from 'fs/promises'
+import * as path from 'path'
 
 import { Pool, PoolClient } from 'pg'
 
@@ -16,6 +18,19 @@ export interface DbQueryResult<T = Record<string, unknown>> {
   fields?: Array<{ name: string; dataTypeID: number }>
 }
 type QueryResultRow = Record<string, unknown>
+
+// Pool's runtime properties not exposed in pg type definitions.
+// Accessed via `as unknown as T` — safer than `as any` because it requires
+// explicit acknowledgement that the shape is compiler-unknown.
+interface PoolWithConnectEvent {
+  on(event: 'connect', listener: (client: PoolClient) => void): this
+}
+
+interface PoolStats {
+  totalCount: number
+  idleCount: number
+  waitingCount: number
+}
 
 // Database configuration
 export interface DatabaseConfig {
@@ -66,7 +81,7 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   })
 
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
-  ;(pool as any).on('connect', (_client: PoolClient) => {
+  ;(pool as unknown as PoolWithConnectEvent).on('connect', (_client: PoolClient) => {
     console.log('New client connected to database')
   })
 
@@ -147,9 +162,9 @@ export async function healthCheck(): Promise<{
       status: 'healthy',
       latency,
       connections: {
-        total: (poolState as any).totalCount,
-        idle: (poolState as any).idleCount,
-        waiting: (poolState as any).waitingCount,
+        total: (poolState as unknown as PoolStats).totalCount,
+        idle: (poolState as unknown as PoolStats).idleCount,
+        waiting: (poolState as unknown as PoolStats).waitingCount,
       },
     }
   } catch {
@@ -198,6 +213,23 @@ export function createContentHash(
     },
   })
   return createHash('sha256').update(hashInput).digest('hex')
+}
+
+/** Result from running migrations from a directory. */
+export interface MigrateFromDirectoryResult {
+  applied: string[]
+  skipped: string[]
+}
+
+/** Result from rolling back the last migration. */
+export interface RollbackLastResult {
+  rolledBack: string | null
+}
+
+/** Status of applied vs pending migrations. */
+export interface MigrationStatusResult {
+  applied: string[]
+  pending: string[]
 }
 
 /**
@@ -257,6 +289,132 @@ export class DatabaseMigration {
    */
   async markMigrationExecuted(name: string): Promise<void> {
     await query('INSERT INTO schema_migrations (name) VALUES ($1)', [name])
+  }
+
+  // ------------------------------------------------------------------
+  // Directory-based migration helpers (used by scripts/db-migrate.ts)
+  // ------------------------------------------------------------------
+
+  /**
+   * List migration files from a directory, sorted by version.
+   * Matches files matching `NNN_*.sql` and explicitly excludes
+   * `*.rollback.sql` so rollback files are never treated as forward migrations.
+   */
+  private async listMigrationFiles(dir: string): Promise<string[]> {
+    const entries = await readdir(dir)
+    const migrationRe = /^(\d+)_.+\.sql$/
+    return entries
+      .filter((f) => migrationRe.test(f) && !f.endsWith('.rollback.sql'))
+      .sort((a, b) => {
+        const va = parseInt(a.match(/^(\d+)/)![1]!, 10)
+        const vb = parseInt(b.match(/^(\d+)/)![1]!, 10)
+        return va - vb
+      })
+  }
+
+  /**
+   * Read the rollback SQL file for a migration, if it exists.
+   * Returns `null` when no `.rollback.sql` file is found (ENOENT).
+   * Includes a type guard so that non-Node error types don't crash.
+   */
+  private async readRollbackFile(
+    migrationName: string,
+    dir: string,
+  ): Promise<string | null> {
+    const baseName = migrationName.replace(/\.sql$/, '')
+    const rollbackPath = path.join(dir, `${baseName}.rollback.sql`)
+    try {
+      return await readFile(rollbackPath, 'utf-8')
+    } catch (err: unknown) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        (err as NodeJS.ErrnoException).code === 'ENOENT'
+      ) {
+        return null
+      }
+      throw err
+    }
+  }
+
+  /**
+   * Run all pending migrations found in a directory.
+   * Reads each `.sql` file (excluding `.rollback.sql`), executes it,
+   * and records it in `schema_migrations`.
+   */
+  async runMigrationsFromDirectory(
+    dir: string,
+  ): Promise<MigrateFromDirectoryResult> {
+    await this.ensureMigrationsTable()
+    const allFiles = await this.listMigrationFiles(dir)
+    const executed = await this.getExecutedMigrations()
+
+    const result: MigrateFromDirectoryResult = { applied: [], skipped: [] }
+
+    for (const name of allFiles) {
+      if (executed.includes(name)) {
+        result.skipped.push(name)
+        continue
+      }
+      const sqlPath = path.join(dir, name)
+      const sql = await readFile(sqlPath, 'utf-8')
+      console.log(`Running migration: ${name}`)
+      try {
+        await query(sql)
+        await this.markMigrationExecuted(name)
+        result.applied.push(name)
+        console.log(`  ✅ ${name}`)
+      } catch (error: unknown) {
+        console.error(`  ❌ ${name} failed:`, error)
+        throw error
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * Roll back the most recently applied migration that has a
+   * corresponding `.rollback.sql` file.
+   */
+  async rollbackLast(dir: string): Promise<RollbackLastResult> {
+    await this.ensureMigrationsTable()
+    const executed = await this.getExecutedMigrations()
+
+    // Walk executed list in reverse to find the first with a rollback file.
+    for (let i = executed.length - 1; i >= 0; i--) {
+      const name = executed[i]!
+      const rollbackSql = await this.readRollbackFile(name, dir)
+      if (rollbackSql === null) continue
+
+      console.log(`Rolling back: ${name}`)
+      try {
+        await query(rollbackSql)
+        await query('DELETE FROM schema_migrations WHERE name = $1', [name])
+        return { rolledBack: name }
+      } catch (error: unknown) {
+        console.error(`  ❌ Rollback of ${name} failed:`, error)
+        throw error
+      }
+    }
+
+    return { rolledBack: null }
+  }
+
+  /**
+   * Get applied and pending migration lists.
+   */
+  async getStatus(dir: string): Promise<MigrationStatusResult> {
+    await this.ensureMigrationsTable()
+    const allFiles = await this.listMigrationFiles(dir)
+    const executed = await this.getExecutedMigrations()
+
+    const executedSet = new Set(executed)
+    return {
+      applied: allFiles.filter((f) => executedSet.has(f)),
+      pending: allFiles.filter((f) => !executedSet.has(f)),
+    }
   }
 }
 
