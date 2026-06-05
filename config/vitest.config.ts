@@ -112,15 +112,12 @@ const vitestConfig = {
     ],
     conditions: ['node', 'import', 'module', 'default'],
   },
-  // PIX-223: Vitest 4 moved pool/poolOptions to top-level (removed `test.poolOptions`).
+  // PIX-223: Vitest 4 removed `poolOptions` entirely; pool worker limits
+  // become top-level options. `maxForks` is renamed to `maxWorkers`; `singleFork`
+  // and `minForks` are removed (Vitest manages minimum workers automatically).
+  // See https://vitest.dev/guide/migration.html#pool-rework
   pool: 'forks',
-  poolOptions: {
-    forks: {
-      singleFork: false,
-      maxForks: process.env['CI'] ? 2 : 8,
-      minForks: process.env['CI'] ? 1 : 2,
-    },
-  },
+  maxWorkers: process.env['CI'] ? 2 : 8,
   test: {
     globals: true,
     environment: 'jsdom',

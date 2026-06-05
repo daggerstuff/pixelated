@@ -351,26 +351,42 @@ describe('audit.ts', () => {
       expect(() => initializeAuditService()).not.toThrow()
     })
 
-    it('merges custom config', async () => {
-      const { initializeAuditService, configureAuditService } =
+    it('merges custom config without throwing and keeps service functional', async () => {
+      const { initializeAuditService, configureAuditService, getAuditLogs, clearAuditLogs, createHIPAACompliantAuditLog, AuditEventType } =
         await loadAuditModule()
-      initializeAuditService({ batchSize: 50, debugMode: true })
-      configureAuditService({ retentionDays: 30 })
-      expect(true).toBe(true)
+      clearAuditLogs()
+      expect(() => {
+        initializeAuditService({ batchSize: 50, debugMode: true })
+        configureAuditService({ retentionDays: 30 })
+      }).not.toThrow()
+      // Behavioral sanity: after configuring, the service still stores logs.
+      // (If config were dropped or the module crashed, this would fail.)
+      await createHIPAACompliantAuditLog({
+        userId: 'u-1',
+        action: 'access:phi',
+        resource: 'patient-record',
+        eventType: AuditEventType.ACCESS,
+      })
+      const logs = getAuditLogs()
+      expect(logs.length).toBeGreaterThan(0)
+      expect(logs[0]?.userId).toBe('u-1')
     })
 
-    it('starts batch timer when remote storage is enabled with endpoint', async () => {
+    it('starts and stops batch timer when remote storage toggles', async () => {
       const { initializeAuditService, configureAuditService } =
         await loadAuditModule()
-      initializeAuditService({
-        remoteStorageEnabled: true,
-        remoteEndpoint: 'https://audit.example.com/logs',
-      })
-      configureAuditService({
-        remoteStorageEnabled: false,
-        remoteEndpoint: undefined,
-      })
-      expect(true).toBe(true)
+      // Both calls must not throw; toggling remote storage on then off exercises
+      // the startBatchTimer / clearInterval branches in configureAuditService.
+      expect(() => {
+        initializeAuditService({
+          remoteStorageEnabled: true,
+          remoteEndpoint: 'https://audit.example.com/logs',
+        })
+        configureAuditService({
+          remoteStorageEnabled: false,
+          remoteEndpoint: undefined,
+        })
+      }).not.toThrow()
     })
   })
 
