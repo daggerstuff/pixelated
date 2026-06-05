@@ -84,16 +84,11 @@ describe('Authentication Middleware', () => {
     mockRequest = new Request('https://example.com/api/test', {
       method: 'GET',
       headers: {
-        'Authorization': 'Bearer valid-token',
-        'X-CSRF-Token': 'valid-csrf-token',
+        'Authorization': 'Bearer dummy-valid-token',
+        'X-CSRF-Token': 'dummy-valid-csrf-token',
         'User-Agent': 'Mozilla/5.0',
         'X-Forwarded-For': '127.0.0.1',
       },
-    })
-
-    // Create mock response
-    _mockResponse = new Response(JSON.stringify({ success: true }), {
-      headers: { 'Content-Type': 'application/json' },
     })
   })
 
@@ -577,7 +572,7 @@ describe('Authentication Middleware', () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
-          'X-CSRF-Token': 'valid-csrf-token',
+          'X-CSRF-Token': 'dummy-valid-csrf-token',
         },
       })
 
@@ -585,7 +580,7 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: 'valid-csrf-token', expiresAt: Date.now() + 3600000 }
+          return { token: 'dummy-valid-csrf-token', expiresAt: Date.now() + 3600000 }
         }
         return null
       })
@@ -612,7 +607,7 @@ describe('Authentication Middleware', () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
-          'X-CSRF-Token': 'invalid-token',
+          'X-CSRF-Token': 'dummy-invalid-token',
         },
       })
 
@@ -620,7 +615,7 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: 'different-token', expiresAt: Date.now() + 3600000 }
+          return { token: 'dummy-different-token', expiresAt: Date.now() + 3600000 }
         }
         return null
       })
@@ -636,7 +631,7 @@ describe('Authentication Middleware', () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
-          'X-CSRF-Token': 'expired-token',
+          'X-CSRF-Token': 'dummy-expired-token',
         },
       })
 
@@ -644,7 +639,7 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: 'expired-token', expiresAt: Date.now() - 1000 } // Expired
+          return { token: 'dummy-expired-token', expiresAt: Date.now() - 1000 } // Expired
         }
         return null
       })
@@ -660,7 +655,7 @@ describe('Authentication Middleware', () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
-          'X-CSRF-Token': 'invalid-token',
+          'X-CSRF-Token': 'dummy-invalid-token',
         },
       })
 
@@ -668,7 +663,7 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: 'different-token', expiresAt: Date.now() + 3600000 }
+          return { token: 'dummy-different-token', expiresAt: Date.now() + 3600000 }
         }
         return null
       })
@@ -694,7 +689,7 @@ describe('Authentication Middleware', () => {
         const request = new Request('https://example.com/api/test', {
           method,
           headers: {
-            'X-CSRF-Token': 'valid-token',
+            'X-CSRF-Token': 'dummy-valid-token',
           },
         })
 
@@ -702,7 +697,7 @@ describe('Authentication Middleware', () => {
 
         vi.mocked(getFromCache).mockImplementation(async (key) => {
           if (key.startsWith('csrf:')) {
-            return { token: 'valid-token', expiresAt: Date.now() + 3600000 }
+            return { token: 'dummy-valid-token', expiresAt: Date.now() + 3600000 }
           }
           return null
         })
@@ -1192,7 +1187,7 @@ describe('Authentication Middleware', () => {
       const postRequest = new Request('https://example.com/api/test', {
         method: 'POST',
         headers: {
-          'X-CSRF-Token': 'invalid-token',
+          'X-CSRF-Token': 'dummy-invalid-token',
         },
       })
 
@@ -1200,7 +1195,7 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: 'different-token', expiresAt: Date.now() + 3600000 }
+          return { token: 'dummy-different-token', expiresAt: Date.now() + 3600000 }
         }
         return null
       })
