@@ -127,10 +127,7 @@ export class InProcessMemoryService {
     return this.memories.length < initialLength
   }
 
-  async getMemory(
-    id: string,
-    userId: string,
-  ): Promise<InProcessMemory | null> {
+  async getMemory(id: string, userId: string): Promise<InProcessMemory | null> {
     return (
       this.memories.find(
         (m) => m.id === id && m.userId === userId && m.isLatest,
@@ -186,9 +183,7 @@ export class InProcessMemoryService {
     return this.listMemories(userId, { ...options, search: query })
   }
 
-  async getMemoryCount(
-    userId: string,
-  ): Promise<number> {
+  async getMemoryCount(userId: string): Promise<number> {
     return this.memories.filter((m) => m.userId === userId && m.isLatest).length
   }
 }

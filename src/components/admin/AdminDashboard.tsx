@@ -82,7 +82,10 @@ const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
 }
 
 // ⚡ Bolt Performance Optimization: Extracted static severity styles to module scope to prevent re-creating this object on every render of SystemTab
-const ISSUE_SEVERITY_STYLES: Record<DiagnosticIssueSeverity, { wrapper: string; label: string }> = {
+const ISSUE_SEVERITY_STYLES: Record<
+  DiagnosticIssueSeverity,
+  { wrapper: string; label: string }
+> = {
   critical: {
     wrapper:
       'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 text-red-700 dark:text-red-100',
@@ -97,8 +100,7 @@ const ISSUE_SEVERITY_STYLES: Record<DiagnosticIssueSeverity, { wrapper: string; 
   info: {
     wrapper:
       'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-100',
-    label:
-      'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
+    label: 'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-100',
   },
 }
 

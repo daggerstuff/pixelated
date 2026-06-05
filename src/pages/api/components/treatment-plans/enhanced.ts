@@ -4,9 +4,9 @@ export const prerender = false
 
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { protectRoute } from '@/lib/auth/serverAuth'
-import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { treatmentPlanDAO } from '@/services/mongodb.dao'
+import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
 
 const logger = createBuildSafeLogger('enhanced-treatment-plans-api')
 
@@ -246,8 +246,7 @@ export const GET = protectRoute()(async (context: AuthAPIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -260,9 +259,7 @@ export const GET = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for creating/updating treatment plans
  */
-export const POST = protectRoute()(async (
-  context: AuthAPIContext,
-) => {
+export const POST = protectRoute()(async (context: AuthAPIContext) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -346,8 +343,7 @@ export const POST = protectRoute()(async (
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -360,9 +356,7 @@ export const POST = protectRoute()(async (
 /**
  * PATCH endpoint for updating specific goals or milestones
  */
-export const PATCH = protectRoute()(async (
-  context: AuthAPIContext,
-) => {
+export const PATCH = protectRoute()(async (context: AuthAPIContext) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -415,11 +409,7 @@ export const PATCH = protectRoute()(async (
       )
     } else if (goalId) {
       // Update a specific goal
-      updatedPlan = await treatmentPlanDAO.updateGoal(
-        planId,
-        goalId,
-        updates,
-      )
+      updatedPlan = await treatmentPlanDAO.updateGoal(planId, goalId, updates)
     } else {
       // Update the plan-level fields
       updatedPlan = await treatmentPlanDAO.update(planId, updates)
@@ -463,8 +453,7 @@ export const PATCH = protectRoute()(async (
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

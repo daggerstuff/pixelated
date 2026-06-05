@@ -40,16 +40,16 @@ describe('SessionList', () => {
     const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: (
-        firstItem
-          ? [firstItem,
+      items: (firstItem
+        ? [
+            firstItem,
             {
               ...firstItem,
               sessionId: 'test-session-2',
               targetSources: ['Different Source'],
-            }]
-          : []
-      ) as typeof mockSessionList['items'],
+            },
+          ]
+        : []) as (typeof mockSessionList)['items'],
       total: 2,
     }
 
@@ -68,16 +68,16 @@ describe('SessionList', () => {
     const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: (
-        firstItem
-          ? [firstItem,
+      items: (firstItem
+        ? [
+            firstItem,
             {
               ...firstItem,
               sessionId: 'test-session-2',
               currentPhase: 'evaluation',
-            }]
-          : []
-      ) as typeof mockSessionList['items'],
+            },
+          ]
+        : []) as (typeof mockSessionList)['items'],
       total: 2,
     }
 
@@ -110,18 +110,18 @@ describe('SessionList', () => {
     const firstItem = mockSessionList.items[0]
     const sessionsWithMultiple = {
       ...mockSessionList,
-      items: (
-        firstItem
-          ? [{
+      items: (firstItem
+        ? [
+            {
               ...firstItem,
               sessionId: 'z-session',
             },
             {
               ...firstItem,
               sessionId: 'a-session',
-            }]
-          : []
-      ) as typeof mockSessionList['items'],
+            },
+          ]
+        : []) as (typeof mockSessionList)['items'],
       total: 2,
     }
 

@@ -78,7 +78,11 @@ function normalizeLogger(raw: unknown): {
         console.debug ? console.debug.bind(console) : console.log.bind(console),
       ),
       child: (name?: string) =>
-        normalizeLogger(obj['child'] ? (obj['child'] as (...args: unknown[]) => unknown)(name) : obj),
+        normalizeLogger(
+          obj['child']
+            ? (obj['child'] as (...args: unknown[]) => unknown)(name)
+            : obj,
+        ),
     }
   }
 

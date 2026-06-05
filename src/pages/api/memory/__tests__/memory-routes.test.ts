@@ -35,17 +35,17 @@ import {
   ProductMemoryGatewayError,
 } from '@/lib/services/product-memory-gateway'
 
-import { POST as createMemory } from '../create'
-import { GET as listMemories } from '../list'
-import { GET as searchGet, POST as searchPost } from '../search'
-import { PUT as updatePut, PATCH as updatePatch } from '../update'
-import { DELETE as deleteMemoryRoute } from '../delete'
 import {
   GET as getMemoryById,
   PATCH as patchMemoryById,
   DELETE as deleteMemoryById,
 } from '../[memoryId]'
+import { POST as createMemory } from '../create'
+import { DELETE as deleteMemoryRoute } from '../delete'
+import { GET as listMemories } from '../list'
+import { GET as searchGet, POST as searchPost } from '../search'
 import { GET as getMemoryStats } from '../stats'
+import { PUT as updatePut, PATCH as updatePatch } from '../update'
 
 const mockGetCurrentUser = vi.mocked(getCurrentUser)
 const mockGetGateway = vi.mocked(getProductMemoryGateway)
@@ -57,9 +57,7 @@ function makeRequest(url: string, body?: unknown): Request {
   } as unknown as Request
 }
 
-function makeUser(
-  overrides: Record<string, unknown> = {},
-): {
+function makeUser(overrides: Record<string, unknown> = {}): {
   id: string
   accountId: string
   workspaceId: string

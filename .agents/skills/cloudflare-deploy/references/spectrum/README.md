@@ -2,20 +2,25 @@
 
 ## Overview
 
-Cloudflare Spectrum provides security and acceleration for ANY TCP or UDP-based application. It's a global Layer 4 (L4) reverse proxy running on Cloudflare's edge nodes that routes MQTT, email, file transfer, version control, games, and more through Cloudflare to mask origins and protect from DDoS attacks.
+Cloudflare Spectrum provides security and acceleration for ANY TCP or UDP-based
+application. It's a global Layer 4 (L4) reverse proxy running on Cloudflare's
+edge nodes that routes MQTT, email, file transfer, version control, games, and
+more through Cloudflare to mask origins and protect from DDoS attacks.
 
-**When to Use Spectrum**: When your protocol isn't HTTP/HTTPS (use Cloudflare proxy for HTTP). Spectrum handles everything else: SSH, gaming, databases, MQTT, SMTP, RDP, custom protocols.
+**When to Use Spectrum**: When your protocol isn't HTTP/HTTPS (use Cloudflare
+proxy for HTTP). Spectrum handles everything else: SSH, gaming, databases, MQTT,
+SMTP, RDP, custom protocols.
 
 ## Plan Capabilities
 
-| Capability | Pro/Business | Enterprise |
-|------------|--------------|------------|
-| TCP protocols | Selected ports only | All ports (1-65535) |
-| UDP protocols | Selected ports only | All ports (1-65535) |
-| Port ranges | ❌ | ✅ |
-| Argo Smart Routing | ✅ | ✅ |
-| IP Firewall | ✅ | ✅ |
-| Load balancer origins | ✅ | ✅ |
+| Capability            | Pro/Business        | Enterprise          |
+| --------------------- | ------------------- | ------------------- |
+| TCP protocols         | Selected ports only | All ports (1-65535) |
+| UDP protocols         | Selected ports only | All ports (1-65535) |
+| Port ranges           | ❌                  | ✅                  |
+| Argo Smart Routing    | ✅                  | ✅                  |
+| IP Firewall           | ✅                  | ✅                  |
+| Load balancer origins | ✅                  | ✅                  |
 
 ## Decision Tree
 
@@ -36,9 +41,11 @@ Cloudflare Spectrum provides security and acceleration for ANY TCP or UDP-based 
    - RDP → See [patterns.md](patterns.md#6-rdp-remote-desktop)
 
 3. **Choose origin type**
-   - Direct IP (single server) → See [configuration.md](configuration.md#direct-ip-origin)
+   - Direct IP (single server) → See
+     [configuration.md](configuration.md#direct-ip-origin)
    - CNAME (hostname) → See [configuration.md](configuration.md#cname-origin)
-   - Load balancer (HA/failover) → See [configuration.md](configuration.md#load-balancer-origin)
+   - Load balancer (HA/failover) → See
+     [configuration.md](configuration.md#load-balancer-origin)
 
 ## Reading Order
 

@@ -64,7 +64,8 @@ router.get('/detailed', async (req: Request, res: Response) => {
     client.release()
     health.services.postgresql = {
       status: 'connected',
-      timestamp: (result.rows[0] as { now?: unknown } | undefined)?.now ?? new Date(),
+      timestamp:
+        (result.rows[0] as { now?: unknown } | undefined)?.now ?? new Date(),
     }
   } catch (error: unknown) {
     health.services.postgresql = {

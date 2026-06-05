@@ -89,7 +89,9 @@ router.get('/callback', async (req: Request, res: Response) => {
     })
 
     if (!tokenEndpointRes.ok) {
-      const errorBody = await tokenEndpointRes.json().catch(() => ({})) as Record<string, unknown>
+      const errorBody = (await tokenEndpointRes
+        .json()
+        .catch(() => ({}))) as Record<string, unknown>
       res.status(502).json({
         error: 'Failed to exchange authorization code',
         code: 'TOKEN_EXCHANGE_FAILED',
@@ -250,7 +252,9 @@ interface StagedUser {
 }
 
 router.get('/me', (req: Request, res: Response) => {
-  const user = (req as unknown as { user?: unknown }).user as StagedUser | undefined
+  const user = (req as unknown as { user?: unknown }).user as
+    | StagedUser
+    | undefined
 
   if (!user) {
     res.status(401).json({
@@ -321,7 +325,9 @@ router.post('/refresh', async (req: Request, res: Response) => {
     })
 
     if (!tokenEndpointRes.ok) {
-      const errorBody = await tokenEndpointRes.json().catch(() => ({})) as Record<string, unknown>
+      const errorBody = (await tokenEndpointRes
+        .json()
+        .catch(() => ({}))) as Record<string, unknown>
       res.status(401).json({
         error:
           'Token refresh failed — the refresh token may be expired or revoked',

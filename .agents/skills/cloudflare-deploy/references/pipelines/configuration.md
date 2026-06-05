@@ -5,9 +5,7 @@
 ```jsonc
 // wrangler.jsonc
 {
-  "pipelines": [
-    { "pipeline": "<STREAM_ID>", "binding": "STREAM" }
-  ]
+  "pipelines": [{ "pipeline": "<STREAM_ID>", "binding": "STREAM" }],
 }
 ```
 
@@ -26,7 +24,8 @@ Get stream ID: `npx wrangler pipelines streams list`
 }
 ```
 
-**Types:** `string`, `int32`, `int64`, `float32`, `float64`, `bool`, `timestamp`, `json`, `binary`, `list`, `struct`
+**Types:** `string`, `int32`, `int64`, `float32`, `float64`, `bool`,
+`timestamp`, `json`, `binary`, `list`, `struct`
 
 ## Stream Setup
 
@@ -46,6 +45,7 @@ npx wrangler pipelines streams delete <ID>
 ## Sink Configuration
 
 **R2 Data Catalog (Iceberg):**
+
 ```bash
 npx wrangler pipelines sinks create my-sink \
   --type r2-data-catalog \
@@ -55,6 +55,7 @@ npx wrangler pipelines sinks create my-sink \
 ```
 
 **R2 Raw (Parquet):**
+
 ```bash
 npx wrangler pipelines sinks create my-sink \
   --type r2 --bucket my-bucket --format parquet \
@@ -63,11 +64,11 @@ npx wrangler pipelines sinks create my-sink \
   --access-key-id $KEY --secret-access-key $SECRET
 ```
 
-| Option | Values | Guidance |
-|--------|--------|----------|
-| `--compression` | `zstd`, `snappy`, `gzip` | `zstd` best ratio, `snappy` fastest |
-| `--roll-interval` | Seconds | Low latency: 10-60, Query perf: 300 |
-| `--roll-size` | MB | Larger = better compression |
+| Option            | Values                   | Guidance                            |
+| ----------------- | ------------------------ | ----------------------------------- |
+| `--compression`   | `zstd`, `snappy`, `gzip` | `zstd` best ratio, `snappy` fastest |
+| `--roll-interval` | Seconds                  | Low latency: 10-60, Query perf: 300 |
+| `--roll-size`     | MB                       | Larger = better compression         |
 
 ## Pipeline Creation
 
@@ -80,11 +81,11 @@ npx wrangler pipelines create my-pipeline \
 
 ## Credentials
 
-| Type | Permission | Get From |
-|------|------------|----------|
-| Catalog token | R2 Admin Read & Write | Dashboard → R2 → API tokens |
-| R2 credentials | Object Read & Write | `wrangler r2 bucket create` output |
-| HTTP ingest token | Workers Pipeline Send | Dashboard → Workers → API tokens |
+| Type              | Permission            | Get From                           |
+| ----------------- | --------------------- | ---------------------------------- |
+| Catalog token     | R2 Admin Read & Write | Dashboard → R2 → API tokens        |
+| R2 credentials    | Object Read & Write   | `wrangler r2 bucket create` output |
+| HTTP ingest token | Workers Pipeline Send | Dashboard → Workers → API tokens   |
 
 ## Complete Example
 

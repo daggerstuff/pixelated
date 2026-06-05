@@ -276,14 +276,18 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = (this.redis as unknown as Record<string, () => Redis>)['duplicate']?.() ?? this.redis
+      const subscriber =
+        (this.redis as unknown as Record<string, () => Redis>)[
+          'duplicate'
+        ]?.() ?? this.redis
       await subscriber.connect()
 
       // Subscribe to detection requests
-      await subscriber.subscribe(
-        `edge-detection-${this.config.location}`,
-      )
-      const onMessage = subscriber['on'] as unknown as (event: string, listener: (...args: string[]) => void) => void
+      await subscriber.subscribe(`edge-detection-${this.config.location}`)
+      const onMessage = subscriber['on'] as unknown as (
+        event: string,
+        listener: (...args: string[]) => void,
+      ) => void
       onMessage('message', (channel: string, message: string) => {
         if (channel !== `edge-detection-${this.config.location}`) return
         void (async () => {
@@ -571,7 +575,6 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
     for (const [modelName, model] of this.models) {
       const startTime = Date.now()
       try {
-
         // Prepare input tensor
         const inputTensor = tf.tensor2d([features])
 
@@ -623,7 +626,12 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       }
     }
 
-    return results as unknown as { anomaly: ModelResult; classification: ModelResult; clustering: ModelResult; prediction: ModelResult }
+    return results as unknown as {
+      anomaly: ModelResult
+      classification: ModelResult
+      clustering: ModelResult
+      prediction: ModelResult
+    }
   }
 
   /**
@@ -697,11 +705,16 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
         (result: ModelResult) => result.predictions || [],
       )
 
-      const biasAnalyze = (this.biasDetector as unknown as Record<string, Function>)['analyze']
+      const biasAnalyze = (
+        this.biasDetector as unknown as Record<string, Function>
+      )['analyze']
       if (typeof biasAnalyze !== 'function') {
-        logger.warn('Bias detection engine analyze method unavailable, skipping bias analysis', {
-          location: this.config.location,
-        })
+        logger.warn(
+          'Bias detection engine analyze method unavailable, skipping bias analysis',
+          {
+            location: this.config.location,
+          },
+        )
         return {
           detected: false,
           score: 0,
@@ -1249,9 +1262,15 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
 
     // Sort queue by priority
     this.processingQueue.sort((a, b) => {
-      const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 }
-      const aPriority = priorityOrder[(a.context?.['priority'] as string) ?? 'medium'] ?? 2
-      const bPriority = priorityOrder[(b.context?.['priority'] as string) ?? 'medium'] ?? 2
+      const priorityOrder: Record<string, number> = {
+        high: 3,
+        medium: 2,
+        low: 1,
+      }
+      const aPriority =
+        priorityOrder[(a.context?.['priority'] as string) ?? 'medium'] ?? 2
+      const bPriority =
+        priorityOrder[(b.context?.['priority'] as string) ?? 'medium'] ?? 2
       return bPriority - aPriority
     })
 
@@ -1283,7 +1302,9 @@ export class EdgeThreatDetectionSystem extends EventEmitter {
       }
 
       // Shutdown bias detector
-      await (this.biasDetector as unknown as Record<string, Function>)['shutdown']?.()
+      await (this.biasDetector as unknown as Record<string, Function>)[
+        'shutdown'
+      ]?.()
 
       this.isInitialized = false
       this.emit('shutdown', {

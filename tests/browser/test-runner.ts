@@ -84,13 +84,14 @@ class TestResultsCollector {
       return acc
     }, {})
 
-    Object.entries(browserCount).forEach(([browser, count]) => {        const failureCount = count as number
-        if (failureCount > 5) {
-          recommendations.push({
-            priority: 'high',
-            category: 'browser-compatibility',
-            browser,
-            message: `High number of failures in ${browser} (${failureCount} tests). Consider browser-specific fixes or polyfills.`,
+    Object.entries(browserCount).forEach(([browser, count]) => {
+      const failureCount = count as number
+      if (failureCount > 5) {
+        recommendations.push({
+          priority: 'high',
+          category: 'browser-compatibility',
+          browser,
+          message: `High number of failures in ${browser} (${failureCount} tests). Consider browser-specific fixes or polyfills.`,
         })
       }
     })

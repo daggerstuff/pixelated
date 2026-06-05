@@ -81,11 +81,12 @@ export async function resolveUserIdFromRequest(
     return userId ?? null
   }
 
-  const cookieToken = request.headers
-    .get('cookie')
-    ?.split(';')
-    .find((c) => c.trim().startsWith('auth-token='))
-    ?.split('=')[1] ?? null
+  const cookieToken =
+    request.headers
+      .get('cookie')
+      ?.split(';')
+      .find((c) => c.trim().startsWith('auth-token='))
+      ?.split('=')[1] ?? null
 
   if (cookieToken) {
     const { userId } = await verifyAuthToken(cookieToken)
