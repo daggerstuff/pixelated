@@ -50,9 +50,10 @@ export async function sendNotification(
   const encodedPayload = new TextEncoder().encode(JSON.stringify(payload))
 
   // Import VAPID keys
+  const privateKeyData = base64ToUint8Array(vapidKeys.privateKey)
   const privateKey = await subtle.importKey(
     'pkcs8',
-    base64ToUint8Array(vapidKeys.privateKey),
+    privateKeyData,
     {
       name: 'ECDSA',
       namedCurve: 'P-256',

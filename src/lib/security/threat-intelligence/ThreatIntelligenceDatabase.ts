@@ -85,6 +85,7 @@ export interface TAXIICollection {
 
 export interface TAXIIManifestEntry {
   id: string
+  collection_id?: string
   date_added: string
   version: string
   media_type: string
@@ -547,7 +548,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         const decryptedData = await decrypt(
           result.encrypted_data,
         )
-        return JSON.parse(decryptedData)
+        return JSON.parse(decryptedData as string)
       }
 
       return result.stix_object
@@ -610,14 +611,13 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       ])
 
       // Decrypt and return objects
-      const decryptedObjects = objects.map((obj) => {
+      const decryptedObjects = await Promise.all(objects.map(async (obj) => {
         if (obj.encrypted_data && this._config.encryption.enabled) {
-          return JSON.parse(
-            decrypt(obj.encrypted_data),
-          )
+          const decrypted = await decrypt(obj.encrypted_data)
+          return JSON.parse(decrypted as string)
         }
         return obj.stix_object
-      })
+      }))
 
       return {
         objects: decryptedObjects,
@@ -766,14 +766,13 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       }
 
       // Decrypt and return objects
-      const decryptedObjects = objects.map((obj) => {
+      const decryptedObjects = await Promise.all(objects.map(async (obj) => {
         if (obj.encrypted_data && this._config.encryption.enabled) {
-          return JSON.parse(
-            decrypt(obj.encrypted_data),
-          )
+          const decrypted = await decrypt(obj.encrypted_data)
+          return JSON.parse(decrypted as string)
         }
         return obj.stix_object
-      })
+      }))
 
       return {
         objects: decryptedObjects,
@@ -842,7 +841,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         const decryptedData = await decrypt(
           obj.encrypted_data,
         )
-        stixObject = JSON.parse(decryptedData)
+        stixObject = JSON.parse(decryptedData as string)
       }
 
       const errors: string[] = []
@@ -906,7 +905,7 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
         const decryptedData = await decrypt(
           obj.encrypted_data,
         )
-        stixObject = JSON.parse(decryptedData)
+        stixObject = JSON.parse(decryptedData as string)
       }
 
       const enrichments: string[] = []
@@ -1229,14 +1228,13 @@ export class ThreatIntelligenceDatabase extends EventEmitter {
       const objects = await this.stixCollection.find(filter).toArray()
 
       // Decrypt objects
-      const decryptedObjects = objects.map((obj) => {
+      const decryptedObjects = await Promise.all(objects.map(async (obj) => {
         if (obj.encrypted_data && this._config.encryption.enabled) {
-          return JSON.parse(
-            decrypt(obj.encrypted_data),
-          )
+          const decrypted = await decrypt(obj.encrypted_data)
+          return JSON.parse(decrypted as string)
         }
         return obj.stix_object
-      })
+      }))
 
       // Create STIX bundle
       const bundle = {

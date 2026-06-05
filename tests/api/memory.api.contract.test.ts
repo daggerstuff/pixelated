@@ -59,6 +59,8 @@ async function makeRequest(
       })
     case 'DELETE':
       return request.delete(url.toString(), { headers })
+    default:
+      throw new Error(`Unsupported HTTP method: ${method}`)
   }
 }
 

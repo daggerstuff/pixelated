@@ -579,7 +579,7 @@ export class ExternalThreatFeedIntegrationCore
       // Apply confidence filter
       if (
         filters['minConfidence'] &&
-        item.confidence < filters['minConfidence']
+        (item.confidence) < (filters['minConfidence'] as number)
       ) {
         return false
       }
@@ -587,7 +587,7 @@ export class ExternalThreatFeedIntegrationCore
       // Apply time filter
       if (filters['maxAge']) {
         const itemAge = Date.now() - new Date(item.timestamp).getTime()
-        if (itemAge > filters['maxAge']) {
+        if (itemAge > (filters['maxAge'] as number)) {
           return false
         }
       }
@@ -631,7 +631,7 @@ export class ExternalThreatFeedIntegrationCore
 
       // Set expiration on the deduplication set (24 hours)
       if (this.redis && typeof this.redis['expire'] === 'function') {
-        await this.redis.expire(cacheKey, 24 * 60 * 60)
+        await (this.redis['expire'])(cacheKey, 24 * 60 * 60)
       }
 
       return deduplicatedItems

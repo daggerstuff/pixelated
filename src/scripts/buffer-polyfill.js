@@ -15,6 +15,8 @@ export default function BufferPolyfill(arg, encodingOrOffset, length) {
   } else {
     this._data = new Uint8Array(0)
   }
+
+  return undefined
 }
 
 BufferPolyfill.prototype.toString = function (encoding) {

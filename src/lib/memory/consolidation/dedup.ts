@@ -52,34 +52,37 @@ export class SemanticDeduplicator {
 
     for (let i = 0; i < memories.length; i++) {
       if (used.has(i)) continue
-      const clusterMembers = [memories[i]]
+      const clusterMembers: MemoryBlock[] = [memories[i]!]
       const clusterScores = [1.0]
       used.add(i)
 
       for (let j = i + 1; j < memories.length; j++) {
         if (used.has(j)) continue
-        const sim = this.cosine(vectors[i], vectors[j])
+        const sim = this.cosine(vectors[i]!, vectors[j]!)
         if (sim >= this.threshold) {
-          clusterMembers.push(memories[j])
+          clusterMembers.push(memories[j]!)
           clusterScores.push(sim)
           used.add(j)
         }
       }
 
       if (clusterMembers.length > 1) {
-        const rep = clusterMembers.reduce((a: MemoryBlock, b: MemoryBlock) =>
-          b.importance.raw > a.importance.raw ? b : a,
+        const rep: MemoryBlock = clusterMembers.reduce(
+          (a: MemoryBlock, b: MemoryBlock) =>
+            b.importance.raw > a.importance.raw ? b : a,
+          clusterMembers[0]!,
         )
-        clusters.push({
+        const cluster: DedupCluster = {
           clusterId: `cluster_${clusters.length}`,
           members: clusterMembers,
           representative: rep,
           similarityScores: clusterScores,
-          provenance: clusterMembers.map((m: MemoryBlock) => m.id),
-        })
-        unique.push(this.mergeCluster(clusters[clusters.length - 1]))
+          provenance: clusterMembers.map((m) => m.id),
+        }
+        clusters.push(cluster)
+        unique.push(this.mergeCluster(cluster))
       } else {
-        unique.push(memories[i])
+        unique.push(memories[i]!)
       }
     }
 
@@ -103,8 +106,6 @@ export class SemanticDeduplicator {
     return text.toLowerCase().match(/[a-z]+/g) ?? []
   }
 
-  private vocabulary: string[] = []
-
   buildIndex(memories: MemoryBlock[]): void {
     const docFreq = new Map<string, number>()
     const allTerms = new Set<string>()
@@ -116,7 +117,6 @@ export class SemanticDeduplicator {
       }
     }
     const n = memories.length
-    this.vocabulary = [...allTerms].sort()
     this.idf = new Map()
     for (const [term, df] of docFreq) {
       this.idf.set(term, Math.log((n + 1) / (df + 1)) + 1)

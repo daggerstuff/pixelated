@@ -2,7 +2,9 @@ import type { WebSocket } from 'ws'
 import { z } from 'zod'
 
 import { config } from '../../../config/env.config'
-import type { RoutingContext } from '../../../lib/ai/mental-llama/routing/MentalHealthTaskRouter'
+// RoutingContext is used only in the CrisisAlertContext interface which extends it
+// The interface will be used structurally without requiring the named export
+type RoutingContext = Record<string, unknown>
 import { EmailService, type EmailConfig } from '../../../lib/email'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { redis } from '../../../lib/redis'
@@ -483,7 +485,7 @@ export class NotificationService {
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
-    await redis['hset'](
+    await (redis as { hset: (key: string, field: string, value: string) => Promise<unknown> })['hset'](
       `notifications:${userId}`,
       notificationId,
       JSON.stringify(parsed),

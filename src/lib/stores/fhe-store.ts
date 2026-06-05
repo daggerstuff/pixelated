@@ -236,7 +236,9 @@ export const useFHEStore = create<FHEState>()((set, get) => {
               : { id: '', data: null, dataType: 'object' }
 
         // Perform decryption
-        const decrypted = await fheService.decrypt(encryptedData)
+        const decrypted = await fheService.decrypt(
+          encryptedData as EncryptedData,
+        )
         const decryptedStr =
           typeof decrypted === 'string' ? decrypted : JSON.stringify(decrypted)
 
@@ -314,7 +316,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
             case FHEOperation.Addition:
               if ('add' in fheService && fheService.add && params?.['value']) {
                 processedData = await fheService.add(
-                  encryptedData,
+                  encryptedData as EncryptedData,
                   params['value'] as EncryptedData,
                 )
               }
@@ -326,7 +328,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
                 params?.['value']
               ) {
                 processedData = await fheService.multiply(
-                  encryptedData,
+                  encryptedData as EncryptedData,
                   params['value'] as EncryptedData,
                 )
               }

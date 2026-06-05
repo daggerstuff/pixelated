@@ -24,11 +24,11 @@ async function main() {
 
     if (existingModels && existingModels.length > 0) {
       console.log(`Found ${existingModels.length} existing models:`)
-      existingModels.forEach((model) => {
-        console.log(
-          `- ${model.name} (${model.id}): ${model.presentingIssues.join(', ')}`,
-        )
-      })
+    existingModels.forEach((model: { name: string; id: string; presentingIssues: string[] }) => {
+      console.log(
+        `- ${model.name} (${model.id}): ${model.presentingIssues.join(', ')}`,
+      )
+    })
 
       const resetPrompt =
         process.argv.includes('--reset') || process.argv.includes('-r')
@@ -57,7 +57,7 @@ async function main() {
 
     for (const model of sampleCognitiveModels) {
       console.log(`Saving model: ${model.name} (${model.id})`)
-      await modelService.saveModel(model)
+      await modelService.saveModel(model as Parameters<typeof modelService.saveModel>[0])
     }
 
     console.log('\nSuccessfully initialized all cognitive models!')
@@ -66,7 +66,7 @@ async function main() {
     const models = await modelService.getAvailableModels()
 
     console.log(`\nVerified ${models.length} models in database:`)
-    models.forEach((model) => {
+    models.forEach((model: { name: string; id: string; presentingIssues: string[] }) => {
       console.log(
         `- ${model.name} (${model.id}): ${model.presentingIssues.join(', ')}`,
       )
@@ -74,13 +74,15 @@ async function main() {
 
     console.log('\nDone!')
   } catch (error: unknown) {
-    console.error('Error initializing cognitive models:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Error initializing cognitive models:', errorMessage)
     process.exit(1)
   }
 }
 
 // Run the script
-main().catch((error) => {
-  console.error('Fatal error:', error)
+main().catch((error: unknown) => {
+  const errorMessage = error instanceof Error ? error.message : String(error)
+  console.error('Fatal error:', errorMessage)
   process.exit(1)
 })

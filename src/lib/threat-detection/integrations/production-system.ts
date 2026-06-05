@@ -439,14 +439,14 @@ class ProductionMonitoringService extends EventEmitter {
 
     // Predictions based on trends
     for (const trend of trends) {
-      if (trend.trend === 'increasing') {
+      if (trend['trend'] === 'increasing') {
         predictions.push({
-          metric: trend.metric,
-          predictedValue: trend.average * 1.5,
+          metric: trend['metric'],
+          predictedValue: (trend['average'] as number) * 1.5,
           confidence: 0.7,
         })
         recommendations.push(
-          `Monitor ${trend.metric} closely - trending upward`,
+          `Monitor ${trend['metric'] as string} closely - trending upward`,
         )
       }
     }
@@ -560,7 +560,7 @@ class ProductionHuntingService extends EventEmitter {
 
     setTimeout(() => {
       const inv = this.investigations.get(investigation.id)
-      if ((inv as Record<string, unknown>)?.['status'] === 'running') {
+      if (          (inv as Record<string, unknown>)['status'] === 'running') {
         (inv as Record<string, unknown>)['status'] = 'completed'
         ;(inv as Record<string, unknown>)['result'] = {
           findings: [],
@@ -579,7 +579,7 @@ class ProductionHuntingService extends EventEmitter {
 
   async getActiveInvestigations(): Promise<Record<string, unknown>[]> {
     return [...this.investigations.values()].filter(
-      (inv) => inv.status === 'running',
+      (inv) => (inv)['status'] === 'running',
     )
   }
 
@@ -649,7 +649,7 @@ class ProductionIntelligenceService extends EventEmitter {
   async lookupIOC(indicator: string, type: string): Promise<Record<string, unknown>[]> {
     const cacheKey = `${type}:${indicator}`
     if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)
+      return this.cache.get(cacheKey) ?? []
     }
 
     try {
@@ -873,11 +873,11 @@ export function createCompleteThreatDetectionSystem(
     async processRequest(request: unknown) {
       try {
         const threatResult =
-          await threatDetectionService.processRequest(request)
+          await threatDetectionService.processRequest(request as Record<string, unknown>)
         const insights = await monitoringService.generateInsights()
 
         // Trigger hunting for high-risk requests
-        if (threatResult.riskScore > 0.7) {
+        if ((threatResult['riskScore'] as number) > 0.7) {
           await huntingService.triggerHunt({
             type: 'high-risk-request',
             context: request,

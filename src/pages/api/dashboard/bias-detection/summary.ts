@@ -62,14 +62,14 @@ export const GET: APIRoute = async () => {
     const uptimeResult = await query(uptimeQuery)
 
     const metrics = metricsResult.rows[0] as Record<string, unknown> | undefined ?? {}
-    const uptime = (uptimeResult.rows[0] as Record<string, unknown> | undefined)?.uptime_hours ?? 0
+    const uptime = (uptimeResult.rows[0] as any)?.['uptime_hours'] ?? 0
 
     // Format response
     const response = {
       metrics: {
         'total-sessions': metrics['total_sessions'] ?? 0,
         'avg-bias-score':
-          ((metrics['avg_bias_score'] ?? 0) * 100).toFixed(1) + '%',
+          (((metrics['avg_bias_score'] as number) ?? 0) * 100).toFixed(1) + '%',
         'active-alerts': metrics['active_alerts'] ?? 0,
         'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },

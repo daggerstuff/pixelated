@@ -417,7 +417,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
 
       const statuses: DeploymentStatus[] = []
       results.forEach((result, index) => {
-        const region = this.config.regions[index]
+        const region = this.config.regions[index]!
         if (result.status === 'fulfilled') {
           statuses.push(result.value)
         } else {

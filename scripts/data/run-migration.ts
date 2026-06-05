@@ -46,7 +46,7 @@ async function runMigration() {
     `)
     console.log(
       'Created tables:',
-      tables.rows.map((row) => row.table_name),
+      tables.rows.map((row: Record<string, unknown>) => row.table_name),
     )
 
     client.release()

@@ -1,5 +1,5 @@
 import type { Database } from '../../types/supabase'
-import { createAuditLog } from '../audit'
+import { createAuditLog, AuditEventType } from '../audit'
 import { mongoClient } from './mongoClient'
 
 export type Conversation = Database['public']['Tables']['conversations']['Row']
@@ -20,7 +20,7 @@ export async function getConversations(
     .sort({ last_message_at: -1 })
     .toArray()
 
-  return conversations as Conversation[]
+  return conversations as unknown as Conversation[]
 }
 
 /**
@@ -30,11 +30,12 @@ export async function getConversation(
   id: string,
   userId: string,
 ): Promise<Conversation | null> {
+  const { ObjectId } = await import('mongodb')
   const conversation = await mongoClient.db
     .collection('conversations')
-    .findOne({ _id: id, user_id: userId })
+    .findOne({ _id: new ObjectId(id), user_id: userId })
 
-  return conversation as Conversation | null
+  return conversation as unknown as Conversation | null
 }
 
 /**
@@ -46,27 +47,32 @@ export async function createConversation(
 ): Promise<Conversation> {
   const result = await mongoClient.db
     .collection('conversations')
-    .insertOne(conversation)
+    .insertOne(conversation as unknown as Record<string, unknown>)
 
   const newConversation = {
     ...conversation,
     _id: result.insertedId,
+    id: result.insertedId.toHexString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    last_message_at: new Date().toISOString(),
   }
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
-    userId: conversation.user_id,
-    action: 'conversation_created',
-    resource: 'conversations',
-    metadata: {
+  await createAuditLog(
+    AuditEventType.CREATE,
+    'conversation_created',
+    conversation.user_id,
+    'conversations',
+    {
       conversationId: newConversation._id.toHexString(),
       title: conversation.title,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
+      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: request?.headers.get('user-agent') ?? undefined,
     },
-  })
+  )
 
-  return newConversation as Conversation
+  return newConversation as unknown as Conversation
 }
 
 /**
@@ -78,32 +84,34 @@ export async function updateConversation(
   updates: UpdateConversation,
   request?: Request,
 ): Promise<Conversation> {
+  const { ObjectId } = await import('mongodb')
   const result = await mongoClient.db
     .collection('conversations')
     .findOneAndUpdate(
-      { _id: id, user_id: userId },
+      { _id: new ObjectId(id), user_id: userId },
       { $set: updates },
       { returnDocument: 'after' },
     )
 
-  if (!result.value) {
+  if (!result?.['value']) {
     throw new Error('Failed to update conversation')
   }
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  await createAuditLog(
+    AuditEventType.MODIFY,
+    'conversation_updated',
     userId,
-    action: 'conversation_updated',
-    resource: 'conversations',
-    metadata: {
+    'conversations',
+    {
       conversationId: id,
       updates,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
+      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: request?.headers.get('user-agent') ?? undefined,
     },
-  })
+  )
 
-  return result.value as Conversation
+  return result['value'] as unknown as Conversation
 }
 
 /**
@@ -114,25 +122,27 @@ export async function deleteConversation(
   userId: string,
   request?: Request,
 ): Promise<void> {
+  const { ObjectId } = await import('mongodb')
   const result = await mongoClient.db
     .collection('conversations')
-    .deleteOne({ _id: id, user_id: userId })
+    .deleteOne({ _id: new ObjectId(id), user_id: userId })
 
   if (result.deletedCount === 0) {
     throw new Error('Failed to delete conversation')
   }
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  await createAuditLog(
+    AuditEventType.DELETE,
+    'conversation_deleted',
     userId,
-    action: 'conversation_deleted',
-    resource: 'conversations',
-    metadata: {
+    'conversations',
+    {
       conversationId: id,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
+      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: request?.headers.get('user-agent') ?? undefined,
     },
-  })
+  )
 }
 
 /**
@@ -145,5 +155,5 @@ export async function adminGetAllConversations(): Promise<Conversation[]> {
     .sort({ created_at: -1 })
     .toArray()
 
-  return conversations as Conversation[]
+  return conversations as unknown as Conversation[]
 }

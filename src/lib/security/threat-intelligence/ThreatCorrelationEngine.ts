@@ -316,13 +316,16 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis.duplicate()
+      const subscriber =
+        typeof this.redis['duplicate'] === 'function'
+          ? this.redis['duplicate']()
+          : this.redis
       await subscriber.connect()
 
       // Subscribe to new threat notifications
-      await subscriber.subscribe('new-threat', async (message) => {
+      await subscriber.subscribe('new-threat', async (message: string) => {
         try {
-          const threatData = JSON.parse(message)
+          const threatData = JSON.parse(message) as { threat_id: string }
           await this.queueThreatForCorrelation(threatData.threat_id)
         } catch (error: unknown) {
           logger.error('Failed to process new threat notification', {
@@ -664,7 +667,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
           ),
           machine_learning_insights: [],
         },
-        time_span,
+        time_span: timeSpan,
       }
     } catch (error: unknown) {
       logger.error('Failed to calculate temporal correlation', {
@@ -772,8 +775,8 @@ export class ThreatCorrelationEngine extends EventEmitter {
    * Calculate distance between two coordinates
    */
   private calculateDistance(
-    coord1: DistanceCoordinates,
-    coord2: DistanceCoordinates,
+    coord1?: DistanceCoordinates,
+    coord2?: DistanceCoordinates,
   ): number {
     if (!coord1 || !coord2) return Infinity
 
@@ -951,7 +954,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
       similarity_score: similarityScore,
       relationship_strength: confidence,
       common_attributes: Object.keys(typeGroups).filter(
-        (type) => typeGroups?.[type].length > 1,
+        (type) => (typeGroups[type]?.length ?? 0) > 1,
       ),
       unique_attributes: [],
       statistical_significance: this.calculateStatisticalSignificance(
@@ -1097,14 +1100,19 @@ export class ThreatCorrelationEngine extends EventEmitter {
     )
 
     // Look for sequences of increasing severity
-    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
+    const severityOrder: Record<string, number> = {
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+    }
 
     for (let i = 0; i < sortedThreats.length - 1; i++) {
       const sequence = [sortedThreats[i]]
-      let currentSeverity = severityOrder[sortedThreats[i]!.severity] || 0
+      let currentSeverity = severityOrder[sortedThreats[i]!.severity] ?? 0
 
       for (let j = i + 1; j < sortedThreats.length; j++) {
-        const nextSeverity = severityOrder[sortedThreats[j]!.severity] || 0
+        const nextSeverity = severityOrder[sortedThreats[j]!.severity] ?? 0
 
         if (nextSeverity > currentSeverity) {
           sequence.push(sortedThreats[j])
@@ -1116,7 +1124,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
 
       if (sequence.length >= 3) {
         groups.push({
-          threats: sequence,
+          threats: sequence.filter((t): t is ThreatData => t !== undefined),
           pattern: 'escalation_pattern',
         })
       }
@@ -1231,8 +1239,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
             threats: group.threats.map((t) => this.mapToCorrelatedThreat(t)),
             patterns: correlation.patterns,
             analysis: correlation.analysis,
-            recommendations:
-              this.generateAttributionRecommendations(correlation),
+            recommendations: this.generateAttributionRecommendations(
+              correlation as AttributionCorrelationResult,
+            ),
             metadata: {
               attribution_data: group.attribution,
               threat_count: group.threats.length,
@@ -1344,7 +1353,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
    */
   private groupBy<T>(array: T[], key: string): Record<string, T[]> {
     return array.reduce<Record<string, T[]>>((groups, item) => {
-      const value = this.getNestedValue(item, key) ?? 'unknown'
+      const value = String(this.getNestedValue(item, key) ?? 'unknown')
       groups[value] = groups[value] ?? []
       groups[value].push(item)
       return groups
@@ -1352,7 +1361,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
   }
 
   private getNestedValue(obj: unknown, path: string): unknown {
-    return path.split('.').reduce((current, key) => current?.[key], obj)
+    return path
+      .split('.')
+      .reduce(
+        (current, key) => (current as Record<string, unknown>)?.[key],
+        obj,
+      )
   }
 
   private countOccurrences(array: string[]): Record<string, number> {
@@ -1399,12 +1413,17 @@ export class ThreatCorrelationEngine extends EventEmitter {
   }
 
   private calculateSeverityIncreaseRate(threats: ThreatData[]): number {
-    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
+    const severityOrder: Record<string, number> = {
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+    }
     let totalIncrease = 0
 
     for (let i = 1; i < threats.length; i++) {
-      const prevSeverity = severityOrder[threats[i - 1]!.severity] || 0
-      const currSeverity = severityOrder[threats[i]!.severity] || 0
+      const prevSeverity = severityOrder[threats[i - 1]!.severity] ?? 0
+      const currSeverity = severityOrder[threats[i]!.severity] ?? 0
       totalIncrease += Math.max(0, currSeverity - prevSeverity)
     }
 
@@ -1430,7 +1449,7 @@ export class ThreatCorrelationEngine extends EventEmitter {
     return {
       threat_id: threat.id,
       region: threat.region,
-      location: threat.location?.name ?? threat.location,
+      location: threat.location?.name ?? 'unknown',
       severity: threat.severity,
       confidence: threat.confidence,
       indicators: threat.indicators ?? [],
@@ -1542,9 +1561,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
       )
     }
 
-    if (correlation.similarity_metrics?.['severity_increase_rate']) {
+    const rate = correlation.similarity_metrics?.['severity_increase_rate']
+    if (rate) {
       recommendations.push(
-        `Monitor for escalation patterns (rate: ${correlation.similarity_metrics['severity_increase_rate'].toFixed(2)})`,
+        `Monitor for escalation patterns (rate: ${rate.toFixed(2)})`,
       )
     }
 
@@ -1604,10 +1624,12 @@ export class ThreatCorrelationEngine extends EventEmitter {
     correlation: ThreatCorrelation,
   ): Promise<void> {
     try {
-      await this.correlationsCollection.insertOne({
-        ...correlation,
-        created_at: new Date(),
-      })
+      const doc = { ...correlation, created_at: new Date() }
+      await this.correlationsCollection.insertOne(
+        doc as unknown as Parameters<
+          typeof this.correlationsCollection.insertOne
+        >[0],
+      )
 
       // Emit correlation event
       this.emit('correlation:detected', correlation)
@@ -1648,7 +1670,9 @@ export class ThreatCorrelationEngine extends EventEmitter {
   ): Promise<ThreatCorrelation[]> {
     try {
       return await this.correlationsCollection
-        .find({ correlation_type: type })
+        .find({
+          correlation_type: type as ThreatCorrelation['correlation_type'],
+        })
         .sort({ timestamp: -1 })
         .limit(limit)
         .toArray()
@@ -1704,12 +1728,10 @@ export class ThreatCorrelationEngine extends EventEmitter {
       }
 
       if (query.startDate || query.endDate) {
-        filter['timestamp'] = {}
-        if (query.startDate)
-          (filter['timestamp'] as Record<string, Date>)['$gte'] =
-            query.startDate
-        if (query.endDate)
-          (filter['timestamp'] as Record<string, Date>)['$lte'] = query.endDate
+        const timestampFilter: Record<string, Date> = {}
+        if (query.startDate) timestampFilter['$gte'] = query.startDate
+        if (query.endDate) timestampFilter['$lte'] = query.endDate
+        filter['timestamp'] = timestampFilter
       }
 
       if (query.regions && query.regions.length > 0) {
@@ -1770,12 +1792,15 @@ export class ThreatCorrelationEngine extends EventEmitter {
         total_correlations: totalCorrelations,
         type_distribution: typeDistribution.reduce<Record<string, number>>(
           (acc, item) => {
-            acc[item['_id']] = item['count']
+            acc[String(item['_id'])] = Number(item['count'])
             return acc
           },
           {},
         ),
-        confidence_distribution: confidenceDistribution,
+        confidence_distribution: confidenceDistribution as unknown as Array<{
+          _id: string
+          count: number
+        }>,
         recent_correlations_24h: recentCorrelations,
       }
     } catch (error: unknown) {

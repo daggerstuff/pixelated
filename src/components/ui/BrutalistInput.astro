@@ -40,20 +40,20 @@ export interface SelectProps {
 <!-- Input Component -->
 <fragment>
   <div class="form-group">
-    <label class="label" for={Astro.props.id || Astro.props.name}>
-      {Astro.props.label}
-      {Astro.props.required && <span class="text-accent ml-1">*</span>}
+    <label class="label" for={(Astro.props as any).id || (Astro.props as any).name}>
+      {(Astro.props as any).label}
+      {(Astro.props as any).required && <span class="text-accent ml-1">*</span>}
     </label>
     <input
-      type={Astro.props.type || 'text'}
-      name={Astro.props.name}
-      id={Astro.props.id || Astro.props.name}
-      placeholder={Astro.props.placeholder}
-      required={Astro.props.required}
-      disabled={Astro.props.disabled}
-      class:list={['input', Astro.props.error && 'input-error']}
+      type={(Astro.props as any).type || 'text'}
+      name={(Astro.props as any).name}
+      id={(Astro.props as any).id || (Astro.props as any).name}
+      placeholder={(Astro.props as any).placeholder}
+      required={(Astro.props as any).required}
+      disabled={(Astro.props as any).disabled}
+      class:list={['input', (Astro.props as any).error && 'input-error']}
     />
-    {Astro.props.error && <span class="form-error">{Astro.props.error}</span>}
+    {(Astro.props as any).error && <span class="form-error">{(Astro.props as any).error}</span>}
   </div>
 </fragment>
 

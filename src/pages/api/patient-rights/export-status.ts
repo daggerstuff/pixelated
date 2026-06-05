@@ -18,7 +18,7 @@ declare module '../../../lib/auth' {
   }
 }
 
-export const GET = async ({ request, cookies }) => {
+export const GET = async ({ request, cookies }: { request: Request; cookies: any }) => {
   try {
     // Extract query parameters from the URL
     const url = new URL(request.url)
@@ -29,14 +29,14 @@ export const GET = async ({ request, cookies }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export status request', {
-        errors: validationResult.error.errors,
+        errors: (validationResult.error as any)?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid export ID',
-          errors: validationResult.error.errors,
+          errors: (validationResult.error as any)?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

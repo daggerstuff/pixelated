@@ -151,7 +151,8 @@ async function getLastStableVersion(
     console.log(`Found stable deployment: ${lastStable.url}`)
     return lastStable.url
   } catch (error: unknown) {
-    console.error('Error finding last stable version:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Error finding last stable version:', errorMessage)
 
     // If fallback branch is specified, use i
     if (
@@ -168,7 +169,7 @@ async function getLastStableVersion(
   }
 }
 
-async function performRollback(options: RollbackOptions): void {
+async function performRollback(options: RollbackOptions): Promise<boolean> {
   try {
     console.log(`=== Initiating Rollback for ${options.environment} ===`)
 
@@ -255,11 +256,12 @@ async function performRollback(options: RollbackOptions): void {
 
     return true
   } catch (error: unknown) {
-    console.error('\n❌ Rollback failed:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('\n❌ Rollback failed:', errorMessage)
 
     if (options.notify) {
        sendNotification(
-        `CRITICAL: Automatic rollback failed. Manual intervention required. Error: ${error}`,
+        `CRITICAL: Automatic rollback failed. Manual intervention required. Error: ${errorMessage}`,
         options.environment,
       )
     }
@@ -287,16 +289,18 @@ async function main() {
       fallbackBranch: values.fallbackBranch as string | undefined,
     }
 
-    const success =  performRollback(options)
+    const success = await performRollback(options)
     process.exit(success ? 0 : 1)
   } catch (error: unknown) {
-    console.error('Unhandled error:', error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    console.error('Unhandled error:', errorMessage)
     process.exit(1)
   }
 }
 
 // Execute main function
-main().catch((error) => {
-  console.error('Unhandled error:', error)
+main().catch((error: unknown) => {
+  const errorMessage = error instanceof Error ? error.message : String(error)
+  console.error('Unhandled error:', errorMessage)
   process.exit(1)
 })

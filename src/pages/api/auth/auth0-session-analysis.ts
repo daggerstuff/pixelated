@@ -6,7 +6,7 @@
 import type { APIRoute } from 'astro'
 
 import { MultidimensionalEmotionMapper } from '@/lib/ai/emotions/MultidimensionalEmotionMapper'
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -100,7 +100,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (session.therapistId !== user.id && session.clientId !== user.id) {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        AuditEventType.SECURITY,
         'auth.session.analysis.forbidden',
         user.id,
         'auth-session-analysis',
@@ -152,7 +152,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'session_analysis_access',
+      AuditEventType.ACCESS,
       'auth.session.analysis.access',
       user.id,
       'auth-session-analysis',
@@ -177,7 +177,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.session.analysis.error',
       'anonymous',
       'auth-session-analysis',

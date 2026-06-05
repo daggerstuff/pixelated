@@ -287,8 +287,11 @@ export function useCognitiveDistortionDetection({
 
         // We don't set result for batch analysis since it's multiple results
         // But we can call callbacks with the first result if needed
-        if (onComplete && data?.length > 0) {
-          onComplete(data[0])
+        if (onComplete && data && data.length > 0) {
+          const firstResult: CognitiveDistortionResult | undefined = data[0]
+          if (firstResult) {
+            onComplete(firstResult)
+          }
         }
 
         return data

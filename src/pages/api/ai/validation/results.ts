@@ -27,7 +27,7 @@ export const GET: APIRoute = async ({ request }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     }
-    const authData = authResult as Record<string, unknown>
+    const authData = (authResult as unknown) as Record<string, unknown>
     const userData = authData['user'] as Record<string, unknown> | undefined
     const userKey =
       authData['authenticated'] && userData?.['id']
@@ -61,9 +61,9 @@ export const GET: APIRoute = async ({ request }) => {
         'validation-pipeline-results-unauthorized',
         (userData?.['id'] as string) ?? 'unknown',
         'validation-api',
-        {
-          userId: userData?.['id'],
-          email: userData?.['email'],
+      {
+        userId: (userData?.['id'] as string) ?? undefined,
+        email: (userData?.['email'] as string) ?? undefined,
         },
         AuditEventStatus.FAILURE,
       )
@@ -98,7 +98,7 @@ export const GET: APIRoute = async ({ request }) => {
       (userData?.['id'] as string) ?? 'system',
       'validation-api',
       {
-        userId: userData?.['id'],
+        userId: (userData?.['id'] as string) ?? undefined,
         resultsCount: validationResults.length,
       },
       AuditEventStatus.SUCCESS,
@@ -134,7 +134,7 @@ export const GET: APIRoute = async ({ request }) => {
       'validation-api',
       {
         error: errorMessage,
-      },
+      } as any,
       AuditEventStatus.FAILURE,
     )
 

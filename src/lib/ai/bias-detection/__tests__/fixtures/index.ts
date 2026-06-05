@@ -56,7 +56,9 @@ export const getBiasTestScenarios = () => {
     socioeconomicBiasLowIncomePatient: (demographicBiasScenarios as Record<string, unknown>)?.[
       'socioeconomicBiasLowIncomePatient'
     ],
-    ageBiasElderlyPatient,
+    ageBiasElderlyPatient: (demographicBiasScenarios as Record<string, unknown>)?.[
+      'ageBiasElderlyPatient'
+    ],
   }
 }
 

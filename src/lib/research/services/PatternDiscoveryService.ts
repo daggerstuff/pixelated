@@ -564,8 +564,8 @@ export class PatternDiscoveryService {
       })
 
       // Update centroids
-      const newCentroids = clusters.map((cluster) => {
-        if (cluster.length === 0) return centroids[clusters.indexOf(cluster)]
+      const newCentroids: number[][] = clusters.map((cluster) => {
+        if (cluster.length === 0) return centroids[clusters.indexOf(cluster)]!
 
         const sum = Array(features.length).fill(0)
         cluster.forEach((index) => {
@@ -594,7 +594,7 @@ export class PatternDiscoveryService {
       }),
       size: cluster.length,
       characteristics: this.describeClusterCharacteristics(
-        cluster.map((i) => data[i]),
+        cluster.map((i) => data[i]!).filter(Boolean),
         features,
       ),
     }))

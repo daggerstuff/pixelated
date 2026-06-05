@@ -14,7 +14,7 @@ const downloadRequestSchema = z.object({
   token: z.string().min(1, 'Security token is required'),
 })
 
-export const GET = async ({ request }) => {
+export const GET = async ({ request }: { request: Request }) => {
   try {
     // Extract query parameters from the URL
     const url = new URL(request.url)
@@ -29,14 +29,14 @@ export const GET = async ({ request }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export download request', {
-        errors: validationResult.error.errors,
+        errors: (validationResult.error as any)?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request parameters',
-          errors: validationResult.error.errors,
+          errors: (validationResult.error as any)?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

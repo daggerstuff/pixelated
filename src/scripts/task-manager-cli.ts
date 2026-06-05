@@ -62,7 +62,7 @@ program
 
       if (!existsSync(validatedFilePath)) {
         console.error(`❌ Task list file not found: ${file}`)
-        process.exit(1)
+        void (process as any).exit(1)
       }
 
       if (verbose) {
@@ -83,7 +83,8 @@ program
       console.log(`   Progress: ${taskSummary.progress}%`)
 
       console.log('\n🔄 Performing Ollama check-in...')
-      const result = await taskManager.performTaskCheckIn(
+      // oxlint-disable no-unsafe-assignment
+      const result: any = await taskManager.performTaskCheckIn(
         taskList,
         taskId,
         summary,
@@ -97,14 +98,14 @@ program
 
       if (result.checkInResult.improvements.length > 0) {
         console.log('\n💡 Improvement suggestions:')
-        result.checkInResult.improvements.forEach((improvement, index) => {
+        result.checkInResult.improvements.forEach((improvement: any, index: number) => {
           console.log(`   ${index + 1}. ${improvement.suggestion}`)
           console.log(`      Category: ${improvement.category}`)
           console.log(`      Priority: ${improvement.priority}`)
         })
 
         console.log('\n🤔 Reasoning:')
-        result.checkInResult.reasoningLog.forEach((reasoning, index) => {
+        result.checkInResult.reasoningLog.forEach((reasoning: any, index: number) => {
           console.log(`   ${index + 1}. ${reasoning}`)
         })
       }
@@ -127,8 +128,8 @@ program
       console.error(
         '❌ Check-in failed:',
         error instanceof Error ? String(error) : String(error),
-      )
-      process.exit(1)
+      );
+      (process as any).exit(1)
     }
   })
 
@@ -149,7 +150,8 @@ program
         logger.info('Testing with', { summary, model })
       }
 
-      const result = await ollamaService.performCheckIn(summary)
+      // oxlint-disable no-unsafe-assignment
+      const result: any = await ollamaService.performCheckIn(summary)
 
       console.log('\n✅ Ollama test completed!')
       console.log(`Decision: ${result.decision.toUpperCase()}`)
@@ -159,14 +161,14 @@ program
 
       if (result.improvements.length > 0) {
         console.log('\n💡 Improvement suggestions:')
-        result.improvements.forEach((improvement, index) => {
+        result.improvements.forEach((improvement: any, index: number) => {
           console.log(`   ${index + 1}. ${improvement.suggestion}`)
           console.log(`      Category: ${improvement.category}`)
           console.log(`      Priority: ${improvement.priority}`)
         })
 
         console.log('\n🤔 Reasoning:')
-        result.reasoningLog.forEach((reasoning, index) => {
+        result.reasoningLog.forEach((reasoning: any, index: number) => {
           console.log(`   ${index + 1}. ${reasoning}`)
         })
       }
@@ -179,8 +181,8 @@ program
       console.error(
         '❌ Ollama test failed:',
         error instanceof Error ? String(error) : String(error),
-      )
-      process.exit(1)
+      );
+      (process as any).exit(1)
     }
   })
 
@@ -200,7 +202,7 @@ program
 
       if (!existsSync(validatedFilePath)) {
         console.error(`❌ Task list file not found: ${file}`)
-        process.exit(1)
+        void (process as any).exit(1)
       }
 
       const taskManager = new TaskListManager()
@@ -235,8 +237,8 @@ program
       console.error(
         '❌ Failed to get status:',
         error instanceof Error ? String(error) : String(error),
-      )
-      process.exit(1)
+      );
+      (process as any).exit(1)
     }
   })
 
@@ -257,7 +259,7 @@ program
 
       if (existsSync(validatedFilePath)) {
         console.error(`❌ File already exists: ${file}`)
-        process.exit(1)
+        void (process as any).exit(1)
       }
 
       const content = `---
@@ -300,17 +302,17 @@ alwaysApply: false
       console.error(
         '❌ Failed to create task list:',
         error instanceof Error ? String(error) : String(error),
-      )
-      process.exit(1)
+      );
+      (process as any).exit(1)
     }
   })
 
 // Handle unhandled promise rejections
-process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+;(process as any).on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
   const errorDetail =
     reason instanceof Error ? reason.message : String(reason)
   logger.error('Unhandled Rejection', { promise, reason: errorDetail })
-  process.exit(1)
+  ;(process as any).exit(1)
 })
 
 program.parse()

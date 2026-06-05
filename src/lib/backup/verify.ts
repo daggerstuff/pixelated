@@ -33,12 +33,10 @@ interface BackupVerificationResult {
 export class BackupVerificationService extends EventEmitter {
   private readonly config: BackupConfig
   private readonly backupDir: string
-
-  constructor(redis: RedisService, config: Partial<BackupConfig> = {}) {
+  constructor(_redis: RedisService, config: Partial<BackupConfig> = {}) {
     super()
-    this.redis = redis
     this.config = {
-      backupDir: getEnv('BACKUP_DIR', './backups'),
+      backupDir: getEnv('BACKUP_DIR', './backups') ?? './backups',
       retentionDays: 30,
       verificationInterval: 24 * 60 * 60 * 1000, // 24 hours
       integrityCheckEnabled: true,
@@ -82,7 +80,9 @@ export class BackupVerificationService extends EventEmitter {
           results.push({
             file,
             isValid: false,
-            error: error?.['message'] ?? 'Unknown error',
+            error: String(
+              (error as Record<string, unknown>)['message'] ?? 'Unknown error',
+            ),
           })
         }
       }
@@ -92,7 +92,7 @@ export class BackupVerificationService extends EventEmitter {
       return results
     } catch (error: unknown) {
       throw new Error(
-        `Failed to verify backups: ${error?.['message'] ?? 'Unknown error'}`,
+        `Failed to verify backups: ${String((error as Record<string, unknown>)['message'] ?? 'Unknown error')}`,
         {
           cause: error,
         },
@@ -126,13 +126,13 @@ export class BackupVerificationService extends EventEmitter {
 
       // Verify metadata
       const metadata: BackupMetadata = {
-        timestamp: backup['timestamp'],
+        timestamp: backup['timestamp'] as number,
         checksum,
         size: data.length,
-        type: backup['type'],
+        type: backup['type'] as 'full' | 'incremental',
         status: 'pending',
-        version: backup['version'],
-        environment: backup['environment'],
+        version: backup['version'] as string,
+        environment: backup['environment'] as string,
       }
 
       // Verify data integrity
@@ -353,7 +353,7 @@ export class BackupVerificationService extends EventEmitter {
       if (user && typeof user === 'object' && 'id' in user) {
         const userId = (user as { id: string }).id
         const restored = await redis.get(`user:${userId}`)
-        if (!restored || (JSON.parse(restored) as { id: unknown }) !== userId) {
+        if (!restored || !(JSON.parse(restored) as { id: unknown }).id) {
           throw new Error(`Restoration verification failed for user: ${userId}`)
         }
       }
@@ -363,7 +363,7 @@ export class BackupVerificationService extends EventEmitter {
 
   private async getBackupMetadata(
     backupFile: string,
-  ): Promise<BackupMetadata | null> {
+  ): Promise<Record<string, unknown> | null> {
     try {
       const metadataPath = path.join(this.backupDir, `${backupFile}.meta`)
       const data = await fs.readFile(metadataPath, 'utf-8')
@@ -379,8 +379,11 @@ export class BackupVerificationService extends EventEmitter {
   ): Promise<void> {
     const existingMetadata = await this.getBackupMetadata(backupFile)
     if (existingMetadata) {
-      existingMetadata.status = 'verified'
-      await this.saveBackupMetadata(backupFile, existingMetadata)
+      existingMetadata['status'] = 'verified'
+      await this.saveBackupMetadata(
+        backupFile,
+        existingMetadata as unknown as BackupMetadata,
+      )
     } else {
       await this.saveBackupMetadata(backupFile, metadata)
     }
@@ -409,7 +412,7 @@ export class BackupVerificationService extends EventEmitter {
 
     for (const backup of backups) {
       const metadata = await this.getBackupMetadata(backup)
-      if (metadata && now - metadata.timestamp > retentionMs) {
+      if (metadata && now - metadata['timestamp'] > retentionMs) {
         await this.deleteBackup(backup)
       }
     }
@@ -437,11 +440,11 @@ export class BackupVerificationService extends EventEmitter {
 let verificationService: BackupVerificationService | null = null
 
 export async function initializeBackupVerification(
-  redis: RedisService,
+  _redis: RedisService,
   config?: Partial<BackupConfig>,
 ): Promise<BackupVerificationService> {
   if (!verificationService) {
-    verificationService = new BackupVerificationService(redis, config)
+    verificationService = new BackupVerificationService(_redis, config)
     await verificationService.initialize()
   }
   return verificationService

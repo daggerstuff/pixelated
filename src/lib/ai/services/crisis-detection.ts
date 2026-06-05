@@ -130,9 +130,8 @@ export class CrisisDetectionService {
           aiAnalysis = await this.performAIAnalysis(text)
         } catch (error: unknown) {
           // Log AI analysis failure but continue with keyword analysis
-          appLogger.warn('AI analysis failed, using keyword analysis only', {
-            error,
-          })
+          const errorMessage = error instanceof Error ? error.message : String(error)
+          appLogger.warn(`AI analysis failed, using keyword analysis only: ${errorMessage}`)
         }
       }
 
@@ -158,11 +157,8 @@ export class CrisisDetectionService {
         timestamp: new Date().toISOString(),
       }
     } catch (error: unknown) {
-      appLogger.error('Error in crisis detection:', {
-        message: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : '',
-        error,
-      })
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      appLogger.error(`Error in crisis detection: ${errorMsg}`)
 
       // Return a safe fallback result instead of throwing
       return {
@@ -188,11 +184,8 @@ export class CrisisDetectionService {
         texts.map( async (text) => this.detectCrisis(text, options)),
       )
     } catch (error: unknown) {
-      appLogger.error('Error in batch crisis detection:', {
-        message: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : '',
-        error,
-      })
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      appLogger.error(`Error in batch crisis detection: ${errorMsg}`)
       throw new Error('Batch crisis detection failed', { cause: error })
     }
   }
@@ -365,8 +358,8 @@ export class CrisisDetectionService {
         }
       }
     } catch (error: unknown) {
-      // This will catch errors from the AI service itself (e.g., network issues, API errors)
-      appLogger.error('AI service call failed in crisis detection', { error })
+      // This will catch errors from the AI service itself (e.g., network issues, API errors)        const errorMsg = error instanceof Error ? error.message : String(error)
+        appLogger.error(`AI service call failed in crisis detection: ${errorMsg}`)
       // Return null to fall back to keyword analysis instead of throwing
       return null
     }

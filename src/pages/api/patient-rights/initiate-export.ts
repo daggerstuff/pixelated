@@ -34,7 +34,7 @@ const initiateExportSchema = z.object({
   urgencyLevel: z.enum(['standard', 'urgent']).default('standard'),
 })
 
-export const POST = async ({ request, cookies }) => {
+export const POST = async ({ request, cookies }: { request: Request; cookies: any }) => {
   try {
     // Get current user - use cookies instead of request
     const user = await getCurrentUser(cookies)
@@ -76,14 +76,14 @@ export const POST = async ({ request, cookies }) => {
 
     if (!validationResult.success) {
       logger.warn('Invalid export request data', {
-        errors: validationResult.error.errors,
+        errors: (validationResult.error as any)?.errors,
       })
 
       return new Response(
         JSON.stringify({
           success: false,
           message: 'Invalid request data',
-          errors: validationResult.error.errors,
+          errors: (validationResult.error as any)?.errors,
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )

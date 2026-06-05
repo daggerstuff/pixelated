@@ -20,7 +20,6 @@ import type {
 } from '@/lib/api/journal-research/bias-audit-types'
 import {
   getBiasAuditService,
-  type _BiasAuditServiceConfig,
 } from '@/lib/services/bias-audit-service'
 
 // Query keys
@@ -314,8 +313,11 @@ export function useBiasAuditDashboard() {
         config,
       })
       if (results.length > 0) {
-        setSelectedDatasetId(results?.[0].datasetId)
-        setSelectedAuditId(results?.[0].auditId)
+        const firstResult = results[0]
+        if (firstResult) {
+          setSelectedDatasetId(firstResult.datasetId)
+          setSelectedAuditId(firstResult.auditId)
+        }
       }
       return results
     },

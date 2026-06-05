@@ -46,7 +46,10 @@ export function usePatientModel() {
 
         // If models exist and no current model selected, select the first one
         if (modelIds.length > 0 && !currentModelId) {
-          setCurrentModelId(modelIds[0])
+          const firstId = modelIds[0]
+          if (firstId) {
+            setCurrentModelId(firstId)
+          }
         }
       } catch (err: unknown) {
         console.error('Failed to load patient models:', err)
