@@ -130,13 +130,18 @@ export class ContextDetector {
             contextualIndicators: [
               {
                 type: 'crisis_detection',
-                description: (crisisResult['category'] as string) ?? 'Crisis detected',
+                description:
+                  (crisisResult['category'] as string) ?? 'Crisis detected',
                 confidence: crisisResult['confidence'] as number,
-                severity: this.mapRiskLevelToNumber(crisisResult['riskLevel'] as string),
+                severity: this.mapRiskLevelToNumber(
+                  crisisResult['riskLevel'] as string,
+                ),
               },
             ],
             needsSpecialHandling: true,
-            urgency: this.mapUrgencyFromCrisis(crisisResult['urgency'] as string),
+            urgency: this.mapUrgencyFromCrisis(
+              crisisResult['urgency'] as string,
+            ),
             metadata: {
               crisisResult,
               suggestedActions: crisisResult['suggestedActions'],
@@ -239,9 +244,7 @@ export class ContextDetector {
           Array.isArray(r['choices']) &&
           (r['choices'] as any)[0]?.['message']?.['content']
         ) {
-          content = String(
-            (r['choices'] as any)[0]?.['message']?.['content'],
-          )
+          content = String((r['choices'] as any)[0]?.['message']?.['content'])
         }
       }
 
@@ -249,7 +252,7 @@ export class ContextDetector {
 
       // Merge crisis detection data if available
       if (crisisResult && !crisisResult['isCrisis']) {
-        (result['metadata'] as Record<string, unknown>)['crisisAnalysis'] = {
+        ;(result['metadata'] as Record<string, unknown>)['crisisAnalysis'] = {
           confidence: crisisResult['confidence'] as number,
           riskLevel: crisisResult['riskLevel'] as string,
         }
@@ -257,7 +260,9 @@ export class ContextDetector {
 
       // Merge educational analysis if available
       if (educationalResult?.['isEducational']) {
-        (result['metadata'] as Record<string, unknown>)['educationalAnalysis'] = {
+        ;(result['metadata'] as Record<string, unknown>)[
+          'educationalAnalysis'
+        ] = {
           confidence: educationalResult['confidence'] as number,
           type: educationalResult['educationalType'] as string,
           complexity: educationalResult['complexity'] as string,
@@ -275,15 +280,15 @@ export class ContextDetector {
         return {
           ...result,
           detectedContext: ContextType.EDUCATIONAL,
-          confidence: (result['confidence']) ?? 0.85,
-          contextualIndicators: (result['contextualIndicators'])?.length
-            ? (result['contextualIndicators'])
+          confidence: result['confidence'] ?? 0.85,
+          contextualIndicators: result['contextualIndicators']?.length
+            ? result['contextualIndicators']
             : [
                 {
                   type: 'educational_pattern',
                   description:
                     'Detected educational query (learning about mental health concept/condition/treatment)',
-                  confidence: (result['confidence']) ?? 0.8,
+                  confidence: result['confidence'] ?? 0.8,
                 },
               ],
           needsSpecialHandling: false,
@@ -479,7 +484,9 @@ export class ContextDetector {
     }
 
     const safeObject = (v: unknown): Record<string, unknown> =>
-      v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {}
+      v && typeof v === 'object' && !Array.isArray(v)
+        ? (v as Record<string, unknown>)
+        : {}
 
     const safeIndicators = (v: unknown): ContextualIndicator[] => {
       if (!Array.isArray(v)) return []

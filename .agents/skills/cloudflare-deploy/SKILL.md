@@ -1,26 +1,33 @@
 ---
 name: cloudflare-deploy
-description: Deploy applications and infrastructure to Cloudflare using Workers, Pages, and related platform services. Use when the user asks to deploy, host, publish, or set up a project on Cloudflare.
+description:
+  Deploy applications and infrastructure to Cloudflare using Workers, Pages, and
+  related platform services. Use when the user asks to deploy, host, publish, or
+  set up a project on Cloudflare.
 ---
 
 # Cloudflare Deploy
 
-Consolidated skill for building on the Cloudflare platform. Use decision trees below to find the right product, then load detailed references.
+Consolidated skill for building on the Cloudflare platform. Use decision trees
+below to find the right product, then load detailed references.
 
 ## Prerequisites
 
-- When sandboxing blocks the deployment network calls, rerun with `sandbox_permissions=require_escalated`.
+- When sandboxing blocks the deployment network calls, rerun with
+  `sandbox_permissions=require_escalated`.
 - The deployment might take a few minutes. Use appropriate timeout values.
 
 ## Authentication (Required Before Deploy)
 
-Verify auth before `wrangler deploy`, `wrangler pages deploy`, or `npm run deploy`:
+Verify auth before `wrangler deploy`, `wrangler pages deploy`, or
+`npm run deploy`:
 
 ```bash
 npx wrangler whoami    # Shows account if authenticated
 ```
 
 Not authenticated? → `references/wrangler/auth.md`
+
 - Interactive/local: `wrangler login` (one-time OAuth)
 - CI/CD: Set `CLOUDFLARE_API_TOKEN` env var
 
@@ -113,119 +120,121 @@ Need IaC? → pulumi/ (Pulumi), terraform/ (Terraform), or api/ (REST API)
 
 ### Compute & Runtime
 
-| Product | Reference |
-| --- | --- |
-| Workers | `references/workers/` |
-| Pages | `references/pages/` |
-| Pages Functions | `references/pages-functions/` |
-| Durable Objects | `references/durable-objects/` |
-| Workflows | `references/workflows/` |
-| Containers | `references/containers/` |
+| Product               | Reference                           |
+| --------------------- | ----------------------------------- |
+| Workers               | `references/workers/`               |
+| Pages                 | `references/pages/`                 |
+| Pages Functions       | `references/pages-functions/`       |
+| Durable Objects       | `references/durable-objects/`       |
+| Workflows             | `references/workflows/`             |
+| Containers            | `references/containers/`            |
 | Workers for Platforms | `references/workers-for-platforms/` |
-| Tail Workers | `references/tail-workers/` |
-| Snippets | `references/snippets/` |
-| Smart Placement | `references/smart-placement/` |
+| Tail Workers          | `references/tail-workers/`          |
+| Snippets              | `references/snippets/`              |
+| Smart Placement       | `references/smart-placement/`       |
 
 ### Storage & Data
 
-| Product | Reference |
-| --- | --- |
-| KV | `references/kv/` |
-| D1 | `references/d1/` |
-| R2 | `references/r2/` |
-| Queues | `references/queues/` |
-| Hyperdrive | `references/hyperdrive/` |
-| DO Storage | `references/do-storage/` |
-| Secrets Store | `references/secrets-store/` |
-| Pipelines | `references/pipelines/` |
+| Product         | Reference                     |
+| --------------- | ----------------------------- |
+| KV              | `references/kv/`              |
+| D1              | `references/d1/`              |
+| R2              | `references/r2/`              |
+| Queues          | `references/queues/`          |
+| Hyperdrive      | `references/hyperdrive/`      |
+| DO Storage      | `references/do-storage/`      |
+| Secrets Store   | `references/secrets-store/`   |
+| Pipelines       | `references/pipelines/`       |
 | R2 Data Catalog | `references/r2-data-catalog/` |
-| R2 SQL | `references/r2-sql/` |
+| R2 SQL          | `references/r2-sql/`          |
 
 ### AI & Machine Learning
 
-| Product | Reference |
-| --- | --- |
+| Product    | Reference                |
+| ---------- | ------------------------ |
 | Workers AI | `references/workers-ai/` |
-| Vectorize | `references/vectorize/` |
+| Vectorize  | `references/vectorize/`  |
 | Agents SDK | `references/agents-sdk/` |
 | AI Gateway | `references/ai-gateway/` |
-| AI Search | `references/ai-search/` |
+| AI Search  | `references/ai-search/`  |
 
 ### Networking & Connectivity
 
-| Product | Reference |
-| --- | --- |
-| Tunnel | `references/tunnel/` |
-| Spectrum | `references/spectrum/` |
-| TURN | `references/turn/` |
+| Product              | Reference                          |
+| -------------------- | ---------------------------------- |
+| Tunnel               | `references/tunnel/`               |
+| Spectrum             | `references/spectrum/`             |
+| TURN                 | `references/turn/`                 |
 | Network Interconnect | `references/network-interconnect/` |
-| Argo Smart Routing | `references/argo-smart-routing/` |
-| Workers VPC | `references/workers-vpc/` |
+| Argo Smart Routing   | `references/argo-smart-routing/`   |
+| Workers VPC          | `references/workers-vpc/`          |
 
 ### Security
 
-| Product | Reference |
-| --- | --- |
-| WAF | `references/waf/` |
-| DDoS Protection | `references/ddos/` |
-| Bot Management | `references/bot-management/` |
-| API Shield | `references/api-shield/` |
-| Turnstile | `references/turnstile/` |
+| Product         | Reference                    |
+| --------------- | ---------------------------- |
+| WAF             | `references/waf/`            |
+| DDoS Protection | `references/ddos/`           |
+| Bot Management  | `references/bot-management/` |
+| API Shield      | `references/api-shield/`     |
+| Turnstile       | `references/turnstile/`      |
 
 ### Media & Content
 
-| Product | Reference |
-| --- | --- |
-| Images | `references/images/` |
-| Stream | `references/stream/` |
+| Product           | Reference                       |
+| ----------------- | ------------------------------- |
+| Images            | `references/images/`            |
+| Stream            | `references/stream/`            |
 | Browser Rendering | `references/browser-rendering/` |
-| Zaraz | `references/zaraz/` |
+| Zaraz             | `references/zaraz/`             |
 
 ### Real-Time Communication
 
-| Product | Reference |
-| --- | --- |
-| RealtimeKit | `references/realtimekit/` |
+| Product      | Reference                  |
+| ------------ | -------------------------- |
+| RealtimeKit  | `references/realtimekit/`  |
 | Realtime SFU | `references/realtime-sfu/` |
 
 ### Developer Tools
 
-| Product | Reference |
-| --- | --- |
-| Wrangler | `references/wrangler/` |
-| Miniflare | `references/miniflare/` |
-| C3 | `references/c3/` |
-| Observability | `references/observability/` |
-| Analytics Engine | `references/analytics-engine/` |
-| Web Analytics | `references/web-analytics/` |
-| Sandbox | `references/sandbox/` |
-| Workerd | `references/workerd/` |
+| Product            | Reference                        |
+| ------------------ | -------------------------------- |
+| Wrangler           | `references/wrangler/`           |
+| Miniflare          | `references/miniflare/`          |
+| C3                 | `references/c3/`                 |
+| Observability      | `references/observability/`      |
+| Analytics Engine   | `references/analytics-engine/`   |
+| Web Analytics      | `references/web-analytics/`      |
+| Sandbox            | `references/sandbox/`            |
+| Workerd            | `references/workerd/`            |
 | Workers Playground | `references/workers-playground/` |
 
 ### Infrastructure as Code
 
-| Product | Reference |
-| --- | --- |
-| Pulumi | `references/pulumi/` |
+| Product   | Reference               |
+| --------- | ----------------------- |
+| Pulumi    | `references/pulumi/`    |
 | Terraform | `references/terraform/` |
-| API | `references/api/` |
+| API       | `references/api/`       |
 
 ### Other Services
 
-| Product | Reference |
-| --- | --- |
+| Product       | Reference                   |
+| ------------- | --------------------------- |
 | Email Routing | `references/email-routing/` |
 | Email Workers | `references/email-workers/` |
 | Static Assets | `references/static-assets/` |
-| Bindings | `references/bindings/` |
+| Bindings      | `references/bindings/`      |
 | Cache Reserve | `references/cache-reserve/` |
 
 ## Troubleshooting
 
 ### Escalated Network Access
 
-If deployment fails due to network issues (timeouts, DNS errors, connection resets), rerun the deploy with escalated permissions
-(use `sandbox_permissions=require_escalated`). The deploy requires escalated network access when sandbox networking blocks outbound requests.
+If deployment fails due to network issues (timeouts, DNS errors, connection
+resets), rerun the deploy with escalated permissions (use
+`sandbox_permissions=require_escalated`). The deploy requires escalated network
+access when sandbox networking blocks outbound requests.
 
 Example guidance to the user:
 

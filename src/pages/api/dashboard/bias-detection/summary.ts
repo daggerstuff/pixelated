@@ -61,7 +61,8 @@ export const GET: APIRoute = async () => {
 
     const uptimeResult = await query(uptimeQuery)
 
-    const metrics = metricsResult.rows[0] as Record<string, unknown> | undefined ?? {}
+    const metrics =
+      (metricsResult.rows[0] as Record<string, unknown> | undefined) ?? {}
     const uptime = (uptimeResult.rows[0] as any)?.['uptime_hours'] ?? 0
 
     // Format response
@@ -73,13 +74,15 @@ export const GET: APIRoute = async () => {
         'active-alerts': metrics['active_alerts'] ?? 0,
         'system-uptime': uptime > 24 ? '99.7%' : '98.5%',
       },
-      recentAnalyses: recentAnalysesResult.rows.map((row: Record<string, unknown>) => ({
-        sessionId: row['session_id'],
-        biasScore: parseFloat((row['bias_score'] as string) ?? '0'),
-        alertLevel: row['alert_level'],
-        timestamp: row['created_at'],
-        sessionType: (row['session_type'] as string) ?? 'Unknown',
-      })),
+      recentAnalyses: recentAnalysesResult.rows.map(
+        (row: Record<string, unknown>) => ({
+          sessionId: row['session_id'],
+          biasScore: parseFloat((row['bias_score'] as string) ?? '0'),
+          alertLevel: row['alert_level'],
+          timestamp: row['created_at'],
+          sessionType: (row['session_type'] as string) ?? 'Unknown',
+        }),
+      ),
       activeAlerts: alertsResult.rows.map((row: Record<string, unknown>) => ({
         id: row['id'],
         title: row['title'],

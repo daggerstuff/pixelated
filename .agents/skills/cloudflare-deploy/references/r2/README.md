@@ -1,10 +1,12 @@
 # Cloudflare R2 Object Storage
 
-S3-compatible object storage with zero egress fees, optimized for large file storage and delivery.
+S3-compatible object storage with zero egress fees, optimized for large file
+storage and delivery.
 
 ## Overview
 
 R2 provides:
+
 - S3-compatible API (Workers API + S3 REST)
 - Zero egress fees globally
 - Strong consistency for writes/deletes
@@ -23,28 +25,29 @@ wrangler r2 object put my-bucket/file.txt --file=./local.txt
 ```typescript
 // Upload
 await env.MY_BUCKET.put(key, data, {
-  httpMetadata: { contentType: 'image/jpeg' }
-});
+  httpMetadata: { contentType: 'image/jpeg' },
+})
 
 // Download
-const object = await env.MY_BUCKET.get(key);
-if (object) return new Response(object.body);
+const object = await env.MY_BUCKET.get(key)
+if (object) return new Response(object.body)
 ```
 
 ## Core Operations
 
-| Method | Purpose | Returns |
-|--------|---------|---------|
-| `put(key, value, options?)` | Upload object | `R2Object \| null` |
-| `get(key, options?)` | Download object | `R2ObjectBody \| R2Object \| null` |
-| `head(key)` | Get metadata only | `R2Object \| null` |
-| `delete(keys)` | Delete object(s) | `Promise<void>` |
-| `list(options?)` | List objects | `R2Objects` |
+| Method                      | Purpose           | Returns                            |
+| --------------------------- | ----------------- | ---------------------------------- |
+| `put(key, value, options?)` | Upload object     | `R2Object \| null`                 |
+| `get(key, options?)`        | Download object   | `R2ObjectBody \| R2Object \| null` |
+| `head(key)`                 | Get metadata only | `R2Object \| null`                 |
+| `delete(keys)`              | Delete object(s)  | `Promise<void>`                    |
+| `list(options?)`            | List objects      | `R2Objects`                        |
 
 ## Storage Classes
 
 - **Standard**: Frequent access, low latency reads
-- **InfrequentAccess**: 30-day minimum storage, retrieval fees, lower storage cost
+- **InfrequentAccess**: 30-day minimum storage, retrieval fees, lower storage
+  cost
 
 ## Event Notifications
 
@@ -74,6 +77,7 @@ async queue(batch: MessageBatch, env: Env) {
 
 **First-time users:** README → configuration.md → api.md → patterns.md  
 **Specific tasks:**
+
 - Setup: configuration.md
 - Client uploads: patterns.md (presigned URLs)
 - Public static site: patterns.md (public access + custom domain)
@@ -82,10 +86,14 @@ async queue(batch: MessageBatch, env: Env) {
 
 ## In This Reference
 
-- [configuration.md](./configuration.md) - Bindings, S3 SDK, CORS, lifecycles, token scopes
-- [api.md](./api.md) - Workers API, multipart, conditional requests, presigned URLs
-- [patterns.md](./patterns.md) - Streaming, caching, client uploads, public buckets
-- [gotchas.md](./gotchas.md) - List truncation, etag format, stream length, S3 SDK region
+- [configuration.md](./configuration.md) - Bindings, S3 SDK, CORS, lifecycles,
+  token scopes
+- [api.md](./api.md) - Workers API, multipart, conditional requests, presigned
+  URLs
+- [patterns.md](./patterns.md) - Streaming, caching, client uploads, public
+  buckets
+- [gotchas.md](./gotchas.md) - List truncation, etag format, stream length, S3
+  SDK region
 
 ## See Also
 

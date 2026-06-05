@@ -301,7 +301,8 @@ export function TherapeuticGoalsTracker({
         <div className="text-gray-600 text-sm">
           Session #
           {patientModel?.therapeuticProgress?.sessionProgressLog?.length
-            ? (patientModel.therapeuticProgress.sessionProgressLog.length ?? 0) + 1
+            ? (patientModel.therapeuticProgress.sessionProgressLog.length ??
+                0) + 1
             : 1}
         </div>
       </div>
@@ -616,7 +617,9 @@ export function TherapeuticGoalsTracker({
                   {checkpoint.isCompleted && checkpoint.completedAt && (
                     <p className="text-gray-500 mt-0.5 text-xs">
                       Completed on{' '}
-                      {checkpoint.completedAt ? new Date(checkpoint.completedAt).toLocaleDateString() : ''}
+                      {checkpoint.completedAt
+                        ? new Date(checkpoint.completedAt).toLocaleDateString()
+                        : ''}
                     </p>
                   )}
                   {checkpoint.notes && (

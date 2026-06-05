@@ -3,8 +3,8 @@ import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { treatmentPlanDAO } from '@/services/mongodb.dao'
-import type { TreatmentPlan } from '@/types/treatment'
 import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
+import type { TreatmentPlan } from '@/types/treatment'
 
 export const prerender = false
 
@@ -111,33 +111,36 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
         dbPlan.updatedAt instanceof Date
           ? dbPlan.updatedAt.toISOString()
           : String(dbPlan.updatedAt),
-      goals: (dbPlan.goals as Array<{
-        id: string
-        title: string
-        description: string
-        targetDate: string
-        priority: string
-        status: string
-        progress: number
-        category: string
-        milestones: Array<unknown>
-        metrics?: unknown
-      }>)?.map((goal) => ({
-        id: goal.id,
-        treatmentPlanId: dbPlan.id ?? String(dbPlan._id),
-        description: goal.description,
-        targetDate: goal.targetDate ?? null,
-        status: goal.status as TreatmentPlan['goals'][number]['status'],
-        createdAt:
-          dbPlan.createdAt instanceof Date
-            ? dbPlan.createdAt.toISOString()
-            : String(dbPlan.createdAt),
-        updatedAt:
-          dbPlan.updatedAt instanceof Date
-            ? dbPlan.updatedAt.toISOString()
-            : String(dbPlan.updatedAt),
-        objectives: [],
-      })) ?? [],
+      goals:
+        (
+          dbPlan.goals as Array<{
+            id: string
+            title: string
+            description: string
+            targetDate: string
+            priority: string
+            status: string
+            progress: number
+            category: string
+            milestones: Array<unknown>
+            metrics?: unknown
+          }>
+        )?.map((goal) => ({
+          id: goal.id,
+          treatmentPlanId: dbPlan.id ?? String(dbPlan._id),
+          description: goal.description,
+          targetDate: goal.targetDate ?? null,
+          status: goal.status as TreatmentPlan['goals'][number]['status'],
+          createdAt:
+            dbPlan.createdAt instanceof Date
+              ? dbPlan.createdAt.toISOString()
+              : String(dbPlan.createdAt),
+          updatedAt:
+            dbPlan.updatedAt instanceof Date
+              ? dbPlan.updatedAt.toISOString()
+              : String(dbPlan.updatedAt),
+          objectives: [],
+        })) ?? [],
     }
 
     return new Response(JSON.stringify(plan), { status: 200 })
@@ -207,11 +210,19 @@ export const PUT: APIRoute = async ({
     }
 
     if (updates.title !== undefined) dbUpdates['title'] = updates.title
-    if (updates.diagnosis !== undefined) dbUpdates['description'] = updates.diagnosis ?? ''
-    if (updates.startDate !== undefined) dbUpdates['startDate'] = new Date(updates.startDate)
-    if (updates.endDate !== undefined) dbUpdates['endDate'] = updates.endDate ? new Date(updates.endDate) : undefined
-    if (updates.status !== undefined) dbUpdates['status'] = (statusMap[updates.status] ?? updates.status.toLowerCase()) as TreatmentPlanDB['status']
-    if (updates.generalNotes !== undefined) dbUpdates['notes'] = updates.generalNotes ?? ''
+    if (updates.diagnosis !== undefined)
+      dbUpdates['description'] = updates.diagnosis ?? ''
+    if (updates.startDate !== undefined)
+      dbUpdates['startDate'] = new Date(updates.startDate)
+    if (updates.endDate !== undefined)
+      dbUpdates['endDate'] = updates.endDate
+        ? new Date(updates.endDate)
+        : undefined
+    if (updates.status !== undefined)
+      dbUpdates['status'] = (statusMap[updates.status] ??
+        updates.status.toLowerCase()) as TreatmentPlanDB['status']
+    if (updates.generalNotes !== undefined)
+      dbUpdates['notes'] = updates.generalNotes ?? ''
 
     // Update in database
     const updatedDbPlan = await treatmentPlanDAO.update(planId, dbUpdates)

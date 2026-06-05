@@ -114,7 +114,11 @@ export const POST = async ({ request, locals }) => {
       Archived: 'draft',
     }
     const dbStatus =
-      (statusMap[planData.status] as 'active' | 'completed' | 'paused' | 'draft') ?? 'draft'
+      (statusMap[planData.status] as
+        | 'active'
+        | 'completed'
+        | 'paused'
+        | 'draft') ?? 'draft'
 
     // Persist to database
     const createdPlan = await treatmentPlanDAO.create({
@@ -137,7 +141,8 @@ export const POST = async ({ request, locals }) => {
           id: `milestone-${Date.now()}-${index}-${objIndex}`,
           title: obj.description,
           completed: obj.status === 'Completed',
-          completedDate: obj.status === 'Completed' ? new Date().toISOString() : undefined,
+          completedDate:
+            obj.status === 'Completed' ? new Date().toISOString() : undefined,
           notes: obj.progressNotes ?? undefined,
           dueDate: obj.targetDate ?? undefined,
         })),

@@ -159,7 +159,9 @@ describe('EvidenceAssistantPanel', () => {
     fireEvent.change(collectionSelect, { target: { value: 'pages' } })
     fireEvent.click(generateAnswerCheckbox)
 
-    expect((queryInput as HTMLInputElement).value).toBe('How do we handle crisis escalation safely?')
+    expect((queryInput as HTMLInputElement).value).toBe(
+      'How do we handle crisis escalation safely?',
+    )
     expect((collectionSelect as HTMLSelectElement).value).toBe('pages')
     expect((generateAnswerCheckbox as HTMLInputElement).checked).toBe(false)
 
