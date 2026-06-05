@@ -1,1 +1,0 @@
-## 2025-02-14 - Deep Equality Testing | Pattern: Testing deeply nested structures is critical for utilities claiming recursive deep equal capabilities. | Action: Ensure deep equality utility tests cover nested objects, arrays, and missing keys to validate structural comparison robustness.
