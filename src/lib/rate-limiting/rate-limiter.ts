@@ -22,8 +22,8 @@ export class DistributedRateLimiter {
   private readonly attackPrefix: string
   private readonly analyticsPrefix: string
 
-  constructor(private readonly config: RateLimitConfig) {
-    this.prefix = config.redis?.keyPrefix ?? 'rate_limit:'
+  constructor(_config: RateLimitConfig) {
+    this.prefix = _config.redis?.keyPrefix ?? 'rate_limit:'
     this.attackPrefix = `${this.prefix}attack_pattern:`
     this.analyticsPrefix = `${this.prefix}rate_analytics:`
   }
@@ -58,8 +58,8 @@ export class DistributedRateLimiter {
 
       // Increment counter
       const pipeline = redis['pipeline']!()
-      pipeline.incr(windowKey)
-      pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+      pipeline['incr'](windowKey)
+      pipeline['expire'](windowKey, Math.ceil(rule.windowMs / 1000))
       await pipeline.exec()
 
       // Check for attack patterns
@@ -80,7 +80,7 @@ export class DistributedRateLimiter {
     } catch (error: unknown) {
       console.error('DEBUG RATE LIMITER ERROR:', error)
       logger.error('Rate limit check failed:', {
-        error,
+        error: error instanceof Error ? error.message : String(error),
         identifier,
         rule: rule.name,
       })
@@ -108,11 +108,11 @@ export class DistributedRateLimiter {
 
     try {
       // Record request timestamp
-      await redis['zadd'](attackKey, now, `${now}:${Math.random()}`)
+      await redis['zadd']!(attackKey, now, `${now}:${Math.random()}`)
 
       // Clean old entries (keep last hour)
       const oneHourAgo = now - 3600000
-      await redis['zremrangebyscore'](attackKey, 0, oneHourAgo)
+      await redis['zremrangebyscore']!(attackKey, 0, oneHourAgo)
 
       // Get recent request pattern
       const recentRequests = await redis['zrangebyscore']!(
@@ -123,7 +123,7 @@ export class DistributedRateLimiter {
 
       if (recentRequests.length >= 10) {
         const timestamps = recentRequests.map((r: string) =>
-          parseInt(r.split(':')[0]),
+          parseInt(r.split(':')[0] ?? '0'),
         )
         const pattern = this.analyzePattern(timestamps)
 
@@ -133,9 +133,9 @@ export class DistributedRateLimiter {
       }
 
       // Set expiration on attack tracking
-      await redis['expire'](attackKey, 3600)
+      await redis['expire']!(attackKey, 3600)
     } catch (error: unknown) {
-      logger.error('Attack pattern detection failed:', { error, identifier })
+      logger.error('Attack pattern detection failed:', { error: String(error), identifier })
     }
   }
 
@@ -201,7 +201,7 @@ export class DistributedRateLimiter {
 
     // Block the identifier temporarily
     const blockKey = `${this.prefix}blocked:${identifier}`
-    await redis['setex'](
+    await redis['setex']!(
       blockKey,
       300,
       JSON.stringify({
@@ -231,8 +231,8 @@ export class DistributedRateLimiter {
   ): Promise<void> {
     const analyticsKey = `${this.analyticsPrefix}blocked:${rule.name}:${new Date().toISOString().slice(0, 10)}`
 
-    await redis['hincrby'](analyticsKey, 'total_blocked', 1)
-    await redis['expire'](analyticsKey, 86400 * 30) // Keep for 30 days
+    await redis['hincrby']!(analyticsKey, 'total_blocked', 1)
+    await redis['expire']!(analyticsKey, 86400 * 30) // Keep for 30 days
 
     // Log security event
     await this.logSecurityEvent('rate_limit_exceeded', {
@@ -255,10 +255,10 @@ export class DistributedRateLimiter {
     const analyticsKey = `${this.analyticsPrefix}usage:${rule.name}:${date}`
 
     const pipeline = redis['pipeline']!()
-    pipeline.hincrby(analyticsKey, 'total_requests', 1)
-    pipeline.hincrby(analyticsKey, 'unique_identifiers', 1)
-    pipeline.hset(analyticsKey, 'last_request', Date.now())
-    pipeline.expire(analyticsKey, 86400 * 30) // Keep for 30 days
+    pipeline['hincrby'](analyticsKey, 'total_requests', 1)
+    pipeline['hincrby'](analyticsKey, 'unique_identifiers', 1)
+    pipeline['hset'](analyticsKey, 'last_request', String(Date.now()))
+    pipeline['expire'](analyticsKey, 86400 * 30) // Keep for 30 days
 
     await pipeline.exec()
   }
@@ -287,10 +287,10 @@ export class DistributedRateLimiter {
         details,
       }
 
-      await redis['lpush'](eventKey, JSON.stringify(event))
-      await redis['expire'](eventKey, 86400 * 7) // Keep for 7 days
+      await redis['lpush']!(eventKey, JSON.stringify(event))
+      await redis['expire']!(eventKey, 86400 * 7) // Keep for 7 days
     } catch (error: unknown) {
-      logger.error('Failed to log security event:', { error, eventType })
+      logger.error('Failed to log security event:', { error: String(error), eventType })
     }
   }
 
@@ -299,7 +299,7 @@ export class DistributedRateLimiter {
    */
   async isBlocked(identifier: string): Promise<boolean> {
     const blockKey = `${this.prefix}blocked:${identifier}`
-    const blocked = await redis?.['get'](blockKey)
+    const blocked = await redis['get']!(blockKey)
     return blocked !== null
   }
 
@@ -320,8 +320,8 @@ export class DistributedRateLimiter {
       const blockedKey = `${this.analyticsPrefix}blocked:${ruleName}:${dateStr}`
 
       const [usage, blocked] = await Promise.all([
-        redis['hgetall'](usageKey),
-        redis['hgetall'](blockedKey),
+        redis['hgetall']!(usageKey),
+        redis['hgetall']!(blockedKey),
       ])
 
       analytics[dateStr] = {
@@ -344,7 +344,7 @@ export class DistributedRateLimiter {
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
 
     try {
-      const current = await redis?.['get'](windowKey)
+      const current = await redis['get']!(windowKey)
       const count = current ? parseInt(current) : 0
 
       return {
@@ -356,7 +356,7 @@ export class DistributedRateLimiter {
       }
     } catch (error: unknown) {
       logger.error('Failed to get rate limit status:', {
-        error,
+        error: error instanceof Error ? error.message : String(error),
         identifier,
         rule: rule.name,
       })
@@ -379,8 +379,8 @@ export class DistributedRateLimiter {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
     const pipeline = redis['pipeline']!()
-    pipeline.incr(windowKey)
-    pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+    pipeline['incr'](windowKey)
+    pipeline['expire'](windowKey, Math.ceil(rule.windowMs / 1000))
     await pipeline.exec()
   }
 
@@ -401,7 +401,7 @@ export class DistributedRateLimiter {
   async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-    await redis['del'](windowKey)
+    await redis['del']!(windowKey)
   }
 }
 

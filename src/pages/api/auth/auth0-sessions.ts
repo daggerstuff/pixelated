@@ -6,7 +6,7 @@
 import type { APIRoute } from 'astro'
 
 import type { TherapySession } from '@/lib/ai/interfaces/therapy'
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -164,7 +164,7 @@ export const GET: APIRoute = async ({ request }) => {
         if (!isTherapist) {
           // Create audit log for forbidden access
           await createAuditLog(
-            'access_denied',
+            AuditEventType.SECURITY,
             'auth.sessions.forbidden',
             user.id,
             'auth-sessions',
@@ -204,7 +204,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'sessions_access',
+      AuditEventType.ACCESS,
       'auth.sessions.access',
       user.id,
       'auth-sessions',
@@ -228,7 +228,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.sessions.error',
       'anonymous',
       'auth-sessions',

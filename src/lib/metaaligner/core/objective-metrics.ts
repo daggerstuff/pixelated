@@ -48,7 +48,10 @@ export interface EvaluationTrend {
 /**
  * Comprehensive alignment metrics
  */
-export interface AlignmentMetrics {
+// Re-export with original name for backward compatibility
+export type AlignmentMetrics = DetailedAlignmentMetrics
+
+export interface DetailedAlignmentMetrics {
   overallScore: number
   objectiveMetrics: Record<string, ObjectiveMetrics>
   balanceScore: number // How well balanced the objectives are
@@ -88,7 +91,7 @@ export interface TimestampedEvaluation {
   timestamp: Date
   evaluation: AlignmentEvaluationResult
   context: AlignmentContext
-  metrics: AlignmentMetrics
+  metrics: DetailedAlignmentMetrics
 }
 
 export interface EvaluationPattern {
@@ -180,7 +183,7 @@ export class ObjectiveMetricsEngine {
   calculateAlignmentMetrics(
     evaluationResult: AlignmentEvaluationResult,
     objectives: ObjectiveDefinition[],
-  ): AlignmentMetrics {
+  ): DetailedAlignmentMetrics {
     const objectiveMetrics: Record<string, ObjectiveMetrics> = {}
 
     // Calculate metrics for each objective

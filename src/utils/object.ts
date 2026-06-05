@@ -56,7 +56,7 @@ const getIdentityKey = (item: any): string => {
     let hash = ''
     const maxKeys = Math.min(keys.length, 20)
     for (let i = 0; i < maxKeys; i++) {
-      const key = keys[i]
+      const key = keys[i] as string
       const val = item[key]
       if (isPrimitive(val)) {
         hash += `${key}:${String(val)}|`

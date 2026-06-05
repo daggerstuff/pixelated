@@ -101,14 +101,13 @@ describe('EvidenceAssistantPanel', () => {
   it('runs search with trimmed query and selected collection', async () => {
     await renderPanel()
 
-    const queryInput = await screen.findByPlaceholderText(
+    const queryInput = screen.getByPlaceholderText(
       /internal docs define crisis sensitivity requirements/i,
     )
+    const collectionSelect = screen.getByRole('combobox')
     fireEvent.change(queryInput, {
       target: { value: '   how to escalate crisis   ' },
     })
-
-    const collectionSelect = screen.getByRole('combobox')
     fireEvent.change(collectionSelect, { target: { value: 'docs' } })
 
     const submitButton = screen.getByRole('button', {
@@ -160,16 +159,16 @@ describe('EvidenceAssistantPanel', () => {
     fireEvent.change(collectionSelect, { target: { value: 'pages' } })
     fireEvent.click(generateAnswerCheckbox)
 
-    expect(queryInput.value).toBe('How do we handle crisis escalation safely?')
-    expect(collectionSelect.value).toBe('pages')
-    expect(generateAnswerCheckbox.checked).toBe(false)
+    expect((queryInput as HTMLInputElement).value).toBe('How do we handle crisis escalation safely?')
+    expect((collectionSelect as HTMLSelectElement).value).toBe('pages')
+    expect((generateAnswerCheckbox as HTMLInputElement).checked).toBe(false)
 
     fireEvent.click(screen.getByRole('button', { name: /Reset/i }))
 
     expect(mockReset).toHaveBeenCalledTimes(1)
-    await waitFor(() => expect(queryInput.value).toBe(''))
-    expect(collectionSelect.value).toBe('')
-    expect(generateAnswerCheckbox.checked).toBe(true)
+    await waitFor(() => expect((queryInput as HTMLInputElement).value).toBe(''))
+    expect((collectionSelect as HTMLSelectElement).value).toBe('')
+    expect((generateAnswerCheckbox as HTMLInputElement).checked).toBe(true)
   })
 
   it('disables search while loading', async () => {

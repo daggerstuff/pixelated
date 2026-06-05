@@ -1,6 +1,5 @@
 import { EventEmitter } from 'node:events'
 
-import { AnalyticsService } from '@/lib/analytics/service'
 import type { RedisService } from '@/lib/services/redis/RedisService'
 
 interface MonitoringConfig {
@@ -24,15 +23,13 @@ interface Metric {
 }
 
 export class MonitoringService extends EventEmitter {
-  private readonly analytics: AnalyticsService
   private readonly config: MonitoringConfig
   private initialized: boolean = false
   private readonly metrics: Metric[] = []
 
-  constructor(redis: RedisService, config: Partial<MonitoringConfig> = {}) {
+  constructor(_redis: RedisService, config: Partial<MonitoringConfig> = {}) {
     super()
-    this.redis = redis
-    this.analytics = new AnalyticsService(redis)
+    void _redis
     this.config = {
       enableWebVitals: true,
       enableErrorTracking: true,
@@ -49,7 +46,8 @@ export class MonitoringService extends EventEmitter {
     }
 
     try {
-      await this.analytics.initialize()
+      // initialize not available on AnalyticsService
+      await Promise.resolve()
 
       if (this.config.enableWebVitals) {
         this.setupWebVitals()
@@ -196,7 +194,8 @@ export class MonitoringService extends EventEmitter {
   }
 
   async shutdown(): Promise<void> {
-    await this.analytics.shutdown()
+    // shutdown not available on AnalyticsService
+    await Promise.resolve()
   }
 }
 

@@ -53,11 +53,6 @@ const getEmotionColor = (emotion: string): string => {
   return emotionColors[emotion.toLowerCase()] ?? '#94a3b8' // slate-400 default
 }
 
-type _RechartsTooltipPayload = {
-  sessionId?: unknown
-  timestamp?: unknown
-}
-
 const toNumber = (value: unknown): number => {
   return typeof value === 'number' ? value : 0
 }

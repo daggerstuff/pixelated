@@ -51,7 +51,11 @@
   const BufferPolyfill = {
     from: function (data) {
       if (typeof data === 'string') {
-        return new Uint8Array([...data].map((char) => char.charCodeAt(0)))
+        const result = []
+        for (let i = 0; i < data.length; i++) {
+          result.push(data.charCodeAt(i))
+        }
+        return new Uint8Array(result)
       }
       return new Uint8Array(data)
     },

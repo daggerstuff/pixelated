@@ -34,7 +34,7 @@ router.post('/complete', async (req, res) => {
 
     // Generate real tokens for the user
     const tokens = AuthService.generateTokens({
-      userId: user.id!,
+      userId: String(user.id),
       email: user.email,
       role: user.role,
     })

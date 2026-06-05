@@ -44,7 +44,7 @@ export default function LoginForm() {
         body: JSON.stringify(result.data),
       })
 
-      const data = await response.json()
+      const data = await response.json() as { error?: string }
 
       if (!response.ok) {
         setError(data.error ?? 'Sign in failed')

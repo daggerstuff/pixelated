@@ -508,9 +508,10 @@ export class SealOperations {
       const currentSchemeType = this.service.getSchemeType()
 
       if (currentSchemeType === SealSchemeType.CKKS) {
-        // const scale = BigInt(1) << BigInt(40)
-        // const ckksEncoder = this.service.getCKKSEncoder()
-        // Using array with single coefficient          ckksEncoder.encode([coefficients[n] as number], Number(scale), highestCoef)
+        const scale = BigInt(1) << BigInt(40)
+        const ckksEncoder = this.service.getCKKSEncoder()
+        // Using array with single coefficient
+        ckksEncoder.encode([coefficients[n] as number], Number(scale), highestCoef)
       } else {
         const batchEncoder = this.service.getBatchEncoder()
         const { slotCount } = batchEncoder

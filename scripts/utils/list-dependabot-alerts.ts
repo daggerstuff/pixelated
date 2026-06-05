@@ -10,17 +10,19 @@ async function main() {
     const repoInfo = execSync('gh repo view --json owner,name', {
       encoding: 'utf-8',
     })
-    const { owner, name } = JSON.parse(repoInfo)
+    const parsedRepoInfo = JSON.parse(repoInfo) as { owner: { login: string }; name: string }
+    const ownerLogin = parsedRepoInfo.owner.login
+    const repoName = parsedRepoInfo.name
 
     // Call the GitHub Dependabot alerts API
-    console.log(`Fetching Dependabot alerts for ${owner.login}/${name}...`)
+    console.log(`Fetching Dependabot alerts for ${ownerLogin}/${repoName}...`)
     const alertsJson = execSync(
-      `gh api repos/${owner.login}/${name}/dependabot/alerts`,
+      `gh api repos/${ownerLogin}/${repoName}/dependabot/alerts`,
       { encoding: 'utf-8' },
     )
 
     // Validate JSON
-    let alertsData: any
+    let alertsData: unknown
     try {
       alertsData = JSON.parse(alertsJson)
     } catch (parseError) {
@@ -32,7 +34,7 @@ async function main() {
     fs.writeFileSync('alerts.json', JSON.stringify(alertsData, null, 2))
 
     console.log(
-      `Successfully wrote ${Array.isArray(alertsData) ? alertsData.length : 'all'} Dependabot alerts to alerts.json`,
+      `Successfully wrote ${Array.isArray(alertsData) ? (alertsData as unknown[]).length : 'all'} Dependabot alerts to alerts.json`,
     )
   } catch (error) {
     console.error(

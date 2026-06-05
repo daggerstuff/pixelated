@@ -89,7 +89,7 @@ export class DocumentVersioningService {
       `)
 
       const versionRecord = await this.getFileVersionInternal(
-        tx,
+        tx as unknown as SqlExecutor,
         fileId,
         newVersion,
       )
@@ -113,13 +113,14 @@ export class DocumentVersioningService {
    * Internal helper to fetch file version using either transaction or pool
    */
   private async getFileVersionInternal(
-    executor: { execute: (s: unknown) => Promise<{ rows: Record<string, unknown>[] }> },
+    executor: SqlExecutor,
     fileId: string,
     version: number,
   ): Promise<DocumentVersion | null> {
-    const result = await executor.execute(
-      sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
-    )
+    const result = await executor.execute({
+      text: `SELECT * FROM file_versions WHERE file_id = $1 AND version = $2 LIMIT 1`,
+      values: [fileId, version],
+    })
 
     const row = result.rows[0] as Record<string, unknown> | undefined
     if (!row) return null
@@ -249,7 +250,7 @@ export class DocumentVersioningService {
 
       // Create new version based on the target version
       return await this.createFileVersionFromExisting(
-        tx,
+        tx as unknown as SqlExecutor,
         fileId,
         targetVersionRow['s3_key'] as string,
         userId,
@@ -358,7 +359,7 @@ export class DocumentVersioningService {
   }
 
   private async createFileVersionFromExisting(
-    executor: { execute: (s: unknown) => Promise<{ rows: Record<string, unknown>[] }> },
+    executor: SqlExecutor,
     fileId: string,
     s3Key: string,
     userId: string,
@@ -371,10 +372,11 @@ export class DocumentVersioningService {
     const newVersion = (Number(versionRow0?.['max_version']) || 0) + 1
 
     const versionId = uuidv4()
-    await executor.execute(sql`
-      INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
-      VALUES (${versionId}, ${fileId}, ${newVersion}, ${`version-${newVersion}`}, 0, '', ${s3Key}, ${userId}, ${changes ?? `Version ${newVersion}`}, ${await this.generateChecksum(Buffer.from(''))}, true)
-    `)
+    await executor.execute({
+      text: `INSERT INTO file_versions (id, file_id, version, file_name, size, url, s3_key, uploaded_by, changes, checksum, is_current)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+      values: [versionId, fileId, newVersion, `version-${newVersion}`, 0, '', s3Key, userId, changes ?? `Version ${newVersion}`, await this.generateChecksum(Buffer.from('')), true],
+    })
 
     const newVersionRecord = await this.getFileVersionInternal(
       executor,

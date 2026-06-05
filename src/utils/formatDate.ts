@@ -141,9 +141,13 @@ export function isValidDate(dateString: string): boolean {
     // strictly validate calendar dates to prevent JavaScript Date rollover
     const isoMatch = dateString.match(/^(\d{4})-(\d{2})-(\d{2})/)
     if (isoMatch) {
-      const year = parseInt(isoMatch[1], 10)
-      const month = parseInt(isoMatch[2], 10)
-      const day = parseInt(isoMatch[3], 10)
+      const yearStr = isoMatch[1]
+      const monthStr = isoMatch[2]
+      const dayStr = isoMatch[3]
+      if (!yearStr || !monthStr || !dayStr) return false
+      const year = parseInt(yearStr, 10)
+      const month = parseInt(monthStr, 10)
+      const day = parseInt(dayStr, 10)
 
       if (month < 1 || month > 12) return false
       const daysInMonth = new Date(year, month, 0).getDate()

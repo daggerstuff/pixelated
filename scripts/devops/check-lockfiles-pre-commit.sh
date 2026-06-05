@@ -2,6 +2,37 @@
 
 set -euo pipefail
 
+# Defensive toolchain pinning: this script shells out to `pnpm`, which on
+# many developer machines is a /bin/sh wrapper that does `exec node`. If
+# PATH resolves `node` to a system Node v20 (missing `node:sqlite`) and
+# pnpm is >= 11.3.0 (which requires Node >= 22.13), pnpm crashes before
+# even checking the lockfile. Pin to the nvm-managed node when one is
+# available so pnpm always finds a compatible runtime.
+if [ -z "${NVM_DIR:-}" ]; then
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.nvm"
+  elif [ -s "$HOME/.config/nvm/nvm.sh" ]; then
+    export NVM_DIR="$HOME/.config/nvm"
+  fi
+fi
+if [ -n "${NVM_DIR:-}" ] && [ -s "$NVM_DIR/nvm.sh" ]; then
+  # shellcheck disable=SC1091
+  . "$NVM_DIR/nvm.sh"
+  _nvm_node_dir="$(nvm which current 2>/dev/null | xargs -r dirname || true)"
+  if [ -n "${_nvm_node_dir:-}" ] && [ -x "${_nvm_node_dir}/node" ]; then
+    _clean_path=""
+    IFS=':' read -r -a _path_parts <<< "$PATH"
+    for _p in "${_path_parts[@]}"; do
+      case ":${_p}:" in
+        *":${PNPM_HOME:-/nonexistent}/bin:"*) continue ;;
+      esac
+      _clean_path="${_clean_path:+${_clean_path}:}${_p}"
+    done
+    export PATH="${_nvm_node_dir}:${_clean_path}"
+    unset _nvm_node_dir _clean_path _path_parts _p
+  fi
+fi
+
 workspaces=(
   "."
   "mcp-servers/linear-mcp"

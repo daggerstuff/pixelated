@@ -17,7 +17,13 @@ import type { TherapistSession } from '@/types/dashboard'
 import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 
 const _rawLogger = createBuildSafeLogger('use-therapist-analytics')
-const normalizeLogger = (raw: unknown) => {
+function normalizeLogger(raw: unknown): {
+  info: (...args: unknown[]) => void
+  warn: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
+  debug: (...args: unknown[]) => void
+  child: (name?: string) => ReturnType<typeof normalizeLogger>
+} {
   const safeFn = (fn: unknown, fallback: (...args: unknown[]) => void) =>
     typeof fn === 'function'
       ? (fn as (...args: unknown[]) => unknown)
@@ -56,13 +62,13 @@ const normalizeLogger = (raw: unknown) => {
           /* swallow */
         }
       },
-      child: (/* name: string */) => normalizeLogger(raw),
+      child: () => normalizeLogger(raw),
     }
   }
 
   // If it's an object, pick methods or fall back to console
   if (typeof raw === 'object' && raw !== null) {
-    const obj = raw as Record<string, any>
+    const obj = raw as Record<string, unknown>
     return {
       info: safeFn(obj['info'], console.info.bind(console)),
       warn: safeFn(obj['warn'], console.warn.bind(console)),
@@ -72,7 +78,7 @@ const normalizeLogger = (raw: unknown) => {
         console.debug ? console.debug.bind(console) : console.log.bind(console),
       ),
       child: (name?: string) =>
-        normalizeLogger(obj['child'] ? obj['child'](name) : obj),
+        normalizeLogger(obj['child'] ? (obj['child'] as (...args: unknown[]) => unknown)(name) : obj),
     }
   }
 

@@ -904,9 +904,10 @@ export class BiasAnalysisCache {
           } catch {
             continue
           }
-          if (cacheData.tags) {
+          const dataWithTags = cacheData as { tags?: string[] }
+          if (dataWithTags.tags) {
             let shouldInvalidate = false
-            for (const tag of cacheData.tags) {
+            for (const tag of dataWithTags.tags) {
               if (tag.startsWith('participant:')) {
                 const parts = tag.split(':')
                 if (parts.length >= 2) {

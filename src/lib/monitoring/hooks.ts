@@ -2,6 +2,19 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { MonitoringService } from './service'
 
+// Extend Window type to include faro
+declare global {
+  interface Window {
+    faro?: {
+      api: {
+        pushEvent: (name: string, properties?: Record<string, unknown>) => void
+        pushError: (error: Error, context?: Record<string, unknown>) => void
+        pushMeasurement: (name: string, data: { value: number; unit?: string }) => void
+      }
+    }
+  }
+}
+
 // Extended hook for monitoring service with RUM capabilities
 export function useMonitoring() {
   useEffect(() => {
@@ -13,8 +26,8 @@ export function useMonitoring() {
 
   const trackEvent = useCallback(
     (eventName: string, properties?: Record<string, unknown>) => {
-      if (window.faro) {
-        window.faro.api.pushEvent(eventName, properties)
+      if ((window as any).faro) {
+        (window as any).faro.api.pushEvent(eventName, properties)
       }
     },
     [],
@@ -22,8 +35,8 @@ export function useMonitoring() {
 
   const trackError = useCallback(
     (error: Error, context?: Record<string, unknown>) => {
-      if (window.faro) {
-        window.faro.api.pushError(error, context)
+      if ((window as any).faro) {
+        (window as any).faro.api.pushError(error, context)
       }
     },
     [],
@@ -31,8 +44,8 @@ export function useMonitoring() {
 
   const trackMetric = useCallback(
     (name: string, value: number, unit?: string) => {
-      if (window.faro) {
-        window.faro.api.pushMeasurement(name, {
+      if ((window as any).faro) {
+        (window as any).faro.api.pushMeasurement(name, {
           value,
           unit,
         })
@@ -99,7 +112,7 @@ export function useRUMData() {
       // For now, we'll use mock data similar to what we use in the Astro component
 
       // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 500))
+      await new Promise((resolve: (value: unknown) => void) => setTimeout(resolve, 500))
 
       const randomFactor = 0.8 + Math.random() * 0.4 // Random value between 0.8 and 1.2
 

@@ -5,7 +5,7 @@ const pool = new Pool({
   connectionString: process.env['DATABASE_URL'],
 })
 
-export const POST = async ({ request }) => {
+export const POST: import('astro').APIRoute = async ({ request }) => {
   try {
     const { sessionId, progressMetrics, therapistId, evaluationFeedback } =
       await request.json()
@@ -100,7 +100,7 @@ export const GET = async ({ request }) => {
         })
       }
 
-      const sessionData = result.rows[0]
+      const sessionData = result.rows[0] as Record<string, unknown> | undefined
       let feedback = null
       if (includeFeedback) {
         // Fetch feedback for this session
@@ -116,9 +116,9 @@ export const GET = async ({ request }) => {
       return new Response(
         JSON.stringify({
           sessionId,
-          progressMetrics: sessionData.progress_metrics,
-          progressSnapshots: sessionData.progress_snapshots,
-          skillScores: sessionData.skill_scores,
+          progressMetrics: sessionData!['progress_metrics'],
+          progressSnapshots: sessionData!['progress_snapshots'],
+          skillScores: sessionData!['skill_scores'],
           feedback,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } },
