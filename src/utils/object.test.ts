@@ -57,4 +57,11 @@ describe('deepEqual', () => {
     expect(deepEqual(obj1, obj3)).toBe(false)
     expect(deepEqual(obj1, obj4)).toBe(false)
   })
+
+  it('handles array edge cases including lengths and ordering', () => {
+    expect(deepEqual([1, 2], [1, 2, 3])).toBe(false)
+    expect(deepEqual([1, 2, 3], [1, 2])).toBe(false)
+    expect(deepEqual([], [1])).toBe(false)
+    expect(deepEqual([1, 2, 3], [1, 3, 2])).toBe(false)
+  })
 })
