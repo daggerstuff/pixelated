@@ -48,7 +48,7 @@
     "lint:markdown:ci:all": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules --ignore '**/node_modules/**' \"**/*.md\" \"**/*.mdx\"",
     "lint:fix": "oxlint -c .oxlintrc.json --fix-dangerously .",
     "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
-    "typecheck:strict": "NODE_OPTIONS='--max-old-space-size=8192' tsx scripts/validate-typescript.ts",
+    "typecheck:strict": "NODE_OPTIONS='--max-old-space-size=4096' tsx scripts/validate-typescript.ts",
     "type-check": "pnpm run typecheck",
     "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
     "check:all": "pnpm run check && pnpm run typecheck",
