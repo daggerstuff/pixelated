@@ -35,8 +35,7 @@ export interface IStrategicPlan {
   save(): Promise<IStrategicPlan>
 }
 
-const getStrategicPlanModel = () =>
-  getMongoConnection().model('StrategicPlan')
+const getStrategicPlanModel = () => getMongoConnection().model('StrategicPlan')
 
 /**
  * Create a new strategic plan
@@ -137,7 +136,7 @@ export async function updateStrategicPlan(
 
   Object.keys(updates).forEach((key) => {
     if (key !== '_id' && key !== 'owner' && key !== 'createdAt') {
-      ;(plan)[key] = (updates as Record<string, unknown>)[key]
+      plan[key] = (updates as Record<string, unknown>)[key]
     }
   })
 

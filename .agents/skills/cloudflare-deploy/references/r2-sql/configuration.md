@@ -10,7 +10,8 @@ Setup and configuration for R2 SQL queries.
 
 ## Enable R2 Data Catalog
 
-R2 SQL queries Apache Iceberg tables in R2 Data Catalog. Must enable catalog on bucket first.
+R2 SQL queries Apache Iceberg tables in R2 Data Catalog. Must enable catalog on
+bucket first.
 
 ### Via Wrangler CLI
 
@@ -19,10 +20,12 @@ npx wrangler r2 bucket catalog enable <bucket-name>
 ```
 
 Output includes:
+
 - **Warehouse name** - Typically same as bucket name
 - **Catalog URI** - REST endpoint for catalog operations
 
 Example output:
+
 ```
 Catalog enabled successfully
 Warehouse: my-bucket
@@ -37,7 +40,8 @@ Catalog URI: https://abc123.r2.cloudflarestorage.com/iceberg/my-bucket
 4. Click **Enable**
 5. Note the **Catalog URI** and **Warehouse** name
 
-**Important:** Enabling catalog creates metadata directories in bucket but does not modify existing objects.
+**Important:** Enabling catalog creates metadata directories in bucket but does
+not modify existing objects.
 
 ## Create API Token
 
@@ -58,12 +62,13 @@ R2 SQL requires API token with R2 permissions.
 
 ### Permission Scope
 
-| Permission | Grants Access To |
-|------------|------------------|
+| Permission            | Grants Access To                                                 |
+| --------------------- | ---------------------------------------------------------------- |
 | R2 Admin Read & Write | R2 storage operations + R2 SQL queries + Data Catalog operations |
-| R2 SQL Read | SQL queries only (no storage writes) |
+| R2 SQL Read           | SQL queries only (no storage writes)                             |
 
-**Note:** R2 SQL Read permission not yet available via Dashboard - use Admin Read & Write.
+**Note:** R2 SQL Read permission not yet available via Dashboard - use Admin
+Read & Write.
 
 ## Configure Environment
 
@@ -97,7 +102,8 @@ curl -X POST https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/sql/q
   }'
 ```
 
-**Note:** HTTP API endpoint URL may vary - see [patterns.md](patterns.md#http-api-query) for current endpoint.
+**Note:** HTTP API endpoint URL may vary - see
+[patterns.md](patterns.md#http-api-query) for current endpoint.
 
 ## Verify Setup
 
@@ -120,6 +126,7 @@ If successful, returns JSON array of results.
 **Cause:** Invalid or missing token
 
 **Solution:**
+
 - Verify `WRANGLER_R2_SQL_AUTH_TOKEN` environment variable set
 - Check token has Admin Read & Write permission
 - Create new token if expired
@@ -129,6 +136,7 @@ If successful, returns JSON array of results.
 **Cause:** Data Catalog not enabled
 
 **Solution:**
+
 - Run `npx wrangler r2 bucket catalog enable <bucket-name>`
 - Or enable via Dashboard (R2 → bucket → Settings → R2 Data Catalog)
 
@@ -137,11 +145,13 @@ If successful, returns JSON array of results.
 **Cause:** Token lacks required permissions
 
 **Solution:**
+
 - Verify token has **Admin Read & Write** permission
 - Create new token with correct permissions
 
 ## See Also
 
-- [r2-data-catalog/configuration.md](../r2-data-catalog/configuration.md) - Detailed token setup and PyIceberg connection
+- [r2-data-catalog/configuration.md](../r2-data-catalog/configuration.md) -
+  Detailed token setup and PyIceberg connection
 - [patterns.md](patterns.md) - Query examples using configuration
 - [gotchas.md](gotchas.md) - Common configuration errors

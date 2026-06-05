@@ -446,7 +446,10 @@ export class TreatmentPlanDAO {
         import('../types/mongodb.types').TreatmentPlanGoal,
         'id' | 'milestones' | 'metrics'
       >
-    > & { milestones?: import('../types/mongodb.types').TreatmentPlanMilestone[]; metrics?: import('../types/mongodb.types').TreatmentPlanGoalMetrics },
+    > & {
+      milestones?: import('../types/mongodb.types').TreatmentPlanMilestone[]
+      metrics?: import('../types/mongodb.types').TreatmentPlanGoalMetrics
+    },
   ): Promise<TreatmentPlan | null> {
     const collection = await this.getCollection()
     const plan = await collection.findOne({ _id: new ObjectId!(planId) })

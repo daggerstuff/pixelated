@@ -10,9 +10,9 @@ import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
-import { treatmentPlanDAO } from '@/services/mongodb.dao'
 import { getUserById } from '@/services/auth0.service'
+import { treatmentPlanDAO } from '@/services/mongodb.dao'
+import type { TreatmentPlan as TreatmentPlanDB } from '@/types/mongodb.types'
 
 export const prerender = false
 
@@ -296,8 +296,7 @@ export const GET: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error:
-          error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -305,8 +304,7 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -445,8 +443,7 @@ export const POST: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error:
-          error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -454,8 +451,7 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,
@@ -544,11 +540,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       )
     } else if (goalId) {
       // Update a specific goal
-      updatedPlan = await treatmentPlanDAO.updateGoal(
-        planId,
-        goalId,
-        updates,
-      )
+      updatedPlan = await treatmentPlanDAO.updateGoal(planId, goalId, updates)
     } else {
       // Update the plan-level fields
       updatedPlan = await treatmentPlanDAO.update(planId, updates)
@@ -611,8 +603,7 @@ export const PATCH: APIRoute = async ({ request }) => {
       'anonymous',
       'auth-components-treatment-plans',
       {
-        error:
-          error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
       },
     )
@@ -620,8 +611,7 @@ export const PATCH: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error',
-        message:
-          error instanceof Error ? error.message : 'Unknown error',
+        message: error instanceof Error ? error.message : 'Unknown error',
       }),
       {
         status: 500,

@@ -10,7 +10,9 @@ type RedirectState = {
 }
 
 function getEnvVariable(name: string): string | undefined {
-  const env = (import.meta as unknown as { env: Record<string, string | undefined> }).env
+  const env = (
+    import.meta as unknown as { env: Record<string, string | undefined> }
+  ).env
   return env[name]
 }
 

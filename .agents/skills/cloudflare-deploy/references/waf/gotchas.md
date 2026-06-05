@@ -2,11 +2,11 @@
 
 ## Execution Order
 
-**Problem:** Rules execute in unexpected order
-**Cause:** Misunderstanding phase execution
-**Solution:**
+**Problem:** Rules execute in unexpected order **Cause:** Misunderstanding phase
+execution **Solution:**
 
 Phases execute sequentially (can't be changed):
+
 1. `http_request_firewall_custom` - Custom rules
 2. `http_request_firewall_managed` - Managed rulesets
 3. `http_ratelimit` - Rate limiting
@@ -30,9 +30,8 @@ await client.rulesets.create({ phase: 'http_request_firewall_managed', rules: [.
 
 ## Expression Errors
 
-**Problem:** Syntax errors prevent deployment
-**Cause:** Invalid field/operator/syntax
-**Solution:**
+**Problem:** Syntax errors prevent deployment **Cause:** Invalid
+field/operator/syntax **Solution:**
 
 ```typescript
 // Common mistakes
@@ -46,11 +45,11 @@ Test expressions in Security Events before deploying.
 
 ## Skip Rule Pitfalls
 
-**Problem:** Skip rules don't work as expected
-**Cause:** Misunderstanding skip scope
-**Solution:**
+**Problem:** Skip rules don't work as expected **Cause:** Misunderstanding skip
+scope **Solution:**
 
 Skip types:
+
 - `ruleset: 'current'` - Skip remaining rules in current ruleset only
 - `phases: ['phase_name']` - Skip entire phases
 
@@ -76,9 +75,8 @@ Skip types:
 
 ## Update Replaces All Rules
 
-**Problem:** Updating ruleset deletes other rules
-**Cause:** `update()` replaces entire rule list
-**Solution:**
+**Problem:** Updating ruleset deletes other rules **Cause:** `update()` replaces
+entire rule list **Solution:**
 
 ```typescript
 // WRONG: This deletes all existing rules!
@@ -86,22 +84,27 @@ await client.rulesets.update({
   zone_id: 'zone_id',
   ruleset_id: 'ruleset_id',
   rules: [{ action: 'block', expression: 'cf.waf.score gt 50' }],
-});
+})
 
 // CORRECT: Get existing rules first
-const ruleset = await client.rulesets.get({ zone_id: 'zone_id', ruleset_id: 'ruleset_id' });
+const ruleset = await client.rulesets.get({
+  zone_id: 'zone_id',
+  ruleset_id: 'ruleset_id',
+})
 await client.rulesets.update({
   zone_id: 'zone_id',
   ruleset_id: 'ruleset_id',
-  rules: [...ruleset.rules, { action: 'block', expression: 'cf.waf.score gt 50' }],
-});
+  rules: [
+    ...ruleset.rules,
+    { action: 'block', expression: 'cf.waf.score gt 50' },
+  ],
+})
 ```
 
 ## Override Conflicts
 
-**Problem:** Managed ruleset overrides don't apply
-**Cause:** Rule ID doesn't exist or category name incorrect
-**Solution:**
+**Problem:** Managed ruleset overrides don't apply **Cause:** Rule ID doesn't
+exist or category name incorrect **Solution:**
 
 ```typescript
 // List managed ruleset rules to find IDs
@@ -112,27 +115,27 @@ const ruleset = await client.rulesets.get({
 console.log(ruleset.rules.map(r => ({ id: r.id, description: r.description })));
 
 // Use correct IDs in overrides
-{ action: 'execute', action_parameters: { id: 'efb7b8c949ac4650a09736fc376e9aee', 
+{ action: 'execute', action_parameters: { id: 'efb7b8c949ac4650a09736fc376e9aee',
   overrides: { rules: [{ id: '5de7edfa648c4d6891dc3e7f84534ffa', action: 'log' }] } } }
 ```
 
 ## False Positives
 
-**Problem:** Legitimate traffic blocked
-**Cause:** Aggressive rules/thresholds
+**Problem:** Legitimate traffic blocked **Cause:** Aggressive rules/thresholds
 **Solution:**
 
 1. Start with log mode: `overrides: { action: 'log' }`
 2. Review Security Events to identify false positives
-3. Override specific rules: `overrides: { rules: [{ id: 'rule_id', action: 'log' }] }`
+3. Override specific rules:
+   `overrides: { rules: [{ id: 'rule_id', action: 'log' }] }`
 
 ## Rate Limiting NAT Issues
 
-**Problem:** Users behind NAT hit rate limits too quickly
-**Cause:** Multiple users sharing single IP
-**Solution:**
+**Problem:** Users behind NAT hit rate limits too quickly **Cause:** Multiple
+users sharing single IP **Solution:**
 
 Add more characteristics: User-Agent, session cookie, or authorization header
+
 ```typescript
 {
   action: 'block',
@@ -149,8 +152,7 @@ Add more characteristics: User-Agent, session cookie, or authorization header
 
 ## Performance Issues
 
-**Problem:** Increased latency
-**Cause:** Complex expressions, excessive rules
+**Problem:** Increased latency **Cause:** Complex expressions, excessive rules
 **Solution:**
 
 1. Skip static assets early: `action: 'skip'` for `\\.(jpg|css|js)$`
@@ -160,16 +162,17 @@ Add more characteristics: User-Agent, session cookie, or authorization header
 
 ## Limits & Quotas
 
-| Resource | Free | Pro | Business | Enterprise |
-|----------|------|-----|----------|------------|
-| Custom rules | 5 | 20 | 100 | 1000 |
-| Rate limiting rules | 1 | 10 | 25 | 100 |
-| Rule expression length | 4096 chars | 4096 chars | 4096 chars | 4096 chars |
-| Rules per ruleset | 75 | 75 | 400 | 1000 |
-| Managed rulesets | Yes | Yes | Yes | Yes |
-| Rate limit characteristics | 2 | 3 | 5 | 5 |
+| Resource                   | Free       | Pro        | Business   | Enterprise |
+| -------------------------- | ---------- | ---------- | ---------- | ---------- |
+| Custom rules               | 5          | 20         | 100        | 1000       |
+| Rate limiting rules        | 1          | 10         | 25         | 100        |
+| Rule expression length     | 4096 chars | 4096 chars | 4096 chars | 4096 chars |
+| Rules per ruleset          | 75         | 75         | 400        | 1000       |
+| Managed rulesets           | Yes        | Yes        | Yes        | Yes        |
+| Rate limit characteristics | 2          | 3          | 5          | 5          |
 
 **Important Notes:**
+
 - Rules execute in order; first match wins (except skip rules)
 - Expression evaluation stops at first `false` in AND chains
 - `matches` regex operator is slower than string operators
@@ -177,9 +180,8 @@ Add more characteristics: User-Agent, session cookie, or authorization header
 
 ## API Errors
 
-**Problem:** API calls fail with cryptic errors
-**Cause:** Invalid parameters or permissions
-**Solution:**
+**Problem:** API calls fail with cryptic errors **Cause:** Invalid parameters or
+permissions **Solution:**
 
 ```typescript
 // Error: "Invalid phase" → Use exact phase name

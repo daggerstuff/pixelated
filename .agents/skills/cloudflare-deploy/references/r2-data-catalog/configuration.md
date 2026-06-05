@@ -4,7 +4,8 @@ How to enable R2 Data Catalog and configure authentication.
 
 ## Prerequisites
 
-- Cloudflare account with [R2 subscription](https://developers.cloudflare.com/r2/pricing/)
+- Cloudflare account with
+  [R2 subscription](https://developers.cloudflare.com/r2/pricing/)
 - R2 bucket created
 - Access to Cloudflare dashboard or Wrangler CLI
 
@@ -19,6 +20,7 @@ npx wrangler r2 bucket catalog enable <BUCKET_NAME>
 ```
 
 **Output:**
+
 ```
 ✅ Data Catalog enabled for bucket 'my-bucket'
    Catalog URI: https://<account-id>.r2.cloudflarestorage.com/iceberg/my-bucket
@@ -32,7 +34,9 @@ npx wrangler r2 bucket catalog enable <BUCKET_NAME>
 3. Note the **Catalog URI** and **Warehouse name** shown
 
 **Result:**
-- Catalog URI: `https://<account-id>.r2.cloudflarestorage.com/iceberg/<bucket-name>`
+
+- Catalog URI:
+  `https://<account-id>.r2.cloudflarestorage.com/iceberg/<bucket-name>`
 - Warehouse: `<bucket-name>` (same as bucket name)
 
 ### Via API (Programmatic)
@@ -45,6 +49,7 @@ curl -X POST \
 ```
 
 **Response:**
+
 ```json
 {
   "result": {
@@ -62,6 +67,7 @@ npx wrangler r2 bucket catalog status <BUCKET_NAME>
 ```
 
 **Output:**
+
 ```
 Catalog Status: enabled
 Catalog URI: https://<account-id>.r2.cloudflarestorage.com/iceberg/my-bucket
@@ -74,11 +80,13 @@ Warehouse: my-bucket
 npx wrangler r2 bucket catalog disable <BUCKET_NAME>
 ```
 
-⚠️ **Warning:** Disabling does NOT delete tables/data. Files remain in bucket. Metadata becomes inaccessible until re-enabled.
+⚠️ **Warning:** Disabling does NOT delete tables/data. Files remain in bucket.
+Metadata becomes inaccessible until re-enabled.
 
 ## API Token Creation
 
-R2 Data Catalog requires API token with **both** R2 Storage + R2 Data Catalog permissions.
+R2 Data Catalog requires API token with **both** R2 Storage + R2 Data Catalog
+permissions.
 
 ### Dashboard Method (Recommended)
 
@@ -89,12 +97,14 @@ R2 Data Catalog requires API token with **both** R2 Storage + R2 Data Catalog pe
 3. Copy token value immediately (shown only once)
 
 **Permission groups included:**
+
 - `Workers R2 Data Catalog Write` (or Read)
 - `Workers R2 Storage Bucket Item Write` (or Read)
 
 ### API Method (Programmatic)
 
 Use Cloudflare API to create tokens programmatically. Required permissions:
+
 - `Workers R2 Data Catalog Write` (or Read)
 - `Workers R2 Storage Bucket Item Write` (or Read)
 
@@ -114,6 +124,7 @@ catalog = RestCatalog(
 ```
 
 **Full example with credentials:**
+
 ```python
 import os
 from pyiceberg.catalog.rest import RestCatalog
@@ -136,7 +147,8 @@ print(catalog.list_namespaces())
 
 ### Spark / Trino / DuckDB
 
-See [patterns.md](patterns.md) for integration examples with other query engines.
+See [patterns.md](patterns.md) for integration examples with other query
+engines.
 
 ## Connection String Format
 
@@ -150,17 +162,19 @@ Token:        <r2-api-token>
 
 **Where to find values:**
 
-| Value | Source |
-|-------|--------|
-| `<account-id>` | Dashboard URL or `wrangler whoami` |
-| `<bucket>` | R2 bucket name |
-| Catalog URI | Output from `wrangler r2 bucket catalog enable` |
-| Token | R2 API Token creation page |
+| Value          | Source                                          |
+| -------------- | ----------------------------------------------- |
+| `<account-id>` | Dashboard URL or `wrangler whoami`              |
+| `<bucket>`     | R2 bucket name                                  |
+| Catalog URI    | Output from `wrangler r2 bucket catalog enable` |
+| Token          | R2 API Token creation page                      |
 
 ## Security Best Practices
 
-1. **Store tokens securely** - Use environment variables or secret managers, never hardcode
-2. **Use least privilege** - Read-only tokens for query engines, write tokens only where needed
+1. **Store tokens securely** - Use environment variables or secret managers,
+   never hardcode
+2. **Use least privilege** - Read-only tokens for query engines, write tokens
+   only where needed
 3. **Rotate tokens regularly** - Create new tokens, test, then revoke old ones
 4. **One token per application** - Easier to track and revoke if compromised
 5. **Monitor token usage** - Check R2 analytics for unexpected patterns
@@ -189,10 +203,10 @@ catalog = RestCatalog(
 
 ## Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| 404 "catalog not found" | Run `wrangler r2 bucket catalog enable <bucket>` |
-| 401 "unauthorized" | Check token has both Catalog + Storage permissions |
-| 403 on data files | Token needs both permission groups |
+| Problem                 | Solution                                           |
+| ----------------------- | -------------------------------------------------- |
+| 404 "catalog not found" | Run `wrangler r2 bucket catalog enable <bucket>`   |
+| 401 "unauthorized"      | Check token has both Catalog + Storage permissions |
+| 403 on data files       | Token needs both permission groups                 |
 
 See [gotchas.md](gotchas.md) for detailed troubleshooting.
