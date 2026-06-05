@@ -37,6 +37,7 @@ jobs:
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
       TRIVY_STRICT_GATE: false
+      VITEST_COVERAGE_ENABLED: false
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
       UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}
