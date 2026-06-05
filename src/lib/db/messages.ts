@@ -1,5 +1,5 @@
 import type { Database } from '../../types/supabase'
-import { createAuditLog } from '../audit'
+import { createAuditLog, AuditEventType } from '../audit'
 import { updateConversation } from './conversations'
 import { mongoClient } from './mongoClient'
 
@@ -17,9 +17,10 @@ export async function getMessages(
   offset = 0,
 ): Promise<Message[]> {
   // First verify the user has access to this conversation
+  const { ObjectId } = await import('mongodb')
   const conversation = await mongoClient.db
     .collection('conversations')
-    .findOne({ _id: conversationId, user_id: userId })
+    .findOne({ _id: new ObjectId(conversationId), user_id: userId })
 
   if (!conversation) {
     throw new Error('Unauthorized access to conversation')
@@ -34,7 +35,7 @@ export async function getMessages(
     .limit(limit)
     .toArray()
 
-  return messages as Message[]
+  return messages as unknown as Message[]
 }
 
 /**
@@ -46,19 +47,25 @@ export async function createMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
+  const { ObjectId } = await import('mongodb')
   const conversation = await mongoClient.db
     .collection('conversations')
-    .findOne({ _id: message.conversation_id, user_id: userId })
+    .findOne({ _id: new ObjectId(message.conversation_id), user_id: userId })
 
   if (!conversation) {
     throw new Error('Unauthorized access to conversation')
   }
 
   // Create the message
-  const result = await mongoClient.db.collection('messages').insertOne(message)
+  const result = await mongoClient.db
+    .collection('messages')
+    .insertOne(message as unknown as Record<string, unknown>)
   const newMessage = {
     ...message,
     _id: result.insertedId,
+    id: result.insertedId.toHexString(),
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   }
 
   // Update the conversation's last_message_at timestamp
@@ -68,20 +75,21 @@ export async function createMessage(
   })
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  await createAuditLog(
+    AuditEventType.CREATE,
+    'message_created',
     userId,
-    action: 'message_created',
-    resource: 'messages',
-    metadata: {
+    'messages',
+    {
       messageId: newMessage._id.toHexString(),
       conversationId: message.conversation_id,
       role: message.role,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
+      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: request?.headers.get('user-agent') ?? undefined,
     },
-  })
+  )
 
-  return newMessage as Message
+  return newMessage as unknown as Message
 }
 
 /**
@@ -95,9 +103,10 @@ export async function updateMessage(
   request?: Request,
 ): Promise<Message> {
   // First verify the user has access to this conversation
+  const { ObjectId } = await import('mongodb')
   const conversation = await mongoClient.db
     .collection('conversations')
-    .findOne({ _id: conversationId, user_id: userId })
+    .findOne({ _id: new ObjectId(conversationId), user_id: userId })
 
   if (!conversation) {
     throw new Error('Unauthorized access to conversation')
@@ -107,30 +116,31 @@ export async function updateMessage(
   const result = await mongoClient.db
     .collection('messages')
     .findOneAndUpdate(
-      { _id: id, conversation_id: conversationId },
+      { _id: new ObjectId(id), conversation_id: conversationId },
       { $set: updates },
       { returnDocument: 'after' },
     )
 
-  if (!result.value) {
+  if (!result?.['value']) {
     throw new Error('Failed to update message')
   }
 
   // Log the event for HIPAA compliance
-  await createAuditLog({
+  await createAuditLog(
+    AuditEventType.MODIFY,
+    'message_updated',
     userId,
-    action: 'message_updated',
-    resource: 'messages',
-    metadata: {
+    'messages',
+    {
       messageId: id,
       conversationId,
       updates,
-      ipAddress: request?.headers.get('x-forwarded-for'),
-      userAgent: request?.headers.get('user-agent'),
+      ipAddress: request?.headers.get('x-forwarded-for') ?? undefined,
+      userAgent: request?.headers.get('user-agent') ?? undefined,
     },
-  })
+  )
 
-  return result.value as Message
+  return result['value'] as unknown as Message
 }
 
 /**
@@ -176,5 +186,5 @@ export async function adminGetFlaggedMessages(): Promise<Message[]> {
     ])
     .toArray()
 
-  return messages as Message[]
+  return messages as unknown as Message[]
 }

@@ -10,13 +10,13 @@
 
 ## Triggers
 
-| Type | When | Use Case |
-|------|------|----------|
-| Pageview | Page load | Track page views |
-| Click | Element clicked | Button tracking |
-| Form Submission | Form submitted | Lead capture |
-| History Change | URL changes (SPA) | React/Vue routing |
-| Variable Match | Custom condition | Conditional firing |
+| Type            | When              | Use Case           |
+| --------------- | ----------------- | ------------------ |
+| Pageview        | Page load         | Track page views   |
+| Click           | Element clicked   | Button tracking    |
+| Form Submission | Form submitted    | Lead capture       |
+| History Change  | URL changes (SPA) | React/Vue routing  |
+| Variable Match  | Custom condition  | Conditional firing |
 
 ### History Change (SPA)
 
@@ -25,7 +25,8 @@ Type: History Change
 Event: pageview
 ```
 
-Fires on `pushState`, `replaceState`, hash changes. **No manual tracking needed.**
+Fires on `pushState`, `replaceState`, hash changes. **No manual tracking
+needed.**
 
 ### Click Trigger
 
@@ -40,18 +41,21 @@ Properties:
 ## Tool Configuration
 
 **GA4:**
+
 ```
 Measurement ID: G-XXXXXXXXXX
 Events: page_view, purchase, user_engagement
 ```
 
 **Facebook Pixel:**
+
 ```
 Pixel ID: 1234567890123456
 Events: PageView, Purchase, AddToCart
 ```
 
 **Google Ads:**
+
 ```
 Conversion ID: AW-XXXXXXXXX
 Conversion Label: YYYYYYYYYY
@@ -64,17 +68,18 @@ Conversion Label: YYYYYYYYYY
 3. Set behavior: "Do not load until consent granted"
 
 **Programmatic consent:**
+
 ```javascript
-zaraz.consent.setAll({ analytics: true, marketing: true });
+zaraz.consent.setAll({ analytics: true, marketing: true })
 ```
 
 ## Privacy Features
 
-| Feature | Default |
-|---------|---------|
-| IP Anonymization | Enabled |
-| Cookie Control | Via consent purposes |
-| GDPR/CCPA | Consent modal |
+| Feature          | Default              |
+| ---------------- | -------------------- |
+| IP Anonymization | Enabled              |
+| Cookie Control   | Via consent purposes |
+| GDPR/CCPA        | Consent modal        |
 
 ## Testing
 
@@ -84,7 +89,7 @@ zaraz.consent.setAll({ analytics: true, marketing: true });
 
 ## Limits
 
-| Resource | Limit |
-|----------|-------|
+| Resource         | Limit |
+| ---------------- | ----- |
 | Event properties | 100KB |
-| Consent purposes | 20 |
+| Consent purposes | 20    |

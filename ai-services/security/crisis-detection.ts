@@ -115,7 +115,9 @@ export function detectCrisisSignals(text: string): CrisisAnalysisResult {
 
   if (actionRequired) {
     const signalCount = signals.length
-    logger.warn(`Crisis signal detected - risk: ${riskLevel}, signals: ${String(signalCount)}`)
+    logger.warn(
+      `Crisis signal detected - risk: ${riskLevel}, signals: ${String(signalCount)}`,
+    )
   }
 
   return result

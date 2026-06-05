@@ -421,7 +421,10 @@ export class AIMonitoringService extends EventEmitter {
   }
 
   private checkEscalation(alert: Alert): void {
-    const escalationTime = this.config.alerting.escalation[alert.severity as 'critical' | 'high' | 'medium']
+    const escalationTime =
+      this.config.alerting.escalation[
+        alert.severity as 'critical' | 'high' | 'medium'
+      ]
     if (escalationTime > 0) {
       setTimeout(
         () => {
