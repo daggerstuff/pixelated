@@ -1,3 +1,0 @@
-## 2024-05-15 - Extracted static tabIcons in AdminDashboard | Learning: Object extraction reduces render overhead | Action: Moved tabIcons out of AdminDashboard
-
-## 2024-11-20 - Array Literals O(1) Lookup Extraction | Learning: Array literals defined inside a React component function are re-allocated on every render, which can cause unnecessary memory pressure and potentially trigger unnecessary re-renders in child components if passed as props. | Action: Extract static arrays (`timeRangeOptions`, `demographicFilterOptions`) outside the component to module scope.
