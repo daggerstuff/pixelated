@@ -53,7 +53,8 @@ export function createMockAuthRequest(
     originalUrl: '/api/users',
     method: 'GET',
     headers,
-    get: ((header: string) => headers[header.toLowerCase()] ?? undefined) as MockAuthRequest['get'],
+    get: ((header: string) =>
+      headers[header.toLowerCase()] ?? undefined) as MockAuthRequest['get'],
     ...overrides,
   } as MockAuthRequest
 }

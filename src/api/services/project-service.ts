@@ -330,7 +330,9 @@ export async function searchProjects(
   })
   let limitedResult: unknown
 
-  if (typeof (queryResult as unknown as { limit?: unknown }).limit === 'function') {
+  if (
+    typeof (queryResult as unknown as { limit?: unknown }).limit === 'function'
+  ) {
     const limited = (
       queryResult as unknown as {
         limit: (limit: number) => Promise<Project[]> | Project[]

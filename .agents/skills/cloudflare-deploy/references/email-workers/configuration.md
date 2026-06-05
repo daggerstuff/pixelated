@@ -8,14 +8,19 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-01-27",
   "send_email": [
-    { "name": "EMAIL" },                                    // Unrestricted
-    { "name": "EMAIL_LOGS", "destination_address": "logs@example.com" },  // Single dest
-    { "name": "EMAIL_TEAM", "allowed_destination_addresses": ["a@ex.com", "b@ex.com"] },
-    { "name": "EMAIL_NOREPLY", "allowed_sender_addresses": ["noreply@ex.com"] }
+    { "name": "EMAIL" }, // Unrestricted
+    { "name": "EMAIL_LOGS", "destination_address": "logs@example.com" }, // Single dest
+    {
+      "name": "EMAIL_TEAM",
+      "allowed_destination_addresses": ["a@ex.com", "b@ex.com"],
+    },
+    { "name": "EMAIL_NOREPLY", "allowed_sender_addresses": ["noreply@ex.com"] },
   ],
   "kv_namespaces": [{ "binding": "ARCHIVE", "id": "xxx" }],
-  "r2_buckets": [{ "binding": "ATTACHMENTS", "bucket_name": "email-attachments" }],
-  "vars": { "WEBHOOK_URL": "https://hooks.example.com" }
+  "r2_buckets": [
+    { "binding": "ATTACHMENTS", "bucket_name": "email-attachments" },
+  ],
+  "vars": { "WEBHOOK_URL": "https://hooks.example.com" },
 }
 ```
 
@@ -23,15 +28,19 @@
 
 ```typescript
 interface Env {
-  EMAIL: SendEmail;
-  ARCHIVE: KVNamespace;
-  ATTACHMENTS: R2Bucket;
-  WEBHOOK_URL: string;
+  EMAIL: SendEmail
+  ARCHIVE: KVNamespace
+  ATTACHMENTS: R2Bucket
+  WEBHOOK_URL: string
 }
 
 export default {
-  async email(message: ForwardableEmailMessage, env: Env, ctx: ExecutionContext) {}
-};
+  async email(
+    message: ForwardableEmailMessage,
+    env: Env,
+    ctx: ExecutionContext,
+  ) {},
+}
 ```
 
 ## Dependencies
@@ -48,9 +57,12 @@ Use postal-mime v2.x, mimetext v3.x.
 ```json
 {
   "compilerOptions": {
-    "target": "ES2022", "module": "ES2022", "lib": ["ES2022"],
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022"],
     "types": ["@cloudflare/workers-types"],
-    "moduleResolution": "bundler", "strict": true
+    "moduleResolution": "bundler",
+    "strict": true
   }
 }
 ```
@@ -85,7 +97,8 @@ npx wrangler deployments list
 
 1. **Email Routing:** Domain → Email → Enable Email Routing
 2. **Verify addresses:** Email → Destination addresses → Add & verify
-3. **Bind Worker:** Email → Email Workers → Create route → Select pattern & Worker
+3. **Bind Worker:** Email → Email Workers → Create route → Select pattern &
+   Worker
 4. **DMARC:** Add TXT `_dmarc.domain.com`: `v=DMARC1; p=quarantine;`
 
 ## Secrets
@@ -105,8 +118,8 @@ npx wrangler tail --format json
 
 ## Troubleshooting
 
-| Error | Fix |
-|-------|-----|
-| "Binding not found" | Check `send_email` name matches code |
-| "Invalid destination" | Verify in Email Routing dashboard |
-| Type errors | Install `@cloudflare/workers-types` |
+| Error                 | Fix                                  |
+| --------------------- | ------------------------------------ |
+| "Binding not found"   | Check `send_email` name matches code |
+| "Invalid destination" | Verify in Email Routing dashboard    |
+| Type errors           | Install `@cloudflare/workers-types`  |
