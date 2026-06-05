@@ -287,7 +287,9 @@ export class ThreatValidationSystem extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = (this.redis as unknown as { duplicate?: () => Redis }).duplicate?.()
+      const subscriber = (
+        this.redis as unknown as { duplicate?: () => Redis }
+      ).duplicate?.()
       if (!subscriber) {
         logger.warn('Redis duplicate() not available, skipping pub/sub setup')
         return
@@ -320,7 +322,10 @@ export class ThreatValidationSystem extends EventEmitter {
           }
         })()
       }
-      subscriber.on('message', messageHandler as unknown as Parameters<typeof subscriber.on>[1])
+      subscriber.on(
+        'message',
+        messageHandler as unknown as Parameters<typeof subscriber.on>[1],
+      )
 
       logger.info('Redis pub/sub setup completed')
     } catch (error: unknown) {
@@ -505,7 +510,10 @@ export class ThreatValidationSystem extends EventEmitter {
       const validation: ThreatValidation = {
         id: validationId,
         threat_id: queueItem.threat_data.id,
-        validation_type: (queueItem.validation_types[0] as ThreatValidation['validation_type']) ?? 'accuracy',
+        validation_type:
+          (queueItem
+            .validation_types[0] as ThreatValidation['validation_type']) ??
+          'accuracy',
         validation_types: queueItem.validation_types,
         status: 'in_progress',
         validator_type: this.determineValidatorType(queueItem),
@@ -794,7 +802,8 @@ export class ThreatValidationSystem extends EventEmitter {
       }
 
       // Cross-reference with external sources
-      const crossRefCheck = await this.crossReferenceExternalSources(_threatData)
+      const crossRefCheck =
+        await this.crossReferenceExternalSources(_threatData)
       if (!crossRefCheck.is_verified) {
         score -= 0.2
         findings.push({

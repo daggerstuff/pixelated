@@ -291,7 +291,11 @@
       }
     },
     {
-      "files": ["src/lib/threat-intelligence/**/*.ts", "src/lib/security/threat-intelligence/**/*.ts", "src/lib/threat-detection/**/*.ts"],
+      "files": [
+        "src/lib/threat-intelligence/**/*.ts",
+        "src/lib/security/threat-intelligence/**/*.ts",
+        "src/lib/threat-detection/**/*.ts"
+      ],
       "rules": {
         "typescript/no-unsafe-assignment": "off",
         "typescript/no-unsafe-member-access": "off",

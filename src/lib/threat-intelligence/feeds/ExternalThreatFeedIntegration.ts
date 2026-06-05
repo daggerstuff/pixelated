@@ -579,7 +579,7 @@ export class ExternalThreatFeedIntegrationCore
       // Apply confidence filter
       if (
         filters['minConfidence'] &&
-        (item.confidence) < (filters['minConfidence'] as number)
+        item.confidence < (filters['minConfidence'] as number)
       ) {
         return false
       }
@@ -631,7 +631,7 @@ export class ExternalThreatFeedIntegrationCore
 
       // Set expiration on the deduplication set (24 hours)
       if (this.redis && typeof this.redis['expire'] === 'function') {
-        await (this.redis['expire'])(cacheKey, 24 * 60 * 60)
+        await this.redis['expire'](cacheKey, 24 * 60 * 60)
       }
 
       return deduplicatedItems
@@ -1216,7 +1216,10 @@ export class ExternalThreatFeedIntegrationCore
 
 // Feed Processor Interface and Implementations
 export interface FeedProcessor {
-  parseFeed(data: Record<string, unknown>, subscription: FeedSubscription): Promise<FeedItem[]>
+  parseFeed(
+    data: Record<string, unknown>,
+    subscription: FeedSubscription,
+  ): Promise<FeedItem[]>
   convertToThreat(
     item: FeedItem,
     subscription: FeedSubscription,
@@ -1280,23 +1283,25 @@ class STIXFeedProcessor implements FeedProcessor {
       const items: FeedItem[] = []
 
       // Parse STIX 2.x format
-      const objects = (data)['objects'] as Record<string, unknown>[] | undefined
+      const objects = data['objects'] as Record<string, unknown>[] | undefined
       if (objects) {
         for (const obj of objects) {
-          if ((obj)['type'] === 'indicator') {
+          if (obj['type'] === 'indicator') {
             items.push({
-              itemId: (obj)['id'] as string,
-              indicator: (obj)['pattern'] as string,
-              indicatorType: this.extractIndicatorType((obj)['pattern'] as string),
-              severity: this.mapSTIXThreatLevel((obj)['labels'] as string[]),
-              confidence: ((obj)['confidence'] as number) ?? 0.5,
-              timestamp: new Date((obj)['created'] as string),
-              description: ((obj)['description'] as string) ?? '',
+              itemId: obj['id'] as string,
+              indicator: obj['pattern'] as string,
+              indicatorType: this.extractIndicatorType(
+                obj['pattern'] as string,
+              ),
+              severity: this.mapSTIXThreatLevel(obj['labels'] as string[]),
+              confidence: (obj['confidence'] as number) ?? 0.5,
+              timestamp: new Date(obj['created'] as string),
+              description: (obj['description'] as string) ?? '',
               source: subscription.provider,
               metadata: {
-                stixVersion: (data)['spec_version'] as string,
-                objectType: (obj)['type'],
-                labels: (obj)['labels'],
+                stixVersion: data['spec_version'] as string,
+                objectType: obj['type'],
+                labels: obj['labels'],
               },
             })
           }
@@ -1430,10 +1435,13 @@ class TAXIIFeedProcessor implements FeedProcessor {
   private extractIndicatorFromTAXII(obj: Record<string, unknown>): string {
     if (obj['pattern']) return obj['pattern'] as string
     if (obj['name']) return obj['name'] as string
-    const extRefs = obj['external_references'] as Record<string, unknown>[] | undefined
+    const extRefs = obj['external_references'] as
+      | Record<string, unknown>[]
+      | undefined
     if (extRefs && extRefs.length > 0) {
       return (
-        (extRefs[0] as Record<string, unknown>)['url'] as string ?? (extRefs[0] as Record<string, unknown>)['external_id'] as string
+        ((extRefs[0] as Record<string, unknown>)['url'] as string) ??
+        ((extRefs[0] as Record<string, unknown>)['external_id'] as string)
       )
     }
     return obj['id'] as string
@@ -1528,7 +1536,9 @@ class MISPFeedProcessor implements FeedProcessor {
       if (response) {
         for (const evt of response) {
           const event = evt
-          const attr = (event['Event'] as Record<string, unknown>)?.['Attribute'] as Record<string, unknown>[] | undefined
+          const attr = (event['Event'] as Record<string, unknown>)?.[
+            'Attribute'
+          ] as Record<string, unknown>[] | undefined
           if (attr) {
             for (const att of attr) {
               const attribute = att
@@ -1537,13 +1547,19 @@ class MISPFeedProcessor implements FeedProcessor {
                 indicator: attribute['value'] as string,
                 indicatorType: this.mapMISPType(attribute['type'] as string),
                 severity: this.mapMISPSeverity(attribute['comment'] as string),
-                confidence: this.mapMISPConfidence(attribute['comment'] as string),
+                confidence: this.mapMISPConfidence(
+                  attribute['comment'] as string,
+                ),
                 timestamp: new Date((attribute['timestamp'] as number) * 1000),
                 description: (attribute['comment'] as string) ?? '',
                 source: subscription.provider,
                 metadata: {
-                  eventId: (event['Event'] as Record<string, unknown>)['id'] as string,
-                  eventInfo: (event['Event'] as Record<string, unknown>)['info'] as string,
+                  eventId: (event['Event'] as Record<string, unknown>)[
+                    'id'
+                  ] as string,
+                  eventInfo: (event['Event'] as Record<string, unknown>)[
+                    'info'
+                  ] as string,
                   category: attribute['category'] as string,
                   type: attribute['type'],
                 },
@@ -1664,7 +1680,9 @@ class OTXFeedProcessor implements FeedProcessor {
       if (results) {
         for (const p of results) {
           const pulse = p
-          const indicators = pulse['indicators'] as Record<string, unknown>[] | undefined
+          const indicators = pulse['indicators'] as
+            | Record<string, unknown>[]
+            | undefined
           if (indicators) {
             for (const ind of indicators) {
               const indicator = ind
@@ -1797,8 +1815,12 @@ class VirusTotalFeedProcessor implements FeedProcessor {
       if (vtData) {
         for (const f of vtData) {
           const file = f
-          const attrs = file['attributes'] as Record<string, unknown> | undefined
-          const stats = attrs?.['last_analysis_stats'] as Record<string, unknown> | undefined
+          const attrs = file['attributes'] as
+            | Record<string, unknown>
+            | undefined
+          const stats = attrs?.['last_analysis_stats'] as
+            | Record<string, unknown>
+            | undefined
           if (stats) {
             const maliciousCount = (stats['malicious'] as number) ?? 0
             const totalCount =
@@ -1815,7 +1837,9 @@ class VirusTotalFeedProcessor implements FeedProcessor {
                 indicatorType: this.detectHashType(fileId),
                 severity: this.mapVTSeverity(maliciousCount, totalCount),
                 confidence: maliciousCount / totalCount,
-                timestamp: new Date((attrs?.['last_analysis_date'] as number) * 1000),
+                timestamp: new Date(
+                  (attrs?.['last_analysis_date'] as number) * 1000,
+                ),
                 description:
                   (attrs?.['meaningful_name'] as string) ?? 'Malicious file',
                 source: subscription.provider,
@@ -1919,13 +1943,28 @@ class GenericFeedProcessor implements FeedProcessor {
           const item = it as Record<string, unknown>
           if (item['indicator'] || item['value'] || item['ioc']) {
             items.push({
-              itemId: (item['id'] ?? item['indicator'] ?? item['value'] ?? item['ioc']) as string,
-              indicator: (item['indicator'] ?? item['value'] ?? item['ioc']) as string,
-              indicatorType: (item['type'] ?? item['indicator_type'] ?? 'unknown') as string,
-              severity: (item['severity'] ?? item['threat_level'] ?? 'medium') as string,
-              confidence: (item['confidence'] ?? item['reliability'] ?? 0.5) as number,
-              timestamp: new Date((item['timestamp'] ?? item['created'] ?? Date.now()) as number),
-              description: (item['description'] ?? item['notes'] ?? '') as string,
+              itemId: (item['id'] ??
+                item['indicator'] ??
+                item['value'] ??
+                item['ioc']) as string,
+              indicator: (item['indicator'] ??
+                item['value'] ??
+                item['ioc']) as string,
+              indicatorType: (item['type'] ??
+                item['indicator_type'] ??
+                'unknown') as string,
+              severity: (item['severity'] ??
+                item['threat_level'] ??
+                'medium') as string,
+              confidence: (item['confidence'] ??
+                item['reliability'] ??
+                0.5) as number,
+              timestamp: new Date(
+                (item['timestamp'] ?? item['created'] ?? Date.now()) as number,
+              ),
+              description: (item['description'] ??
+                item['notes'] ??
+                '') as string,
               source: subscription.provider,
               metadata: {
                 rawData: item,
@@ -1935,7 +1974,9 @@ class GenericFeedProcessor implements FeedProcessor {
           }
         }
       } else {
-        const indicators = data['indicators'] as Record<string, unknown>[] | undefined
+        const indicators = data['indicators'] as
+          | Record<string, unknown>[]
+          | undefined
         if (indicators) {
           // Handle nested indicator format
           for (const ind of indicators) {
@@ -1946,7 +1987,9 @@ class GenericFeedProcessor implements FeedProcessor {
               indicatorType: (indicator['type'] ?? 'unknown') as string,
               severity: (indicator['severity'] ?? 'medium') as string,
               confidence: (indicator['confidence'] ?? 0.5) as number,
-              timestamp: new Date((indicator['timestamp'] ?? Date.now()) as number),
+              timestamp: new Date(
+                (indicator['timestamp'] ?? Date.now()) as number,
+              ),
               description: (indicator['description'] ?? '') as string,
               source: subscription.provider,
               metadata: {

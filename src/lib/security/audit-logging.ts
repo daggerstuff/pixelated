@@ -19,11 +19,5 @@ export interface AuditLogParams {
 export async function auditLog(params: AuditLogParams): Promise<void> {
   const { action, resource, details, userId } = params
 
-  await logAuditEvent(
-    userId,
-    action,
-    resource,
-    'threat_intelligence',
-    details,
-  )
+  await logAuditEvent(userId, action, resource, 'threat_intelligence', details)
 }

@@ -9,7 +9,7 @@ npm create cloudflare@latest my-api -- --type=hello-world --lang=ts --deploy
 # Next.js on Pages
 npm create cloudflare@latest my-app -- --type=web-app --framework=next --platform=pages --ts --deploy
 
-# Astro static site  
+# Astro static site
 npm create cloudflare@latest my-blog -- --type=web-app --framework=astro --platform=pages --ts
 ```
 
@@ -24,6 +24,7 @@ npm create cloudflare@latest my-blog -- --type=web-app --framework=astro --platf
 ```
 
 **Non-interactive requires:**
+
 ```bash
 --type=<value>       # Required
 --no-git             # Recommended (CI already in git)
@@ -34,7 +35,8 @@ npm create cloudflare@latest my-blog -- --type=web-app --framework=astro --platf
 
 ## Monorepo
 
-C3 detects workspace config (`package.json` workspaces or `pnpm-workspace.yaml`).
+C3 detects workspace config (`package.json` workspaces or
+`pnpm-workspace.yaml`).
 
 ```bash
 cd packages/
@@ -53,12 +55,15 @@ npm create cloudflare@latest my-app -- --template=../my-template
 ```
 
 **Template requires `c3.config.json`:**
+
 ```json
 {
   "name": "my-template",
   "category": "hello-world",
   "copies": [{ "path": "src/" }, { "path": "wrangler.jsonc" }],
-  "transforms": [{ "path": "package.json", "jsonc": { "name": "{{projectName}}" }}]
+  "transforms": [
+    { "path": "package.json", "jsonc": { "name": "{{projectName}}" } }
+  ]
 }
 ```
 
@@ -75,7 +80,8 @@ npm create cloudflare@latest . -- --type=web-app --framework=next --platform=pag
 ## Post-Creation Checklist
 
 1. Review `wrangler.jsonc` - set `compatibility_date`, verify `name`
-2. Create bindings: `wrangler kv namespace create`, `wrangler d1 create`, `wrangler r2 bucket create`
+2. Create bindings: `wrangler kv namespace create`, `wrangler d1 create`,
+   `wrangler r2 bucket create`
 3. Generate types: `npm run cf-typegen`
 4. Test: `npm run dev`
 5. Deploy: `npm run deploy`

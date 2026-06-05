@@ -5,24 +5,31 @@
 ### "No bundler/build step" - Pulumi uploads raw code
 
 **Problem:** Worker fails with "Cannot use import statement outside a module"  
-**Cause:** Pulumi doesn't bundle Worker code - uploads exactly what you provide  
+**Cause:** Pulumi doesn't bundle Worker code - uploads exactly what you
+provide  
 **Solution:** Build Worker BEFORE Pulumi deploy
 
 ```typescript
 // WRONG: Pulumi won't bundle this
-const worker = new cloudflare.WorkerScript("worker", {
-    content: fs.readFileSync("./src/index.ts", "utf8"), // Raw TS file
-});
+const worker = new cloudflare.WorkerScript('worker', {
+  content: fs.readFileSync('./src/index.ts', 'utf8'), // Raw TS file
+})
 
 // RIGHT: Build first, then deploy
-import * as command from "@pulumi/command";
-const build = new command.local.Command("build", {
-    create: "npm run build",
-    dir: "./worker",
-});
-const worker = new cloudflare.WorkerScript("worker", {
-    content: build.stdout.apply(() => fs.readFileSync("./worker/dist/index.js", "utf8")),
-}, {dependsOn: [build]});
+import * as command from '@pulumi/command'
+const build = new command.local.Command('build', {
+  create: 'npm run build',
+  dir: './worker',
+})
+const worker = new cloudflare.WorkerScript(
+  'worker',
+  {
+    content: build.stdout.apply(() =>
+      fs.readFileSync('./worker/dist/index.js', 'utf8'),
+    ),
+  },
+  { dependsOn: [build] },
+)
 ```
 
 ### "wrangler.toml not consumed" - Config drift
@@ -34,18 +41,18 @@ const worker = new cloudflare.WorkerScript("worker", {
 ```typescript
 // Pattern: Export Pulumi config to wrangler.toml
 const workerConfig = {
-    name: "my-worker",
-    compatibilityDate: "2025-01-01",
-    compatibilityFlags: ["nodejs_compat"],
-};
+  name: 'my-worker',
+  compatibilityDate: '2025-01-01',
+  compatibilityFlags: ['nodejs_compat'],
+}
 
-new command.local.Command("generate-wrangler", {
-    create: pulumi.interpolate`cat > wrangler.toml <<EOF
+new command.local.Command('generate-wrangler', {
+  create: pulumi.interpolate`cat > wrangler.toml <<EOF
 name = "${workerConfig.name}"
 compatibility_date = "${workerConfig.compatibilityDate}"
 compatibility_flags = ${JSON.stringify(workerConfig.compatibilityFlags)}
 EOF`,
-});
+})
 ```
 
 ### "False no-changes detection" - Content SHA unchanged
@@ -55,11 +62,11 @@ EOF`,
 **Solution:** Add build timestamp or version to force update
 
 ```typescript
-const version = Date.now().toString();
-const worker = new cloudflare.WorkerScript("worker", {
-    content: code,
-    plainTextBindings: [{name: "VERSION", text: version}], // Forces new deployment
-});
+const version = Date.now().toString()
+const worker = new cloudflare.WorkerScript('worker', {
+  content: code,
+  plainTextBindings: [{ name: 'VERSION', text: version }], // Forces new deployment
+})
 ```
 
 ### "D1 migrations don't run on pulumi up"
@@ -69,17 +76,25 @@ const worker = new cloudflare.WorkerScript("worker", {
 **Solution:** Use Command resource with dependsOn
 
 ```typescript
-const db = new cloudflare.D1Database("db", {accountId, name: "mydb"});
+const db = new cloudflare.D1Database('db', { accountId, name: 'mydb' })
 
 // Run migrations after DB created
-const migration = new command.local.Command("migrate", {
+const migration = new command.local.Command(
+  'migrate',
+  {
     create: pulumi.interpolate`wrangler d1 execute ${db.name} --file ./schema.sql`,
-}, {dependsOn: [db]});
+  },
+  { dependsOn: [db] },
+)
 
 // Worker depends on migrations
-const worker = new cloudflare.WorkerScript("worker", {
-    d1DatabaseBindings: [{name: "DB", databaseId: db.id}],
-}, {dependsOn: [migration]});
+const worker = new cloudflare.WorkerScript(
+  'worker',
+  {
+    d1DatabaseBindings: [{ name: 'DB', databaseId: db.id }],
+  },
+  { dependsOn: [migration] },
+)
 ```
 
 ### "Missing required property 'accountId'"
@@ -91,7 +106,7 @@ const worker = new cloudflare.WorkerScript("worker", {
 ```yaml
 # Pulumi.<stack>.yaml
 config:
-  cloudflare:accountId: "abc123..."
+  cloudflare:accountId: 'abc123...'
 ```
 
 ### "Binding name mismatch"
@@ -102,17 +117,22 @@ config:
 
 ```typescript
 // Pulumi
-kvNamespaceBindings: [{name: "MY_KV", namespaceId: kv.id}]
+kvNamespaceBindings: [{ name: 'MY_KV', namespaceId: kv.id }]
 
 // Worker code
-export default { async fetch(request, env) { await env.MY_KV.get("key"); }}
+export default {
+  async fetch(request, env) {
+    await env.MY_KV.get('key')
+  },
+}
 ```
 
 ### "API token permissions insufficient"
 
 **Problem:** `Error: authentication error (10000)`  
 **Cause:** Token lacks required permissions  
-**Solution:** Grant token permissions: Account.Workers Scripts:Edit, Account.Account Settings:Read
+**Solution:** Grant token permissions: Account.Workers Scripts:Edit,
+Account.Account Settings:Read
 
 ### "Resource not found after import"
 
@@ -128,46 +148,60 @@ pulumi preview # If shows changes, adjust Pulumi code to match actual resource
 ### "v6.x Worker versioning confusion"
 
 **Problem:** Worker deployed but not receiving traffic  
-**Cause:** v6.x requires Worker + WorkerVersion + WorkersDeployment (3 resources)  
+**Cause:** v6.x requires Worker + WorkerVersion + WorkersDeployment (3
+resources)  
 **Solution:** Use WorkerScript (auto-versioning) OR full versioning pattern
 
 ```typescript
 // SIMPLE: WorkerScript auto-versions (default behavior)
-const worker = new cloudflare.WorkerScript("worker", {
-    accountId, name: "my-worker", content: code,
-});
+const worker = new cloudflare.WorkerScript('worker', {
+  accountId,
+  name: 'my-worker',
+  content: code,
+})
 
 // ADVANCED: Manual versioning for gradual rollouts (v6.x)
-const worker = new cloudflare.Worker("worker", {accountId, name: "my-worker"});
-const version = new cloudflare.WorkerVersion("v1", {
-    accountId, workerId: worker.id, content: code, compatibilityDate: "2025-01-01",
-});
-const deployment = new cloudflare.WorkersDeployment("prod", {
-    accountId, workerId: worker.id, versionId: version.id,
-});
+const worker = new cloudflare.Worker('worker', { accountId, name: 'my-worker' })
+const version = new cloudflare.WorkerVersion('v1', {
+  accountId,
+  workerId: worker.id,
+  content: code,
+  compatibilityDate: '2025-01-01',
+})
+const deployment = new cloudflare.WorkersDeployment('prod', {
+  accountId,
+  workerId: worker.id,
+  versionId: version.id,
+})
 ```
 
 ## Best Practices
 
-1. **Always set compatibilityDate** - Locks Worker behavior, prevents breaking changes
-2. **Build before deploy** - Pulumi doesn't bundle; use Command resource or CI build step
-3. **Match binding names** - Case-sensitive, must match between Pulumi and Worker code
-4. **Use dependsOn for migrations** - Ensure D1 migrations run before Worker deploys
-5. **Version Worker content** - Add VERSION binding to force redeployment on content changes
-6. **Store secrets in stack config** - Use `pulumi config set --secret` for API keys
+1. **Always set compatibilityDate** - Locks Worker behavior, prevents breaking
+   changes
+2. **Build before deploy** - Pulumi doesn't bundle; use Command resource or CI
+   build step
+3. **Match binding names** - Case-sensitive, must match between Pulumi and
+   Worker code
+4. **Use dependsOn for migrations** - Ensure D1 migrations run before Worker
+   deploys
+5. **Version Worker content** - Add VERSION binding to force redeployment on
+   content changes
+6. **Store secrets in stack config** - Use `pulumi config set --secret` for API
+   keys
 
 ## Limits
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| Worker script size | 10 MB | Includes all dependencies, after compression |
-| Worker CPU time | 50ms (free), 30s (paid) | Per request |
-| KV keys per namespace | Unlimited | 1000 ops/sec write, 100k ops/sec read |
-| R2 storage | Unlimited | Class A ops: 1M/mo free, Class B: 10M/mo free |
-| D1 databases | 50,000 per account | Free: 10 per account, 5 GB each |
-| Queues | 10,000 per account | Free: 1M ops/day |
-| Pages projects | 500 per account | Free: 100 projects |
-| API requests | Varies by plan | ~1200 req/5min on free |
+| Resource              | Limit                   | Notes                                         |
+| --------------------- | ----------------------- | --------------------------------------------- |
+| Worker script size    | 10 MB                   | Includes all dependencies, after compression  |
+| Worker CPU time       | 50ms (free), 30s (paid) | Per request                                   |
+| KV keys per namespace | Unlimited               | 1000 ops/sec write, 100k ops/sec read         |
+| R2 storage            | Unlimited               | Class A ops: 1M/mo free, Class B: 10M/mo free |
+| D1 databases          | 50,000 per account      | Free: 10 per account, 5 GB each               |
+| Queues                | 10,000 per account      | Free: 1M ops/day                              |
+| Pages projects        | 500 per account         | Free: 100 projects                            |
+| API requests          | Varies by plan          | ~1200 req/5min on free                        |
 
 ## Resources
 
@@ -178,4 +212,6 @@ const deployment = new cloudflare.WorkersDeployment("prod", {
 - **Workers Docs:** https://developers.cloudflare.com/workers/
 
 ---
-See: [README.md](./README.md), [configuration.md](./configuration.md), [api.md](./api.md), [patterns.md](./patterns.md)
+
+See: [README.md](./README.md), [configuration.md](./configuration.md),
+[api.md](./api.md), [patterns.md](./patterns.md)

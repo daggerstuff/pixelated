@@ -1,26 +1,32 @@
 # Cloudflare Tunnel
 
-Secure outbound-only connections between infrastructure and Cloudflare's global network.
+Secure outbound-only connections between infrastructure and Cloudflare's global
+network.
 
 ## Overview
 
 Cloudflare Tunnel (formerly Argo Tunnel) enables:
+
 - **Outbound-only connections** - No inbound ports or firewall changes
 - **Public hostname routing** - Expose local services to internet
 - **Private network access** - Connect internal networks via WARP
 - **Zero Trust integration** - Built-in access policies
 
-**Architecture**: Tunnel (persistent object) → Replica (`cloudflared` process) → Origin services
+**Architecture**: Tunnel (persistent object) → Replica (`cloudflared` process) →
+Origin services
 
 **Terminology:**
+
 - **Tunnel**: Named persistent object with UUID
 - **Replica**: Individual `cloudflared` process connected to tunnel
-- **Config Source**: Where ingress rules stored (local file vs Cloudflare dashboard)
+- **Config Source**: Where ingress rules stored (local file vs Cloudflare
+  dashboard)
 - **Connector**: Legacy term for replica
 
 ## Quick Start
 
 ### Local Config
+
 ```bash
 # Install cloudflared
 brew install cloudflared  # macOS
@@ -39,6 +45,7 @@ cloudflared tunnel run my-tunnel
 ```
 
 ### Dashboard Config (Recommended)
+
 1. **Zero Trust** > **Networks** > **Tunnels** > **Create**
 2. Name tunnel, copy token
 3. Configure routes in dashboard
@@ -47,6 +54,7 @@ cloudflared tunnel run my-tunnel
 ## Decision Tree
 
 **Choose config source:**
+
 ```
 Need centralized config updates?
 ├─ Yes → Token-based (dashboard config)
@@ -100,6 +108,7 @@ ingress:
 ## Reading Order
 
 **New to Cloudflare Tunnel:**
+
 1. This README (overview, quick start)
 2. [networking.md](./networking.md) - Firewall rules, connectivity pre-checks
 3. [configuration.md](./configuration.md) - Config file options, ingress rules
@@ -107,17 +116,21 @@ ingress:
 5. [gotchas.md](./gotchas.md) - Troubleshooting, best practices
 
 **Enterprise deployment:**
+
 1. [networking.md](./networking.md) - Corporate firewall requirements
 2. [gotchas.md](./gotchas.md) - HA setup, security best practices
 3. [patterns.md](./patterns.md) - Kubernetes, rolling updates
 
 **Programmatic control:**
+
 1. [api.md](./api.md) - REST API, TypeScript SDK
 
 ## In This Reference
 
-- [networking.md](./networking.md) - Firewall rules, ports, connectivity pre-checks
-- [configuration.md](./configuration.md) - Config file options, ingress rules, TLS settings
+- [networking.md](./networking.md) - Firewall rules, ports, connectivity
+  pre-checks
+- [configuration.md](./configuration.md) - Config file options, ingress rules,
+  TLS settings
 - [api.md](./api.md) - REST API, TypeScript SDK, token-based tunnels
 - [patterns.md](./patterns.md) - Docker, Kubernetes, Terraform, HA, use cases
 - [gotchas.md](./gotchas.md) - Troubleshooting, limitations, best practices

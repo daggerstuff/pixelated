@@ -4,17 +4,23 @@
 
 ## Smart Shield Integration
 
-Cache Reserve is part of **Smart Shield**, Cloudflare's comprehensive security and performance suite:
+Cache Reserve is part of **Smart Shield**, Cloudflare's comprehensive security
+and performance suite:
 
 - **Smart Shield Advanced tier**: Includes 2TB Cache Reserve storage
 - **Standalone purchase**: Available separately if not using Smart Shield
-- **Migration**: Existing standalone customers can migrate to Smart Shield bundles
+- **Migration**: Existing standalone customers can migrate to Smart Shield
+  bundles
 
-**Decision**: Already on Smart Shield Advanced? Cache Reserve is included. Otherwise evaluate standalone purchase vs Smart Shield upgrade.
+**Decision**: Already on Smart Shield Advanced? Cache Reserve is included.
+Otherwise evaluate standalone purchase vs Smart Shield upgrade.
 
 ## Overview
 
-Cache Reserve is Cloudflare's persistent, large-scale cache storage layer built on R2. It acts as the ultimate upper-tier cache, storing cacheable content for extended periods (30+ days) to maximize cache hits, reduce origin egress fees, and shield origins from repeated requests for long-tail content.
+Cache Reserve is Cloudflare's persistent, large-scale cache storage layer built
+on R2. It acts as the ultimate upper-tier cache, storing cacheable content for
+extended periods (30+ days) to maximize cache hits, reduce origin egress fees,
+and shield origins from repeated requests for long-tail content.
 
 ## Core Concepts
 
@@ -22,8 +28,10 @@ Cache Reserve is Cloudflare's persistent, large-scale cache storage layer built 
 
 - **Persistent storage layer**: Built on R2, sits above tiered cache hierarchy
 - **Long-term retention**: 30-day default retention, extended on each access
-- **Automatic operation**: Works seamlessly with existing CDN, no code changes required
-- **Origin shielding**: Dramatically reduces origin egress by serving cached content longer
+- **Automatic operation**: Works seamlessly with existing CDN, no code changes
+  required
+- **Origin shielding**: Dramatically reduces origin egress by serving cached
+  content longer
 - **Usage-based pricing**: Pay only for storage + read/write operations
 
 ### Cache Hierarchy
@@ -42,10 +50,14 @@ Origin Server
 
 ### How It Works
 
-1. **On cache miss**: Content fetched from origin �� written to Cache Reserve + edge caches simultaneously
-2. **On edge eviction**: Content may be evicted from edge cache but remains in Cache Reserve
-3. **On subsequent request**: If edge cache misses but Cache Reserve hits → content restored to edge caches
-4. **Retention**: Assets remain in Cache Reserve for 30 days since last access (configurable via TTL)
+1. **On cache miss**: Content fetched from origin �� written to Cache Reserve +
+   edge caches simultaneously
+2. **On edge eviction**: Content may be evicted from edge cache but remains in
+   Cache Reserve
+3. **On subsequent request**: If edge cache misses but Cache Reserve hits →
+   content restored to edge caches
+4. **Retention**: Assets remain in Cache Reserve for 30 days since last access
+   (configurable via TTL)
 
 ## When to Use Cache Reserve
 
@@ -105,6 +117,7 @@ https://dash.cloudflare.com/caching/cache-reserve
 ```
 
 **Prerequisites:**
+
 - Paid Cache Reserve plan or Smart Shield Advanced required
 - Tiered Cache required for optimal performance
 
@@ -127,21 +140,23 @@ curl -I https://example.com/asset.jpg | grep -i cache
 
 ## In This Reference
 
-| Task | Files |
-|------|-------|
-| Evaluate if Cache Reserve fits your use case | README.md (this file) |
-| Enable Cache Reserve for your zone | README.md + [configuration.md](./configuration.md) |
-| Use with Workers (understand limitations) | [api.md](./api.md) |
-| Setup via SDKs or IaC (TypeScript, Python, Terraform) | [configuration.md](./configuration.md) |
-| Optimize costs and debug issues | [patterns.md](./patterns.md) + [gotchas.md](./gotchas.md) |
-| Understand eligibility and troubleshoot | [gotchas.md](./gotchas.md) → [patterns.md](./patterns.md) |
+| Task                                                  | Files                                                     |
+| ----------------------------------------------------- | --------------------------------------------------------- |
+| Evaluate if Cache Reserve fits your use case          | README.md (this file)                                     |
+| Enable Cache Reserve for your zone                    | README.md + [configuration.md](./configuration.md)        |
+| Use with Workers (understand limitations)             | [api.md](./api.md)                                        |
+| Setup via SDKs or IaC (TypeScript, Python, Terraform) | [configuration.md](./configuration.md)                    |
+| Optimize costs and debug issues                       | [patterns.md](./patterns.md) + [gotchas.md](./gotchas.md) |
+| Understand eligibility and troubleshoot               | [gotchas.md](./gotchas.md) → [patterns.md](./patterns.md) |
 
 **Files:**
+
 - [configuration.md](./configuration.md) - Setup, API, SDKs, and Cache Rules
 - [api.md](./api.md) - Purging, monitoring, Workers integration
 - [patterns.md](./patterns.md) - Best practices, cost optimization, debugging
 - [gotchas.md](./gotchas.md) - Common issues, limitations, troubleshooting
 
 ## See Also
+
 - [r2](../r2/) - Cache Reserve built on R2 storage
 - [workers](../workers/) - Workers integration with Cache API
