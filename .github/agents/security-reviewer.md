@@ -1,6 +1,8 @@
 ---
 name: Security Reviewer
-description: A security-focused code reviewer specializing in mental health application safety, HIPAA compliance, and data protection.
+description:
+  A security-focused code reviewer specializing in mental health application
+  safety, HIPAA compliance, and data protection.
 ---
 
 # Security Reviewer Agent

@@ -2,6 +2,7 @@ import request from 'supertest'
 // Authentication API Integration Tests
 // Tests for OAuth-based authentication flow with Auth0
 import { describe, it, expect, afterAll } from 'vitest'
+
 import { app } from '../../../server'
 
 describe('Authentication API', () => {

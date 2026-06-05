@@ -286,7 +286,9 @@ describe('Simple Accessibility Tests', () => {
     const buttons = screen.getAllByRole('button')
     expect(buttons.length).toBeGreaterThan(0)
 
-    expect(buttons.some((button) => !(button as HTMLButtonElement).disabled)).toBe(true)
+    expect(
+      buttons.some((button) => !(button as HTMLButtonElement).disabled),
+    ).toBe(true)
   })
 
   it('provides sufficient time limits', () => {

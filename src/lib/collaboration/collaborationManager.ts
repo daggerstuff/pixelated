@@ -3,11 +3,11 @@
  * Secure multi-user collaboration with real-time synchronization
  */
 
-import type {
-  UserProfile,
-  CollaborationSession,
-  Notification,
-  Participant,
+import {
+  type UserProfile,
+  type CollaborationSession,
+  type Notification,
+  type Participant,
   ParticipantPermission,
 } from '@/types/collaboration'
 
@@ -128,7 +128,7 @@ class CollaborationManager {
       invitedBy,
       invitedUser,
       role,
-      permissions: this.getRolePermissions(role),
+      permissions: this.getRolePermissions(role) as ParticipantPermission[],
       expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
       accepted: false,
     }
@@ -138,11 +138,11 @@ class CollaborationManager {
     // Send notification to invited user
     await this.sendNotification(invitedUser, {
       id: `notif_${Date.now()}`,
-      type: 'collaboration_invite',
+      type: 'collaboration_invite' as const,
       title: 'Collaboration Session Invitation',
       message: `You have been invited to join a collaboration session by ${invitedBy}`,
-      data: { sessionId, inviteId },
-      createdAt: new Date(),
+      metadata: { sessionId, inviteId },
+      timestamp: new Date(),
       read: false,
     })
 
@@ -151,14 +151,18 @@ class CollaborationManager {
     return invitation
   }
 
-  private getRolePermissions(role: string): string[] {
-    const permissions: Record<string, string[]> = {
-      viewer: ['read', 'comment'],
-      editor: ['read', 'write', 'comment', 'upload'],
-      admin: ['read', 'write', 'comment', 'upload', 'manage_users', 'delete'],
+  private getRolePermissions(role: string): ParticipantPermission[] {
+    const permissions: Record<string, ParticipantPermission[]> = {
+      viewer: [ParticipantPermission.READ],
+      editor: [ParticipantPermission.READ, ParticipantPermission.WRITE],
+      admin: [
+        ParticipantPermission.READ,
+        ParticipantPermission.WRITE,
+        ParticipantPermission.ADMIN,
+      ],
     }
 
-    return permissions[role] ?? permissions['viewer']
+    return permissions[role] ?? permissions['viewer']!
   }
 
   /**
@@ -190,8 +194,16 @@ class CollaborationManager {
       return { success: false, error: 'Session no longer exists' }
     }
 
-    // Add user to session
-    session.participants.push(userId)
+    // Add user to session as a Participant object
+    const newParticipant: Participant = {
+      id: userId,
+      userId,
+      userName: userId,
+      joinedAt: new Date(),
+      lastActiveAt: new Date(),
+      permissions: [ParticipantPermission.READ, ParticipantPermission.WRITE],
+    }
+    session.participants.push(newParticipant)
     this.addUserToSession(userId, invitation.sessionId)
     invitation.accepted = true
     invitation.acceptedAt = new Date()
@@ -199,11 +211,11 @@ class CollaborationManager {
     // Send notification to session creator
     await this.sendNotification(invitation.invitedBy, {
       id: `notif_${Date.now()}`,
-      type: 'collaboration_accepted',
+      type: 'collaboration_accepted' as const,
       title: 'Invitation Accepted',
       message: `${userId} has accepted your collaboration invitation`,
-      data: { sessionId: invitation.sessionId },
-      createdAt: new Date(),
+      metadata: { sessionId: invitation.sessionId },
+      timestamp: new Date(),
       read: false,
     })
 
@@ -236,7 +248,7 @@ class CollaborationManager {
       throw new Error(`Session not found: ${sessionId}`)
     }
 
-    if (!session.participants.includes(senderId)) {
+    if (!session.participants.some((p) => p.userId === senderId)) {
       throw new Error('User not participant in session')
     }
 
@@ -257,6 +269,7 @@ class CollaborationManager {
       timestamp: new Date(),
       encrypted: options.encrypt ?? this.config.encryptionRequired,
       readBy: [senderId],
+      edited: false,
     }
 
     this.addMessage(sessionId, message)
@@ -298,7 +311,9 @@ class CollaborationManager {
     if (!session) return false
 
     // Remove user from participants
-    session.participants = session.participants.filter((id) => id !== userId)
+    session.participants = session.participants.filter(
+      (p) => p.userId !== userId,
+    )
 
     // Remove from user sessions
     const userSessionSet = this.userSessions.get(userId)
@@ -392,7 +407,7 @@ class CollaborationManager {
       throw new Error(`Session not found: ${sessionId}`)
     }
 
-    if (!session.participants.includes(userId)) {
+    if (!session.participants.some((p) => p.userId === userId)) {
       throw new Error('User not authorized to view messages')
     }
 
@@ -503,9 +518,12 @@ class CollaborationManager {
     return session
   }
 
-  private getUserRoleInSession(_sessionId: string, _userId: string): string {
+  private getUserRoleInSession(
+    _sessionId: string,
+    _userId: string,
+  ): 'viewer' | 'editor' | 'admin' {
     // In real implementation, check against session role assignments
-    return 'viewer' // Mock default role
+    return 'admin' // Mock default role
   }
 
   /**

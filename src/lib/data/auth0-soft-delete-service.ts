@@ -131,7 +131,9 @@ export class Auth0SoftDeleteService {
       }
 
       // Get user information before deletion
-      const userResponse = (await auth0Management.users.get({ id: deleteRequest.userId })).data
+      const userResponse = (
+        await auth0Management.users.get({ id: deleteRequest.userId })
+      ).data
       const user = userResponse as Record<string, unknown>
       if (!user) {
         throw new Error('User not found')
@@ -189,7 +191,8 @@ export class Auth0SoftDeleteService {
 
       // Update user in Auth0 to mark as deleted
       // We don't actually delete the user from Auth0, but mark them as inactive
-      const existingAppMeta = (user['app_metadata'] as Record<string, unknown>) ?? {}
+      const existingAppMeta =
+        (user['app_metadata'] as Record<string, unknown>) ?? {}
       await auth0Management.users.update(deleteRequest.userId, {
         blocked: true,
         app_metadata: {
@@ -267,7 +270,9 @@ export class Auth0SoftDeleteService {
       }
 
       // Restore user in Auth0
-      const deletedAppMeta = (deletedUserRecord.userData?.app_metadata as Record<string, unknown>) ?? {}
+      const deletedAppMeta =
+        (deletedUserRecord.userData?.app_metadata as Record<string, unknown>) ??
+        {}
       await auth0Management.users.update(userId, {
         blocked: false,
         app_metadata: {

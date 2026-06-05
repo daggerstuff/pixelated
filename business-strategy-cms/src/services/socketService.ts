@@ -389,7 +389,11 @@ export class SocketService {
   }
 
   // Public methods for external use
-  public emitToDocument(documentId: string, event: string, data: unknown): void {
+  public emitToDocument(
+    documentId: string,
+    event: string,
+    data: unknown,
+  ): void {
     this.io.to(`document:${documentId}`).emit(event, data)
   }
 

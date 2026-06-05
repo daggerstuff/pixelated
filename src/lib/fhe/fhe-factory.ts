@@ -152,7 +152,10 @@ const sealFHEService: FHEService = {
       // Deserialize the ciphertext string back to a SealCipherText object
       const seal = sealService.getSeal()
       const context = sealService.getContext()
-      const sealCipherText = seal.CipherText()
+      const sealCipherText = seal.CipherText() as unknown as {
+        load: (ctx: unknown, s: string) => void
+        delete: () => void
+      }
       sealCipherText.load(context, ciphertext as string)
 
       // Decrypt the SealCipherText object
@@ -192,10 +195,16 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText()
+      const aCiphertext = seal.CipherText() as unknown as {
+        load: (ctx: unknown, s: string) => void
+        delete: () => void
+      }
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText()
+      const bCiphertext = seal.CipherText() as unknown as {
+        load: (ctx: unknown, s: string) => void
+        delete: () => void
+      }
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.add(aCiphertext, bCiphertext)
@@ -209,8 +218,10 @@ const sealFHEService: FHEService = {
       }
 
       // Serialize the result ciphertext back to a string for storage
-      const serializedResult = result.result.save()
-      return createEncryptedData(serializedResult)
+      const serializedResult = (result.result as { save: () => string }).save()
+      return createEncryptedData(
+        serializedResult,
+      ) as unknown as EncryptedData as unknown as EncryptedData
     } catch (error: unknown) {
       logger.error('SEAL addition failed', { error })
       throw error
@@ -241,10 +252,16 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText()
+      const aCiphertext = seal.CipherText() as unknown as {
+        load: (ctx: unknown, s: string) => void
+        delete: () => void
+      }
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText()
+      const bCiphertext = seal.CipherText() as unknown as {
+        load: (ctx: unknown, s: string) => void
+        delete: () => void
+      }
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.subtract(aCiphertext, bCiphertext)
@@ -258,8 +275,10 @@ const sealFHEService: FHEService = {
       }
 
       // Serialize the result ciphertext back to a string for storage
-      const serializedResult = result.result.save()
-      return createEncryptedData(serializedResult)
+      const serializedResult = (result.result as { save: () => string }).save()
+      return createEncryptedData(
+        serializedResult,
+      ) as unknown as EncryptedData as unknown as EncryptedData
     } catch (error: unknown) {
       logger.error('SEAL subtraction failed', { error })
       throw error
@@ -295,7 +314,7 @@ const sealFHEService: FHEService = {
         throw new Error(result.error ?? 'Multiplication operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(result.result as string)
     } catch (error: unknown) {
       logger.error('SEAL multiplication failed', { error })
       throw error
@@ -318,7 +337,7 @@ const sealFHEService: FHEService = {
         throw new Error(result.error ?? 'Negation operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(result.result as string)
     } catch (error: unknown) {
       logger.error('SEAL negation failed', { error })
       throw error
@@ -344,7 +363,7 @@ const sealFHEService: FHEService = {
         throw new Error(result.error ?? 'Polynomial operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(result.result as string)
     } catch (error: unknown) {
       logger.error('SEAL polynomial failed', { error })
       throw error
@@ -367,7 +386,7 @@ const sealFHEService: FHEService = {
         throw new Error(result.error ?? 'Rotation operation failed')
       }
 
-      return createEncryptedData(result.result)
+      return createEncryptedData(result.result as string)
     } catch (error: unknown) {
       logger.error('SEAL rotation failed', { error })
       throw error

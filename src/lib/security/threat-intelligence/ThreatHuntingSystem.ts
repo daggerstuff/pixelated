@@ -623,7 +623,10 @@ export class ThreatHuntingSystem extends EventEmitter {
               source: 'network_hunt',
             },
           ],
-          affected_systems: [c['source_system'] as string, c['dest_system'] as string],
+          affected_systems: [
+            c['source_system'] as string,
+            c['dest_system'] as string,
+          ],
           remediation_suggested: [
             'Block suspicious IP addresses',
             'Investigate source system',
@@ -633,7 +636,8 @@ export class ThreatHuntingSystem extends EventEmitter {
         }
 
         findings.push(finding)
-      }        executionLog.push({
+      }
+      executionLog.push({
         timestamp: new Date(),
         level: 'info',
         message: `Network hunt completed with ${String(findings.length)} findings`,
@@ -916,7 +920,10 @@ export class ThreatHuntingSystem extends EventEmitter {
               source: 'lateral_movement_hunt',
             },
           ],
-          affected_systems: [m['source_system'] as string, m['target_system'] as string],
+          affected_systems: [
+            m['source_system'] as string,
+            m['target_system'] as string,
+          ],
           remediation_suggested: [
             'Review user access patterns',
             'Investigate unusual authentication',
@@ -942,7 +949,9 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Data collection methods (simulated)
    */
-  private async collectNetworkData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
+  private async collectNetworkData(
+    _scope: HuntScope,
+  ): Promise<Record<string, unknown>[]> {
     // Simulate network data collection
     return [
       {
@@ -956,7 +965,9 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectEndpointData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
+  private async collectEndpointData(
+    _scope: HuntScope,
+  ): Promise<Record<string, unknown>[]> {
     // Simulate endpoint data collection
     return [
       {
@@ -970,7 +981,9 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectUserActivityData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
+  private async collectUserActivityData(
+    _scope: HuntScope,
+  ): Promise<Record<string, unknown>[]> {
     // Simulate user activity data collection
     return [
       {
@@ -983,7 +996,9 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectFileData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
+  private async collectFileData(
+    _scope: HuntScope,
+  ): Promise<Record<string, unknown>[]> {
     // Simulate file data collection
     return [
       {
@@ -996,7 +1011,9 @@ export class ThreatHuntingSystem extends EventEmitter {
     ]
   }
 
-  private async collectAuthenticationData(_scope: HuntScope): Promise<Record<string, unknown>[]> {
+  private async collectAuthenticationData(
+    _scope: HuntScope,
+  ): Promise<Record<string, unknown>[]> {
     // Simulate authentication data collection
     return [
       {
@@ -1012,29 +1029,46 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Analysis methods
    */
-  private analyzeNetworkConnections(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
+  private analyzeNetworkConnections(
+    data: Record<string, unknown>[],
+    _query: HuntQuery,
+  ): Record<string, unknown>[] {
     // Simulate network connection analysis
-    return data.filter((connection) => (connection)['confidence'] as number > 0.5)
+    return data.filter(
+      (connection) => (connection['confidence'] as number) > 0.5,
+    )
   }
 
-  private analyzeProcesses(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
+  private analyzeProcesses(
+    data: Record<string, unknown>[],
+    _query: HuntQuery,
+  ): Record<string, unknown>[] {
     // Simulate process analysis
-    return data.filter((process) => (process)['confidence'] as number > 0.7)
+    return data.filter((process) => (process['confidence'] as number) > 0.7)
   }
 
-  private analyzeUserBehavior(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
+  private analyzeUserBehavior(
+    data: Record<string, unknown>[],
+    _query: HuntQuery,
+  ): Record<string, unknown>[] {
     // Simulate user behavior analysis
-    return data.filter((behavior) => (behavior)['confidence'] as number > 0.6)
+    return data.filter((behavior) => (behavior['confidence'] as number) > 0.6)
   }
 
-  private analyzeMalwareIndicators(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
+  private analyzeMalwareIndicators(
+    data: Record<string, unknown>[],
+    _query: HuntQuery,
+  ): Record<string, unknown>[] {
     // Simulate malware indicator analysis
-    return data.filter((indicator) => (indicator)['confidence'] as number > 0.8)
+    return data.filter((indicator) => (indicator['confidence'] as number) > 0.8)
   }
 
-  private analyzeLateralMovement(data: Record<string, unknown>[], _query: HuntQuery): Record<string, unknown>[] {
+  private analyzeLateralMovement(
+    data: Record<string, unknown>[],
+    _query: HuntQuery,
+  ): Record<string, unknown>[] {
     // Simulate lateral movement analysis
-    return data.filter((movement) => (movement)['confidence'] as number > 0.7)
+    return data.filter((movement) => (movement['confidence'] as number) > 0.7)
   }
 
   /**
@@ -1106,16 +1140,22 @@ export class ThreatHuntingSystem extends EventEmitter {
 
       for (const finding of findings) {
         // Simulate AI analysis
-        const aiAnalysis = (await this.simulateAIAnalysis(finding)) as Record<string, number | string | ThreatIndicator[]>
+        const aiAnalysis = (await this.simulateAIAnalysis(finding)) as Record<
+          string,
+          number | string | ThreatIndicator[]
+        >
 
         if (
-          (aiAnalysis['confidence'] as number) > this.config.ai_assistance.confidence_threshold
+          (aiAnalysis['confidence'] as number) >
+          this.config.ai_assistance.confidence_threshold
         ) {
           finding.confidence = Math.min(finding.confidence + 0.1, 1.0)
           finding.description += ` | AI Analysis: ${aiAnalysis['insight'] as string}`
 
           if (aiAnalysis['additional_indicators']) {
-            finding.indicators.push(...(aiAnalysis['additional_indicators'] as ThreatIndicator[]))
+            finding.indicators.push(
+              ...(aiAnalysis['additional_indicators'] as ThreatIndicator[]),
+            )
           }
         }
       }
@@ -1131,7 +1171,9 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Simulate AI analysis (replace with actual AI integration)
    */
-  private async simulateAIAnalysis(_finding: HuntFinding): Promise<Record<string, unknown>> {
+  private async simulateAIAnalysis(
+    _finding: HuntFinding,
+  ): Promise<Record<string, unknown>> {
     // Simulate AI processing delay
     await new Promise((resolve) => setTimeout(resolve, 100))
 
@@ -1255,7 +1297,9 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Handle new data availability
    */
-  private async handleNewDataAvailable(dataInfo: Record<string, unknown>): Promise<void> {
+  private async handleNewDataAvailable(
+    dataInfo: Record<string, unknown>,
+  ): Promise<void> {
     try {
       // Find hunts that might be interested in this data
       const relevantHunts = await this.huntsCollection
@@ -1281,7 +1325,10 @@ export class ThreatHuntingSystem extends EventEmitter {
   /**
    * Determine if hunt should execute on new data
    */
-  private shouldExecuteHuntOnData(hunt: ThreatHunt, dataInfo: Record<string, unknown>): boolean {
+  private shouldExecuteHuntOnData(
+    hunt: ThreatHunt,
+    dataInfo: Record<string, unknown>,
+  ): boolean {
     // Simple logic - execute if hunt is active and data is relevant
     return (
       hunt.status === 'active' &&
