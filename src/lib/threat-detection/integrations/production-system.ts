@@ -23,7 +23,9 @@ class ProductionThreatDetectionService {
 
   constructor(config: Record<string, unknown> = {}) {
     this.enabled = (config['enabled'] as boolean) ?? true
-    this.riskThresholds = (config['riskThresholds'] as typeof this.riskThresholds) ?? {
+    this.riskThresholds = (config[
+      'riskThresholds'
+    ] as typeof this.riskThresholds) ?? {
       low: 0.2,
       medium: 0.5,
       high: 0.7,
@@ -31,7 +33,9 @@ class ProductionThreatDetectionService {
     }
   }
 
-  async processRequest(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async processRequest(
+    request: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     if (!this.enabled) {
       return { success: true, threat: null, action: 'allow', riskScore: 0 }
     }
@@ -66,7 +70,9 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async calculateRiskScore(request: Record<string, unknown>): Promise<number> {
+  private async calculateRiskScore(
+    request: Record<string, unknown>,
+  ): Promise<number> {
     let score = 0
 
     // IP reputation check
@@ -82,7 +88,9 @@ class ProductionThreatDetectionService {
 
     // Payload analysis
     if (request['body'] || request['query']) {
-      score += await this.analyzePayload((request['body'] ?? request['query']) as Record<string, unknown>)
+      score += await this.analyzePayload(
+        (request['body'] ?? request['query']) as Record<string, unknown>,
+      )
     }
 
     // User agent analysis
@@ -96,7 +104,9 @@ class ProductionThreatDetectionService {
   private async checkIPReputation(ip: string): Promise<number> {
     try {
       // Check against known bad IPs in Redis
-      const reputation = redis ? await redis?.['get']?.(`ip_reputation:${ip}`) : null
+      const reputation = redis
+        ? await redis?.['get']?.(`ip_reputation:${ip}`)
+        : null
       if (reputation) {
         return parseFloat(reputation)
       }
@@ -144,7 +154,9 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async analyzePayload(payload: Record<string, unknown>): Promise<number> {
+  private async analyzePayload(
+    payload: Record<string, unknown>,
+  ): Promise<number> {
     if (!payload) return 0
 
     const payloadStr = JSON.stringify(payload).toLowerCase()
@@ -218,11 +230,15 @@ class ProductionThreatDetectionService {
     }
   }
 
-  private async getIndicators(request: Record<string, unknown>): Promise<string[]> {
+  private async getIndicators(
+    request: Record<string, unknown>,
+  ): Promise<string[]> {
     const indicators: string[] = []
 
     if (request['ip'] && redis) {
-      const reputation = await redis?.['get']?.(`ip_reputation:${request['ip']}`)
+      const reputation = await redis?.['get']?.(
+        `ip_reputation:${request['ip']}`,
+      )
       if (reputation && parseFloat(reputation) > 0.5) {
         indicators.push('malicious_ip')
       }
@@ -432,7 +448,10 @@ class ProductionMonitoringService extends EventEmitter {
           metric: name,
           average: avg,
           count: values.length,
-          trend: lastValue !== undefined && lastValue > avg ? 'increasing' : 'stable',
+          trend:
+            lastValue !== undefined && lastValue > avg
+              ? 'increasing'
+              : 'stable',
         })
       }
     }
@@ -491,7 +510,8 @@ class ProductionMonitoringService extends EventEmitter {
 // Production-ready hunting service
 class ProductionHuntingService extends EventEmitter {
   private readonly enabled: boolean
-  private readonly investigations: Map<string, Record<string, unknown>> = new Map()
+  private readonly investigations: Map<string, Record<string, unknown>> =
+    new Map()
 
   constructor(config: Record<string, unknown> = {}) {
     super()
@@ -508,7 +528,9 @@ class ProductionHuntingService extends EventEmitter {
     // Service stopped
   }
 
-  async triggerHunt(huntRequest: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async triggerHunt(
+    huntRequest: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     if (!this.enabled) return { success: false, message: 'Hunting disabled' }
 
     logger.info('Threat hunt triggered:', huntRequest)
@@ -560,8 +582,8 @@ class ProductionHuntingService extends EventEmitter {
 
     setTimeout(() => {
       const inv = this.investigations.get(investigation.id)
-      if (          (inv as Record<string, unknown>)['status'] === 'running') {
-        (inv as Record<string, unknown>)['status'] = 'completed'
+      if ((inv as Record<string, unknown>)['status'] === 'running') {
+        ;(inv as Record<string, unknown>)['status'] = 'completed'
         ;(inv as Record<string, unknown>)['result'] = {
           findings: [],
           riskLevel: (inv as Record<string, unknown>)['severity'],
@@ -573,13 +595,15 @@ class ProductionHuntingService extends EventEmitter {
     return investigation
   }
 
-  async getInvestigationResult(investigationId: string): Promise<Record<string, unknown> | null> {
+  async getInvestigationResult(
+    investigationId: string,
+  ): Promise<Record<string, unknown> | null> {
     return this.investigations.get(investigationId) ?? null
   }
 
   async getActiveInvestigations(): Promise<Record<string, unknown>[]> {
     return [...this.investigations.values()].filter(
-      (inv) => (inv)['status'] === 'running',
+      (inv) => inv['status'] === 'running',
     )
   }
 
@@ -601,7 +625,9 @@ class ProductionHuntingService extends EventEmitter {
     }
   }
 
-  async analyzeWithML(_params: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async analyzeWithML(
+    _params: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     throw new Error('ML model not available')
   }
 
@@ -646,7 +672,10 @@ class ProductionIntelligenceService extends EventEmitter {
     this.emit('service:stopped', { service: 'intelligence' })
   }
 
-  async lookupIOC(indicator: string, type: string): Promise<Record<string, unknown>[]> {
+  async lookupIOC(
+    indicator: string,
+    type: string,
+  ): Promise<Record<string, unknown>[]> {
     const cacheKey = `${type}:${indicator}`
     if (this.cache.has(cacheKey)) {
       return this.cache.get(cacheKey) ?? []
@@ -700,7 +729,10 @@ class ProductionIntelligenceService extends EventEmitter {
           throw new Error(`Feed ${feed.name} returned HTTP ${response.status}`)
         }
         const data = (await response.json()) as Record<string, unknown>
-        const indicators = (data['data'] ?? data['results'] ?? []) as Record<string, unknown>[]
+        const indicators = (data['data'] ?? data['results'] ?? []) as Record<
+          string,
+          unknown
+        >[]
         for (const indicator of indicators) {
           this.iocs.push({
             ...indicator,
@@ -724,7 +756,9 @@ class ProductionIntelligenceService extends EventEmitter {
   async addIOC(ioc: Record<string, unknown>): Promise<void> {
     const encryptedIOC = {
       ...ioc,
-      metadata: this._encryptSensitive(ioc['metadata'] as Record<string, unknown>),
+      metadata: this._encryptSensitive(
+        ioc['metadata'] as Record<string, unknown>,
+      ),
       addedAt: new Date(),
     }
     this.iocs.push(encryptedIOC)
@@ -734,7 +768,9 @@ class ProductionIntelligenceService extends EventEmitter {
   async getRawIOCs(): Promise<Record<string, unknown>[]> {
     return this.iocs.map((ioc) => ({
       ...ioc,
-      metadata: this._encryptSensitive(ioc['metadata'] as Record<string, unknown>),
+      metadata: this._encryptSensitive(
+        ioc['metadata'] as Record<string, unknown>,
+      ),
     }))
   }
 
@@ -823,48 +859,59 @@ export function createCompleteThreatDetectionSystem(
       // Security events → monitoring
       const orch = orchestrator as Record<string, unknown>
       if (orchestrator && typeof orch['on'] === 'function') {
-        ;(orch)['on']('security:event', (event: Record<string, unknown>) => {
+        orch['on']('security:event', (event: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: (event['type'] as string) ?? 'security_event',
-            value: ! (event['success'] as boolean) ? 1 : 0,
+            value: !(event['success'] as boolean) ? 1 : 0,
             timestamp: new Date((event['timestamp'] as number) ?? Date.now()),
-            tags: { userId: (event['userId'] as string) ?? '', ip: (event['ip'] as string) ?? '' },
+            tags: {
+              userId: (event['userId'] as string) ?? '',
+              ip: (event['ip'] as string) ?? '',
+            },
           })
         })
 
         // Threat detected → hunting
-        ;(orch)['on']('threat:detected', async (threat: Record<string, unknown>) => {
-          void monitoringService.recordMetric({
-            name: 'threats_detected',
-            value: 1,
-            timestamp: new Date((threat['timestamp'] as number) ?? Date.now()),
-            tags: {
-              severity: (threat['severity'] as string) ?? '',
-              threatId: (threat['threatId'] as string) ?? '',
-            },
-          })
-
-          if ((threat['severity'] as string) === 'high' || (threat['severity'] as string) === 'critical') {
-            void huntingService.startInvestigation({
-              threatId: (threat['threatId'] as string) ?? '',
-              userId: (threat['userId'] as string) ?? '',
-              severity: (threat['severity'] as string) ?? 'medium',
-              description: `Auto-investigation for ${(threat['type'] as string) ?? 'threat'}`,
+        orch['on'](
+          'threat:detected',
+          async (threat: Record<string, unknown>) => {
+            void monitoringService.recordMetric({
+              name: 'threats_detected',
+              value: 1,
+              timestamp: new Date(
+                (threat['timestamp'] as number) ?? Date.now(),
+              ),
+              tags: {
+                severity: (threat['severity'] as string) ?? '',
+                threatId: (threat['threatId'] as string) ?? '',
+              },
             })
-          }
-        })
+
+            if (
+              (threat['severity'] as string) === 'high' ||
+              (threat['severity'] as string) === 'critical'
+            ) {
+              void huntingService.startInvestigation({
+                threatId: (threat['threatId'] as string) ?? '',
+                userId: (threat['userId'] as string) ?? '',
+                severity: (threat['severity'] as string) ?? 'medium',
+                description: `Auto-investigation for ${(threat['type'] as string) ?? 'threat'}`,
+              })
+            }
+          },
+        )
       }
 
       // Service audit logs → orchestrator
       monitoringService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch)['emit'] === 'function') {
-          ;(orch)['emit']('audit:log', log)
+        if (orchestrator && typeof orch['emit'] === 'function') {
+          orch['emit']('audit:log', log)
         }
       })
 
       huntingService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch)['emit'] === 'function') {
-          ;(orch)['emit']('audit:log', log)
+        if (orchestrator && typeof orch['emit'] === 'function') {
+          orch['emit']('audit:log', log)
         }
       })
     },
@@ -872,8 +919,9 @@ export function createCompleteThreatDetectionSystem(
     // Unified interface
     async processRequest(request: unknown) {
       try {
-        const threatResult =
-          await threatDetectionService.processRequest(request as Record<string, unknown>)
+        const threatResult = await threatDetectionService.processRequest(
+          request as Record<string, unknown>,
+        )
         const insights = await monitoringService.generateInsights()
 
         // Trigger hunting for high-risk requests
@@ -895,10 +943,7 @@ export function createCompleteThreatDetectionSystem(
         logger.error('Request processing failed:', { error })
         return {
           success: false,
-          error:
-            error instanceof Error
-                ? error.message
-                : 'Unknown error',
+          error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date(),
         }
       }
@@ -963,7 +1008,8 @@ export function createCompleteThreatDetectionSystem(
           total: ts['totalThreats'] as number,
           blocked: ts['blockedRequests'] as number,
           averageResponseTime: (ts['averageResponseTime'] as number) ?? 0,
-          distribution: (ts['threatDistribution'] as Record<string, number>) ?? {},
+          distribution:
+            (ts['threatDistribution'] as Record<string, number>) ?? {},
         },
         monitoring: {
           insights: ms['totalInsights'] as number,

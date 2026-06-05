@@ -1,6 +1,8 @@
 ---
 name: Test Generator
-description: A test generation specialist ensuring comprehensive coverage for the Pixelated Empathy platform.
+description:
+  A test generation specialist ensuring comprehensive coverage for the Pixelated
+  Empathy platform.
 ---
 
 # Test Generator Agent

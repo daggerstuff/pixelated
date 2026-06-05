@@ -18,9 +18,7 @@ import type {
   QuarantineStatus,
   AuditProgressUpdate,
 } from '@/lib/api/journal-research/bias-audit-types'
-import {
-  getBiasAuditService,
-} from '@/lib/services/bias-audit-service'
+import { getBiasAuditService } from '@/lib/services/bias-audit-service'
 
 // Query keys
 export const biasAuditKeys = {

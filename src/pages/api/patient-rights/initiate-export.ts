@@ -34,7 +34,13 @@ const initiateExportSchema = z.object({
   urgencyLevel: z.enum(['standard', 'urgent']).default('standard'),
 })
 
-export const POST = async ({ request, cookies }: { request: Request; cookies: any }) => {
+export const POST = async ({
+  request,
+  cookies,
+}: {
+  request: Request
+  cookies: any
+}) => {
   try {
     // Get current user - use cookies instead of request
     const user = await getCurrentUser(cookies)

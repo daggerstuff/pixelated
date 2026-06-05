@@ -16,8 +16,14 @@ describe('mergeValues', () => {
   })
 
   it('merges arrays by identity key, preserving local order and updating/appending remote items', () => {
-    const local = [{ id: 1, val: 'a' }, { id: 2, val: 'b' }]
-    const remote = [{ id: 2, val: 'b-new' }, { id: 3, val: 'c' }]
+    const local = [
+      { id: 1, val: 'a' },
+      { id: 2, val: 'b' },
+    ]
+    const remote = [
+      { id: 2, val: 'b-new' },
+      { id: 3, val: 'c' },
+    ]
     expect(mergeValues(local, remote)).toEqual([
       { id: 1, val: 'a' },
       { id: 2, val: 'b-new' },
@@ -50,5 +56,18 @@ describe('deepEqual', () => {
     expect(deepEqual(obj1, obj2)).toBe(true)
     expect(deepEqual(obj1, obj3)).toBe(false)
     expect(deepEqual(obj1, obj4)).toBe(false)
+  })
+
+  it('handles edge cases like different types, array lengths, and key names', () => {
+    // Type mismatches
+    expect(deepEqual(1, '1' as any)).toBe(false)
+    expect(deepEqual(true, false)).toBe(false)
+
+    // Different array lengths
+    expect(deepEqual([1, 2], [1])).toBe(false)
+    expect(deepEqual([1], [1, 2])).toBe(false)
+
+    // Objects with different keys but same key count
+    expect(deepEqual({ a: 1 }, { b: 1 })).toBe(false)
   })
 })

@@ -219,8 +219,8 @@ export function verifySecureToken(token: string): unknown | null {
     // Decode and parse the data
     const dataString =
       typeof window === 'undefined'
-        ? Buffer.from(encodedData, 'base64').toString('utf-8')
-        : atob(encodedData)
+        ? Buffer.from(encodedData as string, 'base64').toString('utf-8')
+        : atob(encodedData as string)
 
     const payload = JSON.parse(dataString)
 

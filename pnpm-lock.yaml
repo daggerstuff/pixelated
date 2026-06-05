@@ -333,7 +333,7 @@ importers:
         specifier: ^5.11.0
         version: 5.11.0
       axios:
-        specifier: '>=1.15.1'
+        specifier: ^1.17.0
         version: 1.17.0
       bcryptjs:
         specifier: latest
