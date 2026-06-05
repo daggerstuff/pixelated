@@ -120,17 +120,17 @@ export class OptimizedConnectionPool extends EventEmitter {
    */
   private initializePool(): void {
     try {
-      this.pool = new Pool(this.config)
+      this.pool = new Pool(this.config as import('pg').PoolConfig)
 
       // Set up event listeners
-      this.pool.on('connect', (client) => {
+      this.pool['on']('connect', (client) => {
         logger.debug('New client connected to database')
         this.metrics.totalConnections++
         this.updateMetrics()
         this.emit('connection-acquired', client)
       })
 
-      this.pool.on('remove', (client) => {
+      this.pool['on']('remove', (client) => {
         logger.debug('Client removed from pool')
         this.metrics.totalConnections = Math.max(
           0,
@@ -140,7 +140,7 @@ export class OptimizedConnectionPool extends EventEmitter {
         this.emit('connection-released', client)
       })
 
-      this.pool.on('error', (error, client) => {
+      this.pool['on']('error', (error: unknown, client?: unknown) => {
         logger.error('Pool error', {
           error: error instanceof Error ? error.message : 'Unknown error',
           client: !!client,

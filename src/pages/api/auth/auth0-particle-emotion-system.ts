@@ -5,7 +5,7 @@
 
 import type { APIRoute } from 'astro'
 
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { AIRepository } from '@/lib/db/ai/repository'
@@ -197,7 +197,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'particle_system_access',
+      AuditEventType.ACCESS,
       'auth.components.particles.emotion.system.access',
       user.id,
       'auth-components-particles',
@@ -230,7 +230,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.components.particles.emotion.system.error',
       'anonymous',
       'auth-components-particles',
@@ -333,7 +333,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'particle_system_update',
+      AuditEventType.MODIFY,
       'auth.components.particles.emotion.system.update',
       user.id,
       'auth-components-particles',
@@ -366,7 +366,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.components.particles.emotion.system.error',
       'anonymous',
       'auth-components-particles',
@@ -549,7 +549,8 @@ function generateEmotionParticles(
     const rand = Math.random()
     let cumulative = 0
 
-    for (const [emo, percentage] of Object.entries(emotionProfile.emotionMix)) {
+    for (const entry of Object.entries(emotionProfile.emotionMix)) {
+      const [emo, percentage] = entry as [string, number]
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']
