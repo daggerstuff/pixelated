@@ -63,9 +63,15 @@ export interface ThreatIntelligenceDatabase {
   getActiveThreatCount(region?: string): Promise<number>
   getCorrelationCount(region?: string): Promise<number>
   storeCorrelationData(correlation: CorrelationData): Promise<void>
-  getSTIXObjects(objectType: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]>
+  getSTIXObjects(
+    objectType: string,
+    filters?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]>
   getTAXIICollections(): Promise<Record<string, unknown>[]>
-  getTAXIIObjects(collectionId: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]>
+  getTAXIIObjects(
+    collectionId: string,
+    filters?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]>
   searchThreats(
     query: SearchQuery,
     pagination: PaginationParams,
@@ -633,7 +639,9 @@ export class ThreatIntelligenceDatabaseCore
 
       // Query database
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({ threatId })
+      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({
+        threatId,
+      })
 
       // Cache the result
       if (threat) {
@@ -661,7 +669,9 @@ export class ThreatIntelligenceDatabaseCore
 
       // Query database
       const threatsCollection = this.db.collection('global_threat_intelligence')
-      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({ intelligenceId })
+      const threat = await threatsCollection.findOne<GlobalThreatIntelligence>({
+        intelligenceId,
+      })
 
       // Cache the result
       if (threat) {
@@ -685,7 +695,9 @@ export class ThreatIntelligenceDatabaseCore
     try {
       // First find the indicator
       const indicatorsCollection = this.db.collection('threat_indicators')
-      const indicator = await indicatorsCollection.findOne<{ threatId: string }>({
+      const indicator = await indicatorsCollection.findOne<{
+        threatId: string
+      }>({
         indicatorType,
         value: indicatorValue,
       })
@@ -721,7 +733,9 @@ export class ThreatIntelligenceDatabaseCore
         { $project: { region: '$_id', count: 1, _id: 0 } },
       )
 
-      const results = await threatsCollection.aggregate<{ region: string; count: number }>(pipeline).toArray()
+      const results = await threatsCollection
+        .aggregate<{ region: string; count: number }>(pipeline)
+        .toArray()
 
       const threatsByRegion: Record<string, number> = {}
       for (const result of results) {
@@ -749,7 +763,9 @@ export class ThreatIntelligenceDatabaseCore
         pipeline.unshift(matchStage)
       }
 
-      const results = await threatsCollection.aggregate<{ severity: string; count: number }>(pipeline).toArray()
+      const results = await threatsCollection
+        .aggregate<{ severity: string; count: number }>(pipeline)
+        .toArray()
 
       const threatsBySeverity: Record<string, number> = {}
       for (const result of results) {
@@ -864,7 +880,10 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  async getSTIXObjects(objectType: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]> {
+  async getSTIXObjects(
+    objectType: string,
+    filters?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]> {
     try {
       if (!this.stixConfig.enabled) {
         throw new Error('STIX support is not enabled')
@@ -899,7 +918,10 @@ export class ThreatIntelligenceDatabaseCore
     }
   }
 
-  async getTAXIIObjects(collectionId: string, filters?: Record<string, unknown>): Promise<Record<string, unknown>[]> {
+  async getTAXIIObjects(
+    collectionId: string,
+    filters?: Record<string, unknown>,
+  ): Promise<Record<string, unknown>[]> {
     try {
       if (!this.taxiiConfig.enabled) {
         throw new Error('TAXII support is not enabled')
@@ -961,8 +983,7 @@ export class ThreatIntelligenceDatabaseCore
       logger.error('Failed to search threats:', { error, query })
       return {
         success: false,
-        error:
-          error instanceof Error ? error.message : 'Search failed',
+        error: error instanceof Error ? error.message : 'Search failed',
         metadata: {
           timestamp: new Date(),
           requestId: `search_${Date.now()}`,

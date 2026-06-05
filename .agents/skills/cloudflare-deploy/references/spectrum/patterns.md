@@ -3,6 +3,7 @@
 ### 1. SSH Server Protection
 
 **Terraform:**
+
 ```hcl
 resource "cloudflare_spectrum_application" "ssh" {
   zone_id  = var.zone_id
@@ -24,41 +25,46 @@ resource "cloudflare_spectrum_application" "ssh" {
 ### 2. Game Server
 
 **TypeScript (Minecraft):**
+
 ```typescript
 const app = await client.spectrum.apps.create({
   zone_id: 'your-zone-id',
   protocol: 'tcp/25565',
   dns: { type: 'CNAME', name: 'mc.example.com' },
   origin_direct: ['tcp://192.168.1.10:25565'],
-  proxy_protocol: 'v1',  // Preserves player IPs
+  proxy_protocol: 'v1', // Preserves player IPs
   argo_smart_routing: true,
-});
+})
 ```
 
-**Benefits:** DDoS protection, hide origin IP, Proxy Protocol for player IPs/bans, Argo reduces latency
+**Benefits:** DDoS protection, hide origin IP, Proxy Protocol for player
+IPs/bans, Argo reduces latency
 
 ### 3. MQTT Broker
 
 IoT device communication.
 
 **TypeScript:**
+
 ```typescript
 const mqttApp = await client.spectrum.apps.create({
   zone_id: 'your-zone-id',
-  protocol: 'tcp/8883',  // Use 1883 for plain MQTT
+  protocol: 'tcp/8883', // Use 1883 for plain MQTT
   dns: { type: 'CNAME', name: 'mqtt.example.com' },
   origin_direct: ['tcp://mqtt-broker.internal:8883'],
-  tls: 'full',  // Use 'off' for plain MQTT
-});
+  tls: 'full', // Use 'off' for plain MQTT
+})
 ```
 
 **Benefits:** DDoS protection, hide broker IP, TLS termination at edge
 
 ### 4. SMTP Relay
 
-Email submission (port 587). **WARNING**: See [gotchas.md](gotchas.md#smtp-reverse-dns)
+Email submission (port 587). **WARNING**: See
+[gotchas.md](gotchas.md#smtp-reverse-dns)
 
 **Terraform:**
+
 ```hcl
 resource "cloudflare_spectrum_application" "smtp" {
   zone_id  = var.zone_id
@@ -75,6 +81,7 @@ resource "cloudflare_spectrum_application" "smtp" {
 ```
 
 **Limitations:**
+
 - Spectrum IPs lack reverse DNS (PTR records)
 - Many mail servers reject without valid rDNS
 - Best for internal/trusted relay only
@@ -84,6 +91,7 @@ resource "cloudflare_spectrum_application" "smtp" {
 MySQL/PostgreSQL. **Use with caution** - security critical.
 
 **PostgreSQL:**
+
 ```typescript
 const postgresApp = await client.spectrum.apps.create({
   zone_id: 'your-zone-id',
@@ -91,12 +99,13 @@ const postgresApp = await client.spectrum.apps.create({
   dns: { type: 'CNAME', name: 'postgres.example.com' },
   origin_dns: { name: 'db-primary.internal.example.com' },
   origin_port: 5432,
-  tls: 'strict',      // REQUIRED
-  ip_firewall: true,  // REQUIRED
-});
+  tls: 'strict', // REQUIRED
+  ip_firewall: true, // REQUIRED
+})
 ```
 
 **MySQL:**
+
 ```hcl
 resource "cloudflare_spectrum_application" "mysql" {
   zone_id  = var.zone_id
@@ -118,6 +127,7 @@ resource "cloudflare_spectrum_application" "mysql" {
 ```
 
 **Security:**
+
 - ALWAYS use `tls: "strict"`
 - ALWAYS use `ip_firewall: true`
 - Restrict to known IPs via zone firewall
@@ -129,6 +139,7 @@ resource "cloudflare_spectrum_application" "mysql" {
 **Requires IP firewall.**
 
 **Terraform:**
+
 ```hcl
 resource "cloudflare_spectrum_application" "rdp" {
   zone_id  = var.zone_id
@@ -145,13 +156,15 @@ resource "cloudflare_spectrum_application" "rdp" {
 }
 ```
 
-**Security:** ALWAYS `ip_firewall: true`, whitelist admin IPs, RDP is DDoS/brute-force target
+**Security:** ALWAYS `ip_firewall: true`, whitelist admin IPs, RDP is
+DDoS/brute-force target
 
 ### 7. Multi-Origin Failover
 
 High availability with load balancer.
 
 **Terraform:**
+
 ```hcl
 resource "cloudflare_load_balancer" "database_lb" {
   zone_id          = var.zone_id
@@ -187,7 +200,8 @@ resource "cloudflare_spectrum_application" "postgres_ha" {
 }
 ```
 
-**Benefits:** Automatic failover, health monitoring, traffic distribution, zero-downtime deployments
+**Benefits:** Automatic failover, health monitoring, traffic distribution,
+zero-downtime deployments
 
 ## See Also
 
