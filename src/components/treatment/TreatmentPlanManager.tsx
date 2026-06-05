@@ -1,6 +1,6 @@
 import { format, addDays, differenceInDays } from 'date-fns'
 import { Target, Dumbbell } from 'lucide-react'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 
 interface TreatmentGoal {
   id: string
@@ -256,10 +256,14 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     )
   }
 
-  const overallProgress = Math.round(
-    currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
-      currentPlan.goals.length,
-  )
+  // ⚡ Bolt: Memoize O(N) progress calculation to prevent recalculation on tab changes
+  const overallProgress = useMemo(() => {
+    if (!currentPlan.goals.length) return 0
+    return Math.round(
+      currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
+        currentPlan.goals.length,
+    )
+  }, [currentPlan.goals])
 
   return (
     <div className={`bg-white rounded-lg p-6 shadow-lg ${className}`}>
