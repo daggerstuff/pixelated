@@ -7,10 +7,12 @@ import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { MetaAlignerAPI } from '../api/alignment-api'
 import {
   AlignmentContext,
-  AlignmentEvaluationResult,
-  AlignmentMetrics,
   ObjectiveDefinition,
 } from '../core/objectives'
+import type {
+  AlignmentEvaluationResult,
+  AlignmentMetrics,
+} from '../core/objective-interfaces'
 
 const logger = createBuildSafeLogger('enhancement-pipeline')
 
@@ -109,13 +111,13 @@ export class EnhancementPipeline {
       })
 
       // Check if enhancement is needed
+      const initialOverallScore = initialEvaluation.evaluation.overallScore
       const needsEnhancement =
-        initialEvaluation.overallScore <
-        (this.config.enhancementThreshold ?? 0.7)
+        initialOverallScore < (this.config.enhancementThreshold ?? 0.7)
 
       if (!needsEnhancement) {
         logger.info('Response quality sufficient, skipping enhancement', {
-          score: initialEvaluation.overallScore,
+          score: initialOverallScore,
           threshold: this.config.enhancementThreshold,
           action: 'skip_enhancement',
         })
@@ -125,8 +127,8 @@ export class EnhancementPipeline {
           originalResponse: response,
           improvements: [],
           metrics: {
-            original: initialEvaluation.metrics,
-            enhanced: initialEvaluation.metrics,
+            original: initialEvaluation.metrics as unknown as AlignmentMetrics,
+            enhanced: initialEvaluation.metrics as unknown as AlignmentMetrics,
           },
           processingInfo: {
             attempts: 0,
@@ -158,10 +160,10 @@ export class EnhancementPipeline {
       )
 
       logger.info('Enhancement pipeline completed', {
-        originalScore: initialEvaluation.overallScore.toFixed(3),
-        enhancedScore: finalEvaluation.overallScore.toFixed(3),
+        originalScore: initialOverallScore.toFixed(3),
+        enhancedScore: finalEvaluation.evaluation.overallScore.toFixed(3),
         improvement: (
-          finalEvaluation.overallScore - initialEvaluation.overallScore
+          finalEvaluation.evaluation.overallScore - initialOverallScore
         ).toFixed(3),
         durationMs: Date.now() - startTime,
         action: 'process_complete',
@@ -172,8 +174,8 @@ export class EnhancementPipeline {
         originalResponse: response,
         improvements,
         metrics: {
-          original: initialEvaluation.metrics,
-          enhanced: finalEvaluation.metrics,
+          original: initialEvaluation.metrics as unknown as AlignmentMetrics,
+          enhanced: finalEvaluation.metrics as unknown as AlignmentMetrics,
         },
         processingInfo: {
           attempts: enhancementResult.attempts,

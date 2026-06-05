@@ -1,3 +1,5 @@
+import type { APIContext } from 'astro'
+
 import { CrisisSessionFlaggingService } from '@/lib/ai/crisis/CrisisSessionFlaggingService'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
 import { getSession } from '@/lib/auth/session'
@@ -25,7 +27,7 @@ export const GET = async ({ request }: APIContext) => {
 
     if (pending) {
       // Get all pending crisis flags (admin/therapist only)
-      const userRole = sessionData?.['user']?.['user_metadata']?.['role']
+      const userRole = sessionData?.user?.role
       if (!userRole || !['admin', 'therapist'].includes(userRole)) {
         return new Response(
           JSON.stringify({ error: 'Insufficient permissions' }),
@@ -46,10 +48,10 @@ export const GET = async ({ request }: APIContext) => {
     if (userId) {
       // Get crisis flags for specific user
       // Users can only see their own flags, admins/therapists can see any
-      const userRole = sessionData?.['user']?.['user_metadata']?.['role']
+      const userRole = sessionData?.user?.role
       if (
         userId !== sessionData.user.id &&
-        !['admin', 'therapist'].includes(userRole)
+        (!userRole || !['admin', 'therapist'].includes(userRole))
       ) {
         return new Response(
           JSON.stringify({ error: 'Insufficient permissions' }),
@@ -115,7 +117,7 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Only admins and therapists can create crisis flags manually
-    const userRole = sessionData.user.user_metadata?.['role']
+    const userRole = sessionData.user.role
     if (!userRole || !['admin', 'therapist'].includes(userRole)) {
       return new Response(
         JSON.stringify({ error: 'Insufficient permissions' }),
@@ -223,7 +225,7 @@ export const PUT = async ({ request }: APIContext) => {
     }
 
     // Only admins and therapists can update crisis flags
-    const userRole = sessionData.user.user_metadata?.['role']
+    const userRole = sessionData.user.role
     if (!userRole || !['admin', 'therapist'].includes(userRole)) {
       return new Response(
         JSON.stringify({ error: 'Insufficient permissions' }),

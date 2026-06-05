@@ -439,14 +439,14 @@ class ProductionMonitoringService extends EventEmitter {
 
     // Predictions based on trends
     for (const trend of trends) {
-      if (trend.trend === 'increasing') {
+      if (trend['trend'] === 'increasing') {
         predictions.push({
-          metric: trend.metric,
-          predictedValue: trend.average * 1.5,
+          metric: trend['metric'],
+          predictedValue: (trend['average'] as number) * 1.5,
           confidence: 0.7,
         })
         recommendations.push(
-          `Monitor ${trend.metric} closely - trending upward`,
+          `Monitor ${trend['metric'] as string} closely - trending upward`,
         )
       }
     }
@@ -560,7 +560,7 @@ class ProductionHuntingService extends EventEmitter {
 
     setTimeout(() => {
       const inv = this.investigations.get(investigation.id)
-      if ((inv as Record<string, unknown>)?.['status'] === 'running') {
+      if (          (inv as Record<string, unknown>)['status'] === 'running') {
         (inv as Record<string, unknown>)['status'] = 'completed'
         ;(inv as Record<string, unknown>)['result'] = {
           findings: [],
@@ -579,7 +579,7 @@ class ProductionHuntingService extends EventEmitter {
 
   async getActiveInvestigations(): Promise<Record<string, unknown>[]> {
     return [...this.investigations.values()].filter(
-      (inv) => inv.status === 'running',
+      (inv) => (inv)['status'] === 'running',
     )
   }
 
@@ -649,7 +649,7 @@ class ProductionIntelligenceService extends EventEmitter {
   async lookupIOC(indicator: string, type: string): Promise<Record<string, unknown>[]> {
     const cacheKey = `${type}:${indicator}`
     if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)
+      return this.cache.get(cacheKey) ?? []
     }
 
     try {
@@ -703,7 +703,7 @@ class ProductionIntelligenceService extends EventEmitter {
         const indicators = (data['data'] ?? data['results'] ?? []) as Record<string, unknown>[]
         for (const indicator of indicators) {
           this.iocs.push({
-            ...indicator as Record<string, unknown>,
+            ...indicator,
             source: feed.name,
             timestamp: new Date(),
           })
@@ -823,17 +823,17 @@ export function createCompleteThreatDetectionSystem(
       // Security events → monitoring
       const orch = orchestrator as Record<string, unknown>
       if (orchestrator && typeof orch['on'] === 'function') {
-        ;(orch as Record<string, unknown>)['on']('security:event', (event: Record<string, unknown>) => {
+        ;(orch)['on']('security:event', (event: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: (event['type'] as string) ?? 'security_event',
-            value: (event['success'] as boolean) === false ? 1 : 0,
+            value: ! (event['success'] as boolean) ? 1 : 0,
             timestamp: new Date((event['timestamp'] as number) ?? Date.now()),
             tags: { userId: (event['userId'] as string) ?? '', ip: (event['ip'] as string) ?? '' },
           })
         })
 
         // Threat detected → hunting
-        ;(orch as Record<string, unknown>)['on']('threat:detected', async (threat: Record<string, unknown>) => {
+        ;(orch)['on']('threat:detected', async (threat: Record<string, unknown>) => {
           void monitoringService.recordMetric({
             name: 'threats_detected',
             value: 1,
@@ -857,14 +857,14 @@ export function createCompleteThreatDetectionSystem(
 
       // Service audit logs → orchestrator
       monitoringService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
-          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
+        if (orchestrator && typeof (orch)['emit'] === 'function') {
+          ;(orch)['emit']('audit:log', log)
         }
       })
 
       huntingService.on('audit:log', (log: Record<string, unknown>) => {
-        if (orchestrator && typeof (orch as Record<string, unknown>)['emit'] === 'function') {
-          ;(orch as Record<string, unknown>)['emit']('audit:log', log)
+        if (orchestrator && typeof (orch)['emit'] === 'function') {
+          ;(orch)['emit']('audit:log', log)
         }
       })
     },
@@ -873,11 +873,11 @@ export function createCompleteThreatDetectionSystem(
     async processRequest(request: unknown) {
       try {
         const threatResult =
-          await threatDetectionService.processRequest(request)
+          await threatDetectionService.processRequest(request as Record<string, unknown>)
         const insights = await monitoringService.generateInsights()
 
         // Trigger hunting for high-risk requests
-        if (threatResult.riskScore > 0.7) {
+        if ((threatResult['riskScore'] as number) > 0.7) {
           await huntingService.triggerHunt({
             type: 'high-risk-request',
             context: request,
@@ -917,10 +917,10 @@ export function createCompleteThreatDetectionSystem(
         intelligenceService.getHealthStatus(),
       ])
 
-      const th = threatHealth as Record<string, unknown>
-      const mh = monitoringHealth as Record<string, unknown>
-      const hh = huntingHealth as Record<string, unknown>
-      const ih = intelligenceHealth as Record<string, unknown>
+      const th = threatHealth
+      const mh = monitoringHealth
+      const hh = huntingHealth
+      const ih = intelligenceHealth
 
       return {
         healthy:
@@ -953,10 +953,10 @@ export function createCompleteThreatDetectionSystem(
           intelligenceService.getStatistics(),
         ])
 
-      const ts = threatStats as Record<string, unknown>
-      const ms = monitoringStats as Record<string, unknown>
-      const hs = huntingStats as Record<string, unknown>
-      const isc = intelligenceStats as Record<string, unknown>
+      const ts = threatStats
+      const ms = monitoringStats
+      const hs = huntingStats
+      const isc = intelligenceStats
 
       return {
         threats: {

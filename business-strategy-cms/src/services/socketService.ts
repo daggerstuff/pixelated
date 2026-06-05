@@ -389,11 +389,11 @@ export class SocketService {
   }
 
   // Public methods for external use
-  public emitToDocument(documentId: string, event: string, data: any): void {
+  public emitToDocument(documentId: string, event: string, data: unknown): void {
     this.io.to(`document:${documentId}`).emit(event, data)
   }
 
-  public emitToUser(userId: string, event: string, data: any): void {
+  public emitToUser(userId: string, event: string, data: unknown): void {
     const { sockets } = this.io.sockets
     for (const [_socketId, socket] of sockets) {
       const authSocket = socket as AuthenticatedSocket
@@ -411,5 +411,9 @@ export class SocketService {
   public getRoomSize(documentId: string): number {
     const room = this.io.sockets.adapter.rooms.get(`document:${documentId}`)
     return room ? room.size : 0
+  }
+
+  public closeIO(): void {
+    void this.io.close()
   }
 }

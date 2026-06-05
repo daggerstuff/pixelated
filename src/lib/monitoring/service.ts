@@ -90,7 +90,7 @@ export class MonitoringService {
         'https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js'
       script.async = true
       script.onload = () => {
-        window.faro.init({
+        ;(window as any).faro.init({
           url: this.config.grafana.url,
           apiKey,
           app: {
@@ -137,7 +137,7 @@ export class MonitoringService {
       // Largest Contentful Paint
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries()
-        const lastEntry = entries[entries.length - 1]
+        const lastEntry = entries[entries.length - 1]!
         this.reportWebVital('LCP', lastEntry)
       }).observe({ entryTypes: ['largest-contentful-paint'] })
 
@@ -160,8 +160,8 @@ export class MonitoringService {
   }
 
   private reportWebVital(metric: string, entry: PerformanceEntry): void {
-    if (window.faro) {
-      window.faro.api.pushMeasurement(metric, {
+    if ((window as any).faro) {
+      ;(window as any).faro.api.pushMeasurement(metric, {
         value: entry.startTime,
         unit: 'ms',
       })
@@ -174,14 +174,14 @@ export class MonitoringService {
       memory: (performance as ExtendedPerformance).memory?.usedJSHeapSize ?? 0,
       navigation: performance.getEntriesByType(
         'navigation',
-      )[0] as PerformanceNavigationTiming,
+      )[0]! as PerformanceNavigationTiming,
       resources: performance.getEntriesByType(
         'resource',
       ) as PerformanceResourceTiming[],
     }
 
-    if (window.faro) {
-      window.faro.api.pushMeasurement('performance', {
+    if ((window as any).faro) {
+      ;(window as any).faro.api.pushMeasurement('performance', {
         value: metrics,
       })
     }
@@ -264,8 +264,8 @@ export class MonitoringService {
 
     try {
       // Send to Grafana
-      if (window.faro) {
-        window.faro.api.pushError(new Error(data.message), {
+      if ((window as any).faro) {
+        ;(window as any).faro.api.pushError(new Error(data.message), {
           type,
           level: data.level,
           context: data,

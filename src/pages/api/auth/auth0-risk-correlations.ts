@@ -7,7 +7,7 @@ import type { APIRoute } from 'astro'
 
 import type { EmotionAnalysis } from '@/lib/ai/emotions/types'
 import { createPatternRecognitionService } from '@/lib/ai/services/PatternRecognitionFactory'
-import { createAuditLog } from '@/lib/audit'
+import { createAuditLog, AuditEventType } from '@/lib/audit'
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -77,7 +77,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       // Create audit log for the error
       await createAuditLog(
-        'system_error',
+        AuditEventType.SYSTEM,
         'auth.pattern.risk.correlations.error',
         user.id,
         'auth-pattern-risk',
@@ -164,7 +164,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Therapists can only access their own clients
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        AuditEventType.SECURITY,
         'auth.pattern.risk.correlations.forbidden',
         user.id,
         'auth-pattern-risk',
@@ -186,7 +186,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log
     await createAuditLog(
-      'risk_correlations_analysis',
+      AuditEventType.ACCESS,
       'auth.pattern.risk.correlations.access',
       user.id,
       'auth-pattern-risk',
@@ -233,7 +233,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      AuditEventType.SYSTEM,
       'auth.pattern.risk.correlations.error',
       'anonymous',
       'auth-pattern-risk',

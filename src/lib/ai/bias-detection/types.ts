@@ -24,6 +24,7 @@ export type AlertLevel = 'low' | 'medium' | 'high' | 'critical'
 export interface DataQualityMetrics {
   completeness: number
   consistency: number
+  coverage?: number
   accuracy: number
   timeliness: number
   validity: number
@@ -249,7 +250,17 @@ export interface TherapeuticSession {
   [key: string]: unknown
 }
 
-export type ParticipantDemographics = any
+export interface ParticipantDemographics {
+  age?: string
+  gender?: string
+  ethnicity?: string
+  primaryLanguage?: string
+  socioeconomicStatus?: string
+  education?: string
+  region?: string
+  culturalBackground?: string[]
+  disabilityStatus?: string
+}
 
 export interface TrainingScenario {
   scenarioId: string
@@ -320,6 +331,8 @@ export interface SessionMetadata {
   [key: string]: any
 }
 
+export type BiasedTerm = string | { term: string; context: string; biasType: string; severity: string; suggestedAlternative: string }
+
 export interface PreprocessingLayerResult {
   biasScore: number
   linguisticBias: {
@@ -327,8 +340,12 @@ export interface PreprocessingLayerResult {
     racialBiasScore: number
     ageBiasScore: number
     culturalBiasScore: number
-    biasedTerms: Array<string | { term: string; context: string; biasType: string; severity: string; suggestedAlternative: string }>
+    overallBiasScore?: number
+    biasedTerms: Array<BiasedTerm>
     sentimentAnalysis: {
+      positive?: number
+      neutral?: number
+      negative?: number
       overallSentiment: number
       emotionalValence: number
       subjectivity: number
@@ -336,6 +353,8 @@ export interface PreprocessingLayerResult {
     }
   }
   representationAnalysis: {
+    representationParity?: number
+    minorityGroupScore?: number
     demographicDistribution: Record<string, number>
     underrepresentedGroups: string[]
     overrepresentedGroups: string[]
@@ -347,6 +366,9 @@ export interface PreprocessingLayerResult {
   detectedBiases?: string[]
   fallbackMode?: boolean
   serviceError?: string
+  layer?: string
+  timestamp?: string
+  sessionId?: string
 }
 
 export interface ModelLevelLayerResult {

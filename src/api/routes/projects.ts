@@ -23,7 +23,7 @@ router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
     const { name, description, category, stakeholders, budget } = req.body
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     if (!name) {
       throw new ValidationError('Project name is required', {
@@ -52,7 +52,7 @@ router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, category, status } = req.query
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     const result = await listProjects(user.id, {
       page: page ? parseInt(page as string) : 1,
@@ -73,7 +73,7 @@ router.get(
   '/:projectId',
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     const project = await getProject(projectId, user.id)
 
@@ -90,7 +90,7 @@ router.put(
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
     const { name, description, category, budget, status } = req.body
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     const project = await updateProject(projectId, user.id, {
       name,
@@ -113,7 +113,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
     const { title, description, successCriteria, deadline } = req.body
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     if (!title) {
       throw new ValidationError('Objective title is required', {
@@ -141,7 +141,7 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
     const { userId, permissionLevel } = req.body
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     if (!userId || !permissionLevel) {
       throw new ValidationError('userId and permissionLevel required', {
@@ -175,7 +175,7 @@ router.get(
   '/search/:query',
   asyncHandler(async (req: Request, res: Response) => {
     const query = req.params['query'] as string
-    const { user } = req as any
+    const { user } = req as Request & { user: { id: string } }
 
     const results = await searchProjects(query, user.id)
 

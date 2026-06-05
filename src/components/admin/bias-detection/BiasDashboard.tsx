@@ -783,7 +783,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
         )
       }
 
-      const data: BiasDashboardData = await response.json()
+      const data = await response.json() as BiasDashboardData
       setDashboardData(data)
       setLastUpdated(new Date())
 
@@ -805,7 +805,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
   const handleWebSocketMessage = useCallback(
     (event: MessageEvent, socket: WebSocket) => {
       try {
-        const data: unknown = JSON.parse(event.data)
+        const data: unknown = JSON.parse(event.data as string)
 
         if (!isObject(data) || typeof data['type'] !== 'string') {
           logger.warn('WS message missing type', { data })
@@ -948,7 +948,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
       } catch (error: unknown) {
         logger.error('Failed to process WebSocket message', {
           error,
-          rawData: event.data,
+          rawData: event.data as string,
         })
       }
     },
@@ -2796,7 +2796,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         {Object.entries(demographics.age ?? {}).map(
                           ([age, count], index) => (
                             <Cell
-                              key={`age-${age}-${count}`}
+                              key={`age-${age}-${String(count)}`}
                               fill={getChartColors(
                                 index,
                                 Object.keys(demographics.age ?? {}).length,
@@ -2878,7 +2878,7 @@ export const BiasDashboard: React.FC<BiasDashboardProps> = ({
                         {Object.entries(demographics.gender ?? {}).map(
                           ([gender, count], index) => (
                             <Cell
-                              key={`gender-${gender}-${count}`}
+                              key={`gender-${gender}-${String(count)}`}
                               fill={getChartColors(
                                 index,
                                 Object.keys(demographics.gender ?? {}).length,

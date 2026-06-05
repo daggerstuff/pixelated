@@ -14,7 +14,10 @@ export type MockAuthRequest = Omit<Request, 'user'> & {
   originalUrl: string
   method: string
   headers: Record<string, string | undefined>
-  get: (header: string) => string | undefined
+  get: {
+    (name: 'set-cookie'): string[] | undefined
+    (name: string): string | undefined
+  }
   user?: MockAuthUser
 }
 
@@ -50,9 +53,9 @@ export function createMockAuthRequest(
     originalUrl: '/api/users',
     method: 'GET',
     headers,
-    get: (header) => headers[header.toLowerCase()] ?? undefined,
+    get: ((header: string) => headers[header.toLowerCase()] ?? undefined) as MockAuthRequest['get'],
     ...overrides,
-  }
+  } as MockAuthRequest
 }
 
 export function createMockAuthResponse(): {

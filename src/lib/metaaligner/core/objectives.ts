@@ -576,6 +576,7 @@ export interface AlignmentEvaluationResult {
   >
   weights: Record<string, number>
   normalizedScores: Record<string, number>
+  aggregationMethod: import('./objective-interfaces').AggregationMethod
   evaluationContext: AlignmentContext
   timestamp: Date
 }

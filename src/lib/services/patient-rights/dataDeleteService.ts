@@ -65,14 +65,14 @@ export async function createDataDeletionRequest(
     }
 
     // Insert into database
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     await collection.insertOne(deletionRequest)
 
     return deletionRequest
   } catch (error: unknown) {
     logger.error('Error in createDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       params,
     })
     throw error
@@ -86,14 +86,14 @@ export async function getDataDeletionRequest(
   id: string,
 ): Promise<DataDeletionRequest | null> {
   try {
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const request = await collection.findOne({ id })
 
     return request as DataDeletionRequest | null
   } catch (error: unknown) {
     logger.error('Error in getDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       id,
     })
     throw error
@@ -124,14 +124,14 @@ export async function getAllDataDeletionRequests(filters?: {
   }
 
   try {
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
     const requests = await collection.find(query).toArray()
 
     return requests as DataDeletionRequest[]
   } catch (error: unknown) {
     logger.error('Error in getAllDataDeletionRequests', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       filters,
     })
     throw error
@@ -156,7 +156,7 @@ export async function updateDataDeletionRequest(
       updateData.dateProcessed = new Date().toISOString()
     }
 
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
     const collection = db.collection<DeletionRequest>('dataDeletionRequests')
 
     // Update the request in the database
@@ -175,8 +175,23 @@ export async function updateDataDeletionRequest(
 
     // Log the action for audit purposes
     void auditLogger.logAction(
-      { userId: params.processedBy, role: 'system' as const },
-      'update_deletion_request',
+      {
+        userId: params.processedBy,
+        email: 'system@pixelated.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 0,
+        },
+        permissions: [],
+      },
+      {
+        type: 'update',
+        category: 'patient-data',
+        description: 'Update deletion request status',
+        sensitivityLevel: 'high' as const,
+      },
       'patient_data',
       {
         requestId: params.id,
@@ -194,7 +209,7 @@ export async function updateDataDeletionRequest(
     return updatedRequest
   } catch (error: unknown) {
     logger.error('Error in updateDataDeletionRequest', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       params,
     })
     throw error
@@ -242,8 +257,23 @@ async function executeDataDeletion(
 
     // Log the deletion action for audit purposes
     void auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'execute_data_deletion',
+      {
+        userId: processedBy,
+        email: 'system@pixelated.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 0,
+        },
+        permissions: [],
+      },
+      {
+        type: 'delete',
+        category: 'patient-data',
+        description: 'Execute data deletion',
+        sensitivityLevel: 'high' as const,
+      },
       'patient_data',
       {
         requestId: request.id,
@@ -255,7 +285,7 @@ async function executeDataDeletion(
     )
   } catch (error: unknown) {
     logger.error('Error executing data deletion', {
-      error: error instanceof Error ? String(error) : String(error),
+      error: error instanceof Error ? error.message : 'Unknown error',
       requestId: request.id,
       patientId: request.patientId,
     })
@@ -265,14 +295,32 @@ async function executeDataDeletion(
 
     // Log the failure for audit purposes
     void auditLogger.logAction(
-      { userId: processedBy, role: 'system' as const },
-      'data_deletion_error',
+      {
+        userId: processedBy,
+        email: 'system@pixelated.local',
+        role: {
+          id: 'system',
+          name: 'system',
+          description: 'System process',
+          level: 0,
+        },
+        permissions: [],
+      },
+      {
+        type: 'delete',
+        category: 'patient-data',
+        description: 'Data deletion error',
+        sensitivityLevel: 'high' as const,
+      },
       'patient_data',
       {
         requestId: request.id,
-        error: error instanceof Error ? String(error) : String(error),
+        error: error instanceof Error ? error.message : 'Unknown error',
       },
       { ipAddress: '::1', userAgent: 'system' },
+      undefined,
+      false,
+      error instanceof Error ? error.message : 'Unknown error',
     )
   }
 }
@@ -298,7 +346,7 @@ async function deleteAllPatientData(patientId: string): Promise<void> {
     'media_files',
   ]
 
-  const db = mongoClient.getDb()
+  const db = mongoClient.db
   const { client } = db
   const session = client.startSession()
 
@@ -343,7 +391,7 @@ async function deleteSpecificPatientData(
       continue
     }
 
-    const db = mongoClient.getDb()
+    const db = mongoClient.db
 
     // Delete from each table for this category
     for (const table of tables) {

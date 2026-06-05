@@ -107,16 +107,16 @@ class PerformanceMonitor {
     console.log('Performance monitoring stopped')
   }
 
-  private async collectMetrics(): Promise<void> {
-    const metrics: PerformanceMetrics = {
+  private async collectMetrics(): Promise<void> {    const metrics: PerformanceMetrics = {
       timestamp: new Date(),
       responseTime: await this.measureResponseTime(),
       memoryUsage: await this.measureMemoryUsage(),
       cpuUsage: await this.measureCpuUsage(),
+      diskUsage: 0,
+      networkLatency: 0,
+      requestCount: 0,
       errorRate: await this.measureErrorRate(),
       throughput: await this.measureThroughput(),
-      activeUsers: await this.getActiveUserCount(),
-      systemLoad: await this.measureSystemLoad(),
     }
 
     this.metrics.push(metrics)
@@ -155,11 +155,11 @@ class PerformanceMonitor {
     if (recentMetrics.length === 0) return 0
 
     const totalErrors = recentMetrics.reduce(
-      (sum, m) => sum + (m.errorCount ?? 0),
+      (sum, m) => sum + ((m as any).errorCount ?? 0),
       0,
     )
     const totalRequests = recentMetrics.reduce(
-      (sum, m) => sum + (m.requestCount || 1),
+      (sum, m) => sum + m.requestCount,
       0,
     )
 
@@ -169,16 +169,6 @@ class PerformanceMonitor {
   private async measureThroughput(): Promise<number> {
     // Requests per second
     return Math.random() * 100 + 50 // Mock data
-  }
-
-  private async getActiveUserCount(): Promise<number> {
-    // In real implementation, would get from WebSocket connections or database
-    return Math.floor(Math.random() * 100) + 20
-  }
-
-  private async measureSystemLoad(): Promise<number> {
-    // System load average
-    return Math.random() * 2 // Mock data
   }
 
   private analyzePerformance(): void {
@@ -200,11 +190,13 @@ class PerformanceMonitor {
     if (recommendations.length > 0) {
       this.optimizationHistory.push({
         id: `opt_${Date.now()}`,
-        timestamp: new Date(),
-        type: 'performance',
+        createdAt: new Date(),
+        type: 'optimize',
+        priority: 'medium',
+        title: 'Performance optimization',
         description: 'Automatic performance optimization recommendations',
-        recommendations,
-        expectedImprovement: this.calculateExpectedImprovement(recommendations),
+        impact: 'TBD',
+        implemented: false,
       })
     }
   }
@@ -237,7 +229,7 @@ class PerformanceMonitor {
       cpuUsage: sums.cpuUsage / count,
       errorRate: sums.errorRate / count,
       throughput: sums.throughput / count,
-    }
+    } as unknown as PerformanceMetrics
   }
 
   private generateOptimizationRecommendations(
@@ -247,10 +239,15 @@ class PerformanceMonitor {
     const recommendations: string[] = []
 
     // Response time analysis
-    if (recent.responseTime! > this.config.alertThresholds.responseTime) {
+    const recentResponseTime = recent.responseTime ?? 0
+    const olderResponseTime = older.responseTime ?? 0
+    const recentMemoryUsage = recent.memoryUsage ?? 0
+    const recentCpuUsage = recent.cpuUsage ?? 0
+    const recentErrorRate = recent.errorRate ?? 0
+
+    if (recentResponseTime > this.config.alertThresholds.responseTime) {
       const degradation =
-        ((recent.responseTime! - older.responseTime!) / older.responseTime!) *
-        100
+        ((recentResponseTime - olderResponseTime) / olderResponseTime) * 100
       if (degradation > 10) {
         recommendations.push(
           `Response time degraded by ${degradation.toFixed(1)}% - consider caching optimization`,
@@ -259,92 +256,71 @@ class PerformanceMonitor {
     }
 
     // Memory usage analysis
-    if (recent.memoryUsage! > this.config.alertThresholds.memoryUsage) {
+    if (recentMemoryUsage > this.config.alertThresholds.memoryUsage) {
       recommendations.push(
         'Memory usage above threshold - consider garbage collection optimization',
       )
     }
 
     // CPU usage analysis
-    if (recent.cpuUsage! > this.config.alertThresholds.cpuUsage) {
+    if (recentCpuUsage > this.config.alertThresholds.cpuUsage) {
       recommendations.push('High CPU usage detected - consider load balancing')
     }
 
     // Error rate analysis
-    if (recent.errorRate! > this.config.alertThresholds.errorRate) {
+    if (recentErrorRate > this.config.alertThresholds.errorRate) {
       recommendations.push('Elevated error rate - review recent deployments')
     }
 
     return recommendations
   }
 
-  private calculateExpectedImprovement(
-    recommendations: string[],
-  ): Record<string, number> {
-    // Estimate improvement from applying recommendations
-    const improvement: Record<string, number> = {
-      responseTime: 0,
-      memoryUsage: 0,
-      cpuUsage: 0,
-      errorRate: 0,
-    }
-
-    recommendations.forEach((rec) => {
-      if (rec.includes('caching')) improvement['responseTime']! -= 20
-      if (rec.includes('garbage collection')) improvement['memoryUsage']! -= 15
-      if (rec.includes('load balancing')) improvement['cpuUsage']! -= 25
-      if (rec.includes('error rate')) improvement['errorRate']! -= 50
-    })
-
-    return improvement
-  }
-
   private checkAlerts(): void {
     if (this.metrics.length === 0) return
 
-    const latest = this.metrics[this.metrics.length - 1]
+    const latest = this.metrics[this.metrics.length - 1]!
 
     // Check response time
-    if (latest!.responseTime > this.config.alertThresholds.responseTime) {
+    if (latest.responseTime > this.config.alertThresholds.responseTime) {
       this.createAlert(
         'warning',
         'responseTime',
-        latest!.responseTime,
+        latest.responseTime,
         this.config.alertThresholds.responseTime,
-        `Response time ${latest!.responseTime.toFixed(1)}ms exceeds threshold ${this.config.alertThresholds.responseTime}ms`,
+        `Response time ${latest.responseTime.toFixed(1)}ms exceeds threshold ${this.config.alertThresholds.responseTime}ms`,
       )
     }
 
     // Check memory usage
-    if (latest!.memoryUsage > this.config.alertThresholds.memoryUsage) {
+    if (latest.memoryUsage > this.config.alertThresholds.memoryUsage) {
       this.createAlert(
         'critical',
         'memoryUsage',
-        latest!.memoryUsage,
+        latest.memoryUsage,
         this.config.alertThresholds.memoryUsage,
-        `Memory usage ${latest!.memoryUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.memoryUsage}%`,
+        `Memory usage ${latest.memoryUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.memoryUsage}%`,
       )
     }
 
     // Check CPU usage
-    if (latest!.cpuUsage > this.config.alertThresholds.cpuUsage) {
+    if (latest.cpuUsage > this.config.alertThresholds.cpuUsage) {
       this.createAlert(
         'warning',
         'cpuUsage',
-        latest!.cpuUsage,
+        latest.cpuUsage,
         this.config.alertThresholds.cpuUsage,
-        `CPU usage ${latest!.cpuUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.cpuUsage}%`,
+        `CPU usage ${latest.cpuUsage.toFixed(1)}% exceeds threshold ${this.config.alertThresholds.cpuUsage}%`,
       )
     }
 
     // Check error rate
-    if (latest!.errorRate > this.config.alertThresholds.errorRate) {
+    if (latest.errorRate > this.config.alertThresholds.errorRate) {
       this.createAlert(
         'critical',
         'errorRate',
-        latest!.errorRate,
+        latest.errorRate,
         this.config.alertThresholds.errorRate,
-        `Error rate ${latest!.errorRate.toFixed(2)}% exceeds threshold ${this.config.alertThresholds.errorRate}%`,
+        `Error rate ${latest.errorRate.toFixed(2)}% exceeds threshold ${this.config.alertThresholds.errorRate}%`,
       )
     }
   }
@@ -404,7 +380,7 @@ class PerformanceMonitor {
    */
   getCurrentMetrics(): PerformanceMetrics | null {
     return this.metrics.length > 0
-      ? this.metrics[this.metrics.length - 1]
+      ? this.metrics[this.metrics.length - 1]!
       : null
   }
 
@@ -449,12 +425,12 @@ class PerformanceMonitor {
 
     return {
       responseTime: calculateTrend(
-        firstAvg.responseTime,
-        secondAvg.responseTime,
+        firstAvg.responseTime ?? 0,
+        secondAvg.responseTime ?? 0,
       ),
-      memoryUsage: calculateTrend(firstAvg.memoryUsage, secondAvg.memoryUsage),
-      cpuUsage: calculateTrend(firstAvg.cpuUsage, secondAvg.cpuUsage),
-      errorRate: calculateTrend(firstAvg.errorRate, secondAvg.errorRate),
+      memoryUsage: calculateTrend(firstAvg.memoryUsage ?? 0, secondAvg.memoryUsage ?? 0),
+      cpuUsage: calculateTrend(firstAvg.cpuUsage ?? 0, secondAvg.cpuUsage ?? 0),
+      errorRate: calculateTrend(firstAvg.errorRate ?? 0, secondAvg.errorRate ?? 0),
     }
   }
 
@@ -550,7 +526,7 @@ class PerformanceMonitor {
       totalAlerts: number
       uptime: number
     }
-    trends: ReturnType<typeof this.getPerformanceTrends>
+    trends: ReturnType<typeof PerformanceMonitor.prototype.getPerformanceTrends>
     optimizationHistory: OptimizationRecommendation[]
     recommendations: string[]
   } {
@@ -586,9 +562,9 @@ class PerformanceMonitor {
 
     return {
       summary: {
-        averageResponseTime: avgMetrics.responseTime,
-        averageMemoryUsage: avgMetrics.memoryUsage,
-        averageCpuUsage: avgMetrics.cpuUsage,
+        averageResponseTime: avgMetrics.responseTime ?? 0,
+        averageMemoryUsage: avgMetrics.memoryUsage ?? 0,
+        averageCpuUsage: avgMetrics.cpuUsage ?? 0,
         totalAlerts: this.alerts.filter((a) => !a.resolved).length,
         uptime,
       },

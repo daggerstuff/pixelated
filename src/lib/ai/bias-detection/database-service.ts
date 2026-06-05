@@ -158,7 +158,18 @@ export class BiasDetectionDatabaseService {
       const recommendations = this.getRecommendations(summary, alerts)
 
       return {
-        summary,
+        summary: {
+          totalSessions: summary.totalSessions,
+          averageBiasScore: summary.averageBiasScore,
+          alertsLayerBreakdown: summary.alertsLayerBreakdown,
+          alertsLast24h: summary.alertsLast24h,
+          activeAlerts: summary.activeAlerts,
+          trendDirection: summary.trendDirection === 'increasing' ? 'worsening' as const :
+            summary.trendDirection === 'decreasing' ? 'improving' as const :
+            summary.trendDirection,
+          alerts: summary.alerts,
+          criticalAlerts: summary.criticalIssues,
+        },
         alerts,
         trends,
         demographics,
@@ -419,9 +430,12 @@ export class BiasDetectionDatabaseService {
       Object.entries(aggregation).forEach(([dimension, values]) => {
         result[dimension] = {}
         Object.entries(values).forEach(([value, stats]) => {
-          result[dimension][value] = {
-            count: stats.count,
-            averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
+          const dimResult = result[dimension]
+          if (dimResult) {
+            dimResult[value] = {
+              count: stats.count,
+              averageBias: stats.count > 0 ? stats.totalBias / stats.count : 0,
+            }
           }
         })
       })

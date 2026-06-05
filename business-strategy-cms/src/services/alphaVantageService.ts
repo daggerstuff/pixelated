@@ -188,7 +188,7 @@ export class AlphaVantageService {
   async getQuote(symbol: string): Promise<AlphaVantageQuote | null> {
     try {
       const cacheKey = `alpha_quote_${symbol}`
-      const cached = this.getFromCache<AlphaVantageQuote>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as AlphaVantageQuote | null
       if (cached) return cached
 
       const response = await this.client.get<AlphaVantageGlobalQuoteResponse>(
@@ -245,7 +245,7 @@ export class AlphaVantageService {
   async getFundamentals(symbol: string): Promise<CompanyFundamentals | null> {
     try {
       const cacheKey = `alpha_fundamentals_${symbol}`
-      const cached = this.getFromCache<CompanyFundamentals>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as CompanyFundamentals | null
       if (cached) return cached
 
       // Get company overview
@@ -315,7 +315,7 @@ export class AlphaVantageService {
   ): Promise<TechnicalIndicator[]> {
     try {
       const cacheKey = `alpha_${indicator}_${symbol}_${interval}_${timePeriod}`
-      const cached = this.getFromCache<TechnicalIndicator[]>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as TechnicalIndicator[] | null
       if (cached) return cached
 
       let functionType = ''
@@ -412,7 +412,7 @@ export class AlphaVantageService {
   ): Promise<EconomicIndicator[]> {
     try {
       const cacheKey = `alpha_economic_${indicator}`
-      const cached = this.getFromCache<EconomicIndicator[]>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as EconomicIndicator[] | null
       if (cached) return cached
 
       let functionType = ''
@@ -464,7 +464,7 @@ export class AlphaVantageService {
   async getNewsSentiment(symbol: string): Promise<NewsSentiment[]> {
     try {
       const cacheKey = `alpha_news_${symbol}`
-      const cached = this.getFromCache<NewsSentiment[]>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as NewsSentiment[] | null
       if (cached) return cached
 
       const response = await this.client.get<AlphaVantageNewsResponse>('', {
@@ -505,7 +505,7 @@ export class AlphaVantageService {
   async getQuarterlyEarnings(symbol: string): Promise<QuarterlyEarnings[]> {
     try {
       const cacheKey = `alpha_earnings_${symbol}`
-      const cached = this.getFromCache<QuarterlyEarnings[]>(cacheKey)
+      const cached = this.getFromCache(cacheKey) as QuarterlyEarnings[] | null
       if (cached) return cached
 
       const response = await this.client.get<AlphaVantageEarningsResponse>('', {
@@ -594,10 +594,10 @@ export class AlphaVantageService {
     }
   }
 
-  private getFromCache<T>(key: string): T | null {
+  private getFromCache(key: string): unknown {
     const cached = this.cache.get(key)
     if (cached && Date.now() - cached.timestamp < this.CACHE_TTL) {
-      return cached.data as T
+      return cached.data
     }
     return null
   }

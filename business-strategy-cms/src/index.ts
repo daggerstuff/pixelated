@@ -146,7 +146,7 @@ const gracefulShutdown = async (signal: string) => {
 
       // Close Socket.IO connections
       if (socketService && config.enableRealTimeCollaboration) {
-        ;(socketService as any).io.close()
+        socketService.closeIO()
         logger.info('Socket.IO service closed')
       }
 

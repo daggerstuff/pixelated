@@ -195,13 +195,13 @@ export class ThreatCorrelationEngineCore
 
   private async loadCorrelationPatterns(): Promise<void> {
     try {
-      const patterns = await this.db
+      const patterns = (await this.db
         .collection('correlation_patterns')
         .find({})
-        .toArray()
+        .toArray()) as unknown as CorrelationPattern[]
 
       for (const pattern of patterns) {
-        this.correlationPatterns.set(pattern['patternId'], pattern)
+        this.correlationPatterns.set(pattern.patternId, pattern)
       }
 
       logger.info(`Loaded ${patterns.length} correlation patterns`)
@@ -301,8 +301,8 @@ export class ThreatCorrelationEngineCore
       for (let i = 0; i < threats.length; i++) {
         for (let j = i + 1; j < threats.length; j++) {
           const correlation = await this.correlateThreatPair(
-            threats[i],
-            threats[j],
+            threats[i]!,
+            threats[j]!,
           )
           if (
             correlation &&
@@ -492,22 +492,22 @@ export class ThreatCorrelationEngineCore
     for (let i = 1; i <= str2.length; i++) {
       for (let j = 1; j <= str1.length; j++) {
         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i]![j] = matrix[i - 1]![j - 1]
+          matrix[i]![j] = matrix[i - 1]![j - 1]!
         } else {
           matrix[i]![j] = Math.min(
-            matrix[i - 1]![j - 1] + 1,
-            matrix[i]![j - 1] + 1,
-            matrix[i - 1]![j] + 1,
+            matrix[i - 1]![j - 1]! + 1,
+            matrix[i]![j - 1]! + 1,
+            matrix[i - 1]![j]! + 1,
           )
         }
       }
     }
 
-    return matrix[str2.length]![str1.length]
+    return matrix[str2.length]![str1.length]!
   }
 
   private compareSeverity(severity1: string, severity2: string): number {
-    const severityOrder = { low: 1, medium: 2, high: 3, critical: 4 }
+    const severityOrder: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 }
     const score1 = severityOrder[severity1] ?? 1
     const score2 = severityOrder[severity2] ?? 1
 
@@ -681,13 +681,13 @@ export class ThreatCorrelationEngineCore
       return false
     }
 
-    return (
-      (attribution1.actor &&
+    return !!(
+      ((attribution1.actor &&
         attribution2.actor &&
         attribution1.actor === attribution2.actor) ??
       (attribution1.campaign &&
         attribution2.campaign &&
-        attribution1.campaign === attribution2.campaign) ??
+        attribution1.campaign === attribution2.campaign)) ||
       (attribution1.family &&
         attribution2.family &&
         attribution1.family === attribution2.family)
@@ -755,11 +755,11 @@ export class ThreatCorrelationEngineCore
         ],
       }
 
-      const similarThreats = await this.db
+      const similarThreats = (await this.db
         .collection('global_threat_intelligence')
         .find(query)
         .limit(50) // Limit to prevent excessive processing
-        .toArray()
+        .toArray()) as unknown as GlobalThreatIntelligence[]
 
       return similarThreats
     } catch (error: unknown) {
@@ -865,7 +865,7 @@ export class ThreatCorrelationEngineCore
       const dataIndicators = threatData.indicators.map((i) => ({
         indicatorType: i.indicatorType,
         value: i.value,
-      }))
+      })) as ThreatIndicator[]
 
       const indicatorScore = await this.compareIndicators(
         dataIndicators,
@@ -964,33 +964,33 @@ export class ThreatCorrelationEngineCore
       logger.info('Finding similar threats', { threatId, similarityThreshold })
 
       // Get the target threat
-      const targetThreat = await this.db
+      const targetThreat = (await this.db
         .collection('global_threat_intelligence')
-        .findOne({ threatId })
+        .findOne({ threatId })) as unknown as GlobalThreatIntelligence | null
 
       if (!targetThreat) {
         throw new Error(`Threat not found: ${threatId}`)
       }
 
       // Find potential similar threats
-      const candidateThreats = await this.db
+      const candidateThreats = (await this.db
         .collection('global_threat_intelligence')
         .find({
           threatId: { $ne: threatId },
           $or: [
-            { regions: { $in: targetThreat['regions'] } },
-            { severity: targetThreat['severity'] },
+            { regions: { $in: targetThreat.regions } },
+            { severity: targetThreat.severity },
             {
               'indicators.indicatorType': {
-                $in: targetThreat['indicators'].map(
-                  (i: { indicatorType: string }) => i.indicatorType,
+                $in: targetThreat.indicators.map(
+                  (i) => i.indicatorType,
                 ),
               },
             },
           ],
         })
         .limit(100)
-        .toArray()
+        .toArray()) as unknown as GlobalThreatIntelligence[]
 
       // Calculate similarity scores
       const similarThreats: SimilarityResult[] = []
@@ -1003,11 +1003,11 @@ export class ThreatCorrelationEngineCore
 
         if (similarityScore >= similarityThreshold) {
           similarThreats.push({
-            threatId: candidate['threatId'],
+            threatId: candidate.threatId,
             similarityScore,
             matchingIndicators: await this.findMatchingIndicators(
-              targetThreat['indicators'],
-              candidate['indicators'],
+              targetThreat.indicators,
+              candidate.indicators,
             ),
             matchingAttributes: this.findMatchingAttributes(
               targetThreat,
@@ -1023,10 +1023,10 @@ export class ThreatCorrelationEngineCore
 
       // Get full threat data for top matches
       const topThreatIds = similarThreats.slice(0, 10).map((s) => s.threatId)
-      const similarThreatData = await this.db
+      const similarThreatData = (await this.db
         .collection('global_threat_intelligence')
         .find({ threatId: { $in: topThreatIds } })
-        .toArray()
+        .toArray()) as unknown as GlobalThreatIntelligence[]
 
       this.emit('similar_threats_found', {
         originalThreatId: threatId,
@@ -1223,7 +1223,7 @@ export class ThreatCorrelationEngineCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${String(error)}`,
       }
     }
   }
@@ -1308,7 +1308,7 @@ export class ThreatCorrelationEngineCore
         // Create new pattern
         pattern = {
           patternId: this.generatePatternId(),
-          patternType: patternInfo.type,
+          patternType: patternInfo.type as CorrelationPattern['patternType'],
           description: patternInfo.description,
           confidence: correlationData.confidence,
           frequency: 1,
@@ -1323,6 +1323,10 @@ export class ThreatCorrelationEngineCore
       // Update trend analysis
       if (pattern) {
         pattern.trend = await this.analyzePatternTrend(pattern)
+      }
+
+      if (!pattern) {
+        return
       }
 
       // Store pattern
@@ -1389,7 +1393,7 @@ export class ThreatCorrelationEngineCore
   ): Promise<'increasing' | 'decreasing' | 'stable'> {
     try {
       // Analyze recent frequency changes
-      const recentCorrelations = await this.db
+      const recentCorrelations = (await this.db
         .collection('correlation_data')
         .find({
           correlationType: pattern.patternType,
@@ -1397,7 +1401,7 @@ export class ThreatCorrelationEngineCore
         })
         .sort({ timestamp: -1 })
         .limit(10)
-        .toArray()
+        .toArray()) as unknown as CorrelationData[]
 
       if (recentCorrelations.length < 3) {
         return 'stable'
@@ -1455,7 +1459,7 @@ export class ThreatCorrelationEngineCore
 
       for (const group of groups) {
         if (group.length === 1) {
-          mergedCorrelations.push(group[0])
+          mergedCorrelations.push(group[0]!)
         } else {
           const merged = await this.mergeCorrelationGroup(group)
           if (merged) {
@@ -1534,12 +1538,12 @@ export class ThreatCorrelationEngineCore
   private async monitorNewCorrelations(): Promise<void> {
     try {
       // Check for new correlations in the last monitoring period
-      const recentCorrelations = await this.db
+      const recentCorrelations = (await this.db
         .collection('correlation_data')
         .find({
           timestamp: { $gte: new Date(Date.now() - 30000) }, // Last 30 seconds
         })
-        .toArray()
+        .toArray()) as unknown as CorrelationData[]
 
       if (recentCorrelations.length > 0) {
         this.emit('new_correlations_detected', {

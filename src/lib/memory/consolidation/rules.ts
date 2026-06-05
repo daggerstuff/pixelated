@@ -129,7 +129,7 @@ export class ConsolidationTriggerEngine {
   getCrisisReflectionPrompt(context = 'immediate'): string {
     return (
       this.crisisReflectionPrompts[context] ??
-      this.crisisReflectionPrompts['immediate']
+      this.crisisReflectionPrompts['immediate']!
     )
   }
 

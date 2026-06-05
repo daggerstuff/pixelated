@@ -57,6 +57,11 @@ router.post(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const { title, type, category, content, description } = expressReq.body
 
     // Validation
@@ -74,9 +79,9 @@ router.post(
         category,
         content,
         description,
-        owner: expressReq.user!.id,
+        owner: userId,
       },
-      expressReq.user!.id,
+      userId,
     )
 
     expressRes.status(201).json({
@@ -95,6 +100,11 @@ router.get(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const {
       page: pageQuery,
       limit: limitQuery,
@@ -113,20 +123,20 @@ router.get(
     const skip = (pageNum - 1) * pageLimit
 
     // Build query filter
-    const filter: any = {
+    const filter: Record<string, unknown> = {
       $or: [
-        { owner: expressReq.user!.id },
-        { 'permissions.view': expressReq.user!.id },
-        { 'permissions.edit': expressReq.user!.id },
+        { owner: userId },
+        { 'permissions.view': userId },
+        { 'permissions.edit': userId },
       ],
     }
 
-    if (status) filter.status = status
-    if (type) filter.type = type
-    if (category) filter.category = category
+    if (status) filter['status'] = status
+    if (type) filter['type'] = type
+    if (category) filter['category'] = category
 
     if (search) {
-      filter.$text = { $search: search }
+      filter['$text'] = { $search: search }
     }
 
     // Query
@@ -160,12 +170,14 @@ router.get(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
 
-    const document = await documentService.getDocument(
-      documentId,
-      expressReq.user!.id,
-    )
+    const document = await documentService.getDocument(documentId, userId)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
@@ -188,6 +200,11 @@ router.put(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
     const { title, content, status, description } = expressReq.body
 
@@ -199,7 +216,7 @@ router.put(
         status,
         description,
       },
-      expressReq.user!.id,
+      userId,
     )
 
     if (!document) {
@@ -223,12 +240,14 @@ router.delete(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
 
-    const deleted = await documentService.deleteDocument(
-      documentId,
-      expressReq.user!.id,
-    )
+    const deleted = await documentService.deleteDocument(documentId, userId)
 
     if (!deleted) {
       throw new NotFoundError('Document', documentId)
@@ -250,6 +269,11 @@ router.post(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
     const { sharedWith, permissionLevel } = expressReq.body
 
@@ -263,7 +287,7 @@ router.post(
       documentId,
       sharedWith,
       permissionLevel,
-      expressReq.user!.id,
+      userId,
     )
 
     expressRes.json({
@@ -282,6 +306,11 @@ router.post(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
     const { content, parentCommentId } = expressReq.body
 
@@ -294,7 +323,7 @@ router.post(
       `INSERT INTO comments (document_id, author_id, content, parent_comment_id, created_at)
        VALUES ($1, $2, $3, $4, NOW())
        RETURNING id, content, author_id, created_at`,
-      [documentId, expressReq.user!.id, content, parentCommentId ?? null],
+      [documentId, userId, content, parentCommentId ?? null],
     )
 
     expressRes.status(201).json({
@@ -368,14 +397,16 @@ router.get(
   asyncHandler(async (req: unknown, res: unknown) => {
     const expressReq = req as Request
     const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
     const documentId = ensureString(expressReq.params['documentId'])
     const { format: formatQuery = 'json' } = expressReq.query
     const format = ensureString(formatQuery)
 
-    const document = await documentService.getDocument(
-      documentId,
-      expressReq.user!.id,
-    )
+    const document = await documentService.getDocument(documentId, userId)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)

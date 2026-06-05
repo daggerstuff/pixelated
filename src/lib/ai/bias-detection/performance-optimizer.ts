@@ -235,7 +235,7 @@ export class IntelligentCacheManager {
 
       // Check if data is compressed
       if (this.isCompressed(cached)) {
-        return this.decompress(cached)
+        return this.decompress(cached) as T
       }
 
       return JSON.parse(cached) as T
@@ -295,7 +295,7 @@ export class IntelligentCacheManager {
           this.stats.hits++
           try {
             if (this.isCompressed(value)) {
-              processed[key] = this.decompress(value)
+              processed[key] = this.decompress(value) as R
             } else {
               processed[key] = JSON.parse(value) as T
             }

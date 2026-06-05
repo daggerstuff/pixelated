@@ -1,3 +1,4 @@
+import type { FC } from 'react'
 import { useKonamiCode } from '@/lib/hooks/useKonamiCode'
 
 export const KonamiTrigger: FC = () => {

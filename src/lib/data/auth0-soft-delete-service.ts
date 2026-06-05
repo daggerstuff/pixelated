@@ -39,7 +39,6 @@ function initializeAuth0Management() {
     clientId: AUTH0_CONFIG.managementClientId,
     clientSecret: AUTH0_CONFIG.managementClientSecret,
     audience: `https://${AUTH0_CONFIG.domain}/api/v2/`,
-    scope: 'read:users update:users delete:users',
   })
 }
 
@@ -132,7 +131,8 @@ export class Auth0SoftDeleteService {
       }
 
       // Get user information before deletion
-      const user = await auth0Management.getUser({ id: deleteRequest.userId })
+      const userResponse = (await auth0Management.users.get({ id: deleteRequest.userId })).data
+      const user = userResponse as Record<string, unknown>
       if (!user) {
         throw new Error('User not found')
       }
@@ -155,8 +155,8 @@ export class Auth0SoftDeleteService {
       // Create deleted user record
       const deletedUserRecord: DeletedUserRecord = {
         _id: new ObjectId(),
-        auth0UserId: user.user_id,
-        email: user.email,
+        auth0UserId: user['user_id'] as string,
+        email: user['email'] as string,
         deletedAt: now,
         deletedBy: deleteRequest.deletedBy,
         reason: deleteRequest.reason,
@@ -166,21 +166,21 @@ export class Auth0SoftDeleteService {
         notified: false,
         userData: {
           // Store relevant user data for compliance and audit purposes
-          user_id: user.user_id,
-          email: user.email,
-          email_verified: user.email_verified,
-          name: user.name,
-          nickname: user.nickname,
-          picture: user.picture,
-          created_at: user.created_at,
-          updated_at: user.updated_at,
-          last_login: user.last_login,
-          logins_count: user.logins_count,
-          app_metadata: user.app_metadata,
-          user_metadata: user.user_metadata,
-          identities: user.identities,
-          roles: user.roles,
-          permissions: user.permissions,
+          user_id: user['user_id'],
+          email: user['email'],
+          email_verified: user['email_verified'],
+          name: user['name'],
+          nickname: user['nickname'],
+          picture: user['picture'],
+          created_at: user['created_at'],
+          updated_at: user['updated_at'],
+          last_login: user['last_login'],
+          logins_count: user['logins_count'],
+          app_metadata: user['app_metadata'],
+          user_metadata: user['user_metadata'],
+          identities: user['identities'],
+          roles: user['roles'],
+          permissions: user['permissions'],
         },
       }
 
@@ -189,19 +189,17 @@ export class Auth0SoftDeleteService {
 
       // Update user in Auth0 to mark as deleted
       // We don't actually delete the user from Auth0, but mark them as inactive
-      await auth0Management.updateUser(
-        { id: deleteRequest.userId },
-        {
-          blocked: true,
-          app_metadata: {
-            ...user.app_metadata,
-            deleted: true,
-            deleted_at: now.toISOString(),
-            deleted_by: deleteRequest.deletedBy,
-            deletion_reason: deleteRequest.reason,
-          },
+      const existingAppMeta = (user['app_metadata'] as Record<string, unknown>) ?? {}
+      await auth0Management.users.update(deleteRequest.userId, {
+        blocked: true,
+        app_metadata: {
+          ...existingAppMeta,
+          deleted: true,
+          deleted_at: now.toISOString(),
+          deleted_by: deleteRequest.deletedBy,
+          deletion_reason: deleteRequest.reason,
         },
-      )
+      })
 
       // Log soft delete event
       logSecurityEvent(
@@ -269,19 +267,17 @@ export class Auth0SoftDeleteService {
       }
 
       // Restore user in Auth0
-      await auth0Management.updateUser(
-        { id: userId },
-        {
-          blocked: false,
-          app_metadata: {
-            ...deletedUserRecord.userData.app_metadata,
-            deleted: undefined,
-            deleted_at: undefined,
-            deleted_by: undefined,
-            deletion_reason: undefined,
-          },
+      const deletedAppMeta = (deletedUserRecord.userData?.app_metadata as Record<string, unknown>) ?? {}
+      await auth0Management.users.update(userId, {
+        blocked: false,
+        app_metadata: {
+          ...deletedAppMeta,
+          deleted: undefined,
+          deleted_at: undefined,
+          deleted_by: undefined,
+          deletion_reason: undefined,
         },
-      )
+      })
 
       // Remove deleted user record
       await collection.deleteOne({ auth0UserId: userId })
@@ -439,7 +435,7 @@ export class Auth0SoftDeleteService {
       }
 
       // Completely delete user from Auth0
-      await auth0Management.deleteUser({ id: userId })
+      await auth0Management.users.delete({ id: userId })
 
       // Log user purge event
       logSecurityEvent(SecurityEventType.USER_PURGED, userId, {

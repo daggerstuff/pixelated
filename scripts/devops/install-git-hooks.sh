@@ -69,7 +69,7 @@ install_hook "pre-commit" "$TEMPLATES_DIR/pre-commit.tmpl"
 install_hook "commit-msg" "$TEMPLATES_DIR/commit-msg.tmpl"
 install_hook "post-checkout" "$TEMPLATES_DIR/post-sync.tmpl"
 install_hook "post-merge" "$TEMPLATES_DIR/post-sync.tmpl"
-install_hook "pre-push" "$TEMPLATES_DIR/pre-push.tmpl"
+# pre-push hook intentionally removed — was running full test suite on every push
 install_hook "pre-rebase" "$TEMPLATES_DIR/pre-rebase.tmpl"
 
 echo "✨ Git hooks installation complete."

@@ -107,7 +107,7 @@ export function validateTherapeuticSession(session: Record<string, unknown>): Th
   }
   const uuidV4 =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  if (!uuidV4.test(String(session['sessionId'] as string))) {
+  if (!uuidV4.test((session['sessionId'] as string))) {
     throw new Error('Invalid therapeutic session data')
   }
   // Convert timestamps if needed
@@ -233,18 +233,20 @@ export function calculateDemographicRepresentation(
   }
   for (const s of sessions) {
     const d = s.participantDemographics
-    add('age', d.age)
-    add('gender', d.gender)
-    add('ethnicity', d.ethnicity)
-    add('language', d.primaryLanguage)
-    if (d.socioeconomicStatus) {
-      add('socioeconomic', d.socioeconomicStatus)
-    }
-    if (d.education) {
-      add('education', d.education)
-    }
-    if (d.region) {
-      add('region', d.region)
+    if (d) {
+      add('age', d['age'])
+      add('gender', d['gender'])
+      add('ethnicity', d['ethnicity'])
+      add('language', d['primaryLanguage'])
+      if (d['socioeconomicStatus']) {
+        add('socioeconomic', d['socioeconomicStatus'])
+      }
+      if (d['education']) {
+        add('education', d['education'])
+      }
+      if (d['region']) {
+        add('region', d['region'])
+      }
     }
   }
   // Convert to proportions
@@ -418,17 +420,18 @@ export function handleBiasDetectionError(
 
 // Data transformation to/from Python
 export function transformSessionForPython(session: TherapeuticSession): Record<string, unknown> {
+  const demo = session.participantDemographics!
   return {
     session_id: session.sessionId,
     timestamp: (session.timestamp ?? new Date()).toISOString(),
     participant_demographics: {
-      age: session.participantDemographics.age,
-      gender: session.participantDemographics.gender,
-      ethnicity: session.participantDemographics.ethnicity,
-      primary_language: session.participantDemographics.primaryLanguage,
-      socioeconomic_status: session.participantDemographics.socioeconomicStatus,
-      education: session.participantDemographics.education,
-      region: session.participantDemographics.region,
+      age: demo.age,
+      gender: demo.gender,
+      ethnicity: demo.ethnicity,
+      primary_language: demo.primaryLanguage,
+      socioeconomic_status: demo.socioeconomicStatus,
+      education: demo.education,
+      region: demo.region,
     },
     scenario: session.scenario,
     content: session.content,
