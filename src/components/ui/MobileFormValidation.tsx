@@ -406,8 +406,11 @@ export const ValidationRules = {
   }),
   match: (fieldName: string, message: string): ValidationRule => ({
     test: (value) => {
+      // Sanitize fieldName to prevent DOM-based injection attacks
+      // CSS.escape handles special characters and prevents selector injection
+      const sanitizedFieldName = CSS.escape(fieldName)
       const matchField = document.querySelector(
-        `[name="${fieldName}"]`,
+        `[name="${sanitizedFieldName}"]`,
       ) as HTMLInputElement
       return matchField && matchField.value === value
     },
