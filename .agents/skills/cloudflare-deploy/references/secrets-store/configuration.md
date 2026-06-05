@@ -12,9 +12,9 @@
     {
       "binding": "API_KEY",
       "store_id": "abc123",
-      "secret_name": "stripe_api_key"
-    }
-  ]
+      "secret_name": "stripe_api_key",
+    },
+  ],
 }
 ```
 
@@ -28,6 +28,7 @@ secret_name = "stripe_api_key"
 ```
 
 Fields:
+
 - `binding`: Variable name for `env` access
 - `store_id`: From `wrangler secrets-store store list`
 - `secret_name`: Identifier (no spaces)
@@ -44,20 +45,20 @@ Fields:
         {
           "binding": "API_KEY",
           "store_id": "prod-store",
-          "secret_name": "prod_api_key"
-        }
-      ]
+          "secret_name": "prod_api_key",
+        },
+      ],
     },
     "staging": {
       "secrets_store_secrets": [
         {
           "binding": "API_KEY",
           "store_id": "staging-store",
-          "secret_name": "staging_api_key"
-        }
-      ]
-    }
-  }
+          "secret_name": "staging_api_key",
+        },
+      ],
+    },
+  },
 }
 ```
 
@@ -128,15 +129,23 @@ Best practice: Separate names for local/prod:
   "env": {
     "development": {
       "secrets_store_secrets": [
-        { "binding": "API_KEY", "store_id": "store", "secret_name": "dev_api_key" }
-      ]
+        {
+          "binding": "API_KEY",
+          "store_id": "store",
+          "secret_name": "dev_api_key",
+        },
+      ],
     },
     "production": {
       "secrets_store_secrets": [
-        { "binding": "API_KEY", "store_id": "store", "secret_name": "prod_api_key" }
-      ]
-    }
-  }
+        {
+          "binding": "API_KEY",
+          "store_id": "store",
+          "secret_name": "prod_api_key",
+        },
+      ],
+    },
+  },
 }
 ```
 
@@ -150,10 +159,11 @@ Best practice: Separate names for local/prod:
 
 ### Adding Bindings
 
-**Method 1**: Worker → Settings → Bindings → Add → Secrets Store
-**Method 2**: Create secret directly from Worker settings dropdown
+**Method 1**: Worker → Settings → Bindings → Add → Secrets Store **Method 2**:
+Create secret directly from Worker settings dropdown
 
 Deploy options:
+
 - **Deploy**: Immediate 100%
 - **Save version**: Gradual rollout
 
@@ -178,7 +188,8 @@ Deploy options:
 
 ```yaml
 script:
-  - echo "$API_KEY_VALUE" | npx wrangler secrets-store secret create $STORE_ID --name API_KEY --scopes workers --remote
+  - echo "$API_KEY_VALUE" | npx wrangler secrets-store secret create $STORE_ID
+    --name API_KEY --scopes workers --remote
   - npx wrangler deploy
 ```
 

@@ -83,7 +83,9 @@ class PatientManager {
 
     // Encrypt sensitive fields
     if (patientData['contact']?.email) {
-      const encrypted = await encryptionManager.encrypt(patientData['contact'].email)
+      const encrypted = await encryptionManager.encrypt(
+        patientData['contact'].email,
+      )
       patientProfile.contact = {
         ...patientData['contact'],
         email: JSON.stringify(encrypted),
@@ -92,7 +94,9 @@ class PatientManager {
     }
 
     if (patientData['contact']?.phone) {
-      const encrypted = await encryptionManager.encrypt(patientData['contact'].phone)
+      const encrypted = await encryptionManager.encrypt(
+        patientData['contact'].phone,
+      )
       patientProfile.contact = {
         ...patientProfile.contact,
         phone: JSON.stringify(encrypted),
@@ -171,9 +175,17 @@ class PatientManager {
       if (!patient) continue
 
       // Apply date filters
-      if (criteria.lastSeenBefore && patient.lastSeen && patient.lastSeen > criteria.lastSeenBefore)
+      if (
+        criteria.lastSeenBefore &&
+        patient.lastSeen &&
+        patient.lastSeen > criteria.lastSeenBefore
+      )
         continue
-      if (criteria.lastSeenAfter && patient.lastSeen && patient.lastSeen < criteria.lastSeenAfter)
+      if (
+        criteria.lastSeenAfter &&
+        patient.lastSeen &&
+        patient.lastSeen < criteria.lastSeenAfter
+      )
         continue
 
       // Apply diagnosis filter
@@ -243,11 +255,12 @@ class PatientManager {
     }
 
     if (updateData.emergencyContact) {
-      const base: PatientProfile['emergencyContact'] = patient.emergencyContact ?? {
-        name: '',
-        phone: '',
-        relationship: '',
-      }
+      const base: PatientProfile['emergencyContact'] =
+        patient.emergencyContact ?? {
+          name: '',
+          phone: '',
+          relationship: '',
+        }
       patient.emergencyContact = {
         ...base,
         ...updateData.emergencyContact,

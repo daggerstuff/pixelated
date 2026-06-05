@@ -829,7 +829,7 @@ class TabSyncManager {
       localValue,
       remoteValue,
       resolvedValue,
-      strategy:      strategyOpt ?? this.config.conflictStrategy,
+      strategy: strategyOpt ?? this.config.conflictStrategy,
       tabId,
     })
 

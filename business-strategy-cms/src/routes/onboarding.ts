@@ -1,58 +1,69 @@
-import { Router } from 'express'
+import { Router, Request } from 'express'
+import type { Response } from 'express'
 
 import { AuthService } from '@/services/authService'
 import { UserService } from '@/services/userService'
 
 const router = Router()
 
+interface OnboardingBody {
+  userId: string
+  firstName: string
+  lastName: string
+  newPassword: string
+}
+
 // Complete user onboarding
-router.post('/complete', async (req, res) => {
-  try {
-    const { userId, firstName, lastName, newPassword } = req.body
+router.post(
+  '/complete',
+  async (req: Request<unknown, unknown, OnboardingBody>, res: Response) => {
+    try {
+      const { userId, firstName, lastName, newPassword } = req.body
 
-    if (!userId || !firstName || !lastName || !newPassword) {
-      res.status(400).json({
-        success: false,
-        error: { message: 'All fields are required' },
+      if (!userId || !firstName || !lastName || !newPassword) {
+        res.status(400).json({
+          success: false,
+          error: { message: 'All fields are required' },
+        })
+        return
+      }
+
+      const user = await UserService.completeOnboarding(
+        userId,
+        firstName,
+        lastName,
+        newPassword,
+      )
+      if (!user) {
+        res.status(404).json({
+          success: false,
+          error: { message: 'User not found' },
+        })
+        return
+      }
+
+      // Generate real tokens for the user
+      const tokens = AuthService.generateTokens({
+        userId: String(user.id),
+        email: user.email,
+        role: user.role,
       })
-      return
-    }
 
-    const user = await UserService.completeOnboarding(
-      userId,
-      firstName,
-      lastName,
-      newPassword,
-    )
-    if (!user) {
-      res.status(404).json({
-        success: false,
-        error: { message: 'User not found' },
+      res.json({
+        success: true,
+        data: { user, tokens },
+        message: 'Onboarding completed successfully',
       })
-      return
+    } catch (error: unknown) {
+      res.status(500).json({
+        success: false,
+        error: {
+          message: error instanceof Error ? error.message : 'Onboarding failed',
+        },
+      })
     }
-
-    // Generate real tokens for the user
-    const tokens = AuthService.generateTokens({
-      userId: String(user.id),
-      email: user.email,
-      role: user.role,
-    })
-
-    res.json({
-      success: true,
-      data: { user, tokens },
-      message: 'Onboarding completed successfully',
-    })
-  } catch (error: unknown) {
-    res.status(500).json({
-      success: false,
-      error: {
-        message: error instanceof Error ? error.message : 'Onboarding failed',
-      },
-    })
-  }
-})
+  },
+)
 
 // Check if user needs onboarding
 router.get('/status/:userId', async (req, res) => {

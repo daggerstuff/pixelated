@@ -6,7 +6,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { TherapeuticTechnique } from '../../simulator/types'
+import { TherapeuticTechnique } from '../../../types/index'
 import type { EmotionAnalysis } from '../emotions/types'
 
 const logger = createBuildSafeLogger('EnhancedTechniqueClassificationService')
@@ -122,12 +122,12 @@ export class EnhancedTechniqueClassificationService {
   > = new Map()
   private readonly sessionTracking: Map<string, SessionToSessionTracking> = new Map()
   private metrics: AdvancedClassificationMetrics | null = null
-  private isModelTrained: boolean = false
+
 
   private constructor() {
     logger.info('EnhancedTechniqueClassificationService initialized')
     this.initializeEffectivenessDatabase()
-    void this.trainAdvancedClassificationModel()
+void this.trainAdvancedClassificationModel()
   }
 
   public static getInstance(): EnhancedTechniqueClassificationService {
@@ -269,7 +269,7 @@ export class EnhancedTechniqueClassificationService {
       return tracking
     } catch (error: unknown) {
       logger.error('Error tracking session progress', { error })
-      throw new Error(`Failed to track session progress: ${error}`, {
+      throw new Error(`Failed to track session progress: ${String(error)}`, {
         cause: error,
       })
     }
@@ -430,11 +430,9 @@ export class EnhancedTechniqueClassificationService {
         },
       }
 
-      this.isModelTrained = true
       logger.info('Advanced classification model trained successfully')
     } catch (error: unknown) {
       logger.error('Error training classification model', { error })
-      this.isModelTrained = false
     }
   }
 
@@ -668,7 +666,7 @@ export class EnhancedTechniqueClassificationService {
 
   // Helper methods for database initialization
   private getBaselineEffectiveness(technique: TherapeuticTechnique): number {
-    const effectivenessMap: Record<TherapeuticTechnique, number> = {
+    const effectivenessMap: Partial<Record<TherapeuticTechnique, number>> = {
       [TherapeuticTechnique.REFLECTIVE_STATEMENTS]: 0.78,
       [TherapeuticTechnique.COGNITIVE_RESTRUCTURING]: 0.82,
       [TherapeuticTechnique.MOTIVATIONAL_INTERVIEWING]: 0.75,
@@ -756,9 +754,9 @@ export class EnhancedTechniqueClassificationService {
       matrix[i] = []
       for (let j = 0; j < size; j++) {
         if (i === j) {
-          matrix[i][j] = Math.random() * 20 + 80 // True positives: 80-100
+          matrix[i]![j] = Math.random() * 20 + 80 // True positives: 80-100
         } else {
-          matrix[i][j] = Math.random() * 10 // False positives: 0-10
+          matrix[i]![j] = Math.random() * 10 // False positives: 0-10
         }
       }
     }

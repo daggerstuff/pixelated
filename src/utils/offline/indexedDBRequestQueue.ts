@@ -200,9 +200,7 @@ class IndexedDBRequestQueue {
         if (lowPriorityRequests.length > 0) {
           const oldest = lowPriorityRequests[0]
           if (oldest) {
-            this.queue = this.queue.filter(
-              (req) => req.id !== oldest.id,
-            )
+            this.queue = this.queue.filter((req) => req.id !== oldest.id)
           }
         } else {
           console.warn('Request queue is full, dropping oldest request')

@@ -2,9 +2,12 @@
 
 ## Overview
 
-Cloudflare Email Routing enables custom email addresses for your domain that route to verified destination addresses. It's free, privacy-focused (no storage/access), and includes Email Workers for programmatic email processing.
+Cloudflare Email Routing enables custom email addresses for your domain that
+route to verified destination addresses. It's free, privacy-focused (no
+storage/access), and includes Email Workers for programmatic email processing.
 
-**Available to all Cloudflare customers using Cloudflare as authoritative nameserver.**
+**Available to all Cloudflare customers using Cloudflare as authoritative
+nameserver.**
 
 ## Quick Start
 
@@ -13,24 +16,26 @@ Cloudflare Email Routing enables custom email addresses for your domain that rou
 export default {
   async email(message, env, ctx) {
     // CRITICAL: Must consume stream before response
-    const parser = new PostalMime.default();
-    const email = await parser.parse(await message.raw.arrayBuffer());
-    
+    const parser = new PostalMime.default()
+    const email = await parser.parse(await message.raw.arrayBuffer())
+
     // Process email
-    console.log(`From: ${message.from}, Subject: ${email.subject}`);
-    
+    console.log(`From: ${message.from}, Subject: ${email.subject}`)
+
     // Forward or reject
-    await message.forward("verified@destination.com");
-  }
-} satisfies ExportedHandler<Env>;
+    await message.forward('verified@destination.com')
+  },
+} satisfies ExportedHandler<Env>
 ```
 
 ## Reading Order
 
 **Start here based on your goal:**
 
-1. **New to Email Routing?** → [configuration.md](configuration.md) → [patterns.md](patterns.md)
-2. **Adding Workers?** → [api.md](api.md) § Worker Runtime API → [patterns.md](patterns.md)
+1. **New to Email Routing?** → [configuration.md](configuration.md) →
+   [patterns.md](patterns.md)
+2. **Adding Workers?** → [api.md](api.md) § Worker Runtime API →
+   [patterns.md](patterns.md)
 3. **Sending emails?** → [api.md](api.md) § SendEmail Binding
 4. **Managing via API?** → [api.md](api.md) § REST API Operations
 5. **Debugging issues?** → [gotchas.md](gotchas.md)
@@ -55,13 +60,17 @@ Having issues?
 
 ## Key Concepts
 
-**Routing Rules**: Pattern-based forwarding configured via Dashboard/API. Simple but limited.
+**Routing Rules**: Pattern-based forwarding configured via Dashboard/API. Simple
+but limited.
 
-**Email Workers**: Custom TypeScript handlers with full email access. Handles complex logic, parsing, storage, rejection.
+**Email Workers**: Custom TypeScript handlers with full email access. Handles
+complex logic, parsing, storage, rejection.
 
-**SendEmail Binding**: Outbound email API for Workers. Transactional email only (no marketing/bulk).
+**SendEmail Binding**: Outbound email API for Workers. Transactional email only
+(no marketing/bulk).
 
-**ForwardableEmailMessage**: Runtime interface for incoming emails. Provides headers, raw stream, forward/reject methods.
+**ForwardableEmailMessage**: Runtime interface for incoming emails. Provides
+headers, raw stream, forward/reject methods.
 
 ## In This Reference
 
