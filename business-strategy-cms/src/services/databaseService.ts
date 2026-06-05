@@ -322,14 +322,23 @@ export class DatabaseService {
     const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`
     const result = await postgresPool.query(sql)
 
-    return result.rows.map((row: { id: string; name: string; metrics: string | null; widgets: string | null; last_updated: string; is_shared: boolean }) => ({
-      id: row.id,
-      name: row.name,
-      metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
-      widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
-      lastUpdated: new Date(row.last_updated),
-      isShared: row.is_shared,
-    }))
+    return result.rows.map(
+      (row: {
+        id: string
+        name: string
+        metrics: string | null
+        widgets: string | null
+        last_updated: string
+        is_shared: boolean
+      }) => ({
+        id: row.id,
+        name: row.name,
+        metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
+        widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
+        lastUpdated: new Date(row.last_updated),
+        isShared: row.is_shared,
+      }),
+    )
   }
 
   /**

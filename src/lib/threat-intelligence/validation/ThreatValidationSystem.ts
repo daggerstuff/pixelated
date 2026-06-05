@@ -24,7 +24,9 @@ export interface ThreatValidationSystem {
   initialize(): Promise<void>
   validateThreat(threat: GlobalThreatIntelligence): Promise<ThreatValidation>
   validateIndicators(indicators: ThreatIndicator[]): Promise<ValidationResult>
-  validateAttribution(attribution: Record<string, unknown>): Promise<ValidationResult>
+  validateAttribution(
+    attribution: Record<string, unknown>,
+  ): Promise<ValidationResult>
   validateMetadata(metadata: Record<string, unknown>): Promise<ValidationResult>
   getValidationHistory(
     threatId: string,
@@ -102,7 +104,9 @@ export class ThreatValidationSystemCore
       this.emit('validation_system_initialized')
       logger.info('Threat Validation System initialized successfully')
     } catch (error: unknown) {
-      logger.error('Failed to initialize Threat Validation System:', { error: error instanceof Error ? error.message : String(error) })
+      logger.error('Failed to initialize Threat Validation System:', {
+        error: error instanceof Error ? error.message : String(error),
+      })
       this.emit('initialization_error', { error })
       throw error
     }
@@ -138,7 +142,8 @@ export class ThreatValidationSystemCore
 
   private async loadValidationRules(): Promise<void> {
     try {
-      const rulesCollection = this.db.collection<ValidationRule>('validation_rules')
+      const rulesCollection =
+        this.db.collection<ValidationRule>('validation_rules')
       const rules = await rulesCollection.find({ enabled: true }).toArray()
 
       for (const rule of rules) {
@@ -573,7 +578,9 @@ export class ThreatValidationSystemCore
     return duplicates
   }
 
-  async validateAttribution(attribution: Record<string, unknown>): Promise<ValidationResult> {
+  async validateAttribution(
+    attribution: Record<string, unknown>,
+  ): Promise<ValidationResult> {
     try {
       const issues: string[] = []
       let score = 100
@@ -595,7 +602,10 @@ export class ThreatValidationSystemCore
         score -= 20
       }
 
-      if (attribution['campaign'] && typeof attribution['campaign'] !== 'string') {
+      if (
+        attribution['campaign'] &&
+        typeof attribution['campaign'] !== 'string'
+      ) {
         issues.push('Attribution campaign must be a string')
         score -= 20
       }
@@ -613,7 +623,10 @@ export class ThreatValidationSystemCore
         score -= 15
       }
 
-      if (attribution['country'] && typeof attribution['country'] !== 'string') {
+      if (
+        attribution['country'] &&
+        typeof attribution['country'] !== 'string'
+      ) {
         issues.push('Attribution country must be a string')
         score -= 15
       }
@@ -649,7 +662,9 @@ export class ThreatValidationSystemCore
     }
   }
 
-  async validateMetadata(metadata: Record<string, unknown>): Promise<ValidationResult> {
+  async validateMetadata(
+    metadata: Record<string, unknown>,
+  ): Promise<ValidationResult> {
     try {
       const issues: string[] = []
       let score = 100
@@ -918,14 +933,20 @@ export class ThreatValidationSystemCore
       }
     }
 
-    if (condition['min'] !== undefined && numValue < (condition['min'] as number)) {
+    if (
+      condition['min'] !== undefined &&
+      numValue < (condition['min'] as number)
+    ) {
       return {
         passed: false,
         message: `Field ${condition['field'] as string} must be >= ${condition['min'] as number}`,
       }
     }
 
-    if (condition['max'] !== undefined && numValue > (condition['max'] as number)) {
+    if (
+      condition['max'] !== undefined &&
+      numValue > (condition['max'] as number)
+    ) {
       return {
         passed: false,
         message: `Field ${condition['field'] as string} must be <= ${condition['max'] as number}`,
@@ -1447,7 +1468,9 @@ export class ThreatValidationSystemCore
         { $project: { severity: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await validationsCollection.aggregate<{ severity: string; count: number }>(pipeline).toArray()
+      const results = await validationsCollection
+        .aggregate<{ severity: string; count: number }>(pipeline)
+        .toArray()
 
       const validationsBySeverity: Record<string, number> = {}
       for (const result of results) {
@@ -1469,7 +1492,9 @@ export class ThreatValidationSystemCore
         { $project: { threatType: '$_id', count: 1, _id: 0 } },
       ]
 
-      const results = await validationsCollection.aggregate<{ threatType: string; count: number }>(pipeline).toArray()
+      const results = await validationsCollection
+        .aggregate<{ threatType: string; count: number }>(pipeline)
+        .toArray()
 
       const validationsByType: Record<string, number> = {}
       for (const result of results) {

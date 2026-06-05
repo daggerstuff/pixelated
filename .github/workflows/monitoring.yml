@@ -11,7 +11,7 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   NODE_VERSION: 24.14.1
-  PNPM_VERSION: 11.5.0
+  PNPM_VERSION: 11.5.1
 
 jobs:
   health-check:

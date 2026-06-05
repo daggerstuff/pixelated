@@ -5,11 +5,7 @@
  * previous MongoDB-based authentication system.
  */
 
-import {
-  ManagementClient,
-  AuthenticationClient,
-  UserInfoClient,
-} from 'auth0'
+import { ManagementClient, AuthenticationClient, UserInfoClient } from 'auth0'
 
 import type { AuthRole } from '../config/auth.config'
 

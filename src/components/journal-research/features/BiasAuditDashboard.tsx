@@ -517,7 +517,12 @@ const BiasAuditDashboard: React.FC<BiasAuditDashboardProps> = ({
               audit={selectedAudit}
               dataset={selectedDataset}
               isLoading={selectedDatasetLoading || selectedAuditLoading}
-              onAction={processQuarantineAction as (action: string, reason?: string) => Promise<unknown>}
+              onAction={
+                processQuarantineAction as (
+                  action: string,
+                  reason?: string,
+                ) => Promise<unknown>
+              }
               actionLoading={quarantineActionLoading}
             />
           </CardContent>

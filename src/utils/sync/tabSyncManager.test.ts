@@ -36,9 +36,7 @@ describe('MessagingTransport', () => {
       expect.any(Error),
     )
     const firstCall = consoleErrorSpy?.mock.calls[0]
-    expect(firstCall?.[1]?.message).toBe(
-      'Simulated BroadcastChannel failure',
-    )
+    expect(firstCall?.[1]?.message).toBe('Simulated BroadcastChannel failure')
   })
 
   it('should handle BroadcastChannel missing support', () => {
