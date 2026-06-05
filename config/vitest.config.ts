@@ -72,7 +72,7 @@ const astroVite = await astroViteConfig({
 })
 const astroPlugins = astroVite.plugins ?? []
 
-export default defineConfig({
+const vitestConfig = {
   plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',
@@ -111,13 +111,22 @@ export default defineConfig({
     ],
     conditions: ['node', 'import', 'module', 'default'],
   },
+  // PIX-223: Vitest 4 moved pool/poolOptions to top-level (removed `test.poolOptions`).
+  pool: 'forks',
+  poolOptions: {
+    forks: {
+      singleFork: false,
+      maxForks: process.env['CI'] ? 2 : 8,
+      minForks: process.env['CI'] ? 1 : 2,
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
-        classNameStrategy: 'non-scoped',
+        classNameStrategy: 'non-scoped' as const,
       },
     },
     include:
@@ -265,25 +274,17 @@ export default defineConfig({
         },
       },
     ],
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: false,
-        maxForks: process.env['CI'] ? 2 : 8,
-        minForks: process.env['CI'] ? 1 : 2,
-      },
-    },
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
       jsdom: {
-        resources: 'usable',
+        resources: 'usable' as const,
         pretendToBeVisual: false,
         runScripts: 'dangerously',
       },
     },
     coverage: {
-      provider: 'v8',
+        provider: 'v8' as const,
       enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
@@ -325,4 +326,6 @@ export default defineConfig({
   css: {
     devSourcemap: true,
   },
-})
+}
+
+export default defineConfig(vitestConfig)
