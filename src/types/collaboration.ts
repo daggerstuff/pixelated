@@ -52,7 +52,14 @@ export interface UserProfile {
 export interface Notification {
   id: string
   userId: string
-  type: 'mention' | 'assignment' | 'comment' | 'update' | 'alert' | 'collaboration_invite' | 'collaboration_accepted'
+  type:
+    | 'mention'
+    | 'assignment'
+    | 'comment'
+    | 'update'
+    | 'alert'
+    | 'collaboration_invite'
+    | 'collaboration_accepted'
   title: string
   message: string
   read: boolean

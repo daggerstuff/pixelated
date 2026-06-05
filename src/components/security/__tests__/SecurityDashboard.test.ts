@@ -1,6 +1,6 @@
+import { screen, fireEvent, waitFor } from '@testing-library/dom'
 // Vitest is imported via globals
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { screen, fireEvent, waitFor } from '@testing-library/dom'
 
 import { renderAstro } from '@/test/utils/astro'
 

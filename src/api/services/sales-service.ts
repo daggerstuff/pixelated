@@ -216,7 +216,8 @@ export async function updateSalesOpportunity(
   if (data.stage) opportunity['stage'] = data.stage
   if (data.contacts) opportunity['contacts'] = data.contacts
   if (data.expectedCloseDate) opportunity['closeDate'] = data.expectedCloseDate
-  if (data.probability !== undefined) opportunity['probability'] = data.probability
+  if (data.probability !== undefined)
+    opportunity['probability'] = data.probability
   if (data.status) opportunity['status'] = data.status
 
   opportunity['updatedAt'] = new Date()

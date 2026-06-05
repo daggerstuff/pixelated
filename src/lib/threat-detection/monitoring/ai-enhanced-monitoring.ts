@@ -102,7 +102,9 @@ export interface Alert {
 
 export interface IAIService {
   generateInsights(metrics: unknown[]): Promise<{ insights: AIInsight[] }>
-  analyzePattern(alerts: unknown[]): Promise<{ patterns: unknown[]; recommendations?: string[] }>
+  analyzePattern(
+    alerts: unknown[],
+  ): Promise<{ patterns: unknown[]; recommendations?: string[] }>
   predictAnomaly(
     data: unknown[],
   ): Promise<{ isAnomaly: boolean; confidence: number }>
@@ -189,7 +191,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       logger.info('AI-enhanced monitoring service initialized')
       this.emit('monitoring_initialized')
     } catch (error: unknown) {
-      logger.error('Failed to initialize monitoring service:', { error: String(error) })
+      logger.error('Failed to initialize monitoring service:', {
+        error: String(error),
+      })
       throw error
     }
   }
@@ -303,7 +307,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return processedMetrics
     } catch (error: unknown) {
-      logger.error('Failed to collect security metrics:', { error: String(error) })
+      logger.error('Failed to collect security metrics:', {
+        error: String(error),
+      })
       throw error
     }
   }
@@ -391,7 +397,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         databaseSize: await db.stats().then((stats) => stats['dataSize']),
       }
     } catch (error: unknown) {
-      logger.error('Failed to collect database metrics:', { error: String(error) })
+      logger.error('Failed to collect database metrics:', {
+        error: String(error),
+      })
       return {}
     }
   }
@@ -409,7 +417,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         nodeVersion: process.version,
       }
     } catch (error: unknown) {
-      logger.error('Failed to collect system metrics:', { error: String(error) })
+      logger.error('Failed to collect system metrics:', {
+        error: String(error),
+      })
       return {}
     }
   }
@@ -419,7 +429,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       const db = this.mongoClient.db('threat_detection')
 
       // Get threat severity distribution
-      const severityDistribution = await db
+      const severityDistribution = (await db
         .collection('threat_responses')
         .aggregate([
           {
@@ -429,10 +439,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
             },
           },
         ])
-        .toArray() as unknown as Record<string, unknown>[]
+        .toArray()) as unknown as Record<string, unknown>[]
 
       // Get top threat sources
-      const topThreats = await db
+      const topThreats = (await db
         .collection('threat_responses')
         .aggregate([
           {
@@ -444,7 +454,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           { $sort: { count: -1 } },
           { $limit: 5 },
         ])
-        .toArray() as unknown as Record<string, unknown>[]
+        .toArray()) as unknown as Record<string, unknown>[]
 
       return {
         severityDistribution,
@@ -455,7 +465,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         ),
       }
     } catch (error: unknown) {
-      logger.error('Failed to collect threat metrics:', { error: String(error) })
+      logger.error('Failed to collect threat metrics:', {
+        error: String(error),
+      })
       return {}
     }
   }
@@ -520,7 +532,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         inputTensor.dispose()
       }
     } catch (error: unknown) {
-      logger.error('Failed to calculate anomaly score:', { error: String(error) })
+      logger.error('Failed to calculate anomaly score:', {
+        error: String(error),
+      })
       return 0
     }
   }
@@ -655,7 +669,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return null
     } catch (error: unknown) {
-      logger.error('Failed to generate trend insight:', { error: String(error) })
+      logger.error('Failed to generate trend insight:', {
+        error: String(error),
+      })
       return null
     }
   }
@@ -688,7 +704,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return null
     } catch (error: unknown) {
-      logger.error('Failed to generate prediction insight:', { error: String(error) })
+      logger.error('Failed to generate prediction insight:', {
+        error: String(error),
+      })
       return null
     }
   }
@@ -879,7 +897,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         this.alertBuffer = this.alertBuffer.slice(-100)
       }
     } catch (error: unknown) {
-      logger.error('Failed to store alert:', { error: String(error), alertId: alert.id })
+      logger.error('Failed to store alert:', {
+        error: String(error),
+        alertId: alert.id,
+      })
       throw error
     }
   }
@@ -1009,7 +1030,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       await db.collection('alerts').updateOne({ id: alert.id }, { $set: alert })
     } catch (error: unknown) {
-      logger.error('Failed to update alert:', { error: String(error), alertId: alert.id })
+      logger.error('Failed to update alert:', {
+        error: String(error),
+        alertId: alert.id,
+      })
       throw error
     }
   }
@@ -1089,7 +1113,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
 
       return result.modifiedCount > 0
     } catch (error: unknown) {
-      logger.error('Failed to acknowledge alert:', { error: String(error), alertId })
+      logger.error('Failed to acknowledge alert:', {
+        error: String(error),
+        alertId,
+      })
       return false
     }
   }
@@ -1313,7 +1340,9 @@ export class AIEnhancedMonitoringService extends EventEmitter {
       logger.info('AI-enhanced monitoring service shutdown completed')
       this.emit('monitoring_shutdown')
     } catch (error: unknown) {
-      logger.error('Failed to shutdown monitoring service:', { error: String(error) })
+      logger.error('Failed to shutdown monitoring service:', {
+        error: String(error),
+      })
       throw error
     }
   }
@@ -1471,8 +1500,13 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getActiveAlerts(): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await this.redis['lrange']('alerts:active', 0, -1)) as unknown as string[]
-        if (cached && cached.length > 0) return cached.map((s: string) => JSON.parse(s) as Alert)
+        const cached = (await this.redis['lrange'](
+          'alerts:active',
+          0,
+          -1,
+        )) as unknown as string[]
+        if (cached && cached.length > 0)
+          return cached.map((s: string) => JSON.parse(s) as Alert)
       }
       const db = this.mongoClient.db('threat_detection')
       return await db
@@ -1487,8 +1521,13 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getAlertsBySeverity(severity: string): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await this.redis['lrange'](`alerts:${severity}`, 0, -1)) as unknown as string[]
-        if (cached && cached.length > 0) return cached.map((s: string) => JSON.parse(s) as Alert)
+        const cached = (await this.redis['lrange'](
+          `alerts:${severity}`,
+          0,
+          -1,
+        )) as unknown as string[]
+        if (cached && cached.length > 0)
+          return cached.map((s: string) => JSON.parse(s) as Alert)
       }
       const db = this.mongoClient.db('threat_detection')
       return await db.collection<Alert>('alerts').find({ severity }).toArray()
@@ -1527,7 +1566,11 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     try {
       if (this.redis) {
         // Simplified: ignore timeRange for stub/test satisfaction, just return list
-        const cached = (await this.redis['lrange'](`metrics:${name}`, 0, -1)) as unknown as string[]
+        const cached = (await this.redis['lrange'](
+          `metrics:${name}`,
+          0,
+          -1,
+        )) as unknown as string[]
         if (cached) return cached.map((s: string) => JSON.parse(s))
       }
       return []
@@ -1540,7 +1583,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     metrics: unknown[],
   ): Promise<{ insights: AIInsight[]; recommendations: string[] }> {
     if (this.aiService) {
-      return this.aiService.generateInsights(metrics) as unknown as { insights: AIInsight[]; recommendations: string[] }
+      return this.aiService.generateInsights(metrics) as unknown as {
+        insights: AIInsight[]
+        recommendations: string[]
+      }
     }
     // Stub with dummy data
     return {

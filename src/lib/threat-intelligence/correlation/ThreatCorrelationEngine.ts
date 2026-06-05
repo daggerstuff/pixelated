@@ -507,7 +507,12 @@ export class ThreatCorrelationEngineCore
   }
 
   private compareSeverity(severity1: string, severity2: string): number {
-    const severityOrder: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 }
+    const severityOrder: Record<string, number> = {
+      low: 1,
+      medium: 2,
+      high: 3,
+      critical: 4,
+    }
     const score1 = severityOrder[severity1] ?? 1
     const score2 = severityOrder[severity2] ?? 1
 
@@ -685,9 +690,9 @@ export class ThreatCorrelationEngineCore
       ((attribution1.actor &&
         attribution2.actor &&
         attribution1.actor === attribution2.actor) ??
-      (attribution1.campaign &&
-        attribution2.campaign &&
-        attribution1.campaign === attribution2.campaign)) ||
+        (attribution1.campaign &&
+          attribution2.campaign &&
+          attribution1.campaign === attribution2.campaign)) ||
       (attribution1.family &&
         attribution2.family &&
         attribution1.family === attribution2.family)
@@ -982,9 +987,7 @@ export class ThreatCorrelationEngineCore
             { severity: targetThreat.severity },
             {
               'indicators.indicatorType': {
-                $in: targetThreat.indicators.map(
-                  (i) => i.indicatorType,
-                ),
+                $in: targetThreat.indicators.map((i) => i.indicatorType),
               },
             },
           ],

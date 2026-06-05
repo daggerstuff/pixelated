@@ -62,8 +62,8 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
   - path-to-regexp@6.3.0
-  - "@cloudflare/workers-types@4.20260531.1"
-  - "tinyglobby@0.2.17"
+  - '@cloudflare/workers-types@4.20260531.1'
+  - 'tinyglobby@0.2.17'
   - yaml@2.8.3
   - axios@0.28.0
   - jsonwebtoken@8.5.2
@@ -82,11 +82,11 @@ minimumReleaseAgeExclude:
   - hono@4.12.23
 peerDependencyRules:
   ignoreMissing:
-  - '@capacitor/core'
-  - '@capacitor/preferences'
-  - '@netlify/blobs'
-  - typescript
-  - zod
+    - '@capacitor/core'
+    - '@capacitor/preferences'
+    - '@netlify/blobs'
+    - typescript
+    - zod
   allowedVersions:
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'

@@ -1,6 +1,7 @@
 # C3 (create-cloudflare)
 
-Official CLI for scaffolding Cloudflare Workers and Pages projects with templates, TypeScript, and instant deployment.
+Official CLI for scaffolding Cloudflare Workers and Pages projects with
+templates, TypeScript, and instant deployment.
 
 ## Quick Start
 
@@ -38,16 +39,19 @@ What are you building?
     └─ npm create cloudflare@latest . -- --type=pre-existing --existing-script=./src/worker.ts
 ```
 
-**Critical:** Pages projects require `--platform=pages` flag. Without it, C3 defaults to Workers.
+**Critical:** Pages projects require `--platform=pages` flag. Without it, C3
+defaults to Workers.
 
 ## Interactive Flow
 
 When run without flags, C3 prompts in this order:
 
 1. **Project name** - Directory to create (defaults to current dir with `.`)
-2. **Application type** - `hello-world`, `web-app`, `demo`, `pre-existing`, `remote-template`
+2. **Application type** - `hello-world`, `web-app`, `demo`, `pre-existing`,
+   `remote-template`
 3. **Platform** - `workers` (default) or `pages` (for web apps only)
-4. **Framework** - If web-app: `next`, `remix`, `astro`, `react-router`, `solid`, `svelte`, etc.
+4. **Framework** - If web-app: `next`, `remix`, `astro`, `react-router`,
+   `solid`, `svelte`, etc.
 5. **TypeScript** - `yes` (recommended) or `no`
 6. **Git** - Initialize repository? `yes` or `no`
 7. **Deploy** - Deploy now? `yes` or `no` (requires `wrangler login`)
@@ -67,24 +71,24 @@ pnpm create cloudflare@latest
 
 ## In This Reference
 
-| File | Purpose | Use When |
-|------|---------|----------|
-| **api.md** | Complete CLI flag reference | Scripting, CI/CD, advanced usage |
+| File                 | Purpose                          | Use When                            |
+| -------------------- | -------------------------------- | ----------------------------------- |
+| **api.md**           | Complete CLI flag reference      | Scripting, CI/CD, advanced usage    |
 | **configuration.md** | Generated files, bindings, types | Understanding output, customization |
-| **patterns.md** | Workflows, CI/CD, monorepos | Real-world integration |
-| **gotchas.md** | Troubleshooting failures | Deployment blocked, errors |
+| **patterns.md**      | Workflows, CI/CD, monorepos      | Real-world integration              |
+| **gotchas.md**       | Troubleshooting failures         | Deployment blocked, errors          |
 
 ## Reading Order
 
-| Task | Read |
-|------|------|
-| Create first project | README only |
-| Set up CI/CD | README → api → patterns |
-| Debug failed deploy | gotchas |
-| Understand generated files | configuration |
-| Full CLI reference | api |
-| Create custom template | patterns → configuration |
-| Convert existing project | README → patterns |
+| Task                       | Read                     |
+| -------------------------- | ------------------------ |
+| Create first project       | README only              |
+| Set up CI/CD               | README → api → patterns  |
+| Debug failed deploy        | gotchas                  |
+| Understand generated files | configuration            |
+| Full CLI reference         | api                      |
+| Create custom template     | patterns → configuration |
+| Convert existing project   | README → patterns        |
 
 ## Post-Creation
 

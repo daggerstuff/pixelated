@@ -99,7 +99,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -124,7 +124,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -154,7 +154,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -173,7 +173,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (putRequest.onsuccess as () => void)?.()
+        ;(putRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.set(testKey, testValue)
@@ -219,7 +219,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -238,7 +238,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (getRequest.onsuccess as () => void)?.()
+        ;(getRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.get(testKey)
@@ -259,7 +259,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -278,7 +278,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (getRequest.onsuccess as () => void)?.()
+        ;(getRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.get('non-existent-key')
@@ -302,7 +302,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -321,7 +321,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (deleteRequest.onsuccess as () => void)?.()
+        ;(deleteRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.remove(testKey)
@@ -349,7 +349,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -368,7 +368,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (clearRequest.onsuccess as () => void)?.()
+        ;(clearRequest.onsuccess as () => void)?.()
       }, 0)
 
       await storage.clear()
@@ -398,7 +398,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -417,7 +417,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (getAllKeysRequest.onsuccess as () => void)?.()
+        ;(getAllKeysRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.getAllKeys()
@@ -442,7 +442,7 @@ describe('IndexedDBStorage', () => {
       mockIndexedDB.open.mockImplementation((dbName, version) => {
         // Immediately trigger success
         setTimeout(() => {
-          (openRequest.onsuccess as () => void)?.()
+          ;(openRequest.onsuccess as () => void)?.()
         }, 0)
         return openRequest
       })
@@ -461,7 +461,7 @@ describe('IndexedDBStorage', () => {
 
       // Trigger success after a short delay
       setTimeout(() => {
-        (countRequest.onsuccess as () => void)?.()
+        ;(countRequest.onsuccess as () => void)?.()
       }, 0)
 
       const result = await storage.count()

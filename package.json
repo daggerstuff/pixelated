@@ -48,7 +48,7 @@
     "lint:markdown:ci:all": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules --ignore '**/node_modules/**' \"**/*.md\" \"**/*.mdx\"",
     "lint:fix": "oxlint -c .oxlintrc.json --fix-dangerously .",
     "typecheck": "NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit",
-    "typecheck:strict": "NODE_OPTIONS='--max-old-space-size=4096' tsx scripts/validate-typescript.ts",
+    "typecheck:strict": "NODE_OPTIONS='--max-old-space-size=8192' tsx scripts/validate-typescript.ts",
     "type-check": "pnpm run typecheck",
     "check": "NODE_OPTIONS='--max-old-space-size=8192' astro check",
     "check:all": "pnpm run check && pnpm run typecheck",
@@ -449,21 +449,6 @@
   "resolutions": {
     "path-to-regexp": "8.4.2"
   },
-  "engines": {
-    "node": ">=24"
-  },
-  "packageManager": "pnpm@11.5.1",
-  "trustedDependencies": [
-    "aws-sdk",
-    "core-js",
-    "postinstall-postinstall",
-    "protobufjs",
-    "unrs-resolver"
-  ],
-  "allowScripts": {
-    "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
-    "file:../protobufjs@7.6.1/node_modules/protobufjs": true
-  },
   "overrides": {
     "@astrojs/react>devalue": "^5.6.4",
     "@astrojs/react>rollup": "^4.59.0",
@@ -580,5 +565,20 @@
     "yaml@>=2.0.0 <2.8.3": "^2.8.3",
     "yauzl": "^3.2.1",
     "zod": "^4.3.2"
-  }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.5.1",
+  "allowScripts": {
+    "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
+    "file:../protobufjs@7.6.1/node_modules/protobufjs": true
+  },
+  "trustedDependencies": [
+    "aws-sdk",
+    "core-js",
+    "postinstall-postinstall",
+    "protobufjs",
+    "unrs-resolver"
+  ]
 }

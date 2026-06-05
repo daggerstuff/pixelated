@@ -94,8 +94,12 @@ export function processVersion(
     versionType = 'pre'
   }
 
-  const nonHighlightedPart = parts.slice(0, highlightedIndex === -1 ? 0 : highlightedIndex).join('')
-  const highlightedPart = parts.slice(highlightedIndex === -1 ? 0 : highlightedIndex).join('')
+  const nonHighlightedPart = parts
+    .slice(0, highlightedIndex === -1 ? 0 : highlightedIndex)
+    .join('')
+  const highlightedPart = parts
+    .slice(highlightedIndex === -1 ? 0 : highlightedIndex)
+    .join('')
 
   return [versionType, nonHighlightedPart, highlightedPart]
 }

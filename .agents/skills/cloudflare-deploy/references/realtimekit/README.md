@@ -1,20 +1,29 @@
 # Cloudflare RealtimeKit
 
-Expert guidance for building real-time video and audio applications using **Cloudflare RealtimeKit** - a comprehensive SDK suite for adding customizable live video and voice to web or mobile applications.
+Expert guidance for building real-time video and audio applications using
+**Cloudflare RealtimeKit** - a comprehensive SDK suite for adding customizable
+live video and voice to web or mobile applications.
 
 ## Overview
 
-RealtimeKit is Cloudflare's SDK suite built on Realtime SFU, abstracting WebRTC complexity with fast integration, pre-built UI components, global performance (300+ cities), and production features (recording, transcription, chat, polls).
+RealtimeKit is Cloudflare's SDK suite built on Realtime SFU, abstracting WebRTC
+complexity with fast integration, pre-built UI components, global performance
+(300+ cities), and production features (recording, transcription, chat, polls).
 
-**Use cases**: Team meetings, webinars, social video, audio calls, interactive plugins
+**Use cases**: Team meetings, webinars, social video, audio calls, interactive
+plugins
 
 ## Core Concepts
 
-- **App**: Workspace grouping meetings, participants, presets, recordings. Use separate Apps for staging/production
+- **App**: Workspace grouping meetings, participants, presets, recordings. Use
+  separate Apps for staging/production
 - **Meeting**: Re-usable virtual room. Each join creates new **Session**
-- **Session**: Live meeting instance. Created on first join, ends after last leave
-- **Participant**: User added via REST API. Returns `authToken` for client SDK. **Do not reuse tokens**
-- **Preset**: Reusable permission/UI template (permissions, meeting type, theme). Applied at participant creation
+- **Session**: Live meeting instance. Created on first join, ends after last
+  leave
+- **Participant**: User added via REST API. Returns `authToken` for client SDK.
+  **Do not reuse tokens**
+- **Preset**: Reusable permission/UI template (permissions, meeting type,
+  theme). Applied at participant creation
 - **Peer ID** (`id`): Unique per session, changes on rejoin
 - **Participant ID** (`userId`): Persistent across sessions
 
@@ -43,52 +52,62 @@ curl -X POST 'https://api.cloudflare.com/client/v4/accounts/<account_id>/realtim
 ### 2. Client Integration
 
 **React**:
+
 ```tsx
-import { RtkMeeting } from '@cloudflare/realtimekit-react-ui';
+import { RtkMeeting } from '@cloudflare/realtimekit-react-ui'
 
 function App() {
-  return <RtkMeeting authToken="<participant_auth_token>" onLeave={() => {}} />;
+  return <RtkMeeting authToken="<participant_auth_token>" onLeave={() => {}} />
 }
 ```
 
 **Core SDK**:
-```typescript
-import RealtimeKitClient from '@cloudflare/realtimekit';
 
-const meeting = new RealtimeKitClient({ authToken: '<token>', video: true, audio: true });
-await meeting.join();
+```typescript
+import RealtimeKitClient from '@cloudflare/realtimekit'
+
+const meeting = new RealtimeKitClient({
+  authToken: '<token>',
+  video: true,
+  audio: true,
+})
+await meeting.join()
 ```
 
 ## Reading Order
 
-| Task | Files |
-|------|-------|
-| Quick integration | README only |
-| Custom UI | README → patterns → api |
-| Backend setup | README → configuration |
-| Debug issues | gotchas |
-| Advanced features | patterns → api |
+| Task              | Files                   |
+| ----------------- | ----------------------- |
+| Quick integration | README only             |
+| Custom UI         | README → patterns → api |
+| Backend setup     | README → configuration  |
+| Debug issues      | gotchas                 |
+| Advanced features | patterns → api          |
 
 ## RealtimeKit vs Realtime SFU
 
-| Choose | When |
-|--------|------|
-| **RealtimeKit** | Need pre-built UI, fast integration, React/Angular/HTML |
-| **Realtime SFU** | Building from scratch, custom WebRTC, full control |
+| Choose           | When                                                    |
+| ---------------- | ------------------------------------------------------- |
+| **RealtimeKit**  | Need pre-built UI, fast integration, React/Angular/HTML |
+| **Realtime SFU** | Building from scratch, custom WebRTC, full control      |
 
-RealtimeKit is built on Realtime SFU but abstracts WebRTC complexity with UI components and SDKs.
+RealtimeKit is built on Realtime SFU but abstracts WebRTC complexity with UI
+components and SDKs.
 
 ## Which Package?
 
 Need pre-built meeting UI?
+
 - React → `@cloudflare/realtimekit-react-ui` (`<RtkMeeting>`)
 - Angular → `@cloudflare/realtimekit-angular-ui`
 - HTML/Vanilla → `@cloudflare/realtimekit-ui`
 
 Need custom UI?
+
 - Core SDK → `@cloudflare/realtimekit` (RealtimeKitClient) - full control
 
 Need raw WebRTC control?
+
 - See `realtime-sfu/` reference
 
 ## In This Reference
@@ -108,6 +127,7 @@ Need raw WebRTC control?
 ## Reference Links
 
 - **Official Docs**: https://developers.cloudflare.com/realtime/realtimekit/
-- **API Reference**: https://developers.cloudflare.com/api/resources/realtime_kit/
+- **API Reference**:
+  https://developers.cloudflare.com/api/resources/realtime_kit/
 - **Examples**: https://github.com/cloudflare/realtimekit-web-examples
 - **Dashboard**: https://dash.cloudflare.com/?to=/:account/realtime/kit

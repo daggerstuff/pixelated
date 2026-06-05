@@ -97,7 +97,7 @@ export async function query<T extends QueryResultRow = QueryResultRow>(
 ): Promise<DbQueryResult<T>> {
   const client = await getPool().connect()
   try {
-    return await client.query<T>(text, params) as unknown as DbQueryResult<T>
+    return (await client.query<T>(text, params)) as unknown as DbQueryResult<T>
   } finally {
     client.release()
   }
