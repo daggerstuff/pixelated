@@ -6,7 +6,7 @@ aif360==0.6.1
     # via bias-detection-service (pyproject.toml)
 aiohappyeyeballs==2.6.2
     # via aiohttp
-aiohttp==3.13.5
+aiohttp==3.14.0
     # via
     #   bias-detection-service (pyproject.toml)
     #   fsspec
@@ -166,7 +166,7 @@ huggingface-hub==1.16.1
     #   evaluate
     #   tokenizers
     #   transformers
-idna==3.17
+idna==3.18
     # via
     #   anyio
     #   httpx
