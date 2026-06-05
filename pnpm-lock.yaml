@@ -414,7 +414,7 @@ importers:
         specifier: latest
         version: 3.0.3
       i18next:
-        specifier: latest
+        specifier: '>=24.2.3'
         version: 26.3.1(typescript@6.0.3)
       idb:
         specifier: ^8.0.3
@@ -450,7 +450,7 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       nanoid:
-        specifier: latest
+        specifier: '>=5.0.9'
         version: 5.1.11
       node-cron:
         specifier: latest
@@ -531,7 +531,7 @@ importers:
         specifier: 3.36.0
         version: 3.36.0
       slug:
-        specifier: latest
+        specifier: '>=8.0.4'
         version: 11.0.1
       socket.io:
         specifier: ^4.8.3
@@ -558,7 +558,7 @@ importers:
         specifier: latest
         version: 6.0.2
       uuid:
-        specifier: latest
+        specifier: '>=11.1.0'
         version: 14.0.0
       vue:
         specifier: latest
@@ -709,7 +709,7 @@ importers:
         specifier: latest
         version: 5.6.2
       class-transformer:
-        specifier: latest
+        specifier: '>=0.5.1'
         version: 0.5.1
       class-validator:
         specifier: ^0.15.1
@@ -829,7 +829,7 @@ importers:
         specifier: 6.3.0
         version: 6.3.0
       postcss:
-        specifier: latest
+        specifier: '>=8.5.10'
         version: 8.5.15
       postcss-import:
         specifier: latest
@@ -3776,6 +3776,9 @@ packages:
       react-redux:
         optional: true
 
+  '@rolldown/pluginutils@1.0.0-beta.27':
+    resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
+
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
 
@@ -4846,6 +4849,12 @@ packages:
         optional: true
       vue-router:
         optional: true
+
+  '@vitejs/plugin-react@4.7.0':
+    resolution: {integrity: sha512-gUu9hwfWvvEDBBmgtAowQCojwZmJ5mcLn3aufeCsitijs3+f2NsrPtlAWIR6OPiqljl96GVCUbLe0HyqIpVaoA==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^7
 
   '@vitejs/plugin-react@5.2.0':
     resolution: {integrity: sha512-YmKkfhOAi3wsB1PhJq5Scj3GXMn3WvtQ/JC0xoopuHoXSdmtdStOpFrYaT1kie2YgFBcIe64ROzMYRjCrYOdYw==}
@@ -8683,6 +8692,10 @@ packages:
         optional: true
       redux:
         optional: true
+
+  react-refresh@0.17.0:
+    resolution: {integrity: sha512-z6F7K9bV85EfseRCp2bzrpyQ0Gkw1uLoCel9XBVWPg/TjRj94SkJzUTGfOa4bs7iJvBWtQG0Wq7wnI0syw3EBQ==}
+    engines: {node: '>=0.10.0'}
 
   react-refresh@0.18.0:
     resolution: {integrity: sha512-QgT5//D3jfjJb6Gsjxv0Slpj23ip+HtOpnNgnb2S5zU3CB26G/IDPGoy4RJB42wzFE46DRsstbW6tKHoKbhAxw==}
@@ -13368,6 +13381,8 @@ snapshots:
       react: 19.2.7
       react-redux: 9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1)
 
+  '@rolldown/pluginutils@1.0.0-beta.27': {}
+
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
   '@rollup/pluginutils@5.4.0(rollup@4.61.0)':
@@ -14562,6 +14577,18 @@ snapshots:
     optionalDependencies:
       react: 19.2.7
       vue: 3.5.35(typescript@6.0.3)
+
+  '@vitejs/plugin-react@4.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+    dependencies:
+      '@babel/core': 7.29.7
+      '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
+      '@babel/plugin-transform-react-jsx-source': 7.29.7(@babel/core@7.29.7)
+      '@rolldown/pluginutils': 1.0.0-beta.27
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.17.0
+      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+    transitivePeerDependencies:
+      - supports-color
 
   '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
@@ -19042,6 +19069,8 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.16
       redux: 5.0.1
+
+  react-refresh@0.17.0: {}
 
   react-refresh@0.18.0: {}
 
