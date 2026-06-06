@@ -380,9 +380,18 @@ def record_fingerprint(record: TaskRecord) -> str:
 
 
 def provider_ids_match(existing: Mapping[str, str], expected: Mapping[str, str]) -> bool:
-    return {provider: external_id for provider, external_id in existing.items() if external_id} == {
-        provider: external_id for provider, external_id in expected.items() if external_id
-    }
+    """Compare provider IDs, only checking providers present in the expected set.
+
+    The existing record may have provider_ids from its sync metadata for providers
+    that don't have records in the current group. Only providers in `expected`
+    are compared to prevent false mismatches from "extra" provider IDs.
+    """
+    for provider, external_id in expected.items():
+        if not external_id:
+            continue
+        if existing.get(provider) != external_id:
+            return False
+    return True
 
 
 def records_are_in_sync(existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]) -> bool:
@@ -480,47 +489,14 @@ def record_clean_body(record: TaskRecord) -> str:
 def group_records_by_key(
     records_by_provider: Mapping[str, Sequence[TaskRecord]],
 ) -> dict[str, list[TaskRecord]]:
-    # 1. Normalize all records first
-    normalized_by_provider: dict[str, list[TaskRecord]] = {}
-    for provider, records in records_by_provider.items():
-        normalized_list = []
-        for record in records:
-            normalized_record = normalized_group_record(provider, record)
-            if not normalized_record.sync_key:
-                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
-                continue
-            normalized_list.append(normalized_record)
-        normalized_by_provider[provider] = normalized_list
+    normalized_by_provider = _normalize_by_provider(records_by_provider)
+    id_to_key = _build_id_to_key_map(normalized_by_provider)
 
-    # 2. Build the reverse-lookup map: (provider, external_id) -> canonical sync_key
-    # We do two passes to prioritize keys from records that have explicit provider_ids mappings.
-    id_to_key: dict[tuple[str, str], str] = {}
-
-    # Pass A: populate from records that have explicit cross-system provider_ids mappings
-    for provider, records in normalized_by_provider.items():
-        for record in records:
-            if record.provider_ids:
-                key = record.sync_key
-                id_to_key[(provider, record.external_id)] = key
-                for other_provider, other_id in record.provider_ids.items():
-                    if other_id:
-                        id_to_key[(other_provider, other_id)] = key
-
-    # Pass B: populate any remaining records that don't have cross-system mappings
-    for provider, records in normalized_by_provider.items():
-        for record in records:
-            rec_id = (provider, record.external_id)
-            if rec_id not in id_to_key:
-                id_to_key[rec_id] = record.sync_key
-
-    # 3. Group records, forcing matching records to adopt the mapped canonical key
     grouped: dict[str, list[TaskRecord]] = {}
     for provider, records in normalized_by_provider.items():
         for record in records:
             rec_id = (provider, record.external_id)
             canonical_key = id_to_key.get(rec_id, record.sync_key)
-            
-            # Create a copy/update of the record with the aligned canonical key
             updated_record = TaskRecord(
                 provider=record.provider,
                 external_id=record.external_id,
@@ -536,7 +512,6 @@ def group_records_by_key(
                 labels=record.labels,
             )
             grouped.setdefault(canonical_key, []).append(updated_record)
-            
     return grouped
 
 
@@ -558,6 +533,45 @@ def normalized_group_record(provider: str, record: TaskRecord) -> TaskRecord:
     )
 
 
+def _iter_all_records(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> Iterable[TaskRecord]:
+    for records in normalized_by_provider.values():
+        yield from records
+
+
+def _normalize_by_provider(
+    records_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[str, list[TaskRecord]]:
+    normalized_by_provider: dict[str, list[TaskRecord]] = {}
+    for provider, records in records_by_provider.items():
+        normalized_list = []
+        for record in records:
+            normalized_record = normalized_group_record(provider, record)
+            if not normalized_record.sync_key:
+                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
+                continue
+            normalized_list.append(normalized_record)
+        normalized_by_provider[provider] = normalized_list
+    return normalized_by_provider
+
+
+def _build_id_to_key_map(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[tuple[str, str], str]:
+    id_to_key: dict[tuple[str, str], str] = {}
+    for record in _iter_all_records(normalized_by_provider):
+        key = record.sync_key
+        id_to_key[(record.provider, record.external_id)] = key
+        for other_provider, other_id in record.provider_ids.items():
+            if other_id:
+                id_to_key[(other_provider, other_id)] = key
+    for record in _iter_all_records(normalized_by_provider):
+        if (record.provider, record.external_id) not in id_to_key:
+            id_to_key[(record.provider, record.external_id)] = record.sync_key
+    return id_to_key
+
+
 def build_sync_action(
     *,
     provider: str,
@@ -566,8 +580,6 @@ def build_sync_action(
     sync_key: str,
     provider_ids: Mapping[str, str],
 ) -> SyncAction | None:
-    if existing is not None and records_are_in_sync(existing, canonical, provider_ids):
-        return None
 
     known_provider_ids = dict(provider_ids)
     if existing is not None:
@@ -1411,7 +1423,9 @@ def apply_sync_action(
                 run_process=run_process,
             )
 
-    sys.stderr.write(f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n")
+    sys.stderr.write(
+        f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n"
+    )
     sys.stderr.flush()
     return res
 

@@ -340,7 +340,7 @@ PIX-160 [Test Coverage & Security Baseline] (Todo): Test Coverage Baseline - Cov
 PIX-1901 [Test Coverage & Security Baseline] (In Progress): Test Coverage Baseline (Plan 02) | Sync: key: test-coverage-baseline-plan-02, status: open, source-provider: asana
   Description: Parent task for Phase 01, Plan 02: Test Coverage Baseline and HIPAA/security test suites  Goal: Establish 70%+ test coverage baseline across Python an...
 
-PIX-223 [Test Coverage & Security Baseline] (In Progress): Test Coverage & Security Baseline | Sync: key: claude-code-linear-path-hardening-validation, status: open, source-provider: jira
+PIX-223 [Test Coverage & Security Baseline] (Done): Test Coverage & Security Baseline | Sync: key: claude-code-linear-path-hardening-validation, status: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':_'completed'}, source-provider: linear
   Description: Task Overview  This task represents a core pipeline enhancement or feature implementation item: ***Claude Code linear path hardening validation***. Th...
 
 PIX-1896 [Training Pipeline Improvements] (In Progress): FHE Emotional Intelligence Integration - execution backlog | Sync: key: fhe-emotional-intelligence-integration-execution-backlog, status: open, source-provider: asana
