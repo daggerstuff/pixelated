@@ -16,9 +16,11 @@ let warnedAboutDeprecation = false
 if (process.env['NODE_ENV'] !== 'test' && !warnedAboutDeprecation) {
   warnedAboutDeprecation = true
   console.warn(
-    '[auth-legacy] This module is being consolidated into ' +
-      'src/lib/auth/identity-provider.ts. Migrate direct callers to the ' +
-      'IdentityProvider API. See PIX-215 PR3/PR4 for the removal timeline.',
+    '[auth-legacy] This module is the final thin shim before removal. ' +
+      'All new code should use src/lib/auth/identity-provider.ts directly. ' +
+      'Run `pnpm tsx scripts/auth-cutover-check.ts <user-ids>` with ' +
+      'AUTH_DUAL_WRITE=true to validate parity before migrating call sites. ' +
+      'See PIX-215 PR4 for the shim removal timeline.',
   )
 }
 
