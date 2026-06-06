@@ -1,4 +1,4 @@
-"""Tri-directional task sync coordinator for Asana, Jira, GitHub, and Linear."""
+"""Tri-directional task sync coordinator for Asana, Jira, GitHub, GitLab, and Linear."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from scripts.task_sync.provider_bridge import (
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("asana", "github", "linear", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("asana", "github", "gitlab", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
@@ -628,7 +628,6 @@ def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
     return provider_ids
 
 
-
 def _run_command(command: Sequence[str], *, input_text: str | None = None) -> str:
     try:
         completed = subprocess.run(
@@ -931,8 +930,6 @@ def get_provider_normalizer(provider: str):
         raise ValueError(f"Unsupported provider export: {provider}") from exc
 
 
-
-
 def _iter_export_payloads(path: Path) -> Iterable[Mapping[str, Any]]:
     text = path.read_text(encoding="utf-8").strip()
     if not text:
@@ -1002,6 +999,8 @@ def collect_provider_records(
     if exporter is not None:
         return _direct_provider_export(provider, exporter())
     return None
+
+
 def _direct_provider_export(provider: str, payloads: Sequence[Mapping[str, Any]]) -> list[TaskRecord]:
     normalize_payload = get_provider_normalizer(provider)
     records: list[TaskRecord] = []
@@ -1131,8 +1130,6 @@ def resolve_apply_commands_from_env() -> dict[str, list[str]]:
         if raw_command:
             commands[provider] = shlex.split(raw_command)
     return commands
-
-
 
 
 def _apply_bridge_action(
@@ -1314,8 +1311,6 @@ def build_follow_up_plan(
     return follow_up
 
 
-
-
 def plan_from_sources(
     *,
     enabled_providers: Sequence[str] = DEFAULT_PROVIDER_ORDER,
@@ -1370,8 +1365,6 @@ def execute_apply_mode(
             break
         current_plan = build_follow_up_plan(current_plan, results)
 
-    enabled_providers = resolve_enabled_providers_from_env()
-
     payload: dict[str, Any] = {
         "passes": pass_summaries,
         "results": [dataclass_to_dict(result) for result in all_results],
@@ -1380,6 +1373,8 @@ def execute_apply_mode(
     if not all(result.success for result in all_results):
         exit_code = 1
     return payload, exit_code
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(argv or sys.argv[1:])
     mode = args[0] if args else "plan"
