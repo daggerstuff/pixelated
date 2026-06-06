@@ -79,7 +79,6 @@ verbose/coverage/
 # === DATABASES & LOGS ===
 *.db
 *.log
-.dolt/
 /*.log
 /Thumbs.db*
 db.sqlite3
