@@ -370,3 +370,4 @@ aws
 scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
+struct-agent-key.json
