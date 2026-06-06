@@ -4,7 +4,6 @@ Sync from Linear (Source of Truth) to:
   - GitHub Issues
   - Jira Issues
   - Asana Tasks
-  - Beads Tasks
   - GitLab Issues
 
 Ensures NO duplicates are created (matching by ID and title similarity).
@@ -292,8 +291,6 @@ def main():
         print(f"Warning: Asana export failed: {e}")
         providers_data["asana"] = []
 
-    # Beads
-    providers_data["beads"] = beads_export()
 
     # GitLab
     providers_data["gitlab"] = fetch_gitlab_issues()
