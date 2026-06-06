@@ -1,4 +1,3 @@
-"""Tri-directional task sync coordinator for Asana, Jira, GitHub, and Linear."""
 
 from __future__ import annotations
 
@@ -29,7 +28,6 @@ from scripts.task_sync.provider_bridge import (
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("asana", "github", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
