@@ -12,8 +12,9 @@ vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
-import { McpMemoryTransport } from './mcp-memory-transport'
+
 import { InternalMemoryServiceError } from './internal-memory-service-client'
+import { McpMemoryTransport } from './mcp-memory-transport'
 
 const mockUserId = 'test-user'
 const mockLauncherPath = 'scripts/memory/foresight-mcp-server.sh'
@@ -71,16 +72,24 @@ describe('McpMemoryTransport', () => {
 
   it('returns the parsed payload from store_memory', async () => {
     clientInstance.callTool.mockResolvedValueOnce({
-      content: [{ type: 'text', text: JSON.stringify({ memory_id: 'mem-123' }) }],
+      content: [
+        { type: 'text', text: JSON.stringify({ memory_id: 'mem-123' }) },
+      ],
     })
 
-    const result = await transport.addMemory({ content: 'test', userId: mockUserId })
+    const result = await transport.addMemory({
+      content: 'test',
+      userId: mockUserId,
+    })
 
     expect(result).toEqual({ memory_id: 'mem-123' })
     expect(clientInstance.callTool).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'store_memory',
-        arguments: expect.objectContaining({ content: 'test', user_id: mockUserId }),
+        arguments: expect.objectContaining({
+          content: 'test',
+          user_id: mockUserId,
+        }),
       }),
       undefined,
       expect.objectContaining({ signal: expect.any(Object) }),
@@ -88,7 +97,9 @@ describe('McpMemoryTransport', () => {
   })
 
   it('throws InternalMemoryServiceError when store_memory fails', async () => {
-    clientInstance.callTool.mockRejectedValueOnce(new Error('Tool execution failed'))
+    clientInstance.callTool.mockRejectedValueOnce(
+      new Error('Tool execution failed'),
+    )
 
     await expect(
       transport.addMemory({ content: 'test', userId: mockUserId }),
@@ -98,25 +109,50 @@ describe('McpMemoryTransport', () => {
   it('returns the parsed payload from list_memories', async () => {
     clientInstance.callTool.mockResolvedValueOnce({
       content: [
-        { type: 'text', text: JSON.stringify({ memories: [{ id: 'mem-1', content: 'test' }], count: 1 }) },
+        {
+          type: 'text',
+          text: JSON.stringify({
+            memories: [{ id: 'mem-1', content: 'test' }],
+            count: 1,
+          }),
+        },
       ],
     })
 
-    const result = await transport.listMemories({ userId: mockUserId, limit: 10 })
+    const result = await transport.listMemories({
+      userId: mockUserId,
+      limit: 10,
+    })
 
-    expect(result).toEqual({ memories: [{ id: 'mem-1', content: 'test' }], count: 1 })
+    expect(result).toEqual({
+      memories: [{ id: 'mem-1', content: 'test' }],
+      count: 1,
+    })
   })
 
   it('returns the parsed payload from query_memories', async () => {
     clientInstance.callTool.mockResolvedValueOnce({
       content: [
-        { type: 'text', text: JSON.stringify({ memories: [{ id: 'mem-1', content: 'test' }], count: 1 }) },
+        {
+          type: 'text',
+          text: JSON.stringify({
+            memories: [{ id: 'mem-1', content: 'test' }],
+            count: 1,
+          }),
+        },
       ],
     })
 
-    const result = await transport.searchMemories({ userId: mockUserId, query: 'hello', limit: 5 })
+    const result = await transport.searchMemories({
+      userId: mockUserId,
+      query: 'hello',
+      limit: 5,
+    })
 
-    expect(result).toEqual({ memories: [{ id: 'mem-1', content: 'test' }], count: 1 })
+    expect(result).toEqual({
+      memories: [{ id: 'mem-1', content: 'test' }],
+      count: 1,
+    })
   })
 
   it('returns the memory record from get_memory when found', async () => {
@@ -135,7 +171,10 @@ describe('McpMemoryTransport', () => {
       ],
     })
 
-    const result = await transport.getMemory({ userId: mockUserId, memoryId: 'mem-123' })
+    const result = await transport.getMemory({
+      userId: mockUserId,
+      memoryId: 'mem-123',
+    })
 
     expect(result).toEqual({
       id: 'mem-123',
@@ -149,7 +188,10 @@ describe('McpMemoryTransport', () => {
   it('returns null when get_memory fails to find the record', async () => {
     clientInstance.callTool.mockRejectedValueOnce(new Error('Memory not found'))
 
-    const result = await transport.getMemory({ userId: mockUserId, memoryId: 'missing' })
+    const result = await transport.getMemory({
+      userId: mockUserId,
+      memoryId: 'missing',
+    })
 
     expect(result).toBeNull()
   })
@@ -180,18 +222,27 @@ describe('McpMemoryTransport', () => {
   })
 
   it('returns the parsed payload from memory_status', async () => {
-    const mockStats = { totalMemories: 42, categoryCounts: { preference: 10, fact: 32 } }
+    const mockStats = {
+      totalMemories: 42,
+      categoryCounts: { preference: 10, fact: 32 },
+    }
     clientInstance.callTool.mockResolvedValueOnce({
       content: [{ type: 'text', text: JSON.stringify(mockStats) }],
     })
 
-    const result = await transport.getMemoryStats({ userId: mockUserId, includeShared: true })
+    const result = await transport.getMemoryStats({
+      userId: mockUserId,
+      includeShared: true,
+    })
 
     expect(result).toEqual(mockStats)
     expect(clientInstance.callTool).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'memory_status',
-        arguments: expect.objectContaining({ user_id: mockUserId, include_shared: true }),
+        arguments: expect.objectContaining({
+          user_id: mockUserId,
+          include_shared: true,
+        }),
       }),
       undefined,
       expect.objectContaining({ signal: expect.any(Object) }),
