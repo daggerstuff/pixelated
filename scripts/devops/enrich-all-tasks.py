@@ -734,7 +734,6 @@ def _extract_linkages(clean_body: str) -> tuple[list[str], str]:
             or "source status:" in line_strip.lower()
             or "source type:" in line_strip.lower()
             or "linear:" in line_strip.lower()
-            or "linear:" in line_strip.lower()
         ):
             linkages.append(line_strip)
         else:
