@@ -97,8 +97,8 @@ peerDependencyRules:
     pg: 8.18.0
     react: '19'
     react-dom: '19'
-    redis: 5.10.0
-    typescript: ^5.9.3
+    typescript: ^6.0.0
+    zod: '*'
     zod: '*'
 overrides:
   '@astrojs/react>devalue': ^5.6.4
