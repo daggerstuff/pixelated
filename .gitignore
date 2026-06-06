@@ -79,7 +79,6 @@ verbose/coverage/
 # === DATABASES & LOGS ===
 *.db
 *.log
-.dolt/
 /*.log
 /Thumbs.db*
 db.sqlite3
@@ -114,8 +113,6 @@ nohup.out
 *.h5
 *.hdf5
 *.jsonl
-!.beads/issues.jsonl
-!.beads/interactions.jsonl
 *.model
 *.onnx
 *.pickle
@@ -293,25 +290,8 @@ scripts/run-simple-integrated-pipeline.py
 scripts/run-standalone-integrated-pipeline.py
 scripts/*.ipynb
 tests/scripts/
-# Beads: track config and exports; ignore runtime/dolt data (per .beads/.gitignore)
-.beads-credential-key
-.beads/embeddeddolt/
-.beads/dolt/
-.beads/backup/
-.beads/bd.sock
-.beads/bd.sock.startlock
-.beads/sync-state.json
-.beads/last-touched
-.beads/.exclusive-lock
-.beads/daemon.*
-.beads/push-state.json
-.beads/*.lock
-.beads/dolt-server.*
-.beads/export-state/
-.beads/export-state.json
-.beads/.sync.lock
-.beads/ephemeral.sqlite3*
-.beads/redirect
+# === INTERNAL & PRIVATE ===
+/.security/
 .scannerwork
 .swarm/
 .test-coverage-analysis.md
@@ -370,3 +350,4 @@ aws
 scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
+struct-agent-key.json

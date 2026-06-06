@@ -37,7 +37,7 @@ export function createConsoleAuditLogger(): AuditLogger {
       } else {
         console.info(JSON.stringify(logEntry))
       }
-    }
+    },
   }
 }
 
