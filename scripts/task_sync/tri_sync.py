@@ -131,6 +131,7 @@ JIRA_PRIORITY_TO_CANONICAL: dict[str, str] = {
 PROVIDER_PRIORITY = {
     "asana": 3,
     "github": 2,
+    "gitlab": 2,
     "linear": 2,
     "jira": 1,
 }
