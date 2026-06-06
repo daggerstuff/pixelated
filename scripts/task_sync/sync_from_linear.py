@@ -4,7 +4,6 @@ Sync from Linear (Source of Truth) to:
   - GitHub Issues
   - Jira Issues
   - Asana Tasks
-  - Beads Tasks
   - GitLab Issues
 
 Ensures NO duplicates are created (matching by ID and title similarity).
@@ -160,59 +159,6 @@ query($after: String) {
     return issues
 
 # ---------------------------------------------------------------------------
-# Beads Provider
-# ---------------------------------------------------------------------------
-
-def beads_export() -> list[dict]:
-    print("Exporting Beads tasks...")
-    try:
-        result = subprocess.run(["bd", "export", "--no-memories"], capture_output=True, text=True, timeout=30)
-        if result.returncode != 0:
-            print(f"Warning: bd export failed: {result.stderr}")
-            return []
-        tasks = []
-        for line in result.stdout.splitlines():
-            if line.strip():
-                tasks.append(json.loads(line))
-        print(f"  → Found {len(tasks)} Beads tasks.")
-        return tasks
-    except Exception as e:
-        print(f"Warning: Beads CLI is not available or failed: {e}")
-        return []
-
-def apply_beads_action(action: dict) -> bool:
-    action_type = action.get("action")
-    target_id = action.get("target_id")
-    title = action.get("title", "")
-    body = action.get("body", "")
-    sync_key = action.get("sync_key", "")
-    status = action.get("status", "open")
-    
-    # Map status to beads status
-    beads_status = {
-        "backlog": "open",
-        "triage": "open",
-        "open": "open",
-        "in_progress": "in_progress",
-        "review": "in_progress",
-        "closed": "closed"
-    }.get(status, "open")
-    
-    if action_type == "create":
-        cmd = ["bd", "create", title, "--description", body, "--external-ref", sync_key, "--silent"]
-    else:
-        if not target_id:
-            return False
-        cmd = ["bd", "update", target_id, "--title", title, "--description", body, "--status", beads_status, "--external-ref", sync_key]
-        
-    try:
-        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
-        return res.returncode == 0
-    except Exception as e:
-        print(f"Error applying Beads action: {e}")
-        return False
-
-# ---------------------------------------------------------------------------
 # GitLab Provider
 # ---------------------------------------------------------------------------
 
@@ -345,8 +291,6 @@ def main():
         print(f"Warning: Asana export failed: {e}")
         providers_data["asana"] = []
 
-    # Beads
-    providers_data["beads"] = beads_export()
 
     # GitLab
     providers_data["gitlab"] = fetch_gitlab_issues()
@@ -402,16 +346,6 @@ def main():
                     "title": raw["name"],
                     "body": notes,
                     "state": "closed" if raw.get("completed") else "open",
-                    "metadata": meta
-                })
-            elif prov == "beads":
-                desc = raw.get("description") or ""
-                meta = extract_sync_metadata(desc)
-                normalized_list.append({
-                    "target_id": raw["id"],
-                    "title": raw["title"],
-                    "body": desc,
-                    "state": raw["status"],
                     "metadata": meta
                 })
             elif prov == "gitlab":
@@ -607,8 +541,6 @@ def main():
             elif prov == "asana":
                 res = apply_asana_action(a)
                 ok = bool(res.get("gid"))
-            elif prov == "beads":
-                ok = apply_beads_action(a)
             elif prov == "gitlab":
                 res = apply_gitlab_action(a)
                 ok = bool(res)
