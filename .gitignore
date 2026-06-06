@@ -336,6 +336,9 @@ ai/.moderne
 .mcp.json
 HANDOFF.md
 
+# Beads issue tracker (fully removed)
+.beads/
+
 .omc
 .foresight
 job.md
