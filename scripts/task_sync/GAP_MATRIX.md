@@ -9,8 +9,7 @@
 | Linear (PIX) | `normalize_linear_payload` | ✅ Active | 385 issues, 14 projects |
 | Jira ADHD | `normalize_jira_payload` | ✅ Active | 399 issues exported |
 | GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
-
-## 1. Status Mapping Gaps
+| GitLab | `normalize_gitlab_payload` | ⚠️ Partial | Env vars not set |
 
 ### Canonical States (expected vs actual)
 
@@ -53,11 +52,12 @@
 ## 2. Priority Mapping Gaps
 
 ### Current Code (tri_sync.py)
-
+### Current Code (tri_sync.py)
 ```python
 PROVIDER_PRIORITY = {
     "asana": 3,
     "github": 2,
+    "gitlab": 2,
     "linear": 2,
     "jira": 2,
 }
