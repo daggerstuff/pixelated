@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta, timezone
-from types import SimpleNamespace
 
 from scripts.task_sync import tri_sync
 from scripts.task_sync.tri_sync import (
@@ -11,7 +10,6 @@ from scripts.task_sync.tri_sync import (
     SyncMetadata,
     TaskRecord,
     apply_sync_action,
-    apply_sync_plan,
     build_sync_plan,
     collect_provider_records,
     execute_apply_mode,
@@ -30,7 +28,7 @@ from scripts.task_sync.tri_sync import (
 )
 
 
-def make_record(
+def make_record(  # noqa: PLR0913
     provider: str,
     external_id: str,
     title: str,
@@ -126,6 +124,7 @@ def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> 
     assert ("github", "create") in actions
     assert ("jira", "create") not in actions
 
+
 def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
     jira = make_record(
         "jira",
@@ -167,6 +166,7 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("asana", "update") in actions
+
 
 def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
     jira_newer = make_record(
@@ -210,6 +210,7 @@ def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
     assert github_action.provider_ids["jira"] == "PIX-2"
     assert ("jira", "create") not in {(action.provider, action.action) for action in plan}
 
+
 def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
     jira = make_record(
         "jira",
@@ -236,6 +237,8 @@ def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
     assert metadata["source-provider"] == "jira"
     assert metadata["source-id"] == "PIX-1"
     assert metadata["jira"] == "PIX-1"
+
+
 def test_build_sync_plan_preserves_linked_provider_ids_from_metadata() -> None:
     jira = make_record(
         "jira",
@@ -276,6 +279,7 @@ def test_build_sync_plan_preserves_linked_provider_ids_from_metadata() -> None:
 
     assert asana_action.provider_ids["github"] == "G-2"
 
+
 def test_build_sync_plan_ignores_records_without_sync_keys(capsys) -> None:
     jira = make_record(
         "jira",
@@ -308,6 +312,7 @@ def test_build_sync_plan_ignores_records_without_sync_keys(capsys) -> None:
     assert plan == []
     assert "Skipping jira record PIX-1: missing sync key" in captured.err
     assert "Skipping asana record A-1: missing sync key" in captured.err
+
 
 def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
     payload = {
@@ -365,6 +370,7 @@ def test_normalize_jira_payload_reads_fields_shape() -> None:
     assert record.sync_key == "tri-sync-rollout"
     assert record.provider_ids["github"] == "G-1"
 
+
 def test_normalize_jira_payload_flattens_adf_description() -> None:
     payload = {
         "key": "TMPA-1",
@@ -399,6 +405,7 @@ def test_normalize_jira_payload_flattens_adf_description() -> None:
     assert record is not None
     assert record.clean_body == "Ship the sync bridge"
     assert record.sync_key == "tri-sync-rollout"
+
 
 def test_normalize_github_payload_reads_open_closed_status_and_metadata() -> None:
     payload = {
@@ -455,6 +462,7 @@ def test_normalize_linear_payload_reads_state_and_metadata() -> None:
     assert record.sync_key == "modern-dataset-project"
     assert record.provider_ids["jira"] == "PIX-5"
 
+
 def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
     asana_path = tmp_path / "asana.json"
     jira_path = tmp_path / "jira.jsonl"
@@ -486,7 +494,6 @@ def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("github", "create") in actions
-
 
 
 def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() -> None:
@@ -531,6 +538,7 @@ def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() 
     assert github_action.status == "open"
     assert github_action.provider_ids["jira"] == "PIX-open"
 
+
 def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() -> None:
     jira_closed = make_record(
         "jira",
@@ -566,7 +574,6 @@ def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() 
     assert jira_action.source_provider == "asana"
 
 
-
 def test_normalize_status_maps_provider_workflow_terms() -> None:
     assert normalize_status("To Do") == "open"
     assert normalize_status("Under Review") == "in_progress"
@@ -576,28 +583,17 @@ def test_normalize_status_maps_provider_workflow_terms() -> None:
 def test_main_apply_persists_sync_state(tmp_path, monkeypatch, capsys) -> None:
     state_path = tmp_path / "task-sync-state.json"
     plan = [make_action("asana", "create", None)]
-    results = [
-        SyncExecutionResult(
-            provider="asana",
-            action="create",
-            sync_key="tri-sync-rollout",
-            target_id="A-1",
-            success=True,
-            stdout="ok",
-            stderr="",
-        )
-    ]
 
     monkeypatch.setattr(tri_sync, "SYNC_STATE_PATH", state_path)
     monkeypatch.setattr(
         tri_sync,
         "collect_records",
-        lambda enabled_providers=None, export_paths=None: {"asana": []},
+        lambda **kwargs: {"asana": []},
     )
     monkeypatch.setattr(
         tri_sync,
         "build_sync_plan",
-        lambda records_by_provider, enabled_providers=None: plan,
+        lambda *args, **kwargs: plan,
     )
     monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", lambda: {"asana": ["cat"]})
     monkeypatch.setattr(
