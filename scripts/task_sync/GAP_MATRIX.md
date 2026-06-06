@@ -47,7 +47,7 @@
 
 ### Gap: `open` vs `backlog` naming
 - Current: STATUS_ALIASES maps "backlog"/"todo" → `open`
-- But Beads uses `open` correctly; Linear uses "Backlog"/"Todo"
+- But some targets use `open` correctly; Linear uses "Backlog"/"Todo"
 - Issue: cross-system readback of `open` status creates ambiguity
 
 ## 2. Priority Mapping Gaps
