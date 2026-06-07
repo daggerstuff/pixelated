@@ -34,8 +34,8 @@ export interface PrivacyEngineResult {
 class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
   private readonly dpConfig: DifferentialPrivacyConfig
-  private globalModel: any = null
-  private readonly clientModels = new Map<string, any>()
+  private globalModel: Record<string, unknown> | null = null
+  private readonly clientModels = new Map<string, Record<string, unknown>>()
   private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
@@ -61,7 +61,7 @@ class PrivacyEngine {
    */
   async initializeFederatedLearning(clients: string[]): Promise<{
     sessionId: string
-    globalModel: any
+    globalModel: Record<string, unknown>
     clientAssignments: Map<string, string[]>
   }> {
     if (clients.length < this.federatedConfig.minClients) {
@@ -87,7 +87,7 @@ class PrivacyEngine {
     }
   }
 
-  private async createGlobalModel(): Promise<any> {
+  private async createGlobalModel(): Promise<Record<string, unknown>> {
     // Initialize global model with random weights
     return {
       weights: Array.from({ length: 1000 }, () => Math.random()),
@@ -159,7 +159,7 @@ class PrivacyEngine {
   private async applyDifferentialPrivacy(
     update: ModelUpdate,
   ): Promise<ModelUpdate> {
-    const { epsilon, delta: _delta, sensitivity, mechanism } = this.dpConfig
+    const { epsilon, sensitivity, mechanism } = this.dpConfig
 
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
@@ -441,7 +441,7 @@ class PrivacyEngine {
     // Calculate basic statistics
     const progressValues = data
       .map((p) => p.progress)
-      .filter((p): p is number => p !== undefined)
+      .filter((p): p is number => p !== undefined && p !== null)
     if (progressValues.length > 0) {
       stats['progressMean'] =
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
@@ -494,9 +494,9 @@ class PrivacyEngine {
    */
   async zeroKnowledgeProcess(
     computation: string,
-    inputs: any[],
+    inputs: Array<Record<string, unknown>>,
   ): Promise<{
-    result: any
+    result: unknown
     proof: string
     verificationKey: string
   }> {
@@ -521,20 +521,20 @@ class PrivacyEngine {
 
   private async performComputation(
     computation: string,
-    inputs: any[],
-  ): Promise<any> {
+    inputs: Array<Record<string, unknown>>,
+  ): Promise<number | null> {
     // Simulate computation without revealing inputs
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + (input.moodScore ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input.moodScore as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => input.riskScore ?? 0))
+        return Math.max(...inputs.map((input) => (input.riskScore as number) ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + (input.effectiveness ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input.effectiveness as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       default:

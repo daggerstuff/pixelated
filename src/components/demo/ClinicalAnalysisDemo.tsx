@@ -95,52 +95,46 @@ export default function ClinicalAnalysisDemo() {
         throw new Error(`Analysis failed: ${response.status}`)
       }
 
-      const apiResult = await response.json()
+      const apiResult = await response.json() as Record<string, unknown>
+
+      const riskAssess = apiResult.riskAssessment as Record<string, unknown>
+      const indicators = apiResult.indicators as Array<Record<string, unknown>>
+      const recs = apiResult.recommendations as Array<Record<string, unknown>>
+      const analysis = apiResult.analysis as Record<string, unknown>
+      const metadata = apiResult.metadata as Record<string, unknown>
 
       // Transform API response to match our interface
       const analysisResult: AnalysisResult = {
         overallRisk: {
-          level: apiResult.riskAssessment.level,
-          score: apiResult.riskAssessment.score,
-          factors: apiResult.riskAssessment.factors,
-          recommendations: apiResult.riskAssessment.recommendations,
-          immediateActions: apiResult.riskAssessment.immediateActions,
+          level: riskAssess.level as RiskAssessment['level'],
+          score: riskAssess.score as number,
+          factors: riskAssess.factors as string[],
+          recommendations: riskAssess.recommendations as string[],
+          immediateActions: riskAssess.immediateActions as string[] | undefined,
         },
-        mentalHealthIndicators: apiResult.indicators.map(
-          (indicator: {
-            condition: string
-            present: boolean
-            confidence: number
-            severity: number
-            notes: string
-          }) => ({
-            name: indicator.condition,
-            present: indicator.present,
-            confidence: indicator.confidence,
-            severity: indicator.severity,
-            notes: indicator.notes,
+        mentalHealthIndicators: indicators.map(
+          (indicator) => ({
+            name: indicator.condition as string,
+            present: indicator.present as boolean,
+            confidence: indicator.confidence as number,
+            severity: indicator.severity as number | undefined,
+            notes: indicator.notes as string | undefined,
           }),
         ),
-        recommendations: apiResult.recommendations.map(
-          (rec: {
-            type: string
-            priority: string
-            intervention: string
-            rationale: string
-            timeline: string
-          }) => ({
-            type: rec.type,
-            priority: rec.priority,
-            description: rec.intervention,
-            rationale: rec.rationale,
-            timeline: rec.timeline,
+        recommendations: recs.map(
+          (rec) => ({
+            type: rec.type as Recommendation['type'],
+            priority: rec.priority as Recommendation['priority'],
+            description: rec.intervention as string,
+            rationale: rec.rationale as string,
+            timeline: rec.timeline as string,
           }),
         ),
-        clinicalSummary: apiResult.analysis.summary,
-        followUpRequired: apiResult.analysis.followUpRequired,
-        estimatedDuration: apiResult.analysis.estimatedDuration,
-        confidence: apiResult.analysis.overallConfidence,
-        processingTime: apiResult.metadata.processingTime,
+        clinicalSummary: analysis.summary as string,
+        followUpRequired: analysis.followUpRequired as boolean,
+        estimatedDuration: analysis.estimatedDuration as string,
+        confidence: analysis.overallConfidence as number,
+        processingTime: metadata.processingTime as number,
       }
 
       setResults(analysisResult)
