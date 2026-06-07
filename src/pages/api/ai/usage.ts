@@ -22,11 +22,11 @@ const rateLimiter = new RateLimiter(30, 60 * 1000)
  * Rate limited to prevent abuse
  */
 export const GET: APIRoute = async ({ request }) => {
-  let session: any
+  let session: { user?: { id?: string; role?: string } } | null = null
 
   try {
     // Verify session
-    session = await getSession(request)
+    session = (await getSession(request)) as unknown as typeof session
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -37,23 +37,30 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    const role = session.user.role ?? 'user'
+    const userId = session?.user?.id
+    const role = session?.user?.role ?? 'user'
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
     const { allowed, limit, remaining, reset } = rateLimiter.check(
-      `${session.user.id}:/api/ai/usage`,
+      `${userId}:/api/ai/usage`,
       role,
       {
-        admin: 60, // 60 requests per minute for admins
-        therapist: 40, // 40 requests per minute for therapists
-        user: 20, // 20 requests per minute for regular users
-        anonymous: 5, // 5 requests per minute for unauthenticated users
+        admin: 60,
+        therapist: 40,
+        user: 20,
+        anonymous: 5,
       },
-      60 * 1000, // 1 minute window
+      60 * 1000,
     )
 
     if (!allowed) {
       logger.warn('Rate limit exceeded for AI usage stats', {
-        userId: session.user.id,
-        role: role,
+        userId,
+        role,
       })
 
       return new Response(
@@ -75,7 +82,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Check if user has admin access for all users data
-    const isAdmin = session?.user?.role === 'admin'
+    const isAdmin = role === 'admin'
 
     // Validate query parameters
     const [params, validationError] = validateQueryParams(
@@ -88,7 +95,7 @@ export const GET: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'ai.usage.validation_error',
-        session?.user?.id ?? 'anonymous',
+        userId,
         'ai_usage',
         {
           error: validationError.error,
@@ -126,7 +133,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.request',
-      session?.user?.id ?? 'anonymous',
+      userId,
       'ai_usage',
       {
         period: params!.period,
@@ -149,15 +156,15 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     if (params!.startDate) {
-      statsOptions.startDate = new Date(params!.startDate)
+      statsOptions.startDate = new Date(params!.startDate as string)
     }
 
     if (params!.endDate) {
-      statsOptions.endDate = new Date(params!.endDate)
+      statsOptions.endDate = new Date(params!.endDate as string)
     }
 
-    if (!params!.allUsers && session?.user?.id) {
-      statsOptions.userId = session.user.id
+    if (!params!.allUsers) {
+      statsOptions.userId = userId
     }
 
     const stats = await getAIUsageStats(statsOptions)
@@ -166,10 +173,10 @@ export const GET: APIRoute = async ({ request }) => {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'private, max-age=60', // Cache for 1 minute
-        'X-RateLimit-Limit': limit.toString(),
-        'X-RateLimit-Remaining': remaining.toString(),
-        'X-RateLimit-Reset': reset.toString(),
+        'Cache-Control': 'private, max-age=60',
+        'X-RateLimit-Limit': String(limit),
+        'X-RateLimit-Remaining': String(remaining),
+        'X-RateLimit-Reset': String(reset),
       },
     })
   } catch (error: unknown) {
@@ -179,11 +186,11 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.error',
-      session?.user?.id ?? 'anonymous',
+      userId ?? 'anonymous',
       'ai_usage',
       {
-        error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined,
         status: 'error',
       },
       AuditEventStatus.FAILURE,
