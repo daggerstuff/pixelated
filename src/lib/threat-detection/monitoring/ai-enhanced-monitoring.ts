@@ -10,6 +10,7 @@ import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { asRedisOps } from '../../redis-ops'
 // Removed unused type imports to satisfy lint rules
 
 const logger = createBuildSafeLogger('ai-enhanced-monitoring')
@@ -1381,7 +1382,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
         alertData.severity ?? 'medium',
         alertData.title ?? '',
         alertData.description ?? '',
-        alertData.metrics ?? {},
+        alertData.metrics ?? ({} as SecurityMetrics),
         [],
         alertData.metadata,
       )
@@ -1500,7 +1501,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getActiveAlerts(): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await this.redis['lrange'](
+        const cached = (await asRedisOps(this.redis).lrange(
           'alerts:active',
           0,
           -1,
@@ -1521,7 +1522,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
   public async getAlertsBySeverity(severity: string): Promise<Alert[]> {
     try {
       if (this.redis) {
-        const cached = (await this.redis['lrange'](
+        const cached = (await asRedisOps(this.redis).lrange(
           `alerts:${severity}`,
           0,
           -1,
@@ -1530,7 +1531,10 @@ export class AIEnhancedMonitoringService extends EventEmitter {
           return cached.map((s: string) => JSON.parse(s) as Alert)
       }
       const db = this.mongoClient.db('threat_detection')
-      return await db.collection<Alert>('alerts').find({ severity }).toArray()
+      return await db
+        .collection<Alert>('alerts')
+        .find({ severity: severity as any })
+        .toArray()
     } catch {
       return []
     }
@@ -1566,7 +1570,7 @@ export class AIEnhancedMonitoringService extends EventEmitter {
     try {
       if (this.redis) {
         // Simplified: ignore timeRange for stub/test satisfaction, just return list
-        const cached = (await this.redis['lrange'](
+        const cached = (await asRedisOps(this.redis).lrange(
           `metrics:${name}`,
           0,
           -1,

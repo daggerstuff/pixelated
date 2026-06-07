@@ -23,7 +23,7 @@ function resolveSafeLlmBaseUrl(envVars: Record<string, string | undefined>): str
 /**
  * API route for intervention effectiveness analysis
  */
-export const POST = async ({ request }) => {
+export const POST = async ({ request }: { request: Request }) => {
   let session: Awaited<ReturnType<typeof getSession>> | null = null
 
   try {
@@ -37,9 +37,16 @@ export const POST = async ({ request }) => {
     }
 
     // Parse request body
-    const body = await request.json()
-    const { conversation, interventionMessage, userResponse, batch, model } =
-      body
+    const body = await request.json() as Record<string, unknown>
+    const conversation = body['conversation'] as AIMessage[] | undefined
+    const interventionMessage = body['interventionMessage'] as string | undefined
+    const userResponse = body['userResponse'] as string | undefined
+    const batch = body['batch'] as Array<{
+      conversation: AIMessage[]
+      interventionMessage: string
+      userResponse: string
+    }> | undefined
+    const model = body['model'] as string | undefined
 
     // Validate required fields
     if (!(conversation && interventionMessage && userResponse) && !batch) {
@@ -100,6 +107,7 @@ export const POST = async ({ request }) => {
       ).entries()) {
         const latencyMs = Date.now() - startTime
         const batchItem = batch[i]
+        if (!batchItem) continue
 
         await aiRepository.storeInterventionAnalysis({
           userId: session?.user?.id,
@@ -131,12 +139,14 @@ export const POST = async ({ request }) => {
       // Convert conversation to AIMessage[] if it's not already
       const conversationMessages = Array.isArray(conversation)
         ? conversation
-        : ([{ role: 'user', content: conversation, name: '' }] as AIMessage[])
+        : typeof conversation === 'string'
+        ? ([{ role: 'user', content: conversation as string, name: '' }] as AIMessage[])
+        : []
 
       result = await interventionService.analyzeIntervention(
         conversationMessages,
-        interventionMessage,
-        userResponse,
+        interventionMessage ?? '',
+        userResponse ?? '',
       )
 
       const latencyMs = Date.now() - startTime
@@ -153,8 +163,8 @@ export const POST = async ({ request }) => {
         success: true,
         error: null,
         conversation: JSON.stringify(conversationMessages),
-        intervention: interventionMessage,
-        userResponse,
+        intervention: interventionMessage ?? '',
+        userResponse: userResponse ?? '',
         effectiveness: (
           result as import('../../../lib/ai/services/intervention-analysis').InterventionAnalysisResult
         ).effectiveness_score,

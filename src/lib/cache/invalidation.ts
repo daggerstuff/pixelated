@@ -1,6 +1,7 @@
 import Redis from 'ioredis'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { type MultiOps } from '../redis-ops'
 import { RedisService } from '../services/redis/RedisService'
 
 // Initialize logger
@@ -64,7 +65,7 @@ export class CacheInvalidation {
       const serializedValue = JSON.stringify(value)
 
       // Start a Redis transaction
-      const multi = this.redis.multi()
+      const multi = this.redis.multi() as unknown as MultiOps
 
       // Set the cache value with TTL
       const ttl = rule?.ttl ?? this.defaultTTL
@@ -75,7 +76,7 @@ export class CacheInvalidation {
         for (const tag of rule.tags) {
           const tagKey = this.getTagKey(tag)
           void multi.sadd(tagKey, cacheKey)
-          multi['expire'](tagKey, ttl)
+          multi.expire(tagKey, ttl)
         }
       }
 
@@ -84,12 +85,12 @@ export class CacheInvalidation {
         for (const dependency of rule.dependencies) {
           const depKey = this.getDependencyKey(dependency)
           void multi.sadd(depKey, cacheKey)
-          multi['expire'](depKey, ttl)
+          multi.expire(depKey, ttl)
         }
       }
 
       // Execute the transaction
-      await multi['exec']()
+      await multi.exec()
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('set cache', error))
       throw error
@@ -135,10 +136,10 @@ export class CacheInvalidation {
       const keys = await this.redis.smembers(tagKey)
 
       if (keys.length) {
-        const multi = this.redis.multi()
+        const multi = this.redis.multi() as unknown as MultiOps
         void multi.del(...keys)
         void multi.del(tagKey)
-        await multi['exec']()
+        await multi.exec()
       }
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('invalidate cache tag', error))
@@ -152,10 +153,10 @@ export class CacheInvalidation {
       const keys = await this.redis.smembers(depKey)
 
       if (keys.length) {
-        const multi = this.redis.multi()
+        const multi = this.redis.multi() as unknown as MultiOps
         void multi.del(...keys)
         void multi.del(depKey)
-        await multi['exec']()
+        await multi.exec()
       }
     } catch (error: unknown) {
       logger.error(

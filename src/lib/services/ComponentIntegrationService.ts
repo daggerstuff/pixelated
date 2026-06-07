@@ -2,6 +2,81 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('component-integration-service')
 
+interface ChartDataParams {
+  type: 'line' | 'bar' | 'pie' | 'scatter'
+  category?: 'progress' | 'emotions' | 'sessions' | 'outcomes'
+  timeRange?: number
+  clientId?: string
+  sessionId?: string
+  dataPoints?: number
+}
+
+interface EmotionDataParams {
+  clientId?: string
+  sessionId?: string
+  timeRange?: number
+  maxPoints?: number
+  includeTrajectory?: boolean
+}
+
+interface EmotionPointInput {
+  emotion: string
+  valence: number
+  arousal: number
+  dominance: number
+  intensity?: number
+  sessionId?: string
+}
+
+interface TreatmentPlanParams {
+  clientId?: string
+  planId?: string
+  status?: string
+  includeMetrics?: boolean
+}
+
+interface ParticleSystemParams {
+  emotion?: string
+  particleCount?: number
+  intensity?: number
+  sessionId?: string
+  useSessionData?: boolean
+  complexity?: 'low' | 'medium' | 'high'
+}
+
+interface DashboardParams {
+  clientId?: string
+  sessionId?: string
+  timeRange?: number
+  includeMetrics?: boolean
+}
+
+interface CarouselParams {
+  configId?: string
+  category?: string
+  audience?: string
+  includeExpired?: boolean
+}
+
+interface RealtimeSubscriptionParams {
+  sessionId: string
+  components: ('emotions' | 'particles' | 'charts' | 'treatment')[]
+  onUpdate: (data: unknown) => void
+  onError: (error: unknown) => void
+}
+
+interface HealthService {
+  endpoint: string
+  status: 'healthy' | 'unhealthy' | 'error'
+  error: unknown
+}
+
+interface ServiceHealth {
+  overall: 'healthy' | 'degraded' | 'error'
+  services: HealthService[]
+  timestamp: string
+}
+
 /**
  * Central service for managing component data integration
  * Provides a unified interface for all enterprise components to access backend data
@@ -19,14 +94,9 @@ export class ComponentIntegrationService {
   }
 
   // Analytics Dashboard Integration
-  async getChartData(params: {
-    type: 'line' | 'bar' | 'pie' | 'scatter'
-    category?: 'progress' | 'emotions' | 'sessions' | 'outcomes'
-    timeRange?: number
-    clientId?: string
-    sessionId?: string
-    dataPoints?: number
-  }) {
+  async getChartData(
+    params: ChartDataParams,
+  ): Promise<Record<string, unknown>> {
     try {
       const queryParams = new URLSearchParams()
       for (const [key, value] of Object.entries(params)) {
@@ -46,7 +116,10 @@ export class ComponentIntegrationService {
         throw new Error(`Analytics API error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Retrieved chart data', {
         type: params.type,
         category: params.category,
@@ -59,13 +132,9 @@ export class ComponentIntegrationService {
   }
 
   // 3D Emotion Visualization Integration
-  async get3DEmotionData(params: {
-    clientId?: string
-    sessionId?: string
-    timeRange?: number
-    maxPoints?: number
-    includeTrajectory?: boolean
-  }) {
+  async get3DEmotionData(
+    params: EmotionDataParams,
+  ): Promise<Record<string, unknown>> {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -86,9 +155,12 @@ export class ComponentIntegrationService {
         throw new Error(`3D Emotion API error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Retrieved 3D emotion data', {
-        pointCount: data.emotionPoints?.length,
+        pointCount: (data['emotionPoints'] as unknown[] | undefined)?.length,
         sessionId: params.sessionId,
       })
       return data
@@ -98,14 +170,9 @@ export class ComponentIntegrationService {
     }
   }
 
-  async addEmotionPoint(emotionData: {
-    emotion: string
-    valence: number
-    arousal: number
-    dominance: number
-    intensity?: number
-    sessionId?: string
-  }) {
+  async addEmotionPoint(
+    emotionData: EmotionPointInput,
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/components/emotions/3d-visualization`,
@@ -120,7 +187,10 @@ export class ComponentIntegrationService {
         throw new Error(`Add emotion point API error: ${response.status}`)
       }
 
-      const result = await response.json()
+      const result: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Added emotion point', { emotion: emotionData.emotion })
       return result
     } catch (error: unknown) {
@@ -131,13 +201,8 @@ export class ComponentIntegrationService {
 
   // Treatment Plan Management Integration
   async getTreatmentPlans(
-    params: {
-      clientId?: string
-      planId?: string
-      status?: string
-      includeMetrics?: boolean
-    } = {},
-  ) {
+    params: TreatmentPlanParams = {},
+  ): Promise<Record<string, unknown>[]> {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -158,7 +223,8 @@ export class ComponentIntegrationService {
         throw new Error(`Treatment plans API error: ${response.status}`)
       }
 
-      const plans = await response.json()
+      const plans: Record<string, unknown>[] =
+        (await response.json()) as Record<string, unknown>[]
       logger.info('Retrieved treatment plans', {
         planCount: plans.length,
         clientId: params.clientId,
@@ -170,7 +236,9 @@ export class ComponentIntegrationService {
     }
   }
 
-  async saveTreatmentPlan(planData: any) {
+  async saveTreatmentPlan(
+    planData: Record<string, unknown>,
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/components/treatment-plans/enhanced`,
@@ -185,8 +253,11 @@ export class ComponentIntegrationService {
         throw new Error(`Save treatment plan API error: ${response.status}`)
       }
 
-      const result = await response.json()
-      logger.info('Saved treatment plan', { planId: result.id })
+      const result: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
+      logger.info('Saved treatment plan', { planId: result['id'] })
       return result
     } catch (error: unknown) {
       logger.error('Error saving treatment plan', { error, planData })
@@ -198,8 +269,8 @@ export class ComponentIntegrationService {
     planId: string
     goalId?: string
     milestoneId?: string
-    updates: Record<string, any>
-  }) {
+    updates: Record<string, unknown>
+  }): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/components/treatment-plans/enhanced`,
@@ -225,15 +296,8 @@ export class ComponentIntegrationService {
 
   // Particle System Integration
   async getParticleSystem(
-    params: {
-      emotion?: string
-      particleCount?: number
-      intensity?: number
-      sessionId?: string
-      useSessionData?: boolean
-      complexity?: 'low' | 'medium' | 'high'
-    } = {},
-  ) {
+    params: ParticleSystemParams = {},
+  ): Promise<Record<string, unknown>> {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -254,9 +318,12 @@ export class ComponentIntegrationService {
         throw new Error(`Particle system API error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Retrieved particle system', {
-        particleCount: data.particles?.length,
+        particleCount: (data['particles'] as unknown[] | undefined)?.length,
         emotion: params.emotion,
       })
       return data
@@ -270,8 +337,8 @@ export class ComponentIntegrationService {
     emotion: string
     intensity: number
     sessionId?: string
-    particleUpdates?: any[]
-  }) {
+    particleUpdates?: unknown[]
+  }): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/components/particles/emotion-system`,
@@ -297,13 +364,8 @@ export class ComponentIntegrationService {
 
   // UI Carousel Content Integration
   async getCarouselContent(
-    params: {
-      configId?: string
-      category?: string
-      audience?: string
-      includeExpired?: boolean
-    } = {},
-  ) {
+    params: CarouselParams = {},
+  ): Promise<Record<string, unknown>> {
     try {
       const queryParams = new URLSearchParams()
       Object.entries(params).forEach(([key, value]) => {
@@ -324,9 +386,12 @@ export class ComponentIntegrationService {
         throw new Error(`Carousel content API error: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Retrieved carousel content', {
-        configCount: data.configurations?.length,
+        configCount: (data['configurations'] as unknown[] | undefined)?.length,
         audience: params.audience,
       })
       return data
@@ -337,9 +402,9 @@ export class ComponentIntegrationService {
   }
 
   async saveCarouselConfiguration(
-    configData: any,
+    configData: Record<string, unknown>,
     action: 'create' | 'update' = 'create',
-  ) {
+  ): Promise<Record<string, unknown>> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/components/ui/carousel-content`,
@@ -354,9 +419,14 @@ export class ComponentIntegrationService {
         throw new Error(`Save carousel config API error: ${response.status}`)
       }
 
-      const result = await response.json()
+      const result: Record<string, unknown> = (await response.json()) as Record<
+        string,
+        unknown
+      >
       logger.info('Saved carousel configuration', {
-        configId: result.configuration?.id,
+        configId: (
+          result['configuration'] as Record<string, unknown> | undefined
+        )?.['id'],
       })
       return result
     } catch (error: unknown) {
@@ -367,13 +437,8 @@ export class ComponentIntegrationService {
 
   // Cross-Component Integration Methods
   async getIntegratedDashboardData(
-    params: {
-      clientId?: string
-      sessionId?: string
-      timeRange?: number
-      includeMetrics?: boolean
-    } = {},
-  ) {
+    params: DashboardParams = {},
+  ): Promise<Record<string, unknown>> {
     try {
       // Fetch data from multiple endpoints simultaneously
       const [chartData, emotionData, treatmentPlans, particleSystem] =
@@ -448,12 +513,9 @@ export class ComponentIntegrationService {
   }
 
   // Real-time Updates and WebSocket Integration
-  async subscribeToRealTimeUpdates(params: {
-    sessionId: string
-    components: ('emotions' | 'particles' | 'charts' | 'treatment')[]
-    onUpdate: (data: any) => void
-    onError: (error: any) => void
-  }) {
+  async subscribeToRealTimeUpdates(
+    params: RealtimeSubscriptionParams,
+  ): Promise<() => void> {
     try {
       // TODO: Implement WebSocket connection for real-time updates
       logger.info('Subscribing to real-time updates', {
@@ -484,7 +546,7 @@ export class ComponentIntegrationService {
   }
 
   // Health Check and Service Status
-  async getServiceHealth() {
+  async getServiceHealth(): Promise<ServiceHealth> {
     try {
       const endpoints = [
         '/api/components/analytics/charts',
@@ -507,23 +569,25 @@ export class ComponentIntegrationService {
         }),
       )
 
-      const health = {
-        overall: healthChecks.every(
+      const health: ServiceHealth = {
+        overall: (healthChecks.every(
           (check) => check.status === 'fulfilled' && check.value.ok,
         )
           ? 'healthy'
-          : 'degraded',
-        services: healthChecks.map((check) => ({
-          endpoint:
-            check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
-          status:
-            check.status === 'fulfilled'
-              ? check.value.ok
-                ? 'healthy'
-                : 'unhealthy'
-              : 'error',
-          error: check.status === 'rejected' ? check.reason : null,
-        })),
+          : 'degraded') as ServiceHealth['overall'],
+        services: healthChecks.map(
+          (check): HealthService => ({
+            endpoint:
+              check.status === 'fulfilled' ? check.value.endpoint : 'unknown',
+            status:
+              check.status === 'fulfilled'
+                ? check.value.ok
+                  ? 'healthy'
+                  : 'unhealthy'
+                : 'error',
+            error: check.status === 'rejected' ? check.reason : null,
+          }),
+        ),
         timestamp: new Date().toISOString(),
       }
 
