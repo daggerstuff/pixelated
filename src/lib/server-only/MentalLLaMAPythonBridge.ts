@@ -69,8 +69,8 @@ export class MentalLLaMAPythonBridge {
     logger.info('Attempting to initialize PythonBridge...')
     try {
       this.pythonProcess = spawn('python3', [this.pythonScriptPath], {
-        stdio: ['pipe', 'pipe', 'pipe'],
-      })
+        stdio: ['pipe', 'pipe', 'pipe'] as const,
+      }) as unknown as ChildProcessWithoutNullStreams
       this.pythonProcess.stdout.setEncoding('utf-8')
       this.pythonProcess.stderr.setEncoding('utf-8')
 
@@ -80,8 +80,7 @@ export class MentalLLaMAPythonBridge {
           .filter(Boolean)
           .forEach((line) => {
             try {
-              const response: PythonBridgeResponse & { id?: string } =
-                JSON.parse(line) as unknown
+              const response = JSON.parse(line) as unknown as PythonBridgeResponse & { id?: string }
               if (response?.id && this.requestQueue.has(response.id)) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
                 clearTimeout(timeout)
@@ -93,7 +92,7 @@ export class MentalLLaMAPythonBridge {
                 }
               }
             } catch (err: unknown) {
-              logger.error('Failed to parse PythonBridge response', line, err)
+              logger.error('Failed to parse PythonBridge response', { line, error: String(err) })
             }
           })
       })
@@ -108,8 +107,8 @@ export class MentalLLaMAPythonBridge {
         this.isInitialized = false
       })
 
-      this.pythonProcess.on('error', (err) => {
-        logger.error('PythonBridge process error:', err)
+      this.pythonProcess.on('error', (err: Error) => {
+        logger.error('PythonBridge process error:', { error: String(err) })
         this.isFunctional = false
         this.isInitialized = false
       })
@@ -143,15 +142,16 @@ export class MentalLLaMAPythonBridge {
     if (!this.isFunctional) {
       logger.error(
         'PythonBridge is not functional. Cannot analyze text with Python model.',
+        {},
       )
       throw new PythonBridgeError('PythonBridge is not functional.')
     }
     const payload = { text, modelParams }
-    const response = await this.sendRequest('analyze_text', payload)
+    const response = await this.sendRequest('analyze_text', payload) as unknown
     if (
       response &&
       typeof response === 'object' &&
-      'hasMentalHealthIssue' in response
+      'hasMentalHealthIssue' in (response as Record<string, unknown>)
     ) {
       return response as MentalLLaMAAnalysisResult
     }
@@ -175,13 +175,14 @@ export class MentalLLaMAPythonBridge {
     if (!this.isFunctional) {
       logger.error(
         'PythonBridge is not functional. Cannot run IMHI evaluation.',
+        {},
       )
       throw new PythonBridgeError('PythonBridge is not functional.')
     }
     return this.sendRequest(
       'run_imhi_evaluation',
       params as unknown as Record<string, unknown>,
-    )
+    ) as unknown
   }
 
   /**
@@ -196,7 +197,7 @@ export class MentalLLaMAPythonBridge {
       try {
         await this.sendRequest('shutdown', {})
       } catch (e) {
-        logger.warn('Error during PythonBridge shutdown request', e)
+        logger.warn('Error during PythonBridge shutdown request', { error: String(e) })
       }
       this.pythonProcess.kill()
       this.pythonProcess = null
@@ -243,8 +244,7 @@ export class MentalLLaMAPythonBridge {
         reject(new PythonBridgeError(`Request timed out: ${command}`))
       }, this.REQUEST_TIMEOUT_MS)
       this.requestQueue.set(id, { resolve, reject, timeout })
-      try {
-        this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
+      try {              this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
       } catch {
         clearTimeout(timeout)
         this.requestQueue.delete(id)

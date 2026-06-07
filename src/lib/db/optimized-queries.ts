@@ -3,7 +3,7 @@
  * High-performance queries with proper indexing, connection pooling, and query optimization
  */
 
-import type { PoolClient, QueryResult } from 'pg'
+import type { PoolClient } from 'pg'
 
 import { getLogger } from '../logging'
 import { getPool } from './index'
@@ -43,7 +43,7 @@ const OPTIMIZED_INDEXES = {
 /**
  * Execute query with timeout and performance monitoring
  */
-export async function executeQuery<T = unknown>(
+export async function executeQuery(
   text: string,
   params?: unknown[],
   options: {
@@ -51,7 +51,7 @@ export async function executeQuery<T = unknown>(
     retries?: number
     name?: string
   } = {},
-): Promise<QueryResult<T>> {
+): Promise<{ rows: unknown[]; rowCount: number }> {
   const startTime = Date.now()
   const queryName = options.name ?? 'unnamed'
   const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
@@ -93,7 +93,7 @@ export async function executeQuery<T = unknown>(
         attempt,
       })
 
-      return result
+      return result as { rows: unknown[]; rowCount: number }
     } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
 
