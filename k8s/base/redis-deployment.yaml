@@ -15,20 +15,39 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
-        fsGroup: 65534
+        runAsUser: 999
+        runAsGroup: 1000
+        fsGroup: 1000
         seccompProfile:
           type: RuntimeDefault
+      initContainers:
+      - name: fix-permissions
+        image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: false
+          runAsUser: 0
+          capabilities:
+            drop:
+              - ALL
+        command:
+        - sh
+        - -c
+        - chown -R 999:1000 /data
+        volumeMounts:
+        - name: data
+          mountPath: /data
       containers:
       - name: redis
         image: redis:7-alpine
         securityContext:
           allowPrivilegeEscalation: false
           runAsNonRoot: true
+          runAsUser: 999
+          runAsGroup: 1000
           capabilities:
             drop:
-            - ALL
+              - ALL
           readOnlyRootFilesystem: true
         command:
         - sh
@@ -41,6 +60,9 @@ spec:
         - containerPort: 6379
           name: redis
           protocol: TCP
+        volumeMounts:
+        - name: data
+          mountPath: /data
         resources:
           requests:
             cpu: "50m"
@@ -48,3 +70,6 @@ spec:
           limits:
             cpu: "200m"
             memory: "128Mi"
+      volumes:
+      - name: data
+        emptyDir: {}

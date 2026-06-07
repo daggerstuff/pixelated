@@ -1,11 +1,11 @@
 # Task Sync: Cross-System Mapping Gap Matrix
 
-*Generated: 2026-05-29 from live Linear queries + export cross-reference*
+Generated: 2026-05-29 from live Linear queries + export cross-reference
 
 ## Overview
 
 | System | Provider | Status | Issues |
-|--------|----------|--------|--------|
+| --- | --- | --- | --- |
 | Linear (PIX) | `normalize_linear_payload` | ✅ Active | 385 issues, 14 projects |
 | Jira ADHD | `normalize_jira_payload` | ✅ Active | 399 issues exported |
 | GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
@@ -14,7 +14,7 @@
 ### Canonical States (expected vs actual)
 
 | Canonical (wanted) | STATUS_ALIASES (actual) | Linear States Found |
-|---|---|---|
+| --- | --- | --- |
 | `backlog` | `open` (aliased from backlog/todo/triage) | Backlog (45), Todo (45), Triage (9) |
 | `in_progress` | `in_progress` (aliased from "in progress"/review/doing/active) | In Progress (26) |
 | `review` | **MISSING** — maps to `in_progress` | (none — no "In Review" state active) |
@@ -23,7 +23,7 @@
 ### Per-Project State Coverage Gap
 
 | Project | Total | States Used | Missing Canonical States |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Training Pipeline Improvements | 70 | Done, Backlog, In Progress, Todo | `closed`, `review` |
 | CI Federation & Release Readiness | 59 | Done, Todo, Canceled, Backlog | `closed`, `review` |
 | Foresight Memory Architecture | 59 | Done, Todo, Duplicate, In Progress | `closed`, `review` |
@@ -52,7 +52,6 @@
 ## 2. Priority Mapping Gaps
 
 ### Current Code (tri_sync.py)
-### Current Code (tri_sync.py)
 ```python
 PROVIDER_PRIORITY = {
     "asana": 3,
@@ -70,7 +69,7 @@ PROVIDER_PRIORITY = {
 ### Live Data
 
 | Project | Priority Distribution | Notes |
-|---|---|---|
+| --- | --- | --- |
 | All 14 projects | `?` or `None` | Export format doesn't capture priority field |
 
 ### Gap: Priority sync is absent
@@ -86,8 +85,9 @@ PROVIDER_PRIORITY = {
 - Labels are not extracted, normalized, or synced between providers
 
 ### Live Data
+
 | Project | Distinct Labels | Notes |
-|---|---|---|
+| --- | --- | --- |
 | All 14 projects | 0 | Export format doesn't capture labels |
 
 ### Gap: Label system is entirely absent
@@ -101,7 +101,7 @@ PROVIDER_PRIORITY = {
 ### Cross-Reference Status
 
 | Status | Linear → ADHD | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Mapped PIX issues | **223 of 385** (58%) | 162 issues are Linear-only |
 | PIX-ADHD key map | 197 entries | One-directional: PIX→ADHD only |
 | Jira → Linear mapping | **None** | No reverse map exists |
@@ -109,7 +109,7 @@ PROVIDER_PRIORITY = {
 ### Per-Project ADHD Coverage
 
 | Project | Total | Mapped to ADHD | Unmapped | Coverage |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Training Pipeline Improvements | 70 | 0 | 70 | **0%** ❌ |
 | Memory May-Hem Expansion | 19 | 0 | 19 | **0%** ❌ |
 | AutoReview Workflow Improvements | 24 | 24 | 0 | 100% ✅ |
@@ -149,7 +149,7 @@ PROVIDER_PRIORITY = {
 ## 6. Infrastructure Gaps
 
 | Component | Status | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Sync daemon | ❌ None | Must run manually |
 | Cron/scheduler | ❌ None | No automated sync |
 | Export refresh | ❌ Stale (May 27) | 2 days old |
@@ -160,7 +160,7 @@ PROVIDER_PRIORITY = {
 ## Summary of Required Fixes
 
 | # | Issue | Severity | Fix |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | 1 | `review` canonical state missing | High | Add to STATUS_ALIASES |
 | 2 | No priority sync | High | Add priority mapping in build_sync_action |
 | 3 | No label sync | Medium | Add labels to TaskRecord + sync pipeline |
