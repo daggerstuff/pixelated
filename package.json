@@ -162,7 +162,6 @@
     "toolbar:on": "astro preferences enable devToolbar",
     "toolbar:off": "astro preferences disable devToolbar",
     "blog-publisher": "tsx src/lib/scripts/blog-publisher.ts",
-    "blog": "node scripts/blog-web.js",
     "schedule-posts": "node scripts/content/schedule-posts.js",
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
     "db:migrate": "tsx scripts/db-migrate.ts migrate",
@@ -170,7 +169,10 @@
     "db:status": "tsx scripts/db-migrate.ts status",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
-    "mcp:manage": "node scripts/mcp-manager.js"
+    "mcp:manage": "node scripts/mcp-manager.js",
+    "struct:install": "bash scripts/devops/install-struct-cli.sh",
+    "struct:test-mcp": "bash scripts/devops/test-struct-mcp.sh",
+    "struct:validate": "pnpm run struct:test-mcp && echo 'Struct validation complete'"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "latest",
@@ -444,7 +446,7 @@
     "vfile": "latest",
     "viewerjs": "latest",
     "vite": "^8.0.16",
-    "vite-tsconfig-paths": "latest",
+    "vite-tsconfig-paths": "7.0.0-alpha.1",
     "vitest": "^4.1.8",
     "vscode-jsonrpc": "9.0.0",
     "wait-on": "latest"
@@ -453,7 +455,8 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "path-to-regexp": "8.4.2"
+    "path-to-regexp": "8.4.2",
+    "typescript": "^5.9.3"
   },
   "overrides": {
     "@astrojs/react>devalue": "^5.6.4",
@@ -578,7 +581,8 @@
     "yaml@2.7.1": "npm:yaml@2.8.4",
     "yaml@>=2.0.0 <2.8.3": "^2.8.3",
     "yauzl": "^3.2.1",
-    "zod": "^4.3.2"
+    "zod": "^4.3.2",
+    "vite-tsconfig-paths>tsconfck>typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=24"
