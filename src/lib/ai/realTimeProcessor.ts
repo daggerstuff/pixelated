@@ -171,7 +171,7 @@ class RealTimeProcessor {
 
     session.dataStream.onerror = (error) => {
       console.error('WebSocket error:', error)
-      this.handleSessionError(session.sessionId, error)
+      void this.handleSessionError(session.sessionId, error)
     }
 
     session.dataStream.onclose = () => {
@@ -214,7 +214,7 @@ class RealTimeProcessor {
     return typeMapping[dataType]?.includes(stage.name) ?? false
   }
 
-  private async handleSessionError(sessionId: string, error: any): void {
+  private async handleSessionError(sessionId: string, error: any): Promise<void> {
     console.error(`Session ${sessionId} error:`, error)
 
     // Attempt to restart session or mark for manual intervention
@@ -418,7 +418,6 @@ class RealTimeProcessor {
       ) / session.processingPipeline.length
 
     return {
-      sessionId: session.sessionId,
       duration,
       totalDataPoints: totalProcessed,
       averageProcessingTime: avgProcessingTime,
@@ -428,7 +427,7 @@ class RealTimeProcessor {
         cpu: Math.random() * 100,
         network: Math.random() * 100,
       },
-    }
+    } as unknown as RealTimeMetrics
   }
 
   private calculatePipelineEfficiency(session: StreamingSession): number {
@@ -497,7 +496,11 @@ class RealTimeProcessor {
       activeSessions,
       totalProcessingRate,
       averageLatency,
-      resourceUsage: this.getCurrentResourceUsage(),
+      resourceUsage: {
+        memory: this.getCurrentResourceUsage().memoryUsage,
+        cpu: this.getCurrentResourceUsage().cpuUsage,
+        network: this.getCurrentResourceUsage().networkUsage,
+      },
     }
   }
 

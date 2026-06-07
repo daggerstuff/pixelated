@@ -24,11 +24,11 @@ export async function createMentalLLaMAPythonBridge(scriptPath?: string): Promis
       )
       // Fallback to stub if server import fails
       const { MentalLLaMAPythonBridge } = await import('./browser-stub')
-      return new MentalLLaMAPythonBridge()
+      return new MentalLLaMAPythonBridge() as unknown as { initialize(): Promise<void>; isReady(): boolean }
     }
   } else {
     // Browser environment - use stub
     const { MentalLLaMAPythonBridge } = await import('./browser-stub')
-    return new MentalLLaMAPythonBridge()
+    return new MentalLLaMAPythonBridge() as unknown as { initialize(): Promise<void>; isReady(): boolean }
   }
 }

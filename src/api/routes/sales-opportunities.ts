@@ -3,6 +3,31 @@ import express, { Router, Request, Response } from 'express'
 
 import { authMiddleware } from '../middleware/auth'
 import { asyncHandler, ValidationError } from '../middleware/error-handler'
+
+interface SalesOpportunityBody {
+  title?: string
+  amount?: number
+  stage?: string
+  description?: string
+  accountName?: string
+  probability?: number
+  closeDate?: string
+  contacts?: unknown[]
+  status?: string
+}
+
+interface ContactBody {
+  name?: string
+  email?: string
+  phone?: string
+  role?: string
+}
+
+interface ActivityBody {
+  type?: string
+  description?: string
+  metadata?: Record<string, unknown>
+}
 import {
   listSalesOpportunities,
   createSalesOpportunity,
@@ -22,13 +47,19 @@ router.use(authMiddleware)
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, stage } = req.query
-    const { user } = req as { user: { id: string } }
+    const pageParam = req.query['page']
+    const limitParam = req.query['limit']
+    const stageParam = req.query['stage']
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
-    const result = await listSalesOpportunities(user.id, {
-      page: page ? parseInt(page as string) : 1,
-      limit: limit ? parseInt(limit as string) : 50,
-      stage: typeof stage === 'string' ? stage : undefined,
+    const result = await listSalesOpportunities(userId, {
+      page: typeof pageParam === 'string' ? parseInt(pageParam) : 1,
+      limit: typeof limitParam === 'string' ? parseInt(limitParam) : 50,
+      stage: typeof stageParam === 'string' ? stageParam : undefined,
     })
 
     res.json({ success: true, ...result })
@@ -38,8 +69,13 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { title, amount, stage, description } = req.body
-    const { user } = req as { user: { id: string } }
+    const body = req.body as SalesOpportunityBody
+    const { title, amount, stage, description } = body
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
     if (!title || !amount || !stage) {
       throw new ValidationError('title, amount, and stage are required', {
@@ -52,12 +88,12 @@ router.post(
     const opportunity = await createSalesOpportunity({
       title,
       description,
-      ownerId: user.id,
-      accountName: req.body.accountName,
+      ownerId: userId,
+      accountName: body.accountName,
       amount,
-      probability: req.body.probability,
+      probability: body.probability,
       stage,
-      closeDate: req.body.closeDate ? new Date(req.body.closeDate) : undefined,
+      closeDate: body.closeDate ? new Date(body.closeDate) : undefined,
     })
 
     res.status(201).json({ success: true, data: opportunity })
@@ -67,10 +103,14 @@ router.post(
 router.get(
   '/:opportunityId',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
-    const opportunity = await getSalesOpportunity(opportunityId, user.id)
+    const opportunity = await getSalesOpportunity(opportunityId, userId)
 
     res.json({ success: true, data: opportunity })
   }),
@@ -79,20 +119,23 @@ router.get(
 router.put(
   '/:opportunityId',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { title, amount, stage } = req.body
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const body = req.body as SalesOpportunityBody
+    const { title, amount, stage } = body
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
-    const opportunity = await updateSalesOpportunity(opportunityId, user.id, {
+    const opportunity = await updateSalesOpportunity(opportunityId, userId, {
       title,
       value: amount,
       stage,
-      contacts: req.body.contacts,
-      expectedCloseDate: req.body.closeDate
-        ? new Date(req.body.closeDate)
-        : undefined,
-      probability: req.body.probability,
-      status: req.body.status,
+      contacts: body.contacts as Record<string, unknown>[] | undefined,
+      expectedCloseDate: body.closeDate ? new Date(body.closeDate) : undefined,
+      probability: body.probability,
+      status: body.status,
     })
 
     res.json({ success: true, data: opportunity })
@@ -102,10 +145,14 @@ router.put(
 router.delete(
   '/:opportunityId',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
-    await deleteSalesOpportunity(opportunityId, user.id)
+    await deleteSalesOpportunity(opportunityId, userId)
 
     res.json({ success: true, message: 'Opportunity deleted' })
   }),
@@ -114,9 +161,14 @@ router.delete(
 router.put(
   '/:opportunityId/stage',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { stage } = req.body
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const body = req.body as SalesOpportunityBody
+    const { stage } = body
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
     if (!stage) {
       throw new ValidationError('stage is required', {
@@ -124,7 +176,7 @@ router.put(
       })
     }
 
-    const opportunity = await updateStage(opportunityId, user.id, stage)
+    const opportunity = await updateStage(opportunityId, userId, stage)
 
     res.json({ success: true, data: opportunity })
   }),
@@ -133,9 +185,14 @@ router.put(
 router.post(
   '/:opportunityId/contacts',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { name, email, phone, role } = req.body
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const body = req.body as ContactBody
+    const { name, email, phone, role } = body
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
     if (!name) {
       throw new ValidationError('contact name is required', {
@@ -143,7 +200,7 @@ router.post(
       })
     }
 
-    const opportunity = await addContact(opportunityId, user.id, {
+    const opportunity = await addContact(opportunityId, userId, {
       name,
       email,
       phone,
@@ -157,9 +214,14 @@ router.post(
 router.post(
   '/:opportunityId/activities',
   asyncHandler(async (req: Request, res: Response) => {
-    const opportunityId = req.params['opportunityId'] as string
-    const { type, description, metadata } = req.body
-    const { user } = req as { user: { id: string } }
+    const opportunityId = String(req.params['opportunityId'] ?? '')
+    const body = req.body as ActivityBody
+    const { type, description, metadata } = body
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
 
     if (!type || !description) {
       throw new ValidationError('type and description are required', {
@@ -168,8 +230,8 @@ router.post(
       })
     }
 
-    const opportunity = await addActivity(opportunityId, user.id, {
-      type,
+    const opportunity = await addActivity(opportunityId, userId, {
+      type: type as Parameters<typeof addActivity>[2]['type'],
       description,
       metadata,
     })
