@@ -6,6 +6,7 @@
  * system we implemented for the MentalLLaMA adapter.
  */
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 import { runAllTests } from '../lib/ai/mental-llama/evidence/EvidenceExtractor.test'
 
 async function main() {
@@ -13,6 +14,7 @@ async function main() {
   console.log('='.repeat(60))
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await runAllTests()
     console.log('🎉 All evidence system tests completed successfully!')
     console.log('📝 Summary:')

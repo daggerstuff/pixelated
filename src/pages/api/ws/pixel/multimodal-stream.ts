@@ -98,7 +98,10 @@ export const GET: APIRoute = async (context) => {
     return new Response('Expected WebSocket upgrade', { status: 400 })
   }
 
-  const { socket, response } = Astro.getWebSocket(context)
+  const { socket, response } = Astro.getWebSocket(context) as unknown as {
+    socket: WebSocket
+    response: Response
+  }
   const connectionId = crypto.randomUUID()
   const sessionId =
     context.url.searchParams.get('sessionId') ?? crypto.randomUUID()
@@ -203,7 +206,7 @@ export const GET: APIRoute = async (context) => {
  */
 function parseMessage(data: string | ArrayBuffer): StreamMessage {
   if (typeof data === 'string') {
-    return JSON.parse(data)
+    return JSON.parse(data) as StreamMessage
   }
 
   // For binary data (audio chunks), wrap in default message
@@ -234,9 +237,14 @@ function sendMessage(socket: WebSocket, message: StreamResponse) {
 async function handleStartSession(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: typeof activeConnections extends Map<string, infer T>
-    ? T
-    : never,
+  connectionData: {
+    ws: WebSocket
+    sessionId: string
+    userId: string
+    startTime: number
+    audioBuffer: Uint8Array
+    transcriptionBuffer: string[]
+  },
 ) {
   logger.info('Session started', { sessionId: message.sessionId })
 
@@ -259,9 +267,14 @@ async function handleStartSession(
 async function handleAudioChunk(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: typeof activeConnections extends Map<string, infer T>
-    ? T
-    : never,
+  connectionData: {
+    ws: WebSocket
+    sessionId: string
+    userId: string
+    startTime: number
+    audioBuffer: Uint8Array
+    transcriptionBuffer: string[]
+  },
 ) {
   if (!message.data?.chunk) {
     logger.warn('Audio chunk missing data')
@@ -305,9 +318,14 @@ async function handleAudioChunk(
 async function handleTextInput(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: typeof activeConnections extends Map<string, infer T>
-    ? T
-    : never,
+  connectionData: {
+    ws: WebSocket
+    sessionId: string
+    userId: string
+    startTime: number
+    audioBuffer: Uint8Array
+    transcriptionBuffer: string[]
+  },
 ) {
   const text = message.data?.text ?? ''
 
@@ -333,9 +351,14 @@ async function handleTextInput(
 async function handleEndSession(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: typeof activeConnections extends Map<string, infer T>
-    ? T
-    : never,
+  connectionData: {
+    ws: WebSocket
+    sessionId: string
+    userId: string
+    startTime: number
+    audioBuffer: Uint8Array
+    transcriptionBuffer: string[]
+  },
 ) {
   const fullTranscription = connectionData.transcriptionBuffer.join(' ')
 
