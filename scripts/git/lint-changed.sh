@@ -70,6 +70,7 @@ get_changed_files() {
     [[ -z "$f" ]] && continue
     [[ -f "${repo}/${f}" ]] && echo "$f"
   done <<< "$files"
+  true
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────

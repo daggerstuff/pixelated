@@ -7,8 +7,6 @@ import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { createHash } from 'crypto'
-import { readFile, readdir } from 'fs/promises'
-import * as path from 'path'
 
 import { Pool, PoolClient } from 'pg'
 
@@ -84,9 +82,12 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   })
 
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
-  ;(pool as unknown as PoolWithConnectEvent).on('connect', (_client: PoolClient) => {
-    console.log('New client connected to database')
-  })
+  ;(pool as unknown as PoolWithConnectEvent).on(
+    'connect',
+    (_client: PoolClient) => {
+      console.log('New client connected to database')
+    },
+  )
 
   console.log(
     `Database pool initialized with ${finalConfig.max} max connections`,
@@ -301,7 +302,10 @@ export class DatabaseMigration {
    */
   async runMigrationsFromDirectory(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },
@@ -332,7 +336,10 @@ export class DatabaseMigration {
    */
   async rollbackLast(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },
@@ -360,7 +367,10 @@ export class DatabaseMigration {
    */
   async getStatus(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },

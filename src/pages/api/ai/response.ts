@@ -73,7 +73,7 @@ interface Session {
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Verify session for security
-    const session: Session | null = await getSession()
+    const session: Session | null = await getSession(request)
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -142,7 +142,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     // Verify session
-    session = await getSession()
+    session = await getSession(request)
     if (!session) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -151,7 +151,14 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json() as {
+      messages?: AIMessage[]
+      currentMessage?: string
+      model?: string
+      temperature?: number
+      maxResponseTokens?: number
+      instructions?: string
+    }
     const {
       messages,
       currentMessage,
@@ -347,7 +354,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     } else {
       result = await responseService.generateResponseWithInstructions(
-        [currentMessage],
+        [{ role: 'user', content: currentMessage ?? '' }],
         instructions,
       )
     }
@@ -374,7 +381,7 @@ export const POST: APIRoute = async ({ request }) => {
       prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ''),
       response: result?.content,
       context: '',
-      instructions,
+      instructions: instructions ?? null,
       temperature,
       maxTokens: maxResponseTokens,
       requestTokens: result?.usage?.promptTokens ?? 0,

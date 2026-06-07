@@ -8,6 +8,7 @@ import { EventEmitter } from 'events'
 import { mongoClient } from '../../db/mongoClient'
 import { createBuildSafeLogger } from '../../logger'
 import { redis } from '../../redis'
+import { asRedisOps } from '../../redis-ops'
 
 const logger = createBuildSafeLogger('threat-detection-system')
 
@@ -105,7 +106,7 @@ class ProductionThreatDetectionService {
     try {
       // Check against known bad IPs in Redis
       const reputation = redis
-        ? await redis?.['get']?.(`ip_reputation:${ip}`)
+        ? await asRedisOps(redis).get(`ip_reputation:${ip}`)
         : null
       if (reputation) {
         return parseFloat(reputation)
@@ -117,7 +118,7 @@ class ProductionThreatDetectionService {
 
       if (badIP) {
         if (redis) {
-          await redis?.['setex']?.(
+          await asRedisOps(redis).setex(
             `ip_reputation:${ip}`,
             3600,
             (badIP['riskScore'] as number)?.toString() ?? '',
@@ -138,9 +139,9 @@ class ProductionThreatDetectionService {
       const key = `request_freq:${ip}`
       let count = 0
       if (redis) {
-        const result = await redis?.['hincrby']?.(key, 'count', 1)
+        const result = await asRedisOps(redis).hincrby(key, 'count', 1)
         count = typeof result === 'number' ? result : 0
-        redis?.['expire']?.(key, 60) // 1 minute window
+        void asRedisOps(redis).expire(key, 60)
       }
 
       // Risk increases with frequency
@@ -236,7 +237,7 @@ class ProductionThreatDetectionService {
     const indicators: string[] = []
 
     if (request['ip'] && redis) {
-      const reputation = await redis?.['get']?.(
+      const reputation = await asRedisOps(redis).get(
         `ip_reputation:${request['ip']}`,
       )
       if (reputation && parseFloat(reputation) > 0.5) {
