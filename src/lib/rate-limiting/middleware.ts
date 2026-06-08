@@ -27,7 +27,7 @@ export function createRateLimitMiddleware(
   config: RateLimitMiddlewareConfig = {},
 ) {
   const mergedConfig = {
-    ruleSets: config.ruleSets ?? defaultRuleSets,
+    ruleSets: config.ruleSets || defaultRuleSets,
     bypassRules: config.bypassRules ?? defaultBypassRules,
     ddosProtection: config.ddosProtection,
     globalConfig: config.globalConfig,
@@ -166,7 +166,7 @@ async function extractRateLimitContext(
   const forwarded = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
   const identifier =
-    (forwarded?.split(',')?.[0]?.trim() ?? realIp ?? context.clientAddress) ||
+    (forwarded?.split(',')[0].trim() ?? realIp ?? context.clientAddress) ||
     'unknown'
 
   // Get user role if authenticated (Better-Auth integration)

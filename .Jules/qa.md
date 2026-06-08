@@ -1,0 +1,1 @@
+## 2024-05-24 - Test getCurrentFormattedTime | Pattern: Use `vi.useFakeTimers()` and `vi.setSystemTime()` to mock the global Date object in Vitest for predictable time-dependent tests. | Action: Always use fake timers when testing functions that instantiate `new Date()` internally.

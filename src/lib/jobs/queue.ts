@@ -115,7 +115,7 @@ export class JobQueueService {
       return null
     }
 
-    const job: Job = JSON.parse(jobString[0].value) as unknown
+    const job: Job = JSON.parse(jobString[0].value) as unknown as any
     job.status = JobStatus.IN_PROGRESS
     job.startedAt = new Date().toISOString()
     job.updatedAt = new Date().toISOString()
@@ -143,7 +143,7 @@ export class JobQueueService {
 
     if (currentJobString) {
       job = {
-        ...(JSON.parse(currentJobString) as unknown),
+        ...JSON.parse(currentJobString),
         ...updates,
         status,
         updatedAt: new Date().toISOString(),
@@ -206,7 +206,7 @@ export class JobQueueService {
    */
   async getJobStatus(jobId: string): Promise<Job | null> {
     const jobString = await redis.hget(this.jobStatusKeyPrefix + jobId, jobId)
-    return jobString ? (JSON.parse(jobString) as unknown) : null
+    return jobString ? (JSON.parse(jobString) as Job) : null
   }
 
   /**
@@ -223,7 +223,7 @@ export class JobQueueService {
           -1,
           'WITHSCORES',
         )
-        jobStrings = pendingJobsWithScores.map((item) => {
+        jobStrings = pendingJobsWithScores.map((item: any) => {
           if (typeof item === 'object' && item !== null && 'value' in item) {
             return item.value
           }
@@ -244,14 +244,13 @@ export class JobQueueService {
         // Cancelled jobs are currently stored in failedKey
         jobStrings = Object.values(await redis.hgetall(this.failedKey))
         jobStrings = jobStrings.filter(
-          (jobStr) =>
-            (JSON.parse(jobStr) as unknown.status) === JobStatus.CANCELLED,
+          (jobStr) => JSON.parse(jobStr).status === JobStatus.CANCELLED,
         )
         break
       default:
         return []
     }
-    return jobStrings.map((jobString) => JSON.parse(jobString) as unknown)
+    return jobStrings.map((jobString) => JSON.parse(jobString) as Job)
   }
 
   /**
@@ -262,8 +261,12 @@ export class JobQueueService {
     switch (status) {
       case JobStatus.PENDING: {
         const pendingJobs = await redis.zrange(this.queueKey, 0, -1)
-        jobIds = pendingJobs.map((jobStr) => {
-          const job = JSON.parse(jobStr) as unknown as Job
+        jobIds = pendingJobs.map((jobStr: any) => {
+          const jobStrVal =
+            typeof jobStr === 'object' && jobStr !== null && 'value' in jobStr
+              ? jobStr.value
+              : jobStr
+          const job = JSON.parse(jobStrVal) as Job
           return job.id
         })
         break
@@ -282,9 +285,9 @@ export class JobQueueService {
         jobIds = cancelledJobs
           .filter(
             (jobStr: string) =>
-              (JSON.parse(jobStr) as unknown.status) === JobStatus.CANCELLED,
+              JSON.parse(jobStr).status === JobStatus.CANCELLED,
           )
-          .map((jobStr: string) => JSON.parse(jobStr) as unknown.id)
+          .map((jobStr: string) => JSON.parse(jobStr).id)
         break
       }
       default:

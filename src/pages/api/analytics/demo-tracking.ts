@@ -42,7 +42,7 @@ export const POST = async ({ request }) => {
         code: 'VALIDATION_ERROR',
         errorMessage: 'Invalid analytics event data',
         details: validationErrors,
-      }
+      } as any
       return new Response(JSON.stringify(error), {
         status: 400,
         headers: { 'Content-Type': 'application/json' },
@@ -119,7 +119,7 @@ export const POST = async ({ request }) => {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    } as any
 
     return new Response(JSON.stringify(apiError), {
       status: 500,
@@ -177,7 +177,7 @@ export const GET = async ({ url }) => {
         source: 'demo-tracking',
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    } as any
 
     return new Response(JSON.stringify(apiError), {
       status: 500,

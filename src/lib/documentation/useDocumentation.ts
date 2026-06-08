@@ -416,7 +416,7 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
           format:
             typeof rawResult.format === 'string'
               ? rawResult.format
-              : options.format,
+              : (options.format as any),
           metadata:
             typeof rawResult.metadata === 'object' &&
             rawResult.metadata !== null

@@ -94,21 +94,13 @@ import {
 } from './external-threat-intelligence'
 
 // Import and re-export types from response orchestration
-import type {
-  RateLimitResult,
-  ResponseAction,
-  ThreatAnalysis,
-  ThreatData,
-  ThreatResponse,
-} from '../response-orchestration'
-
 export type {
   RateLimitResult,
   ResponseAction,
   ThreatAnalysis,
   ThreatData,
   ThreatResponse,
-}
+} from '../response-orchestration'
 export {
   ExternalThreatIntelligenceService,
   type ThreatIntelligence,

@@ -354,7 +354,7 @@ function calculateStabilityConfidence(window: DimensionalMap[]): number {
     return 0
   }
 
-  const changes = []
+  const changes: any[] = []
   for (let i = 1; i < window.length; i++) {
     changes.push(
       calculateDimensionalDistance(
@@ -377,21 +377,21 @@ function describeTrend(
   arousalTrend: number,
   dominanceTrend: number,
 ): string {
-  const descriptions = []
+  const descriptions: any[] = []
 
   if (Math.abs(valenceTrend) > 0.1) {
     descriptions.push(
-      `${valenceTrend > 0 ? 'Improving' : 'Declining'} emotional valence`,
+      (`${valenceTrend > 0 ? 'Improving' : 'Declining'} emotional valence` as any),
     )
   }
   if (Math.abs(arousalTrend) > 0.1) {
     descriptions.push(
-      `${arousalTrend > 0 ? 'Increasing' : 'Decreasing'} emotional arousal`,
+      (`${arousalTrend > 0 ? 'Increasing' : 'Decreasing'} emotional arousal` as any),
     )
   }
   if (Math.abs(dominanceTrend) > 0.1) {
     descriptions.push(
-      `${dominanceTrend > 0 ? 'Gaining' : 'Losing'} emotional control`,
+      (`${dominanceTrend > 0 ? 'Gaining' : 'Losing'} emotional control` as any),
     )
   }
 
@@ -408,21 +408,21 @@ function describeShift(from: EmotionDimensions, to: EmotionDimensions): string {
   const arousalDiff = to.arousal - from.arousal
   const dominanceDiff = to.dominance - from.dominance
 
-  const changes = []
+  const changes: any[] = []
 
   if (Math.abs(valenceDiff) > 0.3) {
     changes.push(
-      `Shift to ${valenceDiff > 0 ? 'more positive' : 'more negative'} emotions`,
+      (`Shift to ${valenceDiff > 0 ? 'more positive' : 'more negative'} emotions` as any),
     )
   }
   if (Math.abs(arousalDiff) > 0.3) {
     changes.push(
-      `${arousalDiff > 0 ? 'Increased' : 'Decreased'} emotional intensity`,
+      (`${arousalDiff > 0 ? 'Increased' : 'Decreased'} emotional intensity` as any),
     )
   }
   if (Math.abs(dominanceDiff) > 0.3) {
     changes.push(
-      `Shift to ${dominanceDiff > 0 ? 'more' : 'less'} emotional control`,
+      (`Shift to ${dominanceDiff > 0 ? 'more' : 'less'} emotional control` as any),
     )
   }
 

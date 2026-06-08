@@ -4,6 +4,22 @@ import '@testing-library/jest-dom/vitest'
 
 import { TherapistDashboard } from '../TherapistDashboard'
 
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+
 const mockSessions = [
   {
     id: 'session-1',

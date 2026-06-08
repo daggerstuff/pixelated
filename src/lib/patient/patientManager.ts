@@ -116,7 +116,7 @@ class PatientManager {
   }
 
   private generatePatientId(): string {
-    return `P${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`
+    return `P${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`
   }
 
   /**
@@ -374,7 +374,7 @@ class PatientManager {
       throw new Error(`Patient not found: ${patientId}`)
     }
 
-    const reportId = `report_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const reportId = `report_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const sections: ReportSection[] = []
 
@@ -523,7 +523,7 @@ class PatientManager {
     // Analyze patterns in session data
     const moodTrends = sessions
       .map((s) => s.emotionAnalysis?.moodScore)
-      .filter(Boolean)
+      .filter((m): m is number => m !== undefined)
     const avgMood =
       moodTrends.reduce((sum, mood) => sum + mood, 0) / moodTrends.length
 
@@ -542,7 +542,7 @@ class PatientManager {
   private getMostCommonEmotions(sessions: { emotionAnalysis?: { dominantEmotion?: string } }[]): string[] {
     const emotions = sessions
       .map((s) => s.emotionAnalysis?.dominantEmotion)
-      .filter(Boolean)
+      .filter((e): e is string => !!e)
 
     const counts: Record<string, number> = {}
     emotions.forEach((emotion) => {

@@ -141,7 +141,7 @@ export const POST: APIRoute = async ({ request }) => {
                   'warning',
                 )
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
                 logger.error('Failed to load Sentry module', { error })
               })
           },
@@ -178,7 +178,7 @@ export const POST: APIRoute = async ({ request }) => {
                   })
                 }
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
                 logger.error('Webhook request failed', {
                   error,
                   url: webhookUrl,
@@ -219,7 +219,7 @@ export const POST: APIRoute = async ({ request }) => {
                   })
                 }
               })
-              .catch((error) => {
+              .catch((error: unknown) => {
                 logger.error('Email notification failed', {
                   error,
                   url: emailServiceUrl,
@@ -242,7 +242,11 @@ export const POST: APIRoute = async ({ request }) => {
           }),
         }
 
-        rateLimitAnalytics.addMonitor(monitor)
+        rateLimitAnalytics.addMonitor(
+          monitor as unknown as Parameters<
+            typeof rateLimitAnalytics.addMonitor
+          >[0],
+        )
 
         return new Response(
           JSON.stringify({
@@ -300,7 +304,7 @@ export const POST: APIRoute = async ({ request }) => {
         return new Response(
           JSON.stringify({
             status: 'error',
-            message: `Unknown action: ${action}`,
+            message: `Unknown action: ${String(action)}`,
           }),
           { status: 400, headers: { 'Content-Type': 'application/json' } },
         )
