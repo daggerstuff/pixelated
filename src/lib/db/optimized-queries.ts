@@ -3,7 +3,7 @@
  * High-performance queries with proper indexing, connection pooling, and query optimization
  */
 
-import type { PoolClient, QueryResult } from 'pg'
+import type { PoolClient } from 'pg'
 
 import { getLogger } from '../logging'
 import { getPool } from './index'
@@ -93,7 +93,7 @@ export async function executeQuery(
         attempt,
       })
 
-      return result
+      return result as { rows: unknown[]; rowCount: number }
     } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
 
@@ -341,8 +341,9 @@ export class OptimizedBiasQueries {
 
     const countResult = await executeQuery(countQuery, params.slice(0, -2), {
       name: 'getBiasAnalysesCount',
-    })
-    const total = parseInt((countResult.rows[0] as { total: string }).total)
+    }) as { rows: CountRow[] }
+    const countRows = countResult.rows
+    const total = countRows[0] ? parseInt(countRows[0].total) : 0
 
     return {
       analyses: rows,
@@ -431,14 +432,12 @@ export class OptimizedBiasQueries {
       if (recentWeek.length > 0 && previousWeek.length > 0) {
         const recentAvg =
           recentWeek.reduce(
-            (sum: number, day: { avg_score: string }) =>
-              sum + parseFloat(day.avg_score),
+            (sum: number, day) => sum + day.avg_score,
             0,
           ) / recentWeek.length
         const previousAvg =
           previousWeek.reduce(
-            (sum: number, day: { avg_score: string }) =>
-              sum + parseFloat(day.avg_score),
+            (sum: number, day) => sum + day.avg_score,
             0,
           ) / previousWeek.length
 
@@ -542,10 +541,9 @@ export class OptimizedBiasQueries {
 
     const cacheResult = await executeQuery(cacheHitQuery, [], {
       name: 'getCacheHitRate',
-    })
-    const cacheHitRow = cacheResult.rows[0] as
-      | { cache_hit_rate?: string }
-      | undefined
+    }) as { rows: CacheHitRow[] }
+    const cacheHitRows = cacheResult.rows
+    const cacheHitRow = cacheHitRows[0]
     const cacheHitRate = cacheHitRow?.cache_hit_rate ?? '0'
 
     return {

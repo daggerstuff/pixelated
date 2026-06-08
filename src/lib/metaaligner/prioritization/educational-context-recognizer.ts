@@ -22,7 +22,7 @@ export interface EducationalContextResult {
     practicalApplications: string[]
     relatedTopics: string[]
     ageAppropriateness?: 'child' | 'adolescent' | 'adult' | 'all'
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 

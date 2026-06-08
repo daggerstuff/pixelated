@@ -8,7 +8,7 @@ type RoutingContext = Record<string, unknown>
 import { EmailService, type EmailConfig } from '../../../lib/email'
 import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
 import { redis } from '../../../lib/redis'
-import type { IRedisService } from '../redis/types'
+import { asRedisOps } from '../../../lib/redis-ops'
 import { generateVAPIDKeys, sendNotification } from './pushUtils'
 import type { PushSubscription } from './pushUtils'
 import { sendSMS, isValidPhoneNumber } from './smsUtils'
@@ -474,11 +474,11 @@ export class NotificationService {
     parsed.status = NotificationStatus.READ
     parsed.readAt = Date.now()
 
-    await (
-      redis as {
-        hset: (key: string, field: string, value: string) => Promise<unknown>
-      }
-    )['hset'](`notifications:${userId}`, notificationId, JSON.stringify(parsed))
+    await asRedisOps(redis).hset(
+      `notifications:${userId}`,
+      notificationId,
+      JSON.stringify(parsed),
+    )
   }
 
   /**
