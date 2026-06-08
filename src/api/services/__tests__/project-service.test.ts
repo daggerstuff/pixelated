@@ -331,6 +331,7 @@ describe('Project Service', () => {
       )
 
       expect(result.objectives).toHaveLength(1)
+      expect(result?.objectives[0].title).toBe('New Objective')
       expect(result.objectives[0]!.title).toBe('New Objective')
     })
 

@@ -98,7 +98,7 @@ describe('Enhanced Monitoring Service', () => {
         db: () => ({
           collection: () => ({
             countDocuments: vi.fn<() => Promise<number>>(),
-            findOne: vi.fn<() => Promise<unknown>>(),
+            findOne: vi.fn<() => Promise<unknown | null>>(),
             insertOne: vi.fn<() => Promise<{ insertedId: string }>>(),
             insertMany: vi.fn<() => Promise<{ insertedIds: string[] }>>(),
             updateOne: vi.fn<() => Promise<{ modifiedCount: number }>>(),
@@ -117,12 +117,12 @@ describe('Enhanced Monitoring Service', () => {
   describe('Service Initialization', () => {
     it('should initialize with correct configuration', () => {
       expect(service).toBeDefined()
-      expect((service as any).config).toBeDefined()
-      expect((service as any).redis).toBe(mockRedis)
-      expect((service as any).orchestrator).toBe(mockOrchestrator)
-      expect((service as any).aiService).toBe(mockAIService)
-      expect((service as any).alerts).toBeDefined()
-      expect((service as any).metrics).toBeDefined()
+      expect(service.config).toBeDefined()
+      expect(service.redis).toBe(mockRedis)
+      expect(service.orchestrator).toBe(mockOrchestrator)
+      expect(service.aiService).toBe(mockAIService)
+      expect(service.alerts).toBeDefined()
+      expect(service.metrics).toBeDefined()
     })
 
     it('should use default configuration when none provided', () => {
@@ -133,7 +133,7 @@ describe('Enhanced Monitoring Service', () => {
           db: () => ({
             collection: () => ({
               countDocuments: vi.fn<() => Promise<number>>(),
-              findOne: vi.fn<() => Promise<unknown>>(),
+              findOne: vi.fn<() => Promise<unknown | null>>(),
               insertOne: vi.fn<() => Promise<{ insertedId: string }>>(),
               insertMany: vi.fn<() => Promise<{ insertedIds: string[] }>>(),
             }),
@@ -147,7 +147,7 @@ describe('Enhanced Monitoring Service', () => {
       // Implementation doesn't handle undefined config gracefully in constructor currently?
       // "this.config = config".
       // I need to update implementation to default config.
-      expect((defaultService as any).config).toEqual(
+      expect(defaultService.config).toEqual(
         expect.objectContaining({
           enabled: true,
           alertThresholds: {
@@ -196,7 +196,7 @@ describe('Enhanced Monitoring Service', () => {
         mockOrchestrator,
         mockAIService,
       )
-      expect((customService as any).config).toEqual(
+      expect(customService.config).toEqual(
         expect.objectContaining(customConfig),
       )
     })
@@ -214,7 +214,7 @@ describe('Enhanced Monitoring Service', () => {
           anomalyType: 'unusual_login',
           confidence: 0.85,
         },
-      } as any
+      }
 
       mockRedis.incr.mockResolvedValue(1)
       mockRedis.set.mockResolvedValue('OK')
@@ -241,7 +241,7 @@ describe('Enhanced Monitoring Service', () => {
       const updateData = {
         status: 'investigating',
         notes: 'Under investigation by security team',
-      } as any
+      }
 
       const existingAlert = {
         id: alertId,
@@ -290,7 +290,7 @@ describe('Enhanced Monitoring Service', () => {
         resolvedBy: 'security_team',
         resolutionNotes: 'False positive, user verified',
         resolvedAt: new Date().toISOString(),
-      } as any
+      }
 
       const existingAlert = {
         id: alertId,
@@ -406,7 +406,7 @@ describe('Enhanced Monitoring Service', () => {
         status: 'active',
         createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
         escalationCount: 0,
-      } as any
+      }
 
       const shouldEscalate = shouldEscalateAlert(alert)
 
@@ -420,7 +420,7 @@ describe('Enhanced Monitoring Service', () => {
         createdAt: new Date(Date.now() - 300000).toISOString(), // 5 minutes ago
         escalationCount: 1,
         lastEscalatedAt: new Date(Date.now() - 60000).toISOString(), // 1 minute ago
-      } as any
+      }
 
       const shouldEscalate = shouldEscalateAlert(alert)
 
@@ -487,14 +487,11 @@ describe('Enhanced Monitoring Service', () => {
         },
       ]
 
-      const report = await generateAlertReport(
-        alerts as any,
-        {
-          timeRange: '24h',
-          includeMetrics: true,
-          includeRecommendations: true,
-        } as any,
-      )
+      const report = await generateAlertReport(alerts, {
+        timeRange: '24h',
+        includeMetrics: true,
+        includeRecommendations: true,
+      })
 
       expect(report).toBeDefined()
       expect(report.summary).toBeDefined()
@@ -568,7 +565,7 @@ describe('Enhanced Monitoring Service', () => {
         },
       ]
 
-      const summary = await calculateMetricsSummary(metrics as any)
+      const summary = await calculateMetricsSummary(metrics)
 
       expect(summary).toBeDefined()
       expect(summary.average).toBe(150)
@@ -605,8 +602,8 @@ describe('Enhanced Monitoring Service', () => {
       const anomalies = await detectMetricAnomalies(metrics, mockAIService)
 
       expect(anomalies).toHaveLength(1)
-      expect(anomalies?.[0]!.value).toBe(500)
-      expect(anomalies?.[0]!.isAnomaly).toBe(true)
+      expect(anomalies?.[0].value).toBe(500)
+      expect(anomalies?.[0].isAnomaly).toBe(true)
     })
 
     it('should get performance metrics', async () => {
@@ -634,7 +631,7 @@ describe('Enhanced Monitoring Service', () => {
           ...performanceMetrics.system,
           ...performanceMetrics.application,
           ...performanceMetrics.database,
-        } as unknown as Record<string, string>)
+        })
       // The utils parsing code expects string values for numeric properties (from redis),
       // we need to make sure the mock returns strings if the implementation parses them.
       // metrics-utils.ts: parseFloat(metricsData.cpu || '0')
@@ -807,10 +804,10 @@ describe('Enhanced Monitoring Service', () => {
       const result = await service.performRealTimeMonitoring(monitoringData)
 
       expect(result).toBeDefined()
-      expect(vi.mocked(result).healthStatus).toBeDefined()
-      expect(vi.mocked(result).alerts).toBeDefined()
-      expect(vi.mocked(result).insights).toBeDefined()
-      expect(vi.mocked(result).actions).toBeDefined()
+      expect(result['healthStatus']).toBeDefined()
+      expect(result['alerts']).toBeDefined()
+      expect(result['insights']).toBeDefined()
+      expect(result['actions']).toBeDefined()
     })
 
     it('should trigger alerts based on thresholds', async () => {
@@ -843,9 +840,9 @@ describe('Enhanced Monitoring Service', () => {
       const result = await service.performRealTimeMonitoring(monitoringData)
 
       expect(result).toBeDefined()
-      expect(vi.mocked(result).healthStatus).toBe('unknown')
-      expect(vi.mocked(result).insights).toHaveLength(0)
-      expect(vi.mocked(result).errors).toContain('AI analysis timeout')
+      expect(result['healthStatus']).toBe('unknown')
+      expect(result['insights']).toHaveLength(0)
+      expect(result['errors']).toContain('AI analysis timeout')
     })
   })
 
@@ -860,7 +857,7 @@ describe('Enhanced Monitoring Service', () => {
 
       mockRedis.set.mockRejectedValue(new Error('Redis connection failed'))
 
-      const alert = await service.createAlert(alertData as any)
+      const alert = await service.createAlert(alertData)
 
       expect(alert).toBeDefined()
       expect(alert.errors).toContain('Redis connection failed')
@@ -911,7 +908,7 @@ describe('Enhanced Monitoring Service', () => {
       mockRedis.set.mockResolvedValue('OK')
 
       const alerts = Array.from({ length: 10 }, async (_, i) =>
-        service.createAlert({ ...alertData, title: `Alert ${i}` } as any),
+        service.createAlert({ ...alertData, title: `Alert ${i}` }),
       )
 
       const results = await Promise.all(alerts)
@@ -952,11 +949,11 @@ describe('Enhanced Monitoring Service', () => {
       }))
 
       const startTime = Date.now()
-      const report = await service.generateAlertReport(alerts as any)
+      const report = await service.generateAlertReport(alerts)
       const endTime = Date.now()
 
       expect(report).toBeDefined()
-      expect(vi.mocked(report).alerts).toHaveLength(100)
+      expect(report['alerts']).toHaveLength(100)
       expect(endTime - startTime).toBeLessThan(3000) // Should complete in under 3 seconds
     })
   })
@@ -1006,7 +1003,7 @@ describe('Enhanced Monitoring Service', () => {
         ],
       })
 
-      const insights = (await service.analyzeAlertPatterns(alerts)) as any
+      const insights = await service.analyzeAlertPatterns(alerts)
 
       expect(insights.patterns).toHaveLength(1)
       expect(insights.patterns[0].type).toBe('coordinated')
@@ -1045,20 +1042,20 @@ describe('Enhanced Monitoring Service', () => {
       // Step 3: Create alert based on insights
       const alertData = {
         title: 'High CPU Usage',
-        description: (insights as any)?.insights?.[0]?.description,
+        description: insights?.insights[0].description,
         severity: 'high',
         source: 'ai_analysis',
         metadata: {
-          insightType: (insights as any)?.insights?.[0]?.type,
-          recommendation: (insights as any)?.recommendations?.[0],
+          insightType: insights?.insights[0].type,
+          recommendation: insights.recommendations[0],
         },
-      } as any
+      }
 
       const alert = await service.createAlert(alertData)
 
       expect(alert).toBeDefined()
       expect(alert.severity).toBe('high')
-      expect(alert.metadata?.['insightType']).toBe('threshold')
+      expect(alert.metadata['insightType']).toBe('threshold')
     })
   })
 })

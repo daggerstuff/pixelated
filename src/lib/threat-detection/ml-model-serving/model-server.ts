@@ -511,10 +511,7 @@ export class ModelServingServer extends EventEmitter {
       }
 
       // Scalar outputs: simple mean
-      return (
-        (outputs as number[]).reduce((a: number, b: number) => a + b, 0) /
-        outputs.length
-      )
+      return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
     }
     const firstOutput = predictions[0]!.output
     if (Array.isArray(firstOutput)) {
@@ -551,7 +548,7 @@ export class ModelServingServer extends EventEmitter {
       (outputs as number[]).reduce((sum: number, val: number) => sum + val, 0) /
       outputs.length
     const variance =
-      (outputs as number[]).reduce(
+      outputs.reduce(
         (sum: number, val: number) => sum + Math.pow(val - mean, 2),
         0,
       ) / outputs.length
@@ -651,6 +648,40 @@ export class ModelServingServer extends EventEmitter {
 }
 
 // Helper classes for dependencies
+
+class RedisFeatureStore implements FeatureStore {
+  constructor(private readonly redis: Redis) {}
+
+  async getFeatures(featureSetId: string): Promise<FeatureSet | null> {
+    const data = await this.redis.get(`features:${featureSetId}`)
+    return data ? (JSON.parse(data) as FeatureSet) : null
+  }
+
+  async updateFeatures(
+    featureSetId: string,
+    features: FeatureSet,
+  ): Promise<void> {
+    await this.redis.set(
+      `features:${featureSetId}`,
+      JSON.stringify(features),
+      'EX',
+      3600,
+    )
+  }
+
+  async validateFeatures(_features: unknown[]): Promise<ValidationResult> {
+    // Implement feature validation logic
+    return { isValid: true, errors: [] }
+  }
+
+  async getFeatureHistory(
+    featureSetId: string,
+    timeframe: TimeWindow,
+  ): Promise<FeatureHistory> {
+    // Implement feature history retrieval
+    return { features: [], timeframe }
+  }
+}
 
 class MongoModelRegistry implements ModelRegistry {
   constructor(private readonly mongoClient: MongoClient) {}

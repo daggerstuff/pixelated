@@ -1,7 +1,7 @@
 export const prerender = false
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-import { AdminPermission, AdminService } from '../../../lib/admin/index'
+import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
 
 // Initialize logger
@@ -20,7 +20,7 @@ export const GET = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
-    context as any,
+    context,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -29,7 +29,7 @@ export const GET = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId } = (context.locals as any).admin
+    const { userId } = context.locals.admin
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
@@ -93,7 +93,7 @@ export const POST = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
-    context as any,
+    context,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -102,15 +102,11 @@ export const POST = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId: adminId } = (context.locals as any).admin
+    const { userId: adminId } = context.locals.admin
 
     // Parse the request body
-    const requestData = (await context.request.json()) as Record<
-      string,
-      unknown
-    >
-    const sessionId = requestData['sessionId'] as string | undefined
-    const action = requestData['action'] as string | undefined
+    const requestData = await context.request.json()
+    const { sessionId, action } = requestData
 
     if (!sessionId || !action) {
       return new Response(

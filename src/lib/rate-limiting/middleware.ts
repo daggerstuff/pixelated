@@ -12,7 +12,6 @@ import type {
   RateLimitMiddlewareConfig,
   RateLimitContext,
   RateLimitRule,
-  RateLimitBypassRule,
   RateLimitResult,
   RateLimitHeaders,
   BetterAuthRateLimitConfig,
@@ -27,7 +26,7 @@ export function createRateLimitMiddleware(
   config: RateLimitMiddlewareConfig = {},
 ) {
   const mergedConfig = {
-    ruleSets: config.ruleSets ?? defaultRuleSets,
+    ruleSets: config.ruleSets || defaultRuleSets,
     bypassRules: config.bypassRules ?? defaultBypassRules,
     ddosProtection: config.ddosProtection,
     globalConfig: config.globalConfig,
@@ -132,7 +131,7 @@ export function createRateLimitMiddleware(
         if (response instanceof Response) {
           const newHeaders = new Headers(response.headers)
           Object.entries(headers).forEach(([key, value]) => {
-            newHeaders.set(key, String(value))
+            newHeaders.set(key, value)
           })
 
           return new Response(response.body, {
@@ -166,7 +165,7 @@ async function extractRateLimitContext(
   const forwarded = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
   const identifier =
-    (forwarded?.split(',')?.[0]?.trim() ?? realIp ?? context.clientAddress) ||
+    (forwarded?.split(',')[0].trim() ?? realIp ?? context.clientAddress) ||
     'unknown'
 
   // Get user role if authenticated (Better-Auth integration)
@@ -366,7 +365,7 @@ function isIpInRange(ip: string, ranges: string[]): boolean {
     if (range.includes('/')) {
       // CIDR notation - simplified check
       const [network] = range.split('/')
-      return ip.startsWith(network ?? '')
+      return ip.startsWith(network)
     }
     return ip === range
   })

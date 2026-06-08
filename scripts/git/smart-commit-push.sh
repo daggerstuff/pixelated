@@ -219,6 +219,7 @@ commit_repo() {
     return 0
   fi
 
+  git commit -m "$msg"
   git commit --no-verify -m "$msg"
   success "Committed: ${repo_name} → \"$msg\""
 }

@@ -10,7 +10,6 @@ vi.mock('../../logging/build-safe-logger', () => ({
   }),
 }))
 import type { ObjectivePriority } from './context-objective-mapping'
-import { ObjectiveKey } from './context-objective-mapping'
 import {
   UserPreferenceManager,
   applyUserPreferences,
@@ -83,8 +82,8 @@ describe('UserPreferenceManager', () => {
     it('should reject invalid custom weights', () => {
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          [ObjectiveKey.Empathy]: 1.5, // Invalid: > 1
-          [ObjectiveKey.Safety]: -0.1, // Invalid: < 0
+          empathy: 1.5, // Invalid: > 1
+          safety: -0.1, // Invalid: < 0
         },
       }
 
@@ -167,8 +166,8 @@ describe('UserPreferenceManager', () => {
 
     it('should warn about conflicting preferences', () => {
       const prefs: UserPreferences = {
-        disableObjectives: [ObjectiveKey.Empathy, ObjectiveKey.Safety],
-        prioritizeObjectives: [ObjectiveKey.Empathy], // Conflict!
+        disableObjectives: ['empathy', 'safety'],
+        prioritizeObjectives: ['empathy'], // Conflict!
       }
 
       const result = manager.validatePreferences(prefs)
@@ -178,9 +177,9 @@ describe('UserPreferenceManager', () => {
     it('should validate custom weights range', () => {
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          [ObjectiveKey.Empathy]: 0.5,
-          [ObjectiveKey.Safety]: 0.8,
-          [ObjectiveKey.Correctness]: 1.0,
+          empathy: 0.5,
+          safety: 0.8,
+          clarity: 1.0,
         },
       }
 
@@ -259,12 +258,13 @@ describe('UserPreferenceManager', () => {
 
 describe('applyUserPreferences', () => {
   const createBaseObjectives = (): ObjectivePriority[] => [
-    { key: ObjectiveKey.Empathy, priority: 1, weight: 0.2 },
-    { key: ObjectiveKey.Safety, priority: 2, weight: 0.2 },
-    { key: ObjectiveKey.Correctness, priority: 3, weight: 0.15 },
-    { key: ObjectiveKey.Informativeness, priority: 4, weight: 0.15 },
-    { key: ObjectiveKey.Professionalism, priority: 5, weight: 0.1 },
-    { key: ObjectiveKey.Support, priority: 6, weight: 0.1 },
+    { key: 'empathy', priority: 1, weight: 0.2 },
+    { key: 'safety', priority: 2, weight: 0.2 },
+    { key: 'correctness', priority: 3, weight: 0.15 },
+    { key: 'informativeness', priority: 4, weight: 0.15 },
+    { key: 'conciseness', priority: 5, weight: 0.1 },
+    { key: 'clarity', priority: 6, weight: 0.1 },
+    { key: 'warmth', priority: 7, weight: 0.1 },
   ]
 
   describe('basic functionality', () => {
@@ -292,17 +292,13 @@ describe('applyUserPreferences', () => {
     it('should filter out disabled objectives', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        disableObjectives: [ObjectiveKey.Empathy, ObjectiveKey.Safety],
+        disableObjectives: ['empathy', 'warmth'],
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      expect(result).toHaveLength(4) // 6 - 2 = 4
-      expect(
-        result.find((obj) => obj.key === ObjectiveKey.Empathy),
-      ).toBeUndefined()
-      expect(
-        result.find((obj) => obj.key === ObjectiveKey.Safety),
-      ).toBeUndefined()
+      expect(result).toHaveLength(5) // 7 - 2 = 5
+      expect(result.find((obj) => obj.key === 'empathy')).toBeUndefined()
+      expect(result.find((obj) => obj.key === 'warmth')).toBeUndefined()
     })
   })
 
@@ -311,16 +307,16 @@ describe('applyUserPreferences', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          [ObjectiveKey.Empathy]: 0.5,
-          [ObjectiveKey.Safety]: 0.3,
+          empathy: 0.5,
+          safety: 0.3,
         },
       }
 
       const result = applyUserPreferences(objectives, prefs)
 
       // After normalization, empathy should have higher weight than safety
-      const empathy = result.find((obj) => obj.key === ObjectiveKey.Empathy)
-      const safety = result.find((obj) => obj.key === ObjectiveKey.Safety)
+      const empathy = result.find((obj) => obj.key === 'empathy')
+      const safety = result.find((obj) => obj.key === 'safety')
 
       expect(empathy).toBeDefined()
       expect(safety).toBeDefined()
@@ -340,11 +336,9 @@ describe('applyUserPreferences', () => {
       const resultNone = applyUserPreferences(objectives, prefsNone)
 
       const empathyWithStyle = resultEmpathic.find(
-        (obj) => obj.key === ObjectiveKey.Empathy,
+        (obj) => obj.key === 'empathy',
       )!
-      const empathyWithout = resultNone.find(
-        (obj) => obj.key === ObjectiveKey.Empathy,
-      )!
+      const empathyWithout = resultNone.find((obj) => obj.key === 'empathy')!
 
       expect(empathyWithStyle.weight).toBeGreaterThan(empathyWithout.weight)
     })
@@ -356,9 +350,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find(
-        (obj) => obj.key === ObjectiveKey.Professionalism,
-      )!
+      const conciseness = result.find((obj) => obj.key === 'conciseness')!
 
       // After boosting and normalization, should still be relatively higher
       expect(conciseness).toBeDefined()
@@ -371,9 +363,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const correctness = result.find(
-        (obj) => obj.key === ObjectiveKey.Correctness,
-      )!
+      const correctness = result.find((obj) => obj.key === 'correctness')!
 
       expect(correctness).toBeDefined()
       expect(correctness.weight).toBeGreaterThan(0)
@@ -406,12 +396,8 @@ describe('applyUserPreferences', () => {
       const resultHigh = applyUserPreferences(objectives, prefsHigh)
       const resultLow = applyUserPreferences(objectives, prefsLow)
 
-      const safetyHigh = resultHigh.find(
-        (obj) => obj.key === ObjectiveKey.Safety,
-      )!
-      const safetyLow = resultLow.find(
-        (obj) => obj.key === ObjectiveKey.Safety,
-      )!
+      const safetyHigh = resultHigh.find((obj) => obj.key === 'safety')!
+      const safetyLow = resultLow.find((obj) => obj.key === 'safety')!
 
       expect(safetyHigh.weight).toBeGreaterThan(safetyLow.weight)
     })
@@ -423,7 +409,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const safety = result.find((obj) => obj.key === ObjectiveKey.Safety)!
+      const safety = result.find((obj) => obj.key === 'safety')!
 
       expect(safety).toBeDefined()
     })
@@ -437,9 +423,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find(
-        (obj) => obj.key === ObjectiveKey.Professionalism,
-      )!
+      const conciseness = result.find((obj) => obj.key === 'conciseness')!
 
       expect(conciseness).toBeDefined()
       expect(conciseness.weight).toBeGreaterThan(0)
@@ -453,7 +437,7 @@ describe('applyUserPreferences', () => {
 
       const result = applyUserPreferences(objectives, prefs)
       const informativeness = result.find(
-        (obj) => obj.key === ObjectiveKey.Informativeness,
+        (obj) => obj.key === 'informativeness',
       )!
 
       expect(informativeness).toBeDefined()
@@ -479,12 +463,12 @@ describe('applyUserPreferences', () => {
     it('should boost prioritized objectives', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        prioritizeObjectives: [ObjectiveKey.Safety, ObjectiveKey.Support],
+        prioritizeObjectives: ['safety', 'clarity'],
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const safety = result.find((obj) => obj.key === ObjectiveKey.Safety)!
-      const clarity = result.find((obj) => obj.key === ObjectiveKey.Support)!
+      const safety = result.find((obj) => obj.key === 'safety')!
+      const clarity = result.find((obj) => obj.key === 'clarity')!
 
       expect(safety).toBeDefined()
       expect(clarity).toBeDefined()
@@ -501,9 +485,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const clarity = result.find(
-        (obj) => obj.key === ObjectiveKey.Professionalism,
-      )!
+      const clarity = result.find((obj) => obj.key === 'clarity')!
 
       expect(clarity).toBeDefined()
       expect(clarity.weight).toBeGreaterThan(0)
@@ -519,7 +501,7 @@ describe('applyUserPreferences', () => {
 
       const result = applyUserPreferences(objectives, prefs)
       const informativeness = result.find(
-        (obj) => obj.key === ObjectiveKey.Informativeness,
+        (obj) => obj.key === 'informativeness',
       )!
 
       expect(informativeness).toBeDefined()
@@ -535,9 +517,7 @@ describe('applyUserPreferences', () => {
       }
 
       const result = applyUserPreferences(objectives, prefs)
-      const conciseness = result.find(
-        (obj) => obj.key === ObjectiveKey.Professionalism,
-      )!
+      const conciseness = result.find((obj) => obj.key === 'conciseness')!
 
       expect(conciseness).toBeDefined()
       expect(conciseness.weight).toBeGreaterThan(0)
@@ -551,9 +531,9 @@ describe('applyUserPreferences', () => {
         preferredSupportStyle: 'empathic',
         riskSensitivity: 'high',
         verbosityLevel: 'concise',
-        prioritizeObjectives: [ObjectiveKey.Safety],
+        prioritizeObjectives: ['safety'],
         customObjectiveWeights: {
-          [ObjectiveKey.Empathy]: 0.3,
+          empathy: 0.3,
         },
       }
 
@@ -567,7 +547,7 @@ describe('applyUserPreferences', () => {
       expect(sum).toBeCloseTo(1.0, 4)
 
       // Safety should be boosted (high risk + prioritized)
-      const safety = result.find((obj) => obj.key === ObjectiveKey.Safety)!
+      const safety = result.find((obj) => obj.key === 'safety')!
       expect(safety).toBeDefined()
       expect(safety.weight).toBeGreaterThan(0.1)
     })
@@ -607,18 +587,15 @@ describe('applyUserPreferences', () => {
 
     it('should handle zero weights gracefully', () => {
       const objectives: ObjectivePriority[] = [
-        { key: ObjectiveKey.Empathy, priority: 1, weight: 0 },
-        { key: ObjectiveKey.Safety, priority: 2, weight: 0 },
+        { key: 'test1', priority: 1, weight: 0 },
+        { key: 'test2', priority: 2, weight: 0 },
       ]
 
       const result = applyUserPreferences(objectives, {})
 
       // Should distribute equally when all weights are 0
-      expect(result).toBeDefined()
-      if (result?.[0] && result[1]) {
-        expect(result[0].weight).toBeCloseTo(0.5, 4)
-        expect(result[1].weight).toBeCloseTo(0.5, 4)
-      }
+      expect(result?.[0].weight).toBeCloseTo(0.5, 4)
+      expect(result?.[1].weight).toBeCloseTo(0.5, 4)
     })
   })
 })

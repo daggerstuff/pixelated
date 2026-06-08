@@ -23,6 +23,10 @@ router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
     const { title, description, targetMarkets, researchType, timeline } =
+      req.body
+    const { id } = (req as any).user
+
+    if (!title) {
       req.body as {
         title?: string
         description?: string
@@ -62,6 +66,7 @@ router.get(
   '/search/:query',
   asyncHandler(async (req: Request, res: Response) => {
     const query = req.params['query'] as string
+    const { id } = (req as any).user
     const { id } = (req as unknown as { user: { id: string } }).user
 
     const results = await searchMarketResearch(query, id)
@@ -81,6 +86,13 @@ router.post(
   '/:researchId/share',
   asyncHandler(async (req: Request, res: Response) => {
     const researchId = req.params['researchId'] as string
+    const { userId, permissionLevel } = req.body
+    const { id } = (req as any).user
+
+    if (!userId || !permissionLevel) {
+      throw new ValidationError('userId and permissionLevel required', {
+        userId: !userId ? 'User ID is required' : '',
+        permissionLevel: !permissionLevel ? 'Permission level is required' : '',
     const { userId, permissionLevel } = req.body as {
       userId?: string
       permissionLevel?: string

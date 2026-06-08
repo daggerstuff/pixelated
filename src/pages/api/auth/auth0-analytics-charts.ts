@@ -94,8 +94,8 @@ export const GET: APIRoute = async ({ request }) => {
     const type =
       (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
     const timeRange = parseInt(url.searchParams.get('timeRange') ?? '30', 10)
-    const clientId = url.searchParams.get('clientId') ?? undefined
-    const sessionId = url.searchParams.get('sessionId') ?? undefined
+    const clientId = url.searchParams.get('clientId')
+    const sessionId = url.searchParams.get('sessionId')
     const dataPoints = parseInt(url.searchParams.get('dataPoints') ?? '50', 10)
     const category =
       (url.searchParams.get('category') as ChartDataRequest['category']) ??
@@ -273,7 +273,7 @@ async function generateProgressChartData(params: {
     case 'line':
       return {
         data: {
-          labels: progressData.map((d) => d.date as any),
+          labels: progressData.map((d) => d.date),
           datasets: [
             {
               label: 'Therapy Progress',
@@ -371,7 +371,7 @@ async function generateEmotionChartData(params: {
           datasets: [
             {
               label: 'Valence vs Arousal',
-              data: scatterData as any,
+              data: scatterData,
               backgroundColor: 'rgba(59, 130, 246, 0.6)',
             },
           ],
