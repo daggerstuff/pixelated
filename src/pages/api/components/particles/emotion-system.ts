@@ -179,7 +179,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
         'Cache-Control': 'private, max-age=120', // 2-minute cache
       },
     })
-  } catch (error: unknown) {
+  } catch (error) {
     logger.error('Error generating particle emotion system', { error })
 
     return new Response(
@@ -264,7 +264,7 @@ export const POST: APIRoute = protectRoute()(
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       })
-    } catch (error: unknown) {
+    } catch (error) {
       logger.error('Error processing particle system update', { error })
 
       return new Response(

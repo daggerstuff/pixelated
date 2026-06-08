@@ -80,6 +80,7 @@ minimumReleaseAgeExclude:
   - axios@0.31.1
   - axios@0.30.3
   - hono@4.12.23
+  - react-hook-form@7.78.0
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
