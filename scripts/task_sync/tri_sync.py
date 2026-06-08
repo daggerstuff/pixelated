@@ -1,4 +1,4 @@
-"""Tri-directional task sync coordinator for beads, Asana, Jira, GitHub, and Linear."""
+"""Tri-directional task sync coordinator for Asana, Jira, GitHub, GitLab, and Linear."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from scripts.task_sync.provider_bridge import (
 SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
-DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "github", "linear", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("asana", "github", "gitlab", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
@@ -127,51 +127,13 @@ JIRA_PRIORITY_TO_CANONICAL: dict[str, str] = {
     "None": "none",
 }
 
-# Canonical priority → Beads priority label
-PRIORITY_TO_BEADS: dict[str, str] = {
-    "urgent": "critical",
-    "high": "high",
-    "medium": "normal",
-    "low": "low",
-    "none": "none",
-}
-
-BEADS_VALID_STATUSES = frozenset({"open", "in_progress", "blocked", "deferred", "closed", "pinned", "hooked"})
-
-BEADS_STATUS_MAP: dict[str, str] = {
-    "todo": "open",
-    "unstarted": "open",
-    "started": "in_progress",
-    "active": "in_progress",
-    "done": "closed",
-    "cancelled": "closed",
-    "canceled": "closed",
-    "resolved": "closed",
-    "completed": "closed",
-    "complete": "closed",
-    "backlog": "open",
-    "triage": "open",
-    "in_review": "in_progress",
-    "review": "in_progress",
-    "testing": "in_progress",
-    "reopened": "open",
-}
-
-
-def map_status_for_beads(status: str) -> str:
-    """Map a normalized status to a valid Beads status."""
-    s = status.strip().lower().replace(" ", "_")
-    if s in BEADS_VALID_STATUSES:
-        return s
-    return BEADS_STATUS_MAP.get(s, "open")
-
 
 PROVIDER_PRIORITY = {
-    "beads": 4,
     "asana": 3,
     "github": 2,
+    "gitlab": 2,
     "linear": 2,
-    "jira": 2,
+    "jira": 1,
 }
 
 SYNC_KEY_RE = re.compile(r"(?im)^\s*sync-key\s*:\s*(?P<value>[A-Za-z0-9._:-]+)\s*$")
@@ -380,9 +342,18 @@ def record_fingerprint(record: TaskRecord) -> str:
 
 
 def provider_ids_match(existing: Mapping[str, str], expected: Mapping[str, str]) -> bool:
-    return {provider: external_id for provider, external_id in existing.items() if external_id} == {
-        provider: external_id for provider, external_id in expected.items() if external_id
-    }
+    """Compare provider IDs, only checking providers present in the expected set.
+
+    The existing record may have provider_ids from its sync metadata for providers
+    that don't have records in the current group. Only providers in `expected`
+    are compared to prevent false mismatches from "extra" provider IDs.
+    """
+    for provider, external_id in expected.items():
+        if not external_id:
+            continue
+        if existing.get(provider) != external_id:
+            return False
+    return True
 
 
 def records_are_in_sync(existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]) -> bool:
@@ -480,47 +451,14 @@ def record_clean_body(record: TaskRecord) -> str:
 def group_records_by_key(
     records_by_provider: Mapping[str, Sequence[TaskRecord]],
 ) -> dict[str, list[TaskRecord]]:
-    # 1. Normalize all records first
-    normalized_by_provider: dict[str, list[TaskRecord]] = {}
-    for provider, records in records_by_provider.items():
-        normalized_list = []
-        for record in records:
-            normalized_record = normalized_group_record(provider, record)
-            if not normalized_record.sync_key:
-                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
-                continue
-            normalized_list.append(normalized_record)
-        normalized_by_provider[provider] = normalized_list
+    normalized_by_provider = _normalize_by_provider(records_by_provider)
+    id_to_key = _build_id_to_key_map(normalized_by_provider)
 
-    # 2. Build the reverse-lookup map: (provider, external_id) -> canonical sync_key
-    # We do two passes to prioritize keys from records that have explicit provider_ids mappings.
-    id_to_key: dict[tuple[str, str], str] = {}
-
-    # Pass A: populate from records that have explicit cross-system provider_ids mappings
-    for provider, records in normalized_by_provider.items():
-        for record in records:
-            if record.provider_ids:
-                key = record.sync_key
-                id_to_key[(provider, record.external_id)] = key
-                for other_provider, other_id in record.provider_ids.items():
-                    if other_id:
-                        id_to_key[(other_provider, other_id)] = key
-
-    # Pass B: populate any remaining records that don't have cross-system mappings
-    for provider, records in normalized_by_provider.items():
-        for record in records:
-            rec_id = (provider, record.external_id)
-            if rec_id not in id_to_key:
-                id_to_key[rec_id] = record.sync_key
-
-    # 3. Group records, forcing matching records to adopt the mapped canonical key
     grouped: dict[str, list[TaskRecord]] = {}
     for provider, records in normalized_by_provider.items():
         for record in records:
             rec_id = (provider, record.external_id)
             canonical_key = id_to_key.get(rec_id, record.sync_key)
-            
-            # Create a copy/update of the record with the aligned canonical key
             updated_record = TaskRecord(
                 provider=record.provider,
                 external_id=record.external_id,
@@ -536,7 +474,6 @@ def group_records_by_key(
                 labels=record.labels,
             )
             grouped.setdefault(canonical_key, []).append(updated_record)
-            
     return grouped
 
 
@@ -558,6 +495,45 @@ def normalized_group_record(provider: str, record: TaskRecord) -> TaskRecord:
     )
 
 
+def _iter_all_records(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> Iterable[TaskRecord]:
+    for records in normalized_by_provider.values():
+        yield from records
+
+
+def _normalize_by_provider(
+    records_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[str, list[TaskRecord]]:
+    normalized_by_provider: dict[str, list[TaskRecord]] = {}
+    for provider, records in records_by_provider.items():
+        normalized_list = []
+        for record in records:
+            normalized_record = normalized_group_record(provider, record)
+            if not normalized_record.sync_key:
+                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
+                continue
+            normalized_list.append(normalized_record)
+        normalized_by_provider[provider] = normalized_list
+    return normalized_by_provider
+
+
+def _build_id_to_key_map(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[tuple[str, str], str]:
+    id_to_key: dict[tuple[str, str], str] = {}
+    for record in _iter_all_records(normalized_by_provider):
+        key = record.sync_key
+        id_to_key[(record.provider, record.external_id)] = key
+        for other_provider, other_id in record.provider_ids.items():
+            if other_id:
+                id_to_key[(other_provider, other_id)] = key
+    for record in _iter_all_records(normalized_by_provider):
+        if (record.provider, record.external_id) not in id_to_key:
+            id_to_key[(record.provider, record.external_id)] = record.sync_key
+    return id_to_key
+
+
 def build_sync_action(
     *,
     provider: str,
@@ -566,8 +542,6 @@ def build_sync_action(
     sync_key: str,
     provider_ids: Mapping[str, str],
 ) -> SyncAction | None:
-    if existing is not None and records_are_in_sync(existing, canonical, provider_ids):
-        return None
 
     known_provider_ids = dict(provider_ids)
     if existing is not None:
@@ -611,8 +585,8 @@ def build_sync_plan(
     plan: list[SyncAction] = []
 
     for sync_key, records in sorted(grouped.items()):
-        # If there is no Linear record in this group, skip generating any sync actions!
-        if not any(record.provider == "linear" for record in records):
+        # If there is no Linear record in this group and linear is enabled, skip generating any sync actions!
+        if "linear" in enabled_providers and not any(record.provider == "linear" for record in records):
             continue
 
         provider_lookup = {
@@ -655,72 +629,6 @@ def merged_provider_ids(records: Sequence[TaskRecord]) -> dict[str, str]:
     return provider_ids
 
 
-def find_beads_duplicate_groups(
-    records: Sequence[TaskRecord],
-) -> list[tuple[str, TaskRecord, list[TaskRecord]]]:
-    duplicates: list[tuple[str, TaskRecord, list[TaskRecord]]] = []
-    grouped: dict[str, list[TaskRecord]] = {}
-    for record in records:
-        if record.provider != "beads":
-            continue
-        normalized = normalized_group_record("beads", record)
-        if not normalized.sync_key:
-            continue
-        grouped.setdefault(normalized.sync_key, []).append(normalized)
-
-    for sync_key, sync_records in sorted(grouped.items()):
-        if len(sync_records) < 2:
-            continue
-        canonical = select_provider_record(sync_records)
-        stale_records = [record for record in sync_records if record.external_id != canonical.external_id]
-        if stale_records:
-            duplicates.append((sync_key, canonical, stale_records))
-    return duplicates
-
-
-def cleanup_beads_duplicates(
-    records: Sequence[TaskRecord],
-    *,
-    run_process: Any | None = None,
-) -> list[SyncExecutionResult]:
-    run_process = run_process or _run_process
-    results: list[SyncExecutionResult] = []
-    for sync_key, canonical, stale_records in find_beads_duplicate_groups(records):
-        for stale_record in stale_records:
-            close_completed = run_process(["bd", "close", stale_record.external_id])
-            close_success = getattr(close_completed, "returncode", 1) == 0
-            stdout_parts = [(_string_or_empty(getattr(close_completed, "stdout", ""))).strip()]
-            stderr_parts = [(_string_or_empty(getattr(close_completed, "stderr", ""))).strip()]
-
-            if close_success:
-                dep_completed = run_process(
-                    [
-                        "bd",
-                        "dep",
-                        "add",
-                        stale_record.external_id,
-                        canonical.external_id,
-                        "--type",
-                        "related",
-                    ]
-                )
-                close_success = getattr(dep_completed, "returncode", 1) == 0
-                stdout_parts.append((_string_or_empty(getattr(dep_completed, "stdout", ""))).strip())
-                stderr_parts.append((_string_or_empty(getattr(dep_completed, "stderr", ""))).strip())
-
-            results.append(
-                SyncExecutionResult(
-                    provider="beads",
-                    action="dedupe",
-                    sync_key=sync_key,
-                    target_id=canonical.external_id,
-                    success=close_success,
-                    stdout="\n".join(part for part in stdout_parts if part),
-                    stderr="\n".join(part for part in stderr_parts if part),
-                )
-            )
-    return results
-
 
 def _run_command(command: Sequence[str], *, input_text: str | None = None) -> str:
     try:
@@ -752,27 +660,6 @@ def _run_process(command: Sequence[str], *, input_text: str | None = None) -> su
         capture_output=True,
         check=False,
         text=True,
-    )
-
-
-def normalize_beads_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
-    if payload.get("status") == "closed" and payload.get("type") == "memory":
-        return None
-
-    body = str(payload.get("description") or payload.get("notes") or "")
-    clean_body, metadata = parse_sync_metadata(body)
-    return TaskRecord(
-        provider="beads",
-        external_id=str(payload.get("id")),
-        title=str(payload.get("title") or payload.get("name") or ""),
-        body=body,
-        status=normalize_status(str(payload.get("status") or payload.get("state") or "open")),
-        updated_at=_parse_updated_at(payload, "updated_at", "updatedAt", "created_at", "createdAt")
-        or datetime.now(timezone.utc),
-        sync_key=metadata.get("key"),
-        provider_ids=_parse_provider_ids(metadata),
-        clean_body=clean_body,
-        raw=payload,
     )
 
 
@@ -897,6 +784,7 @@ def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         updated_at=(
             _parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc)
         ),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
         raw=payload,
@@ -1035,7 +923,6 @@ def get_provider_normalizer(provider: str):
     normalizers = {
         "asana": normalize_asana_payload,
         "jira": normalize_jira_payload,
-        "beads": normalize_beads_payload,
         "github": normalize_github_payload,
         "linear": normalize_linear_payload,
     }
@@ -1044,18 +931,6 @@ def get_provider_normalizer(provider: str):
     except KeyError as exc:
         raise ValueError(f"Unsupported provider export: {provider}") from exc
 
-
-def beads_export() -> list[TaskRecord]:
-    output = _run_command(["bd", "export", "--no-memories"])
-    records: list[TaskRecord] = []
-    for line in output.splitlines():
-        if not line.strip():
-            continue
-        payload = json.loads(line)
-        record = normalize_beads_payload(payload)
-        if record is not None:
-            records.append(record)
-    return records
 
 
 def _iter_export_payloads(path: Path) -> Iterable[Mapping[str, Any]]:
@@ -1119,9 +994,6 @@ def collect_provider_records(
     provider: str,
     export_paths: Mapping[str, Path | str],
 ) -> list[TaskRecord] | None:
-    if provider == "beads":
-        return beads_export()
-
     path = resolve_export_path(provider, export_paths)
     if path is not None:
         return export_records_from_path(provider, path)
@@ -1130,8 +1002,6 @@ def collect_provider_records(
     if exporter is not None:
         return _direct_provider_export(provider, exporter())
     return None
-
-
 def _direct_provider_export(provider: str, payloads: Sequence[Mapping[str, Any]]) -> list[TaskRecord]:
     normalize_payload = get_provider_normalizer(provider)
     records: list[TaskRecord] = []
@@ -1263,68 +1133,6 @@ def resolve_apply_commands_from_env() -> dict[str, list[str]]:
     return commands
 
 
-def _parse_beads_issue_id(stdout: str) -> str | None:
-    match = re.search(r"\b([A-Za-z]+-\d+)\b", stdout)
-    return match.group(1) if match else None
-
-
-def _apply_beads_action(
-    action: SyncAction,
-    *,
-    run_process: Any,
-) -> SyncExecutionResult:
-    if action.action == "create":
-        command = [
-            "bd",
-            "create",
-            action.title,
-            "--description",
-            action.body,
-            "--external-ref",
-            action.sync_key,
-            "--silent",
-        ]
-    else:
-        if not action.target_id:
-            return SyncExecutionResult(
-                provider=action.provider,
-                action=action.action,
-                sync_key=action.sync_key,
-                target_id=action.target_id,
-                success=False,
-                stderr="beads update requires a target id",
-            )
-        command = [
-            "bd",
-            "update",
-            action.target_id,
-            "--title",
-            action.title,
-            "--description",
-            action.body,
-            "--status",
-            map_status_for_beads(action.status),
-            "--external-ref",
-            action.sync_key,
-        ]
-
-    completed = run_process(command)
-    success = getattr(completed, "returncode", 1) == 0
-    target_id = action.target_id
-    stdout = getattr(completed, "stdout", "") or ""
-    stderr = getattr(completed, "stderr", "") or ""
-    if success and action.action == "create":
-        target_id = _parse_beads_issue_id(stdout) or target_id
-    return SyncExecutionResult(
-        provider=action.provider,
-        action=action.action,
-        sync_key=action.sync_key,
-        target_id=target_id,
-        success=success,
-        stdout=stdout.strip(),
-        stderr=stderr.strip(),
-    )
-
 
 def _apply_bridge_action(
     action: SyncAction,
@@ -1390,28 +1198,23 @@ def apply_sync_action(
 
     sys.stderr.write(f"[{action.provider}] Starting {action.action} for '{action.sync_key}'\n")
     sys.stderr.flush()
+    has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
+    has_provider_command = action.provider in provider_commands
 
-    if action.provider == "beads":
-        res = _apply_beads_action(
+    if has_direct_applier and not has_provider_command:
+        res = _apply_direct_provider_action(action)
+    elif not has_provider_command:
+        raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
+    else:
+        res = _apply_bridge_action(
             action,
+            provider_commands=provider_commands,
             run_process=run_process,
         )
-    else:
-        has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
-        has_provider_command = action.provider in provider_commands
 
-        if has_direct_applier and not has_provider_command:
-            res = _apply_direct_provider_action(action)
-        elif not has_provider_command:
-            raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
-        else:
-            res = _apply_bridge_action(
-                action,
-                provider_commands=provider_commands,
-                run_process=run_process,
-            )
-
-    sys.stderr.write(f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n")
+    sys.stderr.write(
+        f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n"
+    )
     sys.stderr.flush()
     return res
 
@@ -1510,9 +1313,6 @@ def build_follow_up_plan(
     return follow_up
 
 
-def plan_from_beads_only() -> list[SyncAction]:
-    return build_sync_plan({"beads": beads_export()})
-
 
 def plan_from_sources(
     *,
@@ -1568,31 +1368,14 @@ def execute_apply_mode(
             break
         current_plan = build_follow_up_plan(current_plan, results)
 
-    enabled_providers = resolve_enabled_providers_from_env()
-    beads_cleanup_results = []
-    if "beads" in enabled_providers:
-        beads_cleanup_results = cleanup_beads_duplicates(beads_export())
-
     payload: dict[str, Any] = {
         "passes": pass_summaries,
         "results": [dataclass_to_dict(result) for result in all_results],
-        "beads_cleanup": {
-            "summary": {
-                "dedupe": len(beads_cleanup_results),
-                "success": sum(1 for result in beads_cleanup_results if result.success),
-                "failure": sum(1 for result in beads_cleanup_results if not result.success),
-            },
-            "results": [dataclass_to_dict(result) for result in beads_cleanup_results],
-        },
     }
     exit_code = 0
     if not all(result.success for result in all_results):
         exit_code = 1
-    if beads_cleanup_results and not all(result.success for result in beads_cleanup_results):
-        exit_code = 1
     return payload, exit_code
-
-
 def main(argv: Sequence[str] | None = None) -> int:
     args = list(argv or sys.argv[1:])
     mode = args[0] if args else "plan"
