@@ -18,6 +18,9 @@ type RedisClient = Record<string, RedisCommand> & { status?: string }
 type RedisCommand = (...args: any[]) => any
 type RedisClient = Record<string, RedisCommand> & { status?: string }
 
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
