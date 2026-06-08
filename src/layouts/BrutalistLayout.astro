@@ -130,7 +130,7 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
     const scrollTop = window.scrollY
     const docHeight = document.documentElement.scrollHeight - window.innerHeight
     const progress = (scrollTop / docHeight) * 100
-    progressBar?.style.setProperty('width', `${progress}%`)
+    progressBar??.style.setProperty('width', `${progress}%`)
   }
 
   window.addEventListener('scroll', updateProgress, { passive: true })

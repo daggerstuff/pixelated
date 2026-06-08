@@ -292,10 +292,10 @@ export class PerformanceTestUtils {
     const startTime = Date.now()
 
     // Run concurrent requests
-    const promises = []
+    const promises: any[] = []
     for (let i = 0; i < totalRequests; i++) {
       promises.push(
-        this.measureExecutionTime(async () => {
+        (this as any).measureExecutionTime(async () => {
           try {
             await testFn()
             return { success: true }

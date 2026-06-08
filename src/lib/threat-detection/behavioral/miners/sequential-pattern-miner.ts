@@ -46,9 +46,11 @@ export class SequentialPatternMiner implements PatternMiner {
 
   private preprocessSequences(sequences: BehavioralSequence[]): string[][] {
     return sequences
-      .filter((seq) => seq.actions.length >= this.minPatternLength)
+      .filter((seq) => (seq as any).actions.length >= this.minPatternLength)
       .map((seq) =>
-        seq.actions.filter((action) => action && action.trim().length > 0),
+        (seq as any).actions.filter(
+          (action) => action && action.trim().length > 0,
+        ),
       )
   }
 
@@ -236,7 +238,7 @@ export class SequentialPatternMiner implements PatternMiner {
     const minCount = Math.ceil(totalSequences * minSupport)
 
     for (const item of Object.keys(idLists)) {
-      const uniqueSequenceIds = new Set(idLists[item]!.map((entry) => entry[0]))
+      const uniqueSequenceIds = new Set(idLists[item].map((entry) => entry[0]))
       if (uniqueSequenceIds.size >= minCount) {
         frequentSequences.push([item])
       }
@@ -280,8 +282,8 @@ export class SequentialPatternMiner implements PatternMiner {
 
     for (let i = 0; i < frequentSequences.length; i++) {
       for (let j = i + 1; j < frequentSequences.length; j++) {
-        const seq1 = frequentSequences[i]!
-        const seq2 = frequentSequences[j]!
+        const seq1 = frequentSequences[i]
+        const seq2 = frequentSequences[j]
 
         if (
           seq1.length === k - 1 &&
@@ -292,7 +294,7 @@ export class SequentialPatternMiner implements PatternMiner {
           const key = candidate.join('\u0001')
           if (!candidateSet.has(key)) {
             candidateSet.add(key)
-            candidates.push(candidate.filter(Boolean) as string[])
+            candidates.push(candidate.filter(Boolean))
             if (candidates.length >= this.maxCandidatesPerIteration) {
               return candidates
             }
@@ -343,11 +345,11 @@ export class SequentialPatternMiner implements PatternMiner {
   private buildSequencePositionMap(idList: number[][]): Map<number, number[]> {
     const map = new Map<number, number[]>()
     for (const [sequenceId, itemIndex] of idList) {
-      const positions = map.get(sequenceId!)
+      const positions = map.get(sequenceId)
       if (positions) {
-        positions.push(itemIndex!)
+        positions.push(itemIndex)
       } else {
-        map.set(sequenceId!, [itemIndex!])
+        map.set(sequenceId, [itemIndex])
       }
     }
 
@@ -490,7 +492,7 @@ export class SequentialPatternMiner implements PatternMiner {
         frequency,
         lastObserved: new Date(),
         stability,
-      })
+      } as any)
     }
 
     return behavioralPatterns

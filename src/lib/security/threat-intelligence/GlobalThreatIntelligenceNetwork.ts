@@ -215,21 +215,23 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       await subscriber.connect()
 
       // Subscribe to global threat intelligence channel
-      await subscriber.subscribe('threat-intelligence-global', (message) => {
-        void this.handleIncomingThreat(message)
-      })
+      await subscriber.subscribe('threat-intelligence-global')
 
       // Subscribe to regional channels
       for (const region of this.config.regions) {
-        await subscriber.subscribe(
-          `threat-intelligence-${region}`,
-          (message) => {
-            if (region !== this.region) {
-              void this.handleIncomingThreat(message)
-            }
-          },
-        )
+        await subscriber.subscribe(`threat-intelligence-${region}`)
       }
+
+      subscriber.on('message', (channel: string, message: string) => {
+        if (channel === 'threat-intelligence-global') {
+          void this.handleIncomingThreat(message)
+        } else if (channel.startsWith('threat-intelligence-')) {
+          const region = channel.replace('threat-intelligence-', '')
+          if (region !== this.region) {
+            void this.handleIncomingThreat(message)
+          }
+        }
+      })
 
       logger.info('Redis pub/sub setup completed', { region: this.region })
     } catch (error: unknown) {
@@ -406,7 +408,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
           ...threat,
           created_at: new Date(),
           updated_at: new Date(),
-        })
+        } as any)
       }
 
       // Log the sharing activity
@@ -560,7 +562,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
     try {
       if (threat.data?.['encrypted']) {
         const decryptedData = await decrypt(threat.data['encrypted'])
-        return JSON.parse(decryptedData)
+        return JSON.parse(decryptedData as any)
       }
       return threat
     } catch (error: unknown) {

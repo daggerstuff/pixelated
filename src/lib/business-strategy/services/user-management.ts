@@ -26,7 +26,7 @@ export class UserManagementService extends BaseService {
         `SELECT * FROM ${this.db.postgresql.schema}.${this.tableNames.users} WHERE id = $1`,
         [id],
       )
-      return result.rows[0] ?? null
+      return result.rows[0] ?? (null as any)
     } catch (error: unknown) {
       return this.handleError(error, 'getUser')
     }

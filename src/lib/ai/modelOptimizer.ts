@@ -296,7 +296,7 @@ class ModelOptimizer {
       const variance = 0.1; // 10% variance
       const actualChange = expectedChange * (1 + (Math.random() - 0.5) * variance);
 
-      improvements[key] = actualChange;
+      (improvements as any)[key] = actualChange;
     });
 
     return improvements;
@@ -422,7 +422,7 @@ class ModelOptimizer {
           inferenceTime: "stable",
           memoryUsage: "stable",
           privacyScore: "stable",
-        },
+        } as Record<keyof ModelMetrics, "stable" | "improving" | "declining">,
         totalImprovements: {},
       };
     }
@@ -435,7 +435,7 @@ class ModelOptimizer {
       inferenceTime: "stable",
       memoryUsage: "stable",
       privacyScore: "stable",
-    };
+    } as Record<keyof ModelMetrics, "improving" | "declining" | "stable">;
 
     const totalImprovements: Partial<ModelMetrics> = {};
 
@@ -443,13 +443,13 @@ class ModelOptimizer {
     Object.keys(trends).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
       const values = this.optimizationHistory.map((h) => h.improvements[key] ?? 0);
-      const avgChange = values.reduce((sum, val) => sum + val, 0) / values.length;
+      const avgChange = (values.reduce((sum, val) => (sum as number) + (val as number), 0) as number) / values.length;
 
       if (avgChange > 0.01) trends[key] = "improving";
       else if (avgChange < -0.01) trends[key] = "declining";
       else trends[key] = "stable";
 
-      totalImprovements[key] = values.reduce((sum, val) => sum + val, 0);
+      (totalImprovements as any)[key] = values.reduce((sum, val) => (sum as number) + (val as number), 0);
     });
 
     return {

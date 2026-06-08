@@ -4,8 +4,9 @@
 import type { TherapeuticSession } from '../types'
 
 function computeBiasScore(session: TherapeuticSession): number {
-  const content = (session['conversationHistory'] || [])
-    .map((m) => String(m.content || '').toLowerCase())
+  const history = (session['conversationHistory'] as any[]) || []
+  const content = history
+    .map((m: any) => String(m?.content || '').toLowerCase())
     .join(' ')
 
   const CRITICAL = [

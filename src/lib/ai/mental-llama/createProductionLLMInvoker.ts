@@ -436,7 +436,7 @@ export async function createProductionLLMInvoker(
 
         // Check for provider-level errors
         if (response.error) {
-          throw new Error(`Provider error: ${response.String(error)}`)
+          throw new Error(`Provider error: ${(response as any).String(error)}`)
         }
 
         // Validate response structure

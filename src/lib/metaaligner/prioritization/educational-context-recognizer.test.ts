@@ -35,7 +35,7 @@ const mockAIService: AIService = {
         options?: Parameters<AIService['createStreamingChatCompletion']>[1],
       ) => ReturnType<AIService['createStreamingChatCompletion']>
     >(),
-}
+} as any
 
 describe('EducationalContextRecognizer', () => {
   let recognizer: EducationalContextRecognizer

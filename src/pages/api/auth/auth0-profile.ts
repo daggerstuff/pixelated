@@ -114,6 +114,13 @@ export const PATCH = async ({ request }) => {
     // Update user in Auth0
     const updatedUser = await updateUser(validation.userId!, updates)
 
+    if (!updatedUser) {
+      return new Response(JSON.stringify({ error: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
+
     return new Response(
       JSON.stringify({
         user: {

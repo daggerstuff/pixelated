@@ -198,93 +198,103 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       },
     )
   }
-})
+}) as any
 
 /**
  * POST endpoint for real-time particle updates
  */
-export const POST: APIRoute = protectRoute()(async (
-  context: AuthAPIContext,
-) => {
-  try {
-    const { locals, request } = context
-    const { user } = locals
+export const POST: APIRoute = protectRoute()(
+  async (context: AuthAPIContext) => {
+    try {
+      const { locals, request } = context
+      const { user } = locals
 
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
+      if (!user) {
+        return new Response(
+          JSON.stringify({ error: 'Authentication required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+
+      const body = (await request.json()) as Record<string, unknown>
+      const { emotion, intensity, sessionId, particleUpdates } = body
+
+      // Validate input
+      if (!emotion || typeof intensity !== 'number') {
+        return new Response(
+          JSON.stringify({ error: 'emotion and intensity are required' }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+
+      // Process real-time updates
+      const updateResponse = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        appliedUpdates: {
+          emotion,
+          intensity: Math.max(0, Math.min(1, intensity)),
+          sessionId,
+          particleCount: (particleUpdates as any)?.length ?? 0,
         },
-      )
-    }
+        recommendations: generateEmotionRecommendations(
+          emotion as any,
+          intensity,
+        ),
+      }
 
-    const body = (await request.json()) as Record<string, unknown>
-    const { emotion, intensity, sessionId, particleUpdates } = body
+      // TODO: Save particle interaction data for analytics
+      // const repository = new AIRepository()
+      // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
 
-    // Validate input
-    if (!emotion || typeof intensity !== 'number') {
-      return new Response(
-        JSON.stringify({ error: 'emotion and intensity are required' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-    }
-
-    // Process real-time updates
-    const updateResponse = {
-      success: true,
-      timestamp: new Date().toISOString(),
-      appliedUpdates: {
+      logger.info('Processed particle system update', {
         emotion,
-        intensity: Math.max(0, Math.min(1, intensity)),
+        intensity,
         sessionId,
-        particleCount: particleUpdates?.length ?? 0,
-      },
-      recommendations: generateEmotionRecommendations(emotion, intensity),
-    }
+        userId: user.id,
+      })
 
-    // TODO: Save particle interaction data for analytics
-    // const repository = new AIRepository()
-    // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
-
-    logger.info('Processed particle system update', {
-      emotion,
-      intensity,
-      sessionId,
-      userId: user.id,
-    })
-
-    return new Response(JSON.stringify(updateResponse), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  } catch (error: unknown) {
-    logger.error('Error processing particle system update', { error })
-
-    return new Response(
-      JSON.stringify({
-        error: 'Internal server error',
-        message:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : 'Unknown error',
-      }),
-      {
-        status: 500,
+      return new Response(JSON.stringify(updateResponse), {
+        status: 200,
         headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-})
+      })
+    } catch (error: unknown) {
+      logger.error('Error processing particle system update', { error })
+
+      return new Response(
+        JSON.stringify({
+          error: 'Internal server error',
+          message:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+  },
+) as any
 
 // Helper functions
-function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {
+function calculateEmotionProfile(
+  sessionEmotions: {
+    primaryEmotion?: string
+    emotion?: string
+    confidence?: number
+    intensity?: number
+  }[],
+) {
   const emotionCounts = new Map<
     string,
     { count: number; totalIntensity: number }
@@ -418,7 +428,12 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
 
 function generateEmotionParticles(
   config: ParticleSystemConfig,
-  emotionProfile: { dominantEmotion: string; emotionMix: Record<string, number>; averageIntensity: number; volatility: number },
+  emotionProfile: {
+    dominantEmotion: string
+    emotionMix: Record<string, number>
+    averageIntensity: number
+    volatility: number
+  },
 ): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config
@@ -434,7 +449,7 @@ function generateEmotionParticles(
     let cumulative = 0
 
     for (const entry of Object.entries(emotionProfile.emotionMix)) {
-      const [emo, percentage] = entry as [string, number]
+      const [emo, percentage] = entry
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

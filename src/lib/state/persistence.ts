@@ -22,7 +22,7 @@ const defaultOptions: Required<StorageOptions> = {
   storage:
     typeof window !== 'undefined'
       ? storageManager.getStorage()
-      : ({} as Storage),
+      : ({} as Storage as any),
   prefix: 'app_state_',
   encrypt: false,
   compress: false,

@@ -302,7 +302,7 @@ export class CDNEdgeOptimizer {
       const batch = assets.slice(i, i + batchSize)
 
       const batchPromises = batch.map(async (asset) =>
-        this.optimizeImage(asset.path, asset.options),
+        this.optimizeImage(asset.path, asset.options as any),
       )
 
       const batchResults = await Promise.all(batchPromises)

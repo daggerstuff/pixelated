@@ -1,4 +1,4 @@
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { Pool } from 'pg'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -68,7 +68,19 @@ export class DocumentService {
 
   constructor(db: Pool, redis: Redis) {
     this.db = db
+    this.db = db
     this.redis = redis
+  }
+
+  private get redisClient() {
+    return this.redis as unknown as {
+      get(key: string): Promise<string | null>
+      setex(key: string, seconds: number, value: string): Promise<string>
+      sadd(key: string, ...members: string[]): Promise<number>
+      srem(key: string, ...members: string[]): Promise<number>
+      smembers(key: string): Promise<string[]>
+      del(key: string): Promise<number>
+    }
   }
 
   async createDocument(data: {
@@ -98,7 +110,7 @@ export class DocumentService {
       data.isPublic ?? false,
     ])
 
-    return this.mapDocumentRow(result.rows[0] as DocumentRow)
+    return this.mapDocumentRow(result.rows[0])
   }
 
   async getDocument(id: string, userId: string): Promise<Document | null> {
@@ -112,7 +124,7 @@ export class DocumentService {
     `
 
     const result = await this.db.query<DocumentRow>(query, [id, userId])
-    return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0] as DocumentRow) : null
+    return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0]) : null
   }
 
   async updateDocument(
@@ -139,7 +151,7 @@ export class DocumentService {
       id,
     ])
 
-    return this.mapDocumentRow(result.rows[0] as DocumentRow)
+    return this.mapDocumentRow(result.rows[0])
   }
 
   async addCollaborator(
@@ -215,13 +227,13 @@ export class DocumentService {
       lastActivity: new Date(),
     }
 
-    await this.redis.setex(
+    await this.redisClient.setex(
       `session:${session.id}`,
       3600,
       JSON.stringify(session),
     )
 
-    await this.redis.sadd(`doc:${data.documentId}:sessions`, session.id)
+    await this.redisClient.sadd(`doc:${data.documentId}:sessions`, session.id)
 
     return session
   }
@@ -230,7 +242,7 @@ export class DocumentService {
     sessionId: string,
     cursor: { line: number; column: number },
   ): Promise<void> {
-    const sessionData = await this.redis.get(`session:${sessionId}`)
+    const sessionData = await this.redisClient.get(`session:${sessionId}`)
     if (!sessionData) return
 
     const session = parseSession(sessionData)
@@ -238,7 +250,7 @@ export class DocumentService {
     session.cursor = cursor
     session.lastActivity = new Date()
 
-    await this.redis.setex(
+    await this.redisClient.setex(
       `session:${sessionId}`,
       3600,
       JSON.stringify(session),
@@ -248,20 +260,22 @@ export class DocumentService {
   async getActiveCollaborators(
     documentId: string,
   ): Promise<CollaborationSession[]> {
-    const sessionIds = await this.redis.smembers(`doc:${documentId}:sessions`)
+    const sessionIds = await this.redisClient.smembers(
+      `doc:${documentId}:sessions`,
+    )
     const sessions: CollaborationSession[] = []
 
     for (const sessionId of sessionIds) {
-      const sessionData = await this.redis.get(`session:${sessionId}`)
+      const sessionData = await this.redisClient.get(`session:${sessionId}`)
       if (sessionData) {
         const session = parseSession(sessionData)
         if (session) {
           sessions.push(session)
         } else {
-          await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
+          await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
         }
       } else {
-        await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
+        await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
       }
     }
 
@@ -269,13 +283,13 @@ export class DocumentService {
   }
 
   async removeCollaborationSession(sessionId: string): Promise<void> {
-    const sessionData = await this.redis.get(`session:${sessionId}`)
+    const sessionData = await this.redisClient.get(`session:${sessionId}`)
     if (!sessionData) return
 
     const session = parseSession(sessionData)
     if (!session) return
-    await this.redis.srem(`doc:${session.documentId}:sessions`, sessionId)
-    await this.redis.del(`session:${sessionId}`)
+    await this.redisClient.srem(`doc:${session.documentId}:sessions`, sessionId)
+    await this.redisClient.del(`session:${sessionId}`)
   }
 
   private mapDocumentRow(row: DocumentRow): Document {
@@ -292,11 +306,11 @@ export class DocumentService {
       createdAt:
         row.created_at instanceof Date
           ? row.created_at
-          : new Date(row.created_at as string),
+          : new Date(row.created_at),
       updatedAt:
         row.updated_at instanceof Date
           ? row.updated_at
-          : new Date(row.updated_at as string),
+          : new Date(row.updated_at),
       version: row.version,
       isPublic: row.is_public,
     }

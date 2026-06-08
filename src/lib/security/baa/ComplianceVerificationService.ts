@@ -527,7 +527,7 @@ export class ComplianceVerificationService {
       ComplianceLevel.HIGH,
       true,
       VerificationMethod.THIRD_PARTY_AUDIT,
-      'annual',
+      'annual' as any,
     )
 
     this.createRequirement(
@@ -548,7 +548,7 @@ export class ComplianceVerificationService {
       ComplianceLevel.MEDIUM,
       true,
       VerificationMethod.DOCUMENTATION_REVIEW,
-      'annual',
+      'annual' as any,
     )
 
     // Additional standard requirements...

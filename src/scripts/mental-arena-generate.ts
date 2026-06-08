@@ -74,7 +74,7 @@ interface CommandOptions {
   'enable-validation'?: boolean
 }
 
-const options = program.opts<CommandOptions>()
+const options = program.opts() as unknown as CommandOptions
 
 // Mock provider implementation with production-like features
 class MockMentalArenaProvider {

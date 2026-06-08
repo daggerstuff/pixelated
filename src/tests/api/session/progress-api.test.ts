@@ -197,7 +197,7 @@ describe('Session Progress API', () => {
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(1))
 
-      const response = await POST(mockRequest)
+      const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
         response,
         hasSuccessPostShape,
@@ -213,7 +213,7 @@ describe('Session Progress API', () => {
         progressMetrics: { totalMessages: 10, progress: 50 },
       })
 
-      const response = await POST(mockRequest)
+      const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,
@@ -232,7 +232,7 @@ describe('Session Progress API', () => {
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockResolvedValueOnce(createMockQueryResult(0))
 
-      const response = await POST(mockRequest)
+      const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,
@@ -251,7 +251,7 @@ describe('Session Progress API', () => {
       const mockPoolClient = await mockConnect()
       mockPoolClient.query.mockRejectedValueOnce(new Error('Database error'))
 
-      const response = await POST(mockRequest)
+      const response = await POST(mockRequest as any)
       const responseBody = await parseResponseBody(
         response,
         hasErrorResponseShape,

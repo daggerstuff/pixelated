@@ -348,9 +348,9 @@ describe('HIPAA Session Management', () => {
         { action: 'login', timestamp: new Date().toISOString() },
         { action: 'view_session', timestamp: new Date().toISOString() },
       ],
-    }
+    } as any
 
-    expect(session.activity_log.length).toBeGreaterThan(0)
+    expect((session as any).activity_log.length).toBeGreaterThan(0)
     expect(session.last_activity).toBeDefined()
   })
 })

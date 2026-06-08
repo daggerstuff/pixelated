@@ -70,8 +70,8 @@ export class DocumentationSystem extends EventEmitter {
       await this.redisService.subscribe('session:update', (message: string) => {
         try {
           const sessionData = JSON.parse(message) as unknown
-          if (sessionData?.sessionId) {
-            void this.handleSessionUpdate(sessionData.sessionId)
+          if ((sessionData as any)?.sessionId) {
+            void this.handleSessionUpdate((sessionData as any).sessionId)
           }
         } catch (error: unknown) {
           logger.error('Error processing session update', { error })
@@ -82,8 +82,8 @@ export class DocumentationSystem extends EventEmitter {
       await this.redisService.subscribe('session:create', (message: string) => {
         try {
           const sessionData = JSON.parse(message) as unknown
-          if (sessionData?.sessionId) {
-            void this.trackActiveSession(sessionData.sessionId)
+          if ((sessionData as any)?.sessionId) {
+            void this.trackActiveSession((sessionData as any).sessionId)
           }
         } catch (error: unknown) {
           logger.error('Error processing session creation', { error })
@@ -96,8 +96,8 @@ export class DocumentationSystem extends EventEmitter {
         (message: string) => {
           try {
             const sessionData = JSON.parse(message) as unknown
-            if (sessionData?.sessionId) {
-              void this.handleSessionCompletion(sessionData.sessionId)
+            if ((sessionData as any)?.sessionId) {
+              void this.handleSessionCompletion((sessionData as any).sessionId)
             }
           } catch (error: unknown) {
             logger.error('Error processing session completion', { error })

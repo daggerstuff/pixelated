@@ -170,10 +170,9 @@ export const POST = async (context: APIContext) => {
     new Promise<Response>((resolve) =>
       resolve(new Response(null, { status: 200 })),
     )
-  const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SECURITY)(
-    context,
-    next,
-  )
+  const middlewareResponse = await adminGuard(
+    AdminPermission.MANAGE_SECURITY as any,
+  )(context as any, next)
   if (middlewareResponse.status !== 200) {
     return middlewareResponse
   }
