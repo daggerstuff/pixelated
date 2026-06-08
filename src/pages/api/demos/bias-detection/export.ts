@@ -1,7 +1,5 @@
 // API endpoint for bias detection data export
 
-import type { APIRoute } from 'astro'
-
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
@@ -205,10 +203,10 @@ function convertToCSV(exportData: ExportData): string {
     const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
       csvRows.push(
-        `Counterfactual,Scenario ${index + 1},${scenario.biasScoreChange},${scenario.change}` as any,
+        `Counterfactual,Scenario ${index + 1},${scenario['expectedBiasReduction'] as number},${scenario['change']}`,
       )
       csvRows.push(
-        `Counterfactual,Likelihood ${index + 1},${scenario.likelihood},${scenario.impact}` as any,
+        `Counterfactual,Likelihood ${index + 1},${scenario['likelihood']},${scenario['description']}`,
       )
     })
   }
@@ -265,10 +263,10 @@ function convertToText(exportData: ExportData): string {
     content += `COUNTERFACTUAL SCENARIOS\n`
     const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
-      content += `${index + 1}. ${scenario.change}\n`
-      content += `   Expected Reduction: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`
-      content += `   Likelihood: ${scenario.likelihood}\n`
-      content += `   Description: ${scenario.impact}\n\n`
+      content += `${index + 1}. ${scenario['change']}\n`
+      content += `   Expected Reduction: ${((scenario['expectedBiasReduction'] as number) * 100).toFixed(1)}%\n`
+      content += `   Likelihood: ${scenario['likelihood']}\n`
+      content += `   Description: ${scenario['description']}\n\n`
     })
   }
 

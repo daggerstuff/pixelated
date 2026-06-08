@@ -34,6 +34,8 @@ export class MentalLLaMAAdapter {
   private readonly evidenceService: EvidenceService;
   private readonly expertGuidanceOrchestrator: ExpertGuidanceOrchestrator;
 
+  // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
+
   constructor(options: MentalLLaMAAdapterOptions) {
     this.modelProvider = options.modelProvider;
     this.crisisNotifier = options.crisisNotifier;
@@ -50,7 +52,9 @@ export class MentalLLaMAAdapter {
     );
     // Preload CrisisSessionFlaggingService module (optional, handle missing module gracefully)
     try {
-      void import("../../crisis/CrisisSessionFlaggingService.ts");
+      this.crisisSessionFlaggingServiceImport = import(
+        "../../crisis/CrisisSessionFlaggingService.ts"
+      );
     } catch {
       logger.warn("CrisisSessionFlaggingService module not found, continuing without it.");
     }

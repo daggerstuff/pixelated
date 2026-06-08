@@ -100,7 +100,7 @@ describe('therapyChatWebSocketServer', () => {
     wss = new TherapyChatWebSocketServer(mockHttpServer)
 
     // Store reference to internal clients map (optional, if needed for assertions)
-    mockClients = (wss as unknown as any).clients
+    mockClients = (wss as unknown).clients
   })
 
   afterEach(() => {
@@ -126,9 +126,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message events', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
-        wss,
-      )
+      const handleConnection = (wss as unknown).handleConnection.bind(wss)
       handleConnection(mockWebSocket)
 
       // Get message handler attached to the mock *client*

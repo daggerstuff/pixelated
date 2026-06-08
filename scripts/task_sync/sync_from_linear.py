@@ -4,6 +4,7 @@ Sync from Linear (Source of Truth) to:
   - GitHub Issues
   - Jira Issues
   - Asana Tasks
+  - Beads Tasks
   - GitLab Issues
 
 Ensures NO duplicates are created (matching by ID and title similarity).
@@ -18,23 +19,26 @@ import json
 import os
 import re
 import sys
-import urllib.parse
+import subprocess
 import urllib.request
+import urllib.parse
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any, Mapping
 
 from dotenv import load_dotenv
-
 load_dotenv()
 
 # Add the repository root to Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 
-from scripts.task_sync.provider_bridge import (  # noqa: E402
-    apply_asana_action,
-    apply_github_action,
-    apply_jira_action,
-    export_asana_tasks,
+from scripts.task_sync.provider_bridge import (
     export_github_issues,
     export_jira_issues,
+    export_asana_tasks,
+    apply_github_action,
+    apply_jira_action,
+    apply_asana_action,
 )
 
 LINEAR_API = "https://api.linear.app/graphql"
@@ -54,21 +58,18 @@ SYNC_BLOCK_END = "-->"
 # Utility Functions
 # ---------------------------------------------------------------------------
 
-
 def slugify(title: str) -> str:
     t = title.lower()
-    t = re.sub(r"[^a-z0-9\s-]", "", t)
-    t = re.sub(r"[\s-]+", "-", t)
-    return t.strip("-")
-
+    t = re.sub(r'[^a-z0-9\s-]', '', t)
+    t = re.sub(r'[\s-]+', '-', t)
+    return t.strip('-')
 
 def clean_title(title: str) -> str:
     if not title:
         return ""
     t = title.lower()
-    t = re.sub(r"[^a-z0-9\s]", "", t)
+    t = re.sub(r'[^a-z0-9\s]', '', t)
     return " ".join(t.split())
-
 
 def extract_sync_metadata(body: str) -> dict[str, str]:
     if not body or SYNC_BLOCK_START not in body:
@@ -81,7 +82,6 @@ def extract_sync_metadata(body: str) -> dict[str, str]:
         if match:
             metadata[match.group("key").strip().lower()] = match.group("value").strip()
     return metadata
-
 
 def task_body_without_sync_block(body: str) -> str:
     if not body or SYNC_BLOCK_START not in body:
@@ -100,7 +100,6 @@ def task_body_without_sync_block(body: str) -> str:
             lines.append(line)
     return "\n".join(lines).strip()
 
-
 def normalize_linear_state(state_name: str) -> str:
     s = state_name.lower()
     if "backlog" in s:
@@ -115,34 +114,28 @@ def normalize_linear_state(state_name: str) -> str:
         return "closed"
     return "open"
 
-
 def get_priority_label(priority: int) -> str:
     return {0: "none", 1: "urgent", 2: "high", 3: "medium", 4: "low"}.get(priority, "none")
-
 
 # ---------------------------------------------------------------------------
 # Linear Client
 # ---------------------------------------------------------------------------
 
-
 def _gql(query: str, variables: dict | None = None) -> dict:
     payload = json.dumps({"query": query, "variables": variables or {}}).encode()
     req = urllib.request.Request(
-        LINEAR_API,
-        data=payload,
+        LINEAR_API, data=payload,
         headers={"Authorization": LINEAR_TOKEN, "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         return json.loads(resp.read())
-
 
 def fetch_all_linear_issues() -> list[dict]:
     print("Fetching all live Linear issues (unfiltered)...")
     issues = []
     after = None
     while True:
-        data = _gql(
-            """
+        data = _gql("""
 query($after: String) {
   issues(first: 250, after: $after) {
     pageInfo { hasNextPage endCursor }
@@ -156,9 +149,7 @@ query($after: String) {
       state { name }
     }
   }
-}""",
-            {"after": after},
-        )
+}""", {"after": after})
         nodes = data["data"]["issues"]["nodes"]
         page_info = data["data"]["issues"]["pageInfo"]
         issues.extend(nodes)
@@ -168,18 +159,69 @@ query($after: String) {
     print(f"  → Found {len(issues)} active Linear issues.")
     return issues
 
+# ---------------------------------------------------------------------------
+# Beads Provider
+# ---------------------------------------------------------------------------
+
+def beads_export() -> list[dict]:
+    print("Exporting Beads tasks...")
+    try:
+        result = subprocess.run(["bd", "export", "--no-memories"], capture_output=True, text=True, timeout=30)
+        if result.returncode != 0:
+            print(f"Warning: bd export failed: {result.stderr}")
+            return []
+        tasks = []
+        for line in result.stdout.splitlines():
+            if line.strip():
+                tasks.append(json.loads(line))
+        print(f"  → Found {len(tasks)} Beads tasks.")
+        return tasks
+    except Exception as e:
+        print(f"Warning: Beads CLI is not available or failed: {e}")
+        return []
+
+def apply_beads_action(action: dict) -> bool:
+    action_type = action.get("action")
+    target_id = action.get("target_id")
+    title = action.get("title", "")
+    body = action.get("body", "")
+    sync_key = action.get("sync_key", "")
+    status = action.get("status", "open")
+    
+    # Map status to beads status
+    beads_status = {
+        "backlog": "open",
+        "triage": "open",
+        "open": "open",
+        "in_progress": "in_progress",
+        "review": "in_progress",
+        "closed": "closed"
+    }.get(status, "open")
+    
+    if action_type == "create":
+        cmd = ["bd", "create", title, "--description", body, "--external-ref", sync_key, "--silent"]
+    else:
+        if not target_id:
+            return False
+        cmd = ["bd", "update", target_id, "--title", title, "--description", body, "--status", beads_status, "--external-ref", sync_key]
+        
+    try:
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        return res.returncode == 0
+    except Exception as e:
+        print(f"Error applying Beads action: {e}")
+        return False
 
 # ---------------------------------------------------------------------------
 # GitLab Provider
 # ---------------------------------------------------------------------------
-
 
 def fetch_gitlab_issues() -> list[dict]:
     token = os.environ.get("GITLAB_TOKEN")
     if not token:
         print("Warning: GITLAB_TOKEN not set. Skipping GitLab export.")
         return []
-
+    
     print("Fetching GitLab issues...")
     headers = {"PRIVATE-TOKEN": token}
     issues = []
@@ -202,35 +244,39 @@ def fetch_gitlab_issues() -> list[dict]:
     print(f"  → Found {len(issues)} GitLab issues.")
     return issues
 
-
 def apply_gitlab_action(action: dict) -> str | None:
     token = os.environ.get("GITLAB_TOKEN")
     if not token:
         return None
-
+    
     headers = {"PRIVATE-TOKEN": token, "Content-Type": "application/json"}
     action_type = action.get("action")
-    target_id = action.get("target_id")  # Issue iid
-
+    target_id = action.get("target_id") # Issue iid
+    
     payload = {
         "title": action.get("title"),
         "description": action.get("body"),
     }
-
+    
     if action.get("status") == "closed":
         payload["state_event"] = "close"
     else:
         payload["state_event"] = "reopen"
-
+        
     if action_type == "create":
         url = "https://gitlab.com/api/v4/projects/pixelgroupies%2Fpixelated/issues"
         method = "POST"
     else:
         url = f"https://gitlab.com/api/v4/projects/pixelgroupies%2Fpixelated/issues/{target_id}"
         method = "PUT"
-
+        
     try:
-        req = urllib.request.Request(url, data=json.dumps(payload).encode("utf-8"), headers=headers, method=method)
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers=headers,
+            method=method
+        )
         with urllib.request.urlopen(req, timeout=30) as resp:
             res_data = json.loads(resp.read())
             return str(res_data.get("iid"))
@@ -238,15 +284,11 @@ def apply_gitlab_action(action: dict) -> str | None:
         print(f"Error applying GitLab action: {e}")
         return None
 
-
 # ---------------------------------------------------------------------------
 # Sync Logic
 # ---------------------------------------------------------------------------
 
-
-def build_sync_metadata_block(  # noqa: PLR0913
-    sync_key: str, status: str, linear_id: str, linear_url: str, linear_identifier: str, provider_ids: dict[str, str]
-) -> str:
+def build_sync_metadata_block(sync_key: str, status: str, linear_id: str, linear_url: str, linear_identifier: str, provider_ids: dict[str, str]) -> str:
     lines = [
         SYNC_BLOCK_START,
         f"key: {sync_key}",
@@ -265,10 +307,9 @@ def build_sync_metadata_block(  # noqa: PLR0913
     lines.append(SYNC_BLOCK_END)
     return "\n".join(lines)
 
-
-def main():  # noqa: PLR0912, PLR0915
+def main():
     apply_mode = "--apply" in sys.argv
-    print("=== Syncing from Linear (Source of Truth) ===")
+    print(f"=== Syncing from Linear (Source of Truth) ===")
     print(f"Mode: {'APPLY' if apply_mode else 'DRY RUN'}\n")
 
     if not LINEAR_TOKEN:
@@ -277,12 +318,12 @@ def main():  # noqa: PLR0912, PLR0915
 
     linear_issues = fetch_all_linear_issues()
     linear_by_id = {li["id"]: li for li in linear_issues}
-
+    
     # -----------------------------------------------------------------------
     # 1. Fetch from other platforms
     # -----------------------------------------------------------------------
     providers_data = {}
-
+    
     # GitHub
     try:
         providers_data["github"] = export_github_issues()
@@ -304,6 +345,9 @@ def main():  # noqa: PLR0912, PLR0915
         print(f"Warning: Asana export failed: {e}")
         providers_data["asana"] = []
 
+    # Beads
+    providers_data["beads"] = beads_export()
+
     # GitLab
     providers_data["gitlab"] = fetch_gitlab_issues()
 
@@ -311,7 +355,7 @@ def main():  # noqa: PLR0912, PLR0915
     # 2. Reconcile and match
     # -----------------------------------------------------------------------
     print("\nReconciling mappings...")
-
+    
     # Target maps: provider -> list of normalized issues
     # Normalized structure: { id, target_id (number/key/gid), title, body, state, metadata }
     target_issues = {}
@@ -321,15 +365,13 @@ def main():  # noqa: PLR0912, PLR0915
             if prov == "github":
                 body = raw.get("body") or ""
                 meta = extract_sync_metadata(body)
-                normalized_list.append(
-                    {
-                        "target_id": str(raw["number"]),
-                        "title": raw["title"],
-                        "body": body,
-                        "state": raw["state"],
-                        "metadata": meta,
-                    }
-                )
+                normalized_list.append({
+                    "target_id": str(raw["number"]),
+                    "title": raw["title"],
+                    "body": body,
+                    "state": raw["state"],
+                    "metadata": meta
+                })
             elif prov == "jira":
                 desc = raw.get("fields", {}).get("description", "")
                 if isinstance(desc, dict):
@@ -345,54 +387,58 @@ def main():  # noqa: PLR0912, PLR0915
                 else:
                     desc_text = str(desc or "")
                 meta = extract_sync_metadata(desc_text)
-                normalized_list.append(
-                    {
-                        "target_id": raw["key"],
-                        "title": raw.get("fields", {}).get("summary", ""),
-                        "body": desc_text,
-                        "state": raw.get("fields", {}).get("status", {}).get("name", ""),
-                        "metadata": meta,
-                    }
-                )
+                normalized_list.append({
+                    "target_id": raw["key"],
+                    "title": raw.get("fields", {}).get("summary", ""),
+                    "body": desc_text,
+                    "state": raw.get("fields", {}).get("status", {}).get("name", ""),
+                    "metadata": meta
+                })
             elif prov == "asana":
                 notes = raw.get("notes") or ""
                 meta = extract_sync_metadata(notes)
-                normalized_list.append(
-                    {
-                        "target_id": raw["gid"],
-                        "title": raw["name"],
-                        "body": notes,
-                        "state": "closed" if raw.get("completed") else "open",
-                        "metadata": meta,
-                    }
-                )
+                normalized_list.append({
+                    "target_id": raw["gid"],
+                    "title": raw["name"],
+                    "body": notes,
+                    "state": "closed" if raw.get("completed") else "open",
+                    "metadata": meta
+                })
+            elif prov == "beads":
+                desc = raw.get("description") or ""
+                meta = extract_sync_metadata(desc)
+                normalized_list.append({
+                    "target_id": raw["id"],
+                    "title": raw["title"],
+                    "body": desc,
+                    "state": raw["status"],
+                    "metadata": meta
+                })
             elif prov == "gitlab":
                 desc = raw.get("description") or ""
                 meta = extract_sync_metadata(desc)
-                normalized_list.append(
-                    {
-                        "target_id": str(raw["iid"]),
-                        "title": raw["title"],
-                        "body": desc,
-                        "state": raw["state"],
-                        "metadata": meta,
-                    }
-                )
+                normalized_list.append({
+                    "target_id": str(raw["iid"]),
+                    "title": raw["title"],
+                    "body": desc,
+                    "state": raw["state"],
+                    "metadata": meta
+                })
         target_issues[prov] = normalized_list
 
     # Match each Linear issue to target issues
     actions = []
-
+    
     for li in linear_issues:
         lid = li["id"]
         li_title = li["title"]
         li_clean = clean_title(li_title)
         li_state = normalize_linear_state(li["state"]["name"])
         li_priority = get_priority_label(li["priority"])
-
+        
         # Build base sync metadata fields
         sync_key = slugify(li_title)
-
+        
         # Find matches on each platform
         provider_matches = {}
         for prov, normalized_list in target_issues.items():
@@ -406,7 +452,8 @@ def main():  # noqa: PLR0912, PLR0915
             if not match:
                 for t in normalized_list:
                     # Only match by title if it doesn't already point to another Linear ID
-                    if not t["metadata"].get("linear") and clean_title(t["title"]) == li_clean and len(li_clean) > 5:
+                    if not t["metadata"].get("linear"):
+                        if clean_title(t["title"]) == li_clean and len(li_clean) > 5:
                             match = t
                             break
             if match:
@@ -418,24 +465,20 @@ def main():  # noqa: PLR0912, PLR0915
             provider_ids[prov] = match["target_id"]
 
         # Generate action for each provider
-        for prov in target_issues:
+        for prov in target_issues.keys():
             # Check if this provider has credentials / is enabled
             if prov == "gitlab" and not os.environ.get("GITLAB_TOKEN"):
                 continue
-            if prov == "asana" and not any(
-                os.environ.get(k) for k in ["ASANA_API_KEY", "ASANA_TOKEN", "ASANA_ACCESS_TOKEN", "ASANA_PAT"]
-            ):
+            if prov == "asana" and not any(os.environ.get(k) for k in ["ASANA_API_KEY", "ASANA_TOKEN", "ASANA_ACCESS_TOKEN", "ASANA_PAT"]):
                 continue
-
+                
             match = provider_matches.get(prov)
-
+            
             # Format the body
             clean_body = task_body_without_sync_block(li["description"] or "")
-            metadata_block = build_sync_metadata_block(
-                sync_key, li_state, lid, li["url"], li["identifier"], provider_ids
-            )
+            metadata_block = build_sync_metadata_block(sync_key, li_state, lid, li["url"], li["identifier"], provider_ids)
             body_with_meta = f"{clean_body}\n\n{metadata_block}"
-
+            
             action = None
             if not match:
                 action = {
@@ -447,30 +490,30 @@ def main():  # noqa: PLR0912, PLR0915
                     "status": li_state,
                     "priority_label": li_priority,
                     "labels": [],
-                    "linear_id": lid,
+                    "linear_id": lid
                 }
             else:
                 # Check if we need to update
                 needs_update = False
-
+                
                 # Check title difference
                 if match["title"].strip() != li_title.strip():
                     needs_update = True
-
+                    
                 # Check body difference (ignoring whitespaces/newlines)
                 match_clean_body = task_body_without_sync_block(match["body"])
                 if clean_body.strip() != match_clean_body.strip():
                     needs_update = True
-
+                    
                 # Check state difference
                 match_status = normalize_linear_state(match["state"])
                 if match_status != li_state:
                     needs_update = True
-
+                    
                 # Check metadata block completeness
                 if not match["metadata"].get("linear") or match["metadata"].get("key") != sync_key:
                     needs_update = True
-
+                    
                 if needs_update:
                     action = {
                         "provider": prov,
@@ -482,7 +525,7 @@ def main():  # noqa: PLR0912, PLR0915
                         "status": li_state,
                         "priority_label": li_priority,
                         "labels": [],
-                        "linear_id": lid,
+                        "linear_id": lid
                     }
             if action:
                 actions.append(action)
@@ -493,42 +536,41 @@ def main():  # noqa: PLR0912, PLR0915
     for prov, normalized_list in target_issues.items():
         if prov == "gitlab" and not os.environ.get("GITLAB_TOKEN"):
             continue
-        if prov == "asana" and not any(
-            os.environ.get(k) for k in ["ASANA_API_KEY", "ASANA_TOKEN", "ASANA_ACCESS_TOKEN", "ASANA_PAT"]
-        ):
+        if prov == "asana" and not any(os.environ.get(k) for k in ["ASANA_API_KEY", "ASANA_TOKEN", "ASANA_ACCESS_TOKEN", "ASANA_PAT"]):
             continue
 
         for t in normalized_list:
             mapped_lid = t["metadata"].get("linear")
-            if mapped_lid and mapped_lid not in linear_by_id and t["state"].lower() not in ("closed", "done", "canceled"):
-                    actions.append(
-                        {
-                            "provider": prov,
-                            "action": "update",
-                            "target_id": t["target_id"],
-                            "sync_key": t["metadata"].get("key", slugify(t["title"])),
-                            "title": t["title"],
-                            "body": t["body"],
-                            "status": "closed",
-                            "priority_label": "none",
-                            "labels": [],
-                            "linear_id": mapped_lid,
-                            "is_orphan": True,
-                        }
-                    )
+            if mapped_lid and mapped_lid not in linear_by_id:
+                # This task maps to a Linear ID that was deleted or doesn't exist anymore!
+                # We close it.
+                if t["state"].lower() not in ("closed", "done", "canceled"):
+                    actions.append({
+                        "provider": prov,
+                        "action": "update",
+                        "target_id": t["target_id"],
+                        "sync_key": t["metadata"].get("key", slugify(t["title"])),
+                        "title": t["title"],
+                        "body": t["body"],
+                        "status": "closed",
+                        "priority_label": "none",
+                        "labels": [],
+                        "linear_id": mapped_lid,
+                        "is_orphan": True
+                    })
 
     # Summary
-    print("\nSync plan summary:")
+    print(f"\nSync plan summary:")
     creates = [a for a in actions if a["action"] == "create"]
     updates = [a for a in actions if a["action"] == "update" and not a.get("is_orphan")]
     orphans = [a for a in actions if a.get("is_orphan")]
-
+    
     print(f"  To CREATE: {len(creates)}")
     print(f"  To UPDATE: {len(updates)}")
     print(f"  To CLOSE (stale orphans): {len(orphans)}")
-
+    
     # Detail by provider
-    for prov in target_issues:
+    for prov in target_issues.keys():
         prov_actions = [a for a in actions if a["provider"] == prov]
         p_creates = len([a for a in prov_actions if a["action"] == "create"])
         p_updates = len([a for a in prov_actions if a["action"] == "update" and not a.get("is_orphan")])
@@ -544,15 +586,16 @@ def main():  # noqa: PLR0912, PLR0915
     # -----------------------------------------------------------------------
     print("\nExecuting sync...")
     success_count = fail_count = 0
-
+    
     for a in actions:
         prov = a["provider"]
         act = a["action"]
+        target_id = a.get("target_id", "")
         sync_key = a["sync_key"]
-
+        
         label_orphan = " [Orphan]" if a.get("is_orphan") else ""
         print(f"  [{prov.upper()}] Running {act}{label_orphan} for '{sync_key}'...", end="", flush=True)
-
+        
         ok = False
         try:
             if prov == "github":
@@ -564,6 +607,8 @@ def main():  # noqa: PLR0912, PLR0915
             elif prov == "asana":
                 res = apply_asana_action(a)
                 ok = bool(res.get("gid"))
+            elif prov == "beads":
+                ok = apply_beads_action(a)
             elif prov == "gitlab":
                 res = apply_gitlab_action(a)
                 ok = bool(res)
@@ -571,16 +616,15 @@ def main():  # noqa: PLR0912, PLR0915
             print(f" Exception: {e}")
             fail_count += 1
             continue
-
+            
         if ok:
             print(" SUCCESS")
             success_count += 1
         else:
             print(" FAILED")
             fail_count += 1
-
+            
     print(f"\nSync complete. Success: {success_count}, Failed: {fail_count}")
-
 
 if __name__ == "__main__":
     main()

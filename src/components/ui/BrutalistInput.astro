@@ -40,10 +40,7 @@ export interface SelectProps {
 <!-- Input Component -->
 <fragment>
   <div class="form-group">
-    <label
-      class="label"
-      for={(Astro.props as any).id || (Astro.props as any).name}
-    >
+    <label class="label" for={(Astro.props as any).id || (Astro.props as any).name}>
       {(Astro.props as any).label}
       {(Astro.props as any).required && <span class="text-accent ml-1">*</span>}
     </label>
@@ -56,11 +53,7 @@ export interface SelectProps {
       disabled={(Astro.props as any).disabled}
       class:list={['input', (Astro.props as any).error && 'input-error']}
     />
-    {
-      (Astro.props as any).error && (
-        <span class="form-error">{(Astro.props as any).error}</span>
-      )
-    }
+    {(Astro.props as any).error && <span class="form-error">{(Astro.props as any).error}</span>}
   </div>
 </fragment>
 

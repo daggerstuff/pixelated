@@ -13,7 +13,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import '@testing-library/jest-dom/vitest'
 
 import { PixelMultimodalChat } from '@/components/chat/PixelMultimodalChat'
 
@@ -190,7 +189,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useAudioCapture } = await import('@/hooks/useAudioCapture')
       const mockHook = vi.mocked(useAudioCapture)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         startRecording: vi.fn(),
         stopRecording: vi.fn(),
@@ -216,7 +214,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useAudioCapture } = await import('@/hooks/useAudioCapture')
       const mockHook = vi.mocked(useAudioCapture)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         startRecording: vi.fn(),
         stopRecording: vi.fn(),
@@ -247,7 +244,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useAudioCapture } = await import('@/hooks/useAudioCapture')
       const mockHook = vi.mocked(useAudioCapture)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         startRecording: vi.fn(),
         stopRecording: vi.fn(),
@@ -272,7 +268,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useAudioCapture } = await import('@/hooks/useAudioCapture')
       const mockHook = vi.mocked(useAudioCapture)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         startRecording: vi.fn(),
         stopRecording: vi.fn(),
@@ -309,7 +304,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -340,7 +334,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -375,7 +368,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -406,7 +398,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -445,7 +436,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -485,7 +475,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -518,7 +507,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -551,7 +539,6 @@ describe('PixelMultimodalChat Component', () => {
       const { useMultimodalPixel } = await import('@/hooks/useMultimodalPixel')
       const mockHook = vi.mocked(useMultimodalPixel)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: vi.fn(),
         reset: vi.fn(),
@@ -619,7 +606,6 @@ describe('PixelMultimodalChat Component', () => {
         latency_ms: 150,
       }))
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       mockHook.mockReturnValueOnce({
         infer: mockInfer,
         reset: vi.fn(),

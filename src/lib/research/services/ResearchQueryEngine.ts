@@ -130,7 +130,7 @@ export class ResearchQueryEngine {
       // Step 7: Log performance metrics
       const metrics: QueryPerformanceMetrics = {
         executionTime: Date.now() - startTime,
-        resultSize: (anonymizedResult.data as any)?.length ?? 0,
+        resultSize: anonymizedResult.data?.length ?? 0,
         complexityScore: this.calculateComplexityScore(query),
         cacheHit: false,
       }

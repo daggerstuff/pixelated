@@ -17,7 +17,7 @@ describe('PolicyEngine hot reload', () => {
       rules: [
         {
           id: 'rule-1',
-          action: 'test' as any,
+          action: 'test',
           conditions: [],
           required: [],
         },

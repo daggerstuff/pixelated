@@ -28,10 +28,6 @@ describe('resolveInternalMemoryServiceConfig', () => {
       baseUrl: 'http://memory.internal:54321',
       actorId: 'product-gateway',
       actorSecret: 'top-secret',
-      secrets: {
-        current: 'top-secret',
-        previous: undefined,
-      },
       timeoutMs: 9000,
     })
   })
@@ -50,10 +46,6 @@ describe('resolveInternalMemoryServiceConfig', () => {
       baseUrl: 'http://subconscious.internal:54321',
       actorId: 'subconscious-gateway',
       actorSecret: 'subconscious-secret',
-      secrets: {
-        current: 'subconscious-secret',
-        previous: undefined,
-      },
       timeoutMs: 5000,
     })
   })

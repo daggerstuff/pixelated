@@ -48,8 +48,7 @@ export function useChartData(params: {
   autoRefresh?: boolean
   refreshInterval?: number
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadChartData = useCallback(async () => {
@@ -225,7 +224,7 @@ export function useTreatmentPlans(params: {
     if (params.autoSave && isDirty && data && data.length > 0) {
       const autoSaveTimer = setTimeout(() => {
         // Auto-save the first plan (assuming it's being edited)
-        void saveTreatmentPlan(data[0] as Record<string, unknown>)
+        void saveTreatmentPlan(data[0])
       }, 5000) // Auto-save after 5 seconds of inactivity
 
       return () => clearTimeout(autoSaveTimer)
@@ -384,8 +383,7 @@ export function useIntegratedDashboard(params: {
   autoRefresh?: boolean
   refreshInterval?: number
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadDashboardData = useCallback(async () => {
@@ -417,14 +415,8 @@ export function useIntegratedDashboard(params: {
     loading,
     error,
     refresh: loadDashboardData,
-    hasErrors:
-      ((
-        (data?.['metadata'] as Record<string, unknown>)?.['errors'] as unknown[]
-      )?.length ?? 0) > 0,
-    errors:
-      ((data?.['metadata'] as Record<string, unknown>)?.[
-        'errors'
-      ] as unknown[]) ?? [],
+    hasErrors: data?.metadata?.errors?.length > 0,
+    errors: data?.metadata?.errors ?? [],
   }
 }
 
@@ -500,7 +492,7 @@ export function useServiceHealth(checkInterval: number = 60000) {
     setLoading(true)
     try {
       const healthData = await componentIntegrationService.getServiceHealth()
-      setHealth(healthData as unknown as Record<string, unknown>)
+      setHealth(healthData)
     } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
