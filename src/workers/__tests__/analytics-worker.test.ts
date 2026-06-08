@@ -124,7 +124,7 @@ describe('analytics-worker', () => {
       const lastListener = listeners[listeners.length - 1]
       if (lastListener) {
         // Remove the last added listener, which is likely the one from the worker we just imported
-        process.removeListener(signal, listeners[listeners.length - 1])
+        process.removeListener(signal, lastListener)
       }
     })
     if (originalNodeEnv === undefined) {

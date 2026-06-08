@@ -221,7 +221,7 @@ Task,PIX-219,chris@slimshady.me,Medium,Done,Build documentation site with Docusa
 Task,PIX-220,chris@slimshady.me,Medium,To Do,Build audit trail projections for compliance,compliance
 Task,PIX-221,chris@slimshady.me,Medium,To Do,Implement memory versioning with rollback,Feature
 Task,PIX-222,chris@slimshady.me,Medium,To Do,Implement multi-tenant isolation,
-Task,PIX-223,chris@slimshady.me,Medium,To Do,Integrate with Kafka/Kinesis for stream processing,
+Task,PIX-223,chris@slimshady.me,Medium,Done,Test Coverage & Security Baseline,
 Task,PIX-224,chris@slimshady.me,Medium,To Do,Implement WebSocket subscriptions for real-time updates,
 Task,PIX-225,chris@slimshady.me,Medium,To Do,Implement CRDT-based conflict resolution,
 Task,PIX-226,chris@slimshady.me,Medium,To Do,"Build compliance exporters for HIPAA, SOC2",compliance

@@ -7,8 +7,8 @@ import {
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
 import { createMemoryTransport } from '../server/memory-transport-factory'
-import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
+import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
 export interface ProductMemoryRecord {
   id: string
@@ -100,7 +100,7 @@ export class ProductMemoryGateway {
   constructor(
     private readonly client: InternalMemoryServiceClientLike,
     private readonly caller: Caller | null = null,
-    private readonly audit: AuditLogger = new NoOpAuditLogger()
+    private readonly audit: AuditLogger = new NoOpAuditLogger(),
   ) {}
 
   async createMemory(
@@ -223,7 +223,9 @@ export class ProductMemoryGateway {
     scope: ProductMemoryListOptions,
   ): Promise<ProductMemoryStats> {
     const ctx = this.beginCall('getMemoryStats', scope.userId)
-    return this.runCall(ctx, () => this.client.getMemoryStats(toInternalScope(scope)))
+    return this.runCall(ctx, () =>
+      this.client.getMemoryStats(toInternalScope(scope)),
+    )
   }
 
   private beginCall(operation: string, userId: string): CallContext {
