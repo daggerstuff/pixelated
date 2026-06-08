@@ -4,6 +4,25 @@
  */
 
 import Redis from 'ioredis'
+import { asRedisOps } from './redis-ops'
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
 
 type RedisCommand = (...args: any[]) => any
 type RedisClient = Record<string, RedisCommand> & { status?: string }

@@ -60,7 +60,7 @@ export class BatchProcessor implements IBatchProcessor {
   }
 
   constructor(api: IUnifiedMetaAlignerAPI, config: BatchProcessorConfig = {}) {
-    this.api = api
+    ;(this as any).api = api
     this.config = {
       batchSize: 10,
       timeout: 1000,

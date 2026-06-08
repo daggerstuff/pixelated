@@ -519,7 +519,7 @@ describe('notificationService', () => {
         notificationService as unknown as NotificationServiceTestInterface
       ).deliverInApp(notification)
 
-      expect(ws.send).toHaveBeenCalledWith(
+      expect(vi.spyOn(ws, 'send')).toHaveBeenCalledWith(
         expect.stringContaining(notification.id),
       )
     })

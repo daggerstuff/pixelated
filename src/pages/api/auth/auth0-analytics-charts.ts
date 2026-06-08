@@ -273,7 +273,7 @@ async function generateProgressChartData(params: {
     case 'line':
       return {
         data: {
-          labels: progressData.map((d) => d.date),
+          labels: progressData.map((d) => d.date as any),
           datasets: [
             {
               label: 'Therapy Progress',
@@ -371,7 +371,7 @@ async function generateEmotionChartData(params: {
           datasets: [
             {
               label: 'Valence vs Arousal',
-              data: scatterData,
+              data: scatterData as any,
               backgroundColor: 'rgba(59, 130, 246, 0.6)',
             },
           ],

@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Get session for authentication
-    session = await getSession()
+    session = await (getSession as any)()
 
     // Check if user is authenticated
     if (!session?.user) {

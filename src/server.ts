@@ -92,6 +92,7 @@ const db = new Pool({
       ? { rejectUnauthorized: false }
       : false,
 })
+setPostgresPool(db)
 
 // Redis connection
 const redisOptions = REDIS_URL.startsWith('rediss://')
