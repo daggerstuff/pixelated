@@ -1,0 +1,1 @@
+## 2024-10-27 - Escape Key on Modals | Learning: Overlay elements should explicitly capture the Escape key for closure in React components without relying solely on framework defaults | Action: Added explicit conditional handler within existing keydown event listener in HeaderReact.tsx
