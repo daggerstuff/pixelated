@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const includeAnalytics = url.searchParams.get('analytics') === 'true'
     const includeAlerts = url.searchParams.get('alerts') === 'true'
-    const days = parseInt(url.searchParams.get('days') ?? '7')
+    const days = parseInt(url.searchParams.get('days') ?? '7', 10)
 
     const [status, health] = await Promise.all([
       getRateLimitStatus(),
@@ -52,9 +52,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Include analytics if requested
     if (includeAnalytics) {
-      const analytics = (await rateLimitAnalytics.getAnalyticsSummary(
-        days,
-      )) as unknown
+      const analytics = (await rateLimitAnalytics.getAnalyticsSummary(days)) as unknown
       response.data.analytics = analytics
     }
 
@@ -107,10 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
     switch (action) {
       case 'add_monitor': {
         // Add a custom monitor
-        const { name, checkIntervalMs, thresholds, handlers } = data as Record<
-          string,
-          unknown
-        >
+        const { name, checkIntervalMs, thresholds, handlers } = data as Record<string, unknown>
 
         if (!name || !checkIntervalMs || !thresholds || !handlers) {
           return new Response(

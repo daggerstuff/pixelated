@@ -210,7 +210,7 @@ export class RecommendationService {
 
       // Generate base recommendations from clinical knowledge
       const baseRecommendations =
-         this.generateBaseRecommendations(currentState)
+        this.generateBaseRecommendations(currentState)
 
       // Personalize recommendations based on client profile and history
       const personalizedRecommendations = await this.personalizeRecommendations(
