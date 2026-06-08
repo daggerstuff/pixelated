@@ -164,9 +164,6 @@
     "blog-publisher": "tsx src/lib/scripts/blog-publisher.ts",
     "schedule-posts": "node scripts/content/schedule-posts.js",
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
-    "db:migrate": "tsx scripts/db-migrate.ts migrate",
-    "db:rollback": "tsx scripts/db-migrate.ts rollback",
-    "db:status": "tsx scripts/db-migrate.ts status",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
     "mcp:manage": "node scripts/mcp-manager.js",
@@ -530,6 +527,7 @@
     "kysely": ">=0.28.14",
     "langsmith": ">=0.4.6",
     "lodash": "^4.18.0",
+    "lru-cache": "11.5.1",
     "minimatch": "^10.2.3",
     "nanoid": ">=5.0.9",
     "node-domexception": "^2.0.1",
@@ -587,7 +585,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.1",
+  "packageManager": "pnpm@11.5.2",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
