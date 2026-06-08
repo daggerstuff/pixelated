@@ -62,7 +62,6 @@ export class DatabaseService {
       .sort({ timestamp: -1 })
       .limit(100)) as unknown[]
 
-    return docs.map((doc) => doc.toObject() as unknown as MarketData)
     return docs.map((doc: unknown) => toTypedDoc<MarketData>(doc))
   }
 
@@ -192,8 +191,6 @@ export class DatabaseService {
       title: row.title,
       description: row.description,
       severity: row.severity,
-      conditions: JSON.parse(row.conditions ?? '[]'),
-      recipients: JSON.parse(row.recipients ?? '[]'),
       conditions: JSON.parse(row.conditions ?? '[]') as unknown[],
       recipients: JSON.parse(row.recipients ?? '[]') as unknown[],
       isActive: row.is_active,
@@ -293,14 +290,6 @@ export class DatabaseService {
       },
     ]) as unknown[]
 
-    // Note: The previous SQL implementation might have been assuming something else.
-    // Adjusted logic:
-    const data = result[0] ?? {}
-    return {
-      totalRevenue: data.avgRevenue ?? 0, // Using avg for now as it's likely a run-rate
-      totalCustomers: 0, // Not available in this model
-      avgCustomerLifetimeValue: data.avgCLV ?? 0,
-      monthlyGrowthRate: data.avgGrowth ?? 0,
     const data = result[0] as Record<string, number> | undefined
     return {
       totalRevenue: data?.['avgRevenue'] ?? 0,
@@ -317,23 +306,6 @@ export class DatabaseService {
     const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`
     const result = await postgresPool.query(sql) as { rows: KpiDashboardRow[] }
 
-    return result.rows.map(
-      (row: {
-        id: string
-        name: string
-        metrics: string | null
-        widgets: string | null
-        last_updated: string
-        is_shared: boolean
-      }) => ({
-        id: row.id,
-        name: row.name,
-        metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
-        widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
-        lastUpdated: new Date(row.last_updated),
-        isShared: row.is_shared,
-      }),
-    )
     return result.rows.map((row: KpiDashboardRow) => ({
       id: row.id,
       name: row.name,
@@ -389,11 +361,6 @@ export class DatabaseService {
       },
     ])
 
-    const data = result[0] ?? {}
-    return {
-      totalIndustries: data.totalIndustries ?? 0,
-      avgMarketSize: data.avgMarketSize ?? 0,
-      avgGrowthRate: data.avgGrowthRate ?? 0,
     const data = result[0] as Record<string, number> | undefined
     return {
       totalIndustries: data?.['totalIndustries'] ?? 0,

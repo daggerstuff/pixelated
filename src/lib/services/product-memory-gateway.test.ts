@@ -1,11 +1,12 @@
 // @vitest-environment node
 
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 
 import {
   InternalMemoryServiceError,
   type InternalMemoryServiceClient,
 } from '../server/internal-memory-service-client'
+import type { AuditLogger } from './product-memory-audit'
 import {
   ProductMemoryGateway,
   ProductMemoryGatewayError,
@@ -41,7 +42,8 @@ describe('ProductMemoryGateway', () => {
 
   beforeEach(() => {
     client = createClientMock()
-    gateway = new ProductMemoryGateway(client)
+    // For backward compatibility in tests, we pass null as caller
+    gateway = new ProductMemoryGateway(client, null)
   })
 
   it('creates a memory and preserves metadata on the product boundary', async () => {
@@ -478,7 +480,6 @@ describe('ProductMemoryGateway', () => {
       ],
     })
 
-    // Test with includeShared: true (default)
     await gateway.listMemories({
       ...scope,
       includeShared: true,
@@ -494,7 +495,6 @@ describe('ProductMemoryGateway', () => {
       }),
     )
 
-    // Test with includeShared: false
     await gateway.listMemories({
       ...scope,
       includeShared: false,
@@ -509,5 +509,99 @@ describe('ProductMemoryGateway', () => {
         offset: 0,
       }),
     )
+  })
+})
+
+describe('ProductMemoryGateway tenant isolation', () => {
+  const scope = {
+    userId: 'vivi',
+    orgId: 'pixelated',
+    projectId: 'memory',
+  }
+
+  let client: ReturnType<typeof createClientMock>
+  let audit: AuditLogger & { log: Mock }
+
+  beforeEach(() => {
+    client = createClientMock()
+    audit = { log: vi.fn() }
+  })
+
+  it('rejects createMemory when caller userId does not match scope userId', async () => {
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: 'other-user' },
+      audit,
+    )
+
+    await expect(
+      gateway.createMemory({ ...scope, content: 'leak attempt' }),
+    ).rejects.toMatchObject({
+      name: 'ProductMemoryGatewayError',
+      status: 403,
+    })
+
+    expect(client.addMemory).not.toHaveBeenCalled()
+    const events = audit.log.mock.calls.map(([event]) => event.type)
+    expect(events).toContain('auth.success')
+    expect(events).toContain('scope.rejected')
+  })
+
+  it('allows createMemory when caller userId matches scope userId', async () => {
+    client.addMemory.mockResolvedValue({ memory_id: 'mem-1' })
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: scope.userId },
+      audit,
+    )
+
+    await expect(
+      gateway.createMemory({ ...scope, content: 'allowed' }),
+    ).resolves.toMatchObject({ id: 'mem-1' })
+
+    expect(client.addMemory).toHaveBeenCalledTimes(1)
+    const events = audit.log.mock.calls.map(([event]) => event.type)
+    expect(events).toEqual(['auth.success', 'scope.validated'])
+  })
+
+  it('rejects getMemory when caller userId does not match scope userId', async () => {
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: 'other-user' },
+      audit,
+    )
+
+    await expect(
+      gateway.getMemory({ ...scope, memoryId: 'mem-1' }),
+    ).rejects.toMatchObject({ status: 403 })
+
+    expect(client.getMemory).not.toHaveBeenCalled()
+  })
+
+  it('rejects deleteMemory when caller userId does not match scope userId', async () => {
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: 'other-user' },
+      audit,
+    )
+
+    await expect(
+      gateway.deleteMemory({ ...scope, memoryId: 'mem-1' }),
+    ).rejects.toMatchObject({ status: 403 })
+
+    expect(client.deleteMemory).not.toHaveBeenCalled()
+  })
+
+  it('returns null from getMemory when downstream reports not found', async () => {
+    client.getMemory.mockResolvedValue(null)
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: scope.userId },
+      audit,
+    )
+
+    await expect(
+      gateway.getMemory({ ...scope, memoryId: 'missing' }),
+    ).resolves.toBeNull()
   })
 })

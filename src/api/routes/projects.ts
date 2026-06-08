@@ -22,8 +22,6 @@ router.use(authMiddleware)
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { name, description, category, stakeholders, budget } = req.body
-    const { user } = req as Request & { user: { id: string } }
     const { name, description, category, stakeholders, budget } = req.body as {
       name?: string
       description?: string
@@ -59,8 +57,6 @@ router.post(
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { page, limit, category, status } = req.query
-    const { user } = req as Request & { user: { id: string } }
     const { page, limit, category, status } = req.query as Record<
       string,
       unknown
@@ -86,7 +82,6 @@ router.get(
   '/:projectId',
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
-    const { user } = req as Request & { user: { id: string } }
     const { user } = req as unknown as { user: { id: string } }
 
     const project = await getProject(projectId, user.id)
@@ -103,8 +98,6 @@ router.put(
   '/:projectId',
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
-    const { name, description, category, budget, status } = req.body
-    const { user } = req as Request & { user: { id: string } }
     const { name, description, category, budget, status } = req.body as {
       name?: string
       description?: string
@@ -134,8 +127,6 @@ router.post(
   '/:projectId/objectives',
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
-    const { title, description, successCriteria, deadline } = req.body
-    const { user } = req as Request & { user: { id: string } }
     const { title, description, successCriteria, deadline } = req.body as {
       title?: string
       description?: string
@@ -169,13 +160,6 @@ router.post(
   '/:projectId/share',
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
-    const { userId, permissionLevel } = req.body
-    const { user } = req as Request & { user: { id: string } }
-
-    if (!userId || !permissionLevel) {
-      throw new ValidationError('userId and permissionLevel required', {
-        userId: 'userId is required',
-        permissionLevel: 'permissionLevel is required',
     const { userId, permissionLevel } = req.body as {
       userId?: string
       permissionLevel?: string
@@ -214,7 +198,6 @@ router.get(
   '/search/:query',
   asyncHandler(async (req: Request, res: Response) => {
     const query = req.params['query'] as string
-    const { user } = req as Request & { user: { id: string } }
     const { user } = req as unknown as { user: { id: string } }
 
     const results = await searchProjects(query, user.id)

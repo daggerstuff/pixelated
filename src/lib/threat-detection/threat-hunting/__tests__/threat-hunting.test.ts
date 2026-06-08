@@ -129,7 +129,7 @@ function createRedisMock(): IRedisClient {
       keys.map((key) => strings.get(key) ?? null),
     ),
     quit: vi.fn(async () => 'OK'),
-  }
+  } as unknown as IRedisClient
 }
 
 describe('ThreatHuntingService', () => {

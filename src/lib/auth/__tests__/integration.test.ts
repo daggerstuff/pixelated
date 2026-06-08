@@ -5,6 +5,7 @@
 /** @vitest-environment node */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import type { AstroCookies, APIContext } from 'astro'
 
 // Mock dependencies using vi.hoisted for better reliability
 const {
@@ -696,10 +697,41 @@ describe('Authentication System Integration', () => {
 
       const refreshContext = {
         request: refreshRequest,
-        clientAddress: mockClientInfo.ip,
-      }
+        url: new URL(refreshRequest.url),
+        params: {},
+        props: {},
+        locals: {
+          requestId: 'req-mock',
+          timestamp: new Date().toISOString(),
+          user: {
+            id: 'user123',
+            email: 'test@example.com',
+            emailVerified: true,
+            role: 'patient',
+          },
+          session: {
+            id: 'session-mock',
+            userId: 'user123',
+            expiresAt: new Date(Date.now() + 3600000),
+          },
+        },
+        site: undefined,
+        redirect: (path: string, status?: number) =>
+          new Response(null, {
+            status: status ?? 302,
+            headers: { Location: path },
+          }),
+        cookies: {
+          get: vi.fn(),
+          set: vi.fn(),
+          delete: vi.fn(),
+          has: vi.fn(),
+        } as unknown as AstroCookies,
+        currentLocale: 'en',
+        preferredLocale: 'en',
+        preferredLocaleList: ['en'],
+      } as APIContext
 
-      // @ts-expect-error APIRoute context type requires full Astro API context in tests.
       await refreshHandler(refreshContext)
 
       expect(

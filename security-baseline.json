@@ -1,5 +1,4 @@
 {
-  "version": "1.1.0",
   "version": "1.2.0",
   "baseline": {
     "security_policies": {
@@ -27,11 +26,6 @@
       },
       "csp_policy": {
         "default_src": "'self'",
-        "script_src": "'self'",
-        "style_src": "'self' 'unsafe-inline'",
-        "img_src": "'self' data:",
-        "connect_src": "'self'",
-        "report_uri": "/api/v1/csp-violation"
         "script_src": "'self' 'nonce-<generated>' https://cdn.pixelatedempathy.com https://www.googletagmanager.com https://js.sentry-cdn.com https://app.rybbit.io",
         "style_src": "'self' 'unsafe-inline' 'nonce-<generated>' https://cdn.pixelatedempathy.com https://fonts.googleapis.com https://cdn.jsdelivr.net",
         "img_src": "'self' data: blob: https://cdn.pixelatedempathy.com https://images.unsplash.com https://upload.wikimedia.org https://avatars.githubusercontent.com https://www.gravatar.com",

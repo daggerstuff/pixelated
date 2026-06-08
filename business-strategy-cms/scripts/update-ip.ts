@@ -45,7 +45,6 @@ async function updateWhitelist() {
     const client = new DigestFetch(
       PUBLIC_KEY!,
       PRIVATE_KEY!,
-    )
     ) as unknown as { fetch: (url: string, options: Record<string, unknown>) => Promise<unknown> }
 
     // We can't use axios for ipify essentially, but let's just use regular fetch or keeping it simple
@@ -70,7 +69,6 @@ async function updateWhitelist() {
       },
     ]
 
-    const response: unknown = await client.fetch(url, {
     const response = await client.fetch(url, {
       method: 'POST',
       body: JSON.stringify(payload),

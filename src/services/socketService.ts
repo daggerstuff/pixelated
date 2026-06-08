@@ -11,10 +11,18 @@ type RedisLike = {
 
 export class SocketService {
   private readonly io: SocketIOServer
-  private readonly redis!: RedisLike
-  private readonly db!: Pool
+  private readonly _redis: RedisLike
+  private readonly _db: Pool
 
   constructor(server: Server, redis: RedisLike, db: Pool) {
+    this._redis = redis
+    this._db = db
+
+    // Wire up redis error handling
+    this._redis.on('error', (err: unknown) => {
+      console.error('Socket service redis error:', err)
+    })
+
     // Initialize Socket.IO
     this.io = new SocketIOServer(server, {
       cors: {
@@ -24,10 +32,21 @@ export class SocketService {
       },
       transports: ['websocket', 'polling'],
     })
-    this.redis = redis
-    this.db = db
 
     this.setupSocketHandlers()
+  }
+
+  /**
+   * Verify database connectivity.
+   * Used by health-check endpoints to confirm the connection pool is alive.
+   */
+  async healthCheck(): Promise<boolean> {
+    try {
+      await this._db.query('SELECT 1')
+      return true
+    } catch {
+      return false
+    }
   }
 
   private setupSocketHandlers() {

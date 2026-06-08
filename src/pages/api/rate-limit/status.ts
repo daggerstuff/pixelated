@@ -34,7 +34,7 @@ export const GET: APIRoute = async ({ request }) => {
     const url = new URL(request.url)
     const includeAnalytics = url.searchParams.get('analytics') === 'true'
     const includeAlerts = url.searchParams.get('alerts') === 'true'
-    const days = parseInt(url.searchParams.get('days') ?? '7')
+    const days = parseInt(url.searchParams.get('days') ?? '7', 10)
 
     const [status, health] = await Promise.all([
       getRateLimitStatus(),
@@ -52,13 +52,13 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Include analytics if requested
     if (includeAnalytics) {
-      const analytics = await rateLimitAnalytics.getAnalyticsSummary(days)
+      const analytics = (await rateLimitAnalytics.getAnalyticsSummary(days)) as unknown
       response.data.analytics = analytics
     }
 
     // Include recent alerts if requested
     if (includeAlerts) {
-      const alerts = await rateLimitAnalytics.getRecentAlerts(20)
+      const alerts = (await rateLimitAnalytics.getRecentAlerts(20)) as unknown
       response.data.alerts = alerts
     }
 
@@ -99,13 +99,13 @@ export const GET: APIRoute = async ({ request }) => {
  */
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { action, data } = body
 
     switch (action) {
       case 'add_monitor': {
         // Add a custom monitor
-        const { name, checkIntervalMs, thresholds, handlers } = data
+        const { name, checkIntervalMs, thresholds, handlers } = data as Record<string, unknown>
 
         if (!name || !checkIntervalMs || !thresholds || !handlers) {
           return new Response(
@@ -229,10 +229,10 @@ export const POST: APIRoute = async ({ request }) => {
         }
 
         const monitor = {
-          name,
-          checkIntervalMs,
-          thresholds,
-          handlers: handlers.map((handler: string) => {
+          name: name as string,
+          checkIntervalMs: checkIntervalMs as number,
+          thresholds: thresholds as unknown,
+          handlers: (handlers as string[]).map((handler: string) => {
             // Validate handler type against registry
             const safeHandler = safeHandlerRegistry[handler]
             if (!safeHandler) {
@@ -256,7 +256,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       case 'remove_monitor': {
         // Remove a monitor
-        const { name } = data
+        const { name } = data as Record<string, unknown>
 
         if (!name) {
           return new Response(
@@ -268,7 +268,7 @@ export const POST: APIRoute = async ({ request }) => {
           )
         }
 
-        rateLimitAnalytics.removeMonitor(name)
+        rateLimitAnalytics.removeMonitor(name as string)
 
         return new Response(
           JSON.stringify({
@@ -282,9 +282,9 @@ export const POST: APIRoute = async ({ request }) => {
 
       case 'cleanup_analytics': {
         // Cleanup old analytics data
-        const { olderThanDays = 30 } = data
+        const { olderThanDays = 30 } = data as Record<string, unknown>
 
-        await rateLimitAnalytics.cleanup(olderThanDays)
+        await rateLimitAnalytics.cleanup(olderThanDays as number)
 
         return new Response(
           JSON.stringify({

@@ -268,7 +268,6 @@
     "framer-motion": "^12.40.0",
     "helmet": "^8.2.0",
     "html-escaper": "latest",
-    "i18next": "latest",
     "i18next": ">=24.2.3",
     "idb": "^8.0.3",
     "ioredis": "latest",
@@ -281,7 +280,6 @@
     "mongodb": "7.2.0",
     "mongoose": "^9.6.3",
     "multer": "^2.1.1",
-    "nanoid": "latest",
     "nanoid": ">=5.0.9",
     "node-cron": "latest",
     "node-seal": "latest",
@@ -309,7 +307,6 @@
     "remark-rehype": "latest",
     "resend": "latest",
     "simple-git": "3.36.0",
-    "slug": "latest",
     "slug": ">=8.0.4",
     "socket.io": "^4.8.3",
     "socket.io-client": "latest",
@@ -319,7 +316,6 @@
     "tailwind-merge": "latest",
     "tar": "^7.5.16",
     "twilio": "latest",
-    "uuid": "latest",
     "uuid": ">=11.1.0",
     "vue": "latest",
     "ws": "^8.21.0",
@@ -364,7 +360,6 @@
     "@unocss/astro": "^66.7.0",
     "@unocss/core": "^66.7.0",
     "@unocss/reset": "^66.7.0",
-    "@vitejs/plugin-react": "^6.0.2",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitest/coverage-v8": "^4.1.8",
     "@vitest/eslint-plugin": "latest",
@@ -374,7 +369,6 @@
     "autoprefixer": "latest",
     "axe-core": "latest",
     "chalk": "latest",
-    "class-transformer": "latest",
     "cheerio": "^1.2.0",
     "class-transformer": ">=0.5.1",
     "class-validator": "^0.15.1",
@@ -418,7 +412,6 @@
     "oxlint": "latest",
     "oxlint-tsgolint": "latest",
     "path-to-regexp": "8.4.2",
-    "postcss": "latest",
     "postcss": ">=8.5.10",
     "postcss-import": "latest",
     "postinstall-postinstall": "latest",
@@ -454,7 +447,6 @@
     "vfile": "latest",
     "viewerjs": "latest",
     "vite": "^8.0.16",
-    "vite-tsconfig-paths": "latest",
     "vite-tsconfig-paths": "7.0.0-alpha.1",
     "vitest": "^4.1.8",
     "vscode-jsonrpc": "9.0.0",
@@ -464,7 +456,6 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "path-to-regexp": "8.4.2"
     "path-to-regexp": "8.4.2",
     "typescript": "^5.9.3"
   },
@@ -527,9 +518,6 @@
     "express>path-to-regexp": "npm:path-to-regexp@0.1.13",
     "fast-xml-parser": "5.7.0",
     "follow-redirects": ">=1.16.0",
-    "glob": "^13.0.0",
-    "h3": ">=1.15.9",
-    "hono": "^4.12.14",
     "gaxios>uuid": ">=11.1.0",
     "glob": "^13.0.0",
     "h3": ">=1.15.9",
@@ -543,7 +531,6 @@
     "kysely": ">=0.28.14",
     "langsmith": ">=0.4.6",
     "lodash": "^4.18.0",
-    "minimatch": "^10.2.3",
     "lru-cache": "11.5.1",
     "minimatch": "^10.2.3",
     "nanoid": ">=5.0.9",
@@ -596,14 +583,12 @@
     "yaml@2.7.1": "npm:yaml@2.8.4",
     "yaml@>=2.0.0 <2.8.3": "^2.8.3",
     "yauzl": "^3.2.1",
-    "zod": "^4.3.2"
     "zod": "^4.3.2",
     "vite-tsconfig-paths>tsconfck>typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.1",
   "packageManager": "pnpm@11.5.2",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,

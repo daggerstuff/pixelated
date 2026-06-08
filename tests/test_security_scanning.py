@@ -10,7 +10,9 @@ References:
 - HIPAA Security Rule
 """
 
+import json
 import re
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -76,7 +78,7 @@ class TestInputValidation:
 
         for pattern in traversal_patterns:
             # Verify we can detect path traversal patterns
-            is_malicious = bool(re.search(r"(\.\./|\.\.\\\\|%2e%2e)", pattern, re.IGNORECASE))
+            bool(re.search(r"(\.\./|\.\.\\\\|%2e%2e)", pattern, re.IGNORECASE))
             # Path traversal detection - pattern match"
 
     def test_command_injection_prevention(self):
@@ -91,7 +93,6 @@ class TestInputValidation:
     def test_input_sanitization_removes_malicious_chars(self):
         """Verify input sanitization removes dangerous characters"""
         # Simulate sanitization
-        dangerous_chars = ["<", ">", "&", '"', "'"]
         safe_input = "Hello World"
         unsafe_input = "Hello <script> World"
 
@@ -201,7 +202,7 @@ class TestSecretManagement:
         for pattern in secret_patterns:
             for test_str in test_strings:
                 # Verify pattern detection works
-                matches = bool(re.search(pattern, test_str, re.IGNORECASE))
+                bool(re.search(pattern, test_str, re.IGNORECASE))
                 # Some patterns may not match all test strings
                 # This test verifies the patterns are valid regex
 
@@ -214,7 +215,7 @@ class TestSecretManagement:
             "JWT_SECRET": "super-secret-jwt-key-12345",
         }
 
-        for key, value in env_vars.items():
+        for _key, value in env_vars.items():
             # Secrets should be loaded from environment, not hardcoded
             assert value is not None
             assert len(value) > 0
@@ -384,6 +385,79 @@ class TestVulnerabilityScanning:
 
         assert dast_config["enabled"] is True
         assert dast_config["staging_only"] is True
+
+
+class TestSecurityBaselineValidation:
+    """Validate security-baseline.json structure and completeness."""
+
+    @pytest.fixture
+    def baseline(self):
+        """Load the security baseline once for all tests."""
+
+        with open(Path("security-baseline.json")) as f:
+            return json.load(f)
+
+    def test_baseline_has_required_sections(self, baseline):
+        """Verify security-baseline.json has all required top-level sections."""
+        assert "version" in baseline, "Missing version field"
+        config = baseline.get("baseline", {})
+        required_sections = [
+            "security_policies",
+            "compliance_standards",
+            "encryption",
+            "audit",
+            "vulnerability_scanning",
+            "testing",
+            "incident_response",
+        ]
+        for section in required_sections:
+            assert section in config, f"Missing required section: {section}"
+
+    def test_baseline_version_format(self, baseline):
+        """Verify version follows semver format."""
+
+        version = baseline.get("version", "")
+        assert re.match(r"^\d+\.\d+\.\d+$", version), f"Version {version} is not semver"
+
+    def test_baseline_authentication_policy(self, baseline):
+        """Verify authentication policy meets minimum security standards."""
+        auth = baseline["baseline"]["security_policies"]["authentication"]
+        assert auth["password_min_length"] >= 12, "Password min length must be >= 12"
+        assert auth["max_login_attempts"] <= 10, "Max login attempts should be <= 10"
+        assert auth["session_timeout_seconds"] <= 3600, "Session timeout must be <= 1 hour"
+        assert auth["password_require_special"] is True, "Must require special characters"
+        assert auth["password_require_uppercase"] is True, "Must require uppercase letters"
+
+    def test_baseline_encryption_standards(self, baseline):
+        """Verify encryption configuration meets HIPAA requirements."""
+        encryption = baseline["baseline"]["encryption"]
+        assert encryption["data_at_rest"]["algorithm"] in ["AES-256-GCM", "AES-256-CBC"], (
+            "Must use strong encryption algorithm"
+        )
+        assert encryption["data_in_transit"]["protocol"] in ["TLS 1.2", "TLS 1.3"], "Must use TLS 1.2+"
+        assert encryption["fhe_enabled"] is True, "FHE must be enabled"
+
+    def test_baseline_vulnerability_scanning(self, baseline):
+        """Verify vulnerability scanning configuration is complete."""
+        vuln = baseline["baseline"]["vulnerability_scanning"]
+        assert vuln["dependency_audit_enabled"] is True
+        assert len(vuln["sast_tools"]) >= 2, "Need at least 2 SAST tools configured"
+        assert vuln["severity_threshold"] in ["low", "medium", "high", "critical"]
+        assert vuln["fail_pipeline_on"] in ["low", "medium", "high", "critical"]
+
+    def test_baseline_compliance_standards(self, baseline):
+        """Verify required compliance standards are listed."""
+        standards = baseline["baseline"]["compliance_standards"]
+        assert "HIPAA" in standards, "HIPAA compliance required"
+        assert "GDPR" in standards, "GDPR compliance required"
+
+    def test_baseline_incident_response(self, baseline):
+        """Verify incident response configuration meets SLAs."""
+        ir = baseline["baseline"]["incident_response"]
+        assert ir["response_time_target_minutes"] <= 60, "Response SLA must be <= 1 hour"
+        assert ir["resolution_time_target_hours"] <= 24, "Resolution SLA must be <= 24 hours"
+        assert ir["notification_authorities_within_hours"] <= 72, "HIPAA requires 72h notification"
+        assert "phi_breach" in ir["post_mortem_required_for"]
 
 
 if __name__ == "__main__":

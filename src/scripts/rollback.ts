@@ -30,7 +30,7 @@ interface DeploymentInfo {
   target?: string
 }
 
-async function sendNotification(message: string, environment: string): void {
+async function sendNotification(message: string, environment: string): Promise<void> {
   try {
     console.log(`Sending notification for ${environment} rollback...`)
 
@@ -94,13 +94,13 @@ async function getLastStableVersion(
       if (tags.length >= 2) {
         const rollbackTag = tags[1]
         console.log(`Using tag ${rollbackTag} for rollback`)
-        return rollbackTag
+        return rollbackTag!
       } else if (tags.length === 1) {
         console.log(`Only one production tag found: ${tags[0]}`)
         // Use it if explicitly allowed through options
         if (options.fallbackBranch === 'use-current-tag') {
           console.log('Using the only available tag for rollback')
-          return tags[0]
+          return tags[0]!
         }
       }
     } else {
@@ -126,7 +126,7 @@ async function getLastStableVersion(
     }
 
     const deployments = JSON.parse(
-      result.stdout.toString() as unknown,
+      result.stdout.toString(),
     ) as DeploymentInfo[]
 
     // Find last successful deployment (not the current failing one)
@@ -238,7 +238,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
       console.warn(verify.stderr.toString())
 
       if (options.notify) {
-         sendNotification(
+        await sendNotification(
           'Rollback completed but verification checks failed. Manual intervention may be required.',
           options.environment,
         )
@@ -247,7 +247,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
       console.log('✓ Rollback verification successful')
 
       if (options.notify) {
-         sendNotification(
+        await sendNotification(
           `Deployment rollback completed successfully to version ${version}.`,
           options.environment,
         )
@@ -260,7 +260,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
     console.error('\n❌ Rollback failed:', errorMessage)
 
     if (options.notify) {
-       sendNotification(
+       await sendNotification(
         `CRITICAL: Automatic rollback failed. Manual intervention required. Error: ${errorMessage}`,
         options.environment,
       )
