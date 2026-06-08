@@ -65,18 +65,12 @@ describe('breachNotificationSystem', () => {
     vi.clearAllMocks()
 
     // Setup default mock implementations
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(redis['set'] as vi.Mock).mockResolvedValue('OK')
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(redis['get'] as vi.Mock).mockResolvedValue(null)
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(redis['keys'] as vi.Mock).mockResolvedValue([])
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(auth['getUserById'] as vi.Mock).mockResolvedValue(mockUser)
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(fheService['encrypt'] as vi.Mock).mockResolvedValue('encrypted_data')
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    ;(sendEmail as vi.Mock).mockResolvedValue(undefined)
+    ;(redis['set'] as unknown).mockResolvedValue('OK')
+    ;(redis['get'] as unknown).mockResolvedValue(null)
+    ;(redis['keys'] as unknown).mockResolvedValue([])
+    ;(auth['getUserById'] as unknown).mockResolvedValue(mockUser)
+    ;(fheService['encrypt'] as unknown).mockResolvedValue('encrypted_data')
+    ;(sendEmail as unknown).mockResolvedValue(undefined)
 
     // Setup process.env
     process.env['ORGANIZATION_NAME'] = 'Test Org'
@@ -106,7 +100,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle errors during breach reporting', async () => {
-      ;(redis['set'] as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis['set'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.reportBreach(mockBreachDetails),
@@ -136,7 +130,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle missing user email gracefully', async () => {
-      ;(auth['getUserById'] as any).mockResolvedValue({ id: 'user1' }) // User without email
+      ;(auth['getUserById'] as unknown).mockResolvedValue({ id: 'user1' }) // User without email
       process.env['SECURITY_STAKEHOLDERS'] = ''
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
@@ -145,7 +139,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle user notification errors', async () => {
-      ;(sendEmail as any).mockRejectedValue(new Error('Email error'))
+      ;(sendEmail as unknown).mockRejectedValue(new Error('Email error'))
       process.env['SECURITY_STAKEHOLDERS'] = ''
 
       await BreachNotificationSystem.reportBreach(mockBreachDetails)
@@ -164,7 +158,6 @@ describe('breachNotificationSystem', () => {
         affectedUsers: Array.from({ length: 500 }).fill('user'),
       }
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       await BreachNotificationSystem.reportBreach(largeBreachDetails)
 
       expect(sendEmail).toHaveBeenCalledWith(
@@ -230,7 +223,9 @@ describe('breachNotificationSystem', () => {
         notificationStatus: 'completed',
       }
 
-      ;(redis['get'] as any).mockResolvedValue(JSON.stringify(mockStoredBreach))
+      ;(redis['get'] as unknown).mockResolvedValue(
+        JSON.stringify(mockStoredBreach),
+      )
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('test_breach')
@@ -240,7 +235,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should return null for non-existent breach', async () => {
-      ;(redis['get'] as any).mockResolvedValue(null)
+      ;(redis['get'] as unknown).mockResolvedValue(null)
 
       const breach =
         await BreachNotificationSystem.getBreachStatus('non_existent')
@@ -249,7 +244,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis['get'] as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis['get'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.getBreachStatus('test_breach'),
@@ -279,25 +274,23 @@ describe('breachNotificationSystem', () => {
         },
       ]
 
-      ;(redis['keys'] as any).mockResolvedValue([
+      ;(redis['keys'] as unknown).mockResolvedValue([
         'breach:breach1',
         'breach:breach2',
       ])
-      ;(redis['get'] as any)
+      ;(redis['get'] as unknown)
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[0]))
         .mockResolvedValueOnce(JSON.stringify(mockBreaches[1]))
 
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(2)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[0].id).toBe('breach2') // Most recent first
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[1].id).toBe('breach1')
     })
 
     it('should handle Redis errors', async () => {
-      ;(redis['keys'] as any).mockRejectedValue(new Error('Redis error'))
+      ;(redis['keys'] as unknown).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.listRecentBreaches(),
@@ -310,11 +303,11 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should filter out invalid breach data', async () => {
-      ;(redis['keys'] as any).mockResolvedValue([
+      ;(redis['keys'] as unknown).mockResolvedValue([
         'breach:valid',
         'breach:invalid',
       ])
-      ;(redis['get'] as any)
+      ;(redis['get'] as unknown)
         .mockResolvedValueOnce(
           JSON.stringify({
             ...mockBreachDetails,
@@ -328,7 +321,6 @@ describe('breachNotificationSystem', () => {
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(1)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[0].id).toBe('valid')
     })
   })

@@ -6,6 +6,19 @@ import type { Browser, Page } from '@playwright/test'
 import { chromium } from '@playwright/test'
 
 // Browser performance types
+interface PerformanceNavigationEntry extends PerformanceEntry {
+  domContentLoadedEventEnd: number
+  domContentLoadedEventStart: number
+  domComplete: number
+  loadEventEnd: number
+  loadEventStart: number
+}
+
+interface PerformancePaintEntry extends PerformanceEntry {
+  name: string
+  startTime: number
+}
+
 interface PerformanceResourceEntry extends PerformanceEntry {
   encodedBodySize: number
 }
@@ -182,7 +195,7 @@ describe('performance Tests', () => {
             'largest-contentful-paint',
           )
           const lcpStartTime =
-            lcpEntries.length > 0 ? lcpEntries[0]?.startTime ?? 0 : 0
+            lcpEntries.length > 0 ? lcpEntries?.[0].startTime : 0
           const isLayoutShiftEntry = (
             entry: PerformanceEntry,
           ): entry is PerformanceEntry & { value: number } =>
@@ -319,9 +332,7 @@ describe('performance Tests', () => {
             ])
 
             // Store result
-            const pageResult = results.pages[name]
-            if (!pageResult) return
-            pageResult.FID = inputDelay
+            results.pages[name].FID = inputDelay
 
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)
@@ -431,10 +442,8 @@ describe('performance Tests', () => {
         jsonFiles.sort().reverse()
 
         // Load the most recent previous result
-        const previousFile = jsonFiles[0]
-        if (!previousFile) return
         const previousResultsRaw = parseJson(
-          await fs.readFile(join(resultsDir, previousFile), 'utf-8'),
+          await fs.readFile(join(resultsDir, jsonFiles[0]), 'utf-8'),
         )
         if (!isPerformanceResults(previousResultsRaw)) {
           return
@@ -444,7 +453,6 @@ describe('performance Tests', () => {
         // Compare with current results
         for (const [pageName, pageMetrics] of Object.entries(results.pages)) {
           const previousPageMetrics = previousResults.pages[pageName]
-          if (!previousPageMetrics) continue
 
           // Check for significant regressions (>20% worse)
           for (const metricName of ['LCP', 'FID', 'CLS', 'FCP'] as const) {

@@ -22,7 +22,7 @@ export interface EducationalContextResult {
     practicalApplications: string[]
     relatedTopics: string[]
     ageAppropriateness?: 'child' | 'adolescent' | 'adult' | 'all'
-    [key: string]: unknown
+    [key: string]: any
   }
 }
 
@@ -314,7 +314,7 @@ export class EducationalContextRecognizer {
 
       return adapted
     } catch (error: unknown) {
-      logger.error('Error recognizing educational context:', { error: String(error) })
+      logger.error('Error recognizing educational context:', error)
 
       // Fallback to basic non-educational result
       return {

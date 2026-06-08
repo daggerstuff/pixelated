@@ -100,6 +100,9 @@ lint_ts_files() {
   done <<< "$ts_files"
 
   # oxlint
+  if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]]; then
+    local oxlint_cmd="oxlint"
+    [[ -f "${repo}/node_modules/.bin/oxlint" ]] && oxlint_cmd="${repo}/node_modules/.bin/oxlint"
   if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]] || command -v pnpm &>/dev/null; then
     local oxlint_cmd="oxlint"
     if command -v pnpm &>/dev/null; then

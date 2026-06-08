@@ -4,6 +4,9 @@
 import express, { Router, Request, Response } from 'express'
 
 import {
+  getMongoConnection,
+  getPostgresPool,
+  getRedisClient,
   getMongoConnectionSafe,
   getPostgresPoolSafe,
   getRedisClientSafe,
@@ -36,6 +39,61 @@ router.get('/detailed', async (req: Request, res: Response) => {
   }
 
   // Check MongoDB
+  try {
+    const mongoConn = getMongoConnection()
+    const adminDbConnection = mongoConn.db
+    if (!adminDbConnection) {
+      throw new Error('MongoDB admin database is not initialized')
+    }
+    const adminDb = adminDbConnection.admin()
+    const serverStatus = await adminDb.serverStatus()
+    health.services.mongodb = {
+      status: 'connected',
+      uptime: serverStatus['uptime'],
+    }
+  } catch (error: unknown) {
+    health.services.mongodb = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
+  // Check PostgreSQL
+  try {
+    const pool = getPostgresPool()
+    const client = await pool.connect()
+    const result = await client.query('SELECT NOW() as now')
+    client.release()
+    health.services.postgresql = {
+      status: 'connected',
+      timestamp:
+        (result.rows[0] as { now?: unknown } | undefined)?.now ?? new Date(),
+    }
+  } catch (error: unknown) {
+    health.services.postgresql = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
+  // Check Redis
+  try {
+    const redis = getRedisClient()
+    const pong = await redis.ping()
+    health.services.redis = {
+      status: 'connected',
+      response: pong,
+    }
+  } catch (error: unknown) {
+    health.services.redis = {
+      status: 'disconnected',
+      error: (error as Error).message,
+    }
+    health.status = 'degraded'
+  }
+
   const mongoConn = getMongoConnectionSafe()
   if (mongoConn) {
     try {
@@ -119,6 +177,21 @@ router.get('/detailed', async (req: Request, res: Response) => {
 
 router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
   try {
+    // Check all critical services
+    const mongo = getMongoConnection()
+    const postgres = getPostgresPool()
+
+    if (!mongo || !postgres) {
+      return res.status(503).json({
+        ready: false,
+        reason: 'Database connections not initialized',
+      })
+    }
+
+    // Test PostgreSQL
+    const client = await postgres.connect()
+    await client.query('SELECT 1')
+    client.release()
     const mongo = getMongoConnectionSafe()
     const postgres = getPostgresPoolSafe()
 

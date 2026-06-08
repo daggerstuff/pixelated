@@ -106,6 +106,13 @@ describe('Health Endpoints', () => {
 
       const services = getHealthServices(response)
       const mongoStatus = services?.['mongodb']?.status
+      expect(mongoStatus).toBeOneOf(['connected', 'disconnected'])
+
+      const postgresStatus = services?.['postgresql']?.status
+      expect(postgresStatus).toBeOneOf(['connected', 'disconnected'])
+
+      const redisStatus = services?.['redis']?.status
+      expect(redisStatus).toBeOneOf(['connected', 'disconnected'])
       expect(mongoStatus).toBeOneOf([
         'connected',
         'disconnected',

@@ -50,6 +50,8 @@ ACTIVE_DUPLICATES = {
     "PIX-251": "PIX-1896",  # FHE Emotional Intelligence Integration - execution backlog
     "PIX-1874": "PIX-314",  # Implement context optimization architecture
     "PIX-325": "PIX-1877",  # Document idea archival policy and backlog cleanup workflow
+    "PIX-226": "PIX-294",   # Scrambled duplicate of Define weekly operating review
+    "PIX-371": "PIX-514",   # Redundant duplicate of Update Pixelated Memory Service / Checkmate align
     "PIX-226": "PIX-294",  # Scrambled duplicate of Define weekly operating review
     "PIX-371": "PIX-514",  # Redundant duplicate of Update Pixelated Memory Service / Checkmate align
 }
@@ -158,6 +160,7 @@ def build_training_description(task_num: str, task: dict[str, str], pix_key: str
     if not checklist_items:
         checklist_items.append(f"- [ ] Implement and verify the capabilities for task {task_num}: {task['name']}")
 
+    objective_text = "\n".join(other_lines) if other_lines else f"Implement and configure the features specified for task {task_num} ({task['name']})."
     objective_text = (
         "\n".join(other_lines)
         if other_lines
@@ -170,6 +173,9 @@ def build_training_description(task_num: str, task: dict[str, str], pix_key: str
         if fm not in files_mentioned:
             files_mentioned.append(fm)
 
+    specs_section = f"""- **Sprint Scope**: Training Pipeline Improvements (Phase {task_num.split('.', 1)[0]})
+- **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.
+- **Key Objectives**: {task['name']}."""
     specs_section = f"""- **Sprint Scope**: Training Pipeline Improvements (Phase {task_num.split(".", 1)[0]})
 - **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.
 - **Key Objectives**: {task["name"]}."""
@@ -658,6 +664,9 @@ Resolve remaining performance anomalies and edge cases.
 }
 
 
+def execute_relation_and_status(
+    uuid: str, canonical_uuid: str, identifier: str, dry_run: bool
+) -> None:
 def execute_relation_and_status(uuid: str, canonical_uuid: str, identifier: str, dry_run: bool) -> None:
     """Establish a duplicate relation and mark as Duplicate."""
     if dry_run:
@@ -735,6 +744,7 @@ def _extract_linkages(clean_body: str) -> tuple[list[str], str]:
             or "source priority:" in line_strip.lower()
             or "source status:" in line_strip.lower()
             or "source type:" in line_strip.lower()
+            or "beads:" in line_strip.lower()
             or "linear:" in line_strip.lower()
         ):
             linkages.append(line_strip)
@@ -799,6 +809,7 @@ def _build_sections_data(sections: dict[str, str]) -> tuple[list[str], list[str]
                 objective_parts.append(f"**Current State**:\n{content}")
             else:
                 objective_parts.append(content)
+        elif sec_name_lower in {"scope", "implementation", "solution", "operational responsibility", "technical specs", "target state"}:
         elif sec_name_lower in {
             "scope",
             "implementation",
@@ -812,6 +823,7 @@ def _build_sections_data(sections: dict[str, str]) -> tuple[list[str], list[str]
                 continue
             _add_bullets_to_checklist(content, sec_name_lower, checklist_items)
             specs_parts.append(content)
+        elif sec_name_lower in {"definition of done", "completion criteria", "acceptance criteria", "checklist", "tasks"}:
         elif sec_name_lower in {
             "definition of done",
             "completion criteria",
@@ -868,6 +880,8 @@ def parse_and_reformat_generic_issue(title: str, clean_body: str, key: str) -> s
             "- [ ] Confirm that no TypeScript/Python compile errors or lint issues are introduced",
         ]
     else:
+        objective = "\n\n".join(obj_parts).strip() if obj_parts else f"Implement and verify the capabilities for: {title}"
+        specs = "\n\n".join(specs_parts).strip() if specs_parts else f"- **Sprint Scope**: Backlog Improvement\n- **Title Context**: {title}"
         objective = (
             "\n\n".join(obj_parts).strip() if obj_parts else f"Implement and verify the capabilities for: {title}"
         )
@@ -892,6 +906,7 @@ def parse_and_reformat_generic_issue(title: str, clean_body: str, key: str) -> s
         else:
             cleaned_checklist.append(f"- [ ] {item_strip}")
 
+    new_desc = f"### Core Objective\n{objective}\n\n### Technical Design Specs\n{specs}\n\n### Atlassian & Code Linkages\n"
     new_desc = (
         f"### Core Objective\n{objective}\n\n### Technical Design Specs\n{specs}\n\n### Atlassian & Code Linkages\n"
     )
@@ -904,6 +919,9 @@ def parse_and_reformat_generic_issue(title: str, clean_body: str, key: str) -> s
     return new_desc.strip()
 
 
+def enrich_issue(
+    issue: dict[str, Any], pix_to_task: dict[str, Any]
+) -> tuple[str | None, str | None]:
 def enrich_issue(issue: dict[str, Any], pix_to_task: dict[str, Any]) -> tuple[str | None, str | None]:
     """Examine if the issue needs enrichment and return the body/source."""
     title = issue.get("title") or ""
@@ -947,6 +965,9 @@ def enrich_issue(issue: dict[str, Any], pix_to_task: dict[str, Any]) -> tuple[st
         source_provider=meta.get("source-provider", "jira" if "Source plan" in desc else "linear"),
         source_id=meta.get("source-id", key),
         provider_ids={
+            k: v
+            for k, v in meta.items()
+            if k not in {"key", "status", "source-provider", "source-id", "updated-at"}
             k: v for k, v in meta.items() if k not in {"key", "status", "source-provider", "source-id", "updated-at"}
         },
         updated_at=meta.get("updated-at"),
@@ -1034,6 +1055,22 @@ def main() -> int:
 
     logging.info("Loaded %d issues from Linear.", len(issues))
 
+    issue_key_to_uuid = {
+        i.get("identifier"): i.get("id")
+        for i in issues
+        if i.get("identifier") and i.get("id")
+    }
+
+    active_statuses = {"Todo", "In Progress", "Triage", "Backlog"}
+    active_issues = [
+        i for i in issues if (i.get("state") or {}).get("name") in active_statuses
+    ]
+
+    logging.info("Found %d active issues.", len(active_issues))
+
+    enriched_count, duplicate_count = process_active_issues(
+        active_issues, issue_key_to_uuid, pix_to_task, dry_run
+    )
     issue_key_to_uuid = {i.get("identifier"): i.get("id") for i in issues if i.get("identifier") and i.get("id")}
 
     active_statuses = {"Todo", "In Progress", "Triage", "Backlog"}
