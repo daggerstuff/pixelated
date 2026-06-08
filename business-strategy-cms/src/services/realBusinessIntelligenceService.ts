@@ -155,7 +155,7 @@ export class RealBusinessIntelligenceService {
 
       // Store in database for historical tracking
       for (const data of marketData) {
-        await this.db.storeMarketData(data)
+        await this.db.storeMarketData(data as unknown as MarketData)
       }
 
       return marketData as unknown as MarketData[]

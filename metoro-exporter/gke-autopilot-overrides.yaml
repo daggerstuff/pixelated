@@ -1,0 +1,27 @@
+# GKE Autopilot overrides for metoro-exporter
+# Use with: helm upgrade ... metoro-exporter/metoro-exporter -f gke-autopilot-overrides.yaml
+#
+# The node agent DaemonSet is fundamentally incompatible with GKE Autopilot:
+#   - requires hostPID, privileged mode, and hostPath volumes outside /var/log/
+#   - requires EKS-specific node affinity labels not allowed in Autopilot
+# The exporter-only deployment still provides full K8s metadata observability.
+
+nodeAgent:
+  enabled: false
+
+exporter:
+  replicas: 1
+  resources:
+    limits:
+      cpu: "500m"
+      memory: "1Gi"
+    requests:
+      cpu: "250m"
+      memory: "512Mi"
+  autoscaling:
+    horizontalPodAutoscaler:
+      enabled: false
+
+redis:
+  master:
+    resourcesPreset: "nano"

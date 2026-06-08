@@ -124,7 +124,7 @@ export function createThreatDetectionIntegration(
   const threatDetectionService = createThreatDetectionService(
     orchestrator,
     rateLimiter,
-    config,
+    config as any,
   )
 
   const middleware = threatDetectionService.getMiddleware()
@@ -396,7 +396,7 @@ export function createThreatHuntingService(
     aiService,
     behavioralService,
     predictiveService,
-    config,
+    config as any,
   )
 }
 

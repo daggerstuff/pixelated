@@ -7,6 +7,33 @@ import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { createHash } from 'crypto'
+import { readFile, readdir } from 'fs/promises'
+import * as path from 'path'
+
+import { Pool, PoolClient } from 'pg'
+
+// pg does not export these types; define locally
+export interface DbQueryResult<T = Record<string, unknown>> {
+  rows: T[]
+  rowCount: number
+  command?: string
+  oid?: number
+  fields?: Array<{ name: string; dataTypeID: number }>
+}
+type QueryResultRow = Record<string, unknown>
+
+// Pool's runtime properties not exposed in pg type definitions.
+// Accessed via `as unknown as T` — safer than `as any` because it requires
+// explicit acknowledgement that the shape is compiler-unknown.
+interface PoolWithConnectEvent {
+  on(event: 'connect', listener: (client: PoolClient) => void): this
+}
+
+interface PoolStats {
+  totalCount: number
+  idleCount: number
+  waitingCount: number
+}
 
 import { Pool, PoolClient } from 'pg'
 

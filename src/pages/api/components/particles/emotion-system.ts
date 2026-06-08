@@ -198,49 +198,63 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       },
     )
   }
-})
+}) as any
 
 /**
  * POST endpoint for real-time particle updates
  */
-export const POST: APIRoute = protectRoute()(async (
-  context: AuthAPIContext,
-) => {
-  try {
-    const { locals, request } = context
-    const { user } = locals
+export const POST: APIRoute = protectRoute()(
+  async (context: AuthAPIContext) => {
+    try {
+      const { locals, request } = context
+      const { user } = locals
 
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication required' }),
-        {
-          status: 401,
-          headers: { 'Content-Type': 'application/json' },
+      if (!user) {
+        return new Response(
+          JSON.stringify({ error: 'Authentication required' }),
+          {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+
+      const body = (await request.json()) as Record<string, unknown>
+      const { emotion, intensity, sessionId, particleUpdates } = body
+
+      // Validate input
+      if (!emotion || typeof intensity !== 'number') {
+        return new Response(
+          JSON.stringify({ error: 'emotion and intensity are required' }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        )
+      }
+
+      // Process real-time updates
+      const updateResponse = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        appliedUpdates: {
+          emotion,
+          intensity: Math.max(0, Math.min(1, intensity)),
+          sessionId,
+          particleCount: (particleUpdates as any)?.length ?? 0,
         },
-      )
-    }
+        recommendations: generateEmotionRecommendations(
+          emotion as any,
+          intensity,
+        ),
+      }
 
     const body = (await request.json()) as Record<string, unknown>
     const { emotion, intensity, sessionId, particleUpdates } = body
 
-    // Validate input
-    if (!emotion || typeof intensity !== 'number') {
-      return new Response(
-        JSON.stringify({ error: 'emotion and intensity are required' }),
-        {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
-      )
-    }
-
-    // Process real-time updates
-    const updateResponse = {
-      success: true,
-      timestamp: new Date().toISOString(),
-      appliedUpdates: {
+      logger.info('Processed particle system update', {
         emotion,
-        intensity: Math.max(0, Math.min(1, intensity)),
+        intensity,
         sessionId,
         particleCount: particleUpdates?.length ?? 0,
       },
@@ -278,10 +292,28 @@ export const POST: APIRoute = protectRoute()(async (
       {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
-      },
-    )
-  }
-})
+      })
+    } catch (error: unknown) {
+      logger.error('Error processing particle system update', { error })
+
+      return new Response(
+        JSON.stringify({
+          error: 'Internal server error',
+          message:
+            error instanceof Error
+              ? error instanceof Error
+                ? error.message
+                : 'Unknown error'
+              : 'Unknown error',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        },
+      )
+    }
+  },
+) as any
 
 // Helper functions
 function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {

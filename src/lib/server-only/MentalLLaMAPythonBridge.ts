@@ -8,7 +8,9 @@ import type {
   MentalLLaMAAnalysisResult,
 } from '../types/index.ts'
 
-const logger = baseLogger
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('mental-llama-python-bridge')
 
 /**
  * Custom error for features not implemented or unavailable in the Python bridge.

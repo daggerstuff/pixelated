@@ -97,7 +97,7 @@ describe('AdaptiveSelector', () => {
         metadata: {},
       }),
     }
-    vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+    vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
       aiResponseGeneral,
     )
 
@@ -123,7 +123,7 @@ describe('AdaptiveSelector', () => {
       // For GENERAL, weights should be proportional to their base definition if not overridden
       // The actual check depends on how getContextualObjectiveWeights for GENERAL is implemented
       // For now, we check if the weight is present and positive.
-      expect(so.weight).toBeGreaterThanOrEqual(0)
+      expect(vi.mocked(so).weight).toBeGreaterThanOrEqual(0)
     })
     const sumOfWeights = result.selectedObjectives.reduce(
       (sum, so) => sum + so.weight,
@@ -220,7 +220,7 @@ describe('AdaptiveSelector', () => {
         metadata: {},
       }),
     }
-    vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+    vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
       aiResponseEducational,
     )
 
@@ -310,7 +310,7 @@ describe('AdaptiveSelector', () => {
         metadata: {},
       }),
     }
-    vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+    vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
       aiResponseGeneral,
     )
     await adaptiveSelector.selectObjectives('Hello')
@@ -347,7 +347,7 @@ describe('AdaptiveSelector', () => {
         metadata: {},
       }),
     }
-    vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+    vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
       aiResponseEducational,
     )
     const result = await adaptiveSelector.selectObjectives(
@@ -366,7 +366,7 @@ describe('AdaptiveSelector', () => {
   })
 
   test('should fallback to default weights if context detection fails', async () => {
-    vi.mocked(mockAIService.createChatCompletion).mockRejectedValue(
+    vi.mocked(mockAIService).createChatCompletion.mockRejectedValue(
       new Error('AI service failed'),
     )
     mockDetectCrisis.mockResolvedValue({
@@ -413,7 +413,10 @@ describe('AdaptiveSelector', () => {
     }
 
     result.selectedObjectives.forEach((so) => {
-      expect(so.weight).toBeCloseTo(defaultWeights[so.objective.id]!, 5)
+      expect(vi.mocked(so).weight).toBeCloseTo(
+        defaultWeights[so.objective.id]!,
+        5,
+      )
     })
   })
 
@@ -460,7 +463,7 @@ describe('AdaptiveSelector', () => {
         metadata: {},
       }),
     }
-    vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(aiResponse)
+    vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(aiResponse)
 
     const userProfile: UserProfile = {
       preferences: {

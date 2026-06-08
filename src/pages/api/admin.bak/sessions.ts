@@ -126,7 +126,7 @@ export const POST = async (context: APIContext) => {
     const adminService = AdminService.getInstance()
 
     // Perform the requested action on the session
-    let result
+    let result: any
     switch (action) {
       case 'lock':
         result = await adminService.lockSession(sessionId)

@@ -96,7 +96,7 @@ export const GET = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to get WebSocket server status',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -254,7 +254,12 @@ export const POST = async ({ request }: { request: Request }) => {
     }
 
     // Broadcast the test alert
-    await server.broadcastBiasAlert(testAlert, testAnalysisResult)
+    await server.broadcastBiasAlert(
+      testAlert as unknown as Parameters<typeof server.broadcastBiasAlert>[0],
+      testAnalysisResult as unknown as Parameters<
+        typeof server.broadcastBiasAlert
+      >[1],
+    )
 
     logger.info('Test bias alert sent', {
       alertId: testAlert.alertId,
@@ -286,7 +291,7 @@ export const POST = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to send test bias alert',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -310,6 +315,8 @@ export const PATCH = async ({ request }: { request: Request }) => {
     const server = await initializeWebSocketServer()
 
     switch (action) {
+      case undefined:
+        throw new Error('Action is required')
       case 'restart':
         await server.stop()
         await server.start()
@@ -350,7 +357,7 @@ export const PATCH = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to update WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -396,7 +403,7 @@ export const DELETE = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to stop WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -419,7 +426,7 @@ if (
   process.env['NODE_ENV'] === 'production' &&
   process.env['WS_AUTO_START'] === 'true'
 ) {
-  initializeWebSocketServer().catch((error) => {
+  initializeWebSocketServer().catch((error: unknown) => {
     logger.error('Failed to auto-start WebSocket server', { error })
   })
 }
