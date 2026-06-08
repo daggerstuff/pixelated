@@ -20,9 +20,30 @@ export interface Session {
   token?: string
 }
 
+interface AuthProfileResponse {
+  user: User
+}
+
+interface AuthResponse {
+  user?: User
+  token?: string
+  error?: string
+}
+
+interface SignInRequest {
+  email: string
+  password: string
+  rememberMe?: boolean
+}
+
+interface SignUpRequest {
+  email: string
+  password: string
+  role?: string
+}
+
 class AuthClient {
   private _session: Session | null = null
-  private _isLoading = false
 
   /**
    * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.
@@ -53,7 +74,10 @@ class AuthClient {
 
   /**
    */
-  async getSession() {
+  async getSession(): Promise<{
+    data: { session: Session; user: User } | null
+    error: Error | null
+  }> {
     if (this._session) {
       return {
         data: {
@@ -67,16 +91,10 @@ class AuthClient {
     try {
       const response = await fetch('/api/auth/auth0-profile')
       if (response.ok) {
-        const data = await response.json()
+        const data = (await response.json()) as unknown as AuthProfileResponse
         if (data.user) {
           this._session = {
-            user: {
-              id: data.user.id,
-              email: data.user.email,
-              role: data.user.role,
-              fullName: data.user.fullName,
-              avatarUrl: data.user.profile?.picture,
-            },
+            user: data.user,
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
             token: 'cookie-based',
           }
@@ -103,8 +121,10 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({ email, password, rememberMe }: any) {
-    this._isLoading = true
+  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
+    data: AuthResponse | null
+    error: Error | null
+  }> {
     try {
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -112,35 +132,37 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
-        return { error: data.error ?? 'Login failed' }
+        return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
-        user: data.user,
+        user: data.user!,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
 
       return { data, error: null }
-    } catch (error: any) {
+    } catch (error) {
       return {
+        data: null,
         error:
-          (error instanceof Error ? error.message : 'Unknown error') ||
-          'An unexpected error occurred',
+          error instanceof Error
+            ? error
+            : new Error('An unexpected error occurred'),
       }
-    } finally {
-      this._isLoading = false
     }
   }
 
   /**
    * Sign up a new user
    */
-  async signUpEmail({ email, password, role }: any) {
-    this._isLoading = true
+  async signUpEmail({ email, password, role }: SignUpRequest): Promise<{
+    data: AuthResponse | null
+    error: Error | null
+  }> {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -148,28 +170,31 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
-        return { error: data.error ?? 'Registration failed' }
+        return {
+          data: null,
+          error: new Error(data.error ?? 'Registration failed'),
+        }
       }
 
       return { data, error: null }
-    } catch (error: any) {
+    } catch (error) {
       return {
+        data: null,
         error:
-          (error instanceof Error ? error.message : 'Unknown error') ||
-          'An unexpected error occurred',
+          error instanceof Error
+            ? error
+            : new Error('An unexpected error occurred'),
       }
-    } finally {
-      this._isLoading = false
     }
   }
 
   /**
    * Sign out the current user
    */
-  async signOut() {
+  async signOut(): Promise<void> {
     try {
       // Clear cookie
       document.cookie =
@@ -190,7 +215,13 @@ class AuthClient {
   get signIn() {
     return {
       email: this.signInEmail.bind(this),
-      social: async ({ provider, callbackURL }: any) => {
+      social: async ({
+        provider,
+        callbackURL,
+      }: {
+        provider: string
+        callbackURL?: string
+      }) => {
         // Implementation for social login using server-side flow
         console.log(`Social login with ${provider} initiated`)
         const returnTo = callbackURL ?? window.location.pathname
@@ -209,7 +240,13 @@ class AuthClient {
 
   /**
    */
-  async forgetPassword({ email, redirectTo }: any) {
+  async forgetPassword({
+    email,
+    redirectTo,
+  }: {
+    email: string
+    redirectTo?: string
+  }): Promise<{ success: boolean }> {
     console.log(
       `Password reset for ${email} requested, redirect to ${redirectTo}`,
     )
@@ -248,7 +285,7 @@ export function useSession() {
           if (result.data?.session) {
             setSession(result.data.session)
           }
-          setError(result.error as Error | null)
+          setError(result.error)
         }
       } catch (e) {
         if (mounted) {

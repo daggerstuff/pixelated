@@ -8,11 +8,6 @@
 |--------|----------|--------|--------|
 | Linear (PIX) | `normalize_linear_payload` | ✅ Active | 385 issues, 14 projects |
 | Jira ADHD | `normalize_jira_payload` | ✅ Active | 399 issues exported |
-| Asana | `normalize_asana_payload` | ❌ Disabled (config: `enabled: false`) | N/A |
-| Beads | `normalize_beads_payload` | ❌ No runtime | No `.beads/` directory |
-| GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
-
-## 1. Status Mapping Gaps
 | GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
 | GitLab | `normalize_gitlab_payload` | ⚠️ Partial | Env vars not set |
 
@@ -51,19 +46,12 @@
 
 ### Gap: `open` vs `backlog` naming
 - Current: STATUS_ALIASES maps "backlog"/"todo" → `open`
-- But Beads uses `open` correctly; Linear uses "Backlog"/"Todo"
 - But some targets use `open` correctly; Linear uses "Backlog"/"Todo"
 - Issue: cross-system readback of `open` status creates ambiguity
 
 ## 2. Priority Mapping Gaps
 
 ### Current Code (tri_sync.py)
-
-```python
-PROVIDER_PRIORITY = {
-    "beads": 4,
-    "asana": 3,
-    "github": 2,
 ### Current Code (tri_sync.py)
 ```python
 PROVIDER_PRIORITY = {
@@ -74,8 +62,6 @@ PROVIDER_PRIORITY = {
     "jira": 2,
 }
 ```
-
-- This is **provider trust priority** — not issue priority
 - **No actual issue priority mapping exists** across providers
 - Linear uses `priority: 0-4` (0=urgent, 1=high, 2=medium, 3=low, 4=none)
 - Jira ADHD uses `priority: Highest/High/Medium/Low/Lowest`

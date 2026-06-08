@@ -83,8 +83,7 @@ program
       console.log(`   Progress: ${taskSummary.progress}%`)
 
       console.log('\n🔄 Performing Ollama check-in...')
-      // oxlint-disable no-unsafe-assignment
-      const result: any = await taskManager.performTaskCheckIn(
+      const result = await taskManager.performTaskCheckIn(
         taskList,
         taskId,
         summary,
@@ -98,14 +97,14 @@ program
 
       if (result.checkInResult.improvements.length > 0) {
         console.log('\n💡 Improvement suggestions:')
-        result.checkInResult.improvements.forEach((improvement: any, index: number) => {
+        result.checkInResult.improvements.forEach((improvement, index) => {
           console.log(`   ${index + 1}. ${improvement.suggestion}`)
           console.log(`      Category: ${improvement.category}`)
           console.log(`      Priority: ${improvement.priority}`)
         })
 
         console.log('\n🤔 Reasoning:')
-        result.checkInResult.reasoningLog.forEach((reasoning: any, index: number) => {
+        result.checkInResult.reasoningLog.forEach((reasoning, index) => {
           console.log(`   ${index + 1}. ${reasoning}`)
         })
       }
@@ -150,8 +149,7 @@ program
         logger.info('Testing with', { summary, model })
       }
 
-      // oxlint-disable no-unsafe-assignment
-      const result: any = await ollamaService.performCheckIn(summary)
+      const result = await ollamaService.performCheckIn(summary)
 
       console.log('\n✅ Ollama test completed!')
       console.log(`Decision: ${result.decision.toUpperCase()}`)
@@ -161,14 +159,14 @@ program
 
       if (result.improvements.length > 0) {
         console.log('\n💡 Improvement suggestions:')
-        result.improvements.forEach((improvement: any, index: number) => {
+        result.improvements.forEach((improvement, index) => {
           console.log(`   ${index + 1}. ${improvement.suggestion}`)
           console.log(`      Category: ${improvement.category}`)
           console.log(`      Priority: ${improvement.priority}`)
         })
 
         console.log('\n🤔 Reasoning:')
-        result.reasoningLog.forEach((reasoning: any, index: number) => {
+        result.reasoningLog.forEach((reasoning, index) => {
           console.log(`   ${index + 1}. ${reasoning}`)
         })
       }
