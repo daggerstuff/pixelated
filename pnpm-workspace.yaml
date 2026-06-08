@@ -81,6 +81,8 @@ minimumReleaseAgeExclude:
   - axios@0.30.3
   - hono@4.12.23
   - react-hook-form@7.78.0
+  - '@ai-sdk/gateway@3.0.126'
+  - ai@6.0.198
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
