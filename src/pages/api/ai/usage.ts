@@ -99,7 +99,7 @@ export const GET: APIRoute = async ({ request }) => {
       url.searchParams.forEach((value, key) => {
         queryParams[key] = value
       })
-      params = validateQueryParams(UsageStatsRequestSchema, queryParams) as any
+      params = validateQueryParams(UsageStatsRequestSchema, queryParams) as unknown as typeof params
     } catch (err: unknown) {
       const error = err as { message?: string; errors?: Record<string, string>; details?: Record<string, string>; status?: number }
       // Create audit log for validation error

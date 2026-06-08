@@ -23,7 +23,7 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
 
   useEffect(() => {
     if (!serviceWorkerManager.isSupported()) {
-      return
+      return () => {}
     }
 
     // Register service worker
@@ -81,7 +81,7 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
     )
 
     // Check for updates periodically
-    const checkForUpdates = () => {
+    const checkForUpdates = (): void => {
       serviceWorkerManager.update().catch(() => {
         console.error('Service Worker update check failed')
       })
