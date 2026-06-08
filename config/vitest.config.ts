@@ -22,6 +22,7 @@ const baseNodeTestGlobs = [
   'src/lib/redis.test.ts',
   'src/lib/services/notification/__tests__/NotificationService.test.ts',
   'src/lib/__tests__/security-implementation.test.ts',
+  'src/lib/__tests__/security.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -72,7 +73,7 @@ const astroVite = await astroViteConfig({
 })
 const astroPlugins = astroVite.plugins ?? []
 
-export default defineConfig({
+const vitestConfig = {
   plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',
@@ -112,12 +113,14 @@ export default defineConfig({
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
+    pool: 'forks',
+    maxWorkers: process.env['CI'] ? 2 : 8,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
-        classNameStrategy: 'non-scoped',
+        classNameStrategy: 'non-scoped' as const,
       },
     },
     include:
@@ -215,6 +218,7 @@ export default defineConfig({
             'src/lib/redis.test.ts',
             'src/lib/services/notification/__tests__/NotificationService.test.ts',
             'src/lib/__tests__/security-implementation.test.ts',
+            'src/lib/__tests__/security.test.ts',
             'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
@@ -265,7 +269,6 @@ export default defineConfig({
         },
       },
     ],
-    pool: 'forks',
     poolOptions: {
       forks: {
         singleFork: false,
@@ -277,13 +280,13 @@ export default defineConfig({
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
       jsdom: {
-        resources: 'usable',
+        resources: 'usable' as const,
         pretendToBeVisual: false,
         runScripts: 'dangerously',
       },
     },
     coverage: {
-      provider: 'v8',
+        provider: 'v8' as const,
       enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
@@ -325,4 +328,6 @@ export default defineConfig({
   css: {
     devSourcemap: true,
   },
-})
+}
+
+export default defineConfig(vitestConfig)
