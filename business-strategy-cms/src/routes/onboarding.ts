@@ -1,4 +1,5 @@
-import { Router } from 'express'
+import { Router, Request } from 'express'
+import type { Response } from 'express'
 
 import { AuthService } from '@/services/authService'
 import { UserService } from '@/services/userService'
@@ -61,28 +62,8 @@ router.post(
         },
       })
     }
-
-    // Generate real tokens for the user
-    const tokens = AuthService.generateTokens({
-      userId: String(user.id),
-      email: user.email,
-      role: user.role,
-    })
-
-    res.json({
-      success: true,
-      data: { user, tokens },
-      message: 'Onboarding completed successfully',
-    })
-  } catch (error: unknown) {
-    res.status(500).json({
-      success: false,
-      error: {
-        message: error instanceof Error ? error.message : 'Onboarding failed',
-      },
-    })
-  }
-})
+  },
+)
 
 // Check if user needs onboarding
 router.get('/status/:userId', async (req, res) => {

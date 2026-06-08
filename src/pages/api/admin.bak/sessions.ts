@@ -4,9 +4,6 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { AdminPermission, AdminService } from '../../../lib/admin'
 import { adminGuard } from '../../../lib/admin/middleware'
 
-import { AdminPermission, AdminService } from '../../../lib/admin/index'
-import { adminGuard } from '../../../lib/admin/middleware'
-
 // Initialize logger
 const logger = createBuildSafeLogger('default')
 

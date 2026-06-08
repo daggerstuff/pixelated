@@ -152,6 +152,7 @@ export function EvidenceAssistantPanel() {
               className="bg-cyan-400 text-slate-950 hover:bg-cyan-300 disabled:bg-cyan-900/40 disabled:text-slate-400 rounded-xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed"
               disabled={loading || !query.trim()}
               type="submit"
+              aria-busy={loading}
             >
               {loading ? 'Searching...' : 'Run evidence search'}
             </button>
@@ -159,14 +160,15 @@ export function EvidenceAssistantPanel() {
         </div>
       </form>
 
-      {error ? (
-        <div className="border-rose-400/30 bg-rose-500/10 text-rose-200 mt-6 rounded-xl border px-4 py-3 text-sm">
-          {error.message}
-        </div>
-      ) : null}
+      <div aria-live="polite">
+        {error ? (
+          <div className="border-rose-400/30 bg-rose-500/10 text-rose-200 mt-6 rounded-xl border px-4 py-3 text-sm">
+            {error.message}
+          </div>
+        ) : null}
 
-      {response ? (
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
+        {response ? (
+          <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
           <section className="border-white/10 bg-slate-900/70 rounded-2xl border p-5">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-white text-lg font-semibold">
@@ -229,7 +231,8 @@ export function EvidenceAssistantPanel() {
             </div>
           </section>
         </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   )
 }

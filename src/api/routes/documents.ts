@@ -69,6 +69,19 @@ interface CommentBody {
 const router: Router = express.Router()
 
 
+router.post(
+  '/',
+  requirePermission('edit'),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const { title, type, category, content, description } = expressReq.body
+
     // Validation
     if (!title || !type || !category) {
       throw new ValidationError(
@@ -96,6 +109,25 @@ const router: Router = express.Router()
   }),
 )
 
+      return
+    }
+    const {
+      page: pageQuery,
+      limit: limitQuery,
+      status,
+      type,
+      category,
+      search: searchQuery,
+    } = expressReq.query
+
+router.get(
+  '/',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
       return
     }
     const {
@@ -155,6 +187,20 @@ const router: Router = express.Router()
 )
 
 
+router.get(
+  '/:documentId',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+
+    const document = await documentService.getDocument(documentId, userId)
+
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
@@ -167,6 +213,31 @@ const router: Router = express.Router()
 )
 
 
+router.put(
+  '/:documentId',
+  requirePermission('edit'),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { title, content, status, description } = expressReq.body
+
+    const document = await documentService.updateDocument(
+      documentId,
+      {
+        title,
+        content,
+        status,
+        description,
+      },
+      userId,
+    )
+
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
@@ -178,6 +249,19 @@ const router: Router = express.Router()
   }),
 )
 
+
+router.delete(
+  '/:documentId',
+  requireRole(['admin', 'manager']),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
 
     const deleted = await documentService.deleteDocument(documentId, userId)
 
@@ -192,6 +276,19 @@ const router: Router = express.Router()
   }),
 )
 
+
+router.post(
+  '/:documentId/share',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { sharedWith, permissionLevel } = expressReq.body
 
     if (!sharedWith || !permissionLevel) {
       throw new ValidationError(
@@ -214,6 +311,19 @@ const router: Router = express.Router()
 )
 
 
+router.post(
+  '/:documentId/comments',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { content, parentCommentId } = expressReq.body
+
     if (!content) {
       throw new ValidationError('Comment content is required')
     }
@@ -234,6 +344,13 @@ const router: Router = express.Router()
 )
 
 
+router.get(
+  '/:documentId/comments',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+
     const pool = getPostgresPool()
     const result = await pool.query(
       `SELECT c.id, c.content, c.author_id, u.name as author_name, c.created_at, c.resolved
@@ -252,6 +369,13 @@ const router: Router = express.Router()
 )
 
 
+router.get(
+  '/:documentId/versions',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
+
     const pool = getPostgresPool()
     const result = await pool.query(
       `SELECT id, version_number, title, created_by, created_at, change_summary
@@ -268,6 +392,22 @@ const router: Router = express.Router()
   }),
 )
 
+
+router.get(
+  '/:documentId/export',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { format: formatQuery = 'json' } = expressReq.query
+    const format = ensureString(formatQuery)
+
+    const document = await documentService.getDocument(documentId, userId)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)

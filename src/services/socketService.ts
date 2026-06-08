@@ -11,8 +11,12 @@ type RedisLike = {
 
 export class SocketService {
   private readonly io: SocketIOServer
-  private readonly redis!: RedisLike
-  private readonly db!: Pool
+
+  // TODO: Integrate redis and db into socket service (PIX-XXXX)
+  // @ts-expect-error - Reserved for future integration
+  private readonly _redis: RedisLike
+  // @ts-expect-error - Reserved for future integration
+  private readonly _db: Pool
 
   constructor(server: Server, redis: RedisLike, db: Pool) {
     // Initialize Socket.IO
@@ -24,8 +28,8 @@ export class SocketService {
       },
       transports: ['websocket', 'polling'],
     })
-    this.redis = redis
-    this.db = db
+    this._redis = redis
+    this._db = db
 
     this.setupSocketHandlers()
   }

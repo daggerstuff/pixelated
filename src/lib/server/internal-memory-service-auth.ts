@@ -3,7 +3,12 @@ import { createHash, createHmac, randomUUID } from 'node:crypto'
 export interface InternalMemoryServiceClientConfig {
   baseUrl: string
   actorId: string
+  /** @deprecated Use `secrets.current`. */
   actorSecret: string
+  secrets: {
+    current: string
+    previous?: string
+  }
   timeoutMs?: number
 }
 
@@ -15,9 +20,12 @@ export function resolveInternalMemoryServiceConfig(): InternalMemoryServiceClien
   const actorId =
     process.env['MEMORY_SERVICE_ACTOR_ID'] ??
     process.env['SUBCONSCIOUS_MEMORY_ACTOR_ID']
-  const actorSecret =
+
+  const currentSecret =
+    process.env['MEMORY_SERVICE_ACTOR_SECRET_CURRENT'] ??
     process.env['MEMORY_SERVICE_ACTOR_SECRET'] ??
     process.env['SUBCONSCIOUS_MEMORY_ACTOR_SECRET']
+  const previousSecret = process.env['MEMORY_SERVICE_ACTOR_SECRET_PREVIOUS']
 
   if (!actorId) {
     throw new Error(
@@ -25,7 +33,7 @@ export function resolveInternalMemoryServiceConfig(): InternalMemoryServiceClien
     )
   }
 
-  if (!actorSecret) {
+  if (!currentSecret) {
     throw new Error(
       'MEMORY_SERVICE_ACTOR_SECRET or SUBCONSCIOUS_MEMORY_ACTOR_SECRET is required for product memory gateway access',
     )
@@ -34,7 +42,11 @@ export function resolveInternalMemoryServiceConfig(): InternalMemoryServiceClien
   return {
     baseUrl,
     actorId,
-    actorSecret,
+    actorSecret: currentSecret,
+    secrets: {
+      current: currentSecret,
+      previous: previousSecret,
+    },
     timeoutMs: Number(process.env['MEMORY_SERVICE_TIMEOUT_MS'] ?? 5000),
   }
 }

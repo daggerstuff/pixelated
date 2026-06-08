@@ -1,6 +1,6 @@
-import { resolveInternalMemoryServiceConfig } from './internal-memory-service-auth'
 import { InternalMemoryServiceClient } from './internal-memory-service-client'
 import { McpMemoryTransport } from './mcp-memory-transport'
+import { resolveInternalMemoryServiceConfig } from './internal-memory-service-auth'
 
 export type InternalMemoryServiceClientLike = Pick<
   InternalMemoryServiceClient,
@@ -30,18 +30,20 @@ export function createMemoryTransport(): InternalMemoryServiceClientLike {
       const launcherPath =
         process.env['FORESIGHT_MCP_LAUNCHER'] ??
         'scripts/memory/foresight-mcp-server.sh'
-      const timeoutMs = Number(process.env['MEMORY_SERVICE_TIMEOUT_MS'] ?? 5000)
+      const timeoutMs = Number(
+        process.env['MEMORY_SERVICE_TIMEOUT_MS'] ?? 5000
+      )
       return new McpMemoryTransport({ launcherPath, timeoutMs })
     }
     case 'http-loopback': {
       return new InternalMemoryServiceClient(
-        resolveInternalMemoryServiceConfig(),
+        resolveInternalMemoryServiceConfig()
       )
     }
     default: {
       throw new Error(
         `Unknown memory service transport: ${transportType}. ` +
-          "Valid values are 'mcp' or 'http-loopback'.",
+          "Valid values are 'mcp' or 'http-loopback'."
       )
     }
   }

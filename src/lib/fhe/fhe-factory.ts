@@ -213,10 +213,6 @@ const sealFHEService: FHEService = {
       aCiphertext.delete()
       bCiphertext.delete()
 
-      // Clean up the SealCipherText objects
-      aCiphertext.delete()
-      bCiphertext.delete()
-
       if (!result.success) {
         throw new Error(result.error ?? 'Addition operation failed')
       }
@@ -269,10 +265,6 @@ const sealFHEService: FHEService = {
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.subtract(aCiphertext, bCiphertext)
-
-      // Clean up the SealCipherText objects
-      aCiphertext.delete()
-      bCiphertext.delete()
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()
