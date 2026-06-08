@@ -157,7 +157,7 @@ export class AIMonitoringService extends EventEmitter {
       )
 
       // Check for anomalies
-      const latestValue = history[history.length - 1]
+      const latestValue = history[history.length - 1]!
       const zScore = Math.abs((latestValue - avg) / stdDev)
 
       if (zScore > this.config.anomalyDetection.threshold) {

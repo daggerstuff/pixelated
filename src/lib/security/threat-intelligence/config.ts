@@ -99,7 +99,7 @@ export const threatIntelDatabaseConfig: ThreatIntelligenceDatabaseConfig = {
     enabled: process.env['ENCRYPTION_ENABLED'] !== 'false',
     algorithm: 'aes-256-gcm',
     key_rotation_days: parseInt(process.env['KEY_ROTATION_DAYS'] ?? '90'),
-  } as any,
+  },
   backup: {
     enabled: process.env['BACKUP_ENABLED'] !== 'false',
     schedule: process.env['BACKUP_SCHEDULE'] ?? '0 2 * * *', // Daily at 2 AM

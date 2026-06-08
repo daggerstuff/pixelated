@@ -89,8 +89,6 @@ export class GlobalThreatIntelligenceNetworkCore
 {
   private redis!: Redis
   private mongoClient!: MongoClient
-  private db!: import('mongodb').Db
-  private isInitialized = false
 
   private edgeDetectionSystem!: EdgeThreatDetectionSystem
   private correlationEngine!: ThreatCorrelationEngine
@@ -101,8 +99,6 @@ export class GlobalThreatIntelligenceNetworkCore
   private validationSystem!: ThreatValidationSystem
 
   private readonly existingResponseOrchestrator?: AdvancedResponseOrchestrator
-  private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
-  private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
 
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly threatProcessingQueue: string[] = []

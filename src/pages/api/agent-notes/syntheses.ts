@@ -56,7 +56,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
     }
 
     const ledger = getLedger()
-    const actorContext = resolveActorIdentity(locals as any)
+    const actorContext = resolveActorIdentity(locals)
     const artifactTurns = await ledger.replayByArtifact(parsed.data.artifactId)
     if (
       !hasArtifactTurnAccess(

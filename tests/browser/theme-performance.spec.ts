@@ -86,10 +86,9 @@ test.describe('Theme Performance Tests', () => {
     test('should have minimal layout shifts', async () => {
       // Measure cumulative layout shift
       const cls = await page.evaluate(async () => {
-        return new Promise<{ clsValue: number; clsEntries: number }>(
-          (resolve) => {
-            let clsValue = 0
-            let clsEntries = 0
+        return new Promise((resolve) => {
+          let clsValue = 0
+          let clsEntries = 0
 
             new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
@@ -122,8 +121,8 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure theme switch performance
       await page.evaluate(async () => {
-        return new Promise<{ marks: PerformanceEntry[] }>((resolve) => {
-          const marks: PerformanceEntry[] = []
+        return new Promise((resolve) => {
+          const marks = []
 
           // Add performance observer
           new PerformanceObserver((list) => {
@@ -157,10 +156,9 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure layout performance during theme switch
       const layoutMetrics = await page.evaluate(async () => {
-        return new Promise<{ layoutCount: number; styleCount: number }>(
-          (resolve) => {
-            let layoutCount = 0
-            let styleCount = 0
+        return new Promise((resolve) => {
+          let layoutCount = 0
+          let styleCount = 0
 
             new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
@@ -191,11 +189,10 @@ test.describe('Theme Performance Tests', () => {
 
       // Check for efficient DOM batching
       const domBatches = await page.evaluate(async () => {
-        return new Promise<{ mutationCount: number; batchCount: number }>(
-          (resolve) => {
-            let mutationCount = 0
-            let batchCount = 0
-            let lastMutationTime = 0
+        return new Promise((resolve) => {
+          let mutationCount = 0
+          let batchCount = 0
+          let lastMutationTime = 0
 
             const observer = new MutationObserver(
               (mutations: MutationRecord[]) => {
@@ -237,11 +234,7 @@ test.describe('Theme Performance Tests', () => {
     test('should maintain smooth animations at 60fps', async () => {
       // Measure animation frame rate
       const frameMetrics = await page.evaluate(async () => {
-        return new Promise<{
-          averageFps: number
-          minFps: number
-          maxFps: number
-        }>((resolve) => {
+        return new Promise((resolve) => {
           let frames = 0
           let lastTime = performance.now()
           const frameRates: number[] = []
@@ -388,7 +381,7 @@ test.describe('Theme Performance Tests', () => {
         return {
           totalSelectors: selectors.length,
           complexSelectors: selectors.filter(
-            (s) => s.includes('>') || s.includes('+') || s.includes('~'),
+            (s) => s.includes('>') ?? s.includes('+') ?? s.includes('~'),
           ).length,
           universalSelectors: selectors.filter((s) => s.includes('*')).length,
         }
@@ -410,10 +403,12 @@ test.describe('Theme Performance Tests', () => {
         elements.forEach((el) => {
           const style = window.getComputedStyle(el)
           if (style.contain && style.contain !== 'none') {
-            containmentUsage.push({
-              tagName: el.tagName,
-              contain: style.contain,
-            })
+            containmentUsage
+              .push({
+                tagName: el.tagName,
+                contain: style.contain,
+              })
+              .slice(________)
           }
         })
 
@@ -444,8 +439,8 @@ test.describe('Theme Performance Tests', () => {
           ) as PerformanceResourceTiming[]
         )
           .filter(
-            (entry) =>
-              entry.name.includes('.css') || entry.name.includes('theme'),
+            (entry: any) =>
+              entry.name.includes('.css') ?? entry.name.includes('theme'),
           )
           .map((entry) => ({
             name: entry.name,

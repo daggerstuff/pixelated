@@ -39,8 +39,8 @@ interface GlobalModel {
 class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
   private readonly dpConfig: DifferentialPrivacyConfig
-  private globalModel: GlobalModel | null = null
-  private readonly clientModels = new Map<string, ModelUpdate>()
+  private globalModel: any = null
+  private readonly clientModels = new Map<string, any>()
   private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
@@ -446,7 +446,7 @@ class PrivacyEngine {
     // Calculate basic statistics
     const progressValues = data
       .map((p) => p.progress)
-      .filter((p): p is number => p !== undefined && p !== null)
+      .filter((p): p is number => p !== undefined)
     if (progressValues.length > 0) {
       stats['progressMean'] =
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
@@ -532,14 +532,14 @@ class PrivacyEngine {
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + ((input['moodScore'] as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + (input.moodScore ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => (input['riskScore'] as number) ?? 0))
+        return Math.max(...inputs.map((input) => input.riskScore ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + ((input['effectiveness'] as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + (input.effectiveness ?? 0), 0) /
           (inputs.length || 1)
         )
       default:

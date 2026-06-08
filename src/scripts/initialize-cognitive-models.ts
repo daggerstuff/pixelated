@@ -57,7 +57,7 @@ async function main() {
 
     for (const model of sampleCognitiveModels) {
       console.log(`Saving model: ${model.name} (${model.id})`)
-      await modelService.saveModel(model)
+      await modelService.saveModel(model as Parameters<typeof modelService.saveModel>[0])
     }
 
     console.log('\nSuccessfully initialized all cognitive models!')

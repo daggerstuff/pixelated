@@ -245,7 +245,7 @@ describe('DynamicWeightingEngine', () => {
 
       // Check that no weight changed by more than 10%
       const history = customEngine.getWeightHistory()
-      const prevWeights = history[history.length - 2].weights
+      const prevWeights = history[history.length - 2]!.weights
       const newWeights = result.weights
 
       for (const key in newWeights) {
@@ -474,8 +474,8 @@ describe('DynamicWeightingEngine', () => {
 
       // Check that transitions are smooth (no wild swings)
       for (let i = 1; i < results.length; i++) {
-        const prevWeights = results[i - 1].weights
-        const currWeights = results[i].weights
+        const prevWeights = results[i - 1]!.weights
+        const currWeights = results[i]!.weights
 
         for (const key in currWeights) {
           const change = Math.abs(currWeights[key]! - prevWeights[key]!)
@@ -509,7 +509,7 @@ describe('DynamicWeightingEngine', () => {
 
         if (i > 0) {
           const history = engine.getWeightHistory()
-          const prevWeights = history[history.length - 2].weights
+          const prevWeights = history[history.length - 2]!.weights
           const currWeights = result.weights
 
           for (const key in currWeights) {

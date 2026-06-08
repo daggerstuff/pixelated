@@ -1,4 +1,6 @@
-// Supabase client wrapper (stub)
+// Supabase client wrapper
+import { createClient } from '@supabase/supabase-js'
+
 export const supabase = {
   from<T>(table: string) {
     return {
@@ -41,6 +43,7 @@ export const supabase = {
   },
 }
 
+// Renamed to avoid conflict with the @supabase/supabase-js import
 const makeSupabaseClient = (url: string, key: string) => ({
   from: (table: string) => supabase.from(table),
 })

@@ -207,7 +207,7 @@ const specHeadings = generateToc(headings, minHeadingLevel, maxHeadingLevel)
       maxH: number,
       baseSelector = '',
     ) => {
-      const levelSelectors: any[] = []
+      const levelSelectors = []
       for (let i = minH; i <= maxH; i++) {
         if (baseSelector) {
           levelSelectors.push(`${baseSelector} h${i}`)

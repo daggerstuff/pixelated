@@ -409,7 +409,7 @@ export class EdgeThreatDetectionSystemCore
   private async initializeEdgeNodes(): Promise<void> {
     try {
       // Initialize status for configured edge nodes
-      for (const region of (this.config as any).regions ?? []) {
+      for (const region of this.config.regions ?? []) {
         for (const node of region.edgeNodes ?? []) {
           this.nodeStatus.set(node.nodeId, {
             nodeId: node.nodeId,
@@ -618,7 +618,7 @@ export class EdgeThreatDetectionSystemCore
       input.dispose()
       prediction.dispose()
 
-      return anomalyScore[0] ?? 0
+      return anomalyScore[0]
     } catch (error: unknown) {
       logger.error('Anomaly detection failed:', { error })
       return this.fallbackAnomalyDetection(features)
@@ -722,7 +722,7 @@ export class EdgeThreatDetectionSystemCore
       input.dispose()
       prediction.dispose()
 
-      return threatProbability[0] ?? 0
+      return threatProbability[0]
     } catch (error: unknown) {
       logger.error('Threat prediction failed:', { error })
       return this.fallbackPrediction(features)

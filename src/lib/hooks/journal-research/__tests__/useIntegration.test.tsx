@@ -84,7 +84,7 @@ describe('useIntegration hooks', () => {
       toggleComparePlanId: vi.fn<(id: string) => void>(),
       clearCompare: vi.fn<() => void>(),
     }
-    ;(useIntegrationStore as any).mockImplementation(
+    useIntegrationStore.mockImplementation(
       (selector?: (state: typeof storeState) => unknown) =>
         typeof selector === 'function' ? selector(storeState) : storeState,
     )
@@ -92,13 +92,13 @@ describe('useIntegration hooks', () => {
       useIntegrationStore as typeof useIntegrationStore & {
         getState?: () => typeof storeState
       }
-    ).getState = () => storeState as any
+    ).getState = () => storeState
   })
 
   describe('useIntegrationPlanListQuery', () => {
     it('fetches integration plan list successfully', async () => {
       vi.mocked(api.listIntegrationPlans).mockResolvedValue(
-        mockIntegrationPlanList as any,
+        mockIntegrationPlanList,
       )
 
       const { result } = renderHook(
@@ -121,7 +121,7 @@ describe('useIntegration hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listIntegrationPlans).mockResolvedValue(
-        mockIntegrationPlanList as any,
+        mockIntegrationPlanList,
       )
       const filteredStoreState = {
         ...baseStoreState,
@@ -131,7 +131,7 @@ describe('useIntegration hooks', () => {
           maxEffortHours: 10,
         },
       }
-      ;(useIntegrationStore as any).mockImplementation(
+      useIntegrationStore.mockImplementation(
         (selector?: (state: typeof filteredStoreState) => unknown) =>
           typeof selector === 'function'
             ? selector(filteredStoreState)
@@ -141,7 +141,7 @@ describe('useIntegration hooks', () => {
         useIntegrationStore as typeof useIntegrationStore & {
           getState?: () => typeof filteredStoreState
         }
-      ).getState = () => filteredStoreState as any
+      ).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useIntegrationPlanListQuery('session-1'),
@@ -187,9 +187,7 @@ describe('useIntegration hooks', () => {
 
   describe('useIntegrationPlanQuery', () => {
     it('fetches integration plan successfully', async () => {
-      vi.mocked(api.getIntegrationPlan).mockResolvedValue(
-        mockIntegrationPlan as any,
-      )
+      vi.mocked(api.getIntegrationPlan).mockResolvedValue(mockIntegrationPlan)
 
       const { result } = renderHook(
         () => useIntegrationPlanQuery('session-1', 'plan-1'),
@@ -239,19 +237,16 @@ describe('useIntegration hooks', () => {
 
   describe('useIntegrationInitiateMutation', () => {
     it('initiates integration successfully', async () => {
-      vi.mocked(api.initiateIntegration).mockResolvedValue(
-        mockIntegrationPlan as any,
-      )
+      vi.mocked(api.initiateIntegration).mockResolvedValue(mockIntegrationPlan)
       const setSelectedPlanId = vi.fn<(id: string) => void>()
 
       ;(
         useIntegrationStore as typeof useIntegrationStore & {
           getState?: () => { setSelectedPlanId: typeof setSelectedPlanId }
         }
-      ).getState = () =>
-        ({
-          setSelectedPlanId,
-        }) as any
+      ).getState = () => ({
+        setSelectedPlanId,
+      })
 
       const { result } = renderHook(
         () => useIntegrationInitiateMutation('session-1'),
@@ -291,7 +286,7 @@ describe('useIntegration hooks', () => {
         acquisitionIds: ['acq-1'],
         targetFormat: 'jsonl',
         options: {},
-      } as any)
+      })
 
       await waitFor(() => {
         expect(result.current.isError).toBe(true)
@@ -311,7 +306,7 @@ describe('useIntegration hooks', () => {
         clearCompare: vi.fn<() => void>(),
       }
 
-      ;(useIntegrationStore as any).mockReturnValue(mockState)
+      useIntegrationStore.mockReturnValue(mockState)
 
       const { result } = renderHook(() => useIntegrationSelection())
 

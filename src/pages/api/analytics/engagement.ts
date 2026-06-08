@@ -19,7 +19,7 @@ export const GET = async ({ request, cookies }) => {
       request,
       cookies,
       requestIp: request.headers.get('x-forwarded-for'),
-    } as any)
+    })
 
     // TODO: Replace with real data fetching logic
     // For now, return static/mock data

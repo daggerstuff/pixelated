@@ -1,6 +1,6 @@
 import { getLogger } from '../logging'
 
-const logger = getLogger({ module: 'compliance-validator' } as any)
+const logger = getLogger({ module: 'compliance-validator' })
 
 export interface ComplianceContext {
   operation: string

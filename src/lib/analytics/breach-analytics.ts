@@ -1,7 +1,6 @@
 import { fheService } from '../fhe'
 import { logger } from '../logger'
 import { redis } from '../redis'
-import { asRedisOps } from '../redis-ops'
 import { listRecentBreaches } from '../security/breach-notification'
 import type { BreachDetails } from '../security/breach-notification'
 import { calculateScore } from './compliance'
@@ -206,7 +205,7 @@ async function calculateBasicMetrics(
 }
 
 async function calculateResponseTime(breach: Breach): Promise<number> {
-  const notifications = await asRedisOps(redis).get(
+  const notifications = await redis?.['get'](
     getAnalyticsKey('notifications', breach.timestamp),
   )
 

@@ -11,7 +11,6 @@
  */
 
 import { redis } from '../redis'
-import { asRedisOps } from '../redis-ops'
 import { RateLimitAnalyticsService, rateLimitAnalytics } from './analytics'
 import {
   defaultRateLimitConfig,
@@ -131,7 +130,7 @@ export async function checkRateLimitHealth(): Promise<{
   }
 }> {
   try {
-    const redisHealthy = (await asRedisOps(redis).ping()) === 'PONG'
+    const redisHealthy = (await redis['ping']()) === 'PONG'
 
     const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
 

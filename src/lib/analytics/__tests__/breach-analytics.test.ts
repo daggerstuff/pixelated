@@ -195,7 +195,6 @@ describe('breachAnalytics', () => {
     ])
     mockedAnalyzeTrends.mockResolvedValue(['increasing', 'stable'])
     mockedCalculateTrend.mockReturnValue(0.15)
-    // @ts-expect-error - Strictly required for pre-existing test mock files
     mockedFheEncrypt.mockResolvedValue('mocked_encrypted_data')
   })
 
@@ -234,10 +233,10 @@ describe('breachAnalytics', () => {
             attackVector: 'monitoring',
             description: 'Unauthorized access to account',
             metadata: {},
-            remediationStatus: 'completed!',
-            timestamp: new Date(mockBreaches[0].timestamp),
-            detectionTime: new Date(mockBreaches[0].timestamp),
-            responseTime: new Date(mockBreaches[0].timestamp + 3_600_000),
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches?.[0].timestamp),
+            detectionTime: new Date(mockBreaches?.[0].timestamp),
+            responseTime: new Date(mockBreaches?.[0].timestamp + 3_600_000),
           }),
           expect.objectContaining({
             id: 'breach_2',
@@ -247,10 +246,10 @@ describe('breachAnalytics', () => {
             attackVector: 'siem',
             description: 'Sensitive data exposed in logs',
             metadata: {},
-            remediationStatus: 'completed!',
-            timestamp: new Date(mockBreaches[1].timestamp),
-            detectionTime: new Date(mockBreaches[1].timestamp),
-            responseTime: new Date(mockBreaches[1].timestamp + 3_600_000),
+            remediationStatus: 'completed',
+            timestamp: new Date(mockBreaches?.[1].timestamp),
+            detectionTime: new Date(mockBreaches?.[1].timestamp),
+            responseTime: new Date(mockBreaches?.[1].timestamp + 3_600_000),
           }),
         ]),
       )
@@ -261,7 +260,7 @@ describe('breachAnalytics', () => {
         expect.arrayContaining([
           expect.objectContaining({
             id: 'breach_1',
-            timestamp: new Date(mockBreaches[0].timestamp),
+            timestamp: new Date(mockBreaches?.[0].timestamp),
             severity: {
               level: 'high',
               score: 0.8,
@@ -280,7 +279,7 @@ describe('breachAnalytics', () => {
           }),
           expect.objectContaining({
             id: 'breach_2',
-            timestamp: new Date(mockBreaches[1].timestamp),
+            timestamp: new Date(mockBreaches?.[1].timestamp),
             severity: {
               level: 'critical',
               score: 1,

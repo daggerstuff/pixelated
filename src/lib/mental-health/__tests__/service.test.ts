@@ -32,7 +32,7 @@ describe('MentalHealthService', () => {
       expect(result.analysis).toBeDefined()
       expect(result.analysis?.riskLevel).toBe('medium')
       expect(result.analysis?.indicators).toHaveLength(1)
-      expect((result as any)?.analysis?.indicators[0].type).toBe('depression')
+      expect(result?.analysis?.indicators[0].type).toBe('depression')
     })
 
     it('should not analyze short messages', async () => {

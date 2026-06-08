@@ -202,7 +202,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
       )
     }
     turns = await ledger.list(
-      queryParams as TurnQueryParams & Record<string, unknown> as any,
+      queryParams as TurnQueryParams & Record<string, unknown>,
     )
   } else {
     if (!actorContext.actorId && !actorContext.hasPrivilege) {

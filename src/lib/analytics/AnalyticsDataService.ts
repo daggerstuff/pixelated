@@ -175,28 +175,19 @@ export class AnalyticsDataService {
           value: this.calculateTotalSessions(sessionCount),
           label: 'Total Sessions',
           color: 'blue' as const,
-          trend: this.calculateTrend(
-            'total_sessions',
-            filters.timeRange,
-          ) as any,
+          trend: this.calculateTrend('total_sessions', filters.timeRange),
         },
         {
           value: this.calculateCompletionRate(completionRate),
           label: 'Completion Rate',
           color: 'green' as const,
-          trend: this.calculateTrend(
-            'completion_rate',
-            filters.timeRange,
-          ) as any,
+          trend: this.calculateTrend('completion_rate', filters.timeRange),
         },
         {
           value: this.calculateAverageRating(avgRating),
           label: 'Avg. Rating',
           color: 'purple' as const,
-          trend: this.calculateTrend(
-            'average_rating',
-            filters.timeRange,
-          ) as any,
+          trend: this.calculateTrend('average_rating', filters.timeRange),
         },
       ]
     } catch (error: unknown) {

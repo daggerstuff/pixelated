@@ -313,7 +313,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v6.0.1
         with:
           files: ./coverage/lcov.info
           flags: typescript
@@ -448,7 +448,7 @@ jobs:
           DATABASE_URL: postgresql://postgres@localhost:5432/bias_detection
 
       - name: Upload Python coverage
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v6.0.1
         with:
           files: ./src/lib/ai/bias-detection/python-service/coverage.xml
           flags: python

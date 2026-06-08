@@ -46,13 +46,13 @@ export class MentalHealthService {
     if (
       this.config.enableAnalysis &&
       message.role === 'user' &&
-      message.content.length >= (this.config.analysisMinLength ?? 10)
+      message.content.length >= this?.config.analysisMinLength
     ) {
       try {
         const analysis = await this.analyzer.analyze(message.content)
 
         // Only include analysis if confidence meets threshold
-        if (analysis.confidence >= (this.config.confidenceThreshold ?? 0.6)) {
+        if (analysis.confidence >= this?.config.confidenceThreshold) {
           processedMessage.analysis = analysis
 
           // Store analysis in history
@@ -110,7 +110,7 @@ export class MentalHealthService {
       (analysis) =>
         (analysis.requiresIntervention ?? analysis.riskLevel === 'critical') ||
         (analysis.riskLevel === 'high' &&
-          analysis.confidence >= (this.config.interventionThreshold ?? 0.7)),
+          analysis.confidence >= this?.config.interventionThreshold),
     )
   }
 

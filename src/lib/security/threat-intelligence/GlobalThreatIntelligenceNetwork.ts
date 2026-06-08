@@ -215,11 +215,20 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
       await subscriber.connect()
 
       // Subscribe to global threat intelligence channel
-      await subscriber.subscribe('threat-intelligence-global')
+      await subscriber.subscribe('threat-intelligence-global', (message) => {
+        void this.handleIncomingThreat(message)
+      })
 
       // Subscribe to regional channels
       for (const region of this.config.regions) {
-        await subscriber.subscribe(`threat-intelligence-${region}`)
+        await subscriber.subscribe(
+          `threat-intelligence-${region}`,
+          (message) => {
+            if (region !== this.region) {
+              void this.handleIncomingThreat(message)
+            }
+          },
+        )
       }
 
       subscriber.on('message', (channel: string, message: string) => {
@@ -562,7 +571,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
     try {
       if (threat.data?.['encrypted']) {
         const decryptedData = await decrypt(threat.data['encrypted'])
-        return JSON.parse(decryptedData as any)
+        return JSON.parse(decryptedData)
       }
       return threat
     } catch (error: unknown) {

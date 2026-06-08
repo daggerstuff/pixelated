@@ -3,7 +3,7 @@
  * High-performance queries with proper indexing, connection pooling, and query optimization
  */
 
-import type { PoolClient } from 'pg'
+import type { PoolClient, QueryResult } from 'pg'
 
 import { getLogger } from '../logging'
 import { getPool } from './index'
@@ -93,7 +93,7 @@ export async function executeQuery(
         attempt,
       })
 
-      return result as { rows: unknown[]; rowCount: number }
+      return result
     } catch (error: unknown) {
       lastError = error instanceof Error ? error : new Error('Unknown error')
 
@@ -341,9 +341,8 @@ export class OptimizedBiasQueries {
 
     const countResult = await executeQuery(countQuery, params.slice(0, -2), {
       name: 'getBiasAnalysesCount',
-    }) as { rows: CountRow[] }
-    const countRows = countResult.rows
-    const total = countRows[0] ? parseInt(countRows[0].total) : 0
+    })
+    const total = parseInt((countResult.rows[0] as { total: string }).total)
 
     return {
       analyses: rows,
@@ -432,12 +431,14 @@ export class OptimizedBiasQueries {
       if (recentWeek.length > 0 && previousWeek.length > 0) {
         const recentAvg =
           recentWeek.reduce(
-            (sum: number, day) => sum + day.avg_score,
+            (sum: number, day: { avg_score: string }) =>
+              sum + parseFloat(day.avg_score),
             0,
           ) / recentWeek.length
         const previousAvg =
           previousWeek.reduce(
-            (sum: number, day) => sum + day.avg_score,
+            (sum: number, day: { avg_score: string }) =>
+              sum + parseFloat(day.avg_score),
             0,
           ) / previousWeek.length
 
@@ -541,16 +542,21 @@ export class OptimizedBiasQueries {
 
     const cacheResult = await executeQuery(cacheHitQuery, [], {
       name: 'getCacheHitRate',
-    }) as { rows: CacheHitRow[] }
-    const cacheHitRows = cacheResult.rows
-    const cacheHitRow = cacheHitRows[0]
+    })
+    const cacheHitRow = cacheResult.rows[0] as
+      | { cache_hit_rate?: string }
+      | undefined
     const cacheHitRate = cacheHitRow?.cache_hit_rate ?? '0'
 
     return {
-      total_analyses: parseInt(row.total_analyses),
-      avg_processing_time: parseFloat(row.avg_processing_time),
+      total_analyses: parseInt(
+        (row as { total_analyses: string }).total_analyses,
+      ),
+      avg_processing_time: parseFloat(
+        (row as { avg_processing_time: string }).avg_processing_time,
+      ),
       cache_hit_rate: parseFloat(cacheHitRate),
-      slow_queries: parseInt(row.slow_queries),
+      slow_queries: parseInt((row as { slow_queries: string }).slow_queries),
       error_rate: 0, // Would need error tracking table for real calculation
     }
   }

@@ -77,9 +77,7 @@ const activeConnections = new Map<
  * Main WebSocket handler for multimodal streaming
  */
 export const GET: APIRoute = async (context) => {
-  const session = await getSession(
-    context as unknown as Parameters<typeof getSession>[0],
-  )
+  const session = await getSession(context)
 
   if (!session?.user) {
     return new Response('Unauthorized', { status: 401 })
@@ -87,10 +85,7 @@ export const GET: APIRoute = async (context) => {
 
   // Rate limiting
   try {
-    await applyRateLimit(
-      context as unknown as Parameters<typeof applyRateLimit>[0],
-      'pixel-ws',
-    )
+    await applyRateLimit(context, 'pixel-ws', { points: 1 })
   } catch (error: unknown) {
     logger.error('Rate limit exceeded', { error })
     return new Response('Too many connections', { status: 429 })
@@ -103,11 +98,7 @@ export const GET: APIRoute = async (context) => {
     return new Response('Expected WebSocket upgrade', { status: 400 })
   }
 
-  const { socket, response } = (
-    (globalThis as unknown as Record<string, unknown>).Astro as {
-      getWebSocket: (ctx: unknown) => { socket: WebSocket; response: Response }
-    }
-  ).getWebSocket(context)
+  const { socket, response } = Astro.getWebSocket(context)
   const connectionId = crypto.randomUUID()
   const sessionId =
     context.url.searchParams.get('sessionId') ?? crypto.randomUUID()
@@ -133,7 +124,7 @@ export const GET: APIRoute = async (context) => {
   // Setup message handler
   socket.onmessage = async (event) => {
     try {
-      const message = parseMessage(event.data as string | ArrayBuffer)
+      const message = parseMessage(event.data)
 
       switch (message.type) {
         case 'start-session':
@@ -212,7 +203,7 @@ export const GET: APIRoute = async (context) => {
  */
 function parseMessage(data: string | ArrayBuffer): StreamMessage {
   if (typeof data === 'string') {
-    return JSON.parse(data) as StreamMessage
+    return JSON.parse(data)
   }
 
   // For binary data (audio chunks), wrap in default message
@@ -243,14 +234,9 @@ function sendMessage(socket: WebSocket, message: StreamResponse) {
 async function handleStartSession(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
-  },
+  connectionData: typeof activeConnections extends Map<string, infer T>
+    ? T
+    : never,
 ) {
   logger.info('Session started', { sessionId: message.sessionId })
 
@@ -273,14 +259,9 @@ async function handleStartSession(
 async function handleAudioChunk(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
-  },
+  connectionData: typeof activeConnections extends Map<string, infer T>
+    ? T
+    : never,
 ) {
   if (!message.data?.chunk) {
     logger.warn('Audio chunk missing data')
@@ -324,14 +305,9 @@ async function handleAudioChunk(
 async function handleTextInput(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
-  },
+  connectionData: typeof activeConnections extends Map<string, infer T>
+    ? T
+    : never,
 ) {
   const text = message.data?.text ?? ''
 
@@ -357,14 +333,9 @@ async function handleTextInput(
 async function handleEndSession(
   socket: WebSocket,
   message: StreamMessage,
-  connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
-  },
+  connectionData: typeof activeConnections extends Map<string, infer T>
+    ? T
+    : never,
 ) {
   const fullTranscription = connectionData.transcriptionBuffer.join(' ')
 

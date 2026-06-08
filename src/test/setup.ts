@@ -25,7 +25,7 @@ const act = async (callback: () => void | Promise<void>): Promise<void> => {
   return
 }
 
-import '@testing-library/jest-dom/vitest'
+import '@testing-library/jest-dom'
 
 // Keep auth-config imports from exploding in test/bootstrap contexts.
 process.env['JWT_SECRET'] ??= 'test-jwt-secret'

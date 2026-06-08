@@ -224,12 +224,7 @@ export function SecurityProvider({
     }
 
     try {
-      const result =
-        (await fheService.decrypt?.(
-          data as unknown as Parameters<
-            NonNullable<typeof fheService.decrypt>
-          >[0],
-        )) ?? data
+      const result = (await fheService.decrypt?.(data)) ?? data
       // Try to parse the result as JSON if it's a string
       if (typeof result === 'string') {
         try {
@@ -243,9 +238,9 @@ export function SecurityProvider({
       console.error('Decryption failed:', error)
       // Attempt to parse as JSON
       try {
-        const parsed = JSON.parse(data) as unknown
-        if (parsed && typeof parsed === 'object' && 'data' in parsed) {
-          return JSON.parse((parsed as { data: string }).data) as unknown
+        const parsed = JSON.parse(data)
+        if (parsed && typeof parsed === 'object' && parsed.data) {
+          return JSON.parse(parsed.data) as unknown
         }
         return parsed
       } catch {

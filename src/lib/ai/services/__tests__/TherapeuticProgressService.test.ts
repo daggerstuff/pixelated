@@ -128,7 +128,7 @@ describe('TherapeuticProgressService', () => {
       expect(addedInsight?.insight).toBe(insightText)
       expect(addedInsight?.belief).toBe(relatedBelief)
       expect(addedInsight?.dateAchieved).toBeDefined()
-      expect(Date.parse(addedInsight!.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
+      expect(Date.parse(addedInsight.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
       expect(updatedProfile.lastUpdatedAt).not.toBe(
         mockPatientProfile.lastUpdatedAt,
       )
@@ -437,5 +437,12 @@ describe('TherapeuticProgressService', () => {
       )
     })
 
+    // This test becomes redundant as out-of-bounds proficiency is clamped, not an error.
+    // Clamping is tested in 'should clamp new proficiency between 0 and 1'.
+    // Commented: legacy test for behavior that no longer exists - vitest/no-commented-out-tests disabled
+  // eslint-disable-next-line vitest/no-commented-out-tests
+    // it('should throw error for invalid new proficiency', () => {
+    //     // These conditions no longer throw an error.
+    // });
   })
 })

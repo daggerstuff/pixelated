@@ -1,0 +1,50 @@
+# Zed exclusions for files that don't belong in indexing
+
+# Local development tools
+.claude-code-router/
+.zed_server/
+
+# IDE/Tool state
+.vscode/
+.cursor/
+.continue-here.md
+
+# Node/Python caches
+node_modules/
+__pycache__/
+.venv/
+venv/
+
+# Build outputs
+dist/
+build/
+.next/
+.astro/
+.output/
+
+# Environment and secrets
+.env*
+*.key
+*.pem
+*.p12
+
+# Data and model files
+*.model
+*.ckpt
+*.pt
+*.pth
+*.bin
+wandb/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files and archives
+*.zip
+*.tar.gz
+*.7z

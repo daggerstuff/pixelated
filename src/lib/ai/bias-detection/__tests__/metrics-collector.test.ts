@@ -609,7 +609,7 @@ describe('BiasMetricsCollector', () => {
       expect(metrics.overall_stats.total_sessions).toBeGreaterThanOrEqual(1)
       expect(metrics.overall_stats.average_bias_score).toBe(0.3)
       expect(metrics).toHaveProperty('performance_metrics')
-      expect((metrics as any).performance_metrics.health_status).toBe('degraded')
+      expect(metrics.performance_metrics.health_status).toBe('degraded')
     })
 
     it('should return empty fallback metrics when bridge fails and cache is empty', async () => {

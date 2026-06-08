@@ -30,8 +30,8 @@ describe('MappingConfiguration', () => {
 
       const errors = validateContextCoverage(incompleteConfig)
       expect(errors.length).toBeGreaterThan(0)
-      expect(errors[0].type).toBe(ValidationErrorType.MISSING_CONTEXT)
-      expect(errors[0].context).toBe(ContextType.CRISIS)
+      expect(errors?.[0].type).toBe(ValidationErrorType.MISSING_CONTEXT)
+      expect(errors?.[0].context).toBe(ContextType.CRISIS)
     })
 
     it('should detect duplicate context types', () => {
@@ -86,8 +86,8 @@ describe('MappingConfiguration', () => {
 
       const errors = validateWeights(invalidWeights, ContextType.GENERAL)
       expect(errors.length).toBeGreaterThan(0)
-      expect(errors[0].type).toBe(ValidationErrorType.INVALID_WEIGHT)
-      expect(errors[0].objectiveId).toBe(ObjectiveId.CORRECTNESS)
+      expect(errors?.[0].type).toBe(ValidationErrorType.INVALID_WEIGHT)
+      expect(errors?.[0].objectiveId).toBe(ObjectiveId.CORRECTNESS)
     })
 
     it('should reject weights greater than 1', () => {
@@ -101,7 +101,7 @@ describe('MappingConfiguration', () => {
 
       const errors = validateWeights(invalidWeights, ContextType.GENERAL)
       expect(errors.length).toBeGreaterThan(0)
-      expect(errors[0].type).toBe(ValidationErrorType.INVALID_WEIGHT)
+      expect(errors?.[0].type).toBe(ValidationErrorType.INVALID_WEIGHT)
     })
 
     it('should detect missing required objectives', () => {
@@ -147,8 +147,8 @@ describe('MappingConfiguration', () => {
 
       const errors = validateSafetyFloor(config)
       expect(errors.length).toBeGreaterThan(0)
-      expect(errors[0].type).toBe(ValidationErrorType.SAFETY_FLOOR_VIOLATION)
-      expect(errors[0].context).toBe(ContextType.CRISIS)
+      expect(errors?.[0].type).toBe(ValidationErrorType.SAFETY_FLOOR_VIOLATION)
+      expect(errors?.[0].context).toBe(ContextType.CRISIS)
     })
 
     it('should allow safety weight above minimum', () => {

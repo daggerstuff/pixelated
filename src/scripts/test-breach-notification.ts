@@ -145,8 +145,15 @@ program
     'System secured, investigation ongoing',
   )
   .action(
-    async (_options: unknown) => {
-      const options = _options as { type: string; severity: string; description: string; 'affected-data': string; users: string; detection: string; remediation: string };
+    async (options: {
+      type: string
+      severity: string
+      description: string
+      'affected-data': string
+      users: string
+      detection: string
+      remediation: string
+    }) => {
       try {
         console.log(chalk.red('\n🚨 REPORTING A REAL BREACH NOTIFICATION 🚨\n'))
         console.log(chalk.yellow('This will trigger ACTUAL notifications to:'))
@@ -173,7 +180,7 @@ program
         console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
         console.log(`- Type: ${chalk.yellow(options.type)}`)
         console.log(
-          `- Severity: ${getSeverityColor((options.severity as 'low' | 'medium' | 'high' | 'critical'))(options.severity)}`,
+          `- Severity: ${getSeverityColor(options.severity)(options.severity)}`,
         )
         console.log(`- Affected Users: ${chalk.yellow(userCount.toString())}`)
         console.log(`- Description: ${chalk.gray(options.description)}`)

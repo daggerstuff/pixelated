@@ -55,6 +55,9 @@ const rateLimitConfigs: RateLimitConfig[] = [
  */
 export class RateLimiter {
   private readonly storage: Map<string, number>
+  private readonly defaultLimit: number
+  private readonly windowMs: number
+  private readonly userLimits: Record<string, number>
 
   constructor(defaultLimit = 30) {
     this.storage = new Map<string, number>()
@@ -66,8 +69,8 @@ export class RateLimiter {
   check(
     key: string,
     role: string,
-    limits: Record<string, number> = rateLimitConfigs[2].limits,
-    windowMs: number = rateLimitConfigs[2].windowMs,
+    limits: Record<string, number> = rateLimitConfigs?.[2].limits,
+    windowMs: number = rateLimitConfigs?.[2].windowMs,
   ): {
     allowed: boolean
     limit: number
@@ -78,7 +81,7 @@ export class RateLimiter {
     const now = Date.now()
     const resetTime = now + windowMs
 
-    // Get current count! from storage
+    // Get current count from storage
     const currentCount = this.storage.get(key) ?? 0
 
     if (currentCount >= limit) {
@@ -141,8 +144,8 @@ export const rateLimitMiddleware = defineMiddleware(
       const rateLimitResult = rateLimit.check(
         clientIp,
         role,
-        config.limits,
-        config.windowMs,
+        config!.limits,
+        config!.windowMs,
       )
 
       if (!rateLimitResult.allowed) {

@@ -24,49 +24,6 @@ import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 
-interface ApiRiskAssessment {
-  level: RiskAssessment['level']
-  score: number
-  factors: string[]
-  recommendations: string[]
-  immediateActions?: string[]
-}
-
-interface ApiIndicator {
-  condition: string
-  present: boolean
-  confidence: number
-  severity?: number
-  notes?: string
-}
-
-interface ApiRecommendation {
-  type: Recommendation['type']
-  priority: Recommendation['priority']
-  intervention: string
-  rationale: string
-  timeline: string
-}
-
-interface ApiAnalysis {
-  summary: string
-  followUpRequired: boolean
-  estimatedDuration: string
-  overallConfidence: number
-}
-
-interface ApiMetadata {
-  processingTime: number
-}
-
-interface ApiResponse {
-  riskAssessment: ApiRiskAssessment
-  indicators: ApiIndicator[]
-  recommendations: ApiRecommendation[]
-  analysis: ApiAnalysis
-  metadata: ApiMetadata
-}
-
 interface RiskAssessment {
   level: 'low' | 'moderate' | 'high' | 'critical'
   score: number
