@@ -100,7 +100,7 @@ describe('emailService', () => {
         templateModel: { name: 'Test User' },
       }
 
-      await emailService.queueEmail(emailData)
+      await emailService.queueEmail(emailData as any)
 
       expect(mockRedisMethods.lpush).toHaveBeenCalledTimes(1)
       const queueItem = JSON.parse(
@@ -121,7 +121,9 @@ describe('emailService', () => {
         templateModel: { name: 'Test User' },
       }
 
-      await expect(emailService.queueEmail(invalidEmailData)).rejects.toThrow()
+      await expect(
+        emailService.queueEmail(invalidEmailData as any),
+      ).rejects.toThrow()
     })
   })
 
@@ -246,7 +248,7 @@ describe('emailService', () => {
         templateModel: {},
       }
 
-      await emailService.queueEmail(emailData)
+      await emailService.queueEmail(emailData as any)
     })
 
     it('should throw error for invalid template', async () => {

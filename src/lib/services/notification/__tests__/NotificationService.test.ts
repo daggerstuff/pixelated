@@ -250,7 +250,7 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return one item then null
-      vi.mocked(redis['rpoplpush']!)
+      vi.mocked(redis['rpoplpush'])
         .mockResolvedValueOnce(JSON.stringify(queueItem))
         .mockResolvedValueOnce(null as unknown as string)
 
@@ -286,7 +286,7 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return the item
-      vi.mocked(redis['rpoplpush']!).mockResolvedValueOnce(
+      vi.mocked(redis['rpoplpush']).mockResolvedValueOnce(
         JSON.stringify(queueItem),
       )
       vi.spyOn(
@@ -322,7 +322,7 @@ describe('notificationService', () => {
         error: null,
       }
 
-      vi.mocked(redis['hget']!).mockResolvedValueOnce(
+      vi.mocked(redis['hget']).mockResolvedValueOnce(
         JSON.stringify(notification),
       )
 
@@ -336,7 +336,7 @@ describe('notificationService', () => {
     })
 
     it('should throw error for non-existent notification', async () => {
-      vi.mocked(redis['hget']!).mockResolvedValueOnce(null)
+      vi.mocked(redis['hget']).mockResolvedValueOnce(null)
 
       await expect(
         notificationService.markAsRead('test-user', 'test-id'),
@@ -379,12 +379,12 @@ describe('notificationService', () => {
         }),
       }
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications('test-user')
 
       expect(result).toHaveLength(2)
-      expect(result[0]!.id).toBe('test-id-1') // Most recent first
+      expect(result[0].id).toBe('test-id-1') // Most recent first
     })
 
     it('should handle pagination', async () => {
@@ -409,7 +409,7 @@ describe('notificationService', () => {
         ]),
       )
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications(
         'test-user',
@@ -418,7 +418,7 @@ describe('notificationService', () => {
       )
 
       expect(result).toHaveLength(5)
-      expect(result[0]!.id).toBe('test-id-2') // Offset by 2, limit 5
+      expect(result[0].id).toBe('test-id-2') // Offset by 2, limit 5
     })
   })
 
@@ -472,7 +472,7 @@ describe('notificationService', () => {
         }),
       }
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const count = await notificationService.getUnreadCount('test-user')
 

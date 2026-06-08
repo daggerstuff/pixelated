@@ -115,7 +115,9 @@ describe('useProgress hooks', () => {
 
   describe('useProgressMetricsQuery', () => {
     it('fetches progress metrics successfully', async () => {
-      vi.mocked(api.getProgressMetrics).mockResolvedValue(mockProgressMetrics)
+      vi.mocked(api.getProgressMetrics).mockResolvedValue(
+        mockProgressMetrics as any,
+      )
 
       const { result } = renderHook(
         () => useProgressMetricsQuery('session-1'),
@@ -133,7 +135,9 @@ describe('useProgress hooks', () => {
     })
 
     it('supports refetchInterval', async () => {
-      vi.mocked(api.getProgressMetrics).mockResolvedValue(mockProgressMetrics)
+      vi.mocked(api.getProgressMetrics).mockResolvedValue(
+        mockProgressMetrics as any,
+      )
 
       const { result } = renderHook(
         () => useProgressMetricsQuery('session-1', { refetchInterval: 5000 }),

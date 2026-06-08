@@ -43,9 +43,9 @@ interface InitOptions {
   title?: string
 }
 
-program
+(program
   .command('check-in')
-  .description('Perform Ollama check-in for a completed task')
+  .description('Perform Ollama check-in for a completed task') as any)
   .requiredOption('-f, --file <path>', 'Path to task list file')
   .requiredOption('-t, --task-id <id>', 'ID of completed task')
   .requiredOption('-s, --summary <summary>', 'Summary of completed task')
@@ -121,7 +121,7 @@ program
 
       if (verbose) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.checkInResult.rawResponse)
+        console.log((result.checkInResult as any).rawResponse)
       }
     } catch (error: unknown) {
       console.error(
@@ -149,7 +149,7 @@ program
         logger.info('Testing with', { summary, model })
       }
 
-      const result = await ollamaService.performCheckIn(summary)
+      const result = await (ollamaService.performCheckIn as any)(summary)
 
       console.log('\n✅ Ollama test completed!')
       console.log(`Decision: ${result.decision.toUpperCase()}`)
@@ -173,7 +173,7 @@ program
 
       if (verbose) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.rawResponse)
+        console.log((result as any).rawResponse)
       }
     } catch (error: unknown) {
       console.error(

@@ -122,7 +122,7 @@ async function validateApiKey(
     return null
   }
 
-  let validation
+  let validation: any
   try {
     const timeoutPromise = new Promise<null>((_, reject) =>
       setTimeout(() => reject(new Error('API key validation timeout')), 5000),

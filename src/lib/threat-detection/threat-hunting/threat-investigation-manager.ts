@@ -101,7 +101,8 @@ export class ThreatInvestigationManager extends EventEmitter {
               'unknown'
             // Map timeWindow (ms) to timeframe format or use provided timeframe
             const timeframe =
-              params['timeframe'] ?? this.formatTimeframe(params['timeWindow'])
+              params['timeframe'] ??
+              this.formatTimeframe(params['timeWindow'] as any)
             stepFindings = await this.behavioralService.analyzeUserBehavior(
               String(userId),
               timeframe,

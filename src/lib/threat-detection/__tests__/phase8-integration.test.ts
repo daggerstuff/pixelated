@@ -232,7 +232,7 @@ describe('Phase 8: Advanced AI Threat Detection & Response System', () => {
       await new Promise((resolve) => setTimeout(resolve, 5000))
 
       const result = await huntingService.getInvestigationResult(
-        investigation['id'],
+        investigation['id'] as any,
       )
       expect(result).toBeDefined()
       expect(result['status']).toBe('completed')

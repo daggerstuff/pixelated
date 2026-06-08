@@ -19,7 +19,7 @@ export const GET = async ({ request, cookies }) => {
       request,
       cookies,
       requestIp: request.headers.get('x-forwarded-for'),
-    })
+    } as any)
 
     // TODO: Replace with real data fetching logic
     // For now, return static/mock data
@@ -137,7 +137,7 @@ export const GET = async ({ request, cookies }) => {
         source: 'engagement',
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    } as any
 
     const status =
       error && typeof error === 'object' && 'status' in error

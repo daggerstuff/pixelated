@@ -180,7 +180,7 @@ export class PerformanceBenchmarkRunner {
     const batches = Math.ceil(totalRequests / requestsPerBatch)
 
     for (let batch = 0; batch < batches; batch++) {
-      const batchPromises = []
+      const batchPromises: any[] = []
 
       for (
         let i = 0;
@@ -188,7 +188,7 @@ export class PerformanceBenchmarkRunner {
         i++
       ) {
         const requestPromise = this.makeTestRequest(scenario)
-        batchPromises.push(requestPromise)
+        batchPromises.push(requestPromise as any)
       }
 
       try {
@@ -472,7 +472,7 @@ export class PerformanceBenchmarkRunner {
 }
 
 // CLI runner for standalone execution
-if (require.main === module) {
+if ((require as any).main === module) {
   const runner = new PerformanceBenchmarkRunner()
 
   console.log('🚀 Starting Bias Analysis API Performance Benchmarks...\n')

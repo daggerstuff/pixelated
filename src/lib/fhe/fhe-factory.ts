@@ -159,7 +159,9 @@ const sealFHEService: FHEService = {
       sealCipherText.load(context, ciphertext as string)
 
       // Decrypt the SealCipherText object
-      const decryptedNumberArray = await sealService.decrypt(sealCipherText)
+      const decryptedNumberArray = await sealService.decrypt(
+        sealCipherText as any,
+      )
 
       // Clean up the SealCipherText object
       sealCipherText.delete()
@@ -207,7 +209,10 @@ const sealFHEService: FHEService = {
       }
       bCiphertext.load(context, bCiphertextStr as string)
 
-      const result = await sealOperations.add(aCiphertext, bCiphertext)
+      const result = await sealOperations.add(
+        aCiphertext as any,
+        bCiphertext as any,
+      )
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()
@@ -264,7 +269,10 @@ const sealFHEService: FHEService = {
       }
       bCiphertext.load(context, bCiphertextStr as string)
 
-      const result = await sealOperations.subtract(aCiphertext, bCiphertext)
+      const result = await sealOperations.subtract(
+        aCiphertext as any,
+        bCiphertext as any,
+      )
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()
@@ -306,8 +314,8 @@ const sealFHEService: FHEService = {
       }
 
       const result = await sealOperations.multiply(
-        aCiphertext as string,
-        bCiphertext as string,
+        aCiphertext as string as any,
+        bCiphertext as string as any,
       )
 
       if (!result.success) {
@@ -331,7 +339,7 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      const result = await sealOperations.negate(ciphertext)
+      const result = await sealOperations.negate(ciphertext as any)
 
       if (!result.success) {
         throw new Error(result.error ?? 'Negation operation failed')
@@ -357,7 +365,10 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      const result = await sealOperations.polynomial(ciphertext, coefficients)
+      const result = await sealOperations.polynomial(
+        ciphertext as any,
+        coefficients,
+      )
 
       if (!result.success) {
         throw new Error(result.error ?? 'Polynomial operation failed')
@@ -380,7 +391,7 @@ const sealFHEService: FHEService = {
         throw new Error('Invalid encrypted data: missing ciphertext')
       }
 
-      const result = await sealOperations.rotate(ciphertext, steps)
+      const result = await sealOperations.rotate(ciphertext as any, steps)
 
       if (!result.success) {
         throw new Error(result.error ?? 'Rotation operation failed')
@@ -628,7 +639,7 @@ export async function getTenantFHEService(
         )
       }
 
-      return baseService.decrypt<T>(encryptedData, options)
+      return baseService.decrypt<T>(encryptedData as any, options)
     },
   }
 

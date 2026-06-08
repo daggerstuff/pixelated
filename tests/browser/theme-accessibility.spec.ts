@@ -404,7 +404,7 @@ test.describe('Theme Accessibility Tests', () => {
       // Check for proper heading order (no skipping levels)
       for (let i = 1; i < headingStructure.length; i++) {
         const levelDiff = Math.abs(
-          headingStructure[i]!.level - headingStructure[i - 1]!.level,
+          headingStructure[i].level - headingStructure[i - 1].level,
         )
         expect(levelDiff).toBeLessThanOrEqual(1) // No skipping more than one level
       }

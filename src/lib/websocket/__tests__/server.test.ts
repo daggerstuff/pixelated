@@ -100,7 +100,7 @@ describe('therapyChatWebSocketServer', () => {
     wss = new TherapyChatWebSocketServer(mockHttpServer)
 
     // Store reference to internal clients map (optional, if needed for assertions)
-    mockClients = (wss as unknown).clients
+    mockClients = (wss as unknown as any).clients
   })
 
   afterEach(() => {
@@ -109,7 +109,9 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('handleConnection', () => {
     it('should add new client on connection', () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       expect(mockClients.size).toBe(1)
@@ -124,7 +126,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message events', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       // Get message handler attached to the mock *client*
@@ -149,7 +153,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle encrypted messages with FHE', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -185,7 +191,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle status updates', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -208,7 +216,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle client disconnection', () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       // Get close handler using type-safe helper
@@ -226,7 +236,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message parsing errors', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -252,10 +264,10 @@ describe('therapyChatWebSocketServer', () => {
 
       // Add client to session
       mockClients.set(clientId, mockWebSocket)
-      ;(wss as unknown).sessions.set(sessionId, new Set([clientId]))
+      ;(wss as unknown as any).sessions.set(sessionId, new Set([clientId]))
 
       // Broadcast message
-      ;(wss as unknown).broadcastToSession(sessionId, {
+      ;(wss as unknown as any).broadcastToSession(sessionId, {
         type: 'message',
         data: { content: 'test' },
       })
@@ -280,7 +292,9 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('error handling', () => {
     it('should handle FHE initialization errors', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(
@@ -311,7 +325,9 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle missing session ID', async () => {
-      const handleConnection = (wss as unknown).handleConnection.bind(wss)
+      const handleConnection = (wss as unknown as any).handleConnection.bind(
+        wss,
+      )
       handleConnection(mockWebSocket)
 
       const messageHandler = findMockCall(

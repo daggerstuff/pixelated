@@ -79,7 +79,7 @@ export const GET = async ({ request }) => {
     const sinceDate = since ? new Date(since) : null
 
     // Process reports
-    let reports = []
+    let reports: any[] = []
     const filesToProcess = latestOnly ? [reportFiles[0]] : reportFiles
 
     for (const file of filesToProcess) {
@@ -117,7 +117,7 @@ export const GET = async ({ request }) => {
         }
 
         if (report.tests) {
-          report.tests = report.tests.filter((test: { browser: string }) =>
+          report.tests = (report.tests as any).filter((test: { browser: string }) =>
             browsers.includes(test.browser),
           )
         }
@@ -125,7 +125,7 @@ export const GET = async ({ request }) => {
 
       // Filter issues by timestamp if 'since' parameter was provided
       if (sinceDate && report.issues) {
-        report.issues = report.issues.filter(
+        report.issues = (report.issues.filter as any)(
           (issue: { timestamp?: string }) => {
             if (!issue.timestamp) {
               return false
@@ -136,14 +136,14 @@ export const GET = async ({ request }) => {
         )
       }
 
-      reports.push({
-        timestamp: report.timestamp,
-        summary: report.summary,
-        issues: report.issues || [],
-        browsers: report.browsers || {},
-        tests: report.tests || [],
-        screenshots: report.screenshots || [],
-      })
+      reports.push(({
+              timestamp: report.timestamp,
+              summary: (report as any).summary,
+              issues: report.issues || [],
+              browsers: report.browsers || {},
+              tests: report.tests || [],
+              screenshots: (report as any).screenshots || [],
+            } as any))
     }
 
     // Prepare response data
@@ -151,9 +151,9 @@ export const GET = async ({ request }) => {
       reports: reports,
       meta: {
         total: reports.length,
-        latest: reports.length > 0 ? reports?.[0].timestamp : null,
+        latest: reports.length > 0 ? (reports?.[0]).timestamp : null,
         hasNewIssues: reports.some(
-          (report) => report.issues && report.issues.length > 0,
+          (report) => (report).issues && (report).issues.length > 0,
         ),
       },
     }

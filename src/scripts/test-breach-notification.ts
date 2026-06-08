@@ -14,7 +14,6 @@ dotenv.config()
 const program = new Command()
 
 program
-  .name('test-breach-notification')
   .description('Test the security breach notification system')
   .version('1.0.0')
 
@@ -25,7 +24,8 @@ program
   .option('-s, --severity <severity>', 'Breach severity', 'medium')
   .option('-u, --users <count>', 'Number of affected users', '5')
   .action(
-    async (options: { type: string; severity: string; users: string }) => {
+    async (_options: unknown) => {
+      const options = _options as { type: string; severity: string; users: string };
       try {
         const breachTypes = [
           'unauthorized_access',
@@ -145,15 +145,8 @@ program
     'System secured, investigation ongoing',
   )
   .action(
-    async (options: {
-      type: string
-      severity: string
-      description: string
-      'affected-data': string
-      users: string
-      detection: string
-      remediation: string
-    }) => {
+    async (_options: unknown) => {
+      const options = _options as { type: string; severity: string; description: string; 'affected-data': string; users: string; detection: string; remediation: string };
       try {
         console.log(chalk.red('\n🚨 REPORTING A REAL BREACH NOTIFICATION 🚨\n'))
         console.log(chalk.yellow('This will trigger ACTUAL notifications to:'))
@@ -180,7 +173,7 @@ program
         console.log(chalk.blue('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'))
         console.log(`- Type: ${chalk.yellow(options.type)}`)
         console.log(
-          `- Severity: ${getSeverityColor(options.severity)(options.severity)}`,
+          `- Severity: ${getSeverityColor((options.severity as 'low' | 'medium' | 'high' | 'critical'))(options.severity)}`,
         )
         console.log(`- Affected Users: ${chalk.yellow(userCount.toString())}`)
         console.log(`- Description: ${chalk.gray(options.description)}`)
@@ -240,8 +233,9 @@ program
   .command('list')
   .description('List recent breach notifications')
   .option('-l, --limit <count>', 'Number of breaches to show', '10')
-  .action(async (options: { limit: string }) => {
+  .action(async (_options: unknown) => {
     try {
+      const options = _options as { limit: string };
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       if (breaches.length === 0) {
@@ -295,11 +289,11 @@ program
   })
 
 program
-  .command('status')
+  .command('status <id>')
   .description('Get status of a specific breach notification')
-  .argument('<id>', 'Breach notification ID')
-  .action(async (id: string) => {
+  .action(async (_id: unknown) => {
     try {
+      const id = _id as string;
       const breach = await BreachNotificationSystem.getBreachStatus(id)
 
       if (!breach) {

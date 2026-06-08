@@ -10,6 +10,7 @@
  * Target: >95% detection sensitivity with <5% false positive rate
  */
 
+import process from 'node:process'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CrisisProtocol } from '../../src/lib/ai/crisis/CrisisProtocol'
@@ -292,13 +293,13 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
       } as Response)
     })
 
-    global.fetch = mockPixelApi
+    globalThis.fetch = mockPixelApi
   })
 
   describe('Self-Harm Detection', () => {
     it('detects escalating self-harm patterns', async () => {
       const testCase = SELF_HARM_TESTS[1] // High severity escalating
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -312,7 +313,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   describe('Panic Attack Detection', () => {
     it('detects acute panic with immediate intervention needs', async () => {
       const testCase = PANIC_ATTACK_TESTS[0] // Critical panic attack
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -335,7 +336,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   describe('Substance Abuse Detection', () => {
     it('detects active overdose with emergency routing', async () => {
       const testCase = SUBSTANCE_ABUSE_TESTS[0] // Critical overdose
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -353,7 +354,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   describe('Psychotic Symptoms Detection', () => {
     it('detects command hallucinations with critical escalation', async () => {
       const testCase = PSYCHOTIC_SYMPTOMS_TESTS[0] // Critical command hallucinations
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -371,7 +372,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   describe('Non-Crisis Cases (False Positive Prevention)', () => {
     it('correctly identifies safe therapeutic conversations', async () => {
       const testCase = NON_CRISIS_TESTS[0] // Work stress
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -384,7 +385,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
     it('does not flag positive progress as crisis', async () => {
       const testCase = NON_CRISIS_TESTS[1] // Positive progress
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -400,7 +401,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
   describe('Crisis Escalation Workflow', () => {
     it('escalates unhandled crisis events after timeout', async () => {
       const testCase = SUICIDAL_IDEATION_TESTS[1]
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -411,7 +412,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
       await crisisProtocol.handleCrisis(
         'test-user',
-        (testCase!.session as any).sessionId,
+        (testCase.session as any).sessionId,
         conversationText,
         analysis.confidence,
         crisisIndicator?.evidence ?? [],
@@ -428,7 +429,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
     it('resolves crisis events with proper audit trail', async () => {
       const testCase = PANIC_ATTACK_TESTS[2] // Medium panic
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 
@@ -439,7 +440,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
       await crisisProtocol.handleCrisis(
         'test-user',
-        (testCase!.session as any).sessionId,
+        (testCase.session as any).sessionId,
         conversationText,
         analysis.confidence,
         crisisIndicator?.evidence ?? [],
@@ -538,7 +539,7 @@ describe('Phase 4.3 Crisis Integration Tests (Pixel Model)', () => {
 
     it('completes crisis analysis within performance budget (<50ms)', async () => {
       const testCase = SUICIDAL_IDEATION_TESTS[0]
-      const conversationText = (testCase!.session as any).conversationHistory
+      const conversationText = (testCase.session as any).conversationHistory
         .map((msg: { role: string; content: string }) => msg.content)
         .join(' ')
 

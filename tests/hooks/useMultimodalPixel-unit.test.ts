@@ -20,7 +20,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
 
     // Setup fetch mock
     mockFetch = vi.fn()
-    global.fetch = mockFetch as any
+    globalThis.fetch = mockFetch as any
 
     // Setup WebSocket mock
     mockWebSocket = {
@@ -30,7 +30,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       removeEventListener: vi.fn(),
       readyState: 1, // OPEN
     }
-    ;(global as any).WebSocket = vi.fn(function () {
+    ;(globalThis as any).WebSocket = vi.fn(function () {
       return mockWebSocket
     })
   })
@@ -293,14 +293,14 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const wsUrl =
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream?sessionId=test'
 
-      const ws = new (global as any).WebSocket(wsUrl)
+      const ws = new (globalThis as any).WebSocket(wsUrl)
 
       expect(ws).toBeDefined()
-      expect((global as any).WebSocket).toHaveBeenCalledWith(wsUrl)
+      expect((globalThis as any).WebSocket).toHaveBeenCalledWith(wsUrl)
     })
 
     it('should send audio chunks via WebSocket', () => {
-      const ws = new (global as any).WebSocket(
+      const ws = new (globalThis as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -311,7 +311,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
     })
 
     it('should handle streaming responses', () => {
-      const ws = new (global as any).WebSocket(
+      const ws = new (globalThis as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -331,7 +331,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
     })
 
     it('should maintain connection with heartbeat', () => {
-      const ws = new (global as any).WebSocket(
+      const ws = new (globalThis as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -690,8 +690,8 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         { isLoading: false, error: null, result: { emotion: {} } },
       ]
 
-      expect(states[0]!.isLoading).toBe(true)
-      expect(states[1]!.isLoading).toBe(false)
+      expect(states[0].isLoading).toBe(true)
+      expect(states[1].isLoading).toBe(false)
     })
 
     it('should track streaming state during WebSocket', () => {
@@ -702,8 +702,8 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         { isStreaming: false, result: { emotion: {} } },
       ]
 
-      expect(states[0]!.isStreaming).toBe(false)
-      expect(states[3]!.isStreaming).toBe(false)
+      expect(states[0].isStreaming).toBe(false)
+      expect(states[3].isStreaming).toBe(false)
     })
 
     it('should store transcription during streaming', () => {
@@ -767,7 +767,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         { readyState: 3 }, // CLOSED
       ]
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(connectionStates[2].readyState).toBe(3)
     })
 
@@ -791,7 +790,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         { error: null, isLoading: false, result: {} },
       ]
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(errorStates[2].error).toBeNull()
     })
   })
@@ -887,9 +885,9 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
     it('should handle dynamic toggle', () => {
       const streamingStates = [false, true, false]
 
-      expect(streamingStates[0]!).toBe(false)
-      expect(streamingStates[1]!).toBe(true)
-      expect(streamingStates[2]!).toBe(false)
+      expect(streamingStates[0]).toBe(false)
+      expect(streamingStates[1]).toBe(true)
+      expect(streamingStates[2]).toBe(false)
     })
   })
 

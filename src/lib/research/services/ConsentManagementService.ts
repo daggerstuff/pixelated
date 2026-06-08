@@ -439,3 +439,5 @@ export class ConsentManagementService {
     logger.info('Client data purged', { clientId })
   }
 }
+
+export const consentManagementService = new ConsentManagementService()

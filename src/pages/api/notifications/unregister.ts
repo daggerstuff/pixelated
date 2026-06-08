@@ -10,7 +10,7 @@ export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    if (!(authResult as any)?.authenticated) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -26,7 +26,9 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Remove push subscription
-    await notificationService.removePushSubscription(authResult.user?.id)
+    await notificationService.removePushSubscription(
+      (authResult as any).user?.id,
+    )
 
     return new Response(
       JSON.stringify({

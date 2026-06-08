@@ -42,7 +42,7 @@ const logger = createBuildSafeLogger('embeddings-batch')
  */
 export const GET: APIRoute = async ({ request }: APIContext) => {
   try {
-    const session: Session | null = await getSession()
+    const session: Session | null = await (getSession as any)()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -99,7 +99,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    const session: Session | null = await getSession()
+    const session: Session | null = await (getSession as any)()
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
