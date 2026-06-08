@@ -13,6 +13,24 @@ import type {
   RateLimitRule,
 } from './types'
 
+interface AnalyticsRedisOps {
+  pipeline(): {
+    hincrby: (key: string, field: string, value: number) => void
+    hset: (key: string, field: string, value: unknown) => void
+    expire: (key: string, seconds: number) => void
+    exec: () => Promise<unknown>
+  }
+  hgetall(key: string): Promise<Record<string, string>>
+  keys(pattern: string): Promise<string[]>
+  get(key: string): Promise<string | null>
+  setex(key: string, seconds: number, value: string): Promise<'OK'>
+  del(key: string): Promise<number>
+}
+
+function asRedisOps(client: unknown): AnalyticsRedisOps {
+  return client as AnalyticsRedisOps
+}
+
 const logger = createBuildSafeLogger('rate-limit-analytics')
 
 /**

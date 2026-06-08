@@ -243,7 +243,7 @@ export class EducationalContextRecognizer {
       },
     ]
 
-    const response = await this.config.aiService.createChatCompletion(
+    const response = await (this.config.aiService as any).createChatCompletion(
       messages,
       {
         model: this.config.model,
@@ -268,7 +268,7 @@ export class EducationalContextRecognizer {
         isEducational: Boolean(parsed.isEducational),
         confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.8)),
         educationalType: type, // Use pattern-detected type
-        complexity: this.validateComplexity(parsed.complexity),
+        complexity: this.validateComplexity(parsed.complexity as any),
         topicArea, // Use pattern-detected topic
         learningObjectives: Array.isArray(parsed.learningObjectives)
           ? parsed.learningObjectives
@@ -285,12 +285,12 @@ export class EducationalContextRecognizer {
             Math.min(1, parsed.metadata?.conceptualDepth ?? 0.5),
           ),
           practicalApplications: Array.isArray(
-            parsed.metadata?.practicalApplications,
+            (parsed as any).metadata?.practicalApplications,
           )
-            ? parsed.metadata.practicalApplications
+            ? (parsed as any).metadata.practicalApplications
             : [],
-          relatedTopics: Array.isArray(parsed.metadata?.relatedTopics)
-            ? parsed.metadata.relatedTopics
+          relatedTopics: Array.isArray((parsed as any).metadata?.relatedTopics)
+            ? (parsed as any).metadata.relatedTopics
             : [],
         },
       }

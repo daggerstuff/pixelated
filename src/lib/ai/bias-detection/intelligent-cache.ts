@@ -466,7 +466,7 @@ export class IntelligentCache {
       const memoryResult = this.getFromMemory<T>(key)
       if (memoryResult !== null) {
         this.analytics.hits.memory++
-        return memoryResult
+        return (memoryResult as any)
       }
     }
 

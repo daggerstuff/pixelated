@@ -1,3 +1,4 @@
+import type { APIContext } from 'astro'
 export const prerender = false
 
 export interface CrisisDetectionRequest {
@@ -600,7 +601,7 @@ export const POST = async ({ request }: APIContext) => {
   const startTime = Date.now()
 
   try {
-    const body: CrisisDetectionRequest = await request.json()
+    const body = (await request.json()) as CrisisDetectionRequest
 
     if (!body.content || typeof body.content !== 'string') {
       return new Response(
@@ -843,7 +844,6 @@ export const POST = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error during crisis detection',
-        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

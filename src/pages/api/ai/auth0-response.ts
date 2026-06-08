@@ -199,7 +199,14 @@ export const POST: APIRoute = async ({ request }) => {
     userId = user.id
 
     // Parse request body
-    const body = await request.json()
+    const body = await request.json() as {
+      messages?: AIMessage[]
+      currentMessage?: string
+      model?: string
+      temperature?: number
+      maxResponseTokens?: number
+      instructions?: string
+    }
     const {
       messages,
       currentMessage,
@@ -395,7 +402,7 @@ export const POST: APIRoute = async ({ request }) => {
       )
     } else {
       result = await responseService.generateResponseWithInstructions(
-        [currentMessage],
+        [{ role: 'user', content: currentMessage ?? '' }],
         instructions,
       )
     }
@@ -422,7 +429,7 @@ export const POST: APIRoute = async ({ request }) => {
       prompt: currentMessage ?? (messages ? JSON.stringify(messages) : ''),
       response: result?.content,
       context: '',
-      instructions,
+      instructions: instructions ?? null,
       temperature,
       maxTokens: maxResponseTokens,
       requestTokens: result?.usage?.promptTokens ?? 0,

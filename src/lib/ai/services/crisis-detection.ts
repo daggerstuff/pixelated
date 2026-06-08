@@ -111,8 +111,6 @@ export class CrisisDetectionService {
   constructor(config: CrisisDetectionConfig) {
     this.aiService = config.aiService
     this.sensitivityLevel = config.sensitivityLevel
-    this.model = config.model
-    this.defaultPrompt = config.defaultPrompt
   }
 
   async detectCrisis(

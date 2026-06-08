@@ -112,12 +112,14 @@ export default defineConfig({
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
+    pool: 'forks',
+    maxWorkers: process.env['CI'] ? 2 : 8,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
-        classNameStrategy: 'non-scoped',
+        classNameStrategy: 'non-scoped' as const,
       },
     },
     include:
@@ -277,7 +279,7 @@ export default defineConfig({
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
       jsdom: {
-        resources: 'usable',
+        resources: 'usable' as const,
         pretendToBeVisual: false,
         runScripts: 'dangerously',
       },
@@ -325,4 +327,6 @@ export default defineConfig({
   css: {
     devSourcemap: true,
   },
-})
+}
+
+export default defineConfig(vitestConfig)

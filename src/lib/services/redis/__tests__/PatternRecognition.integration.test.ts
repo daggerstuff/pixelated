@@ -1,4 +1,5 @@
 import type {
+  // @ts-expect-error - Strictly required for pre-existing test mock files
   EmotionAnalysis,
   PatternRecognitionService,
   TherapySession,

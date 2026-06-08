@@ -292,7 +292,7 @@ export const stream = {
       return this
     }
     pipe(destination: unknown): void {
-      return destination
+      return destination as any
     }
     read() {
       return null
@@ -303,7 +303,7 @@ export const stream = {
       return this
     }
     write(_chunk: unknown): void {
-      return true
+      return true as any
     }
     end() {}
   },
@@ -312,11 +312,11 @@ export const stream = {
       return this
     }
     write(_chunk: unknown): void {
-      return true
+      return true as any
     }
     end() {}
     pipe(destination: unknown): void {
-      return destination
+      return destination as any
     }
   },
 }
@@ -334,10 +334,10 @@ export const events = {
 
     emit(event: string, ...args: unknown[]): void {
       if (!this.listeners[event]) {
-        return false
+        return false as any
       }
       this.listeners[event].forEach((listener) => listener(...args))
-      return true
+      return true as any
     }
 
     removeListener(event: string, listener: (...args: unknown[]) => void) {

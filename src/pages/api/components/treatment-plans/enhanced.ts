@@ -274,7 +274,7 @@ export const POST = protectRoute()(async (context: AuthAPIContext) => {
       )
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
 
     // Validate the request body
     const validationResult = treatmentPlanEnhancedSchema.safeParse(body)
@@ -371,10 +371,15 @@ export const PATCH = protectRoute()(async (context: AuthAPIContext) => {
       )
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as {
+      planId?: string
+      goalId?: string
+      milestoneId?: string
+      updates?: Record<string, unknown>
+    }
     const { planId, goalId, milestoneId, updates } = body
 
-    if (!planId || !updates) {
+    if (typeof planId !== 'string' || !updates) {
       return new Response(
         JSON.stringify({ error: 'planId and updates are required' }),
         {

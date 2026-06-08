@@ -332,7 +332,6 @@ export class BiasDetectionDatabaseService {
           },
         })
 
-        // Calculate average bias score for this period
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
@@ -343,8 +342,9 @@ export class BiasDetectionDatabaseService {
 
         // Get demographic breakdown for this period
         const demographicBreakdown: Record<string, number> = {}
-        analyses.forEach((analysis) => {
-          const demo = analysis['demographics']
+        analyses.forEach((raw) => {
+          const doc = raw as unknown as MongoAnalysisDoc
+          const demo = doc.demographics
           if (demo) {
             // (Previously unused) key could be used for grouping if needed
             // No-op: placeholder for future demographic aggregation
@@ -410,13 +410,13 @@ export class BiasDetectionDatabaseService {
           }
 
           // Individual dimensions
-          if (demo.age) update('age', demo.age)
-          if (demo.gender) update('gender', demo.gender)
-          if (demo.ethnicity) update('ethnicity', demo.ethnicity)
+          if (demo['age']) update('age', demo['age'])
+          if (demo['gender']) update('gender', demo['gender'])
+          if (demo['ethnicity']) update('ethnicity', demo['ethnicity'])
 
           // Intersectional dimension
-          if (demo.age && demo.gender && demo.ethnicity) {
-            const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
+          if (demo['age'] && demo['gender'] && demo['ethnicity']) {
+            const intersectionKey = [demo['age'], demo['gender'], demo['ethnicity']]
               .sort()
               .join('|')
             update('intersectional', intersectionKey)
@@ -568,6 +568,7 @@ export class BiasDetectionDatabaseService {
         return null
       }
 
+      const doc = analysis as unknown as MongoAnalysisDoc
       return {
         sessionId: analysis['sessionId'],
         timestamp: analysis['timestamp'],

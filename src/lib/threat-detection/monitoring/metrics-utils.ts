@@ -74,8 +74,8 @@ export async function calculateMetricsSummary(
   const count = values.length
   const sum = values.reduce((acc, val) => acc + val, 0)
   const average = sum / count
-  const min = values[0]
-  const max = values[count - 1]
+  const min = values[0] ?? 0
+  const max = values[count - 1] ?? 0
 
   // Calculate standard deviation
   const variance =

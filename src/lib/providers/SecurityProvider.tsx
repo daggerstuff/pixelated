@@ -110,24 +110,25 @@ export function SecurityProvider({
 
   // Check key rotation needs
   useEffect(() => {
-    if (!securityState.lastKeyRotation || securityState.level === 'standard') {
-      return
+    if (securityState.lastKeyRotation && securityState.level !== 'standard') {
+      const checkKeyRotation = () => {
+        const timeSinceLastRotation =
+          Date.now() - securityState.lastKeyRotation!.getTime()
+        setSecurityState((prev) => ({
+          ...prev,
+          isKeyRotationNeeded: timeSinceLastRotation >= KEY_ROTATION_INTERVAL,
+        }))
+      }
+
+      // Check immediately and set up interval
+      checkKeyRotation()
+      const interval = setInterval(checkKeyRotation, 60 * 60 * 1000) // Check every hour
+
+      return () => {
+        clearInterval(interval)
+      }
     }
-
-    const checkKeyRotation = () => {
-      const timeSinceLastRotation =
-        Date.now() - securityState.lastKeyRotation!.getTime()
-      setSecurityState((prev) => ({
-        ...prev,
-        isKeyRotationNeeded: timeSinceLastRotation >= KEY_ROTATION_INTERVAL,
-      }))
-    }
-
-    // Check immediately and set up interval
-    checkKeyRotation()
-    const interval = setInterval(checkKeyRotation, 60 * 60 * 1000) // Check every hour
-
-    return () => clearInterval(interval)
+    return undefined
   }, [securityState.lastKeyRotation, securityState.level])
 
   // Security level management
@@ -196,14 +197,12 @@ export function SecurityProvider({
     try {
       // Convert data to string if needed by the mock service
       const stringData = typeof data === 'string' ? data : JSON.stringify(data)
-      return (
-        (await fheService.encrypt?.(stringData)) ||
+      return ((await fheService.encrypt?.(stringData)) ??
         JSON.stringify({
           data: stringData,
           keyId: securityState.currentKey.keyId,
           timestamp: Date.now(),
-        })
-      )
+        })) as unknown as string
     } catch (error: unknown) {
       console.error('Encryption failed:', error)
       // Fallback to simple encryption

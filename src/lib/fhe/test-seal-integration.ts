@@ -75,7 +75,7 @@ async function testSEALIntegration() {
     const addResult = await operations.add(encrypted, [5, 5, 5, 5, 5])
 
     if (addResult.success) {
-      const decryptedAdd = await service.decrypt(addResult.result)
+      const decryptedAdd = await service.decrypt(addResult.result as any)
       logger.info('Homomorphic addition result:', { decryptedAdd })
       const expectedAdd = testData.map((v) => v + 5)
       const isAdditionSuccessful = expectedAdd.every(
@@ -91,7 +91,7 @@ async function testSEALIntegration() {
     const multResult = await operations.multiply(encrypted, [2, 2, 2, 2, 2])
 
     if (multResult.success) {
-      const decryptedMult = await service.decrypt(multResult.result)
+      const decryptedMult = await service.decrypt(multResult.result as any)
       logger.info('Homomorphic multiplication result:', { decryptedMult })
       const expectedMult = testData.map((v) => v * 2)
       const isMultiplicationSuccessful = expectedMult.every(

@@ -29,7 +29,7 @@ export const GET = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId } = context.locals.admin
+    const { userId } = (context.locals as any).admin
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
@@ -102,11 +102,15 @@ export const POST = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId: adminId } = context.locals.admin
+    const { userId: adminId } = (context.locals as any).admin
 
     // Parse the request body
-    const requestData = await context.request.json()
-    const { sessionId, action } = requestData
+    const requestData = (await context.request.json()) as Record<
+      string,
+      unknown
+    >
+    const sessionId = requestData['sessionId'] as string | undefined
+    const action = requestData['action'] as string | undefined
 
     if (!sessionId || !action) {
       return new Response(
@@ -122,7 +126,7 @@ export const POST = async (context: APIContext) => {
     const adminService = AdminService.getInstance()
 
     // Perform the requested action on the session
-    let result
+    let result: any
     switch (action) {
       case 'lock':
         result = await adminService.lockSession(sessionId)
