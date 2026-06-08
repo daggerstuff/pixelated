@@ -20,10 +20,6 @@ export interface Session {
   token?: string
 }
 
-interface AuthProfileResponse {
-  user: User
-}
-
 interface AuthResponse {
   user?: User
   token?: string
@@ -39,13 +35,11 @@ interface SignInRequest {
 interface SignUpRequest {
   email: string
   password: string
-  name?: string
   role?: string
 }
 
 class AuthClient {
   private _session: Session | null = null
-  private _isLoading = false
 
   /**
    * Note: In a real React app, you should use a Context Provider to avoid duplicate fetches.
@@ -129,7 +123,11 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
+  async signInEmail({
+    email,
+    password,
+    rememberMe,
+  }: SignInRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -143,7 +141,7 @@ class AuthClient {
       const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
-        return { error: data.error ?? 'Login failed' }
+        return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
@@ -153,21 +151,25 @@ class AuthClient {
       }
 
       return { data, error: null }
-    } catch (error: any) {
+    } catch (error) {
       return {
+        data: null,
         error:
-          (error instanceof Error ? error.message : 'Unknown error') ||
-          'An unexpected error occurred',
+          error instanceof Error
+            ? error
+            : new Error('An unexpected error occurred'),
       }
-    } finally {
-      this._isLoading = false
     }
   }
 
   /**
    * Sign up a new user
    */
-  async signUpEmail({ email, password, role, name }: SignUpRequest): Promise<{
+  async signUpEmail({
+    email,
+    password,
+    role,
+  }: SignUpRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -181,18 +183,21 @@ class AuthClient {
       const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
-        return { error: data.error ?? 'Registration failed' }
+        return {
+          data: null,
+          error: new Error(data.error ?? 'Registration failed'),
+        }
       }
 
       return { data, error: null }
-    } catch (error: any) {
+    } catch (error) {
       return {
+        data: null,
         error:
-          (error instanceof Error ? error.message : 'Unknown error') ||
-          'An unexpected error occurred',
+          error instanceof Error
+            ? error
+            : new Error('An unexpected error occurred'),
       }
-    } finally {
-      this._isLoading = false
     }
   }
 
@@ -245,7 +250,13 @@ class AuthClient {
 
   /**
    */
-  async forgetPassword({ email, redirectTo }: any) {
+  async forgetPassword({
+    email,
+    redirectTo,
+  }: {
+    email: string
+    redirectTo?: string
+  }): Promise<{ success: boolean }> {
     console.log(
       `Password reset for ${email} requested, redirect to ${redirectTo}`,
     )

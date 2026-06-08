@@ -112,6 +112,24 @@ type RateLimiterResponse = {
   json: (body: unknown) => RateLimiterResponse
 }
 
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
 interface RateLimitStore {
   [key: string]: { count: number; resetTime: number } | undefined
 }

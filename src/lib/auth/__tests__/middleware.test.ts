@@ -71,6 +71,14 @@ vi.mock('../user-identity', () => ({
 }))
 
 import { auth0AdaptiveMFAService } from '../auth0-adaptive-mfa-service'
+
+// Test constants
+const DUMMY_VALID_TOKEN = 'dummy-valid-token'
+const DUMMY_VALID_CSRF_TOKEN = 'dummy-valid-csrf-token'
+const DUMMY_INVALID_TOKEN = 'dummy-invalid-token'
+const DUMMY_DIFFERENT_TOKEN = 'dummy-different-token'
+const DUMMY_EXPIRED_TOKEN = 'dummy-expired-token'
+
 import { resolveIdentity } from '../user-identity'
 
 describe('Authentication Middleware', () => {

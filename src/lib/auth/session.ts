@@ -10,16 +10,26 @@ import { extractTokenFromRequest } from './auth0-middleware'
 /**
  * Lightweight session shape returned by getSession and consumed by middleware
  * and API route handlers across the application.
+ *
+ * PIX-215 PR3: `workspaceId` and `user.roles` are additive — existing call
+ * sites that only read `user.role` continue to work unchanged. New code that
+ * needs workspace-scoped RBAC should use the `hasWorkspaceRole` /
+ * `hasWorkspaceAccess` helpers below.
  */
 export interface Session {
   user: {
     id: string
     email?: string
+    /** Primary role — kept for backward compatibility with single-role checks */
     role: string
+    /** All roles assigned to this user (multi-role). Falls back to `[role]` when absent. */
+    roles?: string[]
     name?: string
     permissions?: string[]
     appMetadata?: Record<string, unknown>
   }
+  /** Active workspace context. Absent for system-level / cross-workspace sessions. */
+  workspaceId?: string
   /** ISO-8601 timestamp when the session expires */
   expires: string
 }
@@ -72,10 +82,34 @@ export function getSessionFromToken(result: TokenPayload): Session | null {
       id: result.userId,
       email: result.payload?.['email'] as string | undefined,
       role: result.role ?? 'guest',
+      roles: extractRolesFromToken(result),
       name: result.payload?.['name'] as string | undefined,
     },
+    workspaceId: extractWorkspaceIdFromToken(result),
     expires: expiresAt,
   }
+}
+
+function extractRolesFromToken(result: TokenPayload): string[] {
+  const appMetadata = result.payload?.['app_metadata']
+  if (appMetadata && typeof appMetadata === 'object') {
+    const meta = appMetadata as Record<string, unknown>
+    if (Array.isArray(meta['roles'])) {
+      return meta['roles'].filter((r): r is string => typeof r === 'string')
+    }
+  }
+  return [result.role ?? 'guest']
+}
+
+function extractWorkspaceIdFromToken(result: TokenPayload): string | undefined {
+  const appMetadata = result.payload?.['app_metadata']
+  if (appMetadata && typeof appMetadata === 'object') {
+    const meta = appMetadata as Record<string, unknown>
+    if (typeof meta['workspaceId'] === 'string') {
+      return meta['workspaceId']
+    }
+  }
+  return undefined
 }
 
 /**
@@ -146,6 +180,64 @@ export function hasRole(session: Session, requiredRole: string): boolean {
 }
 
 /**
+ * Return the full set of roles for a session, falling back to `[role]`
+ * when `user.roles` is absent (pre-PR3 tokens / system-level sessions).
+ */
+export function getUserRoles(session: Session): string[] {
+  if (session.user.roles && session.user.roles.length > 0) {
+    return session.user.roles
+  }
+  return [session.user.role]
+}
+
+/**
+ * Check if the user holds `requiredRole` within the given workspace.
+ *
+ * Returns false when:
+ *   - the session has no `workspaceId` (system-level / cross-workspace)
+ *   - the session's `workspaceId` does not match the requested one
+ *   - the user's roles (from `user.roles`, falling back to `[user.role]`)
+ *     do not include `requiredRole`
+ *
+ * @param session Session object
+ * @param workspaceId Workspace the check is scoped to
+ * @param requiredRole Role required within that workspace
+ */
+export function hasWorkspaceRole(
+  session: Session,
+  workspaceId: string,
+  requiredRole: string,
+): boolean {
+  if (session.workspaceId !== workspaceId) return false
+  return getUserRoles(session).includes(requiredRole)
+}
+
+/**
+ * Check if the user holds ANY of `requiredRoles` within the given workspace.
+ * Returns false for the same reasons as `hasWorkspaceRole`.
+ */
+export function hasAnyWorkspaceRole(
+  session: Session,
+  workspaceId: string,
+  requiredRoles: readonly string[],
+): boolean {
+  if (session.workspaceId !== workspaceId) return false
+  const userRoles = getUserRoles(session)
+  return requiredRoles.some((r) => userRoles.includes(r))
+}
+
+/**
+ * Check if the user has any role assigned within the given workspace.
+ * Returns false when the session's `workspaceId` does not match.
+ */
+export function hasWorkspaceAccess(
+  session: Session,
+  workspaceId: string,
+): boolean {
+  return session.workspaceId === workspaceId && getUserRoles(session).length > 0
+}
+
+/**
  * Resolve a Session from the incoming HTTP Request.
  *
  * Extraction order:
@@ -190,17 +282,15 @@ export async function getSession(request: Request): Promise<Session | null> {
       Date.now() + SESSION_CACHE_MAX_TTL_MS,
     )
 
-    const session = {
-      user: {
-        id: result.userId,
-        role: result.role ?? 'guest',
-        email: result.payload?.['email'] as string | undefined,
-        name: result.payload?.['name'] as string | undefined,
-      },
+    const baseSession = getSessionFromToken(result)
+    if (!baseSession) return null
+
+    const session: Session = {
+      ...baseSession,
       // Use the calculated eviction time for the session object's expiration
       // to avoid returning a session that claims to be valid but is evicted.
       expires: new Date(evictAt).toISOString(),
-    } satisfies Session
+    }
 
     tokenCache.set(token, { session, evictAt })
 

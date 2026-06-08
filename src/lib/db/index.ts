@@ -3,6 +3,9 @@
  * Supports PostgreSQL with connection pooling and migration management
  */
 
+import { readdir, readFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { createHash } from 'crypto'
 import { readFile, readdir } from 'fs/promises'
 import * as path from 'path'
@@ -31,18 +34,6 @@ interface PoolStats {
   idleCount: number
   waitingCount: number
 }
-
-import { Pool, PoolClient } from 'pg'
-
-// pg does not export these types; define locally
-export interface DbQueryResult<T = Record<string, unknown>> {
-  rows: T[]
-  rowCount: number
-  command?: string
-  oid?: number
-  fields?: Array<{ name: string; dataTypeID: number }>
-}
-type QueryResultRow = Record<string, unknown>
 
 // Database configuration
 export interface DatabaseConfig {
@@ -303,129 +294,115 @@ export class DatabaseMigration {
     await query('INSERT INTO schema_migrations (name) VALUES ($1)', [name])
   }
 
-  // ------------------------------------------------------------------
-  // Directory-based migration helpers (used by scripts/db-migrate.ts)
-  // ------------------------------------------------------------------
-
   /**
-   * List migration files from a directory, sorted by version.
-   * Matches files matching `NNN_*.sql` and explicitly excludes
-   * `*.rollback.sql` so rollback files are never treated as forward migrations.
-   */
-  private async listMigrationFiles(dir: string): Promise<string[]> {
-    const entries = await readdir(dir)
-    const migrationRe = /^(\d+)_.+\.sql$/
-    return entries
-      .filter((f) => migrationRe.test(f) && !f.endsWith('.rollback.sql'))
-      .sort((a, b) => {
-        const va = parseInt(a.match(/^(\d+)/)![1]!, 10)
-        const vb = parseInt(b.match(/^(\d+)/)![1]!, 10)
-        return va - vb
-      })
-  }
-
-  /**
-   * Read the rollback SQL file for a migration, if it exists.
-   * Returns `null` when no `.rollback.sql` file is found (ENOENT).
-   * Includes a type guard so that non-Node error types don't crash.
-   */
-  private async readRollbackFile(
-    migrationName: string,
-    dir: string,
-  ): Promise<string | null> {
-    const baseName = migrationName.replace(/\.sql$/, '')
-    const rollbackPath = path.join(dir, `${baseName}.rollback.sql`)
-    try {
-      return await readFile(rollbackPath, 'utf-8')
-    } catch (err: unknown) {
-      if (
-        typeof err === 'object' &&
-        err !== null &&
-        'code' in err &&
-        (err as NodeJS.ErrnoException).code === 'ENOENT'
-      ) {
-        return null
-      }
-      throw err
-    }
-  }
-
-  /**
-   * Run all pending migrations found in a directory.
-   * Reads each `.sql` file (excluding `.rollback.sql`), executes it,
-   * and records it in `schema_migrations`.
+   * Run all pending migrations from a directory of NNN_*.sql files.
+   * Skips any migration whose filename is already in schema_migrations.
+   * Returns the names of migrations that were applied and skipped.
    */
   async runMigrationsFromDirectory(
     dir: string,
-  ): Promise<MigrateFromDirectoryResult> {
+    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+      readdir,
+      readFile,
+    },
+  ): Promise<{ applied: string[]; skipped: string[] }> {
     await this.ensureMigrationsTable()
-    const allFiles = await this.listMigrationFiles(dir)
-    const executed = await this.getExecutedMigrations()
+    const executed = new Set(await this.getExecutedMigrations())
+    const files = await this.listMigrationFiles(dir, fsAdapter)
+    const applied: string[] = []
+    const skipped: string[] = []
 
-    const result: MigrateFromDirectoryResult = { applied: [], skipped: [] }
-
-    for (const name of allFiles) {
-      if (executed.includes(name)) {
-        result.skipped.push(name)
+    for (const { name, sql } of files) {
+      if (executed.has(name)) {
+        skipped.push(name)
         continue
       }
-      const sqlPath = path.join(dir, name)
-      const sql = await readFile(sqlPath, 'utf-8')
-      console.log(`Running migration: ${name}`)
-      try {
-        await query(sql)
-        await this.markMigrationExecuted(name)
-        result.applied.push(name)
-        console.log(`  ✅ ${name}`)
-      } catch (error: unknown) {
-        console.error(`  ❌ ${name} failed:`, error)
-        throw error
-      }
+      await query(sql)
+      await this.markMigrationExecuted(name)
+      applied.push(name)
     }
 
-    return result
+    return { applied, skipped }
   }
 
   /**
-   * Roll back the most recently applied migration that has a
-   * corresponding `.rollback.sql` file.
+   * Roll back the most recently applied migration that has a paired
+   * .rollback.sql file. Returns the rolled-back name, or null if no
+   * rollback was performed (no applied migrations, or none have rollback files).
    */
-  async rollbackLast(dir: string): Promise<RollbackLastResult> {
+  async rollbackLast(
+    dir: string,
+    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+      readdir,
+      readFile,
+    },
+  ): Promise<{ rolledBack: string | null }> {
     await this.ensureMigrationsTable()
     const executed = await this.getExecutedMigrations()
 
-    // Walk executed list in reverse to find the first with a rollback file.
     for (let i = executed.length - 1; i >= 0; i--) {
-      const name = executed[i]!
-      const rollbackSql = await this.readRollbackFile(name, dir)
-      if (rollbackSql === null) continue
-
-      console.log(`Rolling back: ${name}`)
-      try {
+      const name = executed[i]
+      if (name === undefined) continue
+      const rollbackSql = await this.readRollbackFile(dir, name, fsAdapter)
+      if (rollbackSql !== null) {
         await query(rollbackSql)
         await query('DELETE FROM schema_migrations WHERE name = $1', [name])
         return { rolledBack: name }
-      } catch (error: unknown) {
-        console.error(`  ❌ Rollback of ${name} failed:`, error)
-        throw error
       }
     }
-
     return { rolledBack: null }
   }
 
   /**
-   * Get applied and pending migration lists.
+   * Report which migrations from the directory are applied vs pending.
+   * Files in the directory are sorted by name; a migration is "applied"
+   * if its filename is recorded in schema_migrations.
    */
-  async getStatus(dir: string): Promise<MigrationStatusResult> {
+  async getStatus(
+    dir: string,
+    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+      readdir,
+      readFile,
+    },
+  ): Promise<{ applied: string[]; pending: string[] }> {
     await this.ensureMigrationsTable()
-    const allFiles = await this.listMigrationFiles(dir)
-    const executed = await this.getExecutedMigrations()
+    const executed = new Set(await this.getExecutedMigrations())
+    const files = await this.listMigrationFiles(dir, fsAdapter)
+    const applied: string[] = []
+    const pending: string[] = []
+    for (const { name } of files) {
+      if (executed.has(name)) applied.push(name)
+      else pending.push(name)
+    }
+    return { applied, pending }
+  }
 
-    const executedSet = new Set(executed)
-    return {
-      applied: allFiles.filter((f) => executedSet.has(f)),
-      pending: allFiles.filter((f) => !executedSet.has(f)),
+  private async listMigrationFiles(
+    dir: string,
+    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'>,
+  ): Promise<Array<{ name: string; sql: string }>> {
+    const entries = await fsAdapter.readdir(dir)
+    const sqlFiles = entries.filter((f) => /^\d{3}_.+\.sql$/.test(f)).sort()
+    const out: Array<{ name: string; sql: string }> = []
+    for (const file of sqlFiles) {
+      const sql = await fsAdapter.readFile(path.join(dir, file), 'utf8')
+      out.push({ name: file, sql })
+    }
+    return out
+  }
+
+  private async readRollbackFile(
+    dir: string,
+    migrationName: string,
+    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'>,
+  ): Promise<string | null> {
+    const rollbackName = migrationName.replace(/\.sql$/, '.rollback.sql')
+    const rollbackPath = path.join(dir, rollbackName)
+    try {
+      return await fsAdapter.readFile(rollbackPath, 'utf8')
+    } catch (err: unknown) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null
+      throw err
     }
   }
 }

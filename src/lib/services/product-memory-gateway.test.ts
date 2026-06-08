@@ -6,11 +6,11 @@ import {
   InternalMemoryServiceError,
   type InternalMemoryServiceClient,
 } from '../server/internal-memory-service-client'
+import type { AuditLogger } from './product-memory-audit'
 import {
   ProductMemoryGateway,
   ProductMemoryGatewayError,
 } from './product-memory-gateway'
-import type { AuditLogger } from './product-memory-audit'
 
 function createClientMock() {
   return {
@@ -549,7 +549,11 @@ describe('ProductMemoryGateway tenant isolation', () => {
 
   it('allows createMemory when caller userId matches scope userId', async () => {
     client.addMemory.mockResolvedValue({ memory_id: 'mem-1' })
-    const gateway = new ProductMemoryGateway(client, { userId: scope.userId }, audit)
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: scope.userId },
+      audit,
+    )
 
     await expect(
       gateway.createMemory({ ...scope, content: 'allowed' }),
@@ -590,7 +594,11 @@ describe('ProductMemoryGateway tenant isolation', () => {
 
   it('returns null from getMemory when downstream reports not found', async () => {
     client.getMemory.mockResolvedValue(null)
-    const gateway = new ProductMemoryGateway(client, { userId: scope.userId }, audit)
+    const gateway = new ProductMemoryGateway(
+      client,
+      { userId: scope.userId },
+      audit,
+    )
 
     await expect(
       gateway.getMemory({ ...scope, memoryId: 'missing' }),

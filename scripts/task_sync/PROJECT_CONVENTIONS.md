@@ -133,13 +133,13 @@ Duplicate  → closed (duplicate)
 ### Provider Priority Mapping
 
 ```
-Linear (numeric)   Jira ADHD (name)      Beads
-─────────────────────────────────────────────
-0 (urgent)    →   Highest              → critical
-1 (high)      →   High                 → high
-2 (medium)    →   Medium               → normal
-3 (low)       →   Low                  → low
-4 (none)      →   None                 → none
+Linear (numeric)   Jira ADHD (name)
+───────────────────────────────────
+0 (urgent)    →   Highest
+1 (high)      →   High
+2 (medium)    →   Medium
+3 (low)       →   Low
+4 (none)      →   None
 ```
 
 ### Required Sync Fields
@@ -153,4 +153,3 @@ Every issue synced to any provider MUST have:
 
 ### Blocked Providers
 - **Asana**: ❌ Disabled — all 162 unmapped issues must target ADHD (Jira), not Asana
-- **Beads**: ❌ Not deployed — no `.beads/` directory exists

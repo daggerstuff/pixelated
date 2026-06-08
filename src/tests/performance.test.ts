@@ -6,19 +6,6 @@ import type { Browser, Page } from '@playwright/test'
 import { chromium } from '@playwright/test'
 
 // Browser performance types
-interface PerformanceNavigationEntry extends PerformanceEntry {
-  domContentLoadedEventEnd: number
-  domContentLoadedEventStart: number
-  domComplete: number
-  loadEventEnd: number
-  loadEventStart: number
-}
-
-interface PerformancePaintEntry extends PerformanceEntry {
-  name: string
-  startTime: number
-}
-
 interface PerformanceResourceEntry extends PerformanceEntry {
   encodedBodySize: number
 }
@@ -195,7 +182,7 @@ describe('performance Tests', () => {
             'largest-contentful-paint',
           )
           const lcpStartTime =
-            lcpEntries.length > 0 ? lcpEntries?.[0].startTime : 0
+            lcpEntries.length > 0 ? lcpEntries[0]?.startTime ?? 0 : 0
           const isLayoutShiftEntry = (
             entry: PerformanceEntry,
           ): entry is PerformanceEntry & { value: number } =>
@@ -444,8 +431,10 @@ describe('performance Tests', () => {
         jsonFiles.sort().reverse()
 
         // Load the most recent previous result
+        const previousFile = jsonFiles[0]
+        if (!previousFile) return
         const previousResultsRaw = parseJson(
-          await fs.readFile(join(resultsDir, jsonFiles[0]), 'utf-8'),
+          await fs.readFile(join(resultsDir, previousFile), 'utf-8'),
         )
         if (!isPerformanceResults(previousResultsRaw)) {
           return
