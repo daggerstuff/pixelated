@@ -1,0 +1,9 @@
+---
+// Simple health check endpoint for GCP load balancer
+// Returns 200 OK with minimal JSON
+const healthData = {
+  status: 'healthy',
+  timestamp: new Date().toISOString(),
+}
+---
+{JSON.stringify(healthData)}
