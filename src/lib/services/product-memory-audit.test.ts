@@ -1,20 +1,7 @@
 // @vitest-environment node
 
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-  type Mock,
-} from 'vitest'
-
-import {
-  createConsoleAuditLogger,
-  NoOpAuditLogger,
-  AuditEvent,
-} from './product-memory-audit'
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
+import { createConsoleAuditLogger, NoOpAuditLogger, AuditEvent } from './product-memory-audit'
 
 describe('product-memory-audit', () => {
   let consoleInfoSpy: Mock
@@ -38,14 +25,14 @@ describe('product-memory-audit', () => {
         userId: 'test-user',
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       logger.log(event)
 
       expect(consoleInfoSpy).toHaveBeenCalled()
       expect(consoleErrorSpy).not.toHaveBeenCalled()
-
+      
       // Verify the logged JSON contains the event data
       const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0]![0])
       expect(loggedJson).toMatchObject(event)
@@ -59,14 +46,14 @@ describe('product-memory-audit', () => {
         userId: 'test-user',
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       logger.log(event)
 
       expect(consoleErrorSpy).toHaveBeenCalled()
       expect(consoleInfoSpy).not.toHaveBeenCalled()
-
+      
       // Verify the logged JSON contains the event data
       const loggedJson = JSON.parse(consoleErrorSpy.mock.calls[0]![0])
       expect(loggedJson).toMatchObject(event)
@@ -81,7 +68,7 @@ describe('product-memory-audit', () => {
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
         latencyMs: 150,
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       logger.log(event)
@@ -100,7 +87,7 @@ describe('product-memory-audit', () => {
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
         details: { key: 'value', number: 42 },
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       logger.log(event)
@@ -120,7 +107,7 @@ describe('product-memory-audit', () => {
         userId: 'test-user',
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       // Should not throw
@@ -135,7 +122,7 @@ describe('product-memory-audit', () => {
         userId: 'test-user',
         operation: 'test-operation',
         correlationId: 'test-correlation-id',
-        timestamp: Date.now(),
+        timestamp: Date.now()
       }
 
       logger.log(event)
