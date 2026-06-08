@@ -1,5 +1,7 @@
 import type { AstroCookies } from 'astro'
 
+import { auth0UserService } from '@/services/auth0.service'
+
 import type { AuthRole } from '../config/auth.config'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
 import { getIdentityProvider } from './auth/identity-provider'
@@ -10,19 +12,7 @@ import {
   type AuditDetails,
 } from './audit'
 import type { AuditMetadata } from './audit/types'
-
-let warnedAboutDeprecation = false
-
-if (process.env['NODE_ENV'] !== 'test' && !warnedAboutDeprecation) {
-  warnedAboutDeprecation = true
-  console.warn(
-    '[auth-legacy] This module is the final thin shim before removal. ' +
-      'All new code should use src/lib/auth/identity-provider.ts directly. ' +
-      'Run `pnpm tsx scripts/auth-cutover-check.ts <user-ids>` with ' +
-      'AUTH_DUAL_WRITE=true to validate parity before migrating call sites. ' +
-      'See PIX-215 PR4 for the shim removal timeline.',
-  )
-}
+import { validateToken } from './auth/auth0-jwt-service'
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -92,13 +82,14 @@ export async function getCurrentUser(
 
   const provider = getIdentityProvider()
   try {
-    const decoded = await provider.validateToken(accessToken, 'access')
+    const decoded = await validateToken(accessToken, 'access')
     const userId = decoded.userId
     if (typeof userId !== 'string') {
       return null
     }
 
-    const user = await provider.getUserById(userId)
+    // Fetch user from Auth0
+    const user = await auth0UserService.getUserById(userId)
     if (!user) {
       return null
     }
@@ -134,10 +125,7 @@ export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
   }
 
   try {
-    const decoded = await getIdentityProvider().validateToken(
-      accessToken,
-      'access',
-    )
+    const decoded = await validateToken(accessToken, 'access')
     return !!decoded
   } catch (error: unknown) {
     console.error('Error checking authentication:', error)

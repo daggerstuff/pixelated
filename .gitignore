@@ -79,6 +79,7 @@ verbose/coverage/
 # === DATABASES & LOGS ===
 *.db
 *.log
+.dolt/
 /*.log
 /Thumbs.db*
 db.sqlite3
@@ -113,6 +114,8 @@ nohup.out
 *.h5
 *.hdf5
 *.jsonl
+!.beads/issues.jsonl
+!.beads/interactions.jsonl
 *.model
 *.onnx
 *.pickle
@@ -290,8 +293,25 @@ scripts/run-simple-integrated-pipeline.py
 scripts/run-standalone-integrated-pipeline.py
 scripts/*.ipynb
 tests/scripts/
-# === INTERNAL & PRIVATE ===
-/.security/
+# Beads: track config and exports; ignore runtime/dolt data (per .beads/.gitignore)
+.beads-credential-key
+.beads/embeddeddolt/
+.beads/dolt/
+.beads/backup/
+.beads/bd.sock
+.beads/bd.sock.startlock
+.beads/sync-state.json
+.beads/last-touched
+.beads/.exclusive-lock
+.beads/daemon.*
+.beads/push-state.json
+.beads/*.lock
+.beads/dolt-server.*
+.beads/export-state/
+.beads/export-state.json
+.beads/.sync.lock
+.beads/ephemeral.sqlite3*
+.beads/redirect
 .scannerwork
 .swarm/
 .test-coverage-analysis.md
@@ -336,9 +356,6 @@ ai/.moderne
 .mcp.json
 HANDOFF.md
 
-# Beads issue tracker (fully removed)
-.beads/
-
 .omc
 .foresight
 job.md
@@ -353,8 +370,3 @@ aws
 scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
-struct-agent-key.json
-
-# Metoro-exporter templates and values customization
-!metoro-exporter/templates/
-!metoro-exporter/templates/**

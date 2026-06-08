@@ -76,24 +76,21 @@ const createWrapper = () => {
 
 describe('useDiscovery hooks', () => {
   beforeEach(() => {
-    // @ts-expect-error - Strictly required for pre-existing test mock files
-    vi.clearAllMocks()(useDiscoveryStore as any).mockImplementation(
-      (selector) => {
-        const defaultFilters: MockJournalFilters = {
-          openAccessOnly: false,
-          sourceTypes: [],
-          keywords: [],
-          sortBy: 'relevance',
-          sortDirection: 'asc',
-        }
-        return withFilters(selector, defaultFilters)
-      },
-    )
+    vi.clearAllMocks()
+    useDiscoveryStore.mockImplementation((selector) => {
+      const defaultFilters: MockJournalFilters = {
+        openAccessOnly: false,
+        sourceTypes: [],
+        keywords: [],
+        sortBy: 'relevance',
+        sortDirection: 'asc',
+      }
+      return withFilters(selector, defaultFilters)
+    })
   })
 
   describe('useDiscoveryListQuery', () => {
     it('fetches source list successfully', async () => {
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(api.listSources).mockResolvedValue(mockSourceList)
 
       const { result } = renderHook(() => useDiscoveryListQuery('session-1'), {
@@ -112,20 +109,17 @@ describe('useDiscovery hooks', () => {
     })
 
     it('applies filters from store', async () => {
-      vi.mocked(api.listSources)
-        // @ts-expect-error - Strictly required for pre-existing test mock files
-        .mockResolvedValue(mockSourceList)(useDiscoveryStore as any)
-        // @ts-expect-error - Strictly required for pre-existing test mock files
-        .mockImplementation((selector) => {
-          const filteredFilters: MockJournalFilters = {
-            openAccessOnly: true,
-            sourceTypes: ['journal'],
-            keywords: ['test'],
-            sortBy: 'publication_date',
-            sortDirection: 'desc',
-          }
-          return withFilters(selector, filteredFilters)
-        })
+      vi.mocked(api.listSources).mockResolvedValue(mockSourceList)
+      useDiscoveryStore.mockImplementation((selector) => {
+        const filteredFilters: MockJournalFilters = {
+          openAccessOnly: true,
+          sourceTypes: ['journal'],
+          keywords: ['test'],
+          sortBy: 'publication_date',
+          sortDirection: 'desc',
+        }
+        return withFilters(selector, filteredFilters)
+      })
 
       const { result } = renderHook(() => useDiscoveryListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -165,7 +159,6 @@ describe('useDiscovery hooks', () => {
 
   describe('useSourceQuery', () => {
     it('fetches source successfully', async () => {
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(api.getSource).mockResolvedValue(mockSource)
 
       const { result } = renderHook(
@@ -215,7 +208,6 @@ describe('useDiscovery hooks', () => {
     it('initiates discovery successfully', async () => {
       const mockResponse: api.DiscoveryResponse = {
         sessionId: 'session-1',
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         status: 'in_progress',
         sourcesDiscovered: 0,
         message: 'Discovery started',
@@ -230,7 +222,6 @@ describe('useDiscovery hooks', () => {
       )
 
       const payload: api.DiscoveryInitiatePayload = {
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         searchKeywords: { mental_health: ['depression'] },
         filters: { openAccessOnly: true },
       }
@@ -256,7 +247,6 @@ describe('useDiscovery hooks', () => {
       )
 
       result.current.mutate({
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         searchKeywords: { mental_health: ['depression'] },
       })
 

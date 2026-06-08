@@ -159,9 +159,7 @@ const sealFHEService: FHEService = {
       sealCipherText.load(context, ciphertext as string)
 
       // Decrypt the SealCipherText object
-      const decryptedNumberArray = await sealService.decrypt(
-        sealCipherText as any,
-      )
+      const decryptedNumberArray = await sealService.decrypt(sealCipherText)
 
       // Clean up the SealCipherText object
       sealCipherText.delete()
@@ -209,10 +207,11 @@ const sealFHEService: FHEService = {
       }
       bCiphertext.load(context, bCiphertextStr as string)
 
-      const result = await sealOperations.add(
-        aCiphertext as any,
-        bCiphertext as any,
-      )
+      const result = await sealOperations.add(aCiphertext, bCiphertext)
+
+      // Clean up the SealCipherText objects
+      aCiphertext.delete()
+      bCiphertext.delete()
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()
@@ -269,10 +268,11 @@ const sealFHEService: FHEService = {
       }
       bCiphertext.load(context, bCiphertextStr as string)
 
-      const result = await sealOperations.subtract(
-        aCiphertext as any,
-        bCiphertext as any,
-      )
+      const result = await sealOperations.subtract(aCiphertext, bCiphertext)
+
+      // Clean up the SealCipherText objects
+      aCiphertext.delete()
+      bCiphertext.delete()
 
       // Clean up the SealCipherText objects
       aCiphertext.delete()

@@ -9,13 +9,6 @@ import { closeSentry, Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { safeJsonParse } from '../../utils/json-extraction'
 import { apiMetrics, emotionMetrics } from '../../sentry/utils'
-
-function formatErrorMessage(error: unknown, fallback: string): string {
-  if (error instanceof Error) return error.message
-  if (typeof error === 'string' && error.trim() !== '') return error
-  if (error && typeof error === 'object' && 'message' in error) return String(error.message)
-  return fallback
-}
 import type { AIMessage, AIServiceOptions } from '../models/ai-types'
 import {
   getAIServiceByProvider,

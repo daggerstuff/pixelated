@@ -1,7 +1,6 @@
 ---
 import MarketingCTA from '@/components/marketing/MarketingCTA.astro'
 import MarketingPageHero from '@/components/marketing/MarketingPageHero.astro'
-import { readinessEnhancements } from '@/data/readiness-enhancements'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
 const coreCapabilities = [
@@ -191,40 +190,6 @@ const foundations = [
               <ul class="marketing-list">
                 {capability.items.map((item) => (
                   <li>{item}</li>
-                ))}
-              </ul>
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="marketing-section marketing-section--soft">
-    <div class="marketing-shell">
-      <div class="marketing-section-header">
-        <span class="marketing-eyebrow">Readiness and governance</span>
-        <h2 class="marketing-title marketing-title--medium">
-          Make audit, safety, and vendor readiness part of the training loop.
-        </h2>
-        <p class="marketing-section-copy">
-          These enhancements extend the training workflow into evidence capture,
-          clinical safety stress testing, and executive-ready reporting.
-        </p>
-      </div>
-
-      <div class="marketing-grid marketing-grid--2">
-        {
-          readinessEnhancements.map((enhancement, index) => (
-            <article class="marketing-card">
-              <span class="marketing-card__label">
-                Readiness {String(index + 1).padStart(2, '0')}
-              </span>
-              <h3>{enhancement.title}</h3>
-              <p>{enhancement.summary}</p>
-              <ul class="marketing-list">
-                {enhancement.outcomes.map((outcome) => (
-                  <li>{outcome}</li>
                 ))}
               </ul>
             </article>

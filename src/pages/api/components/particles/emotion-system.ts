@@ -257,11 +257,41 @@ export const POST: APIRoute = protectRoute()(
         emotion,
         intensity,
         sessionId,
-        userId: user.id,
-      })
+        particleCount: particleUpdates?.length ?? 0,
+      },
+      recommendations: generateEmotionRecommendations(emotion, intensity),
+    }
 
-      return new Response(JSON.stringify(updateResponse), {
-        status: 200,
+    // TODO: Save particle interaction data for analytics
+    // const repository = new AIRepository()
+    // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
+
+    logger.info('Processed particle system update', {
+      emotion,
+      intensity,
+      sessionId,
+      userId: user.id,
+    })
+
+    return new Response(JSON.stringify(updateResponse), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (error: unknown) {
+    logger.error('Error processing particle system update', { error })
+
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error',
+        message:
+          error instanceof Error
+            ? error instanceof Error
+              ? error.message
+              : 'Unknown error'
+            : 'Unknown error',
+      }),
+      {
+        status: 500,
         headers: { 'Content-Type': 'application/json' },
       })
     } catch (error: unknown) {
@@ -449,7 +479,7 @@ function generateEmotionParticles(
     let cumulative = 0
 
     for (const entry of Object.entries(emotionProfile.emotionMix)) {
-      const [emo, percentage] = entry
+      const [emo, percentage] = entry as [string, number]
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

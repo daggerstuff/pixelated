@@ -512,7 +512,7 @@ export class BiasMetricsCollector {
       // Store locally in cache with processing time
       this.localCache.set(result.sessionId, {
         timestamp: 'timestamp' in result && result['timestamp']
-          ? new Date(result['timestamp'] as unknown as string).toISOString()
+          ? new Date(result['timestamp'] as string).toISOString()
           : new Date().toISOString(),
         session_id: result.sessionId,
         overall_bias_score: result.overallBiasScore,
@@ -533,7 +533,7 @@ export class BiasMetricsCollector {
         await this.pythonBridge.storeMetrics([
           {
             timestamp: ('timestamp' in result ? result['timestamp'] : undefined)
-              ? new Date(result['timestamp'] as unknown as string).toISOString()
+              ? new Date(result['timestamp'] as string).toISOString()
               : new Date().toISOString(),
             session_id: result.sessionId,
             overall_bias_score: result.overallBiasScore,

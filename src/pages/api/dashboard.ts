@@ -24,7 +24,7 @@ export const GET = async ({ request }: { request: AuthenticatedRequest }) => {
       ? authHeader.slice(7)
       : authHeader
 
-    let user: any
+    let user
     try {
       user = await verifyAuthToken(token)
     } catch (error) {

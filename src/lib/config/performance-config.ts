@@ -549,7 +549,7 @@ export class PerformanceOptimizer {
       // Use dynamic import to avoid top-level circular imports in some environments
       const utils = require('@/lib/utils') as typeof import('@/lib/utils')
       const crypto = utils.tryRequireNode('crypto')
-      createHash = (crypto as any)?.createHash
+      createHash = crypto?.createHash
     } catch (e) {
       console.debug('Failed to dynamically require @/lib/utils or crypto', e)
       createHash = undefined
