@@ -215,7 +215,7 @@ function toRecommendationAnalysis(
  * Production-grade implementation with real AI analysis
  */
 export function createMentalHealthChat(
-  _fheService: FHEService | null = null,
+  _fheService: any = null,
   options: MentalHealthChatOptions = {},
 ) {
   // Initialize services
