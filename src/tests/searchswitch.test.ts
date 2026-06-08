@@ -41,7 +41,7 @@ describe('SearchSwitch safe DOM updates', () => {
     safePopulateResults(container, [{ title: 't1', excerpt: 'e1', url: '/x' }])
     const links = container.querySelectorAll('a.search-results-item')
     expect(links.length).toBe(1)
-    expect(links?.[0].querySelector('.search-results-title')?.textContent).toBe(
+    expect(links[0]?.querySelector('.search-results-title')?.textContent).toBe(
       't1',
     )
   })

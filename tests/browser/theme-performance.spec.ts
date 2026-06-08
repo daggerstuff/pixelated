@@ -20,7 +20,7 @@ const performanceThresholds = {
 }
 
 test.describe('Theme Performance Tests', () => {
-  let page
+  let page: import('@playwright/test').Page
 
   test.beforeEach(async ({ page: testPage }) => {
     page = testPage
@@ -62,11 +62,13 @@ test.describe('Theme Performance Tests', () => {
     test('should load CSS without blocking render', async () => {
       // Check if theme styles are loaded efficiently
       const cssPerformance = await page.evaluate(() => {
-        const cssFiles = performance
-          .getEntriesByType('resource')
-          .filter((entry: any) => entry.name.includes('.css'))
+        const cssFiles = (
+          performance.getEntriesByType(
+            'resource',
+          ) as PerformanceResourceTiming[]
+        ).filter((entry) => entry.name.includes('.css'))
 
-        return cssFiles.map((entry: any) => ({
+        return cssFiles.map((entry) => ({
           name: entry.name,
           startTime: entry.startTime,
           duration: entry.duration,
@@ -84,24 +86,29 @@ test.describe('Theme Performance Tests', () => {
     test('should have minimal layout shifts', async () => {
       // Measure cumulative layout shift
       const cls = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let clsValue = 0
-          let clsEntries = 0
+        return new Promise<{ clsValue: number; clsEntries: number }>(
+          (resolve) => {
+            let clsValue = 0
+            let clsEntries = 0
 
-          new PerformanceObserver((list) => {
-            for (const entry of list.getEntries()) {
-              if (entry.entryType === 'layout-shift' && !entry.hadRecentInput) {
-                clsValue += entry.value
-                clsEntries++
+            new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) {
+                if (
+                  entry.entryType === 'layout-shift' &&
+                  !(entry as { hadRecentInput?: boolean }).hadRecentInput
+                ) {
+                  clsValue += (entry as { value?: number }).value ?? 0
+                  clsEntries++
+                }
               }
-            }
-          }).observe({ entryTypes: ['layout-shift'] })
+            }).observe({ entryTypes: ['layout-shift'] })
 
-          // Wait a bit for layout shifts to occur
-          setTimeout(() => {
-            resolve({ clsValue, clsEntries })
-          }, 1000)
-        })
+            // Wait a bit for layout shifts to occur
+            setTimeout(() => {
+              resolve({ clsValue, clsEntries })
+            }, 1000)
+          },
+        )
       })
 
       // Layout shifts should be minimal during theme loading
@@ -115,8 +122,8 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure theme switch performance
       await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          const marks = []
+        return new Promise<{ marks: PerformanceEntry[] }>((resolve) => {
+          const marks: PerformanceEntry[] = []
 
           // Add performance observer
           new PerformanceObserver((list) => {
@@ -150,24 +157,26 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure layout performance during theme switch
       const layoutMetrics = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let layoutCount = 0
-          let styleCount = 0
+        return new Promise<{ layoutCount: number; styleCount: number }>(
+          (resolve) => {
+            let layoutCount = 0
+            let styleCount = 0
 
-          new PerformanceObserver((list) => {
-            for (const entry of list.getEntries()) {
-              if (entry.entryType === 'measure') {
-                if (entry.name.includes('layout')) layoutCount++
-                if (entry.name.includes('style')) styleCount++
+            new PerformanceObserver((list) => {
+              for (const entry of list.getEntries()) {
+                if (entry.entryType === 'measure') {
+                  if (entry.name.includes('layout')) layoutCount++
+                  if (entry.name.includes('style')) styleCount++
+                }
               }
-            }
-          }).observe({ entryTypes: ['measure'] })
+            }).observe({ entryTypes: ['measure'] })
 
-          // Wait and collect metrics
-          setTimeout(() => {
-            resolve({ layoutCount, styleCount })
-          }, 500)
-        })
+            // Wait and collect metrics
+            setTimeout(() => {
+              resolve({ layoutCount, styleCount })
+            }, 500)
+          },
+        )
       })
 
       await themeToggle.click()
@@ -182,35 +191,39 @@ test.describe('Theme Performance Tests', () => {
 
       // Check for efficient DOM batching
       const domBatches = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let mutationCount = 0
-          let batchCount = 0
-          let lastMutationTime = 0
+        return new Promise<{ mutationCount: number; batchCount: number }>(
+          (resolve) => {
+            let mutationCount = 0
+            let batchCount = 0
+            let lastMutationTime = 0
 
-          const observer = new MutationObserver((mutations) => {
-            const now = performance.now()
-            mutationCount += mutations.length
+            const observer = new MutationObserver(
+              (mutations: MutationRecord[]) => {
+                const now = performance.now()
+                mutationCount += mutations.length
 
-            // Count batches (mutations within 16ms of each other)
-            if (now - lastMutationTime > 16) {
-              batchCount++
-            }
-            lastMutationTime = now
-          })
+                // Count batches (mutations within 16ms of each other)
+                if (now - lastMutationTime > 16) {
+                  batchCount++
+                }
+                lastMutationTime = now
+              },
+            )
 
-          observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['class'],
-            childList: false,
-            subtree: false,
-          })
+            observer.observe(document.documentElement, {
+              attributes: true,
+              attributeFilter: ['class'],
+              childList: false,
+              subtree: false,
+            })
 
-          // Wait for mutations to complete
-          setTimeout(() => {
-            observer.disconnect()
-            resolve({ mutationCount, batchCount })
-          }, 500)
-        })
+            // Wait for mutations to complete
+            setTimeout(() => {
+              observer.disconnect()
+              resolve({ mutationCount, batchCount })
+            }, 500)
+          },
+        )
       })
 
       await themeToggle.click()
@@ -224,10 +237,14 @@ test.describe('Theme Performance Tests', () => {
     test('should maintain smooth animations at 60fps', async () => {
       // Measure animation frame rate
       const frameMetrics = await page.evaluate(async () => {
-        return new Promise((resolve) => {
+        return new Promise<{
+          averageFps: number
+          minFps: number
+          maxFps: number
+        }>((resolve) => {
           let frames = 0
           let lastTime = performance.now()
-          let frameRates = []
+          const frameRates: number[] = []
 
           const measureFrame = () => {
             const currentTime = performance.now()
@@ -282,9 +299,11 @@ test.describe('Theme Performance Tests', () => {
       const themeToggle = page.locator('#theme-toggle-v2')
 
       // Check for optimized transition properties
-      const transitionProperties = await themeToggle.evaluate((el) => {
-        return window.getComputedStyle(el).transitionProperty
-      })
+      const transitionProperties = await themeToggle.evaluate(
+        (el: HTMLElement) => {
+          return window.getComputedStyle(el).transitionProperty
+        },
+      )
 
       // Should only transition specific properties, not 'all'
       expect(transitionProperties).not.toBe('all')
@@ -295,16 +314,16 @@ test.describe('Theme Performance Tests', () => {
   test.describe('Memory Management', () => {
     test('should not leak memory during theme switches', async () => {
       const memoryMetrics = await page.evaluate(() => {
-        if (!performance.memory) {
+        if (!(performance as any).memory) {
           return { unsupported: true }
         }
 
-        const initialMemory = performance.memory.usedJSHeapSize
+        const initialMemory = (performance as any).memory.usedJSHeapSize
         return { initialMemory }
       })
 
       if (memoryMetrics.unsupported) {
-        test.skip('Memory API not supported in this browser')
+        test.skip(true, 'Memory API not supported in this browser')
         return
       }
 
@@ -317,7 +336,7 @@ test.describe('Theme Performance Tests', () => {
 
       // Check final memory usage
       const finalMemory = await page.evaluate(() => {
-        return performance.memory.usedJSHeapSize
+        return (performance as any).memory.usedJSHeapSize
       })
 
       const memoryIncrease = finalMemory - memoryMetrics.initialMemory
@@ -331,8 +350,8 @@ test.describe('Theme Performance Tests', () => {
 
       // Check listener cleanup
       const finalListenerCounts = await page.evaluate(() => {
-        const finalListeners = getEventListeners
-          ? getEventListeners(document)
+        const finalListeners = (window as any).getEventListeners
+          ? (window as any).getEventListeners(document)
           : {}
         return { finalListeners }
       })
@@ -350,14 +369,15 @@ test.describe('Theme Performance Tests', () => {
       // Analyze CSS selector efficiency
       const cssAnalysis = await page.evaluate(() => {
         const stylesheets = Array.from(document.styleSheets)
-        const selectors = []
+        const selectors: string[] = []
 
         stylesheets.forEach((sheet) => {
           try {
             const rules = Array.from(sheet.cssRules || sheet.rules || [])
             rules.forEach((rule) => {
-              if (rule.selectorText) {
-                selectors.push(rule.selectorText)
+              const styleRule = rule as CSSStyleRule
+              if (styleRule.selectorText) {
+                selectors.push(styleRule.selectorText)
               }
             })
           } catch (e) {
@@ -368,7 +388,7 @@ test.describe('Theme Performance Tests', () => {
         return {
           totalSelectors: selectors.length,
           complexSelectors: selectors.filter(
-            (s) => s.includes('>') ?? s.includes('+') ?? s.includes('~'),
+            (s) => s.includes('>') || s.includes('+') || s.includes('~'),
           ).length,
           universalSelectors: selectors.filter((s) => s.includes('*')).length,
         }
@@ -385,17 +405,15 @@ test.describe('Theme Performance Tests', () => {
       // Check for CSS containment properties
       const containment = await page.evaluate(() => {
         const elements = document.querySelectorAll('*')
-        const containmentUsage = []
+        const containmentUsage: Array<{ tagName: string; contain: string }> = []
 
         elements.forEach((el) => {
           const style = window.getComputedStyle(el)
           if (style.contain && style.contain !== 'none') {
-            containmentUsage
-              .push({
-                tagName: el.tagName,
-                contain: style.contain,
-              })
-              .slice(________)
+            containmentUsage.push({
+              tagName: el.tagName,
+              contain: style.contain,
+            })
           }
         })
 
@@ -420,13 +438,16 @@ test.describe('Theme Performance Tests', () => {
     test('should cache theme assets efficiently', async () => {
       // Check caching headers for theme-related resources
       const resourceCaching = await page.evaluate(() => {
-        return performance
-          .getEntriesByType('resource')
+        return (
+          performance.getEntriesByType(
+            'resource',
+          ) as PerformanceResourceTiming[]
+        )
           .filter(
-            (entry: any) =>
-              entry.name.includes('.css') ?? entry.name.includes('theme'),
+            (entry) =>
+              entry.name.includes('.css') || entry.name.includes('theme'),
           )
-          .map((entry: any) => ({
+          .map((entry) => ({
             name: entry.name,
             transferSize: entry.transferSize,
             decodedBodySize: entry.decodedBodySize,
