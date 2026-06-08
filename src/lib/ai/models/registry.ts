@@ -4,13 +4,15 @@
 import type { AIModel } from './types'
 
 // Stub model data based on your existing AI infrastructure
-const STUB_MODELS: AIModel[] = [
+const STUB_MODELS: Array<AIModel & { available: boolean }> = [
   {
     id: 'gemini-2-flash',
     name: 'Gemini 2.0 Flash',
     provider: 'google',
     capabilities: ['text-generation', 'conversation'],
     maxTokens: 32768,
+    contextWindow: 1048576,
+    temperature: 0.7,
     available: true,
   },
   {
@@ -19,6 +21,8 @@ const STUB_MODELS: AIModel[] = [
     provider: 'anthropic',
     capabilities: ['text-generation', 'conversation', 'analysis'],
     maxTokens: 200000,
+    contextWindow: 200000,
+    temperature: 0.7,
     available: true,
   },
   {
@@ -27,6 +31,8 @@ const STUB_MODELS: AIModel[] = [
     provider: 'openai',
     capabilities: ['text-generation', 'conversation', 'vision'],
     maxTokens: 128000,
+    contextWindow: 128000,
+    temperature: 0.7,
     available: true,
   },
   {
@@ -35,6 +41,8 @@ const STUB_MODELS: AIModel[] = [
     provider: 'llm',
     capabilities: ['text-generation', 'conversation'],
     maxTokens: 8192,
+    contextWindow: 8192,
+    temperature: 0.7,
     available: true,
   },
 ]

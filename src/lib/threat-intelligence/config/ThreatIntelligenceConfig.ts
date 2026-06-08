@@ -4,7 +4,7 @@
  */
 
 import Redis from 'ioredis'
-import { MongoClient } from 'mongodb'
+import { type Db, MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
@@ -1214,7 +1214,7 @@ export class ThreatIntelligenceConfigManager {
         throw new Error('At least one region must be configured')
       }
 
-      const primaryRegions = this.config.regions.filter((r) => r.primary)
+      const primaryRegions = this.config.regions?.filter((r) => r.primary)
       if (primaryRegions.length !== 1) {
         throw new Error('Exactly one primary region must be configured')
       }
@@ -1346,7 +1346,7 @@ export class ThreatIntelligenceConfigManager {
   }
 
   async getConfigByRegion(regionId: string): Promise<RegionConfig | undefined> {
-    return this.config.regions.find((r) => r.regionId === regionId)
+    return this.config.regions?.find((r) => r.regionId === regionId)
   }
 
   async updateRegionConfig(
@@ -1363,9 +1363,9 @@ export class ThreatIntelligenceConfigManager {
       }
 
       this.config.regions[regionIndex] = {
-        ...this.config.regions[regionIndex],
+        ...this.config.regions[regionIndex]!,
         ...updates,
-      }
+      } as RegionConfig
 
       await this.storeConfiguration()
 
@@ -1382,7 +1382,7 @@ export class ThreatIntelligenceConfigManager {
   async addRegionConfig(regionConfig: RegionConfig): Promise<void> {
     try {
       // Check if region already exists
-      const existingRegion = this.config.regions.find(
+      const existingRegion = this.config.regions?.find(
         (r) => r.regionId === regionConfig.regionId,
       )
       if (existingRegion) {
@@ -1415,7 +1415,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       // Don't allow removal of primary region
-      if (this?.config.regions[regionIndex].primary) {
+      if (this.config.regions[regionIndex]?.primary) {
         throw new Error('Cannot remove primary region')
       }
 
@@ -1502,7 +1502,7 @@ export class ThreatIntelligenceConfigManager {
 
       return {
         valid:
-          issues.filter((i) => i.startsWith('Missing required')).length === 0,
+          issues?.filter((i) => i.startsWith('Missing required')).length === 0,
         issues,
       }
     } catch (error: unknown) {

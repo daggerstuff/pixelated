@@ -354,3 +354,7 @@ scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
 struct-agent-key.json
+
+# Metoro-exporter templates and values customization
+!metoro-exporter/templates/
+!metoro-exporter/templates/**

@@ -10,6 +10,7 @@ import { MentalHealthTaskRouter } from './routing/MentalHealthTaskRouter.ts'
 import type {
   LLMInvoker,
   LLMInvocationOptions,
+  MentalLLaMAAdapterOptions,
 } from './types/mentalLLaMATypes.ts'
 
 const logger = getHipaaCompliantLogger('general')
@@ -138,11 +139,11 @@ export async function createMentalLLaMAFactory(
     }
   }
 
-  const adapter = new MentalLLaMAAdapter(
-    crisisNotifier
-      ? { modelProvider, taskRouter, crisisNotifier }
-      : { modelProvider, taskRouter },
-  )
+  const adapterOptions: MentalLLaMAAdapterOptions = { modelProvider, taskRouter }
+  if (crisisNotifier) {
+    adapterOptions.crisisNotifier = crisisNotifier as any
+  }
+  const adapter = new MentalLLaMAAdapter(adapterOptions)
   // pythonBridge is not directly part of MentalLLaMAAdapterOptions in the merged version
   // It's used by ExpertGuidanceOrchestrator or other specific components if needed.
   // If the Python bridge is available, one might pass it to the adapter too,

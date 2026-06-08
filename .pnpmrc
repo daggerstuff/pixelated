@@ -1,2 +1,0 @@
-# All workspace-wide configurations (overrides, peer dependency rules, allowBuilds)
-# have been migrated to the root pnpm-workspace.yaml per pnpm 11 requirements.

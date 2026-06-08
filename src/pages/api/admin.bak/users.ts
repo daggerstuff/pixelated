@@ -1,7 +1,7 @@
 export const prerender = false
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-import { AdminPermission, AdminService } from '../../../lib/admin'
+import { AdminPermission, AdminService } from '../../../lib/admin/index'
 import { adminGuard } from '../../../lib/admin/middleware'
 // import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
@@ -21,7 +21,7 @@ export const GET = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
-    context,
+    context as any,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -30,7 +30,7 @@ export const GET = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId } = context.locals.admin
+    const { userId } = (context.locals as any).admin
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
@@ -44,7 +44,7 @@ export const GET = async (context: APIContext) => {
     // Get users with pagination and filtering
     const usersResult = await adminService.getAllAdmins()
     const filteredUsers = role
-      ? usersResult.filter((user: any) => user.role === role)
+      ? usersResult.filter((user: { role?: string }) => user.role === role)
       : usersResult
     const total = filteredUsers.length
     const paginatedUsers = filteredUsers.slice(offset, offset + limit)
@@ -91,7 +91,7 @@ export const PATCH = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
-    context,
+    context as any,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -100,11 +100,17 @@ export const PATCH = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId: adminId } = context.locals.admin
+    const { userId: adminId } = (context.locals as any).admin
 
     // Parse the request body
-    const requestData = await context.request.json()
-    const { userId, updates } = requestData
+    const requestData = (await context.request.json()) as Record<
+      string,
+      unknown
+    >
+    const userId = requestData['userId'] as string | undefined
+    const updates = requestData['updates'] as
+      | Record<string, unknown>
+      | undefined
 
     if (!userId || !updates) {
       return new Response(

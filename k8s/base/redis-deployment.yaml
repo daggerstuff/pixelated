@@ -1,75 +1,34 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: pixelated-empathy-redis
-  namespace: pixelated-empathy
+  name: redis
+  labels:
+    app: redis
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: pixelated-empathy-redis
+      app: redis
   template:
     metadata:
       labels:
-        app: pixelated-empathy-redis
+        app: redis
     spec:
-      securityContext:
-        runAsNonRoot: true
-        runAsUser: 999
-        runAsGroup: 1000
-        fsGroup: 1000
-        seccompProfile:
-          type: RuntimeDefault
-      initContainers:
-      - name: fix-permissions
-        image: redis:7-alpine
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsNonRoot: false
-          runAsUser: 0
-          capabilities:
-            drop:
-              - ALL
-        command:
-        - sh
-        - -c
-        - chown -R 999:1000 /data
-        volumeMounts:
-        - name: data
-          mountPath: /data
       containers:
       - name: redis
         image: redis:7-alpine
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsNonRoot: true
-          runAsUser: 999
-          runAsGroup: 1000
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
-        command:
-        - sh
-        - -c
-        - redis-server --bind 0.0.0.0 --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
-        envFrom:
-        - secretRef:
-            name: pixelated-empathy-secrets
         ports:
         - containerPort: 6379
-          name: redis
-          protocol: TCP
-        volumeMounts:
-        - name: data
-          mountPath: /data
         resources:
           requests:
-            cpu: "50m"
-            memory: "64Mi"
+            cpu: "100m"
+            memory: "128Mi"
           limits:
             cpu: "200m"
             memory: "128Mi"
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
       volumes:
-      - name: data
+      - name: redis-data
         emptyDir: {}
