@@ -24,7 +24,7 @@ function getLuminance(color: string): number {
   const rgb = color.match(/\d+/g)?.map(Number) ?? [0, 0, 0]
 
   // Convert to sRGB
-  const [r, g, b] = rgb.map((c) => {
+  const [r = 0, g = 0, b = 0] = rgb.map((c) => {
     c = c / 255
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   })

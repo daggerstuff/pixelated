@@ -220,7 +220,7 @@ export class MarketAnalyticsService {
    * Analyze customer segmentation
    */
   async analyzeCustomerSegmentation(
-    customerData: any[],
+    customerData: CustomerRecord[],
   ): Promise<CustomerSegment[]> {
     const segments = await this.performClusteringAnalysis(customerData)
 
@@ -345,7 +345,7 @@ export class MarketAnalyticsService {
   private async analyzeTargetMarkets(
     current: string,
     targets: string[],
-  ): Promise<any> {
+  ): Promise<{ current: string; targets: string[]; analysis: string }> {
     // Mock analysis - replace with actual market research
     return {
       current,
@@ -354,7 +354,7 @@ export class MarketAnalyticsService {
     }
   }
 
-  private async performClusteringAnalysis(data: any[]): Promise<any[]> {
+  private async performClusteringAnalysis(data: CustomerRecord[]): Promise<ClusterResult[]> {
     // Mock clustering - replace with actual ML clustering
     return [
       {
@@ -384,7 +384,11 @@ export class MarketAnalyticsService {
     ]
   }
 
-  private async fetchMarketSaturationData(_market: string): Promise<any> {
+  private async fetchMarketSaturationData(_market: string): Promise<{
+    currentCustomers: number
+    totalPotential: number
+    yoyGrowth: number
+  }> {
     // Mock data - replace with actual market data
     return {
       currentCustomers: 450,
@@ -396,9 +400,9 @@ export class MarketAnalyticsService {
   private async fetchHistoricalData(
     _market: string,
     months: number,
-  ): Promise<any[]> {
+  ): Promise<HistoricalDataPoint[]> {
     // Mock historical data - replace with actual data
-    const data = []
+    const data: HistoricalDataPoint[] = []
     let baseSize = 800000
 
     for (let i = 0; i < months; i++) {
@@ -412,11 +416,11 @@ export class MarketAnalyticsService {
     return data
   }
 
-  private calculateTrends(data: any[]): { growthRate: number } {
+  private calculateTrends(data: HistoricalDataPoint[]): { growthRate: number } {
     if (data.length < 2) return { growthRate: 5 }
 
-    const first = data[0].marketSize
-    const last = data[data.length - 1].marketSize
+    const first = data[0]!.marketSize
+    const last = data[data.length - 1]!.marketSize
     const periods = data.length
 
     const growthRate = ((last / first) ** (12 / periods) - 1) * 100
@@ -452,6 +456,28 @@ interface RiskAssessment {
   probabilityOfSuccess: number
   riskFactors: string[]
   mitigationStrategies: string[]
+}
+
+interface CustomerRecord {
+  companySize: number
+  type: string
+  size: number
+}
+
+interface ClusterResult {
+  name: string
+  customers: CustomerRecord[]
+  characteristics: string[]
+  avgLifetimeValue: number
+  avgAcquisitionCost: number
+  churnRate: number
+  expansionPotential: string
+  strategy: string
+}
+
+interface HistoricalDataPoint {
+  date: Date
+  marketSize: number
 }
 
 interface CustomerSegment {

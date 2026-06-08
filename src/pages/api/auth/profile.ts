@@ -23,7 +23,7 @@ export const GET = async ({
 }) => {
   try {
     // Extract client info for logging
-    const clientInfo = {
+    clientInfo = {
       ip: clientAddress || 'unknown',
       userAgent: request.headers.get('user-agent') ?? 'unknown',
       deviceId: request.headers.get('x-device-id') ?? 'unknown',
@@ -46,7 +46,7 @@ export const GET = async ({
       userId =
         (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
-      const authHeader = request.headers.get('Authorization')
+      const authHeader = request.headers.get('Authorization') ?? null
       if (!authHeader) {
         // Fallback to cookie
         const cookieToken = request.headers
@@ -57,11 +57,11 @@ export const GET = async ({
 
         if (cookieToken) {
           const v = await verifyAuthToken(cookieToken)
-          userId = v.userId
+          userId = v.userId ?? null
         }
       } else {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId
+        userId = v.userId ?? null
       }
     }
 
@@ -179,7 +179,7 @@ export const PUT = async ({
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {
         const v = await verifyAuthToken(authHeader)
-        userId = v.userId
+        userId = v.userId ?? null
       }
     }
 
@@ -233,7 +233,7 @@ export const PUT = async ({
 
     // Create Audit Log
     await createAuditLog(
-      AuditEventType.USER_MODIFIED,
+      AuditEventType.MODIFY,
       'profile.update',
       userId,
       'user',

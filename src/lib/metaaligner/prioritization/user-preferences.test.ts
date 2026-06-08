@@ -82,8 +82,8 @@ describe('UserPreferenceManager', () => {
     it('should reject invalid custom weights', () => {
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          empathy: 1.5, // Invalid: > 1
-          safety: -0.1, // Invalid: < 0
+          [ObjectiveKey.Empathy]: 1.5, // Invalid: > 1
+          [ObjectiveKey.Safety]: -0.1, // Invalid: < 0
         },
       }
 
@@ -166,8 +166,8 @@ describe('UserPreferenceManager', () => {
 
     it('should warn about conflicting preferences', () => {
       const prefs: UserPreferences = {
-        disableObjectives: ['empathy', 'safety'],
-        prioritizeObjectives: ['empathy'], // Conflict!
+        disableObjectives: [ObjectiveKey.Empathy, ObjectiveKey.Safety],
+        prioritizeObjectives: [ObjectiveKey.Empathy], // Conflict!
       }
 
       const result = manager.validatePreferences(prefs)
@@ -177,9 +177,9 @@ describe('UserPreferenceManager', () => {
     it('should validate custom weights range', () => {
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          empathy: 0.5,
-          safety: 0.8,
-          clarity: 1.0,
+          [ObjectiveKey.Empathy]: 0.5,
+          [ObjectiveKey.Safety]: 0.8,
+          [ObjectiveKey.Correctness]: 1.0,
         },
       }
 
@@ -258,13 +258,12 @@ describe('UserPreferenceManager', () => {
 
 describe('applyUserPreferences', () => {
   const createBaseObjectives = (): ObjectivePriority[] => [
-    { key: 'empathy', priority: 1, weight: 0.2 },
-    { key: 'safety', priority: 2, weight: 0.2 },
-    { key: 'correctness', priority: 3, weight: 0.15 },
-    { key: 'informativeness', priority: 4, weight: 0.15 },
-    { key: 'conciseness', priority: 5, weight: 0.1 },
-    { key: 'clarity', priority: 6, weight: 0.1 },
-    { key: 'warmth', priority: 7, weight: 0.1 },
+    { key: ObjectiveKey.Empathy, priority: 1, weight: 0.2 },
+    { key: ObjectiveKey.Safety, priority: 2, weight: 0.2 },
+    { key: ObjectiveKey.Correctness, priority: 3, weight: 0.15 },
+    { key: ObjectiveKey.Informativeness, priority: 4, weight: 0.15 },
+    { key: ObjectiveKey.Professionalism, priority: 5, weight: 0.1 },
+    { key: ObjectiveKey.Support, priority: 6, weight: 0.1 },
   ]
 
   describe('basic functionality', () => {
@@ -292,7 +291,7 @@ describe('applyUserPreferences', () => {
     it('should filter out disabled objectives', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        disableObjectives: ['empathy', 'warmth'],
+        disableObjectives: [ObjectiveKey.Empathy, ObjectiveKey.Safety],
       }
 
       const result = applyUserPreferences(objectives, prefs)
@@ -307,8 +306,8 @@ describe('applyUserPreferences', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
         customObjectiveWeights: {
-          empathy: 0.5,
-          safety: 0.3,
+          [ObjectiveKey.Empathy]: 0.5,
+          [ObjectiveKey.Safety]: 0.3,
         },
       }
 
@@ -463,7 +462,7 @@ describe('applyUserPreferences', () => {
     it('should boost prioritized objectives', () => {
       const objectives = createBaseObjectives()
       const prefs: UserPreferences = {
-        prioritizeObjectives: ['safety', 'clarity'],
+        prioritizeObjectives: [ObjectiveKey.Safety, ObjectiveKey.Support],
       }
 
       const result = applyUserPreferences(objectives, prefs)
@@ -531,9 +530,9 @@ describe('applyUserPreferences', () => {
         preferredSupportStyle: 'empathic',
         riskSensitivity: 'high',
         verbosityLevel: 'concise',
-        prioritizeObjectives: ['safety'],
+        prioritizeObjectives: [ObjectiveKey.Safety],
         customObjectiveWeights: {
-          empathy: 0.3,
+          [ObjectiveKey.Empathy]: 0.3,
         },
       }
 
@@ -587,8 +586,8 @@ describe('applyUserPreferences', () => {
 
     it('should handle zero weights gracefully', () => {
       const objectives: ObjectivePriority[] = [
-        { key: 'test1', priority: 1, weight: 0 },
-        { key: 'test2', priority: 2, weight: 0 },
+        { key: ObjectiveKey.Empathy, priority: 1, weight: 0 },
+        { key: ObjectiveKey.Safety, priority: 2, weight: 0 },
       ]
 
       const result = applyUserPreferences(objectives, {})

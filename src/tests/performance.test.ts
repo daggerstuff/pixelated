@@ -332,7 +332,9 @@ describe('performance Tests', () => {
             ])
 
             // Store result
-            results.pages[name].FID = inputDelay
+            const pageResult = results.pages[name]
+            if (!pageResult) return
+            pageResult.FID = inputDelay
 
             // Assert
             expect(inputDelay).toBeLessThan(PERFORMANCE_THRESHOLDS.FID)
@@ -453,6 +455,7 @@ describe('performance Tests', () => {
         // Compare with current results
         for (const [pageName, pageMetrics] of Object.entries(results.pages)) {
           const previousPageMetrics = previousResults.pages[pageName]
+          if (!previousPageMetrics) continue
 
           // Check for significant regressions (>20% worse)
           for (const metricName of ['LCP', 'FID', 'CLS', 'FCP'] as const) {

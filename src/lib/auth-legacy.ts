@@ -4,6 +4,7 @@ import { auth0UserService } from '@/services/auth0.service'
 
 import type { AuthRole } from '../config/auth.config'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
+import { getIdentityProvider } from './auth/identity-provider'
 import {
   createHIPAACompliantAuditLog,
   AuditEventType,
@@ -79,6 +80,7 @@ export async function getCurrentUser(
     return null
   }
 
+  const provider = getIdentityProvider()
   try {
     const decoded = await validateToken(accessToken, 'access')
     const userId = decoded.userId

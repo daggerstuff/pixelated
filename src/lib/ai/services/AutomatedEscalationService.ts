@@ -390,7 +390,7 @@ export class AutomatedEscalationService {
         ...escalationEvent,
         id: this.generateEscalationId(escalationEvent.userId, higherLevel),
         protocolActivated: newProtocol,
-        triggerType: 'escalation',
+        triggerType: 'automated',
       }
 
       await this.executeProtocolActions(higherEscalation)
@@ -600,7 +600,7 @@ export class AutomatedEscalationService {
     this.notificationTemplates.set('crisis_alert_high', {
       type: 'crisis_alert',
       urgency: 'critical',
-      channels: ['phone', 'sms', 'email'],
+      channels: ['call', 'sms', 'email'],
       template: {
         subject: 'URGENT: Crisis Risk Detected - {{userId}}',
         body: 'A high-risk crisis situation has been detected for patient {{userId}}. Risk level: {{riskLevel}}. Immediate intervention required within {{timeframe}}. Primary risk factors: {{riskFactors}}.',
@@ -611,7 +611,7 @@ export class AutomatedEscalationService {
     this.notificationTemplates.set('risk_warning_medium', {
       type: 'risk_warning',
       urgency: 'high',
-      channels: ['phone', 'email'],
+      channels: ['call', 'email'],
       template: {
         subject: 'Risk Warning: Elevated Crisis Risk - {{userId}}',
         body: 'Patient {{userId}} has shown elevated crisis risk indicators. Risk level: {{riskLevel}}. Recommended action: {{recommendations}}. Please review within {{timeframe}}.',
@@ -810,7 +810,7 @@ export class AutomatedEscalationService {
   private getNextEscalationLevel(currentLevel: string): string | null {
     const levels = ['low', 'medium', 'high', 'critical']
     const currentIndex = levels.indexOf(currentLevel)
-    return currentIndex < levels.length - 1 ? levels[currentIndex + 1] : null
+    return currentIndex < levels.length - 1 ? (levels[currentIndex + 1] ?? null) : null
   }
 }
 

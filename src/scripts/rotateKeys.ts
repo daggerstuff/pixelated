@@ -68,7 +68,7 @@ async function main(): Promise<void> {
     // Create crypto system
     const crypto = createCryptoSystem({
       namespace: 'app',
-      useSecureStorage: import.meta.env.PROD,
+      useSecureStorage: (import.meta as unknown as { env: { PROD: boolean } }).env.PROD,
       keyRotationDays: 90,
     })
 

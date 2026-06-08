@@ -1,18 +1,25 @@
 import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
 import { InterventionAnalysisService } from '@/lib/ai/services/intervention-analysis'
 
-// Define types for mocked responses
-interface AIServiceResponse {
-  content: string
-  model: string
-  usage: {
-    total_tokens: number
-    prompt_tokens: number
-    completion_tokens: number
+function createMockAICompletion(id: string, contentObj: any): AICompletion {
+  const content = typeof contentObj === 'string' ? contentObj : JSON.stringify(contentObj)
+  return {
+    id,
+    content,
+    model: 'test-model',
+    usage: { totalTokens: 150, promptTokens: 120, completionTokens: 30 },
+    provider: 'test-provider',
+    created: Date.now(),
+    choices: [
+      {
+        message: {
+          role: 'assistant',
+          content,
+        },
+        finishReason: 'stop',
+      },
+    ],
   }
-  id: string
-  provider: string
-  created: number
 }
 
 interface InterventionRequest {
@@ -21,16 +28,6 @@ interface InterventionRequest {
   userResponse: string
 }
 
-// Define mock interface for AIService with correct return types
-interface MockedAIService extends AIService {
-  createChatCompletion: ReturnType<typeof vi.fn>
-  createStreamingChatCompletion: ReturnType<typeof vi.fn>
-  getModelInfo: ReturnType<typeof vi.fn>
-  createChatCompletionWithTracking: ReturnType<typeof vi.fn>
-  generateCompletion: ReturnType<typeof vi.fn>
-  createChatStream: ReturnType<typeof vi.fn>
-  dispose: ReturnType<typeof vi.fn>
-}
 
 // Create a simplified mock of the AIService
 const mockAIService = {
@@ -65,7 +62,7 @@ const mockAIService = {
     }),
   ),
   dispose: vi.fn(),
-} as unknown as MockedAIService
+} as unknown as AIService
 
 describe('interventionAnalysisService', () => {
   let interventionService: InterventionAnalysisService
@@ -81,27 +78,20 @@ describe('interventionAnalysisService', () => {
   describe('analyzeIntervention', () => {
     it('should analyze intervention effectiveness correctly', async () => {
       // Mock the AI service response with proper typing
-      const mockResponse: AIServiceResponse = {
-        content: JSON.stringify({
-          effectiveness_score: 8,
-          user_receptiveness: 'high',
-          emotional_impact: 'positive',
-          key_insights: [
-            'The intervention was well-timed',
-            'The user responded positively to validation',
-          ],
-          improvement_suggestions: [
-            'Could provide more specific coping strategies',
-          ],
-        }),
-        model: 'test-model',
-        usage: { total_tokens: 150, prompt_tokens: 120, completion_tokens: 30 },
-        id: 'test-id-123',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse = createMockAICompletion('test-id-123', {
+        effectiveness_score: 8,
+        user_receptiveness: 'high',
+        emotional_impact: 'positive',
+        key_insights: [
+          'The intervention was well-timed',
+          'The user responded positively to validation',
+        ],
+        improvement_suggestions: [
+          'Could provide more specific coping strategies',
+        ],
+      })
 
-      vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+      vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
         mockResponse,
       )
 
@@ -160,7 +150,7 @@ describe('interventionAnalysisService', () => {
       } as ExpectedResult)
 
       // Verify the AI service was called with correct parameters
-      expect(mockAIService.createChatCompletion).toHaveBeenCalledWith(
+      expect(vi.spyOn(mockAIService, 'createChatCompletion')).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ role: 'system' }),
           expect.objectContaining({
@@ -174,22 +164,15 @@ describe('interventionAnalysisService', () => {
 
     it('should handle custom analysis prompt', async () => {
       // Mock the AI service response with proper typing
-      const mockResponse: AIServiceResponse = {
-        content: JSON.stringify({
-          effectiveness_score: 7,
-          user_receptiveness: 'medium',
-          emotional_impact: 'neutral',
-          key_insights: ['Custom analysis insight'],
-          improvement_suggestions: ['Custom improvement suggestion'],
-        }),
-        model: 'test-model',
-        usage: { total_tokens: 150, prompt_tokens: 120, completion_tokens: 30 },
-        id: 'test-id-456',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse = createMockAICompletion('test-id-456', {
+        effectiveness_score: 7,
+        user_receptiveness: 'medium',
+        emotional_impact: 'neutral',
+        key_insights: ['Custom analysis insight'],
+        improvement_suggestions: ['Custom improvement suggestion'],
+      })
 
-      vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+      vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
         mockResponse,
       )
 
@@ -213,7 +196,7 @@ describe('interventionAnalysisService', () => {
       )
 
       // Verify the AI service was called with custom prompt
-      expect(mockAIService.createChatCompletion).toHaveBeenCalledWith(
+      expect(vi.spyOn(mockAIService, 'createChatCompletion')).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({
             role: 'user',
@@ -226,16 +209,9 @@ describe('interventionAnalysisService', () => {
 
     it('should handle invalid JSON responses', async () => {
       // Mock the AI service response with invalid JSON
-      const mockResponse: AIServiceResponse = {
-        content: 'Not a valid JSON response',
-        model: 'test-model',
-        usage: { total_tokens: 150, prompt_tokens: 120, completion_tokens: 30 },
-        id: 'test-id-789',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse = createMockAICompletion('test-id-789', 'Not a valid JSON response')
 
-      vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+      vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
         mockResponse,
       )
 
@@ -259,7 +235,7 @@ describe('interventionAnalysisService', () => {
 
     it('should handle AI service errors', async () => {
       // Mock the AI service to throw an error
-      vi.mocked(mockAIService.createChatCompletion).mockRejectedValue(
+      vi.mocked(mockAIService).createChatCompletion.mockRejectedValue(
         new Error('AI service error'),
       )
 
@@ -285,45 +261,23 @@ describe('interventionAnalysisService', () => {
   describe('analyzeBatch', () => {
     it('should analyze multiple interventions in parallel', async () => {
       // Mock the AI service response for multiple calls
-      const mockResponse1: AIServiceResponse = {
-        content: JSON.stringify({
-          effectiveness_score: 8,
-          user_receptiveness: 'high',
-          emotional_impact: 'positive',
-          key_insights: ['First insight'],
-          improvement_suggestions: ['First suggestion'],
-        }),
-        model: 'test-model',
-        usage: {
-          total_tokens: 150,
-          prompt_tokens: 120,
-          completion_tokens: 30,
-        },
-        id: 'test-id-001',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse1 = createMockAICompletion('test-id-001', {
+        effectiveness_score: 8,
+        user_receptiveness: 'high',
+        emotional_impact: 'positive',
+        key_insights: ['First insight'],
+        improvement_suggestions: ['First suggestion'],
+      })
 
-      const mockResponse2: AIServiceResponse = {
-        content: JSON.stringify({
-          effectiveness_score: 6,
-          user_receptiveness: 'medium',
-          emotional_impact: 'neutral',
-          key_insights: ['Second insight'],
-          improvement_suggestions: ['Second suggestion'],
-        }),
-        model: 'test-model',
-        usage: {
-          total_tokens: 150,
-          prompt_tokens: 120,
-          completion_tokens: 30,
-        },
-        id: 'test-id-002',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse2 = createMockAICompletion('test-id-002', {
+        effectiveness_score: 6,
+        user_receptiveness: 'medium',
+        emotional_impact: 'neutral',
+        key_insights: ['Second insight'],
+        improvement_suggestions: ['Second suggestion'],
+      })
 
-      vi.mocked(mockAIService.createChatCompletion)
+      vi.mocked(mockAIService).createChatCompletion
         .mockResolvedValueOnce(mockResponse1)
         .mockResolvedValueOnce(mockResponse2)
 
@@ -356,31 +310,20 @@ describe('interventionAnalysisService', () => {
       expect(result2?.effectiveness_score).toBe(6)
 
       // Verify the AI service was called twice
-      expect(mockAIService.createChatCompletion).toHaveBeenCalledTimes(2)
+      expect(vi.spyOn(mockAIService, 'createChatCompletion')).toHaveBeenCalledTimes(2)
     })
 
     it('should handle errors in batch processing', async () => {
       // Mock the AI service to succeed for first call and fail for second
-      const mockResponse: AIServiceResponse = {
-        content: JSON.stringify({
-          effectiveness_score: 8,
-          user_receptiveness: 'high',
-          emotional_impact: 'positive',
-          key_insights: ['First insight'],
-          improvement_suggestions: ['First suggestion'],
-        }),
-        model: 'test-model',
-        usage: {
-          total_tokens: 150,
-          prompt_tokens: 120,
-          completion_tokens: 30,
-        },
-        id: 'test-id-003',
-        provider: 'test-provider',
-        created: Date.now(),
-      }
+      const mockResponse = createMockAICompletion('test-id-003', {
+        effectiveness_score: 8,
+        user_receptiveness: 'high',
+        emotional_impact: 'positive',
+        key_insights: ['First insight'],
+        improvement_suggestions: ['First suggestion'],
+      })
 
-      vi.mocked(mockAIService.createChatCompletion)
+      vi.mocked(mockAIService).createChatCompletion
         .mockResolvedValueOnce(mockResponse)
         .mockRejectedValueOnce(new Error('AI service error'))
 

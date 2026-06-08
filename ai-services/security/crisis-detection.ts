@@ -7,7 +7,8 @@
  * Following "Crisis Vectors" initiative in GEMINI.md.
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+import { createBuildSafeLogger } from '../../src/lib/logging/build-safe-logger'
 
 type BuildSafeLogger = ReturnType<typeof createBuildSafeLogger>
 const logger: BuildSafeLogger = createBuildSafeLogger('CrisisDetectionService')

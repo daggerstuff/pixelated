@@ -273,6 +273,132 @@ const vitestConfig = {
         },
       },
     ],
+    projects: [
+      {
+        plugins: [react(), ...astroPlugins],
+        resolve: {
+          alias: [
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+            {
+              find: 'react-dom/test-utils',
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/test-utils.js',
+              ),
+            },
+            {
+              find: /@testing-library\/react\/dist\/act-compat\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                'src/test/testing-library-act-compat.ts',
+              ),
+            },
+            {
+              find: /react-dom\/cjs\/react-dom-test-utils\.production\.js$/,
+              replacement: path.resolve(
+                process.cwd(),
+                '__mocks__/react-dom/cjs/react-dom-test-utils.production.js',
+              ),
+            },
+            {
+              find: 'react/jsx-dev-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-dev-runtime.js',
+              ),
+            },
+            {
+              find: 'react/jsx-runtime',
+              replacement: path.resolve(
+                process.cwd(),
+                'node_modules/react/jsx-runtime.js',
+              ),
+            },
+          ],
+          conditions: ['node', 'import', 'module', 'default'],
+        },
+        test: {
+          globals: true,
+          setupFiles: ['./src/test/setup.ts'],
+          name: 'jsdom',
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedJsdomTestGlobs
+              : [
+                  'src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                  'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+                ],
+          environment: 'jsdom',
+          isolate: true,
+          exclude: [
+            '**/node_modules/**',
+            'src/lib/security/__tests__/**/*.test.ts',
+            'src/lib/ehr/__tests__/**/*.test.ts',
+            'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+            'src/lib/redis.test.ts',
+            'src/lib/services/notification/__tests__/NotificationService.test.ts',
+            'src/lib/__tests__/security-implementation.test.ts',
+            'tests/integration/complete-system.integration.test.ts',
+            'src/tests/simple-browser-compatibility.test.ts',
+            'src/tests/browser-compatibility.test.ts',
+            'src/tests/mobile-compatibility.test.ts',
+            'src/tests/cross-browser-compatibility.test.ts',
+            'src/e2e/breach-notification.spec.ts',
+            'src/tests/performance.test.ts',
+            'src/tests/responsive-navigation.test.js',
+            'tests/e2e/**/*',
+            'tests/browser/**/*',
+            'tests/accessibility/**/*',
+            'tests/performance/**/*',
+            'tests/security/**/*',
+            'src/api/routes/__tests__/**/*.test.ts',
+            'src/api/middleware/__tests__/**/*.test.ts',
+            'backups/**',
+            'backups/**/*',
+            'worktrees/**',
+          ],
+        },
+      },
+      {
+        resolve: {
+          alias: [
+            {
+              find: '@/',
+              replacement: `${path.resolve(process.cwd(), 'src')}/`,
+            },
+          ],
+        },
+        test: {
+          globals: true,
+          setupFiles: ['./src/test/setup-node.ts'],
+          name: 'node',
+          include:
+            targetedTestGlobs.length > 0
+              ? targetedNodeTestGlobs
+              : [
+                  ...nodeTestGlobs,
+                  'src/lib/security/__tests__/**/*.test.ts',
+                  'src/lib/ehr/__tests__/allscripts.test.ts',
+                  'src/lib/ai/bias-detection/__tests__/**/*.test.ts',
+                  'src/tests/auth.test.ts',
+                ],
+          exclude: [...cpuBoundNodeTestExcludes],
+          environment: 'node',
+          isolate: true,
+        },
+      },
+    ],
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: false,
+        maxForks: process.env['CI'] ? 2 : 8,
+        minForks: process.env['CI'] ? 1 : 2,
+      },
+    },
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {

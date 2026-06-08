@@ -19,6 +19,11 @@ export class MentalHealthService {
     this.analyzer = new MentalHealthAnalyzer()
     this.therapist = new TherapeuticResponseGenerator()
     this.config = {
+      includeRiskAssessment: true,
+      includeEmotionDetection: true,
+      includeTechniqueRecognition: true,
+      sensitivity: 'medium',
+      maxContextLength: 50,
       enableAnalysis: true,
       confidenceThreshold: 0.6,
       interventionThreshold: 0.7,
@@ -79,6 +84,7 @@ export class MentalHealthService {
       return {
         content:
           "I'm here to listen and support you. How are you feeling today?",
+        confidence: 0.5,
         approach: 'supportive',
         techniques: ['Active listening', 'Empathic responding'],
         followUp: [

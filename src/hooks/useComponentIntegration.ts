@@ -87,8 +87,11 @@ export function use3DEmotionData(params: {
   includeTrajectory?: boolean
   realTimeUpdates?: boolean
 }) {
-  const { data, loading, error, execute } = useAsyncOperation<any>()
-  const [realTimeData, setRealTimeData] = useState<any[]>([])
+  const { data, loading, error, execute } =
+    useAsyncOperation<Record<string, unknown>>()
+  const [realTimeData, setRealTimeData] = useState<Record<string, unknown>[]>(
+    [],
+  )
 
   const load3DEmotionData = useCallback(async () => {
     return execute(async () =>
@@ -111,7 +114,10 @@ export function use3DEmotionData(params: {
 
         // Add to real-time data if tracking
         if (params.realTimeUpdates) {
-          setRealTimeData((prev) => [...prev, result.emotionPoint])
+          setRealTimeData(
+            (prev) =>
+              [...prev, result['emotionPoint']] as Record<string, unknown>[],
+          )
         }
 
         return result
@@ -128,8 +134,8 @@ export function use3DEmotionData(params: {
   }, [load3DEmotionData])
 
   // Combine static and real-time data
-  const combinedEmotionPoints = data?.emotionPoints
-    ? [...data.emotionPoints, ...realTimeData]
+  const combinedEmotionPoints = data?.['emotionPoints']
+    ? [...(data['emotionPoints'] as Record<string, unknown>[]), ...realTimeData]
     : realTimeData
 
   return {
@@ -152,7 +158,8 @@ export function useTreatmentPlans(params: {
   includeMetrics?: boolean
   autoSave?: boolean
 }) {
-  const { data, loading, error, execute } = useAsyncOperation<any[]>()
+  const { data, loading, error, execute } =
+    useAsyncOperation<Record<string, unknown>[]>()
   const [isDirty, setIsDirty] = useState(false)
 
   const loadTreatmentPlans = useCallback(async () => {
@@ -162,7 +169,7 @@ export function useTreatmentPlans(params: {
   }, [execute, params])
 
   const saveTreatmentPlan = useCallback(
-    async (planData: any) => {
+    async (planData: Record<string, unknown>) => {
       try {
         const result =
           await componentIntegrationService.saveTreatmentPlan(planData)
@@ -185,7 +192,7 @@ export function useTreatmentPlans(params: {
       planId: string
       goalId?: string
       milestoneId?: string
-      updates: Record<string, any>
+      updates: Record<string, unknown>
     }) => {
       try {
         const result =
@@ -247,7 +254,8 @@ export function useParticleSystem(params: {
   complexity?: 'low' | 'medium' | 'high'
   realTimeUpdates?: boolean
 }) {
-  const { data, loading, error, execute } = useAsyncOperation<any>()
+  const { data, loading, error, execute } =
+    useAsyncOperation<Record<string, unknown>>()
   const [currentEmotion, setCurrentEmotion] = useState(
     params.emotion ?? 'neutral',
   )
@@ -269,7 +277,7 @@ export function useParticleSystem(params: {
     async (updates: {
       emotion?: string
       intensity?: number
-      particleUpdates?: any[]
+      particleUpdates?: Record<string, unknown>[]
     }) => {
       try {
         if (updates.emotion) setCurrentEmotion(updates.emotion)
@@ -317,7 +325,8 @@ export function useCarouselContent(params: {
   audience?: string
   includeExpired?: boolean
 }) {
-  const { data, loading, error, execute } = useAsyncOperation<any>()
+  const { data, loading, error, execute } =
+    useAsyncOperation<Record<string, unknown>>()
 
   const loadCarouselContent = useCallback(async () => {
     return execute(async () =>
@@ -326,7 +335,10 @@ export function useCarouselContent(params: {
   }, [execute, params])
 
   const saveCarouselConfiguration = useCallback(
-    async (configData: any, action: 'create' | 'update' = 'create') => {
+    async (
+      configData: Record<string, unknown>,
+      action: 'create' | 'update' = 'create',
+    ) => {
       try {
         const result =
           await componentIntegrationService.saveCarouselConfiguration(
@@ -414,7 +426,7 @@ export function useRealTimeUpdates(params: {
   components: ('emotions' | 'particles' | 'charts' | 'treatment')[]
   enabled?: boolean
 }) {
-  const [updates, setUpdates] = useState<any[]>([])
+  const [updates, setUpdates] = useState<Record<string, unknown>[]>([])
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const unsubscribeRef = useRef<(() => void) | null>(null)
@@ -422,11 +434,14 @@ export function useRealTimeUpdates(params: {
   useEffect(() => {
     if (!params.enabled || !params.sessionId) return
 
-    const handleUpdate = (data: any) => {
-      setUpdates((prev) => [...prev.slice(-99), data]) // Keep last 100 updates
+    const handleUpdate = (data: unknown) => {
+      setUpdates((prev) => [
+        ...prev.slice(-99),
+        data as Record<string, unknown>,
+      ]) // Keep last 100 updates
     }
 
-    const handleError = (error: any) => {
+    const handleError = (error: unknown) => {
       setError(error instanceof Error ? error : new Error('Connection error'))
       setConnected(false)
     }
@@ -469,7 +484,7 @@ export function useRealTimeUpdates(params: {
 
 // Hook for service health monitoring
 export function useServiceHealth(checkInterval: number = 60000) {
-  const [health, setHealth] = useState<any>(null)
+  const [health, setHealth] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
@@ -514,8 +529,8 @@ export function useServiceHealth(checkInterval: number = 60000) {
     health,
     loading,
     checkHealth,
-    isHealthy: health?.overall === 'healthy',
-    isDegraded: health?.overall === 'degraded',
-    hasError: health?.overall === 'error',
+    isHealthy: health?.['overall'] === 'healthy',
+    isDegraded: health?.['overall'] === 'degraded',
+    hasError: health?.['overall'] === 'error',
   }
 }

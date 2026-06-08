@@ -12,6 +12,7 @@ import type {
   RateLimitMiddlewareConfig,
   RateLimitContext,
   RateLimitRule,
+  RateLimitBypassRule,
   RateLimitResult,
   RateLimitHeaders,
   BetterAuthRateLimitConfig,
@@ -131,7 +132,7 @@ export function createRateLimitMiddleware(
         if (response instanceof Response) {
           const newHeaders = new Headers(response.headers)
           Object.entries(headers).forEach(([key, value]) => {
-            newHeaders.set(key, value)
+            newHeaders.set(key, String(value))
           })
 
           return new Response(response.body, {
@@ -365,7 +366,7 @@ function isIpInRange(ip: string, ranges: string[]): boolean {
     if (range.includes('/')) {
       // CIDR notation - simplified check
       const [network] = range.split('/')
-      return ip.startsWith(network)
+      return ip.startsWith(network ?? '')
     }
     return ip === range
   })

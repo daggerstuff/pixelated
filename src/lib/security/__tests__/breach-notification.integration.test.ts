@@ -132,7 +132,7 @@ describe('breachNotificationSystem Integration Tests', () => {
     it('should notify affected users with encrypted details', async () => {
       await reportBreach(mockBreach)
 
-      expect(fheService.encrypt).toHaveBeenCalled() // Corrected: FHE to fheService
+      expect(vi.spyOn(fheService, 'encrypt')).toHaveBeenCalled() // Corrected: FHE to fheService
       expect(mockSendEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           to: mockUser.email,
@@ -206,15 +206,15 @@ describe('breachNotificationSystem Integration Tests', () => {
       const status = await getBreachStatus('test_breach_id')
 
       expect(status).toBeDefined()
-      expect(status?.type).toBe(mockBreach.type)
-      expect(status?.severity).toBe(mockBreach.severity)
+      expect(status!.type).toBe(mockBreach.type)
+      expect(status!.severity).toBe(mockBreach.severity)
     })
 
     it('should list recent breaches', async () => {
       const breaches = await listRecentBreaches()
 
       expect(breaches).toHaveLength(1)
-      expect(breaches[0]?.type).toBe(mockBreach.type)
+      expect(breaches[0].type).toBe(mockBreach.type)
     })
   })
 
@@ -247,9 +247,9 @@ describe('breachNotificationSystem Integration Tests', () => {
         guidelines?: unknown
         templates?: unknown
       }
-      expect(typedMaterials.procedures).toBeDefined()
-      expect(typedMaterials.guidelines).toBeDefined()
-      expect(typedMaterials.templates).toBeDefined()
+      expect(vi.mocked(typedMaterials).procedures).toBeDefined()
+      expect(vi.mocked(typedMaterials).guidelines).toBeDefined()
+      expect(vi.mocked(typedMaterials).templates).toBeDefined()
     })
   })
 
@@ -274,7 +274,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       vi?.mocked(redis['set']).mockRejectedValue(new Error('Redis error'))
 
       await expect(reportBreach(mockBreach)).rejects.toThrow('Redis error')
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(vi.mocked(logger).error).toHaveBeenCalledWith(
         'Failed to report breach:',
         expect.any(Error),
       )
@@ -285,7 +285,7 @@ describe('breachNotificationSystem Integration Tests', () => {
 
       await expect(reportBreach(mockBreach)).resolves.toBeDefined()
 
-      expect(logger.error).toHaveBeenCalledWith(
+      expect(vi.mocked(logger).error).toHaveBeenCalledWith(
         'Failed to notify user:',
         expect.objectContaining({
           userId: expect.any(String),

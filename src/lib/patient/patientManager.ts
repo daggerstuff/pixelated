@@ -116,7 +116,7 @@ class PatientManager {
   }
 
   private generatePatientId(): string {
-    return `P${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`
+    return `P${Date.now()}${Math.random().toString(36).substring(2, 7).toUpperCase()}`
   }
 
   /**
@@ -374,7 +374,7 @@ class PatientManager {
       throw new Error(`Patient not found: ${patientId}`)
     }
 
-    const reportId = `report_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const reportId = `report_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const sections: ReportSection[] = []
 
@@ -519,11 +519,15 @@ class PatientManager {
     ]
   }
 
-  private analyzeSessionPatterns(sessions: any[]): any {
+  private analyzeSessionPatterns(
+    sessions: {
+      emotionAnalysis?: { moodScore?: number; dominantEmotion?: string }
+    }[],
+  ): Record<string, unknown> {
     // Analyze patterns in session data
     const moodTrends = sessions
       .map((s) => s.emotionAnalysis?.moodScore)
-      .filter(Boolean)
+      .filter((m): m is number => m !== undefined)
     const avgMood =
       moodTrends.reduce((sum, mood) => sum + mood, 0) / moodTrends.length
 
@@ -539,10 +543,12 @@ class PatientManager {
     }
   }
 
-  private getMostCommonEmotions(sessions: any[]): string[] {
+  private getMostCommonEmotions(
+    sessions: { emotionAnalysis?: { dominantEmotion?: string } }[],
+  ): string[] {
     const emotions = sessions
       .map((s) => s.emotionAnalysis?.dominantEmotion)
-      .filter(Boolean)
+      .filter((e): e is string => !!e)
 
     const counts: Record<string, number> = {}
     emotions.forEach((emotion) => {
@@ -588,7 +594,9 @@ class PatientManager {
     }
   }
 
-  private calculateImprovementRate(sessions: any[]): number {
+  private calculateImprovementRate(
+    sessions: { emotionAnalysis?: { moodScore?: number } }[],
+  ): number {
     if (sessions.length < 2) return 0
 
     const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2))
@@ -625,8 +633,8 @@ class PatientManager {
   private async createAuditEntry(
     patientId: string,
     action: string,
-    oldData: any,
-    newData: any,
+    oldData: unknown,
+    newData: unknown,
     performedBy: string,
     reason?: string,
   ): Promise<void> {
@@ -638,13 +646,19 @@ class PatientManager {
       performedBy,
       timestamp: new Date(),
       reason,
-      changes: this.calculateChanges(oldData, newData),
+      changes: this.calculateChanges(
+        oldData as Record<string, unknown>,
+        newData as Record<string, unknown>,
+      ),
     }
 
     console.log('Audit entry created:', auditEntry)
   }
 
-  private calculateChanges(oldData: any, newData: any): any {
+  private calculateChanges(
+    oldData: Record<string, unknown>,
+    newData: Record<string, unknown>,
+  ): Record<string, { from: unknown; to: unknown }> {
     // Calculate what changed between old and new data
     const changes: any = {}
 
@@ -739,12 +753,11 @@ class PatientManager {
 
   /**
    * Export patient data for portability
-   */
-  async exportPatientData(
+   */ async exportPatientData(
     patientId: string,
     format: 'json' | 'pdf' | 'csv',
   ): Promise<{
-    data: any
+    data: unknown
     format: string
     exportedAt: Date
     checksum: string
@@ -754,7 +767,7 @@ class PatientManager {
       throw new Error(`Patient not found: ${patientId}`)
     }
 
-    let exportData: any
+    let exportData: unknown
 
     switch (format) {
       case 'json':
@@ -798,12 +811,13 @@ class PatientManager {
     return `PDF representation of patient ${patient.id}`
   }
 
-  private generateChecksum(data: string): string {
+  private generateChecksum(data: unknown): string {
+    const str = String(data)
     let hash = 0
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i)
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i)
       hash = (hash << 5) - hash + char
-      hash = hash & hash // Convert to 32-bit integer
+      hash = hash & hash
     }
     return Math.abs(hash).toString(36)
   }
