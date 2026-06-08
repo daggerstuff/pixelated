@@ -96,7 +96,11 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
         <div className="flex items-center gap-4">
           <select
             value={viewMode}
-            onChange={(e) => setViewMode(e.target.value as any)}
+            onChange={(e) =>
+              setViewMode(
+                e.target.value as 'overview' | 'detailed' | 'comparative',
+              )
+            }
             className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2"
           >
             <option value="overview">Overview</option>
@@ -173,7 +177,8 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               <div className="text-lg font-bold">
                 {(
                   selectedDataPoints.reduce(
-                    (sum, p) => sum + (p[config.dimensions.y.field] ?? 0),
+                    (sum, p) =>
+                      sum + ((p[config.dimensions.y.field] ?? 0) as number),
                     0,
                   ) / selectedDataPoints.length
                 ).toFixed(2)}
@@ -186,13 +191,13 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               <div className="text-lg font-bold">
                 {Math.min(
                   ...selectedDataPoints.map(
-                    (p) => p[config.dimensions.y.field] ?? 0,
+                    (p) => (p[config.dimensions.y.field] ?? 0) as number,
                   ),
                 ).toFixed(1)}{' '}
                 -{' '}
                 {Math.max(
                   ...selectedDataPoints.map(
-                    (p) => p[config.dimensions.y.field] ?? 0,
+                    (p) => (p[config.dimensions.y.field] ?? 0) as number,
                   ),
                 ).toFixed(1)}
               </div>
@@ -247,8 +252,8 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
   const chartHeight = 400
   const chartWidth = 600
 
-  const xValues = data.map((d) => d[config.dimensions.x.field] ?? 0)
-  const yValues = data.map((d) => d[config.dimensions.y.field] ?? 0)
+  const xValues = data.map((d) => (d[config.dimensions.x.field] ?? 0) as number)
+  const yValues = data.map((d) => (d[config.dimensions.y.field] ?? 0) as number)
 
   // Avoid NaN/Infinity with empty/single data
   const xMin = xValues.length ? Math.min(...xValues) : 0
@@ -262,13 +267,13 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
 
   const getPointPosition = (point: DataPoint) => {
     const x =
-      (((point[config.dimensions.x.field] ?? 0) - xMin) / xRange) *
+      ((((point[config.dimensions.x.field] ?? 0) as number) - xMin) / xRange) *
         (chartWidth - 40) +
       20
     const y =
       chartHeight -
       20 -
-      (((point[config.dimensions.y.field] ?? 0) - yMin) / yRange) *
+      ((((point[config.dimensions.y.field] ?? 0) as number) - yMin) / yRange) *
         (chartHeight - 40)
     return { x, y }
   }
@@ -460,7 +465,7 @@ function generateInsights(
   }
 
   // Anomaly detection (simplified)
-  const yValues = data.map((d) => d[config.dimensions.y.field] ?? 0)
+  const yValues = data.map((d) => (d[config.dimensions.y.field] ?? 0) as number)
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
   const stdDev = Math.sqrt(
     yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
@@ -468,7 +473,7 @@ function generateInsights(
   )
 
   const anomalies = data.filter((d) => {
-    const val = d[config.dimensions.y.field] ?? 0
+    const val = (d[config.dimensions.y.field] ?? 0) as number
     return Math.abs(val - mean) > 2 * stdDev
   })
 
@@ -532,8 +537,11 @@ function generateInsights(
 /**
  * Calculate trend (slope) of data points
  */
-function calculateTrend(data: any[], xField: string): number {
-  const points = data.map((d, i) => [i, d[xField] ?? 0])
+function calculateTrend(data: DataPoint[], xField: string): number {
+  const points: [number, number][] = data.map((d, i) => [
+    i,
+    (d[xField] ?? 0) as number,
+  ])
 
   const n = points.length
   const sumX = points.reduce((sum, p) => sum + p[0], 0)
@@ -557,8 +565,8 @@ function calculateCorrelation(
   field1: string,
   field2: string,
 ): number {
-  const values1 = data.map((d) => d[field1] ?? 0)
-  const values2 = data.map((d) => d[field2] ?? 0)
+  const values1 = data.map((d) => (d[field1] ?? 0) as number)
+  const values2 = data.map((d) => (d[field2] ?? 0) as number)
 
   if (values1.length === 0 || values2.length === 0) return 0
 

@@ -79,7 +79,7 @@ export class ClinicalKnowledgeBase {
       ],
     }
 
-    return guidelinesMap[category] ?? guidelinesMap['general_mental_health']
+    return guidelinesMap[category] ?? guidelinesMap['general_mental_health']!
   }
 
   /**

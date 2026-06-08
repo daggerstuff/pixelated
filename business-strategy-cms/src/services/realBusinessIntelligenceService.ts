@@ -158,7 +158,7 @@ export class RealBusinessIntelligenceService {
         await this.db.storeMarketData(data as unknown as MarketData)
       }
 
-      return marketData
+      return marketData as unknown as MarketData[]
     } catch (error: unknown) {
       this.logger.error('Failed to get real-time market data', {
         industry,
@@ -256,9 +256,7 @@ export class RealBusinessIntelligenceService {
   /**
    * Get real-time stock data for business intelligence
    */
-  async getStockIntelligence(
-    symbols: string[],
-  ): Promise<StockIntelligenceResult[]> {
+  async getStockIntelligence(symbols: string[]): Promise<StockIntelligenceResult[]> {
     try {
       const results = await Promise.all(
         symbols.map(async (symbol) => {
@@ -287,7 +285,7 @@ export class RealBusinessIntelligenceService {
         }),
       )
 
-      return results.filter(Boolean)
+      return results.filter((r): r is StockIntelligenceResult => r !== null)
     } catch (error: unknown) {
       this.logger.error('Failed to get stock intelligence', {
         symbols,
@@ -412,12 +410,9 @@ export class RealBusinessIntelligenceService {
     return industryMap[industry.toLowerCase()] ?? ['SPY']
   }
 
-  private calculateAverageMetrics(
-    data: FinancialMetricsRecord[],
-    metric: string,
-  ): number {
+  private calculateAverageMetrics(data: FinancialMetricsRecord[], metric: string): number {
     const values = data
-      .map((item) => item[metric] ?? 0)
+      .map((item) => (item as unknown as Record<string, number>)[metric] ?? 0)
       .filter((val) => val > 0)
     return values.length > 0
       ? values.reduce((sum, val) => sum + val, 0) / values.length
@@ -453,9 +448,7 @@ export class RealBusinessIntelligenceService {
     return Math.max(1000, revenue * profitMargin * 3)
   }
 
-  private createMarketSegments(
-    company: FinancialMetricsRecord,
-  ): MarketSegment[] {
+  private createMarketSegments(company: FinancialMetricsRecord): MarketSegment[] {
     return [
       {
         name: 'Enterprise',
@@ -496,9 +489,7 @@ export class RealBusinessIntelligenceService {
     return features
   }
 
-  private identifyCompetitiveGaps(
-    _companies: FinancialMetricsRecord[],
-  ): string[] {
+  private identifyCompetitiveGaps(_companies: FinancialMetricsRecord[]): string[] {
     const commonGaps = [
       'advanced_analytics',
       'predictive_modeling',
