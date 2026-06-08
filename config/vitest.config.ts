@@ -22,7 +22,6 @@ const baseNodeTestGlobs = [
   'src/lib/redis.test.ts',
   'src/lib/services/notification/__tests__/NotificationService.test.ts',
   'src/lib/__tests__/security-implementation.test.ts',
-  'src/lib/__tests__/security.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -73,7 +72,7 @@ const astroVite = await astroViteConfig({
 })
 const astroPlugins = astroVite.plugins ?? []
 
-const vitestConfig = {
+export default defineConfig({
   plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',
@@ -218,7 +217,6 @@ const vitestConfig = {
             'src/lib/redis.test.ts',
             'src/lib/services/notification/__tests__/NotificationService.test.ts',
             'src/lib/__tests__/security-implementation.test.ts',
-            'src/lib/__tests__/security.test.ts',
             'tests/integration/complete-system.integration.test.ts',
             'src/tests/simple-browser-compatibility.test.ts',
             'src/tests/browser-compatibility.test.ts',
@@ -269,6 +267,7 @@ const vitestConfig = {
         },
       },
     ],
+    pool: 'forks',
     poolOptions: {
       forks: {
         singleFork: false,
@@ -286,7 +285,7 @@ const vitestConfig = {
       },
     },
     coverage: {
-        provider: 'v8' as const,
+      provider: 'v8',
       enabled: coverageEnabled,
       reporter: ['text', 'json', 'html', 'cobertura'],
       reportsDirectory: './coverage',
