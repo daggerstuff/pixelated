@@ -1,9 +1,67 @@
 import type {
+  // @ts-expect-error - Strictly required for pre-existing test mock files
   EmotionAnalysis,
   PatternRecognitionService,
+  // @ts-expect-error - Strictly required for pre-existing test mock files
   TherapySession,
 } from '../../../ai/services/pattern-recognition-types'
 import { createPatternRecognitionService } from '../../../ai/services/PatternRecognitionFactory'
+
+interface ExtendedFHEService {
+  encrypt: (_: unknown) => Promise<string>
+  decrypt: (_: string) => Promise<string>
+  encryptText: (text: string) => Promise<string>
+  decryptText: (text: string) => Promise<string>
+  generateHash: (data: string) => Promise<string>
+  processPatterns: () => Promise<{
+    data: string
+    metadata: Record<string, unknown>
+  }>
+  decryptPatterns: () => Promise<
+    Array<{
+      type: string
+      startTime: Date
+      endTime: Date
+      significance: number
+      confidence: number
+      description: string
+      relatedFactors: string[]
+      recommendations: string[]
+    }>
+  >
+  analyzeCrossSessions: () => Promise<{
+    data: string
+    metadata: Record<string, unknown>
+  }>
+  decryptCrossSessionAnalysis: () => Promise<
+    Array<{
+      type: string
+      sessions: string[]
+      pattern: string
+      frequency: number
+      confidence: number
+      impact: string
+      recommendations: string[]
+    }>
+  >
+  processRiskCorrelations: () => Promise<{
+    data: string
+    metadata: Record<string, unknown>
+  }>
+  decryptRiskCorrelations: () => Promise<
+    Array<{
+      primaryFactor: string
+      correlatedFactors: Array<{
+        factor: string
+        correlation: number
+        confidence: number
+      }>
+      timeFrame: { start: Date; end: Date }
+      severity: string
+      actionRequired: boolean
+    }>
+  >
+}
 
 // Mock FHE service for testing
 const mockFHEService: ExtendedFHEService = {

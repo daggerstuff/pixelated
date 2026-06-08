@@ -195,7 +195,7 @@ declare module '@tailus/themer-progress'
 declare module 'twilio'
 declare module 'launchdarkly-js-client-sdk'
 declare module 'ioredis' {
-  type RedisListener = (error: unknown) => void
+  type RedisListener = (...args: any[]) => void
 
   interface RedisOptions {
     maxRetriesPerRequest?: number | null
@@ -234,9 +234,9 @@ declare module 'ioredis' {
     keys(pattern: string): Promise<string[]>
     scan(cursor: string, ...args: unknown[]): Promise<[string, string[]]>
     info(section?: string): Promise<string>
-    subscribe(channel: string): Promise<number>
+    subscribe(...channels: string[]): Promise<number>
     publish(channel: string, message: string): Promise<number>
-    unsubscribe(channel: string): Promise<number>
+    unsubscribe(...channels: string[]): Promise<number>
     lpush(key: string, ...values: string[]): Promise<number>
     rpoplpush(source: string, destination: string): Promise<string | null>
     lrem(key: string, count: number, value: string): Promise<number>
@@ -281,6 +281,7 @@ declare module 'ioredis' {
     connect(): Promise<unknown>
     disconnect(): void
     ping(): Promise<string>
+    duplicate(): Redis
     multi(): Pipeline
     setex(key: string, seconds: number, value: string): Promise<unknown>
     get(key: string): Promise<string | null>
