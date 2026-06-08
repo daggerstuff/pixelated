@@ -10,6 +10,7 @@ import Redis from 'ioredis'
 import { MongoClient, Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { asRedisOps } from '../../redis-ops'
 import {
   FeedConfig,
   FeedItem,
@@ -630,8 +631,8 @@ export class ExternalThreatFeedIntegrationCore
       }
 
       // Set expiration on the deduplication set (24 hours)
-      if (this.redis && typeof this.redis['expire'] === 'function') {
-        await this.redis['expire'](cacheKey, 24 * 60 * 60)
+      if (this.redis && typeof asRedisOps(this.redis).expire === 'function') {
+        await asRedisOps(this.redis).expire(cacheKey, 24 * 60 * 60)
       }
 
       return deduplicatedItems
