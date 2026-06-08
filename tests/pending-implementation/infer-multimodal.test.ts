@@ -50,8 +50,7 @@ vi.mock('@/lib/logging/build-safe-logger', () => ({
 }))
 
 // Import POST handler after mocks are set up
-const { POST } =
-  await import('../../../src/pages/api/ai/pixel/infer-multimodal')
+const { POST } = await import('@/pages/api/ai/pixel/infer-multimodal')
 
 describe('POST /api/ai/pixel/infer-multimodal', () => {
   beforeEach(() => {

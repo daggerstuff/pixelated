@@ -58,7 +58,7 @@ function getNumber(value: unknown, fallback = 0): number {
 
 function getStringArray(value: unknown): string[] {
   if (!Array.isArray(value)) return []
-  return value.filter((entry): entry is string => typeof entry === 'string')
+  return value?.filter((entry): entry is string => typeof entry === 'string')
 }
 
 function getHeaderValue(value: unknown): AxiosHeaderValue | undefined {
@@ -298,9 +298,6 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
   private syncQueue: string[] = []
   private isProcessing = false
   private readonly activeSyncs = new Map<string, Promise<FeedSyncResult>>()
-  private _requestsThisMinute = 0
-  private _requestsThisHour = 0
-  private _requestsThisDay = 0
 
   constructor(private readonly _config: ExternalThreatFeedIntegrationConfig) {
     super()
@@ -413,51 +410,62 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis['duplicate']()
-      await subscriber.connect()
+      interface RedisPubSub {
+        duplicate(): RedisPubSub
+        connect(): Promise<void>
+        subscribe(...channels: string[]): Promise<number | void>
+        on(
+          event: 'message',
+          callback: (channel: string, message: string) => void,
+        ): this
+      }
+      const subscriber = this.redis as unknown as RedisPubSub
+      const sub = subscriber.duplicate()
+      await sub.connect()
 
-      // Subscribe to sync requests
-      await subscriber.subscribe('feed:sync', async (message) => {
-        try {
-          if (typeof message !== 'string') return
+      // Subscribe to channels
+      await sub.subscribe('feed:sync', 'feed:status')
 
-          const rawSyncData = asRecord(JSON.parse(message))
-          const feedId = getString(rawSyncData['feed_id'])
-          if (!feedId) {
-            return
+      sub.on('message', async (channel: string, message: string) => {
+        if (channel === 'feed:sync') {
+          try {
+            if (typeof message !== 'string') return
+
+            const rawSyncData = asRecord(JSON.parse(message))
+            const feedId = getString(rawSyncData['feed_id'])
+            if (!feedId) {
+              return
+            }
+
+            await this.syncFeed(feedId)
+          } catch (error: unknown) {
+            const normalized = normalizeError(error)
+            logger.error('Failed to process feed sync request', {
+              error: normalized.message,
+            })
           }
+        } else if (channel === 'feed:status') {
+          try {
+            if (typeof message !== 'string') return
 
-          await this.syncFeed(feedId)
-        } catch (error: unknown) {
-          const normalized = normalizeError(error)
-          logger.error('Failed to process feed sync request', {
-            error: normalized.message,
-          })
-        }
-      })
-
-      // Subscribe to feed status updates
-      await subscriber.subscribe('feed:status', async (message) => {
-        try {
-          if (typeof message !== 'string') return
-
-          const rawStatusData = asRecord(JSON.parse(message))
-          const feedId = getString(rawStatusData['feed_id'])
-          const status = getString(rawStatusData['status'])
-          if (
-            feedId &&
-            (status === 'active' ||
-              status === 'error' ||
-              status === 'inactive' ||
-              status === 'maintenance')
-          ) {
-            await this.updateFeedStatus(feedId, status)
+            const rawStatusData = asRecord(JSON.parse(message))
+            const feedId = getString(rawStatusData['feed_id'])
+            const status = getString(rawStatusData['status'])
+            if (
+              feedId &&
+              (status === 'active' ||
+                status === 'error' ||
+                status === 'inactive' ||
+                status === 'maintenance')
+            ) {
+              await this.updateFeedStatus(feedId, status)
+            }
+          } catch (error: unknown) {
+            const normalized = normalizeError(error)
+            logger.error('Failed to process feed status update', {
+              error: normalized.message,
+            })
           }
-        } catch (error: unknown) {
-          const normalized = normalizeError(error)
-          logger.error('Failed to process feed status update', {
-            error: normalized.message,
-          })
         }
       })
 
@@ -679,17 +687,8 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     // Reset counters periodically
     setInterval(() => {
-      this._requestsThisMinute = 0
       processQueue()
     }, 60000) // Every minute
-
-    setInterval(() => {
-      this._requestsThisHour = 0
-    }, 3600000) // Every hour
-
-    setInterval(() => {
-      this._requestsThisDay = 0
-    }, 86400000) // Every day
   }
 
   /**
@@ -751,7 +750,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     const now = new Date()
     const activeFeeds = await this.feedsCollection
-      .find({ status: { $in: ['active', 'inactive'] } })
+      ?.find({ status: { $in: ['active', 'inactive'] } })
       .toArray()
 
     for (const feed of activeFeeds) {
@@ -1192,7 +1191,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     baseDate: Date,
   ): Date {
     const next = new Date(baseDate)
-    const frequencies = this._config.feeds.find(
+    const frequencies = this._config.feeds?.find(
       (feed) => feed.id === feedId,
     )?.sync_frequency
     if (!frequencies) {
@@ -1794,10 +1793,10 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
 
     // Simple CSV parsing (in production, use a proper CSV parser)
     const lines = data.split('\n')
-    const headers = lines?.[0].split(',').map((h) => h.trim())
+    const headers = lines?.[0]!.split(',')?.map((h) => h.trim())
 
     for (let i = 1; i < lines.length; i++) {
-      const values = lines?.[i].split(',').map((v) => v.trim())
+      const values = lines?.[i]!.split(',')?.map((v) => v.trim())
       if (values.length === headers.length) {
         const item: Record<string, unknown> = {}
         headers.forEach((header, index) => {
@@ -1941,7 +1940,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.map((indicator) => {
+    return indicators?.map((indicator) => {
       if (transformation.field === 'severity') {
         indicator.severity = this.mapSeverity(
           indicator.severity,
@@ -1964,7 +1963,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.filter((indicator) => {
+    return indicators?.filter((indicator) => {
       const fieldValue = asRecord(indicator)[transformation.field]
       return this.evaluateFilterCondition(fieldValue, transformation.parameters)
     })
@@ -1977,7 +1976,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.map((indicator) => {
+    return indicators?.map((indicator) => {
       if (transformation.field === 'value') {
         indicator.value = this.normalizeIndicatorValue(
           indicator.value,
@@ -2017,7 +2016,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.filter((indicator) => {
+    return indicators?.filter((indicator) => {
       return this.validateIndicator(indicator, transformation.parameters)
     })
   }
@@ -2037,7 +2036,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    * Map STIX severity labels to ThreatIndicator severity
    */
   private mapSTIXSeverity(labels: unknown): ThreatIndicator['severity'] {
-    const normalized = getStringArray(labels).map((label) =>
+    const normalized = getStringArray(labels)?.map((label) =>
       label.toLowerCase(),
     )
     if (normalized.includes('critical')) return 'critical'
@@ -2053,7 +2052,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     const rawType = this.getNestedValue(stixObject, 'type')
     if (typeof rawType === 'string' && rawType.trim()) return rawType
     const labels = getStringArray(this.getNestedValue(stixObject, 'labels'))
-    return labels.find((label) => label.trim().length > 0) ?? 'unknown'
+    return labels?.find((label) => label.trim().length > 0) ?? 'unknown'
   }
 
   /**
@@ -2188,7 +2187,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       case 'in':
         return (
           Array.isArray(filterValue) &&
-          filterValue.some((candidate) => candidate === fieldValue)
+          filterValue?.some((candidate) => candidate === fieldValue)
         )
       case 'truthy':
         return Boolean(fieldValue)
@@ -2285,7 +2284,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       return indicators
     }
 
-    return indicators.filter((indicator) => {
+    return indicators?.filter((indicator) => {
       // Confidence filter
       if (
         filters.confidence_threshold &&

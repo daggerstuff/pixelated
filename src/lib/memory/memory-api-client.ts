@@ -95,10 +95,8 @@ async function handleResponse<T>(res: Response): Promise<T> {
       body,
     )
   }
-  // oxlint-disable-next-line
   if (res.status === 204) return undefined as unknown as T
-  // oxlint-disable-next-line
-  return (await res.json()) as T
+  return (await res.json()) as unknown as T
 }
 
 // ─── Client ────────────────────────────────────────────────────────────────────

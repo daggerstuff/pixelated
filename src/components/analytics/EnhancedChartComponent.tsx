@@ -150,10 +150,6 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   }
 
   // Determine which data to use
-  const chartData =
-    useBackend && backendData?.data
-      ? backendData.data
-      : (fallbackData ?? defaultData[type] ?? defaultData.line)
   const typedBackend = backendData as BackendChartData | null
   const chartData = (
     useBackend && typedBackend?.data

@@ -6,6 +6,8 @@ import {
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
 } from '../server/internal-memory-service-client'
+import { createMemoryTransport } from '../server/memory-transport-factory'
+import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
 import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
 export interface ProductMemoryRecord {
@@ -74,6 +76,8 @@ export class ProductMemoryGatewayError extends Error {
   }
 }
 
+type Caller = { userId: string; tenantId?: string }
+
 type InternalMemoryServiceClientLike = Pick<
   InternalMemoryServiceClient,
   | 'addMemory'
@@ -85,14 +89,26 @@ type InternalMemoryServiceClientLike = Pick<
   | 'getMemoryStats'
 >
 
+type CallContext = {
+  correlationId: string
+  operation: string
+  userId: string
+  startTime: number
+}
+
 export class ProductMemoryGateway {
-  constructor(private readonly client: InternalMemoryServiceClientLike) {}
+  constructor(
+    private readonly client: InternalMemoryServiceClientLike,
+    private readonly caller: Caller | null = null,
+    private readonly audit: AuditLogger = new NoOpAuditLogger(),
+  ) {}
 
   async createMemory(
     input: ProductMemoryCreateInput,
   ): Promise<ProductMemoryRecord> {
+    const ctx = this.beginCall('createMemory', input.userId)
     const metadata = normalizeMetadata(input.metadata)
-    const response = await this.withGatewayError(async () =>
+    const response = await this.runCall(ctx, () =>
       this.client.addMemory({
         ...toInternalScope(input),
         content: input.content,
@@ -103,7 +119,6 @@ export class ProductMemoryGateway {
         metadata,
       }),
     )
-
     return {
       id: response.memory_id,
       content: input.content,
@@ -114,9 +129,9 @@ export class ProductMemoryGateway {
   async listMemories(
     options: ProductMemoryListOptions,
   ): Promise<{ memories: ProductMemoryRecord[]; total: number }> {
+    const ctx = this.beginCall('listMemories', options.userId)
     const pagination = normalizePagination(options)
-
-    const response = await this.withGatewayError(async () =>
+    const response = await this.runCall(ctx, () =>
       this.client.listMemories({
         ...toInternalScope(options),
         limit: pagination.limit,
@@ -125,10 +140,8 @@ export class ProductMemoryGateway {
         tags: options.tags,
       }),
     )
-
-    const memories = response.memories.map(mapProductMemoryRecord)
     return {
-      memories,
+      memories: response.memories.map(mapProductMemoryRecord),
       total: response.count,
     }
   }
@@ -136,19 +149,17 @@ export class ProductMemoryGateway {
   async searchMemories(
     options: ProductMemorySearchOptions,
   ): Promise<{ memories: ProductMemoryRecord[]; total: number }> {
+    const ctx = this.beginCall('searchMemories', options.userId)
     const pagination = normalizePagination(options)
-
-    const response = await this.withGatewayError(async () =>
+    const response = await this.runCall(ctx, () =>
       this.client.searchMemories({
         ...toInternalScope(options),
         query: options.query,
         limit: pagination.limit,
       }),
     )
-
-    const memories = response.memories.map(mapProductMemoryRecord)
     return {
-      memories,
+      memories: response.memories.map(mapProductMemoryRecord),
       total: response.count,
     }
   }
@@ -156,9 +167,10 @@ export class ProductMemoryGateway {
   async updateMemory(
     input: ProductMemoryUpdateInput,
   ): Promise<ProductMemoryRecord> {
+    const ctx = this.beginCall('updateMemory', input.userId)
     const metadata = normalizeMetadata(input.metadata)
     await assertOwnedMemoryAccessible(this.client, input)
-    await this.withGatewayError(async () =>
+    await this.runCall(ctx, () =>
       this.client.updateMemory({
         memoryId: input.memoryId,
         ...toInternalScope(input),
@@ -166,7 +178,6 @@ export class ProductMemoryGateway {
         metadata,
       }),
     )
-
     return {
       id: input.memoryId,
       content: input.content,
@@ -177,19 +188,30 @@ export class ProductMemoryGateway {
   async getMemory(
     input: ProductMemoryGetInput,
   ): Promise<ProductMemoryRecord | null> {
-    const memory = await this.withGatewayError(async () =>
-      this.client.getMemory({
-        memoryId: input.memoryId,
-        ...toInternalScope(input),
-      }),
-    )
-
-    return memory ? mapProductMemoryRecord(memory) : null
+    const ctx = this.beginCall('getMemory', input.userId)
+    try {
+      const memory = await this.runCall(ctx, () =>
+        this.client.getMemory({
+          memoryId: input.memoryId,
+          ...toInternalScope(input),
+        }),
+      )
+      return memory ? mapProductMemoryRecord(memory) : null
+    } catch (err) {
+      if (
+        err instanceof ProductMemoryGatewayError &&
+        (err.status === 404 || err.message.toLowerCase().includes('not found'))
+      ) {
+        return null
+      }
+      throw err
+    }
   }
 
   async deleteMemory(input: ProductMemoryDeleteInput): Promise<void> {
+    const ctx = this.beginCall('deleteMemory', input.userId)
     await assertOwnedMemoryAccessible(this.client, input)
-    await this.withGatewayError(async () =>
+    await this.runCall(ctx, () =>
       this.client.deleteMemory({
         memoryId: input.memoryId,
         ...toInternalScope(input),
@@ -200,23 +222,71 @@ export class ProductMemoryGateway {
   async getMemoryStats(
     scope: ProductMemoryListOptions,
   ): Promise<ProductMemoryStats> {
-    return this.withGatewayError(async () =>
+    const ctx = this.beginCall('getMemoryStats', scope.userId)
+    return this.runCall(ctx, () =>
       this.client.getMemoryStats(toInternalScope(scope)),
     )
   }
 
-  private async withGatewayError<T>(callback: () => Promise<T>): Promise<T> {
+  private beginCall(operation: string, userId: string): CallContext {
+    const correlationId = `${operation}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+    const startTime = Date.now()
+    const actorId = this.caller?.userId ?? 'system'
+
+    this.audit.log({
+      type: 'auth.success',
+      actorId,
+      userId,
+      operation,
+      correlationId,
+      timestamp: Date.now(),
+    })
+
+    if (this.caller && userId !== this.caller.userId) {
+      this.audit.log({
+        type: 'scope.rejected',
+        actorId: this.caller.userId,
+        userId,
+        operation,
+        correlationId,
+        details: { reason: 'User scope mismatch' },
+        timestamp: Date.now(),
+      })
+      throw new ProductMemoryGatewayError(
+        'User scope mismatch: cannot act on another user',
+        403,
+      )
+    }
+
+    if (this.caller) {
+      this.audit.log({
+        type: 'scope.validated',
+        actorId: this.caller.userId,
+        userId,
+        operation,
+        correlationId,
+        timestamp: Date.now(),
+      })
+    }
+
+    return { correlationId, operation, userId, startTime }
+  }
+
+  private async runCall<T>(
+    ctx: CallContext,
+    call: () => Promise<T>,
+  ): Promise<T> {
     try {
-      return await callback()
-    } catch (error: unknown) {
-      if (error instanceof InternalMemoryServiceError) {
+      return await call()
+    } catch (err) {
+      if (err instanceof InternalMemoryServiceError) {
         throw new ProductMemoryGatewayError(
-          error instanceof Error ? error.message : 'Unknown error',
-          error.status,
-          error.details,
+          err.message || 'Unknown error',
+          err.status,
+          err.details,
         )
       }
-      throw error
+      throw err
     }
   }
 }
@@ -282,6 +352,12 @@ function mapProductMemoryRecord(
 
 let gatewaySingleton: ProductMemoryGateway | null = null
 
+/**
+ * Backward-compatible singleton accessor.
+ *
+ * Production code should prefer getProductMemoryGatewayFor() so the gateway
+ * has a caller context for tenant isolation and audit logging.
+ */
 export function getProductMemoryGateway(): ProductMemoryGateway {
   gatewaySingleton ??= new ProductMemoryGateway(
     new InternalMemoryServiceClient(resolveInternalMemoryServiceConfig()),
@@ -290,11 +366,23 @@ export function getProductMemoryGateway(): ProductMemoryGateway {
 }
 
 /**
- * Projects the public ProductMemoryScope into InternalMemoryScopeInput.
- * Destructures out non-scope keys so that callers can pass extended inputs
- * (e.g. ProductMemoryUpdateInput which carries memoryId/content/metadata)
- * without leaking those fields into the scope object sent to the internal service.
+ * Build a per-request gateway bound to the authenticated caller.
+ *
+ * The transport is selected at call time via MEMORY_SERVICE_TRANSPORT so
+ * operators can switch from the HTTP self-loopback to the foresight-mcp
+ * transport without code changes.
  */
+export function getProductMemoryGatewayFor(
+  caller: Caller,
+  audit?: AuditLogger,
+): ProductMemoryGateway {
+  return new ProductMemoryGateway(
+    createMemoryTransport(),
+    caller,
+    audit ?? new NoOpAuditLogger(),
+  )
+}
+
 export function toInternalScope(
   input: ProductMemoryScope,
 ): InternalMemoryScopeInput {
@@ -325,8 +413,5 @@ export function toInternalScope(
 function normalizePagination(options: ProductMemoryListOptions) {
   const offset = options.offset ?? 0
   const limit = options.limit ?? 10
-  return {
-    offset,
-    limit,
-  }
+  return { offset, limit }
 }
