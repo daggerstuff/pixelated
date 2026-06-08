@@ -5,7 +5,7 @@
 
 import type { UnifiedProcessingRequest } from '../api/unified-api'
 import type { ObjectiveDefinition } from '../core/objectives'
-import { CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
+import { CORE_MENTAL_HEALTH_OBJECTIVES } from './objectives'
 
 /**
  * Defines the interface for the ObjectiveInjector.

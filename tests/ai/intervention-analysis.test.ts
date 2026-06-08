@@ -1,4 +1,4 @@
-import type { AIMessage, AIService, AICompletion } from '@/lib/ai/models/ai-types'
+import type { AIMessage, AIService } from '@/lib/ai/models/ai-types'
 import { InterventionAnalysisService } from '@/lib/ai/services/intervention-analysis'
 
 function createMockAICompletion(id: string, contentObj: any): AICompletion {

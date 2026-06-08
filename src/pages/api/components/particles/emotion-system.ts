@@ -203,7 +203,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for real-time particle updates
  */
-export const POST: APIRoute = protectRoute()(
+export const POST: APIRoute = (protectRoute()(
   async (context: AuthAPIContext) => {
     try {
       const { locals, request } = context
@@ -241,17 +241,17 @@ export const POST: APIRoute = protectRoute()(
           emotion,
           intensity: Math.max(0, Math.min(1, intensity)),
           sessionId,
-          particleCount: (particleUpdates as any)?.length ?? 0,
+          particleCount: Array.isArray(particleUpdates) ? particleUpdates.length : 0,
         },
         recommendations: generateEmotionRecommendations(
-          emotion as any,
+          String(emotion),
           intensity,
         ),
       }
 
       // TODO: Save particle interaction data for analytics
       // const repository = new AIRepository()
-      // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
+      // await repository.saveParticleInteraction(user.id, sessionId as string | undefined, updateResponse)
 
       logger.info('Processed particle system update', {
         emotion,
@@ -272,9 +272,7 @@ export const POST: APIRoute = protectRoute()(
           error: 'Internal server error',
           message:
             error instanceof Error
-              ? error instanceof Error
-                ? error.message
-                : 'Unknown error'
+              ? error.message
               : 'Unknown error',
         }),
         {
@@ -284,7 +282,7 @@ export const POST: APIRoute = protectRoute()(
       )
     }
   },
-) as any
+) as any)
 
 // Helper functions
 function calculateEmotionProfile(
@@ -449,7 +447,7 @@ function generateEmotionParticles(
     let cumulative = 0
 
     for (const entry of Object.entries(emotionProfile.emotionMix)) {
-      const [emo, percentage] = entry
+      const [emo, percentage] = entry as [string, number]
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

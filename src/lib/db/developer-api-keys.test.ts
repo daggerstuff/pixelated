@@ -8,14 +8,24 @@ vi.mock('./index', () => ({
   query: vi.fn(),
 }))
 
-const createMockQueryResult = (rows: any[], rowCount = rows.length) =>
-  ({
-    rows,
-    rowCount,
-    command: 'SELECT',
-    oid: 0,
-    fields: [],
-  }) as any
+type MockQueryResult<TRow> = {
+  rows: TRow[]
+  rowCount: number
+  command: string
+  oid: number
+  fields: unknown[]
+}
+
+const createMockQueryResult = <TRow>(
+  rows: TRow[],
+  rowCount = rows.length,
+): MockQueryResult<TRow> => ({
+  rows,
+  rowCount,
+  command: 'SELECT',
+  oid: 0,
+  fields: [],
+})
 
 describe('DeveloperApiKeyManager', () => {
   let manager: DeveloperApiKeyManager
@@ -67,7 +77,9 @@ describe('DeveloperApiKeyManager', () => {
     })
 
     it('should return invalid for non-existent key', async () => {
-      mockQuery.mockResolvedValueOnce(createMockQueryResult([], 0))
+      mockQuery.mockResolvedValueOnce(
+        createMockQueryResult<{ id: string }>([], 0),
+      )
 
       const result = await manager.validateApiKey('dev_invalid')
 

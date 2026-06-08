@@ -155,6 +155,16 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
     setCurrentPlan(plan ?? defaultPlan)
   }, [plan, defaultPlan])
 
+  // ⚡ Bolt: Memoize O(N) progress calculation to prevent recalculation on tab changes
+  // Moved before early return to comply with Rules of Hooks
+  const overallProgress = useMemo(() => {
+    if (!currentPlan || !currentPlan.goals.length) return 0
+    return Math.round(
+      currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
+        currentPlan.goals.length,
+    )
+  }, [currentPlan])
+
   const getPriorityColor = (priority: TreatmentGoal['priority']) => {
     return PRIORITY_COLORS_MAP[priority] ?? 'bg-gray-500 text-white'
   }
@@ -255,11 +265,6 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
       </div>
     )
   }
-
-  const overallProgress = Math.round(
-    currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
-      currentPlan.goals.length,
-  )
 
   return (
     <div className={`bg-white rounded-lg p-6 shadow-lg ${className}`}>

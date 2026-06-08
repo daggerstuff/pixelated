@@ -111,7 +111,7 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
     await redis.connect()
 
     cacheInvalidation = new CacheInvalidation({
-      redis: getRedisClientOrThrow(redis) as unknown as RedisService | Redis,
+      redis: getRedisClientOrThrow(redis),
       prefix: keyPrefix,
     })
   })
@@ -322,7 +322,6 @@ describeCacheInvalidation('cacheInvalidation Integration', () => {
       await redis.disconnect()
       await redis.connect()
       cacheInvalidation = new CacheInvalidation({
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         redis: getRedisClientOrThrow(redis),
         prefix: process.env['REDIS_KEY_PREFIX'] ?? '',
       })
