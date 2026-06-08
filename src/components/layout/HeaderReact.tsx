@@ -20,12 +20,21 @@ export function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false)
 
-  // Handle keyboard shortcut for search (Cmd+K)
+  // Handle keyboard shortcuts (Cmd+K for search, Escape to close)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setIsSearchOpen((prev) => !prev)
+      } else if (e.key === 'Escape') {
+        // Only close if not focused on search modal to preserve two-step escape behavior
+        // First Escape clears search query (handled by SearchBox), second closes modal
+        const searchModal = document.querySelector('[class*="fixed inset-0"][class*="z-50"]')
+        const isFocusInSearchModal = searchModal?.contains(document.activeElement)
+        
+        if (!isFocusInSearchModal) {
+          setIsSearchOpen(false)
+        }
       }
     }
 
