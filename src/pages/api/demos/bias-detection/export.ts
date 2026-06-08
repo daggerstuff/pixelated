@@ -1,5 +1,7 @@
 // API endpoint for bias detection data export
 
+import type { APIRoute } from 'astro'
+
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
@@ -8,9 +10,9 @@ import type {
 } from '../../../../lib/types/bias-detection'
 import { createExportData } from '../../../../lib/utils/demo-helpers'
 
-export const POST = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
 
     // Validate required fields
     if (!body.analysisResults) {
@@ -37,7 +39,13 @@ export const POST = async ({ request }) => {
         recommendations: true,
         demographics: true,
       },
-    } = body
+    } = body as {
+      analysisResults: unknown
+      counterfactualScenarios?: unknown[]
+      historicalComparison?: unknown
+      format?: string
+      includeComponents?: Record<string, boolean>
+    }
 
     // Validate format
     const supportedFormats = ['json', 'csv', 'txt']
@@ -58,7 +66,7 @@ export const POST = async ({ request }) => {
     const exportData = createExportData(
       analysisResults as BiasAnalysisResults,
       counterfactualScenarios as CounterfactualScenario[],
-      historicalComparison as HistoricalComparison | null,
+      historicalComparison as HistoricalComparison,
     )
 
     // Filter components based on includeComponents
@@ -74,7 +82,7 @@ export const POST = async ({ request }) => {
       metadata: {
         ...exportData.metadata,
         includedComponents: Object.keys(includeComponents).filter(
-          (key) => includeComponents[key as keyof typeof includeComponents],
+          (key) => includeComponents[key],
         ),
       },
     }
@@ -86,7 +94,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Content-Disposition': `attachment; filename="bias-analysis-${analysisResults.sessionId}.json"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-${(analysisResults as BiasAnalysisResults).sessionId}.json"`,
           },
         })
 
@@ -96,7 +104,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'text/csv',
-            'Content-Disposition': `attachment; filename="bias-analysis-${analysisResults.sessionId}.csv"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-${(analysisResults as BiasAnalysisResults).sessionId}.csv"`,
           },
         })
       }
@@ -107,7 +115,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'text/plain',
-            'Content-Disposition': `attachment; filename="bias-analysis-report-${analysisResults.sessionId}.txt"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-report-${(analysisResults as BiasAnalysisResults).sessionId}.txt"`,
           },
         })
       }
@@ -194,15 +202,13 @@ function convertToCSV(exportData: ExportData): string {
 
   // Counterfactual scenarios
   if (exportData.counterfactualScenarios) {
-    const scenarios = exportData.counterfactualScenarios as Array<
-      Record<string, unknown>
-    >
+    const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
       csvRows.push(
-        `Counterfactual,Scenario ${index + 1},${scenario['expectedBiasReduction'] as number},${scenario['change']}`,
+        `Counterfactual,Scenario ${index + 1},${scenario.biasScoreChange},${scenario.change}`,
       )
       csvRows.push(
-        `Counterfactual,Likelihood ${index + 1},${scenario['likelihood']},${scenario['description']}`,
+        `Counterfactual,Likelihood ${index + 1},${scenario.likelihood},${scenario.impact}`,
       )
     })
   }
@@ -253,14 +259,12 @@ function convertToText(exportData: ExportData): string {
     Array.isArray(exportData.counterfactualScenarios)
   ) {
     content += `COUNTERFACTUAL SCENARIOS\n`
-    const scenarios = exportData.counterfactualScenarios as Array<
-      Record<string, unknown>
-    >
+    const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
-      content += `${index + 1}. ${scenario['change']}\n`
-      content += `   Expected Reduction: ${((scenario['expectedBiasReduction'] as number) * 100).toFixed(1)}%\n`
-      content += `   Likelihood: ${scenario['likelihood']}\n`
-      content += `   Description: ${scenario['description']}\n\n`
+      content += `${index + 1}. ${scenario.change}\n`
+      content += `   Expected Reduction: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`
+      content += `   Likelihood: ${scenario.likelihood}\n`
+      content += `   Description: ${scenario.impact}\n\n`
     })
   }
 

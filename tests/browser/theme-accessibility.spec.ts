@@ -24,7 +24,7 @@ function getLuminance(color: string): number {
   const rgb = color.match(/\d+/g)?.map(Number) ?? [0, 0, 0]
 
   // Convert to sRGB
-  const [r, g, b] = rgb.map((c) => {
+  const [r = 0, g = 0, b = 0] = rgb.map((c) => {
     c = c / 255
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
   })
@@ -39,49 +39,6 @@ function getContrastRatio(color1: string, color2: string): number {
   const brightest = Math.max(lum1, lum2)
   const darkest = Math.min(lum1, lum2)
   return (brightest + 0.05) / (darkest + 0.05)
-}
-
-// Type definitions for evaluate return types
-interface TextContrast {
-  textColor: string
-  bgColor: string
-}
-
-interface AccentContrast {
-  accentColor: string
-  bgColor: string
-}
-
-interface FocusContrast {
-  focusColor: string
-  bgColor: string
-}
-
-interface TransitionDurations {
-  transition: string
-  animation: string
-}
-
-interface ThemeStatusIndicators {
-  [key: string]: string
-}
-
-interface HighContrastStyles {
-  background: string
-  color: string
-  forcedColors: string
-}
-
-interface SemanticElements {
-  hasMain: boolean
-  hasHeader: boolean
-  hasFooter: boolean
-  hasNav: boolean
-}
-
-interface Heading {
-  level: number
-  text: string
 }
 
 test.describe('Theme Accessibility Tests', () => {
@@ -447,7 +404,7 @@ test.describe('Theme Accessibility Tests', () => {
       // Check for proper heading order (no skipping levels)
       for (let i = 1; i < headingStructure.length; i++) {
         const levelDiff = Math.abs(
-          headingStructure[i].level - headingStructure[i - 1].level,
+          headingStructure[i]!.level - headingStructure[i - 1]!.level,
         )
         expect(levelDiff).toBeLessThanOrEqual(1) // No skipping more than one level
       }

@@ -20,6 +20,10 @@ export interface Session {
   token?: string
 }
 
+interface AuthProfileResponse {
+  user: User
+}
+
 interface AuthResponse {
   user?: User
   token?: string
@@ -87,16 +91,10 @@ class AuthClient {
     try {
       const response = await fetch('/api/auth/auth0-profile')
       if (response.ok) {
-        const data = await response.json() as Record<string, unknown>
+        const data = (await response.json()) as unknown as AuthProfileResponse
         if (data.user) {
           this._session = {
-            user: {
-              id: data.user as string,
-              email: data.user as string,
-              role: data.user as string,
-              fullName: data.user as string | undefined,
-              avatarUrl: (data.user as Record<string, unknown>).profile?.picture as string | undefined,
-            },
+            user: data.user,
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
             token: 'cookie-based',
           }
@@ -123,11 +121,7 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({
-    email,
-    password,
-    rememberMe,
-  }: SignInRequest): Promise<{
+  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -138,7 +132,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json() as AuthResponse
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return { data: null, error: new Error(data.error ?? 'Login failed') }
@@ -165,11 +159,7 @@ class AuthClient {
   /**
    * Sign up a new user
    */
-  async signUpEmail({
-    email,
-    password,
-    role,
-  }: SignUpRequest): Promise<{
+  async signUpEmail({ email, password, role }: SignUpRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -180,7 +170,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json() as AuthResponse
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return {

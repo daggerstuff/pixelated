@@ -14,7 +14,7 @@ import { UsageStatsRequestSchema } from '../../../lib/validation/schemas'
 const logger = createBuildSafeLogger('default')
 
 // Initialize rate limiter
-const rateLimiter = new RateLimiter(30, 60 * 1000)
+const rateLimiter = new RateLimiter(30)
 
 /**
  * API route for AI usage statistics
@@ -23,10 +23,11 @@ const rateLimiter = new RateLimiter(30, 60 * 1000)
  */
 export const GET: APIRoute = async ({ request }) => {
   let session: { user?: { id?: string; role?: string } } | null = null
+  let userId: string | undefined
 
   try {
     // Verify session
-    session = (await getSession(request)) as unknown as typeof session
+    session = (await getSession(request)) as { user?: { id?: string; role?: string } } | null
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -37,7 +38,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    const userId = session?.user?.id
+    userId = session?.user?.id
     const role = session?.user?.role ?? 'user'
     if (!userId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -85,12 +86,22 @@ export const GET: APIRoute = async ({ request }) => {
     const isAdmin = role === 'admin'
 
     // Validate query parameters
-    const [params, validationError] = validateQueryParams(
-      new URL(request.url),
-      UsageStatsRequestSchema,
-    )
+    let params: {
+      period?: string
+      allUsers?: string
+      startDate?: string
+      endDate?: string
+    } = {}
 
-    if (validationError) {
+    try {
+      const url = new URL(request.url)
+      const queryParams: Record<string, string> = {}
+      url.searchParams.forEach((value, key) => {
+        queryParams[key] = value
+      })
+      params = validateQueryParams(UsageStatsRequestSchema, queryParams) as any
+    } catch (err: unknown) {
+      const error = err as { message?: string; errors?: Record<string, string>; details?: Record<string, string>; status?: number }
       // Create audit log for validation error
       await createAuditLog(
         AuditEventType.AI_OPERATION,
@@ -98,15 +109,15 @@ export const GET: APIRoute = async ({ request }) => {
         userId,
         'ai_usage',
         {
-          error: validationError.error,
-          details: JSON.stringify(validationError.details),
+          error: error.message ?? 'Validation failed',
+          details: JSON.stringify(error.errors ?? error.details ?? {}),
           status: 'error',
         },
         AuditEventStatus.FAILURE,
       )
 
-      return new Response(JSON.stringify(validationError), {
-        status: validationError.status,
+      return new Response(JSON.stringify({ error: error.message ?? 'Validation failed', details: error.errors ?? error.details ?? {} }), {
+        status: error.status ?? 400,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -114,7 +125,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Only allow admins to view all users' data
-    if (params!.allUsers && !isAdmin) {
+    if (params.allUsers && !isAdmin) {
       return new Response(
         JSON.stringify({
           error: 'Forbidden',
@@ -136,10 +147,10 @@ export const GET: APIRoute = async ({ request }) => {
       userId,
       'ai_usage',
       {
-        period: params!.period,
-        allUsers: params!.allUsers,
-        startDate: params!.startDate,
-        endDate: params!.endDate,
+        period: params.period,
+        allUsers: params.allUsers,
+        startDate: params.startDate,
+        endDate: params.endDate,
         status: 'success',
       },
       AuditEventStatus.SUCCESS,
@@ -152,18 +163,18 @@ export const GET: APIRoute = async ({ request }) => {
       endDate?: Date
       userId?: string
     } = {
-      period: params!.period,
+      period: params.period as string,
     }
 
-    if (params!.startDate) {
-      statsOptions.startDate = new Date(params!.startDate as string)
+    if (params.startDate) {
+      statsOptions.startDate = new Date(params.startDate)
     }
 
-    if (params!.endDate) {
-      statsOptions.endDate = new Date(params!.endDate as string)
+    if (params.endDate) {
+      statsOptions.endDate = new Date(params.endDate)
     }
 
-    if (!params!.allUsers) {
+    if (!params.allUsers) {
       statsOptions.userId = userId
     }
 

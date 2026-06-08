@@ -147,17 +147,17 @@ describeFn('RedisService Performance', () => {
       }
 
       // Performance expectations
-      expect(results?.[1024].write).toBeLessThan(200) // relaxed timing for write
-      expect(results?.[1024].read).toBeLessThan(200) // relaxed timing for read
+      expect(results[1024]!.write).toBeLessThan(200) // relaxed timing for write
+      expect(results[1024]!.read).toBeLessThan(200) // relaxed timing for read
 
-      expect(results?.[10240].write).toBeLessThan(300) // relaxed
-      expect(results?.[10240].read).toBeLessThan(200) // relaxed
+      expect(results[10240]!.write).toBeLessThan(300) // relaxed
+      expect(results[10240]!.read).toBeLessThan(200) // relaxed
 
-      expect(results?.[102400].write).toBeLessThan(500) // relaxed for environment
-      expect(results?.[102400].read).toBeLessThan(500) // relaxed for environment
+      expect(results[102400]!.write).toBeLessThan(500) // relaxed for environment
+      expect(results[102400]!.read).toBeLessThan(500) // relaxed for environment
 
-      expect(results?.[1048576].write).toBeLessThan(1000) // relaxed for environment
-      expect(results?.[1048576].read).toBeLessThan(1000) // relaxed for environment
+      expect(results[1048576]!.write).toBeLessThan(1000) // relaxed for environment
+      expect(results[1048576]!.read).toBeLessThan(1000) // relaxed for environment
     })
   })
 

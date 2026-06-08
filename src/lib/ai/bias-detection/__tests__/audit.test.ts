@@ -144,7 +144,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.userId).toBe("user-123");
       expect(entry.userEmail).toBe("test@example.com");
@@ -177,7 +177,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.success).toBe(false);
       expect(entry.errorMessage).toBe("Analysis service unavailable");
@@ -196,7 +196,7 @@ describe("BiasDetectionAuditLogger", () => {
 
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(2);
-      expect(entries[0]).toBeDefined();
+      expect(entries[0]!).toBeDefined();
       expect(entries[1]).toBeDefined();
       expect(entries[0]!.id).not.toBe(entries[1]!.id);
       expect(entries[0]!.id).toMatch(/^audit_\d+_[a-z0-9]+$/);
@@ -219,7 +219,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.action.type).toBe("read");
       expect(entry.action.category).toBe("user-data");
@@ -247,7 +247,7 @@ describe("BiasDetectionAuditLogger", () => {
 
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
-      expect(entries[0]).toBeDefined();
+      expect(entries[0]!).toBeDefined();
       expect(entries[0]!.action.sensitivityLevel).toBe("critical"); // >100 session records
 
       mockStorage.clear();
@@ -292,7 +292,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.action.type).toBe("create");
       expect(entry.action.sensitivityLevel).toBe("high"); // high alert level
@@ -385,7 +385,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.action.type).toBe("update");
       expect(entry.action.category).toBe("configuration");
@@ -409,7 +409,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.userId).toBe("user-456");
       expect(entry.userEmail).toBe("user456@example.com");
@@ -431,7 +431,7 @@ describe("BiasDetectionAuditLogger", () => {
       const entries = mockStorage.getEntries();
       expect(entries).toHaveLength(1);
 
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
       expect(entry.success).toBe(false);
       expect(entry.errorMessage).toBe("Invalid credentials");
@@ -579,7 +579,7 @@ describe("BiasDetectionAuditLogger", () => {
       );
 
       const entries = mockStorage.getEntries();
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
 
       // Should anonymize demographics
@@ -606,7 +606,7 @@ describe("BiasDetectionAuditLogger", () => {
       await auditLogger.logAction(mockUser, action, "system", details, mockRequest);
 
       const entries = mockStorage.getEntries();
-      const entry = entries[0];
+      const entry = entries[0]!;
       expect(entry).toBeDefined();
 
       // Should preserve all details for low sensitivity
