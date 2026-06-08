@@ -8,6 +8,7 @@ import { Pool } from 'pg'
 import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
+import { setPostgresPool, setRedisClient } from './lib/database/connection'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
@@ -105,6 +106,7 @@ const redisOptions = REDIS_URL.startsWith('rediss://')
   : ({ lazyConnect: true } as RedisOptions)
 
 let redis: RedisLike | Redis = new Redis(REDIS_URL, redisOptions)
+setRedisClient(redis as unknown as Parameters<typeof setRedisClient>[0])
 
 redis.on('error', (err: unknown) => {
   // We handle connection errors in the connect().catch() block below
@@ -132,6 +134,9 @@ if (typeof redis.connect === 'function') {
         },
       }
       redis = redisMock
+      setRedisClient(
+        redisMock as unknown as Parameters<typeof setRedisClient>[0],
+      )
     } else {
       console.error('Failed to connect to Redis:', err)
     }
