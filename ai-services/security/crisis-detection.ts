@@ -10,6 +10,8 @@
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 import { createBuildSafeLogger } from '../../src/lib/logging/build-safe-logger'
 
+type BuildSafeLogger = ReturnType<typeof createBuildSafeLogger>
+const logger: BuildSafeLogger = createBuildSafeLogger('CrisisDetectionService')
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
 const logger = createBuildSafeLogger('CrisisDetectionService') as {
   warn: (msg: string) => void

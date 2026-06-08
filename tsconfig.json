@@ -40,7 +40,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": false,
+    "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -48,6 +48,7 @@
     "allowArbitraryExtensions": true,
     "allowUmdGlobalAccess": false,
     "skipLibCheck": true,
+    "types": ["node", "react", "react-dom"],
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "plugins": [
       {
@@ -61,10 +62,6 @@
     "./src/**/*.astro",
     "./src/types/**/*.ts",
     "./src/types/**/*.d.ts",
-    "./tests/**/*.ts",
-    "./tests/**/*.tsx",
-    "./src/scripts/**/*.ts",
-    "./ai-services/**/*.ts",
     "./*.config.js",
     "./*.config.ts",
     "./*.config.mjs",
@@ -82,7 +79,7 @@
     "./dist",
     "./node_modules",
     "./**/node_modules/**",
-    
+    "./src/scripts",
     "./.astro",
     "./.local",
     "./**/test-results/**",

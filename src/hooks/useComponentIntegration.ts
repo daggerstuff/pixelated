@@ -48,8 +48,7 @@ export function useChartData(params: {
   autoRefresh?: boolean
   refreshInterval?: number
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadChartData = useCallback(async () => {
@@ -88,11 +87,8 @@ export function use3DEmotionData(params: {
   includeTrajectory?: boolean
   realTimeUpdates?: boolean
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
-  const [realTimeData, setRealTimeData] = useState<Record<string, unknown>[]>(
-    [],
-  )
+  const { data, loading, error, execute } = useAsyncOperation<any>()
+  const [realTimeData, setRealTimeData] = useState<any[]>([])
 
   const load3DEmotionData = useCallback(async () => {
     return execute(async () =>
@@ -115,10 +111,7 @@ export function use3DEmotionData(params: {
 
         // Add to real-time data if tracking
         if (params.realTimeUpdates) {
-          setRealTimeData(
-            (prev) =>
-              [...prev, result['emotionPoint']] as Record<string, unknown>[],
-          )
+          setRealTimeData((prev) => [...prev, result.emotionPoint])
         }
 
         return result
@@ -135,8 +128,8 @@ export function use3DEmotionData(params: {
   }, [load3DEmotionData])
 
   // Combine static and real-time data
-  const combinedEmotionPoints = data?.['emotionPoints']
-    ? [...(data['emotionPoints'] as Record<string, unknown>[]), ...realTimeData]
+  const combinedEmotionPoints = data?.emotionPoints
+    ? [...data.emotionPoints, ...realTimeData]
     : realTimeData
 
   return {
@@ -159,8 +152,7 @@ export function useTreatmentPlans(params: {
   includeMetrics?: boolean
   autoSave?: boolean
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>[]>()
+  const { data, loading, error, execute } = useAsyncOperation<any[]>()
   const [isDirty, setIsDirty] = useState(false)
 
   const loadTreatmentPlans = useCallback(async () => {
@@ -170,7 +162,7 @@ export function useTreatmentPlans(params: {
   }, [execute, params])
 
   const saveTreatmentPlan = useCallback(
-    async (planData: Record<string, unknown>) => {
+    async (planData: any) => {
       try {
         const result =
           await componentIntegrationService.saveTreatmentPlan(planData)
@@ -193,7 +185,7 @@ export function useTreatmentPlans(params: {
       planId: string
       goalId?: string
       milestoneId?: string
-      updates: Record<string, unknown>
+      updates: Record<string, any>
     }) => {
       try {
         const result =
@@ -225,7 +217,7 @@ export function useTreatmentPlans(params: {
     if (params.autoSave && isDirty && data && data.length > 0) {
       const autoSaveTimer = setTimeout(() => {
         // Auto-save the first plan (assuming it's being edited)
-        void saveTreatmentPlan(data[0] as Record<string, unknown>)
+        void saveTreatmentPlan(data[0])
       }, 5000) // Auto-save after 5 seconds of inactivity
 
       return () => clearTimeout(autoSaveTimer)
@@ -255,8 +247,7 @@ export function useParticleSystem(params: {
   complexity?: 'low' | 'medium' | 'high'
   realTimeUpdates?: boolean
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
   const [currentEmotion, setCurrentEmotion] = useState(
     params.emotion ?? 'neutral',
   )
@@ -278,7 +269,7 @@ export function useParticleSystem(params: {
     async (updates: {
       emotion?: string
       intensity?: number
-      particleUpdates?: Record<string, unknown>[]
+      particleUpdates?: any[]
     }) => {
       try {
         if (updates.emotion) setCurrentEmotion(updates.emotion)
@@ -326,8 +317,7 @@ export function useCarouselContent(params: {
   audience?: string
   includeExpired?: boolean
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
 
   const loadCarouselContent = useCallback(async () => {
     return execute(async () =>
@@ -336,10 +326,7 @@ export function useCarouselContent(params: {
   }, [execute, params])
 
   const saveCarouselConfiguration = useCallback(
-    async (
-      configData: Record<string, unknown>,
-      action: 'create' | 'update' = 'create',
-    ) => {
+    async (configData: any, action: 'create' | 'update' = 'create') => {
       try {
         const result =
           await componentIntegrationService.saveCarouselConfiguration(
@@ -384,8 +371,7 @@ export function useIntegratedDashboard(params: {
   autoRefresh?: boolean
   refreshInterval?: number
 }) {
-  const { data, loading, error, execute } =
-    useAsyncOperation<Record<string, unknown>>()
+  const { data, loading, error, execute } = useAsyncOperation<any>()
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   const loadDashboardData = useCallback(async () => {
@@ -417,14 +403,8 @@ export function useIntegratedDashboard(params: {
     loading,
     error,
     refresh: loadDashboardData,
-    hasErrors:
-      ((
-        (data?.['metadata'] as Record<string, unknown>)?.['errors'] as unknown[]
-      )?.length ?? 0) > 0,
-    errors:
-      ((data?.['metadata'] as Record<string, unknown>)?.[
-        'errors'
-      ] as unknown[]) ?? [],
+    hasErrors: data?.metadata?.errors?.length > 0,
+    errors: data?.metadata?.errors ?? [],
   }
 }
 
@@ -434,7 +414,7 @@ export function useRealTimeUpdates(params: {
   components: ('emotions' | 'particles' | 'charts' | 'treatment')[]
   enabled?: boolean
 }) {
-  const [updates, setUpdates] = useState<Record<string, unknown>[]>([])
+  const [updates, setUpdates] = useState<any[]>([])
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const unsubscribeRef = useRef<(() => void) | null>(null)
@@ -442,14 +422,11 @@ export function useRealTimeUpdates(params: {
   useEffect(() => {
     if (!params.enabled || !params.sessionId) return
 
-    const handleUpdate = (data: unknown) => {
-      setUpdates((prev) => [
-        ...prev.slice(-99),
-        data as Record<string, unknown>,
-      ]) // Keep last 100 updates
+    const handleUpdate = (data: any) => {
+      setUpdates((prev) => [...prev.slice(-99), data]) // Keep last 100 updates
     }
 
-    const handleError = (error: unknown) => {
+    const handleError = (error: any) => {
       setError(error instanceof Error ? error : new Error('Connection error'))
       setConnected(false)
     }
@@ -492,7 +469,7 @@ export function useRealTimeUpdates(params: {
 
 // Hook for service health monitoring
 export function useServiceHealth(checkInterval: number = 60000) {
-  const [health, setHealth] = useState<Record<string, unknown> | null>(null)
+  const [health, setHealth] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
@@ -500,7 +477,7 @@ export function useServiceHealth(checkInterval: number = 60000) {
     setLoading(true)
     try {
       const healthData = await componentIntegrationService.getServiceHealth()
-      setHealth(healthData as unknown as Record<string, unknown>)
+      setHealth(healthData)
     } catch (error: unknown) {
       logger.error('Health check failed', { error })
       setHealth({
@@ -537,8 +514,8 @@ export function useServiceHealth(checkInterval: number = 60000) {
     health,
     loading,
     checkHealth,
-    isHealthy: health?.['overall'] === 'healthy',
-    isDegraded: health?.['overall'] === 'degraded',
-    hasError: health?.['overall'] === 'error',
+    isHealthy: health?.overall === 'healthy',
+    isDegraded: health?.overall === 'degraded',
+    hasError: health?.overall === 'error',
   }
 }

@@ -151,13 +151,12 @@ describe('ObjectiveMetricsEngine', () => {
 
   describe('calculateObjectiveMetrics', () => {
     test('should calculate basic objective metrics correctly', () => {
-      const objective = mockObjectives[0]! // correctness
+      const objective = mockObjectives[0] // correctness
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         mockContext,
       )
@@ -175,13 +174,12 @@ describe('ObjectiveMetricsEngine', () => {
     })
 
     test('should calculate criteria breakdown correctly', () => {
-      const objective = mockObjectives[0]! // correctness
+      const objective = mockObjectives[0] // correctness
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         mockContext,
       )
@@ -200,13 +198,12 @@ describe('ObjectiveMetricsEngine', () => {
     })
 
     test('should calculate trend information', () => {
-      const objective = mockObjectives[0]! // correctness
+      const objective = mockObjectives[0] // correctness
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
 
       const metrics = engine.calculateObjectiveMetrics(
         objective,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         mockContext,
       )
@@ -310,7 +307,6 @@ describe('ObjectiveMetricsEngine', () => {
           },
         }
         evaluations.push(evaluation)
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         engine.addEvaluation(evaluation, mockObjectives)
       }
 
@@ -351,7 +347,6 @@ describe('ObjectiveMetricsEngine', () => {
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         objective,
         evaluationResult,
         mockContext,
@@ -379,7 +374,6 @@ describe('ObjectiveMetricsEngine', () => {
 
       const objective = mockObjectives[0]
       const metrics = engine.calculateObjectiveMetrics(
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         objective,
         secondEvaluation.objectiveResults.correctness,
         mockContext,
@@ -396,11 +390,10 @@ describe('ObjectiveMetricsEngine', () => {
         detectedContext: ContextType.CRISIS,
       }
 
-      const safetyObjective = mockObjectives[2]! // safety
+      const safetyObjective = mockObjectives[2] // safety
       const evaluationResult = mockEvaluationResult.objectiveResults['safety']
       const metrics = engine.calculateObjectiveMetrics(
         safetyObjective,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         crisisContext,
       )
@@ -414,12 +407,11 @@ describe('ObjectiveMetricsEngine', () => {
         detectedContext: ContextType.CLINICAL_ASSESSMENT,
       }
 
-      const correctnessObjective = mockObjectives[0]! // correctness
+      const correctnessObjective = mockObjectives[0] // correctness
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
         correctnessObjective,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         clinicalContext,
       )
@@ -443,7 +435,6 @@ describe('ObjectiveMetricsEngine', () => {
             },
           },
         }
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         engine.addEvaluation(evaluation, mockObjectives)
       }
 
@@ -451,7 +442,6 @@ describe('ObjectiveMetricsEngine', () => {
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         objective,
         evaluationResult,
         mockContext,
@@ -476,7 +466,6 @@ describe('ObjectiveMetricsEngine', () => {
             },
           },
         }
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         engine.addEvaluation(evaluation, mockObjectives)
       }
 
@@ -484,7 +473,6 @@ describe('ObjectiveMetricsEngine', () => {
       const evaluationResult =
         mockEvaluationResult.objectiveResults['correctness']
       const metrics = engine.calculateObjectiveMetrics(
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         objective,
         evaluationResult,
         mockContext,
@@ -505,7 +493,6 @@ describe('ObjectiveMetricsEngine', () => {
           overallScore: scores[i],
           timestamp: new Date(Date.now() + i * 1000),
         }
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         engine.addEvaluation(evaluation, mockObjectives)
       }
 
@@ -540,7 +527,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should handle missing criteria scores gracefully', () => {
       const objectiveWithMissingCriteria = {
-        ...mockObjectives[0]!,
+        ...mockObjectives[0],
         criteria: [
           {
             criterion: 'missing_criterion',
@@ -557,15 +544,12 @@ describe('ObjectiveMetricsEngine', () => {
 
       const metrics = engine.calculateObjectiveMetrics(
         objectiveWithMissingCriteria,
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         evaluationResult,
         mockContext,
       )
 
       expect(metrics.criteriaBreakdown).toHaveLength(1)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(metrics?.criteriaBreakdown[0].score).toBe(0)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(metrics?.criteriaBreakdown[0].contribution).toBe(0)
     })
   })
@@ -584,10 +568,8 @@ describe('DEFAULT_METRICS_CONFIG', () => {
     expect(DEFAULT_METRICS_CONFIG.benchmarkThresholds).toBeDefined()
     expect(
       DEFAULT_METRICS_CONFIG.benchmarkThresholds['excellent'],
-      // @ts-expect-error - Strictly required for pre-existing test mock files
     ).toBeGreaterThan(DEFAULT_METRICS_CONFIG.benchmarkThresholds['good'])
     expect(DEFAULT_METRICS_CONFIG.benchmarkThresholds['good']).toBeGreaterThan(
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       DEFAULT_METRICS_CONFIG.benchmarkThresholds['acceptable'],
     )
   })

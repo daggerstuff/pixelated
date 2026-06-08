@@ -310,6 +310,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 5: Cleanup \u0026 Optimization (Sprint 6)"
       "summary": "Phase 5: Cleanup & Optimization (Sprint 6)"
     },
     "fieldsToInclude": null,
@@ -4646,6 +4647,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Privacy-Preserving Intelligence \u0026 FHE"
       "summary": "Privacy-Preserving Intelligence & FHE"
     },
     "fieldsToInclude": null,
@@ -4711,6 +4713,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Data Pipeline Recovery \u0026 External Integrations"
       "summary": "Data Pipeline Recovery & External Integrations"
     },
     "fieldsToInclude": null,
@@ -4776,6 +4779,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Platform Foundations \u0026 Operations"
       "summary": "Platform Foundations & Operations"
     },
     "fieldsToInclude": null,
@@ -4841,6 +4845,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "CI Federation \u0026 Release Readiness"
       "summary": "CI Federation & Release Readiness"
     },
     "fieldsToInclude": null,
@@ -4892,6 +4897,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Product Discovery \u0026 Backlog Hygiene"
       "summary": "Product Discovery & Backlog Hygiene"
     },
     "fieldsToInclude": null,
@@ -5022,6 +5028,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Test Coverage \u0026 Security Baseline"
       "summary": "Test Coverage & Security Baseline"
     },
     "fieldsToInclude": null,
@@ -5152,6 +5159,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Data Governance \u0026 Compliance"
       "summary": "Data Governance & Compliance"
     },
     "fieldsToInclude": null,
@@ -7208,6 +7216,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 5: Cleanup \u0026 Optimization (Sprint 6)"
       "summary": "Phase 5: Cleanup & Optimization (Sprint 6)"
     },
     "fieldsToInclude": null,
@@ -9924,6 +9933,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/4"
         }
       },
+      "summary": "CI Federation \u0026 Release Readiness"
       "summary": "CI Federation & Release Readiness"
     },
     "fieldsToInclude": null,
@@ -10040,6 +10050,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/4"
         }
       },
+      "summary": "Data Governance \u0026 Compliance"
       "summary": "Data Governance & Compliance"
     },
     "fieldsToInclude": null,
@@ -10221,6 +10232,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Privacy-Preserving Intelligence \u0026 FHE"
       "summary": "Privacy-Preserving Intelligence & FHE"
     },
     "fieldsToInclude": null,
@@ -10286,6 +10298,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Product Discovery \u0026 Backlog Hygiene"
       "summary": "Product Discovery & Backlog Hygiene"
     },
     "fieldsToInclude": null,
@@ -10546,6 +10559,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Data Pipeline Recovery \u0026 External Integrations"
       "summary": "Data Pipeline Recovery & External Integrations"
     },
     "fieldsToInclude": null,
@@ -10611,6 +10625,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Platform Foundations \u0026 Operations"
       "summary": "Platform Foundations & Operations"
     },
     "fieldsToInclude": null,
@@ -11832,6 +11847,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 1: Fix the Bleeding — Auto-rebase, fast-path, commit messages, error recovery"
       "summary": "Phase 1: Fix the Bleeding \u2014 Auto-rebase, fast-path, commit messages, error recovery"
     },
     "fieldsToInclude": null,
@@ -11897,6 +11913,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 2: Scale Up — Parallel processing, conflict resolution, test validation, LLM fallback"
       "summary": "Phase 2: Scale Up \u2014 Parallel processing, conflict resolution, test validation, LLM fallback"
     },
     "fieldsToInclude": null,
@@ -11962,6 +11979,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 3: Automate — Daemon, multi-repo, smart filtering, rate limiting"
       "summary": "Phase 3: Automate \u2014 Daemon, multi-repo, smart filtering, rate limiting"
     },
     "fieldsToInclude": null,
@@ -12027,6 +12045,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 4: Enhance — Human escalation, PR reporting, learning loop, dashboard"
       "summary": "Phase 4: Enhance \u2014 Human escalation, PR reporting, learning loop, dashboard"
     },
     "fieldsToInclude": null,
@@ -12092,6 +12111,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Phase 5: Expand — Autonomous PR creation, rule engine, external integrations"
       "summary": "Phase 5: Expand \u2014 Autonomous PR creation, rule engine, external integrations"
     },
     "fieldsToInclude": null,
@@ -12157,6 +12177,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "AutoReview AI — Workflow Expansion \u0026 Improvement"
       "summary": "AutoReview AI \u2014 Workflow Expansion & Improvement"
     },
     "fieldsToInclude": null,
@@ -12287,6 +12308,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "A3: Fast-path for clean PRs (no actionable comments → immediate merge)"
       "summary": "A3: Fast-path for clean PRs (no actionable comments \u2192 immediate merge)"
     },
     "fieldsToInclude": null,
@@ -12742,6 +12764,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "A4: Fix comment resolution — track processed comments locally"
       "summary": "A4: Fix comment resolution \u2014 track processed comments locally"
     },
     "fieldsToInclude": null,
@@ -13197,6 +13220,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "C5: Learning loop — improve decisions from historical outcomes"
       "summary": "C5: Learning loop \u2014 improve decisions from historical outcomes"
     },
     "fieldsToInclude": null,
@@ -13262,6 +13286,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "C6: Dashboard integration — live workflow status"
       "summary": "C6: Dashboard integration \u2014 live workflow status"
     },
     "fieldsToInclude": null,
@@ -14159,6 +14184,20 @@
         "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/priority/3"
       },
       "status": {
+        "description": "",
+        "iconUrl": "https://jira-prod-us-25-as-2.prod.atl-paas.net/images/icons/statuses/generic.png",
+        "id": "10053",
+        "name": "To Do",
+        "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/status/10053",
+        "statusCategory": {
+          "colorName": "blue-gray",
+          "id": 2,
+          "key": "new",
+          "name": "To Do",
+          "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
+        }
+      },
+      "summary": "Integrate with Kafka/Kinesis for stream processing"
         "name": "Done"
       },
       "summary": "Test Coverage & Security Baseline"
@@ -14173,6 +14212,7 @@
     "schema": null,
     "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/issue/10682",
     "transitions": null,
+    "versionedRepresentations": null
     "versionedRepresentations": null,
     "status": "Done",
     "summary": "Test Coverage & Security Baseline"
@@ -16373,6 +16413,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "[SERIOUS-7] Fix topic clustering — substring matching matches wrong words"
       "summary": "[SERIOUS-7] Fix topic clustering \u2014 substring matching matches wrong words"
     },
     "fieldsToInclude": null,
@@ -16828,6 +16869,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "[GAP-4] Fix entity extraction quality — graph store filled with garbage"
       "summary": "[GAP-4] Fix entity extraction quality \u2014 graph store filled with garbage"
     },
     "fieldsToInclude": null,
@@ -17218,6 +17260,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Bulletproof Scaling: Phase 0 Foundation \u0026 Concurrency"
       "summary": "Bulletproof Scaling: Phase 0 Foundation & Concurrency"
     },
     "fieldsToInclude": null,
@@ -17283,6 +17326,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Bulletproof Scaling: Phase 3 Validation \u0026 Portal"
       "summary": "Bulletproof Scaling: Phase 3 Validation & Portal"
     },
     "fieldsToInclude": null,
@@ -17673,6 +17717,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Bulletproof Scaling: Phase 1 Ingestion \u0026 High-Quality Promotion"
       "summary": "Bulletproof Scaling: Phase 1 Ingestion & High-Quality Promotion"
     },
     "fieldsToInclude": null,
@@ -17803,6 +17848,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Discovery \u0026 Backlog"
       "summary": "Discovery & Backlog"
     },
     "fieldsToInclude": null,
@@ -18063,6 +18109,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*1.1 Property test — token length stats correctness (Prop 6)"
       "summary": "*1.1 Property test \u2014 token length stats correctness (Prop 6)"
     },
     "fieldsToInclude": null,
@@ -18128,6 +18175,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*1.2 Property test — truncation warning (Prop 7)"
       "summary": "*1.2 Property test \u2014 truncation warning (Prop 7)"
     },
     "fieldsToInclude": null,
@@ -18323,6 +18371,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*2.1 Property test — multilingual crisis detection (Prop 8)"
       "summary": "*2.1 Property test \u2014 multilingual crisis detection (Prop 8)"
     },
     "fieldsToInclude": null,
@@ -18388,6 +18437,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*2.2 Property test — multilingual negation suppression (Prop 9)"
       "summary": "*2.2 Property test \u2014 multilingual negation suppression (Prop 9)"
     },
     "fieldsToInclude": null,
@@ -18713,6 +18763,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "†6.0 Delete broken pipeline files and garbage data"
       "summary": "\u20206.0 Delete broken pipeline files and garbage data"
     },
     "fieldsToInclude": null,
@@ -18778,6 +18829,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "5.0 Checkpoint — Phase 1 complete"
       "summary": "5.0 Checkpoint \u2014 Phase 1 complete"
     },
     "fieldsToInclude": null,
@@ -18843,6 +18895,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "†7.0 Verify compiled corpus not contaminated by garbage book data"
       "summary": "\u20207.0 Verify compiled corpus not contaminated by garbage book data"
     },
     "fieldsToInclude": null,
@@ -18973,6 +19026,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*8.1 Property test — YouTube language tagging (Prop 15)"
       "summary": "*8.1 Property test \u2014 YouTube language tagging (Prop 15)"
     },
     "fieldsToInclude": null,
@@ -19038,6 +19092,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*8.2 Property test — YouTube safety filtering (Prop 16)"
       "summary": "*8.2 Property test \u2014 YouTube safety filtering (Prop 16)"
     },
     "fieldsToInclude": null,
@@ -19103,6 +19158,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*8.3 Property test — YouTube dedup (Prop 17)"
       "summary": "*8.3 Property test \u2014 YouTube dedup (Prop 17)"
     },
     "fieldsToInclude": null,
@@ -19233,6 +19289,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "‡9.0 Execute YouTube ingestion — Tier 1 channels"
       "summary": "\u20219.0 Execute YouTube ingestion \u2014 Tier 1 channels"
     },
     "fieldsToInclude": null,
@@ -19298,6 +19355,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡10.0 Execute YouTube ingestion — Tier 2 channels"
       "summary": "\u202110.0 Execute YouTube ingestion \u2014 Tier 2 channels"
     },
     "fieldsToInclude": null,
@@ -19363,6 +19421,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡11.0 Execute YouTube ingestion — Tier 3 channels"
       "summary": "\u202111.0 Execute YouTube ingestion \u2014 Tier 3 channels"
     },
     "fieldsToInclude": null,
@@ -19493,6 +19552,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*12.1 Property test — book conversion metadata (Prop 18)"
       "summary": "*12.1 Property test \u2014 book conversion metadata (Prop 18)"
     },
     "fieldsToInclude": null,
@@ -19558,6 +19618,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*12.2 Property test — book conversion safety filtering (Prop 19)"
       "summary": "*12.2 Property test \u2014 book conversion safety filtering (Prop 19)"
     },
     "fieldsToInclude": null,
@@ -19688,6 +19749,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡14.0 Execute book conversion — remaining titles"
       "summary": "\u202114.0 Execute book conversion \u2014 remaining titles"
     },
     "fieldsToInclude": null,
@@ -19753,6 +19815,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡13.0 Execute book conversion — priority titles"
       "summary": "\u202113.0 Execute book conversion \u2014 priority titles"
     },
     "fieldsToInclude": null,
@@ -19883,6 +19946,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*15.1 Property test — near-duplicate removal (Prop 20)"
       "summary": "*15.1 Property test \u2014 near-duplicate removal (Prop 20)"
     },
     "fieldsToInclude": null,
@@ -19948,6 +20012,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*15.2 Property test — ChatML boundary verification (Prop 21)"
       "summary": "*15.2 Property test \u2014 ChatML boundary verification (Prop 21)"
     },
     "fieldsToInclude": null,
@@ -20013,6 +20078,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*15.3 Property test — edge case preservation (Prop 22)"
       "summary": "*15.3 Property test \u2014 edge case preservation (Prop 22)"
     },
     "fieldsToInclude": null,
@@ -20273,6 +20339,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "17.0 Checkpoint — Phase 2 complete"
       "summary": "17.0 Checkpoint \u2014 Phase 2 complete"
     },
     "fieldsToInclude": null,
@@ -20403,6 +20470,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*18.1 Property test — DPO output field completeness (Prop 10)"
       "summary": "*18.1 Property test \u2014 DPO output field completeness (Prop 10)"
     },
     "fieldsToInclude": null,
@@ -20468,6 +20536,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*18.2 Property test — nightmare fuel tagging (Prop 11)"
       "summary": "*18.2 Property test \u2014 nightmare fuel tagging (Prop 11)"
     },
     "fieldsToInclude": null,
@@ -20533,6 +20602,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*18.3 Property test — non-nightmare safety filtering (Prop 12)"
       "summary": "*18.3 Property test \u2014 non-nightmare safety filtering (Prop 12)"
     },
     "fieldsToInclude": null,
@@ -20663,6 +20733,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡19.0 Generate DPO preference pairs (10,000)"
       "summary": "\u202119.0 Generate DPO preference pairs (10,000)"
     },
     "fieldsToInclude": null,
@@ -20728,6 +20799,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡20.0 Generate niche category data (500 × 10 categories)"
       "summary": "\u202120.0 Generate niche category data (500 \u00d7 10 categories)"
     },
     "fieldsToInclude": null,
@@ -20793,6 +20865,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡21.0 Generate nightmare fuel data (5,000)"
       "summary": "\u202121.0 Generate nightmare fuel data (5,000)"
     },
     "fieldsToInclude": null,
@@ -20923,6 +20996,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "‡22.0 Run dedup + normalize on full corpus"
       "summary": "\u202122.0 Run dedup + normalize on full corpus"
     },
     "fieldsToInclude": null,
@@ -20988,6 +21062,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*24.1 Property test — DPO safety filter (Prop 1)"
       "summary": "*24.1 Property test \u2014 DPO safety filter (Prop 1)"
     },
     "fieldsToInclude": null,
@@ -21053,6 +21128,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "23.0 Checkpoint — Phase 3 complete"
       "summary": "23.0 Checkpoint \u2014 Phase 3 complete"
     },
     "fieldsToInclude": null,
@@ -21183,6 +21259,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "25.0 Integration test — DPO end-to-end"
       "summary": "25.0 Integration test \u2014 DPO end-to-end"
     },
     "fieldsToInclude": null,
@@ -21248,6 +21325,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "26.0 Checkpoint — Phase 4 complete"
       "summary": "26.0 Checkpoint \u2014 Phase 4 complete"
     },
     "fieldsToInclude": null,
@@ -21378,6 +21456,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*27.1 Property test — reward score range (Prop 2)"
       "summary": "*27.1 Property test \u2014 reward score range (Prop 2)"
     },
     "fieldsToInclude": null,
@@ -21443,6 +21522,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*27.2 Property test — unsafe response safety score (Prop 3)"
       "summary": "*27.2 Property test \u2014 unsafe response safety score (Prop 3)"
     },
     "fieldsToInclude": null,
@@ -21508,6 +21588,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*27.3 Property test — crisis resource score (Prop 4)"
       "summary": "*27.3 Property test \u2014 crisis resource score (Prop 4)"
     },
     "fieldsToInclude": null,
@@ -21573,6 +21654,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*27.4 Property test — low-reward exclusion (Prop 5)"
       "summary": "*27.4 Property test \u2014 low-reward exclusion (Prop 5)"
     },
     "fieldsToInclude": null,
@@ -21638,6 +21720,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*27.5 Unit tests for reward function — 100% coverage"
       "summary": "*27.5 Unit tests for reward function \u2014 100% coverage"
     },
     "fieldsToInclude": null,
@@ -21703,6 +21786,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "28.0 Integration test — GRPO end-to-end"
       "summary": "28.0 Integration test \u2014 GRPO end-to-end"
     },
     "fieldsToInclude": null,
@@ -21768,6 +21852,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "29.0 Checkpoint — Phase 5 complete"
       "summary": "29.0 Checkpoint \u2014 Phase 5 complete"
     },
     "fieldsToInclude": null,
@@ -21898,6 +21983,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*30.1 Property test — eval metrics completeness (Prop 13)"
       "summary": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)"
     },
     "fieldsToInclude": null,
@@ -21963,6 +22049,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "*30.2 Property test — crisis safety failure detection (Prop 14)"
       "summary": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)"
     },
     "fieldsToInclude": null,
@@ -22093,6 +22180,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "31.0 Integration test — eval suite end-to-end"
       "summary": "31.0 Integration test \u2014 eval suite end-to-end"
     },
     "fieldsToInclude": null,
@@ -22158,6 +22246,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/3"
         }
       },
+      "summary": "32.0 Checkpoint — Phase 6 complete"
       "summary": "32.0 Checkpoint \u2014 Phase 6 complete"
     },
     "fieldsToInclude": null,
@@ -22353,6 +22442,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "35.0 Final checkpoint — All complete"
       "summary": "35.0 Final checkpoint \u2014 All complete"
     },
     "fieldsToInclude": null,
@@ -23523,6 +23613,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Research \u0026 Apply: Alibaba Cloud AI Catalyst Program"
       "summary": "Research & Apply: Alibaba Cloud AI Catalyst Program"
     },
     "fieldsToInclude": null,
@@ -23783,6 +23874,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/4"
         }
       },
+      "summary": "Systematic TypeScript Error Resolution - Phase 5 \u0026 6"
       "summary": "Systematic TypeScript Error Resolution - Phase 5 & 6"
     },
     "fieldsToInclude": null,
@@ -23899,6 +23991,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Sprint 1: Memory Schema \u0026 Unification (May 12 – May 25)"
       "summary": "Sprint 1: Memory Schema & Unification (May 12 \u2013 May 25)"
     },
     "fieldsToInclude": null,
@@ -23964,6 +24057,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Sprint 2: Gating \u0026 Ingestion (May 26 – June 8)"
       "summary": "Sprint 2: Gating & Ingestion (May 26 \u2013 June 8)"
     },
     "fieldsToInclude": null,
@@ -24224,6 +24318,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Sprint 3: Dreaming \u0026 Consolidation (June 9 – June 22)"
       "summary": "Sprint 3: Dreaming & Consolidation (June 9 \u2013 June 22)"
     },
     "fieldsToInclude": null,
@@ -24289,6 +24384,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Design Cross‑Language Memory API"
       "summary": "Design Cross\u2011Language Memory API"
     },
     "fieldsToInclude": null,
@@ -24354,6 +24450,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Sprint 4: Reflection \u0026 Learning (June 23 – July 6)"
       "summary": "Sprint 4: Reflection & Learning (June 23 \u2013 July 6)"
     },
     "fieldsToInclude": null,
@@ -24419,6 +24516,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Sprint 5: Fine-Tuning, Evaluation \u0026 Deployment (July 7 – July 27)"
       "summary": "Sprint 5: Fine-Tuning, Evaluation & Deployment (July 7 \u2013 July 27)"
     },
     "fieldsToInclude": null,
@@ -25199,6 +25297,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Prepare Fine‑Tuning Dataset"
       "summary": "Prepare Fine\u2011Tuning Dataset"
     },
     "fieldsToInclude": null,
@@ -25264,6 +25363,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Fine‑Tune the Model"
       "summary": "Fine\u2011Tune the Model"
     },
     "fieldsToInclude": null,
@@ -25394,6 +25494,7 @@
           "self": "https://jira-prod-us-25-as-2.prod.atl-paas.net/rest/api/3/statuscategory/2"
         }
       },
+      "summary": "Iterate \u0026 Refine"
       "summary": "Iterate & Refine"
     },
     "fieldsToInclude": null,

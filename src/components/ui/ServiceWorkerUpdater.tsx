@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'
@@ -23,7 +23,7 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
 
   useEffect(() => {
     if (!serviceWorkerManager.isSupported()) {
-      return () => {}
+      return
     }
 
     // Register service worker
@@ -81,7 +81,7 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
     )
 
     // Check for updates periodically
-    const checkForUpdates = (): void => {
+    const checkForUpdates = () => {
       serviceWorkerManager.update().catch(() => {
         console.error('Service Worker update check failed')
       })
