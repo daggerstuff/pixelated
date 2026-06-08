@@ -1,15 +1,16 @@
 /* @vitest-environment node */
-import { describe, it, expect } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { config } from '@/config/env.config'
 
-import { encrypt, decrypt } from '../encryption'
+import { decrypt, encrypt } from '../encryption'
 
-import 'dotenv/config'
+// Test fixture, not a credential — keeps this file independent of .env.
+const TEST_ENCRYPTION_KEY = 'a'.repeat(32)
 
-// Mock the config to ensure we're testing with controlled values if needed,
-// but for integration verification we can also check the actual config loader.
-// Since we updated .env, the config loader should pick up the values.
+beforeAll(() => {
+  vi.stubEnv('ENCRYPTION_KEY', TEST_ENCRYPTION_KEY)
+})
 
 describe('Security Implementation Verification', () => {
   it('should have encryption key configured', () => {
@@ -29,7 +30,6 @@ describe('Security Implementation Verification', () => {
     expect(encrypted).toBeDefined()
     expect(typeof encrypted).toBe('string')
 
-    // It should be a stringified JSON object with iv, data, tag, salt
     const parsed = JSON.parse(encrypted)
     expect(parsed).toHaveProperty('iv')
     expect(parsed).toHaveProperty('data')

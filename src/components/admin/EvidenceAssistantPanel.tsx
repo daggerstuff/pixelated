@@ -152,7 +152,6 @@ export function EvidenceAssistantPanel() {
               className="bg-cyan-400 text-slate-950 hover:bg-cyan-300 disabled:bg-cyan-900/40 disabled:text-slate-400 rounded-xl px-5 py-3 text-sm font-semibold transition disabled:cursor-not-allowed"
               disabled={loading || !query.trim()}
               type="submit"
-              aria-busy={loading}
             >
               {loading ? 'Searching...' : 'Run evidence search'}
             </button>
@@ -169,70 +168,60 @@ export function EvidenceAssistantPanel() {
 
         {response ? (
           <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.8fr)]">
-          <section className="border-white/10 bg-slate-900/70 rounded-2xl border p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-white text-lg font-semibold">
-                Grounded answer
-              </h3>
-              <span className="text-slate-400 text-xs uppercase tracking-[0.2em]">
-                {response.providerUsed ?? 'citations only'}
-              </span>
-            </div>
+            <section className="border-white/10 bg-slate-900/70 rounded-2xl border p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-white text-lg font-semibold">
+                  Grounded answer
+                </h3>
+                <span className="text-slate-400 text-xs uppercase tracking-[0.2em]">
+                  {response.providerUsed ?? 'citations only'}
+                </span>
+              </div>
 
-            <p className="text-slate-200 mb-4 text-sm leading-7">
-              {response.answer ??
-                'No synthesized answer was generated for this search.'}
-            </p>
+              <p className="text-slate-200 mb-4 text-sm leading-7">
+                {response.answer ??
+                  'No synthesized answer was generated for this search.'}
+              </p>
 
-            {response.warnings.length > 0 ? (
-              <ul className="border-amber-400/30 bg-amber-500/10 text-amber-100 space-y-2 rounded-xl border p-4 text-sm">
-                {response.warnings.map((warning) => (
-                  <li key={warning}>{warning}</li>
-                ))}
-              </ul>
-            ) : null}
-          </section>
+              {response.warnings.length > 0 ? (
+                <ul className="border-amber-400/30 bg-amber-500/10 text-amber-100 space-y-2 rounded-xl border p-4 text-sm">
+                  {response.warnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
 
-          <section className="border-white/10 bg-slate-900/70 rounded-2xl border p-5">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-white text-lg font-semibold">Citations</h3>
-              <span className="text-slate-400 text-sm">
-                {response.citations.length} source
-                {response.citations.length === 1 ? '' : 's'}
-              </span>
-            </div>
+            <section className="border-white/10 bg-slate-900/70 rounded-2xl border p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-white text-lg font-semibold">Citations</h3>
+                <span className="text-slate-400 text-sm">
+                  {response.citations.length} source
+                  {response.citations.length === 1 ? '' : 's'}
+                </span>
+              </div>
 
-            <div className="space-y-3">
-              {response.results.map((result, index) => (
-                <article
-                  key={`${result.url}-${result.title}`}
-                  className="border-white/8 bg-slate-950/70 rounded-xl border p-4"
-                >
-                  <div className="mb-2 flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-white text-sm font-semibold">
-                        [{index + 1}] {result.title}
-                      </p>
-                      <p className="text-slate-500 text-xs uppercase tracking-[0.2em]">
-                        {result.collection} ·{' '}
-                        {result.category ?? 'uncategorized'}
-                      </p>
+              <div className="space-y-3">
+                {response.results.map((result, index) => (
+                  <article
+                    key={`${result.url}-${result.title}`}
+                    className="border-white/8 bg-slate-950/70 rounded-xl border p-4"
+                  >
+                    <div className="mb-2 flex items-start justify-between gap-4">
+                      <div>
+                        <p className="text-white text-sm font-semibold">
+                          [{index + 1}] {result.title}
+                        </p>
+                        <p className="text-slate-500 text-xs uppercase tracking-[0.2em]">
+                          {result.collection} ·{' '}
+                          {result.category ?? 'uncategorized'}
+                        </p>
+                      </div>
+                      <span className="bg-white/5 text-slate-300 rounded-full px-2 py-1 text-xs">
+                        score {result.score}
+                      </span>
                     </div>
-                    <span className="bg-white/5 text-slate-300 rounded-full px-2 py-1 text-xs">
-                      score {result.score}
-                    </span>
-                  </div>
-                  <p className="text-slate-300 mb-3 text-sm leading-6">
-                    {result.excerpt}
-                  </p>
-                  <code className="text-cyan-200 text-xs">{result.url}</code>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-        ) : null}
-      </div>
-    </div>
-  )
-}
+                    <p className="text-slate-300 mb-3 text-sm leading-6">
+                      {result.excerpt}
+                    </p>
+                    <code className="text-cyan-200 text-xs">{result.url}
