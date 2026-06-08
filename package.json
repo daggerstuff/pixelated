@@ -162,6 +162,9 @@
     "blog": "node scripts/blog-web.js",
     "schedule-posts": "node scripts/content/schedule-posts.js",
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
+    "db:migrate": "tsx scripts/db-migrate.ts migrate",
+    "db:rollback": "tsx scripts/db-migrate.ts rollback",
+    "db:status": "tsx scripts/db-migrate.ts status",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
     "mcp:manage": "node scripts/mcp-manager.js"
