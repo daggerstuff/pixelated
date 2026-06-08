@@ -11,6 +11,12 @@ import {
 
 const router: Router = express.Router()
 
+router.get('/health', (req: Request, res: Response) => {
+  const health = {
+    mongo: getMongoConnection().readyState === 1,
+    postgres: getPostgresPool().totalCount > 0,
+    redis: getRedisClient().isReady,
+  }
   const statusCode = health.status === 'ok' ? 200 : 503
   res.status(statusCode).json(health)
 })
@@ -24,7 +30,8 @@ router.get('/', (req: Request, res: Response) => {
   })
 })
 
-
+router.get('/ready', async (req: Request, res: Response) => {
+  try {
     return res.json({
       ready: true,
       timestamp: new Date().toISOString(),
@@ -37,5 +44,4 @@ router.get('/', (req: Request, res: Response) => {
   }
 })
 
-})
-
+export default router
