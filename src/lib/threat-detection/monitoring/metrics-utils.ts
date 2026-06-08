@@ -70,12 +70,12 @@ export async function calculateMetricsSummary(
     }
   }
 
-  const values = metrics.map((m) => m.value).sort((a, b) => a - b)
+  const values = metrics?.map((m) => m.value).sort((a, b) => a - b)
   const count = values.length
   const sum = values.reduce((acc, val) => acc + val, 0)
   const average = sum / count
-  const min = values[0]
-  const max = values[count - 1]
+  const min = values[0] ?? 0
+  const max = values[count - 1] ?? 0
 
   // Calculate standard deviation
   const variance =
@@ -107,7 +107,7 @@ function calculatePercentile(
   if (sortedValues.length === 0) return 0
 
   const index = Math.ceil(sortedValues.length * percentile) - 1
-  return sortedValues[Math.max(0, index)]
+  return sortedValues[Math.max(0, index)]!
 }
 
 /**
@@ -144,16 +144,16 @@ export async function detectMetricAnomalies(
     }
 
     return metrics
-      .map((metric, index) => ({
+      ?.map((metric, index) => ({
         value: metric.value,
-        isAnomaly: anomalyResults?.[index].isAnomaly,
-        confidence: anomalyResults?.[index].confidence,
-        severity: anomalyResults?.[index].severity as 'low' | 'medium' | 'high',
-        reason: anomalyResults?.[index].isAnomaly
+        isAnomaly: anomalyResults[index]!.isAnomaly,
+        confidence: anomalyResults[index]!.confidence,
+        severity: anomalyResults[index]!.severity as 'low' | 'medium' | 'high',
+        reason: anomalyResults?.[index]!.isAnomaly
           ? 'Statistical anomaly detected'
           : undefined,
       }))
-      .filter((result) => result.isAnomaly)
+      ?.filter((result) => result.isAnomaly)
   } catch (error: unknown) {
     console.error('Error detecting anomalies:', error)
 
@@ -166,7 +166,7 @@ export async function detectMetricAnomalies(
  * Simple statistical anomaly detection fallback
  */
 function detectAnomaliesStatistical(metrics: MetricData[]): AnomalyResult[] {
-  const values = metrics.map((m) => m.value)
+  const values = metrics?.map((m) => m.value)
   const average = values.reduce((sum, val) => sum + val, 0) / values.length
   const variance =
     values.reduce((sum, val) => sum + Math.pow(val - average, 2), 0) /
@@ -174,7 +174,7 @@ function detectAnomaliesStatistical(metrics: MetricData[]): AnomalyResult[] {
   const stdDev = Math.sqrt(variance)
 
   return metrics
-    .map((metric) => {
+    ?.map((metric) => {
       const zScore = Math.abs((metric.value - average) / stdDev)
       const isAnomaly = zScore > 2.5 // More than 2.5 standard deviations
 
@@ -186,7 +186,7 @@ function detectAnomaliesStatistical(metrics: MetricData[]): AnomalyResult[] {
         reason: isAnomaly ? `Z-score: ${zScore.toFixed(2)}` : undefined,
       } as AnomalyResult
     })
-    .filter((result) => result.isAnomaly)
+    ?.filter((result) => result.isAnomaly)
 }
 
 /**

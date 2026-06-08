@@ -30,6 +30,18 @@ ChartJS.register(
   Filler,
 )
 
+interface BackendChartMetadata {
+  source: string
+  lastUpdated: string
+  totalDataPoints: number
+  timeRange?: string
+}
+
+interface BackendChartData {
+  data: Record<string, unknown>
+  metadata?: BackendChartMetadata | null
+}
+
 interface EnhancedChartComponentProps {
   type?: 'line' | 'bar' | 'pie' | 'scatter'
   title?: string
@@ -138,10 +150,12 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   }
 
   // Determine which data to use
-  const chartData =
-    useBackend && backendData?.data
-      ? backendData.data
+  const typedBackend = backendData as BackendChartData | null
+  const chartData = (
+    useBackend && typedBackend?.data
+      ? typedBackend.data
       : (fallbackData ?? defaultData[type] ?? defaultData.line)
+  ) as Record<string, unknown>
 
   // Handle backend errors gracefully
   useEffect(() => {
@@ -194,12 +208,13 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         displayColors: true,
         callbacks: {
           // Add custom tooltip content for therapy context
-          afterBody: function (_context: any) {
-            if (useBackend && backendData?.metadata) {
+          afterBody: function (_context: unknown) {
+            const meta = typedBackend?.metadata
+            if (useBackend && meta) {
               return [
                 '',
-                `Data Source: ${backendData.metadata.source}`,
-                `Last Updated: ${new Date(backendData.metadata.lastUpdated).toLocaleTimeString()}`,
+                `Data Source: ${meta.source}`,
+                `Last Updated: ${new Date(meta.lastUpdated).toLocaleTimeString()}`,
               ]
             }
             return []
@@ -247,7 +262,10 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     },
   }
 
-  const mergedOptions = { ...defaultOptions, ...options }
+  const mergedOptions = {
+    ...defaultOptions,
+    ...((options as Record<string, unknown>) ?? {}),
+  }
 
   // Loading state
   if (useBackend && backendLoading) {
@@ -270,14 +288,22 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   const renderChart = () => {
     switch (type) {
       case 'bar':
-        return <Bar data={chartData} options={mergedOptions} />
+        return (
+          <Bar data={chartData as never} options={mergedOptions as never} />
+        )
       case 'pie':
-        return <Pie data={chartData} options={mergedOptions} />
+        return (
+          <Pie data={chartData as never} options={mergedOptions as never} />
+        )
       case 'scatter':
-        return <Scatter data={chartData} options={mergedOptions} />
+        return (
+          <Scatter data={chartData as never} options={mergedOptions as never} />
+        )
       case 'line':
       default:
-        return <Line data={chartData} options={mergedOptions} />
+        return (
+          <Line data={chartData as never} options={mergedOptions as never} />
+        )
     }
   }
 
@@ -335,11 +361,11 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
         </div>
 
         {/* Metadata display */}
-        {useBackend && backendData?.metadata && (
+        {useBackend && typedBackend?.metadata && (
           <div className="text-right">
-            <div>{backendData.metadata.totalDataPoints} data points</div>
-            {backendData.metadata.timeRange && (
-              <div>Range: {backendData.metadata.timeRange}</div>
+            <div>{typedBackend.metadata.totalDataPoints} data points</div>
+            {typedBackend.metadata.timeRange && (
+              <div>Range: {typedBackend.metadata.timeRange}</div>
             )}
           </div>
         )}

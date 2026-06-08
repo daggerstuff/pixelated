@@ -56,28 +56,6 @@ function getAuth0RuntimeConfig(): Auth0RuntimeConfig {
   }
 }
 
-interface Auth0UserInfo {
-  sub?: string
-  email?: string
-  name?: string
-  given_name?: string
-  family_name?: string
-  picture?: string
-  email_verified?: boolean
-}
-
-interface Auth0UserInfoResponse {
-  data: Auth0UserInfo
-}
-
-type Auth0TokenResponse = {
-  access_token: string
-  refresh_token?: string
-  id_token?: string
-  expires_in: number
-  token_type: string
-}
-
 // Initialize Auth0 clients
 let auth0Authentication: AuthenticationClient | null = null
 let auth0Management: ManagementClient | null = null
@@ -253,7 +231,6 @@ export class Auth0SocialAuthService {
     if (!auth0UserInfo) {
       throw new Error('Auth0 user info client not initialized')
     }
-
     try {
       const response = await auth0UserInfo.getUserInfo(accessToken)
       const userInfo = response.data
@@ -265,7 +242,9 @@ export class Auth0SocialAuthService {
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,
         picture: userInfo.picture,
-        provider: userInfo.sub ? userInfo.sub.split('|')[0] : 'unknown',
+        provider: userInfo.sub
+          ? (userInfo.sub.split('|')[0] ?? 'unknown')
+          : 'unknown',
         emailVerified: userInfo.email_verified ?? false,
         createdAt: new Date().toISOString(),
       }

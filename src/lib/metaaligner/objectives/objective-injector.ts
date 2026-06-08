@@ -5,7 +5,7 @@
 
 import type { UnifiedProcessingRequest } from '../api/unified-api'
 import type { ObjectiveDefinition } from '../core/objectives'
-import { CORE_MENTAL_HEALTH_OBJECTIVES } from './objectives'
+import { CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
 
 /**
  * Defines the interface for the ObjectiveInjector.
@@ -36,7 +36,7 @@ export class ObjectiveInjector implements IObjectiveInjector {
     return {
       ...request,
       context: {
-        ...request.context,
+        ...(request.context as any),
         objectives: resolvedObjectives,
       },
     }
