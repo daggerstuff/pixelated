@@ -1,1 +1,1 @@
-## 2026-06-07 - Add edge case test for formatDate | Pattern: Testing error throwing for invalid dates | Action: Ensure edge cases like invalid formats throwing expected errors are covered for date utilities.
+## 2024-05-24 - Test getCurrentFormattedTime | Pattern: Use `vi.useFakeTimers()` and `vi.setSystemTime()` to mock the global Date object in Vitest for predictable time-dependent tests. | Action: Always use fake timers when testing functions that instantiate `new Date()` internally.
