@@ -96,7 +96,7 @@ export const GET = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to get WebSocket server status',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -114,13 +114,8 @@ export const GET = async () => {
  */
 export const POST = async ({ request }: { request: Request }) => {
   try {
-    const body = (await request.json()) as Record<string, unknown>
-    const {
-      type = 'test',
-      level = 'medium',
-      message,
-      sessionId,
-    } = body as {
+    const body = await request.json() as Record<string, unknown>
+    const { type = 'test', level = 'medium', message, sessionId } = body as {
       type?: string
       level?: string
       message?: string
@@ -296,7 +291,7 @@ export const POST = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to send test bias alert',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -314,7 +309,7 @@ export const POST = async ({ request }: { request: Request }) => {
  */
 export const PATCH = async ({ request }: { request: Request }) => {
   try {
-    const body = (await request.json()) as Record<string, unknown>
+    const body = await request.json() as Record<string, unknown>
     const { action } = body as { action?: string }
 
     const server = await initializeWebSocketServer()
@@ -362,7 +357,7 @@ export const PATCH = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to update WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -408,7 +403,7 @@ export const DELETE = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to stop WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {

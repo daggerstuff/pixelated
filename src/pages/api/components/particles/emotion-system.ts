@@ -285,14 +285,7 @@ export const POST: APIRoute = (protectRoute()(
 ) as any)
 
 // Helper functions
-function calculateEmotionProfile(
-  sessionEmotions: {
-    primaryEmotion?: string
-    emotion?: string
-    confidence?: number
-    intensity?: number
-  }[],
-) {
+function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {
   const emotionCounts = new Map<
     string,
     { count: number; totalIntensity: number }
@@ -426,12 +419,7 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
 
 function generateEmotionParticles(
   config: ParticleSystemConfig,
-  emotionProfile: {
-    dominantEmotion: string
-    emotionMix: Record<string, number>
-    averageIntensity: number
-    volatility: number
-  },
+  emotionProfile: { dominantEmotion: string; emotionMix: Record<string, number>; averageIntensity: number; volatility: number },
 ): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config

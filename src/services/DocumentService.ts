@@ -110,7 +110,7 @@ export class DocumentService {
       data.isPublic ?? false,
     ])
 
-    return this.mapDocumentRow(result.rows[0])
+    return this.mapDocumentRow(result.rows[0] as DocumentRow)
   }
 
   async getDocument(id: string, userId: string): Promise<Document | null> {
@@ -124,7 +124,7 @@ export class DocumentService {
     `
 
     const result = await this.db.query<DocumentRow>(query, [id, userId])
-    return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0]) : null
+    return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0] as DocumentRow) : null
   }
 
   async updateDocument(
@@ -151,7 +151,7 @@ export class DocumentService {
       id,
     ])
 
-    return this.mapDocumentRow(result.rows[0])
+    return this.mapDocumentRow(result.rows[0] as DocumentRow)
   }
 
   async addCollaborator(
@@ -292,10 +292,7 @@ export class DocumentService {
     await this.redis.del(`session:${sessionId}`)
   }
 
-  private mapDocumentRow(row: DocumentRow | undefined): Document {
-    if (!row) {
-      throw new Error('Document row is undefined')
-    }
+  private mapDocumentRow(row: DocumentRow): Document {
     const collaborators = Array.isArray(row.collaborators)
       ? row.collaborators
       : []
@@ -309,11 +306,11 @@ export class DocumentService {
       createdAt:
         row.created_at instanceof Date
           ? row.created_at
-          : new Date(row.created_at),
+          : new Date(row.created_at as string),
       updatedAt:
         row.updated_at instanceof Date
           ? row.updated_at
-          : new Date(row.updated_at),
+          : new Date(row.updated_at as string),
       version: row.version,
       isPublic: row.is_public,
     }

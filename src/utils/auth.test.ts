@@ -16,8 +16,8 @@ describe('verifyAuthToken', () => {
     vi.mocked(auth0Service.verifyToken).mockResolvedValue({
       userId: 'user-123',
       email: 'test@example.com',
-      role: 'client',
-    } as any) // suppress since auth0Service typing is complex and we're mocking it
+      role: 'user' as const,
+    })
 
     await verifyAuthToken('Bearer my-token')
 
@@ -28,8 +28,8 @@ describe('verifyAuthToken', () => {
     vi.mocked(auth0Service.verifyToken).mockResolvedValue({
       userId: 'user-123',
       email: 'test@example.com',
-      role: 'client',
-    } as any) // suppress since auth0Service typing is complex and we're mocking it
+      role: 'user' as const,
+    })
 
     await verifyAuthToken('my-token')
 

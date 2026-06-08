@@ -19,6 +19,30 @@ import type {
   DashboardRecommendation,
 } from './types'
 
+interface MongoAlertDoc {
+  alertId: string
+  timestamp: number
+  level: string
+  type: string
+  message: string
+  sessionId?: string
+  biasScore?: number
+  acknowledged?: boolean
+  resolvedAt?: Date | null
+}
+
+interface MongoAnalysisDoc {
+  sessionId: string
+  timestamp: Date
+  overallBiasScore: number
+  layerResults: unknown
+  demographics?: Record<string, string>
+  recommendations?: string[]
+  alertLevel: string
+  explanation?: string
+  confidence?: number
+}
+
 const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
 export class BiasDetectionDatabaseService {
@@ -274,17 +298,19 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return alerts.map((alert) => ({
-        alertId: alert['alertId'],
-        timestamp: alert['timestamp'],
-        level: alert['level'],
-        type: alert['type'],
-        message: alert['message'],
-        sessionId: alert['sessionId'],
-        biasScore: alert['biasScore'] ?? 0,
-        acknowledged: alert['acknowledged'] ?? false,
-        resolvedAt: alert['resolvedAt'] ?? undefined,
-      }))
+      return alerts.map((raw) => {
+        const alert = raw as unknown as MongoAlertDoc
+        return {
+          alertId: alert.alertId,
+          sessionId: alert.sessionId ?? '',
+          timestamp: alert.timestamp,
+          level: alert.level,
+          message: alert.message,
+          biasScore: alert.biasScore ?? 0,
+          acknowledged: alert.acknowledged ?? false,
+          resolvedAt: alert.resolvedAt ?? undefined,
+        } as unknown as BiasAlert
+      })
     } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
         error: String(error),
@@ -335,7 +361,10 @@ export class BiasDetectionDatabaseService {
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
-                (sum, analysis) => sum + analysis['overallBiasScore'],
+                (sum, raw) => {
+                  const doc = raw as unknown as MongoAnalysisDoc
+                  return sum + doc.overallBiasScore
+                },
                 0,
               ) / analyses.length
             : 0
@@ -396,9 +425,10 @@ export class BiasDetectionDatabaseService {
         intersectional: {},
       }
 
-      analyses.forEach((analysis) => {
-        const demo = analysis['demographics']
-        const biasScore = analysis['overallBiasScore'] ?? 0
+      analyses.forEach((raw) => {
+        const doc = raw as unknown as MongoAnalysisDoc
+        const demo = doc.demographics
+        const biasScore = doc.overallBiasScore ?? 0
 
         if (demo) {
           // Helper to update aggregation
@@ -467,17 +497,20 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return analyses.map((analysis) => ({
-        sessionId: analysis['sessionId'],
-        timestamp: analysis['timestamp'],
-        overallBiasScore: analysis['overallBiasScore'],
-        layerResults: analysis['layerResults'],
-        demographics: analysis['demographics'],
-        recommendations: analysis['recommendations'] ?? [],
-        alertLevel: analysis['alertLevel'],
-        explanation: analysis['explanation'],
-        confidence: analysis['confidence'],
-      }))
+      return analyses.map((raw) => {
+        const analysis = raw as unknown as MongoAnalysisDoc
+        return {
+          sessionId: analysis.sessionId,
+          timestamp: analysis.timestamp,
+          overallBiasScore: analysis.overallBiasScore,
+          layerResults: analysis.layerResults,
+          demographics: analysis.demographics,
+          recommendations: analysis.recommendations ?? [],
+          alertLevel: analysis.alertLevel,
+          explanation: analysis.explanation,
+          confidence: analysis.confidence,
+        } as unknown as BiasAnalysisResult
+      })
     } catch (error: unknown) {
       logger.error('Failed to get recent analyses', {
         error: String(error),
@@ -570,16 +603,16 @@ export class BiasDetectionDatabaseService {
 
       const doc = analysis as unknown as MongoAnalysisDoc
       return {
-        sessionId: analysis['sessionId'],
-        timestamp: analysis['timestamp'],
-        overallBiasScore: analysis['overallBiasScore'],
-        layerResults: analysis['layerResults'],
-        demographics: analysis['demographics'],
-        recommendations: analysis['recommendations'] ?? [],
-        alertLevel: analysis['alertLevel'],
-        explanation: analysis['explanation'],
-        confidence: analysis['confidence'],
-      }
+        sessionId: doc.sessionId,
+        timestamp: doc.timestamp,
+        overallBiasScore: doc.overallBiasScore,
+        layerResults: doc.layerResults,
+        demographics: doc.demographics,
+        recommendations: doc.recommendations ?? [],
+        alertLevel: doc.alertLevel,
+        explanation: doc.explanation,
+        confidence: doc.confidence,
+      } as unknown as BiasAnalysisResult
     } catch (error: unknown) {
       logger.error('Failed to get session analysis', {
         error: String(error),

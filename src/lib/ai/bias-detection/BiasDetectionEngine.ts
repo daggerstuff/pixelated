@@ -532,7 +532,7 @@ export class BiasDetectionEngine {
     const anyFallback = [layerResults.preprocessing, layerResults.modelLevel, layerResults.interactive, layerResults.evaluation].some(
       (r): boolean => {
         if (isRecordValue(r)) {
-          const fallbackVal = r["fallback"]
+          const fallbackVal = (r as Record<string, unknown>)["fallback"]
           return fallbackVal === true
         }
         return false

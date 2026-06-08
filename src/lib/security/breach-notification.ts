@@ -3,6 +3,7 @@ import { sendEmail } from '../email'
 import { fheService } from '../fhe'
 import { logger } from '../logger'
 import { redis } from '../redis'
+import { asRedisOps } from '../redis-ops'
 
 export interface TrainingMaterials {
   procedures: {
@@ -89,10 +90,10 @@ export async function reportBreach(
     }
 
     // Store breach details
-    if (typeof redis['set'] !== 'function') {
+    if (typeof asRedisOps(redis).set !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['set'](
+    await asRedisOps(redis).set(
       getBreachKey(id),
       JSON.stringify(breach),
       'EX',
@@ -124,10 +125,13 @@ async function initiateNotificationProcess(
   try {
     // Update status
     const updatedBreach = { ...breach, notificationStatus: 'in_progress' }
-    if (typeof redis['set'] !== 'function') {
+    if (typeof asRedisOps(redis).set !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['set'](getBreachKey(breach.id), JSON.stringify(updatedBreach))
+    await asRedisOps(redis).set(
+      getBreachKey(breach.id),
+      JSON.stringify(updatedBreach),
+    )
 
     // Prepare notifications
     const template = getNotificationTemplate(breach)
@@ -148,10 +152,13 @@ async function initiateNotificationProcess(
       ...updatedBreach,
       notificationStatus: 'completed',
     }
-    if (typeof redis['set'] !== 'function') {
+    if (typeof asRedisOps(redis).set !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['set'](getBreachKey(breach.id), JSON.stringify(completedBreach))
+    await asRedisOps(redis).set(
+      getBreachKey(breach.id),
+      JSON.stringify(completedBreach),
+    )
   } catch (error: unknown) {
     logger.error('Failed to process breach notifications:', error)
     throw error
@@ -317,8 +324,8 @@ export async function getBreachStatus(
 ): Promise<BreachDetails | null> {
   try {
     const breach =
-      typeof redis?.['get'] === 'function'
-        ? await redis['get'](getBreachKey(id))
+      typeof asRedisOps(redis).get === 'function'
+        ? await asRedisOps(redis).get(getBreachKey(id))
         : null
     return breach ? (JSON.parse(breach) as BreachDetails) : null
   } catch (error: unknown) {
@@ -330,13 +337,15 @@ export async function getBreachStatus(
 export async function listRecentBreaches(): Promise<BreachDetails[]> {
   try {
     const keys =
-      typeof redis?.['keys'] === 'function'
-        ? await redis['keys'](`${BREACH_KEY_PREFIX}*`)
+      typeof asRedisOps(redis).keys === 'function'
+        ? await asRedisOps(redis).keys(`${BREACH_KEY_PREFIX}*`)
         : []
     const breaches = await Promise.all(
       keys.map(async (key: string) => {
         const breach =
-          typeof redis?.['get'] === 'function' ? await redis['get'](key) : null
+          typeof asRedisOps(redis).get === 'function'
+            ? await asRedisOps(redis).get(key)
+            : null
         if (!breach) return null
 
         try {
@@ -410,10 +419,10 @@ async function recordTestExecution(
     result: 'completed',
   }
 
-  if (typeof redis['set'] !== 'function') {
+  if (typeof asRedisOps(redis).set !== 'function') {
     throw new Error('Redis client not properly initialized')
   }
-  await redis['set'](
+  await asRedisOps(redis).set(
     `${BREACH_KEY_PREFIX}test:${breachId}`,
     JSON.stringify(testRecord),
     'EX',
@@ -447,16 +456,16 @@ export async function updateMetrics(breach: BreachDetails): Promise<void> {
       lastUpdated: Date.now(),
     }).flatMap(([key, value]) => [key, String(value)])
 
-    if (typeof redis['hset'] !== 'function') {
+    if (typeof asRedisOps(redis).hset !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['hset'](monthKey, ...metricEntries)
+    await asRedisOps(redis).hset(monthKey, ...metricEntries)
 
     // Set retention period
-    if (typeof redis['expire'] !== 'function') {
+    if (typeof asRedisOps(redis).expire !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['expire'](monthKey, DOCUMENTATION_RETENTION)
+    await asRedisOps(redis).expire(monthKey, DOCUMENTATION_RETENTION)
   } catch (error: unknown) {
     logger.error('Failed to update metrics:', error)
   }
@@ -511,10 +520,10 @@ export async function getTrainingMaterials(): Promise<TrainingMaterials> {
     }
 
     // Store training materials with retention period
-    if (typeof redis['set'] !== 'function') {
+    if (typeof asRedisOps(redis).set !== 'function') {
       throw new Error('Redis client not properly initialized')
     }
-    await redis['set'](
+    await asRedisOps(redis).set(
       `${TRAINING_KEY_PREFIX}current`,
       JSON.stringify(materials),
       'EX',

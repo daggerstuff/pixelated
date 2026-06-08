@@ -34,13 +34,19 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const { title, industry, targetMarket, methodology, budget } = req.body
-    const { user } = req as { user: { id: string } }
+    const { title, industry, targetMarket, methodology, budget } = req.body as {
+      title?: string
+      industry?: string
+      targetMarket?: string
+      methodology?: string
+      budget?: string
+    }
+    const { user } = req as unknown as { user: { id: string } }
 
-    if (!title || !industry) {
+    if (typeof title !== 'string' || typeof industry !== 'string') {
       throw new ValidationError('title and industry are required', {
-        title: !title ? 'Title is required' : '',
-        industry: !industry ? 'Industry is required' : '',
+        title: typeof title !== 'string' ? 'Title is required' : '',
+        industry: typeof industry !== 'string' ? 'Industry is required' : '',
       })
     }
 
@@ -53,7 +59,7 @@ router.post(
       ownerId: user.id,
     } as Parameters<typeof createMarketResearch>[0])
 
-    res.status(201).json({ success: true, data: research })
+    res.status(201).json({ success: true, data: research as unknown })
   }),
 )
 
@@ -61,17 +67,25 @@ router.get(
   '/:researchId',
   asyncHandler(async (req: Request, res: Response) => {
     const researchId = req.params['researchId'] as string
-    const { user } = req as { user: { id: string } }
+    const { user } = req as unknown as { user: { id: string } }
     const research = await getMarketResearch(researchId, user.id)
-    res.json({ success: true, data: research })
+    res.json({ success: true, data: research as unknown })
   }),
 )
 
 router.put(
   '/:researchId',
   asyncHandler(async (req: Request, res: Response) => {
-    const { title, industry, targetMarket, methodology, budget } = req.body
-    const { user } = req as { user: { id: string } }
+    const { title, industry, targetMarket, methodology, budget, description } =
+      req.body as {
+        title?: string
+        industry?: string
+        targetMarket?: string
+        methodology?: string
+        budget?: string
+        description?: string
+      }
+    const { user } = req as unknown as { user: { id: string } }
 
     const research = await createMarketResearch({
       title,
@@ -80,7 +94,7 @@ router.put(
       methodology,
       budget,
       ownerId: user.id,
-      description: req.body.description,
+      description,
     } as {
       title: string
       ownerId: string
@@ -91,7 +105,7 @@ router.put(
       budget?: string
     })
 
-    res.json({ success: true, data: research })
+    res.json({ success: true, data: research as unknown })
   }),
 )
 
@@ -108,8 +122,8 @@ router.post(
   '/:researchId/insights',
   asyncHandler(async (req: Request, res: Response) => {
     const researchId = req.params['researchId'] as string
-    const { title } = req.body
-    const { user } = req as { user: { id: string } }
+    const { title } = req.body as { title?: string }
+    const { user } = req as unknown as { user: { id: string } }
 
     if (!title) {
       throw new ValidationError('Insight title is required', {
@@ -120,7 +134,7 @@ router.post(
     // Note: addInsight is not implemented in the service yet
     // Using getMarketResearch as placeholder - this needs proper implementation
     const research = await getMarketResearch(researchId, user.id)
-    res.json({ success: true, data: research })
+    res.json({ success: true, data: research as unknown })
   }),
 )
 
@@ -128,8 +142,8 @@ router.post(
   '/:researchId/status',
   asyncHandler(async (req: Request, res: Response) => {
     const researchId = req.params['researchId'] as string
-    const { status } = req.body
-    const { user } = req as { user: { id: string } }
+    const { status } = req.body as { status?: string }
+    const { user } = req as unknown as { user: { id: string } }
 
     if (!status) {
       throw new ValidationError('status is required', {
@@ -140,7 +154,7 @@ router.post(
     // Note: updateStatus is not implemented in the service yet
     // Using getMarketResearch as placeholder - this needs proper implementation
     const research = await getMarketResearch(researchId, user.id)
-    res.json({ success: true, data: research })
+    res.json({ success: true, data: research as unknown })
   }),
 )
 
