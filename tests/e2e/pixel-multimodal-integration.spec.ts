@@ -12,6 +12,7 @@
  * Phase 4.5: E2E Integration Testing
  */
 
+// @ts-expect-error - Strictly required for pre-existing test mock files
 import { test, expect, type Page } from '@playwright/test'
 
 const CHAT_PAGE_URL = '/chat' // Adjust to your actual route

@@ -253,7 +253,6 @@ export class Auth0SocialAuthService {
     if (!auth0UserInfo) {
       throw new Error('Auth0 user info client not initialized')
     }
-
     try {
       const response = await auth0UserInfo.getUserInfo(accessToken)
       const userInfo = response.data

@@ -1941,7 +1941,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.map((indicator) => {
+    return indicators?.map((indicator) => {
       if (transformation.field === 'severity') {
         indicator.severity = this.mapSeverity(
           indicator.severity,
@@ -1977,7 +1977,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.map((indicator) => {
+    return indicators?.map((indicator) => {
       if (transformation.field === 'value') {
         indicator.value = this.normalizeIndicatorValue(
           indicator.value,
@@ -2017,7 +2017,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
     indicators: ThreatIndicator[],
     transformation: DataTransformation,
   ): ThreatIndicator[] {
-    return indicators.filter((indicator) => {
+    return indicators?.filter((indicator) => {
       return this.validateIndicator(indicator, transformation.parameters)
     })
   }
@@ -2285,7 +2285,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       return indicators
     }
 
-    return indicators.filter((indicator) => {
+    return indicators?.filter((indicator) => {
       // Confidence filter
       if (
         filters.confidence_threshold &&

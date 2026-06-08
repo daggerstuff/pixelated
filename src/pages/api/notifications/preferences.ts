@@ -9,8 +9,8 @@ const notificationService = new NotificationService()
 export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (!authResult?.['authenticated']) {
+    const user = await getCurrentUser(request as never)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -26,9 +26,10 @@ export const GET = async ({ request }: APIContext) => {
     }
 
     // Get user's notification preferences
-    const preferences = await notificationService.getPreferences(
-      authResult?.['user']?.['id'],
-    )
+    const service = notificationService as unknown as {
+      getPreferences: (id: string) => Promise<unknown>
+    }
+    const preferences = await service.getPreferences(user.id)
 
     return new Response(JSON.stringify(preferences), {
       status: 200,
@@ -54,20 +55,11 @@ export const GET = async ({ request }: APIContext) => {
   }
 }
 
-import type { APIRoute } from 'astro'
-
 export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    const authResult = await isAuthenticated(request)
-    if (
-      !(
-        typeof authResult === 'object' &&
-        authResult !== null &&
-        'authenticated' in authResult &&
-        (authResult as { authenticated: boolean }).authenticated
-      )
-    ) {
+    const user = await getCurrentUser(request as never)
+    if (!user) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -83,8 +75,8 @@ export const PUT: APIRoute = async ({ request }) => {
     }
 
     // Parse request body
-    const body = await request.json()
-    const { preferences } = body
+    const body = (await request.json()) as Record<string, unknown>
+    const preferences = body['preferences']
 
     if (!preferences) {
       return new Response(
@@ -108,16 +100,10 @@ export const PUT: APIRoute = async ({ request }) => {
         preferences: unknown,
       ) => Promise<unknown>
     }
-    const userId =
-      typeof authResult === 'object' &&
-      authResult !== null &&
-      'user' in authResult &&
-      (authResult as { user?: { id?: string } }).user &&
-      typeof (authResult as { user: { id?: string } }).user.id === 'string'
-        ? (authResult as { user: { id: string } }).user.id
-        : undefined
-
-    const result = await service.updatePreferences?.(userId, preferences)
+    const result = await service.updatePreferences?.(
+      user.id as never,
+      preferences,
+    )
 
     return new Response(JSON.stringify(result), {
       status: 200,

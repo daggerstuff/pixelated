@@ -146,7 +146,7 @@ export class AdaptiveSelector {
           reason:
             'Context detection failed - using default weights with human review flag',
         },
-      } as WeightCalculationResult
+      } as any as WeightCalculationResult
     } else {
       const objectiveConfig = {
         objectives: defaults,
@@ -163,7 +163,7 @@ export class AdaptiveSelector {
       weightCalculationResult = this.weightingEngine.calculateWeights(
         CORE_MENTAL_HEALTH_OBJECTIVES,
         alignmentContext,
-        objectiveConfig,
+        objectiveConfig as any,
       )
       selectedObjectives = CORE_MENTAL_HEALTH_OBJECTIVES.map((objective) => ({
         objective,

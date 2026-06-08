@@ -533,7 +533,7 @@ export class RecommendationService {
   /**
    * Generate base recommendations from clinical knowledge
    */
-  private async generateBaseRecommendations(currentState: ClientState): void {
+  private generateBaseRecommendations(currentState: ClientState): Partial<TreatmentRecommendation>[] {
     const recommendations: Partial<TreatmentRecommendation>[] = []
 
     // Get recommendations for each primary concern

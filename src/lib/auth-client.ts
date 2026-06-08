@@ -138,14 +138,14 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
-        user: data.user,
+        user: data.user!,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
@@ -180,7 +180,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return {

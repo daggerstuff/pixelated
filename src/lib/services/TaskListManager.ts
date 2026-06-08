@@ -144,8 +144,7 @@ export class TaskListManager {
           totalTasks,
           completedTasks,
         },
-      }
-    } catch (error: unknown) {
+      }      } catch (error: unknown) {
       logger.error('Failed to load task list', {
         filePath,
         error: error instanceof Error ? String(error) : String(error),
