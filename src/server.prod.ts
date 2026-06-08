@@ -140,6 +140,7 @@ app.get('/health', (_req, res) => {
 // API routes
 app.use('/api/files', createFileRoutes(db))
 app.use('/api/business-intelligence', createBusinessIntelligenceRoutes(db))
+app.use('/api/health', healthRoutes)
 
 // SSL configuration
 let server: HttpServer | HttpsServer

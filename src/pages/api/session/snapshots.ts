@@ -6,16 +6,23 @@ const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {
   throw new Error('DATABASE_URL is not set')
 }
+interface PgPoolGlobal {
+  __pgPool?: Pool
+}
+const globalWithPool = globalThis as unknown as PgPoolGlobal
 const pool =
-  (globalThis as any).__pgPool ??
+  globalWithPool.__pgPool ??
   new Pool({
     connectionString: DATABASE_URL,
   })
-;(globalThis as any).__pgPool = pool
+globalWithPool.__pgPool = pool
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const { sessionId, snapshots } = await request.json()
+    const { sessionId, snapshots } = (await request.json()) as {
+      sessionId: string
+      snapshots: any[]
+    }
 
     const isValidSnapshot = (s: any) =>
       typeof s?.value === 'number' &&
@@ -128,7 +135,7 @@ export const GET: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           sessionId,
-          snapshots: sessionResult.rows[0].progress_snapshots,
+          snapshots: (sessionResult.rows[0] as any).progress_snapshots,
           milestones: milestoneResult.rows,
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } },

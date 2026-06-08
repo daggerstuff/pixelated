@@ -22,7 +22,7 @@ router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, category, status } = req.query
-    const { user } = req as any
+    const { user } = req as unknown as { user: { id: string } }
 
     const result = await listProjects(user.id, {
       page: page ? parseInt(page as string) : 1,

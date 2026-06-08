@@ -278,6 +278,9 @@ class SecureStorageProvider implements StorageProvider {
  * Core encryption functions using AES-256-GCM
  */
 
+/** Oxlint workaround: contains 'any' leakage from @types/crypto-js `export =` declarations */
+type CryptoStringable = { toString(encoder?: unknown): string }
+
 /**
  * Encrypts data using AES-256-GCM with random IV
  */
@@ -286,12 +289,12 @@ export function encrypt(data: string, key: string): string {
     throw new Error('Data and key are required for encryption')
   }
 
-  const iv = CryptoJS.lib.WordArray.random(16)
+  const iv = CryptoJS.lib.WordArray.random(16) as unknown as CryptoStringable
   const encrypted = CryptoJS.AES.encrypt(data, key, {
-    iv,
-    mode: CryptoJS.mode.GCM,
-    padding: CryptoJS.pad.Pkcs7,
-  })
+    iv: iv,
+    mode: CryptoJS.mode.GCM as unknown,
+    padding: CryptoJS.pad.Pkcs7 as unknown,
+  }) as unknown as CryptoStringable
 
   return `${iv.toString()}:${encrypted.toString()}`
 }
@@ -310,14 +313,14 @@ export function decrypt(data: string, key: string): string {
       throw new Error('Invalid encrypted data format')
     }
 
-    const iv = CryptoJS.enc.Hex.parse(ivStr)
+    const iv = CryptoJS.enc.Hex.parse(ivStr) as unknown as CryptoStringable
     const decrypted = CryptoJS.AES.decrypt(encryptedStr, key, {
-      iv,
-      mode: CryptoJS.mode.GCM,
-      padding: CryptoJS.pad.Pkcs7,
-    })
+      iv: iv,
+      mode: CryptoJS.mode.GCM as unknown,
+      padding: CryptoJS.pad.Pkcs7 as unknown,
+    }) as unknown as CryptoStringable
 
-    const result = decrypted.toString(CryptoJS.enc.Utf8)
+    const result: string = decrypted.toString(CryptoJS.enc.Utf8)
     if (!result) {
       throw new Error('Decryption failed - invalid key or corrupted data')
     }
@@ -338,7 +341,9 @@ export function decrypt(data: string, key: string): string {
  * Generates a cryptographically secure key
  */
 export function generateSecureKey(): string {
-  return CryptoJS.lib.WordArray.random(32).toString()
+  return (
+    CryptoJS.lib.WordArray.random(32) as unknown as CryptoStringable
+  ).toString()
 }
 
 /**
@@ -348,7 +353,9 @@ export function createHash(data: string): string {
   if (!data) {
     return ''
   }
-  return CryptoJS.SHA256(data).toString()
+  return (
+    CryptoJS.SHA256(data) as unknown as CryptoStringable
+  ).toString()
 }
 
 /**
@@ -358,7 +365,9 @@ export function createHMAC(data: string, key: string): string {
   if (!data || !key) {
     throw new Error('Data and key are required for HMAC')
   }
-  return CryptoJS.HmacSHA256(data, key).toString()
+  return (
+    CryptoJS.HmacSHA256(data, key) as unknown as CryptoStringable
+  ).toString()
 }
 
 /**

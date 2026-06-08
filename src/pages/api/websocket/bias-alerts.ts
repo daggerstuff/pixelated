@@ -114,8 +114,18 @@ export const GET = async () => {
  */
 export const POST = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { type = 'test', level = 'medium', message, sessionId } = body
+    const body = (await request.json()) as Record<string, unknown>
+    const {
+      type = 'test',
+      level = 'medium',
+      message,
+      sessionId,
+    } = body as {
+      type?: string
+      level?: string
+      message?: string
+      sessionId?: string
+    }
 
     const server = await initializeWebSocketServer()
 
@@ -249,7 +259,12 @@ export const POST = async ({ request }: { request: Request }) => {
     }
 
     // Broadcast the test alert
-    await server.broadcastBiasAlert(testAlert, testAnalysisResult)
+    await server.broadcastBiasAlert(
+      testAlert as unknown as Parameters<typeof server.broadcastBiasAlert>[0],
+      testAnalysisResult as unknown as Parameters<
+        typeof server.broadcastBiasAlert
+      >[1],
+    )
 
     logger.info('Test bias alert sent', {
       alertId: testAlert.alertId,
@@ -299,12 +314,14 @@ export const POST = async ({ request }: { request: Request }) => {
  */
 export const PATCH = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { action } = body
+    const body = (await request.json()) as Record<string, unknown>
+    const { action } = body as { action?: string }
 
     const server = await initializeWebSocketServer()
 
     switch (action) {
+      case undefined:
+        throw new Error('Action is required')
       case 'restart':
         await server.stop()
         await server.start()
@@ -414,7 +431,7 @@ if (
   process.env['NODE_ENV'] === 'production' &&
   process.env['WS_AUTO_START'] === 'true'
 ) {
-  initializeWebSocketServer().catch((error) => {
+  initializeWebSocketServer().catch((error: unknown) => {
     logger.error('Failed to auto-start WebSocket server', { error })
   })
 }

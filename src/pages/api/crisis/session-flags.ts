@@ -7,6 +7,26 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('crisis-session-flags-api')
 
+interface CreateFlagBody {
+  userId: string
+  sessionId: string
+  reason: string
+  severity?: 'critical' | 'high' | 'low' | 'medium'
+  detectedRisks?: string[]
+  confidence?: number
+  textSample?: string
+  metadata?: Record<string, unknown>
+}
+
+interface UpdateFlagBody {
+  flagId: string
+  status: 'dismissed' | 'escalated' | 'resolved' | 'reviewed' | 'under_review'
+  assignedTo?: string
+  reviewerNotes?: string
+  resolutionNotes?: string
+  metadata?: Record<string, unknown>
+}
+
 export const GET = async ({ request }: APIContext) => {
   try {
     // Authenticate user
@@ -128,7 +148,7 @@ export const POST = async ({ request }: APIContext) => {
       )
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as CreateFlagBody
     const {
       userId,
       sessionId,
@@ -236,7 +256,7 @@ export const PUT = async ({ request }: APIContext) => {
       )
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as UpdateFlagBody
     const {
       flagId,
       status,

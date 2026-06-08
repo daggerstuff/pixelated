@@ -39,6 +39,7 @@ export class TherapeuticResponseGenerator {
 
     return {
       content,
+      confidence: analysis.confidence,
       approach,
       techniques,
       followUp,

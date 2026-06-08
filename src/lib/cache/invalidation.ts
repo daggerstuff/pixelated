@@ -64,7 +64,7 @@ export class CacheInvalidation {
       const serializedValue = JSON.stringify(value)
 
       // Start a Redis transaction
-      const multi = this.redis.multi()
+      const multi = this.redis.multi() as unknown as MultiOps
 
       // Set the cache value with TTL
       const ttl = rule?.ttl ?? this.defaultTTL

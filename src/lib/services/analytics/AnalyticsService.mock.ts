@@ -13,7 +13,7 @@ export class AnalyticsService {
   private readonly clients: Map<string, WebSocket[]>
 
   constructor(options: AnalyticsServiceOptions) {
-    this.options = options
+    ;(this as any).options = options
     this.clients = new Map()
   }
 

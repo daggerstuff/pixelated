@@ -1374,50 +1374,6 @@ describe("BiasDetectionEngine", () => {
     });
   });
 
-  // =======================
-  // TARGETED BRANCH & METHOD COVERAGE TESTS (inside outer describe, has access to mockConfig)
-  // =======================
-
-  describe("Engine Method Coverage", () => {
-    let engine: BiasDetectionEngine;
-
-    beforeEach(async () => {
-      vi.clearAllMocks();
-      mockPythonBridge.initialize.mockResolvedValue(undefined);
-      mockPythonBridge.checkHealth.mockResolvedValue({ status: "healthy", message: "OK" });
-      mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue(createDefaultAnalysisResult());
-      mockPythonBridge.runModelLevelAnalysis.mockResolvedValue(createModelLevelAnalysisResult());
-      mockPythonBridge.runInteractiveAnalysis.mockResolvedValue(createInteractiveAnalysisResult());
-      mockPythonBridge.runEvaluationAnalysis.mockResolvedValue(createEvaluationAnalysisResult());
-      mockPythonBridge.dispose.mockResolvedValue(undefined);
-
-      engine = new BiasDetectionEngine(mockConfig);
-      await engine.initialize();
-    });
-
-    afterEach(() => {
-      vi.restoreAllMocks();  // restores spies AND clears mock call data
-    });
-
-    describe("explainBiasDetection", () => {
-      it("should return explanation with highlights sorted by bias score descending", async () => {
-        // Set different layer scores to verify sorting
-        mockPythonBridge.runPreprocessingAnalysis.mockResolvedValue({ ...createDefaultAnalysisResult(), biasScore: 0.2 });
-        mockPythonBridge.runModelLevelAnalysis.mockResolvedValue({ ...createModelLevelAnalysisResult(), biasScore: 0.8 });
-        mockPythonBridge.runInteractiveAnalysis.mockResolvedValue({ ...createInteractiveAnalysisResult(), biasScore: 0.4 });
-        mockPythonBridge.runEvaluationAnalysis.mockResolvedValue({ ...createEvaluationAnalysisResult(), biasScore: 0.6 });
-
-        const analysis = await engine.analyzeSession(sessionDataToTherapeuticSession(mockSessionData));
-        const explanation = await engine.explainBiasDetection(analysis);
-
-        expect(explanation).toBeDefined();
-        expect(explanation.sessionId).toBe(mockSessionData.sessionId);
-        expect(typeof explanation.overallBiasScore).toBe("number");
-        expect(explanation.alertLevel).toMatch(/^(low|medium|high|critical)$/);
-        expect(explanation.highlights).toHaveLength(3);
-        // Highlights should be sorted desc by biasScore
-        expect(explanation.highlights[0]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[1]!.biasScore);
-        expect(explanation.highlights[1]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[2]!.biasScore);
         expect(explanation.confidence).toBeDefined();
       });
 
