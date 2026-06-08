@@ -843,7 +843,6 @@ export const POST = async ({ request }: APIContext) => {
     return new Response(
       JSON.stringify({
         error: 'Internal server error during crisis detection',
-        details: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
