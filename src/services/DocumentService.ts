@@ -1,4 +1,4 @@
-import Redis from 'ioredis'
+import { Redis } from 'ioredis'
 import { Pool } from 'pg'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -272,7 +272,7 @@ export class DocumentService {
         if (session) {
           sessions.push(session)
         } else {
-          await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
+          await this.redis.srem(`doc:${documentId}:sessions`, sessionId)
         }
       } else {
         await this.redisClient.srem(`doc:${documentId}:sessions`, sessionId)
@@ -288,11 +288,14 @@ export class DocumentService {
 
     const session = parseSession(sessionData)
     if (!session) return
-    await this.redisClient.srem(`doc:${session.documentId}:sessions`, sessionId)
-    await this.redisClient.del(`session:${sessionId}`)
+    await this.redis.srem(`doc:${session.documentId}:sessions`, sessionId)
+    await this.redis.del(`session:${sessionId}`)
   }
 
-  private mapDocumentRow(row: DocumentRow): Document {
+  private mapDocumentRow(row: DocumentRow | undefined): Document {
+    if (!row) {
+      throw new Error('Document row is undefined')
+    }
     const collaborators = Array.isArray(row.collaborators)
       ? row.collaborators
       : []

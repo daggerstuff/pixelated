@@ -2,7 +2,7 @@ import { fireEvent } from '@testing-library/dom'
 import { act } from '@testing-library/react'
 import { createRoot } from 'react-dom/client'
 // @vitest-environment jsdom
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import type { SearchFiltersState } from './SearchFilters'
 import SearchFilters from './SearchFilters'
@@ -35,7 +35,7 @@ describe('SearchFilters', () => {
       )
     })
     await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(vi.mocked(container).innerHTML).toContain('Advanced Filters')
+    expect(container.innerHTML).toContain('Advanced Filters')
     return {
       container,
       root,
@@ -50,11 +50,10 @@ describe('SearchFilters', () => {
 
   it('renders with default values', async () => {
     const mockOnChange = vi.fn()
-    const result = await renderFilters(mockOnChange)
-    const container = result.container
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
     try {
-      expect(vi.mocked(container).textContent).toContain('Advanced Filters')
+      expect(container.textContent).toContain('Advanced Filters')
       expect(
         container.querySelector('label[for="min-relevance"]'),
       ).toBeInTheDocument()
@@ -62,14 +61,13 @@ describe('SearchFilters', () => {
         container.querySelector('label[for="sort-by"]'),
       ).toBeInTheDocument()
     } finally {
-      await result.cleanup()
+      await cleanup()
     }
   })
 
   it('calls onChange when sort order changes', async () => {
     const mockOnChange = vi.fn()
-    const result = await renderFilters(mockOnChange)
-    const container = result.container
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
     const sortBySelect = container.querySelector('#sort-by')
     expect(sortBySelect).toBeInTheDocument()
@@ -93,14 +91,13 @@ describe('SearchFilters', () => {
         }),
       )
     } finally {
-      await result.cleanup()
+      await cleanup()
     }
   })
 
   it('reflects active sort state', async () => {
     const mockOnChange = vi.fn()
-    const result = await renderFilters(mockOnChange)
-    const container = result.container
+    const { container, cleanup } = await renderFilters(mockOnChange)
 
     try {
       const relevanceOption = Array.from(
@@ -108,9 +105,9 @@ describe('SearchFilters', () => {
       ).find((option) => option.textContent?.includes('Relevance'))
       expect(relevanceOption).toBeInTheDocument()
       if (!relevanceOption) return
-      expect(vi.mocked(relevanceOption).selected).toBe(true)
+      expect(relevanceOption.selected).toBe(true)
     } finally {
-      await result.cleanup()
+      await cleanup()
     }
   })
 })

@@ -20,7 +20,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
 
     // Setup fetch mock
     mockFetch = vi.fn()
-    globalThis.fetch = mockFetch as any
+    global.fetch = mockFetch as any
 
     // Setup WebSocket mock
     mockWebSocket = {
@@ -30,7 +30,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       removeEventListener: vi.fn(),
       readyState: 1, // OPEN
     }
-    ;(globalThis as any).WebSocket = vi.fn(function () {
+    ;(global as any).WebSocket = vi.fn(function () {
       return mockWebSocket
     })
   })
@@ -92,7 +92,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -118,7 +117,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -139,7 +137,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         json: async () => ({ latency_ms: 187 }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -163,7 +160,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const formData = new FormData()
       formData.append('sessionId', sessionId)
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       await mockFetch('http://localhost:3000/api/ai/pixel/infer-multimodal', {
         method: 'POST',
         body: formData,
@@ -182,7 +178,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -213,7 +208,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -236,7 +230,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -273,7 +266,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -293,14 +285,14 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const wsUrl =
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream?sessionId=test'
 
-      const ws = new (globalThis as any).WebSocket(wsUrl)
+      const ws = new (global as any).WebSocket(wsUrl)
 
       expect(ws).toBeDefined()
-      expect((globalThis as any).WebSocket).toHaveBeenCalledWith(wsUrl)
+      expect((global as any).WebSocket).toHaveBeenCalledWith(wsUrl)
     })
 
     it('should send audio chunks via WebSocket', () => {
-      const ws = new (globalThis as any).WebSocket(
+      const ws = new (global as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -311,7 +303,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
     })
 
     it('should handle streaming responses', () => {
-      const ws = new (globalThis as any).WebSocket(
+      const ws = new (global as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -331,7 +323,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
     })
 
     it('should maintain connection with heartbeat', () => {
-      const ws = new (globalThis as any).WebSocket(
+      const ws = new (global as any).WebSocket(
         'ws://localhost:3000/ws/ai/pixel/multimodal-stream',
       )
 
@@ -347,7 +339,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'))
 
       try {
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         await mockFetch('http://localhost:3000/api/ai/pixel/infer-multimodal')
         expect.fail('Should have thrown error')
       } catch (error) {
@@ -362,7 +353,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         json: async () => ({ error: 'Internal server error' }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
       )
@@ -399,7 +389,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
         }),
       })
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
       )
@@ -418,7 +407,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       })
 
       const start = performance.now()
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       await mockFetch('http://localhost:3000/api/ai/pixel/infer-multimodal')
       const duration = performance.now() - start
 
@@ -434,7 +422,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const promises = Array(5)
         .fill(null)
         .map(() =>
-          // @ts-expect-error - Strictly required for pre-existing test mock files
           mockFetch('http://localhost:3000/api/ai/pixel/infer-multimodal', {
             method: 'POST',
           }),
@@ -443,7 +430,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const results = await Promise.all(promises)
 
       expect(results.length).toBe(5)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(results.every((r) => r.ok)).toBe(true)
     })
   })
@@ -525,7 +511,6 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       const formData = new FormData()
       formData.append('text', 'I feel calm')
 
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
         {
@@ -584,14 +569,12 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
 
       // First attempt fails
       try {
-        // @ts-expect-error - Strictly required for pre-existing test mock files
         await mockFetch('http://localhost:3000/api/ai/pixel/infer-multimodal')
       } catch (e) {
         expect(e).toBeDefined()
       }
 
       // Second attempt succeeds
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       const response = await mockFetch(
         'http://localhost:3000/api/ai/pixel/infer-multimodal',
       )
@@ -619,7 +602,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       messages.push({ type: 'text', data: 'anxious today' })
 
       expect(messages.length).toBe(2)
-      expect(messages[0]!.type).toBe('text')
+      expect(messages[0].type).toBe('text')
     })
 
     it('should send audio chunks over WebSocket', () => {
@@ -632,7 +615,7 @@ describe('useMultimodalPixel Hook - Unit Tests', () => {
       messages.push({ type: 'audio', data: audioChunk2 })
 
       expect(messages.length).toBe(2)
-      expect(messages[0]!.data instanceof Uint8Array).toBe(true)
+      expect(messages[0].data instanceof Uint8Array).toBe(true)
     })
 
     it('should signal stream completion', () => {

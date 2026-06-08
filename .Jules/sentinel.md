@@ -18,10 +18,3 @@
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Learning      | Sending raw `error` objects or `String(error)` downstream, especially from untrusted or external AI/downstream services, exposes internal logic to the client. This is a classic CWE-209 vulnerability                                                   |
 | Prevention    | In generic error handling logic, log the full error context server-side (`console.error` or standard loggers), but always sanitize the response payload sent to the client to only include safe, generic error descriptions like `Internal server error` |
-
-## 2025-06-08 - [Information Exposure] Prevent sending raw Error stacks in Crisis Detection Endpoint
-
-| Vulnerability | The `src/pages/api/mental-health/crisis-detection.ts` endpoint was serializing standard `Error` objects (`String(error)`) into the `details` field of the HTTP 500 response, potentially leaking internal stack traces or internal implementation details |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Learning      | Sending raw `error` objects or `String(error)` downstream exposes internal logic to the client. This is a classic CWE-209 vulnerability                                                                                                                   |
-| Prevention    | Log the full error context server-side, but always sanitize the response payload sent to the client to only include safe, generic error descriptions like `Internal server error`                                                                         |

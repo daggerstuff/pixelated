@@ -13,26 +13,6 @@ import {
   updatePlanStatus,
 } from '../services/strategic-plan-service'
 
-interface StrategicPlanBody {
-  title?: string
-  description?: string
-  startDate?: string
-  endDate?: string
-  objectives?: unknown[]
-  budget?: number
-  keyResults?: unknown[]
-  status?: string
-}
-
-interface AlignProjectBody {
-  projectId?: string
-}
-
-interface StatusBody {
-  status?: string
-  reason?: string
-}
-
 const router: Router = express.Router()
 
 // All strategic plan routes require authentication
@@ -41,16 +21,12 @@ router.use(authMiddleware)
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
     const { page, limit, status } = req.query
+    const { user } = req as { user: { id: string } }
 
-    const result = await listStrategicPlans(userId, {
-      page: page ? parseInt(String(page)) : 1,
-      limit: limit ? parseInt(String(limit)) : 50,
+    const result = await listStrategicPlans(user.id, {
+      page: page ? parseInt(page as string) : 1,
+      limit: limit ? parseInt(limit as string) : 50,
       status: typeof status === 'string' ? status : undefined,
     })
 
@@ -61,13 +37,8 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const body = req.body as StrategicPlanBody
-    const { title, description, startDate, endDate, objectives } = body
+    const { title, description, startDate, endDate, objectives } = req.body
+    const { user } = req as { user: { id: string } }
 
     if (!title || !startDate || !endDate) {
       throw new ValidationError('title, startDate, and endDate are required', {
@@ -80,14 +51,14 @@ router.post(
     const plan = await createStrategicPlan({
       title,
       description,
-      ownerId: userId,
-      objectives: objectives as Record<string, unknown>[] | undefined,
+      ownerId: user.id,
+      objectives,
       timeline: {
         startDate: new Date(startDate),
         endDate: new Date(endDate),
       },
-      budget: body.budget,
-      keyResults: body.keyResults as Record<string, unknown>[] | undefined,
+      budget: req.body.budget,
+      keyResults: req.body.keyResults,
     })
 
     res.status(201).json({ success: true, data: plan })
@@ -97,14 +68,10 @@ router.post(
 router.get(
   '/:planId',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const planId = String(req.params['planId'] ?? '')
+    const planId = req.params['planId'] as string
+    const { user } = req as { user: { id: string } }
 
-    const plan = await getStrategicPlan(planId, userId)
+    const plan = await getStrategicPlan(planId, user.id)
 
     res.json({ success: true, data: plan })
   }),
@@ -113,13 +80,7 @@ router.get(
 router.put(
   '/:planId',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const planId = String(req.params['planId'] ?? '')
-    const body = req.body as StrategicPlanBody
+    const planId = req.params['planId'] as string
     const {
       title,
       description,
@@ -129,20 +90,21 @@ router.put(
       budget,
       keyResults,
       status,
-    } = body
+    } = req.body
+    const { user } = req as { user: { id: string } }
 
-    const plan = await updateStrategicPlan(planId, userId, {
+    const plan = await updateStrategicPlan(planId, user.id, {
       title,
       description,
       timeline:
         startDate && endDate
           ? { startDate: new Date(startDate), endDate: new Date(endDate) }
           : undefined,
-      objectives: objectives as Record<string, unknown>[] | undefined,
+      objectives,
       budget,
-      keyResults: keyResults as Record<string, unknown>[] | undefined,
+      keyResults,
       status,
-    })
+    } as Parameters<typeof updateStrategicPlan>[2])
 
     res.json({ success: true, data: plan })
   }),
@@ -151,14 +113,10 @@ router.put(
 router.delete(
   '/:planId',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const planId = String(req.params['planId'] ?? '')
+    const planId = req.params['planId'] as string
+    const { user } = req as { user: { id: string } }
 
-    await deleteStrategicPlan(planId, userId)
+    await deleteStrategicPlan(planId, user.id)
 
     res.json({ success: true, message: 'Strategic plan deleted' })
   }),
@@ -167,14 +125,9 @@ router.delete(
 router.post(
   '/:planId/projects',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const planId = String(req.params['planId'] ?? '')
-    const body = req.body as AlignProjectBody
-    const { projectId } = body
+    const planId = req.params['planId'] as string
+    const { projectId } = req.body
+    const { user } = req as { user: { id: string } }
 
     if (!projectId) {
       throw new ValidationError('projectId is required', {
@@ -185,7 +138,7 @@ router.post(
     const plan = await alignProjectToPlan({
       planId,
       projectId,
-      userId,
+      userId: user.id,
     })
 
     res.json({ success: true, data: plan })
@@ -195,14 +148,9 @@ router.post(
 router.put(
   '/:planId/status',
   asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.user?.id
-    if (!userId) {
-      res.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const planId = String(req.params['planId'] ?? '')
-    const body = req.body as StatusBody
-    const { status, reason } = body
+    const planId = req.params['planId'] as string
+    const { status, reason } = req.body
+    const { user } = req as { user: { id: string } }
 
     if (!status) {
       throw new ValidationError('status is required', {
@@ -214,7 +162,7 @@ router.put(
       planId,
       status,
       reason,
-      userId,
+      userId: user.id,
     })
 
     res.json({ success: true, data: plan })

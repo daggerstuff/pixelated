@@ -26,8 +26,8 @@ export const GET: APIRoute = async ({ request }) => {
       try {
         const tokenPayload = await verifySecureToken(token)
         if (
-          (tokenPayload as any)?.purpose === 'ai-validation' &&
-          (tokenPayload as any).scope === 'validation:read'
+          tokenPayload?.purpose === 'ai-validation' &&
+          tokenPayload.scope === 'validation:read'
         ) {
           userId = 'github-actions'
           authenticatedViaToken = true

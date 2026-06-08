@@ -667,7 +667,7 @@ pure-eval==0.2.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   stack-data
-pyarrow==23.0.0
+pyarrow==23.0.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets

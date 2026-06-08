@@ -574,7 +574,7 @@ describe('BiasAlertSystem', () => {
       // Get the alert ID from the queue
       const firstAlert = alertSystem.alertQueue[0]
       expect(firstAlert).toBeDefined()
-      const alertId = firstAlert.id
+      const alertId = firstAlert!.id
 
       // Now acknowledge it — this should find it in the local queue (line 975)
       await alertSystem.acknowledgeAlert?.(alertId, 'ack-user')
@@ -1222,9 +1222,9 @@ describe('BiasAlertSystem', () => {
       const recentAlerts = await alertSystem.getRecentAlerts()
 
       // First alert has sessionId, so id = sessionId
-      expect(recentAlerts[0].id).toBe('fallback-id-test')
+      expect(recentAlerts[0]!.id).toBe('fallback-id-test')
       // Second alert has no sessionId either, so id starts with 'external-alert-'
-      expect(recentAlerts[1].id).toMatch(/^external-alert-/)
+      expect(recentAlerts[1]!.id).toMatch(/^external-alert-/)
     })
 
     it('should map acknowledged and escalated fields when present', async () => {
@@ -1241,8 +1241,8 @@ describe('BiasAlertSystem', () => {
       ])
 
       const recentAlerts = await alertSystem.getRecentAlerts()
-      expect(recentAlerts[0].acknowledged).toBe(true)
-      expect(recentAlerts[0].escalated).toBe(true)
+      expect(recentAlerts[0]!.acknowledged).toBe(true)
+      expect(recentAlerts[0]!.escalated).toBe(true)
     })
 
     it('should map level from alertLevel when level is absent', async () => {
@@ -1257,7 +1257,7 @@ describe('BiasAlertSystem', () => {
       ])
 
       const activeAlerts = await alertSystem.getActiveAlerts()
-      expect(activeAlerts[0].level).toBe('high')
+      expect(activeAlerts[0]!.level).toBe('high')
     })
   })
 
@@ -1275,7 +1275,7 @@ describe('BiasAlertSystem', () => {
       ]
 
       for (const r of results) {
-        await alertSystem.checkAlerts((r as any))
+        await alertSystem.checkAlerts(r)
       }
 
       const stats = await alertSystem.getAlertStatistics()
@@ -1300,9 +1300,9 @@ describe('BiasAlertSystem', () => {
 
       const activeAlerts = await alertSystem.getActiveAlerts()
       expect(activeAlerts.length).toBe(1)
-      expect(activeAlerts[0].level).toBe('critical')
+      expect(activeAlerts[0]!.level).toBe('critical')
       // alertId should be mapped to id via the conversion function
-      expect(activeAlerts[0].id).toBe('alt-id-1')
+      expect(activeAlerts[0]!.id).toBe('alt-id-1')
     })
   })
 

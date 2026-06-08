@@ -20,7 +20,7 @@ describe('generateId', () => {
 describe('memoize', () => {
   it('caches results for the same arguments', () => {
     const fn = vi.fn((x: number) => x * 2)
-    const memoized = memoize(fn as any)
+    const memoized = memoize(fn)
 
     expect(memoized(5)).toBe(10)
     expect(memoized(5)).toBe(10)
@@ -29,7 +29,7 @@ describe('memoize', () => {
 
   it('recomputes for different arguments', () => {
     const fn = vi.fn((x: number) => x * 2)
-    const memoized = memoize(fn as any)
+    const memoized = memoize(fn)
 
     memoized(5)
     memoized(10)
@@ -38,7 +38,7 @@ describe('memoize', () => {
 
   it('handles multiple arguments', () => {
     const fn = vi.fn((a: number, b: number) => a + b)
-    const memoized = memoize(fn as any)
+    const memoized = memoize(fn)
 
     expect(memoized(1, 2)).toBe(3)
     expect(memoized(1, 2)).toBe(3)
@@ -47,7 +47,7 @@ describe('memoize', () => {
 
   it('works with object arguments via JSON serialization', () => {
     const fn = vi.fn((obj: { x: number }) => obj.x * 2)
-    const memoized = memoize(fn as any)
+    const memoized = memoize(fn)
 
     expect(memoized({ x: 5 })).toBe(10)
     expect(memoized({ x: 5 })).toBe(10)

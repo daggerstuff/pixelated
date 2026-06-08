@@ -9,6 +9,24 @@ import { asRedisOps } from './redis-ops'
 type RedisCommand = (...args: any[]) => any
 type RedisClient = Record<string, RedisCommand> & { status?: string }
 
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
+
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
@@ -288,8 +306,8 @@ function createRedisClient(): RedisClient {
 }
 
 export const redis: RedisClient = createRedisClient()
-if (typeof asRedisOps(redis).on === 'function') {
-  asRedisOps(redis).on('error', (error: unknown) => {
+if (typeof redis['on'] === 'function') {
+  redis['on']('error', (error: unknown) => {
     console.warn('Redis connection warning:', error)
   })
 }
