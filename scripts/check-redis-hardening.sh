@@ -50,10 +50,13 @@ check_file() {
     return
   fi
 
-  if ! rg -q --fixed-strings -- "--requirepass" "$file"; then
-    fail "$rel missing --requirepass in redis command"
-  else
+  # Accept either inline --requirepass or Docker secrets-based password (more secure)
+  if rg -q --fixed-strings -- "--requirepass" "$file" || \
+     rg -q --fixed-strings -- "REDIS_PASSWORD_FILE" "$file" || \
+     rg -q --fixed-strings -- "/run/secrets/redis-password" "$file"; then
     ok "$rel has requirepass"
+  else
+    fail "$rel missing --requirepass in redis command"
   fi
 
   if ! rg -q --fixed-strings -- "--protected-mode yes" "$file"; then
