@@ -99,17 +99,6 @@ router.post(
   }),
 )
 
-      return
-    }
-    const {
-      page: pageQuery,
-      limit: limitQuery,
-      status,
-      type,
-      category,
-      search: searchQuery,
-    } = expressReq.query
-
 router.get(
   '/',
   asyncHandler(async (req: Request, res: Response) => {

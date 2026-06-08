@@ -11,7 +11,9 @@ import Redis, { type RedisOptions } from 'ioredis'
 import { Pool } from 'pg'
 
 import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
+import healthRoutes from './api/routes/health.js'
 import { productionConfig } from './config/production.js'
+import { setPostgresPool, setRedisClient } from './lib/database/connection.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
@@ -79,10 +81,15 @@ const isProduction = productionConfig.environment === 'production'
 
 // Database connection
 const db = new Pool(productionConfig.database)
+setPostgresPool(db)
+
 const redis = new Redis(productionConfig.redis.url, {
   lazyConnect: true,
-  tls: productionConfig.redis.tls,
+  tls: productionConfig.redis.url.startsWith('rediss://')
+    ? productionConfig.redis.tls
+    : undefined,
 } as RedisOptions)
+setRedisClient(redis)
 
 // Security middleware
 app.use(
