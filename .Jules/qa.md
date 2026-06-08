@@ -1,5 +1,1 @@
-## 2026-06-07 - Add edge case test for formatDate
-
-Pattern: Testing error throwing for invalid dates.
-Action: Ensure edge cases like invalid formats throwing expected errors are
-covered for date utilities.
+## 2026-06-07 - Add edge case test for formatDate | Pattern: Testing error throwing for invalid dates | Action: Ensure edge cases like invalid formats throwing expected errors are covered for date utilities.
