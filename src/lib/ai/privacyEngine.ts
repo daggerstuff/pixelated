@@ -31,11 +31,16 @@ export interface PrivacyEngineResult {
 /**
  * Advanced Privacy-Preserving AI Engine
  */
+interface GlobalModel {
+  weights: number[]
+  metadata: Record<string, unknown>
+}
+
 class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
   private readonly dpConfig: DifferentialPrivacyConfig
-  private globalModel: any = null
-  private readonly clientModels = new Map<string, any>()
+  private globalModel: GlobalModel | null = null
+  private readonly clientModels = new Map<string, ModelUpdate>()
   private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
@@ -61,7 +66,7 @@ class PrivacyEngine {
    */
   async initializeFederatedLearning(clients: string[]): Promise<{
     sessionId: string
-    globalModel: any
+    globalModel: GlobalModel
     clientAssignments: Map<string, string[]>
   }> {
     if (clients.length < this.federatedConfig.minClients) {
@@ -71,7 +76,7 @@ class PrivacyEngine {
     }
 
     const sessionId = `fl_session_${Date.now()}`
-    this.globalModel = await this.createGlobalModel()
+    this.globalModel = this.createGlobalModel()
 
     // Distribute clients across model shards for privacy
     const clientAssignments = this.distributeClientsToShards(clients)
@@ -87,7 +92,7 @@ class PrivacyEngine {
     }
   }
 
-  private async createGlobalModel(): Promise<any> {
+  private createGlobalModel(): GlobalModel {
     // Initialize global model with random weights
     return {
       weights: Array.from({ length: 1000 }, () => Math.random()),
@@ -108,7 +113,7 @@ class PrivacyEngine {
       if (!assignments.has(shardId)) {
         assignments.set(shardId, [])
       }
-      assignments.get(shardId)!.push(clients[i])
+      assignments.get(shardId)!.push(clients[i]!)
     }
 
     return assignments
@@ -140,7 +145,7 @@ class PrivacyEngine {
 
     // Check if we have enough updates for aggregation
     if (this.clientModels.size >= this.federatedConfig.minClients) {
-      const aggregatedUpdate = await this.aggregateModelUpdates()
+      const aggregatedUpdate = this.aggregateModelUpdates()
 
       return {
         aggregatedUpdate,
@@ -159,7 +164,7 @@ class PrivacyEngine {
   private async applyDifferentialPrivacy(
     update: ModelUpdate,
   ): Promise<ModelUpdate> {
-    const { epsilon, delta: _delta, sensitivity, mechanism } = this.dpConfig
+    const { epsilon, sensitivity, mechanism } = this.dpConfig
 
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
@@ -235,7 +240,7 @@ class PrivacyEngine {
     )
   }
 
-  private async aggregateModelUpdates(): Promise<ModelUpdate> {
+  private aggregateModelUpdates(): ModelUpdate {
     const updates = Array.from(this.clientModels.values())
 
     if (updates.length === 0) {
@@ -360,7 +365,7 @@ class PrivacyEngine {
       // Keep clinical data but with privacy preservation
       diagnosis: patient.diagnosis, // Keep for clinical utility
       treatment: patient.treatment,
-      progress: this.addNoiseToValue(patient.progress, 0.05),
+      progress: patient.progress != null ? this.addNoiseToValue(patient.progress, 0.05) : 0,
     }))
 
     const privacyMetrics: PrivacyMetrics = {
@@ -441,7 +446,7 @@ class PrivacyEngine {
     // Calculate basic statistics
     const progressValues = data
       .map((p) => p.progress)
-      .filter((p): p is number => p !== undefined)
+      .filter((p): p is number => p !== undefined && p !== null)
     if (progressValues.length > 0) {
       stats['progressMean'] =
         progressValues.reduce((sum, p) => sum + p, 0) / progressValues.length
@@ -494,9 +499,9 @@ class PrivacyEngine {
    */
   async zeroKnowledgeProcess(
     computation: string,
-    inputs: any[],
+    inputs: Array<Record<string, unknown>>,
   ): Promise<{
-    result: any
+    result: unknown
     proof: string
     verificationKey: string
   }> {
@@ -521,20 +526,20 @@ class PrivacyEngine {
 
   private async performComputation(
     computation: string,
-    inputs: any[],
-  ): Promise<any> {
+    inputs: Array<Record<string, unknown>>,
+  ): Promise<number | null> {
     // Simulate computation without revealing inputs
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + (input.moodScore ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input['moodScore'] as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => input.riskScore ?? 0))
+        return Math.max(...inputs.map((input) => (input['riskScore'] as number) ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + (input.effectiveness ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input['effectiveness'] as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       default:
@@ -576,8 +581,7 @@ class PrivacyEngine {
         epsilon: this.dpConfig.epsilon,
         delta: this.dpConfig.delta,
         mechanism: this.dpConfig.mechanism,
-      },
-      recommendations: this.generatePrivacyRecommendations(
+      },          recommendations: this.generatePrivacyRecommendations(
         {
           differentialPrivacy: { ...this.dpConfig },
           dataSanitization: {
@@ -590,7 +594,7 @@ class PrivacyEngine {
             clientCount: activeClients,
             aggregationStrategy: this.federatedConfig.aggregationStrategy,
           },
-        } as PrivacyMetrics,
+        } as unknown as PrivacyMetrics,
         0.8,
       ),
     }

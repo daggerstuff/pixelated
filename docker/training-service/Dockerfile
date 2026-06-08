@@ -1,9 +1,5 @@
 # Foundation Model Training Service - GPU Enabled
 # HETZNER Golden Image Strategy: Datasets baked into image to avoid DATASYNC errors
-FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS base
-
-# Install Python 3.13 and system dependencies
-RUN apt-get update && \
 FROM nvidia/cuda:12.6.3-devel-ubuntu22.04 AS base
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -27,8 +23,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install uv package manager
-RUN python3.13 -m pip install --no-cache-dir uv==0.4.18
 # Install uv package manager via official installer (avoids py3.13 pip/distutils issues)
 RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
@@ -40,26 +34,6 @@ ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONPATH="/app"
 
 # Copy requirements for training service (from actual location)
-COPY ai/training/requirements.txt ./requirements.txt
-RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
-
-# Install PyTorch with CUDA support
-RUN uv pip install --python /opt/venv/bin/python --no-cache-dir \
-    torch==2.1.0+cu121 \
-    torchvision==0.16.0+cu121 \
-    torchaudio==2.1.0+cu121 \
-    --index-url https://download.pytorch.org/whl/cu121
-
-# Install Lightning.ai and training dependencies
-RUN uv pip install --python /opt/venv/bin/python --no-cache-dir \
-    lightning==2.1.0 \
-    transformers==4.35.0 \
-    datasets==2.14.0 \
-    peft==0.6.0 \
-    bitsandbytes==0.41.0 \
-    accelerate==0.24.0 \
-    wandb==0.16.0 \
-    unsloth
 COPY ai/config/requirements_training.txt ./requirements.txt
 RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
 

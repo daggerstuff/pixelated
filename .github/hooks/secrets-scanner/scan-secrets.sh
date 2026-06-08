@@ -200,7 +200,6 @@ scan_file() {
       fi
 
       # Skip if this looks like a placeholder or example
-      if printf '%s\n' "$match" | grep -qiE '(example|placeholder|your[_-]|xxx|changeme|TODO|FIXME|replace[_-]?me|dummy|fake|test[_-]?key|sample)'; then
       if printf '%s\n' "$match" | grep -qiE '(example|placeholder|your[_-]|xxx|changeme|TODO|FIXME|replace[_-]?me|dummy|fake|test[_-]?key|sample|cookie.based|default.token|demo.(key|secret|token)|sandbox.(key|token)|public.token|not[._-]?real|nope)'; then
         continue
       fi
