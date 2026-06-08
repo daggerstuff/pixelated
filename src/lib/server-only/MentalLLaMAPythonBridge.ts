@@ -6,7 +6,7 @@ import type {
   PythonBridgeResponse,
   IMHIEvaluationParams,
   MentalLLaMAAnalysisResult,
-} from '../ai/mental-llama/types/index.ts'
+} from '../types/index.ts'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
@@ -82,9 +82,8 @@ export class MentalLLaMAPythonBridge {
           .filter(Boolean)
           .forEach((line) => {
             try {
-              const response = JSON.parse(
-                line,
-              ) as unknown as PythonBridgeResponse & { id?: string }
+              const response: PythonBridgeResponse & { id?: string } =
+                JSON.parse(line) as unknown
               if (response?.id && this.requestQueue.has(response.id)) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
                 clearTimeout(timeout)

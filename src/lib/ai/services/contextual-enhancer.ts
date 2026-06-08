@@ -10,7 +10,7 @@ export class ContextualEnhancer {
   private readonly logger: Logger;
 
   constructor() {
-    (this as any).analyzer = new RealTimeAnalyzer();
+    this.analyzer = new RealTimeAnalyzer();
     this.logger = getLogger("ContextualEnhancer");
   }
 

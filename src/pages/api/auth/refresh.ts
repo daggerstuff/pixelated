@@ -82,7 +82,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      ;(logSecurityEvent as any)('token_validation_failed', {
+      logSecurityEvent('token_validation_failed', {
         error: error instanceof Error ? error.message : 'Unknown error',
         clientInfo,
         timestamp: Date.now(),

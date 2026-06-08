@@ -55,23 +55,17 @@ export const GET = async ({ request }: { request: Request }) => {
     }
 
     // Transform for API response
-    const responseData = filteredTechniques.map(
-      (technique: {
-        id: string
-        slug: string
-        data: Record<string, unknown>
-      }) => ({
-        id: technique.id,
-        slug: technique.slug,
-        title: technique.data['title'],
-        description: technique.data['description'],
-        category: technique.data['category'],
-        evidenceLevel: technique.data['evidenceLevel'],
-        duration: technique.data['duration'],
-        difficulty: technique.data['difficulty'],
-        tags: (technique.data['tags'] as string[]) ?? [],
-      }),
-    )
+    const responseData = filteredTechniques.map((technique: any) => ({
+      id: technique.id,
+      slug: technique.slug,
+      title: technique.data.title,
+      description: technique.data.description,
+      category: technique.data.category,
+      evidenceLevel: technique.data.evidenceLevel,
+      duration: technique.data.duration,
+      difficulty: technique.data.difficulty,
+      tags: technique.data.tags ?? [],
+    }))
 
     return new Response(
       JSON.stringify({
@@ -136,10 +130,8 @@ export const POST = async ({
     }
 
     // Get AI recommendations
-    const patientDataObj = (patientData as Record<string, unknown>) ?? {}
-    const preferencesObj = (preferences as Record<string, unknown>) ?? {}
-    const recommendationRequest = { ...patientDataObj, ...preferencesObj }
-    const recommendations = recommend(recommendationRequest as any)
+    const recommendationRequest = { ...patientData, ...preferences }
+    const recommendations = recommend(recommendationRequest)
 
     return new Response(
       JSON.stringify({
