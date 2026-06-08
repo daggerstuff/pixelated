@@ -101,16 +101,17 @@ describe('ContextDetector', () => {
           totalTokens: 30,
         },
         provider: 'test',
+        content: '',
       }
 
-      vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+      vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
         aiResponse,
       )
 
       // Test that crisis detection service is not called when integration is disabled
       const result = await detector.detectContext('I need help with something')
 
-      expect(result.detectedContext).toBe(ContextType.GENERAL)
+      expect(vi.mocked(result).detectedContext).toBe(ContextType.GENERAL)
       expect(mockDetectCrisis).not.toHaveBeenCalled()
       expect(result.metadata['crisisAnalysis']).toBeUndefined()
     })
@@ -139,11 +140,11 @@ describe('ContextDetector', () => {
           'user123',
         )
 
-        expect(result.detectedContext).toBe(ContextType.CRISIS)
-        expect(result.confidence).toBe(0.9)
-        expect(result.needsSpecialHandling).toBe(true)
-        expect(result.urgency).toBe('critical')
-        expect(result.contextualIndicators).toHaveLength(1)
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.CRISIS)
+        expect(vi.mocked(result).confidence).toBe(0.9)
+        expect(vi.mocked(result).needsSpecialHandling).toBe(true)
+        expect(vi.mocked(result).urgency).toBe('critical')
+        expect(vi.mocked(result).contextualIndicators).toHaveLength(1)
         expect(result.contextualIndicators[0]?.type).toBe('crisis_detection')
         expect(mockDetectCrisis).toHaveBeenCalledWith('I want to hurt myself', {
           sensitivityLevel: 'medium',
@@ -197,17 +198,18 @@ describe('ContextDetector', () => {
             totalTokens: 30,
           },
           provider: 'test',
+          content: '',
         }
 
         mockDetectCrisis.mockResolvedValue(crisisResult)
-        vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+        vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
           aiResponse,
         )
 
         const result = await contextDetector.detectContext('What is anxiety?')
 
-        expect(result.detectedContext).toBe(ContextType.EDUCATIONAL)
-        expect(result.confidence).toBe(0.8)
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.EDUCATIONAL)
+        expect(vi.mocked(result).confidence).toBe(0.8)
         expect(result.metadata['crisisAnalysis']).toBeDefined()
         expect(
           (result.metadata['crisisAnalysis'] as CrisisDetectionResult)
@@ -250,6 +252,7 @@ describe('ContextDetector', () => {
             totalTokens: 30,
           },
           provider: 'test',
+          content: '',
         }
 
         const crisisResult: CrisisDetectionResult = {
@@ -265,7 +268,7 @@ describe('ContextDetector', () => {
         }
 
         mockDetectCrisis.mockResolvedValue(crisisResult)
-        vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+        vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
           aiResponse,
         )
 
@@ -273,9 +276,9 @@ describe('ContextDetector', () => {
           'What are the symptoms of anxiety?',
         )
 
-        expect(result.detectedContext).toBe(ContextType.EDUCATIONAL)
-        expect(result.confidence).toBe(0.85)
-        expect(result.urgency).toBe('low')
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.EDUCATIONAL)
+        expect(vi.mocked(result).confidence).toBe(0.85)
+        expect(vi.mocked(result).urgency).toBe('low')
       })
 
       it('should detect clinical assessment context by pattern - basic diagnosis queries', async () => {
@@ -298,8 +301,10 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(vi.mocked(result).detectedContext).toBe(
+            ContextType.CLINICAL_ASSESSMENT,
+          )
+          expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
           expect(result.contextualIndicators?.[0]?.type).toMatch(
             /clinical_assessment/i,
           )
@@ -327,10 +332,12 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
-          expect(result.needsSpecialHandling).toBe(true)
-          expect(result.urgency).toBe('medium')
+          expect(vi.mocked(result).detectedContext).toBe(
+            ContextType.CLINICAL_ASSESSMENT,
+          )
+          expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
+          expect(vi.mocked(result).needsSpecialHandling).toBe(true)
+          expect(vi.mocked(result).urgency).toBe('medium')
         }
       })
 
@@ -354,8 +361,10 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(vi.mocked(result).detectedContext).toBe(
+            ContextType.CLINICAL_ASSESSMENT,
+          )
+          expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
         }
       })
 
@@ -379,8 +388,10 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(vi.mocked(result).detectedContext).toBe(
+            ContextType.CLINICAL_ASSESSMENT,
+          )
+          expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
         }
       })
 
@@ -431,8 +442,8 @@ describe('ContextDetector', () => {
           })
           const result = await contextDetector.detectContext(q)
           // Ambiguous cases may or may not be clinical - just ensure we get a valid context
-          expect(result.detectedContext).toBeDefined()
-          expect(result.confidence).toBeGreaterThan(0)
+          expect(vi.mocked(result).detectedContext).toBeDefined()
+          expect(vi.mocked(result).confidence).toBeGreaterThan(0)
         }
       })
 
@@ -450,9 +461,11 @@ describe('ContextDetector', () => {
           content: query,
         })
         const result = await contextDetector.detectContext(query)
-        expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
-        expect(result.confidence).toBeGreaterThanOrEqual(0.8)
-        expect(result.confidence).toBeLessThanOrEqual(1.0)
+        expect(vi.mocked(result).detectedContext).toBe(
+          ContextType.CLINICAL_ASSESSMENT,
+        )
+        expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
+        expect(vi.mocked(result).confidence).toBeLessThanOrEqual(1.0)
       })
 
       it('should short-circuit to crisis handler when crisis signals present', async () => {
@@ -470,10 +483,10 @@ describe('ContextDetector', () => {
         })
         const result = await contextDetector.detectContext(crisisQuery)
         // Crisis should override clinical assessment
-        expect(result.detectedContext).toBe(ContextType.CRISIS)
-        expect(result.confidence).toBeGreaterThan(0.9)
-        expect(result.urgency).toBe('critical')
-        expect(result.needsSpecialHandling).toBe(true)
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.CRISIS)
+        expect(vi.mocked(result).confidence).toBeGreaterThan(0.9)
+        expect(vi.mocked(result).urgency).toBe('critical')
+        expect(vi.mocked(result).needsSpecialHandling).toBe(true)
       })
 
       it('should not log PII in clinical assessment detection', async () => {
@@ -529,8 +542,10 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(result.detectedContext).toBe(ContextType.INFORMATIONAL)
-          expect(result.confidence).toBeGreaterThanOrEqual(0.8)
+          expect(vi.mocked(result).detectedContext).toBe(
+            ContextType.INFORMATIONAL,
+          )
+          expect(vi.mocked(result).confidence).toBeGreaterThanOrEqual(0.8)
           expect(result.contextualIndicators?.[0]?.type).toMatch(
             /informational/i,
           )
@@ -551,15 +566,15 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: 'Test message',
         })
-        vi.mocked(mockAIService.createChatCompletion).mockRejectedValue(
+        vi.mocked(mockAIService).createChatCompletion.mockRejectedValue(
           new Error('AI service error'),
         )
 
         const result = await contextDetector.detectContext('Test message')
 
-        expect(result.detectedContext).toBe(ContextType.GENERAL)
-        expect(result.confidence).toBe(0.1)
-        expect(result.urgency).toBe('low')
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.GENERAL)
+        expect(vi.mocked(result).confidence).toBe(0.1)
+        expect(vi.mocked(result).urgency).toBe('low')
         expect(result.metadata['error']).toBe('AI service error')
       })
 
@@ -583,6 +598,7 @@ describe('ContextDetector', () => {
             totalTokens: 30,
           },
           provider: 'test',
+          content: '',
         }
 
         mockDetectCrisis.mockResolvedValue({
@@ -596,14 +612,14 @@ describe('ContextDetector', () => {
           timestamp: new Date().toISOString(),
           content: 'Test message',
         })
-        vi.mocked(mockAIService.createChatCompletion).mockResolvedValue(
+        vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(
           malformedResponse,
         )
 
         const result = await contextDetector.detectContext('Test message')
 
-        expect(result.detectedContext).toBe(ContextType.GENERAL)
-        expect(result.confidence).toBe(0.3)
+        expect(vi.mocked(result).detectedContext).toBe(ContextType.GENERAL)
+        expect(vi.mocked(result).confidence).toBe(0.3)
       })
     })
   })
@@ -657,6 +673,7 @@ describe('ContextDetector', () => {
           totalTokens: 30,
         },
         provider: 'test',
+        content: '',
       }))
 
       vi.mocked(mockAIService.createChatCompletion)
@@ -688,8 +705,10 @@ describe('ContextDetector', () => {
         detectionResult,
       )
 
-      expect(alignmentContext.userQuery).toBe(userQuery)
-      expect(alignmentContext.detectedContext).toBe(ContextType.SUPPORT)
+      expect(vi.mocked(alignmentContext).userQuery).toBe(userQuery)
+      expect(vi.mocked(alignmentContext).detectedContext).toBe(
+        ContextType.SUPPORT,
+      )
       expect(alignmentContext.sessionMetadata?.['confidence']).toBe(0.8)
       expect(alignmentContext.sessionMetadata?.['urgency']).toBe('medium')
       expect(alignmentContext.sessionMetadata?.['needsSpecialHandling']).toBe(

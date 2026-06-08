@@ -1949,6 +1949,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "python-dotenv" },
+    { name = "pytorch-lightning" },
     { name = "redis" },
     { name = "scikit-learn" },
     { name = "seaborn" },

@@ -42,13 +42,15 @@ export const GET = async ({ request }: { request: Request }) => {
 
     if (categoryFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique: any) => technique.data.category === categoryFilter,
+        (technique: { data: Record<string, unknown> }) =>
+          technique.data['category'] === categoryFilter,
       )
     }
 
     if (evidenceFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique: any) => technique.data.evidenceLevel === evidenceFilter,
+        (technique: { data: Record<string, unknown> }) =>
+          technique.data['evidenceLevel'] === evidenceFilter,
       )
     }
 
@@ -95,7 +97,13 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const POST = async ({ request, cookies }) => {
+export const POST = async ({
+  request,
+  cookies,
+}: {
+  request: Request
+  cookies: { get: (name: string) => any }
+}) => {
   try {
     // Authentication check
     const sessionCookie = cookies.get('session')
@@ -106,7 +114,7 @@ export const POST = async ({ request, cookies }) => {
       })
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { patientData, preferences } = body
 
     if (!patientData) {

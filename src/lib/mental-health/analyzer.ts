@@ -2,6 +2,7 @@ import type {
   MentalHealthAnalysis,
   HealthIndicator,
   SentimentScore,
+  MentalHealthCategoryDetail,
   MentalHealthCategory,
 } from './types'
 
@@ -96,6 +97,12 @@ export class MentalHealthAnalyzer {
     return {
       id: `analysis_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       timestamp: Date.now(),
+      category: riskLevel,
+      explanation: `Mental health analysis detected indicators: ${indicators.map((i) => i.type).join(', ')}`,
+      expertGuided: false,
+      scores: {},
+      summary: `Analysis with ${indicators.length} health indicators`,
+      hasMentalHealthIssue: indicators.length > 0,
       confidence,
       riskLevel,
       categories,
@@ -103,6 +110,7 @@ export class MentalHealthAnalyzer {
       indicators,
       recommendations: this.generateRecommendations(indicators, riskLevel),
       requiresIntervention,
+      supportingEvidence: indicators.flatMap((i) => i.evidence),
     }
   }
 
@@ -218,17 +226,17 @@ export class MentalHealthAnalyzer {
     const neutral = Math.max(0, 1 - positive - negative)
     const overall = positive - negative
 
-    return { overall, positive, negative, neutral }
+    return { overall, positive, negative, neutral, confidence: 0.5 }
   }
 
   private categorizeIssues(
     indicators: HealthIndicator[],
-  ): MentalHealthCategory[] {
-    const categories: MentalHealthCategory[] = []
+  ): MentalHealthCategoryDetail[] {
+    const categories: MentalHealthCategoryDetail[] = []
 
     indicators.forEach((indicator) => {
       categories.push({
-        name: indicator.type,
+        name: indicator.type as MentalHealthCategory,
         score: indicator.severity,
         confidence: Math.min(1.0, indicator.evidence.length * 0.2 + 0.5),
         keywords: indicator.evidence,

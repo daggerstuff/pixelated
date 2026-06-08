@@ -6,7 +6,9 @@ import { createCompleteThreatDetectionSystem } from '../../../../lib/threat-dete
 export const GET: APIRoute = async ({ request }) => {
   try {
     // Authenticate request
-    const authResult = await authenticateRequest(request as any)
+    const authResult = await authenticateRequest(
+      request as unknown as Parameters<typeof authenticateRequest>[0],
+    )
     if (!authResult.success) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -39,9 +41,21 @@ export const GET: APIRoute = async ({ request }) => {
     // Get status from all services
     const [monitoringStatus, huntingStatus, intelligenceStatus] =
       await Promise.all([
-        threatDetectionSystem.monitoring.getStatus(),
-        threatDetectionSystem.hunting.getStatus(),
-        threatDetectionSystem.intelligence.getStatus(),
+        (
+          threatDetectionSystem as unknown as {
+            monitoring: { getStatus: () => Promise<unknown> }
+          }
+        ).monitoring.getStatus(),
+        (
+          threatDetectionSystem as unknown as {
+            hunting: { getStatus: () => Promise<unknown> }
+          }
+        ).hunting.getStatus(),
+        (
+          threatDetectionSystem as unknown as {
+            intelligence: { getStatus: () => Promise<unknown> }
+          }
+        ).intelligence.getStatus(),
       ])
 
     const status = {

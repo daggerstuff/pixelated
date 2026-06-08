@@ -100,7 +100,7 @@ describe('breachNotificationSystem', () => {
     })
 
     it('should handle errors during breach reporting', async () => {
-      ;(redis['set'] as unknown).mockRejectedValue(new Error('Redis error'))
+      ;(redis['set'] as any).mockRejectedValue(new Error('Redis error'))
 
       await expect(
         BreachNotificationSystem.reportBreach(mockBreachDetails),
@@ -158,6 +158,7 @@ describe('breachNotificationSystem', () => {
         affectedUsers: Array.from({ length: 500 }).fill('user'),
       }
 
+      // @ts-expect-error - Strictly required for pre-existing test mock files
       await BreachNotificationSystem.reportBreach(largeBreachDetails)
 
       expect(sendEmail).toHaveBeenCalledWith(
