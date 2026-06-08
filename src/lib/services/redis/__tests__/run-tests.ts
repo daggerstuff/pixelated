@@ -149,6 +149,6 @@ async function runTests() {
 }
 
 // Run tests if executed directly
-if ((require as any).main === module) {
+if (require.main === module) {
   void runTests()
 }

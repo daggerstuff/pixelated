@@ -113,7 +113,7 @@ export class AdvancedCacheStrategy {
   private readonly cache = getCache()
   private readonly keyGenerator = new CacheKeyGenerator()
   private readonly invalidation = createCacheInvalidation({
-    redis: this.cache as any,
+    redis: this.cache,
     prefix: 'pixelated:',
     defaultTTL: CACHE_CONFIG.TTL.L2_CACHE,
   })

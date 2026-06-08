@@ -13,12 +13,6 @@ import {
   BusinessAlert,
 } from '../types/business-intelligence'
 
-/** Reusable helper: safely extract a typed plain object from a Mongoose document */
-function toTypedDoc<T>(doc: unknown, _type?: T): T {
-  void _type
-  return (doc as { toObject: () => unknown }).toObject() as T
-}
-
 export class DatabaseService {
   /**
    * Store market data in MongoDB
@@ -62,7 +56,7 @@ export class DatabaseService {
       .sort({ timestamp: -1 })
       .limit(100)) as unknown[]
 
-    return docs.map((doc: unknown) => toTypedDoc<MarketData>(doc))
+    return docs.map((doc) => doc.toObject() as unknown as MarketData)
   }
 
   /**
@@ -191,8 +185,8 @@ export class DatabaseService {
       title: row.title,
       description: row.description,
       severity: row.severity,
-      conditions: JSON.parse(row.conditions ?? '[]') as unknown[],
-      recipients: JSON.parse(row.recipients ?? '[]') as unknown[],
+      conditions: JSON.parse(row.conditions ?? '[]'),
+      recipients: JSON.parse(row.recipients ?? '[]'),
       isActive: row.is_active,
       createdAt: row.created_at,
     })) as unknown as BusinessAlert[]
@@ -290,12 +284,14 @@ export class DatabaseService {
       },
     ]) as unknown[]
 
-    const data = result[0] as Record<string, number> | undefined
+    // Note: The previous SQL implementation might have been assuming something else.
+    // Adjusted logic:
+    const data = result[0] ?? {}
     return {
-      totalRevenue: data?.['avgRevenue'] ?? 0,
-      totalCustomers: 0,
-      avgCustomerLifetimeValue: data?.['avgCLV'] ?? 0,
-      monthlyGrowthRate: data?.['avgGrowth'] ?? 0,
+      totalRevenue: data.avgRevenue ?? 0, // Using avg for now as it's likely a run-rate
+      totalCustomers: 0, // Not available in this model
+      avgCustomerLifetimeValue: data.avgCLV ?? 0,
+      monthlyGrowthRate: data.avgGrowth ?? 0,
     }
   }
 
@@ -306,14 +302,23 @@ export class DatabaseService {
     const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`
     const result = await postgresPool.query(sql) as { rows: KpiDashboardRow[] }
 
-    return result.rows.map((row: KpiDashboardRow) => ({
-      id: row.id,
-      name: row.name,
-      metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
-      widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
-      lastUpdated: new Date(row.last_updated),
-      isShared: row.is_shared,
-    }))
+    return result.rows.map(
+      (row: {
+        id: string
+        name: string
+        metrics: string | null
+        widgets: string | null
+        last_updated: string
+        is_shared: boolean
+      }) => ({
+        id: row.id,
+        name: row.name,
+        metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
+        widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
+        lastUpdated: new Date(row.last_updated),
+        isShared: row.is_shared,
+      }),
+    )
   }
 
   /**
@@ -361,11 +366,11 @@ export class DatabaseService {
       },
     ])
 
-    const data = result[0] as Record<string, number> | undefined
+    const data = result[0] ?? {}
     return {
-      totalIndustries: data?.['totalIndustries'] ?? 0,
-      avgMarketSize: data?.['avgMarketSize'] ?? 0,
-      avgGrowthRate: data?.['avgGrowthRate'] ?? 0,
+      totalIndustries: data.totalIndustries ?? 0,
+      avgMarketSize: data.avgMarketSize ?? 0,
+      avgGrowthRate: data.avgGrowthRate ?? 0,
     }
   }
 }
