@@ -30,8 +30,6 @@ router.get('/', (req: Request, res: Response) => {
   })
 })
 
-router.get('/ready', async (req: Request, res: Response) => {
-  try {
     return res.json({
       ready: true,
       timestamp: new Date().toISOString(),
@@ -42,6 +40,8 @@ router.get('/ready', async (req: Request, res: Response) => {
       error: (error as Error).message,
     })
   }
+})
+
 })
 
 export default router
