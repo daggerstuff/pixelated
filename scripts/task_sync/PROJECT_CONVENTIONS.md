@@ -140,6 +140,13 @@ Linear (numeric)   Jira ADHD (name)      Beads
 2 (medium)    →   Medium               → normal
 3 (low)       →   Low                  → low
 4 (none)      →   None                 → none
+Linear (numeric)   Jira ADHD (name)
+───────────────────────────────────
+0 (urgent)    →   Highest
+1 (high)      →   High
+2 (medium)    →   Medium
+3 (low)       →   Low
+4 (none)      →   None
 ```
 
 ### Required Sync Fields

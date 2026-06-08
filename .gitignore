@@ -312,6 +312,8 @@ tests/scripts/
 .beads/.sync.lock
 .beads/ephemeral.sqlite3*
 .beads/redirect
+# === INTERNAL & PRIVATE ===
+/.security/
 .scannerwork
 .swarm/
 .test-coverage-analysis.md
@@ -356,6 +358,9 @@ ai/.moderne
 .mcp.json
 HANDOFF.md
 
+# Beads issue tracker (fully removed)
+.beads/
+
 .omc
 .foresight
 job.md
@@ -370,3 +375,8 @@ aws
 scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
+struct-agent-key.json
+
+# Metoro-exporter templates and values customization
+!metoro-exporter/templates/
+!metoro-exporter/templates/**

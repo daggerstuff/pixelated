@@ -24,6 +24,14 @@ router.post(
   asyncHandler(async (req: Request, res: Response) => {
     const { name, description, category, stakeholders, budget } = req.body
     const { user } = req as Request & { user: { id: string } }
+    const { name, description, category, stakeholders, budget } = req.body as {
+      name?: string
+      description?: string
+      category?: string
+      stakeholders?: string[]
+      budget?: number
+    }
+    const { user } = req as unknown as { user: { id: string } }
 
     if (!name) {
       throw new ValidationError('Project name is required', {
@@ -53,6 +61,11 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const { page, limit, category, status } = req.query
     const { user } = req as Request & { user: { id: string } }
+    const { page, limit, category, status } = req.query as Record<
+      string,
+      unknown
+    >
+    const { user } = req as unknown as { user: { id: string } }
 
     const result = await listProjects(user.id, {
       page: page ? parseInt(page as string) : 1,
@@ -74,6 +87,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const projectId = req.params['projectId'] as string
     const { user } = req as Request & { user: { id: string } }
+    const { user } = req as unknown as { user: { id: string } }
 
     const project = await getProject(projectId, user.id)
 
@@ -91,6 +105,14 @@ router.put(
     const projectId = req.params['projectId'] as string
     const { name, description, category, budget, status } = req.body
     const { user } = req as Request & { user: { id: string } }
+    const { name, description, category, budget, status } = req.body as {
+      name?: string
+      description?: string
+      category?: string
+      budget?: number
+      status?: string
+    }
+    const { user } = req as unknown as { user: { id: string } }
 
     const project = await updateProject(projectId, user.id, {
       name,
@@ -114,6 +136,13 @@ router.post(
     const projectId = req.params['projectId'] as string
     const { title, description, successCriteria, deadline } = req.body
     const { user } = req as Request & { user: { id: string } }
+    const { title, description, successCriteria, deadline } = req.body as {
+      title?: string
+      description?: string
+      successCriteria?: string[]
+      deadline?: string | Date
+    }
+    const { user } = req as unknown as { user: { id: string } }
 
     if (!title) {
       throw new ValidationError('Objective title is required', {
@@ -147,6 +176,16 @@ router.post(
       throw new ValidationError('userId and permissionLevel required', {
         userId: 'userId is required',
         permissionLevel: 'permissionLevel is required',
+    const { userId, permissionLevel } = req.body as {
+      userId?: string
+      permissionLevel?: string
+    }
+    const { user } = req as unknown as { user: { id: string } }
+
+    if (typeof userId !== 'string' || typeof permissionLevel !== 'string') {
+      throw new ValidationError('userId and permissionLevel required', {
+        userId: 'userId must be a string',
+        permissionLevel: 'permissionLevel must be a string',
       })
     }
 
@@ -176,6 +215,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const query = req.params['query'] as string
     const { user } = req as Request & { user: { id: string } }
+    const { user } = req as unknown as { user: { id: string } }
 
     const results = await searchProjects(query, user.id)
 

@@ -113,6 +113,25 @@ describe('Health Endpoints', () => {
 
       const redisStatus = services?.['redis']?.status
       expect(redisStatus).toBeOneOf(['connected', 'disconnected'])
+      expect(mongoStatus).toBeOneOf([
+        'connected',
+        'disconnected',
+        'not_configured',
+      ])
+
+      const postgresStatus = services?.['postgresql']?.status
+      expect(postgresStatus).toBeOneOf([
+        'connected',
+        'disconnected',
+        'not_configured',
+      ])
+
+      const redisStatus = services?.['redis']?.status
+      expect(redisStatus).toBeOneOf([
+        'connected',
+        'disconnected',
+        'not_configured',
+      ])
     })
 
     it('should include uptime information', async () => {

@@ -3,6 +3,7 @@ import { act } from '@testing-library/react'
 import { createRoot } from 'react-dom/client'
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { SearchFiltersState } from './SearchFilters'
 import SearchFilters from './SearchFilters'
@@ -36,6 +37,7 @@ describe('SearchFilters', () => {
     })
     await new Promise((resolve) => setTimeout(resolve, 0))
     expect(container.innerHTML).toContain('Advanced Filters')
+    expect(vi.mocked(container).innerHTML).toContain('Advanced Filters')
     return {
       container,
       root,
@@ -54,6 +56,11 @@ describe('SearchFilters', () => {
 
     try {
       expect(container.textContent).toContain('Advanced Filters')
+    const result = await renderFilters(mockOnChange)
+    const container = result.container
+
+    try {
+      expect(vi.mocked(container).textContent).toContain('Advanced Filters')
       expect(
         container.querySelector('label[for="min-relevance"]'),
       ).toBeInTheDocument()
@@ -62,12 +69,15 @@ describe('SearchFilters', () => {
       ).toBeInTheDocument()
     } finally {
       await cleanup()
+      await result.cleanup()
     }
   })
 
   it('calls onChange when sort order changes', async () => {
     const mockOnChange = vi.fn()
     const { container, cleanup } = await renderFilters(mockOnChange)
+    const result = await renderFilters(mockOnChange)
+    const container = result.container
 
     const sortBySelect = container.querySelector('#sort-by')
     expect(sortBySelect).toBeInTheDocument()
@@ -92,12 +102,15 @@ describe('SearchFilters', () => {
       )
     } finally {
       await cleanup()
+      await result.cleanup()
     }
   })
 
   it('reflects active sort state', async () => {
     const mockOnChange = vi.fn()
     const { container, cleanup } = await renderFilters(mockOnChange)
+    const result = await renderFilters(mockOnChange)
+    const container = result.container
 
     try {
       const relevanceOption = Array.from(
@@ -108,6 +121,9 @@ describe('SearchFilters', () => {
       expect(relevanceOption.selected).toBe(true)
     } finally {
       await cleanup()
+      expect(vi.mocked(relevanceOption).selected).toBe(true)
+    } finally {
+      await result.cleanup()
     }
   })
 })

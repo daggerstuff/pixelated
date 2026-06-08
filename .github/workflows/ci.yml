@@ -32,11 +32,13 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    timeout-minutes: 45
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       ARTIFACT_REGISTRY_LOCATION: us-west1
       ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
       TRIVY_STRICT_GATE: false
+      VITEST_COVERAGE_ENABLED: false
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
       UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}

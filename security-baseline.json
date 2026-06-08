@@ -1,5 +1,6 @@
 {
   "version": "1.1.0",
+  "version": "1.2.0",
   "baseline": {
     "security_policies": {
       "enforce_mfa": true,
@@ -31,6 +32,28 @@
         "img_src": "'self' data:",
         "connect_src": "'self'",
         "report_uri": "/api/v1/csp-violation"
+        "script_src": "'self' 'nonce-<generated>' https://cdn.pixelatedempathy.com https://www.googletagmanager.com https://js.sentry-cdn.com https://app.rybbit.io",
+        "style_src": "'self' 'unsafe-inline' 'nonce-<generated>' https://cdn.pixelatedempathy.com https://fonts.googleapis.com https://cdn.jsdelivr.net",
+        "img_src": "'self' data: blob: https://cdn.pixelatedempathy.com https://images.unsplash.com https://upload.wikimedia.org https://avatars.githubusercontent.com https://www.gravatar.com",
+        "connect_src": "'self' https://api.nebius.ai https://api.openai.com https://api.replicate.com https://api.resend.com https://www.googletagmanager.com https://js.sentry-cdn.com https://app.rybbit.io https://accounts.google.com https://api.github.com https://*.sentry.io https://pixelatedempathy.com wss://*.sentry.io https://cdn.jsdelivr.net",
+        "font_src": "'self' https://cdn.pixelatedempathy.com https://fonts.gstatic.com https://fonts.bunny.net https://cdn.jsdelivr.net",
+        "object_src": "'none'",
+        "frame_ancestors": "'none'",
+        "base_uri": "'self'",
+        "form_action": "'self'",
+        "frame_src": "'self' https://giscus.app",
+        "worker_src": "'self' blob:",
+        "manifest_src": "'self'",
+        "media_src": "'self' https://cdn.pixelatedempathy.com",
+        "upgrade_insecure_requests": true,
+        "report_uri": "/api/v1/csp-violation"
+      },
+      "security_headers": {
+        "x_content_type_options": "nosniff",
+        "x_frame_options": "DENY",
+        "referrer_policy": "strict-origin-when-cross-origin",
+        "permissions_policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "hsts": "max-age=31536000; includeSubDomains; preload"
       }
     },
     "compliance_standards": ["HIPAA", "GDPR", "SOC2", "ISO-27001"],

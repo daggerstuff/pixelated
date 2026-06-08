@@ -13,6 +13,8 @@
 | GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
 
 ## 1. Status Mapping Gaps
+| GitHub | `normalize_github_payload` | ⚠️ Partial | Env vars not set |
+| GitLab | `normalize_gitlab_payload` | ⚠️ Partial | Env vars not set |
 
 ### Canonical States (expected vs actual)
 
@@ -50,6 +52,7 @@
 ### Gap: `open` vs `backlog` naming
 - Current: STATUS_ALIASES maps "backlog"/"todo" → `open`
 - But Beads uses `open` correctly; Linear uses "Backlog"/"Todo"
+- But some targets use `open` correctly; Linear uses "Backlog"/"Todo"
 - Issue: cross-system readback of `open` status creates ambiguity
 
 ## 2. Priority Mapping Gaps
@@ -61,6 +64,12 @@ PROVIDER_PRIORITY = {
     "beads": 4,
     "asana": 3,
     "github": 2,
+### Current Code (tri_sync.py)
+```python
+PROVIDER_PRIORITY = {
+    "asana": 3,
+    "github": 2,
+    "gitlab": 2,
     "linear": 2,
     "jira": 2,
 }

@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: pixelated-empathy-redis
   namespace: pixelated-empathy
+  name: redis
+  labels:
+    app: redis
 spec:
   replicas: 1
   selector:
@@ -48,3 +51,27 @@ spec:
           limits:
             cpu: "200m"
             memory: "128Mi"
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "200m"
+            memory: "128Mi"
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - name: redis-data
+        emptyDir: {}

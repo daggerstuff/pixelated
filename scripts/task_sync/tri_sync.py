@@ -1,4 +1,5 @@
 """Tri-directional task sync coordinator for beads, Asana, Jira, GitHub, and Linear."""
+"""Tri-directional task sync coordinator for Asana, Jira, GitHub, GitLab, and Linear."""
 
 from __future__ import annotations
 
@@ -30,6 +31,7 @@ SYNC_BLOCK_START = "<!-- pixelated-sync"
 SYNC_BLOCK_END = "-->"
 SYNC_BLOCK_NAME = "pixelated-sync"
 DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("beads", "asana", "github", "linear", "jira")
+DEFAULT_PROVIDER_ORDER: tuple[str, ...] = ("asana", "github", "gitlab", "linear", "jira")
 SYNC_STATE_PATH = Path(".agent/internal/task-sync-state.json")
 PROVIDER_EXPORT_ENV_VARS = {
     "asana": "PIXELATED_ASANA_EXPORT_PATH",
@@ -172,6 +174,13 @@ PROVIDER_PRIORITY = {
     "github": 2,
     "linear": 2,
     "jira": 2,
+
+PROVIDER_PRIORITY = {
+    "asana": 3,
+    "github": 2,
+    "gitlab": 2,
+    "linear": 2,
+    "jira": 1,
 }
 
 SYNC_KEY_RE = re.compile(r"(?im)^\s*sync-key\s*:\s*(?P<value>[A-Za-z0-9._:-]+)\s*$")
@@ -383,6 +392,18 @@ def provider_ids_match(existing: Mapping[str, str], expected: Mapping[str, str])
     return {provider: external_id for provider, external_id in existing.items() if external_id} == {
         provider: external_id for provider, external_id in expected.items() if external_id
     }
+    """Compare provider IDs, only checking providers present in the expected set.
+
+    The existing record may have provider_ids from its sync metadata for providers
+    that don't have records in the current group. Only providers in `expected`
+    are compared to prevent false mismatches from "extra" provider IDs.
+    """
+    for provider, external_id in expected.items():
+        if not external_id:
+            continue
+        if existing.get(provider) != external_id:
+            return False
+    return True
 
 
 def records_are_in_sync(existing: TaskRecord, canonical: TaskRecord, provider_ids: Mapping[str, str]) -> bool:
@@ -514,6 +535,9 @@ def group_records_by_key(
                 id_to_key[rec_id] = record.sync_key
 
     # 3. Group records, forcing matching records to adopt the mapped canonical key
+    normalized_by_provider = _normalize_by_provider(records_by_provider)
+    id_to_key = _build_id_to_key_map(normalized_by_provider)
+
     grouped: dict[str, list[TaskRecord]] = {}
     for provider, records in normalized_by_provider.items():
         for record in records:
@@ -556,6 +580,45 @@ def normalized_group_record(provider: str, record: TaskRecord) -> TaskRecord:
         priority_label=record.priority_label,
         labels=record.labels,
     )
+
+
+def _iter_all_records(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> Iterable[TaskRecord]:
+    for records in normalized_by_provider.values():
+        yield from records
+
+
+def _normalize_by_provider(
+    records_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[str, list[TaskRecord]]:
+    normalized_by_provider: dict[str, list[TaskRecord]] = {}
+    for provider, records in records_by_provider.items():
+        normalized_list = []
+        for record in records:
+            normalized_record = normalized_group_record(provider, record)
+            if not normalized_record.sync_key:
+                sys.stderr.write(f"Skipping {provider} record {record.external_id}: missing sync key\n")
+                continue
+            normalized_list.append(normalized_record)
+        normalized_by_provider[provider] = normalized_list
+    return normalized_by_provider
+
+
+def _build_id_to_key_map(
+    normalized_by_provider: Mapping[str, Sequence[TaskRecord]],
+) -> dict[tuple[str, str], str]:
+    id_to_key: dict[tuple[str, str], str] = {}
+    for record in _iter_all_records(normalized_by_provider):
+        key = record.sync_key
+        id_to_key[(record.provider, record.external_id)] = key
+        for other_provider, other_id in record.provider_ids.items():
+            if other_id:
+                id_to_key[(other_provider, other_id)] = key
+    for record in _iter_all_records(normalized_by_provider):
+        if (record.provider, record.external_id) not in id_to_key:
+            id_to_key[(record.provider, record.external_id)] = record.sync_key
+    return id_to_key
 
 
 def build_sync_action(
@@ -613,6 +676,8 @@ def build_sync_plan(
     for sync_key, records in sorted(grouped.items()):
         # If there is no Linear record in this group, skip generating any sync actions!
         if not any(record.provider == "linear" for record in records):
+        # If there is no Linear record in this group and linear is enabled, skip generating any sync actions!
+        if "linear" in enabled_providers and not any(record.provider == "linear" for record in records):
             continue
 
         provider_lookup = {
@@ -897,6 +962,7 @@ def normalize_linear_payload(payload: Mapping[str, Any]) -> TaskRecord | None:
         updated_at=(
             _parse_updated_at(payload, "updatedAt", "updated", "createdAt", "created") or datetime.now(timezone.utc)
         ),
+        sync_key=_string_or_empty(_first_present(payload, "sync_key")) or metadata.get("key"),
         provider_ids=_parse_provider_ids(metadata),
         clean_body=clean_body,
         raw=payload,
@@ -1412,6 +1478,23 @@ def apply_sync_action(
             )
 
     sys.stderr.write(f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n")
+    has_direct_applier = _resolve_direct_provider_applier(action.provider) is not None
+    has_provider_command = action.provider in provider_commands
+
+    if has_direct_applier and not has_provider_command:
+        res = _apply_direct_provider_action(action)
+    elif not has_provider_command:
+        raise RuntimeError(f"No sync execution path configured for provider '{action.provider}'.")
+    else:
+        res = _apply_bridge_action(
+            action,
+            provider_commands=provider_commands,
+            run_process=run_process,
+        )
+
+    sys.stderr.write(
+        f"[{action.provider}] Completed {action.action} for '{action.sync_key}' -> {'Success' if res.success else 'Failure'} (ID: {res.target_id})\n"
+    )
     sys.stderr.flush()
     return res
 
@@ -1584,6 +1667,9 @@ def execute_apply_mode(
             },
             "results": [dataclass_to_dict(result) for result in beads_cleanup_results],
         },
+    payload: dict[str, Any] = {
+        "passes": pass_summaries,
+        "results": [dataclass_to_dict(result) for result in all_results],
     }
     exit_code = 0
     if not all(result.success for result in all_results):

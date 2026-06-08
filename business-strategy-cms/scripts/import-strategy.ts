@@ -78,6 +78,7 @@ function parseStrategyFile(
         : baseName
 
    let category = frontmatter.category && frontmatter.category.length > 0 ? frontmatter.category : DocumentCategory.BUSINESS_PLAN
+   let category = typeof frontmatter.category === 'string' && frontmatter.category.length > 0 ? frontmatter.category : DocumentCategory.BUSINESS_PLAN
   if (!frontmatter.category) {
     if (sourceFile.startsWith('outreach/') || sourceFile.startsWith('pilot-operations/')) {
       category = DocumentCategory.OPERATIONS_PLAN

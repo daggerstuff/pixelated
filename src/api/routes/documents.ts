@@ -44,7 +44,41 @@ const ensureString = (param: unknown): string => {
     return ''
   }
   return param !== undefined && param !== null ? String(param) : ''
+// Helper to coerce Express param/query to string
+const coerceString = (value: unknown): string => {
+  if (typeof value === 'string') return value
+  if (Array.isArray(value)) return coerceString(value[0])
+  if (value && typeof value === 'object') {
+    const vals = Object.values(value as Record<string, unknown>)
+    if (vals.length > 0) return coerceString(vals[0])
+    return ''
+  }
+  if (value !== undefined && value !== null) {
+    return String(value as string | number | boolean)
+  }
+  return ''
 }
+
+// Typed request body interfaces
+interface DocumentBody {
+  title?: string
+  type?: string
+  category?: string
+  content?: Record<string, unknown>
+  description?: string
+  status?: string
+}
+
+interface ShareBody {
+  sharedWith?: string
+  permissionLevel?: string
+}
+
+interface CommentBody {
+  content?: string
+  parentCommentId?: string
+}
+
 const router: Router = express.Router()
 
 // ============================================================================
@@ -63,6 +97,14 @@ router.post(
       return
     }
     const { title, type, category, content, description } = expressReq.body
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const body = (req as unknown as { body: DocumentBody }).body
+    const { title, type, category, content, description } = body
 
     // Validation
     if (!title || !type || !category) {
@@ -73,6 +115,7 @@ router.post(
 
     // Create document
     const document = await documentService.createDocument(
+    const document = (await documentService.createDocument(
       {
         title,
         type,
@@ -85,6 +128,9 @@ router.post(
     )
 
     expressRes.status(201).json({
+    )) as unknown
+
+    res.status(201).json({
       success: true,
       data: document,
     })
@@ -103,6 +149,10 @@ router.get(
     const userId = expressReq.user?.id
     if (!userId) {
       expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
       return
     }
     const {
@@ -117,6 +167,11 @@ router.get(
     const page = ensureString(pageQuery)
     const limit = ensureString(limitQuery)
     const search = ensureString(searchQuery)
+    } = req.query as Record<string, unknown>
+
+    const page = coerceString(pageQuery)
+    const limit = coerceString(limitQuery)
+    const search = coerceString(searchQuery)
 
     const pageNum = Math.max(1, parseInt(page) || 1)
     const pageLimit = Math.min(100, parseInt(limit) || 20)
@@ -149,6 +204,23 @@ router.get(
     const total = await BusinessDocument.countDocuments(filter)
 
     expressRes.json({
+    // Query — cast Mongoose model to avoid no-unsafe on chain methods
+    const DocModel = BusinessDocument as unknown as {
+      find(f: Record<string, unknown>): {
+        skip(n: number): { limit(n: number): { sort(o: Record<string, number>): { lean(): Promise<unknown[]> } } }
+      }
+      countDocuments(f: Record<string, unknown>): Promise<number>
+    }
+
+    const documents = await DocModel.find(filter)
+      .skip(skip)
+      .limit(pageLimit)
+      .sort({ updatedAt: -1 })
+      .lean()
+
+    const total = await DocModel.countDocuments(filter)
+
+    res.json({
       success: true,
       data: documents,
       pagination: {
@@ -178,12 +250,22 @@ router.get(
     const documentId = ensureString(expressReq.params['documentId'])
 
     const document = await documentService.getDocument(documentId, userId)
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
+
+    const document = (await documentService.getDocument(documentId, userId)) as unknown
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
 
     expressRes.json({
+    res.json({
       success: true,
       data: document,
     })
@@ -218,12 +300,35 @@ router.put(
       },
       userId,
     )
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
+    const body = (req as unknown as { body: DocumentBody }).body
+    const { title, content, status, description } = body
+
+    const document = (await documentService.updateDocument(
+      documentId,
+      {
+        title,
+        content: content,
+        status: status as Parameters<
+          typeof documentService.updateDocument
+        >[1]['status'],
+        description,
+      },
+      userId,
+    )) as unknown
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
     }
 
     expressRes.json({
+    res.json({
       success: true,
       data: document,
     })
@@ -246,6 +351,13 @@ router.delete(
       return
     }
     const documentId = ensureString(expressReq.params['documentId'])
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
 
     const deleted = await documentService.deleteDocument(documentId, userId)
 
@@ -254,6 +366,7 @@ router.delete(
     }
 
     expressRes.json({
+    res.json({
       success: true,
       message: 'Document deleted successfully',
     })
@@ -276,6 +389,15 @@ router.post(
     }
     const documentId = ensureString(expressReq.params['documentId'])
     const { sharedWith, permissionLevel } = expressReq.body
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
+    const body = (req as unknown as { body: ShareBody }).body
+    const { sharedWith, permissionLevel } = body
 
     if (!sharedWith || !permissionLevel) {
       throw new ValidationError(
@@ -291,6 +413,14 @@ router.post(
     )
 
     expressRes.json({
+    const document = (await documentService.shareDocument(
+      documentId,
+      sharedWith,
+      permissionLevel as Parameters<typeof documentService.shareDocument>[2],
+      userId,
+    )) as unknown
+
+    res.json({
       success: true,
       data: document,
     })
@@ -313,6 +443,15 @@ router.post(
     }
     const documentId = ensureString(expressReq.params['documentId'])
     const { content, parentCommentId } = expressReq.body
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
+    const body = (req as unknown as { body: CommentBody }).body
+    const { content, parentCommentId } = body
 
     if (!content) {
       throw new ValidationError('Comment content is required')
@@ -327,6 +466,7 @@ router.post(
     )
 
     expressRes.status(201).json({
+    res.status(201).json({
       success: true,
       data: result.rows[0],
     })
@@ -343,6 +483,8 @@ router.get(
     const expressReq = req as Request
     const expressRes = res as Response
     const documentId = ensureString(expressReq.params['documentId'])
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = coerceString(req.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -355,6 +497,7 @@ router.get(
     )
 
     expressRes.json({
+    res.json({
       success: true,
       data: result.rows,
     })
@@ -371,6 +514,8 @@ router.get(
     const expressReq = req as Request
     const expressRes = res as Response
     const documentId = ensureString(expressReq.params['documentId'])
+  asyncHandler(async (req: Request, res: Response) => {
+    const documentId = coerceString(req.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -382,6 +527,7 @@ router.get(
     )
 
     expressRes.json({
+    res.json({
       success: true,
       data: result.rows,
     })
@@ -407,6 +553,20 @@ router.get(
     const format = ensureString(formatQuery)
 
     const document = await documentService.getDocument(documentId, userId)
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id
+    if (!userId) {
+      res.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = coerceString(req.params['documentId'])
+    const formatQuery = (req.query as Record<string, unknown>)['format']
+    const format = coerceString(formatQuery) || 'json'
+
+    const document = (await documentService.getDocument(documentId, userId)) as unknown as {
+      slug?: string
+      content?: { markdown?: string }
+    } | null
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
@@ -430,6 +590,23 @@ router.get(
         `attachment; filename="${document.slug}.json"`,
       )
       expressRes.json(document)
+      res.setHeader('Content-Type', 'text/markdown')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.md"`,
+      )
+      const markdownContent: string | undefined = document.content?.markdown
+      if (!markdownContent) {
+        throw new NotFoundError('Document content', documentId)
+      }
+      res.send(markdownContent)
+    } else {
+      res.setHeader('Content-Type', 'application/json')
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.json"`,
+      )
+      res.json(document)
     }
   }),
 )

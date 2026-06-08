@@ -74,7 +74,7 @@ export const GET: APIRoute = async ({ request }) => {
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        'access_denied' as any,
         'auth.security.backup.recovery.tests.forbidden',
         user.id,
         'auth-security-backup',
@@ -102,7 +102,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_tests_list',
+        'recovery_tests_list' as any,
         'auth.security.backup.recovery.tests.list',
         user.id,
         'auth-security-backup',
@@ -125,7 +125,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_test_get',
+        'recovery_test_get' as any,
         'auth.security.backup.recovery.tests.get',
         user.id,
         'auth-security-backup',
@@ -142,7 +142,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_test_config_get',
+        'recovery_test_config_get' as any,
         'auth.security.backup.recovery.tests.config.get',
         user.id,
         'auth-security-backup',
@@ -166,7 +166,7 @@ export const GET: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      'system_error' as any,
       'auth.security.backup.recovery.tests.error',
       'anonymous',
       'auth-security-backup',
@@ -231,7 +231,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (user.role !== 'admin' && user.role !== 'superadmin') {
       // Create audit log for forbidden access
       await createAuditLog(
-        'access_denied',
+        'access_denied' as any,
         'auth.security.backup.recovery.tests.forbidden',
         user.id,
         'auth-security-backup',
@@ -262,7 +262,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_test_run',
+        'recovery_test_run' as any,
         'auth.security.backup.recovery.tests.run',
         user.id,
         'auth-security-backup',
@@ -281,7 +281,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_test_config_update',
+        'recovery_test_config_update' as any,
         'auth.security.backup.recovery.tests.config.update',
         user.id,
         'auth-security-backup',
@@ -300,7 +300,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       // Create audit log
       await createAuditLog(
-        'recovery_test_schedule',
+        'recovery_test_schedule' as any,
         'auth.security.backup.recovery.tests.schedule',
         user.id,
         'auth-security-backup',
@@ -324,7 +324,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Create audit log for the error
     await createAuditLog(
-      'system_error',
+      'system_error' as any,
       'auth.security.backup.recovery.tests.error',
       'anonymous',
       'auth-security-backup',

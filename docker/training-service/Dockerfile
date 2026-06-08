@@ -4,6 +4,17 @@ FROM nvidia/cuda:12.1.0-devel-ubuntu22.04 AS base
 
 # Install Python 3.13 and system dependencies
 RUN apt-get update && \
+FROM nvidia/cuda:12.6.3-devel-ubuntu22.04 AS base
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/New_York
+
+# Install Python 3.13 and system dependencies
+# Ubuntu 22.04 doesn't ship 3.13 — add deadsnakes PPA first
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y software-properties-common && \
+    add-apt-repository ppa:deadsnakes/ppa -y && \
+    apt-get update && \
     apt-get install --no-install-recommends -y \
     python3.13 \
     python3.13-venv \
@@ -18,6 +29,8 @@ RUN apt-get update && \
 
 # Install uv package manager
 RUN python3.13 -m pip install --no-cache-dir uv==0.4.18
+# Install uv package manager via official installer (avoids py3.13 pip/distutils issues)
+RUN curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
 
 WORKDIR /app
 
@@ -47,6 +60,11 @@ RUN uv pip install --python /opt/venv/bin/python --no-cache-dir \
     accelerate==0.24.0 \
     wandb==0.16.0 \
     unsloth
+COPY ai/config/requirements_training.txt ./requirements.txt
+RUN uv pip install --python /opt/venv/bin/python --no-cache-dir -r requirements.txt
+
+# Note: torch, transformers, peft, accelerate, bitsandbytes, and other training deps
+# are already installed via requirements_training.txt above with Python 3.13-compatible versions.
 
 FROM base AS production
 

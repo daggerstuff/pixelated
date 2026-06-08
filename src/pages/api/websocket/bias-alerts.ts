@@ -114,8 +114,13 @@ export const GET = async () => {
  */
 export const POST = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { type = 'test', level = 'medium', message, sessionId } = body
+    const body = await request.json() as Record<string, unknown>
+    const { type = 'test', level = 'medium', message, sessionId } = body as {
+      type?: string
+      level?: string
+      message?: string
+      sessionId?: string
+    }
 
     const server = await initializeWebSocketServer()
 
@@ -299,8 +304,8 @@ export const POST = async ({ request }: { request: Request }) => {
  */
 export const PATCH = async ({ request }: { request: Request }) => {
   try {
-    const body = await request.json()
-    const { action } = body
+    const body = await request.json() as Record<string, unknown>
+    const { action } = body as { action?: string }
 
     const server = await initializeWebSocketServer()
 
