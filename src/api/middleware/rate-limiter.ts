@@ -2,6 +2,7 @@
 import { NextFunction } from 'express'
 
 import { getRedisClient } from '../../lib/database/connection'
+import { asRedisOps } from '../../lib/redis-ops'
 
 type RateLimiterRequest = {
   ip?: string
@@ -81,15 +82,14 @@ export async function incrementRedisCounter(
 ): Promise<number> {
   try {
     const redis = getRedisClient()
-
-    // Use Redis incr directly
-    if (typeof redis['incr'] !== 'function') {
+    const r = asRedisOps(redis)
+    if (typeof r.incr !== 'function') {
       return 0
     }
 
-    const rawCount = await redis['incr'](key)
-    if (typeof redis['expire'] === 'function') {
-      await redis['expire'](key, windowSeconds)
+    const rawCount = await r.incr(key)
+    if (typeof r.expire === 'function') {
+      await r.expire(key, windowSeconds)
     }
     return parseCount(rawCount)
   } catch (error: unknown) {

@@ -12,10 +12,10 @@
  * Phase 4.5: E2E Integration Testing
  */
 
+// @ts-expect-error - Strictly required for pre-existing test mock files
 import { test, expect, type Page } from '@playwright/test'
 
 const CHAT_PAGE_URL = '/chat' // Adjust to your actual route
-const API_BASE_URL = process.env.API_BASE_URL ?? 'http://localhost:5173'
 
 test.describe('Pixel Multimodal Chat - E2E Integration', () => {
   test.beforeEach(async ({ page }) => {
@@ -537,7 +537,7 @@ test.describe('Pixel Multimodal Chat - E2E Integration', () => {
     test('should support keyboard navigation', async ({ page }) => {
       // Tab through interactive elements
       await page.keyboard.press('Tab')
-      let focusedElement = await page.evaluate(() =>
+      await page.evaluate(() =>
         document.activeElement?.getAttribute('data-testid'),
       )
 

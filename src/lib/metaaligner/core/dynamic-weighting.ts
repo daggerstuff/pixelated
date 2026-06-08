@@ -8,6 +8,7 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getContextMapperService } from '../config/context-mapper-service'
 import { ContextType, AlignmentContext } from './objectives'
+import type { ContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
 
 const logger = createBuildSafeLogger('dynamic-weighting')
 
@@ -46,7 +47,7 @@ export interface DynamicWeightingConfig {
  * Weight update result with telemetry
  */
 export interface WeightUpdateResult {
-  weights: Record<string, number>
+  weights: ContextualObjectiveWeights
   context: ContextType
   updateTimeMs: number
   blendingApplied: boolean
@@ -63,7 +64,7 @@ export interface WeightUpdateResult {
 interface WeightHistoryEntry {
   timestamp: number
   context: ContextType
-  weights: Record<string, number>
+  weights: ContextualObjectiveWeights
   confidence: number
 }
 
@@ -110,7 +111,7 @@ export class DynamicWeightingEngine {
   private readonly oscillationTrackers: Map<string, OscillationTracker> =
     new Map()
   private cache: {
-    weights: Record<string, number> | null
+    weights: ContextualObjectiveWeights | null
     context: ContextType | null
     timestamp: number
   } = {
@@ -304,33 +305,43 @@ export class DynamicWeightingEngine {
    * Apply exponential moving average blending between new and previous weights
    */
   private applyBlending(
-    newWeights: Record<string, number>,
-    previousWeights: Record<string, number>,
+    newWeights: ContextualObjectiveWeights,
+    previousWeights: ContextualObjectiveWeights,
     alpha?: number,
-  ): Record<string, number> {
+  ): ContextualObjectiveWeights {
     const blendAlpha = alpha ?? this.config.blendingAlpha
-    const blended: Record<string, number> = {}
+    const blended: Partial<ContextualObjectiveWeights> = {}
 
-    for (const [key, newValue] of Object.entries(newWeights)) {
+    for (const [k, v] of Object.entries(newWeights) as [
+      keyof ContextualObjectiveWeights,
+      number | undefined,
+    ][]) {
+      const newValue = v ?? 0
+      const key = k
       const prevValue = previousWeights[key] ?? newValue
       // EMA: blended = alpha * previous + (1 - alpha) * new
       blended[key] = blendAlpha * prevValue + (1 - blendAlpha) * newValue
     }
 
-    return blended
+    return blended as ContextualObjectiveWeights
   }
 
   /**
    * Apply stability guard to limit maximum weight change per turn
    */
   private applyStabilityGuard(
-    newWeights: Record<string, number>,
-    previousWeights: Record<string, number>,
-  ): Record<string, number> {
-    const guarded: Record<string, number> = {}
+    newWeights: ContextualObjectiveWeights,
+    previousWeights: ContextualObjectiveWeights,
+  ): ContextualObjectiveWeights {
+    const guarded: Partial<ContextualObjectiveWeights> = {}
     const maxChange = this.config.maxWeightChangePerTurn
 
-    for (const [key, newValue] of Object.entries(newWeights)) {
+    for (const [k, v] of Object.entries(newWeights) as [
+      keyof ContextualObjectiveWeights,
+      number | undefined,
+    ][]) {
+      const newValue = v ?? 0
+      const key = k
       const prevValue = previousWeights[key] ?? newValue
       const change = newValue - prevValue
       const absChange = Math.abs(change)
@@ -344,19 +355,24 @@ export class DynamicWeightingEngine {
       }
     }
 
-    return guarded
+    return guarded as ContextualObjectiveWeights
   }
 
   /**
    * Check if weight change is significant enough to update (hysteresis)
    */
   private isChangeSignificant(
-    newWeights: Record<string, number>,
-    previousWeights: Record<string, number>,
+    newWeights: ContextualObjectiveWeights,
+    previousWeights: ContextualObjectiveWeights,
   ): boolean {
     const threshold = this.config.hysteresisThreshold
 
-    for (const [key, newValue] of Object.entries(newWeights)) {
+    for (const [k, v] of Object.entries(newWeights) as [
+      keyof ContextualObjectiveWeights,
+      number | undefined,
+    ][]) {
+      const newValue = v ?? 0
+      const key = k
       const prevValue = previousWeights[key] ?? newValue
       const change = Math.abs(newValue - prevValue)
 
@@ -372,8 +388,8 @@ export class DynamicWeightingEngine {
    * Detect oscillation in weight updates
    */
   private detectOscillation(
-    newWeights: Record<string, number>,
-    previousWeights: Record<string, number>,
+    newWeights: ContextualObjectiveWeights,
+    previousWeights: ContextualObjectiveWeights,
   ): boolean {
     const window = this.config.oscillationDetectionWindow
     const threshold = this.config.oscillationThreshold
@@ -386,7 +402,12 @@ export class DynamicWeightingEngine {
     // }
 
     // Track direction changes for each objective
-    for (const [objectiveId, newValue] of Object.entries(newWeights)) {
+    for (const [k, v] of Object.entries(newWeights) as [
+      keyof ContextualObjectiveWeights,
+      number | undefined,
+    ][]) {
+      const newValue = v ?? 0
+      const objectiveId = k
       const prevValue = previousWeights[objectiveId] ?? newValue
       const change = newValue - prevValue
 
@@ -429,31 +450,37 @@ export class DynamicWeightingEngine {
    * Normalize weights to sum to 1.0
    */
   private normalizeWeights(
-    weights: Record<string, number>,
-  ): Record<string, number> {
-    const sum = Object.values(weights).reduce((acc, w) => acc + w, 0)
+    weights: ContextualObjectiveWeights,
+  ): ContextualObjectiveWeights {
+    const sum = (Object.values(weights) as (number | undefined)[]).reduce(
+      (acc: number, w) => acc + (w ?? 0),
+      0,
+    )
 
     if (sum === 0 || sum === 1.0) {
       return weights
     }
 
-    const normalized: Record<string, number> = {}
-    for (const [key, value] of Object.entries(weights)) {
-      normalized[key] = value / sum
+    const normalized: Partial<ContextualObjectiveWeights> = {}
+    for (const [k, v] of Object.entries(weights) as [
+      keyof ContextualObjectiveWeights,
+      number | undefined,
+    ][]) {
+      normalized[k] = (v ?? 0) / sum
     }
 
-    return normalized
+    return normalized as ContextualObjectiveWeights
   }
 
   /**
    * Get previous weights from history
    */
-  private getPreviousWeights(): Record<string, number> | null {
+  private getPreviousWeights(): ContextualObjectiveWeights | null {
     if (this.weightHistory.length === 0) {
       return null
     }
 
-    return this.weightHistory[this.weightHistory.length - 1].weights
+    return this.weightHistory[this.weightHistory.length - 1]!.weights
   }
 
   /**
@@ -461,7 +488,7 @@ export class DynamicWeightingEngine {
    */
   private addToHistory(
     context: AlignmentContext,
-    weights: Record<string, number>,
+    weights: ContextualObjectiveWeights,
   ): void {
     this.weightHistory.push({
       timestamp: Date.now(),
@@ -487,7 +514,7 @@ export class DynamicWeightingEngine {
    */
   private updateCache(
     context: ContextType,
-    weights: Record<string, number>,
+    weights: ContextualObjectiveWeights,
   ): void {
     this.cache = {
       weights: { ...weights },
@@ -533,8 +560,8 @@ export class DynamicWeightingEngine {
    * Check if two weight objects are equal (within tolerance)
    */
   private weightsEqual(
-    weights1: Record<string, number>,
-    weights2: Record<string, number>,
+    weights1: ContextualObjectiveWeights,
+    weights2: ContextualObjectiveWeights,
     tolerance: number = 0.0001,
   ): boolean {
     const keys1 = Object.keys(weights1)
@@ -545,7 +572,9 @@ export class DynamicWeightingEngine {
     }
 
     for (const key of keys1) {
-      const diff = Math.abs(weights1?.[key] - weights2?.[key])
+      const v1 = weights1[key as keyof ContextualObjectiveWeights] ?? 0
+      const v2 = weights2[key as keyof ContextualObjectiveWeights] ?? 0
+      const diff = Math.abs(v1 - v2)
       if (diff > tolerance) {
         return false
       }

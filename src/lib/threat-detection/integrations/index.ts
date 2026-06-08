@@ -94,13 +94,21 @@ import {
 } from './external-threat-intelligence'
 
 // Import and re-export types from response orchestration
-export type {
+import type {
   RateLimitResult,
   ResponseAction,
   ThreatAnalysis,
   ThreatData,
   ThreatResponse,
 } from '../response-orchestration'
+
+export type {
+  RateLimitResult,
+  ResponseAction,
+  ThreatAnalysis,
+  ThreatData,
+  ThreatResponse,
+}
 export {
   ExternalThreatIntelligenceService,
   type ThreatIntelligence,
@@ -124,7 +132,7 @@ export function createThreatDetectionIntegration(
   const threatDetectionService = createThreatDetectionService(
     orchestrator,
     rateLimiter,
-    config,
+    config as any,
   )
 
   const middleware = threatDetectionService.getMiddleware()
@@ -396,7 +404,7 @@ export function createThreatHuntingService(
     aiService,
     behavioralService,
     predictiveService,
-    config,
+    config as any,
   )
 }
 

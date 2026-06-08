@@ -52,7 +52,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return our test response
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: validResponse,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -66,7 +66,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       )
 
       expect(semanticEvidence).toHaveLength(2)
-      expect(semanticEvidence[0]).toMatchObject({
+      expect(semanticEvidence[0]!).toMatchObject({
         text: 'I feel hopeless',
         type: 'direct_quote',
         confidence: 0.8,
@@ -74,8 +74,8 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         category: 'depression_symptom',
         clinicalRelevance: 'significant',
       })
-      expect(semanticEvidence?.[0].metadata).toBeDefined()
-      expect(semanticEvidence?.[0].metadata!.semanticRationale).toBe(
+      expect(semanticEvidence[0]!.metadata).toBeDefined()
+      expect(semanticEvidence[0]!.metadata!.semanticRationale).toBe(
         'Indicates depressive mood',
       )
     })
@@ -84,7 +84,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       const invalidJson = 'this is not valid json'
 
       // Mock the model provider to return invalid JSON
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: invalidJson,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -111,7 +111,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response without evidence array
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithoutEvidence,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -152,7 +152,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response with invalid items
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithInvalidItems,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -165,9 +165,9 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence?.[0].text).toBe('Valid evidence item')
-      expect(semanticEvidence?.[0].confidence).toBe(0.9)
-      expect(semanticEvidence?.[0].clinicalRelevance).toBe('critical')
+      expect(semanticEvidence[0]!.text).toBe('Valid evidence item')
+      expect(semanticEvidence[0]!.confidence).toBe(0.9)
+      expect(semanticEvidence[0]!.clinicalRelevance).toBe('critical')
     })
 
     it('should apply default values for optional fields', async () => {
@@ -180,7 +180,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return minimal response
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: minimalResponse,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -193,7 +193,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence[0]).toMatchObject({
+      expect(semanticEvidence[0]!).toMatchObject({
         text: 'Minimal evidence item',
         confidence: 0.5, // default value
         clinicalRelevance: 'supportive', // default value
@@ -217,7 +217,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response with invalid confidence values
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithInvalidConfidence,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -232,7 +232,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
 
       // Note: Low confidence item may be filtered out due to minConfidenceThreshold (0.1)
       // since clamped confidence of 0 is less than threshold
-      expect(semanticEvidence.length).toBeGreaterThanOrEqual(1)
+      expect(vi.mocked(semanticEvidence).length).toBeGreaterThanOrEqual(1)
 
       // Find items by text to verify confidence clamping
       const highConfidenceItem = semanticEvidence.find(
@@ -261,7 +261,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response with invalid clinical relevance
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithInvalidClinicalRelevance,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -274,7 +274,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence?.[0].clinicalRelevance).toBe('supportive') // Should default to 'supportive'
+      expect(semanticEvidence[0]!.clinicalRelevance).toBe('supportive') // Should default to 'supportive'
     })
 
     it('should trim whitespace from text fields', async () => {
@@ -288,7 +288,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response with whitespace
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithWhitespace,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -301,7 +301,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence?.[0].text).toBe('Evidence with whitespace')
+      expect(semanticEvidence[0]!.text).toBe('Evidence with whitespace')
     })
 
     it('should handle empty evidence array', async () => {
@@ -310,7 +310,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return empty evidence array
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithEmptyEvidence,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -342,7 +342,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       })
 
       // Mock the model provider to return response with malformed items
-      vi.mocked(mockModelProvider.invoke).mockResolvedValue({
+      vi.mocked(mockModelProvider).invoke.mockResolvedValue({
         content: responseWithMalformedItems,
         usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
       })
@@ -355,8 +355,8 @@ describe('EvidenceExtractor Semantic Analysis', () => {
         (item) => item.metadata?.semanticRationale,
       )
       expect(semanticEvidence).toHaveLength(1)
-      expect(semanticEvidence?.[0].text).toBe('Valid item')
-      expect(semanticEvidence?.[0].confidence).toBe(0.8)
+      expect(semanticEvidence[0]!.text).toBe('Valid item')
+      expect(semanticEvidence[0]!.confidence).toBe(0.8)
     })
   })
 
@@ -381,7 +381,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       const depressionEvidence = result.evidenceItems.filter((item) =>
         item.category.includes('depression'),
       )
-      expect(depressionEvidence.length).toBeGreaterThan(0)
+      expect(vi.mocked(depressionEvidence).length).toBeGreaterThan(0)
     })
 
     it('should extract pattern-based evidence for anxiety', async () => {
@@ -396,7 +396,7 @@ describe('EvidenceExtractor Semantic Analysis', () => {
       const anxietyEvidence = result.evidenceItems.filter((item) =>
         item.category.includes('anxiety'),
       )
-      expect(anxietyEvidence.length).toBeGreaterThan(0)
+      expect(vi.mocked(anxietyEvidence).length).toBeGreaterThan(0)
     })
   })
 })

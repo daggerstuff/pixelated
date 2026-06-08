@@ -70,6 +70,7 @@ get_changed_files() {
     [[ -z "$f" ]] && continue
     [[ -f "${repo}/${f}" ]] && echo "$f"
   done <<< "$files"
+  true
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────
@@ -99,9 +100,13 @@ lint_ts_files() {
   done <<< "$ts_files"
 
   # oxlint
-  if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]]; then
+  if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]] || command -v pnpm &>/dev/null; then
     local oxlint_cmd="oxlint"
-    [[ -f "${repo}/node_modules/.bin/oxlint" ]] && oxlint_cmd="${repo}/node_modules/.bin/oxlint"
+    if command -v pnpm &>/dev/null; then
+      oxlint_cmd="pnpm exec oxlint"
+    elif [[ -f "${repo}/node_modules/.bin/oxlint" ]]; then
+      oxlint_cmd="${repo}/node_modules/.bin/oxlint"
+    fi
 
     info "    Running oxlint..."
     if [[ "$FIX" == "true" ]]; then
