@@ -86,9 +86,10 @@ test.describe('Theme Performance Tests', () => {
     test('should have minimal layout shifts', async () => {
       // Measure cumulative layout shift
       const cls = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let clsValue = 0
-          let clsEntries = 0
+        return new Promise<{ clsValue: number; clsEntries: number }>(
+          (resolve) => {
+            let clsValue = 0
+            let clsEntries = 0
 
             new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
@@ -121,8 +122,8 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure theme switch performance
       await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          const marks = []
+        return new Promise<{ marks: PerformanceEntry[] }>((resolve) => {
+          const marks: PerformanceEntry[] = []
 
           // Add performance observer
           new PerformanceObserver((list) => {
@@ -156,9 +157,10 @@ test.describe('Theme Performance Tests', () => {
 
       // Measure layout performance during theme switch
       const layoutMetrics = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let layoutCount = 0
-          let styleCount = 0
+        return new Promise<{ layoutCount: number; styleCount: number }>(
+          (resolve) => {
+            let layoutCount = 0
+            let styleCount = 0
 
             new PerformanceObserver((list) => {
               for (const entry of list.getEntries()) {
@@ -189,10 +191,11 @@ test.describe('Theme Performance Tests', () => {
 
       // Check for efficient DOM batching
       const domBatches = await page.evaluate(async () => {
-        return new Promise((resolve) => {
-          let mutationCount = 0
-          let batchCount = 0
-          let lastMutationTime = 0
+        return new Promise<{ mutationCount: number; batchCount: number }>(
+          (resolve) => {
+            let mutationCount = 0
+            let batchCount = 0
+            let lastMutationTime = 0
 
             const observer = new MutationObserver(
               (mutations: MutationRecord[]) => {
@@ -234,7 +237,11 @@ test.describe('Theme Performance Tests', () => {
     test('should maintain smooth animations at 60fps', async () => {
       // Measure animation frame rate
       const frameMetrics = await page.evaluate(async () => {
-        return new Promise((resolve) => {
+        return new Promise<{
+          averageFps: number
+          minFps: number
+          maxFps: number
+        }>((resolve) => {
           let frames = 0
           let lastTime = performance.now()
           const frameRates: number[] = []
@@ -403,12 +410,10 @@ test.describe('Theme Performance Tests', () => {
         elements.forEach((el) => {
           const style = window.getComputedStyle(el)
           if (style.contain && style.contain !== 'none') {
-            containmentUsage
-              .push({
-                tagName: el.tagName,
-                contain: style.contain,
-              })
-              .slice(________)
+            containmentUsage.push({
+              tagName: el.tagName,
+              contain: style.contain,
+            })
           }
         })
 
@@ -439,8 +444,8 @@ test.describe('Theme Performance Tests', () => {
           ) as PerformanceResourceTiming[]
         )
           .filter(
-            (entry: any) =>
-              entry.name.includes('.css') ?? entry.name.includes('theme'),
+            (entry) =>
+              entry.name.includes('.css') || entry.name.includes('theme'),
           )
           .map((entry) => ({
             name: entry.name,

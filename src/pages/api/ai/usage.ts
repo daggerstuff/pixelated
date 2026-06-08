@@ -23,11 +23,10 @@ const rateLimiter = new RateLimiter(30)
  */
 export const GET: APIRoute = async ({ request }) => {
   let session: { user?: { id?: string; role?: string } } | null = null
-  let userId: string | undefined
 
   try {
     // Verify session
-    session = (await getSession(request)) as { user?: { id?: string; role?: string } } | null
+    session = (await getSession(request)) as unknown as typeof session
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -38,7 +37,14 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    const role = session.user.role ?? 'user'
+    const userId = session?.user?.id
+    const role = session?.user?.role ?? 'user'
+    if (!userId) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      })
+    }
     const { allowed, limit, remaining, reset } = rateLimiter.check(
       `${userId}:/api/ai/usage`,
       role,
@@ -99,7 +105,7 @@ export const GET: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'ai.usage.validation_error',
-        session?.user?.id ?? 'anonymous',
+        userId,
         'ai_usage',
         {
           error: error.message ?? 'Validation failed',
@@ -137,7 +143,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.request',
-      session?.user?.id ?? 'anonymous',
+      userId,
       'ai_usage',
       {
         period: params.period,
@@ -159,15 +165,15 @@ export const GET: APIRoute = async ({ request }) => {
       period: params.period as string,
     }
 
-    if (params.startDate) {
-      statsOptions.startDate = new Date(params.startDate)
+    if (params!.startDate) {
+      statsOptions.startDate = new Date(params!.startDate as string)
     }
 
-    if (params.endDate) {
-      statsOptions.endDate = new Date(params.endDate)
+    if (params!.endDate) {
+      statsOptions.endDate = new Date(params!.endDate as string)
     }
 
-    if (!params.allUsers) {
+    if (!params!.allUsers) {
       statsOptions.userId = userId
     }
 
@@ -190,11 +196,11 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.error',
-      session?.user?.id ?? 'anonymous',
+      userId ?? 'anonymous',
       'ai_usage',
       {
-        error: error instanceof Error ? String(error) : String(error),
-        stack: error instanceof Error ? (error)?.stack : undefined,
+        error: String(error),
+        stack: error instanceof Error ? error.stack : undefined,
         status: 'error',
       },
       AuditEventStatus.FAILURE,
