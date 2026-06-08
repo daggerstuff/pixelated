@@ -136,46 +136,46 @@ importers:
         version: 3.0.68(zod@4.4.3)
       '@astrojs/node':
         specifier: ^10.1.3
-        version: 10.1.3(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 10.1.3(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@astrojs/react':
         specifier: latest
-        version: 5.0.7(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 5.0.7(@types/node@25.9.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       '@astrojs/vercel':
         specifier: '>=10.0.2'
-        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.48)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.1)(vue@3.5.35(typescript@6.0.3))
+        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.49)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.1)(vue@3.5.35(typescript@6.0.3))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@aws-sdk/client-dynamodb':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/client-ec2':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/client-eks':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/client-kms':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/client-rds':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/client-s3':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@aws-sdk/lib-dynamodb':
         specifier: latest
-        version: 3.1062.0(@aws-sdk/client-dynamodb@3.1062.0)
+        version: 3.1063.0(@aws-sdk/client-dynamodb@3.1063.0)
       '@aws-sdk/s3-request-presigner':
         specifier: latest
-        version: 3.1062.0
+        version: 3.1063.0
       '@azure/storage-blob':
         specifier: latest
         version: 12.32.0
       '@cloudflare/workers-types':
         specifier: latest
-        version: 4.20260605.1
+        version: 4.20260606.1
       '@composio/core':
         specifier: latest
         version: 0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)
@@ -259,13 +259,13 @@ importers:
         version: 1.1.0
       '@radix-ui/react-slot':
         specifier: latest
-        version: 1.2.4(@types/react@19.2.16)(react@19.2.7)
+        version: 1.2.5(@types/react@19.2.17)(react@19.2.7)
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
-        version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sentry/astro':
         specifier: latest
-        version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)
+        version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)
       '@sentry/node':
         specifier: latest
         version: 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))
@@ -283,7 +283,7 @@ importers:
         version: 5.3.0(rollup@4.61.1)
       '@spotlightjs/astro':
         specifier: latest
-        version: 3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@tanstack/react-query':
         specifier: latest
         version: 5.101.0(react@19.2.7)
@@ -385,7 +385,7 @@ importers:
         version: 3.4.8
       drizzle-orm:
         specifier: ^0.45.2
-        version: 0.45.2(@cloudflare/workers-types@4.20260605.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.21.0)(postgres@3.4.9)
+        version: 0.45.2(@cloudflare/workers-types@4.20260606.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.21.0)(postgres@3.4.9)
       es-module-lexer:
         specifier: latest
         version: 2.1.0
@@ -430,7 +430,7 @@ importers:
         version: 0.4.5
       jotai:
         specifier: latest
-        version: 2.20.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.16)(react@19.2.7)
+        version: 2.20.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.17)(react@19.2.7)
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.3
@@ -502,7 +502,7 @@ importers:
         version: 7.17.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       recharts:
         specifier: latest
-        version: 3.8.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react-is@17.0.2)(react@19.2.7)(redux@5.0.1)
+        version: 3.8.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@17.0.2)(react@19.2.7)(redux@5.0.1)
       redis:
         specifier: latest
         version: 6.0.0(@opentelemetry/api@1.9.1)
@@ -571,17 +571,17 @@ importers:
         version: 4.4.3
       zustand:
         specifier: latest
-        version: 5.0.14(@types/react@19.2.16)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
+        version: 5.0.14(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7))
     devDependencies:
       '@aaif/goose':
         specifier: ^0.20.1
-        version: 0.20.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(utf-8-validate@6.0.6)(zod@4.4.3)
+        version: 0.20.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(utf-8-validate@6.0.6)(zod@4.4.3)
       '@astrojs/check':
         specifier: latest
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.3)(typescript@6.0.3)
       '@astrojs/markdoc':
         specifier: latest
-        version: 1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)
+        version: 1.0.6(@types/react@19.2.17)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)
       '@astrojs/rss':
         specifier: latest
         version: 4.0.18
@@ -617,7 +617,7 @@ importers:
         version: 1.12.1
       '@letta-ai/letta-code-sdk':
         specifier: latest
-        version: 0.1.14(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)
+        version: 0.1.14(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)
       '@playwright/test':
         specifier: latest
         version: 1.60.0
@@ -629,7 +629,7 @@ importers:
         version: 6.9.1
       '@testing-library/react':
         specifier: latest
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@testing-library/user-event':
         specifier: latest
         version: 14.6.1(@testing-library/dom@10.4.1)
@@ -653,7 +653,7 @@ importers:
         version: 1.9.10
       '@types/node':
         specifier: latest
-        version: 25.9.1
+        version: 25.9.2
       '@types/nprogress':
         specifier: latest
         version: 0.2.3
@@ -665,16 +665,16 @@ importers:
         version: 8.20.0
       '@types/react':
         specifier: latest
-        version: 19.2.16
+        version: 19.2.17
       '@types/react-dom':
         specifier: latest
-        version: 19.2.3(@types/react@19.2.16)
+        version: 19.2.3(@types/react@19.2.17)
       '@types/slug':
         specifier: latest
         version: 5.0.9
       '@unocss/astro':
         specifier: ^66.7.0
-        version: 66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@unocss/core':
         specifier: ^66.7.0
         version: 66.7.0
@@ -683,7 +683,7 @@ importers:
         version: 66.7.0
       '@vitejs/plugin-react':
         specifier: ^5.2.0
-        version: 5.2.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 5.2.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@vitest/coverage-v8':
         specifier: ^4.1.8
         version: 4.1.8(vitest@4.1.8)
@@ -692,7 +692,7 @@ importers:
         version: 1.6.19(@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.8)
       astro:
         specifier: ^6.4.4
-        version: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       astro-eslint-parser:
         specifier: latest
         version: 1.4.0
@@ -806,7 +806,7 @@ importers:
         version: 11.2.0
       msw:
         specifier: latest
-        version: 2.14.6(@types/node@25.9.1)(typescript@6.0.3)
+        version: 2.14.6(@types/node@25.9.2)(typescript@6.0.3)
       nprogress:
         specifier: latest
         version: 0.2.0
@@ -917,7 +917,7 @@ importers:
         version: 8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
       unocss:
         specifier: ^66.7.0
-        version: 66.7.0(@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 66.7.0(@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       url-polyfill:
         specifier: latest
         version: 1.1.14
@@ -932,13 +932,13 @@ importers:
         version: 1.11.7
       vite:
         specifier: ^7
-        version: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+        version: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       vite-tsconfig-paths:
         specifier: 7.0.0-alpha.1
-        version: 7.0.0-alpha.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 7.0.0-alpha.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vitest:
         specifier: ^4.1.8
-        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vscode-jsonrpc:
         specifier: 9.0.0
         version: 9.0.0
@@ -1164,136 +1164,140 @@ packages:
   '@aws-crypto/util@5.2.0':
     resolution: {integrity: sha512-4RkU9EsI6ZpBve5fseQlGNUWKMa1RLPQ1dnjnQoe07ldfIzcsGb5hC5W0Dm7u423KWzawlrpbjXBrXCEv9zazQ==}
 
-  '@aws-sdk/checksums@3.1000.1':
-    resolution: {integrity: sha512-DFCtlisEuWzw7rESV65jHK7De1QsJZRZgUNJ8ovpmdVaayPrxvmlsAlW8hka9E7f9B31d1T7lHG9oozZf6Bp6w==}
+  '@aws-sdk/checksums@3.1000.2':
+    resolution: {integrity: sha512-PIha+kauTbp6IRmOpYktPTrlfrrSqDVixvhO/EUOFOf62DPX81CaJoHJreuA1m9HYpSKyXf99BKjU1dvJPeUfw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-dynamodb@3.1062.0':
-    resolution: {integrity: sha512-phKhzMJz2EOt7atfjo1Zc6nuB9wIaRESlenzVfYK4IVLjX78iH6lI9AkVajpn6/k9usEbOvUAgdhXVS9VIOU5g==}
+  '@aws-sdk/client-dynamodb@3.1063.0':
+    resolution: {integrity: sha512-RH5PM9lJsGgTDYyIjhPIqwRTuIZdVzRfEdLWB9/p11VVoDjQ+itbzZ7Qi/KMaw6AucAo8uXxnlVp1fZ0cVQjuA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-ec2@3.1062.0':
-    resolution: {integrity: sha512-OkuvnknC0CwLmlVthI0daFxE/IrMbsUcKXZ8wvxM8x6rCfBrIV5ZnLd7NomqMk9zjVfg5t1Q7sixE3ZuHFJ7fQ==}
+  '@aws-sdk/client-ec2@3.1063.0':
+    resolution: {integrity: sha512-RVVqRR6SBQwTHnttHXj/QbUwagA1a86tqJhyDik9/REviSfu7XGJ61RlXmDfyeU76bhv3NJ4mW2EZrhWO2/0hQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-eks@3.1062.0':
-    resolution: {integrity: sha512-WExoQvbCsQui5BGSIGvrXVzqvkzxUvw+gkazFTB/y3l5sTwvBc+3fCU+PFHFgMIMSgATL283FKpZXMIp7TrnQw==}
+  '@aws-sdk/client-eks@3.1063.0':
+    resolution: {integrity: sha512-+s5ZAxXW4A6tmfE/hF23woIsoCA3zogPCO+T4hj45CF0O6MRpwDVjJkMhjfDWnCzKvhnrJwabfRXk5LGyeIGnQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-kms@3.1062.0':
-    resolution: {integrity: sha512-Fii0+X9hIqp24labw9FflFkR04inz0oTe6fvPRvDPFceVQXf9org/TndgvnyDmB+IieaEU/3c1N9HwneRUr2bA==}
+  '@aws-sdk/client-kms@3.1063.0':
+    resolution: {integrity: sha512-nRq2Hcyxh6nl3dZ6dVXIF5lh650u8eIcpVZ1Ur6Lk/IiuQw9OFCP7KL4TDRpePzpIDL15aUFPjc9gLMmI6Q1zw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-rds@3.1062.0':
-    resolution: {integrity: sha512-yML/es405S28Okd5IFkD3LVJAUZ0vzeGUnLdJ93boDiF+VMhG6GlaD6VnPbzvU0N7VL744UbtfF5NtfAKdZbkQ==}
+  '@aws-sdk/client-rds@3.1063.0':
+    resolution: {integrity: sha512-x70D2ueB0I6g+kgRocxENcgLcH7EQf1xFn2aqP06pIG9La8rTDlSVgM7Qxsj/KlPsNsvo+c141E/dVIOX4pwhg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-s3@3.1062.0':
-    resolution: {integrity: sha512-fb+qr6Jql36rJwlOEgkzaC85PGZ1sQ1pTd5YlpwPbOoN54gpVBaSLsDp8GXMToymJzpDHd8GeSDalUak1W9gLw==}
+  '@aws-sdk/client-s3@3.1063.0':
+    resolution: {integrity: sha512-ETn+vvmZVK1MmOZwVBXmWANpmD5iTbzojIqyEIoZ86qo+8oWy35S8QyQNE/ZDI+WHgMU1dS+VSYbpRl1QkEySg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/core@3.974.17':
-    resolution: {integrity: sha512-r8o4h2K7j6P9ngno+8ei0aK0U/4JwDb7A2fMMxGVoSqDN8AFlIzSDeZHME9LcVLR2codyhtr1WAAg+/nmkeeMA==}
+  '@aws-sdk/core@3.974.18':
+    resolution: {integrity: sha512-JDYCPI0j7zGrzXTDFsLB346cxss7J/AxH7+O0MzWlqppJBEyB9Qe6TQXRL6iwLUo/xZkNv9KFmBL2hqElmwW0g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-env@3.972.43':
-    resolution: {integrity: sha512-g0XVQKzaA/4cq1vz1IvCQwYM+1Pkv01J9yHDpCTXekVuGZRDEz0wqBQ1AuYTq7FM6uik4uBGH8Tb5d9YvgeA7g==}
+  '@aws-sdk/credential-provider-env@3.972.44':
+    resolution: {integrity: sha512-3hKJVrZ7bqXzDAXCQp+OaQ1ASN+vWstaNuEH418wQVl//cRZhqhfR9Bjk1qIWmgUGe8/D3gdO73PgidRj378EQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-http@3.972.45':
-    resolution: {integrity: sha512-w9PuOoKCt6+xoESvY+zlV0u3PKQ0mVL259PcsVR6a3S/uYJJHnIi4r1NxdJHEcNldUVRIciltWnFMGBR4YEm3g==}
+  '@aws-sdk/credential-provider-http@3.972.46':
+    resolution: {integrity: sha512-VhwC9pGAZHhiQ2xSViyOPDFqvr9aRxGCAXZtADsUhU3R65nad7y//CwynE6mQnWNR+suRlqE79W36IVayL+m1g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-ini@3.972.49':
-    resolution: {integrity: sha512-83r5MK+PERv9irzky1o5aNbXiLuaLfeB7N8MrktB9USpoebdNtuG0Ek9ieIxpGH1aZ9a0nIaDaLjEr3EmOV3Ng==}
+  '@aws-sdk/credential-provider-ini@3.972.50':
+    resolution: {integrity: sha512-09Xi6ovxiK42+De/qBGF71sT5F2bWgYM+1fFyDwSOpy1xpsQ5R/naIu7MVDpH6Dic36QNc8dAv4KADtMGK2JYg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-login@3.972.48':
-    resolution: {integrity: sha512-amPGeF6fcvLInK4Pu2k2Y2jHFR6MpaIKrZrbaf0QUnV3tjzjWh442eifZ2+KcmzFdsqyvyjBqAhq2JNLt1C5gA==}
+  '@aws-sdk/credential-provider-login@3.972.49':
+    resolution: {integrity: sha512-EfJF/1Fh9mI4pZyoheU2RY9xUhTcugIZNkD63+orXMkYj/QXacJNbKVDUK90Yv5hE+aX+rt9J/EZ9Qr3vKOa7g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-node@3.972.51':
-    resolution: {integrity: sha512-mbhSY3ytXIGMuBoJsWCivk+63dtVlenT6wstUra07Lar4Ln2MVL8/j5zCTIOog+ig5/FlFJ8gcFU4nQZV+Jh4Q==}
+  '@aws-sdk/credential-provider-node@3.972.52':
+    resolution: {integrity: sha512-7QX+PbyiWBEOVipJq8Nke/TqXT6lAPLE7fvTaopa39/IVWuLfS+Fzdy71sZJONf/mLGgmtj6aU17+REw3+aRrw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-process@3.972.43':
-    resolution: {integrity: sha512-GPokLNyvTfCmuaHk+v3GKVs4ZT3cMu5kgS2a+NPkOMt96cq6fSIK0g+mZHpGS6Cd4QGrPKesANEaLUKgOskTzg==}
+  '@aws-sdk/credential-provider-process@3.972.44':
+    resolution: {integrity: sha512-V+UUhZpRP7QDRhi+qgBDisM9tUBnYmMje8Bk77A6MZsfeGeGdMsQXmaHP1CDYFcept0o/Rz5g2Y0TMeVlG9dzg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-sso@3.972.48':
-    resolution: {integrity: sha512-tf0sD47SeTgCDfOWYssctzGgwAuk8/ECjb7bom4wZ7P1om0qE8i2yjniUdvysmANm5haARr35O8vZnTe/UEtpQ==}
+  '@aws-sdk/credential-provider-sso@3.972.49':
+    resolution: {integrity: sha512-9QqOYGuh5tZ76OzaT68kwI78AH+5lS/uZGGvkfxb3fc8FzRrIz2jOufNTliEBEeSAwmgK2rWLNsK+IB3zbtNPA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/credential-provider-web-identity@3.972.48':
-    resolution: {integrity: sha512-YYsumc2oe09gl4l+fjfmR64JDn6+0o4Ql5HMBkMuhFazO1tZlE5NjSnZM3oXHwenPjh2qow0TFgSIVjfWfsojg==}
+  '@aws-sdk/credential-provider-web-identity@3.972.49':
+    resolution: {integrity: sha512-IYx1lN38MnnPXv+NBLpuATu0cZakbZ321TAfjW+aVkw7HIJF38YnEwdeEO55MSl3pl7hIX1IvvnD6EmnAzmAJw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/dynamodb-codec@3.973.17':
-    resolution: {integrity: sha512-pQWklb7GU4WBx2E1aMRMsMCtCq8O6BBeqmV5URtcXDld4n+qtNr2A3x2Ld6dQadqFrThqmlc66Ue/tL8pwhNOA==}
+  '@aws-sdk/dynamodb-codec@3.973.18':
+    resolution: {integrity: sha512-XWn19CsVEv0cbWjGvK140RHn7GWguXZCEDshCcYAKCLn13Edjd/gQfOtUPgldLaqlDfy2/OnG6w7Ife/JYoK7A==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/endpoint-cache@3.972.5':
-    resolution: {integrity: sha512-itVdge0NozgtgmtbZ25FVwWU3vGlE7x7feE/aOEJNkQfEpbkrF8Rj1QmnK+2blFfYE1xWt/iU+6/jUp/pv1+MA==}
+  '@aws-sdk/endpoint-cache@3.972.6':
+    resolution: {integrity: sha512-Lyn8Oint4e6w5e5a+gsyWvDmb2NkXykfTHl8u2WCUS+iGxV5beeBK47g+Fbu7YZ9A+n+ezFmZaF3SWrd9MT52g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/lib-dynamodb@3.1062.0':
-    resolution: {integrity: sha512-RoLG7LLo+y5i4ND5tsetGal5mIeyADRCa/hVYPbAm2udb10d49cZ8XAP7PxwsZ5yc0WRyAHAlF07Or7mxDJ9gw==}
+  '@aws-sdk/lib-dynamodb@3.1063.0':
+    resolution: {integrity: sha512-3vXZzmYUe1k0vswOByKuLNQuB4TBu4L6IajHGFbas4I+z6Kaw875FwJLvoc6oSogvowo84Z/5rmB+5u0DX+DKw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-dynamodb': ^3.1062.0
+      '@aws-sdk/client-dynamodb': ^3.1063.0
 
-  '@aws-sdk/middleware-endpoint-discovery@3.972.16':
-    resolution: {integrity: sha512-ULfU47WcHvfjzk5CeJcHAwoYSIIBjNKQnGrs3/jJhyHqbx/A+zGOIsnZt0MxKS64SAComc0CIlBGugSTSaZOYw==}
+  '@aws-sdk/middleware-endpoint-discovery@3.972.17':
+    resolution: {integrity: sha512-F6LjerpVoMfqqGej7f3tWyKhznOWMB2O1T/L3L4h2LU0Soy2JEO/rQFmOT0OAyJD+/zBoqU7k7g9wd1QgseUSA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-flexible-checksums@3.974.26':
-    resolution: {integrity: sha512-WndRXQV8wAU/bW3GH8THumEOSV7FpS0AtoluT2M7lYaaDUyG0gOCD+DppB+IWQ4TPmzuTtFcCedh9xCzM4Zv4g==}
+  '@aws-sdk/middleware-flexible-checksums@3.974.27':
+    resolution: {integrity: sha512-bZqezPLdllFC4VAeV/f+EIc/hz56ab3TD/+4zNCgOgmG5ZHAE5dMHrX1gtTwdcQXbPr3KR7x3zTC3zuCTE6+ng==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-sdk-ec2@3.972.31':
-    resolution: {integrity: sha512-EMyZRmFzjLvLKY7cIUCSrUc9l0HOXbfNDJuzJ69ws+wTvu4KLRlfkrkkHG4dXmm1Z5kEnrjkVnTSCwXo8coH0Q==}
+  '@aws-sdk/middleware-sdk-ec2@3.972.32':
+    resolution: {integrity: sha512-pYIQfl8jN0HVuz6iDisD4wxA59MgLLp2mAs6ziPPA4OMGXkQ5eDQgZRU1K7d5b6tFcdTmQTYD+pcqqUpeG5Plw==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-sdk-rds@3.972.31':
-    resolution: {integrity: sha512-XIuNZJzBue1RbKZA9cfA2znnYZ+sI53hAvyuR3K2eDKodxVmbPDxXhEfly1CNjeenKkf/gCRDyY+gS974q5R4Q==}
+  '@aws-sdk/middleware-sdk-rds@3.972.32':
+    resolution: {integrity: sha512-TWC/yvkqyAbSf/kmzsS+2ETqYAySU/UeE7biigwviDTjo1KQ5rHT3dFrsd+m8zfO09g2NyusOkG5S4Mh85buEA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/middleware-sdk-s3@3.972.47':
-    resolution: {integrity: sha512-fzVBvGib8P1G6RFV3qVTPlXy9bMFAy5nxhdhA7LwyhWjRkJufNfJIPiloZq2mt36YAXSlLsEa4s3Kgcw6cv3+g==}
+  '@aws-sdk/middleware-sdk-s3@3.972.48':
+    resolution: {integrity: sha512-MRTqx8wD/T3REt6LTT3/yN8rrp6+xIHrbUekkDYJTYWVch70mwtdJBovR4qKJz1jIPlbN+9R/Sn6R04BfsglzA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/nested-clients@3.997.16':
-    resolution: {integrity: sha512-bGvfDgC2KQePjEmZdltScPPLKFoyjPElAXeZcLfvZ58J1AO283//WGtvp9GdnryLHTi7gis0UoCezqh0vl/nig==}
+  '@aws-sdk/nested-clients@3.997.17':
+    resolution: {integrity: sha512-lDRgraoTfKRawUyc176Ow93mrNrOho/x+EoK4C+lKU+vKkHWhNhzvSMVAx0WEJUJoeQxxDN5ZdKMfiGEyNejig==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/s3-request-presigner@3.1062.0':
-    resolution: {integrity: sha512-AE/LWvZWNBDbtx/29KdIAs3NKOvMi3xm22icENTwTDSlaRzsckTCb3xjaVB8ahKNylOhNbSLFSqgc0HtAax45A==}
+  '@aws-sdk/s3-request-presigner@3.1063.0':
+    resolution: {integrity: sha512-uYDuWEbBYz/DfS0sEbDA3BeBCNNaLiE+dmblIRrmU02bhoqsotJb3qWfx0+I3JlukC7Vk8wRuyRgjZzq1FyXGA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/signature-v4-multi-region@3.996.31':
-    resolution: {integrity: sha512-Kn2up9SlG1KC6wRtwf0d7waTGF6rvp9DxYqB54x6UCKdQ6kyaXCqHL4WGb5vUJga5kS8FxnjhY0LqM28aMvnNQ==}
+  '@aws-sdk/signature-v4-multi-region@3.996.32':
+    resolution: {integrity: sha512-llvApLcsWtmRFhG2wT3WIp1CmDeRaIYutqty1ZZXoMzK7TiJ6MOLOimk9eXUS8PwgG4ew4pa4QAbt0lfhn++1w==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/token-providers@3.1062.0':
-    resolution: {integrity: sha512-fvHh53zSm2FoQPgkw9thH5D7sd13bC0nPyuZb+mQJ85l5v7lQnsZ97u6e6YkJJN/LU1Mxm1/DLGrIIRR2L7tZw==}
+  '@aws-sdk/token-providers@3.1063.0':
+    resolution: {integrity: sha512-nYDaWWdzjKiDP5xj8k4oUgcYd4WPgzfAOgdU5vJsaqH/07Dfvm7ffisHCFJ+NEl7kUC9JEIUxh0kznvenbo3NQ==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/types@3.973.10':
     resolution: {integrity: sha512-992QrTO7G9qCvKD0fx1rMlqcL14plUcRAbwmqqYVsuF3GrqcvlAL9qxR+baMafarEZ+l7DUQ5lCMmt5mbMhF7g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/util-dynamodb@3.996.2':
-    resolution: {integrity: sha512-ddpwaZmjBzcApYN7lgtAXjk+u+GO8fiPsxzuc59UqP+zqdxI1gsenPvkyiHiF9LnYnyRGijz6oN2JylnN561qQ==}
+  '@aws-sdk/types@3.973.11':
+    resolution: {integrity: sha512-YjS0qFuECClRh4qhEyW8XagW0fwEPBeZ1cfsW/gU73Kh/ExFILxbzxOfPCmzF/2DwEvhvsHYt0b0qnvStwKYrg==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/util-dynamodb@3.996.3':
+    resolution: {integrity: sha512-vLTbeDu000/6OvdjSL3J549WmRU9R5a/HIR6xhFDK682D74c3cYCYmnvDjGOtHfQL3c8RChFulbK2n3pxNPXyA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-dynamodb': ^3.1003.0
+      '@aws-sdk/client-dynamodb': ^3.1063.0
 
   '@aws-sdk/util-locate-window@3.965.5':
     resolution: {integrity: sha512-WhlJNNINQB+9qtLtZJcpQdgZw3SCDCpXdUJP7cToGwHbCWCnRckGlc6Bx/OhWwIYFNAn+FIydY8SZ0QmVu3xTQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/xml-builder@3.972.27':
-    resolution: {integrity: sha512-hpsCXCOI436kxWpjtRuIHVvuPP81MOw8f18jzfZeg+UOiiOvlqWcmWChzEhJEu16cOC6+ku4ncBN+7rdt+DZ9g==}
+  '@aws-sdk/xml-builder@3.972.28':
+    resolution: {integrity: sha512-lI/l3c/vPvsxmspzV63NfS3x9q4CkMmdhJy4QiM+NThAufVkDvi/PZZQ6xETnICL0UD7jI808pY83gllf86RFg==}
     engines: {node: '>=20.0.0'}
 
   '@aws/lambda-invoke-store@0.2.4':
@@ -1467,8 +1471,8 @@ packages:
     resolution: {integrity: sha512-zccHj2z2oCCO4yrDiRSlFOxWerGqRiysP7a5jPK6uoI9URKAquwY42Dd/iUP8JWHxEzdRe4TlbvZCo8z1/mhrw==}
     engines: {node: '>= 20.12.0'}
 
-  '@cloudflare/workers-types@4.20260605.1':
-    resolution: {integrity: sha512-9YJaGPQwuQYFHoElVhJP40ZmUO/Z2OiBon58sKpHjgwq5btC/B2BZLC45AQ14k+1I+hjcY2z2t2R6uUxU9AqwQ==}
+  '@cloudflare/workers-types@4.20260606.1':
+    resolution: {integrity: sha512-0FFUsixapowVJcAjRlXLb6UEZG1caUlSuUX1KHhKgWgjKxq20dY5XeCS5lKPqgc80XJ9puwffJ2H1U6Fwr5N1g==}
 
   '@colors/colors@1.5.0':
     resolution: {integrity: sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==}
@@ -3520,6 +3524,15 @@ packages:
       '@types/react':
         optional: true
 
+  '@radix-ui/react-compose-refs@1.1.3':
+    resolution: {integrity: sha512-rYOP8OMnuuPMQF1uhPVlGNcCDlkokKqGFE3JcxFViIkAXP7EvFWUliJAstrapypaBLJNHbZL6jGhbVDGTwmVhA==}
+    peerDependencies:
+      '@types/react': '*'
+      react: ^19.2.4
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   '@radix-ui/react-context@1.1.2':
     resolution: {integrity: sha512-jCi/QKUM2r1Ju5a3J64TH2A5SpKAgh0LpknyqdQ4m6DCV0xJ2HG1xARRwNGPQfi1SLdLWZ1OJz6F4OMBBNiGJA==}
     peerDependencies:
@@ -3612,8 +3625,8 @@ packages:
       '@types/react':
         optional: true
 
-  '@radix-ui/react-slot@1.2.4':
-    resolution: {integrity: sha512-Jl+bCv8HxKnlTLVrcDE8zTMJ09R9/ukw4qBs/oZClOfoQk/cOTbDn+NceXfV7j09YPVQUryJPHurafcSg6EVKA==}
+  '@radix-ui/react-slot@1.2.5':
+    resolution: {integrity: sha512-rCMO3QsIVKv5JTY5CVbo2MvO77SpEqqYc8AvRE7OWqRDOIqAKjsp+DrmnY9uc8NPdxB5E2z47HTYGeE2+NTptg==}
     peerDependencies:
       '@types/react': '*'
       react: ^19.2.4
@@ -4453,6 +4466,9 @@ packages:
   '@types/node@25.9.1':
     resolution: {integrity: sha512-xfrlY7UD5rMJk3ZVJP8BNzS28J36YJg+xp+LPXV1TdWxr8uMH5A860QNxYDGQe/ylDSgjxE52Q9VnO7p75tJxg==}
 
+  '@types/node@25.9.2':
+    resolution: {integrity: sha512-G05zqtJhcDLb8uslf5EjCxXg9G1KQxiV8OS0R26IC//Eoyitzqe8z37I7cqvnZlrlSfgocQRfSn/AHBZJJFyGw==}
+
   '@types/nodemailer@8.0.0':
     resolution: {integrity: sha512-fyf8jWULsCo0d0BuoQ75i6IeoHs47qcqxWc7yUdUcV0pOZGjUTTOvwdG1PRXUDqN/8A64yQdQdnA2pZgcdi+cA==}
 
@@ -4494,8 +4510,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.16':
-    resolution: {integrity: sha512-esJiCAnl0kfpNdE69f3So4WJUXy95dLZydX0KwK46riIHDzHM7O9Vtf9xCHW0PXIqvgqNrswl522kA/5yx+F4w==}
+  '@types/react@19.2.17':
+    resolution: {integrity: sha512-MXfmqaVPEVgkBT/aY0aGCkRWWtByiYQXo3xdQ8r5RzuFrPiRn8Gar2tQdXSUQ2GKV3bkXckek89V8wQBY2Q/Aw==}
 
   '@types/request@2.48.13':
     resolution: {integrity: sha512-FGJ6udDNUCjd19pp0Q3iTiDkwhYup7J8hpMW9c4k53NrccQFFWKRho6hvtPPEhnXWKvukfwAlB6DbDz4yhH5Gg==}
@@ -10430,13 +10446,13 @@ snapshots:
       - react-dom
       - supports-color
 
-  '@aaif/goose@0.20.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(utf-8-validate@6.0.6)(zod@4.4.3)':
+  '@aaif/goose@0.20.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(utf-8-validate@6.0.6)(zod@4.4.3)':
     dependencies:
       '@aaif/goose-sdk': 0.20.1(@agentclientprotocol/sdk@0.19.2(zod@4.4.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@agentclientprotocol/sdk': 0.19.2(zod@4.4.3)
-      '@inkjs/ui': 2.0.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))
-      ink: 6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6)
-      ink-multiline-input: 0.1.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)
+      '@inkjs/ui': 2.0.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))
+      ink: 6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6)
+      ink-multiline-input: 0.1.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7)
       marked: 15.0.12
       marked-terminal: 7.3.0(marked@15.0.12)
       meow: 13.2.0
@@ -10585,12 +10601,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@1.0.6(@types/react@19.2.16)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)':
+  '@astrojs/markdoc@1.0.6(@types/react@19.2.17)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/prism': 4.0.2
-      '@markdoc/markdoc': 0.5.7(@types/react@19.2.16)(react@19.2.7)
-      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      '@markdoc/markdoc': 0.5.7(@types/react@19.2.17)(react@19.2.7)
+      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.0
       github-slugger: 2.0.0
       htmlparser2: 10.1.0
@@ -10620,10 +10636,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@10.1.3(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@astrojs/node@10.1.3(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
-      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -10633,17 +10649,17 @@ snapshots:
     dependencies:
       prismjs: 1.30.0
 
-  '@astrojs/react@5.0.7(@types/node@25.9.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)':
+  '@astrojs/react@5.0.7(@types/node@25.9.2)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
-      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
+      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       devalue: 5.8.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       ultrahtml: 1.6.0
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -10672,14 +10688,14 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.48)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.1)(vue@3.5.35(typescript@6.0.3))':
+  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.49)(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.61.1)(vue@3.5.35(typescript@6.0.3))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@vercel/analytics': 1.6.1(react@19.2.7)(vue@3.5.35(typescript@6.0.3))
-      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
+      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49)
       '@vercel/nft': 1.10.2(rollup@4.61.1)
       '@vercel/routing-utils': 6.2.0
-      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.0
       tinyglobby: 0.2.17
     transitivePeerDependencies:
@@ -10764,107 +10780,107 @@ snapshots:
       '@smithy/util-utf8': 2.3.0
       tslib: 2.8.1
 
-  '@aws-sdk/checksums@3.1000.1':
+  '@aws-sdk/checksums@3.1000.2':
     dependencies:
       '@aws-crypto/crc32': 5.2.0
       '@aws-crypto/crc32c': 5.2.0
       '@aws-crypto/util': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-dynamodb@3.1062.0':
+  '@aws-sdk/client-dynamodb@3.1063.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/dynamodb-codec': 3.973.17
-      '@aws-sdk/middleware-endpoint-discovery': 3.972.16
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/dynamodb-codec': 3.973.18
+      '@aws-sdk/middleware-endpoint-discovery': 3.972.17
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-ec2@3.1062.0':
+  '@aws-sdk/client-ec2@3.1063.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/middleware-sdk-ec2': 3.972.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/middleware-sdk-ec2': 3.972.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-eks@3.1062.0':
+  '@aws-sdk/client-eks@3.1063.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-kms@3.1062.0':
+  '@aws-sdk/client-kms@3.1063.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-rds@3.1062.0':
+  '@aws-sdk/client-rds@3.1063.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/middleware-sdk-rds': 3.972.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/middleware-sdk-rds': 3.972.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-s3@3.1062.0':
+  '@aws-sdk/client-s3@3.1063.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-node': 3.972.51
-      '@aws-sdk/middleware-flexible-checksums': 3.974.26
-      '@aws-sdk/middleware-sdk-s3': 3.972.47
-      '@aws-sdk/signature-v4-multi-region': 3.996.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-node': 3.972.52
+      '@aws-sdk/middleware-flexible-checksums': 3.974.27
+      '@aws-sdk/middleware-sdk-s3': 3.972.48
+      '@aws-sdk/signature-v4-multi-region': 3.996.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/core@3.974.17':
+  '@aws-sdk/core@3.974.18':
     dependencies:
-      '@aws-sdk/types': 3.973.10
-      '@aws-sdk/xml-builder': 3.972.27
+      '@aws-sdk/types': 3.973.11
+      '@aws-sdk/xml-builder': 3.972.28
       '@aws/lambda-invoke-store': 0.2.4
       '@smithy/core': 3.24.6
       '@smithy/signature-v4': 5.4.6
@@ -10872,185 +10888,185 @@ snapshots:
       bowser: 2.14.1
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-env@3.972.43':
+  '@aws-sdk/credential-provider-env@3.972.44':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-http@3.972.45':
+  '@aws-sdk/credential-provider-http@3.972.46':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-ini@3.972.49':
+  '@aws-sdk/credential-provider-ini@3.972.50':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/credential-provider-env': 3.972.43
-      '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-login': 3.972.48
-      '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.48
-      '@aws-sdk/credential-provider-web-identity': 3.972.48
-      '@aws-sdk/nested-clients': 3.997.16
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/credential-provider-env': 3.972.44
+      '@aws-sdk/credential-provider-http': 3.972.46
+      '@aws-sdk/credential-provider-login': 3.972.49
+      '@aws-sdk/credential-provider-process': 3.972.44
+      '@aws-sdk/credential-provider-sso': 3.972.49
+      '@aws-sdk/credential-provider-web-identity': 3.972.49
+      '@aws-sdk/nested-clients': 3.997.17
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.8
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-login@3.972.48':
+  '@aws-sdk/credential-provider-login@3.972.49':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.16
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/nested-clients': 3.997.17
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-node@3.972.51':
+  '@aws-sdk/credential-provider-node@3.972.52':
     dependencies:
-      '@aws-sdk/credential-provider-env': 3.972.43
-      '@aws-sdk/credential-provider-http': 3.972.45
-      '@aws-sdk/credential-provider-ini': 3.972.49
-      '@aws-sdk/credential-provider-process': 3.972.43
-      '@aws-sdk/credential-provider-sso': 3.972.48
-      '@aws-sdk/credential-provider-web-identity': 3.972.48
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/credential-provider-env': 3.972.44
+      '@aws-sdk/credential-provider-http': 3.972.46
+      '@aws-sdk/credential-provider-ini': 3.972.50
+      '@aws-sdk/credential-provider-process': 3.972.44
+      '@aws-sdk/credential-provider-sso': 3.972.49
+      '@aws-sdk/credential-provider-web-identity': 3.972.49
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/credential-provider-imds': 4.3.8
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-process@3.972.43':
+  '@aws-sdk/credential-provider-process@3.972.44':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-sso@3.972.48':
+  '@aws-sdk/credential-provider-sso@3.972.49':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.16
-      '@aws-sdk/token-providers': 3.1062.0
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/nested-clients': 3.997.17
+      '@aws-sdk/token-providers': 3.1063.0
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/credential-provider-web-identity@3.972.48':
+  '@aws-sdk/credential-provider-web-identity@3.972.49':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.16
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/nested-clients': 3.997.17
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/dynamodb-codec@3.973.17':
+  '@aws-sdk/dynamodb-codec@3.973.18':
     dependencies:
-      '@aws-sdk/core': 3.974.17
+      '@aws-sdk/core': 3.974.18
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/endpoint-cache@3.972.5':
+  '@aws-sdk/endpoint-cache@3.972.6':
     dependencies:
       mnemonist: 0.38.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-dynamodb@3.1062.0(@aws-sdk/client-dynamodb@3.1062.0)':
+  '@aws-sdk/lib-dynamodb@3.1063.0(@aws-sdk/client-dynamodb@3.1063.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1062.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/util-dynamodb': 3.996.2(@aws-sdk/client-dynamodb@3.1062.0)
+      '@aws-sdk/client-dynamodb': 3.1063.0
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/util-dynamodb': 3.996.3(@aws-sdk/client-dynamodb@3.1063.0)
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-endpoint-discovery@3.972.16':
+  '@aws-sdk/middleware-endpoint-discovery@3.972.17':
     dependencies:
-      '@aws-sdk/endpoint-cache': 3.972.5
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/endpoint-cache': 3.972.6
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-flexible-checksums@3.974.26':
+  '@aws-sdk/middleware-flexible-checksums@3.974.27':
     dependencies:
-      '@aws-sdk/checksums': 3.1000.1
+      '@aws-sdk/checksums': 3.1000.2
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-sdk-ec2@3.972.31':
+  '@aws-sdk/middleware-sdk-ec2@3.972.32':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
-      '@smithy/core': 3.24.6
-      '@smithy/signature-v4': 5.4.6
-      '@smithy/types': 4.14.3
-      tslib: 2.8.1
-
-  '@aws-sdk/middleware-sdk-rds@3.972.31':
-    dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/signature-v4': 5.4.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/middleware-sdk-s3@3.972.47':
+  '@aws-sdk/middleware-sdk-rds@3.972.32':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/signature-v4-multi-region': 3.996.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/types': 3.973.11
+      '@smithy/core': 3.24.6
+      '@smithy/signature-v4': 5.4.6
+      '@smithy/types': 4.14.3
+      tslib: 2.8.1
+
+  '@aws-sdk/middleware-sdk-s3@3.972.48':
+    dependencies:
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/signature-v4-multi-region': 3.996.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/nested-clients@3.997.16':
+  '@aws-sdk/nested-clients@3.997.17':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/signature-v4-multi-region': 3.996.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/signature-v4-multi-region': 3.996.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/fetch-http-handler': 5.4.6
       '@smithy/node-http-handler': 4.7.7
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/s3-request-presigner@3.1062.0':
+  '@aws-sdk/s3-request-presigner@3.1063.0':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/signature-v4-multi-region': 3.996.31
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/signature-v4-multi-region': 3.996.32
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/signature-v4-multi-region@3.996.31':
+  '@aws-sdk/signature-v4-multi-region@3.996.32':
     dependencies:
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/types': 3.973.11
       '@smithy/signature-v4': 5.4.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/token-providers@3.1062.0':
+  '@aws-sdk/token-providers@3.1063.0':
     dependencies:
-      '@aws-sdk/core': 3.974.17
-      '@aws-sdk/nested-clients': 3.997.16
-      '@aws-sdk/types': 3.973.10
+      '@aws-sdk/core': 3.974.18
+      '@aws-sdk/nested-clients': 3.997.17
+      '@aws-sdk/types': 3.973.11
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
@@ -11060,16 +11076,21 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/util-dynamodb@3.996.2(@aws-sdk/client-dynamodb@3.1062.0)':
+  '@aws-sdk/types@3.973.11':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1062.0
+      '@smithy/types': 4.14.3
+      tslib: 2.8.1
+
+  '@aws-sdk/util-dynamodb@3.996.3(@aws-sdk/client-dynamodb@3.1063.0)':
+    dependencies:
+      '@aws-sdk/client-dynamodb': 3.1063.0
       tslib: 2.8.1
 
   '@aws-sdk/util-locate-window@3.965.5':
     dependencies:
       tslib: 2.8.1
 
-  '@aws-sdk/xml-builder@3.972.27':
+  '@aws-sdk/xml-builder@3.972.28':
     dependencies:
       '@smithy/types': 4.14.3
       fast-xml-parser: 5.7.0
@@ -11331,7 +11352,7 @@ snapshots:
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
 
-  '@cloudflare/workers-types@4.20260605.1': {}
+  '@cloudflare/workers-types@4.20260606.1': {}
 
   '@colors/colors@1.5.0':
     optional: true
@@ -11878,40 +11899,40 @@ snapshots:
   '@img/sharp-win32-x64@0.34.5':
     optional: true
 
-  '@inkjs/ui@2.0.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))':
+  '@inkjs/ui@2.0.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))':
     dependencies:
       chalk: 5.6.2
       cli-spinners: 3.4.0
       deepmerge: 4.3.1
       figures: 6.1.0
-      ink: 6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6)
+      ink: 6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6)
 
   '@inquirer/ansi@2.0.7': {}
 
-  '@inquirer/confirm@6.1.1(@types/node@25.9.1)':
+  '@inquirer/confirm@6.1.1(@types/node@25.9.2)':
     dependencies:
-      '@inquirer/core': 11.2.1(@types/node@25.9.1)
-      '@inquirer/type': 4.0.7(@types/node@25.9.1)
+      '@inquirer/core': 11.2.1(@types/node@25.9.2)
+      '@inquirer/type': 4.0.7(@types/node@25.9.2)
     optionalDependencies:
-      '@types/node': 25.9.1
+      '@types/node': 25.9.2
 
-  '@inquirer/core@11.2.1(@types/node@25.9.1)':
+  '@inquirer/core@11.2.1(@types/node@25.9.2)':
     dependencies:
       '@inquirer/ansi': 2.0.7
       '@inquirer/figures': 2.0.7
-      '@inquirer/type': 4.0.7(@types/node@25.9.1)
+      '@inquirer/type': 4.0.7(@types/node@25.9.2)
       cli-width: 4.1.0
       fast-wrap-ansi: 0.2.2
       mute-stream: 3.0.0
       signal-exit: 4.1.0
     optionalDependencies:
-      '@types/node': 25.9.1
+      '@types/node': 25.9.2
 
   '@inquirer/figures@2.0.7': {}
 
-  '@inquirer/type@4.0.7(@types/node@25.9.1)':
+  '@inquirer/type@4.0.7(@types/node@25.9.2)':
     optionalDependencies:
-      '@types/node': 25.9.1
+      '@types/node': 25.9.2
 
   '@ioredis/as-callback@3.0.0': {}
 
@@ -11961,20 +11982,20 @@ snapshots:
 
   '@letta-ai/letta-client@1.12.1': {}
 
-  '@letta-ai/letta-code-sdk@0.1.14(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
+  '@letta-ai/letta-code-sdk@0.1.14(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
     dependencies:
-      '@letta-ai/letta-code': 0.19.5(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)
+      '@letta-ai/letta-code': 0.19.5(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - bufferutil
       - ink
       - utf-8-validate
 
-  '@letta-ai/letta-code@0.19.5(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
+  '@letta-ai/letta-code@0.19.5(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(utf-8-validate@6.0.6)':
     dependencies:
       '@letta-ai/letta-client': 1.12.1
       glob: 13.0.6
       highlight.js: 11.11.1
-      ink-link: 5.0.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))
+      ink-link: 5.0.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))
       lowlight: 3.3.0
       node-pty: 1.1.0
       open: 10.2.0
@@ -12000,11 +12021,11 @@ snapshots:
       - encoding
       - supports-color
 
-  '@markdoc/markdoc@0.5.7(@types/react@19.2.16)(react@19.2.7)':
+  '@markdoc/markdoc@0.5.7(@types/react@19.2.17)(react@19.2.7)':
     optionalDependencies:
       '@types/linkify-it': 3.0.5
       '@types/markdown-it': 12.2.3
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
       react: 19.2.7
 
   '@microsoft/clarity@1.0.2': {}
@@ -13115,184 +13136,190 @@ snapshots:
 
   '@radix-ui/primitive@1.1.3': {}
 
-  '@radix-ui/react-arrow@1.1.7(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-arrow@1.1.7(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-compose-refs@1.1.2(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-compose-refs@1.1.2(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-context@1.1.2(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-compose-refs@1.1.3(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-dismissable-layer@1.1.11(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-context@1.1.2(@types/react@19.2.17)(react@19.2.7)':
+    dependencies:
+      react: 19.2.7
+    optionalDependencies:
+      '@types/react': 19.2.17
+
+  '@radix-ui/react-dismissable-layer@1.1.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@radix-ui/primitive': 1.1.3
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-escape-keydown': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-escape-keydown': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-id@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-id@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-popper@1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-popper@1.2.8(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@floating-ui/react-dom': 2.1.8(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-arrow': 1.1.7(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-context': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-rect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-size': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-arrow': 1.1.7(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-context': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-rect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-size': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       '@radix-ui/rect': 1.1.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-portal@1.1.9(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-portal@1.1.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-presence@1.1.5(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-presence@1.1.5(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-primitive@2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-primitive@2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-slot@1.2.3(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-slot@1.2.3(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-slot@1.2.4(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-slot@1.2.5(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.3(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-tooltip@1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-tooltip@1.2.8(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@radix-ui/primitive': 1.1.3
-      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-context': 1.1.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-dismissable-layer': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-id': 1.1.1(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-popper': 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-portal': 1.1.9(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-presence': 1.1.5(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-visually-hidden': 1.2.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-compose-refs': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-context': 1.1.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-dismissable-layer': 1.1.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-id': 1.1.1(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-popper': 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-portal': 1.1.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-presence': 1.1.5(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-slot': 1.2.3(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-visually-hidden': 1.2.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
-  '@radix-ui/react-use-callback-ref@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-callback-ref@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-controllable-state@1.2.2(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-controllable-state@1.2.2(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-use-effect-event': 0.0.2(@types/react@19.2.16)(react@19.2.7)
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-use-effect-event': 0.0.2(@types/react@19.2.17)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-effect-event@0.0.2(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-effect-event@0.0.2(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-escape-keydown@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-escape-keydown@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-use-callback-ref': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-layout-effect@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-layout-effect@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-rect@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-rect@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
       '@radix-ui/rect': 1.1.1
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-use-size@1.1.1(@types/react@19.2.16)(react@19.2.7)':
+  '@radix-ui/react-use-size@1.1.1(@types/react@19.2.17)(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.16)(react@19.2.7)
+      '@radix-ui/react-use-layout-effect': 1.1.1(@types/react@19.2.17)(react@19.2.7)
       react: 19.2.7
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@radix-ui/react-visually-hidden@1.2.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@radix-ui/react-visually-hidden@1.2.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      '@radix-ui/react-primitive': 2.1.3(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
   '@radix-ui/rect@1.1.1': {}
 
@@ -13318,7 +13345,7 @@ snapshots:
     dependencies:
       '@redis/client': 6.0.0(@opentelemetry/api@1.9.1)
 
-  '@reduxjs/toolkit@2.12.0(react-redux@9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1))(react@19.2.7)':
+  '@reduxjs/toolkit@2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1))(react@19.2.7)':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@standard-schema/utils': 0.3.0
@@ -13328,7 +13355,7 @@ snapshots:
       reselect: 5.1.1
     optionalDependencies:
       react: 19.2.7
-      react-redux: 9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1)
+      react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
@@ -13442,13 +13469,13 @@ snapshots:
     dependencies:
       '@sentry/core': 10.56.0
 
-  '@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)':
+  '@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)':
     dependencies:
       '@sentry/browser': 10.56.0
       '@sentry/core': 10.56.0
       '@sentry/node': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))
       '@sentry/vite-plugin': 5.3.0(rollup@4.61.1)
-      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@opentelemetry/exporter-trace-otlp-http'
       - encoding
@@ -13768,11 +13795,11 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
-      '@sentry/astro': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)
+      '@sentry/astro': 10.56.0(@opentelemetry/exporter-trace-otlp-http@0.218.0(@opentelemetry/api@1.9.1))(astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.61.1)
       '@spotlightjs/spotlight': 3.0.2
-      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      astro: 6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -13903,15 +13930,15 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
-      '@types/react-dom': 19.2.3(@types/react@19.2.16)
+      '@types/react': 19.2.17
+      '@types/react-dom': 19.2.3(@types/react@19.2.17)
 
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.1)':
     dependencies:
@@ -14093,6 +14120,10 @@ snapshots:
     dependencies:
       undici-types: 7.24.6
 
+  '@types/node@25.9.2':
+    dependencies:
+      undici-types: 7.24.6
+
   '@types/nodemailer@8.0.0':
     dependencies:
       '@types/node': 25.9.1
@@ -14135,11 +14166,11 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/react-dom@19.2.3(@types/react@19.2.16)':
+  '@types/react-dom@19.2.3(@types/react@19.2.17)':
     dependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
 
-  '@types/react@19.2.16':
+  '@types/react@19.2.17':
     dependencies:
       csstype: 3.2.3
 
@@ -14310,13 +14341,13 @@ snapshots:
 
   '@ungap/structured-clone@1.3.1': {}
 
-  '@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@unocss/core': 66.7.0
       '@unocss/reset': 66.7.0
-      '@unocss/vite': 66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@unocss/vite': 66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     optionalDependencies:
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@unocss/cli@66.7.0':
     dependencies:
@@ -14436,7 +14467,7 @@ snapshots:
     dependencies:
       '@unocss/core': 66.7.0
 
-  '@unocss/vite@66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@unocss/vite@66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@unocss/config': 66.7.0
@@ -14447,7 +14478,7 @@ snapshots:
       pathe: 2.0.3
       tinyglobby: 0.2.17
       unplugin-utils: 0.3.1
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@upstash/core-analytics@0.0.10':
     dependencies:
@@ -14481,11 +14512,11 @@ snapshots:
     dependencies:
       execa: 5.1.1
 
-  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)':
+  '@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49)':
     dependencies:
       '@vercel/oidc': 3.6.0
     optionalDependencies:
-      '@aws-sdk/credential-provider-web-identity': 3.972.48
+      '@aws-sdk/credential-provider-web-identity': 3.972.49
 
   '@vercel/nft@1.10.2(rollup@4.61.1)':
     dependencies:
@@ -14525,7 +14556,7 @@ snapshots:
       react: 19.2.7
       vue: 3.5.35(typescript@6.0.3)
 
-  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -14533,7 +14564,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -14549,7 +14580,7 @@ snapshots:
       obug: 2.1.2
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
 
   '@vitest/eslint-plugin@1.6.19(@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.8)':
     dependencies:
@@ -14559,7 +14590,7 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.60.1(@typescript-eslint/parser@8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3))(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
       typescript: 6.0.3
-      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -14572,14 +14603,14 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.8(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.8(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.8
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      msw: 2.14.6(@types/node@25.9.1)(typescript@6.0.3)
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      msw: 2.14.6(@types/node@25.9.2)(typescript@6.0.3)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.8':
     dependencies:
@@ -14985,7 +15016,7 @@ snapshots:
       valid-filename: 4.0.0
       zod: 4.4.3
 
-  astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.1)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
+  astro@6.4.4(@azure/storage-blob@12.32.0)(@types/node@25.9.2)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.61.1)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
       '@astrojs/internal-helpers': 0.10.0
@@ -15035,10 +15066,10 @@ snapshots:
       ultrahtml: 1.6.0
       unifont: 0.7.4
       unist-util-visit: 5.1.0
-      unstorage: 1.17.5(@azure/storage-blob@12.32.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1)
+      unstorage: 1.17.5(@azure/storage-blob@12.32.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1)
       vfile: 6.0.3
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
-      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       xxhash-wasm: 1.1.0
       yargs-parser: 22.0.0
       zod: 4.4.3
@@ -15825,9 +15856,9 @@ snapshots:
 
   dpop@2.1.1: {}
 
-  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260605.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.21.0)(postgres@3.4.9):
+  drizzle-orm@0.45.2(@cloudflare/workers-types@4.20260606.1)(@opentelemetry/api@1.9.1)(@types/pg@8.20.0)(@upstash/redis@1.38.0)(better-sqlite3@12.10.0)(pg@8.21.0)(postgres@3.4.9):
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20260605.1
+      '@cloudflare/workers-types': 4.20260606.1
       '@opentelemetry/api': 1.9.1
       '@types/pg': 8.20.0
       '@upstash/redis': 1.38.0
@@ -17013,17 +17044,17 @@ snapshots:
 
   ini@4.1.3: {}
 
-  ink-link@5.0.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6)):
+  ink-link@5.0.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6)):
     dependencies:
-      ink: 6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6)
+      ink: 6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6)
       terminal-link: 5.0.0
 
-  ink-multiline-input@0.1.0(ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7):
+  ink-multiline-input@0.1.0(ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6))(react@19.2.7):
     dependencies:
-      ink: 6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6)
+      ink: 6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6)
       react: 19.2.7
 
-  ink@6.8.0(@types/react@19.2.16)(react@19.2.7)(utf-8-validate@6.0.6):
+  ink@6.8.0(@types/react@19.2.17)(react@19.2.7)(utf-8-validate@6.0.6):
     dependencies:
       '@alcalzone/ansi-tokenize': 0.2.5
       ansi-escapes: 7.3.0
@@ -17052,7 +17083,7 @@ snapshots:
       ws: 8.21.0(utf-8-validate@6.0.6)
       yoga-layout: 3.2.1
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
@@ -17323,11 +17354,11 @@ snapshots:
 
   jose@6.2.3: {}
 
-  jotai@2.20.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.16)(react@19.2.7):
+  jotai@2.20.0(@babel/core@7.29.7)(@babel/template@7.29.7)(@types/react@19.2.17)(react@19.2.7):
     optionalDependencies:
       '@babel/core': 7.29.7
       '@babel/template': 7.29.7
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
       react: 19.2.7
 
   js-base64@3.7.8: {}
@@ -18218,9 +18249,9 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3):
+  msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3):
     dependencies:
-      '@inquirer/confirm': 6.1.1(@types/node@25.9.1)
+      '@inquirer/confirm': 6.1.1(@types/node@25.9.2)
       '@mswjs/interceptors': 0.41.9
       '@open-draft/deferred-promise': 3.0.0
       '@types/statuses': 2.0.6
@@ -18996,13 +19027,13 @@ snapshots:
       react: 19.2.7
       scheduler: 0.27.0
 
-  react-redux@9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1):
+  react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1):
     dependencies:
       '@types/use-sync-external-store': 0.0.6
       react: 19.2.7
       use-sync-external-store: 1.6.0(react@19.2.7)
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
       redux: 5.0.1
 
   react-refresh@0.18.0: {}
@@ -19063,9 +19094,9 @@ snapshots:
 
   readline-sync@1.4.10: {}
 
-  recharts@3.8.1(@types/react@19.2.16)(react-dom@19.2.7(react@19.2.7))(react-is@17.0.2)(react@19.2.7)(redux@5.0.1):
+  recharts@3.8.1(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react-is@17.0.2)(react@19.2.7)(redux@5.0.1):
     dependencies:
-      '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1))(react@19.2.7)
+      '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1))(react@19.2.7)
       clsx: 2.1.1
       decimal.js-light: 2.5.1
       es-toolkit: 1.47.0
@@ -19074,7 +19105,7 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       react-is: 17.0.2
-      react-redux: 9.3.0(@types/react@19.2.16)(react@19.2.7)(redux@5.0.1)
+      react-redux: 9.3.0(@types/react@19.2.17)(react@19.2.7)(redux@5.0.1)
       reselect: 5.1.1
       tiny-invariant: 1.3.3
       use-sync-external-store: 1.6.0(react@19.2.7)
@@ -20394,7 +20425,7 @@ snapshots:
       unist-util-is: 6.0.1
       unist-util-visit-parents: 6.0.2
 
-  unocss@66.7.0(@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
+  unocss@66.7.0(@unocss/astro@66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@unocss/cli': 66.7.0
       '@unocss/core': 66.7.0
@@ -20412,9 +20443,9 @@ snapshots:
       '@unocss/transformer-compile-class': 66.7.0
       '@unocss/transformer-directives': 66.7.0
       '@unocss/transformer-variant-group': 66.7.0
-      '@unocss/vite': 66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@unocss/vite': 66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     optionalDependencies:
-      '@unocss/astro': 66.7.0(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@unocss/astro': 66.7.0(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     transitivePeerDependencies:
       - vite
 
@@ -20432,7 +20463,7 @@ snapshots:
       picomatch: 4.0.4
       webpack-virtual-modules: 0.6.2
 
-  unstorage@1.17.5(@azure/storage-blob@12.32.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48))(ioredis@5.11.1):
+  unstorage@1.17.5(@azure/storage-blob@12.32.0)(@upstash/redis@1.38.0)(@vercel/functions@3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49))(ioredis@5.11.1):
     dependencies:
       anymatch: 3.1.3
       chokidar: 5.0.0
@@ -20445,7 +20476,7 @@ snapshots:
     optionalDependencies:
       '@azure/storage-blob': 12.32.0
       '@upstash/redis': 1.38.0
-      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.48)
+      '@vercel/functions': 3.6.2(@aws-sdk/credential-provider-web-identity@3.972.49)
       ioredis: 5.11.1
 
   until-async@3.0.2: {}
@@ -20540,17 +20571,17 @@ snapshots:
 
   viewerjs@1.11.7: {}
 
-  vite-tsconfig-paths@7.0.0-alpha.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vite-tsconfig-paths@7.0.0-alpha.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       debug: 4.4.3
       oxc-resolver: 11.20.0
       tsconfck: 3.1.6(typescript@6.0.3)
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
+  vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       esbuild: 0.28.0
       fdir: 6.5.0(picomatch@4.0.4)
@@ -20559,21 +20590,21 @@ snapshots:
       rollup: 4.61.1
       tinyglobby: 0.2.17
     optionalDependencies:
-      '@types/node': 25.9.1
+      '@types/node': 25.9.2
       fsevents: 2.3.3
       jiti: 2.7.0
       terser: 5.48.0
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     optionalDependencies:
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
-  vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.1)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.2)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.8
-      '@vitest/mocker': 4.1.8(msw@2.14.6(@types/node@25.9.1)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.8(msw@2.14.6(@types/node@25.9.2)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.8
       '@vitest/runner': 4.1.8
       '@vitest/snapshot': 4.1.8
@@ -20590,11 +20621,11 @@ snapshots:
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 7.3.5(@types/node@25.9.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.2)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
-      '@types/node': 25.9.1
+      '@types/node': 25.9.2
       '@vitest/coverage-v8': 4.1.8(vitest@4.1.8)
       jsdom: 29.1.1(@noble/hashes@1.8.0)
     transitivePeerDependencies:
@@ -20979,9 +21010,9 @@ snapshots:
 
   zod@4.4.3: {}
 
-  zustand@5.0.14(@types/react@19.2.16)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
+  zustand@5.0.14(@types/react@19.2.17)(immer@11.1.8)(react@19.2.7)(use-sync-external-store@1.6.0(react@19.2.7)):
     optionalDependencies:
-      '@types/react': 19.2.16
+      '@types/react': 19.2.17
       immer: 11.1.8
       react: 19.2.7
       use-sync-external-store: 1.6.0(react@19.2.7)
