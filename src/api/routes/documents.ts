@@ -22,6 +22,28 @@ const requireRole =
   (_roles: string[]) => (_req: Request, _res: Response, next: () => void) =>
     next()
 
+// Helper to ensure param is a string (Express types params as string | string[])
+const ensureString = (param: unknown): string => {
+  if (Array.isArray(param)) {
+    return ensureString(param[0])
+  }
+  if (typeof param === 'string') {
+    return param
+  }
+  if (param && typeof param === 'object') {
+    // Handle ParsedQs or other objects
+    const values = Object.values(param)
+    if (values.length > 0) {
+      const firstValue = values[0]
+      return typeof firstValue === 'string'
+        ? firstValue
+        : typeof firstValue === 'object' && firstValue !== null
+          ? String(firstValue)
+          : String(firstValue ?? '')
+    }
+    return ''
+  }
+  return param !== undefined && param !== null ? String(param) : ''
 // Helper to coerce Express param/query to string
 const coerceString = (value: unknown): string => {
   if (typeof value === 'string') return value
@@ -66,6 +88,15 @@ const router: Router = express.Router()
 router.post(
   '/',
   requirePermission('edit'),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const { title, type, category, content, description } = expressReq.body
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -83,6 +114,7 @@ router.post(
     }
 
     // Create document
+    const document = await documentService.createDocument(
     const document = (await documentService.createDocument(
       {
         title,
@@ -93,6 +125,9 @@ router.post(
         owner: userId,
       },
       userId,
+    )
+
+    expressRes.status(201).json({
     )) as unknown
 
     res.status(201).json({
@@ -108,6 +143,12 @@ router.post(
 
 router.get(
   '/',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -121,6 +162,11 @@ router.get(
       type,
       category,
       search: searchQuery,
+    } = expressReq.query
+
+    const page = ensureString(pageQuery)
+    const limit = ensureString(limitQuery)
+    const search = ensureString(searchQuery)
     } = req.query as Record<string, unknown>
 
     const page = coerceString(pageQuery)
@@ -148,6 +194,16 @@ router.get(
       filter['$text'] = { $search: search }
     }
 
+    // Query
+    const documents = await BusinessDocument.find(filter)
+      .skip(skip)
+      .limit(pageLimit)
+      .sort({ updatedAt: -1 })
+      .lean()
+
+    const total = await BusinessDocument.countDocuments(filter)
+
+    expressRes.json({
     // Query — cast Mongoose model to avoid no-unsafe on chain methods
     const DocModel = BusinessDocument as unknown as {
       find(f: Record<string, unknown>): {
@@ -183,6 +239,17 @@ router.get(
 
 router.get(
   '/:documentId',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+
+    const document = await documentService.getDocument(documentId, userId)
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -197,6 +264,7 @@ router.get(
       throw new NotFoundError('Document', documentId)
     }
 
+    expressRes.json({
     res.json({
       success: true,
       data: document,
@@ -211,6 +279,27 @@ router.get(
 router.put(
   '/:documentId',
   requirePermission('edit'),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { title, content, status, description } = expressReq.body
+
+    const document = await documentService.updateDocument(
+      documentId,
+      {
+        title,
+        content,
+        status,
+        description,
+      },
+      userId,
+    )
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -238,6 +327,7 @@ router.put(
       throw new NotFoundError('Document', documentId)
     }
 
+    expressRes.json({
     res.json({
       success: true,
       data: document,
@@ -252,6 +342,15 @@ router.put(
 router.delete(
   '/:documentId',
   requireRole(['admin', 'manager']),
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -266,6 +365,7 @@ router.delete(
       throw new NotFoundError('Document', documentId)
     }
 
+    expressRes.json({
     res.json({
       success: true,
       message: 'Document deleted successfully',
@@ -279,6 +379,16 @@ router.delete(
 
 router.post(
   '/:documentId/share',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { sharedWith, permissionLevel } = expressReq.body
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -295,6 +405,14 @@ router.post(
       )
     }
 
+    const document = await documentService.shareDocument(
+      documentId,
+      sharedWith,
+      permissionLevel,
+      userId,
+    )
+
+    expressRes.json({
     const document = (await documentService.shareDocument(
       documentId,
       sharedWith,
@@ -315,6 +433,16 @@ router.post(
 
 router.post(
   '/:documentId/comments',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { content, parentCommentId } = expressReq.body
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -337,6 +465,7 @@ router.post(
       [documentId, userId, content, parentCommentId ?? null],
     )
 
+    expressRes.status(201).json({
     res.status(201).json({
       success: true,
       data: result.rows[0],
@@ -350,6 +479,10 @@ router.post(
 
 router.get(
   '/:documentId/comments',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
   asyncHandler(async (req: Request, res: Response) => {
     const documentId = coerceString(req.params['documentId'])
 
@@ -363,6 +496,7 @@ router.get(
       [documentId],
     )
 
+    expressRes.json({
     res.json({
       success: true,
       data: result.rows,
@@ -376,6 +510,10 @@ router.get(
 
 router.get(
   '/:documentId/versions',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const documentId = ensureString(expressReq.params['documentId'])
   asyncHandler(async (req: Request, res: Response) => {
     const documentId = coerceString(req.params['documentId'])
 
@@ -388,6 +526,7 @@ router.get(
       [documentId],
     )
 
+    expressRes.json({
     res.json({
       success: true,
       data: result.rows,
@@ -401,6 +540,19 @@ router.get(
 
 router.get(
   '/:documentId/export',
+  asyncHandler(async (req: unknown, res: unknown) => {
+    const expressReq = req as Request
+    const expressRes = res as Response
+    const userId = expressReq.user?.id
+    if (!userId) {
+      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
+      return
+    }
+    const documentId = ensureString(expressReq.params['documentId'])
+    const { format: formatQuery = 'json' } = expressReq.query
+    const format = ensureString(formatQuery)
+
+    const document = await documentService.getDocument(documentId, userId)
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id
     if (!userId) {
@@ -421,6 +573,23 @@ router.get(
     }
 
     if (format === 'md') {
+      expressRes.setHeader('Content-Type', 'text/markdown')
+      expressRes.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.md"`,
+      )
+      const markdownContent = document.content?.markdown
+      if (!markdownContent) {
+        throw new NotFoundError('Document content', documentId)
+      }
+      expressRes.send(markdownContent)
+    } else {
+      expressRes.setHeader('Content-Type', 'application/json')
+      expressRes.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.slug}.json"`,
+      )
+      expressRes.json(document)
       res.setHeader('Content-Type', 'text/markdown')
       res.setHeader(
         'Content-Disposition',

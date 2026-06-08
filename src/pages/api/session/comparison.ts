@@ -6,15 +6,9 @@ const { DATABASE_URL } = process.env
 if (!DATABASE_URL) {
   throw new Error('DATABASE_URL is not set')
 }
-
-interface PgPoolGlobal {
-  __pgPool?: Pool
-}
-
-const globalWithPool = globalThis as unknown as PgPoolGlobal
-const pool: Pool =
-  globalWithPool.__pgPool ?? new Pool({ connectionString: DATABASE_URL })
-globalWithPool.__pgPool = pool
+const pool =
+  (globalThis as any).__pgPool ?? new Pool({ connectionString: DATABASE_URL })
+;(globalThis as any).__pgPool = pool
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -63,7 +57,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: true,
-          comparisonId: (result.rows[0] as any).id,
+          comparisonId: result.rows[0].id,
           therapistId,
           currentSessionId,
         }),
@@ -98,7 +92,7 @@ export const GET: APIRoute = async ({ request }) => {
     const client = await pool.connect()
     try {
       let query = ''
-      let queryParams: string[] = []
+      let queryParams: any[] = []
 
       if (sessionId) {
         // Get specific session comparison
@@ -121,14 +115,8 @@ export const GET: APIRoute = async ({ request }) => {
           LIMIT 1
         `
         queryParams = [sessionId]
-      } else if (therapistId) {
+      } else {
         // Get therapist's session comparisons
-        // Allowlist simple forms like '7 days', '30 days', '24 hours', '30d'
-        const allowed =
-          /^(?:\d+\s+(?:minutes?|hours?|days?|weeks?|months?|years?)|\d+d)$/i
-        const safeRange = allowed.test(timeRange)
-          ? timeRange.replace(/(\d+)d/i, '$1 days')
-          : '30 days'
         query = `
           SELECT
             sc.id,
@@ -147,17 +135,22 @@ export const GET: APIRoute = async ({ request }) => {
             AND sc.analyzed_at >= NOW() - $2::interval
           ORDER BY sc.analyzed_at DESC
         `
+        // Allowlist simple forms like '7 days', '30 days', '24 hours', '30d'
+        const allowed =
+          /^(?:\d+\s+(?:minutes?|hours?|days?|weeks?|months?|years?)|\d+d)$/i
+        const safeRange = allowed.test(timeRange)
+          ? timeRange.replace(/(\d+)d/i, '$1 days')
+          : '30 days'
         queryParams = [therapistId, safeRange]
+        queryParams = [therapistId]
       }
 
       const result = await client.query(query, queryParams)
 
       // Transform data for client consumption
-      const toObj = (v: unknown): Record<string, unknown> =>
-        typeof v === 'string'
-          ? (JSON.parse(v || '{}') as Record<string, unknown>)
-          : ((v as Record<string, unknown>) ?? {})
-      const comparisons = (result.rows as any[]).map((row) => ({
+      const toObj = (v: any) =>
+        typeof v === 'string' ? JSON.parse(v || '{}') : (v ?? {})
+      const comparisons = result.rows.map((row) => ({
         id: row.id,
         therapistId: row.therapist_id,
         currentSessionId: row.current_session_id,
@@ -177,7 +170,7 @@ export const GET: APIRoute = async ({ request }) => {
 
       return new Response(
         JSON.stringify({
-          therapistId: therapistId ?? (result.rows[0] as any)?.therapist_id,
+          therapistId: therapistId ?? result.rows[0]?.therapist_id,
           sessionId: sessionId,
           comparisons,
         }),

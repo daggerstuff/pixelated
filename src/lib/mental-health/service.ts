@@ -19,11 +19,6 @@ export class MentalHealthService {
     this.analyzer = new MentalHealthAnalyzer()
     this.therapist = new TherapeuticResponseGenerator()
     this.config = {
-      includeRiskAssessment: true,
-      includeEmotionDetection: true,
-      includeTechniqueRecognition: true,
-      sensitivity: 'medium',
-      maxContextLength: 50,
       enableAnalysis: true,
       confidenceThreshold: 0.6,
       interventionThreshold: 0.7,
@@ -46,13 +41,13 @@ export class MentalHealthService {
     if (
       this.config.enableAnalysis &&
       message.role === 'user' &&
-      message.content.length >= (this.config.analysisMinLength ?? 10)
+      message.content.length >= this?.config.analysisMinLength
     ) {
       try {
         const analysis = await this.analyzer.analyze(message.content)
 
         // Only include analysis if confidence meets threshold
-        if (analysis.confidence >= (this.config.confidenceThreshold ?? 0.6)) {
+        if (analysis.confidence >= this?.config.confidenceThreshold) {
           processedMessage.analysis = analysis
 
           // Store analysis in history
@@ -84,7 +79,6 @@ export class MentalHealthService {
       return {
         content:
           "I'm here to listen and support you. How are you feeling today?",
-        confidence: 0.5,
         approach: 'supportive',
         techniques: ['Active listening', 'Empathic responding'],
         followUp: [
@@ -110,7 +104,7 @@ export class MentalHealthService {
       (analysis) =>
         (analysis.requiresIntervention ?? analysis.riskLevel === 'critical') ||
         (analysis.riskLevel === 'high' &&
-          analysis.confidence >= (this.config.interventionThreshold ?? 0.7)),
+          analysis.confidence >= this?.config.interventionThreshold),
     )
   }
 

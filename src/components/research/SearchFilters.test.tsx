@@ -2,6 +2,7 @@ import { fireEvent } from '@testing-library/dom'
 import { act } from '@testing-library/react'
 import { createRoot } from 'react-dom/client'
 // @vitest-environment jsdom
+import { describe, expect, it, vi } from 'vitest'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { SearchFiltersState } from './SearchFilters'
@@ -35,6 +36,7 @@ describe('SearchFilters', () => {
       )
     })
     await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(container.innerHTML).toContain('Advanced Filters')
     expect(vi.mocked(container).innerHTML).toContain('Advanced Filters')
     return {
       container,
@@ -50,6 +52,10 @@ describe('SearchFilters', () => {
 
   it('renders with default values', async () => {
     const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
+
+    try {
+      expect(container.textContent).toContain('Advanced Filters')
     const result = await renderFilters(mockOnChange)
     const container = result.container
 
@@ -62,12 +68,14 @@ describe('SearchFilters', () => {
         container.querySelector('label[for="sort-by"]'),
       ).toBeInTheDocument()
     } finally {
+      await cleanup()
       await result.cleanup()
     }
   })
 
   it('calls onChange when sort order changes', async () => {
     const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
     const result = await renderFilters(mockOnChange)
     const container = result.container
 
@@ -93,12 +101,14 @@ describe('SearchFilters', () => {
         }),
       )
     } finally {
+      await cleanup()
       await result.cleanup()
     }
   })
 
   it('reflects active sort state', async () => {
     const mockOnChange = vi.fn()
+    const { container, cleanup } = await renderFilters(mockOnChange)
     const result = await renderFilters(mockOnChange)
     const container = result.container
 
@@ -108,6 +118,9 @@ describe('SearchFilters', () => {
       ).find((option) => option.textContent?.includes('Relevance'))
       expect(relevanceOption).toBeInTheDocument()
       if (!relevanceOption) return
+      expect(relevanceOption.selected).toBe(true)
+    } finally {
+      await cleanup()
       expect(vi.mocked(relevanceOption).selected).toBe(true)
     } finally {
       await result.cleanup()

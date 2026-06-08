@@ -19,30 +19,6 @@ import type {
   DashboardRecommendation,
 } from './types'
 
-interface MongoAlertDoc {
-  alertId: string
-  timestamp: number
-  level: string
-  type: string
-  message: string
-  sessionId?: string
-  biasScore?: number
-  acknowledged?: boolean
-  resolvedAt?: Date | null
-}
-
-interface MongoAnalysisDoc {
-  sessionId: string
-  timestamp: Date
-  overallBiasScore: number
-  layerResults: unknown
-  demographics?: Record<string, string>
-  recommendations?: string[]
-  alertLevel: string
-  explanation?: string
-  confidence?: number
-}
-
 const logger = createBuildSafeLogger('BiasDetectionDatabase')
 
 export class BiasDetectionDatabaseService {
@@ -298,19 +274,17 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return alerts.map((raw) => {
-        const alert = raw as unknown as MongoAlertDoc
-        return {
-          alertId: alert.alertId,
-          sessionId: alert.sessionId ?? '',
-          timestamp: alert.timestamp,
-          level: alert.level,
-          message: alert.message,
-          biasScore: alert.biasScore ?? 0,
-          acknowledged: alert.acknowledged ?? false,
-          resolvedAt: alert.resolvedAt ?? undefined,
-        } as unknown as BiasAlert
-      })
+      return alerts.map((alert) => ({
+        alertId: alert['alertId'],
+        timestamp: alert['timestamp'],
+        level: alert['level'],
+        type: alert['type'],
+        message: alert['message'],
+        sessionId: alert['sessionId'],
+        biasScore: alert['biasScore'] ?? 0,
+        acknowledged: alert['acknowledged'] ?? false,
+        resolvedAt: alert['resolvedAt'] ?? undefined,
+      }))
     } catch (error: unknown) {
       logger.error('Failed to get recent alerts', {
         error: String(error),
@@ -358,22 +332,19 @@ export class BiasDetectionDatabaseService {
           },
         })
 
+        // Calculate average bias score for this period
         const avgScore =
           analyses.length > 0
             ? analyses.reduce(
-                (sum, raw) => {
-                  const doc = raw as unknown as MongoAnalysisDoc
-                  return sum + doc.overallBiasScore
-                },
+                (sum, analysis) => sum + analysis['overallBiasScore'],
                 0,
               ) / analyses.length
             : 0
 
         // Get demographic breakdown for this period
         const demographicBreakdown: Record<string, number> = {}
-        analyses.forEach((raw) => {
-          const doc = raw as unknown as MongoAnalysisDoc
-          const demo = doc.demographics
+        analyses.forEach((analysis) => {
+          const demo = analysis['demographics']
           if (demo) {
             // (Previously unused) key could be used for grouping if needed
             // No-op: placeholder for future demographic aggregation
@@ -425,10 +396,9 @@ export class BiasDetectionDatabaseService {
         intersectional: {},
       }
 
-      analyses.forEach((raw) => {
-        const doc = raw as unknown as MongoAnalysisDoc
-        const demo = doc.demographics
-        const biasScore = doc.overallBiasScore ?? 0
+      analyses.forEach((analysis) => {
+        const demo = analysis['demographics']
+        const biasScore = analysis['overallBiasScore'] ?? 0
 
         if (demo) {
           // Helper to update aggregation
@@ -440,13 +410,13 @@ export class BiasDetectionDatabaseService {
           }
 
           // Individual dimensions
-          if (demo['age']) update('age', demo['age'])
-          if (demo['gender']) update('gender', demo['gender'])
-          if (demo['ethnicity']) update('ethnicity', demo['ethnicity'])
+          if (demo.age) update('age', demo.age)
+          if (demo.gender) update('gender', demo.gender)
+          if (demo.ethnicity) update('ethnicity', demo.ethnicity)
 
           // Intersectional dimension
-          if (demo['age'] && demo['gender'] && demo['ethnicity']) {
-            const intersectionKey = [demo['age'], demo['gender'], demo['ethnicity']]
+          if (demo.age && demo.gender && demo.ethnicity) {
+            const intersectionKey = [demo.age, demo.gender, demo.ethnicity]
               .sort()
               .join('|')
             update('intersectional', intersectionKey)
@@ -497,20 +467,17 @@ export class BiasDetectionDatabaseService {
         .limit(limit)
         .toArray()
 
-      return analyses.map((raw) => {
-        const analysis = raw as unknown as MongoAnalysisDoc
-        return {
-          sessionId: analysis.sessionId,
-          timestamp: analysis.timestamp,
-          overallBiasScore: analysis.overallBiasScore,
-          layerResults: analysis.layerResults,
-          demographics: analysis.demographics,
-          recommendations: analysis.recommendations ?? [],
-          alertLevel: analysis.alertLevel,
-          explanation: analysis.explanation,
-          confidence: analysis.confidence,
-        } as unknown as BiasAnalysisResult
-      })
+      return analyses.map((analysis) => ({
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] ?? [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }))
     } catch (error: unknown) {
       logger.error('Failed to get recent analyses', {
         error: String(error),
@@ -601,18 +568,17 @@ export class BiasDetectionDatabaseService {
         return null
       }
 
-      const doc = analysis as unknown as MongoAnalysisDoc
       return {
-        sessionId: doc.sessionId,
-        timestamp: doc.timestamp,
-        overallBiasScore: doc.overallBiasScore,
-        layerResults: doc.layerResults,
-        demographics: doc.demographics,
-        recommendations: doc.recommendations ?? [],
-        alertLevel: doc.alertLevel,
-        explanation: doc.explanation,
-        confidence: doc.confidence,
-      } as unknown as BiasAnalysisResult
+        sessionId: analysis['sessionId'],
+        timestamp: analysis['timestamp'],
+        overallBiasScore: analysis['overallBiasScore'],
+        layerResults: analysis['layerResults'],
+        demographics: analysis['demographics'],
+        recommendations: analysis['recommendations'] ?? [],
+        alertLevel: analysis['alertLevel'],
+        explanation: analysis['explanation'],
+        confidence: analysis['confidence'],
+      }
     } catch (error: unknown) {
       logger.error('Failed to get session analysis', {
         error: String(error),

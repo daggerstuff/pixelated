@@ -74,6 +74,7 @@ dependencies = [
   "mcp[cli]>=1.23.0", # Fixes GHSA-9h52-p55h-vw2f
   "protobuf>=6.33.5", # Fixes CVE-2026-0994
   "urllib3>=2.7.0", # Fixes GHSA-gm62-xv2j-4w53, GHSA-2xpw-w6gg-jr37 (CVE-2025-66418, CVE-2025-66471)
+  "aiohttp>=3.14.0", # Fixes CVE-2025-69223, CVE-2025-69224, CVE-2025-69228, CVE-2025-69229, CVE-2025-69230
   "aiohttp>=3.14.0", # Fixes CVE-2026-34519, CVE-2026-34518, CVE-2026-34515 and earlier CVEs
   # Security: Pin pillow to fix CVE-2026-25990 (Out-of-bounds Write in PSD image parser)
   "pillow>=12.1.1",

@@ -40,7 +40,6 @@ export interface InterventionResult {
  */
 class InterventionEngine {
   private rules: InterventionRule[] = []
-  public context?: InterventionContext
 
   constructor() {
     this.initializeRules()
@@ -66,8 +65,6 @@ class InterventionEngine {
         },
         suggestions: [
           {
-            id: 'crisis_intervention',
-            name: 'Crisis Intervention Protocol',
             type: 'immediate',
             category: 'crisis',
             title: 'Crisis Intervention Protocol',
@@ -99,8 +96,6 @@ class InterventionEngine {
         },
         suggestions: [
           {
-            id: 'anxiety_grounding',
-            name: 'Grounding Techniques',
             type: 'immediate',
             category: 'technique',
             title: 'Grounding Techniques',
@@ -140,8 +135,6 @@ class InterventionEngine {
         },
         suggestions: [
           {
-            id: 'depression_treatment',
-            name: 'Depression Treatment Protocol',
             type: 'strategic',
             category: 'therapy',
             title: 'Depression Treatment Protocol',
@@ -173,10 +166,9 @@ class InterventionEngine {
         },
         suggestions: [
           {
-            id: 'alliance_building',
-            name: 'Alliance Building Techniques',
             type: 'immediate',
             category: 'relationship',
+            title: 'Alliance Building Techniques',
             description: 'Enhance therapeutic relationship',
             actions: [
               'Validate patient experience',
@@ -205,8 +197,6 @@ class InterventionEngine {
         },
         suggestions: [
           {
-            id: 'progress_celebration',
-            name: 'Progress Celebration',
             type: 'immediate',
             category: 'reinforcement',
             title: 'Progress Celebration',

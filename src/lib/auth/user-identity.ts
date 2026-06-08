@@ -1,16 +1,14 @@
 /**
  * User Identity Resolver
  *
- * Provides the canonical provider sub → internal UUID mapping layer.
- * This is the single source of truth for resolving an external identity
+ * Provides the canonical Auth0 sub → internal UUID mapping layer.
+ * This is the single source of truth for resolving an Auth0 identity
  * to a platform-internal user record.
  *
  * Design decisions:
  * - Internal UUIDs are stored in the `users` table (Postgres)
- * - The link between provider `sub` and internal UUID lives in `auth_accounts`
- *   (providerId = sub, provider = <IdentityProvider.name>). The provider is
- *   selected at runtime via `getIdentityProvider()`; this file no longer
- *   hardcodes the provider name.
+ * - The link between Auth0 `sub` and internal UUID lives in `auth_accounts`
+ *   (providerId = sub, provider = 'auth0')
  * - The resolved mapping is cached in Redis (TTL: 1 hour) to avoid repeated DB reads
  * - On first login, we upsert both the `users` row and the `auth_accounts` link
  *   inside a single transaction so we never end up with orphaned accounts
@@ -21,10 +19,8 @@ import { randomUUID } from 'crypto'
 
 import { PoolClient } from 'pg'
 
-import { transaction } from '../db/index'
+import { query, transaction } from '../db/index'
 import { getFromCache, setInCache, removeFromCache } from '../redis'
-import type { IdentityProvider } from './identity-provider'
-import { getIdentityProvider } from './identity-provider'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -63,6 +59,7 @@ export interface ResolvedIdentity {
 // ---------------------------------------------------------------------------
 
 const CACHE_TTL_SECONDS = 60 * 60 // 1 hour
+const PROVIDER = 'auth0'
 
 // ---------------------------------------------------------------------------
 // Cache helpers
@@ -99,15 +96,31 @@ async function cacheIdentity(identity: ResolvedIdentity): Promise<void> {
 // DB helpers (run inside a transaction)
 // ---------------------------------------------------------------------------
 
+async function findUserByAuth0Sub(
+  client: PoolClient,
+  sub: string,
+): Promise<{ internalId: string; role: string } | null> {
+  const result = await client.query<{ user_id: string; role: string }>(
+    `SELECT aa.user_id, u.role
+     FROM auth_accounts aa
+     JOIN users u ON u.id = aa.user_id
+     WHERE aa.provider_id = $1
+       AND aa.provider    = $2
+     LIMIT 1`,
+    [sub, PROVIDER],
+  )
+  if (result.rows.length === 0) return null
+  return { internalId: result.rows[0]!.user_id, role: result.rows[0]!.role }
+}
+
 async function createUserWithLink(
   client: PoolClient,
   profile: Auth0UserProfile,
-  provider: IdentityProvider,
 ): Promise<{ internalId: string; role: string }> {
   const internalId = randomUUID()
   const role = profile.role ?? 'therapist'
 
-  // 1. Insert into users (our schema — provider-agnostic)
+  // 1. Insert into users
   await client.query(
     `INSERT INTO users (
        id, email, email_verified, name, role,
@@ -135,8 +148,13 @@ async function createUserWithLink(
   const actualId = upsertResult.rows[0]!.id
   const actualRole = upsertResult.rows[0]!.role
 
-  // 2. Link via provider (owns the auth_accounts insert and its `provider` value)
-  await provider.linkSubToInternalId(profile.sub, actualId, client)
+  // 2. Insert into auth_accounts (link sub → internal UUID)
+  await client.query(
+    `INSERT INTO auth_accounts (id, user_id, provider, provider_id, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, NOW(), NOW())
+     ON CONFLICT DO NOTHING`,
+    [randomUUID(), actualId, PROVIDER, profile.sub],
+  )
 
   return { internalId: actualId, role: actualRole }
 }
@@ -146,22 +164,21 @@ async function createUserWithLink(
 // ---------------------------------------------------------------------------
 
 /**
- * Resolve a provider user profile to an internal identity.
+ * Resolve an Auth0 user profile to an internal identity.
  *
  * This is the single entry-point that should be called after a successful
- * token validation. It:
+ * Auth0 token validation. It:
  *   1. Checks the Redis cache (fast path ~1ms)
- *   2. Falls back to a Postgres lookup via the provider's `findInternalIdBySub`
+ *   2. Falls back to a Postgres lookup via `auth_accounts`
  *   3. On first login, provisions the `users` row + `auth_accounts` link
  *
- * @param profile - Decoded provider user profile (from ID token or /userinfo)
+ * @param profile - Decoded Auth0 user profile (from ID token or /userinfo)
  * @returns A `ResolvedIdentity` whose `internalId` is the UUID to use everywhere
  */
 export async function resolveIdentity(
   profile: Auth0UserProfile,
 ): Promise<ResolvedIdentity> {
   const { sub } = profile
-  const provider = getIdentityProvider()
 
   // --- Fast path: Redis cache ---
   const cached = await getCachedIdentity(sub)
@@ -175,13 +192,13 @@ export async function resolveIdentity(
   let isNewUser = false
 
   await transaction(async (client: PoolClient) => {
-    const existing = await provider.findInternalIdBySub(sub, client)
+    const existing = await findUserByAuth0Sub(client, sub)
 
     if (existing) {
       internalId = existing.internalId
       role = existing.role
     } else {
-      const created = await createUserWithLink(client, profile, provider)
+      const created = await createUserWithLink(client, profile)
       internalId = created.internalId
       role = created.role
       isNewUser = true
@@ -206,7 +223,7 @@ export async function resolveIdentity(
 }
 
 /**
- * Invalidate the cached identity for a given provider sub.
+ * Invalidate the cached identity for a given Auth0 sub.
  * Call this after role changes, deactivations, or account updates.
  */
 export async function invalidateIdentityCache(sub: string): Promise<void> {
@@ -218,12 +235,18 @@ export async function invalidateIdentityCache(sub: string): Promise<void> {
 }
 
 /**
- * Look up the provider sub for a given internal UUID.
- * Used when we need to call the provider's Management API by internal ID.
+ * Look up the Auth0 sub for a given internal UUID.
+ * Used when we need to call the Auth0 Management API by internal ID.
  */
 export async function resolveAuth0SubFromInternalId(
   internalId: string,
 ): Promise<string | null> {
-  const provider = getIdentityProvider()
-  return provider.findSubByInternalId(internalId)
+  const result = await query<{ provider_id: string }>(
+    `SELECT provider_id
+     FROM auth_accounts
+     WHERE user_id = $1 AND provider = $2
+     LIMIT 1`,
+    [internalId, PROVIDER],
+  )
+  return result.rows[0]?.provider_id ?? null
 }

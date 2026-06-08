@@ -121,10 +121,9 @@ describe('analytics-worker', () => {
     const signals = ['SIGTERM', 'SIGINT']
     signals.forEach((signal) => {
       const listeners = process.listeners(signal)
-      const lastListener = listeners[listeners.length - 1]
-      if (lastListener) {
+      if (listeners.length > 0) {
         // Remove the last added listener, which is likely the one from the worker we just imported
-        process.removeListener(signal, lastListener)
+        process.removeListener(signal, listeners[listeners.length - 1])
       }
     })
     if (originalNodeEnv === undefined) {
@@ -289,7 +288,8 @@ describe('analytics-worker', () => {
       const messageHandler = vi
         .mocked(mockWsClient.once)
         .mock.calls.find(
-          (call) => call[0] === 'message',
+          (call: [string | symbol, (...args: unknown[]) => void]) =>
+            call[0] === 'message',
         )?.[1]
 
       if (!messageHandler) {
@@ -330,7 +330,8 @@ describe('analytics-worker', () => {
       const messageHandler = vi
         .mocked(mockWsClient.once)
         .mock.calls.find(
-          (call) => call[0] === 'message',
+          (call: [string | symbol, (...args: unknown[]) => void]) =>
+            call[0] === 'message',
         )?.[1]
       if (!messageHandler) {
         throw new Error('Message handler not attached')

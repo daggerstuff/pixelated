@@ -1,5 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
+
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
@@ -706,6 +707,10 @@ export default defineConfig({
                 disable: true,
               },
             }),
+            // Temporarily disable SpotlightJS due to build issues
+            // ...(shouldUseSpotlight ? [spotlightjs()] : [])
+          ]
+        : []),
             // ...(shouldUseSpotlight ? [spotlightjs()] : [])
           ]
         : []),
