@@ -1,7 +1,7 @@
 export const prerender = false
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
-import { AdminPermission, AdminService } from '../../../lib/admin'
+import { AdminPermission, AdminService } from '../../../lib/admin/index'
 import { adminGuard } from '../../../lib/admin/middleware'
 // import type { BaseAPIContext } from '@/lib/auth/apiRouteTypes'
 
@@ -21,7 +21,7 @@ export const GET = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.VIEW_USERS)(
-    context,
+    context as any,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -91,7 +91,7 @@ export const PATCH = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.UPDATE_USER)(
-    context,
+    context as any,
     next,
   )
   if (middlewareResponse.status !== 200) {

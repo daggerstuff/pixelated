@@ -519,11 +519,7 @@ class PatientManager {
     ]
   }
 
-  private analyzeSessionPatterns(
-    sessions: {
-      emotionAnalysis?: { moodScore?: number; dominantEmotion?: string }
-    }[],
-  ): Record<string, unknown> {
+  private analyzeSessionPatterns(sessions: { emotionAnalysis?: { moodScore?: number; dominantEmotion?: string } }[]): Record<string, unknown> {
     // Analyze patterns in session data
     const moodTrends = sessions
       .map((s) => s.emotionAnalysis?.moodScore)
@@ -543,9 +539,7 @@ class PatientManager {
     }
   }
 
-  private getMostCommonEmotions(
-    sessions: { emotionAnalysis?: { dominantEmotion?: string } }[],
-  ): string[] {
+  private getMostCommonEmotions(sessions: { emotionAnalysis?: { dominantEmotion?: string } }[]): string[] {
     const emotions = sessions
       .map((s) => s.emotionAnalysis?.dominantEmotion)
       .filter((e): e is string => !!e)
@@ -594,9 +588,7 @@ class PatientManager {
     }
   }
 
-  private calculateImprovementRate(
-    sessions: { emotionAnalysis?: { moodScore?: number } }[],
-  ): number {
+  private calculateImprovementRate(sessions: { emotionAnalysis?: { moodScore?: number } }[]): number {
     if (sessions.length < 2) return 0
 
     const firstHalf = sessions.slice(0, Math.floor(sessions.length / 2))
@@ -646,19 +638,13 @@ class PatientManager {
       performedBy,
       timestamp: new Date(),
       reason,
-      changes: this.calculateChanges(
-        oldData as Record<string, unknown>,
-        newData as Record<string, unknown>,
-      ),
+      changes: this.  calculateChanges(oldData as Record<string, unknown>, newData as Record<string, unknown>)
     }
 
     console.log('Audit entry created:', auditEntry)
   }
 
-  private calculateChanges(
-    oldData: Record<string, unknown>,
-    newData: Record<string, unknown>,
-  ): Record<string, { from: unknown; to: unknown }> {
+  private calculateChanges(oldData: unknown, newData: unknown): Record<string, { from: unknown; to: unknown }> {
     // Calculate what changed between old and new data
     const changes: any = {}
 
@@ -753,7 +739,7 @@ class PatientManager {
 
   /**
    * Export patient data for portability
-   */ async exportPatientData(
+   */    async exportPatientData(
     patientId: string,
     format: 'json' | 'pdf' | 'csv',
   ): Promise<{

@@ -141,10 +141,8 @@ const SessionChart: FC<SessionChartProps> = ({ data, isLoading }) => {
           <div key={day.date} className="flex flex-1 flex-col items-center">
             <div
               role="img"
-              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-              tabIndex={0}
               aria-label={`${day.sessions} sessions on ${day.dateString}`}
-              className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-400 w-full rounded-t transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-1"
+              className="bg-blue-500 hover:bg-blue-600 w-full rounded-t transition-all duration-300"
               style={{
                 height: day.heightPct,
                 minHeight: '4px',

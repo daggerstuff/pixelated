@@ -35,6 +35,31 @@ interface PoolStats {
   waitingCount: number
 }
 
+import { Pool, PoolClient } from 'pg'
+
+// pg does not export these types; define locally
+export interface DbQueryResult<T = Record<string, unknown>> {
+  rows: T[]
+  rowCount: number
+  command?: string
+  oid?: number
+  fields?: Array<{ name: string; dataTypeID: number }>
+}
+type QueryResultRow = Record<string, unknown>
+
+// Pool's runtime properties not exposed in pg type definitions.
+// Accessed via `as unknown as T` — safer than `as any` because it requires
+// explicit acknowledgement that the shape is compiler-unknown.
+interface PoolWithConnectEvent {
+  on(event: 'connect', listener: (client: PoolClient) => void): this
+}
+
+interface PoolStats {
+  totalCount: number
+  idleCount: number
+  waitingCount: number
+}
+
 // Database configuration
 export interface DatabaseConfig {
   host: string
@@ -84,9 +109,12 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   })
 
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
-  ;(pool as unknown as PoolWithConnectEvent).on('connect', (_client: PoolClient) => {
-    console.log('New client connected to database')
-  })
+  ;(pool as unknown as PoolWithConnectEvent).on(
+    'connect',
+    (_client: PoolClient) => {
+      console.log('New client connected to database')
+    },
+  )
 
   console.log(
     `Database pool initialized with ${finalConfig.max} max connections`,
@@ -301,7 +329,10 @@ export class DatabaseMigration {
    */
   async runMigrationsFromDirectory(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },
@@ -332,7 +363,10 @@ export class DatabaseMigration {
    */
   async rollbackLast(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },
@@ -360,7 +394,10 @@ export class DatabaseMigration {
    */
   async getStatus(
     dir: string,
-    fsAdapter: Pick<typeof import('node:fs/promises'), 'readdir' | 'readFile'> = {
+    fsAdapter: Pick<
+      typeof import('node:fs/promises'),
+      'readdir' | 'readFile'
+    > = {
       readdir,
       readFile,
     },

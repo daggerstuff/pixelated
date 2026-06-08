@@ -249,9 +249,8 @@ export const POST: APIRoute = protectRoute()(
         ),
       }
 
-      // TODO: Save particle interaction data for analytics
-      // const repository = new AIRepository()
-      // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
+    const body = (await request.json()) as Record<string, unknown>
+    const { emotion, intensity, sessionId, particleUpdates } = body
 
       logger.info('Processed particle system update', {
         emotion,
@@ -317,14 +316,7 @@ export const POST: APIRoute = protectRoute()(
 ) as any
 
 // Helper functions
-function calculateEmotionProfile(
-  sessionEmotions: {
-    primaryEmotion?: string
-    emotion?: string
-    confidence?: number
-    intensity?: number
-  }[],
-) {
+function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {
   const emotionCounts = new Map<
     string,
     { count: number; totalIntensity: number }
@@ -458,12 +450,7 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
 
 function generateEmotionParticles(
   config: ParticleSystemConfig,
-  emotionProfile: {
-    dominantEmotion: string
-    emotionMix: Record<string, number>
-    averageIntensity: number
-    volatility: number
-  },
+  emotionProfile: { dominantEmotion: string; emotionMix: Record<string, number>; averageIntensity: number; volatility: number },
 ): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config

@@ -87,6 +87,7 @@ export interface TherapeuticResponse {
   confidence: number
   intervention?: boolean
   techniques?: string[]
+  followUp?: string[]
   riskLevel?: 'low' | 'medium' | 'high' | 'critical'
   suggestedFollowup?: string
   approach?: string
@@ -103,6 +104,7 @@ export interface AnalysisConfig {
   confidenceThreshold?: number
   interventionThreshold?: number
   analysisMinLength?: number
+  enableCrisisDetection?: boolean
 }
 
 // Enhanced mental health analysis
