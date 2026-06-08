@@ -45,24 +45,29 @@ const ensureString = (param: unknown): string => {
   }
   return param !== undefined && param !== null ? String(param) : ''
 }
+
+// Typed request body interfaces
+interface DocumentBody {
+  title?: string
+  type?: string
+  category?: string
+  content?: Record<string, unknown>
+  description?: string
+  status?: string
+}
+
+interface ShareBody {
+  sharedWith?: string
+  permissionLevel?: string
+}
+
+interface CommentBody {
+  content?: string
+  parentCommentId?: string
+}
+
 const router: Router = express.Router()
 
-// ============================================================================
-// CREATE DOCUMENT
-// ============================================================================
-
-router.post(
-  '/',
-  requirePermission('edit'),
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const { title, type, category, content, description } = expressReq.body
 
     // Validation
     if (!title || !type || !category) {
@@ -91,18 +96,6 @@ router.post(
   }),
 )
 
-// ============================================================================
-// LIST DOCUMENTS
-// ============================================================================
-
-router.get(
-  '/',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
       return
     }
     const {
@@ -161,23 +154,6 @@ router.get(
   }),
 )
 
-// ============================================================================
-// GET SINGLE DOCUMENT
-// ============================================================================
-
-router.get(
-  '/:documentId',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
-
-    const document = await documentService.getDocument(documentId, userId)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
@@ -190,34 +166,6 @@ router.get(
   }),
 )
 
-// ============================================================================
-// UPDATE DOCUMENT
-// ============================================================================
-
-router.put(
-  '/:documentId',
-  requirePermission('edit'),
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
-    const { title, content, status, description } = expressReq.body
-
-    const document = await documentService.updateDocument(
-      documentId,
-      {
-        title,
-        content,
-        status,
-        description,
-      },
-      userId,
-    )
 
     if (!document) {
       throw new NotFoundError('Document', documentId)
@@ -230,22 +178,6 @@ router.put(
   }),
 )
 
-// ============================================================================
-// DELETE DOCUMENT
-// ============================================================================
-
-router.delete(
-  '/:documentId',
-  requireRole(['admin', 'manager']),
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
 
     const deleted = await documentService.deleteDocument(documentId, userId)
 
@@ -260,22 +192,6 @@ router.delete(
   }),
 )
 
-// ============================================================================
-// SHARE DOCUMENT
-// ============================================================================
-
-router.post(
-  '/:documentId/share',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
-    const { sharedWith, permissionLevel } = expressReq.body
 
     if (!sharedWith || !permissionLevel) {
       throw new ValidationError(
@@ -297,22 +213,6 @@ router.post(
   }),
 )
 
-// ============================================================================
-// ADD COMMENT
-// ============================================================================
-
-router.post(
-  '/:documentId/comments',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
-    const { content, parentCommentId } = expressReq.body
 
     if (!content) {
       throw new ValidationError('Comment content is required')
@@ -333,16 +233,6 @@ router.post(
   }),
 )
 
-// ============================================================================
-// GET DOCUMENT COMMENTS
-// ============================================================================
-
-router.get(
-  '/:documentId/comments',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const documentId = ensureString(expressReq.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -361,16 +251,6 @@ router.get(
   }),
 )
 
-// ============================================================================
-// DOCUMENT HISTORY / VERSIONS
-// ============================================================================
-
-router.get(
-  '/:documentId/versions',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const documentId = ensureString(expressReq.params['documentId'])
 
     const pool = getPostgresPool()
     const result = await pool.query(
@@ -388,25 +268,6 @@ router.get(
   }),
 )
 
-// ============================================================================
-// EXPORT DOCUMENT
-// ============================================================================
-
-router.get(
-  '/:documentId/export',
-  asyncHandler(async (req: unknown, res: unknown) => {
-    const expressReq = req as Request
-    const expressRes = res as Response
-    const userId = expressReq.user?.id
-    if (!userId) {
-      expressRes.status(401).json({ success: false, error: 'Unauthorized' })
-      return
-    }
-    const documentId = ensureString(expressReq.params['documentId'])
-    const { format: formatQuery = 'json' } = expressReq.query
-    const format = ensureString(formatQuery)
-
-    const document = await documentService.getDocument(documentId, userId)
 
     if (!document) {
       throw new NotFoundError('Document', documentId)

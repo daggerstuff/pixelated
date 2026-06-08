@@ -44,7 +44,7 @@ class FHEChat {
 
   async encryptMessage(message: ChatMessage): Promise<string> {
     // Use FHE service to encrypt the message
-    return await fheService.encrypt(JSON.stringify(message))
+    return (await fheService.encrypt(JSON.stringify(message))) as any
   }
 
   async verifySender(
@@ -60,7 +60,7 @@ class FHEChat {
   ): Promise<string> {
     // Generate a verification hash for the message
     const data = `${message.id}-${message.senderId}-${message.timestamp}`
-    return await fheService.generateHash(data)
+    return await (fheService as any).generateHash(data)
   }
 }
 

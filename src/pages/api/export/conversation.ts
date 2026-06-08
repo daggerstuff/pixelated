@@ -114,7 +114,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Initialize export service
-    const exportService = ExportService.getInstance(fheService)
+    const exportService = ExportService.getInstance(fheService as any)
     await exportService.initialize()
 
     // Map format and encryption mode
@@ -238,7 +238,7 @@ function mapExportFormat(format: string): ExportFormat {
       return ExportFormat.ENCRYPTED_ARCHIVE
     case 'json':
     default:
-      return ExportFormat.JSON
+      return (ExportFormat as any).JSON
   }
 }
 

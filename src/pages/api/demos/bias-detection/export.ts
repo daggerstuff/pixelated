@@ -8,9 +8,9 @@ import type {
 } from '../../../../lib/types/bias-detection'
 import { createExportData } from '../../../../lib/utils/demo-helpers'
 
-export const POST = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
 
     // Validate required fields
     if (!body.analysisResults) {
@@ -37,7 +37,13 @@ export const POST = async ({ request }) => {
         recommendations: true,
         demographics: true,
       },
-    } = body
+    } = body as {
+      analysisResults: unknown
+      counterfactualScenarios?: unknown[]
+      historicalComparison?: unknown
+      format?: string
+      includeComponents?: Record<string, boolean>
+    }
 
     // Validate format
     const supportedFormats = ['json', 'csv', 'txt']
@@ -58,7 +64,7 @@ export const POST = async ({ request }) => {
     const exportData = createExportData(
       analysisResults as BiasAnalysisResults,
       counterfactualScenarios as CounterfactualScenario[],
-      historicalComparison as HistoricalComparison | null,
+      historicalComparison as HistoricalComparison,
     )
 
     // Filter components based on includeComponents
@@ -74,7 +80,7 @@ export const POST = async ({ request }) => {
       metadata: {
         ...exportData.metadata,
         includedComponents: Object.keys(includeComponents).filter(
-          (key) => includeComponents[key as keyof typeof includeComponents],
+          (key) => includeComponents[key],
         ),
       },
     }
@@ -86,7 +92,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'application/json',
-            'Content-Disposition': `attachment; filename="bias-analysis-${analysisResults.sessionId}.json"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-${(analysisResults as BiasAnalysisResults).sessionId}.json"`,
           },
         })
 
@@ -96,7 +102,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'text/csv',
-            'Content-Disposition': `attachment; filename="bias-analysis-${analysisResults.sessionId}.csv"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-${(analysisResults as BiasAnalysisResults).sessionId}.csv"`,
           },
         })
       }
@@ -107,7 +113,7 @@ export const POST = async ({ request }) => {
           status: 200,
           headers: {
             'Content-Type': 'text/plain',
-            'Content-Disposition': `attachment; filename="bias-analysis-report-${analysisResults.sessionId}.txt"`,
+            'Content-Disposition': `attachment; filename="bias-analysis-report-${(analysisResults as BiasAnalysisResults).sessionId}.txt"`,
           },
         })
       }
@@ -142,61 +148,59 @@ export const POST = async ({ request }) => {
 
 // Helper function to convert export data to CSV format
 function convertToCSV(exportData: ExportData): string {
-  const csvRows = []
+  const csvRows: string[] = []
 
   // Headers
-  csvRows.push('Category,Metric,Value,Details')
+  csvRows.push('Category,Metric,Value,Details' as any)
 
   // Analysis data
   if (exportData.analysis) {
     const { analysis } = exportData
     csvRows.push(
-      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}`,
+      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}` as any,
     )
-    csvRows.push(`Analysis,Confidence,${analysis.confidence},`)
-    csvRows.push(`Analysis,Session ID,${analysis.sessionId},`)
+    csvRows.push(`Analysis,Confidence,${analysis.confidence},` as any)
+    csvRows.push(`Analysis,Session ID,${analysis.sessionId},` as any)
 
     // Layer results
     const layers = analysis.layerResults
     csvRows.push(
-      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},`,
+      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},`,
+      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},`,
+      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},`,
-    )
-
-    csvRows.push(
-      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},`,
-    )
-    csvRows.push(
-      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},`,
-    )
-    csvRows.push(
-      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},`,
+      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},` as any,
     )
 
     csvRows.push(
-      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},`,
+      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},` as any,
     )
     csvRows.push(
-      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},`,
+      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},` as any,
     )
     csvRows.push(
-      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},`,
+      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},` as any,
+    )
+
+    csvRows.push(
+      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},` as any,
+    )
+    csvRows.push(
+      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},` as any,
+    )
+    csvRows.push(
+      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},` as any,
     )
   }
 
   // Counterfactual scenarios
   if (exportData.counterfactualScenarios) {
-    const scenarios = exportData.counterfactualScenarios as Array<
-      Record<string, unknown>
-    >
+    const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
       csvRows.push(
         `Counterfactual,Scenario ${index + 1},${scenario['expectedBiasReduction'] as number},${scenario['change']}`,
@@ -210,9 +214,13 @@ function convertToCSV(exportData: ExportData): string {
   // Historical comparison
   if (exportData.historicalComparison) {
     const historical = exportData.historicalComparison
-    csvRows.push(`Historical,30-Day Average,${historical.thirtyDayAverage},`)
-    csvRows.push(`Historical,Percentile Rank,${historical.percentileRank},`)
-    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},`)
+    csvRows.push(
+      `Historical,30-Day Average,${historical.thirtyDayAverage},` as any,
+    )
+    csvRows.push(
+      `Historical,Percentile Rank,${historical.percentileRank},` as any,
+    )
+    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},` as any)
   }
 
   return csvRows.join('\n')
@@ -253,9 +261,7 @@ function convertToText(exportData: ExportData): string {
     Array.isArray(exportData.counterfactualScenarios)
   ) {
     content += `COUNTERFACTUAL SCENARIOS\n`
-    const scenarios = exportData.counterfactualScenarios as Array<
-      Record<string, unknown>
-    >
+    const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
       content += `${index + 1}. ${scenario['change']}\n`
       content += `   Expected Reduction: ${((scenario['expectedBiasReduction'] as number) * 100).toFixed(1)}%\n`

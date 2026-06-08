@@ -43,7 +43,7 @@ const OPTIMIZED_INDEXES = {
 /**
  * Execute query with timeout and performance monitoring
  */
-export async function executeQuery<T = unknown>(
+export async function executeQuery(
   text: string,
   params?: unknown[],
   options: {
@@ -51,7 +51,7 @@ export async function executeQuery<T = unknown>(
     retries?: number
     name?: string
   } = {},
-): Promise<QueryResult<T>> {
+): Promise<{ rows: unknown[]; rowCount: number }> {
   const startTime = Date.now()
   const queryName = options.name ?? 'unnamed'
   const timeout = options.timeout ?? QUERY_CONFIG.TIMEOUT_MS
@@ -175,6 +175,61 @@ export async function executeTransaction<T>(
   }
 }
 
+/** Row types for query results */
+interface BiasAnalysisRow {
+  id: string
+  overall_bias_score: string
+  alert_level: string
+  confidence: string
+  recommendations: unknown
+  demographics: unknown
+  processing_time_ms: string
+  created_at: string
+  session_type: string
+  therapist_first_name: string
+  therapist_last_name: string
+  client_id: string
+}
+
+interface CountRow {
+  total: string
+}
+
+interface BiasTrendRow {
+  date: string
+  avg_score: string
+  analysis_count: string
+  high_alerts: string
+}
+
+interface PerfMetricsRow {
+  total_analyses: string
+  avg_processing_time: string
+  fast_queries_pct: string
+  slow_queries: string
+}
+
+interface CacheHitRow {
+  cache_hit_rate?: string
+}
+
+interface TableSizeRow {
+  table: string
+  size: string
+  rows: number
+}
+
+interface IndexUsageRow {
+  index: string
+  usage: number
+}
+
+interface QueryPerfRow {
+  query: string
+  avg_time: number
+  calls: number
+}
+
 /**
  * Optimized bias analysis queries
  */
@@ -273,7 +328,8 @@ export class OptimizedBiasQueries {
     // Execute main query
     const result = await executeQuery(query, params, {
       name: 'getBiasAnalyses',
-    })
+    }) as { rows: BiasAnalysisRow[] }
+    const rows = result.rows
 
     // Get total count for pagination
     const countQuery = `
@@ -289,7 +345,7 @@ export class OptimizedBiasQueries {
     const total = parseInt((countResult.rows[0] as { total: string }).total)
 
     return {
-      analyses: result.rows,
+      analyses: rows,
       total,
       page: Math.floor(offset / limit) + 1,
       pageSize: limit,
@@ -299,7 +355,7 @@ export class OptimizedBiasQueries {
   /**
    * Get cached analysis by content hash (optimized)
    */
-  async getCachedAnalysis(contentHash: string): Promise<unknown | null> {
+  async getCachedAnalysis(contentHash: string): Promise<unknown> {
     const query = `
       SELECT 
         ba.id,
@@ -320,7 +376,7 @@ export class OptimizedBiasQueries {
     const result = await executeQuery(query, [contentHash], {
       name: 'getCachedAnalysis',
       timeout: 2000, // 2 second timeout for cache lookups
-    })
+    }) as { rows: unknown[] }
 
     return result.rows[0] ?? null
   }
@@ -356,10 +412,15 @@ export class OptimizedBiasQueries {
 
     const result = await executeQuery(query, [therapistId], {
       name: 'getBiasTrend',
-    })
+    }) as { rows: BiasTrendRow[] }
 
     // Calculate trend
-    const dailyScores = result.rows
+    const dailyScores = result.rows.map((row) => ({
+      date: row.date,
+      avg_score: parseFloat(row.avg_score),
+      analysis_count: parseInt(row.analysis_count),
+      high_alerts: parseInt(row.high_alerts),
+    }))
     let overallTrend: 'improving' | 'stable' | 'worsening' = 'stable'
     let avgScoreChange = 0
 
@@ -424,7 +485,7 @@ export class OptimizedBiasQueries {
 
     const result = await executeQuery(query, [limit], {
       name: 'getHighRiskAnalyses',
-    })
+    }) as { rows: unknown[] }
 
     return result.rows
   }
@@ -454,8 +515,18 @@ export class OptimizedBiasQueries {
 
     const result = await executeQuery(query, [], {
       name: 'getPerformanceMetrics',
-    })
-    const row = result.rows[0]
+    }) as { rows: PerfMetricsRow[] }
+    const rows = result.rows
+    const row = rows[0]
+    if (!row) {
+      return {
+        total_analyses: 0,
+        avg_processing_time: 0,
+        cache_hit_rate: 0,
+        slow_queries: 0,
+        error_rate: 0,
+      }
+    }
 
     // Calculate cache hit rate from recent analyses with low processing time
     const cacheHitQuery = `
@@ -569,7 +640,8 @@ export class DatabaseOptimizer {
 
     const tableSizeResult = await executeQuery(tableSizeQuery, [], {
       name: 'getTableSizes',
-    })
+    }) as { rows: TableSizeRow[] }
+    const tableSizes = tableSizeResult.rows
 
     // Get index usage
     const indexUsageQuery = `
@@ -583,14 +655,11 @@ export class DatabaseOptimizer {
 
     const indexUsageResult = await executeQuery(indexUsageQuery, [], {
       name: 'getIndexUsage',
-    })
+    }) as { rows: IndexUsageRow[] }
+    const indexUsage = indexUsageResult.rows
 
     // Get query performance (if pg_stat_statements is enabled)
-    let queryPerformance: Array<{
-      query: string
-      avg_time: number
-      calls: number
-    }> = []
+    let queryPerformance: QueryPerfRow[] = []
 
     try {
       const queryPerfQuery = `
@@ -605,15 +674,15 @@ export class DatabaseOptimizer {
 
       const queryPerfResult = await executeQuery(queryPerfQuery, [], {
         name: 'getQueryPerformance',
-      })
+      }) as { rows: QueryPerfRow[] }
       queryPerformance = queryPerfResult.rows
     } catch (error: unknown) {
       logger.warn('pg_stat_statements not available', { error })
     }
 
     return {
-      table_sizes: tableSizeResult.rows,
-      index_usage: indexUsageResult.rows,
+      table_sizes: tableSizes,
+      index_usage: indexUsage,
       query_performance: queryPerformance,
     }
   }
@@ -630,7 +699,7 @@ export async function monitorQueryPerformance(): Promise<void> {
   logger.info('Database performance monitoring', {
     tableCount: stats.table_sizes.length,
     totalRows: stats.table_sizes.reduce(
-      (sum, table) => sum + parseInt(table.rows),
+      (sum, table) => sum + table.rows,
       0,
     ),
     slowQueries: stats.query_performance.length,

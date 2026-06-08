@@ -44,7 +44,7 @@ export class UniversalDemoAnalytics {
 
   constructor(pageName: DemoPageName) {
     this.pageName = pageName
-    this.pageConfig = DEMO_PAGES_CONFIG[pageName]
+    this.pageConfig = DEMO_PAGES_CONFIG[pageName]!
     this.sessionId = this.generateSessionId()
     this.startTime = Date.now()
     this.scrollDepths = new Set()
@@ -110,7 +110,7 @@ export class UniversalDemoAnalytics {
 
     if (!variant) {
       const variants = Object.keys(this.pageConfig.abTestVariants.headline)
-      variant = variants[Math.floor(Math.random() * variants.length)]
+      variant = variants[Math.floor(Math.random() * variants.length)]!
       sessionStorage.setItem(ANALYTICS_CONFIG.STORAGE_KEYS.AB_VARIANT, variant)
 
       // Track variant assignment
@@ -119,8 +119,7 @@ export class UniversalDemoAnalytics {
         page_name: this.pageName,
       })
     }
-
-    return variant
+    return variant ?? ''
   }
 
   private applyABTestVariant() {
@@ -317,7 +316,7 @@ export class UniversalDemoAnalytics {
     window.addEventListener('unhandledrejection', (e) => {
       void this.trackEvent(ANALYTICS_EVENTS.ERROR_OCCURRED, {
         error_type: 'unhandled_promise_rejection',
-        error_reason: e.reason?.toString(),
+        error_reason: String(e.reason),
       })
     })
   }
@@ -361,12 +360,11 @@ export class UniversalDemoAnalytics {
       session_id: this.sessionId,
       page_name: this.pageName,
       ab_variant: this.abTestVariant,
-      url: window.location.href,
-      referrer: document.referrer,
-      user_agent: navigator.userAgent,
+      url: window.location.href || '',
+      referrer: document.referrer || '',
+      user_agent: navigator.userAgent || '',
       viewport_width: window.innerWidth,
       viewport_height: window.innerHeight,
-      ...properties,
     }
 
     this.eventQueue.push(eventData)
