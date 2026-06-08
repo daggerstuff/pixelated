@@ -22,7 +22,7 @@ import { validateData } from './validation'
 export async function toUnifiedProcessingRequest(
   data: unknown,
 ): Promise<UnifiedProcessingRequest> {
-  return validateData(UnifiedProcessingRequestSchema, data)
+  return validateData(UnifiedProcessingRequestSchema, data) as any
 }
 
 /**
@@ -34,5 +34,5 @@ export async function toUnifiedProcessingRequest(
 export async function toUnifiedProcessingResponse(
   data: unknown,
 ): Promise<UnifiedProcessingResponse> {
-  return validateData(UnifiedProcessingResponseSchema, data)
+  return validateData(UnifiedProcessingResponseSchema, data) as any
 }

@@ -32,6 +32,18 @@ interface PoolStats {
   waitingCount: number
 }
 
+import { Pool, PoolClient } from 'pg'
+
+// pg does not export these types; define locally
+export interface DbQueryResult<T = Record<string, unknown>> {
+  rows: T[]
+  rowCount: number
+  command?: string
+  oid?: number
+  fields?: Array<{ name: string; dataTypeID: number }>
+}
+type QueryResultRow = Record<string, unknown>
+
 // Database configuration
 export interface DatabaseConfig {
   host: string

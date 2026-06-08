@@ -293,7 +293,7 @@ describe('ObjectiveMetricsEngine', () => {
 
     test('should track trends after multiple evaluations', () => {
       // Add multiple evaluations with varying scores
-      const evaluations = []
+      const evaluations: any[] = []
       for (let i = 0; i < 5; i++) {
         const evaluation = {
           ...mockEvaluationResult,
@@ -306,7 +306,7 @@ describe('ObjectiveMetricsEngine', () => {
             },
           },
         }
-        evaluations.push(evaluation)
+        evaluations.push(evaluation as any)
         engine.addEvaluation(evaluation, mockObjectives)
       }
 

@@ -43,9 +43,9 @@ interface InitOptions {
   title?: string
 }
 
-program
+(program
   .command('check-in')
-  .description('Perform Ollama check-in for a completed task')
+  .description('Perform Ollama check-in for a completed task') as any)
   .requiredOption('-f, --file <path>', 'Path to task list file')
   .requiredOption('-t, --task-id <id>', 'ID of completed task')
   .requiredOption('-s, --summary <summary>', 'Summary of completed task')
@@ -122,7 +122,7 @@ program
 
       if (verbose) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.checkInResult.rawResponse)
+        console.log((result.checkInResult as any).rawResponse)
       }
     } catch (error: unknown) {
       console.error(
@@ -175,7 +175,7 @@ program
 
       if (verbose) {
         console.log('\n📝 Raw Ollama response:')
-        console.log(result.rawResponse)
+        console.log((result as any).rawResponse)
       }
     } catch (error: unknown) {
       console.error(
@@ -210,109 +210,3 @@ program
       const summary = taskManager.getTaskSummary(taskList)
 
       console.log('📋 Task List Status')
-      console.log('==================')
-      console.log(`File: ${validatedFilePath}`)
-      console.log(`Total tasks: ${summary.total}`)
-      console.log(`Completed: ${summary.completed}`)
-      console.log(`Remaining: ${summary.remaining}`)
-      console.log(`Progress: ${summary.progress}%`)
-
-      if (summary.nextTask) {
-        console.log(`\n🎯 Next task: ${summary.nextTask.content}`)
-        if (summary.nextTask.metadata?.addedBy === 'ollama') {
-          console.log(
-            `   ↳ Added by Ollama (${summary.nextTask.metadata.category})`,
-          )
-        }
-      } else {
-        console.log('\n🎉 All tasks completed!')
-      }
-
-      if (taskList.metadata?.lastCheckIn) {
-        console.log(
-          `\n⏰ Last check-in: ${new Date(taskList.metadata.lastCheckIn).toLocaleString()}`,
-        )
-      }
-    } catch (error: unknown) {
-      console.error(
-        '❌ Failed to get status:',
-        error instanceof Error ? String(error) : String(error),
-      );
-      (process as any).exit(1)
-    }
-  })
-
-program
-  .command('init')
-  .description('Initialize a new task list file')
-  .requiredOption('-f, --file <path>', 'Path for new task list file')
-  .option('-t, --title <title>', 'Title for the task list', 'Task List')
-  .action(async (options: InitOptions) => {
-    try {
-      const { file, title } = options
-
-      // Validate file path to prevent path traversal
-      const validatedFilePath = validatePath(
-        file,
-        ALLOWED_DIRECTORIES.PROJECT_ROOT,
-      )
-
-      if (existsSync(validatedFilePath)) {
-        console.error(`❌ File already exists: ${file}`)
-        void (process as any).exit(1)
-      }
-
-      const content = `---
-description: ${title}
-globs:
-alwaysApply: false
----
-
-# ${title}
-
-## Tasks
-
-- [ ] Example task 1
-- [ ] Example task 2
-  - [ ] Sub-task 2.1
-  - [ ] Sub-task 2.2
-- [ ] Example task 3
-
-## Relevant Files
-
-(List files created or modified during task completion)
-
-## Notes
-
-(Add any relevant notes or context here)
-`
-
-      const taskManager = new TaskListManager()
-      const taskList = await taskManager.loadTaskList(validatedFilePath)
-      taskList.content = content
-      await taskManager.saveTaskList(taskList)
-
-      console.log(`✅ Task list created: ${validatedFilePath}`)
-      console.log('You can now use the following commands:')
-      console.log(`  task-manager status -f ${validatedFilePath}`)
-      console.log(
-        `  task-manager check-in -f ${validatedFilePath} -t <task-id> -s "<summary>"`,
-      )
-    } catch (error: unknown) {
-      console.error(
-        '❌ Failed to create task list:',
-        error instanceof Error ? String(error) : String(error),
-      );
-      (process as any).exit(1)
-    }
-  })
-
-// Handle unhandled promise rejections
-;(process as any).on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
-  const errorDetail =
-    reason instanceof Error ? reason.message : String(reason)
-  logger.error('Unhandled Rejection', { promise, reason: errorDetail })
-  ;(process as any).exit(1)
-})
-
-program.parse()

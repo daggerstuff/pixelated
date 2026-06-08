@@ -20,6 +20,29 @@ export interface Session {
   token?: string
 }
 
+interface AuthProfileResponse {
+  user: User
+}
+
+interface AuthResponse {
+  user?: User
+  token?: string
+  error?: string
+}
+
+interface SignInRequest {
+  email: string
+  password: string
+  rememberMe?: boolean
+}
+
+interface SignUpRequest {
+  email: string
+  password: string
+  name?: string
+  role?: string
+}
+
 class AuthClient {
   private _session: Session | null = null
   private _isLoading = false
@@ -53,7 +76,10 @@ class AuthClient {
 
   /**
    */
-  async getSession() {
+  async getSession(): Promise<{
+    data: { session: Session; user: User } | null
+    error: Error | null
+  }> {
     if (this._session) {
       return {
         data: {
@@ -103,8 +129,10 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({ email, password, rememberMe }: any) {
-    this._isLoading = true
+  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
+    data: AuthResponse | null
+    error: Error | null
+  }> {
     try {
       const response = await fetch('/api/auth/signin', {
         method: 'POST',
@@ -112,14 +140,14 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return { error: data.error ?? 'Login failed' }
       }
 
       this._session = {
-        user: data.user,
+        user: data.user!,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
@@ -139,8 +167,10 @@ class AuthClient {
   /**
    * Sign up a new user
    */
-  async signUpEmail({ email, password, role }: any) {
-    this._isLoading = true
+  async signUpEmail({ email, password, role, name }: SignUpRequest): Promise<{
+    data: AuthResponse | null
+    error: Error | null
+  }> {
     try {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -148,7 +178,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return { error: data.error ?? 'Registration failed' }
@@ -169,7 +199,7 @@ class AuthClient {
   /**
    * Sign out the current user
    */
-  async signOut() {
+  async signOut(): Promise<void> {
     try {
       // Clear cookie
       document.cookie =
@@ -190,7 +220,13 @@ class AuthClient {
   get signIn() {
     return {
       email: this.signInEmail.bind(this),
-      social: async ({ provider, callbackURL }: any) => {
+      social: async ({
+        provider,
+        callbackURL,
+      }: {
+        provider: string
+        callbackURL?: string
+      }) => {
         // Implementation for social login using server-side flow
         console.log(`Social login with ${provider} initiated`)
         const returnTo = callbackURL ?? window.location.pathname
@@ -248,7 +284,7 @@ export function useSession() {
           if (result.data?.session) {
             setSession(result.data.session)
           }
-          setError(result.error as Error | null)
+          setError(result.error)
         }
       } catch (e) {
         if (mounted) {

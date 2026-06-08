@@ -30,7 +30,7 @@ export const GET = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId } = context.locals.admin
+    const { userId } = (context.locals as any).admin
 
     // Parse query parameters for pagination and filtering
     const url = new URL(context.request.url)
@@ -44,7 +44,7 @@ export const GET = async (context: APIContext) => {
     // Get users with pagination and filtering
     const usersResult = await adminService.getAllAdmins()
     const filteredUsers = role
-      ? usersResult.filter((user: any) => user.role === role)
+      ? usersResult.filter((user: { role?: string }) => user.role === role)
       : usersResult
     const total = filteredUsers.length
     const paginatedUsers = filteredUsers.slice(offset, offset + limit)
@@ -100,11 +100,17 @@ export const PATCH = async (context: APIContext) => {
 
   try {
     // Get admin user ID from middleware context
-    const { userId: adminId } = context.locals.admin
+    const { userId: adminId } = (context.locals as any).admin
 
     // Parse the request body
-    const requestData = await context.request.json()
-    const { userId, updates } = requestData
+    const requestData = (await context.request.json()) as Record<
+      string,
+      unknown
+    >
+    const userId = requestData['userId'] as string | undefined
+    const updates = requestData['updates'] as
+      | Record<string, unknown>
+      | undefined
 
     if (!userId || !updates) {
       return new Response(

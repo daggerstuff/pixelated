@@ -95,7 +95,7 @@ export default function ClinicalAnalysisDemo() {
         throw new Error(`Analysis failed: ${response.status}`)
       }
 
-      const apiResult = await response.json()
+      const apiResult = (await response.json()) as unknown as ApiResponse
 
       // Transform API response to match our interface
       const analysisResult: AnalysisResult = {
@@ -106,36 +106,20 @@ export default function ClinicalAnalysisDemo() {
           recommendations: apiResult.riskAssessment.recommendations,
           immediateActions: apiResult.riskAssessment.immediateActions,
         },
-        mentalHealthIndicators: apiResult.indicators.map(
-          (indicator: {
-            condition: string
-            present: boolean
-            confidence: number
-            severity: number
-            notes: string
-          }) => ({
-            name: indicator.condition,
-            present: indicator.present,
-            confidence: indicator.confidence,
-            severity: indicator.severity,
-            notes: indicator.notes,
-          }),
-        ),
-        recommendations: apiResult.recommendations.map(
-          (rec: {
-            type: string
-            priority: string
-            intervention: string
-            rationale: string
-            timeline: string
-          }) => ({
-            type: rec.type,
-            priority: rec.priority,
-            description: rec.intervention,
-            rationale: rec.rationale,
-            timeline: rec.timeline,
-          }),
-        ),
+        mentalHealthIndicators: apiResult.indicators.map((indicator) => ({
+          name: indicator.condition,
+          present: indicator.present,
+          confidence: indicator.confidence,
+          severity: indicator.severity,
+          notes: indicator.notes,
+        })),
+        recommendations: apiResult.recommendations.map((rec) => ({
+          type: rec.type,
+          priority: rec.priority,
+          description: rec.intervention,
+          rationale: rec.rationale,
+          timeline: rec.timeline,
+        })),
         clinicalSummary: apiResult.analysis.summary,
         followUpRequired: apiResult.analysis.followUpRequired,
         estimatedDuration: apiResult.analysis.estimatedDuration,

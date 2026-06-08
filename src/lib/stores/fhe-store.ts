@@ -13,6 +13,7 @@ import type {
   FHEServiceInterface,
   EncryptedData,
 } from '../fhe/types'
+import { isEncryptedData } from '../fhe/types'
 import { FHEOperation } from '../fhe/types'
 import { EncryptionMode as EncryptionModeEnum } from '../fhe/types'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -294,11 +295,11 @@ export const useFHEStore = create<FHEState>()((set, get) => {
         let result: HomomorphicOperationResult
 
         if ('processEncrypted' in fheService && fheService.processEncrypted) {
-          result = await fheService.processEncrypted(
+          result = (await fheService.processEncrypted(
             encryptedMessage,
             operation,
             params,
-          )
+          )) as unknown as HomomorphicOperationResult
         } else {
           // Fallback to individual operation methods
           const encryptedData =

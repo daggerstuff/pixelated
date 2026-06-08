@@ -56,15 +56,18 @@ describe('PipelineDashboard', () => {
     onError: vi.fn(),
   }
 
-  const renderComponent = (props = {}) => {
-    return render(
-      <WebSocketProvider>
-        <PipelineAPIProvider>
-          <PipelineDashboard {...mockProps} {...props} />
-        </PipelineAPIProvider>
-      </WebSocketProvider>,
-    )
-  }
+const renderComponent = (props = {}) => {
+  return render(
+    <WebSocketProvider>
+      <PipelineAPIProvider>
+        <PipelineDashboard {...defaultMockProps} {...props} />
+      </PipelineAPIProvider>
+    </WebSocketProvider>,
+  )
+}
+
+describe('PipelineDashboard', () => {
+  const mockProps = defaultMockProps
 
   beforeEach(() => {
     vi.clearAllMocks()
