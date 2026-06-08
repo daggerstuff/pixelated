@@ -1416,8 +1416,8 @@ describe("BiasDetectionEngine", () => {
         expect(explanation.alertLevel).toMatch(/^(low|medium|high|critical)$/);
         expect(explanation.highlights).toHaveLength(3);
         // Highlights should be sorted desc by biasScore
-        expect(explanation.highlights[0]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[1]!.biasScore);
-        expect(explanation.highlights[1]!.biasScore).toBeGreaterThanOrEqual(explanation.highlights[2]!.biasScore);
+        expect(explanation.highlights[0].biasScore).toBeGreaterThanOrEqual(explanation.highlights[1].biasScore);
+        expect(explanation.highlights[1].biasScore).toBeGreaterThanOrEqual(explanation.highlights[2].biasScore);
         expect(explanation.confidence).toBeDefined();
       });
 
@@ -1616,7 +1616,7 @@ describe("BiasDetectionEngine", () => {
         const result = await noMaskEngine.analyzeSession(sessionWithPii);
         expect(result).toBeDefined();
         // With masking disabled, demographics should still be populated
-        expect(result.demographics.age).toBe("35");
+        expect((result as any).demographics.age).toBe("35");
       });
 
       it("should return undefined demographics when input is undefined", async () => {
@@ -1795,7 +1795,7 @@ describe("BiasDetectionEngine", () => {
 
         expect(result.results).toHaveLength(1);
         expect(result.errors).toHaveLength(1);
-        expect(result.errors[0]!.error.message).toBe('Session processing failed');
+        expect(result.errors[0].error.message).toBe('Session processing failed');
         // Should have logged the error
         expect(consoleErrorSpy).toHaveBeenCalledWith(
           expect.stringContaining('[BatchError]'),
@@ -1817,8 +1817,8 @@ describe("BiasDetectionEngine", () => {
 
         expect(report).toBeDefined();
         expect(report.summary).toBeDefined();
-        expect(report.summary.sessionCount).toBe(2);
-        expect(typeof report.summary.averageBiasScore).toBe("number");
+        expect((report as any).summary.sessionCount).toBe(2);
+        expect(typeof (report as any).summary.averageBiasScore).toBe("number");
         expect(report.performance).toBeDefined();
         expect(report.alerts).toBeDefined();
       });
@@ -1828,8 +1828,8 @@ describe("BiasDetectionEngine", () => {
         const report = await engine.generateBiasReport([session]);
 
         expect(report).toBeDefined();
-        expect(report.summary.sessionCount).toBe(1);
-        expect(typeof report.summary.averageBiasScore).toBe("number");
+        expect((report as any).summary.sessionCount).toBe(1);
+        expect(typeof (report as any).summary.averageBiasScore).toBe("number");
         expect(report.alerts).toBeDefined();
         expect(report.performance).toBeDefined();
       });

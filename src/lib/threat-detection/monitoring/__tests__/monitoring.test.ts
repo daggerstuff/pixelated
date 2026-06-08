@@ -605,8 +605,8 @@ describe('Enhanced Monitoring Service', () => {
       const anomalies = await detectMetricAnomalies(metrics, mockAIService)
 
       expect(anomalies).toHaveLength(1)
-      expect(anomalies?.[0]!.value).toBe(500)
-      expect(anomalies?.[0]!.isAnomaly).toBe(true)
+      expect(anomalies?.[0].value).toBe(500)
+      expect(anomalies?.[0].isAnomaly).toBe(true)
     })
 
     it('should get performance metrics', async () => {
@@ -1042,7 +1042,7 @@ describe('Enhanced Monitoring Service', () => {
 
       const insights = await service.generateAIInsights(metrics)
 
-      // Step 3: Create alert based on insights
+      // Step 3: Create! alert based on insights
       const alertData = {
         title: 'High CPU Usage',
         description: (insights as any)?.insights?.[0]?.description,

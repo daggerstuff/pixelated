@@ -7,7 +7,7 @@ import type { TherapeuticSession } from '../../types'
 export const baselineAnxietyScenario: TherapeuticSession = {
   sessionId: 'baseline-anxiety-001',
   participantDemographics: {
-    age: 32,
+    age: (32 as any),
     gender: 'female',
     ethnicity: 'hispanic',
     socioeconomicStatus: 'middle-class',
@@ -83,7 +83,7 @@ export const baselineAnxietyScenario: TherapeuticSession = {
 export const baselineDepressionScenario: TherapeuticSession = {
   sessionId: 'baseline-depression-001',
   participantDemographics: {
-    age: 45,
+    age: (45 as any),
     gender: 'male',
     ethnicity: 'caucasian',
     socioeconomicStatus: 'working-class',
@@ -159,7 +159,7 @@ export const baselineDepressionScenario: TherapeuticSession = {
 export const baselinePainManagementScenario: TherapeuticSession = {
   sessionId: 'baseline-pain-001',
   participantDemographics: {
-    age: 28,
+    age: (28 as any),
     gender: 'non-binary',
     ethnicity: 'asian',
     socioeconomicStatus: 'upper-middle-class',

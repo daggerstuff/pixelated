@@ -72,7 +72,7 @@ const astroVite = await astroViteConfig({
 })
 const astroPlugins = astroVite.plugins ?? []
 
-export default defineConfig({
+export default (defineConfig as any)({
   plugins: [react(), ...astroPlugins],
   define: {
     global: 'globalThis',

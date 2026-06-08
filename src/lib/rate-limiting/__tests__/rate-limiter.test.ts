@@ -128,7 +128,6 @@ describe('DistributedRateLimiter', () => {
       }
 
       // Setup mock responding to attack pattern checks
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['zrangebyscore']).mockResolvedValueOnce(
         Array(15)
           .fill(0)
@@ -141,7 +140,7 @@ describe('DistributedRateLimiter', () => {
 
     it('should fail open on Redis errors', async () => {
       // Mock pipeline to throw error ONCE
-      const pipeline = redis['pipeline']!()
+      const pipeline = redis['pipeline']()
       vi.mocked(pipeline.exec).mockRejectedValueOnce(
         new Error('Redis connection failed'),
       )
@@ -152,7 +151,6 @@ describe('DistributedRateLimiter', () => {
         ...pipeline,
         exec: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
       }
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['pipeline']).mockReturnValueOnce(failingPipeline)
 
       const rule: RateLimitRule = {
@@ -172,7 +170,6 @@ describe('DistributedRateLimiter', () => {
 
   describe('isBlocked', () => {
     it('should check if identifier is blocked', async () => {
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['get']).mockResolvedValueOnce(
         JSON.stringify({
           pattern: { isSuspicious: true, type: 'rapid_fire' },
@@ -185,7 +182,6 @@ describe('DistributedRateLimiter', () => {
     })
 
     it('should return false when not blocked', async () => {
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['get']).mockResolvedValueOnce(null)
 
       const isBlocked = await rateLimiter.isBlocked('test_user')
@@ -195,12 +191,10 @@ describe('DistributedRateLimiter', () => {
 
   describe('getAnalytics', () => {
     it('should return analytics data', async () => {
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['hgetall']).mockResolvedValueOnce({
         total_requests: '100',
         total_blocked: '5',
       })
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       vi.mocked(redis['hgetall']).mockResolvedValueOnce({
         total_blocked: '5',
       })

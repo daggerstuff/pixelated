@@ -60,7 +60,7 @@ export class BatchProcessor implements IBatchProcessor {
   }
 
   constructor(api: IUnifiedMetaAlignerAPI, config: BatchProcessorConfig = {}) {
-    this.api = api
+    ;(this as any).api = api
     this.config = {
       batchSize: 10,
       timeout: 1000,
@@ -74,7 +74,7 @@ export class BatchProcessor implements IBatchProcessor {
   ): Promise<UnifiedProcessingResponse> {
     this.queue.push(request)
 
-    if (this.queue.length >= this?.config.batchSize) {
+    if (this.queue.length >= (this as any)?.config.batchSize) {
       void this.flush()
     }
 

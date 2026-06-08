@@ -165,7 +165,7 @@ async function extractRateLimitContext(
   // Get client IP (considering proxies)
   const forwarded = request.headers.get('x-forwarded-for')
   const realIp = request.headers.get('x-real-ip')
-  const identifier =
+  const identifier: string =
     (forwarded?.split(',')?.[0]?.trim() ?? realIp ?? context.clientAddress) ||
     'unknown'
 

@@ -413,7 +413,7 @@ export class OptimizedBiasDetectionService {
       }
     } finally {
       // Destroy connection on timeout; recycle normally otherwise.
-      client.release(timedOut)
+      ;(client.release as any)(timedOut)
     }
   }
 

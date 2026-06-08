@@ -119,7 +119,7 @@ async function main() {
   }
 }
 
-if (require.main === module) {
+if ((require as any).main === module) {
   main().catch((error: unknown) => {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('Script failed:', errorMessage)

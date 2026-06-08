@@ -276,7 +276,7 @@ export const useJournalResearchWebSocket = ({
           )
         }
         return new TextEncoder().encode(String(data)).buffer
-      })()
+      })() as any
 
       const socket = socketRef.current
       if (socket?.readyState === WebSocket.OPEN) {

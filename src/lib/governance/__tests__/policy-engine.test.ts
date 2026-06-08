@@ -99,7 +99,7 @@ describe('PolicyEngine regex safety', () => {
       rules: [
         {
           id: 'rule-1',
-          action: 'test',
+          action: 'test' as any,
           conditions: [
             {
               field: 'email',

@@ -537,9 +537,9 @@ describe('Data Transformation', () => {
       const result = transformSessionForPython(sampleSession)
 
       expect(result['session_id']).toBe(sampleSession.sessionId)
-      expect(result['participant_demographics'].age).toBe('25-35')
-      expect(result['ai_responses'][0].response_id).toBe('resp-1')
-      expect(result['transcripts'][0].speaker_id).toBe('therapist')
+      expect((result['participant_demographics'] as any).age).toBe('25-35')
+      expect((result['ai_responses'][0] as any).response_id).toBe('resp-1')
+      expect((result['transcripts'][0] as any).speaker_id).toBe('therapist')
     })
   })
 
@@ -741,7 +741,7 @@ describe('Utility Helpers', () => {
           timestamp: new Date(),
           overallBiasScore: 0.3,
           layerResults: {} as BiasAnalysisResult['layerResults'],
-          demographics: {} as unknown,
+          demographics: ({} as unknown as any),
           recommendations: ['Improve diversity', 'Add training'],
           alertLevel: 'medium',
           confidence: 0.8,
@@ -751,7 +751,7 @@ describe('Utility Helpers', () => {
           timestamp: new Date(),
           overallBiasScore: 0.7,
           layerResults: {} as BiasAnalysisResult['layerResults'],
-          demographics: {} as unknown,
+          demographics: ({} as unknown as any),
           recommendations: ['Improve diversity', 'Review model'],
           alertLevel: 'high',
           confidence: 0.9,

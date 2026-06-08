@@ -285,21 +285,21 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
   const config: Partial<RateLimitConfig> = {}
 
   if (process.env['RATE_LIMIT_ENABLED']) {
-    config.global = {
+    ;(config as any).global = {
       ...config.global,
       enabled: process.env['RATE_LIMIT_ENABLED'] === 'true',
     }
   }
 
   if (process.env['RATE_LIMIT_DEFAULT_WINDOW_MS']) {
-    config.global = {
+    ;(config as any).global = {
       ...config.global,
       defaultWindowMs: parseInt(process.env['RATE_LIMIT_DEFAULT_WINDOW_MS']),
     }
   }
 
   if (process.env['RATE_LIMIT_ATTACK_DETECTION']) {
-    config.global = {
+    ;(config as any).global = {
       ...config.global,
       enableAttackDetection:
         process.env['RATE_LIMIT_ATTACK_DETECTION'] === 'true',
@@ -307,7 +307,7 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
   }
 
   if (process.env['RATE_LIMIT_ANALYTICS']) {
-    config.global = {
+    ;(config as any).global = {
       ...config.global,
       enableAnalytics: process.env['RATE_LIMIT_ANALYTICS'] === 'true',
     }

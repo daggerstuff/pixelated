@@ -80,7 +80,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return createErrorResponse(404, 'NOT_FOUND', 'Source turn not found.')
     }
 
-    const actorContext = resolveActorIdentity(locals)
+    const actorContext = resolveActorIdentity(locals as any)
     const canAccessSource =
       actorContext.hasPrivilege ||
       hasArtifactTurnAccess(
