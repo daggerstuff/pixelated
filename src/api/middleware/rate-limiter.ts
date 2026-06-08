@@ -22,6 +22,114 @@ type RateLimiterResponse = {
   json: (body: unknown) => RateLimiterResponse
 }
 
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
+type RateLimiterRequest = {
+  ip?: string
+  socket?: { remoteAddress?: string }
+  headers: Record<string, string | string[] | undefined>
+  user?: {
+    id?: string
+  }
+}
+
+type RateLimiterResponse = {
+  set: (name: string, value: string) => RateLimiterResponse
+  setHeader?: (name: string, value: string) => RateLimiterResponse
+  status: (statusCode: number) => {
+    json: (body: unknown) => RateLimiterResponse
+  }
+  json: (body: unknown) => RateLimiterResponse
+}
+
 interface RateLimitStore {
   [key: string]: { count: number; resetTime: number } | undefined
 }
@@ -82,14 +190,15 @@ export async function incrementRedisCounter(
 ): Promise<number> {
   try {
     const redis = getRedisClient()
-    const r = asRedisOps(redis)
-    if (typeof r.incr !== 'function') {
+
+    // Use Redis incr directly
+    if (typeof redis['incr'] !== 'function') {
       return 0
     }
 
-    const rawCount = await r.incr(key)
-    if (typeof r.expire === 'function') {
-      await r.expire(key, windowSeconds)
+    const rawCount = await redis['incr'](key)
+    if (typeof redis['expire'] === 'function') {
+      await redis['expire'](key, windowSeconds)
     }
     return parseCount(rawCount)
   } catch (error: unknown) {

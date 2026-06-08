@@ -158,7 +158,7 @@ export class RealBusinessIntelligenceService {
         await this.db.storeMarketData(data as unknown as MarketData)
       }
 
-      return marketData as unknown as MarketData[]
+      return marketData
     } catch (error: unknown) {
       this.logger.error('Failed to get real-time market data', {
         industry,
@@ -287,7 +287,7 @@ export class RealBusinessIntelligenceService {
         }),
       )
 
-      return results.filter((r): r is StockIntelligenceResult => r !== null)
+      return results.filter(Boolean)
     } catch (error: unknown) {
       this.logger.error('Failed to get stock intelligence', {
         symbols,
@@ -417,7 +417,7 @@ export class RealBusinessIntelligenceService {
     metric: string,
   ): number {
     const values = data
-      .map((item) => (item as unknown as Record<string, number>)[metric] ?? 0)
+      .map((item) => item[metric] ?? 0)
       .filter((val) => val > 0)
     return values.length > 0
       ? values.reduce((sum, val) => sum + val, 0) / values.length

@@ -38,14 +38,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    userId = session?.user?.id
-    const role = session?.user?.role ?? 'user'
-    if (!userId) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401,
-        headers: { 'Content-Type': 'application/json' },
-      })
-    }
+    const role = session.user.role ?? 'user'
     const { allowed, limit, remaining, reset } = rateLimiter.check(
       `${userId}:/api/ai/usage`,
       role,
@@ -106,7 +99,7 @@ export const GET: APIRoute = async ({ request }) => {
       await createAuditLog(
         AuditEventType.AI_OPERATION,
         'ai.usage.validation_error',
-        userId,
+        session?.user?.id ?? 'anonymous',
         'ai_usage',
         {
           error: error.message ?? 'Validation failed',
@@ -144,7 +137,7 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.request',
-      userId,
+      session?.user?.id ?? 'anonymous',
       'ai_usage',
       {
         period: params.period,
@@ -197,11 +190,11 @@ export const GET: APIRoute = async ({ request }) => {
     await createAuditLog(
       AuditEventType.AI_OPERATION,
       'ai.usage.error',
-      userId ?? 'anonymous',
+      session?.user?.id ?? 'anonymous',
       'ai_usage',
       {
-        error: String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        error: error instanceof Error ? String(error) : String(error),
+        stack: error instanceof Error ? (error)?.stack : undefined,
         status: 'error',
       },
       AuditEventStatus.FAILURE,

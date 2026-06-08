@@ -5,7 +5,6 @@
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { redis } from '../redis'
-import { asRedisOps } from '../redis-ops'
 import type {
   RateLimitConfig,
   RateLimitResult,
@@ -42,7 +41,7 @@ export class DistributedRateLimiter {
 
     try {
       // Get current count
-      const current = await asRedisOps(redis).get(windowKey)
+      const current = await redis['get']!(windowKey)
       const count = current ? parseInt(current) : 0
 
       // Check if limit exceeded
@@ -58,9 +57,9 @@ export class DistributedRateLimiter {
       }
 
       // Increment counter
-      const pipeline = asRedisOps(redis).pipeline()
-      pipeline.incr(windowKey)
-      pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+      const pipeline = redis['pipeline']!()
+      pipeline['incr'](windowKey)
+      pipeline['expire'](windowKey, Math.ceil(rule.windowMs / 1000))
       await pipeline.exec()
 
       // Check for attack patterns
@@ -109,14 +108,14 @@ export class DistributedRateLimiter {
 
     try {
       // Record request timestamp
-      await asRedisOps(redis).zadd(attackKey, now, `${now}:${Math.random()}`)
+      await redis['zadd']!(attackKey, now, `${now}:${Math.random()}`)
 
       // Clean old entries (keep last hour)
       const oneHourAgo = now - 3600000
-      await asRedisOps(redis).zremrangebyscore(attackKey, 0, oneHourAgo)
+      await redis['zremrangebyscore']!(attackKey, 0, oneHourAgo)
 
       // Get recent request pattern
-      const recentRequests = await asRedisOps(redis).zrangebyscore(
+      const recentRequests = await redis['zrangebyscore']!(
         attackKey,
         oneHourAgo,
         now,
@@ -134,7 +133,7 @@ export class DistributedRateLimiter {
       }
 
       // Set expiration on attack tracking
-      await asRedisOps(redis).expire(attackKey, 3600)
+      await redis['expire']!(attackKey, 3600)
     } catch (error: unknown) {
       logger.error('Attack pattern detection failed:', {
         error: String(error),
@@ -205,7 +204,7 @@ export class DistributedRateLimiter {
 
     // Block the identifier temporarily
     const blockKey = `${this.prefix}blocked:${identifier}`
-    await asRedisOps(redis).setex(
+    await redis['setex']!(
       blockKey,
       300,
       JSON.stringify({
@@ -235,8 +234,8 @@ export class DistributedRateLimiter {
   ): Promise<void> {
     const analyticsKey = `${this.analyticsPrefix}blocked:${rule.name}:${new Date().toISOString().slice(0, 10)}`
 
-    await asRedisOps(redis).hincrby(analyticsKey, 'total_blocked', 1)
-    await asRedisOps(redis).expire(analyticsKey, 86400 * 30) // Keep for 30 days
+    await redis['hincrby']!(analyticsKey, 'total_blocked', 1)
+    await redis['expire']!(analyticsKey, 86400 * 30) // Keep for 30 days
 
     // Log security event
     await this.logSecurityEvent('rate_limit_exceeded', {
@@ -258,11 +257,11 @@ export class DistributedRateLimiter {
     const date = new Date().toISOString().slice(0, 10)
     const analyticsKey = `${this.analyticsPrefix}usage:${rule.name}:${date}`
 
-    const pipeline = asRedisOps(redis).pipeline()
-    pipeline.hincrby(analyticsKey, 'total_requests', 1)
-    pipeline.hincrby(analyticsKey, 'unique_identifiers', 1)
-    pipeline.hset(analyticsKey, 'last_request', String(Date.now()))
-    pipeline.expire(analyticsKey, 86400 * 30) // Keep for 30 days
+    const pipeline = redis['pipeline']!()
+    pipeline['hincrby'](analyticsKey, 'total_requests', 1)
+    pipeline['hincrby'](analyticsKey, 'unique_identifiers', 1)
+    pipeline['hset'](analyticsKey, 'last_request', String(Date.now()))
+    pipeline['expire'](analyticsKey, 86400 * 30) // Keep for 30 days
 
     await pipeline.exec()
   }
@@ -291,8 +290,8 @@ export class DistributedRateLimiter {
         details,
       }
 
-      await asRedisOps(redis).lpush(eventKey, JSON.stringify(event))
-      await asRedisOps(redis).expire(eventKey, 86400 * 7) // Keep for 7 days
+      await redis['lpush']!(eventKey, JSON.stringify(event))
+      await redis['expire']!(eventKey, 86400 * 7) // Keep for 7 days
     } catch (error: unknown) {
       logger.error('Failed to log security event:', {
         error: String(error),
@@ -306,7 +305,7 @@ export class DistributedRateLimiter {
    */
   async isBlocked(identifier: string): Promise<boolean> {
     const blockKey = `${this.prefix}blocked:${identifier}`
-    const blocked = await asRedisOps(redis).get(blockKey)
+    const blocked = await redis['get']!(blockKey)
     return blocked !== null
   }
 
@@ -327,8 +326,8 @@ export class DistributedRateLimiter {
       const blockedKey = `${this.analyticsPrefix}blocked:${ruleName}:${dateStr}`
 
       const [usage, blocked] = await Promise.all([
-        asRedisOps(redis).hgetall(usageKey),
-        asRedisOps(redis).hgetall(blockedKey),
+        redis['hgetall']!(usageKey),
+        redis['hgetall']!(blockedKey),
       ])
 
       analytics[dateStr] = {
@@ -351,7 +350,7 @@ export class DistributedRateLimiter {
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
 
     try {
-      const current = await asRedisOps(redis).get(windowKey)
+      const current = await redis['get']!(windowKey)
       const count = current ? parseInt(current) : 0
 
       return {
@@ -385,9 +384,9 @@ export class DistributedRateLimiter {
   ): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-    const pipeline = asRedisOps(redis).pipeline()
-    pipeline.incr(windowKey)
-    pipeline.expire(windowKey, Math.ceil(rule.windowMs / 1000))
+    const pipeline = redis['pipeline']!()
+    pipeline['incr'](windowKey)
+    pipeline['expire'](windowKey, Math.ceil(rule.windowMs / 1000))
     await pipeline.exec()
   }
 
@@ -408,7 +407,7 @@ export class DistributedRateLimiter {
   async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
     const key = `${this.prefix}${rule.name}:${identifier}`
     const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-    await asRedisOps(redis).del(windowKey)
+    await redis['del']!(windowKey)
   }
 }
 

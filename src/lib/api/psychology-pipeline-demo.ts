@@ -728,7 +728,7 @@ function calculateConversationQuality(request: ConversationRequest): any {
   } as any
 }
 
-function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): any {
+function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
   return dialogue.map((turn, index) => {
     const ks = turn['knowledgeSource'] as {
       type: string
@@ -749,7 +749,7 @@ function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): any {
         },
       ],
     }
-  }) as any
+  })
 }
 
 // Export types for conversation converter

@@ -41,10 +41,8 @@ export const POST: APIRoute = async ({ request }) => {
     const sanitizedData = {
       threatId: sanitizeInput(threatId),
       userId: sanitizeInput(userId),
-      severity: sanitizeInput((severity as string) ?? 'medium'),
-      templateId: sanitizeInput(
-        (templateId as string) ?? 'standard_threat_investigation',
-      ),
+      severity: sanitizeInput(severity ?? 'medium'),
+      templateId: sanitizeInput(templateId ?? 'standard_threat_investigation'),
       metadata: metadata ? sanitizeInput(JSON.stringify(metadata)) : undefined,
     }
 
