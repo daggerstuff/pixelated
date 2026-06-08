@@ -1363,7 +1363,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       this.config.regions[regionIndex] = {
-        ...this.config.regions[regionIndex]!,
+        ...this.config.regions[regionIndex],
         ...updates,
       } as RegionConfig
 

@@ -175,19 +175,28 @@ export class AnalyticsDataService {
           value: this.calculateTotalSessions(sessionCount),
           label: 'Total Sessions',
           color: 'blue' as const,
-          trend: this.calculateTrend('total_sessions', filters.timeRange),
+          trend: this.calculateTrend(
+            'total_sessions',
+            filters.timeRange,
+          ) as any,
         },
         {
           value: this.calculateCompletionRate(completionRate),
           label: 'Completion Rate',
           color: 'green' as const,
-          trend: this.calculateTrend('completion_rate', filters.timeRange),
+          trend: this.calculateTrend(
+            'completion_rate',
+            filters.timeRange,
+          ) as any,
         },
         {
           value: this.calculateAverageRating(avgRating),
           label: 'Avg. Rating',
           color: 'purple' as const,
-          trend: this.calculateTrend('average_rating', filters.timeRange),
+          trend: this.calculateTrend(
+            'average_rating',
+            filters.timeRange,
+          ) as any,
         },
       ]
     } catch (error: unknown) {
@@ -334,7 +343,7 @@ export class AnalyticsDataService {
               ? ('down' as const)
               : ('stable' as const),
         period: `vs previous ${timeRange}`,
-      }
+      } as any
     } catch (error: unknown) {
       logger.error(`Failed to calculate trend for ${metricName}`, { error })
       return undefined

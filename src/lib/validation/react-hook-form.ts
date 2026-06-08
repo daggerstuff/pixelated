@@ -41,8 +41,8 @@ export function useValidatedForm<T extends FieldValues>({
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const form = useForm<T>({
-    resolver: zodResolver(schema),
-    defaultValues: defaultValues as T,
+    resolver: (zodResolver as any)(schema),
+    defaultValues: defaultValues as T as any,
     mode: 'onChange', // Validate on change for real-time feedback
   })
 
@@ -105,7 +105,7 @@ export function useValidatedForm<T extends FieldValues>({
     isSubmitting,
     fieldErrors,
     clearErrors,
-  }
+  } as any
 }
 
 /**

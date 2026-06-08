@@ -283,16 +283,14 @@ describe('breachNotificationSystem', () => {
         'breach:breach1',
         'breach:breach2',
       ])
-      ;(redis['get'] as any)
-        .mockResolvedValueOnce(JSON.stringify(mockBreaches[0]))
-        .mockResolvedValueOnce(JSON.stringify(mockBreaches[1]))
+      ;(redis['get'] as any).mockResolvedValueOnce(
+        JSON.stringify(mockBreaches[0]),
+      ).mockResolvedValueOnce!(JSON.stringify(mockBreaches[1]))
 
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(2)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[0].id).toBe('breach2') // Most recent first
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[1].id).toBe('breach1')
     })
 
@@ -328,7 +326,6 @@ describe('breachNotificationSystem', () => {
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       expect(breaches).toHaveLength(1)
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       expect(breaches?.[0].id).toBe('valid')
     })
   })

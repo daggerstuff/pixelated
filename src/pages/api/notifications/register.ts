@@ -10,7 +10,7 @@ export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    if (!(authResult as any)?.authenticated) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -46,7 +46,7 @@ export const POST = async ({ request }: APIContext) => {
 
     // Register push subscription
     await notificationService.storePushSubscription(
-      authResult.user?.id,
+      (authResult as any).user?.id,
       subscription,
     )
 

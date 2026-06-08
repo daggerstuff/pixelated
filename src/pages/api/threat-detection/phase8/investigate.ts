@@ -16,7 +16,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Parse and validate request body
-    const body = await request.json()
+    const body = (await request.json()) as {
+      threatId?: string
+      userId?: string
+      severity?: string
+      templateId?: string
+      metadata?: unknown
+    }
     const { threatId, userId, severity, templateId, metadata } = body
 
     if (!threatId || !userId) {
@@ -35,8 +41,10 @@ export const POST: APIRoute = async ({ request }) => {
     const sanitizedData = {
       threatId: sanitizeInput(threatId),
       userId: sanitizeInput(userId),
-      severity: sanitizeInput(severity ?? 'medium'),
-      templateId: sanitizeInput(templateId ?? 'standard_threat_investigation'),
+      severity: sanitizeInput((severity as string) ?? 'medium'),
+      templateId: sanitizeInput(
+        (templateId as string) ?? 'standard_threat_investigation',
+      ),
       metadata: metadata ? sanitizeInput(JSON.stringify(metadata)) : undefined,
     }
 
@@ -74,9 +82,11 @@ export const POST: APIRoute = async ({ request }) => {
           | 'critical',
         templateId: sanitizedData.templateId,
         metadata: sanitizedData.metadata
-          ? JSON.parse(sanitizedData.metadata)
+          ? (JSON.parse(sanitizedData.metadata) as unknown)
           : undefined,
-      })
+      } as unknown as Parameters<
+        typeof threatDetectionSystem.huntingService.startInvestigation
+      >[0])
 
     return new Response(
       JSON.stringify({

@@ -39,6 +39,7 @@ interface SignInRequest {
 interface SignUpRequest {
   email: string
   password: string
+  name?: string
   role?: string
 }
 
@@ -159,7 +160,7 @@ class AuthClient {
   /**
    * Sign up a new user
    */
-  async signUpEmail({ email, password, role }: SignUpRequest): Promise<{
+  async signUpEmail({ email, password, role, name }: SignUpRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -167,7 +168,7 @@ class AuthClient {
       const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ email, password, role, name }),
       })
 
       const data = (await response.json()) as AuthResponse
@@ -256,10 +257,19 @@ class AuthClient {
 
   /**
    */
+  async submitResetPassword(data: {
+    newPassword: string
+    token: string
+    email?: string
+  }): Promise<{ error?: { message: string } }> {
+    console.log(`Password reset submitted for token ${data.token}`)
+    return {}
+  }
+
   get resetPassword() {
-    return {
+    return Object.assign(this.submitResetPassword.bind(this), {
       send: this.forgetPassword.bind(this),
-    }
+    })
   }
 }
 

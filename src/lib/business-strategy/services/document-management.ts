@@ -88,7 +88,7 @@ export class DocumentManagementService extends BaseService {
     try {
       await this.db.mongodb.database.collection(this.collectionName).insertOne({
         ...document,
-        _id: documentId, // Use documentId as MongoDB _id
+        _id: documentId as any, // Use documentId as MongoDB _id
       })
 
       await this.logAudit({

@@ -59,7 +59,7 @@ describe('useReports hooks', () => {
 
   describe('useReportListQuery', () => {
     it('fetches report list successfully', async () => {
-      vi.mocked(api.listReports).mockResolvedValue(mockReportList)
+      vi.mocked(api.listReports).mockResolvedValue(mockReportList as any)
 
       const { result } = renderHook(() => useReportListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -103,7 +103,7 @@ describe('useReports hooks', () => {
 
   describe('useReportQuery', () => {
     it('fetches report successfully', async () => {
-      vi.mocked(api.getReport).mockResolvedValue(mockReport)
+      vi.mocked(api.getReport).mockResolvedValue(mockReport as any)
 
       const { result } = renderHook(
         () => useReportQuery('session-1', 'report-1'),
@@ -150,7 +150,7 @@ describe('useReports hooks', () => {
 
   describe('useGenerateReportMutation', () => {
     it('generates report successfully', async () => {
-      vi.mocked(api.generateReport).mockResolvedValue(mockReport)
+      vi.mocked(api.generateReport).mockResolvedValue(mockReport as any)
 
       const { result } = renderHook(
         () => useGenerateReportMutation('session-1'),

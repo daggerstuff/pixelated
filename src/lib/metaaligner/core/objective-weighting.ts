@@ -215,7 +215,7 @@ export class ObjectiveWeightingEngine {
     // Ensure all objectives are represented; fall back to base when missing
     for (const [objectiveId, base] of Object.entries(baseWeights)) {
       weights[objectiveId] =
-        (contextual as Record<string, number>)[objectiveId] ?? base
+        (contextual as any as Record<string, number>)[objectiveId] ?? base
     }
     const { userProfile } = context
 
@@ -462,7 +462,7 @@ export class ObjectiveWeightingEngine {
     for (const [objectiveId, adjustedWeight] of Object.entries(
       adjustedWeights,
     )) {
-      const baseWeight = baseWeights[objectiveId]!
+      const baseWeight = baseWeights[objectiveId]
 
       if (Math.abs(adjustedWeight - baseWeight) > 0.01) {
         this.adjustmentHistory.push({

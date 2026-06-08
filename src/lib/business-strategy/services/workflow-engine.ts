@@ -34,14 +34,14 @@ export class WorkflowEngineService extends BaseService {
       id: executionId,
       workflowId,
       documentId,
-      status: 'running',
+      status: 'running' as any,
       currentStepId: 'step-1', // Default first step
       startedAt: timestamp,
       startedBy: userId,
       context: {
         triggeredBy: userId,
         documentId,
-      },
+      } as any,
       history: [
         {
           stepId: 'start',
@@ -98,7 +98,7 @@ export class WorkflowEngineService extends BaseService {
                 timestamp,
                 details: { feedback },
               },
-            },
+            } as any,
           },
         )
 

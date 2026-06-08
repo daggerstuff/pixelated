@@ -8,8 +8,8 @@ import {
   mockSessionList,
 } from '@/components/journal-research/__tests__/test-utils'
 import type {
-  JournalSession,
-  JournalSessionList,
+  Session as JournalSession,
+  SessionList as JournalSessionList,
 } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useJournalSessionStore } from '@/lib/stores/journal-research'
@@ -74,7 +74,7 @@ describe('useSession hooks', () => {
       useJournalSessionStore as typeof useJournalSessionStore & {
         getState?: () => typeof storeState
       }
-    ).getState = () => storeState
+    ).getState = () => storeState as any
   })
 
   describe('useSessionListQuery', () => {
@@ -109,7 +109,7 @@ describe('useSession hooks', () => {
         useJournalSessionStore as typeof useJournalSessionStore & {
           getState?: () => typeof filteredStoreState
         }
-      ).getState = () => filteredStoreState
+      ).getState = () => filteredStoreState as any
 
       const { result } = renderHook(() => useSessionListQuery(), {
         wrapper: createWrapper(),
@@ -205,10 +205,11 @@ describe('useSession hooks', () => {
             closeCreateDrawer: typeof closeCreateDrawer
           }
         }
-      ).getState = () => ({
-        setSelectedSessionId,
-        closeCreateDrawer,
-      })
+      ).getState = () =>
+        ({
+          setSelectedSessionId,
+          closeCreateDrawer,
+        }) as any
 
       const { result } = renderHook(() => useCreateSessionMutation(), {
         wrapper: createWrapper(),
@@ -265,10 +266,11 @@ describe('useSession hooks', () => {
             setSelectedSessionId: typeof setSelectedSessionId
           }
         }
-      ).getState = () => ({
-        selectedSessionId: 'test-session-1',
-        setSelectedSessionId,
-      })
+      ).getState = () =>
+        ({
+          selectedSessionId: 'test-session-1',
+          setSelectedSessionId,
+        }) as any
 
       const { result } = renderHook(() => useDeleteSessionMutation(), {
         wrapper: createWrapper(),
@@ -295,10 +297,11 @@ describe('useSession hooks', () => {
             setSelectedSessionId: typeof setSelectedSessionId
           }
         }
-      ).getState = () => ({
-        selectedSessionId: 'other-session',
-        setSelectedSessionId,
-      })
+      ).getState = () =>
+        ({
+          selectedSessionId: 'other-session',
+          setSelectedSessionId,
+        }) as any
 
       const { result } = renderHook(() => useDeleteSessionMutation(), {
         wrapper: createWrapper(),

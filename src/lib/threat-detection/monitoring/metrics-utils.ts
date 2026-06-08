@@ -107,7 +107,7 @@ function calculatePercentile(
   if (sortedValues.length === 0) return 0
 
   const index = Math.ceil(sortedValues.length * percentile) - 1
-  return sortedValues[Math.max(0, index)]!
+  return sortedValues[Math.max(0, index)]
 }
 
 /**
@@ -146,10 +146,10 @@ export async function detectMetricAnomalies(
     return metrics
       ?.map((metric, index) => ({
         value: metric.value,
-        isAnomaly: anomalyResults[index]!.isAnomaly,
-        confidence: anomalyResults[index]!.confidence,
-        severity: anomalyResults[index]!.severity as 'low' | 'medium' | 'high',
-        reason: anomalyResults?.[index]!.isAnomaly
+        isAnomaly: anomalyResults[index].isAnomaly,
+        confidence: anomalyResults[index].confidence,
+        severity: anomalyResults[index].severity as 'low' | 'medium' | 'high',
+        reason: anomalyResults?.[index].isAnomaly
           ? 'Statistical anomaly detected'
           : undefined,
       }))

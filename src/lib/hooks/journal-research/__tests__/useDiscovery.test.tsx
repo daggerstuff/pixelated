@@ -78,7 +78,6 @@ describe('useDiscovery hooks', () => {
   beforeEach(() => {
     // @ts-expect-error - Strictly required for pre-existing test mock files
     vi.clearAllMocks()(useDiscoveryStore as any).mockImplementation(
-      // @ts-expect-error - Strictly required for pre-existing test mock files
       (selector) => {
         const defaultFilters: MockJournalFilters = {
           openAccessOnly: false,

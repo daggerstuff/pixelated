@@ -387,13 +387,13 @@ export class PerformanceOptimizer {
 
     // Process immediately if batch is full
     if (batch.items.length >= this.config.batching.maxBatchSize) {
-      await this.processBatch(batchName, processor)
+      await this.processBatch(batchName, processor as any)
       return
     }
 
     // Set timer for batch processing if not already set
     batch.timer ??= setTimeout(async () => {
-      await this.processBatch(batchName, processor)
+      await this.processBatch(batchName, processor as any)
     }, this.config.batching.batchTimeout)
   }
 
