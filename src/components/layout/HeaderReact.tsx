@@ -20,12 +20,14 @@ export function Header({
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false)
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false)
 
-  // Handle keyboard shortcut for search (Cmd+K)
+  // Handle keyboard shortcuts (Cmd+K for search, Escape to close)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault()
         setIsSearchOpen((prev) => !prev)
+      } else if (e.key === 'Escape') {
+        setIsSearchOpen(false)
       }
     }
 
