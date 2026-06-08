@@ -102,7 +102,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       0,
       Math.min(1, parseFloat(url.searchParams.get('intensity') ?? '0.5')),
     )
-    const sessionId = url.searchParams.get('sessionId')
+    const sessionId = url.searchParams.get('sessionId') ?? undefined
     const useSessionData = url.searchParams.get('useSessionData') === 'true'
     const complexity = url.searchParams.get('complexity') ?? 'medium'
 
@@ -220,7 +220,7 @@ export const POST: APIRoute = protectRoute()(async (
       )
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { emotion, intensity, sessionId, particleUpdates } = body
 
     // Validate input
@@ -284,7 +284,7 @@ export const POST: APIRoute = protectRoute()(async (
 })
 
 // Helper functions
-function calculateEmotionProfile(sessionEmotions: any[]) {
+function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {
   const emotionCounts = new Map<
     string,
     { count: number; totalIntensity: number }
@@ -418,7 +418,7 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
 
 function generateEmotionParticles(
   config: ParticleSystemConfig,
-  emotionProfile: any,
+  emotionProfile: { dominantEmotion: string; emotionMix: Record<string, number>; averageIntensity: number; volatility: number },
 ): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config

@@ -27,7 +27,7 @@ export interface VisualizationConfig {
     color?: DataDimension
     size?: DataDimension
   }
-  filters: Record<string, any>
+  filters: Record<string, unknown>
   interactive: boolean
   realTime: boolean
 }
@@ -38,13 +38,17 @@ export interface AnalyticsInsight {
   title: string
   description: string
   confidence: number
-  data: any
+  data: Record<string, unknown>
   recommendations: string[]
   impact: 'low' | 'medium' | 'high'
 }
 
+export interface DataPoint {
+  [key: string]: unknown
+}
+
 interface AdvancedVisualizationProps {
-  data: any[]
+  data: DataPoint[]
   config: VisualizationConfig
   onInsightGenerated?: (insight: AnalyticsInsight) => void
   className?: string
@@ -60,7 +64,9 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
   className = '',
 }) => {
   const [insights, setInsights] = React.useState<AnalyticsInsight[]>([])
-  const [selectedDataPoints, setSelectedDataPoints] = React.useState<any[]>([])
+  const [selectedDataPoints, setSelectedDataPoints] = React.useState<
+    DataPoint[]
+  >([])
   const [viewMode, setViewMode] = React.useState<
     'overview' | 'detailed' | 'comparative'
   >('overview')
@@ -74,7 +80,7 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
     }
   }, [data, config, onInsightGenerated])
 
-  const handleDataPointSelection = (points: any[]) => {
+  const handleDataPointSelection = (points: DataPoint[]) => {
     setSelectedDataPoints(points)
     // Generate insights for selected subset
     if (points.length > 0) {
@@ -90,7 +96,11 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
         <div className="flex items-center gap-4">
           <select
             value={viewMode}
-            onChange={(e) => setViewMode(e.target.value as any)}
+            onChange={(e) =>
+              setViewMode(
+                e.target.value as 'overview' | 'detailed' | 'comparative',
+              )
+            }
             className="border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg border px-3 py-2"
           >
             <option value="overview">Overview</option>
@@ -167,7 +177,8 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               <div className="text-lg font-bold">
                 {(
                   selectedDataPoints.reduce(
-                    (sum, p) => sum + (p[config.dimensions.y.field] ?? 0),
+                    (sum, p) =>
+                      sum + ((p[config.dimensions.y.field] ?? 0) as number),
                     0,
                   ) / selectedDataPoints.length
                 ).toFixed(2)}
@@ -180,13 +191,13 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
               <div className="text-lg font-bold">
                 {Math.min(
                   ...selectedDataPoints.map(
-                    (p) => p[config.dimensions.y.field] ?? 0,
+                    (p) => (p[config.dimensions.y.field] ?? 0) as number,
                   ),
                 ).toFixed(1)}{' '}
                 -{' '}
                 {Math.max(
                   ...selectedDataPoints.map(
-                    (p) => p[config.dimensions.y.field] ?? 0,
+                    (p) => (p[config.dimensions.y.field] ?? 0) as number,
                   ),
                 ).toFixed(1)}
               </div>
@@ -220,10 +231,10 @@ export const AdvancedVisualization: React.FC<AdvancedVisualizationProps> = ({
 }
 
 interface VisualizationChartProps {
-  data: any[]
+  data: DataPoint[]
   config: VisualizationConfig
-  selectedPoints: any[]
-  onSelectionChange: (points: any[]) => void
+  selectedPoints: DataPoint[]
+  onSelectionChange: (points: DataPoint[]) => void
 }
 
 /**
@@ -235,14 +246,14 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
   selectedPoints,
   onSelectionChange,
 }) => {
-  const [hoveredPoint, setHoveredPoint] = React.useState<any>(null)
+  const [hoveredPoint, setHoveredPoint] = React.useState<DataPoint | null>(null)
 
   // Simplified chart rendering
   const chartHeight = 400
   const chartWidth = 600
 
-  const xValues = data.map((d) => d[config.dimensions.x.field] ?? 0)
-  const yValues = data.map((d) => d[config.dimensions.y.field] ?? 0)
+  const xValues = data.map((d) => (d[config.dimensions.x.field] ?? 0) as number)
+  const yValues = data.map((d) => (d[config.dimensions.y.field] ?? 0) as number)
 
   // Avoid NaN/Infinity with empty/single data
   const xMin = xValues.length ? Math.min(...xValues) : 0
@@ -254,15 +265,15 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
   const xRange = xMax - xMin || 1
   const yRange = yMax - yMin || 1
 
-  const getPointPosition = (point: any) => {
+  const getPointPosition = (point: DataPoint) => {
     const x =
-      (((point[config.dimensions.x.field] ?? 0) - xMin) / xRange) *
+      ((((point[config.dimensions.x.field] ?? 0) as number) - xMin) / xRange) *
         (chartWidth - 40) +
       20
     const y =
       chartHeight -
       20 -
-      (((point[config.dimensions.y.field] ?? 0) - yMin) / yRange) *
+      ((((point[config.dimensions.y.field] ?? 0) as number) - yMin) / yRange) *
         (chartHeight - 40)
     return { x, y }
   }
@@ -334,9 +345,11 @@ const VisualizationChart: React.FC<VisualizationChartProps> = ({
             top: getPointPosition(hoveredPoint).y - 10,
           }}
         >
-          {config.dimensions.x.label}: {hoveredPoint[config.dimensions.x.field]}
+          {config.dimensions.x.label}:{' '}
+          {hoveredPoint[config.dimensions.x.field] as any}
           <br />
-          {config.dimensions.y.label}: {hoveredPoint[config.dimensions.y.field]}
+          {config.dimensions.y.label}:{' '}
+          {hoveredPoint[config.dimensions.y.field] as any}
         </div>
       )}
     </div>
@@ -421,7 +434,7 @@ const InsightCard: React.FC<{ insight: AnalyticsInsight }> = ({ insight }) => {
  * Generate insights from data analysis
  */
 function generateInsights(
-  data: any[],
+  data: DataPoint[],
   config: VisualizationConfig,
 ): AnalyticsInsight[] {
   const insights: AnalyticsInsight[] = []
@@ -452,7 +465,7 @@ function generateInsights(
   }
 
   // Anomaly detection (simplified)
-  const yValues = data.map((d) => d[config.dimensions.y.field] ?? 0)
+  const yValues = data.map((d) => (d[config.dimensions.y.field] ?? 0) as number)
   const mean = yValues.reduce((sum, val) => sum + val, 0) / yValues.length
   const stdDev = Math.sqrt(
     yValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
@@ -460,12 +473,9 @@ function generateInsights(
   )
 
   const anomalies = data.filter((d) => {
-    const val = d[config.dimensions.y.field] ?? 0
+    const val = (d[config.dimensions.y.field] ?? 0) as number
     return Math.abs(val - mean) > 2 * stdDev
   })
-
-  // Avoid division by zero in correlation if data is constant
-  // (Handling logic simplified here)
 
   if (anomalies.length > 0) {
     insights.push({
@@ -476,7 +486,10 @@ function generateInsights(
         anomalies.length > 1 ? 's' : ''
       } found that deviate significantly from the norm`,
       confidence: 0.85,
-      data: { anomalies: anomalies.length, threshold: 2 * stdDev },
+      data: { anomalies: anomalies.length, threshold: 2 * stdDev } as Record<
+        string,
+        unknown
+      >,
       recommendations: [
         'Review anomalous sessions for clinical significance',
         'Check for data collection errors',
@@ -524,14 +537,17 @@ function generateInsights(
 /**
  * Calculate trend (slope) of data points
  */
-function calculateTrend(data: any[], xField: string): number {
-  const points = data.map((d, i) => [i, d[xField] ?? 0])
+function calculateTrend(data: DataPoint[], xField: string): number {
+  const points: [number, number][] = data.map((d, i) => [
+    i,
+    (d[xField] ?? 0) as number,
+  ])
 
   const n = points.length
-  const sumX = points.reduce((sum, [x]) => sum + x, 0)
-  const sumY = points.reduce((sum, [, y]) => sum + y, 0)
-  const sumXY = points.reduce((sum, [x, y]) => sum + x * y, 0)
-  const sumXX = points.reduce((sum, [x]) => sum + x * x, 0)
+  const sumX = points.reduce((sum, p) => sum + p[0], 0)
+  const sumY = points.reduce((sum, p) => sum + p[1], 0)
+  const sumXY = points.reduce((sum, p) => sum + p[0] * p[1], 0)
+  const sumXX = points.reduce((sum, p) => sum + p[0] * p[0], 0)
 
   // Avoid division by zero
   const denominator = n * sumXX - sumX * sumX
@@ -545,12 +561,12 @@ function calculateTrend(data: any[], xField: string): number {
  * Calculate correlation between two fields (simplified)
  */
 function calculateCorrelation(
-  data: any[],
+  data: DataPoint[],
   field1: string,
   field2: string,
 ): number {
-  const values1 = data.map((d) => d[field1] ?? 0)
-  const values2 = data.map((d) => d[field2] ?? 0)
+  const values1 = data.map((d) => (d[field1] ?? 0) as number)
+  const values2 = data.map((d) => (d[field2] ?? 0) as number)
 
   if (values1.length === 0 || values2.length === 0) return 0
 
@@ -558,7 +574,7 @@ function calculateCorrelation(
   const mean2 = values2.reduce((sum, val) => sum + val, 0) / values2.length
 
   const numerator = values1.reduce(
-    (sum, val1, i) => sum + (val1 - mean1) * (values2[i] - mean2),
+    (sum, val1, i) => sum + (val1 - mean1) * ((values2[i] ?? 0) - mean2),
     0,
   )
   const denom1 = Math.sqrt(

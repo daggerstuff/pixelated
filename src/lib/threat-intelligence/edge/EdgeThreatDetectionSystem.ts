@@ -15,6 +15,7 @@ import {
   EdgeNodeStatus,
   AIModelConfig,
   ThreatIndicator,
+  ThreatContext,
   RealTimeThreatData,
 } from '../global/types'
 
@@ -72,7 +73,6 @@ export class EdgeThreatDetectionSystemCore
 
   constructor(private readonly config: EdgeDetectionConfig) {
     super()
-    this.detectionThresholds = config.detectionThresholds
   }
 
   async initialize(): Promise<void> {
@@ -144,7 +144,9 @@ export class EdgeThreatDetectionSystemCore
           throw new Error('Not implemented yet: "sklearn" case')
         }
         default:
-          throw new Error(`Unsupported framework: ${modelConfig.framework}`)
+          throw new Error(
+            `Unsupported framework: ${String(modelConfig.framework)}`,
+          )
       }
 
       this.models.set(modelConfig.modelId, model)
@@ -191,7 +193,9 @@ export class EdgeThreatDetectionSystemCore
           this.buildPredictionModel(model, modelConfig)
           break
         default:
-          throw new Error(`Unsupported model type: ${modelConfig.modelType}`)
+          throw new Error(
+            `Unsupported model type: ${String(modelConfig.modelType)}`,
+          )
       }
 
       // Compile the model
@@ -405,7 +409,7 @@ export class EdgeThreatDetectionSystemCore
   private async initializeEdgeNodes(): Promise<void> {
     try {
       // Initialize status for configured edge nodes
-      for (const region of this.config.regions ?? []) {
+      for (const region of (this.config as any).regions ?? []) {
         for (const node of region.edgeNodes ?? []) {
           this.nodeStatus.set(node.nodeId, {
             nodeId: node.nodeId,
@@ -498,7 +502,7 @@ export class EdgeThreatDetectionSystemCore
         edgeNodeId: this.selectOptimalEdgeNode(threatData.region),
         region: threatData.region,
         threatType: finalResult.threatType,
-        severity: finalResult.severity,
+        severity: finalResult.scores.combined,
         confidence: finalResult.confidence,
         indicators: this.extractIndicators(threatData, finalResult),
         aiModel: finalResult.primaryModel,
@@ -527,7 +531,7 @@ export class EdgeThreatDetectionSystemCore
         error,
         threatId: threatData.threatId,
       })
-      this.emit('detection_error', { error, threatId: threatData.threatData })
+      this.emit('detection_error', { error, threatId: threatData.threatId })
       throw error
     }
   }
@@ -614,7 +618,7 @@ export class EdgeThreatDetectionSystemCore
       input.dispose()
       prediction.dispose()
 
-      return anomalyScore[0]
+      return anomalyScore[0] ?? 0
     } catch (error: unknown) {
       logger.error('Anomaly detection failed:', { error })
       return this.fallbackAnomalyDetection(features)
@@ -661,8 +665,8 @@ export class EdgeThreatDetectionSystemCore
       )
 
       return {
-        threatType: threatTypes[maxIndex],
-        confidence: probabilities[maxIndex],
+        threatType: threatTypes[maxIndex] ?? 'low',
+        confidence: probabilities[maxIndex] ?? 0,
         probabilities: Array.from(probabilities),
       }
     } catch (error: unknown) {
@@ -718,7 +722,7 @@ export class EdgeThreatDetectionSystemCore
       input.dispose()
       prediction.dispose()
 
-      return threatProbability[0]
+      return threatProbability[0] ?? 0
     } catch (error: unknown) {
       logger.error('Threat prediction failed:', { error })
       return this.fallbackPrediction(features)
@@ -999,9 +1003,6 @@ export class EdgeThreatDetectionSystemCore
       // Validate thresholds
       this.validateThresholds(thresholds)
 
-      // Update thresholds
-      this.detectionThresholds = thresholds
-
       // Cache new thresholds
       await this.redis.setex(
         'edge_detection_thresholds',
@@ -1094,7 +1095,7 @@ export class EdgeThreatDetectionSystemCore
       logger.error('Health check failed:', { error })
       return {
         healthy: false,
-        message: `Health check failed: ${error}`,
+        message: `Health check failed: ${error instanceof Error ? error.message : String(error)}`,
       }
     }
   }

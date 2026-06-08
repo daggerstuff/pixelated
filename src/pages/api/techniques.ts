@@ -42,28 +42,36 @@ export const GET = async ({ request }: { request: Request }) => {
 
     if (categoryFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique: any) => technique.data.category === categoryFilter,
+        (technique: { data: Record<string, unknown> }) =>
+          technique.data['category'] === categoryFilter,
       )
     }
 
     if (evidenceFilter) {
       filteredTechniques = filteredTechniques.filter(
-        (technique: any) => technique.data.evidenceLevel === evidenceFilter,
+        (technique: { data: Record<string, unknown> }) =>
+          technique.data['evidenceLevel'] === evidenceFilter,
       )
     }
 
     // Transform for API response
-    const responseData = filteredTechniques.map((technique: any) => ({
-      id: technique.id,
-      slug: technique.slug,
-      title: technique.data.title,
-      description: technique.data.description,
-      category: technique.data.category,
-      evidenceLevel: technique.data.evidenceLevel,
-      duration: technique.data.duration,
-      difficulty: technique.data.difficulty,
-      tags: technique.data.tags ?? [],
-    }))
+    const responseData = filteredTechniques.map(
+      (technique: {
+        id: string
+        slug: string
+        data: Record<string, unknown>
+      }) => ({
+        id: technique.id,
+        slug: technique.slug,
+        title: technique.data['title'],
+        description: technique.data['description'],
+        category: technique.data['category'],
+        evidenceLevel: technique.data['evidenceLevel'],
+        duration: technique.data['duration'],
+        difficulty: technique.data['difficulty'],
+        tags: (technique.data['tags'] as string[]) ?? [],
+      }),
+    )
 
     return new Response(
       JSON.stringify({
@@ -95,7 +103,13 @@ export const GET = async ({ request }: { request: Request }) => {
   }
 }
 
-export const POST = async ({ request, cookies }) => {
+export const POST = async ({
+  request,
+  cookies,
+}: {
+  request: Request
+  cookies: { get: (name: string) => any }
+}) => {
   try {
     // Authentication check
     const sessionCookie = cookies.get('session')
@@ -106,7 +120,7 @@ export const POST = async ({ request, cookies }) => {
       })
     }
 
-    const body = await request.json()
+    const body = (await request.json()) as Record<string, unknown>
     const { patientData, preferences } = body
 
     if (!patientData) {
@@ -122,8 +136,10 @@ export const POST = async ({ request, cookies }) => {
     }
 
     // Get AI recommendations
-    const recommendationRequest = { ...patientData, ...preferences }
-    const recommendations = recommend(recommendationRequest)
+    const patientDataObj = (patientData as Record<string, unknown>) ?? {}
+    const preferencesObj = (preferences as Record<string, unknown>) ?? {}
+    const recommendationRequest = { ...patientDataObj, ...preferencesObj }
+    const recommendations = recommend(recommendationRequest as any)
 
     return new Response(
       JSON.stringify({

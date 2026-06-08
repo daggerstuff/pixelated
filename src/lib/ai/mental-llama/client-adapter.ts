@@ -64,11 +64,8 @@ class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
         confidence: 0,
         supportingEvidence: [],
         isCrisis: false,
-        stressLevel: 'low',
-        modelInfo: {
-          directModelAvailable: false,
-          modelTier: '7B',
-        },
+        stressLevel: 0.1,
+        timestamp: new Date().toISOString(),
       }
     }
   }

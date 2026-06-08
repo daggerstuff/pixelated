@@ -931,7 +931,6 @@ def get_provider_normalizer(provider: str):
         raise ValueError(f"Unsupported provider export: {provider}") from exc
 
 
-
 def _iter_export_payloads(path: Path) -> Iterable[Mapping[str, Any]]:
     text = path.read_text(encoding="utf-8").strip()
     if not text:
@@ -1134,7 +1133,6 @@ def resolve_apply_commands_from_env() -> dict[str, list[str]]:
     return commands
 
 
-
 def _apply_bridge_action(
     action: SyncAction,
     *,
@@ -1312,7 +1310,6 @@ def build_follow_up_plan(
 
     follow_up.sort(key=lambda action: (action.sync_key, action.provider))
     return follow_up
-
 
 
 def plan_from_sources(

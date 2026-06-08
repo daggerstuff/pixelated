@@ -20,6 +20,10 @@ export interface Session {
   token?: string
 }
 
+interface AuthProfileResponse {
+  user: User
+}
+
 interface AuthResponse {
   user?: User
   token?: string
@@ -87,16 +91,10 @@ class AuthClient {
     try {
       const response = await fetch('/api/auth/auth0-profile')
       if (response.ok) {
-        const data = await response.json()
+        const data = (await response.json()) as unknown as AuthProfileResponse
         if (data.user) {
           this._session = {
-            user: {
-              id: data.user.id,
-              email: data.user.email,
-              role: data.user.role,
-              fullName: data.user.fullName,
-              avatarUrl: data.user.profile?.picture,
-            },
+            user: data.user,
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
             token: 'cookie-based',
           }
@@ -123,11 +121,7 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({
-    email,
-    password,
-    rememberMe,
-  }: SignInRequest): Promise<{
+  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -138,14 +132,14 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
-        user: data.user,
+        user: data.user!,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
@@ -165,11 +159,7 @@ class AuthClient {
   /**
    * Sign up a new user
    */
-  async signUpEmail({
-    email,
-    password,
-    role,
-  }: SignUpRequest): Promise<{
+  async signUpEmail({ email, password, role }: SignUpRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -180,7 +170,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as AuthResponse
 
       if (!response.ok) {
         return {
