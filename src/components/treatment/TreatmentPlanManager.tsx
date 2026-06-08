@@ -1,6 +1,6 @@
 import { format, addDays, differenceInDays } from 'date-fns'
 import { Target, Dumbbell } from 'lucide-react'
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect } from 'react'
 
 interface TreatmentGoal {
   id: string
