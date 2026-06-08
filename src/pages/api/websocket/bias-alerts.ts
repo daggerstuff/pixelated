@@ -96,7 +96,7 @@ export const GET = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to get WebSocket server status',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -296,7 +296,7 @@ export const POST = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to send test bias alert',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -362,7 +362,7 @@ export const PATCH = async ({ request }: { request: Request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to update WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
@@ -408,7 +408,7 @@ export const DELETE = async () => {
       JSON.stringify({
         success: false,
         error: 'Failed to stop WebSocket server',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: 'An unexpected error occurred',
         timestamp: new Date().toISOString(),
       }),
       {
