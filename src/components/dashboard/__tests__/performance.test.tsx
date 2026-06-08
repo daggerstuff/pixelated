@@ -16,6 +16,8 @@ import { TherapistDashboard } from '../TherapistDashboard'
 
 import { TherapistDashboard } from '../TherapistDashboard'
 
+import { TherapistDashboard } from '../TherapistDashboard'
+
 // Local minimal type to avoid relying on path aliases in tests
 interface TherapistSession {
   id: string

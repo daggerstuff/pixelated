@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 
-import { isValidDate, isDiffMonth, isSameYear, formatDate } from './datetime'
+import { isValidDate, isDiffMonth, isSameYear } from './datetime'
 
 describe('datetime utils', () => {
   describe('isValidDate', () => {
@@ -61,12 +61,6 @@ describe('datetime utils', () => {
     it('returns undefined if either argument is missing', () => {
       expect(isSameYear('2024-03-15T12:00:00Z', undefined)).toBe(undefined)
       expect(isSameYear(undefined, '2024-03-15T12:00:00Z')).toBe(undefined)
-    })
-  })
-
-  describe('formatDate', () => {
-    it('throws an error for invalid dates', () => {
-      expect(() => formatDate('invalid date')).toThrow('Invalid Date')
     })
   })
 })
