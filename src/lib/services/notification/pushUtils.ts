@@ -51,7 +51,6 @@ export async function sendNotification(
 
   // Import VAPID keys
   const privateKeyData = base64ToUint8Array(vapidKeys.privateKey)
-    .buffer as ArrayBuffer
   const privateKey = await subtle.importKey(
     'pkcs8',
     privateKeyData,

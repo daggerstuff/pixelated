@@ -57,7 +57,7 @@ describe('SimulatorContext', () => {
     renderHook(() => useSimulator(), { wrapper: errorBoundary })
 
     expect(capturedError).toBeDefined()
-    expect((capturedError as any)?.message).toBe(
+    expect(capturedError?.message).toBe(
       'useSimulator must be used within a SimulatorProvider',
     )
   })

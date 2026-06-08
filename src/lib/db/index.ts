@@ -3,9 +3,6 @@
  * Supports PostgreSQL with connection pooling and migration management
  */
 
-import { readdir, readFile } from 'node:fs/promises'
-import path from 'node:path'
-
 import { createHash } from 'crypto'
 
 import { Pool, PoolClient } from 'pg'
@@ -19,19 +16,6 @@ export interface DbQueryResult<T = Record<string, unknown>> {
   fields?: Array<{ name: string; dataTypeID: number }>
 }
 type QueryResultRow = Record<string, unknown>
-
-// Pool's runtime properties not exposed in pg type definitions.
-// Accessed via `as unknown as T` — safer than `as any` because it requires
-// explicit acknowledgement that the shape is compiler-unknown.
-interface PoolWithConnectEvent {
-  on(event: 'connect', listener: (client: PoolClient) => void): this
-}
-
-interface PoolStats {
-  totalCount: number
-  idleCount: number
-  waitingCount: number
-}
 
 // Database configuration
 export interface DatabaseConfig {
@@ -82,12 +66,9 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   })
 
   // 'connect' is not in Pool's type definition but pool does emit it at runtime
-  ;(pool as unknown as PoolWithConnectEvent).on(
-    'connect',
-    (_client: PoolClient) => {
-      console.log('New client connected to database')
-    },
-  )
+  ;(pool as any).on('connect', (_client: PoolClient) => {
+    console.log('New client connected to database')
+  })
 
   console.log(
     `Database pool initialized with ${finalConfig.max} max connections`,
@@ -166,9 +147,9 @@ export async function healthCheck(): Promise<{
       status: 'healthy',
       latency,
       connections: {
-        total: (poolState as unknown as PoolStats).totalCount,
-        idle: (poolState as unknown as PoolStats).idleCount,
-        waiting: (poolState as unknown as PoolStats).waitingCount,
+        total: (poolState as any).totalCount,
+        idle: (poolState as any).idleCount,
+        waiting: (poolState as any).waitingCount,
       },
     }
   } catch {

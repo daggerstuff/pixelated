@@ -1,7 +1,5 @@
 #!/usr/bin/env ts-node
 
-/// <reference types="node" />
-
 import { execSync } from 'child_process'
 import * as fs from 'fs'
 

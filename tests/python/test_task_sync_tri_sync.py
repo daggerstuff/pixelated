@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 from scripts.task_sync import tri_sync
 from scripts.task_sync.tri_sync import (
@@ -10,10 +11,14 @@ from scripts.task_sync.tri_sync import (
     SyncMetadata,
     TaskRecord,
     apply_sync_action,
+    apply_sync_plan,
+    beads_export,
     build_sync_plan,
+    cleanup_beads_duplicates,
     collect_provider_records,
     execute_apply_mode,
     extract_sync_key,
+    find_beads_duplicate_groups,
     merge_body_with_sync_metadata,
     normalize_asana_payload,
     normalize_github_payload,
@@ -28,7 +33,7 @@ from scripts.task_sync.tri_sync import (
 )
 
 
-def make_record(  # noqa: PLR0913
+def make_record(
     provider: str,
     external_id: str,
     title: str,
@@ -54,8 +59,8 @@ def test_extract_sync_key_prefers_embedded_metadata() -> None:
 <!-- pixelated-sync
 key: tri-sync-42
 status: open
-source-provider: jira
-source-id: PIX-1
+source-provider: beads
+source-id: bd-1
 -->"""
 
     assert extract_sync_key("Different title", body) == "tri-sync-42"
@@ -65,9 +70,9 @@ def test_sync_block_round_trip_preserves_task_body() -> None:
     metadata = SyncMetadata(
         key="tri-sync-42",
         status="in_progress",
-        source_provider="jira",
-        source_id="PIX-1",
-        provider_ids={"asana": "A-1", "github": "G-4"},
+        source_provider="beads",
+        source_id="bd-1",
+        provider_ids={"asana": "A-1", "jira": "PIX-4"},
         updated_at="2026-03-23T00:00:00Z",
     )
 
@@ -78,22 +83,22 @@ def test_sync_block_round_trip_preserves_task_body() -> None:
     assert parsed["key"] == "tri-sync-42"
     assert parsed["status"] == "in_progress"
     assert parsed["asana"] == "A-1"
-    assert parsed["github"] == "G-4"
+    assert parsed["jira"] == "PIX-4"
     assert task_body_without_sync_block(merged) == "Add tri-sync support"
 
 
-def test_select_canonical_record_prefers_latest_record_and_asana_on_tie() -> None:
+def test_select_canonical_record_prefers_latest_record_and_beads_on_tie() -> None:
     earlier = make_record("asana", "A-1", "Tri-sync", "Body", "open", minutes_ago=30, sync_key="tri-sync")
     later = make_record("jira", "PIX-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync")
-    tie_asana = make_record("asana", "A-2", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync")
+    tie_beads = make_record("beads", "bd-1", "Tri-sync", "Body", "open", minutes_ago=5, sync_key="tri-sync")
 
-    assert select_canonical_record([earlier, later, tie_asana]).provider == "asana"
+    assert select_canonical_record([earlier, later, tie_beads]).provider == "beads"
 
 
 def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> None:
-    jira = make_record(
-        "jira",
-        "PIX-1",
+    beads = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
@@ -112,23 +117,23 @@ def test_build_sync_plan_creates_missing_targets_and_updates_stale_targets() -> 
 
     plan = build_sync_plan(
         {
-            "jira": [jira],
+            "beads": [beads],
             "asana": [asana],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
     actions = {(action.provider, action.action) for action in plan}
 
     assert ("asana", "update") in actions
-    assert ("github", "create") in actions
-    assert ("jira", "create") not in actions
+    assert ("jira", "create") in actions
+    assert ("beads", "create") not in actions
 
 
 def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
-    jira = make_record(
-        "jira",
-        "PIX-1",
+    beads = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
@@ -157,10 +162,10 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
 
     plan = build_sync_plan(
         {
-            "jira": [jira],
+            "beads": [beads],
             "asana": [asana],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
     actions = {(action.provider, action.action) for action in plan}
@@ -169,18 +174,18 @@ def test_build_sync_plan_updates_when_provider_links_are_incomplete() -> None:
 
 
 def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
-    jira_newer = make_record(
-        "jira",
-        "PIX-2",
+    beads_newer = make_record(
+        "beads",
+        "bd-2",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
         1,
         "tri-sync-rollout",
     )
-    jira_older = make_record(
-        "jira",
-        "PIX-1",
+    beads_older = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         "Old body",
         "open",
@@ -199,22 +204,22 @@ def test_build_sync_plan_collapses_duplicate_provider_records() -> None:
 
     plan = build_sync_plan(
         {
-            "jira": [jira_newer, jira_older],
+            "beads": [beads_newer, beads_older],
             "asana": [asana],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
-    github_action = next(action for action in plan if action.provider == "github")
+    jira_action = next(action for action in plan if action.provider == "jira")
 
-    assert github_action.provider_ids["jira"] == "PIX-2"
-    assert ("jira", "create") not in {(action.provider, action.action) for action in plan}
+    assert jira_action.provider_ids["beads"] == "bd-2"
+    assert ("beads", "create") not in {(action.provider, action.action) for action in plan}
 
 
 def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
-    jira = make_record(
-        "jira",
-        "PIX-1",
+    beads = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
@@ -224,75 +229,75 @@ def test_build_sync_plan_embeds_sync_metadata_in_target_body() -> None:
 
     plan = build_sync_plan(
         {
-            "jira": [jira],
+            "beads": [beads],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
-    asana_action = next(action for action in plan if action.provider == "asana")
-    clean_body, metadata = parse_sync_metadata(asana_action.body)
+    jira_action = next(action for action in plan if action.provider == "jira")
+    clean_body, metadata = parse_sync_metadata(jira_action.body)
 
     assert clean_body == "Ship the sync bridge"
     assert metadata["key"] == "tri-sync-rollout"
-    assert metadata["source-provider"] == "jira"
-    assert metadata["source-id"] == "PIX-1"
-    assert metadata["jira"] == "PIX-1"
+    assert metadata["source-provider"] == "beads"
+    assert metadata["source-id"] == "bd-1"
+    assert metadata["beads"] == "bd-1"
 
 
 def test_build_sync_plan_preserves_linked_provider_ids_from_metadata() -> None:
-    jira = make_record(
-        "jira",
-        "PIX-1",
+    beads = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         merge_body_with_sync_metadata(
             "Ship the sync bridge",
             SyncMetadata(
                 key="tri-sync-rollout",
                 status="open",
-                source_provider="jira",
-                source_id="PIX-1",
-                provider_ids={"jira": "PIX-1", "asana": "A-7", "github": "G-2"},
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-7", "jira": "PIX-2"},
             ),
         ),
         "open",
         minutes_ago=1,
         sync_key="tri-sync-rollout",
     )
-    jira = TaskRecord(
-        provider=jira.provider,
-        external_id=jira.external_id,
-        title=jira.title,
-        body=jira.body,
-        status=jira.status,
-        updated_at=jira.updated_at,
-        sync_key=jira.sync_key,
-        provider_ids={"jira": "PIX-1", "asana": "A-7", "github": "G-2"},
+    beads = TaskRecord(
+        provider=beads.provider,
+        external_id=beads.external_id,
+        title=beads.title,
+        body=beads.body,
+        status=beads.status,
+        updated_at=beads.updated_at,
+        sync_key=beads.sync_key,
+        provider_ids={"beads": "bd-1", "asana": "A-7", "jira": "PIX-2"},
         clean_body="Ship the sync bridge",
     )
 
     plan = build_sync_plan(
-        {"jira": [jira]},
-        enabled_providers=("asana", "jira", "github"),
+        {"beads": [beads]},
+        enabled_providers=("beads", "asana", "jira"),
     )
 
     asana_action = next(action for action in plan if action.provider == "asana")
 
-    assert asana_action.provider_ids["github"] == "G-2"
+    assert asana_action.provider_ids["jira"] == "PIX-2"
 
 
 def test_build_sync_plan_ignores_records_without_sync_keys(capsys) -> None:
-    jira = make_record(
-        "jira",
-        "PIX-1",
+    beads = make_record(
+        "beads",
+        "bd-1",
         "",
         "",
         "open",
         minutes_ago=1,
         sync_key=None,
     )
-    asana = make_record(
-        "asana",
-        "A-1",
+    jira = make_record(
+        "jira",
+        "PIX-1",
         "",
         "",
         "open",
@@ -302,16 +307,16 @@ def test_build_sync_plan_ignores_records_without_sync_keys(capsys) -> None:
 
     plan = build_sync_plan(
         {
+            "beads": [beads],
             "jira": [jira],
-            "asana": [asana],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
     captured = capsys.readouterr()
 
     assert plan == []
+    assert "Skipping beads record bd-1: missing sync key" in captured.err
     assert "Skipping jira record PIX-1: missing sync key" in captured.err
-    assert "Skipping asana record A-1: missing sync key" in captured.err
 
 
 def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
@@ -323,9 +328,9 @@ def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
             SyncMetadata(
                 key="tri-sync-rollout",
                 status="open",
-                source_provider="jira",
-                source_id="PIX-1",
-                provider_ids={"jira": "PIX-1", "github": "G-1"},
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "jira": "PIX-1"},
             ),
         ),
         "completed": True,
@@ -338,7 +343,7 @@ def test_normalize_asana_payload_reads_metadata_and_completion() -> None:
     assert record.external_id == "A-1"
     assert record.status == "closed"
     assert record.sync_key == "tri-sync-rollout"
-    assert record.provider_ids["github"] == "G-1"
+    assert record.provider_ids["jira"] == "PIX-1"
 
 
 def test_normalize_jira_payload_reads_fields_shape() -> None:
@@ -351,9 +356,9 @@ def test_normalize_jira_payload_reads_fields_shape() -> None:
                 SyncMetadata(
                     key="tri-sync-rollout",
                     status="open",
-                    source_provider="asana",
-                    source_id="A-1",
-                    provider_ids={"asana": "A-1", "github": "G-1"},
+                    source_provider="beads",
+                    source_id="bd-1",
+                    provider_ids={"beads": "bd-1", "asana": "A-1"},
                 ),
             ),
             "status": {"name": "In Progress"},
@@ -368,7 +373,7 @@ def test_normalize_jira_payload_reads_fields_shape() -> None:
     assert record.title == "Tri-sync rollout"
     assert record.status == "in_progress"
     assert record.sync_key == "tri-sync-rollout"
-    assert record.provider_ids["github"] == "G-1"
+    assert record.provider_ids["asana"] == "A-1"
 
 
 def test_normalize_jira_payload_flattens_adf_description() -> None:
@@ -389,7 +394,7 @@ def test_normalize_jira_payload_flattens_adf_description() -> None:
                         "content": [
                             {
                                 "type": "text",
-                                "text": "<!-- pixelated-sync\nkey: tri-sync-rollout\nstatus: open\nsource-provider: asana\nsource-id: A-1\n-->",
+                                "text": "<!-- pixelated-sync\nkey: tri-sync-rollout\nstatus: open\nsource-provider: beads\nsource-id: bd-1\n-->",
                             }
                         ],
                     },
@@ -416,9 +421,9 @@ def test_normalize_github_payload_reads_open_closed_status_and_metadata() -> Non
             SyncMetadata(
                 key="modern-dataset-project",
                 status="closed",
-                source_provider="asana",
-                source_id="A-15",
-                provider_ids={"asana": "A-15", "jira": "PIX-5"},
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-15"},
             ),
         ),
         "state": "closed",
@@ -432,7 +437,7 @@ def test_normalize_github_payload_reads_open_closed_status_and_metadata() -> Non
     assert record.external_id == "15"
     assert record.status == "closed"
     assert record.sync_key == "modern-dataset-project"
-    assert record.provider_ids["jira"] == "PIX-5"
+    assert record.provider_ids["asana"] == "A-15"
 
 
 def test_normalize_linear_payload_reads_state_and_metadata() -> None:
@@ -444,9 +449,9 @@ def test_normalize_linear_payload_reads_state_and_metadata() -> None:
             SyncMetadata(
                 key="modern-dataset-project",
                 status="closed",
-                source_provider="asana",
-                source_id="A-15",
-                provider_ids={"asana": "A-15", "jira": "PIX-5"},
+                source_provider="beads",
+                source_id="bd-1",
+                provider_ids={"beads": "bd-1", "asana": "A-15"},
             ),
         ),
         "state": "completed",
@@ -460,13 +465,13 @@ def test_normalize_linear_payload_reads_state_and_metadata() -> None:
     assert record.external_id == "lin-15"
     assert record.status == "closed"
     assert record.sync_key == "modern-dataset-project"
-    assert record.provider_ids["jira"] == "PIX-5"
+    assert record.provider_ids["asana"] == "A-15"
 
 
 def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
     asana_path = tmp_path / "asana.json"
     jira_path = tmp_path / "jira.jsonl"
-    github_path = tmp_path / "github.jsonl"
+    beads_path = tmp_path / "beads.jsonl"
 
     asana_path.write_text(
         """[
@@ -484,31 +489,81 @@ def test_plan_from_sources_loads_asana_and_jira_exports(tmp_path) -> None:
         """{"key":"PIX-1","fields":{"summary":"Tri-sync rollout","description":"Ship the sync bridge","status":{"name":"To Do"},"updated":"2026-03-23T00:00:00Z"}}\n""",
         encoding="utf-8",
     )
-    github_path.write_text("[]", encoding="utf-8")
+    beads_path.write_text(
+        """{"id":"bd-1","title":"Tri-sync rollout","description":"Ship the sync bridge","status":"open","external_ref":"tri-sync-rollout","updated_at":"2026-03-23T00:00:00Z"}""",
+        encoding="utf-8",
+    )
 
     plan = plan_from_sources(
-        enabled_providers=("asana", "jira", "github"),
-        export_paths={"asana": asana_path, "jira": jira_path, "github": github_path},
+        enabled_providers=("asana", "jira", "beads"),
+        export_paths={"asana": asana_path, "jira": jira_path, "beads": beads_path},
     )
 
     actions = {(action.provider, action.action) for action in plan}
 
-    assert ("github", "create") in actions
+    assert ("beads", "create") in actions
 
 
-def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() -> None:
-    jira_open = make_record(
-        "jira",
-        "PIX-open",
+def test_beads_export_does_not_use_scrubbed_snapshot(monkeypatch) -> None:
+    commands: list[list[str]] = []
+
+    def fake_run(command: list[str], *, input_text=None) -> str:
+        commands.append(command)
+        return (
+            '{"id":"bd-1","title":"Tri-sync rollout","description":"Ship the sync bridge\\n\\n'
+            '<!-- pixelated-sync\\nkey: tri-sync-rollout\\nstatus: open\\nsource-provider: beads\\nsource-id: bd-1\\n-->",'
+            '"status":"open","external_ref":"tri-sync-rollout","updated_at":"2026-03-23T00:00:00Z"}'
+        )
+
+    monkeypatch.setattr(tri_sync, "_run_command", fake_run)
+
+    records = beads_export()
+
+    assert commands == [["bd", "export", "--no-memories"]]
+    assert records[0].sync_key == "tri-sync-rollout"
+
+
+def test_find_beads_duplicate_groups_prefers_latest_record() -> None:
+    canonical = make_record(
+        "beads",
+        "bd-2",
+        "Tri-sync rollout",
+        "Ship the sync bridge",
+        "open",
+        1,
+        "tri-sync-rollout",
+    )
+    duplicate = make_record(
+        "beads",
+        "bd-1",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "open",
         20,
         "tri-sync-rollout",
     )
-    jira_closed = make_record(
-        "jira",
-        "PIX-closed",
+
+    groups = find_beads_duplicate_groups([duplicate, canonical])
+
+    assert len(groups) == 1
+    assert groups[0][0] == "tri-sync-rollout"
+    assert groups[0][1].external_id == "bd-2"
+    assert [record.external_id for record in groups[0][2]] == ["bd-1"]
+
+
+def test_build_sync_plan_prefers_open_beads_record_over_newer_closed_duplicate() -> None:
+    beads_open = make_record(
+        "beads",
+        "bd-open",
+        "Tri-sync rollout",
+        "Ship the sync bridge",
+        "open",
+        20,
+        "tri-sync-rollout",
+    )
+    beads_closed = make_record(
+        "beads",
+        "bd-closed",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "closed",
@@ -527,22 +582,22 @@ def test_build_sync_plan_prefers_open_jira_record_over_newer_closed_duplicate() 
 
     plan = build_sync_plan(
         {
-            "jira": [jira_open, jira_closed],
+            "beads": [beads_open, beads_closed],
             "asana": [asana],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
-    github_action = next(action for action in plan if action.provider == "github")
+    jira_action = next(action for action in plan if action.provider == "jira")
 
-    assert github_action.status == "open"
-    assert github_action.provider_ids["jira"] == "PIX-open"
+    assert jira_action.status == "open"
+    assert jira_action.provider_ids["beads"] == "bd-open"
 
 
-def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() -> None:
-    jira_closed = make_record(
-        "jira",
-        "PIX-closed",
+def test_build_sync_plan_prefers_open_non_beads_record_over_closed_beads_record() -> None:
+    beads_closed = make_record(
+        "beads",
+        "bd-closed",
         "Tri-sync rollout",
         "Ship the sync bridge",
         "closed",
@@ -561,17 +616,100 @@ def test_build_sync_plan_prefers_open_non_jira_record_over_closed_jira_record() 
 
     plan = build_sync_plan(
         {
-            "jira": [jira_closed],
+            "beads": [beads_closed],
             "asana": [asana_open],
         },
-        enabled_providers=("asana", "jira", "github"),
+        enabled_providers=("beads", "asana", "jira"),
     )
 
-    jira_action = next(action for action in plan if action.provider == "jira")
+    beads_action = next(action for action in plan if action.provider == "beads")
 
-    assert jira_action.action == "update"
-    assert jira_action.status == "open"
-    assert jira_action.source_provider == "asana"
+    assert beads_action.action == "update"
+    assert beads_action.status == "open"
+    assert beads_action.source_provider == "asana"
+
+
+def test_cleanup_beads_duplicates_closes_noncanonical_records() -> None:
+    commands: list[list[str]] = []
+
+    def fake_runner(command, *, input_text=None):
+        command_list = list(command)
+        commands.append(command_list)
+        return SimpleNamespace(returncode=0, stdout="ok\n", stderr="")
+
+    canonical = make_record(
+        "beads",
+        "bd-2",
+        "Tri-sync rollout",
+        "Ship the sync bridge",
+        "open",
+        1,
+        "tri-sync-rollout",
+    )
+    duplicate = make_record(
+        "beads",
+        "bd-1",
+        "Tri-sync rollout",
+        "Ship the sync bridge",
+        "open",
+        20,
+        "tri-sync-rollout",
+    )
+
+    results = cleanup_beads_duplicates([duplicate, canonical], run_process=fake_runner)
+
+    assert len(results) == 1
+    assert results[0].success is True
+    assert results[0].target_id == "bd-2"
+    assert commands == [
+        ["bd", "close", "bd-1"],
+        ["bd", "dep", "add", "bd-1", "bd-2", "--type", "related"],
+    ]
+
+
+def test_apply_sync_plan_runs_beads_and_external_provider_commands() -> None:
+    commands: list[tuple[list[str], str | None]] = []
+
+    def fake_runner(command, *, input_text=None):
+        command_list = list(command)
+        commands.append((command_list, input_text))
+        if command_list[:2] == ["bd", "create"]:
+            return SimpleNamespace(returncode=0, stdout="bd-42\n", stderr="")
+        return SimpleNamespace(returncode=0, stdout='{"gid":"A-1"}\n', stderr="")
+
+    results = apply_sync_plan(
+        [
+            make_action("beads", "create", None),
+            make_action("asana", "update", "A-1"),
+        ],
+        provider_commands={"asana": ["cat"]},
+        run_process=fake_runner,
+    )
+
+    assert results[0].success is True
+    assert results[0].target_id == "bd-42"
+    assert results[1].success is True
+    assert results[1].target_id == "A-1"
+    assert commands[0][0][:2] == ["bd", "create"]
+    assert commands[1][0] == ["cat"]
+    assert '"provider": "asana"' in (commands[1][1] or "")
+
+
+def test_apply_sync_plan_beads_create_uses_default_open_status() -> None:
+    commands: list[tuple[list[str], str | None]] = []
+
+    def fake_runner(command, *, input_text=None):
+        command_list = list(command)
+        commands.append((command_list, input_text))
+        return SimpleNamespace(returncode=0, stdout="bd-42\n", stderr="")
+
+    results = apply_sync_plan(
+        [make_action("beads", "create", None)],
+        run_process=fake_runner,
+    )
+
+    assert results[0].success is True
+    assert "--status" not in commands[0][0]
 
 
 def test_normalize_status_maps_provider_workflow_terms() -> None:
@@ -583,35 +721,33 @@ def test_normalize_status_maps_provider_workflow_terms() -> None:
 def test_main_apply_persists_sync_state(tmp_path, monkeypatch, capsys) -> None:
     state_path = tmp_path / "task-sync-state.json"
     plan = [make_action("asana", "create", None)]
+    results = [
+        SyncExecutionResult(
+            provider="asana",
+            action="create",
+            sync_key="tri-sync-rollout",
+            target_id="A-1",
+            success=True,
+            stdout="ok",
+            stderr="",
+        )
+    ]
 
     monkeypatch.setattr(tri_sync, "SYNC_STATE_PATH", state_path)
     monkeypatch.setattr(
         tri_sync,
         "collect_records",
-        lambda **kwargs: {"asana": []},
+        lambda enabled_providers=None, export_paths=None: {"beads": []},
     )
     monkeypatch.setattr(
         tri_sync,
         "build_sync_plan",
-        lambda *args, **kwargs: plan,
+        lambda records_by_provider, enabled_providers=None: plan,
     )
     monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", lambda: {"asana": ["cat"]})
-    monkeypatch.setattr(
-        tri_sync,
-        "apply_sync_plan",
-        lambda actions, provider_commands: [
-            SyncExecutionResult(
-                provider=action.provider,
-                action=action.action,
-                sync_key=action.sync_key,
-                target_id="A-1",
-                success=True,
-                stdout="ok",
-                stderr="",
-            )
-            for action in actions
-        ],
-    )
+    monkeypatch.setattr(tri_sync, "apply_sync_plan", lambda actions, provider_commands: results)
+    monkeypatch.setattr(tri_sync, "beads_export", list)
+    monkeypatch.setattr(tri_sync, "cleanup_beads_duplicates", lambda records: [])
 
     exit_code = tri_sync.main(["apply"])
     captured = capsys.readouterr()
@@ -623,6 +759,7 @@ def test_main_apply_persists_sync_state(tmp_path, monkeypatch, capsys) -> None:
     record = state["records"]["tri-sync-rollout"]
 
     assert payload["results"][0]["target_id"] == "A-1"
+    assert record["provider_ids"]["beads"] == "bd-1"
     assert record["provider_ids"]["asana"] == "A-1"
     assert record["providers"]["asana"]["target_id"] == "A-1"
     assert record["providers"]["asana"]["success"] is True
@@ -635,13 +772,13 @@ def test_execute_apply_mode_reconciles_until_plan_is_stable(monkeypatch, tmp_pat
         provider="jira",
         action="create",
         sync_key="tri-sync-rollout",
-        source_provider="asana",
-        source_id="A-1",
+        source_provider="beads",
+        source_id="bd-1",
         target_id=None,
         title="Tri-sync rollout",
         body="Ship the sync bridge",
         status="open",
-        provider_ids={"asana": "A-1", "github": "G-1"},
+        provider_ids={"beads": "bd-1", "asana": "A-1"},
     )
     first_plan = [first_action]
     apply_calls: list[list[SyncAction]] = []
@@ -671,6 +808,8 @@ def test_execute_apply_mode_reconciles_until_plan_is_stable(monkeypatch, tmp_pat
     monkeypatch.setattr(tri_sync, "resolve_apply_commands_from_env", dict)
     monkeypatch.setattr(tri_sync, "resolve_enabled_providers_from_env", lambda: tri_sync.DEFAULT_PROVIDER_ORDER)
     monkeypatch.setattr(tri_sync, "apply_sync_plan", fake_apply_sync_plan)
+    monkeypatch.setattr(tri_sync, "beads_export", list)
+    monkeypatch.setattr(tri_sync, "cleanup_beads_duplicates", lambda records: [])
 
     payload, exit_code = execute_apply_mode(first_plan)
 
@@ -683,9 +822,12 @@ def test_execute_apply_mode_reconciles_until_plan_is_stable(monkeypatch, tmp_pat
 
 
 def test_resolve_enabled_providers_from_env(monkeypatch) -> None:
-    monkeypatch.setenv("PIXELATED_TASK_SYNC_PROVIDERS", "asana,jira")
+    monkeypatch.setenv("PIXELATED_TASK_SYNC_PROVIDERS", "beads,asana")
 
-    assert resolve_enabled_providers_from_env() == ("asana", "jira")
+    assert resolve_enabled_providers_from_env() == ("beads", "asana")
+
+
+def test_collect_provider_records_uses_direct_asana_export_when_no_path(monkeypatch) -> None:
     monkeypatch.setattr(
         tri_sync,
         "export_asana_tasks",
@@ -793,11 +935,11 @@ def make_action(provider: str, action: str, target_id: str | None):
         provider=provider,
         action=action,
         sync_key="tri-sync-rollout",
-        source_provider="jira",
-        source_id="PIX-1",
+        source_provider="beads",
+        source_id="bd-1",
         target_id=target_id,
         title="Tri-sync rollout",
         body="Ship the sync bridge",
         status="open",
-        provider_ids={"jira": "PIX-1"},
+        provider_ids={"beads": "bd-1"},
     )

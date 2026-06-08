@@ -74,7 +74,7 @@ export class BatchProcessor implements IBatchProcessor {
   ): Promise<UnifiedProcessingResponse> {
     this.queue.push(request)
 
-    if (this.queue.length >= (this as any)?.config.batchSize) {
+    if (this.queue.length >= this?.config.batchSize) {
       void this.flush()
     }
 

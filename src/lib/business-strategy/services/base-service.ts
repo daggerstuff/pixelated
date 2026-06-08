@@ -33,7 +33,7 @@ export abstract class BaseService {
     await this.auditService.logEvent({
       ...params,
       timestamp: new Date(),
-    } as any)
+    })
   }
 
   /**

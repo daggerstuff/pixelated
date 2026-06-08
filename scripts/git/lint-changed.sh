@@ -1,76 +1,4 @@
 #!/usr/bin/env bash
-# =============================================================================
-# lint-changed.sh
-# Runs linting and formatting on all changed files (staged + unstaged) across
-# all 4 repos in the Pixelated workspace.
-#
-# Covers:
-#   • TypeScript/JavaScript: oxlint + prettier
-#   • Python: ruff (lint + format)
-#
-# Usage:
-#   ./scripts/git/lint-changed.sh [--fix] [--check-only] [--repo <name>]
-#   --fix         Auto-fix issues where possible (default: true)
-#   --check-only  Only report, don't write any fixes
-#   --repo        Limit to one repo: ai | docs | foresight-mcp | main
-# =============================================================================
-set -euo pipefail
-
-# ── Colour helpers ────────────────────────────────────────────────────────────
-BOLD=$'\e[1m'; RESET=$'\e[0m'
-GREEN=$'\e[32m'; YELLOW=$'\e[33m'; CYAN=$'\e[36m'; RED=$'\e[31m'; MAGENTA=$'\e[35m'
-
-info()    { echo "${CYAN}${BOLD}ℹ  $*${RESET}"; }
-success() { echo "${GREEN}${BOLD}✔  $*${RESET}"; }
-warn()    { echo "${YELLOW}${BOLD}⚠  $*${RESET}"; }
-error()   { echo "${RED}${BOLD}✖  $*${RESET}" >&2; }
-section() { echo ""; echo "${MAGENTA}${BOLD}━━━  $*  ━━━${RESET}"; echo ""; }
-
-# ── Argument parsing ──────────────────────────────────────────────────────────
-FIX=true
-TARGET_REPO=""
-
-while [[ $# -gt 0 ]]; do
-  case $1 in
-    --fix)         FIX=true; shift ;;
-    --check-only)  FIX=false; shift ;;
-    --repo)        TARGET_REPO="$2"; shift 2 ;;
-    *) warn "Unknown arg: $1"; shift ;;
-  esac
-done
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "/home/vivi/pixelated")"
-
-ERRORS=0
-
-# ── Helper: collect changed files in a repo ───────────────────────────────────
-get_changed_files() {
-  local repo="$1"
-  local exts="${2:-}"  # optional extension filter like "ts|tsx|js|jsx"
-
-  cd "$repo"
-
-  # Staged + unstaged modified + untracked
-  local files
-  files=$(
-    {
-      git diff --name-only HEAD 2>/dev/null || true
-      git diff --name-only 2>/dev/null || true
-      git ls-files --others --exclude-standard 2>/dev/null || true
-    } | sort -u | grep -v '^$' | grep -v "^scratch/" | grep -v "^aws/" || true
-  )
-
-  if [[ -n "$exts" ]]; then
-    files=$(echo "$files" | grep -E "\.(${exts})$" || true)
-  fi
-
-  # Return only files that actually exist
-  while IFS= read -r f; do
-    [[ -z "$f" ]] && continue
-    [[ -f "${repo}/${f}" ]] && echo "$f"
-  done <<< "$files"
-  true
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────
@@ -100,13 +28,9 @@ lint_ts_files() {
   done <<< "$ts_files"
 
   # oxlint
-  if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]] || command -v pnpm &>/dev/null; then
+  if command -v oxlint &>/dev/null || [[ -f "${repo}/node_modules/.bin/oxlint" ]]; then
     local oxlint_cmd="oxlint"
-    if command -v pnpm &>/dev/null; then
-      oxlint_cmd="pnpm exec oxlint"
-    elif [[ -f "${repo}/node_modules/.bin/oxlint" ]]; then
-      oxlint_cmd="${repo}/node_modules/.bin/oxlint"
-    fi
+    [[ -f "${repo}/node_modules/.bin/oxlint" ]] && oxlint_cmd="${repo}/node_modules/.bin/oxlint"
 
     info "    Running oxlint..."
     if [[ "$FIX" == "true" ]]; then

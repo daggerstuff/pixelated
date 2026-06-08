@@ -61,7 +61,7 @@ export const BiasResultSchema = z.object({
   bias_level: z.string(),
   indicators: z.array(BiasIndicatorSchema),
   recommendations: z.array(z.string()),
-  fairness_metrics: (z.record as any)(z.number()),
+  fairness_metrics: z.record(z.number()),
 })
 
 export const PIIScrubResultSchema = z.object({

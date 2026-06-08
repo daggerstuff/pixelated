@@ -1,6 +1,9 @@
 export const prerender = false
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
+import { AdminPermission, AdminService } from '../../../lib/admin'
+import { adminGuard } from '../../../lib/admin/middleware'
+
 import { AdminPermission, AdminService } from '../../../lib/admin/index'
 import { adminGuard } from '../../../lib/admin/middleware'
 
@@ -20,7 +23,7 @@ export const GET = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
-    context as any,
+    context,
     next,
   )
   if (middlewareResponse.status !== 200) {
@@ -93,7 +96,7 @@ export const POST = async (context: APIContext) => {
       resolve(new Response(null, { status: 200 })),
     )
   const middlewareResponse = await adminGuard(AdminPermission.MANAGE_SESSIONS)(
-    context as any,
+    context,
     next,
   )
   if (middlewareResponse.status !== 200) {
