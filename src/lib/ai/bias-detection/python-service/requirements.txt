@@ -360,7 +360,7 @@ propcache==0.5.2
     #   yarl
 psycopg2-binary==2.9.12
     # via bias-detection-service (pyproject.toml)
-pyarrow==24.0.0
+pyarrow==23.0.1
     # via datasets
 pycparser==3.0
     # via cffi
