@@ -36,10 +36,10 @@ export class ObjectiveInjector implements IObjectiveInjector {
     return {
       ...request,
       context: {
-        ...(request.context as any),
+        ...(request.context as Record<string, unknown>),
         objectives: resolvedObjectives,
       },
-    }
+    } as unknown as UnifiedProcessingRequest
   }
 
   private validateObjectives(_objectives: ObjectiveDefinition[]): boolean {
