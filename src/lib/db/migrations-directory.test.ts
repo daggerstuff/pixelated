@@ -1,3 +1,4 @@
+/* @vitest-environment node */
 /**
  * Tests for DatabaseMigration directory-based methods.
  *
@@ -90,13 +91,16 @@ describe('DatabaseMigration directory methods', () => {
     it('applies all SQL files in sorted order when none are executed', async () => {
       const fs = buildFsAdapter({
         '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
-        '011_workspace_id.sql': 'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
         '012_rbac.sql': 'CREATE TABLE roles (id UUID);',
       })
 
       const result = await migration.runMigrationsFromDirectory(
         '/migrations',
-        fs as unknown as Parameters<typeof migration.runMigrationsFromDirectory>[1],
+        fs as unknown as Parameters<
+          typeof migration.runMigrationsFromDirectory
+        >[1],
       )
 
       expect(result.applied).toEqual([
@@ -129,12 +133,15 @@ describe('DatabaseMigration directory methods', () => {
 
       const fs = buildFsAdapter({
         '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
-        '011_workspace_id.sql': 'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
       })
 
       const result = await migration.runMigrationsFromDirectory(
         '/migrations',
-        fs as unknown as Parameters<typeof migration.runMigrationsFromDirectory>[1],
+        fs as unknown as Parameters<
+          typeof migration.runMigrationsFromDirectory
+        >[1],
       )
 
       expect(result.applied).toEqual(['011_workspace_id.sql'])
@@ -151,7 +158,9 @@ describe('DatabaseMigration directory methods', () => {
 
       const result = await migration.runMigrationsFromDirectory(
         '/migrations',
-        fs as unknown as Parameters<typeof migration.runMigrationsFromDirectory>[1],
+        fs as unknown as Parameters<
+          typeof migration.runMigrationsFromDirectory
+        >[1],
       )
 
       expect(result.applied).toEqual(['010_workspaces.sql'])
@@ -180,7 +189,8 @@ describe('DatabaseMigration directory methods', () => {
       const fs = buildFsAdapter({
         '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
         '010_workspaces.rollback.sql': 'DROP TABLE workspaces;',
-        '011_workspace_id.sql': 'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
         '011_workspace_id.rollback.sql':
           'ALTER TABLE users DROP COLUMN workspace_id;',
         '012_rbac.sql': 'CREATE TABLE roles (id UUID);',
@@ -196,7 +206,9 @@ describe('DatabaseMigration directory methods', () => {
 
       const executedSql = mockQueryFn.mock.calls.map((c) => c[0] as string)
       expect(executedSql).toContain('DROP TABLE roles;')
-      expect(executedSql).toContain('DELETE FROM schema_migrations WHERE name = $1')
+      expect(executedSql).toContain(
+        'DELETE FROM schema_migrations WHERE name = $1',
+      )
     })
 
     it('skips applied migrations without a rollback file and tries the previous one', async () => {
@@ -219,7 +231,8 @@ describe('DatabaseMigration directory methods', () => {
       const fs = buildFsAdapter({
         '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
         '010_workspaces.rollback.sql': 'DROP TABLE workspaces;',
-        '011_workspace_id.sql': 'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
       })
 
       const result = await migration.rollbackLast(
@@ -262,10 +275,7 @@ describe('DatabaseMigration directory methods', () => {
         }
         if (text.startsWith('SELECT name FROM schema_migrations')) {
           return {
-            rows: [
-              { name: '010_workspaces.sql' },
-              { name: '012_rbac.sql' },
-            ],
+            rows: [{ name: '010_workspaces.sql' }, { name: '012_rbac.sql' }],
             rowCount: 2,
           }
         }
@@ -274,7 +284,8 @@ describe('DatabaseMigration directory methods', () => {
 
       const fs = buildFsAdapter({
         '010_workspaces.sql': 'CREATE TABLE workspaces (id UUID);',
-        '011_workspace_id.sql': 'ALTER TABLE users ADD COLUMN workspace_id UUID;',
+        '011_workspace_id.sql':
+          'ALTER TABLE users ADD COLUMN workspace_id UUID;',
         '012_rbac.sql': 'CREATE TABLE roles (id UUID);',
       })
 

@@ -11,7 +11,7 @@ import { getLogger } from '../logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
 
-const logger = getLogger('connection-pool')
+const logger = getLogger({ prefix: 'connection-pool' })
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -38,7 +38,7 @@ interface OptimizedPoolConfig extends PoolConfig {
 }
 
 // Pool metrics interface
-interface PoolMetrics {
+export interface PoolMetrics {
   totalConnections: number
   idleConnections: number
   waitingClients: number
