@@ -61,7 +61,7 @@ export async function getStaticPaths() {
 
   // Get all blog posts
   const posts = await getCollection("blog", (entry: any) => {
-    return import.meta['env'].PROD ? !entry.data.draft : true;
+    return import.meta.env.PROD ? !entry.data.draft : true;
   });
 
   // Sort by date - newest first
@@ -81,7 +81,7 @@ const currentPage = parseInt(pageParam, 10)
 const pageSize = 20
 
 const posts = await getCollection('blog', (entry: any) => {
-  return import.meta['env'].PROD ? !entry.data.draft : true
+  return import.meta.env.PROD ? !entry.data.draft : true
 })
 
 const sortedPosts = posts.sort((postA: any, postB: any) => {
