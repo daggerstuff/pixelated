@@ -136,7 +136,7 @@ export const POST = async ({
   } catch (error: any) {
     console.error('Sign up error:', error)
 
-    logSecurityEvent('error', {
+    logSecurityEvent('error', null, {
       error: error instanceof Error ? error.message : 'Unknown error',
       clientInfo,
       timestamp: Date.now(),
