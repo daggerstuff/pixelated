@@ -413,7 +413,7 @@ const universityResults = [
         page_location: window.location.href,
         ab_variant:
           (document.querySelector('[data-variant]') as HTMLElement | null)
-            ?.dataset?.variant || 'unknown',
+            ?.dataset['variant'] || 'unknown',
       })
     }
 
@@ -423,7 +423,7 @@ const universityResults = [
         const target = e.target as HTMLElement | null
         if (!target) return
 
-        const action = target.dataset?.demoAction
+        const action = target.dataset['demoAction']
 
         if (!action) return
 
@@ -433,7 +433,7 @@ const universityResults = [
             interaction_type: action,
             ab_variant:
               (document.querySelector('[data-variant]') as HTMLElement | null)
-                ?.dataset.variant || 'unknown',
+                ?.dataset['variant'] || 'unknown',
           })
         }
 
@@ -449,7 +449,7 @@ const universityResults = [
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
               (document.querySelector('[data-variant]') as HTMLElement | null)
-                ?.dataset?.variant || 'unknown',
+                ?.dataset['variant'] || 'unknown',
           }),
         }).catch(console.error)
       })
