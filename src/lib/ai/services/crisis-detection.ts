@@ -15,14 +15,11 @@ const appLogger = createBuildSafeLogger('app')
 export interface CrisisDetectionConfig {
   aiService: AIService
   sensitivityLevel: 'low' | 'medium' | 'high'
-  model?: string
-  defaultPrompt?: string
 }
 
 export class CrisisDetectionService {
   private readonly aiService: AIService
   private readonly sensitivityLevel: 'low' | 'medium' | 'high'
-
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
     self_harm: [
@@ -356,8 +353,9 @@ export class CrisisDetectionService {
         }
       }
     } catch (error: unknown) {
-      // This will catch errors from the AI service itself (e.g., network issues, API errors)        const errorMsg = error instanceof Error ? error.message : String(error)
-        appLogger.error(`AI service call failed in crisis detection: ${errorMsg}`)
+      // This will catch errors from the AI service itself (e.g., network issues, API errors)
+      const errorMsg = error instanceof Error ? error.message : String(error)
+      appLogger.error(`AI service call failed in crisis detection: ${errorMsg}`)
       // Return null to fall back to keyword analysis instead of throwing
       return null
     }
