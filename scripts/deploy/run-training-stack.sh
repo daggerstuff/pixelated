@@ -3,7 +3,7 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_ROOT="/home/vivi/pixelated"
 cd "$PROJECT_ROOT"
 
 REDIS_AUDIT="${PROJECT_ROOT}/scripts/check-redis-hardening.sh"
