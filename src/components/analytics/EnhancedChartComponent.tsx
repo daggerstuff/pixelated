@@ -90,6 +90,8 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
     refreshInterval: dataConfig?.refreshInterval ?? 60000,
   })
 
+  const typedBackend = backendData as unknown as BackendChartData | null
+
   // Fallback to default data if backend is not available
   const defaultData = {
     line: {
@@ -150,10 +152,11 @@ const EnhancedChartComponent: React.FC<EnhancedChartComponentProps> = ({
   }
 
   // Determine which data to use
-  const chartData =
-    useBackend && backendData?.data
-      ? backendData.data
+  const chartData = (
+    useBackend && typedBackend?.data
+      ? typedBackend.data
       : (fallbackData ?? defaultData[type] ?? defaultData.line)
+  ) as Record<string, unknown>
 
   // Handle backend errors gracefully
   useEffect(() => {

@@ -14,33 +14,16 @@ if (!isUserAuthenticated) {
   return Astro.redirect('/auth/login')
 }
 
-const session = await getCurrentUser(Astro.request)
-if (!session) {
+const userSession = await getCurrentUser(Astro.request)
+if (!userSession) {
   return Astro.redirect('/auth/login')
 }
 
-const userRole = session.role // 'trainee', 'supervisor', 'admin'
+const userRole = userSession.role // 'trainee', 'supervisor', 'admin'
 
-// Get active training sessions for this user
-// Note: In a real implementation, you'd need to retrieve the actual access token from cookies
-const activeTrainingSessions = await fetch(
-  `${import.meta.env.API_BASE_URL}/training/sessions/active`,
-  {
-    headers: { 'X-User-Id': session.id },
-  },
-)
-  .then((res) => res.json())
-  .catch(() => [])
-
-// Get available training programs
-const trainingPrograms = await fetch(
-  `${import.meta.env.API_BASE_URL}/training/programs`,
-  {
-    headers: { 'X-User-Id': session.id },
-  },
-)
-  .then((res) => res.json())
-  .catch(() => [])
+// Mock data for now - in a real implementation, you'd fetch from API
+const activeTrainingSessions: any[] = []
+const trainingPrograms: any[] = []
 ---
 
 <Layout
