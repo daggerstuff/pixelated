@@ -347,7 +347,6 @@ coverage:report:
   stage: test
   image: node:${NODE_VERSION}-slim
   needs:
-    - job: test:unit
     - job: test:integration
   cache:
     key:
