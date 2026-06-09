@@ -340,6 +340,7 @@
     "@letta-ai/letta-client": "latest",
     "@letta-ai/letta-code-sdk": "latest",
     "@playwright/test": "latest",
+    "@schpet/linear-cli": "^2.0.0",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
