@@ -332,7 +332,7 @@ const placeholderThumbnail =
                         href="#"
                         class="text-sm text-blue-600 dark:text-blue-400 hover:underline"
                         data-name={screenshot.name}
-                        onclick="openImageComparisonModal(this.dataset.name); return false;"
+                        onclick="openImageComparisonModal(this.dataset['name']); return false;"
                       >
                         View Full Size
                       </a>
@@ -542,8 +542,8 @@ const placeholderThumbnail =
 <script>
   // Get data from container
   const dataContainer = document.getElementById('visual-data') as HTMLElement
-  const visualData = JSON.parse(dataContainer?.dataset.visualData || '{}')
-  const placeholderThumbnail = dataContainer?.dataset.placeholder || ''
+  const visualData = JSON.parse(dataContainer?.dataset['visualData'] || '{}')
+  const placeholderThumbnail = dataContainer?.dataset['placeholder'] || ''
 
   // Refresh button
   document.getElementById('refresh-data')?.addEventListener('click', () => {

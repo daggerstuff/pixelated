@@ -7,10 +7,7 @@ import {
   mockSession,
   mockSessionList,
 } from '@/components/journal-research/__tests__/test-utils'
-import type {
-  JournalSession,
-  JournalSessionList,
-} from '@/lib/api/journal-research'
+import type { Session, SessionList } from '@/lib/api/journal-research'
 import * as api from '@/lib/api/journal-research'
 import { useJournalSessionStore } from '@/lib/stores/journal-research'
 
@@ -24,10 +21,10 @@ import {
 
 // Mock API functions
 vi.mock('@/lib/api/journal-research', () => ({
-  listSessions: vi.fn<() => Promise<JournalSessionList>>(),
-  getSession: vi.fn<() => Promise<JournalSession>>(),
-  createSession: vi.fn<() => Promise<JournalSession>>(),
-  updateSession: vi.fn<() => Promise<JournalSession>>(),
+  listSessions: vi.fn<() => Promise<SessionList>>(),
+  getSession: vi.fn<() => Promise<Session>>(),
+  createSession: vi.fn<() => Promise<Session>>(),
+  updateSession: vi.fn<() => Promise<Session>>(),
   deleteSession: vi.fn<() => Promise<void>>(),
 }))
 
@@ -50,29 +47,29 @@ const createWrapper = () => {
 }
 
 describe('useSession hooks', () => {
-  const baseStoreState = {
-    selectedSessionId: null as string | null,
-    filters: { searchTerm: '', phases: [] as string[] },
-    openCreateDrawer: vi.fn(),
-    closeCreateDrawer: vi.fn(),
-    setSelectedSessionId: vi.fn<(id: string | null) => void>(),
-  }
-
   beforeEach(() => {
     vi.clearAllMocks()
     const storeState = {
-      ...baseStoreState,
+      selectedSessionId: null as string | null,
+      filters: { searchTerm: '', phases: [] as string[] },
+      isCreateDrawerOpen: false,
       openCreateDrawer: vi.fn(),
       closeCreateDrawer: vi.fn(),
       setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+      togglePhaseFilter: vi.fn(),
+      setSearchTerm: vi.fn(),
+      resetFilters: vi.fn(),
     }
     ;(useJournalSessionStore as any).mockImplementation(
       (selector?: (state: typeof storeState) => unknown) =>
         typeof selector === 'function' ? selector(storeState) : storeState,
     )
     ;(
-      useJournalSessionStore as typeof useJournalSessionStore & {
-        getState?: () => typeof storeState
+      useJournalSessionStore as unknown as Omit<
+        typeof useJournalSessionStore,
+        'getState'
+      > & {
+        getState: () => typeof storeState
       }
     ).getState = () => storeState
   })
@@ -96,8 +93,15 @@ describe('useSession hooks', () => {
     it('applies filters from store', async () => {
       vi.mocked(api.listSessions).mockResolvedValue(mockSessionList)
       const filteredStoreState = {
-        ...baseStoreState,
+        selectedSessionId: null as string | null,
         filters: { searchTerm: 'test', phases: ['discovery'] },
+        isCreateDrawerOpen: false,
+        openCreateDrawer: vi.fn(),
+        closeCreateDrawer: vi.fn(),
+        setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+        togglePhaseFilter: vi.fn(),
+        setSearchTerm: vi.fn(),
+        resetFilters: vi.fn(),
       }
       ;(useJournalSessionStore as any).mockImplementation(
         (selector?: (state: typeof filteredStoreState) => unknown) =>
@@ -106,8 +110,11 @@ describe('useSession hooks', () => {
             : filteredStoreState,
       )
       ;(
-        useJournalSessionStore as typeof useJournalSessionStore & {
-          getState?: () => typeof filteredStoreState
+        useJournalSessionStore as unknown as Omit<
+          typeof useJournalSessionStore,
+          'getState'
+        > & {
+          getState: () => typeof filteredStoreState
         }
       ).getState = () => filteredStoreState
 
@@ -197,18 +204,25 @@ describe('useSession hooks', () => {
       vi.mocked(api.createSession).mockResolvedValue(mockSession)
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
       const closeCreateDrawer = vi.fn<() => void>()
-
-      ;(
-        useJournalSessionStore as typeof useJournalSessionStore & {
-          getState?: () => {
-            setSelectedSessionId: typeof setSelectedSessionId
-            closeCreateDrawer: typeof closeCreateDrawer
-          }
-        }
-      ).getState = () => ({
-        setSelectedSessionId,
+      const storeState = {
+        selectedSessionId: null as string | null,
+        filters: { searchTerm: '', phases: [] as string[] },
+        isCreateDrawerOpen: true,
+        openCreateDrawer: vi.fn(),
         closeCreateDrawer,
-      })
+        setSelectedSessionId,
+        togglePhaseFilter: vi.fn(),
+        setSearchTerm: vi.fn(),
+        resetFilters: vi.fn(),
+      }
+      ;(
+        useJournalSessionStore as unknown as Omit<
+          typeof useJournalSessionStore,
+          'getState'
+        > & {
+          getState: () => typeof storeState
+        }
+      ).getState = () => storeState
 
       const { result } = renderHook(() => useCreateSessionMutation(), {
         wrapper: createWrapper(),
@@ -236,7 +250,25 @@ describe('useSession hooks', () => {
     it('updates session successfully', async () => {
       const updatedSession = { ...mockSession, currentPhase: 'evaluation' }
       vi.mocked(api.updateSession).mockResolvedValue(updatedSession)
-
+      const storeState = {
+        selectedSessionId: null as string | null,
+        filters: { searchTerm: '', phases: [] as string[] },
+        isCreateDrawerOpen: false,
+        openCreateDrawer: vi.fn(),
+        closeCreateDrawer: vi.fn(),
+        setSelectedSessionId: vi.fn<(id: string | null) => void>(),
+        togglePhaseFilter: vi.fn(),
+        setSearchTerm: vi.fn(),
+        resetFilters: vi.fn(),
+      }
+      ;(
+        useJournalSessionStore as unknown as Omit<
+          typeof useJournalSessionStore,
+          'getState'
+        > & {
+          getState: () => typeof storeState
+        }
+      ).getState = () => storeState
       const { result } = renderHook(() => useUpdateSessionMutation(), {
         wrapper: createWrapper(),
       })
@@ -257,19 +289,25 @@ describe('useSession hooks', () => {
     it('deletes session successfully', async () => {
       vi.mocked(api.deleteSession).mockResolvedValue(undefined)
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
-
-      ;(
-        useJournalSessionStore as typeof useJournalSessionStore & {
-          getState?: () => {
-            selectedSessionId: string
-            setSelectedSessionId: typeof setSelectedSessionId
-          }
-        }
-      ).getState = () => ({
+      const storeState = {
         selectedSessionId: 'test-session-1',
+        filters: { searchTerm: '', phases: [] as string[] },
+        isCreateDrawerOpen: false,
+        openCreateDrawer: vi.fn(),
+        closeCreateDrawer: vi.fn(),
         setSelectedSessionId,
-      })
-
+        togglePhaseFilter: vi.fn(),
+        setSearchTerm: vi.fn(),
+        resetFilters: vi.fn(),
+      }
+      ;(
+        useJournalSessionStore as unknown as Omit<
+          typeof useJournalSessionStore,
+          'getState'
+        > & {
+          getState: () => typeof storeState
+        }
+      ).getState = () => storeState
       const { result } = renderHook(() => useDeleteSessionMutation(), {
         wrapper: createWrapper(),
       })
@@ -287,18 +325,25 @@ describe('useSession hooks', () => {
     it('does not clear selected session if different session is deleted', async () => {
       vi.mocked(api.deleteSession).mockResolvedValue(undefined)
       const setSelectedSessionId = vi.fn<(id: string | null) => void>()
-
-      ;(
-        useJournalSessionStore as typeof useJournalSessionStore & {
-          getState?: () => {
-            selectedSessionId: string
-            setSelectedSessionId: typeof setSelectedSessionId
-          }
-        }
-      ).getState = () => ({
+      const storeState = {
         selectedSessionId: 'other-session',
+        filters: { searchTerm: '', phases: [] as string[] },
+        isCreateDrawerOpen: false,
+        openCreateDrawer: vi.fn(),
+        closeCreateDrawer: vi.fn(),
         setSelectedSessionId,
-      })
+        togglePhaseFilter: vi.fn(),
+        setSearchTerm: vi.fn(),
+        resetFilters: vi.fn(),
+      }
+      ;(
+        useJournalSessionStore as unknown as Omit<
+          typeof useJournalSessionStore,
+          'getState'
+        > & {
+          getState: () => typeof storeState
+        }
+      ).getState = () => storeState
 
       const { result } = renderHook(() => useDeleteSessionMutation(), {
         wrapper: createWrapper(),

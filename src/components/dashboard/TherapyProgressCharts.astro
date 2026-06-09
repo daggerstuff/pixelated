@@ -5,7 +5,7 @@ interface Props {
 }
 
 const { sessions = [], metrics = {} } = Astro.props
-const timeRange = '30d'
+const timeRange: '7d' | '30d' | '90d' | 'all' = '30d'
 
 const filteredSessions = sessions.filter((session: any) => {
   const date = new Date(session.timestamp)
@@ -13,7 +13,7 @@ const filteredSessions = sessions.filter((session: any) => {
   const diffDays = Math.floor(
     (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
   )
-  return timeRange === '7d' ? diffDays <= 7 : diffDays <= 30
+  return diffDays <= 30
 })
 
 const moodData = filteredSessions.map((session: any) => ({

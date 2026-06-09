@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import _SearchDemoComponent from '@/components/SearchDemo.astro'
+import SearchDemo from '@/components/SearchDemo.astro'
 ---
 
 <BaseLayout title="Search Demo | Pixelated Empathy">
@@ -9,7 +9,6 @@ import _SearchDemoComponent from '@/components/SearchDemo.astro'
     <p class="text-muted-foreground mb-8">
       Try our client-side search powered by FlexSearch and backed by the
       /api/v1/search endpoint.
-    </p>
-    <SearchDemoComponent client:load />
+    <SearchDemo client:load />
   </div>
 </BaseLayout>

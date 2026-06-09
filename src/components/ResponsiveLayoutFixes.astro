@@ -345,8 +345,9 @@
     window.addEventListener('scroll', () => {
       const scrolled = window.pageYOffset
 
-      parallaxElements.forEach((element) => {
-        const speed = parseFloat(element.dataset.parallaxSpeed) || 0.5
+      parallaxElements.forEach((el) => {
+        const element = el as HTMLElement
+        const speed = parseFloat(element.dataset['parallaxSpeed'] || '') || 0.5
         const yPos = -(scrolled * speed)
         element.style.transform = `translate3d(0, ${yPos}px, 0)`
       })
@@ -368,9 +369,9 @@
 
   // Add smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-    anchor.addEventListener('click', function (e) {
-      const href = this.getAttribute('href')
-      if (href !== '#' && href.length > 1) {
+    anchor.addEventListener('click', (e: Event) => {
+      const href = anchor.getAttribute('href')
+      if (href && href !== '#' && href.length > 1) {
         e.preventDefault()
         const target = document.querySelector(href)
         if (target) {

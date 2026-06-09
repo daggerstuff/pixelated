@@ -36,7 +36,7 @@ for (const item of new Set(left)) {
           class={`grid grid-flow-col items-center gap-4.8 print:op-0 ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
         >
           {left.map((key) =>
-            key === 'hr' ? (
+            String(key) === 'hr' ? (
               <Divider class={mergeOnMobile ? 'lt-md:hidden' : undefined} />
             ) : key === 'searchButton' ? (
               <SearchSwitch />
@@ -65,7 +65,7 @@ for (const item of new Set(left)) {
               ${mergeOnMobile ? '' : 'lt-md:(gap-3)'}`}
         >
           {right.map((key) =>
-            key === 'hr' ? (
+            String(key) === 'hr' ? (
               <Divider class={mergeOnMobile ? 'lt-md:hidden' : undefined} />
             ) : key === 'searchButton' ? (
               <SearchSwitch />

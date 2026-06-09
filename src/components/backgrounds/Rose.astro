@@ -81,11 +81,11 @@ const roses = [
   export class RoseBloom extends HTMLElement {
     get #config() {
       return {
-        topRange: this.#parseRange(this.dataset.topRange) ?? [50, 50],
-        leftRange: this.#parseRange(this.dataset.leftRange) ?? [50, 50],
-        scaleRange: this.#parseRange(this.dataset.scaleRange) ?? [0.05, 0.06],
-        rotationRange: this.#parseRange(this.dataset.rotationRange) ?? [-3, 3],
-        smallOnMobile: this.dataset.smallOnMobile === 'true',
+        topRange: this.#parseRange(this.dataset['topRange']) ?? [50, 50],
+        leftRange: this.#parseRange(this.dataset['leftRange']) ?? [50, 50],
+        scaleRange: this.#parseRange(this.dataset['scaleRange']) ?? [0.05, 0.06],
+        rotationRange: this.#parseRange(this.dataset['rotationRange']) ?? [-3, 3],
+        smallOnMobile: this.dataset['smallOnMobile'] === 'true',
       }
     }
 

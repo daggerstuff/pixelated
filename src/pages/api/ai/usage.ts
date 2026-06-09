@@ -22,11 +22,18 @@ const rateLimiter = new RateLimiter(30)
  * Rate limited to prevent abuse
  */
 export const GET: APIRoute = async ({ request }) => {
-  let session: { user?: { id?: string; role?: string } } | null = null
+  interface UserSession {
+    user?: {
+      id?: string
+      role?: string
+    }
+  }
+  let session: UserSession | null = null
+  let userId = 'anonymous'
 
   try {
     // Verify session
-    session = (await getSession(request)) as unknown as typeof session
+    session = (await getSession(request)) as unknown as UserSession
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -37,14 +44,15 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    const userId = session?.user?.id
-    const role = session?.user?.role ?? 'user'
-    if (!userId) {
+    const currentUserId = session.user.id
+    const role = session.user.role ?? 'user'
+    if (!currentUserId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       })
     }
+    userId = currentUserId
     const { allowed, limit, remaining, reset } = rateLimiter.check(
       `${userId}:/api/ai/usage`,
       role,
@@ -165,15 +173,15 @@ export const GET: APIRoute = async ({ request }) => {
       period: params.period as string,
     }
 
-    if (params!.startDate) {
-      statsOptions.startDate = new Date(params!.startDate as string)
+    if (params.startDate) {
+      statsOptions.startDate = new Date(params.startDate)
     }
 
-    if (params!.endDate) {
-      statsOptions.endDate = new Date(params!.endDate as string)
+    if (params.endDate) {
+      statsOptions.endDate = new Date(params.endDate)
     }
 
-    if (!params!.allUsers) {
+    if (!params.allUsers) {
       statsOptions.userId = userId
     }
 
