@@ -684,7 +684,7 @@ const trainingMetrics = {
   // Scenario Selection
   scenarioItems.forEach((item) => {
     item.addEventListener('click', () => {
-      const scenarioId = item.dataset.scenario
+      const scenarioId = item.dataset['scenario']
       if (scenarioId) loadScenario(scenarioId)
     })
   })

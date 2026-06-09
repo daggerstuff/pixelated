@@ -165,9 +165,6 @@
     "blog": "node scripts/blog-web.js",
     "schedule-posts": "node scripts/content/schedule-posts.js",
     "mcp:installer": "pnpm exec cursor-mcp-installer-free /workspaces/pixelated",
-    "db:migrate": "tsx scripts/db-migrate.ts migrate",
-    "db:rollback": "tsx scripts/db-migrate.ts rollback",
-    "db:status": "tsx scripts/db-migrate.ts status",
     "mcp:list": "node scripts/mcp-manager.js list",
     "mcp:run": "node scripts/mcp-manager.js run",
     "mcp:manage": "node scripts/mcp-manager.js"
@@ -584,7 +581,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.1",
+  "packageManager": "pnpm@11.5.2",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true

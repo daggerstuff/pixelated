@@ -671,7 +671,7 @@ const universityResults = [
     const variantElement = document.querySelector(
       '[data-variant]',
     ) as HTMLElement | null
-    const variant = variantElement?.dataset?.variant || 'unknown'
+    const variant = variantElement?.dataset['variant'] || 'unknown'
 
     if (typeof window.gtag !== 'undefined') {
       window.gtag('event', 'page_view', {
@@ -687,7 +687,7 @@ const universityResults = [
         const target = e.target as HTMLElement | null
         if (!target) return
 
-        const action = target.dataset?.demoAction
+        const action = target.dataset['demoAction']
 
         if (!action) return
 
@@ -721,8 +721,8 @@ const universityResults = [
         const target = e.target as HTMLElement | null
         if (!target) return
 
-        const ctaType = target.dataset?.demoCta
-        const ctaVariant = target.dataset?.variant
+        const ctaType = target.dataset['demoCta']
+        const ctaVariant = target.dataset['variant']
 
         if (!ctaType) return
 

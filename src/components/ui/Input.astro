@@ -11,7 +11,7 @@ const { type, error, errorId, class: className, ...props } = Astro.props
 
 // Accessibility logic (Review suggestion: consolidate attributes)
 const ariaAttributes = {
-  'aria-invalid': error ? 'true' : undefined,
+  'aria-invalid': Boolean(error),
   'aria-describedby': error && errorId ? errorId : props['aria-describedby'],
 }
 ---

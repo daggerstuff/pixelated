@@ -280,23 +280,23 @@
         'meta[name="theme-color"]',
       )
       metaThemeColors.forEach((meta) => {
-        const media = meta.getAttribute('media')
+        const media = meta['getAttribute']('media')
         if (theme === 'dark') {
           if (media && media.includes('dark')) {
-            meta.setAttribute('content', '#0a0a0a')
+            meta['setAttribute']('content', '#0a0a0a')
           }
         } else if (theme === 'light') {
           if (media && media.includes('light')) {
-            meta.setAttribute('content', '#ffffff')
+            meta['setAttribute']('content', '#ffffff')
           }
         } else if (theme === 'system') {
           const systemDark = window.matchMedia(
             '(prefers-color-scheme: dark)',
           ).matches
           if (systemDark && media && media.includes('dark')) {
-            meta.setAttribute('content', '#0a0a0a')
+            meta['setAttribute']('content', '#0a0a0a')
           } else if (!systemDark && media && media.includes('light')) {
-            meta.setAttribute('content', '#ffffff')
+            meta['setAttribute']('content', '#ffffff')
           }
         }
       })

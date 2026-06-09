@@ -409,7 +409,7 @@ export const prerender = false
       buttons.forEach((button) => {
         button.addEventListener('click', async (e: any) => {
           const target = e.target as HTMLElement
-          const days = parseInt(target.dataset.days || '30')
+          const days = parseInt(target.dataset['days'] || '30')
 
           // Update active state
           buttons.forEach((btn) => btn.classList.remove('active'))
