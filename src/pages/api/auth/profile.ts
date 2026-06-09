@@ -21,6 +21,9 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
+  let clientInfo:
+    | { ip: string; userAgent: string; deviceId: string }
+    | undefined
   try {
     // Extract client info for logging
     clientInfo = {
@@ -146,7 +149,9 @@ export const PUT = async ({
   request: Request
   clientAddress: string
 }) => {
-  let clientInfo
+  let clientInfo:
+    | { ip: string; userAgent: string; deviceId: string }
+    | undefined
   try {
     clientInfo = {
       ip: clientAddress || 'unknown',

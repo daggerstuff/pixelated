@@ -274,6 +274,8 @@ export interface BehavioralPattern {
   frequency: number
   firstSeen: Date
   lastSeen: Date
+  confidence?: number
+  stability?: number
 }
 
 export interface BehavioralSequence {
@@ -294,7 +296,7 @@ export interface SecurityEvent {
 }
 
 export interface PatternMiner {
-  minePatterns(events: SecurityEvent[]): Promise<BehavioralPattern[]>
+  minePatterns(sequences: BehavioralSequence[]): Promise<BehavioralPattern[]>
 }
 
 export interface BehaviorGraph {
