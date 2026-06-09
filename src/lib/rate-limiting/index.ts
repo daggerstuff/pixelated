@@ -10,8 +10,7 @@
  * - Configurable rules with role-based bypass
  */
 
-import { redis } from '../redis'
-import { asRedisOps } from '../redis-ops'
+import { checkRedisConnection } from '../redis'
 import { RateLimitAnalyticsService, rateLimitAnalytics } from './analytics'
 import {
   defaultRateLimitConfig,
@@ -52,7 +51,7 @@ export type {
 export {
   DistributedRateLimiter,
   createRateLimiter,
-  RateLimitAnalytics,
+  RateLimitAnalyticsService as RateLimitAnalytics,
   rateLimitAnalytics,
   createRateLimitMiddleware,
   createBetterAuthRateLimitMiddleware,
@@ -67,8 +66,6 @@ export {
   getConfigFromEnv,
   getMergedConfig,
 }
-
-const RateLimitAnalytics = RateLimitAnalyticsService
 
 /**
  * Quick setup function for comprehensive rate limiting
@@ -131,8 +128,7 @@ export async function checkRateLimitHealth(): Promise<{
   }
 }> {
   try {
-    const redisHealthy = (await asRedisOps(redis).ping()) === 'PONG'
-
+    const redisHealthy = await checkRedisConnection()
     const recentAlerts = await rateLimitAnalytics.getRecentAlerts(10)
 
     const details = {
@@ -196,7 +192,7 @@ export async function getRateLimitStatus(): Promise<{
  */
 export default {
   DistributedRateLimiter,
-  RateLimitAnalytics,
+  RateLimitAnalytics: RateLimitAnalyticsService,
   rateLimitAnalytics,
 
   createRateLimitMiddleware,

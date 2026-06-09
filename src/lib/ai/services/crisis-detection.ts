@@ -15,14 +15,11 @@ const appLogger = createBuildSafeLogger('app')
 export interface CrisisDetectionConfig {
   aiService: AIService
   sensitivityLevel: 'low' | 'medium' | 'high'
-  model?: string
-  defaultPrompt?: string
 }
 
 export class CrisisDetectionService {
   private readonly aiService: AIService
   private readonly sensitivityLevel: 'low' | 'medium' | 'high'
-
   // Crisis detection keywords by category
   private static readonly CRISIS_KEYWORDS = {
     self_harm: [

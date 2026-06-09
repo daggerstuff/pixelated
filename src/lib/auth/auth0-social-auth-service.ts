@@ -231,6 +231,7 @@ export class Auth0SocialAuthService {
     if (!auth0UserInfo) {
       throw new Error('Auth0 user info client not initialized')
     }
+
     try {
       const response = await auth0UserInfo.getUserInfo(accessToken)
       const userInfo = response.data
@@ -242,9 +243,7 @@ export class Auth0SocialAuthService {
         givenName: userInfo.given_name,
         familyName: userInfo.family_name,
         picture: userInfo.picture,
-        provider: userInfo.sub
-          ? (userInfo.sub.split('|')[0] ?? 'unknown')
-          : 'unknown',
+        provider: userInfo.sub?.split('|')[0] ?? 'unknown',
         emailVerified: userInfo.email_verified ?? false,
         createdAt: new Date().toISOString(),
       }
