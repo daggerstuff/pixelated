@@ -81,6 +81,28 @@ const tabIcons: Record<DashboardTab['icon'], React.ReactNode> = {
   compliance: <Clipboard className="h-5 w-5" />,
 }
 
+// ⚡ Bolt Performance Optimization: Extracted static audits array to module scope to prevent re-creating this array on every render of ComplianceTab
+const RECENT_AUDITS = [
+  {
+    type: 'Security Audit',
+    date: '2024-01-15',
+    status: 'passed',
+    score: 96,
+  },
+  {
+    type: 'HIPAA Compliance',
+    date: '2024-01-10',
+    status: 'passed',
+    score: 94,
+  },
+  {
+    type: 'Data Privacy',
+    date: '2024-01-05',
+    status: 'passed',
+    score: 98,
+  },
+]
+
 // ⚡ Bolt Performance Optimization: Extracted static severity styles to module scope to prevent re-creating this object on every render of SystemTab
 const ISSUE_SEVERITY_STYLES: Record<
   DiagnosticIssueSeverity,
@@ -1102,26 +1124,7 @@ const ComplianceTab: FC<{
         <div className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg border p-6">
           <h3 className="mb-4 text-lg font-semibold">Recent Audits</h3>
           <div className="space-y-3">
-            {[
-              {
-                type: 'Security Audit',
-                date: '2024-01-15',
-                status: 'passed',
-                score: 96,
-              },
-              {
-                type: 'HIPAA Compliance',
-                date: '2024-01-10',
-                status: 'passed',
-                score: 94,
-              },
-              {
-                type: 'Data Privacy',
-                date: '2024-01-05',
-                status: 'passed',
-                score: 98,
-              },
-            ].map((audit) => (
+            {RECENT_AUDITS.map((audit) => (
               <div
                 key={`${audit.type}-${audit.date}`}
                 className="bg-gray-50 dark:bg-gray-800/50 flex items-center justify-between rounded-lg p-3"
