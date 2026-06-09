@@ -1,144 +1,180 @@
 {
   "config": {
-    "configFile": "/home/vivi/pixelated/config/playwright.config.ts",
-    "rootDir": "/home/vivi/pixelated/tests",
-    "forbidOnly": false,
+    "configFile": "/app/config/playwright.config.ts",
+    "rootDir": "/app/tests",
+    "forbidOnly": true,
     "fullyParallel": true,
     "globalSetup": null,
     "globalTeardown": null,
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
-    "maxFailures": 10,
+    "maxFailures": 0,
     "metadata": {
       "actualWorkers": 1
     },
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "firefox",
         "name": "firefox",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "webkit",
         "name": "webkit",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "msedge",
         "name": "msedge",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "Tablet Chrome",
         "name": "Tablet Chrome",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "Tablet Safari",
         "name": "Tablet Safari",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
         "timeout": 30000
       },
       {
-        "outputDir": "/home/vivi/pixelated/test-results",
+        "outputDir": "/app/test-results",
         "repeatEach": 1,
-        "retries": 0,
+        "retries": 2,
         "metadata": {
           "actualWorkers": 1
         },
         "id": "theme-compatibility",
         "name": "theme-compatibility",
-        "testDir": "/home/vivi/pixelated/tests",
-        "testIgnore": ["tests/accessibility/**"],
-        "testMatch": ["**/theme-compatibility.spec.ts"],
+        "testDir": "/app/tests",
+        "testIgnore": [
+          "tests/accessibility/**"
+        ],
+        "testMatch": [
+          "**/theme-compatibility.spec.ts"
+        ],
         "timeout": 30000
       }
     ],
@@ -171,214 +207,16 @@
     "tags": [],
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
-    "version": "1.59.1",
+    "version": "1.60.0",
     "workers": 1,
     "webServer": {
-      "command": "ASTRO_PORT=4323 pnpm dev --port 4323",
-      "url": "http://127.0.0.1:4323",
-      "reuseExistingServer": true,
-      "timeout": 180000
+      "command": "pnpm run build && pnpm run preview -- --port 4321",
+      "url": "http://localhost:4321",
+      "reuseExistingServer": false,
+      "timeout": 600000
     }
   },
   "suites": [
-    {
-      "title": "browser/auth.spec.ts",
-      "file": "browser/auth.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "login page has correct form elements",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 725,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-04-11T21:17:35.714Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "ad37a75ba3da77f8b725-65d8d64253a59930a3c5",
-          "file": "browser/auth.spec.ts",
-          "line": 4,
-          "column": 1
-        },
-        {
-          "title": "login form shows validation errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 3181,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-04-11T21:17:36.560Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "ad37a75ba3da77f8b725-a7de8e1a0acb82c0870e",
-          "file": "browser/auth.spec.ts",
-          "line": 21,
-          "column": 1
-        },
-        {
-          "title": "login form is properly visible on mobile viewport",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [
-                {
-                  "type": "skip",
-                  "description": "This test is mobile-only",
-                  "location": {
-                    "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
-                    "line": 111,
-                    "column": 8
-                  }
-                }
-              ],
-              "expectedStatus": "skipped",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "skipped",
-                  "duration": 216,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-04-11T21:17:39.771Z",
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "description": "This test is mobile-only",
-                      "location": {
-                        "file": "/home/vivi/pixelated/tests/browser/auth.spec.ts",
-                        "line": 111,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "attachments": []
-                }
-              ],
-              "status": "skipped"
-            }
-          ],
-          "id": "ad37a75ba3da77f8b725-10a58190e4df691a302b",
-          "file": "browser/auth.spec.ts",
-          "line": 106,
-          "column": 1
-        },
-        {
-          "title": "login page has proper transitions",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 2478,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-04-11T21:17:40.011Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "ad37a75ba3da77f8b725-4246a0e449a9db00beea",
-          "file": "browser/auth.spec.ts",
-          "line": 130,
-          "column": 1
-        },
-        {
-          "title": "login page visual comparison",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 3301,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-04-11T21:17:42.508Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "ad37a75ba3da77f8b725-12e6036596c5b0fd1d07",
-          "file": "browser/auth.spec.ts",
-          "line": 197,
-          "column": 1
-        }
-      ]
-    },
     {
       "title": "browser/browser-compatibility.spec.ts",
       "file": "browser/browser-compatibility.spec.ts",
@@ -396,7 +234,7 @@
                 {
                   "type": "slow",
                   "location": {
-                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "file": "/app/tests/browser/browser-compatibility.spec.ts",
                     "line": 26,
                     "column": 10
                   }
@@ -410,7 +248,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2182,
+                  "duration": 3344,
                   "errors": [],
                   "stdout": [
                     {
@@ -425,12 +263,12 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-04-11T21:17:45.837Z",
+                  "startTime": "2026-06-09T12:25:06.070Z",
                   "annotations": [
                     {
                       "type": "slow",
                       "location": {
-                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "file": "/app/tests/browser/browser-compatibility.spec.ts",
                         "line": 26,
                         "column": 10
                       }
@@ -458,7 +296,7 @@
                 {
                   "type": "slow",
                   "location": {
-                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "file": "/app/tests/browser/browser-compatibility.spec.ts",
                     "line": 26,
                     "column": 10
                   }
@@ -472,7 +310,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2074,
+                  "duration": 3154,
                   "errors": [],
                   "stdout": [
                     {
@@ -487,12 +325,12 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-04-11T21:17:48.034Z",
+                  "startTime": "2026-06-09T12:25:09.591Z",
                   "annotations": [
                     {
                       "type": "slow",
                       "location": {
-                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "file": "/app/tests/browser/browser-compatibility.spec.ts",
                         "line": 26,
                         "column": 10
                       }
@@ -520,7 +358,7 @@
                 {
                   "type": "slow",
                   "location": {
-                    "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                    "file": "/app/tests/browser/browser-compatibility.spec.ts",
                     "line": 26,
                     "column": 10
                   }
@@ -534,7 +372,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2042,
+                  "duration": 3156,
                   "errors": [],
                   "stdout": [
                     {
@@ -549,12 +387,12 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-04-11T21:17:50.118Z",
+                  "startTime": "2026-06-09T12:25:12.764Z",
                   "annotations": [
                     {
                       "type": "slow",
                       "location": {
-                        "file": "/home/vivi/pixelated/tests/browser/browser-compatibility.spec.ts",
+                        "file": "/app/tests/browser/browser-compatibility.spec.ts",
                         "line": 26,
                         "column": 10
                       }
@@ -587,7 +425,7 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 1082,
+                  "duration": 1210,
                   "errors": [],
                   "stdout": [
                     {
@@ -596,7 +434,7 @@
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-04-11T21:17:52.174Z",
+                  "startTime": "2026-06-09T12:25:15.940Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -606,7 +444,7 @@
           ],
           "id": "b6c4abe85fc513ddff34-b65c4847fe42742ccda2",
           "file": "browser/browser-compatibility.spec.ts",
-          "line": 90,
+          "line": 102,
           "column": 1
         }
       ]
@@ -614,10 +452,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-04-11T21:17:35.030Z",
-    "duration": 18331.113,
-    "expected": 8,
-    "skipped": 1,
+    "startTime": "2026-06-09T12:23:48.180Z",
+    "duration": 89089.09700000001,
+    "expected": 4,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }
