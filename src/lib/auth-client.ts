@@ -20,10 +20,6 @@ export interface Session {
   token?: string
 }
 
-interface AuthProfileResponse {
-  user: User
-}
-
 interface AuthResponse {
   user?: User
   token?: string
@@ -91,10 +87,16 @@ class AuthClient {
     try {
       const response = await fetch('/api/auth/auth0-profile')
       if (response.ok) {
-        const data = (await response.json()) as unknown as AuthProfileResponse
+        const data = await response.json()
         if (data.user) {
           this._session = {
-            user: data.user,
+            user: {
+              id: data.user.id,
+              email: data.user.email,
+              role: data.user.role,
+              fullName: data.user.fullName,
+              avatarUrl: data.user.profile?.picture,
+            },
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
             token: 'cookie-based',
           }
@@ -132,14 +134,14 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = (await response.json()) as AuthResponse
+      const data = await response.json()
 
       if (!response.ok) {
         return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
-        user: data.user!,
+        user: data.user,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
@@ -170,7 +172,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = (await response.json()) as AuthResponse
+      const data = await response.json()
 
       if (!response.ok) {
         return {
