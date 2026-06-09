@@ -12,12 +12,6 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { loadEnv, createLogger } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
-const isRailwayDeploy =
-  process.env.DEPLOY_TARGET === 'railway' || !!process.env.RAILWAY_ENVIRONMENT
-const isHerokuDeploy =
-  process.env.DEPLOY_TARGET === 'heroku' || !!process.env.DYNO
-const isFlyioDeploy =
-  process.env.DEPLOY_TARGET === 'flyio' || !!process.env.FLY_APP_NAME
 const isVercelDeploy =
   process.env.DEPLOY_TARGET === 'vercel' || !!process.env.VERCEL
 
@@ -279,35 +273,10 @@ function getChunkName(id) {
 }
 
 const adapter = (() => {
-  if (isRailwayDeploy) {
-    console.log('🚂 Using Node adapter for Railway deployment')
-    return node({
-      mode: 'standalone',
-    })
-  }
-
-  if (isHerokuDeploy) {
-    console.log('🟣 Using Node adapter for Heroku deployment')
-    return node({
-      mode: 'standalone',
-    })
-  }
-
-  // Fly.io deployment
-  if (isFlyioDeploy) {
-    console.log('✈️ Using Node adapter for Fly.io deployment')
-    return node({
-      mode: 'standalone',
-    })
-  }
-
-  // Vercel deployment (backup)
   if (isVercelDeploy) {
     console.log('▲ Using Vercel adapter for Vercel deployment')
     return vercel()
   }
-
-  // Default: Node adapter for Kubernetes/standard deployments
   console.log('🟢 Using Node adapter for standard deployment')
   return node({
     mode: 'standalone',

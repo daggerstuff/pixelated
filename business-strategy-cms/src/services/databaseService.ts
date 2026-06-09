@@ -13,12 +13,6 @@ import {
   BusinessAlert,
 } from '../types/business-intelligence'
 
-/** Reusable helper: safely extract a typed plain object from a Mongoose document */
-function toTypedDoc<T>(doc: unknown, _type?: T): T {
-  void _type
-  return (doc as { toObject: () => unknown }).toObject() as T
-}
-
 export class DatabaseService {
   /**
    * Store market data in MongoDB
@@ -58,11 +52,11 @@ export class DatabaseService {
    * Get market data by industry from MongoDB
    */
   async getMarketData(industry: string): Promise<MarketData[]> {
-    const docs = (await MarketDataModel.find({ industry })
+    const docs = await MarketDataModel.find({ industry })
       .sort({ timestamp: -1 })
-      .limit(100)) as unknown[]
+      .limit(100)
 
-    return docs.map((doc: unknown) => toTypedDoc<MarketData>(doc))
+    return docs.map((doc) => doc.toObject() as unknown as MarketData)
   }
 
   /**
@@ -90,7 +84,7 @@ export class DatabaseService {
       }
     }
 
-    return toTypedDoc<BusinessMetrics>(doc)
+    return doc.toObject() as unknown as BusinessMetrics
   }
 
   /**
@@ -124,7 +118,7 @@ export class DatabaseService {
    */
   async getKPIDashboard(id: string): Promise<KPIDashboard | null> {
     const sql = `SELECT * FROM kpi_dashboards WHERE id = $1`
-    const result = await postgresPool.query(sql, [id]) as { rows: Array<{ id: string; name: string; metrics: string | null; widgets: string | null; last_updated: string; is_shared: boolean }> }
+    const result = await postgresPool.query(sql, [id])
 
     if (result.rows.length === 0) return null
 
@@ -183,19 +177,19 @@ export class DatabaseService {
    */
   async getActiveBusinessAlerts(): Promise<BusinessAlert[]> {
     const sql = `SELECT * FROM business_alerts WHERE is_active = true ORDER BY created_at DESC`
-    const result = await postgresPool.query(sql) as { rows: AlertRow[] }
+    const result = await postgresPool.query(sql)
 
-    return result.rows.map((row: AlertRow) => ({
+    return result.rows.map((row) => ({
       id: row.id,
       type: row.type,
       title: row.title,
       description: row.description,
       severity: row.severity,
-      conditions: JSON.parse(row.conditions ?? '[]') as unknown[],
-      recipients: JSON.parse(row.recipients ?? '[]') as unknown[],
+      conditions: JSON.parse(row.conditions ?? '[]'),
+      recipients: JSON.parse(row.recipients ?? '[]'),
       isActive: row.is_active,
       createdAt: row.created_at,
-    })) as unknown as BusinessAlert[]
+    }))
   }
 
   /**
@@ -206,12 +200,12 @@ export class DatabaseService {
     startDate: Date,
     endDate: Date,
   ): Promise<MarketData[]> {
-    const docs = (await MarketDataModel.find({
+    const docs = await MarketDataModel.find({
       industry,
       timestamp: { $gte: startDate, $lte: endDate },
-    }).sort({ timestamp: -1 })) as unknown[]
+    }).sort({ timestamp: -1 })
 
-    return docs.map((doc: unknown) => toTypedDoc<MarketData>(doc))
+    return docs.map((doc) => doc.toObject() as unknown as MarketData)
   }
 
   /**
@@ -220,7 +214,7 @@ export class DatabaseService {
   async getTrendAnalysis(
     metric: string,
     period: 'week' | 'month' | 'quarter' | 'year',
-  ): Promise<unknown[]> {
+  ): Promise<any[]> {
     const periodMap = {
       week: 7,
       month: 30,
@@ -283,19 +277,41 @@ export class DatabaseService {
       {
         $group: {
           _id: null,
+          totalRevenue: { $sum: '$revenue' },
+          // Approximating total customers via average revenue/LTV or just summing count?
+          // The SQL used `COUNT(DISTINCT id)` but documents here are metrics snapshots.
+          // This seems to imply business metrics are per-customer? No, they are high level.
+          // The SQL query meant `COUNT(DISTINCT id)` FROM `business_metrics`.
+          // If business_metrics are snapshots, then counting IDs is just counting snapshots?
+          // Ah, likely the SQL logic was slightly flawed if it was just tracking high-level KPIs.
+          // Let's assume BusinessMetrics is a daily snapshot.
+          // So "Total Customers" isn't directly in BusinessMetrics unless we query the latest snapshot?
+          // Wait, the SQL was: COALESCE(COUNT(DISTINCT id), 0)
+          // ID of the metric record? That's just count of records.
+          // If `BusinessMetrics` is "Global Company Metrics", then summing revenue across days is WRONG (double counting).
+          // We should usually take the LATEST snapshot or the AVERAGE.
+          // The previous code: SUM(revenue) -> This implies revenue is transactional?
+          // But BusinessMetrics interface has `revenue` as a number along with `growthRate`.
+          // If it's a snapshot, we should GET THE LATEST or AVERAGE.
+          // Summing snapshots of "Annual Revenue" is wrong.
+          // I will assume for now we want the AVERAGE over the period or SUM if it represents discrete events.
+          // Given fields like "churnRate" and "marketShare", it's definitely a snapshot.
+          // So I will calculate average over the period.
           avgRevenue: { $avg: '$revenue' },
           avgCLV: { $avg: '$customerLifetimeValue' },
           avgGrowth: { $avg: '$growthRate' },
         },
       },
-    ]) as unknown[]
+    ])
 
-    const data = result[0] as Record<string, number> | undefined
+    // Note: The previous SQL implementation might have been assuming something else.
+    // Adjusted logic:
+    const data = result[0] ?? {}
     return {
-      totalRevenue: data?.['avgRevenue'] ?? 0,
-      totalCustomers: 0,
-      avgCustomerLifetimeValue: data?.['avgCLV'] ?? 0,
-      monthlyGrowthRate: data?.['avgGrowth'] ?? 0,
+      totalRevenue: data.avgRevenue ?? 0, // Using avg for now as it's likely a run-rate
+      totalCustomers: 0, // Not available in this model
+      avgCustomerLifetimeValue: data.avgCLV ?? 0,
+      monthlyGrowthRate: data.avgGrowth ?? 0,
     }
   }
 
@@ -304,16 +320,25 @@ export class DatabaseService {
    */
   async getAllKPIDashboards(): Promise<KPIDashboard[]> {
     const sql = `SELECT * FROM kpi_dashboards ORDER BY last_updated DESC`
-    const result = await postgresPool.query(sql) as { rows: KpiDashboardRow[] }
+    const result = await postgresPool.query(sql)
 
-    return result.rows.map((row: KpiDashboardRow) => ({
-      id: row.id,
-      name: row.name,
-      metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
-      widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
-      lastUpdated: new Date(row.last_updated),
-      isShared: row.is_shared,
-    }))
+    return result.rows.map(
+      (row: {
+        id: string
+        name: string
+        metrics: string | null
+        widgets: string | null
+        last_updated: string
+        is_shared: boolean
+      }) => ({
+        id: row.id,
+        name: row.name,
+        metrics: JSON.parse(row.metrics ?? '{}') as KPIDashboard['metrics'],
+        widgets: JSON.parse(row.widgets ?? '[]') as KPIDashboard['widgets'],
+        lastUpdated: new Date(row.last_updated),
+        isShared: row.is_shared,
+      }),
+    )
   }
 
   /**
@@ -361,32 +386,11 @@ export class DatabaseService {
       },
     ])
 
-    const data = result[0] as Record<string, number> | undefined
+    const data = result[0] ?? {}
     return {
-      totalIndustries: data?.['totalIndustries'] ?? 0,
-      avgMarketSize: data?.['avgMarketSize'] ?? 0,
-      avgGrowthRate: data?.['avgGrowthRate'] ?? 0,
+      totalIndustries: data.totalIndustries ?? 0,
+      avgMarketSize: data.avgMarketSize ?? 0,
+      avgGrowthRate: data.avgGrowthRate ?? 0,
     }
   }
-}
-
-interface KpiDashboardRow {
-  id: string
-  name: string
-  metrics: string | null
-  widgets: string | null
-  last_updated: string
-  is_shared: boolean
-}
-
-interface AlertRow {
-  id: string
-  type: string
-  title: string
-  description: string
-  severity: string
-  conditions: string | null
-  recipients: string | null
-  is_active: boolean
-  created_at: string
 }

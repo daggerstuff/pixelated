@@ -116,6 +116,7 @@ nohup.out
 *.model
 *.onnx
 *.pickle
+.pi/
 *.pkl
 *.pt
 *.pth

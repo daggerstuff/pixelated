@@ -245,27 +245,3 @@ export async function withMongoSession<T>(
     await session.endSession()
   }
 }
-
-// ============================================================================
-// SETTERS & SAFE GETTERS
-// ============================================================================
-
-export function setPostgresPool(pool: Pool): void {
-  postgresPool = pool
-}
-
-export function setRedisClient(client: typeof redisClient): void {
-  redisClient = client
-}
-
-export function getMongoConnectionSafe(): MongoConnection | null {
-  return mongoConnection
-}
-
-export function getPostgresPoolSafe(): Pool | null {
-  return postgresPool
-}
-
-export function getRedisClientSafe(): Redis | null {
-  return redisClient
-}

@@ -1,123 +1,229 @@
 #!/usr/bin/env bash
+# =============================================================================
+# smart-commit-push.sh
+# Intelligently groups, stages, commits, and pushes all 4 repos in the
+# Pixelated monorepo workspace (submodules first, then main repo).
+#
+# Usage:
+#   ./scripts/git/smart-commit-push.sh [--dry-run] [--message "override msg"]
+#   --dry-run    Show what would be committed without actually committing
+#   --message    Override the auto-generated commit message for all repos
+# =============================================================================
 set -euo pipefail
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# ── Colour helpers ────────────────────────────────────────────────────────────
+BOLD=$'\e[1m'; RESET=$'\e[0m'
+GREEN=$'\e[32m'; YELLOW=$'\e[33m'; CYAN=$'\e[36m'; RED=$'\e[31m'; MAGENTA=$'\e[35m'
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-DRY_RUN="${DRY_RUN:-false}"
-MSG_OVERRIDE="${MSG_OVERRIDE:-}"
+info()    { echo "${CYAN}${BOLD}ℹ  $*${RESET}"; }
+success() { echo "${GREEN}${BOLD}✔  $*${RESET}"; }
+warn()    { echo "${YELLOW}${BOLD}⚠  $*${RESET}"; }
+error()   { echo "${RED}${BOLD}✖  $*${RESET}" >&2; }
+section() { echo ""; echo "${MAGENTA}${BOLD}━━━  $*  ━━━${RESET}"; echo ""; }
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-NC='\033[0m' # No Color
+# ── Argument parsing ──────────────────────────────────────────────────────────
+DRY_RUN=false
+MSG_OVERRIDE=""
 
-section() { echo -e "\n${MAGENTA}▶${NC} $*"; }
-info()    { echo -e "  ${BLUE}ℹ${NC} $*"; }
-warn()    { echo -e "  ${YELLOW}⚠${NC} $*"; }
-error()   { echo -e "  ${RED}✗${NC} $*"; }
-success() { echo -e "  ${GREEN}✓${NC} $*"; }
-
-# ── Argument parsing ───────────────────────────────────────────────────────────
-
-for arg in "$@"; do
-  case $arg in
-    --dry-run) DRY_RUN="true" ;;
-    --message=*) MSG_OVERRIDE="${arg#*=}" ;;
-    -m) shift; MSG_OVERRIDE="$1" ;;
-    *) warn "Unknown arg: $arg" ;;
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --dry-run)   DRY_RUN=true; shift ;;
+    --message)   MSG_OVERRIDE="$2"; shift 2 ;;
+    -m)          MSG_OVERRIDE="$2"; shift 2 ;;
+    *) warn "Unknown arg: $1"; shift ;;
   esac
 done
 
-# ── Generate semantic commit message ────────────────────────────────────────────
+[[ "$DRY_RUN" == "true" ]] && warn "DRY-RUN mode — no commits or pushes will be made"
 
-generate_msg() {
-  local repo_path="$1"
-  local repo_name="$2"
+# ── Repo root detection ───────────────────────────────────────────────────────
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "/home/vivi/pixelated")"
 
-  cd "$repo_path"
+if [[ ! -e "$ROOT/.git" ]]; then
+  error "Cannot locate monorepo root (expected: /home/vivi/pixelated)"
+  exit 1
+fi
 
-  local staged
-  staged=$(git diff --name-only --cached 2>/dev/null || true)
-  local unstaged
-  unstaged=$(git diff --name-only 2>/dev/null || true)
-  local all_files
-  all_files=$(echo -e "$staged\n$unstaged" | sort -u | grep -v "^$" || true)
+# ── Semantic grouping logic ───────────────────────────────────────────────────
+# Returns a short group label for a file path
+classify_file() {
+  local f="$1"
+  case "$f" in
+    # CI / DevOps
+    .github/*|.gitlab-ci*|ci-cd/*|Dockerfile*|*.dockerfile|docker-compose*)
+      echo "ci" ;;
+    # Tests
+    *test*|*spec*|pytest.ini|jest.config*|vitest.config*|coverage*)
+      echo "tests" ;;
+    # Training / AI / ML pipeline
+    training/*|core/pipelines/*|annotation/*|*fine_tuning*|*fine-tuning*|*dataset*|*embedder*|*ingestion*)
+      echo "training" ;;
+    # Memory / RAG / knowledge
+    memory/*|*rag*|*nemotron*|*foresight*)
+      echo "memory" ;;
+    # Bias detection
+    *bias*detection*|*bias_detection*)
+      echo "bias-detection" ;;
+    # CLI tooling
+    cli/*|scripts/*)
+      echo "tooling" ;;
+    # Analytics / security / compliance
+    *analytics*|*security*|*breach*|security-baseline*|release-readiness*)
+      echo "security" ;;
+    # Dependencies / lockfiles
+    package.json|pnpm-lock.yaml|uv.lock|pyproject.toml|requirements*)
+      echo "deps" ;;
+    # Docs
+    *.md|docs/*)
+      echo "docs" ;;
+    # Source components / lib
+    src/*)
+      echo "src" ;;
+    # Tests (Python)
+    tests/*)
+      echo "tests" ;;
+    # Everything else
+    *)
+      echo "misc" ;;
+  esac
+}
 
-  if [[ -z "$all_files" ]]; then
-    echo ""
-    return 0
-  fi
-
-  # Categorize files
-  local ts_files py_files md_files cfg_files other_files
-  ts_files=$(echo "$all_files" | grep -E "\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$" | wc -l)
-  py_files=$(echo "$all_files" | grep -E "\.py$" | wc -l)
-  md_files=$(echo "$all_files" | grep -E "\.(md|mdx)$" | wc -l)
-  cfg_files=$(echo "$all_files" | grep -E "(package\.json|tsconfig|pyproject\.toml|requirements|\.yaml|\.yml|\.toml|\.json|\.lock)$" | wc -l)
-  other_files=$(echo "$all_files" | wc -l)
-
+# Builds a human-readable commit message from a map of group→files
+build_message() {
+  local -n _groups=$1   # nameref to associative array
   local parts=()
-  [[ $ts_files -gt 0 ]] && parts+=("$ts_files TS/JS")
-  [[ $py_files -gt 0 ]] && parts+=("$py_files Python")
-  [[ $md_files -gt 0 ]] && parts+=("$md_files docs")
-  [[ $cfg_files -gt 0 ]] && parts+=("$cfg_files config")
-  [[ $other_files -gt ${#parts[@]} ]] && parts+=("$((other_files - ts_files - py_files - md_files - cfg_files)) other")
+
+  # Priority order for message prefix
+  local priority=(training memory bias-detection ci tests src deps tooling security docs misc)
+
+  for grp in "${priority[@]}"; do
+    if [[ -n "${_groups[$grp]+x}" ]]; then
+      local count
+      count=$(echo "${_groups[$grp]}" | wc -w)
+      parts+=("${grp}(${count})")
+    fi
+  done
 
   if [[ ${#parts[@]} -eq 0 ]]; then
-    echo "chore: update $repo_name"
+    echo "chore: update files"
+    return
+  fi
+
+  local prefix="${parts[0]}"
+  local summary
+  # Derive verb from group
+  case "${prefix%%(*}" in
+    ci)             summary="update CI/CD workflows" ;;
+    tests)          summary="update test coverage and fixtures" ;;
+    training)       summary="improve training pipeline and readiness gates" ;;
+    memory)         summary="update memory and RAG components" ;;
+    bias-detection) summary="update bias detection service and tests" ;;
+    tooling)        summary="update CLI tooling and scripts" ;;
+    security)       summary="update security baseline and analytics" ;;
+    deps)           summary="update dependencies and lockfiles" ;;
+    docs)           summary="update documentation" ;;
+    src)            summary="update source components" ;;
+    misc)           summary="miscellaneous updates" ;;
+    *)              summary="update files" ;;
+  esac
+
+  # Add extra groups as scope hints
+  if [[ ${#parts[@]} -gt 1 ]]; then
+    local extras=("${parts[@]:1}")
+    echo "chore: ${summary} [${extras[*]}]"
   else
-    local msg="chore($repo_name): ${parts[*]}"
-    echo "$msg"
+    echo "chore: ${summary}"
   fi
 }
 
-# ── Commit a single repo ────────────────────────────────────────────────────────
-
+# ── Stage + commit one repo ───────────────────────────────────────────────────
 commit_repo() {
   local repo_path="$1"
   local repo_name="$2"
-  local msg_override="$3"
+  local custom_msg="${3:-}"
+
+  section "Processing: ${repo_name}"
 
   cd "$repo_path"
 
-  # Check for changes (staged + unstaged, excluding excluded dirs)
-  local changes
-  changes=$(git status --porcelain 2>/dev/null | grep -v -E "^\?\? (scratch|aws|tests/results)/" | grep -v "^$" || true)
+  # Collect changed & untracked files
+  local modified new_files all_files
+  modified=$(git diff --name-only HEAD 2>/dev/null || git diff --name-only 2>/dev/null || true)
+  new_files=$(git ls-files --others --exclude-standard 2>/dev/null || true)
+  # Filter out scratch/aws/test results dirs from auto-commit
+  new_files=$(echo "$new_files" | grep -v "^scratch/" | grep -v "^aws/" | grep -v "^tests/results/" || true)
 
-  if [[ -z "$changes" ]]; then
-    info "No changes in ${repo_name}"
+  all_files=$(printf '%s\n%s\n' "$modified" "$new_files" | grep -v '^$' | sort -u || true)
+
+  if [[ -z "$all_files" ]]; then
+    info "No changes in ${repo_name} — skipping"
     return 0
   fi
 
+  # Classify files into groups
+  declare -A groups=()
+  local file_list=()
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    local grp
+    grp=$(classify_file "$f")
+    groups[$grp]="${groups[$grp]:-} $f"
+    file_list+=("$f")
+  done <<< "$all_files"
+
+  # Show grouping summary
+  info "Files grouped:"
+  for grp in "${!groups[@]}"; do
+    local cnt
+    cnt=$(echo "${groups[$grp]}" | wc -w)
+    echo "    ${BOLD}${grp}${RESET}: ${cnt} file(s)"
+  done
+
+  # Build commit message
   local msg
-  if [[ -n "$msg_override" ]]; then
-    msg="$msg_override"
+  if [[ -n "$custom_msg" ]]; then
+    msg="$custom_msg"
   else
-    msg=$(generate_msg "$repo_path" "$repo_name")
+    msg=$(build_message groups)
   fi
+
+  info "Commit message: \"${msg}\""
 
   if [[ "$DRY_RUN" == "true" ]]; then
-    info "[DRY-RUN] Would commit ${repo_name}: \"$msg\""
-    info "[DRY-RUN] Files: $(echo "$changes" | wc -l)"
+    info "[DRY-RUN] Would stage ${#file_list[@]} file(s) and commit: \"$msg\""
+    echo "  Files that would be staged:"
+    printf '    %s\n' "${file_list[@]}"
     return 0
   fi
 
-  # Stage all changes (except excluded)
-  git add -A 2>/dev/null || true
+  # Stage tracked modified files with -u (respects tracked state, bypasses gitignore for dirs)
+  local tracked_modified
+  tracked_modified=$(git diff --name-only HEAD 2>/dev/null || true)
+  if [[ -n "$tracked_modified" ]]; then
+    git add -u 2>/dev/null || true
+  fi
 
-  # Remove excluded from staging
-  git reset -q HEAD -- scratch aws tests/results 2>/dev/null || true
+  # Stage new untracked files individually (skip those git refuses due to gitignore)
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    # Only try to add if it's an untracked file (not already staged above)
+    if git ls-files --others --exclude-standard -- "$f" 2>/dev/null | grep -q .; then
+      git add -- "$f" 2>/dev/null || warn "  Skipped (gitignored?): $f"
+    fi
+  done <<< "$new_files"
 
-  git commit -m "$msg" 2>&1 | tail -1
+  # Check if there's actually something staged
+  if git diff --cached --quiet; then
+    info "Nothing new to commit in ${repo_name} after staging"
+    return 0
+  fi
+
+  git commit -m "$msg"
   success "Committed: ${repo_name} → \"$msg\""
 }
 
 # ── Push to all remotes ───────────────────────────────────────────────────────
-
 push_repo() {
   local repo_path="$1"
   local repo_name="$2"
@@ -125,7 +231,7 @@ push_repo() {
   cd "$repo_path"
 
   local branch
-  branch=$(git branch --show-current 2>/dev/null)
+  branch=$(git branch --show-current)
   # If detached HEAD (submodules), get the branch from the remote tracking
   if [[ -z "$branch" ]]; then
     branch=$(git symbolic-ref --short -q HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
@@ -152,6 +258,7 @@ push_repo() {
   while IFS= read -r remote; do
     [[ -z "$remote" ]] && continue
 
+    # Check if remote has the branch (avoid pushing to remotes that lack it)
     if [[ "$DRY_RUN" == "true" ]]; then
       info "[DRY-RUN] Would push ${branch} → ${remote}"
       continue
@@ -178,13 +285,10 @@ push_repo() {
 }
 
 # ── Main workflow ─────────────────────────────────────────────────────────────
-
 section "Pixelated Smart Commit & Push"
 info "Root: ${ROOT}"
-[[ "$DRY_RUN" == "true" ]] && warn "DRY-RUN mode — no changes will be made"
 
 # ── 1. Submodules (order: ai → docs → foresight-mcp) ─────────────────────────
-
 SUBMODULES=("ai" "docs" "foresight-mcp")
 
 for sub in "${SUBMODULES[@]}"; do
@@ -204,7 +308,6 @@ for sub in "${SUBMODULES[@]}"; do
 done
 
 # ── 2. Main repo ──────────────────────────────────────────────────────────────
-
 # After submodule commits, the parent needs updated submodule pointers
 cd "$ROOT"
 
@@ -223,7 +326,6 @@ commit_repo "$ROOT" "pixelated (main)" "$MSG_OVERRIDE"
 push_repo "$ROOT" "pixelated (main)"
 
 # ── Summary ───────────────────────────────────────────────────────────────────
-
 section "Done"
 success "All repos committed and pushed to all remotes."
 echo ""

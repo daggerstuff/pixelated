@@ -83,7 +83,7 @@ export class BusinessIntelligenceService {
   /**
    * Pricing intelligence analysis
    */
-  async analyzePricingStrategy(competitorData: CompetitorPricingRecord[]): Promise<{
+  async analyzePricingStrategy(competitorData: any[]): Promise<{
     recommendedPrice: number
     priceRange: { min: number; max: number }
     marketPosition: 'premium' | 'competitive' | 'budget'
@@ -273,7 +273,7 @@ export class BusinessIntelligenceService {
   /**
    * Fetch competitor data from APIs
    */
-  private async fetchCompetitorData(industry: string): Promise<CompetitorRecord[]> {
+  private async fetchCompetitorData(industry: string): Promise<any[]> {
     // Mock implementation - replace with actual API calls
     const mockCompetitors = [
       {
@@ -311,7 +311,7 @@ export class BusinessIntelligenceService {
    * Perform competitive analysis
    */
   private async performCompetitiveAnalysis(
-    competitors: CompetitorRecord[],
+    competitors: any[],
   ): Promise<CompetitorAnalysis> {
     const avgPricing =
       competitors.reduce(
@@ -348,7 +348,7 @@ export class BusinessIntelligenceService {
   /**
    * Analyze feature frequency across competitors
    */
-  private analyzeFeatureFrequency(competitors: CompetitorRecord[]): Record<string, number> {
+  private analyzeFeatureFrequency(competitors: any[]): Record<string, number> {
     const featureCounts: Record<string, number> = {}
 
     competitors.forEach((competitor) => {
@@ -364,7 +364,7 @@ export class BusinessIntelligenceService {
   /**
    * Identify competitive gaps
    */
-  private identifyCompetitiveGaps(competitors: CompetitorRecord[]): string[] {
+  private identifyCompetitiveGaps(competitors: any[]): string[] {
     const allFeatures = competitors.flatMap((c) => c.features)
     const uniqueFeatures = [...new Set(allFeatures)]
 
@@ -385,7 +385,7 @@ export class BusinessIntelligenceService {
   ): number {
     const adoptionRate =
       competitorFeatures.filter((cf) =>
-        cf.some((f: string) => f.toLowerCase().includes(feature.toLowerCase())),
+        cf.some((f) => f.toLowerCase().includes(feature.toLowerCase())),
       ).length / competitorFeatures.length
 
     return Math.min(10, adoptionRate * 10) // Scale to 0-10
@@ -459,21 +459,4 @@ export class BusinessIntelligenceService {
     this.marketDataCache.clear()
     this.competitorCache.clear()
   }
-}
-
-interface CompetitorPricingRecord {
-  price: number
-}
-
-interface CompetitorRecord {
-  name: string
-  marketShare: number
-  pricing: {
-    basic: number
-    premium: number
-    enterprise: number
-  }
-  features: string[]
-  strengths: string[]
-  weaknesses: string[]
 }

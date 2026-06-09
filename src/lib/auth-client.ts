@@ -87,15 +87,15 @@ class AuthClient {
     try {
       const response = await fetch('/api/auth/auth0-profile')
       if (response.ok) {
-        const data = await response.json() as Record<string, unknown>
+        const data = await response.json()
         if (data.user) {
           this._session = {
             user: {
-              id: data.user as string,
-              email: data.user as string,
-              role: data.user as string,
-              fullName: data.user as string | undefined,
-              avatarUrl: (data.user as Record<string, unknown>).profile?.picture as string | undefined,
+              id: data.user.id,
+              email: data.user.email,
+              role: data.user.role,
+              fullName: data.user.fullName,
+              avatarUrl: data.user.profile?.picture,
             },
             expiresAt: new Date(Date.now() + 3600000).toISOString(), // Estimated
             token: 'cookie-based',
@@ -123,11 +123,7 @@ class AuthClient {
   /**
    * Sign in with email and password
    */
-  async signInEmail({
-    email,
-    password,
-    rememberMe,
-  }: SignInRequest): Promise<{
+  async signInEmail({ email, password, rememberMe }: SignInRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -138,14 +134,14 @@ class AuthClient {
         body: JSON.stringify({ email, password, rememberMe }),
       })
 
-      const data = await response.json() as AuthResponse
+      const data = await response.json()
 
       if (!response.ok) {
         return { data: null, error: new Error(data.error ?? 'Login failed') }
       }
 
       this._session = {
-        user: data.user!,
+        user: data.user,
         expiresAt: new Date(Date.now() + 3600000).toISOString(), // 1 hour
         token: data.token,
       }
@@ -165,11 +161,7 @@ class AuthClient {
   /**
    * Sign up a new user
    */
-  async signUpEmail({
-    email,
-    password,
-    role,
-  }: SignUpRequest): Promise<{
+  async signUpEmail({ email, password, role }: SignUpRequest): Promise<{
     data: AuthResponse | null
     error: Error | null
   }> {
@@ -180,7 +172,7 @@ class AuthClient {
         body: JSON.stringify({ email, password, role }),
       })
 
-      const data = await response.json() as AuthResponse
+      const data = await response.json()
 
       if (!response.ok) {
         return {

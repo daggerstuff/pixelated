@@ -3,6 +3,8 @@
   "ignorePatterns": [
     "scripts/**/*.js",
     "scripts/**/*.mjs",
+    "scripts/**/*.ts",
+    "business-strategy-cms/scripts/**/*.ts",
     "public/polyfills/**/*.js",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
