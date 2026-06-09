@@ -1,5 +1,4 @@
-import type { APIContext, APIRoute } from 'astro'
-import { getCurrentUser } from '@/lib/auth'
+import { isAuthenticated } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { NotificationService } from '../../../lib/services/notification/NotificationService'

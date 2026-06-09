@@ -1,0 +1,1974 @@
+[
+  {
+    "id": "1b087dce-2ec2-4d70-9cac-667f337f1272",
+    "identifier": "PIX-3475",
+    "title": "Tri-sync bootstrap sentinel",
+    "description": "```\n  1. Core Objective\n```\n\nBootstrap sentinel retained because this Jira role cannot delete the original Jira bootstrap issue, but the tri-sync bootstrap/config work is now complete.\n\nCompleted on 2026-03-29:\n\n* Asana tri-sync now reads the dedicated multi-project `task_sync_projects` mapping from `.agent/internal/config.json` instead of assuming a single Active Sprint project.\n* Direct provider fallback now supports Asana/Jira export and apply without requiring external bridge commands.\n* Jira bootstrap discovery now persists runtime bridge state in `.agent/internal/task-sync-state.json` instead of mutating static config.\n* Focused verification passed with `uv run pytest tests/python/test_task_sync_provider_bridge.py -q` and `uv run pytest tests/python/test_task_sync_tri_sync.py -q`.\n\nThis sentinel should remain only as a historical bootstrap marker, not as an open implementation task.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Backlog Improvement\n* ***Title Context***: Tri-sync bootstrap sentinel\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n\n***Jira:*** [ADHD-400](<https://russianvodka.atlassian.net/browse/ADHD-400>) (migrated from slimshadyme PIX-98)\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] Implement and verify the capabilities for: Tri-sync bootstrap sentinel\n\n<!-- pixelated-sync\nkey: tri-sync-bootstrap-sentinel\nstatus: triage\nsource-provider: linear\nsource-id: 8acce207-03fe-4ded-ac21-a19aba60d9df\nasana: 1215187397328137\nbeads: foresight-mcp-slof\ngithub: 1938\njira: ADHD-623\nlinear: 8acce207-03fe-4ded-ac21-a19aba60d9df\nupdated-at: 2026-05-27T21:23:29.412000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T14:51:16.068Z",
+    "createdAt": "2026-05-27T21:38:10.924Z"
+  },
+  {
+    "id": "958e11fc-e895-42c2-ab7f-c0047249cd53",
+    "identifier": "PIX-3034",
+    "title": "Prepare Fine\u2011Tuning Dataset",
+    "description": "```\n  1. Core Objective\n```\n\nFormat cleaned conversational dialogue into training-ready shards.\n\n```\n  1. Technical Design Specs\n```\n\n* Format training targets in ChatML.\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] Extract dialogue turns from database.\n- [ ] Format training targets in ChatML.",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:24.497Z",
+    "createdAt": "2026-05-27T20:38:30.307Z"
+  },
+  {
+    "id": "464e8875-d067-4d8a-a80b-4ca231feea52",
+    "identifier": "PIX-3031",
+    "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 26.0 (Checkpoint \u2014 Phase 4 complete).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 26)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: Checkpoint \u2014 Phase 4 complete.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-470\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] DPO trainer functional with synthetic 50-sample test\n- [ ] Ready to run on real 10K DPO pairs from Phase 3\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:05.952Z",
+    "createdAt": "2026-05-27T20:38:28.141Z"
+  },
+  {
+    "id": "1b14efaf-25b2-4f70-92e4-404b55e7e851",
+    "identifier": "PIX-3030",
+    "title": "25.0 Integration test \u2014 DPO end-to-end",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 25.0 (Integration test \u2014 DPO end-to-end).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 25)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: Integration test \u2014 DPO end-to-end.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-469\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] Run DPO trainer with 50-sample preference dataset (mocked model loading)\n- [ ] Verify final adapter saved, metrics JSON written, all logs present\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:06.802Z",
+    "createdAt": "2026-05-27T20:38:27.518Z"
+  },
+  {
+    "id": "22392f5a-6593-4d3c-8883-fffc0c2d4e7a",
+    "identifier": "PIX-3029",
+    "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 23.0 (Checkpoint \u2014 Phase 3 complete).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 23)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: Checkpoint \u2014 Phase 3 complete.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-464\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* _**Source File**_: \\[data_audit.py\\](file:///home/vivi/pixelated/data_audit.py)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] All Phase 3 tests pass\n- [ ] DPO pairs: 10K+ generated and verified\n- [ ] Niche categories: all 10 at 500+ samples each\n- [ ] Nightmare fuel: 5,000 real samples, balanced across 8 types\n- [ ] Full corpus deduplicated and ChatML-verified\n- [ ] `data_audit.py` confirms all gaps addressed\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:09.741Z",
+    "createdAt": "2026-05-27T20:38:26.795Z"
+  },
+  {
+    "id": "5495e47d-77a9-424a-aa66-46cc9b9712b4",
+    "identifier": "PIX-3028",
+    "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 17.0 (Checkpoint \u2014 Phase 2 complete).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 17)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: Checkpoint \u2014 Phase 2 complete.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-454\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* _**Source File**_: \\[data_audit.py\\](file:///home/vivi/pixelated/data_audit.py)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] All Phase 2 tests pass\n- [ ] All broken pipeline files deleted\n- [ ] YouTube ingestion run on all 91 channels (3 tiers)\n- [ ] All \\~50 books converted with quality verification\n- [ ] Compiled corpus verified free of garbage book data contamination\n- [ ] `data_audit.py` reports current category counts \u2014 identify exact gaps for Phase 3\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:11.688Z",
+    "createdAt": "2026-05-27T20:38:25.980Z"
+  },
+  {
+    "id": "09e058b1-b71e-4ddf-a10e-41fca0715fc4",
+    "identifier": "PIX-3027",
+    "title": "\u202114.0 Execute book conversion \u2014 remaining titles",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 14.0 (\u2021 Execute book conversion \u2014 remaining titles).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 14)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: \u2021 Execute book conversion \u2014 remaining titles.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-446\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* _**Source File**_: \\[conversion_report.json\\](file:///home/vivi/pixelated/conversion_report.json)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] Convert remaining \\~44 books and PDFs from the GDrive archive\n- [ ] Verify conversion quality across all titles\n- [ ] Review `conversion_report.json` for skipped books and reasons\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:20.926Z",
+    "createdAt": "2026-05-27T20:38:25.621Z"
+  },
+  {
+    "id": "206f4047-6cb0-44a4-bb3d-83f8c73c130c",
+    "identifier": "PIX-3026",
+    "title": "\u202113.0 Execute book conversion \u2014 priority titles",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 13.0 (\u2021 Execute book conversion \u2014 priority titles).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 13)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: \u2021 Execute book conversion \u2014 priority titles.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-445\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] Convert high-priority clinical books:\n- [ ] DSM-V (19.1MB, 3 copies \u2014 use best quality copy)\n- [ ] Complex PTSD: From Surviving to Thriving \u2014 Pete Walker (668KB)\n- [ ] Internal Family Systems Therapy \u2014 Richard C. Schwartz (440KB)\n- [ ] The High Conflict Couple (DBT Guide) \u2014 Fruzzetti (831KB)\n- [ ] Treating PTSD in Military Personnel (2.3MB)\n- [ ] CBT and DBT For Anxiety (182KB + 611KB)\n- [ ] Verify QA pairs are clinically grounded, not verbatim excerpts\n- [ ] Verify DSM-V pairs are clinical knowledge QA, not therapy conversation\n- [ ] Target: \\~6 books producing estimated 500-2000 QA pairs each\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:22.039Z",
+    "createdAt": "2026-05-27T20:38:24.654Z"
+  },
+  {
+    "id": "568355d6-12cd-4c07-936e-dce9a1afdd95",
+    "identifier": "PIX-3025",
+    "title": "\u202111.0 Execute YouTube ingestion \u2014 Tier 3 channels",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 11.0 (\u2021 Execute YouTube ingestion \u2014 Tier 3 channels).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 11)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***: \u2021 Execute YouTube ingestion \u2014 Tier 3 channels.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  ```\n\n```\n* _**Linear Key**_: PIX-440\n* _**Source Plan File**_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] Run ingestion on Tier 3 channels (general wellness / entertainment):\n- [ ] Jay Shetty, Mel Robbins, Theo Von, Big Think, TEDx Talks, etc.\n- [ ] Run ingestion on German channels with `--german_channels` flag\n- [ ] ARTEde, DW Deutsch, Kaltbl\u00fctig, Klein aber Hannah, SWR Doku, WDR, Y-Kollektiv, ZDF MAGAZIN ROYALE, ZDFheute Nachrichten, rbb Doku, hunds-kompetent Karin Actun\n- [ ] These produce `\"language\": \"de\"` tagged samples \u2014 NOT mixed into English training set\n- [ ] Review output quality\n\n<!-- pixelated-sync\nkey: pix-440\nstatus: open\nsource-provider: linear\nsource-id: 568355d6-12cd-4c07-936e-dce9a1afdd95\nasana: 1215187397179279\nbeads: foresight-mcp-aq80\ngithub: 2372\njira: ADHD-2674\nlinear: 568355d6-12cd-4c07-936e-dce9a1afdd95\nupdated-at: 2026-05-27T21:28:33.717000Z\n-->\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:22.949Z",
+    "createdAt": "2026-05-27T20:38:23.855Z"
+  },
+  {
+    "id": "2af69626-091b-449d-80f9-46cc00450000",
+    "identifier": "PIX-3004",
+    "title": "Workstream A: Consolidate acquisition report and next backlog",
+    "description": "```\n  1. Core Objective\n```\n\n1. Workstream A: Consolidate acquisition report and next backlog\n\nConsolidate acquisition findings and reporting into a decision-ready backlog. Convert pilot evidence and source-quality data into the next canonical acquisition backlog, ensuring coverage gaps and next-source priorities are visible and actionable.\n\n```\n  1. Technical Design Specs\n```\n\n* Consolidate acquisition reporting across pilots\n* Convert findings into prioritized backlog items\n* Map coverage gaps to next-source priorities\n* Ensure backlog structure is clear enough for new work placement\n\n***completion summary***:  \nAcquisition report consolidated, backlog canonical.\n\n***audit note (2026-05-23)***:  \nThe previous description text (\"YouTube dedup Prop 17 property-based testing\") was from a different migrated Jira issue and did not match this issue's title or scope. Replaced with correct scope documentation.\n\n```\n  1. Atlassian & Code Linkages\n```\n\n***Historical Context: Migrated from*** [PIX-299](https://linear.app/pixelated/issue/PIX-299/write-runbook-and-escalation-map) ***(Jira: ADHD-1102)***\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] Consolidate acquisition reporting across pilots\n- [ ] Convert findings into prioritized backlog items\n- [ ] Map coverage gaps to next-source priorities\n- [ ] Ensure backlog structure is clear enough for new work placement\n\n<!-- pixelated-sync\nkey: workstream-a-consolidate-acquisition-report-and-next-backlog\nstatus: open\nsource-provider: linear\nsource-id: 2af69626-091b-449d-80f9-46cc00450000\nasana: 1215187491523056\nbeads: foresight-mcp-utvm\ngithub: 3302\njira: ADHD-323\nlinear: 2af69626-091b-449d-80f9-46cc00450000\nupdated-at: 2026-05-27T21:27:51.546000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-28T10:40:46.292Z",
+    "createdAt": "2026-05-27T20:38:06.422Z"
+  },
+  {
+    "id": "0e6322dc-02fb-44ec-ba44-616b5dd74d49",
+    "identifier": "PIX-2985",
+    "title": "Integrate Reflection with Dream Cycles",
+    "description": "```\n  1. Core Objective\n```\n\nFeed reflection findings back into long-term patient memories.\n\n```\n  1. Technical Design Specs\n```\n\n* Save consolidated insights to MongoDB.\n\n```\n  1. Verification & Testing Checklist\n  \n  \n```\n\n```\n```\n\n- [ ] Hook reflection tasks into dream scheduler.\n- [ ] Save consolidated insights to MongoDB.\n\n```\n```\n\n<!-- pixelated-sync\nkey: integrate-reflection-with-dream-cycles\nstatus: open\nsource-provider: linear\nsource-id: ccc63b9d-352e-4eac-98ef-7ed2fe18254d\nasana: 1215187300805259\nbeads: foresight-mcp-p4pf\ngithub: 3283\njira: ADHD-2634\nlinear: ccc63b9d-352e-4eac-98ef-7ed2fe18254d\nupdated-at: 2026-05-27T21:26:43.467000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:23.533Z",
+    "createdAt": "2026-05-27T20:37:50.557Z"
+  },
+  {
+    "id": "a72d5916-f41d-4bc4-9b18-569ba2402950",
+    "identifier": "PIX-2984",
+    "title": "Integrate Gate into Pixelated Ingestion",
+    "description": "```\n  1. Core Objective\n```\n\nIntercept conversational inputs at the gate, checking safety levels and routing them dynamically.\n\n```\n  1. Technical Design Specs\n```\n\n* Integrate fast API gate controllers with screening interfaces in React.\n\n```\n  1. Verification & Testing Checklist\n  \n  \n```\n\n```\n```\n\n- [ ] Intercept messages in fast API gate controller.\n- [ ] Add real-time UI screening state indicators.\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:24.223Z",
+    "createdAt": "2026-05-27T20:37:49.953Z"
+  },
+  {
+    "id": "e4cd3a4b-94e9-4845-a8b9-0cec9e7eace4",
+    "identifier": "PIX-2983",
+    "title": "Integrate Gate into AI Ingestion",
+    "description": "Integrate the Socratic Gate into the AI ingestion pipeline. Call the gate before storing messages in reflection_memory.py; only store messages that pass.\n\n***Jira:*** [ADHD-327](<https://russianvodka.atlassian.net/browse/ADHD-327>) (migrated from slimshadyme [PIX-383](https://linear.app/pixelated/issue/PIX-383/crit-2-fix-sql-like-injection-in-query-memories))",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:13.453Z",
+    "createdAt": "2026-05-27T20:37:49.428Z"
+  },
+  {
+    "id": "30cd9728-76ee-4a7d-80f5-5caa0f4f2697",
+    "identifier": "PIX-2980",
+    "title": "Implement Socratic Gate",
+    "description": "Migrated from slimshadyme [PIX-358](https://linear.app/pixelated/issue/PIX-358/create-typescript-sdk-with-complete-type-safety).\n\n***Audit note (2026-05-24)***: Work delivered by [daggerstuff/pixelated#721](<https://linear.app/pixelated/issue/PIX-522/integrate-gate-into-ai-ingestion>) (PR [daggerstuff/pixelated#1158](<https://linear.app/pixelated/review/pix-522-integrate-gate-into-ai-ingestion-pipeline-f6f538515011>)). The Socratic Gate implementation (crisis-detector, PII redactor, trauma filter, consent gate) was completed as part of the gate-into-AI-ingestion integration. Marking Done \u2014 duplicate of [daggerstuff/pixelated#721](<https://linear.app/pixelated/issue/PIX-522/integrate-gate-into-ai-ingestion>) in practice.\n\nSource type: Task  \nSource status: Done (migrated)  \nSource priority: Medium\n\n<!-- pixelated-sync\nkey: implement-socratic-gate\nstatus: open\nsource-provider: linear\nsource-id: d89eb69d-b691-4c59-a4d1-45887f7b38a6\nasana: 1215187273186180\nbeads: foresight-mcp-p5cf\ngithub: 3278\njira: ADHD-2629\nlinear: d89eb69d-b691-4c59-a4d1-45887f7b38a6\nupdated-at: 2026-05-27T21:26:19.056000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:25.480Z",
+    "createdAt": "2026-05-27T20:37:46.706Z"
+  },
+  {
+    "id": "7da81b3c-52be-4e7c-b016-fa7afec416f0",
+    "identifier": "PIX-2809",
+    "title": "1.0 Create shared training infrastructure",
+    "description": "Create `ai/training/shared_config.py` with:\n\n* `shared_qlora_config()` \u2192 `BitsAndBytesConfig` (load_in_4bit=True, nf4, double_quant, bf16/bf16 auto-detect)\n* `add_lora_args(parser)` \u2192 registers `--lora_r`, `--lora_alpha`, `--lora_dropout`, `--lora_bias`, `--lora_target_modules` with same names/defaults as `pixelated_production_pilot.py`\n* `build_lora_config(args)` \u2192 `LoraConfig` from parsed args; raises `ValueError` if target_modules empty\n* `log_token_length_distribution(lengths, max_seq_length, logger, field_name)` \u2192 computes min/mean/median/p95/max, logs warning if p95 > max_seq_length, returns stats dict with `truncated_count`\n* `count_truncated(lengths, max_seq_length)` \u2192 count of lengths exceeding threshold\n\n***Reqs***: 1.2, 1.3, 2.6, 3.2, 3.3, 3.4, 4.1  \n***Blocks***: All subsequent phases \u2014 every trainer and pipeline depends on shared_config\n\n***Jira:*** [ADHD-216](<https://russianvodka.atlassian.net/browse/ADHD-216>) (migrated from slimshadyme [PIX-282](https://linear.app/pixelated/issue/PIX-282/data-governance-task-41-retention-policies))\n\n<!-- pixelated-sync\nkey: 1-0-create-shared-training-infrastructure\nstatus: open\nsource-provider: linear\nsource-id: 7da81b3c-52be-4e7c-b016-fa7afec416f0\nasana: 1215187161190996\nbeads: foresight-mcp-65i\ngithub: 3107\njira: ADHD-2921\nlinear: 7da81b3c-52be-4e7c-b016-fa7afec416f0\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:25.644Z",
+    "createdAt": "2026-05-27T20:35:09.533Z"
+  },
+  {
+    "id": "e25e8e72-86d3-4fb7-aa28-7b5ec87ad45a",
+    "identifier": "PIX-2804",
+    "title": "Workstream E: Integrate steering with upstream workstreams",
+    "description": "```\n  1. Core Objective\n```\n\nHook the automated backlog steering and prioritization pipeline directly into the active scrum sync cycle, pushing updates bidirectionally between our tracking boards and local databases.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Scrum Steering Integrator***:\n* Connect the scoring engine output directly to the task synchronization pipeline hooks.\n* Develop bidirectionally-enabled webhooks to automatically sync calculated priorities, backlog mappings, and sprint assignments.\n* ***Unified Messaging Notifications***:\n* Implement a messaging module that pushes interactive alerts (visualizing current steering adjustments, sprint progress, and resolved performance gaps) to designated notification integrations (Slack/Teams).\n* ***Steering Control Panel***:\n* Design a premium frontend dashboard for developers to visualize steering decisions and review conversion rules.\n\n```\n  1. Atlassian & Code Linkages\n```\n\n* ***Epic Link***: \\[ADHD-9: Steering & Adaptive Development Loop\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* ***Primary Source Code***:\n* Sync Coordinator Hook: `scripts/task_sync/tri_sync.py`\n* Slack Notification Helper: `src/lib/notifications/slack.ts`\n* Developer Control Screen: `src/components/dashboard/SteeringPanel.tsx`\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] **End-to-End Synchronization Run**: Trigger a local test sync using `tri_sync.py apply` and confirm that calculated priorities successfully override status mappings on Linear and Jira.\n- [ ] **Callback Validation**: Validate that webhook payloads trigger proper notifications with zero formatting errors.\n- [ ] **Telemetry Visual Audit**: Confirm that dashboard tables display data cleanly with fully functioning search and filter operations.\n\n<!-- pixelated-sync\nkey: workstream-e-integrate-steering-with-upstream-workstreams\nstatus: open\nsource-provider: linear\nsource-id: e25e8e72-86d3-4fb7-aa28-7b5ec87ad45a\nasana: 1215187491501360\nbeads: foresight-mcp-wmu1\ngithub: 3102\njira: ADHD-2454\nlinear: e25e8e72-86d3-4fb7-aa28-7b5ec87ad45a\nupdated-at: 2026-05-27T21:24:11.614000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-28T10:40:20.315Z",
+    "createdAt": "2026-05-27T20:33:15.457Z"
+  },
+  {
+    "id": "2ba3996c-bd6e-4811-8250-7b43ae0a05e8",
+    "identifier": "PIX-2802",
+    "title": "Workstream E: Build evidence-based reprioritization engine",
+    "description": "```\n  1. Core Objective\n```\n\nDesign and implement the algorithmic reprioritization engine that scores and re-ranks outstanding backlog items based on real-time empirical performance evidence and user session data.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Evidence Collector***:\n* Extract performance gaps, clinical safety alerts, and therapist interaction frequencies from the database.\n* ***Multi-Criteria Scoring Engine***:\n* Implement a mathematical prioritization model using NumPy/SciPy in Python.\n* Calculate priority scores based on: Severity Weight, Frequency Score, System Performance Gap, and User-Facing Impact.\n* Establish a rank-order sorting routine to output a dynamically prioritized list of open tickets.\n* ***Priority Sync Bridge***:\n* Map prioritization outputs back to standard Atlassian/Linear priority levels (Highest, High, Medium, Low, Lowest).\n\n```\n  1. Atlassian & Code Linkages\n```\n\n* ***Epic Link***: \\[ADHD-9: Steering & Adaptive Development Loop\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* ***Primary Source Code***:\n* Prioritization Backend Service: `ai-services/prioritization/engine.py`\n* Math Model Utilities: `ai-services/prioritization/scoring.py`\n* Scoring Tests: `ai-services/tests/test_prioritizer.py`\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] **Mathematical Verification**: Run python tests verifying that:\n  - Higher-impact performance anomalies consistently result in higher ranking shifts.\n  - The sorting routine operates with $O(N \\\\log N)$ complexity, handling 5000 items in `< 100ms`.\n  - Randomized perturbations in weights preserve rank ordering constraints.\n- [ ] **Consistency Audit**: Verify that calculated priorities match available ticket fields on the target system.",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:36.954Z",
+    "createdAt": "2026-05-27T20:33:13.128Z"
+  },
+  {
+    "id": "a3503c8c-3df1-4a0c-92c0-5595a6e22779",
+    "identifier": "PIX-2801",
+    "title": "Workstream E: Build evaluation-to-data feedback loop",
+    "description": "1. Workstream E: Build evaluation-to-data feedback loop\n   1. Objective\n\nBuild the feedback loop that turns evaluation findings into upstream dataset-pipeline action. Ensure that evaluation failures and model-quality signals become concrete changes to source prioritization, curation rules, review focus, packaging assumptions, or validation thresholds.\n\n1. Operational responsibility\n\n* Map evaluation failures to likely upstream causes\n* Turn measured quality gaps into concrete dataset interventions\n* Feed new priorities back into acquisition, curation, and review work\n* Make the pipeline improve through evidence rather than intuition alone\n\n1. Verified Files\n\n* `ai/training/feedback_loop.py` (680 lines) \u2014 EvaluationParser, UpstreamCauseMapper, InterventionGenerator, FeedbackLoop\n* `ai/lab/evals/feedback_output/feedback_report.json` \u2014 Full intervention report\n* `ai/lab/evals/feedback_output/linear_issues/` \u2014 5 intervention templates\n\n1. Completion Summary\n\n9 actionable interventions generated from 515,749 record evaluation dataset:\n\n* 2 acquisition priority/threshold changes\n* 2 curation rule/dataset filter updates\n* 1 review focus area addition\n* 2 context normalization improvements\n\n1. Audit Note (2026-05-23)\n\nThis module has no dependency on the broken `training_readiness_gates.py` import chain and works independently. All logic verified. Issue status of Done is confirmed correct.\n\n***Jira:*** ADHD-314 (migrated from slimshadyme [PIX-370](https://linear.app/pixelated/issue/PIX-370/checkmate-establish-a-current-truth-baseline-and-launch-ready))\n\n<!-- pixelated-sync\nkey: workstream-e-build-evaluation-to-data-feedback-loop\nstatus: open\nsource-provider: linear\nsource-id: a3503c8c-3df1-4a0c-92c0-5595a6e22779\nasana: 1215187491631329\nbeads: foresight-mcp-caoj\ngithub: 3099\njira: ADHD-2451\nlinear: a3503c8c-3df1-4a0c-92c0-5595a6e22779\nupdated-at: 2026-05-27T21:24:12.054000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-28T10:40:23.518Z",
+    "createdAt": "2026-05-27T20:33:11.931Z"
+  },
+  {
+    "id": "4b4b1364-97e3-41c8-9529-9ebbe32e84c6",
+    "identifier": "PIX-2808",
+    "title": "Workstream D: Define training-ready packaging and automation plan",
+    "description": "1. Workstream D: Define training-ready packaging and automation plan\n   1. Objective\n\nDefine how curated stage-sliced datasets are packaged into promotion-ready artifacts. Integrates with training readiness gates ([daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>)) to produce validated, self-describing dataset packages.\n\n1. Package Model\n\nEach package is a self-contained bundle containing:\n\n* `manifest.json`: Package metadata and validation status\n* `data.jsonl`: Serialized records in canonical format\n* `metrics.json`: Quality metrics snapshot\n* `readiness_report.json`: [daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>) validation output\n* `promotion_token.json`: Promotion eligibility proof (if can_promote=True)\n\n1. Verified Files\n\n* `ai/core/pipelines/packaging.py` (308 lines) \u2014 DatasetPackager, PackageBundle, PackageStatus\n* `ai/core/pipelines/test_packaging.py` (269 lines) \u2014 12 passing tests\n* `ai/core/pipelines/training_ready/` \u2014 Generated training-ready data directory\n\n1. Audit Note (2026-05-23)\n\nThis issue was marked Done but had no `startedAt` date, no verified files listed, and its code depended on `training_readiness_gates.py` which had a SyntaxError (fixed in [daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>) audit). After the [daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>) fix, packaging module imports and tests pass (12/12). The original description was a vague placeholder; replaced with accurate scope.\n\n***Historical Context: Migrated from*** [PIX-160](https://linear.app/pixelated/issue/PIX-160/test-coverage-baseline-coverage-audit) ***(Jira: ADHD-1371)***",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:39.561Z",
+    "createdAt": "2026-05-27T20:33:11.290Z"
+  },
+  {
+    "id": "489e63a2-23fd-4a0d-b1b7-cd72d32daff1",
+    "identifier": "PIX-2796",
+    "title": "Workstream B/D: Implement stage-based dataset slicing",
+    "description": "1. Workstream B/D: Implement stage-based dataset slicing\n   1. Implementation Complete \u2705\n      1. Deliverables\n\n***Code:***\n\n* `ai/core/pipelines/processing/stage_classifier.py` - Stage classification logic (412 LOC)\n* `ai/core/pipelines/processing/stage_slicer.py` - Base slicing implementation (327 LOC)\n* `ai/core/pipelines/processing/stage_slicer_enhanced.py` - Enhanced with validation (688 LOC)\n\n***Stage Model:***\n\n| Stage | Empathy | Clinical | Safety | Clinical Validity | Dedup |  \n| - | < />< />< />< /> | < />< />< />< /> | < />< />< />< /> | < />< />< />< /> | - |  \n| Foundation | \u226570% | \u226530% | 100% | \u226570% | 50% |  \n| Expertise | \u226575% | \u226550% | 100% | \u226575% | 50% |  \n| Edge | \u226560% | \u226540% | 100% | \u226565% | 40% |  \n| Voice | \u226580% | \u226535% | 100% | \u226575% | 60% |\n\n***Downstream Integration:***\n\n* [PIX-303](https://linear.app/pixelated/issue/PIX-303/workstream-d-define-training-ready-packaging-and-automation-plan) (packaging automation) - can consume stage outputs\n* [daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>) (training-readiness validation) - can consume quality thresholds\n* [daggerstuff/pixelated#699](<https://linear.app/pixelated/issue/PIX-507/workstream-d-add-pipeline-observability-for-failures>) (pipeline observability) - metrics structure defined\n\n***Tests:*** 5/5 passing in test_stage_slicer_enhanced.py\n\n1. Audit Note (2026-05-23)\n\n***Code fix applied:*** `stage_slicer_enhanced.py` had a `SyntaxError: keyword argument repeated: safety_floor` in all four `StageConfig` constructors. The duplicate `safety_floor` values (0.70, 0.75, 0.65, 0.75) were actually intended as `clinical_validity_floor` thresholds but were incorrectly duplicated as `safety_floor` kwargs. Fix: added `clinical_validity_floor` field to `StageConfig`, restored `safety_floor=1.0` per project spec, and moved the lower values to the new field. Also fixed `safety_avg` being overwritten with `clinical_validity_avg` on line 394.\n\n***Jira:*** ADHD-25 (migrated from slimshadyme PIX-104)\n\n<!-- pixelated-sync\nkey: workstream-b-d-implement-stage-based-dataset-slicing\nstatus: open\nsource-provider: linear\nsource-id: 489e63a2-23fd-4a0d-b1b7-cd72d32daff1\nasana: 1215187397202158\nbeads: foresight-mcp-5k1e\ngithub: 3094\njira: ADHD-630\nlinear: 489e63a2-23fd-4a0d-b1b7-cd72d32daff1\nupdated-at: 2026-05-27T21:23:59.477000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T14:50:55.437Z",
+    "createdAt": "2026-05-27T20:33:07.017Z"
+  },
+  {
+    "id": "26ab79f1-a19a-4e7d-ab1d-b876556cd939",
+    "identifier": "PIX-2785",
+    "title": "Tri-sync bootstrap sentinel (completed)",
+    "description": "```\n  1. Task Overview\n```\n\nThis task represents a core pipeline enhancement or feature implementation item: ***Implement ConvApparel-style user-simulator realism evaluation pipeline for Pixelated Empathy***. The target is to design, implement, and document the specified capability, ensuring it integrates cleanly with the existing codebase and conforms to our performance, security, and styling guidelines.\n\n```\n  1. Implementation Checklist\n```\n\n1. Review existing code patterns and documentation in the relevant modules.\n2. Implement the designated feature or process upgrade.\n3. Validate functionality through thorough unit tests and manual execution.\n4. Update inline comments and external README logs where appropriate.\n\n---\n\n***Historical Context: Migrated from PIX-186 (Source Priority: Medium, Source Status: To)***\n\n<!-- pixelated-sync\nkey: tri-sync-bootstrap-sentinel-completed\nstatus: open\nsource-provider: linear\nsource-id: 26ab79f1-a19a-4e7d-ab1d-b876556cd939\nasana: 1215187411351435\nbeads: foresight-mcp-49tu\ngithub: 3083\njira: ADHD-2434\nlinear: 26ab79f1-a19a-4e7d-ab1d-b876556cd939\nupdated-at: 2026-05-27T21:23:31.612000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T14:51:11.848Z",
+    "createdAt": "2026-05-27T20:32:56.032Z"
+  },
+  {
+    "id": "9907bc0c-7e46-40b8-8e6e-e5b9a34f4668",
+    "identifier": "PIX-2773",
+    "title": "Standardize command contract",
+    "description": "```\n  1. Core Objective\n```\n\nDesign, implement, and verify the capabilities for the task: 'Standardize command contract'.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: General Feature Implementation\n* ***Runtime Stack***: Astro 6, React 19, TypeScript, and Python (`uv` managed)\n* ***Title Context***: Standardize command contract\n\n```\n  1. Atlassian & Code Linkages\n```\n\n***Historical Context: Migrated from*** [PIX-325](https://linear.app/pixelated/issue/PIX-325/document-idea-archival-policy-and-backlog-cleanup-workflow) ***(Source Priority: Medium, Source Status: To)***\n\n```\n  1. Verification & Testing Checklist\n```\n\n- [ ] Implement the core requirements for: Standardize command contract\n- [ ] Add unit/integration tests to verify functionality\n- [ ] Confirm that no TypeScript/Python compile errors or lint issues are introduced",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:32.682Z",
+    "createdAt": "2026-05-27T20:32:46.717Z"
+  },
+  {
+    "id": "9332b1e7-3708-4ffa-a742-c6018a24cf4a",
+    "identifier": "PIX-2772",
+    "title": "Sprint 5: Fine-Tuning, Evaluation & Deployment (July 7 \u2013 July 27)",
+    "description": "Migrated from slimshadyme [PIX-355](https://linear.app/pixelated/issue/PIX-355/implement-composable-memory-block-schemas).\n\nSource type: Task\n\nSource status: To Do\n\nSource priority: Medium",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:33.162Z",
+    "createdAt": "2026-05-27T20:32:45.881Z"
+  },
+  {
+    "id": "ee9eb105-b691-47ca-b778-f9ad34360073",
+    "identifier": "PIX-2770",
+    "title": "Sprint 3: Dreaming & Consolidation (June 9 \u2013 June 22)",
+    "description": "```\n  1. Core Objective\n```\n\nBuild the background memory consolidation and summarization engine (\"Dreaming\") that runs offline to analyze daily interaction logs, synthesize long-term semantic understandings, and execute database garbage collection.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Offline Dream Scheduler***:\n* Implement a cron-based scheduler using BullMQ (backed by local Redis container) to trigger dream consolidation cycles during off-peak hours.\n* ***Cognitive Summarization Model***:\n* Utilize pre-trained text transformers to extract core therapeutic themes, patient emotional progress markers, and key cognitive behavioral milestones.\n* Save unified, high-level summaries to the patient's long-term memory store in MongoDB.\n* ***Data Compaction & Garbage Collection***:\n* Prune obsolete, redundant chat logs and temporary caches to keep database storage footprint optimized.\n* Ensure correct primary key references are maintained across compacted collections.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  \n  \n  ```\n\n```\n```\n\n```\n\n* _**Epic Link**_: \\[ADHD-21: Cognitive Reflection and Offline Processing\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* _**Primary Source Code**_:\n* Dream Scheduler Service: `src/services/dream_scheduler.ts`\n* ML Summarization Task: `ai-services/dream/consolidation.py`\n* Worker Handler: `src/workers/dream_worker.ts`\n```\n\n# Verification & Testing Checklist\n\n```\n\n- [ ] **Integration Tests**: Write an integration suite verifying that a completed dream consolidation cycle successfully:\n  - Produces a coherent long-term memory document.\n  - Deletes raw session caches as configured.\n  - Maintains strict referential integrity.\n- [ ] **Memory Indexing Performance**: Audit read/write query latency before and after running a dream cycle, ensuring indexing speeds are improved by at least 15%.\n- [ ] **Failure Recovery**: Interrupt a dream worker mid-processing and confirm that the system handles job retries via Redis seamlessly without duplicating summaries.\n```\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:31.358Z",
+    "createdAt": "2026-05-27T20:32:43.915Z"
+  },
+  {
+    "id": "6d4d7e5a-7883-4731-b717-d4e9b725d9d3",
+    "identifier": "PIX-2769",
+    "title": "Sprint 2: Gating & Ingestion (May 26 \u2013 June 8)",
+    "description": "```\n  1. Core Objective\n```\n\nImplement the real-time clinical safety and data ingestion gating layer to screen all conversational inputs, evaluate safety levels, detect high emotional arousal, and route messages dynamically.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Ingestion Pipeline***:\n* Build an async ingestion pipeline using Fast API in `ai-services` that intermediates between the React UI layer and the core memory storage adapter.\n* Integrate an LLM-based safety classifier that screens patient inputs against defined diagnostic criteria.\n* ***React UI Gating Integration***:\n* Design React components displaying real-time screening states (Ingesting, Gating, Safety Verified, Routed) using micro-animations.\n* Provide immediate feedback to the therapist if critical safety flags (e.g. self-harm, severe crisis) are detected.\n* ***Safety Routing Engine***:\n* Route standard messages to standard memory collections and flag high-arousal messages for immediate professional escalation.\n\n```\n  1. Atlassian & Code Linkages\n  \n```\n\n```\n* _*****Epic Link*****_: \\[ADHD-20: AI Ingestion and Safety Protocols\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* _*****Primary Source Code*****_:\n* Fast API Gate Controller: `ai-services/ingestion/gate.py`\n* React Chat Screen: `src/components/chat/TherapyGate.tsx`\n* Database collection schemas: `packages/memory-schema/src/gate-types.ts`\n```\n\n# Verification & Testing Checklist\n\n```\n\n- [ ] *****End-to-End Specs*****: Create a Playwright integration test at `e2e/chat-gating.spec.ts` asserting that safety blocks render instantly when flagged input is injected.\n- [ ] *****Performance Profiling*****: Run load testing simulating 100 concurrent chat session ingestions and verify average response time remains `< 200ms`.\n- [ ] *****Safety Rule Verification*****: Ensure all boundary inputs (empty messages, massive blocks of text, special markdown characters) are correctly handled without crashing.\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:31.021Z",
+    "createdAt": "2026-05-27T20:32:42.815Z"
+  },
+  {
+    "id": "3098923a-e651-4497-b633-f217b9fdbe41",
+    "identifier": "PIX-2493",
+    "title": "Workstream A: Define acquisition rubric and acceptance gates",
+    "description": "Define auto-create/update issue/task behavior for critical security failures and AI validation regressions.\n\nSource plan: 2026-03-17-ci-federation-asana-tasks.csv\n\n***Jira:*** [ADHD-84](<https://russianvodka.atlassian.net/browse/ADHD-84>) (migrated from slimshadyme [PIX-158](https://linear.app/pixelated/issue/PIX-158/phase-3-auth-consolidation-sprint-4))",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:38.021Z",
+    "createdAt": "2026-05-27T19:16:37.847Z"
+  },
+  {
+    "id": "bd80eddd-4816-4d0f-bf5f-65f9022874e4",
+    "identifier": "PIX-2180",
+    "title": "YouTube ingestion: process remaining 90 channels",
+    "description": "```\n  1. Core Objective\n```\n\nComplete YouTube ingestion for all 91 therapeutic channels. Currently only 1/91 channels have been processed. This is a critical data acquisition gap blocking the 3x pipeline size target.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Channels List***: `tmp/youtube_ingestion_final/` contains 90 unprocessed channel JSONL files\n* ***Script***: `ai/training/youtube_ingestion.py`\n* ***Output***: Processed transcripts in `data/therapeutic/` with ChatML format\n* ***Deduplication***: Cross-channel dedup pass required after all channels processed\n* ***Runtime***: `uv run python ai/training/youtube_ingestion.py --all-channels`\n\n```\n  1. Atlassian & Code Linkages\n  \n```\n\n```\n* _***Ingestion Script***_: `ai/training/youtube_ingestion.py`\n* _***Channel Data***_: `tmp/youtube_ingestion_final/`\n* _***Output Dir***_: `data/therapeutic/`\n* _***Source Plan***_: CONSOLIDATED-MODERN-PLAN-2026-05-08.md\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] All 91 channel directories processed (no empty outputs)\n- [ ] Total processed records > 100,000 new samples\n- [ ] ChatML format verified on random sample of 50 records\n- [ ] Cross-channel deduplication pass complete\n- [ ] Processing report saved to `tmp/youtube_ingestion_final/processing_report.json`\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T15:27:38.445Z",
+    "createdAt": "2026-05-27T19:07:57.134Z"
+  },
+  {
+    "id": "eb5d0aae-5bf4-4ce9-b256-e2e633e22eb3",
+    "identifier": "PIX-2179",
+    "title": "Write Unit Tests for the Gate",
+    "description": "```\n  1. Core Objective\n```\n\nDevelop a comprehensive suite of unit tests for the AI safety gating layer, ensuring 100% test coverage of boundary-value inputs, threat classifiers, and safety routing decisions.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Testing Framework***: Vitest, mock server engines (`msw` or simple local stub servers).\n* ***Test Scenarios***:\n* Screen standard safe patient messages (should pass gate with zero flags).\n* Validate trigger safety flags for boundary inputs (empty strings, malicious injection attempts, high-arousal indicators).\n* Mock third-party AI endpoints to guarantee deterministic testing execution without network overhead.\n* ***Coverage Criteria***:\n* Enforce a minimum of ***95% statement and branch coverage*** on safety rules files.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  \n  ```\n\n```\n```\n\n* ***Parent Task***: \\[ADHD-317: Sprint 2: Gating & Ingestion\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* ***Primary Source Code***:\n* Test Suite: `packages/memory-schema/tests/gate-rules.test.ts`\n* Ingestion Gate Rules: `packages/memory-schema/src/gate-rules.ts`\n\n```\n\n# Verification & Testing Checklist\n```\n\n- [ ] **Coverage Verification**: Run `pnpm vitest run --coverage packages/memory-schema/tests/gate-rules.test.ts` and confirm coverage metrics are fully satisfied.\n- [ ] **Boundary Verification**: Ensure the test suite executes successfully in less than 3000ms.\n- [ ] **CI Pipeline Validation**: Integrate test execution directly into the advisory check pipeline to block broken gate regressions.\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:37.519Z",
+    "createdAt": "2026-05-27T19:07:56.518Z"
+  },
+  {
+    "id": "f9e5fa04-6c62-4df9-986c-18f6cb690423",
+    "identifier": "PIX-2176",
+    "title": "Workstream D: Define training-readiness validation gates",
+    "description": "1. Workstream D: Define training-readiness validation gates\n   1. Objective\n\nDefine the validation gates and failure criteria that determine whether a dataset is training-ready. This issue owns the readiness definition, validation failure criteria, and the gate-checking infrastructure that downstream packaging and observability depend on.\n\n1. Operational responsibility\n\n* Define training-readiness validation gates (quality floors, completeness, dedup retention, privacy compliance, slice boundaries)\n* Implement `TrainingReadinessGates` class with stage-aware thresholds\n* Provide `STAGE_QUALITY_THRESHOLDS` for consumption by packaging ([PIX-303](https://linear.app/pixelated/issue/PIX-303/workstream-d-define-training-ready-packaging-and-automation-plan)) and observability ([daggerstuff/pixelated#699](<https://linear.app/pixelated/issue/PIX-507/workstream-d-add-pipeline-observability-for-failures>))\n\n1. Verified Files\n\n* `ai/core/pipelines/training_readiness_gates.py` (628 lines) \u2014 gate definitions and validation logic\n* `ai/core/pipelines/test_training_readiness_gates.py` (309 lines) \u2014 23 passing tests\n\n1. Audit Note (2026-05-23)\n\n***Code fix applied:*** `_estimate_quality_floors()` had a SyntaxError on line 432 \u2014 an unclosed `return self._check_quality_floors(` call with a second dead-code `return` block below it. The fix closed the call correctly and removed the broken duplicate block. Tests now pass (23/23).\n\nThe previous description text (\"Build event bus for memory operations\") was from a different migrated Jira issue and did not match this issue's scope. Replaced with correct scope documentation.\n\n***Historical Context: Migrated from*** [PIX-214](https://linear.app/pixelated/issue/PIX-214/publish-ci-operating-model-rfc) ***(Jira: ADHD-312)***",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:38.632Z",
+    "createdAt": "2026-05-27T19:07:40.477Z"
+  },
+  {
+    "id": "dac10cae-3191-4fc1-88b5-92bc1bd73717",
+    "identifier": "PIX-2175",
+    "title": "Workstream D: Add pipeline observability for failures",
+    "description": "1. Workstream D: Add pipeline observability for failures\n   1. Objective\n\nAdd the observability layer that makes the modern dataset pipeline manageable as an operational system. Expose throughput, readiness state, validation outcomes, failures, and regressions so the pipeline can be debugged and improved without relying on manual reconstruction.\n\n1. Operational responsibility\n\n* Instrument stage throughput and readiness state\n* Surface validation failures and regressions\n* Make pipeline health visible enough to support operational decisions\n* Reduce hidden failure accumulation across the pipeline\n\n1. Verified Files\n\n* `ai/core/pipelines/pipeline_observability.py` (792 lines) \u2014 PipelineMetricsCollector, PipelineHealthSummary, ThroughputMetrics, ReadinessMetrics, FailureMetrics, RegressionAlert, Prometheus export\n* `ai/core/pipelines/test_pipeline_observability.py` (387 lines) \u2014 20 passing tests\n\n1. API Endpoints\n\n* `/api/v1/pipeline/observability/health` - Health summary JSON\n* `/metrics` - Prometheus format metrics\n\n1. Audit Note (2026-05-23)\n\nThis module imports from `training_readiness_gates.py` ([daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>)), which had a SyntaxError that prevented the entire observability module from loading. After the [daggerstuff/pixelated#698](<https://linear.app/pixelated/issue/PIX-506/workstream-d-define-training-readiness-validation-gates>) fix, all 20 tests pass. The issue was marked Done but was non-functional until the upstream fix was applied.\n\n***Jira:*** ADHD-312 (migrated from slimshadyme [PIX-369](https://linear.app/pixelated/issue/PIX-369/build-offline-first-synchronization))",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:38.316Z",
+    "createdAt": "2026-05-27T19:07:38.315Z"
+  },
+  {
+    "id": "8f2733ad-725d-482d-9a75-69ad1b78719d",
+    "identifier": "PIX-2174",
+    "title": "Workstream C: Define privacy and content handling gates",
+    "description": "Please address the remaining issues and suggestions from Gilfoyle's code review:\n\n1. Major Issues\n2. ***Database Schema Assumption***: The API key service assumes the `api_keys` table exists. We need to add database migration scripts for production.\n3. ***Hardcoded Expiration***: The 1-year expiration is a reasonable default but should be made configurable.\n   1. Minor Issues\n4. ***Style & Testing Issues***: Address various style and testing improvements (items 6-16 from the review) that were not blocking deployment.\n   1. Remaining Risks\n5. ***PYTHONPATH***: Ensure proper PYTHONPATH configuration is documented/setup for Python scripts.\n6. ***Testing***: Add a comprehensive test suite.",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:37.109Z",
+    "createdAt": "2026-05-27T19:07:36.573Z"
+  },
+  {
+    "id": "76853aa2-adff-48ea-966b-54f6acd96d3d",
+    "identifier": "PIX-2173",
+    "title": "Workstream B: Normalize and deduplicate ingested data",
+    "description": "1. Workstream B: Normalize and deduplicate ingested data\n\n***Status: Done (with path notes)***\n\n1. Verified Files\n\n* `ai/core/pipelines/processing/data_normalizer.py` (450 lines) - real logic\n* `ai/core/pipelines/processing/normalization_pipeline.py` (642 lines) - real logic\n\n1. Path Notes\n\n* Code at `data_normalizer.py` and `normalization_pipeline.py`, NOT `normalizer.py` as originally planned",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:35.867Z",
+    "createdAt": "2026-05-27T19:07:35.361Z"
+  },
+  {
+    "id": "bf930e7c-88cd-42b9-9786-3095582b40a3",
+    "identifier": "PIX-2171",
+    "title": "Workstream B/C: Formalize human review for borderline data",
+    "description": "1. Workstream B/C: Formalize human review for borderline data\n\n***Status: Done (with path notes)***\n\n1. Verified Files\n\n* `ai/core/pipelines/human_review_queue.py` (1521 lines) - real logic\n* `ai/memory/gates/review_queue_api.py` (297 lines) - real logic\n\n1. Path Notes\n\n* Queue at `ai/core/pipelines/human_review_queue.py`, NOT `ai/core/pipelines/processing/human_review_queue.py`\n\n<!-- pixelated-sync\nkey: workstream-b-c-formalize-human-review-for-borderline-data\nstatus: open\nsource-provider: linear\nsource-id: bf930e7c-88cd-42b9-9786-3095582b40a3\nasana: 1215187476514056\nbeads: foresight-mcp-eqyx\ngithub: 2467\njira: ADHD-1821\nlinear: bf930e7c-88cd-42b9-9786-3095582b40a3\nupdated-at: 2026-05-27T21:23:55.640000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T14:50:51.528Z",
+    "createdAt": "2026-05-27T19:07:32.116Z"
+  },
+  {
+    "id": "5ccc5345-951a-428e-8e63-b7beb607a4e5",
+    "identifier": "PIX-2170",
+    "title": "Workstream A: Run public-web acquisition pilot",
+    "description": "1. Workstream A: Run public-web acquisition pilot\n   1. Objective\n\nValidate whether public-web sources can produce acquisition-ready data that meets the intake rubric ([PIX-178](https://linear.app/pixelated/issue/PIX-178/workstream-a-define-acquisition-rubric-and-acceptance-gates)) and acceptance gates. This pilot proves whether a concrete source-expansion path should be promoted from experimental to operational.\n\n1. Operational responsibility\n\n* Run a limited acquisition pilot against public-web sources\n* Evaluate pilot output against the acquisition rubric gates\n* Produce evidence for whether this source class should be promoted\n* Feed findings into [PIX-188](https://linear.app/pixelated/issue/PIX-188/workstream-a-consolidate-acquisition-report-and-next-backlog) for backlog curation\n\n1. Completion Summary\n\nPilot completed and validated. Reference report at `ai/data/reports/PIX-181-public-web-pilot-report.md` (198 lines).\n\n1. Audit Note (2026-05-23)\n\nThe previous description text (\"Update Colab notebook for TRL API parity\") was from a different migrated Jira issue and did not match this issue's title or scope. Replaced with correct scope documentation.\n\n***Historical Context: Migrated from*** [PIX-292](https://linear.app/pixelated/issue/PIX-292/wire-readiness-check-into-azure-pre-deploy-stage) ***(Jira: ADHD-1364)***",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:38.147Z",
+    "createdAt": "2026-05-27T19:07:30.392Z"
+  },
+  {
+    "id": "41c1ada0-ec5b-466f-abb5-08a8e1724b5c",
+    "identifier": "PIX-2154",
+    "title": "Sprint 4: Reflection & Learning (June 23 \u2013 July 6)",
+    "description": "```\n  1. 1\\. Task Overview\n```\n\nThis task represents a core pipeline enhancement or feature implementation item: ***\\[Checkmate\\] Make Phase D feature decisions (CM-016/017/018)***. The target is to design, implement, and document the specified capability, ensuring it integrates cleanly with the existing codebase and conforms to our performance, security, and styling guidelines.\n\n```\n  1. 1\\. Implementation Checklist\n```\n\n1. Review existing code patterns and documentation in the relevant modules.\n2. Implement the designated feature or process upgrade.\n3. Validate functionality through thorough unit tests and manual execution.\n4. Update inline comments and external README logs where appropriate.\n\n---\n\n***Historical Context: Migrated from*** [PIX-360](https://linear.app/pixelated/issue/PIX-360/create-vs-code-extension-for-foresight) ***(Source Priority: Medium, Source Status: Done)***",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:33.896Z",
+    "createdAt": "2026-05-27T19:06:48.480Z"
+  },
+  {
+    "id": "d1df6882-4f99-4ce5-a71f-295f7a302859",
+    "identifier": "PIX-2151",
+    "title": "Sprint 1: Memory Schema & Unification (May 12 \u2013 May 25)",
+    "description": "```\n  1. Core Objective\n```\n\nUnify the clinical data definitions across all application modules, establishing a shared, strictly-typed memory schema structure spanning the Astro frontend, package libraries, and Python ML/AI adapters.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Schema Single Source of Truth***:\n* Consolidate all schema configurations into the shared package `@pixelated/memory-schema` under `packages/memory-schema`.\n* Use Zod schemas in TypeScript and Pydantic models in Python to enforce exact format validation.\n* ***Memory Serialization/Deserialization***:\n* Validate that conversational transcripts, episodic memories, and compaction logs serialize/deserialize bidirectionally without loss of metadata or timestamp precision.\n* Maintain absolute compliance with local storage adapters and Mongo document formats.\n* ***Retroactive Migrations***:\n* Develop migration scripts to upgrade pre-existing database records to the unified structural format.\n\n  ```\n  1. Atlassian & Code Linkages\n  \n  \n  \n  ```\n\n```\n```\n\n```\n\n* _**Epic Link**_: \\[ADHD-19: Clinical Memory Subsystem Refactor\\](file:///home/vivi/pixelated/exports/pix-to-adhd-key-map.json)\n* _**Primary Source Code**_:\n* Schema Defaults: \\[defaults.ts\\](file:///home/vivi/pixelated/packages/memory-schema/src/defaults.ts)\n* Memory Manager Client: \\[memory.ts\\](file:///home/vivi/pixelated/src/lib/memory.ts)\n* Package Configuration: \\[package.json\\](file:///home/vivi/pixelated/packages/memory-schema/package.json)\n* Python Adapter: \\[memory_adapter.py\\](file:///home/vivi/pixelated/ai-services/memory_adapter.py)\n```\n\n# Verification & Testing Checklist\n\n```\n\n- [ ] **TypeScript Typecheck**: Run `pnpm typecheck` and confirm zero compilation warnings or type mismatches.\n- [ ] **Bidirectional Verification Tests**:\n  - Run `pnpm vitest run -c config/vitest.config.ts packages/memory-schema` and verify all serialization test blocks succeed.\n  - Execute python validations with `uv run pytest ai-services/tests/test_memory_adapter.py`.\n- [ ] **Manual Sanity Check**: Populate a mock patient record using the unified schema and confirm that both Astro SSR and the Python service parse the patient's long-term recall blocks correctly.\n```\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:32.030Z",
+    "createdAt": "2026-05-27T19:06:44.378Z"
+  },
+  {
+    "id": "ccc63b9d-352e-4eac-98ef-7ed2fe18254d",
+    "identifier": "PIX-2099",
+    "title": "Integrate Reflection with Dream Cycles",
+    "description": "```\n  1. Core Objective\n```\n\nFeed reflection findings back into long-term patient memories.\n\n```\n  1. Technical Design Specs\n```\n\n* Save consolidated insights to MongoDB.\n\n  ```\n  1. Verification & Testing Checklist\n  \n  \n  \n  ```\n\n```\n```\n\n```\n\n- [ ] Hook reflection tasks into dream scheduler.\n- [ ] Save consolidated insights to MongoDB.\n```\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:23.533Z",
+    "createdAt": "2026-05-27T19:04:23.270Z"
+  },
+  {
+    "id": "3f7527c1-c46d-49d0-ae84-c36d3afd5456",
+    "identifier": "PIX-2098",
+    "title": "Integrate Gate into Pixelated Ingestion",
+    "description": "```\n  1. Core Objective\n```\n\nIntercept conversational inputs at the gate, checking safety levels and routing them dynamically.\n\n```\n  1. Technical Design Specs\n```\n\n* Integrate fast API gate controllers with screening interfaces in React.\n\n  ```\n  1. Verification & Testing Checklist\n  \n  \n  \n  ```\n\n```\n```\n\n```\n\n- [ ] Intercept messages in fast API gate controller.\n- [ ] Add real-time UI screening state indicators.\n```\n\n```\n\n<!-- pixelated-sync\nkey: integrate-gate-into-pixelated-ingestion\nstatus: open\nsource-provider: linear\nsource-id: 3f7527c1-c46d-49d0-ae84-c36d3afd5456\nasana: 1215187301133659\nbeads: foresight-mcp-qlz9\ngithub: 3282\njira: ADHD-2633\nlinear: 3f7527c1-c46d-49d0-ae84-c36d3afd5456\nupdated-at: 2026-05-27T21:26:34.512000Z\n-->\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:24.223Z",
+    "createdAt": "2026-05-27T19:04:20.589Z"
+  },
+  {
+    "id": "d89eb69d-b691-4c59-a4d1-45887f7b38a6",
+    "identifier": "PIX-2094",
+    "title": "Implement Socratic Gate",
+    "description": "Migrated from slimshadyme [PIX-358](https://linear.app/pixelated/issue/PIX-358/create-typescript-sdk-with-complete-type-safety).\n\n***Audit note (2026-05-24)***: Work delivered by [daggerstuff/pixelated#721](<https://linear.app/pixelated/issue/PIX-522/integrate-gate-into-ai-ingestion>) (PR [daggerstuff/pixelated#1158](<https://linear.app/pixelated/review/pix-522-integrate-gate-into-ai-ingestion-pipeline-f6f538515011>)). The Socratic Gate implementation (crisis-detector, PII redactor, trauma filter, consent gate) was completed as part of the gate-into-AI-ingestion integration. Marking Done \u2014 duplicate of [daggerstuff/pixelated#721](<https://linear.app/pixelated/issue/PIX-522/integrate-gate-into-ai-ingestion>) in practice.\n\nSource type: Task  \nSource status: Done (migrated)  \nSource priority: Medium\n\n<!-- pixelated-sync\nkey: implement-socratic-gate\nstatus: open\nsource-provider: linear\nsource-id: d89eb69d-b691-4c59-a4d1-45887f7b38a6\nasana: 1215187273186180\nbeads: foresight-mcp-p5cf\ngithub: 3278\njira: ADHD-2629\nlinear: d89eb69d-b691-4c59-a4d1-45887f7b38a6\nupdated-at: 2026-05-27T21:26:19.056000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T16:31:24.725Z",
+    "createdAt": "2026-05-27T19:04:13.471Z"
+  },
+  {
+    "id": "02a7e4f4-1333-4879-a517-8bf61cbf0395",
+    "identifier": "PIX-2093",
+    "title": "Implement Reflection Tasks",
+    "description": "```\n  1. Core Objective\n```\n\nSetup automated self-reflection hooks that analyze recent actions and update guidance.\n\n```\n  1. Technical Design Specs\n```\n\n* Build reflection evaluation prompts and automate self-improvement updates.\n\n  ```\n  1. Verification & Testing Checklist\n  \n  \n  \n  ```\n\n```\n```\n\n```\n\n- [ ] Build reflection evaluation prompts.\n- [ ] Implement automated self-improvement updates.\n```\n\n```\n```",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T15:27:09.206Z",
+    "createdAt": "2026-05-27T19:04:11.780Z"
+  },
+  {
+    "id": "1904a6bb-5dce-4b43-8558-3e2876a72e83",
+    "identifier": "PIX-1943",
+    "title": "Model registry with versioning and rollback tagging",
+    "description": "```\n  1. Core Objective\n```\n\nImplement a lightweight model registry that tags every fine-tuned checkpoint with metadata (training run ID, dataset version, eval scores) and supports one-command rollback to any previous checkpoint.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Registry***: JSON manifest at `training/registry/models.json` listing all published checkpoints\n* ***Tagging***: Each checkpoint tagged with `run_id`, `base_model`, `dataset_version`, `clinical_validity_score`, `timestamp`\n* ***Storage***: Checkpoints in S3 (existing bucket) with path `models/{run_id}/{checkpoint}/`\n* ***Rollback***: `scripts/devops/rollback-model.sh {run_id}` pulls checkpoint and updates symlink\n* ***CLI***: `uv run python scripts/devops/model-registry.py list|tag|rollback`\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Registry CLI***: `scripts/devops/model-registry.py` \\[NEW\\]\n* ***Rollback Script***: `scripts/devops/rollback-model.sh` \\[NEW\\]\n* ***Registry Manifest***: `training/registry/models.json` \\[NEW\\]\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] `model-registry.py list` shows all checkpoints with scores\n- [ ] `model-registry.py tag` correctly writes metadata to manifest\n- [ ] `rollback-model.sh` restores checkpoint and updates active symlink\n- [ ] Rollback survives concurrent training run (no file corruption)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T19:17:50.814Z",
+    "createdAt": "2026-05-27T17:35:33.480Z"
+  },
+  {
+    "id": "64689b68-c5e3-4d2b-938c-80a9a772bf4f",
+    "identifier": "PIX-1934",
+    "title": "Clinical validity metrics dashboard (Grafana/Prometheus)",
+    "description": "```\n  1. Core Objective\n```\n\nImplement real-time monitoring for clinical validity pass rate, pipeline throughput, and annotation queue depth. Alert on any >10% degradation in validity score.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Metrics***: `clinical_validity_pass_rate`, `pipeline_throughput_records_per_hour`, `annotation_queue_depth`\n* ***Stack***: Prometheus metrics endpoint in training script + Grafana dashboard JSON\n* ***Alert***: Slack webhook when `clinical_validity_pass_rate` drops >10% week-over-week\n* ***Dashboard Location***: `monitoring/dashboards/clinical-validity.json`\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Dashboard File***: `monitoring/dashboards/clinical-validity.json` \\[NEW\\]\n* ***Source Plan***: CONSOLIDATED-MODERN-PLAN-2026-05-08.md\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] Prometheus metrics endpoint emitting all three metric types\n- [ ] Grafana dashboard visualizing pass rate trend over 30 days\n- [ ] Alert fires in test environment when pass rate drops >10%\n- [ ] Dashboard accessible at local Grafana on port 3000",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T19:16:36.439Z",
+    "createdAt": "2026-05-27T17:35:29.699Z"
+  },
+  {
+    "id": "9bb09446-af95-40c1-8ca8-33cef9ab2776",
+    "identifier": "PIX-1933",
+    "title": "Expert annotation workflow for borderline training samples",
+    "description": "```\n  1. Core Objective\n```\n\nBuild tooling to route borderline training samples (validity score 0.4-0.6) to a human expert review queue, targeting 100 samples reviewed per week to progressively improve the clinical validity baseline.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Queue***: MongoDB collection `annotation_queue` with sample text, score, flags, and status (pending/approved/rejected)\n* ***Review UI***: Simple web interface or CLI tool for reviewer to approve/reject with optional note\n* ***Feedback Loop***: Approved samples re-enter training data; rejected samples log reasons for scorer improvement\n* ***Reporting***: Weekly summary: queue depth, throughput, approval rate\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Queue Script***: `ai/training/annotation_queue.py` \\[NEW\\]\n* ***Source Plan***: CONSOLIDATED-MODERN-PLAN-2026-05-08.md\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] Borderline samples automatically inserted into queue after SDG pipeline run\n- [ ] Reviewer can approve/reject samples via CLI or UI\n- [ ] Approved samples added to training dataset manifest\n- [ ] Weekly throughput report generated automatically",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T19:17:21.907Z",
+    "createdAt": "2026-05-27T17:35:29.417Z"
+  },
+  {
+    "id": "f25bf2f9-0cd2-4dc3-9313-73f81c77f2c3",
+    "identifier": "PIX-1932",
+    "title": "Build clinical validity scorer for SDG pipeline",
+    "description": "```\n  1. Core Objective\n```\n\nReplace safety scoring in `ai/training/sdg_pipeline.py` with a DSM-5-aligned clinical validity scorer that outputs a 0-1 score per training sample. This directly addresses the 13.3% clinical pass rate bottleneck.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Scorer Architecture***: Fine-tuned classifier (or prompted LLM judge) against DSM-5 therapeutic best practice criteria\n* ***Output Schema***: `{\"validity_score\": float, \"flags\": list[str], \"category\": str}`\n* ***Integration Point***: Replace `is_safe()` check in `sdg_pipeline.py` with `clinical_validity_score()` call\n* ***Threshold***: Samples scoring <0.4 excluded; 0.4-0.6 routed to annotation queue; >0.6 accepted\n* ***Runtime***: `uv run python ai/training/clinical_validity_scorer.py`\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Primary File***: `ai/training/clinical_validity_scorer.py` \\[NEW\\]\n* ***Integration Target***: `ai/training/sdg_pipeline.py`\n* ***Source Plan***: \\[CONSOLIDATED-MODERN-PLAN-2026-05-08.md\\](file:///.agent/internal/plans/CONSOLIDATED-MODERN-PLAN-2026-05-08.md)\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] Scorer outputs valid 0-1 float for all input formats\n- [ ] Scores >0.6 on 100 expert-validated high-quality samples\n- [ ] Scores <0.4 on 100 expert-validated low-quality samples\n- [ ] `sdg_pipeline.py` integrated and pipeline runs end-to-end\n- [ ] Unit tests cover edge cases (empty input, non-English, crisis content)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T19:16:16.576Z",
+    "createdAt": "2026-05-27T17:35:29.143Z"
+  },
+  {
+    "id": "a7c474eb-8ab9-4cfb-9fb0-61127966ff74",
+    "identifier": "PIX-1929",
+    "title": "EPIC: Training Pipeline Test Suite Completion",
+    "description": "```\n  1. Core Objective\n```\n\nComplete all property-based and unit tests for the training pipeline modules, achieving the required safety-critical test coverage for `shared_config.py`, `MultilingualSafetyChecker`, the SFT script, and reward functions.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Property tests***: `hypothesis`-based tests for token length stats, truncation, multilingual crisis detection, reward score range\n* ***Unit tests***: 100% branch coverage on `shared_config.py`, `pixelated_production_pilot.py`, DPO/GRPO reward functions\n* ***Runner***\\*: `uv run pytest` with all `**N.N` starred tasks resolved\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Sub-tasks***: [PIX-424](https://linear.app/pixelated/issue/PIX-424/21-property-test-multilingual-crisis-detection-prop-8), [PIX-426](https://linear.app/pixelated/issue/PIX-426/23-unit-tests-for-multilingualsafetychecker), [PIX-428](https://linear.app/pixelated/issue/PIX-428/31-unit-tests-for-sft-script-improvements), PIX-472-PIX-480\n* ***Test Files***\\*: `tests/python/test_training_**.py`\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] All starred (\\*) test tasks in Done state\n- [ ] `uv run pytest tests/python/` passes with 0 failures\n- [ ] Coverage report shows \u226590% on training module files",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T19:17:21.120Z",
+    "createdAt": "2026-05-27T17:35:27.735Z"
+  },
+  {
+    "id": "1b880b43-f782-47d9-8559-e23f77948764",
+    "identifier": "PIX-1926",
+    "title": "EPIC: Clinical Validity Enhancement Pipeline",
+    "description": "```\n  1. Core Objective\n```\n\nDrive the clinical validity pass rate from 13.3% \u2192 \u226550% by implementing a domain-specific scoring pipeline, expert annotation workflow, and automated quality monitoring.\n\nThis is the [#1](<https://github.com/daggerstuff/pixelated/issues/1>) ***bottleneck*** for the Pixelated Empathy training pipeline. Until clinical validity improves, all other data acquisition and fine-tuning work is blocked from delivering meaningful model quality gains.\n\n```\n  1. Technical Design Specs\n```\n\n* ***Clinical Validity Scorer***: DSM-5-aligned scoring model producing a 0-1 validity score per training sample\n* ***Expert Annotation Loop***: Route borderline samples (score 0.4-0.6) to human reviewer queue (target: 100 samples/week)\n* ***Pipeline Integration***: Replace safety scoring in `ai/training/sdg_pipeline.py` with clinical validity scoring\n* ***Monitoring***: Grafana/Prometheus dashboard tracking pass rate over time\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Source Plan***: \\[CONSOLIDATED-MODERN-PLAN-2026-05-08.md\\](file:///.agent/internal/plans/CONSOLIDATED-MODERN-PLAN-2026-05-08.md)\n* ***Primary Script***: `ai/training/sdg_pipeline.py`\n* ***Eval Script***: `ai/training/mental_health_eval.py`\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] Clinical validity scorer implemented and scoring >0.5 on 100 expert-validated samples\n- [ ] Expert annotation queue receiving borderline samples\n- [ ] Pass rate dashboard live and alerting on >10% degradation\n- [ ] A/B test results comparing model quality before/after validity gating",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T19:17:20.965Z",
+    "createdAt": "2026-05-27T17:35:24.194Z"
+  },
+  {
+    "id": "fa11e610-c584-4d38-b0d4-98c27f1e25ad",
+    "identifier": "PIX-1896",
+    "title": "FHE Emotional Intelligence Integration - execution backlog",
+    "description": "```\n  1. Core Objective\n```\n\nTrack execution of the FHE Emotional Intelligence Integration plan. Summary: 80-100 tasks across 8 phases covering FHE service enhancements, encrypted memory/session storage, homomorphic analytics, crisis detection on encrypted patterns, caching, tests, and docs.\n\nSource plan: [2025-03-16-fhe-emotional-intelligence-integration.md](<http://2025-03-16-fhe-emotional-intelligence-integration.md>)\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Backlog Improvement\n* ***Title Context***: FHE Emotional Intelligence Integration - execution backlog\n\n  ```\n  1. Atlassian & Code Linkages\n  ```\n* ***Linear Key***: PIX-1896\n\n  ```\n  1. Verification & Testing Checklist\n  ```\n\n- [ ] Implement and verify the capabilities for: FHE Emotional Intelligence Integration - execution backlog\n\n<!-- pixelated-sync\nkey: fhe-emotional-intelligence-integration-execution-backlog\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: fa11e610-c584-4d38-b0d4-98c27f1e25ad\nasana: 1213871176254693\nbeads: pixelated-000\ngithub: 2169\njira: ADHD-363\nlinear: fa11e610-c584-4d38-b0d4-98c27f1e25ad\nupdated-at: 2026-05-27T17:23:49.514000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T19:05:34.547Z",
+    "createdAt": "2026-05-17T17:08:11.458Z"
+  },
+  {
+    "id": "f3cb74b3-89fa-4520-9179-2bf36d2188cf",
+    "identifier": "PIX-499",
+    "title": "*27.5 Unit tests for reward function \u2014 100% coverage",
+    "description": "```\n  1. Core Objective\n```\n\nImplement and configure the features specified for task 27.5 (Unit tests for reward function \u2014 ***100% coverage target (safety-critical)***).\n\n```\n  1. Technical Design Specs\n```\n\n* ***Sprint Scope***: Training Pipeline Improvements (Phase 27)\n* ***Runtime Environment***: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* ***Key Objectives***\\_: Unit tests for reward function \u2014 \\_***100% coverage target (safety-critical)***.\n\n```\n  1. Atlassian & Code Linkages\n  \n```\n\n```\n* _*****Linear Key*****_: PIX-476\n* _*****Source Plan File*****_: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n```\n\n1. Verification & Testing Checklist\n\n```\n\n- [ ] Known inputs \u2192 expected composite value\n- [ ] `_crisis_score()` \u2192 1.0 for non-crisis prompts\n- [ ] `_crisis_score()` \u2192 1.0 for each of 7 crisis resource strings\n- [ ] `_empathy_score()` \u2192 0.0 for no empathy keywords\n```\n\n<!-- pixelated-sync\nkey: 27-5-unit-tests-for-reward-function-100-coverage\nstatus: open\nsource-provider: github\nsource-id: 3116\nasana: 1215187252772269\nbeads: foresight-mcp-l6i\ngithub: 3116\njira: ADHD-453\nlinear: f3cb74b3-89fa-4520-9179-2bf36d2188cf\nupdated-at: 2026-05-27T21:14:39Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+      "name": "Duplicate",
+      "type": "duplicate"
+    },
+    "updatedAt": "2026-05-31T16:31:27.431Z",
+    "createdAt": "2026-04-30T14:09:08.421Z"
+  },
+  {
+    "id": "7e6a8db1-8d04-475d-bdc5-1bcbe73770b2",
+    "identifier": "PIX-487",
+    "title": "35.0 Final checkpoint \u2014 All complete",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 35.0 (Final checkpoint \u2014 All complete).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 35)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Final checkpoint \u2014 All complete.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-487\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* **Source File**: \\[data_audit.py\\](file:///home/vivi/pixelated/data_audit.py)\n\n### Verification & Testing Checklist\n\n- [ ] All 22 property tests passing (100+ hypothesis iterations each)\n- [ ] All unit tests passing\n- [ ] All integration tests passing\n- [ ] Test coverage > 90% for all new modules; 100% for reward function\n- [ ] `data_audit.py` confirms all category gaps addressed\n- [ ] Full pipeline produces evaluable final adapter\n\n<!-- pixelated-sync\nkey: 21-0-generate-nightmare-fuel-data-5-000\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 83e2afd3-0d1b-439d-8498-5aa479dafc80\njira: ADHD-896\nlinear: 83e2afd3-0d1b-439d-8498-5aa479dafc80\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T17:13:27.585Z",
+    "createdAt": "2026-04-29T14:17:50.118Z"
+  },
+  {
+    "id": "a4dfc35c-6dc4-4c73-a4cb-0b0860a232d9",
+    "identifier": "PIX-486",
+    "title": "34.0 Full pipeline production run",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 34.0 (Full pipeline production run).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 34)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Full pipeline production run.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-486\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] SFT on full deduplicated corpus (2.2M+ samples)\n- [ ] DPO on 10K+ preference pairs against SFT checkpoint\n- [ ] GRPO on prompt dataset against DPO checkpoint\n- [ ] Eval suite on final GRPO adapter\n- [ ] Compare against SFT-only baseline\n\n<!-- pixelated-sync\nkey: 2-3-unit-tests-for-multilingualsafetychecker\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: a4dfc35c-6dc4-4c73-a4cb-0b0860a232d9\nasana: 1215187160931335\nbeads: foresight-mcp-0ie\ngithub: 2005\njira: ADHD-894\nlinear: a4dfc35c-6dc4-4c73-a4cb-0b0860a232d9\nupdated-at: 2026-05-27T17:13:27.248000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T20:29:28.790Z",
+    "createdAt": "2026-04-29T14:17:48.451Z"
+  },
+  {
+    "id": "b8f2439b-22eb-4809-978f-39f2676a5b85",
+    "identifier": "PIX-485",
+    "title": "33.0 Full pipeline dry run",
+    "description": "Property test for multilingual crisis detection.\n\n* `st.sampled_from()` over curated crisis expressions per language\n* Assert `is_unsafe()` returns `True` for all\n\n***Req***: 5.1\u20135.4  \n***Correctness Property***: Prop 8 \u2014 All known crisis expressions in all 5 languages are detected as unsafe\n\n***Jira:*** [ADHD-221](<https://russianvodka.atlassian.net/browse/ADHD-221>) (migrated from slimshadyme [PIX-287](https://linear.app/pixelated/issue/PIX-287/consolidate-bitbucket-ai-validation-lane))\n\n<!-- pixelated-sync\nkey: 2-1-property-test-multilingual-crisis-detection-prop-8\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 7921d49b-07ed-4edf-b773-02583de37bb2\njira: ADHD-892\nlinear: 7921d49b-07ed-4edf-b773-02583de37bb2\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-21T21:32:03.102Z",
+    "createdAt": "2026-04-29T14:17:47.184Z"
+  },
+  {
+    "id": "8ad9d82a-7fbd-4ff6-9523-e5ad92a1e1f8",
+    "identifier": "PIX-484",
+    "title": "32.0 Checkpoint \u2014 Phase 6 complete",
+    "description": "Run: `python ai/training/sdg_pipeline.py --scenario dpo_preference_pairs --target_count 10000 --output_path ai/training/data/generated/dpo_pairs.jsonl`\n\n* Verify `generation_report.json` \u2014 generated count, filter rate\n* Spot-check 50 pairs: chosen demonstrates correct protocol, rejected is clinically inferior but plausible\n* Verify format matches `dpo_trainer.py` `load_preference_dataset()` expectations\n\n***Addresses***: 197KB \u2192 10K+ pairs (Req 6.2)\n\n***Jira:*** [ADHD-262](<https://russianvodka.atlassian.net/browse/ADHD-262>) (migrated from slimshadyme [PIX-323](https://linear.app/pixelated/issue/PIX-323/discovery-define-rewards-program-concept-and-rollout-criteria))\n\n<!-- pixelated-sync\nkey: 19-0-generate-dpo-preference-pairs-10-000\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 45348dcf-d1c7-44b0-8451-7f04f49d9e6c\njira: ADHD-890\nlinear: 45348dcf-d1c7-44b0-8451-7f04f49d9e6c\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-21T21:31:54.560Z",
+    "createdAt": "2026-04-29T14:17:45.636Z"
+  },
+  {
+    "id": "8e3d596d-4999-492e-8835-9b93e5479c71",
+    "identifier": "PIX-483",
+    "title": "31.0 Integration test \u2014 eval suite end-to-end",
+    "description": "Property test \u2014 non-nightmare safety filtering (Prop 12):\n\n* Unsafe output excluded for `dpo_preference_pairs` and `niche_category`\n\n***Correctness Property***: Prop 12 \u2014 Non-nightmare SDG output is safety-filtered\n\n***Jira:*** [ADHD-260](<https://russianvodka.atlassian.net/browse/ADHD-260>) (migrated from slimshadyme PIX-321)\n\n<!-- pixelated-sync\nkey: 18-3-property-test-non-nightmare-safety-filtering-prop-12\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: add2b709-f533-4016-bab0-20888234684e\njira: ADHD-888\nlinear: add2b709-f533-4016-bab0-20888234684e\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-21T21:32:26.042Z",
+    "createdAt": "2026-04-29T14:17:43.675Z"
+  },
+  {
+    "id": "3eb92f26-fc45-4526-af39-f52acfde801c",
+    "identifier": "PIX-482",
+    "title": "*30.3 Unit tests for mental_health_eval.py",
+    "description": "### 1\\. Objective\n\nImplement a property-based testing suite to thoroughly validate ***DPO output field completeness (Prop 10)***. Property-based testing allows us to assert invariant correctness across randomized and complex inputs, ensuring absolute reliability.\n\n```\n  1. Execution Plan\n```\n\n1. Define the core mathematical or behavioral invariants for the property under test.\n2. Set up generators to feed a diverse set of randomized inputs, including edge cases and boundary limits.\n3. Assert that the invariant holds true for all generated inputs.\n4. Integrate the property test execution into the CI/CD validation pipeline.\n\n---\n\n***Historical Context: Migrated from*** [PIX-319](https://linear.app/pixelated/issue/PIX-319/public-memory-product-transition-program) ***(Source Priority: Medium, Source Status: Done)***\n\n<!-- pixelated-sync\nkey: 18-1-property-test-dpo-output-field-completeness-prop-10\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 3eb92f26-fc45-4526-af39-f52acfde801c\nasana: 1215187161128681\nbeads: foresight-mcp-6xn\ngithub: 1998\njira: ADHD-1619\nlinear: 3eb92f26-fc45-4526-af39-f52acfde801c\nupdated-at: 2026-05-27T19:08:11.915000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:47.427Z",
+    "createdAt": "2026-04-29T14:17:41.089Z"
+  },
+  {
+    "id": "37891f12-af9a-4fc0-ae6a-6ec4a21192ef",
+    "identifier": "PIX-481",
+    "title": "*30.2 Property test \u2014 crisis safety failure detection (Prop 14)",
+    "description": "Verify all Phase 2 criteria before proceeding to Phase 3:\n\n* All Phase 2 tests pass\n* All broken pipeline files deleted\n* YouTube ingestion run on all 91 channels (3 tiers)\n* All \\~50 books converted with quality verification\n* Compiled corpus verified free of garbage book data contamination\n* `data_audit.py` reports current category counts \u2014 identify exact gaps for Phase 3\n\n***Blocks***: Phase 3 (SDG needs data audit to know what to generate)\n\n***Jira:*** [ADHD-255](<https://russianvodka.atlassian.net/browse/ADHD-255>) (migrated from slimshadyme [PIX-317](https://linear.app/pixelated/issue/PIX-317/introduce-explicit-account-and-workspace-memory-scoping))\n\n<!-- pixelated-sync\nkey: 17-0-checkpoint-phase-2-complete\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 7c0aa6ca-89c8-494e-b082-48960c361bfd\njira: ADHD-884\nlinear: 7c0aa6ca-89c8-494e-b082-48960c361bfd\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-21T21:31:34.203Z",
+    "createdAt": "2026-04-29T14:17:39.467Z"
+  },
+  {
+    "id": "61a2b8b9-4371-44de-99b5-7439e0cb370b",
+    "identifier": "PIX-480",
+    "title": "*30.1 Property test \u2014 eval metrics completeness (Prop 13)",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 30.1 (Property test \u2014 eval metrics completeness (Prop 13)).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 30)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Property test \u2014 eval metrics completeness (Prop 13).\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-480\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Dataset with \u22651 sample \u2192 all six metric fields are non-negative floats\n\n<!-- pixelated-sync\nkey: 16-0-implement-data-audit-script\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: 61a2b8b9-4371-44de-99b5-7439e0cb370b\nasana: 1215187201696659\nbeads: foresight-mcp-x6i\ngithub: 1207\njira: ADHD-459\nlinear: 61a2b8b9-4371-44de-99b5-7439e0cb370b\nupdated-at: 2026-05-27T19:08:10.088000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+      "name": "In Progress",
+      "type": "started"
+    },
+    "updatedAt": "2026-05-27T21:29:50.401Z",
+    "createdAt": "2026-04-29T14:17:37.858Z"
+  },
+  {
+    "id": "5259d312-30c6-4528-a8bd-da0d88cdc120",
+    "identifier": "PIX-479",
+    "title": "30.0 Implement mental health evaluation suite",
+    "description": "### Task Overview\n\nThis task represents a core pipeline enhancement or feature implementation item: ***30.0 Implement mental health evaluation suite***. The target is to design, implement, and document the specified capability, ensuring it integrates cleanly with the existing codebase and conforms to our performance, security, and styling guidelines.\n\n### Implementation Checklist\n\n1. Review existing code patterns and documentation in the relevant modules.\n2. Implement the designated feature or process upgrade.\n3. Validate functionality through thorough unit tests and manual execution.\n4. Update inline comments and external README logs where appropriate.\n\n---\n\n**Historical Context: Migrated from PIX-341 (Source Priority: Medium, Source Status: Done)**\n\n<!-- pixelated-sync\nkey: 30-0-implement-mental-health-evaluation-suite\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 5259d312-30c6-4528-a8bd-da0d88cdc120\nasana: 1215187168277923\nbeads: foresight-mcp-ezw\ngithub: 2027\njira: ADHD-458\nlinear: 5259d312-30c6-4528-a8bd-da0d88cdc120\nupdated-at: 2026-05-27T19:08:20.096000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:05.168Z",
+    "createdAt": "2026-04-29T14:17:36.144Z"
+  },
+  {
+    "id": "907f2c0f-88c1-4448-9dbf-83773865407b",
+    "identifier": "PIX-478",
+    "title": "29.0 Checkpoint \u2014 Phase 5 complete",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 29.0 (Checkpoint \u2014 Phase 5 complete).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 29)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Checkpoint \u2014 Phase 5 complete.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-478\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] GRPO trainer functional with reward function\n- [ ] Reward function 100% test coverage\n- [ ] All 4 reward property tests passing\n\n<!-- pixelated-sync\nkey: 15-1-property-test-near-duplicate-removal-prop-20\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 907f2c0f-88c1-4448-9dbf-83773865407b\nasana: 1215187167574862\nbeads: foresight-mcp-9hy\ngithub: 1204\njira: ADHD-1613\nlinear: 907f2c0f-88c1-4448-9dbf-83773865407b\nupdated-at: 2026-05-27T19:08:09.001000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T21:29:46.553Z",
+    "createdAt": "2026-04-29T14:13:36.484Z"
+  },
+  {
+    "id": "8a6c309f-2012-4c67-a315-06757648c547",
+    "identifier": "PIX-477",
+    "title": "28.0 Integration test \u2014 GRPO end-to-end",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 28.0 (Integration test \u2014 GRPO end-to-end).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 28)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Integration test \u2014 GRPO end-to-end.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-477\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Run GRPO trainer with 50-sample prompt dataset (mocked model loading)\n- [ ] Verify reward scores logged, low-reward filtered, checkpoint saved\n\n<!-- pixelated-sync\nkey: 14-0-execute-book-conversion-remaining-titles\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 8a6c309f-2012-4c67-a315-06757648c547\nasana: 1215187201449024\ngithub: 1199\njira: ADHD-1611\nlinear: 8a6c309f-2012-4c67-a315-06757648c547\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T19:08:08.672Z",
+    "createdAt": "2026-04-29T14:13:34.883Z"
+  },
+  {
+    "id": "dc50338e-afce-46d6-a74e-58eb04a8f4c4",
+    "identifier": "PIX-476",
+    "title": "*27.5 Unit tests for reward function \u2014 100% coverage",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 27.5 (Unit tests for reward function \u2014 **100% coverage target (safety-critical)**).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 27)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Unit tests for reward function \u2014 **100% coverage target (safety-critical)**.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-476\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Known inputs \u2192 expected composite value\n- [ ] `_crisis_score()` \u2192 1.0 for non-crisis prompts\n- [ ] `_crisis_score()` \u2192 1.0 for each of 7 crisis resource strings\n- [ ] `_empathy_score()` \u2192 0.0 for no empathy keywords\n\n<!-- pixelated-sync\nkey: 12-3-unit-tests-for-book-pdf-converter-py\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: dc50338e-afce-46d6-a74e-58eb04a8f4c4\nasana: 1215187252218160\nbeads: foresight-mcp-awk\ngithub: 1987\njira: ADHD-1610\nlinear: dc50338e-afce-46d6-a74e-58eb04a8f4c4\nupdated-at: 2026-05-27T19:08:08.780000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T16:31:26.594Z",
+    "createdAt": "2026-04-29T14:13:33.602Z"
+  },
+  {
+    "id": "72d0ae2c-9bbe-4bc0-a97c-57f7650d4463",
+    "identifier": "PIX-475",
+    "title": "*27.4 Property test \u2014 low-reward exclusion (Prop 5)",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 27.4 (Property test \u2014 low-reward exclusion (Prop 5)).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 27)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Property test \u2014 low-reward exclusion (Prop 5).\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-475\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Filtered batch contains only score >= threshold\n\n<!-- pixelated-sync\nkey: 12-1-property-test-book-conversion-metadata-prop-18\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: 72d0ae2c-9bbe-4bc0-a97c-57f7650d4463\nasana: 1215187167004669\nbeads: foresight-mcp-kvn\ngithub: 1984\njira: ADHD-1608\nlinear: 72d0ae2c-9bbe-4bc0-a97c-57f7650d4463\nupdated-at: 2026-05-27T19:08:04.955000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+      "name": "In Progress",
+      "type": "started"
+    },
+    "updatedAt": "2026-05-27T19:10:34.319Z",
+    "createdAt": "2026-04-29T14:13:32.235Z"
+  },
+  {
+    "id": "9da5cd97-6b91-4b87-b3a0-c790e7f13f94",
+    "identifier": "PIX-474",
+    "title": "*27.3 Property test \u2014 crisis resource score (Prop 4)",
+    "description": "Run ingestion on Tier 3 channels (general wellness / entertainment):\n\n* Jay Shetty, Mel Robbins, Theo Von, Big Think, TEDx Talks, etc.\n* Run ingestion on German channels with `--german_channels` flag:\n* ARTEde, DW Deutsch, Kaltbl\u00fctig, Klein aber Hannah, SWR Doku, WDR, Y-Kollektiv, ZDF MAGAZIN ROYALE, ZDFheute Nachrichten, rbb Doku, hunds-kompetent Karin Actun\n* These produce `\"language\": \"de\"` tagged samples \u2014 NOT mixed into English training set\n* Review output quality\n\n***Jira:*** [ADHD-240](<https://russianvodka.atlassian.net/browse/ADHD-240>) (migrated from slimshadyme [PIX-303](https://linear.app/pixelated/issue/PIX-303/workstream-d-define-training-ready-packaging-and-automation-plan))\n\n<!-- pixelated-sync\nkey: 11-0-execute-youtube-ingestion-tier-3-channels\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 99cab6dc-bad9-4e89-b5e4-5924315f5334\njira: ADHD-870\nlinear: 99cab6dc-bad9-4e89-b5e4-5924315f5334\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-21T21:31:25.210Z",
+    "createdAt": "2026-04-29T14:13:30.936Z"
+  },
+  {
+    "id": "9d4bc08a-f69b-4540-95ca-08dd4eabeaba",
+    "identifier": "PIX-473",
+    "title": "*27.2 Property test \u2014 unsafe response safety score (Prop 3)",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 27.2 (Property test \u2014 unsafe response safety score (Prop 3)).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 27)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Property test \u2014 unsafe response safety score (Prop 3).\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-473\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] `is_unsafe()` True \u2192 `_safety_score()` == 0.0, composite \u2264 empathy_weight + crisis_weight\n\n<!-- pixelated-sync\nkey: 27-2-property-test-unsafe-response-safety-score-prop-3\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: 9d4bc08a-f69b-4540-95ca-08dd4eabeaba\nasana: 1215187161140286\nbeads: foresight-mcp-hma\ngithub: 2018\njira: ADHD-450\nlinear: 9d4bc08a-f69b-4540-95ca-08dd4eabeaba\nupdated-at: 2026-05-27T19:08:18.487000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+      "name": "In Progress",
+      "type": "started"
+    },
+    "updatedAt": "2026-05-27T21:30:31.433Z",
+    "createdAt": "2026-04-29T14:13:29.604Z"
+  },
+  {
+    "id": "d7e65c82-df20-4723-b929-fa1121ba5bd2",
+    "identifier": "PIX-472",
+    "title": "*27.1 Property test \u2014 reward score range (Prop 2)",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 27.1 (Property test \u2014 reward score range (Prop 2)).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 27)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Property test \u2014 reward score range (Prop 2).\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-472\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] `st.text()` \u2192 assert `score()` and sub-scores in \\[0.0, 1.0\\]\n\n<!-- pixelated-sync\nkey: 1-1-property-test-token-length-stats-correctness-prop-6\nstatus: in_progress\nsource-provider: linear\nsource-id: d7e65c82-df20-4723-b929-fa1121ba5bd2\nasana: 1215187201243440\nbeads: foresight-mcp-chf\ngithub: 1192\njira: ADHD-2920\nlinear: d7e65c82-df20-4723-b929-fa1121ba5bd2\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+      "name": "In Progress",
+      "type": "started"
+    },
+    "updatedAt": "2026-05-31T15:25:06.436Z",
+    "createdAt": "2026-04-29T14:13:28.125Z"
+  },
+  {
+    "id": "7bcbd27b-7fa6-45a8-aced-e7b5f1122711",
+    "identifier": "PIX-471",
+    "title": "27.0 Implement GRPO trainer and reward function",
+    "description": "```\n  1. 1\\. Task Overview\n```\n\nThis task represents a core pipeline enhancement or feature implementation item: ***\\[Checkmate\\] Submit audit package to security auditor***. The target is to design, implement, and document the specified capability, ensuring it integrates cleanly with the existing codebase and conforms to our performance, security, and styling guidelines.\n\n```\n  1. 1\\. Implementation Checklist\n```\n\n1. Review existing code patterns and documentation in the relevant modules.\n2. Implement the designated feature or process upgrade.\n3. Validate functionality through thorough unit tests and manual execution.\n4. Update inline comments and external README logs where appropriate.\n\n---\n\n***Historical Context: Migrated from*** [PIX-359](https://linear.app/pixelated/issue/PIX-359/build-cli-for-memory-operations) ***(Source Priority: Medium, Source Status: To)***\n\n<!-- pixelated-sync\nkey: checkmate-submit-audit-package-to-security-auditor\nstatus: closed\nsource-provider: linear\nsource-id: 7bcbd27b-7fa6-45a8-aced-e7b5f1122711\nasana: 1215187299807429\nbeads: foresight-mcp-ad9\ngithub: 2094\njira: TPI-98\nlinear: 7bcbd27b-7fa6-45a8-aced-e7b5f1122711\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T15:26:44.689Z",
+    "createdAt": "2026-04-29T14:13:26.525Z"
+  },
+  {
+    "id": "37bcbb71-4a2a-4551-a2a2-1b01c850faed",
+    "identifier": "PIX-470",
+    "title": "26.0 Checkpoint \u2014 Phase 4 complete",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 26.0 (Checkpoint \u2014 Phase 4 complete).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 26)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Checkpoint \u2014 Phase 4 complete.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-470\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] DPO trainer functional with synthetic 50-sample test\n- [ ] Ready to run on real 10K DPO pairs from Phase 3\n\n<!-- pixelated-sync\nkey: pix-470\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 37bcbb71-4a2a-4551-a2a2-1b01c850faed\nasana: 1215187270828083\nbeads: foresight-mcp-z2b5\ngithub: 2381\njira: ADHD-1781\nlinear: 37bcbb71-4a2a-4551-a2a2-1b01c850faed\nupdated-at: 2026-05-27T19:09:20.323000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:05.952Z",
+    "createdAt": "2026-04-29T14:13:25.143Z"
+  },
+  {
+    "id": "20926591-8da0-4385-847a-a519bf747a13",
+    "identifier": "PIX-469",
+    "title": "25.0 Integration test \u2014 DPO end-to-end",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 25.0 (Integration test \u2014 DPO end-to-end).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 25)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Integration test \u2014 DPO end-to-end.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-469\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Run DPO trainer with 50-sample preference dataset (mocked model loading)\n- [ ] Verify final adapter saved, metrics JSON written, all logs present\n\n<!-- pixelated-sync\nkey: pix-469\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 20926591-8da0-4385-847a-a519bf747a13\nasana: 1215187364208858\nbeads: foresight-mcp-p4tx\ngithub: 2379\njira: ADHD-1778\nlinear: 20926591-8da0-4385-847a-a519bf747a13\nupdated-at: 2026-05-27T19:09:19.997000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:06.802Z",
+    "createdAt": "2026-04-29T14:13:23.744Z"
+  },
+  {
+    "id": "d1e6e313-ed2d-4969-adcc-8a95e8d2d77e",
+    "identifier": "PIX-467",
+    "title": "*24.2 Unit tests for dpo_trainer.py",
+    "description": "### Objective\n\nWrite comprehensive unit tests for ***dpo_trainer.py*** to achieve near 100% test coverage. Standardizing our testing infrastructure ensures early bug detection and stable releases.\n\n### Verification Plan\n\n1. Mock external dependencies to keep tests fast, isolated, and predictable.\n2. Cover happy-path scenarios, boundary conditions, and expected error states.\n3. Assert correct handling of exceptions, type validations, and return values.\n4. Verify tests pass consistently across local and remote pipeline environments.\n\n---\n\n**Historical Context: Migrated from PIX-330 (Source Priority: Medium, Source Status: Done)**\n\n<!-- pixelated-sync\nkey: 24-2-unit-tests-for-dpo-trainer-py\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: d1e6e313-ed2d-4969-adcc-8a95e8d2d77e\nasana: 1215187160759995\nbeads: foresight-mcp-xmi\ngithub: 2013\njira: ADHD-445\nlinear: d1e6e313-ed2d-4969-adcc-8a95e8d2d77e\nupdated-at: 2026-05-27T19:08:17.857000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:57.413Z",
+    "createdAt": "2026-04-29T14:10:20.525Z"
+  },
+  {
+    "id": "e31ad268-bee2-40fe-8c7c-0661e86d2591",
+    "identifier": "PIX-466",
+    "title": "*24.1 Property test \u2014 DPO safety filter (Prop 1)",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 24.1 (Property test \u2014 DPO safety filter (Prop 1)).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 24)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Property test \u2014 DPO safety filter (Prop 1).\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-466\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Mixed safe/unsafe chosen/rejected \u2192 no unsafe sample remains\n\n<!-- pixelated-sync\nkey: 24-1-property-test-dpo-safety-filter-prop-1\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: e31ad268-bee2-40fe-8c7c-0661e86d2591\nasana: 1215187201315797\nbeads: foresight-mcp-kb5\ngithub: 2012\njira: ADHD-1630\nlinear: e31ad268-bee2-40fe-8c7c-0661e86d2591\nupdated-at: 2026-05-27T19:08:18.235000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T21:33:42.515Z",
+    "createdAt": "2026-04-29T14:10:18.671Z"
+  },
+  {
+    "id": "2c3c9a9c-c31e-4731-8e57-e35182c02c49",
+    "identifier": "PIX-465",
+    "title": "24.0 Implement DPO trainer",
+    "description": "Create `ai/training/dpo_trainer.py` with CLI args: `--data_path`, `--base_model_checkpoint`, `--output_dir`, `--beta` (0.1), `--max_seq_length` (512-8192), plus shared LoRA/training args via `add_lora_args()`\n\n* `load_preference_dataset()`: load JSONL, apply safety filter to chosen/rejected, log skipped at DEBUG, log token length distribution for both fields, raise `ValueError` if < 20 samples\n* Load model with `shared_qlora_config()`, build LoRA with `build_lora_config()`\n* `DPOTrainer` with `CheckpointVerificationCallback`\n* Log: training loss, `chosen_rewards/mean`, `rejected_rewards/mean` at `--logging_steps`\n* Save to `{output_dir}/final_model/` + metrics JSON\n\n**Reqs**: 1.1\u20131.9, 3.5, 4.4\n\n**Jira:** [ADHD-265](<https://russianvodka.atlassian.net/browse/ADHD-265>) (migrated from slimshadyme PIX-326)\n\n<!-- pixelated-sync\nkey: 24-0-implement-dpo-trainer\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 2c3c9a9c-c31e-4731-8e57-e35182c02c49\nasana: 1215187218066032\nbeads: foresight-mcp-dfo\ngithub: 2010\njira: ADHD-443\nlinear: 2c3c9a9c-c31e-4731-8e57-e35182c02c49\nupdated-at: 2026-05-27T19:08:17.531000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:55.696Z",
+    "createdAt": "2026-04-29T14:10:16.029Z"
+  },
+  {
+    "id": "79c3628a-2d20-4872-8cfd-cac2cea7dcba",
+    "identifier": "PIX-464",
+    "title": "23.0 Checkpoint \u2014 Phase 3 complete",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 23.0 (Checkpoint \u2014 Phase 3 complete).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 23)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Checkpoint \u2014 Phase 3 complete.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-464\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* **Source File**: \\[data_audit.py\\](file:///home/vivi/pixelated/data_audit.py)\n\n### Verification & Testing Checklist\n\n- [ ] All Phase 3 tests pass\n- [ ] DPO pairs: 10K+ generated and verified\n- [ ] Niche categories: all 10 at 500+ samples each\n- [ ] Nightmare fuel: 5,000 real samples, balanced across 8 types\n- [ ] Full corpus deduplicated and ChatML-verified\n- [ ] `data_audit.py` confirms all gaps addressed\n\n<!-- pixelated-sync\nkey: pix-464\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 79c3628a-2d20-4872-8cfd-cac2cea7dcba\nasana: 1215187271286397\nbeads: foresight-mcp-5muy\ngithub: 2377\njira: ADHD-1776\nlinear: 79c3628a-2d20-4872-8cfd-cac2cea7dcba\nupdated-at: 2026-05-27T19:09:19.716000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:09.741Z",
+    "createdAt": "2026-04-29T14:10:14.449Z"
+  },
+  {
+    "id": "9f8432bc-26dc-486c-b597-d40a9a4933f2",
+    "identifier": "PIX-463",
+    "title": "\u202122.0 Run dedup + normalize on full corpus",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 22.0 (\u2021 Run dedup + normalize on full corpus).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 22)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: \u2021 Run dedup + normalize on full corpus.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-463\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* **Source File**: \\[dedup_normalize.py\\](file:///home/vivi/pixelated/dedup_normalize.py)\n* **Source File**: \\[normalization_report.json\\](file:///home/vivi/pixelated/normalization_report.json)\n\n### Verification & Testing Checklist\n\n- [ ] Run `dedup_normalize.py` on ALL training data directories:\n- [ ] S3 final_dataset shards (2.2M samples)\n- [ ] YouTube ingestion output (Phase 2)\n- [ ] Book conversion output (Phase 2)\n- [ ] SDG-generated DPO pairs, niche categories, nightmare fuel (Phase 3)\n- [ ] Verify `normalization_report.json`: total samples in, duplicates removed, ChatML failures, edge cases preserved, total samples out\n- [ ] Verify rejection log \u2014 investigate any unexpected ChatML failures\n- [ ] Output: clean, deduplicated, ChatML-verified sharded JSONL ready for training\n\n<!-- pixelated-sync\nkey: 22-0-run-dedup-normalize-on-full-corpus\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 9f8432bc-26dc-486c-b597-d40a9a4933f2\nasana: 1215187160983807\nbeads: foresight-mcp-sqn\ngithub: 1722\njira: ADHD-1629\nlinear: 9f8432bc-26dc-486c-b597-d40a9a4933f2\nupdated-at: 2026-05-27T19:08:17Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+      "name": "Backlog",
+      "type": "backlog"
+    },
+    "updatedAt": "2026-05-27T21:33:28.085Z",
+    "createdAt": "2026-04-29T14:10:12.835Z"
+  },
+  {
+    "id": "83e2afd3-0d1b-439d-8498-5aa479dafc80",
+    "identifier": "PIX-462",
+    "title": "\u202121.0 Generate nightmare fuel data (5,000)",
+    "description": "Run: `python ai/training/sdg_pipeline.py --scenario nightmare_fuel --target_count 5000 --output_path ai/training/data/generated/nightmare_fuel.jsonl`\n\nVerify 8 scenario types are balanced (\u226425% each = 625 max per type):\n\n* Active suicidal ideation with plan\n* Active self-harm disclosure\n* Psychotic episodes\n* Severe dissociation mid-session\n* Client threatening harm to others\n* Manipulation / boundary-testing\n* Crisis escalation sequences\n* Treatment refusal\n* Spot-check 50 samples: each has crisis expression in prompt + correct protocol in response + crisis resource citation\n* Verify all samples tagged `is_training_edge_case: true`\n\n**Addresses**: 100 stubs \u2192 5,000 real samples (Req 13)\n\n**Jira:** [ADHD-264](<https://russianvodka.atlassian.net/browse/ADHD-264>) (migrated from slimshadyme PIX-325)\n\n<!-- pixelated-sync\nkey: 21-0-generate-nightmare-fuel-data-5-000\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 83e2afd3-0d1b-439d-8498-5aa479dafc80\nasana: 1215187167070983\nbeads: foresight-mcp-ygh\ngithub: 1721\njira: ADHD-1628\nlinear: 83e2afd3-0d1b-439d-8498-5aa479dafc80\nupdated-at: 2026-05-27T19:08:16.623000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:53.196Z",
+    "createdAt": "2026-04-29T14:10:11.112Z"
+  },
+  {
+    "id": "ac8de167-6e15-450c-9927-be8bb76c4ac8",
+    "identifier": "PIX-461",
+    "title": "\u202120.0 Generate niche category data (500 \u00d7 10 categories)",
+    "description": "Generate niche category data \u2014 500 per category \u00d7 10 categories = 5,000 total:\n\n* `--scenario niche_category --category dissociation --target_count 500`\n* `--scenario niche_category --category somatic_therapy --target_count 500`\n* `--scenario niche_category --category attachment_disorders --target_count 500`\n* `--scenario niche_category --category narcissistic_abuse_recovery --target_count 500`\n* `--scenario niche_category --category complicated_grief --target_count 500`\n* `--scenario niche_category --category eating_disorders --target_count 500`\n* `--scenario niche_category --category ocd_intrusive_thoughts --target_count 500`\n* `--scenario niche_category --category personality_disorders --target_count 500`\n* `--scenario niche_category --category neurodivergent_mental_health --target_count 500`\n* `--scenario niche_category --category cultural_religious_contexts --target_count 500`\n* Verify each output JSONL has 500+ samples, quality spot-check per category\n* Run `data_audit.py` \u2014 confirm all categories now \u2265 500\n\n**Addresses**: \\~ZERO niche coverage \u2192 500+ per category (Req 12)\n\n**Jira:** [ADHD-263](<https://russianvodka.atlassian.net/browse/ADHD-263>) (migrated from slimshadyme PIX-324)\n\n<!-- pixelated-sync\nkey: 20-0-generate-niche-category-data-500-10-categories\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: ac8de167-6e15-450c-9927-be8bb76c4ac8\nasana: 1215187201174787\nbeads: foresight-mcp-5iw\ngithub: 1719\njira: ADHD-1627\nlinear: ac8de167-6e15-450c-9927-be8bb76c4ac8\nupdated-at: 2026-05-27T19:08:17.222000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:52.534Z",
+    "createdAt": "2026-04-29T14:10:08.788Z"
+  },
+  {
+    "id": "da6f682a-27bd-4c7f-ba34-5c619b5ab739",
+    "identifier": "PIX-460",
+    "title": "\u202119.0 Generate DPO preference pairs (10,000)",
+    "description": "Run: `python ai/training/sdg_pipeline.py --scenario dpo_preference_pairs --target_count 10000 --output_path ai/training/data/generated/dpo_pairs.jsonl`\n\n* Verify `generation_report.json` \u2014 generated count, filter rate\n* Spot-check 50 pairs: chosen demonstrates correct protocol, rejected is clinically inferior but plausible\n* Verify format matches `dpo_trainer.py` `load_preference_dataset()` expectations\n\n**Addresses**: 197KB \u2192 10K+ pairs (Req 6.2)\n\n**Jira:** [ADHD-262](<https://russianvodka.atlassian.net/browse/ADHD-262>) (migrated from slimshadyme PIX-323)\n\n<!-- pixelated-sync\nkey: 19-0-generate-dpo-preference-pairs-10-000\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: da6f682a-27bd-4c7f-ba34-5c619b5ab739\nasana: 1215187161546363\nbeads: foresight-mcp-mjr\ngithub: 1216\njira: ADHD-1623\nlinear: da6f682a-27bd-4c7f-ba34-5c619b5ab739\nupdated-at: 2026-05-27T19:08:13.309000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:49.310Z",
+    "createdAt": "2026-04-29T14:10:07.353Z"
+  },
+  {
+    "id": "7abb3555-58ec-45ea-ab4c-a222ef7df10b",
+    "identifier": "PIX-459",
+    "title": "*18.4 Unit tests for sdg_pipeline.py",
+    "description": "Unit tests for `ai/training/sdg_pipeline.py`:\n\n* `niche_category` without `--category` \u2192 argparse error\n* NeMo API error \u2192 log, partial results, exit 1\n* `max_iterations` hit \u2192 warning, partial results, exit 0\n* `generation_report.json` has all six fields\n\n**Jira:** [ADHD-261](<https://russianvodka.atlassian.net/browse/ADHD-261>) (migrated from slimshadyme PIX-322)\n\n<!-- pixelated-sync\nkey: 18-4-unit-tests-for-sdg-pipeline-py\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 7abb3555-58ec-45ea-ab4c-a222ef7df10b\nasana: 1215187161338335\nbeads: foresight-mcp-g2y\ngithub: 2001\njira: ADHD-1622\nlinear: 7abb3555-58ec-45ea-ab4c-a222ef7df10b\nupdated-at: 2026-05-27T19:08:12.901000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:48.458Z",
+    "createdAt": "2026-04-29T14:10:05.931Z"
+  },
+  {
+    "id": "add2b709-f533-4016-bab0-20888234684e",
+    "identifier": "PIX-458",
+    "title": "*18.3 Property test \u2014 non-nightmare safety filtering (Prop 12)",
+    "description": "Property test \u2014 non-nightmare safety filtering (Prop 12):\n\n* Unsafe output excluded for `dpo_preference_pairs` and `niche_category`\n\n**Correctness Property**: Prop 12 \u2014 Non-nightmare SDG output is safety-filtered\n\n**Jira:** [ADHD-260](<https://russianvodka.atlassian.net/browse/ADHD-260>) (migrated from slimshadyme PIX-321)\n\n<!-- pixelated-sync\nkey: 18-3-property-test-non-nightmare-safety-filtering-prop-12\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: add2b709-f533-4016-bab0-20888234684e\nasana: 1215187252019686\nbeads: foresight-mcp-26v\ngithub: 2000\njira: ADHD-1621\nlinear: add2b709-f533-4016-bab0-20888234684e\nupdated-at: 2026-05-27T19:08:12.643000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:47.932Z",
+    "createdAt": "2026-04-29T14:10:04.293Z"
+  },
+  {
+    "id": "b055bd73-7598-4df6-96af-e462e7250ea7",
+    "identifier": "PIX-457",
+    "title": "*18.2 Property test \u2014 nightmare fuel tagging (Prop 11)",
+    "description": "Property test \u2014 nightmare fuel tagging (Prop 11):\n\n* Assert `is_training_edge_case == True` + output contains crisis resource\n\n**Correctness Property**: Prop 11 \u2014 Nightmare fuel samples are tagged and contain crisis resources\n\n**Jira:** [ADHD-259](<https://russianvodka.atlassian.net/browse/ADHD-259>) (migrated from slimshadyme PIX-320)\n\n<!-- pixelated-sync\nkey: 18-2-property-test-nightmare-fuel-tagging-prop-11\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: b055bd73-7598-4df6-96af-e462e7250ea7\nasana: 1215187251698053\nbeads: foresight-mcp-z5s\ngithub: 1999\njira: ADHD-1620\nlinear: b055bd73-7598-4df6-96af-e462e7250ea7\nupdated-at: 2026-05-27T19:08:12.182000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:47.670Z",
+    "createdAt": "2026-04-29T14:05:55.731Z"
+  },
+  {
+    "id": "1734f5d0-daff-477f-9c83-3fc15bcc153d",
+    "identifier": "PIX-456",
+    "title": "*18.1 Property test \u2014 DPO output field completeness (Prop 10)",
+    "description": "Property test \u2014 DPO output field completeness (Prop 10):\n\n* Assert `prompt`, `chosen`, `rejected` all non-empty\n\n**Correctness Property**: Prop 10 \u2014 DPO preference pairs have all required fields populated\n\n**Jira:** [ADHD-257](<https://russianvodka.atlassian.net/browse/ADHD-257>) (migrated from slimshadyme PIX-319)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-17T19:52:00.952Z",
+    "createdAt": "2026-04-29T14:05:54.289Z"
+  },
+  {
+    "id": "397d514b-1b10-4107-a986-d862a511fc66",
+    "identifier": "PIX-455",
+    "title": "18.0 Implement SDG pipeline",
+    "description": "Create `ai/training/sdg_pipeline.py` with CLI args: `--scenario`, `--target_count`, `--output_path`, `--category`, `--max_iterations` (10), `--nemo_api_key`, `--nemo_endpoint`\n\nIterative generate \u2192 filter \u2192 evaluate loop; re-generate filtered samples until target or `max_iterations`:\n\n* `dpo_preference_pairs`: `{prompt, chosen, rejected}` \u2014 chosen = correct protocol, rejected = plausible but clinically inferior\n* `niche_category`: requires `--category`; generates `{instruction, output}` grounded in category's clinical patterns\n* `nightmare_fuel`: crisis expressions in prompt; `is_training_edge_case: true` tag; response must include crisis resource (988/741741/findahelpline/emergency services/911/999/112)\n* Safety filter on output for `dpo_preference_pairs` and `niche_category`; **exempt** `nightmare_fuel`\n* `generation_report.json` with scenario, target, generated, filtered, filter_rate, timestamp\n* NeMo API error: log context, write partial results, exit non-zero\n\n**Reqs**: 6.1\u20136.8\n**Data gaps addressed**: 197KB DPO pairs (need 10K+), \\~ZERO niche category data (need 500+ each), 100 nightmare fuel stubs (need 5,000 real)\n\n**Jira:** [ADHD-256](<https://russianvodka.atlassian.net/browse/ADHD-256>) (migrated from slimshadyme PIX-318)\n\n<!-- pixelated-sync\nkey: 18-0-implement-sdg-pipeline\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 397d514b-1b10-4107-a986-d862a511fc66\nasana: 1215187161320675\nbeads: foresight-mcp-sjp\ngithub: 1997\njira: ADHD-1618\nlinear: 397d514b-1b10-4107-a986-d862a511fc66\nupdated-at: 2026-05-27T19:08:11.489000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:47.198Z",
+    "createdAt": "2026-04-29T14:05:52.729Z"
+  },
+  {
+    "id": "3130adac-76dc-4d3d-a3bd-40f625bccf9a",
+    "identifier": "PIX-454",
+    "title": "17.0 Checkpoint \u2014 Phase 2 complete",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 17.0 (Checkpoint \u2014 Phase 2 complete).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 17)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Checkpoint \u2014 Phase 2 complete.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-454\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* **Source File**: \\[data_audit.py\\](file:///home/vivi/pixelated/data_audit.py)\n\n### Verification & Testing Checklist\n\n- [ ] All Phase 2 tests pass\n- [ ] All broken pipeline files deleted\n- [ ] YouTube ingestion run on all 91 channels (3 tiers)\n- [ ] All \\~50 books converted with quality verification\n- [ ] Compiled corpus verified free of garbage book data contamination\n- [ ] `data_audit.py` reports current category counts \u2014 identify exact gaps for Phase 3\n\n<!-- pixelated-sync\nkey: pix-454\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: 3130adac-76dc-4d3d-a3bd-40f625bccf9a\nasana: 1215187397217063\nbeads: foresight-mcp-8awj\ngithub: 2376\njira: ADHD-1775\nlinear: 3130adac-76dc-4d3d-a3bd-40f625bccf9a\nupdated-at: 2026-05-27T19:09:19.355000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:11.688Z",
+    "createdAt": "2026-04-29T14:05:50.302Z"
+  },
+  {
+    "id": "3b7da812-82e4-4e7e-81cc-a11c70310104",
+    "identifier": "PIX-453",
+    "title": "*16.1 Unit tests for data_audit.py",
+    "description": "Unit tests for `ai/training/data_audit.py`:\n\n* Test with empty directory \u2192 zero counts, no crash\n* Test with known dataset \u2192 correct per-category counts\n* Test threshold flagging \u2192 categories below 500 flagged\n\n**Jira:** [ADHD-254](<https://russianvodka.atlassian.net/browse/ADHD-254>) (migrated from slimshadyme PIX-316)\n\n<!-- pixelated-sync\nkey: 16-1-unit-tests-for-data-audit-py\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 3b7da812-82e4-4e7e-81cc-a11c70310104\nasana: 1215187161359830\nbeads: foresight-mcp-9ct\ngithub: 1993\njira: ADHD-1617\nlinear: 3b7da812-82e4-4e7e-81cc-a11c70310104\nupdated-at: 2026-05-27T19:08:10.887000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:45.433Z",
+    "createdAt": "2026-04-29T14:05:48.667Z"
+  },
+  {
+    "id": "613e1692-40f5-4deb-ad05-234d7a000854",
+    "identifier": "PIX-452",
+    "title": "16.0 Implement data audit script",
+    "description": "Create `ai/training/data_audit.py` with CLI args for input dataset directories + configurable per-category threshold (default 500):\n\n* Report per-category sample counts across all input JSONL files\n* Flag categories below threshold with clear warning\n* Output categories covered: General counseling, addiction, personality disorders, CPTSD/trauma, crisis/edge cases, long-running therapy, voice persona, roleplay, DPO pairs, niche categories (dissociation, somatic, attachment, narcissistic abuse recovery, grief, eating disorders, OCD, BPD/NPD/HPD, neurodivergent, cultural/religious), clinical literature, YouTube transcripts\n\n**Req**: 12.5\n\n**Jira:** [ADHD-253](<https://russianvodka.atlassian.net/browse/ADHD-253>) (migrated from slimshadyme PIX-315)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-17T19:52:09.714Z",
+    "createdAt": "2026-04-29T14:05:47.050Z"
+  },
+  {
+    "id": "b37400f5-b8b3-40aa-b458-8f0fa1c7a7aa",
+    "identifier": "PIX-451",
+    "title": "*15.4 Unit tests for dedup_normalize.py",
+    "description": "Unit tests for `ai/training/dedup_normalize.py`:\n\n* Unreadable input JSONL \u2192 skip, log error, not crash\n* Output shard write failure \u2192 raise (data integrity critical)\n* `normalization_report.json` has all five required fields\n* Rejection log written for ChatML failures\n\n**Jira:** [ADHD-252](<https://russianvodka.atlassian.net/browse/ADHD-252>) (migrated from slimshadyme PIX-314)\n\n<!-- pixelated-sync\nkey: 15-4-unit-tests-for-dedup-normalize-py\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: b37400f5-b8b3-40aa-b458-8f0fa1c7a7aa\nasana: 1215187073677331\nbeads: foresight-mcp-9ew\ngithub: 1994\njira: ADHD-1616\nlinear: b37400f5-b8b3-40aa-b458-8f0fa1c7a7aa\nupdated-at: 2026-05-27T19:08:09.898000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:43.687Z",
+    "createdAt": "2026-04-29T14:05:45.191Z"
+  },
+  {
+    "id": "bc730a67-581c-400c-9a84-7eb62ce336e6",
+    "identifier": "PIX-450",
+    "title": "*15.3 Property test \u2014 edge case preservation (Prop 22)",
+    "description": "Property test \u2014 edge case preservation (Prop 22):\n\n* `is_training_edge_case: True` samples preserved even with near-duplicates\n\n**Correctness Property**: Prop 22 \u2014 Edge case samples are never deduplicated away\n\n**Jira:** [ADHD-251](<https://russianvodka.atlassian.net/browse/ADHD-251>) (migrated from slimshadyme PIX-313)\n\n<!-- pixelated-sync\nkey: 15-3-property-test-edge-case-preservation-prop-22\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: bc730a67-581c-400c-9a84-7eb62ce336e6\nasana: 1215187201644019\nbeads: foresight-mcp-mos\ngithub: 1205\njira: ADHD-1615\nlinear: bc730a67-581c-400c-9a84-7eb62ce336e6\nupdated-at: 2026-05-27T19:08:09.662000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:41.157Z",
+    "createdAt": "2026-04-29T14:05:42.884Z"
+  },
+  {
+    "id": "b1edc8c6-276a-4c30-b2c0-273f68678f24",
+    "identifier": "PIX-449",
+    "title": "*15.2 Property test \u2014 ChatML boundary verification (Prop 21)",
+    "description": "Property test \u2014 ChatML boundary verification (Prop 21):\n\n* All output samples pass `verify_chatml_boundary()`\n\n**Correctness Property**: Prop 21 \u2014 All output samples have valid \\[/INST\\] boundary\n\n**Jira:** [ADHD-250](<https://russianvodka.atlassian.net/browse/ADHD-250>) (migrated from slimshadyme PIX-312)\n\n<!-- pixelated-sync\nkey: 15-2-property-test-chatml-boundary-verification-prop-21\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: b1edc8c6-276a-4c30-b2c0-273f68678f24\nasana: 1215187167905023\nbeads: foresight-mcp-8uz\ngithub: 1988\njira: ADHD-1614\nlinear: b1edc8c6-276a-4c30-b2c0-273f68678f24\nupdated-at: 2026-05-27T19:08:10.513000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:39.710Z",
+    "createdAt": "2026-04-29T14:05:41.206Z"
+  },
+  {
+    "id": "2380f075-4479-4f19-b916-ecd477297b16",
+    "identifier": "PIX-448",
+    "title": "*15.1 Property test \u2014 near-duplicate removal (Prop 20)",
+    "description": "Property test \u2014 near-duplicate removal (Prop 20):\n\n* Jaccard > 0.85 \u2192 at most one sample in output\n\n**Correctness Property**: Prop 20 \u2014 Near-duplicates are collapsed to single sample\n\n**Jira:** [ADHD-249](<https://russianvodka.atlassian.net/browse/ADHD-249>) (migrated from slimshadyme PIX-311)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-17T19:52:13.709Z",
+    "createdAt": "2026-04-29T14:02:00.276Z"
+  },
+  {
+    "id": "65177bad-ee79-4e19-be01-29471e9b8979",
+    "identifier": "PIX-447",
+    "title": "15.0 Implement deduplication and ChatML normalization pipeline",
+    "description": "Create `ai/training/dedup_normalize.py` with CLI args: `--input_dirs`, `--output_dir`, `--model_name`, `--jaccard_threshold` (0.85), `--shard_size` (10000), `--rejection_log`\n\n* Content hash (SHA-256) for exact dedup\n* Jaccard similarity on token sets for near-dedup (threshold configurable)\n* Preserve `is_training_edge_case: true` samples \u2014 do NOT pass through safety checker\n* Verify `[/INST]` boundary via `tokenizer.apply_chat_template()`\n* Attempt reformatting on ChatML failure; write unreformattable to rejection log\n* Write sharded JSONL output + `normalization_report.json`\n\n**Reqs**: 11.1\u201311.6\n**Data gap addressed**: No dedup or ChatML format verification exists\n\n**Jira:** [ADHD-248](<https://russianvodka.atlassian.net/browse/ADHD-248>) (migrated from slimshadyme PIX-310)\n\n<!-- pixelated-sync\nkey: 15-0-implement-deduplication-and-chatml-normalization-pipeline\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 65177bad-ee79-4e19-be01-29471e9b8979\nasana: 1215187217338507\nbeads: foresight-mcp-2vc\ngithub: 1990\njira: ADHD-1612\nlinear: 65177bad-ee79-4e19-be01-29471e9b8979\nupdated-at: 2026-05-27T19:08:09.408000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:37.875Z",
+    "createdAt": "2026-04-29T14:01:58.829Z"
+  },
+  {
+    "id": "eb8bb194-223f-4d59-9068-ba53afb74a5f",
+    "identifier": "PIX-446",
+    "title": "\u202114.0 Execute book conversion \u2014 remaining titles",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 14.0 (\u2021 Execute book conversion \u2014 remaining titles).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 14)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: \u2021 Execute book conversion \u2014 remaining titles.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-446\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n* **Source File**: \\[conversion_report.json\\](file:///home/vivi/pixelated/conversion_report.json)\n\n### Verification & Testing Checklist\n\n- [ ] Convert remaining \\~44 books and PDFs from the GDrive archive\n- [ ] Verify conversion quality across all titles\n- [ ] Review `conversion_report.json` for skipped books and reasons\n\n<!-- pixelated-sync\nkey: pix-446\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: eb8bb194-223f-4d59-9068-ba53afb74a5f\nasana: 1215187301588990\nbeads: foresight-mcp-bfs0\ngithub: 2375\njira: ADHD-1774\nlinear: eb8bb194-223f-4d59-9068-ba53afb74a5f\nupdated-at: 2026-05-27T19:09:18.957000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:20.926Z",
+    "createdAt": "2026-04-29T14:01:57.567Z"
+  },
+  {
+    "id": "ae25cd39-18c6-4ff9-82cc-39c68093c388",
+    "identifier": "PIX-445",
+    "title": "\u202113.0 Execute book conversion \u2014 priority titles",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 13.0 (\u2021 Execute book conversion \u2014 priority titles).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 13)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: \u2021 Execute book conversion \u2014 priority titles.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-445\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Convert high-priority clinical books:\n- [ ] DSM-V (19.1MB, 3 copies \u2014 use best quality copy)\n- [ ] Complex PTSD: From Surviving to Thriving \u2014 Pete Walker (668KB)\n- [ ] Internal Family Systems Therapy \u2014 Richard C. Schwartz (440KB)\n- [ ] The High Conflict Couple (DBT Guide) \u2014 Fruzzetti (831KB)\n- [ ] Treating PTSD in Military Personnel (2.3MB)\n- [ ] CBT and DBT For Anxiety (182KB + 611KB)\n- [ ] Verify QA pairs are clinically grounded, not verbatim excerpts\n- [ ] Verify DSM-V pairs are clinical knowledge QA, not therapy conversation\n- [ ] Target: \\~6 books producing estimated 500-2000 QA pairs each\n\n<!-- pixelated-sync\nkey: pix-445\nstatus: {'id':*'74b11563-2856-45f3-bcb7-e813702cd73f',*'name':*'backlog',*'type':\\_'backlog'}\nsource-provider: linear\nsource-id: ae25cd39-18c6-4ff9-82cc-39c68093c388\nasana: 1215187363426707\nbeads: foresight-mcp-22ft\ngithub: 2374\njira: ADHD-1772\nlinear: ae25cd39-18c6-4ff9-82cc-39c68093c388\nupdated-at: 2026-05-27T19:09:18.767000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-31T16:31:22.039Z",
+    "createdAt": "2026-04-29T14:01:55.893Z"
+  },
+  {
+    "id": "adc177d1-cc7f-4fe6-960d-21f3fd36c69e",
+    "identifier": "PIX-444",
+    "title": "*12.3 Unit tests for book_pdf_converter.py",
+    "description": "Unit tests for `ai/training/book_pdf_converter.py`:\n\n* Corrupted PDF \u2192 logged, skipped, not crash\n* Corrupted EPUB \u2192 logged, skipped, not crash\n* DSM title detection \u2192 routes to clinical-knowledge QA format\n* `conversion_report.json` has all required fields\n\n**Jira:** [ADHD-244](<https://russianvodka.atlassian.net/browse/ADHD-244>) (migrated from slimshadyme PIX-307)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-17T19:52:17.524Z",
+    "createdAt": "2026-04-29T14:01:54.493Z"
+  },
+  {
+    "id": "e2493ad6-3b30-412b-8b5d-625fd80ed0f9",
+    "identifier": "PIX-443",
+    "title": "*12.2 Property test \u2014 book conversion safety filtering (Prop 19)",
+    "description": "Property test \u2014 book conversion safety filtering (Prop 19):\n\n* Assert unsafe output pairs excluded\n\n**Correctness Property**: Prop 19 \u2014 Unsafe book-derived content is filtered\n\n**Jira:** [ADHD-243](<https://russianvodka.atlassian.net/browse/ADHD-243>) (migrated from slimshadyme PIX-306)\n\n<!-- pixelated-sync\nkey: 12-2-property-test-book-conversion-safety-filtering-prop-19\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: e2493ad6-3b30-412b-8b5d-625fd80ed0f9\nasana: 1215187251068347\nbeads: foresight-mcp-blx\ngithub: 1699\njira: ADHD-1609\nlinear: e2493ad6-3b30-412b-8b5d-625fd80ed0f9\nupdated-at: 2026-05-27T19:08:05.253000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:35.151Z",
+    "createdAt": "2026-04-29T14:01:53.177Z"
+  },
+  {
+    "id": "c4240846-0246-4e95-a6c2-15e39bcb750e",
+    "identifier": "PIX-442",
+    "title": "*12.1 Property test \u2014 book conversion metadata (Prop 18)",
+    "description": "Property test \u2014 book conversion metadata (Prop 18):\n\n* Assert `source_book` non-empty, `source_type == \"clinical_literature\"`\n\n**Correctness Property**: Prop 18 \u2014 Book-derived samples have correct metadata\n\n**Jira:** [ADHD-242](<https://russianvodka.atlassian.net/browse/ADHD-242>) (migrated from slimshadyme PIX-305)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:00:30.695Z",
+    "createdAt": "2026-04-29T14:01:51.873Z"
+  },
+  {
+    "id": "e8140428-2f77-4afd-a847-1dc6fa53ec67",
+    "identifier": "PIX-441",
+    "title": "12.0 Implement book and PDF conversion pipeline",
+    "description": "Create `ai/training/book_pdf_converter.py` with CLI args: `--books_dir`, `--output_dir`, `--safety_checker`, `--dsm_titles`\n\nDependencies: `pypdf` (PDF), `ebooklib` (EPUB), `beautifulsoup4` (HTML cleaning)\n\n* Extract text \u2192 `{instruction, output}` QA pairs\n* **Outputs must NOT be verbatim excerpts** \u2014 paraphrased or reformatted as therapeutic dialogue / clinical explanation\n* Tag each sample: `source_book` + `\"source_type\": \"clinical_literature\"`\n* DSM titles (via `--dsm_titles`) \u2192 clinical knowledge QA format (not therapy conversation)\n* Apply `ClinicalSafetyChecker.is_unsafe()` to all generated pairs\n* Write per-book JSONL + `conversion_report.json`\n\n**Reqs**: 10.1\u201310.6\n**Data gap addressed**: Extraction pipeline broken, zero books converted\n\n**Jira:** [ADHD-241](<https://russianvodka.atlassian.net/browse/ADHD-241>) (migrated from slimshadyme PIX-304)\n\n<!-- pixelated-sync\nkey: 12-0-implement-book-and-pdf-conversion-pipeline\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: e8140428-2f77-4afd-a847-1dc6fa53ec67\nasana: 1215187167824215\nbeads: foresight-mcp-6vo\ngithub: 1373\njira: ADHD-1607\nlinear: e8140428-2f77-4afd-a847-1dc6fa53ec67\nupdated-at: 2026-05-27T19:08:04.669000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:33.918Z",
+    "createdAt": "2026-04-29T14:01:50.003Z"
+  },
+  {
+    "id": "58f14df5-a262-4c36-91cd-6b643b7ddd59",
+    "identifier": "PIX-440",
+    "title": "\u202111.0 Execute YouTube ingestion \u2014 Tier 3 channels",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 11.0 (\u2021 Execute YouTube ingestion \u2014 Tier 3 channels).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 11)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: \u2021 Execute YouTube ingestion \u2014 Tier 3 channels.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-440\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] Run ingestion on Tier 3 channels (general wellness / entertainment):\n- [ ] Jay Shetty, Mel Robbins, Theo Von, Big Think, TEDx Talks, etc.\n- [ ] Run ingestion on German channels with `--german_channels` flag\n- [ ] ARTEde, DW Deutsch, Kaltbl\u00fctig, Klein aber Hannah, SWR Doku, WDR, Y-Kollektiv, ZDF MAGAZIN ROYALE, ZDFheute Nachrichten, rbb Doku, hunds-kompetent Karin Actun\n- [ ] These produce `\"language\": \"de\"` tagged samples \u2014 NOT mixed into English training set\n- [ ] Review output quality\n\n<!-- pixelated-sync\nkey: pix-440\nstatus: open\nsource-provider: linear\nsource-id: 58f14df5-a262-4c36-91cd-6b643b7ddd59\nasana: 1215187397179279\nbeads: foresight-mcp-aq80\ngithub: 2372\njira: TPI-240\nlinear: 58f14df5-a262-4c36-91cd-6b643b7ddd59\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T16:31:22.949Z",
+    "createdAt": "2026-04-29T14:01:47.500Z"
+  },
+  {
+    "id": "232d08ad-28e2-4358-955a-9bafc458814b",
+    "identifier": "PIX-439",
+    "title": "\u202110.0 Execute YouTube ingestion \u2014 Tier 2 channels",
+    "description": "## Status: COMPLETE \u2705\n\nAll 9 remaining Tier 2 channels ingested and voice-analyzed.\nAll 34 profiles enhanced with communication_patterns and tone_characteristics.\n\n### Channel ingestion (9 channels)\n\nEckhart Tolle, Chris Williamson, Psych2Go, Wu Wei Wisdom, Caroline Myss, Rebecca C. Mandeville, Michele Lee Nieves, Sandstone Care, Sounds True\n\n### Results\n\n* 34 voice profiles (was 25)\n* 168 scored conversations\n* Mean clinical validity: 0.8674\n* Pass rate (>=0.5): 97.6%\n\n<!-- pixelated-sync\nkey: 10-0-execute-youtube-ingestion-tier-2-channels\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 232d08ad-28e2-4358-955a-9bafc458814b\nasana: 1215187200695059\nbeads: foresight-mcp-6gs\ngithub: 1983\njira: ADHD-1606\nlinear: 232d08ad-28e2-4358-955a-9bafc458814b\nupdated-at: 2026-05-27T19:08:03.294000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:33.336Z",
+    "createdAt": "2026-04-29T14:01:45.718Z"
+  },
+  {
+    "id": "f744ba5d-dda4-442f-83e3-3776db5eee6f",
+    "identifier": "PIX-438",
+    "title": "\u20219.0 Execute YouTube ingestion \u2014 Tier 1 channels",
+    "description": "Run ingestion on Tier 1 channels (directly therapeutic, highest priority):\n\n* Patrick Teahan (11 files \u2014 narcissistic abuse, CPTSD)\n* DoctorRamani (8 files \u2014 narcissistic personality, abuse recovery)\n* Crappy Childhood Fairy (7 files \u2014 CPTSD, childhood trauma)\n* Therapy in a Nutshell (6 files \u2014 CBT, general therapy skills)\n* Dr. Snipes (6 files \u2014 clinical education, DBT, personality disorders)\n\nAlso:\n\n* Verify Tim Fletcher re-ingestion matches existing profile (consistency check)\n* Review per-channel JSONL quality \u2014 spot check that conversations make clinical sense\n* Target: \\~38 new channel JSONL files produced\n\n**Jira:** [ADHD-238](<https://russianvodka.atlassian.net/browse/ADHD-238>) (migrated from slimshadyme PIX-301)\n\n<!-- pixelated-sync\nkey: 9-0-execute-youtube-ingestion-tier-1-channels\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: f744ba5d-dda4-442f-83e3-3776db5eee6f\nasana: 1215187218195533\nbeads: foresight-mcp-lzk\ngithub: 2045\njira: ADHD-1639\nlinear: f744ba5d-dda4-442f-83e3-3776db5eee6f\nupdated-at: 2026-05-27T19:08:24.947000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:14.805Z",
+    "createdAt": "2026-04-29T13:56:08.816Z"
+  },
+  {
+    "id": "247a206e-54c2-40d2-903b-7bdca3d6ca42",
+    "identifier": "PIX-437",
+    "title": "*8.4 Unit tests for youtube_ingestion.py",
+    "description": "Unit tests for `ai/training/youtube_ingestion.py`:\n\n* Missing channel dir \u2192 logged, added to skipped list, not crash\n* Unreadable transcript \u2192 skipped with warning\n* All samples filtered \u2192 empty JSONL, manifest with `sample_count=0`\n* `processing_report.json` has all required fields\n\n**Jira:** [ADHD-237](<https://russianvodka.atlassian.net/browse/ADHD-237>) (migrated from slimshadyme PIX-300)\n\n<!-- pixelated-sync\nkey: 8-4-unit-tests-for-youtube-ingestion-py\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 247a206e-54c2-40d2-903b-7bdca3d6ca42\nasana: 1215187201689421\nbeads: foresight-mcp-4yf\ngithub: 2043\njira: ADHD-1638\nlinear: 247a206e-54c2-40d2-903b-7bdca3d6ca42\nupdated-at: 2026-05-27T19:08:23.450000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:14.243Z",
+    "createdAt": "2026-04-29T13:56:06.681Z"
+  },
+  {
+    "id": "b8f65e4e-d2e8-4443-a1a7-6de30030678f",
+    "identifier": "PIX-436",
+    "title": "*8.3 Property test \u2014 YouTube dedup (Prop 17)",
+    "description": "Property test \u2014 YouTube dedup (Prop 17):\n\n* Assert content matching compiled dataset hash excluded from output\n\n**Correctness Property**: Prop 17 \u2014 YouTube samples duplicate-compared against compiled dataset\n\n**Jira:** [ADHD-234](<https://russianvodka.atlassian.net/browse/ADHD-234>) (migrated from slimshadyme PIX-299)\n\n<!-- pixelated-sync\nkey: 8-3-property-test-youtube-dedup-prop-17\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: b8f65e4e-d2e8-4443-a1a7-6de30030678f\nasana: 1215187201383402\nbeads: foresight-mcp-h86\ngithub: 2041\njira: ADHD-1637\nlinear: b8f65e4e-d2e8-4443-a1a7-6de30030678f\nupdated-at: 2026-05-27T19:08:23.056000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:12.855Z",
+    "createdAt": "2026-04-29T13:56:05.368Z"
+  },
+  {
+    "id": "a4a36182-17d8-4906-932e-511e54d6f1de",
+    "identifier": "PIX-435",
+    "title": "*8.2 Property test \u2014 YouTube safety filtering (Prop 16)",
+    "description": "Property test \u2014 YouTube safety filtering (Prop 16):\n\n* Assert unsafe transcript content absent from output\n\n**Correctness Property**: Prop 16 \u2014 Unsafe YouTube content is filtered\n\n**Jira:** [ADHD-233](<https://russianvodka.atlassian.net/browse/ADHD-233>) (migrated from slimshadyme PIX-298)\n\n<!-- pixelated-sync\nkey: 8-2-property-test-youtube-safety-filtering-prop-16\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: a4a36182-17d8-4906-932e-511e54d6f1de\nasana: 1215187167912493\nbeads: foresight-mcp-98o\ngithub: 2042\njira: ADHD-1636\nlinear: a4a36182-17d8-4906-932e-511e54d6f1de\nupdated-at: 2026-05-27T19:08:22.752000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:12.273Z",
+    "createdAt": "2026-04-29T13:56:03.616Z"
+  },
+  {
+    "id": "03868cab-19b0-4e2b-be2f-5fdff5823d70",
+    "identifier": "PIX-434",
+    "title": "*8.1 Property test \u2014 YouTube language tagging (Prop 15)",
+    "description": "Property test \u2014 YouTube language tagging (Prop 15):\n\n* `st.sampled_from()` over German channel names \u2192 assert `language == \"de\"`\n\n**Correctness Property**: Prop 15 \u2014 German channels produce de-tagged samples\n\n**Jira:** [ADHD-232](<https://russianvodka.atlassian.net/browse/ADHD-232>) (migrated from slimshadyme PIX-297)\n\n<!-- pixelated-sync\nkey: 8-1-property-test-youtube-language-tagging-prop-15\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 03868cab-19b0-4e2b-be2f-5fdff5823d70\nasana: 1215187252772281\nbeads: foresight-mcp-nhe\ngithub: 2040\njira: ADHD-1635\nlinear: 03868cab-19b0-4e2b-be2f-5fdff5823d70\nupdated-at: 2026-05-27T19:08:22.485000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:11.134Z",
+    "createdAt": "2026-04-29T13:56:01.164Z"
+  },
+  {
+    "id": "3ebb6020-8c02-4a08-8e3b-ad902d1d1a19",
+    "identifier": "PIX-433",
+    "title": "8.0 Implement YouTube transcript ingestion pipeline",
+    "description": "Create `ai/training/youtube_ingestion.py` with CLI args: `--transcripts_dir`, `--output_dir`, `--compiled_dataset_dir`, `--german_channels`, `--safety_checker`\n\n* Read `{transcripts_dir}/{channel_name}/` \u2192 per-channel JSONL with `{instruction, output, language, source_channel}`\n* Tag German channel samples `\"language\": \"de\"`; don't mix into English set\n* Apply `MultilingualSafetyChecker.is_unsafe()` to filter unsafe content\n* Dedup against compiled dataset via SHA-256 content hashing\n* Write `manifest.json` (channel, path, sample count, estimated tokens)\n* Write `processing_report.json` (processed/skipped, totals, filtered count)\n\n**Reqs**: 9.1\u20139.6\n**Data gap addressed**: 90 of 91 YouTube channels unprocessed\n\n**Jira:** [ADHD-231](<https://russianvodka.atlassian.net/browse/ADHD-231>) (migrated from slimshadyme PIX-296)\n\n<!-- pixelated-sync\nkey: 8-0-implement-youtube-transcript-ingestion-pipeline\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 3ebb6020-8c02-4a08-8e3b-ad902d1d1a19\nasana: 1215187200982412\nbeads: foresight-mcp-wj5\ngithub: 2039\njira: ADHD-691\nlinear: 3ebb6020-8c02-4a08-8e3b-ad902d1d1a19\nupdated-at: 2026-05-27T19:08:22.083000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T16:31:27.445Z",
+    "createdAt": "2026-04-29T13:55:59.426Z"
+  },
+  {
+    "id": "df37d9a2-e728-4217-a3da-5f57ea905a5e",
+    "identifier": "PIX-432",
+    "title": "\u20207.0 Verify compiled corpus not contaminated by garbage book data",
+    "description": "Check whether `processed_wisdom_books.jsonl` (420KB garbage) was ingested into any of the 440 training shards in `s3://pixel-data/final_dataset/`:\n\n* If contaminated shards found: identify them, remove from training split, flag for regeneration\n* Log results in data audit report\n\n**Why critical**: The broken book extraction pipeline produced binary garbage (including TurboTax PDF content). If this was ingested into the compiled training corpus, those shards are contaminated and must be excluded or regenerated before any training run.\n\n**Jira:** [ADHD-230](<https://russianvodka.atlassian.net/browse/ADHD-230>) (migrated from slimshadyme PIX-295)\n\n<!-- pixelated-sync\nkey: 7-0-verify-compiled-corpus-not-contaminated-by-garbage-book-data\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: df37d9a2-e728-4217-a3da-5f57ea905a5e\nasana: 1215187161748086\nbeads: foresight-mcp-o4n\ngithub: 2038\njira: ADHD-1634\nlinear: df37d9a2-e728-4217-a3da-5f57ea905a5e\nupdated-at: 2026-05-27T19:08:21.589000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:08.859Z",
+    "createdAt": "2026-04-29T13:55:57.586Z"
+  },
+  {
+    "id": "78565836-f026-4b11-9a87-dcb070e63b33",
+    "identifier": "PIX-431",
+    "title": "\u20206.0 Delete broken pipeline files and garbage data",
+    "description": "Delete broken pipeline files and garbage data:\n\n1. Delete `ai/training/scripts/extract_all_books_to_training.py` (stub \u2014 outputs placeholder)\n2. Delete `ai/training_corpus/extract_pdfs_greedy.py` (broken \u2014 produces binary garbage incl. TurboTax)\n3. Delete `ai/training_corpus/assets/processed_wisdom_books.jsonl` (27 records of garbage: PDF binary, CSS, noise)\n4. Delete `ai/data/cleaned_v3/nightmare_fuel_cleaned.jsonl` (100 stub records with placeholder responses)\n\n**Status note**: Code implementation is complete for the replacement pipelines. The actual file deletion still needs to be executed against the filesystem/S3. Marking as In Progress since the new pipelines exist but the old broken files have not been confirmed deleted yet.\n\n**Jira:** [ADHD-228](<https://russianvodka.atlassian.net/browse/ADHD-228>) (migrated from slimshadyme PIX-293)\n\n<!-- pixelated-sync\nkey: 6-0-delete-broken-pipeline-files-and-garbage-data\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 78565836-f026-4b11-9a87-dcb070e63b33\nasana: 1215187201872203\nbeads: foresight-mcp-wq6\ngithub: 2037\njira: ADHD-689\nlinear: 78565836-f026-4b11-9a87-dcb070e63b33\nupdated-at: 2026-05-27T19:08:21.207000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:08.058Z",
+    "createdAt": "2026-04-29T13:55:56.110Z"
+  },
+  {
+    "id": "80d9eb20-2ee3-4a1b-a87f-833bb31834af",
+    "identifier": "PIX-430",
+    "title": "5.0 Checkpoint \u2014 Phase 1 complete",
+    "description": "Verify all Phase 1 criteria before proceeding to Phase 2:\n\n* All Phase 1 tests pass (`pytest ai/training/tests/test_shared_config.py ai/training/tests/test_multilingual_safety_checker.py -v`)\n* `shared_config.py` imports work from both production and Colab\n* MultilingualSafetyChecker correctly detects crisis in all 5 languages\n\n**Blocks**: All subsequent phases\n\n**Jira:** [ADHD-229](<https://russianvodka.atlassian.net/browse/ADHD-229>) (migrated from slimshadyme PIX-294)\n\n<!-- pixelated-sync\nkey: 5-0-checkpoint-phase-1-complete\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 80d9eb20-2ee3-4a1b-a87f-833bb31834af\nasana: 1215187161546187\nbeads: foresight-mcp-edc\ngithub: 2036\njira: ADHD-688\nlinear: 80d9eb20-2ee3-4a1b-a87f-833bb31834af\nupdated-at: 2026-05-27T19:08:20.894000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:07.862Z",
+    "createdAt": "2026-04-29T13:55:53.712Z"
+  },
+  {
+    "id": "968c8ce8-cbbe-414f-91c6-780c46d2c66e",
+    "identifier": "PIX-429",
+    "title": "4.0 Update Colab notebook for TRL API parity",
+    "description": "Update `ai/training/pixelated_colab_pilot.ipynb`:\n\n* Replace `TrainingArguments` with `SFTConfig` (TRL >= 0.9)\n* Remove `max_seq_length`, `dataset_text_field`, `packing`, `neftune_noise_alpha` from `SFTTrainer` kwargs\n* Expose `max_seq_length` as named variable with comment about 1024 default\n* Expose `lora_target_modules` as configurable list with MLP comment\n* Verify `GPUStatsThread` present\n* Add comment in production script noting `GPUStatsThread` is in Colab\n\n**Reqs**: 8.1\u20138.5, 4.3\n\n**Jira:** [ADHD-227](<https://russianvodka.atlassian.net/browse/ADHD-227>) (migrated from slimshadyme PIX-292)\n\n<!-- pixelated-sync\nkey: 4-0-update-colab-notebook-for-trl-api-parity\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 968c8ce8-cbbe-414f-91c6-780c46d2c66e\nasana: 1215187168046268\nbeads: foresight-mcp-gg8\ngithub: 2035\njira: ADHD-1633\nlinear: 968c8ce8-cbbe-414f-91c6-780c46d2c66e\nupdated-at: 2026-05-27T19:08:20.366000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:06.609Z",
+    "createdAt": "2026-04-29T13:55:51.982Z"
+  },
+  {
+    "id": "9bc1b0c4-a2ed-4f6d-9d45-359f9f8805e1",
+    "identifier": "PIX-428",
+    "title": "*3.1 Unit tests for SFT script improvements",
+    "description": "### Core Objective\n\nImplement and configure the features specified for task 3.1 (Unit tests for SFT script improvements).\n\n### Technical Design Specs\n\n* **Sprint Scope**: Training Pipeline Improvements (Phase 3)\n* **Runtime Environment**: Python v3.13 (`uv` managed), PyTorch, Hugging Face transformers, TRL API.\n* **Key Objectives**: Unit tests for SFT script improvements.\n\n### Atlassian & Code Linkages\n\n* **Linear Key**: PIX-428\n* **Source Plan File**: \\[TRAINING-PIPELINE-TASKS-2026-04-29.md\\](file:///.agent/internal/plans/TRAINING-PIPELINE-TASKS-2026-04-29.md)\n\n### Verification & Testing Checklist\n\n- [ ] `--max_seq_length 511` \u2192 argparse error\n- [ ] `--max_seq_length 8193` \u2192 argparse error\n- [ ] `--max_seq_length 2048` \u2192 accepted\n- [ ] `--lora_target_modules gate_proj,up_proj,down_proj` \u2192 accepted and logged\n\n<!-- pixelated-sync\nkey: 3-1-unit-tests-for-sft-script-improvements\nstatus: {'id':*'7a263ba2-7184-4a62-8882-0dbc56f7822b',*'name':*'in_progress',*'type':\\_'started'}\nsource-provider: linear\nsource-id: 9bc1b0c4-a2ed-4f6d-9d45-359f9f8805e1\nasana: 1215187201327207\nbeads: foresight-mcp-8fl\ngithub: 2025\njira: ADHD-457\nlinear: 9bc1b0c4-a2ed-4f6d-9d45-359f9f8805e1\nupdated-at: 2026-05-27T19:08:19.833000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+      "name": "In Progress",
+      "type": "started"
+    },
+    "updatedAt": "2026-05-27T21:34:06.350Z",
+    "createdAt": "2026-04-29T13:48:47.846Z"
+  },
+  {
+    "id": "e8cd38e2-d369-4b7c-92bf-f1d9054a9b1e",
+    "identifier": "PIX-427",
+    "title": "3.0 Extend production SFT script",
+    "description": "Update `ai/training/pixelated_production_pilot.py`:\n\n* Add `--max_seq_length` CLI arg, range \\[512, 8192\\], default 1024\n* Call `log_token_length_distribution()` after dataset preparation\n* Accept `gate_proj`, `up_proj`, `down_proj` in `--lora_target_modules`\n* Log targeted modules + trainable param count before training\n* Import `shared_qlora_config()` and `add_lora_args()` from `shared_config.py`\n\n**Reqs**: 3.1\u20133.4, 4.1, 4.2\n\n**Jira:** [ADHD-225](<https://russianvodka.atlassian.net/browse/ADHD-225>) (migrated from slimshadyme PIX-290)\n\n<!-- pixelated-sync\nkey: 3-0-extend-production-sft-script\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: e8cd38e2-d369-4b7c-92bf-f1d9054a9b1e\nasana: 1215187201911419\nbeads: foresight-mcp-1e5\ngithub: 1737\njira: ADHD-1632\nlinear: e8cd38e2-d369-4b7c-92bf-f1d9054a9b1e\nupdated-at: 2026-05-27T19:08:19.380000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:11:03.349Z",
+    "createdAt": "2026-04-29T13:48:46.262Z"
+  },
+  {
+    "id": "43d0911f-2669-42c8-8d61-e67a4bd5d8ad",
+    "identifier": "PIX-426",
+    "title": "*2.3 Unit tests for MultilingualSafetyChecker",
+    "description": "1. Audit Note (2026-05-26) \u2014 STATUS CORRECTED\n\nCode verification confirms this work IS DONE despite Linear showing In Progress.\n\n```\n  1. Verified Implementation\n```\n\n* `memory_versions` table has `tenant_id TEXT NOT NULL` column ([server.py:317](<http://server.py:317>))\n* Index `idx_versions_tenant ON memory_versions(tenant_id)` exists ([server.py:336](<http://server.py:336>))\n* All `memory_versions` queries include `AND tenant_id = ?` check:\n* `get_memory_versions` (line 504): `WHERE memory_id = ? AND tenant_id = ?`\n* `get_specific_version` (line 577): `WHERE memory_id = ? AND version = ? AND tenant_id = ?`\n* `_diff_versions` (line 640): dual-tenant check\n\n  ```\n  1. Original Issue (migration artifact)\n  ```\n\nLinear description was placeholder migrated text. Actual implementation verified by code inspection.\n\n<!-- pixelated-sync\nkey: crit-9-add-user-tenant-isolation-to-memory-versions-queries\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 43d0911f-2669-42c8-8d61-e67a4bd5d8ad\nasana: 1215193328082851\nbeads: foresight-mcp-29a\ngithub: 2597\njira: ADHD-777\nlinear: 43d0911f-2669-42c8-8d61-e67a4bd5d8ad\nupdated-at: 2026-05-27T19:24:52.563000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T13:36:59.735Z",
+    "createdAt": "2026-04-29T13:48:44.725Z"
+  },
+  {
+    "id": "088a32a7-4957-4251-aa48-cbcc708ae5c5",
+    "identifier": "PIX-425",
+    "title": "*2.2 Property test \u2014 multilingual negation suppression (Prop 9)",
+    "description": "```\n  1. Remediation Scope\n```\n\nThis task addresses a critical issue or high-priority technical debt item: ***\\[CRIT-7\\] Enforce WAL mode consistently across all DB modules***. The primary objective is to investigate the root cause, design a permanent architectural fix, and enforce robust controls to prevent recurrence.\n\n```\n  1. Implementation Checklist\n```\n\n1. Conduct root-cause analysis on the reported symptom in the target module.\n2. Draft and apply the appropriate security, concurrency, or performance fix.\n3. Verify changes locally and add regression tests to the test suite.\n4. Confirm no side effects occur in related systems or upstream modules.\n\n---\n\n***Historical Context: Migrated from PIX-251 (Source Priority: Medium, Source Status: Done)***\n\n<!-- pixelated-sync\nkey: crit-7-enforce-wal-mode-consistently-across-all-db-modules\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 088a32a7-4957-4251-aa48-cbcc708ae5c5\nasana: 1215187299863717\nbeads: foresight-mcp-0as\ngithub: 2596\njira: ADHD-775\nlinear: 088a32a7-4957-4251-aa48-cbcc708ae5c5\nupdated-at: 2026-05-27T19:16:46.540000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T13:37:35.636Z",
+    "createdAt": "2026-04-29T13:48:43.266Z"
+  },
+  {
+    "id": "3b3e9f4d-709b-467d-9c60-29977a742367",
+    "identifier": "PIX-424",
+    "title": "*2.1 Property test \u2014 multilingual crisis detection (Prop 8)",
+    "description": "1. Audit Note (2026-05-26) \u2014 STATUS CORRECTED\n\nCode verification confirms this work IS DONE despite Linear showing In Progress.\n\n```\n  1. Verified Implementation\n```\n\n* `memory_entity_links` table has both `user_id TEXT NOT NULL` and `tenant_id TEXT NOT NULL DEFAULT default` columns (graph_store.py:126)\n* Index `idx_links_user ON memory_entity_links(user_id)` exists (line 204)\n* Index `idx_links_tenant ON memory_entity_links(tenant_id)` exists (line 205)\n* Migration `001_add_tenant_to_graph_tables.py` (1240 lines) for schema updates\n* 7 passing tests in `tests/test_graph_store_tenant.py`\n\n  ```\n  1. Original Issue (migration artifact)\n  ```\n\nLinear description was placeholder migrated text. Actual implementation verified by code inspection.\n\n<!-- pixelated-sync\nkey: crit-5-add-user-id-to-memory-entity-links-for-tenant-isolation\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: 3b3e9f4d-709b-467d-9c60-29977a742367\nasana: 1215187384775423\nbeads: foresight-mcp-3ie\ngithub: 2594\njira: ADHD-773\nlinear: 3b3e9f4d-709b-467d-9c60-29977a742367\nupdated-at: 2026-05-27T20:29:27.127000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T13:37:10.701Z",
+    "createdAt": "2026-04-29T13:48:41.825Z"
+  },
+  {
+    "id": "b10c7127-9432-40ce-9b54-ea6692b39ee1",
+    "identifier": "PIX-423",
+    "title": "2.0 Create MultilingualSafetyChecker",
+    "description": "Create `ai/training/multilingual_safety_checker.py` extending `ClinicalSafetyChecker`:\n\n* Crisis patterns for Spanish, French, Portuguese, German (min 6 per language: suicide, self-harm, want to die, no reason to live, cutting, medication overdose)\n* Negation patterns per language; asymmetric negation-window (100 chars before, 30 chars after)\n* `VERSION = \"1.0.0\"`, `supported_languages = [\"en\", \"es\", \"fr\", \"pt\", \"de\"]`\n* Unknown language \u2192 apply all pattern sets, return `True` on any match\n* Same `is_unsafe(text: str) -> bool` interface \u2014 zero changes to existing call sites\n\n**Reqs**: 5.1\u20135.7\n**Why critical**: Current ClinicalSafetyChecker is English-only. Multilingual training data (German YouTube, etc.) has zero safety filtering without this.\n\n**Jira:** [ADHD-220](<https://russianvodka.atlassian.net/browse/ADHD-220>) (migrated from slimshadyme PIX-286)\n\n<!-- pixelated-sync\nkey: 2-0-create-multilingualsafetychecker\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: b10c7127-9432-40ce-9b54-ea6692b39ee1\nasana: 1215187168148871\nbeads: foresight-mcp-ua5\ngithub: 1716\njira: ADHD-1624\nlinear: b10c7127-9432-40ce-9b54-ea6692b39ee1\nupdated-at: 2026-05-27T19:08:13.727000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:49.789Z",
+    "createdAt": "2026-04-29T13:48:40.094Z"
+  },
+  {
+    "id": "fbcabf2f-57b6-4171-a96a-52490ed24cc6",
+    "identifier": "PIX-422",
+    "title": "*1.3 Unit tests for shared_config.py",
+    "description": "```\n  1. Remediation Scope\n```\n\nThis task addresses a critical issue or high-priority technical debt item: ***\\[CRIT-10\\] Remove duplicate @mcp.tool() decorator on rollback_memory***. The primary objective is to investigate the root cause, design a permanent architectural fix, and enforce robust controls to prevent recurrence.\n\n```\n  1. Implementation Checklist\n```\n\n1. Conduct root-cause analysis on the reported symptom in the target module.\n2. Draft and apply the appropriate security, concurrency, or performance fix.\n3. Verify changes locally and add regression tests to the test suite.\n4. Confirm no side effects occur in related systems or upstream modules.\n\n---\n\n***Historical Context: Migrated from PIX-250 (Source Priority: Medium, Source Status: Done)***\n\n<!-- pixelated-sync\nkey: crit-10-remove-duplicate-mcp-tool-decorator-on-rollback-memory\nstatus: {'id':*'d47f8fab-abb9-474e-879b-9c581a9852ed',*'name':*'todo',*'type':\\_'unstarted'}\nsource-provider: linear\nsource-id: fbcabf2f-57b6-4171-a96a-52490ed24cc6\nasana: 1215187272103071\nbeads: foresight-mcp-yk5\ngithub: 2590\njira: ADHD-769\nlinear: fbcabf2f-57b6-4171-a96a-52490ed24cc6\nupdated-at: 2026-05-27T19:16:41.878000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+      "name": "Todo",
+      "type": "unstarted"
+    },
+    "updatedAt": "2026-05-27T20:36:44.686Z",
+    "createdAt": "2026-04-29T13:48:38.685Z"
+  },
+  {
+    "id": "3125e029-d9ca-46c9-87fb-633e1db797b8",
+    "identifier": "PIX-421",
+    "title": "*1.2 Property test \u2014 truncation warning (Prop 7)",
+    "description": "Property test for truncation count correctness.\n\n* Assert `truncated_count == sum(1 for l in lengths if l > max_seq_length)`\n\n**Reqs**: 3.3, 3.4\n**Correctness Property**: Prop 7 \u2014 Truncation count is exact count of lengths exceeding threshold\n\n**Jira:** [ADHD-218](<https://russianvodka.atlassian.net/browse/ADHD-218>) (migrated from slimshadyme PIX-284)\n\n<!-- pixelated-sync\nkey: 1-2-property-test-truncation-warning-prop-7\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 3125e029-d9ca-46c9-87fb-633e1db797b8\nasana: 1215187201293699\nbeads: foresight-mcp-58v\ngithub: 1195\njira: ADHD-1604\nlinear: 3125e029-d9ca-46c9-87fb-633e1db797b8\nupdated-at: 2026-05-27T19:08:06.417000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-27T19:10:30.607Z",
+    "createdAt": "2026-04-29T13:48:37.101Z"
+  },
+  {
+    "id": "2a179a25-5405-4e78-b04a-009e86d8f1a4",
+    "identifier": "PIX-420",
+    "title": "*1.1 Property test \u2014 token length stats correctness (Prop 6)",
+    "description": "Property test for `log_token_length_distribution()` and `count_truncated()`.\n\n* `hypothesis` with `st.lists(st.integers(min_value=1, max_value=16384), min_size=1)`\n* Assert min/max/mean/median/p95 match `statistics` module within float tolerance\n\n**Req**: 3.2\n**Correctness Property**: Prop 6 \u2014 Token length statistics are deterministic and match reference implementation\n\n**Jira:** [ADHD-217](<https://russianvodka.atlassian.net/browse/ADHD-217>) (migrated from slimshadyme PIX-283)",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-17T19:52:46.010Z",
+    "createdAt": "2026-04-29T13:48:35.608Z"
+  },
+  {
+    "id": "4af2ccde-500b-4241-8d95-e66064389dd2",
+    "identifier": "PIX-419",
+    "title": "1.0 Create shared training infrastructure",
+    "description": "Create `ai/training/shared_config.py` with:\n\n* `shared_qlora_config()` \u2192 `BitsAndBytesConfig` (load_in_4bit=True, nf4, double_quant, bf16/bf16 auto-detect)\n* `add_lora_args(parser)` \u2192 registers `--lora_r`, `--lora_alpha`, `--lora_dropout`, `--lora_bias`, `--lora_target_modules` with same names/defaults as `pixelated_production_pilot.py`\n* `build_lora_config(args)` \u2192 `LoraConfig` from parsed args; raises `ValueError` if target_modules empty\n* `log_token_length_distribution(lengths, max_seq_length, logger, field_name)` \u2192 computes min/mean/median/p95/max, logs warning if p95 > max_seq_length, returns stats dict with `truncated_count`\n* `count_truncated(lengths, max_seq_length)` \u2192 count of lengths exceeding threshold\n\n**Reqs**: 1.2, 1.3, 2.6, 3.2, 3.3, 3.4, 4.1\n**Blocks**: All subsequent phases \u2014 every trainer and pipeline depends on shared_config\n\n**Jira:** [ADHD-216](<https://russianvodka.atlassian.net/browse/ADHD-216>) (migrated from slimshadyme PIX-282)\n\n<!-- pixelated-sync\nkey: 1-0-create-shared-training-infrastructure\nstatus: {'id':*'6024760d-da33-4bf4-b3bf-463546bbef4a',*'name':*'done',*'type':\\_'completed'}\nsource-provider: linear\nsource-id: 4af2ccde-500b-4241-8d95-e66064389dd2\nasana: 1215187161190996\nbeads: foresight-mcp-65i\ngithub: 1978\njira: ADHD-1603\nlinear: 4af2ccde-500b-4241-8d95-e66064389dd2\nupdated-at: 2026-05-27T19:08:01.721000Z\n-->",
+    "project": {
+      "id": "70c0c2a7-35d9-492a-bba5-0531ed028ea7",
+      "name": "Training Pipeline Improvements"
+    },
+    "state": {
+      "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+      "name": "Done",
+      "type": "completed"
+    },
+    "updatedAt": "2026-05-31T16:31:25.205Z",
+    "createdAt": "2026-04-29T13:48:32.275Z"
+  }
+]

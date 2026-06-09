@@ -1,1 +1,18 @@
-// Placeholder - no tests defined yet
+/**
+ * Unit tests for Performance Optimizer
+ *
+ * Covers: ConnectionPoolManager, IntelligentCacheManager, BatchProcessor,
+ * BackgroundJobQueue, MemoryOptimizer, and PerformanceOptimizer
+ */
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
+import {
+  ConnectionPoolManager,
+  IntelligentCacheManager,
+  BatchProcessor,
+  BackgroundJobQueue,
+  MemoryOptimizer,
+  PerformanceOptimizer,
+  getPerformanceOptimizer,
+  type PerformanceOptimizerConfig,
+} from '../performance-optimizer'
