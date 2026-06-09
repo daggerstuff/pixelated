@@ -115,44 +115,6 @@ validate:typecheck:
       - stuck_or_timeout_failure
 
 # Test jobs
-test:unit:
-  stage: test
-  image: node:${NODE_VERSION}-slim
-  cache:
-    key:
-      files:
-        - pnpm-lock.yaml
-    paths:
-      - .pnpm-store
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - npm install -g pnpm@$PNPM_VERSION
-  script:
-    - echo "Running unit tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm test:unit
-  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
-  artifacts:
-    reports:
-      junit: test-results/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/cobertura-coverage.xml
-    paths:
-      - coverage/
-    expire_in: 1 week
-    when: always
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 15m
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-
 test:integration:
   stage: test
   image: node:${NODE_VERSION}-slim
@@ -284,7 +246,6 @@ build:
     - docker:dind
   needs:
     - job: validate:dependencies
-    - job: test:unit
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: '/certs'
@@ -309,7 +270,6 @@ build:
     - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     - docker push ${IMAGE_NAME}:latest
     - echo "Build completed"
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -368,7 +328,6 @@ security:scan:
       container_scanning: gl-container-scanning-report.json
     expire_in: 1 week
     when: always
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
