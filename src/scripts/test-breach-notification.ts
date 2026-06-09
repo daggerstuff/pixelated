@@ -14,7 +14,6 @@ dotenv.config()
 const program = new Command()
 
 program
-  .name('test-breach-notification')
   .description('Test the security breach notification system')
   .version('1.0.0')
 
@@ -25,7 +24,8 @@ program
   .option('-s, --severity <severity>', 'Breach severity', 'medium')
   .option('-u, --users <count>', 'Number of affected users', '5')
   .action(
-    async (options: { type: string; severity: string; users: string }) => {
+    async (_options: unknown) => {
+      const options = _options as { type: string; severity: string; users: string };
       try {
         const breachTypes = [
           'unauthorized_access',
@@ -240,8 +240,9 @@ program
   .command('list')
   .description('List recent breach notifications')
   .option('-l, --limit <count>', 'Number of breaches to show', '10')
-  .action(async (options: { limit: string }) => {
+  .action(async (_options: unknown) => {
     try {
+      const options = _options as { limit: string };
       const breaches = await BreachNotificationSystem.listRecentBreaches()
 
       if (breaches.length === 0) {
@@ -295,11 +296,11 @@ program
   })
 
 program
-  .command('status')
+  .command('status <id>')
   .description('Get status of a specific breach notification')
-  .argument('<id>', 'Breach notification ID')
-  .action(async (id: string) => {
+  .action(async (_id: unknown) => {
     try {
+      const id = _id as string;
       const breach = await BreachNotificationSystem.getBreachStatus(id)
 
       if (!breach) {

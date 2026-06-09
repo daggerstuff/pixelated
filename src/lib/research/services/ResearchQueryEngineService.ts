@@ -164,7 +164,7 @@ export class ResearchQueryEngineService {
     } catch (error: unknown) {
       console.error('Error translating natural language query:', error)
       throw new Error(
-        `Query translation failed: ${error?.message ?? 'Unknown error'}`,
+        `Query translation failed: ${(error as any)?.message ?? 'Unknown error'}`,
         { cause: error },
       )
     }
@@ -407,13 +407,13 @@ export class ResearchQueryEngineService {
     }
 
     // Extract entities (simplified)
-    const entities = []
+    const entities: any[] = []
     if (query.includes('anxiety'))
-      entities.push({ type: 'condition', value: 'anxiety' })
+      entities.push({ type: 'condition', value: 'anxiety' } as any)
     if (query.includes('depression'))
-      entities.push({ type: 'condition', value: 'depression' })
+      entities.push({ type: 'condition', value: 'depression' } as any)
     if (query.includes('session'))
-      entities.push({ type: 'data_type', value: 'therapeutic_session' })
+      entities.push({ type: 'data_type', value: 'therapeutic_session' } as any)
 
     return {
       intent,
@@ -446,7 +446,7 @@ export class ResearchQueryEngineService {
       'session_date',
       'emotional_metrics',
     ]
-    let conditions = []
+    let conditions: any[] = []
     let params: unknown[] = []
     let paramIndex = 1
 
@@ -460,7 +460,7 @@ export class ResearchQueryEngineService {
     // Add conditions based on entities using parameterized queries
     entities.forEach((entity) => {
       if (entity.type === 'condition') {
-        conditions.push(`primary_condition = $${paramIndex}`)
+        conditions.push(`primary_condition = $${paramIndex}` as any)
         params.push(entity.value)
         paramIndex++
       }
@@ -469,7 +469,7 @@ export class ResearchQueryEngineService {
     // Add time range if specified using parameterized queries
     if (researchContext.timeRange) {
       conditions.push(
-        `session_date BETWEEN $${paramIndex} AND $${paramIndex + 1}`,
+        `session_date BETWEEN $${paramIndex} AND $${paramIndex + 1}` as any,
       )
       params.push(
         researchContext.timeRange.start,
@@ -617,13 +617,13 @@ export class ResearchQueryEngineService {
     sql: string,
     _dataScope: string[],
   ): Promise<string[]> {
-    const permissions = []
+    const permissions: any[] = []
 
     if (sql.includes('emotional_metrics'))
-      permissions.push('emotional_data_access')
-    if (sql.includes('session_')) permissions.push('session_data_access')
-    if (sql.includes('user_')) permissions.push('user_data_access')
-    if (sql.includes('outcome')) permissions.push('outcome_data_access')
+      permissions.push('emotional_data_access' as any)
+    if (sql.includes('session_')) permissions.push('session_data_access' as any)
+    if (sql.includes('user_')) permissions.push('user_data_access' as any)
+    if (sql.includes('outcome')) permissions.push('outcome_data_access' as any)
 
     return permissions
   }
@@ -667,16 +667,16 @@ export class ResearchQueryEngineService {
     query: ResearchQuery,
     results: AnonymizedRecord[],
   ): string[] {
-    const warnings = []
+    const warnings: any[] = []
 
     if (results.length === 0) {
       warnings.push(
-        'No results found for query. Consider broadening search criteria.',
+        'No results found for query. Consider broadening search criteria.' as any,
       )
     }
 
     if (query.estimatedExecutionTime > 10) {
-      warnings.push('Query may take longer than expected to execute.')
+      warnings.push('Query may take longer than expected to execute.' as any)
     }
 
     const avgInformationLoss =
@@ -684,7 +684,7 @@ export class ResearchQueryEngineService {
       results.length
     if (avgInformationLoss > 0.5) {
       warnings.push(
-        'High information loss due to anonymization. Results may be less precise.',
+        'High information loss due to anonymization. Results may be less precise.' as any,
       )
     }
 
@@ -695,24 +695,24 @@ export class ResearchQueryEngineService {
     history: ResearchQuery[],
     metrics: QueryPerformanceMetrics,
   ): string[] {
-    const suggestions = []
+    const suggestions: any[] = []
 
     if (metrics.averageExecutionTime > 5) {
       suggestions.push(
-        'Consider adding more specific filters to reduce query execution time',
+        'Consider adding more specific filters to reduce query execution time' as any,
       )
     }
 
     if (metrics.cacheHitRate < 0.5) {
       suggestions.push(
-        'Similar queries detected. Consider reusing previous results when appropriate',
+        'Similar queries detected. Consider reusing previous results when appropriate' as any,
       )
     }
 
     const complexQueries = history.filter((q) => q.estimatedExecutionTime > 10)
     if (complexQueries.length > 0) {
       suggestions.push(
-        'Break down complex queries into smaller, more focused analyses',
+        'Break down complex queries into smaller, more focused analyses' as any,
       )
     }
 

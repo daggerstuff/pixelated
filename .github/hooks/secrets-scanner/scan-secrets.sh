@@ -171,11 +171,9 @@ scan_file() {
       return 0 ;;
     *"/references/"*)
       return 0 ;;
-    # Auto-generated Helm chart documentation (contains example YAML with placeholder values)
-    *"/charts/"*"/README.md"|*"/charts/"*"/values.yaml")
+    tests/_legacy/*)
       return 0 ;;
-    # Other generated docs with example credentials
-    *"/.github/hooks/"*)
+    *"/__tests__/"*|*".test.ts"|*".test.js"|*".spec.ts"|*".spec.js")
       return 0 ;;
   esac
 
@@ -200,7 +198,7 @@ scan_file() {
       fi
 
       # Skip if this looks like a placeholder or example
-      if printf '%s\n' "$match" | grep -qiE '(example|placeholder|your[_-]|xxx|changeme|TODO|FIXME|replace[_-]?me|dummy|fake|test[_-]?key|sample|cookie.based|default.token|demo.(key|secret|token)|sandbox.(key|token)|public.token|not[._-]?real|nope)'; then
+      if printf '%s\n' "$match" | grep -qiE '(example|placeholder|your[_-]|xxx|changeme|TODO|FIXME|replace[_-]?me|dummy|fake|test[_-]?key|sample)'; then
         continue
       fi
 

@@ -245,7 +245,7 @@ export class CompatibilityService {
         to: recipient,
         templateAlias: 'browser-compatibility-alert',
         templateModel: templateData,
-      }),
+      } as any),
     )
 
     await Promise.all(emailPromises)

@@ -23,11 +23,10 @@ const rateLimiter = new RateLimiter(30)
  */
 export const GET: APIRoute = async ({ request }) => {
   let session: { user?: { id?: string; role?: string } } | null = null
-  let userId: string | undefined
 
   try {
     // Verify session
-    session = (await getSession(request)) as { user?: { id?: string; role?: string } } | null
+    session = (await getSession(request)) as unknown as typeof session
     if (!session?.user) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
@@ -38,7 +37,7 @@ export const GET: APIRoute = async ({ request }) => {
     }
 
     // Apply rate limiting based on user role
-    userId = session?.user?.id
+    const userId = session?.user?.id
     const role = session?.user?.role ?? 'user'
     if (!userId) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
@@ -166,15 +165,15 @@ export const GET: APIRoute = async ({ request }) => {
       period: params.period as string,
     }
 
-    if (params.startDate) {
-      statsOptions.startDate = new Date(params.startDate)
+    if (params!.startDate) {
+      statsOptions.startDate = new Date(params!.startDate as string)
     }
 
-    if (params.endDate) {
-      statsOptions.endDate = new Date(params.endDate)
+    if (params!.endDate) {
+      statsOptions.endDate = new Date(params!.endDate as string)
     }
 
-    if (!params.allUsers) {
+    if (!params!.allUsers) {
       statsOptions.userId = userId
     }
 

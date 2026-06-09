@@ -200,13 +200,13 @@ export class MultiModalRiskAssessmentService {
         behavioralRisk,
         clinicalRisk,
         contextualRisk,
-        {
-          hasEmotional: emotionalData.length > 0,
-          hasBiometric: !!biometricData,
-          hasBehavioral: !!behavioralData,
-          hasClinical: !!clinicalData,
-          hasContextual: !!contextualData,
-        },
+        ({
+                  hasEmotional: emotionalData.length > 0,
+                  hasBiometric: !!biometricData,
+                  hasBehavioral: !!behavioralData,
+                  hasClinical: !!clinicalData,
+                  hasContextual: !!contextualData,
+                } as any),
       )
 
       // Identify primary contributors

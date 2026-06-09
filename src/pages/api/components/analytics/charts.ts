@@ -167,7 +167,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
       },
     )
   }
-})
+}) as any
 
 async function generateProgressChartData(params: {
   type: string
@@ -309,7 +309,7 @@ async function generateEmotionChartData(params: {
           datasets: [
             {
               label: 'Valence vs Arousal',
-              data: scatterData,
+              data: scatterData as any,
               backgroundColor: 'rgba(59, 130, 246, 0.6)',
             },
           ],

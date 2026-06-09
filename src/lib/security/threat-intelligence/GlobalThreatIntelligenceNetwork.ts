@@ -231,6 +231,17 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
         )
       }
 
+      subscriber.on('message', (channel: string, message: string) => {
+        if (channel === 'threat-intelligence-global') {
+          void this.handleIncomingThreat(message)
+        } else if (channel.startsWith('threat-intelligence-')) {
+          const region = channel.replace('threat-intelligence-', '')
+          if (region !== this.region) {
+            void this.handleIncomingThreat(message)
+          }
+        }
+      })
+
       logger.info('Redis pub/sub setup completed', { region: this.region })
     } catch (error: unknown) {
       logger.error('Failed to setup Redis pub/sub', {
@@ -406,7 +417,7 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
           ...threat,
           created_at: new Date(),
           updated_at: new Date(),
-        })
+        } as any)
       }
 
       // Log the sharing activity

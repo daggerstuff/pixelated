@@ -10,7 +10,7 @@ export const POST = async ({ request }: APIContext) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
-    if (!authResult?.authenticated) {
+    if (!(authResult as any)?.authenticated) {
       return new Response(
         JSON.stringify({
           error: 'Unauthorized',
@@ -26,7 +26,7 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Check admin permission
-    if (!authResult.user?.isAdmin) {
+    if (!(authResult as any).user?.isAdmin) {
       return new Response(
         JSON.stringify({
           error: 'Forbidden',

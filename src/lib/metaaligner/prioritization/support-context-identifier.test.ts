@@ -33,7 +33,7 @@ const mockAIService: TestAIService = {
   getModelInfo: vi.fn(),
   createChatCompletion: vi.fn(),
   createChatStream: vi.fn(),
-}
+} as any
 
 describe('SupportContextIdentifier', () => {
   let identifier: SupportContextIdentifier

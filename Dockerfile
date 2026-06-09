@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy package manifests first for better layer caching
 COPY package.json pnpm-lock.yaml* ./
+COPY pnpm-workspace.yaml ./
 # Include patch files and npm configuration required during installation
 COPY patches ./patches
 COPY config/package/.npmrc ./.npmrc

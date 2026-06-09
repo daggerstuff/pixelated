@@ -526,7 +526,12 @@ export class BaaTemplateService {
       'Default BAA template compliant with HIPAA regulations',
       '1.0',
       createdBy,
-      ['EHR_VENDOR', 'CLOUD_SERVICE', 'DATA_ANALYTICS', 'TELEMEDICINE'],
+      [
+        'EHR_VENDOR' as any,
+        'CLOUD_SERVICE' as any,
+        'DATA_ANALYTICS' as any,
+        'TELEMEDICINE' as any,
+      ],
       ['DATA_STORAGE', 'SOFTWARE_SERVICES', 'CONSULTING'],
       [],
       [],

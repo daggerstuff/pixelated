@@ -97,7 +97,7 @@ export class PatternDiscoveryService {
           confidence: 'confidence' in p ? (p.confidence as number) : 1,
           statisticalSignificance: 'pValue' in p ? p.pValue : 0.05,
           supportingData: p,
-        })),
+        })) as any,
         metadata: {
           totalRecords,
           processingTime,
@@ -181,8 +181,8 @@ export class PatternDiscoveryService {
         'data-scientist',
       )
 
-      if (result.data && result.data.length > 0) {
-        const trend = this.calculateTrend(result.data, metric)
+      if (result.data && (result.data as any).length > 0) {
+        const trend = this.calculateTrend(result.data as any, metric)
         if (trend) {
           trends.push(trend)
         }
@@ -216,7 +216,7 @@ export class PatternDiscoveryService {
       )
 
       if (result.data) {
-        const metricAnomalies = this.detectAnomalies(result.data, metric)
+        const metricAnomalies = this.detectAnomalies(result.data as any, metric)
         anomalies.push(...metricAnomalies)
       }
     }
@@ -248,7 +248,7 @@ export class PatternDiscoveryService {
       return []
     }
 
-    return this.performClustering(result.data, features)
+    return this.performClustering(result.data as any, features)
   }
 
   /**
@@ -597,7 +597,7 @@ export class PatternDiscoveryService {
         cluster.map((i) => data[i]!).filter(Boolean),
         features,
       ),
-    }))
+    })) as any
   }
 
   private initializeCentroids(vectors: number[][], k: number): number[][] {

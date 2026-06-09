@@ -238,7 +238,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
       console.warn(verify.stderr.toString())
 
       if (options.notify) {
-        await sendNotification(
+         sendNotification(
           'Rollback completed but verification checks failed. Manual intervention may be required.',
           options.environment,
         )
@@ -247,7 +247,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
       console.log('✓ Rollback verification successful')
 
       if (options.notify) {
-        await sendNotification(
+         sendNotification(
           `Deployment rollback completed successfully to version ${version}.`,
           options.environment,
         )
@@ -260,7 +260,7 @@ async function performRollback(options: RollbackOptions): Promise<boolean> {
     console.error('\n❌ Rollback failed:', errorMessage)
 
     if (options.notify) {
-       await sendNotification(
+       sendNotification(
         `CRITICAL: Automatic rollback failed. Manual intervention required. Error: ${errorMessage}`,
         options.environment,
       )

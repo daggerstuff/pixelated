@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import '@testing-library/jest-dom/vitest'
+import React from 'react'
 
 import { PipelineAPIProvider } from '@/contexts/PipelineAPIContext'
 import { WebSocketProvider } from '@/contexts/WebSocketContext'
@@ -48,12 +48,13 @@ global.WebSocket = vi.fn(() => ({
   readyState: WebSocket.CONNECTING,
 })) as any
 
-const defaultMockProps = {
-  className: 'test-class',
-  onExecutionStart: vi.fn(),
-  onExecutionComplete: vi.fn(),
-  onError: vi.fn(),
-}
+describe('PipelineDashboard', () => {
+  const mockProps = {
+    className: 'test-class',
+    onExecutionStart: vi.fn(),
+    onExecutionComplete: vi.fn(),
+    onError: vi.fn(),
+  }
 
 const renderComponent = (props = {}) => {
   return render(

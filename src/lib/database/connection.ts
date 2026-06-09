@@ -114,7 +114,6 @@ export async function connectRedis(): Promise<Redis> {
     if (!redisUrl) {
       throw new Error('REDIS_URL is not defined in environment variables')
     }
-
     redisClient = new Redis(redisUrl, {
       maxRetriesPerRequest: null,
       enableReadyCheck: false,

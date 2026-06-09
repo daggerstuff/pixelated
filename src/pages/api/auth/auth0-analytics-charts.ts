@@ -94,8 +94,8 @@ export const GET: APIRoute = async ({ request }) => {
     const type =
       (url.searchParams.get('type') as ChartDataRequest['type']) || 'line'
     const timeRange = parseInt(url.searchParams.get('timeRange') ?? '30', 10)
-    const clientId = url.searchParams.get('clientId') ?? undefined
-    const sessionId = url.searchParams.get('sessionId') ?? undefined
+    const clientId = url.searchParams.get('clientId')
+    const sessionId = url.searchParams.get('sessionId')
     const dataPoints = parseInt(url.searchParams.get('dataPoints') ?? '50', 10)
     const category =
       (url.searchParams.get('category') as ChartDataRequest['category']) ??

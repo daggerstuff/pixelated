@@ -1,8 +1,30 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { isValidDate, isDiffMonth, isSameYear } from './datetime'
+import { isValidDate, isDiffMonth, isSameYear, getCurrentFormattedTime } from './datetime'
 
 describe('datetime utils', () => {
+  describe('getCurrentFormattedTime', () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('returns time formatted as HH:MM:SS with zero padding', () => {
+      const mockDate = new Date(2024, 0, 1, 9, 5, 7)
+      vi.setSystemTime(mockDate)
+      expect(getCurrentFormattedTime()).toBe('09:05:07')
+    })
+
+    it('returns time correctly for double digit values', () => {
+      const mockDate = new Date(2024, 0, 1, 14, 25, 49)
+      vi.setSystemTime(mockDate)
+      expect(getCurrentFormattedTime()).toBe('14:25:49')
+    })
+  })
+
   describe('isValidDate', () => {
     it('returns true for a valid Date object', () => {
       expect(isValidDate(new Date())).toBe(true)

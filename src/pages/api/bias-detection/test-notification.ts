@@ -65,7 +65,7 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Send test notification
-    const result = await biasDetectionEngine.sendTestNotification(
+    const result = await (biasDetectionEngine as any).sendTestNotification(
       notificationType,
       testData,
       {

@@ -86,40 +86,6 @@ async function main() {
     const report = await generateReport()
 
     console.log('\nPerformance Report')
-    console.log('=================\n')
-    console.log(`Total Requests: ${report.totalRequests}`)
-    console.log(`Average Latency: ${report.averageLatency.toFixed(2)}ms`)
-    console.log(`P95 Latency: ${report.p95Latency}ms`)
-    console.log(`P99 Latency: ${report.p99Latency}ms`)
-    console.log(`Success Rate: ${report.successRate.toFixed(2)}%`)
-    console.log(`Cache Hit Rate: ${report.cacheHitRate.toFixed(2)}%`)
-    console.log(`Average Tokens: ${report.averageTokens.toFixed(2)}\n`)
-
-    console.log('Error Distribution:')
-    Object.entries(report.errorDistribution).forEach(([error, count]) => {
-      console.log(
-        `  ${error}: ${count} (${((count / report.totalRequests) * 100).toFixed(2)}%)`,
-      )
-    })
-
-    console.log('\nModel Distribution:')
-    Object.entries(report.modelDistribution).forEach(([model, count]) => {
-      console.log(
-        `  ${model}: ${count} (${((count / report.totalRequests) * 100).toFixed(2)}%)`,
-      )
-    })
-
-    // TODO: Replace with proper cleanup implementation
-    // await PerformanceLogger.getInstance().cleanup()
-    console.info('Performance report generation completed')
-  } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error('Failed to generate performance report:', errorMessage)
-    process.exit(1)
-  }
-}
-
-if (require.main === module) {
   main().catch((error: unknown) => {
     const errorMessage = error instanceof Error ? error.message : String(error)
     console.error('Script failed:', errorMessage)

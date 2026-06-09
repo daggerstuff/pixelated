@@ -547,10 +547,14 @@ export class OptimizedBiasQueries {
     const cacheHitRate = cacheHitRow?.cache_hit_rate ?? '0'
 
     return {
-      total_analyses: parseInt(row.total_analyses),
-      avg_processing_time: parseFloat(row.avg_processing_time),
+      total_analyses: parseInt(
+        (row as { total_analyses: string }).total_analyses,
+      ),
+      avg_processing_time: parseFloat(
+        (row as { avg_processing_time: string }).avg_processing_time,
+      ),
       cache_hit_rate: parseFloat(cacheHitRate),
-      slow_queries: parseInt(row.slow_queries),
+      slow_queries: parseInt((row as { slow_queries: string }).slow_queries),
       error_rate: 0, // Would need error tracking table for real calculation
     }
   }

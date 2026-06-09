@@ -221,7 +221,7 @@ export class BackupVerificationService extends EventEmitter {
   private verifyRedisData(data: unknown): boolean {
     return (
       typeof data === 'object' &&
-      Object.entries(data).every(
+      (Object.entries as any)(data).every(
         ([key, value]) =>
           typeof key === 'string' &&
           (typeof value === 'string' || typeof value === 'number'),

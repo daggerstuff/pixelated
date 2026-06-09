@@ -58,7 +58,7 @@ export async function POST({ request }: { request: Request }) {
     // Create new user
     const userId = await userManager.createUser({
       email,
-      passwordHash: hashedPassword,
+      passwordHash: hashedPassword as any,
       firstName,
       lastName,
       role: 'user',

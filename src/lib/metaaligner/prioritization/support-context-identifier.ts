@@ -458,9 +458,15 @@ export class SupportContextIdentifier {
         resources.unshift('Emergency crisis hotline')
       }
       // Add human-in-the-loop review flag for high urgency cases
-      if (!result.metadata) result.metadata = {}
-      result.metadata.requiresHumanReview = true
-      result.metadata.crisisInterventionFlagged = true
+      if (!result.metadata)
+        result.metadata = {
+          emotionalIndicators: [],
+          copingCapacity: 'medium',
+          socialSupport: 'unknown',
+          immediateNeeds: [],
+        }
+      ;(result.metadata as any).requiresHumanReview = true
+      ;(result.metadata as any).crisisInterventionFlagged = true
     }
     // Final safety: ensure at least one crisis/hotline/emergency string present for high urgency
     const urgCheck = (result.urgency || '').toLowerCase().trim()
@@ -475,9 +481,15 @@ export class SupportContextIdentifier {
     ) {
       resources.push('Emergency support and crisis hotline information')
       // Add human-in-the-loop review flag for high urgency cases
-      if (!result.metadata) result.metadata = {}
-      result.metadata.requiresHumanReview = true
-      result.metadata.crisisInterventionFlagged = true
+      if (!result.metadata)
+        result.metadata = {
+          emotionalIndicators: [],
+          copingCapacity: 'medium',
+          socialSupport: 'unknown',
+          immediateNeeds: [],
+        }
+      ;(result.metadata as any).requiresHumanReview = true
+      ;(result.metadata as any).crisisInterventionFlagged = true
     }
 
     // Type-safe resource stringification
@@ -893,9 +905,12 @@ Consider this context in your assessment.`
       { role: 'user', content: queryWithContext },
     ]
 
-    const response = (await this.aiService.createChatCompletion(messages, {
-      model: this.model,
-    })) as any
+    const response = (await this.aiService.createChatCompletion(
+      messages as any,
+      {
+        model: this.model,
+      },
+    )) as any
 
     let content = ''
     if (typeof response === 'string') {
@@ -1582,7 +1597,10 @@ Consider this context in your assessment.`
 
   private getRelevantResources(result: SupportContextResult): string[] {
     // For high urgency (or critical), include crisis resources
-    if (result.urgency === 'high' || result.urgency === 'critical') {
+    if (
+      result.urgency === 'high' ||
+      (result.urgency as string) === 'critical'
+    ) {
       const crisisResources = [
         'Crisis hotline: 988 Suicide & Crisis Lifeline',
         'Emergency services: 911 for immediate danger',

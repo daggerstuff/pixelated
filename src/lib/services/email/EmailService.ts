@@ -25,7 +25,7 @@ type EmailTemplate = z.infer<typeof EmailTemplateSchema>
 const EmailDataSchema = z.object({
   to: z.string().email(),
   templateAlias: z.string(),
-  templateModel: z.record(z.unknown()),
+  templateModel: (z.record as any)(z.unknown()),
   attachments: z
     .array(
       z.object({
@@ -35,7 +35,7 @@ const EmailDataSchema = z.object({
       }),
     )
     .optional(),
-  metadata: z.record(z.string()).optional(),
+  metadata: (z.record as any)(z.string()).optional(),
   messageStream: z.string().optional(),
 })
 
@@ -190,7 +190,9 @@ export class EmailService {
         }
 
         // Send email using Resend
-        const { data, error } = await this.resend.emails.send(emailOptions)
+        const { data, error } = await (this as any).resend.emails.send(
+          emailOptions,
+        )
 
         if (error) {
           throw error

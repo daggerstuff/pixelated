@@ -194,7 +194,7 @@ describe('notificationService', () => {
       const id = await notificationService.queueNotification(mockNotification)
 
       expect(id).toBeDefined()
-      expect(vi.mocked(redis).lpush).toHaveBeenCalledWith(
+      expect(redis['lpush']).toHaveBeenCalledWith(
         'notification_queue',
         expect.stringContaining(mockNotification.userId),
       )
@@ -250,17 +250,17 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return one item then null
-      vi.mocked(redis['rpoplpush']!)
+      vi?.mocked(redis['rpoplpush'])
         .mockResolvedValueOnce(JSON.stringify(queueItem))
         .mockResolvedValueOnce(null as unknown as string)
 
       await notificationService.processQueue()
 
-      expect(vi.mocked(redis).rpoplpush).toHaveBeenCalledWith(
+      expect(redis['rpoplpush']).toHaveBeenCalledWith(
         'notification_queue',
         'notification_processing',
       )
-      expect(vi.mocked(redis).hset).toHaveBeenCalledWith(
+      expect(redis['hset']).toHaveBeenCalledWith(
         `notifications:${queueItem.userId}`,
         queueItem.id,
         expect.stringContaining(NotificationStatus.DELIVERED),
@@ -286,7 +286,7 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return the item
-      vi.mocked(redis['rpoplpush']!).mockResolvedValueOnce(
+      vi?.mocked(redis['rpoplpush']).mockResolvedValueOnce(
         JSON.stringify(queueItem),
       )
       vi.spyOn(
@@ -296,7 +296,7 @@ describe('notificationService', () => {
 
       await notificationService.processQueue()
 
-      expect(vi.mocked(redis).hset).toHaveBeenCalledWith(
+      expect(redis['hset']).toHaveBeenCalledWith(
         `notifications:${queueItem.userId}`,
         queueItem.id,
         expect.stringContaining(NotificationStatus.FAILED),
@@ -322,13 +322,13 @@ describe('notificationService', () => {
         error: null,
       }
 
-      vi.mocked(redis['hget']!).mockResolvedValueOnce(
+      vi?.mocked(redis['hget']).mockResolvedValueOnce(
         JSON.stringify(notification),
       )
 
       await notificationService.markAsRead('test-user', 'test-id')
 
-      expect(vi.mocked(redis).hset).toHaveBeenCalledWith(
+      expect(redis['hset']).toHaveBeenCalledWith(
         'notifications:test-user',
         'test-id',
         expect.stringContaining(NotificationStatus.READ),
@@ -336,7 +336,7 @@ describe('notificationService', () => {
     })
 
     it('should throw error for non-existent notification', async () => {
-      vi.mocked(redis['hget']!).mockResolvedValueOnce(null)
+      vi?.mocked(redis['hget']).mockResolvedValueOnce(null)
 
       await expect(
         notificationService.markAsRead('test-user', 'test-id'),
@@ -379,12 +379,12 @@ describe('notificationService', () => {
         }),
       }
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications('test-user')
 
       expect(result).toHaveLength(2)
-      expect(result[0]!.id).toBe('test-id-1') // Most recent first
+      expect(result?.[0].id).toBe('test-id-1') // Most recent first
     })
 
     it('should handle pagination', async () => {
@@ -409,7 +409,7 @@ describe('notificationService', () => {
         ]),
       )
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications(
         'test-user',
@@ -418,7 +418,7 @@ describe('notificationService', () => {
       )
 
       expect(result).toHaveLength(5)
-      expect(result[0]!.id).toBe('test-id-2') // Offset by 2, limit 5
+      expect(result?.[0].id).toBe('test-id-2') // Offset by 2, limit 5
     })
   })
 
@@ -472,7 +472,7 @@ describe('notificationService', () => {
         }),
       }
 
-      vi.mocked(redis['hgetall']!).mockResolvedValueOnce(notifications)
+      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
 
       const count = await notificationService.getUnreadCount('test-user')
 

@@ -35,7 +35,6 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
       const response = await authClient.resetPassword.send({
         newPassword: password,
         token,
-        email,
       })
 
       if (!('error' in response && response.error)) {

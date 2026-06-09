@@ -5,11 +5,7 @@ import { describe, expect, vi, test, beforeEach } from 'vitest'
 
 import type { AIService } from '../../ai/models/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
-import {
-  ContextType,
-  CORE_MENTAL_HEALTH_OBJECTIVES,
-  type UserProfile,
-} from '../core/objectives'
+import { ContextType, CORE_MENTAL_HEALTH_OBJECTIVES } from '../core/objectives'
 import {
   AdaptiveSelector,
   type AdaptiveSelectorConfig,

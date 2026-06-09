@@ -111,7 +111,7 @@ export const GET = async ({ request }) => {
           ORDER BY created_at DESC
         `
         const feedbackResult = await client.query(feedbackQuery, [sessionId])
-        feedback = feedbackResult.rows
+        feedback = feedbackResult.rows as any
       }
       return new Response(
         JSON.stringify({

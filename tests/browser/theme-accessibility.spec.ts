@@ -41,6 +41,49 @@ function getContrastRatio(color1: string, color2: string): number {
   return (brightest + 0.05) / (darkest + 0.05)
 }
 
+// Type definitions for evaluate return types
+interface TextContrast {
+  textColor: string
+  bgColor: string
+}
+
+interface AccentContrast {
+  accentColor: string
+  bgColor: string
+}
+
+interface FocusContrast {
+  focusColor: string
+  bgColor: string
+}
+
+interface TransitionDurations {
+  transition: string
+  animation: string
+}
+
+interface ThemeStatusIndicators {
+  [key: string]: string
+}
+
+interface HighContrastStyles {
+  background: string
+  color: string
+  forcedColors: string
+}
+
+interface SemanticElements {
+  hasMain: boolean
+  hasHeader: boolean
+  hasFooter: boolean
+  hasNav: boolean
+}
+
+interface Heading {
+  level: number
+  text: string
+}
+
 test.describe('Theme Accessibility Tests', () => {
   let page: Page
 
@@ -404,7 +447,7 @@ test.describe('Theme Accessibility Tests', () => {
       // Check for proper heading order (no skipping levels)
       for (let i = 1; i < headingStructure.length; i++) {
         const levelDiff = Math.abs(
-          headingStructure[i]!.level - headingStructure[i - 1]!.level,
+          headingStructure[i].level - headingStructure[i - 1].level,
         )
         expect(levelDiff).toBeLessThanOrEqual(1) // No skipping more than one level
       }

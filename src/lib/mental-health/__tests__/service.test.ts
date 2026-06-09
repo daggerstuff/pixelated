@@ -60,9 +60,9 @@ describe('MentalHealthService', () => {
 
       expect(result.analysis?.riskLevel).toBe('critical')
       expect(result.analysis?.requiresIntervention).toBe(true)
-      expect(result.analysis?.indicators.some((i) => i.type === 'crisis')).toBe(
-        true,
-      )
+      expect(
+        (result as any).analysis?.indicators.some((i) => i.type === 'crisis'),
+      ).toBe(true)
     })
   })
 

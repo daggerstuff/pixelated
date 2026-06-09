@@ -87,11 +87,9 @@ export const GET: APIRoute = async ({ request, url }) => {
     // Perform IOC lookup
     // Use a stricter IOC type instead of `any` to satisfy linter/type rules
     type IOCType = 'ip' | 'domain' | 'hash' | 'url'
-    const results = await threatDetectionSystem.intelligenceService.lookupIOC(
-      sanitizedIndicator,
-      sanitizedType as IOCType,
-      refresh,
-    )
+    const results = await (
+      threatDetectionSystem.intelligenceService.lookupIOC as any
+    )(sanitizedIndicator, sanitizedType as IOCType, refresh)
 
     return new Response(
       JSON.stringify({
@@ -138,7 +136,10 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = (await request.json()) as {
+      indicators?: unknown
+      refresh?: boolean
+    }
     const { indicators, refresh = false } = body
 
     if (!indicators || !Array.isArray(indicators) || indicators.length === 0) {
@@ -214,12 +215,13 @@ export const POST: APIRoute = async ({ request }) => {
             ? (type as IOCType)
             : 'domain'
 
-          const result =
-            await threatDetectionSystem.intelligenceService.lookupIOC(
-              indicator,
-              validatedType,
-              refresh,
-            )
+          const result = await (
+            threatDetectionSystem.intelligenceService.lookupIOC as unknown as (
+              i: string,
+              t: string,
+              r: boolean,
+            ) => Promise<unknown>
+          )(indicator, validatedType, refresh)
           return {
             indicator,
             type,
@@ -280,7 +282,7 @@ export const PUT: APIRoute = async ({ request }) => {
   try {
     // Authenticate request - require admin privileges
     const authResult = await authenticateRequest(request)
-    if (!authResult.success || !authResult.user?.isAdmin) {
+    if (!authResult.success || !(authResult as any).user?.isAdmin) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized or insufficient privileges' }),
         {
@@ -291,7 +293,10 @@ export const PUT: APIRoute = async ({ request }) => {
     }
 
     // Parse request body
-    const body = await request.json()
+    const body = (await request.json()) as {
+      feeds?: unknown[]
+      updateInterval?: number
+    }
     const { feeds, updateInterval } = body
 
     if (!feeds || !Array.isArray(feeds)) {
@@ -333,7 +338,14 @@ export const PUT: APIRoute = async ({ request }) => {
     )
 
     // Update feeds configuration
-    await threatDetectionSystem.intelligenceService.updateConfiguration({
+    await (
+      threatDetectionSystem.intelligenceService as unknown as {
+        updateConfiguration: (config: {
+          feeds: unknown
+          updateInterval: unknown
+        }) => Promise<void>
+      }
+    ).updateConfiguration({
       feeds,
       updateInterval,
     })

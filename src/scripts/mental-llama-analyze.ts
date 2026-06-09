@@ -176,7 +176,18 @@ async function main() {
     // Analyze text
     console.log('Analyzing text for mental health indicators...')
 
-    let analysisResult
+    let analysisResult: {
+      hasMentalHealthIssue: boolean
+      mentalHealthCategory: string
+      confidence: number
+      _routingDecision?: {
+        method: string
+        targetAnalyzer: string
+        insights?: Record<string, unknown>
+      }
+      explanation: string
+      supportingEvidence?: string[]
+    }
     if (options.expert) {
       console.log('Using expert-guided explanations...')
       analysisResult =
@@ -265,9 +276,9 @@ async function main() {
       : undefined = undefined
     if (options.evaluateExplanation) {
       console.log('\nEvaluating explanation quality (STUBBED)...')
-      qualityMetricsResults = await adapter.evaluateExplanationQuality(
-        analysisResult.explanation,
-      )
+        qualityMetricsResults = (await adapter.evaluateExplanationQuality(
+                analysisResult.explanation,
+              ) as unknown as typeof qualityMetricsResults)
 
       console.log('\nQuality Metrics (STUBBED):')
       console.log(JSON.stringify(qualityMetricsResults, null, 2))

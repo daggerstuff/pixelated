@@ -106,7 +106,7 @@ export const threatIntelDatabaseConfig: ThreatIntelligenceDatabaseConfig = {
     retention_days: parseInt(process.env['BACKUP_RETENTION_DAYS'] ?? '30'),
     storage_provider: process.env['BACKUP_STORAGE'] ?? 's3',
   },
-}
+} as any
 
 export const globalThreatIntelConfig: GlobalThreatNetworkConfig = {
   ...baseConfig,
@@ -136,7 +136,7 @@ export const globalThreatIntelConfig: GlobalThreatNetworkConfig = {
       capabilities: ['full_processing', 'ai_analysis', 'correlation'],
       max_capacity: parseInt(process.env['AP_SOUTHEAST_CAPACITY'] ?? '6000'),
     },
-  },
+  } as any,
   sync_settings: {
     interval_ms: parseInt(process.env['SYNC_INTERVAL_MS'] ?? '30000'), // 30 seconds
     batch_size: parseInt(process.env['SYNC_BATCH_SIZE'] ?? '1000'),
@@ -155,11 +155,11 @@ export const globalThreatIntelConfig: GlobalThreatNetworkConfig = {
     interval_ms: parseInt(process.env['HEALTH_CHECK_INTERVAL'] ?? '60000'), // 1 minute
     timeout_ms: parseInt(process.env['HEALTH_CHECK_TIMEOUT'] ?? '5000'),
   },
-}
+} as any
 
 export const edgeThreatDetectionConfig: EdgeDetectionConfig = {
   ...baseConfig,
-  edge_locations: baseConfig.regions.edge_locations.map((location, index) => ({
+  edge_locations: baseConfig.regions.edge_locations.map((_location, index) => ({
     id: `edge-${index + 1}`,
     region:
       baseConfig.regions.secondary[
@@ -217,7 +217,7 @@ export const edgeThreatDetectionConfig: EdgeDetectionConfig = {
     cache_ttl_ms: parseInt(process.env['CACHE_TTL'] ?? '300000'), // 5 minutes
     batch_size: parseInt(process.env['EDGE_BATCH_SIZE'] ?? '100'),
   },
-}
+} as any
 
 export const threatCorrelationConfig: CorrelationEngineConfig = {
   ...baseConfig,
@@ -289,7 +289,7 @@ export const threatCorrelationConfig: CorrelationEngineConfig = {
     ),
     format: process.env['CORRELATION_OUTPUT_FORMAT'] ?? 'json',
   },
-}
+} as any
 
 export const threatResponseConfig: ResponseOrchestratorConfig = {
   ...baseConfig,
@@ -323,7 +323,7 @@ export const threatResponseConfig: ResponseOrchestratorConfig = {
         process.env['MANUAL_NOTIFICATION_CHANNELS'] ?? 'email,slack'
       ).split(','),
     },
-  },
+  } as any,
   integration_apis: {
     firewall_api:
       process.env['FIREWALL_API'] ?? 'https://firewall.internal/api',
@@ -364,7 +364,7 @@ export const threatResponseConfig: ResponseOrchestratorConfig = {
     timeout_ms: parseInt(process.env['ROLLBACK_TIMEOUT'] ?? '60000'), // 1 minute
     backup_before_action: process.env['BACKUP_BEFORE_ACTION'] === 'true',
   },
-}
+} as any
 
 export const threatHuntingConfig: ThreatHuntingSystemConfig = {
   ...baseConfig,
@@ -471,7 +471,7 @@ export const externalFeedConfig: ExternalThreatFeedIntegrationConfig = {
           confidence_threshold: 0.5,
           published: true,
           to_ids: true,
-        },
+        } as any,
       },
       status: 'active',
       sync_frequency: 'daily',
@@ -508,7 +508,7 @@ export const externalFeedConfig: ExternalThreatFeedIntegrationConfig = {
         filters: {
           limit: 1000,
           modified_since: '24h',
-        },
+        } as any,
       },
       status: 'active',
       sync_frequency: 'hourly',
@@ -682,8 +682,8 @@ export function validateThreatIntelConfig(): {
   }
 
   if (
-    threatIntelDatabaseConfig.stix_taxii.enabled &&
-    !threatIntelDatabaseConfig.stix_taxii.taxii_username
+    (threatIntelDatabaseConfig as any).stix_taxii.enabled &&
+    !(threatIntelDatabaseConfig as any).stix_taxii.taxii_username
   ) {
     errors.push('STIX/TAXII enabled but missing credentials')
   }

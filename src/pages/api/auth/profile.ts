@@ -21,7 +21,6 @@ export const GET = async ({
   request: Request
   clientAddress: string
 }) => {
-  let clientInfo = { ip: 'unknown', userAgent: 'unknown', deviceId: 'unknown' }
   try {
     // Extract client info for logging
     clientInfo = {
@@ -44,9 +43,8 @@ export const GET = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = (session.user.id ?? String((session.user as any)._id)) as
-        | string
-        | null
+      userId =
+        (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization') ?? null
       if (!authHeader) {
@@ -148,7 +146,7 @@ export const PUT = async ({
   request: Request
   clientAddress: string
 }) => {
-  let clientInfo = { ip: 'unknown', userAgent: 'unknown', deviceId: 'unknown' }
+  let clientInfo
   try {
     clientInfo = {
       ip: clientAddress || 'unknown',
@@ -175,9 +173,8 @@ export const PUT = async ({
     let userId: string | null = null
 
     if (session?.user) {
-      userId = (session.user.id ?? String((session.user as any)._id)) as
-        | string
-        | null
+      userId =
+        (session.user.id || (session.user as any)._id?.toString()) ?? null
     } else {
       const authHeader = request.headers.get('Authorization')
       if (authHeader) {

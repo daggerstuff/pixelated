@@ -173,7 +173,7 @@ export class EmbeddingAgentClient {
       }
 
       const data = await response.json()
-      return toCamelCase<T>(data)
+      return (toCamelCase(data) as any)
     } catch (error: unknown) {
       clearTimeout(timeoutId)
       if (error instanceof EmbeddingAgentError) {

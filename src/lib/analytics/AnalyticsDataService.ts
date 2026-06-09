@@ -334,7 +334,7 @@ export class AnalyticsDataService {
               ? ('down' as const)
               : ('stable' as const),
         period: `vs previous ${timeRange}`,
-      }
+      } as any
     } catch (error: unknown) {
       logger.error(`Failed to calculate trend for ${metricName}`, { error })
       return undefined

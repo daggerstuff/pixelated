@@ -387,7 +387,7 @@ export class PerformanceOptimizer {
 
     // Process immediately if batch is full
     if (batch.items.length >= this.config.batching.maxBatchSize) {
-      await this.processBatch(batchName, processor)
+      await this.processBatch(batchName, processor as any)
       return
     }
 

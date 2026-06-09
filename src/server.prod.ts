@@ -225,10 +225,9 @@ const startServer = () => {
 }
 
 // Only start the server if this file is run directly
-const isMain = !!(
+const isMain =
   process.argv[1]?.includes('server.prod.js') ??
   process.argv[1]?.includes('server.prod.ts')
-)
 if (isMain) {
   startServer()
 }

@@ -209,7 +209,9 @@ export class WebRTCService implements WebRTCServiceInterface {
 
     // Example monitoring function that could be expanded
     const monitorAudio = () => {
-      analyzer.getByteFrequencyData(dataArray)
+      analyzer.getByteFrequencyData(
+        dataArray as unknown as Uint8Array<ArrayBuffer>,
+      )
 
       // Calculate average energy level (for demonstration)
       let sum = 0

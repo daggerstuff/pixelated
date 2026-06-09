@@ -39,8 +39,8 @@ interface GlobalModel {
 class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
   private readonly dpConfig: DifferentialPrivacyConfig
-  private globalModel: GlobalModel | null = null
-  private readonly clientModels = new Map<string, ModelUpdate>()
+  private globalModel: Record<string, unknown> | null = null
+  private readonly clientModels = new Map<string, Record<string, unknown>>()
   private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
@@ -66,7 +66,7 @@ class PrivacyEngine {
    */
   async initializeFederatedLearning(clients: string[]): Promise<{
     sessionId: string
-    globalModel: GlobalModel
+    globalModel: Record<string, unknown>
     clientAssignments: Map<string, string[]>
   }> {
     if (clients.length < this.federatedConfig.minClients) {
@@ -92,7 +92,7 @@ class PrivacyEngine {
     }
   }
 
-  private createGlobalModel(): GlobalModel {
+  private async createGlobalModel(): Promise<Record<string, unknown>> {
     // Initialize global model with random weights
     return {
       weights: Array.from({ length: 1000 }, () => Math.random()),
@@ -532,14 +532,14 @@ class PrivacyEngine {
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + ((input['moodScore'] as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input.moodScore as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => (input['riskScore'] as number) ?? 0))
+        return Math.max(...inputs.map((input) => (input.riskScore as number) ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + ((input['effectiveness'] as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input.effectiveness as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       default:

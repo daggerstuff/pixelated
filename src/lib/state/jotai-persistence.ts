@@ -58,7 +58,7 @@ class EncryptedJotaiStorage<Value> {
       allowOffline: true,
       syncAcrossTabs: true,
       version: 1,
-      ttl: options.ttl ?? undefined,
+      ttl: options.ttl ?? (undefined as any),
       ...options,
     }
 
@@ -102,7 +102,7 @@ class EncryptedJotaiStorage<Value> {
 
     if (this.options.encrypt) {
       try {
-        serialized = await encrypt(serialized)
+        serialized = await (encrypt as any)(serialized)
       } catch (error: unknown) {
         logger.error('Failed to encrypt state:', error)
         throw new Error('Failed to encrypt state for storage', { cause: error })
@@ -119,7 +119,7 @@ class EncryptedJotaiStorage<Value> {
       // Try to decrypt if it looks like encrypted data
       if (this.options.encrypt || serialized.startsWith('enc:')) {
         try {
-          decrypted = await decrypt(serialized)
+          decrypted = await (decrypt as any)(serialized)
         } catch (error: unknown) {
           logger.warn(
             'Failed to decrypt stored state, treating as plain text:',
@@ -129,7 +129,9 @@ class EncryptedJotaiStorage<Value> {
         }
       }
 
-      const storedState: StoredState<Value> = JSON.parse(decrypted) as unknown
+      const storedState: StoredState<Value> = JSON.parse(
+        decrypted,
+      ) as unknown as any
 
       // Check TTL
       if (storedState.metadata.ttl) {
@@ -239,7 +241,7 @@ export function atomWithEnhancedStorage<Value>(
   return atomWithStorage(
     key,
     initialValue,
-    createJSONStorage<Value>(() => storage as unknown),
+    (createJSONStorage as any)<Value>(() => storage as unknown),
   )
 }
 

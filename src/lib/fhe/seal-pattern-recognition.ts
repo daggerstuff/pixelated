@@ -86,7 +86,7 @@ export class SealPatternRecognitionService implements FHEService {
     encryptedData: EncryptedData,
     options?: unknown,
   ): Promise<T> {
-    return this.enhancedService.decrypt(encryptedData, options)
+    return this.enhancedService.decrypt(encryptedData, options) as any
   }
 
   /**

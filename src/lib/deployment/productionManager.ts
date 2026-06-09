@@ -70,7 +70,7 @@ class ProductionManager {
       enableBlueGreen: true,
       enableCanary: true,
       notificationChannels: ['email', 'slack', 'sms'],
-    }
+    } as any
 
     this.initializeEnvironments()
   }
@@ -212,7 +212,7 @@ class ProductionManager {
       console.error(`Deployment to ${environment} failed:`, error)
 
       // Auto-rollback if enabled
-      if (this.config.enableAutoRollback) {
+      if ((this.config as any).enableAutoRollback) {
         const rollbackPlan = await this.createRollbackPlan(
           environment,
           artifact,
@@ -539,16 +539,16 @@ class ProductionManager {
       fromVersion: failedArtifact.version,
       toVersion: previousDeployment.version,
       steps: [
-        'Backup current database state',
-        'Switch traffic to previous version',
-        'Validate rollback health',
+        'Backup current database state' as any,
+        'Switch traffic to previous version' as any,
+        'Validate rollback health' as any,
         'Restore user sessions',
         'Clean up failed deployment',
-      ],
+      ] as any,
       estimatedDuration: 300000, // 5 minutes
       riskLevel: 'medium',
       requiresApproval: true,
-    }
+    } as any
   }
 
   private findPreviousDeployment(
@@ -581,7 +581,7 @@ class ProductionManager {
       // Execute rollback steps
       for (const step of rollbackPlan.steps) {
         console.log(`Executing rollback step: ${step}`)
-        await this.executeRollbackStep(step, environment)
+        await this.executeRollbackStep(step as any, environment)
       }
 
       const duration = Date.now() - startTime

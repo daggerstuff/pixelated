@@ -83,7 +83,9 @@ export class Encryption {
   async decrypt(encryptedString: string): Promise<string> {
     try {
       // Parse the encrypted data
-      const encrypted: EncryptedData = JSON.parse(encryptedString) as unknown
+      const encrypted: EncryptedData = JSON.parse(
+        encryptedString,
+      ) as unknown as any
 
       // Get the key data
       const keyData = await this.keyStorage.getKey(encrypted.keyId)
@@ -131,7 +133,9 @@ export class Encryption {
     const decrypted = await this.decrypt(encryptedString)
 
     // Parse the encrypted data to get the purpose
-    const encrypted: EncryptedData = JSON.parse(encryptedString) as unknown
+    const encrypted: EncryptedData = JSON.parse(
+      encryptedString,
+    ) as unknown as any
     const oldKey = await this.keyStorage.getKey(encrypted.keyId)
 
     if (!oldKey) {

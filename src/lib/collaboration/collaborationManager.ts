@@ -144,7 +144,7 @@ class CollaborationManager {
       metadata: { sessionId, inviteId },
       timestamp: new Date(),
       read: false,
-    })
+    } as any)
 
     console.log(`Invitation sent: ${invitedUser} to session ${sessionId}`)
 
@@ -217,7 +217,7 @@ class CollaborationManager {
       metadata: { sessionId: invitation.sessionId },
       timestamp: new Date(),
       read: false,
-    })
+    } as any)
 
     console.log(`User ${userId} joined session ${invitation.sessionId}`)
 

@@ -26,7 +26,7 @@ export const POST = async ({
         },
       )
     }
-    const user = await getCurrentUser(cookies)
+    const user = await getCurrentUser((cookies as any))
     if (!user) {
       return new Response(
         JSON.stringify({

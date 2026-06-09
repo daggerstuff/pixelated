@@ -137,7 +137,7 @@ export const GET = async ({ request, cookies }) => {
         source: 'engagement',
         message: error instanceof Error ? String(error) : String(error),
       },
-    }
+    } as any
 
     const status =
       error && typeof error === 'object' && 'status' in error

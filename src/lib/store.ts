@@ -233,302 +233,313 @@ export const useStore = create<StoreState>()(
   devtools(
     subscribeWithSelector(
       persist(
-        (set, get) => ({
-          // Original state
-          securityLevel: 'hipaa',
-          encryptionEnabled: true,
-          fheInitialized: false,
-          aiService: null as unknown as AIService,
-          fheService: null,
-          mentalHealthChat: null,
-          mentalHealthAnalysisEnabled: true,
-          expertGuidanceEnabled: true,
+        (set, get) =>
+          ({
+            // Original state
+            securityLevel: 'hipaa',
+            encryptionEnabled: true,
+            fheInitialized: false,
+            aiService: null as unknown as AIService,
+            fheService: null,
+            mentalHealthChat: null,
+            mentalHealthAnalysisEnabled: true,
+            expertGuidanceEnabled: true,
 
-          // Enhanced state
-          preferences: defaultPreferences,
-          uiState: defaultUIState,
-          sessionState: defaultSessionState,
-          offlineQueue: [],
-          formDrafts: {},
-          usageStats: defaultUsageStats,
+            // Enhanced state
+            preferences: defaultPreferences,
+            uiState: defaultUIState,
+            sessionState: defaultSessionState,
+            offlineQueue: [],
+            formDrafts: {},
+            usageStats: defaultUsageStats,
 
-          // Original actions
-          setSecurityLevel: (level) => set({ securityLevel: level }),
-          setEncryptionEnabled: (enabled) =>
-            set({ encryptionEnabled: enabled }),
-          setFHEInitialized: (initialized) =>
-            set({ fheInitialized: initialized }),
-          setAIService: (service) => set({ aiService: service }),
-          initializeMentalHealthChat: () => {
-            if (get().fheService) {
-              const mentalHealthChat = createMentalHealthChat(
-                get().fheService,
-                {
-                  enableAnalysis: get().mentalHealthAnalysisEnabled,
-                  useExpertGuidance: get().expertGuidanceEnabled,
-                },
-              )
-              set({ mentalHealthChat })
-              return mentalHealthChat
-            }
-            return null
-          },
-          configureMentalHealthAnalysis: (
-            enableAnalysis: boolean,
-            useExpertGuidance: boolean,
-          ) => {
-            set({
-              mentalHealthAnalysisEnabled: enableAnalysis,
-              expertGuidanceEnabled: useExpertGuidance,
-            })
-
-            const { mentalHealthChat } = get()
-            if (mentalHealthChat) {
-              mentalHealthChat.configure({
-                enableAnalysis,
-                useExpertGuidance,
+            // Original actions
+            setSecurityLevel: (level) => set({ securityLevel: level }),
+            setEncryptionEnabled: (enabled) =>
+              set({ encryptionEnabled: enabled }),
+            setFHEInitialized: (initialized) =>
+              set({ fheInitialized: initialized }),
+            setAIService: (service) => set({ aiService: service }),
+            initializeMentalHealthChat: () => {
+              if (get().fheService) {
+                const mentalHealthChat = createMentalHealthChat(
+                  get().fheService,
+                  {
+                    enableAnalysis: get().mentalHealthAnalysisEnabled,
+                    useExpertGuidance: get().expertGuidanceEnabled,
+                  },
+                )
+                set({ mentalHealthChat })
+                return mentalHealthChat
+              }
+              return null
+            },
+            configureMentalHealthAnalysis: (
+              enableAnalysis: boolean,
+              useExpertGuidance: boolean,
+            ) => {
+              set({
+                mentalHealthAnalysisEnabled: enableAnalysis,
+                expertGuidanceEnabled: useExpertGuidance,
               })
-            }
-          },
 
-          // Enhanced actions - User Preferences
-          updatePreferences: (preferences) =>
-            set((state) => ({
-              preferences: { ...state.preferences, ...preferences },
-            })),
-          setTheme: (theme) =>
-            set((state) => ({
-              preferences: { ...state.preferences, theme },
-            })),
-          setLanguage: (language) =>
-            set((state) => ({
-              preferences: { ...state.preferences, language },
-            })),
-          updateNotificationSettings: (notifications) =>
-            set((state) => ({
-              preferences: {
-                ...state.preferences,
-                notifications: {
-                  ...state.preferences.notifications,
-                  ...notifications,
+              const { mentalHealthChat } = get()
+              if (mentalHealthChat) {
+                mentalHealthChat.configure({
+                  enableAnalysis,
+                  useExpertGuidance,
+                })
+              }
+            },
+
+            // Enhanced actions - User Preferences
+            updatePreferences: (preferences) =>
+              set((state) => ({
+                preferences: { ...state.preferences, ...preferences },
+              })),
+            setTheme: (theme) =>
+              set((state) => ({
+                preferences: { ...state.preferences, theme },
+              })),
+            setLanguage: (language) =>
+              set((state) => ({
+                preferences: { ...state.preferences, language },
+              })),
+            updateNotificationSettings: (notifications) =>
+              set((state) => ({
+                preferences: {
+                  ...state.preferences,
+                  notifications: {
+                    ...state.preferences.notifications,
+                    ...notifications,
+                  },
                 },
-              },
-            })),
-          updateAccessibilitySettings: (accessibility) =>
-            set((state) => ({
-              preferences: {
-                ...state.preferences,
-                accessibility: {
-                  ...state.preferences.accessibility,
-                  ...accessibility,
+              })),
+            updateAccessibilitySettings: (accessibility) =>
+              set((state) => ({
+                preferences: {
+                  ...state.preferences,
+                  accessibility: {
+                    ...state.preferences.accessibility,
+                    ...accessibility,
+                  },
                 },
-              },
-            })),
-          updatePrivacySettings: (privacy) =>
-            set((state) => ({
-              preferences: {
-                ...state.preferences,
-                privacy: { ...state.preferences.privacy, ...privacy },
-              },
-            })),
-
-          // Enhanced actions - UI State
-          updateUIState: (uiState) =>
-            set((state) => ({
-              uiState: { ...state.uiState, ...uiState },
-            })),
-          toggleSidebar: () =>
-            set((state) => ({
-              uiState: {
-                ...state.uiState,
-                sidebarOpen: !state.uiState.sidebarOpen,
-              },
-            })),
-          setActiveTab: (tab) =>
-            set((state) => ({
-              uiState: { ...state.uiState, activeTab: tab },
-            })),
-          setLayout: (layout) =>
-            set((state) => ({
-              uiState: { ...state.uiState, layout },
-            })),
-          setViewMode: (viewMode) =>
-            set((state) => ({
-              uiState: { ...state.uiState, viewMode },
-            })),
-          updateFilters: (filters) =>
-            set((state) => ({
-              uiState: {
-                ...state.uiState,
-                filters: { ...state.uiState.filters, ...filters },
-              },
-            })),
-          setSortBy: (sortBy, sortOrder = 'desc') =>
-            set((state) => ({
-              uiState: { ...state.uiState, sortBy, sortOrder },
-            })),
-
-          // Enhanced actions - Session State
-          updateSessionState: (sessionState) =>
-            set((state) => ({
-              sessionState: { ...state.sessionState, ...sessionState },
-            })),
-          setCurrentRoute: (route) =>
-            set((state) => ({
-              sessionState: {
-                ...state.sessionState,
-                lastRoute: route,
-                lastActivity: Date.now(),
-              },
-            })),
-          setCurrentWorkspace: (workspace) =>
-            set((state) => ({
-              sessionState: {
-                ...state.sessionState,
-                currentWorkspace: workspace,
-              },
-            })),
-          addOpenTab: (tab) =>
-            set((state) => {
-              const openTabs = [...state.sessionState.openTabs]
-              if (!openTabs.includes(tab)) {
-                openTabs.push(tab)
-                // Keep only last 10 tabs
-                if (openTabs.length > 10) {
-                  openTabs.shift()
-                }
-              }
-              return {
-                sessionState: { ...state.sessionState, openTabs },
-              }
-            }),
-          removeOpenTab: (tab) =>
-            set((state) => ({
-              sessionState: {
-                ...state.sessionState,
-                openTabs: state.sessionState.openTabs.filter((t) => t !== tab),
-              },
-            })),
-          addRecentItem: (item) =>
-            set((state) => {
-              const recentItems = [
-                item,
-                ...state.sessionState.recentItems.filter((i) => i !== item),
-              ]
-              // Keep only last 20 items
-              if (recentItems.length > 20) {
-                recentItems.splice(20)
-              }
-              return {
-                sessionState: { ...state.sessionState, recentItems },
-              }
-            }),
-          addSearchHistory: (query) =>
-            set((state) => {
-              const searchHistory = [
-                query,
-                ...state.sessionState.searchHistory.filter((q) => q !== query),
-              ]
-              // Keep only last 50 searches
-              if (searchHistory.length > 50) {
-                searchHistory.splice(50)
-              }
-              return {
-                sessionState: { ...state.sessionState, searchHistory },
-              }
-            }),
-          updateLastActivity: () =>
-            set((state) => ({
-              sessionState: { ...state.sessionState, lastActivity: Date.now() },
-            })),
-
-          // Enhanced actions - Offline Queue
-          queueOfflineAction: (type, payload) =>
-            set((state) => ({
-              offlineQueue: [
-                ...state.offlineQueue,
-                {
-                  id: `${Date.now()}_${Math.random().toString(36).substring(2)}`,
-                  type,
-                  payload,
-                  timestamp: Date.now(),
-                  retryCount: 0,
+              })),
+            updatePrivacySettings: (privacy) =>
+              set((state) => ({
+                preferences: {
+                  ...state.preferences,
+                  privacy: { ...state.preferences.privacy, ...privacy },
                 },
-              ],
-            })),
-          removeOfflineAction: (id) =>
-            set((state) => ({
-              offlineQueue: state.offlineQueue.filter(
-                (action) => action.id !== id,
+              })),
+
+            // Enhanced actions - UI State
+            updateUIState: (uiState) =>
+              set((state) => ({
+                uiState: { ...state.uiState, ...uiState },
+              })),
+            toggleSidebar: () =>
+              set((state) => ({
+                uiState: {
+                  ...state.uiState,
+                  sidebarOpen: !state.uiState.sidebarOpen,
+                },
+              })),
+            setActiveTab: (tab) =>
+              set((state) => ({
+                uiState: { ...state.uiState, activeTab: tab },
+              })),
+            setLayout: (layout) =>
+              set((state) => ({
+                uiState: { ...state.uiState, layout },
+              })),
+            setViewMode: (viewMode) =>
+              set((state) => ({
+                uiState: { ...state.uiState, viewMode },
+              })),
+            updateFilters: (filters) =>
+              set((state) => ({
+                uiState: {
+                  ...state.uiState,
+                  filters: { ...state.uiState.filters, ...filters },
+                },
+              })),
+            setSortBy: (sortBy, sortOrder = 'desc') =>
+              set(
+                (state) =>
+                  ({
+                    uiState: { ...state.uiState, sortBy, sortOrder },
+                  }) as any,
               ),
-            })),
-          clearOfflineQueue: () => set({ offlineQueue: [] }),
 
-          // Enhanced actions - Form Drafts
-          saveDraft: (formId, data) =>
-            set((state) => ({
-              formDrafts: {
-                ...state.formDrafts,
-                [formId]: { data, timestamp: Date.now() },
-              },
-            })),
-          getDraft: (formId) => {
-            const draft = get().formDrafts[formId]
-            return draft?.data ?? null
-          },
-          clearDraft: (formId) =>
-            set((state) => {
-              const { [formId]: _, ...rest } = state.formDrafts
-              return { formDrafts: rest }
-            }),
-          clearAllDrafts: () => set({ formDrafts: {} }),
-
-          // Enhanced actions - Usage Analytics
-          trackFeatureUsage: (featureName) =>
-            set((state) => ({
-              usageStats: {
-                ...state.usageStats,
-                featureUsage: {
-                  ...state.usageStats.featureUsage,
-                  [featureName]:
-                    (state.usageStats.featureUsage[featureName] ?? 0) + 1,
+            // Enhanced actions - Session State
+            updateSessionState: (sessionState) =>
+              set((state) => ({
+                sessionState: { ...state.sessionState, ...sessionState },
+              })),
+            setCurrentRoute: (route) =>
+              set((state) => ({
+                sessionState: {
+                  ...state.sessionState,
+                  lastRoute: route,
+                  lastActivity: Date.now(),
                 },
-              },
-            })),
-          incrementSessionCount: () =>
-            set((state) => ({
-              usageStats: {
-                ...state.usageStats,
-                sessionCount: state.usageStats.sessionCount + 1,
-              },
-            })),
-          recordSessionEnd: () =>
-            set((state) => {
-              const now = Date.now()
-              const sessionDuration = state.usageStats.lastSessionEnd
-                ? now - state.usageStats.lastSessionEnd
-                : 0
+              })),
+            setCurrentWorkspace: (workspace) =>
+              set((state) => ({
+                sessionState: {
+                  ...state.sessionState,
+                  currentWorkspace: workspace,
+                },
+              })),
+            addOpenTab: (tab) =>
+              set((state) => {
+                const openTabs = [...state.sessionState.openTabs]
+                if (!openTabs.includes(tab)) {
+                  openTabs.push(tab)
+                  // Keep only last 10 tabs
+                  if (openTabs.length > 10) {
+                    openTabs.shift()
+                  }
+                }
+                return {
+                  sessionState: { ...state.sessionState, openTabs },
+                }
+              }),
+            removeOpenTab: (tab) =>
+              set((state) => ({
+                sessionState: {
+                  ...state.sessionState,
+                  openTabs: state.sessionState.openTabs.filter(
+                    (t) => t !== tab,
+                  ),
+                },
+              })),
+            addRecentItem: (item) =>
+              set((state) => {
+                const recentItems = [
+                  item,
+                  ...state.sessionState.recentItems.filter((i) => i !== item),
+                ]
+                // Keep only last 20 items
+                if (recentItems.length > 20) {
+                  recentItems.splice(20)
+                }
+                return {
+                  sessionState: { ...state.sessionState, recentItems },
+                }
+              }),
+            addSearchHistory: (query) =>
+              set((state) => {
+                const searchHistory = [
+                  query,
+                  ...state.sessionState.searchHistory.filter(
+                    (q) => q !== query,
+                  ),
+                ]
+                // Keep only last 50 searches
+                if (searchHistory.length > 50) {
+                  searchHistory.splice(50)
+                }
+                return {
+                  sessionState: { ...state.sessionState, searchHistory },
+                }
+              }),
+            updateLastActivity: () =>
+              set((state) => ({
+                sessionState: {
+                  ...state.sessionState,
+                  lastActivity: Date.now(),
+                },
+              })),
 
-              return {
+            // Enhanced actions - Offline Queue
+            queueOfflineAction: (type, payload) =>
+              set((state) => ({
+                offlineQueue: [
+                  ...state.offlineQueue,
+                  {
+                    id: `${Date.now()}_${Math.random().toString(36).substring(2)}`,
+                    type,
+                    payload,
+                    timestamp: Date.now(),
+                    retryCount: 0,
+                  },
+                ],
+              })),
+            removeOfflineAction: (id) =>
+              set((state) => ({
+                offlineQueue: state.offlineQueue.filter(
+                  (action) => action.id !== id,
+                ),
+              })),
+            clearOfflineQueue: () => set({ offlineQueue: [] }),
+
+            // Enhanced actions - Form Drafts
+            saveDraft: (formId, data) =>
+              set((state) => ({
+                formDrafts: {
+                  ...state.formDrafts,
+                  [formId]: { data, timestamp: Date.now() },
+                },
+              })),
+            getDraft: (formId) => {
+              const draft = get().formDrafts[formId]
+              return draft?.data ?? null
+            },
+            clearDraft: (formId) =>
+              set((state) => {
+                const { [formId]: _, ...rest } = state.formDrafts
+                return { formDrafts: rest }
+              }),
+            clearAllDrafts: () => set({ formDrafts: {} }),
+
+            // Enhanced actions - Usage Analytics
+            trackFeatureUsage: (featureName) =>
+              set((state) => ({
                 usageStats: {
                   ...state.usageStats,
-                  lastSessionEnd: now,
-                  totalTimeSpent:
-                    state.usageStats.totalTimeSpent + sessionDuration,
+                  featureUsage: {
+                    ...state.usageStats.featureUsage,
+                    [featureName]:
+                      (state.usageStats.featureUsage[featureName] ?? 0) + 1,
+                  },
                 },
-              }
-            }),
-          updatePerformanceMetric: (metric, value) =>
-            set((state) => ({
-              usageStats: {
-                ...state.usageStats,
-                performanceMetrics: {
-                  ...state.usageStats.performanceMetrics,
-                  [metric]: value,
+              })),
+            incrementSessionCount: () =>
+              set((state) => ({
+                usageStats: {
+                  ...state.usageStats,
+                  sessionCount: state.usageStats.sessionCount + 1,
                 },
-              },
-            })),
-        }),
+              })),
+            recordSessionEnd: () =>
+              set((state) => {
+                const now = Date.now()
+                const sessionDuration = state.usageStats.lastSessionEnd
+                  ? now - state.usageStats.lastSessionEnd
+                  : 0
+
+                return {
+                  usageStats: {
+                    ...state.usageStats,
+                    lastSessionEnd: now,
+                    totalTimeSpent:
+                      state.usageStats.totalTimeSpent + sessionDuration,
+                  },
+                }
+              }),
+            updatePerformanceMetric: (metric, value) =>
+              set((state) => ({
+                usageStats: {
+                  ...state.usageStats,
+                  performanceMetrics: {
+                    ...state.usageStats.performanceMetrics,
+                    [metric]: value,
+                  },
+                },
+              })),
+          }) as any,
         {
           name: 'therapy-state-enhanced',
           partialize: (state) => ({

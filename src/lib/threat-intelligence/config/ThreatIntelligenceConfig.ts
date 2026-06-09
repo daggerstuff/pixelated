@@ -4,7 +4,7 @@
  */
 
 import Redis from 'ioredis'
-import { type Db, MongoClient } from 'mongodb'
+import { MongoClient } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
@@ -1363,7 +1363,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       this.config.regions[regionIndex] = {
-        ...this.config.regions[regionIndex]!,
+        ...this.config.regions[regionIndex],
         ...updates,
       } as RegionConfig
 
@@ -1415,7 +1415,7 @@ export class ThreatIntelligenceConfigManager {
       }
 
       // Don't allow removal of primary region
-      if (this.config.regions[regionIndex]?.primary) {
+      if (this?.config.regions[regionIndex].primary) {
         throw new Error('Cannot remove primary region')
       }
 

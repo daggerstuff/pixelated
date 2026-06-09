@@ -388,7 +388,7 @@ test.describe('Theme Performance Tests', () => {
         return {
           totalSelectors: selectors.length,
           complexSelectors: selectors.filter(
-            (s) => s.includes('>') || s.includes('+') || s.includes('~'),
+            (s) => s.includes('>') ?? s.includes('+') ?? s.includes('~'),
           ).length,
           universalSelectors: selectors.filter((s) => s.includes('*')).length,
         }

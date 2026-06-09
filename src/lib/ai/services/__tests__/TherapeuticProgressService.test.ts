@@ -128,7 +128,7 @@ describe('TherapeuticProgressService', () => {
       expect(addedInsight?.insight).toBe(insightText)
       expect(addedInsight?.belief).toBe(relatedBelief)
       expect(addedInsight?.dateAchieved).toBeDefined()
-      expect(Date.parse(addedInsight!.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
+      expect(Date.parse(addedInsight.dateAchieved)).toBeCloseTo(Date.now(), -3) // Check if date is recent
       expect(updatedProfile.lastUpdatedAt).not.toBe(
         mockPatientProfile.lastUpdatedAt,
       )

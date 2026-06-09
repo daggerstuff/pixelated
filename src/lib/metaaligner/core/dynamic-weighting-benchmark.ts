@@ -289,7 +289,7 @@ async function generateVisualizationData(): Promise<VisualizationData> {
       iteration: i,
       context: contextType,
       updateTimeMs: result.updateTimeMs,
-      weights: result.weights,
+      weights: result.weights as any,
       blendingApplied: result.blendingApplied,
       oscillationDetected: result.oscillationDetected,
     })

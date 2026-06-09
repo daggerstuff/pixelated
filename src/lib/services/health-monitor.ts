@@ -150,8 +150,7 @@ export class HealthMonitor {
       return {
         name: 'system',
         status: 'unhealthy',
-        message:
-          _error instanceof Error ? _String(error) : 'System check failed',
+        message: error instanceof Error ? String(error) : 'System check failed',
       }
     }
   }
@@ -190,8 +189,7 @@ export class HealthMonitor {
       return {
         name: 'memory',
         status: 'unhealthy',
-        message:
-          _error instanceof Error ? _String(error) : 'Memory check failed',
+        message: error instanceof Error ? String(error) : 'Memory check failed',
       }
     }
   }
@@ -226,7 +224,7 @@ export class HealthMonitor {
       return {
         name: 'disk',
         status: 'unhealthy',
-        message: _error instanceof Error ? _String(error) : 'Disk check failed',
+        message: error instanceof Error ? String(error) : 'Disk check failed',
       }
     }
   }

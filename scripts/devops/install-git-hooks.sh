@@ -27,6 +27,11 @@ fi
 
 HOOKS_DIR="$GIT_DIR/hooks"
 HOOKS_PATH=$(git config --get core.hooksPath || true)
+if [[ "$HOOKS_PATH" == *".beads"* ]]; then
+  echo "Clean up legacy beads configuration: unsetting core.hooksPath"
+  git config --unset core.hooksPath || true
+  HOOKS_PATH=""
+fi
 if [ -n "$HOOKS_PATH" ]; then
   case "$HOOKS_PATH" in
     /*) HOOKS_DIR="$HOOKS_PATH" ;;

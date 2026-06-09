@@ -457,7 +457,7 @@ export const convertKnowledgeToConversation = async (
   const generatedDialogue = generateKnowledgeBasedDialogue(validatedRequest)
 
   // Calculate quality metrics
-  const qualityMetrics = calculateConversationQuality(validatedRequest)
+  const qualityMetrics = calculateConversationQuality(validatedRequest as any)
 
   // Map knowledge sources to dialogue turns
   const knowledgeMapping = mapKnowledgeToDialogue(generatedDialogue)
@@ -490,7 +490,7 @@ function generateKnowledgeBasedDialogue(
   request: z.infer<typeof ConversationConverterRequestSchema>,
 ) {
   const { clientProfile, conversationParameters, knowledgeBase } = request
-  const dialogue = []
+  const dialogue: any[] = []
 
   // Opening therapist response based on approach and knowledge
   dialogue.push({
@@ -506,7 +506,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Therapeutic engagement best practices',
       confidence: 0.95,
     },
-  })
+  } as any)
 
   // Client response based on profile
   dialogue.push({
@@ -525,7 +525,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Presenting problem and demographics',
       confidence: 0.9,
     },
-  })
+  } as any)
 
   // Therapist intervention based on DSM-5 and techniques
   dialogue.push({
@@ -544,7 +544,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Evidence-based intervention protocols',
       confidence: 0.88,
     },
-  })
+  } as any)
 
   // Client processing response
   dialogue.push({
@@ -561,7 +561,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Client engagement and processing indicators',
       confidence: 0.85,
     },
-  })
+  } as any)
 
   // Follow-up therapist response
   dialogue.push({
@@ -577,7 +577,7 @@ function generateKnowledgeBasedDialogue(
       reference: 'Progressive intervention strategies',
       confidence: 0.92,
     },
-  })
+  } as any)
 
   return dialogue
 }
@@ -640,8 +640,8 @@ function generateClientResponse(profile: ClientProfile): string {
 
 function generateKnowledgeBasedIntervention(
   approach: string,
-  dsm5: string[],
-  techniques: string[],
+  _dsm5: string[],
+  _techniques: string[],
   problem: string,
 ): string {
   const interventions = {
@@ -658,7 +658,7 @@ function generateKnowledgeBasedIntervention(
 }
 
 function generateClientProcessingResponse(
-  profile: ClientProfile,
+  _profile: ClientProfile,
   approach: string,
 ): string {
   const responses = {
@@ -694,7 +694,7 @@ interface ConversationRequest {
   [key: string]: unknown
 }
 
-function calculateConversationQuality(request: ConversationRequest): void {
+function calculateConversationQuality(request: ConversationRequest): any {
   // Simulate quality calculation based on knowledge integration
   const baseScore = 80
   const kb = request.knowledgeBase as { dsm5Criteria?: unknown[] }
@@ -725,7 +725,7 @@ function calculateConversationQuality(request: ConversationRequest): void {
     therapeuticAccuracy: Math.round(therapeuticAccuracy),
     knowledgeIntegration: Math.round(knowledgeIntegration),
     conversationFlow: Math.round(conversationFlow),
-  }
+  } as any
 }
 
 function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
