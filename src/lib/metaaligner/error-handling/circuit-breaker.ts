@@ -65,7 +65,7 @@ export class CircuitBreaker implements ICircuitBreaker {
 
   private fail(error: Error): void {
     this.failures++
-    this.lastError = error
+    ;(this as any).lastError = error
     if (this.failures >= this.failureThreshold) {
       this.state = CircuitBreakerState.OPEN
       this.nextAttempt = Date.now() + this.resetTimeout

@@ -201,7 +201,7 @@ const jobsWorker = {
               start: new Date(timeRange.start),
               end: new Date(timeRange.end),
             },
-            safeOptions,
+            safeOptions as any,
           )
           const reportDurationMs = Date.now() - reportStartTime
           distributionMetric(

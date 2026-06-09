@@ -5,7 +5,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import type { AIService } from '../../ai/models/types'
 import type { CrisisDetectionService } from '../../ai/services/crisis-detection'
-import type { CrisisDetectionResult } from '../../ai/crisis/types'
 import { ContextType } from '../core/objectives'
 import {
   ContextDetector,
@@ -417,7 +416,7 @@ describe('ContextDetector', () => {
             content: q,
           })
           const result = await contextDetector.detectContext(q)
-          expect(vi.mocked(result).detectedContext).not.toBe(
+          expect(result.detectedContext).not.toBe(
             ContextType.CLINICAL_ASSESSMENT,
           )
         }
@@ -509,9 +508,7 @@ describe('ContextDetector', () => {
         const loggerSpy = vi.spyOn(console, 'log')
         const result = await contextDetector.detectContext(queryWithPII)
 
-        expect(vi.mocked(result).detectedContext).toBe(
-          ContextType.CLINICAL_ASSESSMENT,
-        )
+        expect(result.detectedContext).toBe(ContextType.CLINICAL_ASSESSMENT)
 
         // Check that no logged messages contain PII
         const logCalls = loggerSpy.mock.calls
@@ -679,9 +676,9 @@ describe('ContextDetector', () => {
         content: '',
       }))
 
-      vi.mocked(mockAIService)
-        .createChatCompletion.mockResolvedValueOnce(aiResponses[0] as any)
-        .mockResolvedValueOnce(aiResponses[1] as any)
+      vi.mocked(mockAIService.createChatCompletion)
+        .mockResolvedValueOnce(aiResponses[0])
+        .mockResolvedValueOnce(aiResponses[1])
 
       const results = await contextDetector.detectContextBatch(inputs)
 

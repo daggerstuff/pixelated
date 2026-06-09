@@ -592,7 +592,7 @@ export class BiasWebSocketServer {
       data: {
         summary: dashboardData.summary,
         newAlerts: dashboardData.alerts?.slice(0, 5) || [],
-        updatedTrends: dashboardData.trends?.slice(-10) || [],
+        updatedTrends: dashboardData.trends?.slice(-10) || ([] as any),
       },
     }
 
@@ -622,7 +622,7 @@ export class BiasWebSocketServer {
           },
           version: '1.0.0',
           uptime: 0,
-        },
+        } as any,
         changedServices: [],
       },
     }
