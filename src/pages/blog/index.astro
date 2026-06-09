@@ -3,6 +3,7 @@ export const prerender = false
 
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { isAstroProduction } from '@/utils/astro-env'
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-'
   const date = new Date(dateInput)
