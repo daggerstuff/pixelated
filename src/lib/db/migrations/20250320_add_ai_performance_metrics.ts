@@ -4,7 +4,7 @@ import postgres from 'postgres'
 const sql = postgres(process.env['DATABASE_URL'] ?? '')
 
 export async function up() {
-  await sql.unsafe`
+  await sql.unsafe(`
     CREATE TABLE IF NOT EXISTS ai_performance_metrics (
       id SERIAL PRIMARY KEY,
       model VARCHAR(255) NOT NULL,
@@ -26,15 +26,15 @@ export async function up() {
     CREATE INDEX IF NOT EXISTS idx_ai_perf_created_at ON ai_performance_metrics(created_at);
     CREATE INDEX IF NOT EXISTS idx_ai_perf_user_id ON ai_performance_metrics(user_id);
     CREATE INDEX IF NOT EXISTS idx_ai_perf_success ON ai_performance_metrics(success);
-  `
+  `)
 
   console.log('Created ai_performance_metrics table')
 }
 
 export async function down() {
-  await sql.unsafe`
+  await sql.unsafe(`
     DROP TABLE IF EXISTS ai_performance_metrics;
-  `
+  `)
 
   console.log('Dropped ai_performance_metrics table')
 }

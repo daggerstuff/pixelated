@@ -344,18 +344,33 @@ declare module 'pg' {
     release(): void
   }
 
+  interface PoolConfig extends Record<string, any> {
+    host?: string
+    port?: number
+    database?: string
+    user?: string
+    password?: string
+    max?: number
+    min?: number
+    idleTimeoutMillis?: number
+    connectionTimeoutMillis?: number
+    ssl?: any
+  }
+
   class Pool {
-    constructor(config?: Record<string, unknown>)
+    constructor(config?: PoolConfig)
     connect(): Promise<PoolClient>
     query<T = unknown>(
       query: string,
       values?: unknown[],
     ): Promise<QueryResult<T>>
     end(): Promise<void>
-    on(event: 'error', listener: (error: unknown) => void): this
+    on(event: 'error', listener: (error: any, client?: any) => void): this
+    on(event: 'connect', listener: (client: PoolClient) => void): this
+    on(event: 'remove', listener: (client: PoolClient) => void): this
   }
 
-  export { Pool, PoolClient }
+  export { Pool, PoolClient, PoolConfig }
 }
 declare module 'ioredis-mock'
 declare module 'eslint-plugin-node'

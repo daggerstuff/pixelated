@@ -138,3 +138,25 @@ export interface CompetitorProfile {
   recentNews?: string[]
   lastUpdated: Date
 }
+
+export interface MarketTrend {
+  id: string
+  marketId: string
+  name: string
+  description: string
+  direction: 'up' | 'down' | 'stable'
+  impact: 'high' | 'medium' | 'low'
+  date: Date
+  source?: string
+}
+
+export interface Opportunity {
+  id: string
+  marketId: string
+  name: string
+  description: string
+  status: 'open' | 'closed' | 'in-progress'
+  estimatedValue?: number
+  probability?: number
+  createdAt: Date
+}

@@ -50,7 +50,7 @@ export class AuditService {
         entityId: event.resourceId ?? '',
         entityType: event.resource ?? 'system',
         action: event.action,
-        userId: event.userId,
+        userId: event.userId ?? ('system' as UserId),
         timestamp: event.timestamp,
         changes: event.details
           ? { details: { from: null, to: event.details } }

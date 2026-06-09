@@ -5,7 +5,7 @@
  * while maintaining separation of concerns for business strategy data
  */
 
-import type { Redis } from 'ioredis'
+import type Redis from 'ioredis'
 import type { MongoClient, Db } from 'mongodb'
 import type { Pool } from 'pg'
 

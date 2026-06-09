@@ -289,3 +289,33 @@ export interface DocumentSearchResult {
   }[]
   matchedTerms: string[]
 }
+
+export interface DocumentCreate {
+  title: string
+  content: string
+  contentType?: ContentType
+  type: DocumentType
+  category: Category
+  tags?: DocumentTag[]
+  description?: string
+  excerpt?: string
+  priority?: Priority
+  isPublic?: boolean
+  isTemplate?: boolean
+}
+
+export interface DocumentUpdate {
+  title?: string
+  content?: string
+  contentType?: ContentType
+  type?: DocumentType
+  category?: Category
+  tags?: DocumentTag[]
+  description?: string
+  excerpt?: string
+  priority?: Priority
+  status?: Status
+  isPublic?: boolean
+  isTemplate?: boolean
+  summary?: string
+}

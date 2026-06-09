@@ -23,15 +23,28 @@ export abstract class BaseService {
    */
   protected async logAudit(params: {
     userId?: UserId
+    type?:
+      | 'authentication'
+      | 'authorization'
+      | 'data_access'
+      | 'data_modification'
+      | 'system'
     action: string
-    entityType: string
+    entityType?: string
     entityId?: string
     result: 'success' | 'failure' | 'error'
     details?: Record<string, unknown>
     riskScore?: number
   }): Promise<void> {
     await this.auditService.logEvent({
-      ...params,
+      userId: params.userId,
+      type: params.type ?? 'system',
+      action: params.action,
+      resource: params.entityType,
+      resourceId: params.entityId,
+      result: params.result,
+      details: params.details,
+      riskScore: params.riskScore,
       timestamp: new Date(),
     })
   }
@@ -78,7 +91,7 @@ export abstract class BaseService {
    * Sanitize input data
    */
   protected sanitizeInput<T extends Record<string, unknown>>(data: T): T {
-    const sanitized = { ...data }
+    const sanitized = { ...data } as Record<string, unknown>
 
     // Remove any potential XSS or injection attempts
     for (const [key, value] of Object.entries(sanitized)) {
@@ -88,11 +101,11 @@ export abstract class BaseService {
           .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
           .replace(/javascript:/gi, '')
           .replace(/on\w+\s*=/gi, '')
-          .trim() as T[Extract<keyof T, string>]
+          .trim()
       }
     }
 
-    return sanitized
+    return sanitized as T
   }
 
   /**
