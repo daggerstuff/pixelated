@@ -1,7 +1,5 @@
 // API endpoint for bias detection data export
 
-import type { APIRoute } from 'astro'
-
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
@@ -150,53 +148,53 @@ export const POST: APIRoute = async ({ request }) => {
 
 // Helper function to convert export data to CSV format
 function convertToCSV(exportData: ExportData): string {
-  const csvRows = []
+  const csvRows: string[] = []
 
   // Headers
-  csvRows.push('Category,Metric,Value,Details')
+  csvRows.push('Category,Metric,Value,Details' as any)
 
   // Analysis data
   if (exportData.analysis) {
     const { analysis } = exportData
     csvRows.push(
-      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}`,
+      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}` as any,
     )
-    csvRows.push(`Analysis,Confidence,${analysis.confidence},`)
-    csvRows.push(`Analysis,Session ID,${analysis.sessionId},`)
+    csvRows.push(`Analysis,Confidence,${analysis.confidence},` as any)
+    csvRows.push(`Analysis,Session ID,${analysis.sessionId},` as any)
 
     // Layer results
     const layers = analysis.layerResults
     csvRows.push(
-      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},`,
+      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},`,
+      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},`,
+      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},` as any,
     )
     csvRows.push(
-      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},`,
-    )
-
-    csvRows.push(
-      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},`,
-    )
-    csvRows.push(
-      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},`,
-    )
-    csvRows.push(
-      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},`,
+      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},` as any,
     )
 
     csvRows.push(
-      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},`,
+      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},` as any,
     )
     csvRows.push(
-      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},`,
+      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},` as any,
     )
     csvRows.push(
-      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},`,
+      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},` as any,
+    )
+
+    csvRows.push(
+      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},` as any,
+    )
+    csvRows.push(
+      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},` as any,
+    )
+    csvRows.push(
+      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},` as any,
     )
   }
 
@@ -205,10 +203,10 @@ function convertToCSV(exportData: ExportData): string {
     const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
       csvRows.push(
-        `Counterfactual,Scenario ${index + 1},${scenario.biasScoreChange},${scenario.change}`,
+        `Counterfactual,Scenario ${index + 1},${scenario['expectedBiasReduction'] as number},${scenario['change']}`,
       )
       csvRows.push(
-        `Counterfactual,Likelihood ${index + 1},${scenario.likelihood},${scenario.impact}`,
+        `Counterfactual,Likelihood ${index + 1},${scenario['likelihood']},${scenario['description']}`,
       )
     })
   }
@@ -216,9 +214,13 @@ function convertToCSV(exportData: ExportData): string {
   // Historical comparison
   if (exportData.historicalComparison) {
     const historical = exportData.historicalComparison
-    csvRows.push(`Historical,30-Day Average,${historical.thirtyDayAverage},`)
-    csvRows.push(`Historical,Percentile Rank,${historical.percentileRank},`)
-    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},`)
+    csvRows.push(
+      `Historical,30-Day Average,${historical.thirtyDayAverage},` as any,
+    )
+    csvRows.push(
+      `Historical,Percentile Rank,${historical.percentileRank},` as any,
+    )
+    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},` as any)
   }
 
   return csvRows.join('\n')
@@ -261,10 +263,10 @@ function convertToText(exportData: ExportData): string {
     content += `COUNTERFACTUAL SCENARIOS\n`
     const scenarios = exportData.counterfactualScenarios
     scenarios.forEach((scenario, index) => {
-      content += `${index + 1}. ${scenario.change}\n`
-      content += `   Expected Reduction: ${(scenario.biasScoreChange * 100).toFixed(1)}%\n`
-      content += `   Likelihood: ${scenario.likelihood}\n`
-      content += `   Description: ${scenario.impact}\n\n`
+      content += `${index + 1}. ${scenario['change']}\n`
+      content += `   Expected Reduction: ${((scenario['expectedBiasReduction'] as number) * 100).toFixed(1)}%\n`
+      content += `   Likelihood: ${scenario['likelihood']}\n`
+      content += `   Description: ${scenario['description']}\n\n`
     })
   }
 

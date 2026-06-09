@@ -112,12 +112,14 @@ export default defineConfig({
     conditions: ['node', 'import', 'module', 'default'],
   },
   test: {
+    pool: 'forks',
+    maxWorkers: process.env['CI'] ? 2 : 8,
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     css: {
       modules: {
-        classNameStrategy: 'non-scoped',
+        classNameStrategy: 'non-scoped' as const,
       },
     },
     include:
@@ -265,19 +267,11 @@ export default defineConfig({
         },
       },
     ],
-    pool: 'forks',
-    poolOptions: {
-      forks: {
-        singleFork: false,
-        maxForks: process.env['CI'] ? 2 : 8,
-        minForks: process.env['CI'] ? 1 : 2,
-      },
-    },
     testTimeout: process.env['CI'] ? 15_000 : 30_000,
     hookTimeout: process.env['CI'] ? 10_000 : 30_000,
     environmentOptions: {
       jsdom: {
-        resources: 'usable',
+        resources: 'usable' as const,
         pretendToBeVisual: false,
         runScripts: 'dangerously',
       },

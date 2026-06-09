@@ -86,7 +86,7 @@ export const POST = async ({ request }: APIContext) => {
       },
     }
 
-    const user = await getCurrentUser(cookies)
+    const user = await getCurrentUser(cookies as any)
     if (!user) {
       return new Response(
         JSON.stringify({
@@ -138,7 +138,7 @@ export const POST = async ({ request }: APIContext) => {
     }
 
     // Generate documentation
-    const result = await documentationService.generateDocumentation(
+    const result = await (documentationService as any).generateDocumentation(
       section,
       options,
     )

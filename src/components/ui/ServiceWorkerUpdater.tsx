@@ -1,4 +1,4 @@
-import { type FC, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 
 import { serviceWorkerManager } from '../../utils/serviceWorkerRegistration'

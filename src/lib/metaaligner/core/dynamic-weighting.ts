@@ -8,7 +8,6 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getContextMapperService } from '../config/context-mapper-service'
 import { ContextType, AlignmentContext } from './objectives'
-import type { ContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
 
 const logger = createBuildSafeLogger('dynamic-weighting')
 
@@ -572,9 +571,7 @@ export class DynamicWeightingEngine {
     }
 
     for (const key of keys1) {
-      const v1 = weights1[key as keyof ContextualObjectiveWeights] ?? 0
-      const v2 = weights2[key as keyof ContextualObjectiveWeights] ?? 0
-      const diff = Math.abs(v1 - v2)
+      const diff = Math.abs(weights1?.[key] - weights2?.[key])
       if (diff > tolerance) {
         return false
       }

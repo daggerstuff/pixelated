@@ -30,7 +30,7 @@ function simulatePHIAuditLog() {
       headers: {
         'Content-Type': 'application/json',
         'X-Audit-Source': 'k6-load-test',
-      },
+      } as any,
     },
   )
 }
@@ -143,7 +143,7 @@ function generateBreachDetails() {
 // Helper function to check breach status
 function checkBreachStatus(breachId: string): void {
   const response = http.get(`/api/security/breaches/${breachId}`)
-  return response.json()
+  return response.json() as any
 }
 
 // Main test scenario
@@ -159,7 +159,7 @@ export default function () {
       headers: {
         'Content-Type': 'application/json',
         'X-Test-Mode': 'true', // Special header to indicate load testing
-      },
+      } as any,
     },
   )
 
@@ -187,9 +187,9 @@ export default function () {
   let completed = false
 
   while (attempts < maxAttempts && !completed) {
-    const statusResponse = checkBreachStatus(breachId)
+    const statusResponse = checkBreachStatus(breachId as any)
 
-    if (statusResponse.notificationStatus === 'completed') {
+    if ((statusResponse as any).notificationStatus === 'completed') {
       completed = true
       const processingTime = new Date().getTime() - startTime // Use timestamp for subtraction
       breachProcessingTime.add(processingTime)
