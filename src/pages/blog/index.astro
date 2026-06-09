@@ -23,7 +23,7 @@ function getReadingTime(content: string) {
 type BlogPost = CollectionEntry<'blog'>
 
 const allPosts = await getCollection('blog', ({ data }: BlogPost) => {
-  return import.meta['env'].PROD ? !data.draft : true
+  return import.meta.env.PROD ? !data.draft : true
 })
 
 const posts = allPosts

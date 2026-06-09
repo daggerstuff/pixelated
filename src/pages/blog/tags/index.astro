@@ -9,7 +9,7 @@ export const prerender = false
 const posts = await getCollection(
   'blog',
   ({ data }: { data: { draft?: boolean } }) => {
-    return import.meta['env'].PROD ? !data.draft : true
+    return import.meta.env.PROD ? !data.draft : true
   },
 )
 

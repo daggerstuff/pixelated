@@ -23,7 +23,7 @@ type DocPage = {
 
 // Get all docs and sort by order, then by date
 const docs = await getCollection('docs', ({ data }: DocPage) => {
-  return import.meta['env'].PROD ? !data.draft : true
+  return import.meta.env.PROD ? !data.draft : true
 })
 
 const sortedDocs = docs.sort((a: DocPage, b: DocPage) => {
