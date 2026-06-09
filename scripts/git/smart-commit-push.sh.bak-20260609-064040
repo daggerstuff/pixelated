@@ -21,38 +21,6 @@ warn()    { echo "${YELLOW}${BOLD}⚠  $*${RESET}"; }
 error()   { echo "${RED}${BOLD}✖  $*${RESET}" >&2; }
 section() { echo ""; echo "${MAGENTA}${BOLD}━━━  $*  ━━━${RESET}"; echo ""; }
 
-# ── Pre-commit sync: fetch + pull --rebase before committing ──────────────────
-pre_commit_sync() {
-  local repo_path="$1"
-  local repo_name="$2"
-  cd "$repo_path"
-
-  info "Syncing ${repo_name} with remote before commit..."
-  git fetch --all --prune 2>&1 || true
-
-  local_ahead=$(git rev-list --count @{u}..HEAD 2>/dev/null || echo 0)
-  local_behind=$(git rev-list --count HEAD..@{u} 2>/dev/null || echo 0)
-
-  if [[ "$local_ahead" -gt 0 && "$local_behind" -gt 0 ]]; then
-    error "Diverged: ${repo_name} has ${local_ahead} local-only commit(s) and ${local_behind} remote commit(s)."
-    error "Rebase would be required. Stopping — manual intervention needed."
-    return 1
-  fi
-
-  if [[ "$local_behind" -gt 0 ]]; then
-    info "Pulling ${local_behind} remote commit(s) into ${repo_name} (rebase)..."
-    git pull --rebase 2>&1 || {
-      error "Rebase failed for ${repo_name}. Resolve conflicts and re-run."
-      return 1
-    }
-    success "Rebased ${repo_name} onto remote"
-  elif [[ "$local_ahead" -gt 0 ]]; then
-    info "${repo_name} is ahead of ${local_ahead} commit(s); skipping pull"
-  else
-    info "${repo_name} is up to date with remote"
-  fi
-}
-
 # ── Argument parsing ──────────────────────────────────────────────────────────
 DRY_RUN=false
 MSG_OVERRIDE=""
@@ -178,7 +146,6 @@ commit_repo() {
   section "Processing: ${repo_name}"
 
   cd "$repo_path"
-  pre_commit_sync "$repo_path" "$repo_name"
 
   # Collect changed & untracked files
   local modified new_files all_files
