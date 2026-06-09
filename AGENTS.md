@@ -97,6 +97,43 @@ Before substantial work, execute the continuity handshake:
 
 ---
 
+## Cursor Cloud specific instructions
+
+### Node.js PATH
+Cloud VMs ship `/exec-daemon/node` (v22) ahead of nvm on `PATH`. Prepend Node 24 before running pnpm scripts:
+```bash
+export PATH="$HOME/.nvm/versions/node/v24.14.1/bin:$PATH"
+```
+(`~/.bashrc` in this environment is configured to do this in interactive shells.)
+
+### Docker
+- Start the daemon if needed: `sudo service docker start`
+- Compose files require secrets on the command line (not only in `.env`):
+  ```bash
+  export POSTGRES_PASSWORD=dev_password_change_in_prod
+  export REDIS_PASSWORD=dev_redis_password
+  export PGBOUNCER_PASSWORD=dev_pgbouncer_password
+  sudo -E docker compose -f docker/docker-compose.db.yml up -d postgres redis
+  sudo docker network create docker_web 2>/dev/null || true
+  sudo docker compose -f docker/docker-compose.local-mongo.yml up -d
+  ```
+- Redis binds to `127.0.0.1:6379` with `--requirepass`; use `redis://:dev_redis_password@127.0.0.1:6379/0` in `.env` and test overrides.
+
+### Local `.env` bootstrap
+If `.env` is missing, derive Postgres user/db from the running container and write local URLs (see `WALKTHROUGH.md`). Do not commit `.env`.
+
+### E2E against an already-running dev server
+```bash
+DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
+  pnpm exec playwright test tests/e2e/infrastructure/ssr-functionality.spec.ts \
+  --config=config/playwright.config.ts --project=chromium
+```
+
+### Long-running dev server
+Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
+
+---
+
 ## Delivery Checks (Task Completion Contract)
 
 Before ending a turn and finishing a task, perform the following checks:
