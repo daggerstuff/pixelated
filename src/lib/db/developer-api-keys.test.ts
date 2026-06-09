@@ -2,19 +2,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { DeveloperApiKeyManager } from './developer-api-keys'
-import { query } from './index'
+import { query, type DbQueryResult } from './index'
 
 vi.mock('./index', () => ({
   query: vi.fn(),
 }))
 
-type MockQueryResult<TRow> = {
-  rows: TRow[]
-  rowCount: number
-  command: string
-  oid: number
-  fields: unknown[]
-}
+type MockQueryResult<TRow> = DbQueryResult<TRow>
 
 const createMockQueryResult = <TRow>(
   rows: TRow[],
