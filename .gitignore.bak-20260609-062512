@@ -355,8 +355,3 @@ scratch
 sliced_output.worktrees/
 scripts/devops/hooks/templates/
 struct-agent-key.json
-
-id_rsa
-id_ed25519
-credentials.json
-secrets.json
