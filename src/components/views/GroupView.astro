@@ -23,10 +23,9 @@ const tocEnabled = Array.isArray(toc) && toc[0] && pageToc
 const { showGroupItemColorOnHover } = UI.groupView
 ---
 
-{
   tocEnabled && (
     <Toc
-      category={Object.keys(projects)}
+      anchors={Object.keys(projects)}
       style={toc[1].displayPosition === 'right' ? 'text-align:end' : ''}
     />
   )

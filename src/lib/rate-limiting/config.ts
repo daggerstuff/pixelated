@@ -282,7 +282,11 @@ export const getEnvironmentConfig = (env: string) => {
  * Get configuration from environment variables
  */
 export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
-  const config: Partial<RateLimitConfig> = {}
+  interface EnvConfig {
+    global?: Partial<RateLimitConfig['global']>
+    redis?: Partial<NonNullable<RateLimitConfig['redis']>>
+  }
+  const config: EnvConfig = {}
 
   if (process.env['RATE_LIMIT_ENABLED']) {
     config.global = {
@@ -320,7 +324,7 @@ export const getConfigFromEnv = (): Partial<RateLimitConfig> => {
     }
   }
 
-  return config
+  return config as unknown as Partial<RateLimitConfig>
 }
 
 /**

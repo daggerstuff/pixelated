@@ -504,16 +504,19 @@ export class ModelServingServer extends EventEmitter {
         const sumVec: number[] = Array.from({ length }, () => 0)
         outputs.forEach((out) => {
           ;(out as number[]).forEach((v, i) => {
-            sumVec[i]! += v
+            sumVec[i] += v
           })
         })
         return sumVec.map((v) => v / outputs.length)
       }
 
       // Scalar outputs: simple mean
-      return outputs.reduce((a: number, b: number) => a + b, 0) / outputs.length
+      return (
+        (outputs as number[]).reduce((a: number, b: number) => a + b, 0) /
+        outputs.length
+      )
     }
-    const firstOutput = predictions[0]!.output
+    const firstOutput = predictions[0].output
     if (Array.isArray(firstOutput)) {
       // Weighted average for vector outputs (classification probabilities)
       const { length } = firstOutput as number[]
@@ -521,7 +524,7 @@ export class ModelServingServer extends EventEmitter {
         (sum: number[], pred: ModelPrediction, index: number) => {
           const w = weights[index]
           ;(pred.output as number[]).forEach((val: number, i: number) => {
-            sum[i] = (sum[i] ?? 0) + val * w!
+            sum[i] = (sum[i] ?? 0) + val * w
           })
           return sum
         },
@@ -533,7 +536,7 @@ export class ModelServingServer extends EventEmitter {
       // Weighted average for scalar outputs (regression)
       const weightedSum = predictions.reduce(
         (sum: number, pred: ModelPrediction, index: number) => {
-          return sum + (pred.output as number) * weights[index]!
+          return sum + (pred.output as number) * weights[index]
         },
         0,
       )
@@ -543,9 +546,9 @@ export class ModelServingServer extends EventEmitter {
   }
 
   private calculateUncertainty(predictions: ModelPrediction[]): number {
-    const outputs = predictions.map((p) => p.output)
+    const outputs = predictions.map((p) => p.output) as number[]
     const mean =
-      (outputs as number[]).reduce((sum: number, val: number) => sum + val, 0) /
+      outputs.reduce((sum: number, val: number) => sum + val, 0) /
       outputs.length
     const variance =
       outputs.reduce(

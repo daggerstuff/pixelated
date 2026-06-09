@@ -145,7 +145,6 @@ const sanitizedDetails = details
               alt={external.title}
               width={1200}
               height={628}
-              {...imageProps}
             />
           )}
           <div class="flex flex-col px-3 pt-2 pb-1">
@@ -281,13 +280,13 @@ const sanitizedDetails = details
           this.#detailsContainer.style.maxHeight = `${this.#detailsContainer.scrollHeight}px`
           this.#upIcon.classList.remove('hidden')
           this.#downIcon.classList.add('hidden')
-          this.#button.setAttribute('aria-expanded', 'true')
+          this.#button?.setAttribute('aria-expanded', 'true')
         } else {
           this.#detailsContainer.style.marginTop = '0'
           this.#detailsContainer.style.maxHeight = '0'
           this.#upIcon.classList.add('hidden')
           this.#downIcon.classList.remove('hidden')
-          this.#button.setAttribute('aria-expanded', 'false')
+          this.#button?.setAttribute('aria-expanded', 'false')
         }
       }
 
