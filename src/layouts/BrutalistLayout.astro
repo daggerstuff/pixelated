@@ -124,13 +124,15 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
 
 <script>
   // Scroll progress indicator
-  const progressBar = document.querySelector('.scroll-progress')
+  const progressBar = document.querySelector<HTMLElement>('.scroll-progress')
 
   function updateProgress() {
     const scrollTop = window.scrollY
     const docHeight = document.documentElement.scrollHeight - window.innerHeight
     const progress = (scrollTop / docHeight) * 100
-    progressBar?.style.setProperty('width', `${progress}%`)
+    if (progressBar) {
+      progressBar.style.width = `${progress}%`
+    }
   }
 
   window.addEventListener('scroll', updateProgress, { passive: true })

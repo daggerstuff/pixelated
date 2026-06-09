@@ -90,7 +90,7 @@ export class CacheInvalidation {
       }
 
       // Execute the transaction
-      await multi.exec()
+      await multi['exec']()
     } catch (error: unknown) {
       logger.error(this.formatErrorMessage('set cache', error))
       throw error

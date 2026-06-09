@@ -8,7 +8,6 @@ import { Pool } from 'pg'
 import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
-import healthRoutes from './api/routes/health'
 import { setPostgresPool, setRedisClient } from './lib/database/connection'
 import { SocketService } from './services/socketService'
 
@@ -162,7 +161,6 @@ app.use(express.json())
 // API Routes
 app.use('/api/auth', authRoutes)
 app.use('/api/projects', projectsRoutes)
-app.use('/api/health', healthRoutes)
 
 // Health check endpoint
 app.get('/health', (_req, res) => {
