@@ -125,7 +125,17 @@ push_repo() {
   cd "$repo_path"
 
   local branch
-  branch=$(git branch --show-current 2>/dev/null || echo "main")
+  branch=$(git branch --show-current 2>/dev/null)
+  # If detached HEAD (submodules), get the branch from the remote tracking
+  if [[ -z "$branch" ]]; then
+    branch=$(git symbolic-ref --short -q HEAD 2>/dev/null || git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+  fi
+
+  # Skip if detached HEAD (submodules in detached state can't be pushed)
+  if [[ "$branch" == "HEAD" ]]; then
+    warn "${repo_name} is in detached HEAD — skipping push"
+    return 0
+  fi
 
   # Gather all remotes
   local remotes
