@@ -1,8 +1,6 @@
 import * as dotenv from 'dotenv'
 import DigestFetch from 'digest-fetch'
 
-dotenv.config()
-
 function isResponse(value: unknown): value is Response {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -45,7 +43,7 @@ async function updateWhitelist() {
     const client = new DigestFetch(
       PUBLIC_KEY!,
       PRIVATE_KEY!,
-    ) as unknown as { fetch: (url: string, options: Record<string, unknown>) => Promise<unknown> }
+    )
 
     // We can't use axios for ipify essentially, but let's just use regular fetch or keeping it simple
     const ipRes = await fetch('https://api.ipify.org?format=json')
@@ -69,7 +67,7 @@ async function updateWhitelist() {
       },
     ]
 
-    const response = await client.fetch(url, {
+    const response: unknown = await client.fetch(url, {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: { 'Content-Type': 'application/json' },

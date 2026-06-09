@@ -1,40 +1,75 @@
 #!/usr/bin/env bash
+# =============================================================================
+# lint-changed.sh
+# Runs linting and formatting on all changed files (staged + unstaged) across
+# all 4 repos in the Pixelated workspace.
+#
+# Covers:
+#   • TypeScript/JavaScript: oxlint + prettier
+#   • Python: ruff (lint + format)
+#
+# Usage:
+#   ./scripts/git/lint-changed.sh [--fix] [--check-only] [--repo <name>]
+#   --fix         Auto-fix issues where possible (default: true)
+#   --check-only  Only report, don't write any fixes
+#   --repo        Limit to one repo: ai | docs | foresight-mcp | main
+# =============================================================================
 set -euo pipefail
 
-# ── Helpers ────────────────────────────────────────────────────────────────────
+# ── Colour helpers ────────────────────────────────────────────────────────────
+BOLD=$'\e[1m'; RESET=$'\e[0m'
+GREEN=$'\e[32m'; YELLOW=$'\e[33m'; CYAN=$'\e[36m'; RED=$'\e[31m'; MAGENTA=$'\e[35m'
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-FIX="${FIX:-true}"
+info()    { echo "${CYAN}${BOLD}ℹ  $*${RESET}"; }
+success() { echo "${GREEN}${BOLD}✔  $*${RESET}"; }
+warn()    { echo "${YELLOW}${BOLD}⚠  $*${RESET}"; }
+error()   { echo "${RED}${BOLD}✖  $*${RESET}" >&2; }
+section() { echo ""; echo "${MAGENTA}${BOLD}━━━  $*  ━━━${RESET}"; echo ""; }
+
+# ── Argument parsing ──────────────────────────────────────────────────────────
+FIX=true
+TARGET_REPO=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --fix)         FIX=true; shift ;;
+    --check-only)  FIX=false; shift ;;
+    --repo)        TARGET_REPO="$2"; shift 2 ;;
+    *) warn "Unknown arg: $1"; shift ;;
+  esac
+done
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel 2>/dev/null || echo "/home/vivi/pixelated")"
+
 ERRORS=0
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-section() { echo -e "\n${BLUE}▶${NC} $*"; }
-info()    { echo -e "  ${BLUE}ℹ${NC} $*"; }
-warn()    { echo -e "  ${YELLOW}⚠${NC} $*"; }
-error()   { echo -e "  ${RED}✗${NC} $*"; }
-success() { echo -e "  ${GREEN}✓${NC} $*"; }
-
-# Get changed files in a repo matching a regex pattern
+# ── Helper: collect changed files in a repo ───────────────────────────────────
 get_changed_files() {
   local repo="$1"
-  local pattern="$2"
-  
+  local exts="${2:-}"  # optional extension filter like "ts|tsx|js|jsx"
+
   cd "$repo"
-  
-  # Get staged + unstaged files
+
+  # Staged + unstaged modified + untracked
   local files
-  files=$(git diff --name-only HEAD 2>/dev/null || true)
-  local staged
-  staged=$(git diff --name-only --cached HEAD 2>/dev/null || true)
-  
-  # Combine and deduplicate - match file extension properly
-  echo -e "$files\n$staged" | grep -E "\.($pattern)$" | sort -u | grep -v "^$" || true
+  files=$(
+    {
+      git diff --name-only HEAD 2>/dev/null || true
+      git diff --name-only 2>/dev/null || true
+      git ls-files --others --exclude-standard 2>/dev/null || true
+    } | sort -u | grep -v '^$' | grep -v "^scratch/" | grep -v "^aws/" || true
+  )
+
+  if [[ -n "$exts" ]]; then
+    files=$(echo "$files" | grep -E "\.(${exts})$" || true)
+  fi
+
+  # Return only files that actually exist
+  while IFS= read -r f; do
+    [[ -z "$f" ]] && continue
+    [[ -f "${repo}/${f}" ]] && echo "$f"
+  done <<< "$files"
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────
@@ -160,18 +195,6 @@ process_repo() {
 
   success "${repo_name} lint complete"
 }
-
-# ── Parse args ────────────────────────────────────────────────────────────────
-TARGET_REPO=""
-for arg in "$@"; do
-  case $arg in
-    --check-only) FIX="false" ;;
-    --fix) FIX="true" ;;
-    --repo=*) TARGET_REPO="${arg#*=}" ;;
-    --repo) shift; TARGET_REPO="$1" ;;
-    *) warn "Unknown arg: $arg" ;;
-  esac
-done
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 section "Pixelated Lint & Format — Changed Files"
