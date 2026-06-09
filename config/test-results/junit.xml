@@ -1,24 +1,6 @@
-<testsuites id="" name="" tests="9" failures="0" skipped="1" errors="0" time="18.331113000000002">
-<testsuite name="browser/auth.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="5" failures="0" skipped="1" time="9.901" errors="0">
-<testcase name="login page has correct form elements" classname="browser/auth.spec.ts" time="0.725">
-</testcase>
-<testcase name="login form shows validation errors" classname="browser/auth.spec.ts" time="3.181">
-</testcase>
-<testcase name="login form is properly visible on mobile viewport" classname="browser/auth.spec.ts">
-<properties>
-<property name="skip" value="This test is mobile-only">
-</property>
-</properties>
-<skipped>
-</skipped>
-</testcase>
-<testcase name="login page has proper transitions" classname="browser/auth.spec.ts" time="2.478">
-</testcase>
-<testcase name="login page visual comparison" classname="browser/auth.spec.ts" time="3.301">
-</testcase>
-</testsuite>
-<testsuite name="browser/browser-compatibility.spec.ts" timestamp="2026-04-11T21:17:35.162Z" hostname="chromium" tests="4" failures="0" skipped="0" time="7.38" errors="0">
-<testcase name="Home page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.182">
+<testsuites id="" name="" tests="4" failures="0" skipped="0" errors="0" time="89.08909700000001">
+<testsuite name="browser/browser-compatibility.spec.ts" timestamp="2026-06-09T12:25:05.240Z" hostname="chromium" tests="4" failures="0" skipped="0" time="10.864" errors="0">
+<testcase name="Home page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="3.344">
 <properties>
 <property name="slow" value="">
 </property>
@@ -30,7 +12,7 @@ Page title: Pixelated Empathy | Clinical simulation for therapist training and s
 ]]>
 </system-out>
 </testcase>
-<testcase name="Blog page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.074">
+<testcase name="Blog page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="3.154">
 <properties>
 <property name="slow" value="">
 </property>
@@ -42,7 +24,7 @@ Page title: Blog - Pixelated Empathy
 ]]>
 </system-out>
 </testcase>
-<testcase name="Documentation page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="2.042">
+<testcase name="Documentation page should work in all browsers" classname="browser/browser-compatibility.spec.ts" time="3.156">
 <properties>
 <property name="slow" value="">
 </property>
@@ -54,7 +36,7 @@ Page title: Getting Started with Pixelated Empathy - Pixelated Empathy
 ]]>
 </system-out>
 </testcase>
-<testcase name="CSS feature support check" classname="browser/browser-compatibility.spec.ts" time="1.082">
+<testcase name="CSS feature support check" classname="browser/browser-compatibility.spec.ts" time="1.21">
 <system-out>
 <![CDATA[CSS features support in chromium: {
   flexbox: [33mtrue[39m,
