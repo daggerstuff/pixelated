@@ -147,7 +147,7 @@
     "@cloudflare/workers-types": "latest",
     "@composio/core": "latest",
     "@composio/vercel": "latest",
-    "@google-cloud/storage": "^7.19.0",
+    "@google-cloud/storage": "^7.21.0",
     "@heroicons/react": "latest",
     "@hookform/resolvers": "^5.4.0",
     "@iconify-json/lucide": "^1.2.111",
