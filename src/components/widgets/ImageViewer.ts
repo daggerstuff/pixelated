@@ -28,7 +28,7 @@ Viewer.setDefaults({
 
 export function initImageViewer(element: HTMLElement): () => void {
   const selector = element.dataset['selector'] || 'img'
-  const container = document.querySelector(selector) as HTMLElement | null
+  const container = document.querySelector(selector)
   if (!container) return () => {}
 
   let userOptions = {}
