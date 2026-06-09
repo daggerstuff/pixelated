@@ -3,6 +3,7 @@ allowBuilds:
   '@contrast/fn-inspect': true
   '@dwmkerr/terminal-ai': true
   '@letta-ai/letta-code': true
+  '@schpet/linear-cli': true
   '@modelcontextprotocol/ext-apps': false
   '@newrelic/native-metrics': true
   '@parcel/watcher': true
