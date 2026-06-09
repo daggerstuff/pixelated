@@ -340,6 +340,7 @@
     "@letta-ai/letta-client": "latest",
     "@letta-ai/letta-code-sdk": "latest",
     "@playwright/test": "latest",
+    "@schpet/linear-cli": "^2.0.0",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
@@ -583,7 +584,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.1",
+  "packageManager": "pnpm@11.5.2",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true

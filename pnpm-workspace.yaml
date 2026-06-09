@@ -3,6 +3,7 @@ allowBuilds:
   '@contrast/fn-inspect': true
   '@dwmkerr/terminal-ai': true
   '@letta-ai/letta-code': true
+  '@schpet/linear-cli': true
   '@modelcontextprotocol/ext-apps': false
   '@newrelic/native-metrics': true
   '@parcel/watcher': true
@@ -118,6 +119,11 @@ overrides:
   '@foresight/core>vite': 6.4.2
   '@foresight/docs>fast-uri': 3.1.1
   '@foresight/docs>serialize-javascript': ^7.0.5
+  '@google-cloud/storage>uuid': '>=11.1.1'
+  'gcp-metadata>uuid': '>=11.1.1'
+  'gaxios>uuid': '>=11.1.1'
+  'retry-request>uuid': '>=11.1.1'
+  'teeny-request>uuid': '>=11.1.1'
   '@grpc/proto-loader>protobufjs': '>=8.0.2'
   '@hono/node-server': ^1.19.13
   '@modelcontextprotocol/sdk': ^1.29.0
