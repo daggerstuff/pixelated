@@ -81,8 +81,6 @@ const pageParam = Astro.params['page'] || '1'
 const currentPage = parseInt(pageParam, 10)
 const pageSize = 20
 
-import { isAstroProduction } from '@/utils/astro-env'
-
 const posts = await getCollection('blog', (entry: any) => {
   return isAstroProduction() ? !entry.data.draft : true
 })
