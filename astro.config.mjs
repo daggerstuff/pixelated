@@ -1,5 +1,6 @@
 import path from 'node:path'
 import process from 'node:process'
+
 import node from '@astrojs/node'
 import react from '@astrojs/react'
 import vercel from '@astrojs/vercel'
@@ -9,7 +10,6 @@ import UnoCSS from '@unocss/astro'
 import { defineConfig, passthroughImageService } from 'astro/config'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { loadEnv, createLogger } from 'vite'
-import redisConnect from './src/integrations/redis-connect/index.ts'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
 const isRailwayDeploy =
@@ -695,22 +695,16 @@ export default defineConfig({
         ? [
             sentry({
               telemetry: false,
-              debug: true,
-              dsn: process.env.PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN,
-              environment: process.env.NODE_ENV || 'development',
-              release: process.env.npm_package_version || '0.0.1',
-              serverInitPath: './sentry.server.config.ts',
               // Upload sourcemaps through the Vite plugin so each Astro build
               // phase only uploads the files it actually emitted.
               sourcemaps: {
                 disable: true,
               },
             }),
+            // Temporarily disable SpotlightJS due to build issues
             // ...(shouldUseSpotlight ? [spotlightjs()] : [])
           ]
         : []),
-      // Redis connection integration
-      redisConnect(),
     ]
   })(),
   markdown: {

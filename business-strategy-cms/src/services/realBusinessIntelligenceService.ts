@@ -135,7 +135,7 @@ export class RealBusinessIntelligenceService {
       const financialData = await this.yahooService.getFinancialMetrics(symbols)
       await this.yahooService.getMarketIndices()
 
-      const marketData = financialData.map((company) => ({
+      const marketData: MarketData[] = financialData.map((company) => ({
         id: `${industry}_${company.symbol}_${Date.now()}`,
         industry,
         marketSize: company.marketCap,
@@ -155,10 +155,10 @@ export class RealBusinessIntelligenceService {
 
       // Store in database for historical tracking
       for (const data of marketData) {
-        await this.db.storeMarketData(data as unknown as MarketData)
+        await this.db.storeMarketData(data)
       }
 
-      return marketData as unknown as MarketData[]
+      return marketData
     } catch (error: unknown) {
       this.logger.error('Failed to get real-time market data', {
         industry,
@@ -256,9 +256,7 @@ export class RealBusinessIntelligenceService {
   /**
    * Get real-time stock data for business intelligence
    */
-  async getStockIntelligence(
-    symbols: string[],
-  ): Promise<StockIntelligenceResult[]> {
+  async getStockIntelligence(symbols: string[]): Promise<any[]> {
     try {
       const results = await Promise.all(
         symbols.map(async (symbol) => {
@@ -287,7 +285,7 @@ export class RealBusinessIntelligenceService {
         }),
       )
 
-      return results.filter((r): r is StockIntelligenceResult => r !== null)
+      return results.filter(Boolean)
     } catch (error: unknown) {
       this.logger.error('Failed to get stock intelligence', {
         symbols,
@@ -412,12 +410,9 @@ export class RealBusinessIntelligenceService {
     return industryMap[industry.toLowerCase()] ?? ['SPY']
   }
 
-  private calculateAverageMetrics(
-    data: FinancialMetricsRecord[],
-    metric: string,
-  ): number {
+  private calculateAverageMetrics(data: any[], metric: string): number {
     const values = data
-      .map((item) => (item as unknown as Record<string, number>)[metric] ?? 0)
+      .map((item) => item[metric] ?? 0)
       .filter((val) => val > 0)
     return values.length > 0
       ? values.reduce((sum, val) => sum + val, 0) / values.length
@@ -453,9 +448,7 @@ export class RealBusinessIntelligenceService {
     return Math.max(1000, revenue * profitMargin * 3)
   }
 
-  private createMarketSegments(
-    company: FinancialMetricsRecord,
-  ): MarketSegment[] {
+  private createMarketSegments(company: any): any[] {
     return [
       {
         name: 'Enterprise',
@@ -477,7 +470,7 @@ export class RealBusinessIntelligenceService {
 
   private analyzeSectorFeatures(
     _industry: string,
-    _companies: FinancialMetricsRecord[],
+    _companies: any[],
   ): Record<string, number> {
     const features: Record<string, number> = {}
 
@@ -496,9 +489,7 @@ export class RealBusinessIntelligenceService {
     return features
   }
 
-  private identifyCompetitiveGaps(
-    _companies: FinancialMetricsRecord[],
-  ): string[] {
+  private identifyCompetitiveGaps(_companies: any[]): string[] {
     const commonGaps = [
       'advanced_analytics',
       'predictive_modeling',
@@ -511,35 +502,4 @@ export class RealBusinessIntelligenceService {
     // Return random gaps based on industry analysis
     return commonGaps.slice(0, 3 + Math.floor(Math.random() * 3))
   }
-}
-
-interface FinancialMetricsRecord {
-  marketCap: number
-  symbol: string
-  revenue: number
-  profitMargin: number
-  peRatio: number
-  beta: number
-}
-
-interface StockIntelligenceResult {
-  symbol: string
-  companyName: string
-  currentPrice: number
-  change: number
-  changePercent: number
-  marketCap: number
-  volume: number
-  peRatio: number
-  dividendYield: number
-  beta: number
-  sector: string
-  industry: string
-  timestamp: Date
-}
-
-interface MarketSegment {
-  name: string
-  size: number
-  growth: number
 }

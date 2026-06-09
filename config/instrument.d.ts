@@ -1,43 +1,32 @@
-// Type declarations for config/instrument.mjs exports
-// Provides proper types for the Sentry instrumentation module
-
-interface SentrySpan {
-  end: () => void
-}
-
-interface SentryRequest {
-  data?: unknown
-}
-
-interface SentryEvent {
-  request?: SentryRequest
-}
-
-interface SentryBreadcrumb {
+/**
+ * Type declarations for config/instrument.mjs exports
+ * This file resolves oxlint no-unsafe-* warnings by providing proper types for the Sentry instrumentation
+ */
+type SentrySpan = { end: () => void }
+type SentryRequest = { data?: unknown }
+type SentryEvent = { request?: SentryRequest }
+type SentryBreadcrumb = {
   category?: string
   level?: string
   [key: string]: unknown
 }
-
-interface SentryUser {
-  id?: string
-  email?: string
-  username?: string
-}
-
-interface SentryScope {
+type SentryScope = {
   setTags: (tags: Record<string, string>) => void
   setExtras: (extras: Record<string, unknown>) => void
   setUser: (user: SentryUser) => void
 }
-
-interface SentrySpanOptions {
-  id?: string
-  op: string
-  [key: string]: unknown
-}
-
-interface SentryMetrics {
+type SentryUser = { id?: string; email?: string; username?: string }
+type PrimitiveValue =
+  | string
+  | number
+  | boolean
+  | null
+  | Record<string, unknown>
+  | unknown[]
+type SentrySpanOptions = { id?: string; op: string; [key: string]: unknown }
+type HttpIntegrationFactory = (options?: { tracing?: boolean }) => unknown
+type BasicIntegrationFactory = () => unknown
+type SentryMetrics = {
   count: (
     name: string,
     value: number,
@@ -49,24 +38,18 @@ interface SentryMetrics {
     options?: { attributes?: Record<string, unknown> },
   ) => void
 }
-
-interface EventData {
-  category?: string
-  [key: string]: unknown
+type CaptureHandler = (error: unknown) => void
+type EventData = { category?: string; [key: string]: unknown }
+type SentrySpanFactory = {
+  startInactiveSpan: (options: SentrySpanOptions) => SentrySpan
+  startSpan: (options: SentrySpanOptions) => SentrySpan
 }
-
-interface CaptureErrorContext {
-  tags?: Record<string, string>
-  extra?: Record<string, unknown>
-  user?: SentryUser
-}
-
-type DatabaseQueryInput = string | (() => Promise<unknown>)
-
-interface SentryInstance {
+type QueryFunction = () => Promise<unknown>
+type DatabaseQueryInput = string | QueryFunction
+type SentryLike = {
   init: (options: Record<string, unknown>) => void
   close: () => Promise<void> | void
-  captureException: (error: unknown) => void
+  captureException: CaptureHandler
   setUser: (user: SentryUser | null) => void
   setContext: (key: string, context: EventData) => void
   withScope: (callback: (scope: SentryScope) => void) => void
@@ -76,7 +59,27 @@ interface SentryInstance {
   setTag?: (key: string, value: string) => void
   setExtra?: (key: string, value: unknown) => void
 }
-
+type PrimitiveValueRecord = { [key: string]: unknown }
+type CaptureErrorContext = {
+  tags?: Record<string, string>
+  extra?: PrimitiveValueRecord
+  user?: SentryUser
+}
+type SentryStub = {
+  init: (options: Record<string, unknown>) => void
+  close: () => Promise<void> | void
+  captureException: CaptureHandler
+  setUser: (user: SentryUser | null) => void
+  setContext: (key: string, context: EventData) => void
+  withScope: (callback: (scope: SentryScope) => void) => void
+  startInactiveSpan: (options: SentrySpanOptions) => SentrySpan
+  startSpan: (options: SentrySpanOptions) => SentrySpan
+  metrics: SentryMetrics
+  setTag?: (key: string, value: string) => void
+  setExtra?: (key: string, value: unknown) => void
+}
+type SentryInstance = SentryLike & SentryStub
+type NextHandler = (error?: unknown) => void
 declare const Sentry: SentryInstance
 declare const closeSentry: () => Promise<void>
 declare const sentryMiddleware: (
