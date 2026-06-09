@@ -24,7 +24,8 @@ function getReadingTime(content: string) {
 type BlogPost = CollectionEntry<'blog'>
 
 const allPosts = await getCollection('blog', ({ data }: BlogPost) => {
-  return isAstroProduction() ? !data.draft : true
+  const isProd = import.meta.env.PROD === true || process.env.NODE_ENV === 'production';
+  return isProd ? !data.draft : true
 })
 
 const posts = allPosts

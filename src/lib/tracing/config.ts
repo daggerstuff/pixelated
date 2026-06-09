@@ -40,41 +40,42 @@ export interface TracingConfig {
  * Get tracing configuration from environment variables
  */
 export function getTracingConfig(): TracingConfig {
-  const isProduction = import.meta.env.PROD
+  const envObj = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (process.env || {});
+  const isProduction = envObj.PROD === true || process.env.NODE_ENV === 'production'
 
   // Default to enabled in production, can be disabled via env var
   const enabled =
-    import.meta.env['TRACING_ENABLED'] !== 'false' &&
-    (isProduction || import.meta.env['TRACING_ENABLED'] === 'true')
+    envObj['TRACING_ENABLED'] !== 'false' &&
+    (isProduction || envObj['TRACING_ENABLED'] === 'true')
 
   return {
     enabled,
-    serviceName: import.meta.env['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
-    serviceVersion: import.meta.env['TRACING_SERVICE_VERSION'] ?? '1.0.0',
+    serviceName: envObj['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
+    serviceVersion: envObj['TRACING_SERVICE_VERSION'] ?? '1.0.0',
     environment:
-      import.meta.env.MODE || (isProduction ? 'production' : 'development'),
+      envObj.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
       type:
-        (import.meta.env['TRACING_EXPORTER_TYPE'] as
+        (envObj['TRACING_EXPORTER_TYPE'] as
           | 'otlp'
           | 'console'
           | 'jaeger'
           | 'zipkin') || 'otlp',
       endpoint:
-        import.meta.env['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
-      headers: import.meta.env['TRACING_EXPORTER_HEADERS']
-        ? JSON.parse(import.meta.env['TRACING_EXPORTER_HEADERS'])
+        envObj['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
+      headers: envObj['TRACING_EXPORTER_HEADERS']
+        ? JSON.parse(envObj['TRACING_EXPORTER_HEADERS'])
         : undefined,
     },
     sampling: {
-      ratio: parseFloat(import.meta.env['TRACING_SAMPLING_RATIO'] ?? '1.0'),
+      ratio: parseFloat(envObj['TRACING_SAMPLING_RATIO'] ?? '1.0'),
     },
     instrumentation: {
-      http: import.meta.env['TRACING_INSTRUMENT_HTTP'] !== 'false',
-      express: import.meta.env['TRACING_INSTRUMENT_EXPRESS'] !== 'false',
-      mongodb: import.meta.env['TRACING_INSTRUMENT_MONGODB'] !== 'false',
-      postgres: import.meta.env['TRACING_INSTRUMENT_POSTGRES'] !== 'false',
-      redis: import.meta.env['TRACING_INSTRUMENT_REDIS'] !== 'false',
+      http: envObj['TRACING_INSTRUMENT_HTTP'] !== 'false',
+      express: envObj['TRACING_INSTRUMENT_EXPRESS'] !== 'false',
+      mongodb: envObj['TRACING_INSTRUMENT_MONGODB'] !== 'false',
+      postgres: envObj['TRACING_INSTRUMENT_POSTGRES'] !== 'false',
+      redis: envObj['TRACING_INSTRUMENT_REDIS'] !== 'false',
     },
   }
 }
