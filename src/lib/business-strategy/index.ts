@@ -7,7 +7,6 @@
 
 export * from './types'
 export * from './services'
-export * from './utils'
 
 // Core services
 export { MarketResearchService } from './services/market-research'

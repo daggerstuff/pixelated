@@ -34,15 +34,17 @@ export class DocumentManagementService extends BaseService {
     data: DocumentCreate,
   ): Promise<Document> {
     await this.validatePermissions(userId, 'document', 'create')
-    this.validateRequired(data, ['title', 'content', 'type', 'category'])
+    this.validateRequired(data as any, ['title', 'content', 'type', 'category'])
 
-    const sanitized = this.sanitizeInput(data)
+    const sanitized = this.sanitizeInput(data as any) as DocumentCreate
     const documentId = this.generateId() as DocumentId
     const timestamp = new Date()
 
     const document: Document = {
       id: documentId,
       ...sanitized,
+      contentType: sanitized.contentType ?? 'markdown',
+      tags: sanitized.tags ?? [],
       slug: this.generateSlug(sanitized.title),
       version: 1,
       size: Buffer.byteLength(sanitized.content),
@@ -51,7 +53,7 @@ export class DocumentManagementService extends BaseService {
       priority: 'medium',
       createdBy: userId,
       createdAt: timestamp,
-      updatedBy: userId,
+      lastModifiedBy: userId,
       updatedAt: timestamp,
       permissions: {
         read: [userId],
@@ -88,7 +90,7 @@ export class DocumentManagementService extends BaseService {
     try {
       await this.db.mongodb.database.collection(this.collectionName).insertOne({
         ...document,
-        _id: documentId, // Use documentId as MongoDB _id
+        _id: documentId as any, // Use documentId as MongoDB _id
       })
 
       await this.logAudit({
@@ -203,7 +205,7 @@ export class DocumentManagementService extends BaseService {
       }
 
       const timestamp = new Date()
-      const sanitized = this.sanitizeInput(updates)
+      const sanitized = this.sanitizeInput(updates as any) as DocumentUpdate
 
       const currentDoc = await this.getDocument(userId, id)
       const newVersion = currentDoc.version + 1
@@ -211,7 +213,7 @@ export class DocumentManagementService extends BaseService {
       const updateFields: any = {
         ...sanitized,
         version: newVersion,
-        updatedBy: userId,
+        lastModifiedBy: userId,
         updatedAt: timestamp,
       }
 
