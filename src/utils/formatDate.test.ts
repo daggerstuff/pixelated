@@ -107,4 +107,10 @@ describe('formatDate', () => {
       expect(formatDate(date.toISOString())).toBe('May 15, 2023')
     })
   })
+
+  describe('error handling', () => {
+    it('throws an error for invalid date strings', () => {
+      expect(() => formatDate('not-a-date')).toThrow('Failed to format date: Error: Invalid date string')
+    })
+  })
 })
