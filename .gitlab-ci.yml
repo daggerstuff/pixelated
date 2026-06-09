@@ -355,14 +355,16 @@ coverage:report:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils curl >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.cargo/bin:$PATH"
   script:
     - echo "Generating consolidated coverage report..."
     - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
     - chmod +x scripts/consolidate-coverage.sh
-    - ./scripts/consolidate-coverage.sh
+    - COVERAGE_TIMEOUT=600 ./scripts/consolidate-coverage.sh
   artifacts:
     paths:
       - coverage/
@@ -371,7 +373,7 @@ coverage:report:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 10m
+  timeout: 20m
 
 # Note: Kubernetes deployment is handled through the Azure AKS deployment system.
 # This GitLab pipeline remains focused on validation, testing, build, and security jobs.
