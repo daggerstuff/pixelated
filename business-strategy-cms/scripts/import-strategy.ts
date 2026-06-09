@@ -16,11 +16,10 @@ dotenv.config()
 
 const STRATEGY_DIR = path.resolve(__dirname, '../../business-strategy')
 const WORKSPACE_DIR = path.resolve(__dirname, '..')
-const MONGO_URI =
-   (process.env.MONGODB_URI && process.env.MONGODB_URI.length > 0
-     ? process.env.MONGODB_URI
-     : 'mongodb://admin:password@127.0.0.1:27017/business-strategy-cms?authSource=admin')
-const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000'
+const MONGO_URI = process.env.MONGODB_URI
+if (!MONGO_URI || MONGO_URI.length === 0) {
+  throw new Error('MONGODB_URI environment variable is required')
+}
 
 /** Collect all .md file paths under dir, relative to STRATEGY_DIR. Excludes README.md at root. */
 function collectMarkdownPaths(
@@ -77,7 +76,7 @@ function parseStrategyFile(
         ? titleMatch[1]
         : baseName
 
-   let category = typeof frontmatter.category === 'string' && frontmatter.category.length > 0 ? frontmatter.category : DocumentCategory.BUSINESS_PLAN
+   let category = frontmatter.category && frontmatter.category.length > 0 ? frontmatter.category : DocumentCategory.BUSINESS_PLAN
   if (!frontmatter.category) {
     if (sourceFile.startsWith('outreach/') || sourceFile.startsWith('pilot-operations/')) {
       category = DocumentCategory.OPERATIONS_PLAN

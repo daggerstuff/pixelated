@@ -1,34 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis
-  labels:
-    app: redis
+  name: pixelated-empathy-redis
+  namespace: pixelated-empathy
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: redis
+      app: pixelated-empathy-redis
   template:
     metadata:
       labels:
-        app: redis
+        app: pixelated-empathy-redis
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: redis
         image: redis:7-alpine
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+        command:
+        - sh
+        - -c
+        - redis-server --bind 0.0.0.0 --appendonly yes --requirepass "${REDIS_PASSWORD}" --protected-mode yes
+        envFrom:
+        - secretRef:
+            name: pixelated-empathy-secrets
         ports:
         - containerPort: 6379
+          name: redis
+          protocol: TCP
         resources:
           requests:
-            cpu: "100m"
-            memory: "128Mi"
+            cpu: "50m"
+            memory: "64Mi"
           limits:
             cpu: "200m"
             memory: "128Mi"
-        volumeMounts:
-        - mountPath: /data
-          name: redis-data
-      volumes:
-      - name: redis-data
-        emptyDir: {}
