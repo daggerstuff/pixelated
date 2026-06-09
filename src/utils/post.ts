@@ -1,4 +1,5 @@
 import type { CollectionEntry as AstroCollectionEntry } from 'astro:content'
+import { isAstroProduction } from '@/utils/astro-env'
 
 // Define the base data interface that matches our schema
 export interface PostData {
@@ -72,7 +73,7 @@ export async function getFilteredPosts(
 
   // Filter out drafts in production (unless explicitly filtered)
   const filteredPosts =
-    import.meta.env.PROD && !filterFn ? filterDrafts(posts) : posts
+    isAstroProduction() && !filterFn ? filterDrafts(posts) : posts
 
   // Sort by date
   return sortPosts(filteredPosts)
