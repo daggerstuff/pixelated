@@ -167,15 +167,14 @@ const newTransform = currentTransition.new.transform || 'none'
 
 <!-- Script to handle custom transitions logic -->
 <script>
-  document.addEventListener('astro:page-load', (_event: Event) => {
+  document.addEventListener('astro:page-load', (_event) => {
     // Add here any JS that needs to run on page transitions
     console.log('Page transition completed')
   })
-
-  document.addEventListener('astro:before-swap', (event: Event) => {
+  document.addEventListener('astro:before-swap', (event) => {
     // Access the document that is about to be added to the page
-    const newDocument = event.newDocument
-
+    const newDocument = (event as any).newDocument
+    void newDocument // Suppress unused variable warning
     // You can manipulate both documents before the swap
     // This is useful for maintaining scroll position, focus, etc.
   })

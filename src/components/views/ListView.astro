@@ -140,7 +140,7 @@ const warningHTML = `The '${collectionType}' collection type does no
   collection types to render the list.`
 ---
 
-{tocEnabled && <Toc {years} />}
+{tocEnabled && <Toc anchors={years} />}
 
 {
   (collectionType === 'blog' || collectionType === 'changelog') && (
@@ -275,6 +275,6 @@ const warningHTML = `The '${collectionType}' collection type does no
 }
 {
   !['blog', 'changelog', 'feeds', 'streams'].includes(collectionType) && (
-    <Warning rawHTMLString={warningHTML} />
+    <Warning html={warningHTML} />
   )
 }

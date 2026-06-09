@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 
 import { fheService } from '@/lib/fhe'
+import type { EncryptedData } from '@/lib/fhe'
 
 export type SecurityLevel = 'standard' | 'hipaa' | 'maximum'
 
@@ -224,8 +225,8 @@ export function SecurityProvider({
     }
 
     try {
-      const result = (await fheService.decrypt?.(data)) ?? data
-      // Try to parse the result as JSON if it's a string
+      const result =
+        (await fheService.decrypt?.(data as unknown as EncryptedData)) ?? data
       if (typeof result === 'string') {
         try {
           return JSON.parse(result) as unknown
@@ -238,9 +239,12 @@ export function SecurityProvider({
       console.error('Decryption failed:', error)
       // Attempt to parse as JSON
       try {
-        const parsed = JSON.parse(data)
-        if (parsed && typeof parsed === 'object' && parsed.data) {
-          return JSON.parse(parsed.data) as unknown
+        const parsed = JSON.parse(data) as unknown
+        if (parsed && typeof parsed === 'object' && 'data' in parsed) {
+          const parsedData = (parsed as { data: unknown }).data
+          if (typeof parsedData === 'string') {
+            return JSON.parse(parsedData) as unknown
+          }
         }
         return parsed
       } catch {

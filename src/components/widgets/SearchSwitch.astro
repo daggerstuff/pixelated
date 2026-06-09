@@ -411,7 +411,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 
       if (!this.#content) return
 
-      if (import.meta.env.PROD) {
+      if (import.meta['env'].PROD) {
         const requestId = ++this.#activeRequestId
         this.#resetView()
         if (normalizedValue.length === 0) return
@@ -456,7 +456,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
         for (const result of fakeResults) {
           this.#content.innerHTML += `
             <a href="${this.#results?.dataset['base']}" class="search-result-item">
-              <div class="search-result-title">${result.meta.title}</div>
+              <div class="search-result-title">${result.meta['title']}</div>
               <div class="search-result-excerpt">${result.excerpt}</div>
             </a>`
         }
@@ -771,7 +771,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
 </script>
 
 <!-- https://github.com/pagefind/pagefind/blob/production-docs/pagefind_web_js/types/index.d.ts -->
-{import.meta.env.PROD &&
+{import.meta['env'].PROD &&
   <script is:inline define:vars={{scriptUrl: withBasePath('/pagefind/pagefind.js'), navHighlight}}>
     async function loadPagefind() {
       const module = await import(scriptUrl)
@@ -800,7 +800,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
     if (!window.pagefind) loadPagefind()
   </script>}
 
-{import.meta.env.PROD && navHighlight &&
+{import.meta['env'].PROD && navHighlight &&
   <script is:inline define:vars={{scriptUrl: withBasePath('/pagefind/pagefind-highlight.js')}}>
     async function loadPagefindHighlight() {
       await import(scriptUrl)
@@ -825,7 +825,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
     if (!window.pagefindHighlight) loadPagefindHighlight()
   </script>}
 
-{import.meta.env.PROD && navHighlight &&
+{import.meta['env'].PROD && navHighlight &&
   <script>
     document.addEventListener('astro:page-load', () => {
       const params = new URLSearchParams(location.search)
