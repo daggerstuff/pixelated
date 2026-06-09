@@ -616,7 +616,7 @@ const performanceBudgets = {
           tooltip: {
             callbacks: {
               label: function (context) {
-                const label = context.dataset.label || ''
+                const label = context.dataset['label'] || ''
                 const value = context.raw
                 if (label.includes('CLS')) {
                   return `${label}: ${(value / 100).toFixed(2)}`
