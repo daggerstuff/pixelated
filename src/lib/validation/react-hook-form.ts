@@ -7,11 +7,7 @@ import { useState, useCallback } from 'react'
 import { useForm, type UseFormReturn, type FieldValues } from 'react-hook-form'
 import { z } from 'zod'
 
-import {
-  normalizeError,
-  getFieldErrors,
-  type ValidationError,
-} from '@/lib/error'
+import { normalizeError, getFieldErrors, ValidationError } from '@/lib/error'
 
 export interface UseValidatedFormOptions<T extends FieldValues> {
   schema: z.ZodType<T>
@@ -140,7 +136,9 @@ export function isFormFieldTouched<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): boolean {
-  return !!form.formState.touchedFields[fieldName]
+  return !!(form.formState.touchedFields as Record<string, unknown>)[
+    fieldName as string
+  ]
 }
 
 /**
@@ -150,5 +148,7 @@ export function isFormFieldDirty<T extends FieldValues>(
   form: UseFormReturn<T>,
   fieldName: keyof T,
 ): boolean {
-  return !!form.formState.dirtyFields[fieldName]
+  return !!(form.formState.dirtyFields as Record<string, unknown>)[
+    fieldName as string
+  ]
 }
