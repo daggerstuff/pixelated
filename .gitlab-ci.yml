@@ -309,7 +309,6 @@ build:
     - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     - docker push ${IMAGE_NAME}:latest
     - echo "Build completed"
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
@@ -368,7 +367,6 @@ security:scan:
       container_scanning: gl-container-scanning-report.json
     expire_in: 1 week
     when: always
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
