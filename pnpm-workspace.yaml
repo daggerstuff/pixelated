@@ -63,6 +63,7 @@ minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
   - path-to-regexp@6.3.0
   - '@cloudflare/workers-types@4.20260531.1'
+  - '@cloudflare/workers-types@4.20260608.1'
   - 'tinyglobby@0.2.17'
   - yaml@2.8.3
   - axios@0.28.0
