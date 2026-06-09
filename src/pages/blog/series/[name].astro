@@ -2,6 +2,7 @@
 import PostCard from '@/components/blog/PostCard.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { isAstroProduction } from '@/utils/astro-env'
 
 type BlogPost = CollectionEntry<'blog'>
 
@@ -10,7 +11,7 @@ type BlogPost = CollectionEntry<'blog'>
 /*
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection("blog", ({ data }: BlogPost) =>
-    import.meta['env'].PROD ? !data.draft : true,
+    isAstroProduction() ? !data.draft : true,
   );
 
   const allSeries = [
@@ -32,7 +33,7 @@ if (!name) {
 }
 
 const allPosts = await getCollection('blog', ({ data }: BlogPost) =>
-  import.meta['env'].PROD ? !data.draft : true,
+  isAstroProduction() ? !data.draft : true,
 )
 
 const postsInSeries = allPosts
