@@ -32,7 +32,7 @@ validate:dependencies:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
@@ -60,7 +60,7 @@ validate:lint:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
@@ -93,7 +93,7 @@ validate:typecheck:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
@@ -125,7 +125,7 @@ test:integration:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
@@ -347,7 +347,6 @@ coverage:report:
   stage: test
   image: node:${NODE_VERSION}-slim
   needs:
-    - job: test:unit
     - job: test:integration
   cache:
     key:
@@ -356,7 +355,7 @@ coverage:report:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
