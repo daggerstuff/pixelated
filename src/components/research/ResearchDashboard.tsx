@@ -327,9 +327,9 @@ export const ResearchDashboard: FC = () => {
 const DatasetsTab: FC<{ datasets: DatasetInfo[] }> = memo(({ datasets }) => (
   <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
     {datasets.map((dataset) => (
-      <Card key={dataset.id} className="p-6">
-        <h3 className="text-lg font-semibold">{dataset.name}</h3>
-        <p className="text-gray-500 text-sm">{dataset.description}</p>
+      <Card key={dataset['id']} className="p-6">
+        <h3 className="text-lg font-semibold">{dataset['name']}</h3>
+        <p className="text-gray-500 text-sm">{dataset['description']}</p>
       </Card>
     ))}
   </div>

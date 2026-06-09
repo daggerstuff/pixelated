@@ -168,22 +168,23 @@ function DatasetList({
     <div className="space-y-1">
       {datasets.items.map((dataset) => (
         <button
-          key={dataset.datasetId}
-          onClick={() => onSelect(dataset.datasetId)}
+          key={dataset['datasetId']}
+          onClick={() => onSelect(dataset['datasetId'])}
           className={cn(
             'flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors',
-            selectedId === dataset.datasetId
+            selectedId === dataset['datasetId']
               ? 'bg-primary/10 border-primary/30 border'
               : 'hover:bg-muted border border-transparent',
           )}
         >
           <div className="min-w-0 flex-1 truncate">
-            <p className="truncate font-medium">{dataset.name}</p>
+            <p className="truncate font-medium">{dataset['name']}</p>
             <p className="text-muted-foreground text-xs">
-              {dataset.recordCount.toLocaleString()} records · {dataset.format}
+              {dataset['recordCount'].toLocaleString()} records ·{' '}
+              {dataset['format']}
             </p>
           </div>
-          <StatusBadge status={dataset.quarantineStatus} />
+          <StatusBadge status={dataset['quarantineStatus']} />
         </button>
       ))}
     </div>
@@ -226,27 +227,27 @@ function AuditDetailPanel({
     <div className="space-y-4">
       {/* Dataset info */}
       <div>
-        <h3 className="text-lg font-semibold">{dataset.name}</h3>
+        <h3 className="text-lg font-semibold">{dataset['name']}</h3>
         <div className="text-muted-foreground mt-1 grid grid-cols-2 gap-2 text-sm">
           <div>
-            Format: <span className="font-medium">{dataset.format}</span>
+            Format: <span className="font-medium">{dataset['format']}</span>
           </div>
           <div>
             Records:{' '}
             <span className="font-medium">
-              {dataset.recordCount.toLocaleString()}
+              {dataset['recordCount'].toLocaleString()}
             </span>
           </div>
           <div>
             Size:{' '}
             <span className="font-medium">
-              {(dataset.fileSize / 1024 / 1024).toFixed(1)} MB
+              {(dataset['fileSize'] / 1024 / 1024).toFixed(1)} MB
             </span>
           </div>
           <div>
             Uploaded:{' '}
             <span className="font-medium">
-              {new Date(dataset.uploadedAt).toLocaleDateString()}
+              {new Date(dataset['uploadedAt']).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -322,8 +323,8 @@ function AuditDetailPanel({
           )}
 
           {/* Actions */}
-          {dataset.quarantineStatus !== 'approved' &&
-            dataset.quarantineStatus !== 'rejected' && (
+          {dataset['quarantineStatus'] !== 'approved' &&
+            dataset['quarantineStatus'] !== 'rejected' && (
               <div className="flex flex-wrap gap-2 pt-2">
                 <button
                   onClick={() => onAction('approve')}

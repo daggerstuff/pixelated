@@ -681,7 +681,7 @@ const universityResults = [
         page_location: window.location.href,
         ab_variant:
           (document.querySelector('[data-variant]') as HTMLElement)?.dataset
-            ?.variant || 'unknown',
+            ['variant'] || 'unknown',
       })
     }
 
@@ -691,7 +691,7 @@ const universityResults = [
         const target = e.target as HTMLElement | null
         if (!target) return
 
-        const action = target.dataset?.demoAction
+        const action = target.dataset['demoAction']
 
         if (!action) return
 
@@ -701,7 +701,7 @@ const universityResults = [
             interaction_type: action,
             ab_variant:
               (document.querySelector('[data-variant]') as HTMLElement)?.dataset
-                ?.variant || 'unknown',
+                ['variant'] || 'unknown',
           })
         }
 
@@ -717,7 +717,7 @@ const universityResults = [
             session_id: sessionStorage.getItem('session_id') || 'anonymous',
             ab_variant:
               (document.querySelector('[data-variant]') as HTMLElement)?.dataset
-                ?.variant || 'unknown',
+                ['variant'] || 'unknown',
           }),
         }).catch(console.error)
       })
@@ -729,8 +729,8 @@ const universityResults = [
         const target = e.target as HTMLElement | null
         if (!target) return
 
-        const ctaType = target.dataset?.['demoCta']
-        const variant = target.dataset?.['variant']
+        const ctaType = target.dataset['demoCta']
+        const variant = target.dataset['variant']
 
         if (!ctaType) return
 
@@ -774,7 +774,7 @@ const universityResults = [
             scroll_depth: maxScroll,
             ab_variant:
               (document.querySelector('[data-variant]') as HTMLElement)?.dataset
-                ?.variant || 'unknown',
+                ['variant'] || 'unknown',
           })
         }
       }

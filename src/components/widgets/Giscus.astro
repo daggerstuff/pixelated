@@ -20,7 +20,7 @@
     crossOrigin: 'anonymous',
     async: '',
   }).forEach(([key, value]) => {
-    giscusTemplateScript.setAttribute(key, value)
+    giscusTemplateScript.setAttribute(key, String(value))
   })
 
   const removeOldGiscus = () => {

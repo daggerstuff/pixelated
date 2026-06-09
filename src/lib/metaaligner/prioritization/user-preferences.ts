@@ -15,7 +15,7 @@
  */
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
-import { ObjectivePriority } from './context-objective-mapping'
+import { ObjectivePriority, ObjectiveKey } from './context-objective-mapping'
 
 const logger = createBuildSafeLogger('user-preferences')
 
@@ -416,7 +416,7 @@ function applyRiskSensitivityAdjustments(
   const multiplier = safetyMultipliers[sensitivity]
 
   return objectives.map((obj) =>
-    obj.key === 'safety'
+    obj.key === ObjectiveKey.Safety
       ? { ...obj, weight: Math.min(obj.weight * multiplier, 1) }
       : obj,
   )
@@ -466,7 +466,7 @@ function applyInteractionPreferenceAdjustments(
   // Boost clarity if user prefers step-by-step
   if (preferences.preferStepByStep) {
     result = result.map((obj) =>
-      obj.key === 'clarity'
+      obj.key === ObjectiveKey.Professionalism
         ? { ...obj, weight: Math.min(obj.weight * 1.15, 1) }
         : obj,
     )
@@ -475,7 +475,7 @@ function applyInteractionPreferenceAdjustments(
   // Boost informativeness if user prefers examples
   if (preferences.preferExamples) {
     result = result.map((obj) =>
-      obj.key === 'informativeness'
+      obj.key === ObjectiveKey.Informativeness
         ? { ...obj, weight: Math.min(obj.weight * 1.1, 1) }
         : obj,
     )
@@ -484,7 +484,7 @@ function applyInteractionPreferenceAdjustments(
   // Boost conciseness if user prefers summaries
   if (preferences.preferSummaries) {
     result = result.map((obj) =>
-      obj.key === 'conciseness'
+      obj.key === ObjectiveKey.Professionalism
         ? { ...obj, weight: Math.min(obj.weight * 1.15, 1) }
         : obj,
     )

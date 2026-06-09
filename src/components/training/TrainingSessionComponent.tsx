@@ -291,13 +291,15 @@ export function TrainingSessionComponent() {
       }
 
       // Construct a proper CoachingNote object with all required fields
+      const payloadTimestamp = msg.payload?.['timestamp']
       const coachingNote: CoachingNote = {
         id: `note-${Date.now()}-${noteAuthorId}`,
         authorId: noteAuthorId,
         content: noteContent,
-        timestamp: String(
-          msg.payload?.['timestamp'] ?? new Date().toISOString(),
-        ),
+        timestamp:
+          typeof payloadTimestamp === 'string'
+            ? payloadTimestamp
+            : new Date().toISOString(),
       }
 
       setCoachingNotes((prev) => [...prev, coachingNote])
@@ -380,7 +382,7 @@ export function TrainingSessionComponent() {
     isAuthenticatedRef.current = false
 
     const wsUrl =
-      import.meta.env['PUBLIC_TRAINING_WS_URL'] ?? 'ws://localhost:8084'
+      import.meta['env']['PUBLIC_TRAINING_WS_URL'] ?? 'ws://localhost:8084'
     const websocket = new WebSocket(wsUrl)
     ws.current = websocket
 

@@ -71,10 +71,11 @@ const { nprogress, mediumZoom } = FEATURES
     <SpeedInsights />
     <Analytics />
     <script is:inline nonce={cspNonce}>
-      function _speedInsightsBeforeSend(data: any) {
+      function _speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)
         return data
       }
+    </script>
     </script>
   </body>
 </html>
