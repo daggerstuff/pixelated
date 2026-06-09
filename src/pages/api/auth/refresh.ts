@@ -55,7 +55,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     const tokenPair = await refreshAccessToken(refreshToken, clientInfo)
 
     // Log successful token refresh
-    logSecurityEvent('token_refreshed', {
+    logSecurityEvent('token_refreshed', tokenPair.user.id, {
       clientInfo,
       timestamp: Date.now(),
     })
@@ -82,7 +82,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
     // Handle specific authentication errors
     if (error.name === 'AuthenticationError') {
-      logSecurityEvent('token_validation_failed', {
+      logSecurityEvent('token_validation_failed', null, {
         error: error instanceof Error ? error.message : 'Unknown error',
         clientInfo,
         timestamp: Date.now(),
@@ -103,7 +103,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     // Handle unexpected errors
     console.error('Token refresh error:', err)
 
-    logSecurityEvent('error', {
+    logSecurityEvent('error', null, {
       error:
         (error instanceof Error ? error.message : 'Unknown error') ||
         String(err),
