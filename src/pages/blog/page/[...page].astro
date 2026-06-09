@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection } from 'astro:content'
+import { isAstroProduction } from '@/utils/astro-env'
 
 // export const prerender = true
 
@@ -61,7 +62,7 @@ export async function getStaticPaths() {
 
   // Get all blog posts
   const posts = await getCollection("blog", (entry: any) => {
-    return import.meta['env'].PROD ? !entry.data.draft : true;
+    return isAstroProduction() ? !entry.data.draft : true;
   });
 
   // Sort by date - newest first
@@ -81,7 +82,7 @@ const currentPage = parseInt(pageParam, 10)
 const pageSize = 20
 
 const posts = await getCollection('blog', (entry: any) => {
-  return import.meta['env'].PROD ? !entry.data.draft : true
+  return isAstroProduction() ? !entry.data.draft : true
 })
 
 const sortedPosts = posts.sort((postA: any, postB: any) => {
