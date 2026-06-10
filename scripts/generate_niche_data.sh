@@ -32,16 +32,27 @@ STATE_FILE="/home/vivi/pixelated/data/therapeutic/.generation_state"
 
 # Categories to generate
 CATEGORIES=(
-  "dissociation"
-  "somatic_therapy"
+  "addiction"
   "attachment_disorders"
-  "narcissistic_abuse_recovery"
+  "clinical_literature"
   "complicated_grief"
+  "cot_reasoning"
+  "cptsd_trauma"
+  "cultural_religious"
+  "dissociation"
   "eating_disorders"
+  "general_counseling"
+  "long_running_therapy"
+  "neurodivergent"
+  "narcissistic_abuse_recovery"
   "ocd_intrusive_thoughts"
   "personality_disorders"
-  "neurodivergent_mental_health"
-  "cultural_religious_contexts"
+  "roleplay_simulation"
+  "safety_guardrails"
+  "somatic_therapy"
+  "therapeutic_expertise"
+  "video_transcripts"
+  "voice_persona"
 )
 
 # Target per category (higher to account for stricter validation filtering)
