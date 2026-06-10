@@ -296,6 +296,8 @@ gha-creds-*.json
 # Playwright
 /blob-report/
 /playwright/.auth/
+/config/playwright-report/
+/config/test-results/
 
 # === COPILOT CLI ===
 .copilot/
