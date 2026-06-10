@@ -17,6 +17,7 @@ from auth import authenticate
 from bias_detector import TherapeuticSession, analyze_session_bias
 from crisis_detection import detect_crisis_signals
 from database import DatabaseService
+from dream.consolidation import dream_bp
 from emotion_validator import EmotionData, validate_emotion_result
 from pii_scrubber import ScrubberOptions, scan_for_pii, scrub_pii
 
@@ -26,6 +27,9 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend integration
+
+# Register blueprints
+app.register_blueprint(dream_bp)
 
 # Initialize Database
 MONGODB_URI = os.environ.get("MONGODB_URI")
