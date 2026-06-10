@@ -61,56 +61,44 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
 minimumReleaseAgeExclude:
-  # Packages exempted from minimumReleaseAge policy.
-  # Entries should be pruned once the package release is older than 24 hours.
-  # Use generic package-only entries (no version pin) when the entire package
-  # ecosystem publishes frequently and causes repeated violations (e.g. astro).
-  - '@iconify-json/lucide@1.2.111'
-  - path-to-regexp@6.3.0
-  - '@cloudflare/workers-types@4.20260531.1'
-  - tinyglobby@0.2.17
-  - yaml@2.8.3
-  - axios@0.28.0
-  - jsonwebtoken@8.5.2
-  - jsonwebtoken@9.0.0
-  - dompurify@3.2.4
-  - axios@0.30.0
-  - '@tootallnate/once@3.0.1'
-  - nodemailer@8.0.4
-  - dompurify@3.3.2
-  - nodemailer@8.0.5
-  - dompurify@3.3.4
-  - axios@0.31.0
-  - dompurify@3.4.0
-  - axios@0.31.1
-  - axios@0.30.3
-  - hono@4.12.23
-  - react-hook-form@7.78.0
-  - '@ai-sdk/gateway@3.0.126'
-  - '@ai-sdk/gateway@3.0.127'
-  - '@ai-sdk/anthropic@3.0.82'
-  - '@ai-sdk/openai@3.0.69'
-  - '@astrojs/node@10.1.4'
-  - ai@6.0.198
-  - ai@6.0.199
-  - '@cloudflare/workers-types@4.20260609.1'
-  - '@typescript-eslint/eslint-plugin@8.61.0'
-  - '@typescript-eslint/parser@8.61.0'
-  - '@typescript-eslint/project-service@8.61.0'
-  - '@typescript-eslint/scope-manager@8.61.0'
-  - '@typescript-eslint/tsconfig-utils@8.61.0'
-  - '@typescript-eslint/type-utils@8.61.0'
-  - '@typescript-eslint/types@8.61.0'
-  - '@typescript-eslint/typescript-estree@8.61.0'
-  - '@typescript-eslint/utils@8.61.0'
-  - '@typescript-eslint/visitor-keys@8.61.0'
-  - typescript-eslint@8.61.0
-  # Exempted because astro publishes frequently; Dependabot bumps fail pnpm minimumReleaseAge checks within 24 hours
-  - astro@6.4.5
-  # Exempted because mongodb driver was updated alongside mongoose; fresh publish violates minimumReleaseAge
-  - mongodb@7.3.0
-  # Exempted because mongoose was updated to support new mongodb driver version; fresh publish violates minimumReleaseAge
-  - mongoose@9.7.0
+- '@iconify-json/lucide@1.2.111'
+- path-to-regexp@6.3.0
+- '@cloudflare/workers-types@4.20260531.1'
+- tinyglobby@0.2.17
+- yaml@2.8.3
+- axios@0.28.0
+- jsonwebtoken@8.5.2
+- jsonwebtoken@9.0.0
+- dompurify@3.2.4
+- axios@0.30.0
+- '@tootallnate/once@3.0.1'
+- nodemailer@8.0.4
+- dompurify@3.3.2
+- nodemailer@8.0.5
+- dompurify@3.3.4
+- axios@0.31.0
+- dompurify@3.4.0
+- axios@0.31.1
+- axios@0.30.3
+- hono@4.12.23
+- react-hook-form@7.78.0
+- '@ai-sdk/gateway@3.0.126'
+- '@ai-sdk/gateway@3.0.127'
+- ai@6.0.198
+- ai@6.0.199
+- '@cloudflare/workers-types@4.20260609.1'
+- '@typescript-eslint/eslint-plugin@8.61.0'
+- '@typescript-eslint/parser@8.61.0'
+- '@typescript-eslint/project-service@8.61.0'
+- '@typescript-eslint/scope-manager@8.61.0'
+- '@typescript-eslint/tsconfig-utils@8.61.0'
+- '@typescript-eslint/type-utils@8.61.0'
+- '@typescript-eslint/types@8.61.0'
+- '@typescript-eslint/typescript-estree@8.61.0'
+- '@typescript-eslint/utils@8.61.0'
+- '@typescript-eslint/visitor-keys@8.61.0'
+- typescript-eslint@8.61.0
+- mongoose@9.7.0
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
