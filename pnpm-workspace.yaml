@@ -101,13 +101,13 @@ minimumReleaseAgeExclude:
 - mongoose@9.7.0
 peerDependencyRules:
   ignoreMissing:
-  - '@capacitor/core'
-  - '@capacitor/preferences'
-  - '@netlify/blobs'
-  - typescript
-  - zod
-  - eslint-plugin-jsx-a11y
-  - tsconfck
+    - '@capacitor/core'
+    - '@capacitor/preferences'
+    - '@netlify/blobs'
+    - typescript
+    - zod
+    - eslint-plugin-jsx-a11y
+    - tsconfck
   allowedVersions:
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
