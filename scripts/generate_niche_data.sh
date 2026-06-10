@@ -30,7 +30,7 @@ LOG_FILE="/home/vivi/pixelated/data/therapeutic/generation.log"
 AI_DIR="/home/vivi/pixelated/ai"
 STATE_FILE="/home/vivi/pixelated/data/therapeutic/.generation_state"
 
-# Categories to generate
+# Categories to generate (derived from sdg_pipeline.py NICHE_CATEGORIES keys)
 CATEGORIES=(
   "dissociation"
   "somatic_therapy"
@@ -40,8 +40,19 @@ CATEGORIES=(
   "eating_disorders"
   "ocd_intrusive_thoughts"
   "personality_disorders"
-  "neurodivergent_mental_health"
-  "cultural_religious_contexts"
+  "neurodivergent"
+  "cultural_religious"
+  "addiction"
+  "clinical_literature"
+  "cot_reasoning"
+  "cptsd_trauma"
+  "general_counseling"
+  "long_running_therapy"
+  "roleplay_simulation"
+  "safety_guardrails"
+  "therapeutic_expertise"
+  "video_transcripts"
+  "voice_persona"
 )
 
 # Target per category (higher to account for stricter validation filtering)
