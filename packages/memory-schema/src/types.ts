@@ -1,0 +1,268 @@
+/**
+ * @pixelated/memory-schema — Unified Memory Schema
+ *
+ * Canonical type definitions for the Pixelated Empathy memory system.
+ * All services (Astro frontend, Foresight MCP, AI services) use these types
+ * at their API boundaries to ensure consistent memory representation.
+ *
+ * Sprint 1 — ADHD-318: Design Unified Memory Schema
+ * Epic: ADHD-3 Foresight Memory Architecture
+ */
+
+// ---------------------------------------------------------------------------
+// Enumerations
+// ---------------------------------------------------------------------------
+
+/**
+ * Memory scope defines the logical lifecycle boundary of a memory.
+ *
+ * - `session`  : Relevant only to the current conversation/session
+ * - `arc`      : Spans a therapeutic arc (multiple sessions, one theme)
+ * - `trait`    : Persistent user/persona trait (semi-permanent)
+ * - `fact`     : Ground-truth factual knowledge (permanent until explicitly retracted)
+ */
+export type MemoryScope = 'session' | 'arc' | 'trait' | 'fact'
+
+/**
+ * Retention policy controls how long a memory stays in active vector space
+ * before being archived or evicted by the decay scheduler.
+ */
+export type RetentionPolicy =
+  | 'ephemeral' // < 1 hour — scratch space
+  | 'short_term' // 1 day – 1 week
+  | 'long_term' // 1 week – 6 months
+  | 'permanent' // Never evicted (only explicit delete)
+
+/**
+ * Strength trend — set by the temporal decay scheduler after each retrieval cycle.
+ */
+export type StrengthTrend = 'stable' | 'strengthening' | 'weakening' | 'stale'
+
+/**
+ * Gate decision — output of Socratic Gate evaluation before memory ingestion.
+ */
+export type GateDecision = 'auto' | 'passive' | 'active' | 'block'
+
+/**
+ * Which service originally wrote this memory row.
+ * Used for audit trails, debugging, and selective sync.
+ */
+export type SourceService =
+  | 'foresight'
+  | 'ai-services'
+  | 'astro-frontend'
+  | 'unknown'
+
+// ---------------------------------------------------------------------------
+// Sub-objects
+// ---------------------------------------------------------------------------
+
+/**
+ * Emotional metadata anchored to Plutchik's Wheel of Emotions.
+ * All values are normalized floats.
+ */
+export interface EmotionalContext {
+  /** Valence: -1.0 (strongly negative) → 1.0 (strongly positive) */
+  valence: number
+  /** Arousal: 0.0 (calm/flat) → 1.0 (highly activated) */
+  arousal: number
+  /** Dominance: 0.0 (submissive) → 1.0 (dominant) */
+  dominance: number
+  /** The primary detected emotion (e.g. 'grief', 'rage', 'anticipation') */
+  primaryEmotion: string
+  /** Intensity: 0.0 (trace) → 1.0 (maximum) */
+  intensity: number
+}
+
+/**
+ * Empathy quality metrics derived from a therapeutic interaction.
+ * Scored post-hoc by the evaluation pipeline.
+ */
+export interface EmpathyMetrics {
+  /** How well the participant matched the AI's empathy level */
+  reciprocity: number
+  /** Accuracy of the participant's emotional validation */
+  validationAccuracy: number
+  /** Resistance to persona/perspective shift (0 = none, 1 = maximum) */
+  resistanceLevel: number
+}
+
+/**
+ * Result of Socratic Gate evaluation (run before memory ingestion).
+ */
+export interface GateResult {
+  decision: GateDecision
+  reason: string
+  suggestedTags: string[]
+  anomalyDetected: boolean
+}
+
+// ---------------------------------------------------------------------------
+// Canonical Memory Object
+// ---------------------------------------------------------------------------
+
+/**
+ * UnifiedMemory — the canonical memory object shared by all Pixelated services.
+ *
+ * Mapping to storage backends:
+ *   - SQLite (Foresight):  snake_case columns, JSON-serialized sub-objects
+ *   - MongoDB (ai-services): `_id` = id, `data` field wrapped by encryption
+ *   - TypeScript in-memory: this interface directly
+ */
+export interface UnifiedMemory {
+  // ── Identity ──────────────────────────────────────────────────────────────
+  /** UUID v4 — globally unique across all storage backends */
+  id: string
+
+  /** Tenant identifier for multi-tenant hard isolation */
+  tenantId: string
+
+  /** User identifier (maps to Pixelated user profile) */
+  userId: string
+
+  /** Memory bank — logical grouping (e.g. 'default', 'training', 'session:<id>') */
+  bankId: string
+
+  // ── Content ───────────────────────────────────────────────────────────────
+  /** The primary memory content — the "what happened" */
+  content: string
+
+  /** Semantic scope of this memory */
+  scope: MemoryScope
+
+  /** Retention / eviction policy */
+  retention: RetentionPolicy
+
+  /** Category label for filtering (e.g. 'fact', 'crisis', 'conversation', 'preference') */
+  category: string
+
+  /** Free-form tags for ad-hoc filtering and label propagation */
+  tags: string[]
+
+  // ── Versioning ────────────────────────────────────────────────────────────
+  /** Monotonically increasing version counter, incremented on every update */
+  version: number
+
+  /** Version of this unified schema definition that wrote this row (semver string) */
+  schemaVersion: string
+
+  /** Which service originally created this memory */
+  sourceService: SourceService
+
+  // ── Decay & Importance ────────────────────────────────────────────────────
+  /** Current importance score (0.0 → 1.0), updated by decay scheduler */
+  importance: number
+
+  /** Per-memory decay rate (fraction of importance lost per hour) */
+  decayRate: number
+
+  /** Current strength trend — updated by temporal decay scheduler */
+  strengthTrend: StrengthTrend
+
+  /** Total number of times this memory was activated (retrieved + reinforced) */
+  activationCount: number
+
+  /** Total number of times this memory appeared in a retrieval result set */
+  retrievalCount: number
+
+  // ── Ghost / Synthesis ─────────────────────────────────────────────────────
+  /** True if this is a Ghost Node — a compressed summary of evicted memories */
+  isGhost: boolean
+
+  /** 10-word gist summary (set for Ghost Nodes and synthesized memories) */
+  gist: string | null
+
+  /** IDs of source memories this memory was synthesized from */
+  synthesizedFrom: string[]
+
+  // ── Embeddings ────────────────────────────────────────────────────────────
+  /** Reference ID in the vector store (pgvector / Qdrant) */
+  vectorId: string | null
+
+  // ── Emotional / Clinical ──────────────────────────────────────────────────
+  /** Emotional context at time of creation */
+  emotionalContext: EmotionalContext | null
+
+  /** Empathy quality metrics (null for non-interaction memories) */
+  empathyMetrics: EmpathyMetrics | null
+
+  // ── Timestamps ────────────────────────────────────────────────────────────
+  /** ISO 8601 — when this memory was first created */
+  createdAt: string
+
+  /** ISO 8601 — when this memory was last mutated */
+  updatedAt: string | null
+
+  /** ISO 8601 — when this memory was last accessed (read) */
+  accessedAt: string | null
+
+  /** ISO 8601 — when this memory was last retrieved in a search result */
+  lastRetrievedAt: string | null
+}
+
+// ---------------------------------------------------------------------------
+// Partial / Input Types
+// ---------------------------------------------------------------------------
+
+/**
+ * Input shape for creating a new memory.
+ * Required fields only — defaults are applied by the receiving service.
+ */
+export interface CreateMemoryInput {
+  content: string
+  userId: string
+  tenantId?: string
+  bankId?: string
+  scope?: MemoryScope
+  retention?: RetentionPolicy
+  category?: string
+  tags?: string[]
+  importance?: number
+  emotionalContext?: EmotionalContext
+  empathyMetrics?: EmpathyMetrics
+}
+
+/**
+ * Input shape for updating an existing memory.
+ * All fields optional — only provided fields are mutated.
+ */
+export interface UpdateMemoryInput {
+  content?: string
+  scope?: MemoryScope
+  retention?: RetentionPolicy
+  category?: string
+  tags?: string[]
+  importance?: number
+  emotionalContext?: EmotionalContext | null
+  empathyMetrics?: EmpathyMetrics | null
+}
+
+/**
+ * Query options for listing / searching memories.
+ */
+export interface MemoryQueryOptions {
+  userId: string
+  tenantId?: string
+  bankId?: string
+  scope?: MemoryScope
+  retention?: RetentionPolicy
+  category?: string
+  tags?: string[]
+  strengthTrend?: StrengthTrend
+  minImportance?: number
+  search?: string
+  limit?: number
+  offset?: number
+  sortBy?: keyof Pick<
+    UnifiedMemory,
+    'createdAt' | 'updatedAt' | 'importance' | 'accessedAt'
+  >
+  sortOrder?: 'asc' | 'desc'
+}
+
+// ---------------------------------------------------------------------------
+// Schema version constant
+// ---------------------------------------------------------------------------
+
+/** Current schema version — bump when adding fields to UnifiedMemory */
+export const MEMORY_SCHEMA_VERSION = '1.0.0' as const

@@ -291,20 +291,29 @@ push_repo() {
   while IFS= read -r remote; do
     [[ -z "$remote" ]] && continue
 
+    local refspec="$branch"
+    if [[ "$remote" == "gitlab" && "$repo_name" == "pixelated (main)" && "$branch" == "staging" ]]; then
+      refspec="staging:sync-from-github-2026-06-09"
+    fi
+
     # Check if remote has the branch (avoid pushing to remotes that lack it)
     if [[ "$DRY_RUN" == "true" ]]; then
-      info "[DRY-RUN] Would push ${branch} → ${remote}"
+      info "[DRY-RUN] Would push ${refspec} → ${remote}"
       continue
     fi
 
-    if git push "$remote" "$branch" 2>&1; then
-      success "  Pushed → ${remote}/${branch}"
+    if [[ "$remote" == "gitlab" && "$repo_name" == "pixelated (main)" && "$branch" == "staging" ]]; then
+      info "  Using custom refspec for gitlab: staging → sync-from-github-2026-06-09"
+    fi
+
+    if git push "$remote" "$refspec" 2>&1; then
+      success "  Pushed → ${remote}/${refspec}"
       any_pushed=true
     else
       # Try force-with-lease for non-origin remotes if normal push fails
       warn "  Normal push failed for ${remote}; trying --force-with-lease"
-      if git push --force-with-lease "$remote" "$branch" 2>&1; then
-        success "  Force-pushed → ${remote}/${branch}"
+      if git push --force-with-lease "$remote" "$refspec" 2>&1; then
+        success "  Force-pushed → ${remote}/${refspec}"
         any_pushed=true
       else
         error "  Failed to push to ${remote} — manual intervention may be needed"
