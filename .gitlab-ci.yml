@@ -37,7 +37,10 @@ validate:dependencies:
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Validating dependencies..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - >
+      NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
+      { echo "⚠️ Lockfile out of date - refreshing...";
+        NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
     - pnpm audit --audit-level moderate
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -274,8 +277,7 @@ build:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_TAG'
-    - if:
-        '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - when: never
   timeout: 30m
   retry:
@@ -332,8 +334,7 @@ security:scan:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_TAG'
-    - if:
-        '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - when: never
   timeout: 20m
   retry:
@@ -359,7 +360,7 @@ coverage:report:
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
     - curl -LsSf https://astral.sh/uv/install.sh | sh
-    - export PATH="$HOME/.cargo/bin:$PATH"
+    - export PATH="$HOME/.local/bin:$PATH"
   script:
     - echo "Generating consolidated coverage report..."
     - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile

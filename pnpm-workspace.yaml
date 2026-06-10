@@ -101,15 +101,16 @@ minimumReleaseAgeExclude:
 - '@typescript-eslint/utils@8.61.0'
 - '@typescript-eslint/visitor-keys@8.61.0'
 - typescript-eslint@8.61.0
+- mongoose@9.7.0
 peerDependencyRules:
   ignoreMissing:
-  - '@capacitor/core'
-  - '@capacitor/preferences'
-  - '@netlify/blobs'
-  - typescript
-  - zod
-  - eslint-plugin-jsx-a11y
-  - tsconfck
+    - '@capacitor/core'
+    - '@capacitor/preferences'
+    - '@netlify/blobs'
+    - typescript
+    - zod
+    - eslint-plugin-jsx-a11y
+    - tsconfck
   allowedVersions:
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
