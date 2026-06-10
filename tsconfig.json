@@ -15,7 +15,8 @@
       "@components/*": ["./src/components/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@utils/*": ["./src/utils/*"],
-      "@types/*": ["./src/types/*"]
+      "@types/*": ["./src/types/*"],
+      "@pixelated/memory-schema": ["./packages/memory-schema/src"]
     },
     "allowJs": true,
     "resolveJsonModule": true,

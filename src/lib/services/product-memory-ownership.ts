@@ -1,15 +1,14 @@
-import { InternalMemoryServiceClient } from '../server/internal-memory-service-client'
+import type { UnifiedMemory } from "@pixelated/memory-schema";
 import {
   ProductMemoryGatewayError,
   type ProductMemoryDeleteInput,
   type ProductMemoryUpdateInput,
   toInternalScope,
-} from './product-memory-gateway'
+} from "./product-memory-gateway";
 
-type InternalMemoryServiceClientLike = Pick<
-  InternalMemoryServiceClient,
-  'getMemory'
->
+type InternalMemoryServiceClientLike = {
+  getMemory: (input: any) => Promise<UnifiedMemory | null>;
+};
 
 export async function assertOwnedMemoryAccessible(
   client: InternalMemoryServiceClientLike,
@@ -18,9 +17,9 @@ export async function assertOwnedMemoryAccessible(
   const memory = await client.getMemory({
     memoryId: input.memoryId,
     ...toInternalScope(input),
-  })
+  });
 
   if (!memory) {
-    throw new ProductMemoryGatewayError('Memory not found', 404)
+    throw new ProductMemoryGatewayError("Memory not found", 404);
   }
 }
