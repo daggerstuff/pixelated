@@ -1,1 +1,2 @@
 ## 2026-06-07 - Add edge case test for formatDate | Pattern: Testing error throwing for invalid dates | Action: Ensure edge cases like invalid formats throwing expected errors are covered for date utilities.
+## 2026-06-10 - Add test coverage for getStartOf | Pattern: Using UTC standard dates for localized time functions | Action: When adding tests for date utilities like getStartOf, verify all time segment offsets (hours, minutes, seconds, ms) correctly reset to 0 in local time if required.
