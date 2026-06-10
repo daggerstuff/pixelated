@@ -61,5 +61,5 @@
 - Foresight MCP first for active state: `manage_subconscious` (`list` and `get`
   for `pending_items` + `project_context`), `search_memories` (`active tasks`,
   `upcoming work`, owner/team scope), then `manage_memories` as needed.
-- `.agent/internal` and `.agent/internal/decisions.md` remain the durable continuity layer.
-- For scoped rules, prefer nested instruction files (`AGENTS.md` / `.claude/rules` as needed).
+- Root `AGENTS.md` is the main source of truth.
+- For scoped rules, prefer nested instruction files (`AGENTS.md` under touched directories).
