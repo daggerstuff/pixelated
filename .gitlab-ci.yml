@@ -9,7 +9,7 @@ stages:
   - security
 
 variables:
-  NODE_VERSION: '24.14.1'
+  NODE_VERSION: '24.16.0'
   PNPM_VERSION: '11.3.0'
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
