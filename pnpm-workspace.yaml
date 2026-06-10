@@ -61,6 +61,9 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
 minimumReleaseAgeExclude:
+  - "@ai-sdk/anthropic@3.0.82"
+  - "@ai-sdk/openai@3.0.69"
+  - "@astrojs/node@10.1.4"
 - '@iconify-json/lucide@1.2.111'
 - path-to-regexp@6.3.0
 - '@cloudflare/workers-types@4.20260531.1'
