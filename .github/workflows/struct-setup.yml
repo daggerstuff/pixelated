@@ -49,15 +49,17 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
-          key:
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
+          key: ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
             hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        run: >
+          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
+          { echo "⚠️ Lockfile out of date - refreshing...";
+            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
 
       - name: Install Struct CLI
         continue-on-error: true

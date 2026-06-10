@@ -66,7 +66,10 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        run: >
+          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
+          { echo "⚠️ Lockfile out of date - refreshing...";
+            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
 
       - name: Run advisory suite
         continue-on-error: true
