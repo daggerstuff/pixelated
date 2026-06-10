@@ -21,6 +21,16 @@ const appLogger = createBuildSafeLogger('ai-server')
 
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
 
+function formatErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+  if (typeof error === 'string') {
+    return error
+  }
+  return fallback
+}
+
 
 
 type HttpResponse = NodeServerResponse

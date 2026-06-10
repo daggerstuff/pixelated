@@ -3,6 +3,7 @@ export const prerender = false
 
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { isAstroProduction } from '@/utils/astro-env'
 function formatDate(dateInput: any, options: any = {}) {
   if (!dateInput) return '-'
   const date = new Date(dateInput)
@@ -23,7 +24,8 @@ function getReadingTime(content: string) {
 type BlogPost = CollectionEntry<'blog'>
 
 const allPosts = await getCollection('blog', ({ data }: BlogPost) => {
-  return import.meta['env'].PROD ? !data.draft : true
+  const isProd = import.meta.env.PROD === true || process.env.NODE_ENV === 'production';
+  return isProd ? !data.draft : true
 })
 
 const posts = allPosts

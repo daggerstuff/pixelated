@@ -53,11 +53,12 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
     }
 
     // Initialize FHE service if not already initialized
+    const isProd = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
     if (!fheService.isInitialized()) {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: !import.meta.env.PROD,
+        enableDebug: !isProd,
       })
     }
 
@@ -78,11 +79,12 @@ export const POST: APIRoute = async ({ request, cookies }: APIContext) => {
       `Key rotation API error: ${(error as Error).message}`,
     )
 
+    const isProdError = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to rotate encryption keys',
-        message: !import.meta.env.PROD ? (error as Error).message : undefined,
+        message: !isProdError ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

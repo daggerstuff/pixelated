@@ -83,7 +83,21 @@ minimumReleaseAgeExclude:
 - hono@4.12.23
 - react-hook-form@7.78.0
 - '@ai-sdk/gateway@3.0.126'
+- '@ai-sdk/gateway@3.0.127'
 - ai@6.0.198
+- ai@6.0.199
+- '@cloudflare/workers-types@4.20260609.1'
+- '@typescript-eslint/eslint-plugin@8.61.0'
+- '@typescript-eslint/parser@8.61.0'
+- '@typescript-eslint/project-service@8.61.0'
+- '@typescript-eslint/scope-manager@8.61.0'
+- '@typescript-eslint/tsconfig-utils@8.61.0'
+- '@typescript-eslint/type-utils@8.61.0'
+- '@typescript-eslint/types@8.61.0'
+- '@typescript-eslint/typescript-estree@8.61.0'
+- '@typescript-eslint/utils@8.61.0'
+- '@typescript-eslint/visitor-keys@8.61.0'
+- typescript-eslint@8.61.0
 peerDependencyRules:
   ignoreMissing:
   - '@capacitor/core'
@@ -98,13 +112,13 @@ peerDependencyRules:
     '@radix-ui/react-popover': '*'
     '@types/pg': 8.16.0
     drizzle-orm: ^0.45.2
-    eslint: ^9.39.4
+    eslint: ^10.4.1
     mongodb: ^6.14.0
     pg: 8.18.0
     react: '19'
     react-dom: '19'
     redis: 5.10.0
-    typescript: ^5.9.3
+    typescript: ^6.0.3
     zod: '*'
 overrides:
   '@astrojs/react>devalue': ^5.6.4
