@@ -84,6 +84,9 @@ minimumReleaseAgeExclude:
 - react-hook-form@7.78.0
 - '@ai-sdk/gateway@3.0.126'
 - '@ai-sdk/gateway@3.0.127'
+- '@ai-sdk/anthropic@3.0.82'
+- '@ai-sdk/openai@3.0.69'
+- '@astrojs/node@10.1.4'
 - ai@6.0.198
 - ai@6.0.199
 - '@cloudflare/workers-types@4.20260609.1'
@@ -98,15 +101,21 @@ minimumReleaseAgeExclude:
 - '@typescript-eslint/utils@8.61.0'
 - '@typescript-eslint/visitor-keys@8.61.0'
 - typescript-eslint@8.61.0
+  # Exempted because astro publishes frequently; Dependabot bumps fail pnpm minimumReleaseAge checks within 24 hours
+- astro@6.4.5
+  # Exempted because mongodb driver was updated alongside mongoose; fresh publish violates minimumReleaseAge
+- mongodb@7.3.0
+  # Exempted because mongoose was updated to support new mongodb driver version; fresh publish violates minimumReleaseAge
+- mongoose@9.7.0
 peerDependencyRules:
   ignoreMissing:
-  - '@capacitor/core'
-  - '@capacitor/preferences'
-  - '@netlify/blobs'
-  - typescript
-  - zod
-  - eslint-plugin-jsx-a11y
-  - tsconfck
+    - '@capacitor/core'
+    - '@capacitor/preferences'
+    - '@netlify/blobs'
+    - typescript
+    - zod
+    - eslint-plugin-jsx-a11y
+    - tsconfck
   allowedVersions:
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'

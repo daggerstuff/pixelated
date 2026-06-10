@@ -125,6 +125,18 @@ updates:
           - 'version-update:semver-patch'
           - 'version-update:semver-minor'
           - 'version-update:semver-major'
+      - dependency-name: '@ai-sdk/*'
+        update-types:
+          - 'version-update:semver-patch'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-major'
+      # @astrojs/node publishes frequently; Dependabot updates fail pnpm
+      # minimumReleaseAge supply-chain policy checks within 24 hours.
+      - dependency-name: '@astrojs/node'
+        update-types:
+          - 'version-update:semver-patch'
+          - 'version-update:semver-minor'
+          - 'version-update:semver-major'
       # @cloudflare/workers-types publishes daily; Dependabot updates fail
       # pnpm minimumReleaseAge supply-chain policy checks within 24 hours.
       - dependency-name: '@cloudflare/workers-types'
