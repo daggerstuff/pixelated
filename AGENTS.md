@@ -6,7 +6,7 @@
 Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeScript) for the frontend/SSR, and Express/FastAPI/Flask backend services.
 
 ### Runtime Versions
-- **Node.js**: 24.14.1 (see `.nvmrc`)
+- **Node.js**: 24.16.0 (see `.nvmrc`)
 - **pnpm**: 11.3.0 (see `package.json`)
 - **Python**: 3.13 (see `.python-version`)
 - **uv**: Python package and environment manager (always prefer `uv run` for execution)
@@ -102,7 +102,7 @@ Before substantial work, execute the continuity handshake:
 ### Node.js PATH
 Cloud VMs ship `/exec-daemon/node` (v22) ahead of nvm on `PATH`. Prepend Node 24 before running pnpm scripts:
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.14.1/bin:$PATH"
+export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
 ```
 (`~/.bashrc` in this environment is configured to do this in interactive shells.)
 
@@ -147,5 +147,3 @@ Before ending a turn and finishing a task, perform the following checks:
 2. **Review Diffs**: Ensure edits are minimal, clean, safe, and do not contain suppression comments.
 3. **Execute Verification Command**: Run a target check (e.g. `pnpm lint`, `pnpm typecheck`, or targeted tests).
 4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose the next steps.
-
-
