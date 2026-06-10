@@ -68,6 +68,7 @@ if (size === 'icon' && !rest['aria-label']) {
     <a
       href={href}
       class={cn(buttonVariants({ variant, size, className }))}
+      aria-busy={loading ? "true" : undefined}
       {...rest}
     >
       {loading && (
@@ -99,6 +100,7 @@ if (size === 'icon' && !rest['aria-label']) {
       type={type}
       class={cn(buttonVariants({ variant, size, className }))}
       disabled={isDisabled}
+      aria-busy={loading ? "true" : undefined}
       {...rest}
     >
       {loading && (
