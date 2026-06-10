@@ -31,4 +31,4 @@ cryptography==48.0.0
 python-dateutil==2.9.0
 pyyaml==6.0.3
 requests==2.34.2
-tqdm==4.68.1
+tqdm==4.68.2
