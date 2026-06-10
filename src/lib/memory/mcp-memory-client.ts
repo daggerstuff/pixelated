@@ -4,121 +4,119 @@ import type {
   MemoryMetadata,
   MemoryStats,
   SearchOptions,
-} from './memory-client'
+} from "./memory-client";
 
-const BASE_URL = process.env['NEXT_PUBLIC_APP_ORIGIN'] ?? ''
+/**
+ * Memory client for the browser.
+ *
+ * All operations use relative URLs (/api/memory/*) that are resolved against
+ * the browser's current origin. The Astro gateway (/pages/api/memory/*) handles
+ * auth, scope validation, and proxies to the internal memory service.
+ *
+ * @重要 - Do NOT use absolute URLs or NEXT_PUBLIC_* env vars here. The browser
+ * must never know the internal service URL. Use relative paths only.
+ */
 
 export const mcpMemoryManager = {
   async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await fetch(`${BASE_URL}/api/memory/add`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const resolvedUserId = requireUserId(userId);
+    const response = await fetch("/api/memory/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content: input.content,
         user_id: resolvedUserId,
         metadata: input.metadata,
         category: input.metadata?.category,
       }),
-    })
+    });
     if (!response.ok) {
-      throw new Error(`Failed to add memory: ${response.statusText}`)
+      throw new Error(`Failed to add memory: ${response.statusText}`);
     }
 
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    const memoryId =
-      typeof data['memory_id'] === 'string' ? data['memory_id'] : undefined
+    const rawData = (await response.json()) as unknown;
+    const data = isRecord(rawData) ? rawData : {};
+    const memoryId = typeof data["memory_id"] === "string" ? data["memory_id"] : undefined;
     if (!memoryId) {
-      throw new Error('Memory add response did not include memory_id')
+      throw new Error("Memory add response did not include memory_id");
     }
-    return memoryId
+    return memoryId;
   },
 
-  async updateMemory(
-    memoryId: string,
-    content: string,
-    userId?: string,
-  ): Promise<void> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await fetch(
-      `${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}`,
-      {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, user_id: resolvedUserId }),
-      },
-    )
+  async updateMemory(memoryId: string, content: string, userId?: string): Promise<void> {
+    const resolvedUserId = requireUserId(userId);
+    const response = await fetch(`/api/memory/${encodeURIComponent(memoryId)}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, user_id: resolvedUserId }),
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to update memory: ${response.statusText}`)
+      throw new Error(`Failed to update memory: ${response.statusText}`);
     }
   },
 
   async deleteMemory(memoryId: string, userId?: string): Promise<void> {
-    const resolvedUserId = requireUserId(userId)
-    const params = new URLSearchParams()
-    params.set('userId', resolvedUserId)
+    const resolvedUserId = requireUserId(userId);
+    const params = new URLSearchParams();
+    params.set("userId", resolvedUserId);
     const response = await fetch(
-      `${BASE_URL}/api/memory/${encodeURIComponent(memoryId)}?${params.toString()}`,
+      `/api/memory/${encodeURIComponent(memoryId)}?${params.toString()}`,
       {
-        method: 'DELETE',
+        method: "DELETE",
       },
-    )
+    );
 
     if (!response.ok) {
-      throw new Error(`Failed to delete memory: ${response.statusText}`)
+      throw new Error(`Failed to delete memory: ${response.statusText}`);
     }
   },
 
   async getAllMemories(userId?: string): Promise<MemoryEntry[]> {
-    const resolvedUserId = requireUserId(userId)
-    return fetchMappedMemories(buildMemoryListQuery({ userId: resolvedUserId }))
+    const resolvedUserId = requireUserId(userId);
+    return fetchMappedMemories(buildMemoryListQuery({ userId: resolvedUserId }));
   },
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
-    const { userId, query, limit = 10 } = options
-    const resolvedUserId = requireUserId(userId)
-    const response = await fetch(`${BASE_URL}/api/memory/search`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const { userId, query, limit = 10 } = options;
+    const resolvedUserId = requireUserId(userId);
+    const response = await fetch(`/api/memory/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query,
         user_id: resolvedUserId,
         limit,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`Failed to search memories: ${response.statusText}`)
+      throw new Error(`Failed to search memories: ${response.statusText}`);
     }
 
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    return mapMemoryEntries(data['memories'])
+    const rawData = (await response.json()) as unknown;
+    const data = isRecord(rawData) ? rawData : {};
+    return mapMemoryEntries(data["memories"]);
   },
 
   async getMemoryStats(userId?: string): Promise<MemoryStats> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await fetch(
-      `${BASE_URL}/api/memory/stats/${encodeURIComponent(resolvedUserId)}`,
-    )
+    const resolvedUserId = requireUserId(userId);
+    const response = await fetch(`/api/memory/stats/${encodeURIComponent(resolvedUserId)}`);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
+      throw new Error(`Failed to fetch memory stats: ${response.statusText}`);
     }
 
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
+    const rawData = (await response.json()) as unknown;
+    const data = isRecord(rawData) ? rawData : {};
 
-    const totalMemories =
-      typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
+    const totalMemories = typeof data["totalMemories"] === "number" ? data["totalMemories"] : 0;
 
-    let categoryCounts: Record<string, number> = {}
-    if (isRecord(data['categoryCounts'])) {
-      for (const [key, value] of Object.entries(data['categoryCounts'])) {
-        if (typeof value === 'number') {
-          categoryCounts[key] = value
+    let categoryCounts: Record<string, number> = {};
+    if (isRecord(data["categoryCounts"])) {
+      for (const [key, value] of Object.entries(data["categoryCounts"])) {
+        if (typeof value === "number") {
+          categoryCounts[key] = value;
         }
       }
     }
@@ -127,44 +125,33 @@ export const mcpMemoryManager = {
       totalMemories,
       categoryCounts,
       recentActivity: [],
-    }
+    };
   },
 
-  async searchByCategory(
-    category: string,
-    userId?: string,
-  ): Promise<MemoryEntry[]> {
-    const resolvedUserId = requireUserId(userId)
-    return fetchMappedMemories(
-      buildMemoryListQuery({ userId: resolvedUserId, category }),
-    )
+  async searchByCategory(category: string, userId?: string): Promise<MemoryEntry[]> {
+    const resolvedUserId = requireUserId(userId);
+    return fetchMappedMemories(buildMemoryListQuery({ userId: resolvedUserId, category }));
   },
 
   async searchByTags(tags: string[], userId?: string): Promise<MemoryEntry[]> {
-    const resolvedUserId = requireUserId(userId)
-    return fetchMappedMemories(
-      buildMemoryListQuery({ userId: resolvedUserId, tags }),
-    )
+    const resolvedUserId = requireUserId(userId);
+    return fetchMappedMemories(buildMemoryListQuery({ userId: resolvedUserId, tags }));
   },
 
   async getMemoryHistory(userId?: string): Promise<any[]> {
-    requireUserId(userId)
-    return []
+    requireUserId(userId);
+    return [];
   },
 
   // Legacy support methods (if needed by UI)
-  async addUserPreference(
-    userId: string | undefined,
-    key: string,
-    value: unknown,
-  ): Promise<void> {
+  async addUserPreference(userId: string | undefined, key: string, value: unknown): Promise<void> {
     await this.addMemory(
       {
         content: `User preference: ${key} = ${JSON.stringify(value)}`,
-        metadata: { category: 'preference', tags: ['preference', key] },
+        metadata: { category: "preference", tags: ["preference", key] },
       },
       userId,
-    )
+    );
   },
 
   async addConversationContext(
@@ -176,13 +163,13 @@ export const mcpMemoryManager = {
       {
         content: context,
         metadata: {
-          category: 'conversation',
-          tags: ['conversation'],
+          category: "conversation",
+          tags: ["conversation"],
           sessionId,
         },
       },
       userId,
-    )
+    );
   },
 
   async addProjectInfo(
@@ -193,18 +180,18 @@ export const mcpMemoryManager = {
     await this.addMemory(
       {
         content: projectInfo,
-        metadata: { category: 'project', tags: ['project'], projectId },
+        metadata: { category: "project", tags: ["project"], projectId },
       },
       userId,
-    )
+    );
   },
-}
+};
 
 function requireUserId(userId?: string): string {
   if (!userId) {
-    throw new Error('Memory operations require an authenticated user id')
+    throw new Error("Memory operations require an authenticated user id");
   }
-  return userId
+  return userId;
 }
 
 function buildMemoryListQuery({
@@ -213,61 +200,57 @@ function buildMemoryListQuery({
   tags,
   limit = 100,
 }: {
-  userId: string
-  category?: string
-  tags?: string[]
-  limit?: number
+  userId: string;
+  category?: string;
+  tags?: string[];
+  limit?: number;
 }): URLSearchParams {
-  const params = new URLSearchParams()
-  params.set('limit', String(limit))
-  params.set('userId', userId)
+  const params = new URLSearchParams();
+  params.set("limit", String(limit));
+  params.set("userId", userId);
   if (category) {
-    params.set('category', category)
+    params.set("category", category);
   }
   for (const tag of tags ?? []) {
-    params.append('tag', tag)
+    params.append("tag", tag);
   }
-  return params
+  return params;
 }
 
-async function fetchMappedMemories(
-  params: URLSearchParams,
-): Promise<MemoryEntry[]> {
-  const response = await fetch(
-    `${BASE_URL}/api/memory/list?${params.toString()}`,
-  )
+async function fetchMappedMemories(params: URLSearchParams): Promise<MemoryEntry[]> {
+  const response = await fetch(`/api/memory/list?${params.toString()}`);
   if (!response.ok) {
-    throw new Error(`Failed to fetch memories: ${response.statusText}`)
+    throw new Error(`Failed to fetch memories: ${response.statusText}`);
   }
-  const rawData = (await response.json()) as unknown
-  const data = isRecord(rawData) ? rawData : {}
-  return mapMemoryEntries(data['memories'])
+  const rawData = (await response.json()) as unknown;
+  const data = isRecord(rawData) ? rawData : {};
+  return mapMemoryEntries(data["memories"]);
 }
 
 function mapMemoryEntries(memories: unknown): MemoryEntry[] {
   if (!Array.isArray(memories)) {
-    return []
+    return [];
   }
 
   return memories.map((item: unknown) => {
-    const memory = isRecord(item) ? item : {}
+    const memory = isRecord(item) ? item : {};
     return {
-      id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
+      id: typeof memory["id"] === "string" ? memory["id"] : "unknown",
       content:
-        typeof memory['content'] === 'string'
-          ? memory['content']
-          : typeof memory['memory'] === 'string'
-            ? memory['memory']
-            : '',
-      metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
-    }
-  })
+        typeof memory["content"] === "string"
+          ? memory["content"]
+          : typeof memory["memory"] === "string"
+            ? memory["memory"]
+            : "",
+      metadata: isMetadata(memory["metadata"]) ? memory["metadata"] : {},
+    };
+  });
 }
 
 function isRecord(val: unknown): val is Record<string, unknown> {
-  return typeof val === 'object' && val !== null
+  return typeof val === "object" && val !== null;
 }
 
 function isMetadata(val: unknown): val is MemoryMetadata {
-  return typeof val === 'object' && val !== null
+  return typeof val === "object" && val !== null;
 }
