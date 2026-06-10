@@ -34,7 +34,7 @@ install_docker() {
 
 install_node() {
   [ ! -d "$HOME_DIR/.nvm" ] && su "$R_USER" -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash" 2>/dev/null || true
-  su "$R_USER" -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm install 24.14.1 2>/dev/null; nvm alias default 24.14.1 2>/dev/null; npm install -g pnpm@11.5.2 2>/dev/null' 2>/dev/null || true
+  su "$R_USER" -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; nvm install 24.16.0 2>/dev/null; nvm alias default 24.16.0 2>/dev/null; npm install -g pnpm@11.5.2 2>/dev/null' 2>/dev/null || true
   [ ! -f "$HOME_DIR/.bun/bin/bun" ] && su "$R_USER" -c "curl -fsSL https://bun.sh/install | bash" 2>/dev/null || true
 }
 

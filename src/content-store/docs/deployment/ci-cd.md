@@ -53,7 +53,7 @@ build:
         version: 11.3.0
     - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 24.14.1
+        node-version: 24.16.0
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
@@ -93,7 +93,7 @@ deploy:
         version: 11.3.0
     - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 24.14.1
+        node-version: 24.16.0
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile
@@ -169,7 +169,7 @@ rollback:
         version: 11.3.0
     - uses: actions/setup-node@v6.4.0
       with:
-        node-version: 24.14.1
+        node-version: 24.16.0
         cache: pnpm
     - name: Install dependencies
       run: pnpm install --no-frozen-lockfile

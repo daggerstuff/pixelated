@@ -1,4 +1,4 @@
-image: node:24.14.1-bullseye-slim
+image: node:24.16.0-bullseye-slim
 
 clone:
   depth: full
@@ -37,7 +37,7 @@ definitions:
         - uv run pytest -q tests/python/test_quality_scoring_stub.py
     - step: &lint-oxlint
       name: Lint & Oxlint
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
@@ -47,7 +47,7 @@ definitions:
         - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
       name: Security Scan
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
@@ -56,7 +56,7 @@ definitions:
         - pnpm security:scan
     - step: &playwright-e2e
       name: Playwright Smoke E2E
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
