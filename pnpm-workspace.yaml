@@ -101,18 +101,21 @@ minimumReleaseAgeExclude:
 - '@typescript-eslint/utils@8.61.0'
 - '@typescript-eslint/visitor-keys@8.61.0'
 - typescript-eslint@8.61.0
+  # Exempted because astro publishes frequently; Dependabot bumps fail pnpm minimumReleaseAge checks within 24 hours
 - astro@6.4.5
+  # Exempted because mongodb driver was updated alongside mongoose; fresh publish violates minimumReleaseAge
 - mongodb@7.3.0
+  # Exempted because mongoose was updated to support new mongodb driver version; fresh publish violates minimumReleaseAge
 - mongoose@9.7.0
 peerDependencyRules:
   ignoreMissing:
-  - '@capacitor/core'
-  - '@capacitor/preferences'
-  - '@netlify/blobs'
-  - typescript
-  - zod
-  - eslint-plugin-jsx-a11y
-  - tsconfck
+    - '@capacitor/core'
+    - '@capacitor/preferences'
+    - '@netlify/blobs'
+    - typescript
+    - zod
+    - eslint-plugin-jsx-a11y
+    - tsconfck
   allowedVersions:
     '@opentelemetry/api': '*'
     '@radix-ui/react-popover': '*'
