@@ -29,5 +29,5 @@
 
 | Vulnerability | The `src/pages/api/health/simple.ts` endpoint was directly serializing `error.message` into the HTTP 503 JSON response. This exposes internal details to the client, constituting a CWE-209 Information Exposure vulnerability |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Learning      | Any server-side error handling must decouple internal logging from external responses. Using `error.message` directly in `JSON.stringify` within an API route violates this principle                                                                                         |
-| Prevention    | Always use a server-side logger (e.g., `createBuildSafeLogger`) to record the full error and stack trace. Return a safe, static generic message such as `Internal server error` to the client                                                                                            |
+| Learning      | Same as the 2025-03-24 entry: sending raw `error` objects or `String(error)` downstream exposes internal logic to the client (CWE-209) |
+| Prevention    | Same as the 2025-05-24 entry: always use a server-side logger to record the full error and stack trace. Return a safe, static generic message such as `Internal server error` to the client |
