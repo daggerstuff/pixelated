@@ -41,7 +41,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
+        - npm install -g pnpm@11.5.2
         - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
         - pnpm lint
         - pnpm exec oxlint --type-aware -c .oxlintrc.json .
@@ -51,7 +51,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
+        - npm install -g pnpm@11.5.2
         - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
         - pnpm security:scan
     - step: &playwright-e2e
@@ -60,7 +60,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
+        - npm install -g pnpm@11.5.2
         - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
         - pnpm test:e2e:smoke
     - step: &build-test-sonarcloud
@@ -73,7 +73,7 @@ definitions:
         - docker
       script:
         - echo "Installing dependencies"
-        - npm install -g pnpm@11.3.0
+        - npm install -g pnpm@11.5.2
         - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
         - echo "Run tests and build"
         - pnpm test --silent

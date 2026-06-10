@@ -43,7 +43,7 @@ and workflows so you can contribute confidently.
 ### Prerequisites
 
 - Node.js ≥ 24 (see `.nvmrc`) — install via `nvm install`
-- pnpm ≥ 11.3.0
+- pnpm ≥ 11.5.2
 - Python 3.13 + [uv](https://github.com/astral-sh/uv)
 - Docker (must be running)
 
