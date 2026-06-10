@@ -32,7 +32,7 @@ fi
 
 # 3. Configure pnpm and Install Node dependencies
 echo "🟢 Configuring pnpm..."
-npm install -g pnpm@11.3.0
+npm install -g pnpm@11.5.2
 pnpm install --frozen-lockfile || pnpm install
 bash scripts/devops/install-git-hooks.sh
 
