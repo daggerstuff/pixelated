@@ -19,7 +19,7 @@ TARGETS = {
 Establish the foundational microservice baseline with enterprise-grade distributed concurrency control, high-availability database connection pooling, and proactive connection health diagnostics.
 
 ### Technical Design Specs
-- **Runtime Environment**: Node.js v24.14.1, pnpm v11.3.0, TypeScript v5.x.
+- **Runtime Environment**: Node.js v24.14.1, pnpm v11.5.2, TypeScript v5.x.
 - **Distributed Lock Manager (DLM)**:
   - Implement a Redis-backed distributed lock utilizing the standard Redlock algorithm pattern under `src/lib/redis/lock.ts`.
   - Enforce automated lock lease renewal (heartbeat) running in the background via a persistent timer loop.
