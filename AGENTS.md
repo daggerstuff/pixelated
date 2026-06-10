@@ -107,7 +107,11 @@ export PATH="$HOME/.nvm/versions/node/v24.14.1/bin:$PATH"
 (`~/.bashrc` in this environment is configured to do this in interactive shells.)
 
 ### Docker
-- Start the daemon if needed: `sudo service docker start`
+- Cloud VMs may not have Docker preinstalled. If `docker info` fails, install Docker CE and start `dockerd` manually (systemd often cannot start the service here):
+  ```bash
+  sudo dockerd >/tmp/dockerd.log 2>&1 &
+  ```
+  Use `sudo docker` / `sudo -E docker compose` unless your user is in the `docker` group.
 - Compose files require secrets on the command line (not only in `.env`):
   ```bash
   export POSTGRES_PASSWORD=dev_password_change_in_prod
@@ -123,6 +127,8 @@ export PATH="$HOME/.nvm/versions/node/v24.14.1/bin:$PATH"
 If `.env` is missing, derive Postgres user/db from the running container and write local URLs (see `WALKTHROUGH.md`). Do not commit `.env`.
 
 ### E2E against an already-running dev server
+Install browsers once per VM: `pnpm exec playwright install chromium`
+
 ```bash
 DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
   pnpm exec playwright test tests/e2e/infrastructure/ssr-functionality.spec.ts \
