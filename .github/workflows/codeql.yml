@@ -27,8 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
-      cancel-in-progress: true
+      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
