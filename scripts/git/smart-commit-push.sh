@@ -53,6 +53,7 @@ pre_commit_sync() {
   fi
 }
 
+
 # ── Argument parsing ──────────────────────────────────────────────────────────
 DRY_RUN=false
 MSG_OVERRIDE=""
