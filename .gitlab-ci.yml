@@ -360,7 +360,7 @@ coverage:report:
       /dev/null
     - npm install -g pnpm@$PNPM_VERSION
     - curl -LsSf https://astral.sh/uv/install.sh | sh
-    - export PATH="$HOME/.cargo/bin:$PATH"
+    - export PATH="$HOME/.local/bin:$PATH"
   script:
     - echo "Generating consolidated coverage report..."
     - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
