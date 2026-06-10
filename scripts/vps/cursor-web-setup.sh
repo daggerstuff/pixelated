@@ -3,7 +3,7 @@
 # Cursor Web & Cloud VM Environment Setup Script - Pixelated Empathy
 #
 # This script provisions a clean Ubuntu 22.04 / 24.04 Cloud VM for remote development,
-# installs all required runtimes (Node 24.14.1, pnpm 11.3.0, python 3.13, uv),
+# installs all required runtimes (Node 24.14.1, pnpm 11.5.2, python 3.13, uv),
 # boots up the required database containers (Mongo, Redis, Postgres),
 # installs the Cursor CLI Tunnel daemon, and sets up a systemd service for persistent access.
 #
@@ -151,12 +151,12 @@ install_node_stack() {
         nvm alias default 24.14.1
     "
 
-    # Install pnpm 11.3.0 globally
-    log_info "Installing pnpm 11.3.0..."
+    # Install pnpm 11.5.2 globally
+    log_info "Installing pnpm 11.5.2..."
     sudo -u "$REAL_USER" bash -c "
         export NVM_DIR=\"\$HOME/.nvm\"
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-        npm install -g pnpm@11.3.0
+        npm install -g pnpm@11.5.2
     "
 
     # Install Bun
