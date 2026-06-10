@@ -7,7 +7,7 @@ torchvision==0.27.0
 torchaudio==2.12.0
 --find-links https://download.pytorch.org/whl/cpu/torch_stable.html
 
-transformers==5.10.2
+transformers==5.11.0
 sentence-transformers==5.5.1
 scikit-learn==1.9.0
 fairlearn==0.14.0
@@ -27,7 +27,7 @@ flask-cors==6.0.5
 pydantic==2.13.4
 
 # Utilities
-cryptography==48.0.0
+cryptography==48.0.1
 python-dateutil==2.9.0
 pyyaml==6.0.3
 requests==2.34.2
