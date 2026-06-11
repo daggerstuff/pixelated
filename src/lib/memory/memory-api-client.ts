@@ -133,7 +133,7 @@ export class MemoryApiClient {
     return handleResponse<CreateMemoryResponse>(res)
   }
 
-  async list(query: ListMemoriesQuery = {}): Promise<ListMemoriesResponse> {
+  async list(query: ListMemoriesQuery = { tags: undefined }): Promise<ListMemoriesResponse> {
     const res = await this.request(
       appendQuery('', {
         limit: query.limit,
