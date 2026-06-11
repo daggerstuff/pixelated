@@ -178,6 +178,12 @@ minimumReleaseAgeExclude:
   - path-to-regexp@6.3.0
   - playwright-core@1.61.0-alpha-2026-06-10
   - playwright@1.61.0-alpha-2026-06-10
+  - '@ai-sdk/mcp@1.0.47'
+  - '@opentelemetry/*'
+  - '@types/nodemailer@8.0.1'
+  - '@vue/*'
+  - 'vue@3.5.38'
+  - 'jotai@2.20.1'
 
 
 peerDependencyRules:
