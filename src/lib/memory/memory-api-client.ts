@@ -115,13 +115,14 @@ export class MemoryApiClient {
     init: RequestInit = {},
   ): Promise<Response> {
     const extraHeaders = (await this.getHeaders?.()) ?? {}
+    const mergedHeaders = new Headers(init.headers)
+    mergedHeaders.set('Content-Type', 'application/json')
+    for (const [key, val] of Object.entries(extraHeaders)) {
+      mergedHeaders.set(key, val)
+    }
     return this.fetchFn(`${this.baseUrl}${path}`, {
       ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        ...extraHeaders,
-        ...init.headers,
-      },
+      headers: mergedHeaders,
     })
   }
 
@@ -133,7 +134,7 @@ export class MemoryApiClient {
     return handleResponse<CreateMemoryResponse>(res)
   }
 
-  async list(query: ListMemoriesQuery = {}): Promise<ListMemoriesResponse> {
+  async list(query: ListMemoriesQuery = { tags: undefined }): Promise<ListMemoriesResponse> {
     const res = await this.request(
       appendQuery('', {
         limit: query.limit,
