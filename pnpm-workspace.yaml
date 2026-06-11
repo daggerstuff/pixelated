@@ -157,6 +157,21 @@ minimumReleaseAgeExclude:
   - 'playwright-core@1.61.0-alpha-1781023400000'
   - 'playwright@1.61.0-alpha-1781023400000'
   - '@auth0/auth0-react@2.18.0'
+  - '@aws-sdk/util-locate-window@3.965.7'
+  - '@github/copilot-darwin-arm64@1.0.61'
+  - '@github/copilot-darwin-x64@1.0.61'
+  - '@github/copilot-linux-arm64@1.0.61'
+  - '@github/copilot-linux-x64@1.0.61'
+  - '@github/copilot-linuxmusl-arm64@1.0.61'
+  - '@github/copilot-linuxmusl-x64@1.0.61'
+  - '@github/copilot-win32-arm64@1.0.61'
+  - '@github/copilot-win32-x64@1.0.61'
+  - '@github/copilot@1.0.61'
+  - path-to-regexp@6.3.0
+  - playwright-core@1.61.0-alpha-2026-06-10
+  - playwright@1.61.0-alpha-2026-06-10
+  - react-hook-form@7.78.0
+  - typescript-eslint@8.61.0
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
