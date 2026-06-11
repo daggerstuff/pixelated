@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from "react";
 import { mcpMemoryManager } from "../lib/memory/mcp-memory-client";
 import type { MemoryEntry, SearchOptions, MemoryStats } from "../lib/memory/memory-client";
 
-// PIX-1920: Always route through mcpMemoryManager → /api/memory/* gateway.
+// PIX-1920 / PIX-3903: Route through mcpMemoryManager → /api/v1/memory/* gateway.
 // No env-var override is allowed — localMemoryManager is test/dev only.
 const memoryManager = mcpMemoryManager;
 
