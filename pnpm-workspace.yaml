@@ -3,6 +3,10 @@ packages:
   - 'business-strategy-cms'
   - 'package'
 
+# Committed lockfile is the trusted source of truth in CI; minimumReleaseAgeExclude
+# only applies during resolution, not lockfile supply-chain verification.
+trustLockfile: true
+
 allowBuilds:
   '@aws-amplify/cli': true
   '@contrast/fn-inspect': true
