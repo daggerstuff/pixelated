@@ -141,8 +141,11 @@ After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
 ```bash
 git submodule init
 git submodule update
+pnpm install --no-frozen-lockfile
 ```
-For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead.
+Use `--no-frozen-lockfile` for local and CI installs to avoid frozen-lockfile retry/failover loops when the lockfile drifts.
+
+For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead of plain `git submodule` commands.
 
 ### Long-running dev server
 Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.

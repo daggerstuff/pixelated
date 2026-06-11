@@ -76,7 +76,7 @@ setup: ## One-command local setup
 install: ## Install all dependencies (submodules, JS, Python)
 	git submodule init
 	git submodule update
-	pnpm install && uv sync
+	pnpm install --no-frozen-lockfile && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────
 

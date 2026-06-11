@@ -37,10 +37,7 @@ validate:dependencies:
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Validating dependencies..."
-    - >
-      NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
-      { echo "⚠️ Lockfile out of date - refreshing...";
-        NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
+    - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
     - pnpm audit --audit-level moderate
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -68,7 +65,7 @@ validate:lint:
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running lint validation..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
     - pnpm lint:ci
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -102,7 +99,7 @@ validate:typecheck:
   script:
     - echo "Running typecheck validation..."
     - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
     # Split typecheck into separate commands to reduce peak memory usage
     # and ensure NODE_OPTIONS is properly applied
     - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
@@ -133,7 +130,7 @@ test:integration:
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running integration tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
     - pnpm test:integration
   artifacts:
     reports:
@@ -363,7 +360,7 @@ coverage:report:
     - export PATH="$HOME/.local/bin:$PATH"
   script:
     - echo "Generating consolidated coverage report..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
     - chmod +x scripts/consolidate-coverage.sh
     - COVERAGE_TIMEOUT=600 ./scripts/consolidate-coverage.sh
   artifacts:

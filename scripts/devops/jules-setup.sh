@@ -33,7 +33,7 @@ fi
 # 3. Configure pnpm and Install Node dependencies
 echo "🟢 Configuring pnpm..."
 npm install -g pnpm@11.3.0
-pnpm install --frozen-lockfile || pnpm install
+pnpm install --no-frozen-lockfile
 bash scripts/devops/install-git-hooks.sh
 
 # 4. Configure Python with uv (Preinstalled in Jules)
