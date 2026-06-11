@@ -2,12 +2,11 @@ import { IncomingMessage, ServerResponse as NodeServerResponse } from 'http'
 import { createServer } from 'http'
 import { parse } from 'url'
 
+// IMPORTANT: Import Sentry instrumentation before constructing the service.
+import { Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { BiasDetectionEngine } from './BiasDetectionEngine'
 import type { TherapeuticSession } from './types'
-
-// IMPORTANT: Import Sentry instrumentation at the very top
-import '../../../../config/instrument.mjs'
 
 const appLogger = createBuildSafeLogger('bias-detection-server')
 
@@ -43,6 +42,10 @@ class BiasDetectionServer {
     res.end(JSON.stringify(data))
   }
 
+  private captureCaughtError(error: unknown): void {
+    Sentry.captureException(error)
+  }
+
   private async handleHealthCheck(res: NodeServerResponse): Promise<void> {
     try {
       const engineHealth = await this.engine.getHealthStatus()
@@ -74,6 +77,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Health check failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
@@ -129,6 +133,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Bias analysis failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Bias analysis failed',
@@ -199,6 +204,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Batch analysis failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Batch analysis failed',
@@ -227,6 +233,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Dashboard data retrieval failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
@@ -258,6 +265,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Session analysis retrieval failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
@@ -278,6 +286,7 @@ class BiasDetectionServer {
       })
     } catch (error: unknown) {
       appLogger.error('Performance stats retrieval failed:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error:
@@ -368,6 +377,7 @@ class BiasDetectionServer {
       }
     } catch (error: unknown) {
       appLogger.error('Request handling error:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: 'Internal server error',
@@ -383,6 +393,7 @@ class BiasDetectionServer {
       (req: IncomingMessage, res: NodeServerResponse) => {
         this.handleRequest(req, res).catch((error) => {
           appLogger.error('Unhandled request error:', error)
+          this.captureCaughtError(error)
           if (!res.headersSent) {
             this.sendJsonResponse(res, 500, {
               success: false,
@@ -422,6 +433,7 @@ class BiasDetectionServer {
 
       this.server!.on('error', (error) => {
         appLogger.error('Server error:', error)
+        this.captureCaughtError(error)
         reject(error)
       })
     })
@@ -462,5 +474,6 @@ process.on('SIGINT',  async () =>
 // Start server
 biasDetectionServer.start().catch((error) => {
   console.error('Failed to start Bias Detection service:', error)
+  Sentry.captureException(error)
   process.exit(1)
 })
