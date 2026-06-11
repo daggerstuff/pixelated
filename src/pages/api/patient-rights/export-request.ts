@@ -10,7 +10,7 @@ const logger = createBuildSafeLogger('api-export-request')
 
 // Define validation schema for export request
 const exportRequestSchema = z.object({
-  patientId: z.string().uuid({ message: 'Patient ID must be a valid UUID' }),
+  patientId: z.uuid({ message: 'Patient ID must be a valid UUID' }),
   format: (z.enum as any)(['json', 'csv', 'xml', 'pdf'], {
     errorMap: () => ({ message: 'Format must be one of: json, csv, xml, pdf' }),
   }),
