@@ -65,7 +65,15 @@ allowBuilds:
   utf-8-validate: true
   win-export-certificate-and-key: true
   workerd: true
+# Package-level/wildcard excludes must precede version-pinned entries: pnpm stops at
+# the first name match, so an earlier pin for another version blocks later rules.
 minimumReleaseAgeExclude:
+  - '@cloudflare/workers-types'
+  - '@cloudflare/*'
+  - '@opentelemetry/*'
+  - '@ai-sdk/*'
+  - '@vue/*'
+  - ai
   - '@iconify-json/lucide@1.2.111'
   - 'path-to-regexp@6.3.0'
   - '@cloudflare/workers-types@4.20260531.1'
@@ -89,11 +97,9 @@ minimumReleaseAgeExclude:
   - 'react-hook-form@7.78.0'
   - '@ai-sdk/gateway@3.0.126'
   - '@ai-sdk/gateway@3.0.127'
-  - ai
+  - '@ai-sdk/gateway@3.0.128'
   - ai@6.0.198
   - ai@6.0.199
-  - '@cloudflare/workers-types'
-  - '@cloudflare/*'
   - '@cloudflare/workers-types@4.20260609.1'
   - '@typescript-eslint/eslint-plugin@8.61.0'
   - '@typescript-eslint/parser@8.61.0'
@@ -178,11 +184,8 @@ minimumReleaseAgeExclude:
   - path-to-regexp@6.3.0
   - playwright-core@1.61.0-alpha-2026-06-10
   - playwright@1.61.0-alpha-2026-06-10
-  - '@ai-sdk/*'
   - '@ai-sdk/mcp@1.0.47'
-  - '@opentelemetry/*'
   - '@types/nodemailer@8.0.1'
-  - '@vue/*'
   - '@vue/compiler-core@3.5.38'
   - '@vue/compiler-dom@3.5.38'
   - '@vue/compiler-sfc@3.5.38'

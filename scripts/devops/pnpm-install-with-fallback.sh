@@ -61,7 +61,10 @@ install_with_retry() {
     fi
   done
   
-  return $success
+  if (( success )); then
+    return 0
+  fi
+  return 1
 }
 
 # Main execution
@@ -105,7 +108,7 @@ main() {
         ;;
       "no-supply-chain")
         export NODE_OPTIONS="--no-deprecation ${NODE_OPTIONS:-}"
-        args="--no-frozen-lockfile --no-supply-chain $PNPM_ARGS"
+        args="--no-frozen-lockfile --config.minimumReleaseAge=0 $PNPM_ARGS"
         ;;
       *)
         args="$PNPM_ARGS"
