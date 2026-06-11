@@ -439,7 +439,7 @@ if (unresolved.size > 0) {
     console.error("Example: pnpm add <package> (or pnpm add -D for dev dependency)");
   }
   console.error(
-    "Hint: if the package is already in package.json, run scripts/devops/pnpm-install-with-fallback.sh --frozen-lockfile to repair node_modules.",
+    "Hint: if the package is already in package.json, run pnpm install --frozen-lockfile to repair node_modules.",
   );
   process.exit(1);
 }
