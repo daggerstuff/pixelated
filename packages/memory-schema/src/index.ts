@@ -49,6 +49,8 @@ export type {
   EmpathyMetrics,
   /** Result of Socratic Gate evaluation run before memory ingestion. */
   GateResult,
+  /** Detailed metadata produced by the safety-gating pipeline (PII, crisis, trauma, consent). */
+  GatingMetadata,
 } from './types'
 
 // ---------------------------------------------------------------------------
