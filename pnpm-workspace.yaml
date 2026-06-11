@@ -1,3 +1,8 @@
+packages:
+  - 'packages/*'
+  - 'business-strategy-cms'
+  - 'package'
+
 allowBuilds:
   '@aws-amplify/cli': true
   '@contrast/fn-inspect': true
