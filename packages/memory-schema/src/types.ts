@@ -82,6 +82,38 @@ export interface EmpathyMetrics {
   resistanceLevel: number
 }
 
+/**
+ * Result of Socratic Gate evaluation (run before memory ingestion).
+ */
+export interface GateResult {
+  decision: GateDecision
+  reason: string
+  suggestedTags: string[]
+  anomalyDetected: boolean
+  /**
+   * Optional detailed gating metadata produced by the safety pipeline
+   * (PII redaction, crisis detection, trauma filtering, consent gate).
+   * Only populated when the caller asks for the full evaluation trace.
+   */
+  gating?: GatingMetadata
+}
+
+/**
+ * Detailed metadata produced by the safety-gating pipeline. Mirrors the
+ * fields the local `SocraticGate` produces in `src/lib/ai/memory/gate.ts`.
+ */
+export interface GatingMetadata {
+  piiRedacted: boolean
+  piiTypes: string[]
+  crisisTier: string
+  crisisFlag: boolean
+  traumaIndicators: string[]
+  traumaSeverity: string
+  consentTier: string
+  consentAllowed: boolean
+  scrubbedContent: string
+}
+
 // ---------------------------------------------------------------------------
 // Canonical Memory Object
 // ---------------------------------------------------------------------------
@@ -253,4 +285,4 @@ export interface MemoryQueryOptions {
 export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
 
 // Re-export gate types for backward-compatible imports from ./types
-export type { GateDecision, GateResult } from './gate-types'
+export type { GateDecision } from './gate-types'
