@@ -63,7 +63,7 @@ export class EmailService {
       // For now, we'll simulate sending
       await this.simulateEmailSend(message)
 
-      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
       logger.info('Email sent successfully', {
         messageId,

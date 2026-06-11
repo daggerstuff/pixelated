@@ -1,5 +1,7 @@
 // API endpoint for bias detection data export
 
+import type { APIRoute } from 'astro'
+
 import type {
   BiasAnalysisResults,
   CounterfactualScenario,
@@ -13,7 +15,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = (await request.json()) as Record<string, unknown>
 
     // Validate required fields
-    if (!body.analysisResults) {
+    if (!body['analysisResults']) {
       return new Response(
         JSON.stringify({
           error: 'Missing required field: analysisResults',
@@ -70,11 +72,11 @@ export const POST: APIRoute = async ({ request }) => {
     // Filter components based on includeComponents
     const filteredExportData = {
       ...exportData,
-      analysis: includeComponents.analysis ? exportData.analysis : undefined,
-      counterfactualScenarios: includeComponents.counterfactual
+      analysis: includeComponents['analysis'] ? exportData.analysis : undefined,
+      counterfactualScenarios: includeComponents['counterfactual']
         ? exportData.counterfactualScenarios
         : undefined,
-      historicalComparison: includeComponents.historical
+      historicalComparison: includeComponents['historical']
         ? exportData.historicalComparison
         : undefined,
       metadata: {
@@ -151,50 +153,50 @@ function convertToCSV(exportData: ExportData): string {
   const csvRows: string[] = []
 
   // Headers
-  csvRows.push('Category,Metric,Value,Details' as any)
+  csvRows.push('Category,Metric,Value,Details')
 
   // Analysis data
   if (exportData.analysis) {
     const { analysis } = exportData
     csvRows.push(
-      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}` as any,
+      `Analysis,Overall Bias Score,${analysis.overallBiasScore},${analysis.alertLevel}`,
     )
-    csvRows.push(`Analysis,Confidence,${analysis.confidence},` as any)
-    csvRows.push(`Analysis,Session ID,${analysis.sessionId},` as any)
+    csvRows.push(`Analysis,Confidence,${analysis.confidence},`)
+    csvRows.push(`Analysis,Session ID,${analysis.sessionId},`)
 
     // Layer results
     const layers = analysis.layerResults
     csvRows.push(
-      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},` as any,
+      `Preprocessing,Gender Bias,${layers.preprocessing.linguisticBias.genderBiasScore},`,
     )
     csvRows.push(
-      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},` as any,
+      `Preprocessing,Racial Bias,${layers.preprocessing.linguisticBias.racialBiasScore},`,
     )
     csvRows.push(
-      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},` as any,
+      `Preprocessing,Age Bias,${layers.preprocessing.linguisticBias.ageBiasScore},`,
     )
     csvRows.push(
-      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},` as any,
-    )
-
-    csvRows.push(
-      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},` as any,
-    )
-    csvRows.push(
-      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},` as any,
-    )
-    csvRows.push(
-      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},` as any,
+      `Preprocessing,Cultural Bias,${layers.preprocessing.linguisticBias.culturalBiasScore},`,
     )
 
     csvRows.push(
-      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},` as any,
+      `Model,Demographic Parity,${layers.modelLevel.fairnessMetrics.demographicParity},`,
     )
     csvRows.push(
-      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},` as any,
+      `Model,Equalized Odds,${layers.modelLevel.fairnessMetrics.equalizedOdds},`,
     )
     csvRows.push(
-      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},` as any,
+      `Model,Calibration,${layers.modelLevel.fairnessMetrics.calibration},`,
+    )
+
+    csvRows.push(
+      `Interactive,Scenarios Analyzed,${layers.interactive.counterfactualAnalysis.scenariosAnalyzed},`,
+    )
+    csvRows.push(
+      `Interactive,Bias Detected,${layers.interactive.counterfactualAnalysis.biasDetected},`,
+    )
+    csvRows.push(
+      `Interactive,Consistency Score,${layers.interactive.counterfactualAnalysis.consistencyScore},`,
     )
   }
 
@@ -214,13 +216,9 @@ function convertToCSV(exportData: ExportData): string {
   // Historical comparison
   if (exportData.historicalComparison) {
     const historical = exportData.historicalComparison
-    csvRows.push(
-      `Historical,30-Day Average,${historical.thirtyDayAverage},` as any,
-    )
-    csvRows.push(
-      `Historical,Percentile Rank,${historical.percentileRank},` as any,
-    )
-    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},` as any)
+    csvRows.push(`Historical,30-Day Average,${historical.thirtyDayAverage},`)
+    csvRows.push(`Historical,Percentile Rank,${historical.percentileRank},`)
+    csvRows.push(`Historical,7-Day Trend,${historical.sevenDayTrend},`)
   }
 
   return csvRows.join('\n')

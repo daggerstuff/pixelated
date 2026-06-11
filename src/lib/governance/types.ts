@@ -8,7 +8,7 @@ export interface GovernancePolicy {
 
 export interface GovernanceRule {
   id: string
-  action: 'encrypt' | 'access' | 'delete' | 'share'
+  action: string
   conditions: Condition[]
   required: RequiredCondition[]
 }

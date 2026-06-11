@@ -5,7 +5,7 @@
 
 import { getLogger } from '../logging'
 
-const logger = getLogger({ module: 'lifecycle-manager' })
+const logger = getLogger({ module: 'lifecycle-manager' } as any)
 
 export type RetentionPeriod = '30-day' | '90-day' | '7-year' | 'permanent'
 
