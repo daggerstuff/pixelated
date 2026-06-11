@@ -25,7 +25,7 @@ const initiateExportSchema = z.object({
   recipientType: z.enum(['patient', 'provider', 'third-party']),
   recipientDetails: z.object({
     name: z.string().min(1, 'Recipient name is required'),
-    email: z.string().email('Valid email is required'),
+    email: z.email('Valid email is required'),
     organization: z.string().optional(),
     phone: z.string().optional(),
   }),

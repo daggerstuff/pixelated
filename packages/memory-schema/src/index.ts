@@ -16,6 +16,12 @@
 export { MEMORY_SCHEMA_VERSION } from './types'
 
 // ---------------------------------------------------------------------------
+// Canonical enum value sets (for Zod, guards, OpenAPI)
+// ---------------------------------------------------------------------------
+
+export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
+
+// ---------------------------------------------------------------------------
 // Primitive enum types
 // ---------------------------------------------------------------------------
 
@@ -74,6 +80,25 @@ export type {
 } from './types'
 
 // ---------------------------------------------------------------------------
+// Zod runtime validation schemas  (schemas.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  MemoryScopeSchema,
+  RetentionPolicySchema,
+  StrengthTrendSchema,
+  GateDecisionSchema,
+  SourceServiceSchema,
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
+  GateResultSchema,
+  UnifiedMemorySchema,
+  CreateMemoryInputSchema,
+  UpdateMemoryInputSchema,
+  MemoryQueryOptionsSchema,
+} from './schemas'
+
+// ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
 // ---------------------------------------------------------------------------
 
@@ -110,6 +135,30 @@ export {
   hasEmpathyMetrics,
   isEmbedded,
 } from './guards'
+
+// ---------------------------------------------------------------------------
+// Reflection loop contracts  (reflection.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  ReflectionOutcomeSchema,
+  ReflectionInsightSchema,
+  ReflectionContextSchema,
+  ActionFeedbackPairSchema,
+  VerbalReflectionSchema,
+  ReflexionResultSchema,
+  actionFeedbackPairToReflectionContext,
+  verbalReflectionToInsights,
+} from './reflection'
+
+export type {
+  ReflectionOutcome,
+  ReflectionInsight,
+  ReflectionContext,
+  ActionFeedbackPair,
+  VerbalReflection,
+  ReflexionResult,
+} from './reflection'
 
 // ---------------------------------------------------------------------------
 // Factory defaults & construction helpers  (defaults.ts)

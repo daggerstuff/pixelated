@@ -62,7 +62,7 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
-  - path-to-regexp@6.3.0
+  - 'path-to-regexp@6.3.0'
   - '@cloudflare/workers-types@4.20260531.1'
   - tinyglobby@0.2.17
   - yaml@2.8.3
@@ -81,7 +81,7 @@ minimumReleaseAgeExclude:
   - axios@0.31.1
   - axios@0.30.3
   - hono@4.12.23
-  - react-hook-form@7.78.0
+  - 'react-hook-form@7.78.0'
   - '@ai-sdk/gateway@3.0.126'
   - '@ai-sdk/gateway@3.0.127'
   - ai@6.0.198
@@ -97,11 +97,11 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/typescript-estree@8.61.0'
   - '@typescript-eslint/utils@8.61.0'
   - '@typescript-eslint/visitor-keys@8.61.0'
-  - typescript-eslint@8.61.0
+  - 'typescript-eslint@8.61.0'
   - mongoose@9.7.0
   - '@playwright/test@1.61.0-alpha-2026-06-10'
-  - playwright-core@1.61.0-alpha-2026-06-10
-  - playwright@1.61.0-alpha-2026-06-10
+  - 'playwright-core@1.61.0-alpha-2026-06-10'
+  - 'playwright@1.61.0-alpha-2026-06-10'
   - '@aws-sdk/checksums@3.1000.5'
   - '@aws-sdk/client-dynamodb@3.1066.0'
   - '@aws-sdk/client-ec2@3.1066.0'
@@ -152,6 +152,26 @@ minimumReleaseAgeExclude:
   - astro@6.4.6
   - markdownlint@0.41.0
   - sharp@0.35.0
+  - '@cloudflare/workers-types@4.20260610.1'
+  - '@playwright/test@1.61.0-alpha-1781023400000'
+  - 'playwright-core@1.61.0-alpha-1781023400000'
+  - 'playwright@1.61.0-alpha-1781023400000'
+  - '@auth0/auth0-react@2.18.0'
+  - '@aws-sdk/util-locate-window@3.965.7'
+  - '@github/copilot-darwin-arm64@1.0.61'
+  - '@github/copilot-darwin-x64@1.0.61'
+  - '@github/copilot-linux-arm64@1.0.61'
+  - '@github/copilot-linux-x64@1.0.61'
+  - '@github/copilot-linuxmusl-arm64@1.0.61'
+  - '@github/copilot-linuxmusl-x64@1.0.61'
+  - '@github/copilot-win32-arm64@1.0.61'
+  - '@github/copilot-win32-x64@1.0.61'
+  - '@github/copilot@1.0.61'
+  - path-to-regexp@6.3.0
+  - playwright-core@1.61.0-alpha-2026-06-10
+  - playwright@1.61.0-alpha-2026-06-10
+
+
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
