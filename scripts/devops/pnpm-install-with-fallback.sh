@@ -30,12 +30,12 @@ install_with_retry() {
   local args="$2"
   local attempt=0
   local success=0
-  
+
   log "Attempting pnpm install with strategy: $strategy"
-  
+
   while [[ $attempt -lt $MAX_ATTEMPTS ]]; do
     attempt=$((attempt + 1))
-    
+
     if [[ $attempt -gt 1 ]]; then
       local delay=$(backoff $attempt)
       log "Attempt $attempt/$MAX_ATTEMPTS failed, retrying in ${delay}s..."
@@ -43,7 +43,7 @@ install_with_retry() {
     else
       log "Attempt $attempt/$MAX_ATTEMPTS..."
     fi
-    
+
     # Try the install command
     if pnpm install $args; then
       log "Successfully installed dependencies with strategy: $strategy"
@@ -52,7 +52,7 @@ install_with_retry() {
     else
       local exit_code=$?
       log "Attempt $attempt failed with exit code: $exit_code"
-      
+
       # If this is the last attempt, we'll try the next strategy
       if [[ $attempt -eq $MAX_ATTEMPTS ]]; then
         log "Max attempts reached for strategy: $strategy"
@@ -60,7 +60,7 @@ install_with_retry() {
       fi
     fi
   done
-  
+
   # Return 0 for success, 1 for failure (bash convention)
   return $((1 - success))
 }
@@ -68,7 +68,7 @@ install_with_retry() {
 # Main execution
 main() {
   local strategies=()
-  
+
   # Determine which strategies to use based on environment
   if [[ "${PNPM_INSTALL_FORCE_NO_FROZEN_LOCKFILE:-}" == "1" ]]; then
     strategies=("no-frozen-lockfile")
@@ -76,18 +76,18 @@ main() {
     # Default strategy: try frozen-lockfile first, then fallback to no-frozen-lockfile
     strategies=("frozen-lockfile" "no-frozen-lockfile")
   fi
-  
+
   # Add additional strategies if requested
   if [[ "${PNPM_INSTALL_TRY_OFFLINE_FIRST:-}" == "1" ]]; then
     strategies=("offline" "${strategies[@]}")
   fi
-  
+
   local overall_success=0
-  
+
   # Try each strategy in order
   for strategy in "${strategies[@]}"; do
     local args=""
-    
+
     case "$strategy" in
       "offline")
         args="--offline $PNPM_ARGS"
@@ -102,13 +102,13 @@ main() {
         args="$PNPM_ARGS"
         ;;
     esac
-    
+
     if install_with_retry "$strategy" "$args"; then
       overall_success=1
       break
     fi
   done
-  
+
   if [[ $overall_success -eq 1 ]]; then
     log "Dependencies installed successfully!"
     exit 0
