@@ -9,8 +9,6 @@
  * Epic: ADHD-3 Foresight Memory Architecture
  */
 
-import { z } from 'zod'
-
 // ---------------------------------------------------------------------------
 // Enumerations
 // ---------------------------------------------------------------------------
@@ -25,8 +23,6 @@ import { z } from 'zod'
  */
 export type MemoryScope = 'session' | 'arc' | 'trait' | 'fact'
 
-export const MemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
-
 /**
  * Retention policy controls how long a memory stays in active vector space
  * before being archived or evicted by the decay scheduler.
@@ -37,29 +33,10 @@ export type RetentionPolicy =
   | 'long_term' // 1 week – 6 months
   | 'permanent' // Never evicted (only explicit delete)
 
-export const RetentionPolicySchema = z.enum([
-  'ephemeral',
-  'short_term',
-  'long_term',
-  'permanent',
-])
-
 /**
  * Strength trend — set by the temporal decay scheduler after each retrieval cycle.
  */
 export type StrengthTrend = 'stable' | 'strengthening' | 'weakening' | 'stale'
-
-export const StrengthTrendSchema = z.enum([
-  'stable',
-  'strengthening',
-  'weakening',
-  'stale',
-])
-
-/**
- * Gate decision — output of Socratic Gate evaluation before memory ingestion.
- */
-export type GateDecision = 'auto' | 'passive' | 'active' | 'block'
 
 /**
  * Which service originally wrote this memory row.
@@ -70,13 +47,6 @@ export type SourceService =
   | 'ai-services'
   | 'astro-frontend'
   | 'unknown'
-
-export const SourceServiceSchema = z.enum([
-  'foresight',
-  'ai-services',
-  'astro-frontend',
-  'unknown',
-])
 
 // ---------------------------------------------------------------------------
 // Sub-objects
@@ -99,14 +69,6 @@ export interface EmotionalContext {
   intensity: number
 }
 
-export const EmotionalContextSchema = z.object({
-  valence: z.number().min(-1).max(1),
-  arousal: z.number().min(0).max(1),
-  dominance: z.number().min(0).max(1),
-  primaryEmotion: z.string(),
-  intensity: z.number().min(0).max(1),
-})
-
 /**
  * Empathy quality metrics derived from a therapeutic interaction.
  * Scored post-hoc by the evaluation pipeline.
@@ -118,22 +80,6 @@ export interface EmpathyMetrics {
   validationAccuracy: number
   /** Resistance to persona/perspective shift (0 = none, 1 = maximum) */
   resistanceLevel: number
-}
-
-export const EmpathyMetricsSchema = z.object({
-  reciprocity: z.number().min(0).max(1),
-  validationAccuracy: z.number().min(0).max(1),
-  resistanceLevel: z.number().min(0).max(1),
-})
-
-/**
- * Result of Socratic Gate evaluation (run before memory ingestion).
- */
-export interface GateResult {
-  decision: GateDecision
-  reason: string
-  suggestedTags: string[]
-  anomalyDetected: boolean
 }
 
 // ---------------------------------------------------------------------------
@@ -239,51 +185,6 @@ export interface UnifiedMemory {
   lastRetrievedAt: string | null
 }
 
-export const UnifiedMemorySchema = z.object({
-  // ── Identity ──────────────────────────────────────────────────────────────
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  userId: z.string(),
-  bankId: z.string(),
-
-  // ── Content ───────────────────────────────────────────────────────────────
-  content: z.string().min(1).max(100000),
-  scope: MemoryScopeSchema,
-  retention: RetentionPolicySchema,
-  category: z.string(),
-  tags: z.array(z.string()),
-
-  // ── Versioning ────────────────────────────────────────────────────────────
-  version: z.number().int().min(1),
-  schemaVersion: z.string(),
-  sourceService: SourceServiceSchema,
-
-  // ── Decay & Importance ────────────────────────────────────────────────────
-  importance: z.number().min(0).max(1),
-  decayRate: z.number().min(0),
-  strengthTrend: StrengthTrendSchema,
-  activationCount: z.number().int().min(0),
-  retrievalCount: z.number().int().min(0),
-
-  // ── Ghost / Synthesis ─────────────────────────────────────────────────────
-  isGhost: z.boolean(),
-  gist: z.string().max(200).nullable(),
-  synthesizedFrom: z.array(z.string()),
-
-  // ── Embeddings ────────────────────────────────────────────────────────────
-  vectorId: z.string().nullable(),
-
-  // ── Emotional / Clinical ──────────────────────────────────────────────────
-  emotionalContext: EmotionalContextSchema.nullable(),
-  empathyMetrics: EmpathyMetricsSchema.nullable(),
-
-  // ── Timestamps ────────────────────────────────────────────────────────────
-  createdAt: z.string(),
-  updatedAt: z.string().nullable(),
-  accessedAt: z.string().nullable(),
-  lastRetrievedAt: z.string().nullable(),
-})
-
 // ---------------------------------------------------------------------------
 // Partial / Input Types
 // ---------------------------------------------------------------------------
@@ -306,20 +207,6 @@ export interface CreateMemoryInput {
   empathyMetrics?: EmpathyMetrics
 }
 
-export const CreateMemoryInputSchema = z.object({
-  content: z.string().min(1).max(100000),
-  userId: z.string(),
-  tenantId: z.string().optional(),
-  bankId: z.string().optional(),
-  scope: MemoryScopeSchema.optional(),
-  retention: RetentionPolicySchema.optional(),
-  category: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  importance: z.number().min(0).max(1).optional(),
-  emotionalContext: EmotionalContextSchema.optional(),
-  empathyMetrics: EmpathyMetricsSchema.optional(),
-})
-
 /**
  * Input shape for updating an existing memory.
  * All fields optional — only provided fields are mutated.
@@ -334,19 +221,6 @@ export interface UpdateMemoryInput {
   emotionalContext?: EmotionalContext | null
   empathyMetrics?: EmpathyMetrics | null
 }
-
-export const UpdateMemoryInputSchema = z
-  .object({
-    content: z.string().min(1).max(100000).optional(),
-    scope: MemoryScopeSchema.optional(),
-    retention: RetentionPolicySchema.optional(),
-    category: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    importance: z.number().min(0).max(1).optional(),
-    emotionalContext: EmotionalContextSchema.optional().nullable(),
-    empathyMetrics: EmpathyMetricsSchema.optional().nullable(),
-  })
-  .partial()
 
 /**
  * Query options for listing / searching memories.
@@ -371,28 +245,12 @@ export interface MemoryQueryOptions {
   sortOrder?: 'asc' | 'desc'
 }
 
-export const MemoryQueryOptionsSchema = z.object({
-  userId: z.string(),
-  tenantId: z.string().optional(),
-  bankId: z.string().optional(),
-  scope: MemoryScopeSchema.optional(),
-  retention: RetentionPolicySchema.optional(),
-  category: z.string().optional(),
-  tags: z.array(z.string()).optional(),
-  strengthTrend: StrengthTrendSchema.optional(),
-  minImportance: z.number().min(0).max(1).optional(),
-  search: z.string().optional(),
-  limit: z.number().optional(),
-  offset: z.number().optional(),
-  sortBy: z
-    .enum(['createdAt', 'updatedAt', 'importance', 'accessedAt'])
-    .optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
-})
-
 // ---------------------------------------------------------------------------
 // Schema version constant
 // ---------------------------------------------------------------------------
 
 /** Current schema version — bump when adding fields to UnifiedMemory */
 export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
+
+// Re-export gate types for backward-compatible imports from ./types
+export type { GateDecision, GateResult } from './gate-types'
