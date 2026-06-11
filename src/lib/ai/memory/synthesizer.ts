@@ -28,33 +28,33 @@ export class MemorySynthesizer {
     try {
       // 1. Calculate Stance Shifts (comparing recent vs historic)
       const splits = this.splitRecentAndHistoric(memories);
-      const stance_shifts = this.detectStanceShifts(splits.historic, splits.recent);
+      const stanceShifts = this.detectStanceShifts(splits.historic, splits.recent);
 
       // 2. Identify candidates for merging (low importance/decayed)
       const mergeCandidates = this.identifyMergeCandidates(memories);
 
       if (mergeCandidates.length < 2) {
         return {
-          merged_ids: [],
-          new_memory_id: '',
-          stance_shifts,
-          compression_ratio: 1,
+          mergedIds: [],
+          newMemoryId: '',
+          stanceShifts,
+          compressionRatio: 1,
         };
       }
 
       // 3. Create a synthesized "Abstract Memory"
-      const merged_ids = mergeCandidates.map(m => m.id);
+      const mergedIds = mergeCandidates.map(m => m.id);
 
       appLogger.info('Synthesis completed', {
-        mergedCount: merged_ids.length,
-        shiftsDetected: stance_shifts.length,
+        mergedCount: mergedIds.length,
+        shiftsDetected: stanceShifts.length,
       });
 
       return {
-        merged_ids,
-        new_memory_id: uuidv4(),
-        stance_shifts,
-        compression_ratio: memories.length / (memories.length - merged_ids.length + 1),
+        mergedIds,
+        newMemoryId: uuidv4(),
+        stanceShifts,
+        compressionRatio: memories.length / (memories.length - mergedIds.length + 1),
       };
     } catch (error: unknown) {
       appLogger.error('Synthesis pass failed', {
@@ -91,10 +91,10 @@ export class MemorySynthesizer {
     if (Math.abs(reciprocityDelta) > this.SHIFT_THRESHOLD) {
       shifts.push({
         attribute: 'reciprocity',
-        old_value: historicEmpathy.reciprocity,
-        new_value: recentEmpathy.reciprocity,
+        oldValue: historicEmpathy.reciprocity,
+        newValue: recentEmpathy.reciprocity,
         delta: reciprocityDelta,
-        evidence_ids: recent.map(r => r.id),
+        evidenceIds: recent.map(r => r.id),
         confidence: 0.8,
       });
     }
@@ -104,10 +104,10 @@ export class MemorySynthesizer {
     if (Math.abs(validationDelta) > this.SHIFT_THRESHOLD) {
       shifts.push({
         attribute: 'validation_accuracy',
-        old_value: historicEmpathy.validationAccuracy,
-        new_value: recentEmpathy.validationAccuracy,
+        oldValue: historicEmpathy.validationAccuracy,
+        newValue: recentEmpathy.validationAccuracy,
         delta: validationDelta,
-        evidence_ids: recent.map(r => r.id),
+        evidenceIds: recent.map(r => r.id),
         confidence: 0.75,
       });
     }
