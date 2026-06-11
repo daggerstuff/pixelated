@@ -27,7 +27,7 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -37,12 +37,12 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 24.16.0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v4
         with:
           version: 11.5.2
 

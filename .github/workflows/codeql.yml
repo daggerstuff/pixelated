@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -55,13 +55,13 @@ jobs:
 
       - name: Setup Node.js
         if: matrix.language == 'javascript'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: Setup pnpm
         if: matrix.language == 'javascript'
-        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+        uses: pnpm/action-setup@v4 # v6.0.8
         with:
           version: 11.5.2
           run_install: false

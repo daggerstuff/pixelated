@@ -43,7 +43,7 @@ export const GET = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch todos',
-        message: 'An unexpected error occurred',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,
@@ -100,7 +100,7 @@ export const POST = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to create todo',
-        message: 'An unexpected error occurred',
+        message: error instanceof Error ? String(error) : 'Unknown error',
       }),
       {
         status: 500,

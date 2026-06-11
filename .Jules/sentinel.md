@@ -31,9 +31,3 @@
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Learning      | Same as the 2025-03-24 entry: sending raw `error` objects or `String(error)` downstream exposes internal logic to the client (CWE-209) |
 | Prevention    | Same as the 2025-05-24 entry: always use a server-side logger to record the full error and stack trace. Return a safe, static generic message such as `Internal server error` to the client |
-## 2025-06-11 - [Information Exposure] Prevent sending raw Error messages in Todos API
-
-| Vulnerability | The `src/pages/api/todos.ts` endpoint was directly serializing `error instanceof Error ? String(error) : 'Unknown error'` into the HTTP 500 JSON response message field. This exposes internal details to the client, constituting a CWE-209 Information Exposure vulnerability |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Learning      | Same as previous entries: sending raw `error` objects or `String(error)` downstream exposes internal logic to the client (CWE-209) |
-| Prevention    | Same as previous entries: always use a server-side logger to record the full error and stack trace. Return a safe, static generic message such as `An unexpected error occurred` to the client |

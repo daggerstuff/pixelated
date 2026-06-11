@@ -3,13 +3,13 @@ allowBuilds:
   '@contrast/fn-inspect': true
   '@dwmkerr/terminal-ai': true
   '@letta-ai/letta-code': true
-  '@schpet/linear-cli': true
   '@modelcontextprotocol/ext-apps': false
   '@newrelic/native-metrics': true
   '@parcel/watcher': true
   '@playwright/browser-chromium': true
   '@prisma/client': true
   '@prisma/engines': true
+  '@schpet/linear-cli': true
   '@sentry-internal/node-cpu-profiler': true
   '@sentry/cli': true
   '@smithery/cli': true
@@ -61,69 +61,67 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@iconify-json/lucide@1.2.111'
-  - path-to-regexp@6.3.0
-  - '@cloudflare/workers-types@4.20260531.1'
-  - tinyglobby@0.2.17
-  - yaml@2.8.3
-  - axios@0.28.0
-  - jsonwebtoken@8.5.2
-  - jsonwebtoken@9.0.0
-  - dompurify@3.2.4
-  - axios@0.30.0
-  - '@tootallnate/once@3.0.1'
-  - nodemailer@8.0.4
-  - dompurify@3.3.2
-  - nodemailer@8.0.5
-  - dompurify@3.3.4
-  - axios@0.31.0
-  - dompurify@3.4.0
-  - axios@0.31.1
-  - axios@0.30.3
-  - hono@4.12.23
-  - react-hook-form@7.78.0
-  - '@ai-sdk/gateway@3.0.126'
-  - '@ai-sdk/gateway@3.0.127'
-  - ai@6.0.198
-  - ai@6.0.199
-  - '@cloudflare/workers-types@4.20260609.1'
-  - '@typescript-eslint/eslint-plugin@8.61.0'
-  - '@typescript-eslint/parser@8.61.0'
-  - '@typescript-eslint/project-service@8.61.0'
-  - '@typescript-eslint/scope-manager@8.61.0'
-  - '@typescript-eslint/tsconfig-utils@8.61.0'
-  - '@typescript-eslint/type-utils@8.61.0'
-  - '@typescript-eslint/types@8.61.0'
-  - '@typescript-eslint/typescript-estree@8.61.0'
-  - '@typescript-eslint/utils@8.61.0'
-  - '@typescript-eslint/visitor-keys@8.61.0'
-  - typescript-eslint@8.61.0
-  - mongoose@9.7.0
-  - '@playwright/test@1.61.0-alpha-2026-06-10'
-  - playwright-core@1.61.0-alpha-2026-06-10
-  - playwright@1.61.0-alpha-2026-06-10
-peerDependencyRules:
-  ignoreMissing:
-    - '@capacitor/core'
-    - '@capacitor/preferences'
-    - '@netlify/blobs'
-    - typescript
-    - zod
-    - eslint-plugin-jsx-a11y
-    - tsconfck
-  allowedVersions:
-    '@opentelemetry/api': '*'
-    '@radix-ui/react-popover': '*'
-    '@types/pg': 8.16.0
-    drizzle-orm: ^0.45.2
-    eslint: ^10.4.1
-    mongodb: ^6.14.0
-    pg: 8.18.0
-    react: '19'
-    react-dom: '19'
-    redis: 5.10.0
-    typescript: ^6.0.3
-    zod: '*'
+- '@iconify-json/lucide@1.2.111'
+- path-to-regexp@6.3.0
+- '@cloudflare/workers-types@4.20260531.1'
+- tinyglobby@0.2.17
+- yaml@2.8.3
+- axios@0.28.0
+- jsonwebtoken@8.5.2
+- jsonwebtoken@9.0.0
+- dompurify@3.2.4
+- axios@0.30.0
+- '@tootallnate/once@3.0.1'
+- nodemailer@8.0.4
+- dompurify@3.3.2
+- nodemailer@8.0.5
+- dompurify@3.3.4
+- axios@0.31.0
+- dompurify@3.4.0
+- axios@0.31.1
+- axios@0.30.3
+- hono@4.12.23
+- react-hook-form@7.78.0
+- '@ai-sdk/gateway@3.0.126'
+- '@ai-sdk/gateway@3.0.127'
+- ai@6.0.198
+- ai@6.0.199
+- '@cloudflare/workers-types@4.20260609.1'
+- '@typescript-eslint/eslint-plugin@8.61.0'
+- '@typescript-eslint/parser@8.61.0'
+- '@typescript-eslint/project-service@8.61.0'
+- '@typescript-eslint/scope-manager@8.61.0'
+- '@typescript-eslint/tsconfig-utils@8.61.0'
+- '@typescript-eslint/type-utils@8.61.0'
+- '@typescript-eslint/types@8.61.0'
+- '@typescript-eslint/typescript-estree@8.61.0'
+- '@typescript-eslint/utils@8.61.0'
+- '@typescript-eslint/visitor-keys@8.61.0'
+- typescript-eslint@8.61.0
+- mongoose@9.7.0
+- '@playwright/test@1.61.0-alpha-2026-06-10'
+- playwright-core@1.61.0-alpha-2026-06-10
+- playwright@1.61.0-alpha-2026-06-10
+- '@aws-sdk/checksums@3.1000.5'
+- '@aws-sdk/client-dynamodb@3.1066.0'
+- '@aws-sdk/client-ec2@3.1066.0'
+- '@aws-sdk/client-eks@3.1066.0'
+- '@aws-sdk/client-kms@3.1066.0'
+- '@aws-sdk/client-rds@3.1066.0'
+- '@aws-sdk/client-s3@3.1066.0'
+- '@aws-sdk/credential-provider-ini@3.972.53'
+- '@aws-sdk/credential-provider-login@3.972.52'
+- '@aws-sdk/credential-provider-node@3.972.55'
+- '@aws-sdk/credential-provider-sso@3.972.52'
+- '@aws-sdk/credential-provider-web-identity@3.972.52'
+- '@aws-sdk/lib-dynamodb@3.1066.0'
+- '@aws-sdk/middleware-flexible-checksums@3.974.30'
+- '@aws-sdk/middleware-sdk-s3@3.972.51'
+- '@aws-sdk/nested-clients@3.997.20'
+- '@aws-sdk/s3-request-presigner@3.1066.0'
+- '@aws-sdk/signature-v4-multi-region@3.996.34'
+- '@aws-sdk/token-providers@3.1066.0'
+- '@github/copilot-sdk@1.0.1'
 overrides:
   '@astrojs/react>devalue': ^5.6.4
   '@astrojs/react>rollup': ^4.59.0
@@ -140,10 +138,6 @@ overrides:
   '@foresight/docs>fast-uri': 3.1.1
   '@foresight/docs>serialize-javascript': ^7.0.5
   '@google-cloud/storage>uuid': '>=11.1.1'
-  gcp-metadata>uuid: '>=11.1.1'
-  gaxios>uuid: '>=11.1.1'
-  retry-request>uuid: '>=11.1.1'
-  teeny-request>uuid: '>=11.1.1'
   '@grpc/proto-loader>protobufjs': '>=8.0.2'
   '@hono/node-server': ^1.19.13
   '@modelcontextprotocol/sdk': ^1.29.0
@@ -178,6 +172,8 @@ overrides:
   express: '>=4.19.2'
   fast-xml-parser: 5.7.0
   follow-redirects: '>=1.16.0'
+  gaxios>uuid: '>=11.1.1'
+  gcp-metadata>uuid: '>=11.1.1'
   glob: ^13.0.0
   h3: '>=1.15.9'
   hono: ^4.12.14
@@ -201,10 +197,12 @@ overrides:
   qs: ^6.14.2
   react: ^19.2.4
   react-dom: ^19.2.4
+  retry-request>uuid: '>=11.1.1'
   scmp: 2.1.0
   sitemap: ^9.0.0
   socket.io-parser: '>=4.2.6'
   tar: ^7.5.7
+  teeny-request>uuid: '>=11.1.1'
   tmp: '>=0.2.4'
   undici: ^7.25.0
   unocss: ^66.7.0
@@ -214,3 +212,25 @@ overrides:
   yaml@2.7.1: npm:yaml@2.8.4
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   zod: ^4.3.2
+peerDependencyRules:
+  allowedVersions:
+    '@opentelemetry/api': '*'
+    '@radix-ui/react-popover': '*'
+    '@types/pg': 8.16.0
+    drizzle-orm: ^0.45.2
+    eslint: ^10.4.1
+    mongodb: ^6.14.0
+    pg: 8.18.0
+    react: '19'
+    react-dom: '19'
+    redis: 5.10.0
+    typescript: ^6.0.3
+    zod: '*'
+  ignoreMissing:
+  - '@capacitor/core'
+  - '@capacitor/preferences'
+  - '@netlify/blobs'
+  - typescript
+  - zod
+  - eslint-plugin-jsx-a11y
+  - tsconfck
