@@ -278,11 +278,60 @@ export interface MemoryQueryOptions {
 }
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+/**
+ * StanceShift — detected change in user/persona behavior across memories.
+ *
+ * Produced by the reconciliation pass in the synthesizer when the
+ * temporal or qualitative delta between historic and recent observations
+ * exceeds a confidence threshold.
+ */
+export interface StanceShift {
+  /** Which attribute shifted (e.g. 'openness', 'defensiveness', 'reciprocity') */
+  attribute: string
+  /** Previous value of the attribute (from the historic baseline) */
+  oldValue: number
+  /** New value of the attribute (from recent observations) */
+  newValue: number
+  /** Signed change: `newValue - oldValue` */
+  delta: number
+  /** IDs of memories that evidence this shift */
+  evidenceIds: string[]
+  /** Confidence score for the shift, normalized 0.0 – 1.0 */
+  confidence: number
+}
+
+/**
+ * SynthesisResult — output of a memory reconciliation pass.
+ *
+ * Captures which memories were merged, the new memory identifier that
+ * replaced them, the detected stance shifts, and the compression ratio
+ * (number of source memories / (source memories − merged + 1)).
+ */
+export interface SynthesisResult {
+  /** IDs of source memories that were merged into the synthesis */
+  mergedIds: string[]
+  /** ID of the newly synthesized memory */
+  newMemoryId: string
+  /** Stance shifts detected during this synthesis pass */
+  stanceShifts: StanceShift[]
+  /** Compression ratio (≥ 1.0; > 1.0 means net memory reduction) */
+  compressionRatio: number
+}
+
+// ---------------------------------------------------------------------------
 // Schema version constant
 // ---------------------------------------------------------------------------
 
-/** Current schema version — bump when adding fields to UnifiedMemory */
-export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
+/**
+ * Current schema version — bump when adding fields to `UnifiedMemory` or
+ * shipping new top-level types like `StanceShift` / `SynthesisResult`.
+ *
+ * 1.1.0 — added `StanceShift` and `SynthesisResult` (Foresight synthesis pipeline, PIX-3905)
+ */
+export const MEMORY_SCHEMA_VERSION = '1.1.0' as const
 
 // Re-export gate types for backward-compatible imports from ./types
 export type { GateDecision } from './gate-types'
