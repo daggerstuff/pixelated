@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { buildMemorySkeleton } from '@pixelated/memory-schema';
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
 import type { MemoryObject, MemoryScope, RetentionPolicy, GateResult, SynthesisResult } from './types';
 import { SocraticGate } from './gate';
@@ -41,22 +42,19 @@ export class MemorySystem {
     userId: string,
     metadata?: Partial<MemoryObject>
   ): Promise<{ memory: MemoryObject; gateResult: GateResult }> {
-    const memory: MemoryObject = {
-      id: uuidv4(),
-      timestamp: new Date().toISOString(),
-      content,
-      scope,
-      retention,
-      tags: [],
-      synthesized_from: [],
-      is_ghost: false,
-      ...metadata,
-    };
+    // Use the package's buildMemorySkeleton so the constructed record
+    // satisfies the canonical UnifiedMemory shape (tenantId, userId,
+    // bankId, version, schemaVersion, etc.). Caller-supplied metadata
+    // overrides the skeleton fields.
+    const memory: MemoryObject = buildMemorySkeleton(
+      { content, userId, scope, retention },
+      { ...metadata, id: uuidv4(), userId }
+    );
 
     const gateResult = await this.gate.evaluate(memory, userId);
-    
+
     // Apply tags suggested by the gate/tagger
-    memory.tags = [...new Set([...(memory.tags || []), ...gateResult.suggested_tags])];
+    memory.tags = [...new Set([...(memory.tags || []), ...(gateResult.suggestedTags ?? [])])];
 
     appLogger.info('Memory ingested', {
       id: memory.id,
