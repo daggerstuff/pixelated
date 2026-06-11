@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+# Husky pre-commit hook
+# Runs lint-staged on staged files. The `.lintstagedrc.json` config includes
+# the Zod 3 → Zod 4 deprecation guard (`scripts/ci/check-zod-deprecations.mjs`)
+# for staged `*.{ts,tsx}` files, so deprecated patterns are caught here
+# before they ever reach CI.
+. "$(dirname -- "$0")/_/husky.sh"
+
+pnpm lint-staged

@@ -16,6 +16,12 @@
 export { MEMORY_SCHEMA_VERSION } from './types'
 
 // ---------------------------------------------------------------------------
+// Canonical enum value sets (for Zod, guards, OpenAPI)
+// ---------------------------------------------------------------------------
+
+export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
+
+// ---------------------------------------------------------------------------
 // Primitive enum types
 // ---------------------------------------------------------------------------
 
@@ -26,28 +32,11 @@ export type {
   RetentionPolicy,
   /** Strength trend set by the temporal decay scheduler. */
   StrengthTrend,
+  /** Gate decision output from the Socratic Gate pre-ingestion evaluation. */
+  GateDecision,
   /** Which service originally wrote this memory row. */
   SourceService,
 } from './types'
-
-export type {
-  /** Gate decision output from the Socratic Gate pre-ingestion evaluation. */
-  GateDecision,
-  /** Extended gating metadata from the Astro Socratic Gate pipeline. */
-  GatingMetadata,
-  /** Result of Socratic Gate evaluation run before memory ingestion. */
-  GateResult,
-  /** Minimal memory payload required for gate evaluation. */
-  GateMemoryInput,
-  /** Input envelope for a Socratic Gate evaluation request. */
-  GateEvaluateInput,
-  /** Output envelope for a Socratic Gate evaluation response. */
-  GateEvaluateOutput,
-  /** Snake_case wire format for Foresight MCP interop. */
-  GateResultWire,
-  GateEvaluateInputWire,
-  GateEvaluateOutputWire,
-} from './gate-types'
 
 // ---------------------------------------------------------------------------
 // Sub-object types
@@ -58,6 +47,8 @@ export type {
   EmotionalContext,
   /** Empathy quality metrics derived from a therapeutic interaction. */
   EmpathyMetrics,
+  /** Result of Socratic Gate evaluation run before memory ingestion. */
+  GateResult,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -89,20 +80,23 @@ export type {
 } from './types'
 
 // ---------------------------------------------------------------------------
-// Socratic Gate Zod schemas  (gate-types.ts)
+// Zod runtime validation schemas  (schemas.ts)
 // ---------------------------------------------------------------------------
 
 export {
+  MemoryScopeSchema,
+  RetentionPolicySchema,
+  StrengthTrendSchema,
   GateDecisionSchema,
-  GatingMetadataSchema,
+  SourceServiceSchema,
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
   GateResultSchema,
-  GateResultWireSchema,
-  GateMemoryInputSchema,
-  GateEvaluateInputSchema,
-  GateEvaluateInputWireSchema,
-  GateEvaluateOutputSchema,
-  GateEvaluateOutputWireSchema,
-} from './gate-types'
+  UnifiedMemorySchema,
+  CreateMemoryInputSchema,
+  UpdateMemoryInputSchema,
+  MemoryQueryOptionsSchema,
+} from './schemas'
 
 // ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
@@ -141,6 +135,30 @@ export {
   hasEmpathyMetrics,
   isEmbedded,
 } from './guards'
+
+// ---------------------------------------------------------------------------
+// Reflection loop contracts  (reflection.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  ReflectionOutcomeSchema,
+  ReflectionInsightSchema,
+  ReflectionContextSchema,
+  ActionFeedbackPairSchema,
+  VerbalReflectionSchema,
+  ReflexionResultSchema,
+  actionFeedbackPairToReflectionContext,
+  verbalReflectionToInsights,
+} from './reflection'
+
+export type {
+  ReflectionOutcome,
+  ReflectionInsight,
+  ReflectionContext,
+  ActionFeedbackPair,
+  VerbalReflection,
+  ReflexionResult,
+} from './reflection'
 
 // ---------------------------------------------------------------------------
 // Factory defaults & construction helpers  (defaults.ts)

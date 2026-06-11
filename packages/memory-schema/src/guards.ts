@@ -5,31 +5,24 @@
  * Safe to use in both Node and browser contexts.
  */
 
-import type { GateDecision } from './gate-types'
+import { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
 import type {
   UnifiedMemory,
   MemoryScope,
   RetentionPolicy,
   StrengthTrend,
+  GateDecision,
 } from './types'
 
 // ---------------------------------------------------------------------------
 // Enum membership guards
 // ---------------------------------------------------------------------------
 
-const MEMORY_SCOPES: ReadonlySet<MemoryScope> = new Set([
-  'session',
-  'arc',
-  'trait',
-  'fact',
-])
+const MEMORY_SCOPES: ReadonlySet<MemoryScope> = new Set(MEMORY_SCOPE_VALUES)
 
-const RETENTION_POLICIES: ReadonlySet<RetentionPolicy> = new Set([
-  'ephemeral',
-  'short_term',
-  'long_term',
-  'permanent',
-])
+const RETENTION_POLICIES: ReadonlySet<RetentionPolicy> = new Set(
+  RETENTION_POLICY_VALUES,
+)
 
 const STRENGTH_TRENDS: ReadonlySet<StrengthTrend> = new Set([
   'stable',
