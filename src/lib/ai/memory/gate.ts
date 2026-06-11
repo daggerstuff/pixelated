@@ -1,4 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
+import type { GatingMetadata } from '@pixelated/memory-schema';
 import type { MemoryObject, GateResult, GateDecision } from './types';
 import { MemoryCrisisTagger } from './tagger';
 import { piiRedactor } from '../../memory/gates/pii-redactor';
@@ -8,17 +9,9 @@ import { consentGate } from '../../memory/gates/consent-gate';
 
 const appLogger = createBuildSafeLogger('socratic-gate');
 
-export interface GatingMetadata {
-  piiRedacted: boolean;
-  piiTypes: string[];
-  crisisTier: string;
-  crisisFlag: boolean;
-  traumaIndicators: string[];
-  traumaSeverity: string;
-  consentTier: string;
-  consentAllowed: boolean;
-  scrubbedContent: string;
-}
+// Re-export GatingMetadata under its local name for backwards compatibility
+// with the gate tests and any other consumers that imported it from here.
+export type { GatingMetadata };
 
 export class SocraticGate {
   private readonly tagger: MemoryCrisisTagger;
@@ -64,8 +57,8 @@ export class SocraticGate {
       return {
         decision,
         reason,
-        suggested_tags: tags,
-        crisis_detected: isCrisis,
+        suggestedTags: tags,
+        anomalyDetected: isCrisis,
         gating: gatingMeta,
       };
     } catch (error: unknown) {
@@ -77,8 +70,8 @@ export class SocraticGate {
       return {
         decision: 'block',
         reason: 'Internal safety gate error. Blocking ingestion for security.',
-        suggested_tags: ['ERROR_GATE_FAILURE'],
-        crisis_detected: true,
+        suggestedTags: ['ERROR_GATE_FAILURE'],
+        anomalyDetected: true,
       };
     }
   }
