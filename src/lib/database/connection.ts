@@ -142,6 +142,18 @@ export async function connectRedis(): Promise<Redis> {
 }
 
 // ============================================================================
+// SETTERS
+// ============================================================================
+
+export function setPostgresPool(pool: Pool | null): void {
+  postgresPool = pool
+}
+
+export function setRedisClient(client: Redis | null): void {
+  redisClient = client
+}
+
+// ============================================================================
 // GETTERS
 // ============================================================================
 
