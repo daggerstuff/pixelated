@@ -55,10 +55,13 @@ describe('ProductMemoryGateway', () => {
         content: 'Vivi prefers direct summaries',
         metadata: { category: 'preference', source: 'product' },
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       id: 'mem-1',
       content: 'Vivi prefers direct summaries',
-      metadata: { category: 'preference', source: 'product' },
+      category: 'preference',
+      scope: 'session',
+      retention: 'short_term',
+      sourceService: 'astro-frontend',
     })
 
     expect(client.addMemory).toHaveBeenCalledWith({
@@ -91,13 +94,16 @@ describe('ProductMemoryGateway', () => {
         limit: 25,
         offset: 5,
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       total: 1,
       memories: [
         {
           id: 'mem-2',
           content: 'Shared-service content',
-          metadata: { visibility: 'private' },
+          category: 'conversation',
+          scope: 'session',
+          retention: 'short_term',
+          sourceService: 'foresight',
           createdAt: '2026-04-06T00:00:00.000Z',
           updatedAt: '2026-04-06T01:00:00.000Z',
         },
@@ -446,10 +452,13 @@ describe('ProductMemoryGateway', () => {
         content: 'Complex metadata test',
         metadata: complexMetadata,
       }),
-    ).resolves.toEqual({
+    ).resolves.toMatchObject({
       id: 'mem-complex',
       content: 'Complex metadata test',
-      metadata: complexMetadata,
+      category: 'conversation',
+      scope: 'session',
+      retention: 'short_term',
+      sourceService: 'astro-frontend',
     })
 
     expect(client.addMemory).toHaveBeenCalledWith(

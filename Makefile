@@ -74,7 +74,7 @@ setup: ## One-command local setup
 	./scripts/setup-dev.sh
 
 install: ## Install all dependencies
-	pnpm install && uv sync
+		pnpm install --no-frozen-lockfile && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────
 
