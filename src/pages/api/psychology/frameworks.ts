@@ -738,7 +738,7 @@ export const GET = async ({ url }: { url: URL }) => {
   }
 }
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     const body: FrameworksRequest = await request.json()
 

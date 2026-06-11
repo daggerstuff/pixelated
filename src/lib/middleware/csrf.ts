@@ -2,7 +2,7 @@ import type { AstroCookies } from 'astro'
 import { defineMiddleware } from 'astro:middleware'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { generateSecureToken } from '../security'
+import { createSecureToken } from '../security'
 
 // Initialize logger
 const logger = createBuildSafeLogger('default')
@@ -61,7 +61,7 @@ export const defaultCSRFConfig: CSRFConfig = {
  * Generate a new CSRF token
  */
 function generateCSRFToken(): string {
-  return generateSecureToken(32)
+  return createSecureToken(32)
 }
 
 /**

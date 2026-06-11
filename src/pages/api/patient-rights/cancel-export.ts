@@ -23,7 +23,7 @@ export const POST = async ({ request }) => {
     const validation = cancelExportSchema.safeParse(body)
 
     if (!validation.success) {
-      const errors = validation.error.flatten()
+      const errors = z.flattenError(validation.error)
       logger.warn('Invalid cancel export request', { errors })
 
       return new Response(

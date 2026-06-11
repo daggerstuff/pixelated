@@ -1,10 +1,10 @@
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/BiasDetectionEngine'
 import { JobQueue } from '../../../lib/ai/bias-detection/job-queue'
 import type { TherapeuticSession } from '../../../lib/ai/bias-detection/types'
-import type { BatchAnalysisResult } from '../../../lib/ai/bias-detection/types'
+import type { BiasAnalysisResult } from '../../../lib/ai/bias-detection/types'
 
 const engine = new BiasDetectionEngine()
-const batchJobQueue = new JobQueue<TherapeuticSession[], BatchAnalysisResult>(
+const batchJobQueue = new JobQueue<TherapeuticSession[], BiasAnalysisResult>(
   async (sessions, update) => {
     // Use batchAnalyzeSessions with progress callback
     return await engine.batchAnalyzeSessions(sessions, {

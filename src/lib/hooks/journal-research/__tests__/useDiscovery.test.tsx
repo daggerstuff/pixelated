@@ -26,7 +26,7 @@ type MockJournalFilters = {
 }
 
 const withFilters = (
-  selector: (state: { filters: MockJournalFilters }) => unknown,
+  selector: (state: any) => any,
   filters: MockJournalFilters,
 ) => selector({ filters })
 
@@ -45,12 +45,17 @@ vi.mock('@/lib/stores/journal-research', () => ({
 const mockSource = {
   sourceId: 'source-1',
   title: 'Test Source',
+  authors: ['Test Author'],
   sourceType: 'journal' as const,
-  publicationDate: '2024-01-01',
+  publicationDate: new Date('2024-01-01'),
   openAccess: true,
   dataAvailability: 'available',
   keywords: ['test', 'research'],
   url: 'https://example.com',
+  doi: null,
+  abstract: '',
+  discoveryDate: new Date('2024-01-01'),
+  discoveryMethod: 'search',
 }
 
 const mockSourceList = {
@@ -77,7 +82,7 @@ const createWrapper = () => {
 describe('useDiscovery hooks', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    useDiscoveryStore.mockImplementation((selector) => {
+    vi.mocked(useDiscoveryStore).mockImplementation((selector) => {
       const defaultFilters: MockJournalFilters = {
         openAccessOnly: false,
         sourceTypes: [],
@@ -110,7 +115,7 @@ describe('useDiscovery hooks', () => {
 
     it('applies filters from store', async () => {
       vi.mocked(api.listSources).mockResolvedValue(mockSourceList)
-      useDiscoveryStore.mockImplementation((selector) => {
+      vi.mocked(useDiscoveryStore).mockImplementation((selector) => {
         const filteredFilters: MockJournalFilters = {
           openAccessOnly: true,
           sourceTypes: ['journal'],
@@ -208,9 +213,9 @@ describe('useDiscovery hooks', () => {
     it('initiates discovery successfully', async () => {
       const mockResponse: api.DiscoveryResponse = {
         sessionId: 'session-1',
-        status: 'in_progress',
-        sourcesDiscovered: 0,
-        message: 'Discovery started',
+        discoveryStatus: 'in_progress',
+        sources: [],
+        totalSources: 0,
       }
       vi.mocked(api.initiateDiscovery).mockResolvedValue(mockResponse)
 
@@ -222,8 +227,7 @@ describe('useDiscovery hooks', () => {
       )
 
       const payload: api.DiscoveryInitiatePayload = {
-        searchKeywords: { mental_health: ['depression'] },
-        filters: { openAccessOnly: true },
+        keywords: ['depression'],
       }
 
       result.current.mutate(payload)
@@ -247,7 +251,7 @@ describe('useDiscovery hooks', () => {
       )
 
       result.current.mutate({
-        searchKeywords: { mental_health: ['depression'] },
+        keywords: ['depression'],
       })
 
       await waitFor(() => {

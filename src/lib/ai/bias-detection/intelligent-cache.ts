@@ -61,7 +61,7 @@ export interface IntelligentCacheConfig {
   analyticsInterval: number // ms
 }
 
-export interface CacheEntry<T> {
+export interface IntelligentCacheEntry<T> {
   key: string
   value: T
   tier: 'memory' | 'redis' | 'cdn'
@@ -144,7 +144,7 @@ const DEFAULT_CONFIG: IntelligentCacheConfig = {
  */
 export class IntelligentCache {
   private readonly config: IntelligentCacheConfig
-  private readonly memoryCache = new Map<string, CacheEntry<unknown>>()
+  private readonly  memoryCache = new Map<string, IntelligentCacheEntry<unknown>>()
   private readonly redisPool = getRedisPoolManager().createPool('intelligent-cache')
   private readonly cacheService = getCacheService()
 
@@ -175,7 +175,7 @@ export class IntelligentCache {
   private readonly analyticsInterval?: ReturnType<typeof setInterval>
 
   // Predefined cache strategies for different data types
-  private readonly strategies: Map<string, CacheStrategy> = new Map([
+  private readonly strategies: Map<string, CacheStrategy> = new Map<string, any>([
     [
       'analysis-result',
       {
@@ -341,7 +341,7 @@ export class IntelligentCache {
 
     if (this.config.enableMemoryCache) {
       for (const key of keys) {
-        const entry = this.memoryCache.get(key) as CacheEntry<T> | undefined
+        const entry = this.memoryCache.get(key) as IntelligentCacheEntry<T> | undefined
         if (entry && !this.isExpired(entry)) {
           this.analytics.hits.memory++
         } else {
@@ -368,7 +368,7 @@ export class IntelligentCache {
           if (key) {
             if (value) {
               try {
-                const entry = JSON.parse(value) as CacheEntry<T>
+                const entry = JSON.parse(value) as IntelligentCacheEntry<T>
                 if (!this.isExpired(entry)) {
                   this.analytics.hits.redis++
 
@@ -430,7 +430,7 @@ export class IntelligentCache {
           try {
             const value = await redis.get(redisKey)
             if (value) {
-              const entry = JSON.parse(value) as CacheEntry<unknown>
+              const entry = JSON.parse(value) as IntelligentCacheEntry<unknown>
               if (entry.tags.some((tag) => tags.includes(tag))) {
                 await redis.del(redisKey)
                 count++
@@ -586,7 +586,7 @@ export class IntelligentCache {
       }
 
       try {
-        const entry = JSON.parse(value) as CacheEntry<T>
+        const entry = JSON.parse(value) as IntelligentCacheEntry<T>
 
         if (this.isExpired(entry)) {
           await redis.del(this.getRedisKey(key))
@@ -620,7 +620,7 @@ export class IntelligentCache {
       this.evictLRU()
     }
 
-    const entry: CacheEntry<unknown> = {
+    const entry: IntelligentCacheEntry<unknown> = {
       key,
       value,
       tier: 'memory',
@@ -655,7 +655,7 @@ export class IntelligentCache {
         }
       }
 
-      const entry: CacheEntry<unknown> = {
+      const entry: IntelligentCacheEntry<unknown> = {
         key,
         value: serializedValue,
         tier: 'redis',
@@ -680,7 +680,7 @@ export class IntelligentCache {
     }
   }
 
-  private async deserializeValue<T>(entry: CacheEntry<T>): Promise<T> {
+  private async deserializeValue<T>(entry: IntelligentCacheEntry<T>): Promise<T> {
     if (!entry.compressed) {
       return entry.value
     }
@@ -694,7 +694,7 @@ export class IntelligentCache {
     }
   }
 
-  private isExpired(entry: CacheEntry<unknown>): boolean {
+  private isExpired(entry: IntelligentCacheEntry<unknown>): boolean {
     const now = Date.now()
     const expiresAt = entry.createdAt.getTime() + entry.ttl * 1000
     return now > expiresAt
