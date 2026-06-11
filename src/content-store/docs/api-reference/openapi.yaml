@@ -1,0 +1,211 @@
+openapi: 3.1.0
+info:
+  title: Pixelated Memory API (v1)
+  version: 1.0.0
+  description: |
+    Public v1 memory API contract. Schemas derive from `src/lib/memory/contract/v1.ts`.
+
+servers:
+  - url: https://api.gradiant.dev/api/v1
+    description: Production
+  - url: http://localhost:5173/api/v1
+    description: Local development
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Memory
+    description: Versioned public memory surface (`/api/v1/memory/*`)
+
+paths:
+  /memory/search:
+    get:
+      summary: Search memories
+      operationId: searchMemoriesGet
+      tags: [Memory]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query string
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: Search results
+          headers:
+            X-Memory-Contract-Version:
+              schema:
+                type: string
+                example: '1.0.0'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchMemoriesResponse'
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Search memories (POST)
+      description: |
+        Semantically identical to GET. Uses the same `q` field name as the GET
+        query parameter for SDK-friendly client generation.
+      operationId: searchMemoriesPost
+      tags: [Memory]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchMemoryRequest'
+      responses:
+        '200':
+          description: Search results
+          headers:
+            X-Memory-Contract-Version:
+              schema:
+                type: string
+                example: '1.0.0'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchMemoriesResponse'
+        '400':
+          $ref: '#/components/responses/ValidationFailed'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    SearchMemoryRequest:
+      type: object
+      additionalProperties: false
+      required: [q]
+      properties:
+        q:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Search query string
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+        offset:
+          type: integer
+          minimum: 0
+          default: 0
+
+    SearchMemoriesResponse:
+      type: object
+      additionalProperties: false
+      required: [data, query, pagination]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicMemory'
+        query:
+          type: string
+          description: Echo of the submitted search string
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+
+    PublicMemory:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        scope:
+          type: string
+          enum: [session, arc, trait, fact]
+        retention:
+          type: string
+          enum: [ephemeral, short_term, long_term, permanent]
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        version:
+          type: integer
+        importance:
+          type: number
+          minimum: 0
+          maximum: 1
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    Pagination:
+      type: object
+      additionalProperties: false
+      properties:
+        limit:
+          type: integer
+        offset:
+          type: integer
+        total:
+          type: integer
+
+    ErrorEnvelope:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        code:
+          type: string
+
+  responses:
+    ValidationFailed:
+      description: Request failed schema validation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error: validation_failed
+            message: Invalid request
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+          example:
+            error: unauthorized
+            message: Authentication required

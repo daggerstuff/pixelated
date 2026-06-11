@@ -38,23 +38,26 @@
  * permitted to be imported by client SDKs, the OpenAPI generator, and the
  * route handlers.
  */
+import {
+  MEMORY_SCOPE_VALUES,
+  RETENTION_POLICY_VALUES,
+} from '@pixelated/memory-schema'
+import type {
+  MemoryScope as MemoryScopeType,
+  RetentionPolicy as RetentionPolicyType,
+} from '@pixelated/memory-schema'
 import { z } from 'zod'
 
 // ---------------------------------------------------------------------------
-// Enumerations (re-declared here so the public contract is self-contained
-// and not coupled to the internal @pixelated/memory-schema package).
+// Enumerations — value sets sourced from @pixelated/memory-schema so the
+// public contract cannot drift from the canonical schema.
 // ---------------------------------------------------------------------------
 
-export const MemoryScope = z.enum(['session', 'arc', 'trait', 'fact'])
-export type MemoryScope = z.infer<typeof MemoryScope>
+export const MemoryScope = z.enum(MEMORY_SCOPE_VALUES)
+export type MemoryScope = MemoryScopeType
 
-export const RetentionPolicy = z.enum([
-  'ephemeral',
-  'short_term',
-  'long_term',
-  'permanent',
-])
-export type RetentionPolicy = z.infer<typeof RetentionPolicy>
+export const RetentionPolicy = z.enum(RETENTION_POLICY_VALUES)
+export type RetentionPolicy = RetentionPolicyType
 
 // ---------------------------------------------------------------------------
 // Core resource — the PUBLIC memory record.
@@ -119,7 +122,7 @@ export type UpdateMemoryRequest = z.infer<typeof UpdateMemoryRequest>
 
 export const SearchMemoryRequest = z
   .object({
-    query: z.string().min(1).max(1_000),
+    q: z.string().min(1).max(1_000),
     limit: z.number().int().positive().max(100).optional(),
     offset: z.number().int().nonnegative().optional(),
   })

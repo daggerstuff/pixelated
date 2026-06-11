@@ -11,6 +11,9 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # pnpm 11.5+ verifies lockfile supply-chain policy on every install; CI uses
+  # trust-lockfile because minimumReleaseAgeExclude does not apply during verification.
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
 
 jobs:
   build:
@@ -54,10 +57,8 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: >
-          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
-          { echo "⚠️ Lockfile out of date - refreshing...";
-            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
+        run: |
+                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.0.0

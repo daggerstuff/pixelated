@@ -77,6 +77,10 @@ class AIServer {
     res.end(JSON.stringify(data))
   }
 
+  private captureCaughtError(error: unknown): void {
+    Sentry.captureException(error)
+  }
+
   private getProviderPreference(): AIProviderType[] {
     const preference = process.env['AI_PROVIDER_PREFERENCE']
     if (preference) {
@@ -222,6 +226,7 @@ class AIServer {
       })
      } catch (error: unknown) {
        appLogger.error('Health check failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Health check failed'),
@@ -303,6 +308,7 @@ class AIServer {
       })
      } catch (error: unknown) {
        appLogger.error('Chat completion failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Chat completion failed'),
@@ -409,6 +415,7 @@ Respond in JSON format with the following structure:
       })
      } catch (error: unknown) {
        appLogger.error('Emotion analysis failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Emotion analysis failed'),
@@ -497,6 +504,7 @@ Respond in JSON format with the following structure:
       res.end()
      } catch (error: unknown) {
        appLogger.error('Streaming chat failed:', error)
+       this.captureCaughtError(error)
        if (!res.headersSent) {
          this.sendJsonResponse(res, 500, {
            success: false,
@@ -622,6 +630,7 @@ Respond in JSON format with the following structure:
       apiMetrics.error('/ai-service', errorType)
       apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: 'Internal server error',
