@@ -19,8 +19,10 @@ import type {
   MemoryScope,
   RetentionPolicy,
   SourceService,
+  StanceShift,
   StrengthTrend,
   GateDecision,
+  SynthesisResult,
   UnifiedMemory,
   UpdateMemoryInput,
 } from './types'
@@ -29,12 +31,7 @@ import type {
 // Enumerations
 // ---------------------------------------------------------------------------
 
-export const MemoryScopeSchema = z.enum([
-  'session',
-  'arc',
-  'trait',
-  'fact',
-])
+export const MemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
 
 export const RetentionPolicySchema = z.enum([
   'ephemeral',
@@ -168,15 +165,34 @@ export const MemoryQueryOptionsSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+export const StanceShiftSchema = z.object({
+  attribute: z.string(),
+  oldValue: z.number(),
+  newValue: z.number(),
+  delta: z.number(),
+  evidenceIds: z.array(z.string()),
+  confidence: z.number().min(0).max(1),
+})
+
+export const SynthesisResultSchema = z.object({
+  mergedIds: z.array(z.string()),
+  newMemoryId: z.string(),
+  stanceShifts: z.array(StanceShiftSchema),
+  compressionRatio: z.number().min(1),
+})
+
+// ---------------------------------------------------------------------------
 // Compile-time compatibility checks (z.infer ↔ canonical TS types)
 // ---------------------------------------------------------------------------
 
-type AssertCompatible<Inferred, Canonical> =
-  Inferred extends Canonical
-    ? Canonical extends Inferred
-      ? true
-      : never
+type AssertCompatible<Inferred, Canonical> = Inferred extends Canonical
+  ? Canonical extends Inferred
+    ? true
     : never
+  : never
 
 type _CheckMemoryScope = AssertCompatible<
   z.infer<typeof MemoryScopeSchema>,
@@ -226,9 +242,17 @@ type _CheckMemoryQueryOptions = AssertCompatible<
   z.infer<typeof MemoryQueryOptionsSchema>,
   MemoryQueryOptions
 >
+type _CheckStanceShift = AssertCompatible<
+  z.infer<typeof StanceShiftSchema>,
+  StanceShift
+>
+type _CheckSynthesisResult = AssertCompatible<
+  z.infer<typeof SynthesisResultSchema>,
+  SynthesisResult
+>
 
 // Silence unused-type warnings while keeping compile-time assertions.
-const _schemaCompatibilityChecks: [
+const schemaCompatibilityChecks: [
   _CheckMemoryScope,
   _CheckRetentionPolicy,
   _CheckStrengthTrend,
@@ -241,7 +265,11 @@ const _schemaCompatibilityChecks: [
   _CheckCreateMemoryInput,
   _CheckUpdateMemoryInput,
   _CheckMemoryQueryOptions,
+  _CheckStanceShift,
+  _CheckSynthesisResult,
 ] = [
+  true,
+  true,
   true,
   true,
   true,
@@ -256,4 +284,4 @@ const _schemaCompatibilityChecks: [
   true,
 ]
 
-void _schemaCompatibilityChecks
+void schemaCompatibilityChecks
