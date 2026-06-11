@@ -26,7 +26,7 @@ pnpm vitest run -c config/vitest.config.ts
 ```
 
 ### Key Commands
-- **Submodules**: `bash scripts/devops/init-submodules.sh` (init + sync + update; run after clone/pull)
+- **Submodules**: `git submodule init && git submodule update` (run after clone/pull, before `pnpm install`)
 - **Lint**: `pnpm lint` (oxlint; pre-existing warnings expected)
 - **Typecheck**: `pnpm typecheck`
 - **Tests**: `pnpm vitest run -c config/vitest.config.ts`
@@ -137,11 +137,12 @@ DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
 ```
 
 ### Submodules
-After clone or when `.gitmodules` changes, initialize and update submodules before `pnpm install`:
+After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
 ```bash
-bash scripts/devops/init-submodules.sh
+git submodule init
+git submodule update
 ```
-Requires network access and `GITHUB_TOKEN`/`GITHUB_PAT` for private submodule repos when applicable.
+For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead.
 
 ### Long-running dev server
 Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.

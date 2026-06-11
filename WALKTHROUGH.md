@@ -59,7 +59,8 @@ and copies `.env.example → .env` if needed.
 ### Manual setup
 
 ```bash
-bash scripts/devops/init-submodules.sh
+git submodule init
+git submodule update
 pnpm install
 uv sync
 docker compose -f docker/docker-compose.db.yml up -d

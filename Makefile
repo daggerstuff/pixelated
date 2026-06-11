@@ -74,7 +74,8 @@ setup: ## One-command local setup
 	./scripts/setup-dev.sh
 
 install: ## Install all dependencies (submodules, JS, Python)
-	bash scripts/devops/init-submodules.sh
+	git submodule init
+	git submodule update
 	pnpm install && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────
