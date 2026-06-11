@@ -15,7 +15,7 @@ const router: Router = express.Router()
 // BASIC HEALTH CHECK
 // ============================================================================
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -28,7 +28,7 @@ router.get('/', (req: Request, res: Response) => {
 // DETAILED HEALTH CHECK
 // ============================================================================
 
-router.get('/detailed', async (req: Request, res: Response) => {
+router.get('/detailed', async (_req: Request, res: Response) => {
   const health: any = {
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -99,7 +99,7 @@ router.get('/detailed', async (req: Request, res: Response) => {
 // READINESS CHECK (for Kubernetes)
 // ============================================================================
 
-router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
+router.get('/ready', async (_req: Request, res: Response): Promise<Response> => {
   try {
     // Check all critical services
     const mongo = getMongoConnection()
@@ -133,7 +133,7 @@ router.get('/ready', async (req: Request, res: Response): Promise<Response> => {
 // LIVENESS CHECK (for Kubernetes)
 // ============================================================================
 
-router.get('/live', (req: Request, res: Response) => {
+router.get('/live', (_req: Request, res: Response) => {
   res.json({
     alive: true,
     timestamp: new Date().toISOString(),

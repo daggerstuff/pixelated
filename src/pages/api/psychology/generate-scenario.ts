@@ -422,7 +422,7 @@ function generateSupervisionNotes(
   return notes
 }
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     const body: GenerateScenarioRequest = await request.json()
 
