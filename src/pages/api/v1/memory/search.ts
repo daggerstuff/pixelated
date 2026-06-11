@@ -4,7 +4,7 @@
  * v1 public memory API — search.
  *
  *   GET  /api/v1/memory/search?q=<query>&limit=&offset=
- *   POST /api/v1/memory/search  body: { query, limit?, offset? }
+ *   POST /api/v1/memory/search  body: { q, limit?, offset? }
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 
@@ -65,19 +65,19 @@ export const POST = async (context: { request: Request }): Promise<Response> => 
 
   const parsed = await parseRequestJson(SearchMemoryRequest, context.request)
   if (!parsed.ok) return parsed.response
-  const { query, limit = 10, offset = 0 } = parsed.data
+  const { q, limit = 10, offset = 0 } = parsed.data
 
   try {
     const result = await getProductMemoryGateway().searchMemories({
       ...auth.caller.scope,
-      query,
+      query: q,
       limit,
       offset,
     })
 
     const body: SearchMemoriesResponse = {
       data: result.memories.map((m) => toPublicMemory(m)),
-      query,
+      query: q,
       pagination: Pagination.parse({ limit, offset, total: result.total }),
     }
     return jsonResponse(body)
