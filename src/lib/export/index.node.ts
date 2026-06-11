@@ -382,13 +382,15 @@ export class ExportService {
       }) as unknown as PDFDocumentWithMethods
 
       // Set up error handling for PDF generation
-      doc.on('error', (err: Error) => {
+      doc.on('error', (...args: unknown[]) => {
+        const err = args[0] as Error | undefined
         console.error(`PDF generation error: ${err?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout
       const chunks: Buffer[] = []
-      doc.on('data', (chunk: Buffer) => {
+      doc.on('data', (...args: unknown[]) => {
+        const chunk = args[0] as Buffer
         chunks.push(chunk)
       })
 

@@ -85,6 +85,7 @@ export class HealthMonitor extends EventEmitter {
   > = new Map()
   private healthCheckInterval: NodeJS.Timeout | null = null
   private metricsRetentionInterval: NodeJS.Timeout | null = null
+  private isInitialized = false
 
   constructor(config: HealthCheckConfig) {
     super()

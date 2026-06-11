@@ -155,6 +155,8 @@ zthgquiz_history.json
 /.env.staging
 /.env.test
 /*.env.*
+alloy-key.json
+alloy-helm-values.yaml
 *.key
 *.p12
 *.pem
@@ -191,6 +193,8 @@ k8s/base/secrets.local.yaml
 /security-report.md
 /security-reports/
 /test-results/
+config/test-results/
+config/playwright-report/
 # Test output files
 *_output.txt
 test_output.txt
@@ -219,6 +223,7 @@ tmp/
 /*.DS_Store*
 /.astro
 /.bin
+/bin/
 /.output
 /.python
 /.tsbuildinfo
@@ -326,7 +331,11 @@ __mocks__
 ai/.moderne
 
 .mcp.json
+.mcp.json.tmp
 HANDOFF.md
+
+# Temp symlinks
+latest
 
 # Beads issue tracker (fully removed)
 .beads/

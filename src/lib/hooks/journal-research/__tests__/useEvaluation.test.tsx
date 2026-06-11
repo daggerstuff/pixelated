@@ -38,8 +38,8 @@ const mockEvaluation = {
   dataStructureQuality: 0.8,
   trainingIntegration: 0.85,
   ethicalAccessibility: 0.8,
-  evaluationDate: '2024-01-01T00:00:00Z',
-  notes: 'Test evaluation',
+  evaluationDate: new Date('2024-01-01T00:00:00Z'),
+  evaluator: 'test-evaluator',
 }
 
 const mockEvaluationList = {
@@ -88,15 +88,13 @@ describe('useEvaluation hooks', () => {
       setEditingEvaluationId: vi.fn<(id: string | null) => void>(),
       toggleBulkEditMode: vi.fn<() => void>(),
     }
-    useEvaluationStore.mockImplementation(
-      (selector?: (state: typeof storeState) => unknown) =>
-        typeof selector === 'function' ? selector(storeState) : storeState,
-    )
-    ;(
-      useEvaluationStore as typeof useEvaluationStore & {
-        getState?: () => typeof storeState
-      }
-    ).getState = () => storeState
+    vi.mocked(useEvaluationStore).mockImplementation(((
+      selector?: (state: typeof storeState) => unknown,
+    ) =>
+      typeof selector === 'function'
+        ? selector(storeState)
+        : storeState) as any)
+    ;(useEvaluationStore as any).getState = () => storeState
   })
 
   describe('useEvaluationListQuery', () => {
@@ -130,17 +128,13 @@ describe('useEvaluation hooks', () => {
           sortDirection: 'asc',
         },
       }
-      useEvaluationStore.mockImplementation(
-        (selector?: (state: typeof filteredStoreState) => unknown) =>
-          typeof selector === 'function'
-            ? selector(filteredStoreState)
-            : filteredStoreState,
-      )
-      ;(
-        useEvaluationStore as typeof useEvaluationStore & {
-          getState?: () => typeof filteredStoreState
-        }
-      ).getState = () => filteredStoreState
+      vi.mocked(useEvaluationStore).mockImplementation(((
+        selector?: (state: typeof filteredStoreState) => unknown,
+      ) =>
+        typeof selector === 'function'
+          ? selector(filteredStoreState)
+          : filteredStoreState) as any)
+      ;(useEvaluationStore as any).getState = () => filteredStoreState
 
       const { result } = renderHook(() => useEvaluationListQuery('session-1'), {
         wrapper: createWrapper(),
@@ -230,13 +224,7 @@ describe('useEvaluation hooks', () => {
       vi.mocked(api.initiateEvaluation).mockResolvedValue(mockEvaluation)
       const setSelectedEvaluationId = vi.fn<(id: string) => void>()
 
-      ;(
-        useEvaluationStore as typeof useEvaluationStore & {
-          getState?: () => {
-            setSelectedEvaluationId: typeof setSelectedEvaluationId
-          }
-        }
-      ).getState = () => ({
+      ;(useEvaluationStore as any).getState = () => ({
         setSelectedEvaluationId,
       })
 
@@ -249,7 +237,6 @@ describe('useEvaluation hooks', () => {
 
       const payload = {
         sourceIds: ['source-1'],
-        evaluationCriteria: {},
       }
 
       result.current.mutate(payload)
@@ -275,7 +262,6 @@ describe('useEvaluation hooks', () => {
 
       result.current.mutate({
         sourceIds: ['source-1'],
-        evaluationCriteria: {},
       })
 
       await waitFor(() => {
@@ -299,7 +285,7 @@ describe('useEvaluation hooks', () => {
       )
 
       const payload = {
-        notes: 'Updated notes',
+        therapeuticRelevance: 8,
       }
 
       result.current.mutate({ evaluationId: 'eval-1', payload })
@@ -328,7 +314,7 @@ describe('useEvaluation hooks', () => {
 
       result.current.mutate({
         evaluationId: 'eval-1',
-        payload: { notes: 'Updated' },
+        payload: { therapeuticRelevance: 8 },
       })
 
       await waitFor(() => {
@@ -350,7 +336,7 @@ describe('useEvaluation hooks', () => {
         toggleBulkEditMode: vi.fn<() => void>(),
       }
 
-      useEvaluationStore.mockReturnValue(mockState)
+      vi.mocked(useEvaluationStore).mockReturnValue(mockState)
 
       const { result } = renderHook(() => useEvaluationSelection())
 

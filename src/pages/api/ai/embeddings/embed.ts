@@ -140,7 +140,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
         JSON.stringify({
           error: 'Validation error',
           message: 'Invalid request format',
-          details: validation.error.flatten(),
+          details: z.flattenError(validation.error),
         }),
         {
           status: 400,

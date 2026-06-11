@@ -15,14 +15,14 @@ import { serverEnvSchema } from './schemas/server.schema'
  * Merged from modular domain schemas
  */
 export const envSchema = serverEnvSchema
-  .merge(databaseEnvSchema)
-  .merge(authEnvSchema)
-  .merge(aiEnvSchema)
-  .merge(monitoringEnvSchema)
-  .merge(securityEnvSchema)
-  .merge(notificationEnvSchema)
-  .merge(clientEnvSchema)
-  .merge(azureEnvSchema)
+  .and(databaseEnvSchema)
+  .and(authEnvSchema)
+  .and(aiEnvSchema)
+  .and(monitoringEnvSchema)
+  .and(securityEnvSchema)
+  .and(notificationEnvSchema)
+  .and(clientEnvSchema)
+  .and(azureEnvSchema)
 
 /**
  * Cache the validated environment variables

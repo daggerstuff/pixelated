@@ -28,6 +28,7 @@ const mockAIService: AIService = {
         options?: Parameters<AIService['createChatCompletion']>[1],
       ) => ReturnType<AIService['createChatCompletion']>
     >(),
+  // @ts-expect-error - createChatStream is not part of AIService interface but used in tests
   createChatStream:
     vi.fn<
       (

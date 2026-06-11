@@ -3,6 +3,8 @@
  * Centralized performance settings and optimization parameters
  */
 
+import { createHash } from 'node:crypto'
+
 export interface PerformanceConfig {
   // API Performance
   api: {
@@ -543,21 +545,10 @@ export class PerformanceOptimizer {
    * Generate ETag for caching
    */
   private generateETag(data: any): string {
-    // Use guarded runtime require helper to avoid bundling Node crypto into frontend builds
-    let createHash: ((algo: string) => import('crypto').Hash) | undefined
     try {
-      // Use dynamic import to avoid top-level circular imports in some environments
-      const utils = require('@/lib/utils') as typeof import('@/lib/utils')
-      const crypto = utils.tryRequireNode('crypto')
-      createHash = crypto?.createHash
-    } catch (e) {
-      console.debug('Failed to dynamically require @/lib/utils or crypto', e)
-      createHash = undefined
-    }
-
-    if (!createHash) {
+      return createHash('md5').update(JSON.stringify(data)).digest('hex')
+    } catch {
       // Fallback to a deterministic but weaker hash if crypto isn't available.
-      // This avoids runtime exceptions while keeping behavior predictable.
       const str = JSON.stringify(data)
       let hash = 0
       for (let i = 0; i < str.length; i++) {
@@ -567,8 +558,6 @@ export class PerformanceOptimizer {
       }
       return Math.abs(hash).toString(16)
     }
-
-    return createHash('md5').update(JSON.stringify(data)).digest('hex')
   }
 
   /**
@@ -831,4 +820,4 @@ export const performanceMonitoring = new PerformanceMonitoringService()
 
 // Logger instance
 import { getLogger } from '@/lib/logging'
-const logger = getLogger('performance-config')
+const logger = getLogger({ prefix: 'performance-config' })

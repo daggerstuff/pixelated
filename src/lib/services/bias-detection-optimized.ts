@@ -248,7 +248,7 @@ export class OptimizedBiasDetectionService {
         timestamp: new Date(),
       }
 
-      const result = await this.engine.analyzeSession(session)
+      const result = await this.engine.analyzeSession(session as any)
 
       // Extract detected biases from layer results (not a top-level field on AnalysisResult)
       const detectedBiases: string[] = []

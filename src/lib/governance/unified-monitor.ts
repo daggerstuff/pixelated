@@ -1,6 +1,6 @@
 import { getLogger } from '../logging'
 
-const logger = getLogger({ module: 'unified-monitor' })
+const logger = getLogger({ module: 'unified-monitor' } as any)
 
 export interface MonitorEvent {
   source: 'fhe' | 'audit' | 'secrets' | 'governance'

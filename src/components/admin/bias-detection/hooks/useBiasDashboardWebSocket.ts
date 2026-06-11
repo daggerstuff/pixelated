@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
+import type { RefObject } from 'react'
 
 type WsConnectionStatus =
   | 'disconnected'
@@ -23,7 +24,7 @@ interface ExtendedWebSocket extends WebSocket {
 
 interface UseBiasDashboardWebSocketOptions {
   enableRealTimeUpdates: boolean
-  wsRef: MutableRefObject<WebSocket | null>
+  wsRef: RefObject<WebSocket | null>
   selectedTimeRange: string
   biasScoreFilter: BiasScoreFilter
   alertLevelFilter: BiasLevel

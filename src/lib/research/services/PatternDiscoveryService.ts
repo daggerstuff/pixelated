@@ -174,14 +174,13 @@ export class PatternDiscoveryService {
         text: `Analyze trend for ${metric} over time`,
         context: 'temporal-analysis',
       })
-
       const result = await this.queryEngine.executeQuery(
         query,
         'system',
         'data-scientist',
       )
 
-      if (result.data && (result.data as any).length > 0) {
+      if (result.data && typeof result.data === 'object' && 'length' in (result.data as any) && (result.data as any).length > 0) {
         const trend = this.calculateTrend(result.data as any, metric)
         if (trend) {
           trends.push(trend)

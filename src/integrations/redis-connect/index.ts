@@ -5,7 +5,7 @@ export default function redisConnect(): AstroIntegration {
   return {
     name: 'redis-connect',
     hooks: {
-      'astro:server:setup': async ({ server }) => {
+      'astro:server:setup': async ({ server: _server }) => {
         console.log('[redis-connect] Setting up Redis connection...')
         try {
           await connectRedis()

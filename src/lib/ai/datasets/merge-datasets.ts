@@ -103,6 +103,7 @@ function createWriter(
     case "jsonl":
       return new JSONLWriter(writeStream);
     default:
+      return new JSONLWriter(writeStream);
   }
 }
 

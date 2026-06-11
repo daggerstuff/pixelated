@@ -58,8 +58,11 @@ vi.mock('ws', () => {
     return {
       send: vi.fn(),
       on: vi.fn(),
-      readyState: 1, // Simulate WebSocket.OPEN
-      // Add other necessary WebSocket properties/methods if needed by the code
+      readyState: 1,
+      OPEN: 1,
+      CLOSING: 2,
+      CLOSED: 3,
+      CONNECTING: 0,
     }
   })
   mockWebSocketConstructor.OPEN = 1
@@ -100,7 +103,7 @@ describe('therapyChatWebSocketServer', () => {
     wss = new TherapyChatWebSocketServer(mockHttpServer)
 
     // Store reference to internal clients map (optional, if needed for assertions)
-    mockClients = (wss as unknown).clients
+    mockClients = (wss as unknown as { clients: Map<string, WebSocket> }).clients
   })
 
   afterEach(() => {
@@ -109,7 +112,7 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('handleConnection', () => {
     it('should add new client on connection', () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -151,7 +154,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle encrypted messages with FHE', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -189,7 +192,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle status updates', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -214,7 +217,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle client disconnection', () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -234,7 +237,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle message parsing errors', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -290,7 +293,7 @@ describe('therapyChatWebSocketServer', () => {
 
   describe('error handling', () => {
     it('should handle FHE initialization errors', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)
@@ -323,7 +326,7 @@ describe('therapyChatWebSocketServer', () => {
     })
 
     it('should handle missing session ID', async () => {
-      const handleConnection = (wss as unknown as any).handleConnection.bind(
+      const handleConnection = (wss as unknown as { handleConnection: (ws: WebSocket) => void }).handleConnection.bind(
         wss,
       )
       handleConnection(mockWebSocket)

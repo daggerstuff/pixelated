@@ -18,11 +18,12 @@ const ForecastRequestSchema = z.object({
   recentInterventions: z.array(z.string()),
   userPreferences: z.record(z.string(), z.unknown()).optional(),
   mentalHealthAnalysis: MentalHealthAnalysisSchema.optional(),
+  clientId: z.string().optional(),
   desiredOutcomes: z.array(z.string()).min(1),
   maxResults: z.number().min(1).max(10).optional(),
 })
 
-export const post = async ({ request }) => {
+export const post = async ({ request }: { request: Request }) => {
   try {
     const body = await request.json()
     const parsed = ForecastRequestSchema.safeParse(body)
@@ -31,7 +32,7 @@ export const post = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Invalid input',
-          details: parsed.error.flatten(),
+          details: z.flattenError(parsed.error),
         }),
         { status: 400, headers: { 'Content-Type': 'application/json' } },
       )
@@ -55,6 +56,7 @@ export const post = async ({ request }) => {
       recentInterventions,
       ...(userPreferences !== undefined ? { userPreferences } : {}),
       mentalHealthAnalysis,
+      sessionId: session.id,
     })
 
     // Generate recommendations (forecasts)

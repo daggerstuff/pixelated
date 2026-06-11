@@ -37,7 +37,7 @@ export const GET = async ({ request, url }) => {
     const validation = exportStatusSchema.safeParse({ exportId })
 
     if (!validation.success) {
-      const errors = validation.error.flatten()
+      const errors = z.flattenError(validation.error)
       logger.warn('Invalid export ID format', { errors })
 
       return new Response(

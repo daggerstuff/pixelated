@@ -7,6 +7,7 @@
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getContextMapperService } from '../config/context-mapper-service'
+import { ContextualObjectiveWeights } from '../prioritization/context-objective-mapper'
 import { ContextType, AlignmentContext } from './objectives'
 
 const logger = createBuildSafeLogger('dynamic-weighting')
@@ -406,8 +407,10 @@ export class DynamicWeightingEngine {
       number | undefined,
     ][]) {
       const newValue = v ?? 0
-      const objectiveId = k
-      const prevValue = previousWeights[objectiveId] ?? newValue
+      const objectiveId = k as string
+      const prevValue =
+        previousWeights[objectiveId as keyof ContextualObjectiveWeights] ??
+        newValue
       const change = newValue - prevValue
 
       let direction: 'up' | 'down' | 'stable' = 'stable'
@@ -415,25 +418,27 @@ export class DynamicWeightingEngine {
       else if (change < -0.01) direction = 'down'
 
       // Get or create tracker
-      let tracker = this.oscillationTrackers.get(objectiveId)
-      if (!tracker) {
-        tracker = {
+      const existingTracker = this.oscillationTrackers.get(objectiveId)
+      if (existingTracker) {
+        // Check for direction change
+        if (
+          direction !== 'stable' &&
+          direction !== existingTracker.lastDirection
+        ) {
+          existingTracker.directionChanges++
+          existingTracker.lastDirection = direction
+        }
+
+        // Check if oscillation threshold exceeded
+        if (existingTracker.directionChanges >= threshold) {
+          return true
+        }
+      } else {
+        this.oscillationTrackers.set(objectiveId, {
           objectiveId,
           directionChanges: 0,
           lastDirection: direction,
-        }
-        this.oscillationTrackers.set(objectiveId, tracker)
-      }
-
-      // Check for direction change
-      if (direction !== 'stable' && direction !== tracker.lastDirection) {
-        tracker.directionChanges++
-        tracker.lastDirection = direction
-      }
-
-      // Check if oscillation threshold exceeded
-      if (tracker.directionChanges >= threshold) {
-        return true
+        })
       }
     }
 
@@ -479,7 +484,7 @@ export class DynamicWeightingEngine {
       return null
     }
 
-    return this.weightHistory[this.weightHistory.length - 1]!.weights
+    return this.weightHistory[this.weightHistory.length - 1].weights
   }
 
   /**

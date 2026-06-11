@@ -153,7 +153,7 @@ const jobsWorker = {
             request: RequestInfo
           })
           const batchStartTime = Date.now()
-          results = await biasDetectionEngine.analyzeSessionsBatch(
+          results = await (biasDetectionEngine as any).analyzeSessionsBatch(
             sessions,
             user,
             {

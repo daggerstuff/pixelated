@@ -535,11 +535,14 @@ describe('Data Transformation', () => {
   describe('transformSessionForPython', () => {
     it('should transform session to Python format', () => {
       const result = transformSessionForPython(sampleSession)
+      const demographics = result['participant_demographics'] as Record<string, unknown>
+      const aiResponses = result['ai_responses'] as Array<Record<string, unknown>>
+      const transcripts = result['transcripts'] as Array<Record<string, unknown>>
 
       expect(result['session_id']).toBe(sampleSession.sessionId)
-      expect(result['participant_demographics'].age).toBe('25-35')
-      expect(result['ai_responses'][0].response_id).toBe('resp-1')
-      expect(result['transcripts'][0].speaker_id).toBe('therapist')
+      expect(demographics['age']).toBe('25-35')
+      expect(aiResponses[0]?.['response_id']).toBe('resp-1')
+      expect(transcripts[0]?.['speaker_id']).toBe('therapist')
     })
   })
 
@@ -741,7 +744,7 @@ describe('Utility Helpers', () => {
           timestamp: new Date(),
           overallBiasScore: 0.3,
           layerResults: {} as BiasAnalysisResult['layerResults'],
-          demographics: {} as unknown,
+          demographics: {} as ParticipantDemographics,
           recommendations: ['Improve diversity', 'Add training'],
           alertLevel: 'medium',
           confidence: 0.8,
@@ -751,7 +754,7 @@ describe('Utility Helpers', () => {
           timestamp: new Date(),
           overallBiasScore: 0.7,
           layerResults: {} as BiasAnalysisResult['layerResults'],
-          demographics: {} as unknown,
+          demographics: {} as ParticipantDemographics,
           recommendations: ['Improve diversity', 'Review model'],
           alertLevel: 'high',
           confidence: 0.9,
