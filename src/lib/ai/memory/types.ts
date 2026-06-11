@@ -16,8 +16,9 @@
  * its own copy of equivalent Zod schemas under
  * `foresight-mcp/packages/foresight-core/src/types.ts`.
  *
- * Local-only types that are not yet upstream (`StanceShift`,
- * `SynthesisResult`) remain defined here until the package grows them.
+ * As of PIX-3905, `StanceShift` and `SynthesisResult` are also
+ * re-exported from the package. This file is a pure re-export barrel
+ * — no local interface declarations remain.
  */
 
 // Primitive enums and shared types — re-exported as-is
