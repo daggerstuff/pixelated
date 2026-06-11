@@ -62,7 +62,7 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
-  - path-to-regexp@6.3.0
+  - 'path-to-regexp@6.3.0'
   - '@cloudflare/workers-types@4.20260531.1'
   - tinyglobby@0.2.17
   - yaml@2.8.3
@@ -81,7 +81,7 @@ minimumReleaseAgeExclude:
   - axios@0.31.1
   - axios@0.30.3
   - hono@4.12.23
-  - react-hook-form@7.78.0
+  - 'react-hook-form@7.78.0'
   - '@ai-sdk/gateway@3.0.126'
   - '@ai-sdk/gateway@3.0.127'
   - ai
@@ -100,12 +100,11 @@ minimumReleaseAgeExclude:
   - '@typescript-eslint/typescript-estree@8.61.0'
   - '@typescript-eslint/utils@8.61.0'
   - '@typescript-eslint/visitor-keys@8.61.0'
-  - typescript-eslint@8.61.0
+  - 'typescript-eslint@8.61.0'
   - mongoose@9.7.0
   - '@playwright/test@1.61.0-alpha-2026-06-10'
-  - playwright-core@1.61.0-alpha-2026-06-10
-  - playwright@1.61.0-alpha-2026-06-10
-  - '@ai-sdk/mcp@1.0.47'
+  - 'playwright-core@1.61.0-alpha-2026-06-10'
+  - 'playwright@1.61.0-alpha-2026-06-10'
   - '@aws-sdk/checksums@3.1000.5'
   - '@aws-sdk/client-dynamodb@3.1066.0'
   - '@aws-sdk/client-ec2@3.1066.0'
@@ -125,78 +124,57 @@ minimumReleaseAgeExclude:
   - '@aws-sdk/s3-request-presigner@3.1066.0'
   - '@aws-sdk/signature-v4-multi-region@3.996.34'
   - '@aws-sdk/token-providers@3.1066.0'
-  - '@aws-sdk/util-locate-window@3.965.7'
+  - '@github/copilot-sdk@1.0.1'
+  - '@img/sharp-darwin-arm64@0.35.0'
+  - '@img/sharp-darwin-x64@0.35.0'
+  - '@img/sharp-freebsd-wasm32@0.35.0'
+  - '@img/sharp-libvips-darwin-arm64@1.3.0'
+  - '@img/sharp-libvips-darwin-x64@1.3.0'
+  - '@img/sharp-libvips-linux-arm64@1.3.0'
+  - '@img/sharp-libvips-linux-arm@1.3.0'
+  - '@img/sharp-libvips-linux-ppc64@1.3.0'
+  - '@img/sharp-libvips-linux-riscv64@1.3.0'
+  - '@img/sharp-libvips-linux-s390x@1.3.0'
+  - '@img/sharp-libvips-linux-x64@1.3.0'
+  - '@img/sharp-libvips-linuxmusl-arm64@1.3.0'
+  - '@img/sharp-libvips-linuxmusl-x64@1.3.0'
+  - '@img/sharp-linux-arm64@0.35.0'
+  - '@img/sharp-linux-arm@0.35.0'
+  - '@img/sharp-linux-ppc64@0.35.0'
+  - '@img/sharp-linux-riscv64@0.35.0'
+  - '@img/sharp-linux-s390x@0.35.0'
+  - '@img/sharp-linux-x64@0.35.0'
+  - '@img/sharp-linuxmusl-arm64@0.35.0'
+  - '@img/sharp-linuxmusl-x64@0.35.0'
+  - '@img/sharp-wasm32@0.35.0'
+  - '@img/sharp-webcontainers-wasm32@0.35.0'
+  - '@img/sharp-win32-arm64@0.35.0'
+  - '@img/sharp-win32-ia32@0.35.0'
+  - '@img/sharp-win32-x64@0.35.0'
+  - '@types/node@25.9.3'
+  - astro@6.4.6
+  - markdownlint@0.41.0
+  - sharp@0.35.0
   - '@cloudflare/workers-types@4.20260610.1'
-  - '@cloudflare/workers-types@4.20260611.1'
-  - '@github/copilot@1.0.61'
+  - '@playwright/test@1.61.0-alpha-1781023400000'
+  - 'playwright-core@1.61.0-alpha-1781023400000'
+  - 'playwright@1.61.0-alpha-1781023400000'
+  - '@auth0/auth0-react@2.18.0'
+  - '@aws-sdk/util-locate-window@3.965.7'
   - '@github/copilot-darwin-arm64@1.0.61'
   - '@github/copilot-darwin-x64@1.0.61'
   - '@github/copilot-linux-arm64@1.0.61'
   - '@github/copilot-linux-x64@1.0.61'
   - '@github/copilot-linuxmusl-arm64@1.0.61'
   - '@github/copilot-linuxmusl-x64@1.0.61'
-  - '@github/copilot-sdk@1.0.1'
   - '@github/copilot-win32-arm64@1.0.61'
   - '@github/copilot-win32-x64@1.0.61'
-  - '@img/sharp-darwin-arm64@0.35.0'
-  - '@img/sharp-darwin-x64@0.35.0'
-  - '@img/sharp-freebsd-wasm32@0.35.0'
-  - '@img/sharp-libvips-darwin-arm64@1.3.0'
-  - '@img/sharp-libvips-darwin-x64@1.3.0'
-  - '@img/sharp-libvips-linux-arm@1.3.0'
-  - '@img/sharp-libvips-linux-arm64@1.3.0'
-  - '@img/sharp-libvips-linuxmusl-arm64@1.3.0'
-  - '@img/sharp-libvips-linuxmusl-x64@1.3.0'
-  - '@img/sharp-libvips-linux-ppc64@1.3.0'
-  - '@img/sharp-libvips-linux-riscv64@1.3.0'
-  - '@img/sharp-libvips-linux-s390x@1.3.0'
-  - '@img/sharp-libvips-linux-x64@1.3.0'
-  - '@img/sharp-linux-arm@0.35.0'
-  - '@img/sharp-linux-arm64@0.35.0'
-  - '@img/sharp-linuxmusl-arm64@0.35.0'
-  - '@img/sharp-linuxmusl-x64@0.35.0'
-  - '@img/sharp-linux-ppc64@0.35.0'
-  - '@img/sharp-linux-riscv64@0.35.0'
-  - '@img/sharp-linux-s390x@0.35.0'
-  - '@img/sharp-linux-x64@0.35.0'
-  - '@img/sharp-wasm32@0.35.0'
-  - '@img/sharp-webcontainers-wasm32@0.35.0'
-  - '@img/sharp-win32-arm64@0.35.0'
-  - '@img/sharp-win32-ia32@0.35.0'
-  - '@img/sharp-win32-x64@0.35.0'
-  - '@opentelemetry/api-logs@0.219.0'
-  - '@opentelemetry/context-async-hooks@2.8.0'
-  - '@opentelemetry/core@2.8.0'
-  - '@opentelemetry/exporter-metrics-otlp-http@0.219.0'
-  - '@opentelemetry/exporter-trace-otlp-grpc@0.219.0'
-  - '@opentelemetry/exporter-trace-otlp-http@0.219.0'
-  - '@opentelemetry/instrumentation@0.219.0'
-  - '@opentelemetry/instrumentation-http@0.219.0'
-  - '@opentelemetry/otlp-exporter-base@0.219.0'
-  - '@opentelemetry/otlp-grpc-exporter-base@0.219.0'
-  - '@opentelemetry/otlp-transformer@0.219.0'
-  - '@opentelemetry/resources@2.8.0'
-  - '@opentelemetry/sdk-logs@0.219.0'
-  - '@opentelemetry/sdk-metrics@2.8.0'
-  - '@opentelemetry/sdk-trace-base@2.8.0'
-  - '@opentelemetry/sdk-trace-node@2.8.0'
-  - '@types/nodemailer@8.0.1'
-  - '@types/node@25.9.3'
-  - '@vue/compiler-core@3.5.38'
-  - '@vue/compiler-dom@3.5.38'
-  - '@vue/compiler-sfc@3.5.38'
-  - '@vue/compiler-ssr@3.5.38'
-  - '@vue/reactivity@3.5.38'
-  - '@vue/runtime-core@3.5.38'
-  - '@vue/runtime-dom@3.5.38'
-  - '@vue/server-renderer@3.5.38'
-  - '@vue/shared@3.5.38'
-  - ai@6.0.201
-  - astro@6.4.6
-  - jotai@2.20.1
-  - markdownlint@0.41.0
-  - sharp@0.35.0
-  - vue@3.5.38
+  - '@github/copilot@1.0.61'
+  - path-to-regexp@6.3.0
+  - playwright-core@1.61.0-alpha-2026-06-10
+  - playwright@1.61.0-alpha-2026-06-10
+
+
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
