@@ -22,7 +22,7 @@ export class PolicyStore {
       this.db = this.client.db(GOVERNANCE_DB_NAME)
     } else {
       await sharedMongoClient.connect()
-      this.client = sharedMongoClient
+      this.client = sharedMongoClient as unknown as MongoClient
       this.db = sharedMongoClient.db
     }
   }

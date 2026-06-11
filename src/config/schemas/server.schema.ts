@@ -17,5 +17,5 @@ export const serverEnvSchema = z.object({
     .default(true),
   ANALYTICS_WS_PORT: z.coerce.number().default(8083),
   NOTIFICATION_WS_PORT: z.coerce.number().default(8082),
-  SITE_URL: z.string().url().optional(),
+  SITE_URL: z.url().optional(),
 })

@@ -1,4 +1,5 @@
 import { getCurrentUser } from '@/lib/auth'
+import type { APIContext } from 'astro'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import {
@@ -73,7 +74,7 @@ const aiService = {
 }
 const documentationService = new DocumentationService(repository, aiService)
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: any) => {
   try {
     // Authenticate request
     // To get cookies in Astro API route, use the request.headers

@@ -29,6 +29,7 @@ interface Session {
   role: string
   created_at: string
   last_activity: string
+  activity_log?: Array<{ action: string; timestamp: string }>
 }
 
 // Mock data for tests
@@ -350,7 +351,7 @@ describe('HIPAA Session Management', () => {
       ],
     }
 
-    expect(session.activity_log.length).toBeGreaterThan(0)
+    expect(session.activity_log?.length).toBeGreaterThan(0)
     expect(session.last_activity).toBeDefined()
   })
 })
