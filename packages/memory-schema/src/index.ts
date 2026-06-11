@@ -137,6 +137,30 @@ export {
 } from './guards'
 
 // ---------------------------------------------------------------------------
+// Reflection loop contracts  (reflection.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  ReflectionOutcomeSchema,
+  ReflectionInsightSchema,
+  ReflectionContextSchema,
+  ActionFeedbackPairSchema,
+  VerbalReflectionSchema,
+  ReflexionResultSchema,
+  actionFeedbackPairToReflectionContext,
+  verbalReflectionToInsights,
+} from './reflection'
+
+export type {
+  ReflectionOutcome,
+  ReflectionInsight,
+  ReflectionContext,
+  ActionFeedbackPair,
+  VerbalReflection,
+  ReflexionResult,
+} from './reflection'
+
+// ---------------------------------------------------------------------------
 // Factory defaults & construction helpers  (defaults.ts)
 // ---------------------------------------------------------------------------
 
