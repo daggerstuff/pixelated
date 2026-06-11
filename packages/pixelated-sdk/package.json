@@ -15,7 +15,7 @@
   "author": "Pixelated Empathy",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^18.0.0",
+    "@types/node": "^25.9.3",
     "typescript": "^4.9.0",
     "vitest": "^1.0.0"
   }
