@@ -256,7 +256,7 @@ describe('v1 public memory API contract (PIX-1908)', () => {
     it('POST /search rejects unknown fields', async () => {
       const response = await searchPost({
         request: makeRequest('http://localhost/api/v1/memory/search', {
-          query: 'hello',
+          q: 'hello',
           userId: 'attacker',
         }),
       })
@@ -399,6 +399,32 @@ describe('v1 public memory API contract (PIX-1908)', () => {
       expect(response.status).toBe(400)
       const body = (await response.json()) as { error: string }
       expect(body.error).toBe('validation_failed')
+    })
+
+    it('POST /memory/search requires q (same field name as GET)', async () => {
+      const response = await searchPost({
+        request: makeRequest('http://[REDACTED]/api/v1/memory/search', {
+          query: 'legacy-field-name',
+        }),
+      })
+      expect(response.status).toBe(400)
+      const body = (await response.json()) as { error: string }
+      expect(body.error).toBe('validation_failed')
+    })
+
+    it('POST /memory/search delegates to gateway with q', async () => {
+      gateway.searchMemories.mockResolvedValue({ memories: [], total: 0 })
+      const response = await searchPost({
+        request: makeRequest('http://[REDACTED]/api/v1/memory/search', {
+          q: 'anxiety coping',
+        }),
+      })
+      expect(response.status).toBe(200)
+      expect(gateway.searchMemories).toHaveBeenCalledWith(
+        expect.objectContaining({ query: 'anxiety coping' }),
+      )
+      const body = (await response.json()) as { query: string }
+      expect(body.query).toBe('anxiety coping')
     })
   })
 })
