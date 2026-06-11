@@ -42,7 +42,8 @@ definitions:
         - pnpm
       script:
         - npm install -g pnpm@11.5.2
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
         - pnpm lint
         - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
@@ -52,7 +53,8 @@ definitions:
         - pnpm
       script:
         - npm install -g pnpm@11.5.2
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
         - pnpm security:scan
     - step: &playwright-e2e
       name: Playwright Smoke E2E
@@ -61,7 +63,8 @@ definitions:
         - pnpm
       script:
         - npm install -g pnpm@11.5.2
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
         - pnpm test:e2e:smoke
     - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
@@ -74,7 +77,8 @@ definitions:
       script:
         - echo "Installing dependencies"
         - npm install -g pnpm@11.5.2
-        - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh --no-frozen-lockfile
         - echo "Run tests and build"
         - pnpm test --silent
         - pnpm build --if-present

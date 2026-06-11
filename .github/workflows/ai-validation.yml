@@ -97,7 +97,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Install system tools (jq, bc)
         run: |

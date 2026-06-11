@@ -97,7 +97,7 @@ MCP
 install_deps() {
   cd "$WS_DIR" || return
   [ ! -f "package.json" ] && return
-  su "$R_USER" -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; export PATH="$HOME/.local/bin:$PATH"; pnpm install --no-frozen-lockfile' 2>/dev/null || true
+  su "$R_USER" -c 'export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"; export PATH="$HOME/.local/bin:$PATH"; chmod +x scripts/devops/pnpm-install-with-fallback.sh; scripts/devops/pnpm-install-with-fallback.sh' 2>/dev/null || true
 }
 
 [ -f /swapfile ] || setup_swap
