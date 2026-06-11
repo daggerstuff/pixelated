@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod'
+import type { GateDecision } from './gate-types'
 
 // ---------------------------------------------------------------------------
 // Enumerations
@@ -55,11 +56,6 @@ export const StrengthTrendSchema = z.enum([
   'weakening',
   'stale',
 ])
-
-/**
- * Gate decision — output of Socratic Gate evaluation before memory ingestion.
- */
-export type GateDecision = 'auto' | 'passive' | 'active' | 'block'
 
 /**
  * Which service originally wrote this memory row.
@@ -134,6 +130,28 @@ export interface GateResult {
   reason: string
   suggestedTags: string[]
   anomalyDetected: boolean
+  /**
+   * Optional detailed gating metadata produced by the safety pipeline
+   * (PII redaction, crisis detection, trauma filtering, consent gate).
+   * Only populated when the caller asks for the full evaluation trace.
+   */
+  gating?: GatingMetadata
+}
+
+/**
+ * Detailed metadata produced by the safety-gating pipeline. Mirrors the
+ * fields the local `SocraticGate` produces in `src/lib/ai/memory/gate.ts`.
+ */
+export interface GatingMetadata {
+  piiRedacted: boolean
+  piiTypes: string[]
+  crisisTier: string
+  crisisFlag: boolean
+  traumaIndicators: string[]
+  traumaSeverity: string
+  consentTier: string
+  consentAllowed: boolean
+  scrubbedContent: string
 }
 
 // ---------------------------------------------------------------------------
@@ -391,8 +409,60 @@ export const MemoryQueryOptionsSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+/**
+ * StanceShift — detected change in user/persona behavior across memories.
+ *
+ * Produced by the reconciliation pass in the synthesizer when the
+ * temporal or qualitative delta between historic and recent observations
+ * exceeds a confidence threshold.
+ */
+export interface StanceShift {
+  /** Which attribute shifted (e.g. 'openness', 'defensiveness', 'reciprocity') */
+  attribute: string
+  /** Previous value of the attribute (from the historic baseline) */
+  oldValue: number
+  /** New value of the attribute (from recent observations) */
+  newValue: number
+  /** Signed change: `newValue - oldValue` */
+  delta: number
+  /** IDs of memories that evidence this shift */
+  evidenceIds: string[]
+  /** Confidence score for the shift, normalized 0.0 – 1.0 */
+  confidence: number
+}
+
+/**
+ * SynthesisResult — output of a memory reconciliation pass.
+ *
+ * Captures which memories were merged, the new memory identifier that
+ * replaced them, the detected stance shifts, and the compression ratio
+ * (number of source memories / (source memories − merged + 1)).
+ */
+export interface SynthesisResult {
+  /** IDs of source memories that were merged into the synthesis */
+  mergedIds: string[]
+  /** ID of the newly synthesized memory */
+  newMemoryId: string
+  /** Stance shifts detected during this synthesis pass */
+  stanceShifts: StanceShift[]
+  /** Compression ratio (≥ 1.0; > 1.0 means net memory reduction) */
+  compressionRatio: number
+}
+
+// ---------------------------------------------------------------------------
 // Schema version constant
 // ---------------------------------------------------------------------------
 
-/** Current schema version — bump when adding fields to UnifiedMemory */
-export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
+/**
+ * Current schema version — bump when adding fields to `UnifiedMemory` or
+ * shipping new top-level types like `StanceShift` / `SynthesisResult`.
+ *
+ * 1.1.0 — added `StanceShift` and `SynthesisResult` (Foresight synthesis pipeline, PIX-3905)
+ */
+export const MEMORY_SCHEMA_VERSION = '1.1.0' as const
+
+// Re-export gate types for backward-compatible imports from ./types
+export type { GateDecision } from './gate-types'

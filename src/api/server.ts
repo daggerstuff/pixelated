@@ -30,6 +30,11 @@ import readinessRoutes from "./routes/readiness";
 import salesOpportunitiesRoutes from "./routes/sales-opportunities";
 import strategicPlanRoutes from "./routes/strategic-plans";
 import userRoutes from "./routes/users";
+import {
+  getSentryExpressHandlers,
+  hasSentryExpressErrorHandler,
+  registerSentryExpressErrorHandler,
+} from "../lib/sentry/express";
 
 // Load environment variables
 dotenv.config();
@@ -39,65 +44,11 @@ app.set("trust proxy", 1);
 const PORT = parseInt(process.env["PORT"] ?? "5000", 10);
 const NODE_ENV = process.env["NODE_ENV"] ?? "development";
 
-type SentryExpressErrorHandler = (app: express.Application) => void;
-type SentryErrorHandler = (options?: Record<string, string>) => express.ErrorRequestHandler;
-type SentryCaptureHandler = (error: unknown) => void;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const isSentryExpressErrorHandler = (value: unknown): value is SentryExpressErrorHandler =>
-  typeof value === "function";
-
-const isSentryExpressErrorRequestHandler = (value: unknown): value is SentryErrorHandler =>
-  typeof value === "function";
-
-const isSentryCaptureHandler = (value: unknown): value is SentryCaptureHandler =>
-  typeof value === "function";
-
-const getSentryHandlers = (
-  source: unknown,
-): {
-  setupExpressErrorHandler?: SentryExpressErrorHandler;
-  expressErrorHandler?: SentryErrorHandler;
-  captureException?: SentryCaptureHandler;
-} => {
-  if (!isRecord(source)) {
-    return {};
-  }
-
-  const handlers: {
-    setupExpressErrorHandler?: SentryExpressErrorHandler;
-    expressErrorHandler?: SentryErrorHandler;
-    captureException?: SentryCaptureHandler;
-  } = {};
-
-  if (isSentryExpressErrorHandler(source["setupExpressErrorHandler"])) {
-    handlers.setupExpressErrorHandler = source["setupExpressErrorHandler"];
-  }
-
-  if (isSentryExpressErrorRequestHandler(source["expressErrorHandler"])) {
-    handlers.expressErrorHandler = source["expressErrorHandler"];
-  }
-
-  if (isSentryCaptureHandler(source["captureException"])) {
-    handlers.captureException = source["captureException"];
-  }
-
-  return handlers;
-};
-
-const { setupExpressErrorHandler, expressErrorHandler, captureException } =
-  getSentryHandlers(Sentry);
-
-const hasSentryErrorHandler = !!setupExpressErrorHandler || !!expressErrorHandler;
+const sentryHandlers = getSentryExpressHandlers(Sentry);
+const hasSentryErrorHandler = hasSentryExpressErrorHandler(sentryHandlers);
+const { captureException } = sentryHandlers;
 
 app.use(sentryMiddleware);
-if (typeof setupExpressErrorHandler === "function") {
-  setupExpressErrorHandler(app);
-} else if (typeof expressErrorHandler === "function") {
-  app.use(expressErrorHandler());
-}
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -169,6 +120,7 @@ app.use("/api/users", userRoutes);
 // ============================================================================
 
 // 404 handler
+registerSentryExpressErrorHandler(app, sentryHandlers);
 app.use(notFoundHandler);
 
 // Global error handler (must be last)

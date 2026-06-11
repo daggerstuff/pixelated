@@ -1,105 +1,70 @@
 import { resolveInternalMemoryServiceConfig } from '../server/internal-memory-service-auth'
 import {
-  InternalMemoryServiceClient,
+  buildMemorySkeleton,
+  isUnifiedMemory,
+  memoryInputDefaults,
+  type CreateMemoryInput,
+  type UnifiedMemory,
+} from "@pixelated/memory-schema";
+import {
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
-} from '../server/internal-memory-service-client'
-import { createMemoryTransport } from '../server/memory-transport-factory'
-import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
-import { assertOwnedMemoryAccessible } from './product-memory-ownership'
-import type { UnifiedMemory } from '@pixelated/memory-schema'
+} from "../server/internal-memory-service-client";
+import { createMemoryTransport } from "../server/memory-transport-factory";
+import { AuditLogger, NoOpAuditLogger } from "./product-memory-audit";
+import { assertOwnedMemoryAccessible } from "./product-memory-ownership";
 
-export interface ProductMemoryRecord {
-  id: string
-  content: string
-  metadata: Record<string, unknown>
-  createdAt?: string
-  updatedAt?: string
-  // UnifiedMemory fields
-  tenantId?: string
-  userId?: string
-  bankId?: string
-  scope?: 'session' | 'arc' | 'trait' | 'fact'
-  retention?: 'ephemeral' | 'short_term' | 'long_term' | 'permanent'
-  category?: string
-  tags?: string[]
-  version?: number
-  schemaVersion?: string
-  sourceService?: 'foresight' | 'ai-services' | 'astro-frontend' | 'unknown'
-  importance?: number
-  decayRate?: number
-  strengthTrend?: 'stable' | 'strengthening' | 'weakening' | 'stale'
-  activationCount?: number
-  retrievalCount?: number
-  isGhost?: boolean
-  gist?: string | null
-  synthesizedFrom?: string[]
-  vectorId?: string | null
-  emotionalContext?: {
-    valence: number
-    arousal: number
-    dominance: number
-    primaryEmotion: string
-    intensity: number
-  } | null
-  empathyMetrics?: {
-    reciprocity: number
-    validationAccuracy: number
-    resistanceLevel: number
-  } | null
-  accessedAt?: string | null
-  lastRetrievedAt?: string | null
-}
+export type ProductMemoryRecord = UnifiedMemory;
 
 export interface ProductMemoryScope {
-  userId: string
-  accountId?: string
-  workspaceId?: string
-  orgId?: string
-  projectId?: string
-  sessionId?: string
-  agentId?: string
-  runId?: string
-  includeShared?: boolean
+  userId: string;
+  accountId?: string;
+  workspaceId?: string;
+  orgId?: string;
+  projectId?: string;
+  sessionId?: string;
+  agentId?: string;
+  runId?: string;
+  includeShared?: boolean;
 }
 
 export interface ProductMemoryListOptions extends ProductMemoryScope {
-  limit?: number
-  offset?: number
-  category?: string
-  tags?: string[]
-  scope?: string
-  retention?: string
+  limit?: number;
+  offset?: number;
+  category?: string;
+  tags?: string[];
+  scope?: string;
+  retention?: string;
 }
 
 export interface ProductMemorySearchOptions extends ProductMemoryListOptions {
-  query: string
+  query: string;
 }
 
 export interface ProductMemoryCreateInput extends ProductMemoryScope {
-  content: string
-  metadata?: Record<string, unknown>
+  content: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ProductMemoryUpdateInput extends ProductMemoryScope {
-  memoryId: string
-  content: string
-  metadata?: Record<string, unknown>
+  memoryId: string;
+  content: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ProductMemoryDeleteInput extends ProductMemoryScope {
-  memoryId: string
+  memoryId: string;
 }
 
 export interface ProductMemoryGetInput extends ProductMemoryScope {
-  memoryId: string
+  memoryId: string;
 }
 
 export interface ProductMemoryStats {
-  totalMemories: number
-  categoryCounts: Record<string, number>
+  totalMemories: number;
+  categoryCounts: Record<string, number>;
 }
 
 export class ProductMemoryGatewayError extends Error {
@@ -161,12 +126,14 @@ export class ProductMemoryGateway {
             : undefined,
         metadata,
       }),
-    )
-    return {
-      id: response.memory_id,
+    );
+    return buildProductMemoryRecord({
+      memoryId: response.memory_id,
       content: input.content,
+      userId: input.userId,
+      tenantId: this.caller?.tenantId,
       metadata,
-    }
+    });
   }
 
   async listMemories(
@@ -181,10 +148,14 @@ export class ProductMemoryGateway {
         offset: pagination.offset,
         category: options.category,
         tags: options.tags,
+        scope: options.scope,
+        retention: options.retention,
       }),
     )
     return {
-      memories: response.memories.map(mapProductMemoryRecord),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
     }
   }
@@ -199,10 +170,17 @@ export class ProductMemoryGateway {
         ...toInternalScope(options),
         query: options.query,
         limit: pagination.limit,
+        offset: pagination.offset,
+        category: options.category,
+        tags: options.tags,
+        scope: options.scope,
+        retention: options.retention,
       }),
     )
     return {
-      memories: response.memories.map(mapProductMemoryRecord),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
     }
   }
@@ -220,12 +198,15 @@ export class ProductMemoryGateway {
         content: input.content,
         metadata,
       }),
-    )
-    return {
-      id: input.memoryId,
+    );
+    return buildProductMemoryRecord({
+      memoryId: input.memoryId,
       content: input.content,
+      userId: input.userId,
+      tenantId: this.caller?.tenantId,
       metadata,
-    }
+      updatedAt: new Date().toISOString(),
+    });
   }
 
   async getMemory(
@@ -238,8 +219,8 @@ export class ProductMemoryGateway {
           memoryId: input.memoryId,
           ...toInternalScope(input),
         }),
-      )
-      return memory ? mapProductMemoryRecord(memory) : null
+      );
+      return memory ? mapProductMemoryRecord(memory, input.userId) : null;
     } catch (err) {
       if (
         err instanceof ProductMemoryGatewayError &&
@@ -381,124 +362,108 @@ function toJsonValue(value: unknown): JsonValue | undefined {
   return undefined
 }
 
+function metadataCategory(metadata: InternalMemoryMetadata): string | undefined {
+  return typeof metadata["category"] === "string" ? metadata["category"] : undefined;
+}
+
+function metadataTags(metadata: InternalMemoryMetadata): string[] | undefined {
+  if (!Array.isArray(metadata["tags"])) {
+    return undefined;
+  }
+  const tags = metadata["tags"].filter((tag): tag is string => typeof tag === "string");
+  return tags.length > 0 ? tags : undefined;
+}
+
+function metadataImportance(metadata: InternalMemoryMetadata): number | undefined {
+  return typeof metadata["importance"] === "number" ? metadata["importance"] : undefined;
+}
+
+function createMemoryInputFromMetadata(
+  base: { content: string; userId: string; tenantId?: string },
+  metadata: InternalMemoryMetadata,
+): CreateMemoryInput {
+  const input: CreateMemoryInput = {
+    content: base.content,
+    userId: base.userId,
+  };
+  if (base.tenantId) {
+    input.tenantId = base.tenantId;
+  }
+  const category = metadataCategory(metadata);
+  if (category) {
+    input.category = category;
+  }
+  const tags = metadataTags(metadata);
+  if (tags) {
+    input.tags = tags;
+  }
+  const importance = metadataImportance(metadata);
+  if (importance !== undefined) {
+    input.importance = importance;
+  }
+  return input;
+}
+
+function buildProductMemoryRecord(input: {
+  memoryId: string;
+  content: string;
+  userId: string;
+  tenantId?: string;
+  metadata?: InternalMemoryMetadata;
+  updatedAt?: string;
+}): ProductMemoryRecord {
+  const metadata = input.metadata ?? {};
+  return buildMemorySkeleton(
+    memoryInputDefaults(
+      createMemoryInputFromMetadata(
+        {
+          content: input.content,
+          userId: input.userId,
+          tenantId: input.tenantId,
+        },
+        metadata,
+      ),
+    ),
+    {
+      id: input.memoryId,
+      sourceService: "astro-frontend",
+      updatedAt: input.updatedAt ?? null,
+    },
+  );
+}
+
+function legacyInternalRecordToUnifiedMemory(
+  memory: InternalMemoryRecord,
+  userId: string,
+): UnifiedMemory {
+  const metadata = memory.metadata ?? {};
+  return buildMemorySkeleton(
+    memoryInputDefaults(
+      createMemoryInputFromMetadata(
+        {
+          content: memory.content ?? memory.memory ?? "",
+          userId,
+        },
+        metadata,
+      ),
+    ),
+    {
+      id: memory.id,
+      sourceService: "foresight",
+      createdAt: memory.createdAt ?? memory.created_at ?? new Date().toISOString(),
+      updatedAt: memory.updatedAt ?? memory.updated_at ?? null,
+    },
+  );
+}
+
 function mapProductMemoryRecord(
   memory: InternalMemoryRecord | UnifiedMemory,
+  userId: string,
 ): ProductMemoryRecord {
-  function getMemoryContent(
-    memory: InternalMemoryRecord | UnifiedMemory,
-  ): string {
-    if ('content' in memory && typeof memory.content === 'string') {
-      return memory.content
-    }
-    if ('memory' in memory && typeof (memory as any).memory === 'string') {
-      return (memory as any).memory as string
-    }
-    return ''
-  }
-
-  function getMemoryMetadata(
-    memory: InternalMemoryRecord | UnifiedMemory,
-  ): Record<string, unknown> {
-    if (
-      'metadata' in memory &&
-      typeof memory.metadata === 'object' &&
-      memory.metadata !== null
-    ) {
-      return memory.metadata as Record<string, unknown>
-    }
-    if (
-      'metadata' in memory &&
-      typeof (memory as any).metadata === 'object' &&
-      (memory as any).metadata !== null
-    ) {
-      return (memory as any).metadata as Record<string, unknown>
-    }
-    return {}
-  }
-
-  function getMemoryCreatedAt(
-    memory: InternalMemoryRecord | UnifiedMemory,
-  ): string | undefined {
-    if ('createdAt' in memory && typeof memory.createdAt === 'string') {
-      return memory.createdAt
-    }
-    if (
-      'created_at' in memory &&
-      typeof (memory as any).created_at === 'string'
-    ) {
-      return (memory as any).created_at as string
-    }
-    return undefined
-  }
-
-  function getMemoryUpdatedAt(
-    memory: InternalMemoryRecord | UnifiedMemory,
-  ): string | undefined {
-    if (
-      'updatedAt' in memory &&
-      (typeof memory.updatedAt === 'string' || memory.updatedAt === null)
-    ) {
-      return memory.updatedAt ?? undefined
-    }
-    if (
-      'updated_at' in memory &&
-      typeof (memory as any).updated_at === 'string'
-    ) {
-      return (memory as any).updated_at as string
-    }
-    return undefined
-  }
-
-  // Type guard to check if it's a UnifiedMemory
-  const isUnifiedMemory = (
-    m: InternalMemoryRecord | UnifiedMemory,
-  ): m is UnifiedMemory => {
-    return 'tenantId' in m || 'sourceService' in m || 'strengthTrend' in m
-  }
-
   if (isUnifiedMemory(memory)) {
-    return {
-      id: memory.id,
-      // Memory objects may come from different sources (UnifiedMemory vs internal format)
-      // with different property names - handle both cases safely
-      content: getMemoryContent(memory),
-      metadata: getMemoryMetadata(memory),
-      createdAt: getMemoryCreatedAt(memory),
-      updatedAt: getMemoryUpdatedAt(memory),
-      // UnifiedMemory fields
-      tenantId: memory.tenantId,
-      userId: memory.userId,
-      bankId: memory.bankId,
-      scope: memory.scope,
-      retention: memory.retention,
-      category: memory.category,
-      tags: memory.tags,
-      version: memory.version,
-      schemaVersion: memory.schemaVersion,
-      sourceService: memory.sourceService,
-      importance: memory.importance,
-      decayRate: memory.decayRate,
-      strengthTrend: memory.strengthTrend,
-      activationCount: memory.activationCount,
-      retrievalCount: memory.retrievalCount,
-      isGhost: memory.isGhost,
-      gist: memory.gist,
-      synthesizedFrom: memory.synthesizedFrom,
-      vectorId: memory.vectorId,
-      emotionalContext: memory.emotionalContext,
-      empathyMetrics: memory.empathyMetrics,
-      accessedAt: memory.accessedAt,
-      lastRetrievedAt: memory.lastRetrievedAt,
-    }
+    return memory;
   }
-  // Legacy InternalMemoryRecord
-  return {
-    id: memory.id,
-    content: getMemoryContent(memory),
-    metadata: getMemoryMetadata(memory),
-    createdAt: getMemoryCreatedAt(memory),
-    updatedAt: getMemoryUpdatedAt(memory),
-  }
+  return legacyInternalRecordToUnifiedMemory(memory, userId);
 }
 
 let gatewaySingleton: ProductMemoryGateway | null = null

@@ -58,7 +58,7 @@ jobs:
         run: pnpm store prune
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Configure Git
         run: |

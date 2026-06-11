@@ -1,3 +1,12 @@
+packages:
+  - 'packages/*'
+  - 'business-strategy-cms'
+  - 'package'
+
+
+  # Committed lockfile is the trusted source of truth;
+  # skips re-verifying minimumReleaseAge on every install.
+trustLockfile: true
 allowBuilds:
   '@aws-amplify/cli': true
   '@contrast/fn-inspect': true
@@ -60,49 +69,54 @@ allowBuilds:
   utf-8-validate: true
   win-export-certificate-and-key: true
   workerd: true
+minimumReleaseAge: 0
 minimumReleaseAgeExclude:
-  - '@iconify-json/lucide@1.2.111'
-  - path-to-regexp@6.3.0
-  - '@cloudflare/workers-types@4.20260531.1'
-  - tinyglobby@0.2.17
-  - yaml@2.8.3
-  - axios@0.28.0
-  - jsonwebtoken@8.5.2
-  - jsonwebtoken@9.0.0
-  - dompurify@3.2.4
-  - axios@0.30.0
-  - '@tootallnate/once@3.0.1'
-  - nodemailer@8.0.4
-  - dompurify@3.3.2
-  - nodemailer@8.0.5
-  - dompurify@3.3.4
-  - axios@0.31.0
-  - dompurify@3.4.0
-  - axios@0.31.1
-  - axios@0.30.3
-  - hono@4.12.23
-  - react-hook-form@7.78.0
+  - '@ai-sdk/*'
+  - '@cloudflare/*'
+  - '@cloudflare/workers-types'
+  - '@opentelemetry/*'
+  - '@vue/*'
+  - ai
   - '@ai-sdk/gateway@3.0.126'
   - '@ai-sdk/gateway@3.0.127'
-  - ai@6.0.198
-  - ai@6.0.199
+  - '@ai-sdk/gateway@3.0.128'
+  - '@ai-sdk/mcp@1.0.47'
+  - '@auth0/auth0-react@2.18.0'
+  - '@aws-sdk/checksums@3.1000.5'
+  - '@aws-sdk/client-dynamodb@3.1066.0'
+  - '@aws-sdk/client-ec2@3.1066.0'
+  - '@aws-sdk/client-eks@3.1066.0'
+  - '@aws-sdk/client-kms@3.1066.0'
+  - '@aws-sdk/client-rds@3.1066.0'
+  - '@aws-sdk/client-s3@3.1066.0'
+  - '@aws-sdk/credential-provider-ini@3.972.53'
+  - '@aws-sdk/credential-provider-login@3.972.52'
+  - '@aws-sdk/credential-provider-node@3.972.55'
+  - '@aws-sdk/credential-provider-sso@3.972.52'
+  - '@aws-sdk/credential-provider-web-identity@3.972.52'
+  - '@aws-sdk/lib-dynamodb@3.1066.0'
+  - '@aws-sdk/middleware-flexible-checksums@3.974.30'
+  - '@aws-sdk/middleware-sdk-s3@3.972.51'
+  - '@aws-sdk/nested-clients@3.997.20'
+  - '@aws-sdk/s3-request-presigner@3.1066.0'
+  - '@aws-sdk/signature-v4-multi-region@3.996.34'
+  - '@aws-sdk/token-providers@3.1066.0'
+  - '@aws-sdk/util-locate-window@3.965.7'
+  - '@cloudflare/workers-types@4.20260531.1'
   - '@cloudflare/workers-types@4.20260609.1'
-  - '@typescript-eslint/eslint-plugin@8.61.0'
-  - '@typescript-eslint/parser@8.61.0'
-  - '@typescript-eslint/project-service@8.61.0'
-  - '@typescript-eslint/scope-manager@8.61.0'
-  - '@typescript-eslint/tsconfig-utils@8.61.0'
-  - '@typescript-eslint/type-utils@8.61.0'
-  - '@typescript-eslint/types@8.61.0'
-  - '@typescript-eslint/typescript-estree@8.61.0'
-  - '@typescript-eslint/utils@8.61.0'
-  - '@typescript-eslint/visitor-keys@8.61.0'
-  - typescript-eslint@8.61.0
-  - mongoose@9.7.0
-  - '@playwright/test@1.61.0-alpha-2026-06-10'
-  - playwright-core@1.61.0-alpha-2026-06-10
-  - playwright@1.61.0-alpha-2026-06-10
+  - '@cloudflare/workers-types@4.20260610.1'
+  - '@cloudflare/workers-types@4.20260611.1'
+  - '@github/copilot-darwin-arm64@1.0.61'
+  - '@github/copilot-darwin-x64@1.0.61'
+  - '@github/copilot-linux-arm64@1.0.61'
+  - '@github/copilot-linux-x64@1.0.61'
+  - '@github/copilot-linuxmusl-arm64@1.0.61'
+  - '@github/copilot-linuxmusl-x64@1.0.61'
   - '@github/copilot-sdk@1.0.1'
+  - '@github/copilot-win32-arm64@1.0.61'
+  - '@github/copilot-win32-x64@1.0.61'
+  - '@github/copilot@1.0.61'
+  - '@iconify-json/lucide@1.2.111'
   - '@img/sharp-darwin-arm64@0.35.0'
   - '@img/sharp-darwin-x64@0.35.0'
   - '@img/sharp-freebsd-wasm32@0.35.0'
@@ -129,8 +143,60 @@ minimumReleaseAgeExclude:
   - '@img/sharp-win32-arm64@0.35.0'
   - '@img/sharp-win32-ia32@0.35.0'
   - '@img/sharp-win32-x64@0.35.0'
+  - '@playwright/test@1.61.0-alpha-1781023400000'
+  - '@playwright/test@1.61.0-alpha-2026-06-10'
+  - '@tootallnate/once@3.0.1'
+  - '@types/node@25.9.3'
+  - '@types/nodemailer@8.0.1'
+  - '@typescript-eslint/eslint-plugin@8.61.0'
+  - '@typescript-eslint/parser@8.61.0'
+  - '@typescript-eslint/project-service@8.61.0'
+  - '@typescript-eslint/scope-manager@8.61.0'
+  - '@typescript-eslint/tsconfig-utils@8.61.0'
+  - '@typescript-eslint/type-utils@8.61.0'
+  - '@typescript-eslint/types@8.61.0'
+  - '@typescript-eslint/typescript-estree@8.61.0'
+  - '@typescript-eslint/utils@8.61.0'
+  - '@typescript-eslint/visitor-keys@8.61.0'
+  - '@vue/compiler-core@3.5.38'
+  - '@vue/compiler-dom@3.5.38'
+  - '@vue/compiler-sfc@3.5.38'
+  - '@vue/compiler-ssr@3.5.38'
+  - 'path-to-regexp@6.3.0'
+  - 'playwright-core@1.61.0-alpha-1781023400000'
+  - 'playwright-core@1.61.0-alpha-2026-06-10'
+  - 'playwright@1.61.0-alpha-1781023400000'
+  - 'playwright@1.61.0-alpha-2026-06-10'
+  - 'react-hook-form@7.78.0'
+  - 'typescript-eslint@8.61.0'
+  - ai@6.0.198
+  - ai@6.0.199
   - astro@6.4.6
+  - axios@0.28.0
+  - axios@0.30.0
+  - axios@0.30.3
+  - axios@0.31.0
+  - axios@0.31.1
+  - dompurify@3.2.4
+  - dompurify@3.3.2
+  - dompurify@3.3.4
+  - dompurify@3.4.0
+  - hono@4.12.23
+  - jotai@2.20.1
+  - jsonwebtoken@8.5.2
+  - jsonwebtoken@9.0.0
+  - markdownlint@0.41.0
+  - mongoose@9.7.0
+  - nodemailer@8.0.4
+  - nodemailer@8.0.5
+  - path-to-regexp@6.3.0
+  - playwright-core@1.61.0-alpha-2026-06-10
+  - playwright@1.61.0-alpha-2026-06-10
   - sharp@0.35.0
+  - tinyglobby@0.2.17
+  - vue@3.5.38
+  - yaml@2.8.3
+
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
@@ -154,6 +220,7 @@ peerDependencyRules:
     typescript: ^6.0.3
     zod: '*'
 overrides:
+  '@cloudflare/workers-types': 4.20260611.1
   '@astrojs/react>devalue': ^5.6.4
   '@astrojs/react>rollup': ^4.59.0
   '@astrojs/react>svgo': ^4.0.1
@@ -180,7 +247,7 @@ overrides:
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
   '@opentelemetry/otlp-transformer>protobufjs': 8.0.2
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
-  '@tootallnate/once': ^3.0.1
+  '@totallnate/once': ^3.0.1
   '@typescript-eslint/typescript-estree>minimatch': ^9.0.9
   '@unocss/astro': ^66.7.0
   '@unocss/core': ^66.7.0
@@ -189,6 +256,7 @@ overrides:
   '@vercel/routing-utils': npm:@vercel/routing-utils@6.2.0
   '@vercel/routing-utils>path-to-regexp': ^6.3.0
   '@vercel/routing-utils>path-to-regexp@<6.3.0': 6.3.0
+
   '@vercel/routing-utils@5.3.3>path-to-regexp': npm:path-to-regexp@6.3.0
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
   astro>devalue: '>=5.8.1'

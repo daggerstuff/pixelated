@@ -16,6 +16,12 @@
 export { MEMORY_SCHEMA_VERSION } from './types'
 
 // ---------------------------------------------------------------------------
+// Canonical enum value sets (for Zod, guards, OpenAPI)
+// ---------------------------------------------------------------------------
+
+export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
+
+// ---------------------------------------------------------------------------
 // Primitive enum types
 // ---------------------------------------------------------------------------
 
@@ -43,6 +49,8 @@ export type {
   EmpathyMetrics,
   /** Result of Socratic Gate evaluation run before memory ingestion. */
   GateResult,
+  /** Detailed metadata produced by the safety-gating pipeline (PII, crisis, trauma, consent). */
+  GatingMetadata,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -61,6 +69,17 @@ export type {
 } from './types'
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+export type {
+  /** Detected change in user/persona behavior across memories. */
+  StanceShift,
+  /** Output of a memory reconciliation pass. */
+  SynthesisResult,
+} from './types'
+
+// ---------------------------------------------------------------------------
 // Input / query shapes
 // ---------------------------------------------------------------------------
 
@@ -72,6 +91,27 @@ export type {
   /** Query options for listing / searching memories. */
   MemoryQueryOptions,
 } from './types'
+
+// ---------------------------------------------------------------------------
+// Zod runtime validation schemas  (schemas.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  MemoryScopeSchema,
+  RetentionPolicySchema,
+  StrengthTrendSchema,
+  GateDecisionSchema,
+  SourceServiceSchema,
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
+  GateResultSchema,
+  UnifiedMemorySchema,
+  CreateMemoryInputSchema,
+  UpdateMemoryInputSchema,
+  MemoryQueryOptionsSchema,
+  StanceShiftSchema,
+  SynthesisResultSchema,
+} from './schemas'
 
 // ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
@@ -109,7 +149,35 @@ export {
   hasEmotionalContext,
   hasEmpathyMetrics,
   isEmbedded,
+
+  // Synthesis output guards
+  isStanceShift,
+  isSynthesisResult,
 } from './guards'
+
+// ---------------------------------------------------------------------------
+// Reflection loop contracts  (reflection.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  ReflectionOutcomeSchema,
+  ReflectionInsightSchema,
+  ReflectionContextSchema,
+  ActionFeedbackPairSchema,
+  VerbalReflectionSchema,
+  ReflexionResultSchema,
+  actionFeedbackPairToReflectionContext,
+  verbalReflectionToInsights,
+} from './reflection'
+
+export type {
+  ReflectionOutcome,
+  ReflectionInsight,
+  ReflectionContext,
+  ActionFeedbackPair,
+  VerbalReflection,
+  ReflexionResult,
+} from './reflection'
 
 // ---------------------------------------------------------------------------
 // Factory defaults & construction helpers  (defaults.ts)

@@ -100,6 +100,18 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
     [],
   )
 
+  // Performance optimization: Pre-compute formatted date strings to avoid O(N) Date object creations during render map iterations
+  const formattedEmotionData = useMemo(() => {
+    return emotionData.map(point => {
+      const date = new Date(point.timestamp);
+      return {
+        ...point,
+        timeString: date.toLocaleTimeString(),
+        localeString: date.toLocaleString(),
+      };
+    })
+  }, [emotionData])
+
   // Memoize the calculation of averages to avoid O(N) recalculations on checkbox toggles
   const averages = useMemo(() => {
     if (emotionData.length === 0) {
@@ -217,7 +229,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
             </text>
 
             {/* Data points */}
-            {emotionData.map((point) => {
+            {formattedEmotionData.map((point) => {
               let x = 50,
                 y = 250
 
@@ -249,7 +261,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                   strokeWidth="2"
                   opacity={point.confidence}
                 >
-                  <title>{`${point.emotion} (${new Date(point.timestamp).toLocaleTimeString()})`}</title>
+                  <title>{`${point.emotion} (${point.timeString})`}</title>
                 </circle>
               )
             })}
@@ -260,7 +272,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
       <div className="bg-white rounded-lg p-6 shadow">
         <h3 className="mb-4 text-xl font-semibold">Emotion Timeline</h3>
         <div className="space-y-3">
-          {emotionData.map((point) => (
+          {formattedEmotionData.map((point) => (
             <div
               key={point.id}
               className="bg-gray-50 flex items-center justify-between rounded-lg p-3"
@@ -272,7 +284,7 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
                 />
                 <span className="font-medium capitalize">{point.emotion}</span>
                 <span className="text-gray-500 text-sm">
-                  {new Date(point.timestamp).toLocaleString()}
+                  {point.localeString}
                 </span>
               </div>
               <div className="text-right">

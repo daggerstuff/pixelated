@@ -1,5 +1,10 @@
 import type { AuthRequestConfig } from '../auth/auth0-protected-fetch'
 import { fetchWithAuthToken } from '../auth/auth0-protected-fetch'
+import type { PublicMemory } from '@/lib/memory/contract/v1'
+import {
+  DEFAULT_MEMORY_API_BASE_URL,
+  MemoryApiClient,
+} from './memory-api-client'
 import type {
   AddMemoryInput,
   MemoryEntry,
@@ -13,15 +18,18 @@ type MemoryAuthConfig = Omit<AuthRequestConfig, 'getAccessTokenSilently'> & {
 }
 
 /**
- * ProductMemoryClient targets the app-owned /api/memory/* gateway routes
- * using relative paths to ensure it works across different environments.
- * It provides a standardized interface for memory operations in the frontend.
+ * ProductMemoryClient targets the canonical /api/v1/memory/* routes.
+ * Identity is derived from the authenticated session — userId is only
+ * used locally to assert the caller is authenticated.
  */
 export class ProductMemoryClient {
-  private readonly defaultAuthConfig?: MemoryAuthConfig
+  private readonly api: MemoryApiClient
 
   constructor(defaultAuthConfig?: MemoryAuthConfig) {
-    this.defaultAuthConfig = defaultAuthConfig
+    this.api = new MemoryApiClient({
+      baseUrl: DEFAULT_MEMORY_API_BASE_URL,
+      fetchFn: (input, init) => this.request(input, init, defaultAuthConfig),
+    })
   }
 
   private async request(
@@ -29,7 +37,7 @@ export class ProductMemoryClient {
     init: RequestInit = {},
     authConfig?: MemoryAuthConfig,
   ): Promise<Response> {
-    const activeConfig = authConfig ?? this.defaultAuthConfig
+    const activeConfig = authConfig
     return activeConfig?.getAccessTokenSilently
       ? fetchWithAuthToken(input, init, {
           getAccessTokenSilently: activeConfig.getAccessTokenSilently,
@@ -40,40 +48,15 @@ export class ProductMemoryClient {
   }
 
   async addMemory(input: AddMemoryInput, userId?: string): Promise<string> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await this.request('/api/memory/add', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        content: input.content,
-        userId: resolvedUserId,
-        metadata: input.metadata,
-      }),
+    requireUserId(userId)
+    const response = await this.api.create({
+      content: input.content,
+      ...(input.metadata?.category
+        ? { category: String(input.metadata.category) }
+        : {}),
+      ...(input.metadata?.tags ? { tags: input.metadata.tags } : {}),
     })
-
-    if (!response.ok) {
-      const rawError = (await response.json().catch(() => ({}))) as unknown
-      const error = isRecord(rawError) ? rawError : {}
-      const errorMessage =
-        typeof error['message'] === 'string' ? error['message'] : undefined
-      throw new Error(
-        errorMessage ?? `Failed to add memory: ${response.statusText}`,
-      )
-    }
-
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    // Support both legacy memory_id and new id format
-    const memoryId =
-      typeof data['id'] === 'string'
-        ? data['id']
-        : typeof data['memory_id'] === 'string'
-          ? data['memory_id']
-          : undefined
-    if (!memoryId) {
-      throw new Error('Memory add response did not include an ID')
-    }
-    return memoryId
+    return response.data.id
   }
 
   async listMemories(
@@ -85,47 +68,34 @@ export class ProductMemoryClient {
       tags?: string[]
     } = {},
   ): Promise<MemoryEntry[]> {
-    const resolvedUserId = requireUserId(userId)
-    const params = new URLSearchParams()
-    params.set('userId', resolvedUserId)
-    if (options.limit) params.set('limit', String(options.limit))
-    if (options.offset) params.set('offset', String(options.offset))
-    if (options.category) params.set('category', options.category)
-    if (options.tags) {
-      options.tags.forEach((tag) => params.append('tag', tag))
-    }
-
-    const response = await this.request(`/api/memory/list?${params.toString()}`)
-    if (!response.ok) {
-      throw new Error(`Failed to list memories: ${response.statusText}`)
-    }
-
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    return mapMemoryEntries(data['memories'])
+    requireUserId(userId)
+    const response = await this.api.list({
+      limit: options.limit,
+      offset: options.offset,
+      category: options.category,
+      tags: options.tags,
+    })
+    return response.data.map(toMemoryEntry)
   }
 
   async searchMemories(options: SearchOptions): Promise<MemoryEntry[]> {
-    const resolvedUserId = requireUserId(options.userId)
-    const response = await this.request('/api/memory/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: options.query,
-        userId: resolvedUserId,
-        category: options.category,
-        tags: options.tags,
-        limit: options.limit,
-      }),
+    requireUserId(options.userId)
+    const response = await this.api.search({
+      q: options.query,
+      limit: options.limit,
     })
-
-    if (!response.ok) {
-      throw new Error(`Failed to search memories: ${response.statusText}`)
+    let results = response.data.map(toMemoryEntry)
+    if (options.category) {
+      results = results.filter(
+        (entry) => (entry.metadata.category ?? 'general') === options.category,
+      )
     }
-
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    return mapMemoryEntries(data['memories'])
+    if (options.tags?.length) {
+      results = results.filter((entry) =>
+        options.tags!.every((tag) => entry.metadata.tags?.includes(tag)),
+      )
+    }
+    return results
   }
 
   async updateMemory(
@@ -133,89 +103,30 @@ export class ProductMemoryClient {
     content: string,
     userId?: string,
   ): Promise<void> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await this.request('/api/memory/update', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        memoryId,
-        content,
-        userId: resolvedUserId,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to update memory: ${response.statusText}`)
-    }
+    requireUserId(userId)
+    await this.api.update(memoryId, { content })
   }
 
   async deleteMemory(memoryId: string, userId?: string): Promise<void> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await this.request('/api/memory/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        memoryId,
-        userId: resolvedUserId,
-      }),
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to delete memory: ${response.statusText}`)
-    }
+    requireUserId(userId)
+    await this.api.delete(memoryId)
   }
 
   async getStats(userId?: string): Promise<MemoryStats> {
-    const resolvedUserId = requireUserId(userId)
-    const response = await this.request(
-      `/api/memory/stats?userId=${encodeURIComponent(resolvedUserId)}`,
-    )
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch memory stats: ${response.statusText}`)
+    requireUserId(userId)
+    const response = await this.api.list({ limit: 100, offset: 0, tags: undefined })
+    const categoryCounts: Record<string, number> = {}
+    for (const memory of response.data) {
+      const cat = memory.category || 'general'
+      categoryCounts[cat] = (categoryCounts[cat] ?? 0) + 1
     }
-
-    const rawData = (await response.json()) as unknown
-    const data = isRecord(rawData) ? rawData : {}
-    const totalMemories =
-      typeof data['totalMemories'] === 'number' ? data['totalMemories'] : 0
-
-    let categoryCounts: Record<string, number> = {}
-    if (isRecord(data['categoryCounts'])) {
-      categoryCounts = {}
-      for (const [key, value] of Object.entries(data['categoryCounts'])) {
-        if (typeof value === 'number') {
-          categoryCounts[key] = value
-        }
-      }
-    }
-
-    let recentActivity: MemoryStats['recentActivity'] = []
-    if (Array.isArray(data['recentActivity'])) {
-      recentActivity = data['recentActivity'].map((item: unknown) => {
-        const act = isRecord(item) ? item : {}
-        return {
-          id: typeof act['id'] === 'string' ? act['id'] : 'unknown',
-          timestamp:
-            typeof act['timestamp'] === 'string'
-              ? act['timestamp']
-              : new Date().toISOString(),
-          operation:
-            typeof act['operation'] === 'string' ? act['operation'] : 'unknown',
-          memoryId:
-            typeof act['memoryId'] === 'string' ? act['memoryId'] : undefined,
-        }
-      })
-    }
-
     return {
-      totalMemories,
+      totalMemories: response.pagination.total,
       categoryCounts,
-      recentActivity,
+      recentActivity: [],
     }
   }
 
-  // Compatibility methods
   async getAllMemories(userId?: string): Promise<MemoryEntry[]> {
     return this.listMemories(userId)
   }
@@ -245,42 +156,25 @@ function requireUserId(userId?: string): string {
   return userId
 }
 
-function isRecord(val: unknown): val is Record<string, unknown> {
-  return typeof val === 'object' && val !== null
-}
-
-function isMetadata(val: unknown): val is MemoryMetadata {
-  return typeof val === 'object' && val !== null
-}
-
-function mapMemoryEntries(memories: unknown): MemoryEntry[] {
-  if (!Array.isArray(memories)) {
-    return []
+function toMemoryEntry(memory: PublicMemory): MemoryEntry {
+  // Map MemoryScope values to MemoryMetadata scope values
+  const scopeMap: Record<string, 'shared' | 'private' | 'user' | 'global' | undefined> = {
+    'session': 'private',   // Session-scoped memories are private to the session
+    'arc': 'user',          // Arc-scoped memories belong to the user
+    'trait': 'global',      // Trait-scoped memories are globally accessible
+    'fact': 'global'        // Fact-scoped memories are globally accessible
   }
-
-  return memories.map((item: unknown) => {
-    const memory = isRecord(item) ? item : {}
-    return {
-      id: typeof memory['id'] === 'string' ? memory['id'] : 'unknown',
-      content:
-        typeof memory['content'] === 'string'
-          ? memory['content']
-          : typeof memory['memory'] === 'string'
-            ? memory['memory']
-            : '',
-      metadata: isMetadata(memory['metadata']) ? memory['metadata'] : {},
-      createdAt:
-        typeof memory['createdAt'] === 'string'
-          ? memory['createdAt']
-          : typeof memory['created_at'] === 'string'
-            ? memory['created_at']
-            : undefined,
-      updatedAt:
-        typeof memory['updatedAt'] === 'string'
-          ? memory['updatedAt']
-          : typeof memory['updated_at'] === 'string'
-            ? memory['updated_at']
-            : undefined,
-    }
-  })
+  
+  const metadata: MemoryMetadata = {
+    category: memory.category,
+    tags: memory.tags,
+    scope: scopeMap[memory.scope],
+  }
+  return {
+    id: memory.id,
+    content: memory.content,
+    metadata,
+    createdAt: memory.createdAt,
+    updatedAt: memory.updatedAt ?? undefined,
+  }
 }
