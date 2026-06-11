@@ -15,15 +15,15 @@ const EmailTemplateSchema = z.object({
   subject: z.string(),
   htmlBody: z.string(),
   textBody: z.string().optional(),
-  from: z.string().email(),
-  replyTo: z.string().email().optional(),
+  from: z.email(),
+  replyTo: z.email().optional(),
 })
 
 type EmailTemplate = z.infer<typeof EmailTemplateSchema>
 
 // Email data schema
 const EmailDataSchema = z.object({
-  to: z.string().email(),
+  to: z.email(),
   templateAlias: z.string(),
   templateModel: (z.record as any)(z.unknown()),
   attachments: z
