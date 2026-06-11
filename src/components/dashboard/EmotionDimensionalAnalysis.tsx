@@ -104,8 +104,9 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
   const formattedEmotionData = useMemo(() => {
     return emotionData.map(point => ({
       ...point,
-      timeString: new Date(point.timestamp).toLocaleTimeString(),
-      localeString: new Date(point.timestamp).toLocaleString(),
+      const date = new Date(point.timestamp);
+timeString: date.toLocaleTimeString(),
+      localeString: date.toLocaleString(),
     }))
   }, [emotionData])
 
