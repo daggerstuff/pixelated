@@ -1,0 +1,36 @@
+discovery.relabel "logs_integrations_integrations_gcp" {
+	targets = []
+
+	rule {
+		source_labels = ["__gcp_logname"]
+		target_label  = "logname"
+	}
+
+	rule {
+		source_labels = ["__gcp_resource_type"]
+		target_label  = "resource_type"
+	}
+}
+
+loki.source.gcplog "logs_integrations_integrations_gcp" {
+	pull {
+		project_id   = "grand-karma-492912-v1"
+		subscription = "cloud-logs"
+		labels       = {
+			job = "integrations/gcp",
+		}
+	}
+	forward_to    = [loki.write.grafana_cloud_loki.receiver]
+	relabel_rules = discovery.relabel.logs_integrations_integrations_gcp.rules
+}
+
+loki.write "grafana_cloud_loki" {
+	endpoint {
+		url = "https://logs-prod-us-central1.grafana.net/loki/api/v1/push"
+		// If using basic auth, users can add credentials here:
+		// basic_auth {
+		// 	username = "<grafana_loki_username>"
+		// 	password = "<grafana_loki_api_key>"
+		// }
+	}
+}

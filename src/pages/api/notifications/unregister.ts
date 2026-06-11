@@ -6,7 +6,7 @@ import { NotificationService } from '../../../lib/services/notification/Notifica
 const logger = createBuildSafeLogger('notifications-api')
 const notificationService = new NotificationService()
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)
