@@ -16,6 +16,12 @@
 export { MEMORY_SCHEMA_VERSION } from './types'
 
 // ---------------------------------------------------------------------------
+// Canonical enum value sets (for Zod, guards, OpenAPI)
+// ---------------------------------------------------------------------------
+
+export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
+
+// ---------------------------------------------------------------------------
 // Primitive enum types
 // ---------------------------------------------------------------------------
 
@@ -72,6 +78,25 @@ export type {
   /** Query options for listing / searching memories. */
   MemoryQueryOptions,
 } from './types'
+
+// ---------------------------------------------------------------------------
+// Zod runtime validation schemas  (schemas.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  MemoryScopeSchema,
+  RetentionPolicySchema,
+  StrengthTrendSchema,
+  GateDecisionSchema,
+  SourceServiceSchema,
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
+  GateResultSchema,
+  UnifiedMemorySchema,
+  CreateMemoryInputSchema,
+  UpdateMemoryInputSchema,
+  MemoryQueryOptionsSchema,
+} from './schemas'
 
 // ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
