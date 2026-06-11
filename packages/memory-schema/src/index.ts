@@ -74,6 +74,25 @@ export type {
 } from './types'
 
 // ---------------------------------------------------------------------------
+// Zod runtime validation schemas  (schemas.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  MemoryScopeSchema,
+  RetentionPolicySchema,
+  StrengthTrendSchema,
+  GateDecisionSchema,
+  SourceServiceSchema,
+  EmotionalContextSchema,
+  EmpathyMetricsSchema,
+  GateResultSchema,
+  UnifiedMemorySchema,
+  CreateMemoryInputSchema,
+  UpdateMemoryInputSchema,
+  MemoryQueryOptionsSchema,
+} from './schemas'
+
+// ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
 // ---------------------------------------------------------------------------
 
