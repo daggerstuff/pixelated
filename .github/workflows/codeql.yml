@@ -95,9 +95,9 @@ jobs:
 
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
-        run:
-          NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
-          --ignore-scripts
+        run: |
+          chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'
@@ -123,8 +123,7 @@ jobs:
         env:
           # Point uv at the venv that prepare-uv-venv created so it doesn't
           # fall back to the system interpreter when USE_SYSTEM is empty.
-          VIRTUAL_ENV:
-            ${{ github.workspace
+          VIRTUAL_ENV: ${{ github.workspace
             }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           # Install Python dependencies for CodeQL analysis

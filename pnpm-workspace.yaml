@@ -178,13 +178,18 @@ minimumReleaseAgeExclude:
   - path-to-regexp@6.3.0
   - playwright-core@1.61.0-alpha-2026-06-10
   - playwright@1.61.0-alpha-2026-06-10
+  - '@ai-sdk/*'
   - '@ai-sdk/mcp@1.0.47'
   - '@opentelemetry/*'
   - '@types/nodemailer@8.0.1'
   - '@vue/*'
-  - 'vue@3.5.38'
-  - 'jotai@2.20.1'
-
+  - '@vue/compiler-core@3.5.38'
+  - '@vue/compiler-dom@3.5.38'
+  - '@vue/compiler-sfc@3.5.38'
+  - '@vue/compiler-ssr@3.5.38'
+  - '@cloudflare/workers-types@4.20260611.1'
+  - jotai@2.20.1
+  - vue@3.5.38
 
 peerDependencyRules:
   ignoreMissing:
@@ -209,7 +214,7 @@ peerDependencyRules:
     typescript: ^6.0.3
     zod: '*'
 overrides:
-  '@cloudflare/workers-types': 4.20260610.1
+  '@cloudflare/workers-types': 4.20260611.1
   '@astrojs/react>devalue': ^5.6.4
   '@astrojs/react>rollup': ^4.59.0
   '@astrojs/react>svgo': ^4.0.1

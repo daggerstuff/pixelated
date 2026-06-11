@@ -88,7 +88,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: |
+          chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Lint code and markdown
         continue-on-error: true
