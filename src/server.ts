@@ -9,6 +9,11 @@ import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import authRoutes from './api/routes/auth'
 import projectsRoutes from './api/routes/projects'
 import { setPostgresPool, setRedisClient } from './lib/database/connection'
+import {
+  getSentryExpressHandlers,
+  hasSentryExpressErrorHandler,
+  registerSentryExpressErrorHandler,
+} from './lib/sentry/express'
 import { SocketService } from './services/socketService'
 
 import 'dotenv/config'
@@ -19,64 +24,13 @@ type RedisLike = {
   quit: () => Promise<unknown>
 }
 
-type SentryExpressErrorHandler = (app: express.Application) => void
-type SentryErrorHandler = (
-  options?: Record<string, string>,
-) => express.ErrorRequestHandler
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null
-
-const isSentryExpressErrorHandler = (
-  value: unknown,
-): value is SentryExpressErrorHandler => typeof value === 'function'
-
-const isSentryExpressErrorRequestHandler = (
-  value: unknown,
-): value is SentryErrorHandler => typeof value === 'function'
-
-const getSentryHandlers = (
-  source: unknown,
-): {
-  setupExpressErrorHandler?: SentryExpressErrorHandler
-  expressErrorHandler?: SentryErrorHandler
-} => {
-  if (!isRecord(source)) {
-    return {}
-  }
-
-  const handlers: {
-    setupExpressErrorHandler?: SentryExpressErrorHandler
-    expressErrorHandler?: SentryErrorHandler
-  } = {}
-
-  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
-    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
-  }
-
-  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
-    handlers.expressErrorHandler = source['expressErrorHandler']
-  }
-
-  return handlers
-}
-
 const app = express()
 const server = createServer(app)
 
-const { setupExpressErrorHandler, expressErrorHandler } =
-  getSentryHandlers(Sentry)
+const sentryHandlers = getSentryExpressHandlers(Sentry)
+const hasSentryErrorHandler = hasSentryExpressErrorHandler(sentryHandlers)
 
-const hasSentryErrorHandler =
-  !!setupExpressErrorHandler || !!expressErrorHandler
-
-// The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
-if (typeof setupExpressErrorHandler === 'function') {
-  setupExpressErrorHandler(app)
-} else if (typeof expressErrorHandler === 'function') {
-  app.use(expressErrorHandler())
-}
 
 // Environment variables
 const PORT = process.env['WS_PORT'] ?? 3001
@@ -166,6 +120,8 @@ app.use('/api/projects', projectsRoutes)
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
+
+registerSentryExpressErrorHandler(app, sentryHandlers)
 
 app.use(
   (
