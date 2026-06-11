@@ -248,7 +248,7 @@ overrides:
   '@opentelemetry/otlp-transformer>protobufjs': 8.0.2
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
   '@totallnate/once': ^3.0.1
-  '@typescript-eslint/typescript-estree>minimatch': ^9.0.9,
+  '@typescript-eslint/typescript-estree>minimatch': ^9.0.9
   '@unocss/astro': ^66.7.0
   '@unocss/core': ^66.7.0
   '@unocss/reset': ^66.7.0
