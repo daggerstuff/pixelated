@@ -7,7 +7,7 @@ import { createHash } from 'crypto'
 
 import { getLogger } from '@/lib/logging'
 
-const logger = getLogger('cdn-optimizer')
+const logger = getLogger({ prefix: 'cdn-optimizer' })
 
 // CDN configuration
 interface CDNConfig {

@@ -152,7 +152,14 @@ export class AnalyticsDataService {
     const startTime = endTime - timeRange
 
     try {
-      const [sessionCount, completionRate, avgRating] = await Promise.all([
+      const [
+        sessionCount,
+        completionRate,
+        avgRating,
+        totalTrend,
+        completionTrend,
+        ratingTrend,
+      ] = await Promise.all([
         this.analyticsService.getMetrics({
           name: 'total_sessions',
           startTime,
@@ -168,6 +175,9 @@ export class AnalyticsDataService {
           startTime,
           endTime,
         }),
+        this.calculateTrend('total_sessions', filters.timeRange),
+        this.calculateTrend('completion_rate', filters.timeRange),
+        this.calculateTrend('average_rating', filters.timeRange),
       ])
 
       return [
@@ -175,19 +185,19 @@ export class AnalyticsDataService {
           value: this.calculateTotalSessions(sessionCount),
           label: 'Total Sessions',
           color: 'blue' as const,
-          trend: this.calculateTrend('total_sessions', filters.timeRange),
+          trend: totalTrend,
         },
         {
           value: this.calculateCompletionRate(completionRate),
           label: 'Completion Rate',
           color: 'green' as const,
-          trend: this.calculateTrend('completion_rate', filters.timeRange),
+          trend: completionTrend,
         },
         {
           value: this.calculateAverageRating(avgRating),
           label: 'Avg. Rating',
           color: 'purple' as const,
-          trend: this.calculateTrend('average_rating', filters.timeRange),
+          trend: ratingTrend,
         },
       ]
     } catch (error: unknown) {
@@ -295,7 +305,17 @@ export class AnalyticsDataService {
     return Math.round(avgRating * 10) / 10 // Round to 1 decimal
   }
 
-  private async calculateTrend(metricName: string, timeRange: TimeRange): void {
+  private async calculateTrend(
+    metricName: string,
+    timeRange: TimeRange,
+  ): Promise<
+    | {
+        value: number
+        direction: 'up' | 'down' | 'stable'
+        period: string
+      }
+    | undefined
+  > {
     try {
       const currentPeriod = this.getTimeRangeInMs(timeRange)
       const endTime = Date.now()
@@ -334,7 +354,7 @@ export class AnalyticsDataService {
               ? ('down' as const)
               : ('stable' as const),
         period: `vs previous ${timeRange}`,
-      } as any
+      }
     } catch (error: unknown) {
       logger.error(`Failed to calculate trend for ${metricName}`, { error })
       return undefined
@@ -394,7 +414,7 @@ export class AnalyticsDataService {
   /**
    * Cache management
    */
-  private getCachedData(key: string): unknown | null {
+  private getCachedData<T = unknown>(key: string): T | null {
     const entry = this.cache.get(key)
     if (!entry) {
       return null
@@ -406,7 +426,7 @@ export class AnalyticsDataService {
       return null
     }
 
-    return entry.data
+    return entry.data as T
   }
 
   private setCachedData(key: string, data: unknown, ttl: number): void {

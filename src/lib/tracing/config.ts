@@ -41,7 +41,7 @@ export interface TracingConfig {
  */
 export function getTracingConfig(): TracingConfig {
   const envObj = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (process.env || {});
-  const isProduction = envObj.PROD === true || process.env.NODE_ENV === 'production'
+  const isProduction = envObj.PROD === true || process.env['NODE_ENV'] === 'production'
 
   // Default to enabled in production, can be disabled via env var
   const enabled =

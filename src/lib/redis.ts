@@ -97,7 +97,7 @@ function createMockRedisClient(): RedisClient {
       mockStore.has(key) ? 1 : 0,
 
     // Advanced operations needed by rate limiter
-    setex: async (key: string, seconds: number, value: string) => {
+    setex: async (key: string, _seconds: number, value: string) => {
       mockStore['set'](key, value)
       return 'OK'
     },
@@ -163,7 +163,7 @@ function createMockRedisClient(): RedisClient {
         stop + 1,
       )
     },
-    lrem: async (key: string, count: number, value: string) => {
+    lrem: async (key: string, _count: number, value: string) => {
       const listKey = `list:${key}`
       const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
       const filtered = list.filter((item: string) => item !== value)
