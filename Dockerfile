@@ -43,13 +43,10 @@ COPY patches ./patches
 COPY config/package/.npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
-RUN for i in 1 2 3; do \
-    if PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --prod=false --ignore-scripts; then \
-      break; \
-    fi; \
-    echo "pnpm install attempt $i failed, retrying in $((i * 2))s..."; \
-    sleep $((i * 2)); \
-  done
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    PNPM_INSTALL_ARGS="--prod=false --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source and run the build
 COPY . .
@@ -113,13 +110,10 @@ COPY --from=builder /app/patches ./patches
 COPY --from=builder /app/.npmrc ./.npmrc
 
 # Install production dependencies with smart fallback approach
-RUN for i in 1 2 3; do \
-    if PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --prod --ignore-scripts; then \
-      break; \
-    fi; \
-    echo "pnpm install attempt $i failed, retrying in $((i * 2))s..."; \
-    sleep $((i * 2)); \
-  done
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    PNPM_INSTALL_ARGS="--prod --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh && \
     pnpm store prune && \
     # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
