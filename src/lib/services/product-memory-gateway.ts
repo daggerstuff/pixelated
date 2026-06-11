@@ -9,49 +9,29 @@ import {
 import { createMemoryTransport } from "../server/memory-transport-factory";
 import { AuditLogger, NoOpAuditLogger } from "./product-memory-audit";
 import { assertOwnedMemoryAccessible } from "./product-memory-ownership";
-import type { UnifiedMemory } from "@pixelated/memory-schema";
+import { isUnifiedMemory, type UnifiedMemory } from "@pixelated/memory-schema";
 
-export interface ProductMemoryRecord {
+/**
+ * Product-facing memory record.
+ *
+ * Single alias of `Partial<UnifiedMemory>` plus the legacy `metadata`
+ * bag the product boundary has always exposed. `id` and `content` are
+ * re-required (they are always populated by the gateway at runtime) to
+ * preserve the old contract exactly and keep future consumers from
+ * writing `if (!record.id)` checks that would only ever be true at the
+ * type level.
+ *
+ * @see ../../memory/contract/v1.ts for the narrower PUBLIC shape that
+ * `/api/v1/memory/*` promises to external consumers.
+ */
+export type ProductMemoryRecord = Omit<
+  Partial<UnifiedMemory>,
+  'id' | 'content'
+> & {
   id: string;
   content: string;
   metadata: Record<string, unknown>;
-  createdAt?: string;
-  updatedAt?: string;
-  // UnifiedMemory fields
-  tenantId?: string;
-  userId?: string;
-  bankId?: string;
-  scope?: "session" | "arc" | "trait" | "fact";
-  retention?: "ephemeral" | "short_term" | "long_term" | "permanent";
-  category?: string;
-  tags?: string[];
-  version?: number;
-  schemaVersion?: string;
-  sourceService?: "foresight" | "ai-services" | "astro-frontend" | "unknown";
-  importance?: number;
-  decayRate?: number;
-  strengthTrend?: "stable" | "strengthening" | "weakening" | "stale";
-  activationCount?: number;
-  retrievalCount?: number;
-  isGhost?: boolean;
-  gist?: string | null;
-  synthesizedFrom?: string[];
-  vectorId?: string | null;
-  emotionalContext?: {
-    valence: number;
-    arousal: number;
-    dominance: number;
-    primaryEmotion: string;
-    intensity: number;
-  } | null;
-  empathyMetrics?: {
-    reciprocity: number;
-    validationAccuracy: number;
-    resistanceLevel: number;
-  } | null;
-  accessedAt?: string | null;
-  lastRetrievedAt?: string | null;
-}
+};
 
 export interface ProductMemoryScope {
   userId: string;
@@ -355,11 +335,6 @@ function toJsonValue(value: unknown): JsonValue | undefined {
 }
 
 function mapProductMemoryRecord(memory: InternalMemoryRecord | UnifiedMemory): ProductMemoryRecord {
-  // Type guard to check if it's a UnifiedMemory
-  const isUnifiedMemory = (m: InternalMemoryRecord | UnifiedMemory): m is UnifiedMemory => {
-    return "tenantId" in m || "sourceService" in m || "strengthTrend" in m;
-  };
-
   if (isUnifiedMemory(memory)) {
     return {
       id: memory.id,
