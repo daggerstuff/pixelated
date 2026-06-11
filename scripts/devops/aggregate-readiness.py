@@ -234,17 +234,15 @@ def aggregate_readiness(
     summary = calculate_summary(validation_lanes)
 
     report = {
+        "meta": {"generatedAt": timestamp, "schemaVersion": "1.0", "generator": "pixelated-readiness-aggregator"},
         "releaseId": f"ready-{normalize_branch(branch)}-{commit_hash[:7]}",
-        "commit": commit_hash,
-        "branch": branch,
-        "timestamp": timestamp,
-        "overallStatus": summary["overallStatus"],
-        "overallScore": summary["overallScore"],
+        "git": {"commit": commit_hash, "branch": branch},
+        "readiness": {"status": summary["overallStatus"], "score": summary["overallScore"]},
         "summary": {
-            "total": summary["total"],
-            "passed": summary["passed"],
-            "failed": summary["failed"],
-            "skipped": summary["skipped"],
+            "totalLanes": summary["total"],
+            "passedLanes": summary["passed"],
+            "failedLanes": summary["failed"],
+            "skippedLanes": summary["skipped"],
         },
         "validationLanes": validation_lanes,
     }
@@ -253,12 +251,12 @@ def aggregate_readiness(
     logger.info("==========================================")
     logger.info(" VALIDATION LANE READINESS SUMMARY")
     logger.info("==========================================")
-    logger.info("Overall Status: %s", summary["overallStatus"].upper())
-    logger.info("Overall Score:  %.1f%%", summary["overallScore"])
-    logger.info("Total Lanes:    %d", summary["total"])
-    logger.info("Passed Lanes:   %d", summary["passed"])
-    logger.info("Failed Lanes:   %d", summary["failed"])
-    logger.info("Skipped Lanes:  %d", summary["skipped"])
+    logger.info("Overall Status: %s", report["readiness"]["status"].upper())
+    logger.info("Overall Score:  %.1f%%", report["readiness"]["score"])
+    logger.info("Total Lanes:    %d", report["summary"]["totalLanes"])
+    logger.info("Passed Lanes:   %d", report["summary"]["passedLanes"])
+    logger.info("Failed Lanes:   %d", report["summary"]["failedLanes"])
+    logger.info("Skipped Lanes:  %d", report["summary"]["skippedLanes"])
     logger.info("==========================================")
 
     if output_path:
@@ -268,10 +266,10 @@ def aggregate_readiness(
             json.dump(report, f, indent=2)
         logger.info("Report saved to: %s", out_p)
 
-    if summary["overallStatus"] == "not-ready":
+    if report["readiness"]["status"] == "not-ready":
         logger.info("Release is not ready — validation lanes have failures.")
         return 1
-    if summary["overallStatus"] == "warning":
+    if report["readiness"]["status"] == "warning":
         logger.info("Release has warnings but is acceptable under policy.")
         return 0
 
