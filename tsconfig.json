@@ -70,6 +70,7 @@
     "./vitest.setup.ts",
     "./api/**/*.ts",
     "./plugins/**/*.ts",
+    "./packages/memory-schema/src/**/*.ts",
     "./types/**/*.d.ts",
     "./.astro-env.d.ts",
     "./src/types/declarations.d.ts",
