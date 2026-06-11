@@ -63,7 +63,7 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
   - 'path-to-regexp@6.3.0'
-  - '@cloudflare/workers-types@4.20260531.1||4.20260609.1||4.20260610.1||4.20260611.1'
+  - '@cloudflare/workers-types@4.20260531.1'
   - tinyglobby@0.2.17
   - yaml@2.8.3
   - axios@0.28.0
@@ -84,7 +84,12 @@ minimumReleaseAgeExclude:
   - 'react-hook-form@7.78.0'
   - '@ai-sdk/gateway@3.0.126'
   - '@ai-sdk/gateway@3.0.127'
-  - 'ai@6.0.198||6.0.199||6.0.201'
+  - ai
+  - ai@6.0.198
+  - ai@6.0.199
+  - '@cloudflare/workers-types'
+  - '@cloudflare/*'
+  - '@cloudflare/workers-types@4.20260609.1'
   - '@typescript-eslint/eslint-plugin@8.61.0'
   - '@typescript-eslint/parser@8.61.0'
   - '@typescript-eslint/project-service@8.61.0'
@@ -150,39 +155,26 @@ minimumReleaseAgeExclude:
   - astro@6.4.6
   - markdownlint@0.41.0
   - sharp@0.35.0
+  - '@cloudflare/workers-types@4.20260610.1'
   - '@playwright/test@1.61.0-alpha-1781023400000'
   - 'playwright-core@1.61.0-alpha-1781023400000'
   - 'playwright@1.61.0-alpha-1781023400000'
   - '@auth0/auth0-react@2.18.0'
-  - '@ai-sdk/mcp@1.0.47'
-  - '@opentelemetry/api-logs@0.219.0'
-  - '@opentelemetry/context-async-hooks@2.8.0'
-  - '@opentelemetry/core@2.8.0'
-  - '@opentelemetry/exporter-metrics-otlp-http@0.219.0'
-  - '@opentelemetry/exporter-trace-otlp-grpc@0.219.0'
-  - '@opentelemetry/exporter-trace-otlp-http@0.219.0'
-  - '@opentelemetry/instrumentation@0.219.0'
-  - '@opentelemetry/instrumentation-http@0.219.0'
-  - '@opentelemetry/otlp-exporter-base@0.219.0'
-  - '@opentelemetry/otlp-grpc-exporter-base@0.219.0'
-  - '@opentelemetry/otlp-transformer@0.219.0'
-  - '@opentelemetry/resources@2.8.0'
-  - '@opentelemetry/sdk-logs@0.219.0'
-  - '@opentelemetry/sdk-metrics@2.8.0'
-  - '@opentelemetry/sdk-trace-base@2.8.0'
-  - '@opentelemetry/sdk-trace-node@2.8.0'
-  - '@types/nodemailer@8.0.1'
-  - '@vue/compiler-core@3.5.38'
-  - '@vue/compiler-dom@3.5.38'
-  - '@vue/compiler-sfc@3.5.38'
-  - '@vue/compiler-ssr@3.5.38'
-  - '@vue/reactivity@3.5.38'
-  - '@vue/runtime-core@3.5.38'
-  - '@vue/runtime-dom@3.5.38'
-  - '@vue/server-renderer@3.5.38'
-  - '@vue/shared@3.5.38'
-  - 'vue@3.5.38'
-  - jotai@2.20.1
+  - '@aws-sdk/util-locate-window@3.965.7'
+  - '@github/copilot-darwin-arm64@1.0.61'
+  - '@github/copilot-darwin-x64@1.0.61'
+  - '@github/copilot-linux-arm64@1.0.61'
+  - '@github/copilot-linux-x64@1.0.61'
+  - '@github/copilot-linuxmusl-arm64@1.0.61'
+  - '@github/copilot-linuxmusl-x64@1.0.61'
+  - '@github/copilot-win32-arm64@1.0.61'
+  - '@github/copilot-win32-x64@1.0.61'
+  - '@github/copilot@1.0.61'
+  - path-to-regexp@6.3.0
+  - playwright-core@1.61.0-alpha-2026-06-10
+  - playwright@1.61.0-alpha-2026-06-10
+
+
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
@@ -206,6 +198,7 @@ peerDependencyRules:
     typescript: ^6.0.3
     zod: '*'
 overrides:
+  '@cloudflare/workers-types': 4.20260610.1
   '@astrojs/react>devalue': ^5.6.4
   '@astrojs/react>rollup': ^4.59.0
   '@astrojs/react>svgo': ^4.0.1
