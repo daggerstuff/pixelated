@@ -102,6 +102,19 @@ minimumReleaseAgeExclude:
   - '@playwright/test@1.61.0-alpha-2026-06-10'
   - playwright-core@1.61.0-alpha-2026-06-10
   - playwright@1.61.0-alpha-2026-06-10
+  - '@playwright/test@1.61.0-alpha-1781023400000'
+  - playwright-core@1.61.0-alpha-1781023400000
+  - playwright@1.61.0-alpha-1781023400000
+  # AWS SDK publishes daily; Dependabot bumps fail pnpm minimumReleaseAge checks within 24 hours.
+  - '@aws-sdk/*'
+  - '@auth0/auth0-react@2.18.0'
+  - '@cloudflare/workers-types@4.20260610.1'
+  - '@github/copilot-sdk@1.0.1'
+  - astro@6.4.6
+  - sharp@0.35.0
+  - '@img/*'
+  - '@types/node@25.9.3'
+  - markdownlint@0.41.0
 peerDependencyRules:
   ignoreMissing:
     - '@capacitor/core'
