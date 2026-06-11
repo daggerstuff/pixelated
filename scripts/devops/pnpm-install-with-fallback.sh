@@ -61,7 +61,8 @@ install_with_retry() {
     fi
   done
   
-  return $success
+  # Bash treats `return 0` as success; invert so failure (success=0) exits non-zero.
+  return $((1 - success))
 }
 
 # Main execution
@@ -84,7 +85,7 @@ main() {
   fi
   
   if [[ "${PNPM_INSTALL_BYPASS_SUPPLY_CHAIN:-}" == "1" ]]; then
-    strategies=("no-supply-chain" "${strategies[@]}")
+    strategies=("trust-lockfile" "${strategies[@]}")
   fi
   
   local overall_success=0
@@ -103,9 +104,9 @@ main() {
       "no-frozen-lockfile")
         args="--no-frozen-lockfile $PNPM_ARGS"
         ;;
-      "no-supply-chain")
+      "trust-lockfile")
         export NODE_OPTIONS="--no-deprecation ${NODE_OPTIONS:-}"
-        args="--no-frozen-lockfile --no-supply-chain $PNPM_ARGS"
+        args="--no-frozen-lockfile --config.trust-lockfile=true $PNPM_ARGS"
         ;;
       *)
         args="$PNPM_ARGS"
