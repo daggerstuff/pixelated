@@ -40,7 +40,7 @@ class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
   private readonly dpConfig: DifferentialPrivacyConfig
   private globalModel: Record<string, unknown> | null = null
-  private readonly clientModels = new Map<string, Record<string, unknown>>()
+  private readonly clientModels = new Map<string, ModelUpdate>()
   private readonly privacyBudgets = new Map<string, number>()
 
   constructor() {
@@ -92,7 +92,7 @@ class PrivacyEngine {
     }
   }
 
-  private async createGlobalModel(): Promise<Record<string, unknown>> {
+  private createGlobalModel(): Record<string, unknown> {
     // Initialize global model with random weights
     return {
       weights: Array.from({ length: 1000 }, () => Math.random()),
@@ -113,7 +113,7 @@ class PrivacyEngine {
       if (!assignments.has(shardId)) {
         assignments.set(shardId, [])
       }
-      assignments.get(shardId)!.push(clients[i]!)
+      assignments.get(shardId)!.push(clients[i])
     }
 
     return assignments
@@ -141,7 +141,7 @@ class PrivacyEngine {
     this.privacyBudgets.set(clientId, currentBudget - usedBudget)
 
     // Store client model for aggregation
-    this.clientModels.set(clientId, privateUpdate)
+    this.clientModels.set(clientId, privateUpdate as unknown as ModelUpdate)
 
     // Check if we have enough updates for aggregation
     if (this.clientModels.size >= this.federatedConfig.minClients) {
@@ -169,7 +169,8 @@ class PrivacyEngine {
     // Add noise based on sensitivity and privacy parameters
     const noise = this.generateNoise(mechanism, sensitivity, epsilon)
 
-    const privateWeights = update.weights.map(        (weight, index) => weight + noise[index % noise.length]!,
+    const privateWeights = update.weights.map(
+      (weight, index) => weight + noise[index % noise.length],
     )
 
     return {
@@ -177,7 +178,7 @@ class PrivacyEngine {
       weights: privateWeights,
       privacyLevel: 'high',
       noiseAdded: true,
-    }
+    } as unknown as ModelUpdate
   }
 
   private generateNoise(
@@ -262,14 +263,14 @@ class PrivacyEngine {
   private federatedAveraging(updates: ModelUpdate[]): ModelUpdate {
     const totalWeight = updates.length
     const averagedWeights = Array.from(
-      { length: updates[0]!.weights.length },
+      { length: updates[0].weights.length },
       () => 0,
     )
 
     // Simple averaging of model weights
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
-        averagedWeights[index]! += weight / totalWeight
+        averagedWeights[index] += weight / totalWeight
       })
     })
 
@@ -286,7 +287,7 @@ class PrivacyEngine {
   private federatedProximal(updates: ModelUpdate[]): ModelUpdate {
     // FedProx: Federated learning with proximal regularization
     const mu = 0.01 // Proximal term weight
-    const globalWeights = this.globalModel?.weights ?? updates[0]!.weights
+    const globalWeights = (this.globalModel?.['weights'] as number[] | undefined) ?? updates[0].weights
 
     const proximalWeights = Array.from(
       { length: globalWeights.length },
@@ -295,8 +296,8 @@ class PrivacyEngine {
 
     updates.forEach((update) => {
       update.weights.forEach((weight, index) => {
-        const proximal = weight + mu * (weight - globalWeights[index]!)
-        proximalWeights[index]! += proximal / updates.length
+        const proximal = weight + mu * (weight - globalWeights[index])
+        proximalWeights[index] += proximal / updates.length
       })
     })
 
@@ -429,13 +430,13 @@ class PrivacyEngine {
     let preservationScore = 0
     let comparisons = 0
 
-    Object.keys(originalStats).forEach((key) => {
+    for (const key of Object.keys(originalStats)) {
       if (sanitizedStats[key] !== undefined) {
-        const diff = Math.abs(originalStats[key]! - sanitizedStats[key])
+        const diff = Math.abs(originalStats[key] - sanitizedStats[key])
         preservationScore += Math.max(0, 1 - diff)
         comparisons++
       }
-    })
+    }
 
     return comparisons > 0 ? preservationScore / comparisons : 0
   }
@@ -532,14 +533,14 @@ class PrivacyEngine {
     switch (computation) {
       case 'average_mood':
         return (
-          inputs.reduce((sum, input) => sum + ((input.moodScore as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input['moodScore'] as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       case 'risk_assessment':
-        return Math.max(...inputs.map((input) => (input.riskScore as number) ?? 0))
+        return Math.max(...inputs.map((input) => (input['riskScore'] as number) ?? 0))
       case 'treatment_effectiveness':
         return (
-          inputs.reduce((sum, input) => sum + ((input.effectiveness as number) ?? 0), 0) /
+          inputs.reduce((sum, input) => sum + ((input['effectiveness'] as number) ?? 0), 0) /
           (inputs.length || 1)
         )
       default:

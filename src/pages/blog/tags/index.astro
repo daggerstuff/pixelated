@@ -2,7 +2,6 @@
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import type { CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
-import { isAstroProduction } from '@/utils/astro-env'
 
 export const prerender = false
 
@@ -10,7 +9,7 @@ export const prerender = false
 const posts = await getCollection(
   'blog',
   ({ data }: { data: { draft?: boolean } }) => {
-    return isAstroProduction() ? !data.draft : true
+    return import.meta.env.PROD ? !data.draft : true
   },
 )
 

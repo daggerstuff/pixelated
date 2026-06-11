@@ -106,7 +106,11 @@ describe('breachNotificationSystem Integration Tests', () => {
     mockGetUserById.mockResolvedValue(mockUser)
 
     // Setup FHE mock
-    vi.mocked(fheService.encrypt).mockResolvedValue('encrypted_data') // Corrected to use fheService
+    vi.mocked(fheService.encrypt).mockResolvedValue({
+      id: 'enc-1',
+      data: 'encrypted_data',
+      dataType: 'string',
+    })
 
     process.env['HHS_NOTIFICATION_EMAIL'] = 'hhs@example.com'
     process.env['SECURITY_STAKEHOLDERS'] = ''

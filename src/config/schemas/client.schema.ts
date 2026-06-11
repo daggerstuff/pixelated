@@ -2,9 +2,9 @@ import { z } from 'zod'
 
 export const clientEnvSchema = z.object({
   // VITE / PUBLIC variables exposed to the browser
-  VITE_API_URL: z.string().url().optional(),
+  VITE_API_URL: z.url().optional(),
   VITE_MONGODB_CLUSTER: z.string().optional(),
-  PUBLIC_SENTRY_DSN: z.string().url().optional(),
+  PUBLIC_SENTRY_DSN: z.url().optional(),
   PUBLIC_SENTRY_TRACES_SAMPLE_RATE: z.string().optional(),
   PUBLIC_SENTRY_PROFILES_SAMPLE_RATE: z.string().optional(),
   PUBLIC_SENTRY_DEBUG: z.string().optional(),
@@ -26,6 +26,6 @@ export const clientEnvSchema = z.object({
       },
     )
     .optional(),
-  PUBLIC_RYBBIT_SCRIPT_URL: z.string().url().optional(),
+  PUBLIC_RYBBIT_SCRIPT_URL: z.url().optional(),
   PUBLIC_RYBBIT_SITE_ID: z.string().optional(),
 })

@@ -2,7 +2,7 @@
  * Request body validation utilities
  */
 
-import type { Request } from 'astro'
+import type { Request as AstroRequest } from 'astro'
 import { z } from 'zod'
 
 /**
@@ -21,7 +21,7 @@ export interface ValidationErrorDetails {
  * - If validation fails: [null, ValidationErrorDetails]
  */
 export async function validateRequestBody<T extends z.ZodType>(
-  request: Request,
+  request: AstroRequest,
   schema: T,
 ): Promise<[z.infer<T> | null, ValidationErrorDetails | null]> {
   try {

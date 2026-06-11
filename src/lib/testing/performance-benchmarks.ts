@@ -472,7 +472,7 @@ export class PerformanceBenchmarkRunner {
 }
 
 // CLI runner for standalone execution
-if (require.main === module) {
+if ((require as NodeRequire).main === module) {
   const runner = new PerformanceBenchmarkRunner()
 
   console.log('🚀 Starting Bias Analysis API Performance Benchmarks...\n')

@@ -147,7 +147,7 @@ describe('Enhanced Monitoring Service', () => {
       // Implementation doesn't handle undefined config gracefully in constructor currently?
       // "this.config = config".
       // I need to update implementation to default config.
-      expect(defaultService.config).toEqual(
+      expect((defaultService as any).config).toEqual(
         expect.objectContaining({
           enabled: true,
           alertThresholds: {
@@ -196,7 +196,7 @@ describe('Enhanced Monitoring Service', () => {
         mockOrchestrator,
         mockAIService,
       )
-      expect(customService.config).toEqual(
+      expect((customService as any).config).toEqual(
         expect.objectContaining(customConfig),
       )
     })
@@ -627,14 +627,6 @@ describe('Enhanced Monitoring Service', () => {
           cacheHitRate: 0.85,
         },
       }
-
-      mockRedis.hGetAll = vi
-        .fn<() => Promise<Record<string, string>>>()
-        .mockResolvedValue({
-          ...performanceMetrics.system,
-          ...performanceMetrics.application,
-          ...performanceMetrics.database,
-        })
       // The utils parsing code expects string values for numeric properties (from redis),
       // we need to make sure the mock returns strings if the implementation parses them.
       // metrics-utils.ts: parseFloat(metricsData.cpu || '0')
@@ -911,7 +903,7 @@ describe('Enhanced Monitoring Service', () => {
       mockRedis.set.mockResolvedValue('OK')
 
       const alerts = Array.from({ length: 10 }, async (_, i) =>
-        service.createAlert({ ...alertData, title: `Alert ${i}` }),
+        service.createAlert({ ...alertData, title: `Alert ${i}` } as any),
       )
 
       const results = await Promise.all(alerts)
@@ -1058,7 +1050,7 @@ describe('Enhanced Monitoring Service', () => {
 
       expect(alert).toBeDefined()
       expect(alert.severity).toBe('high')
-      expect(alert.metadata['insightType']).toBe('threshold')
+      expect(alert.metadata?.['insightType']).toBe('threshold')
     })
   })
 })

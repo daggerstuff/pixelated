@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const monitoringEnvSchema = z.object({
   // Sentry
-  SENTRY_DSN: z.string().url().optional(),
+  SENTRY_DSN: z.url().optional(),
 
   // Axiom
   AXIOM_DATASET: z.string().optional(),

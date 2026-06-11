@@ -12,7 +12,7 @@ import {
   validatePath,
 } from '@/utils/path-security'
 
-const logger = getLogger('secrets-manager')
+const logger = getLogger('secrets-manager' as any)
 
 // Security configuration
 const SECURITY_CONFIG = {

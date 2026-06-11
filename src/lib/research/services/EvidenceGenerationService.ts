@@ -38,6 +38,9 @@ export interface EvidenceRequest {
 export class EvidenceGenerationService {
   private readonly config: EvidenceConfig
 
+  private patternService: PatternDiscoveryService | null = null
+  private queryEngine: ResearchQueryEngine | null = null
+
   constructor(
     config: EvidenceConfig = {
       significanceLevel: 0.05,
@@ -46,12 +49,12 @@ export class EvidenceGenerationService {
       confidenceLevel: 0.95,
       maxHypotheses: 10,
     },
-    patternService: PatternDiscoveryService,
-    queryEngine: ResearchQueryEngine,
+    patternService?: PatternDiscoveryService,
+    queryEngine?: ResearchQueryEngine,
   ) {
     this.config = config
-    this.patternService = patternService
-    this.queryEngine = queryEngine
+    if (patternService) this.patternService = patternService
+    if (queryEngine) this.queryEngine = queryEngine
   }
 
   /**

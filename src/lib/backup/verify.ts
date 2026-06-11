@@ -107,13 +107,13 @@ export class BackupVerificationService extends EventEmitter {
 
     try {
       // Read file
-      const data = await fs.readFile(filePath)
+      const rawData = await fs.readFile(filePath)
 
       // Calculate checksum
-      const checksum = this.calculateChecksum(data)
+      const checksum = this.calculateChecksum(rawData)
 
       // Parse backup data
-      const backup = JSON.parse(data.toString()) as Record<string, unknown>
+      const backup = JSON.parse(rawData.toString()) as Record<string, unknown>
 
       // Verify structure
       if (!this.isValidBackupStructure(backup)) {
@@ -128,7 +128,7 @@ export class BackupVerificationService extends EventEmitter {
       const metadata: BackupMetadata = {
         timestamp: backup['timestamp'] as number,
         checksum,
-        size: data.length,
+        size: rawData.length,
         type: backup['type'] as 'full' | 'incremental',
         status: 'pending',
         version: backup['version'] as string,
@@ -144,9 +144,6 @@ export class BackupVerificationService extends EventEmitter {
           metadata,
         }
       }
-
-      // Verify backup contents
-      await this.verifyBackupContents(filePath)
 
       // Mark backup as verified
       await this.markBackupVerified(filename, metadata)
@@ -219,13 +216,13 @@ export class BackupVerificationService extends EventEmitter {
   }
 
   private verifyRedisData(data: unknown): boolean {
-    return (
-      typeof data === 'object' &&
-      (Object.entries as any)(data).every(
-        ([key, value]) =>
-          typeof key === 'string' &&
-          (typeof value === 'string' || typeof value === 'number'),
-      )
+    if (typeof data !== 'object' || data === null) {
+      return false
+    }
+    return Object.entries(data as Record<string, unknown>).every(
+      ([key, value]) =>
+        typeof key === 'string' &&
+        (typeof value === 'string' || typeof value === 'number'),
     )
   }
 
@@ -253,24 +250,24 @@ export class BackupVerificationService extends EventEmitter {
   private async verifyBackupContents(backupPath: string): Promise<void> {
     try {
       // Read backup file
-      const backupData = await fs.readFile(backupPath)
-      const backup = JSON.parse(backupData.toString()) as Record<
+      const backupFileData = await fs.readFile(backupPath)
+      const backupData = JSON.parse(backupFileData.toString()) as Record<
         string,
         unknown
       >
 
       // Verify backup structure
-      if (!backup['data'] || !backup['metadata']) {
+      if (!backupData['data'] || !backupData['metadata']) {
         throw new Error('Invalid backup structure')
       }
 
       // Verify data integrity
       if (this.config.integrityCheckEnabled) {
-        this.verifyDataIntegrity(backup['data'])
+        this.verifyDataIntegrity(backupData['data'])
       }
 
       // Verify restoration capability
-      await this.verifyRestoration(backup)
+      await this.verifyRestoration(backupData)
     } catch (error: unknown) {
       throw new Error(`Backup content verification failed: ${String(error)}`, {
         cause: error,

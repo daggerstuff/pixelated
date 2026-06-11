@@ -3,21 +3,22 @@
  * Supports PostgreSQL with connection pooling and migration management
  */
 
+import { readdir, readFile } from 'node:fs/promises'
+import path from 'node:path'
+
 import { createHash } from 'crypto'
-import { readdir, readFile } from 'fs/promises'
-import path from 'path'
 
 import { Pool, PoolClient } from 'pg'
 
 // pg does not export these types; define locally
-export interface DbQueryResult<T = Record<string, unknown>> {
+export type QueryResultRow = Record<string, any>
+export interface DbQueryResult<T = QueryResultRow> {
   rows: T[]
   rowCount: number
   command?: string
   oid?: number
   fields?: Array<{ name: string; dataTypeID: number }>
 }
-type QueryResultRow = Record<string, unknown>
 
 // Pool's runtime properties not exposed in pg type definitions.
 // Accessed via `as unknown as T` — safer than `as any` because it requires

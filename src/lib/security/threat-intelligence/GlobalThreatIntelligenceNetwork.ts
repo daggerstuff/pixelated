@@ -211,27 +211,18 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis['duplicate']()
+      const subscriber = (this.redis['duplicate'] as () => Redis)()
       await subscriber.connect()
 
       // Subscribe to global threat intelligence channel
-      await subscriber.subscribe('threat-intelligence-global', (message) => {
-        void this.handleIncomingThreat(message)
-      })
+      await subscriber.subscribe('threat-intelligence-global')
 
       // Subscribe to regional channels
       for (const region of this.config.regions) {
-        await subscriber.subscribe(
-          `threat-intelligence-${region}`,
-          (message) => {
-            if (region !== this.region) {
-              void this.handleIncomingThreat(message)
-            }
-          },
-        )
+        await subscriber.subscribe(`threat-intelligence-${region}`)
       }
 
-      subscriber.on('message', (channel: string, message: string) => {
+      ;(subscriber as any).on('message', (channel: string, message: string) => {
         if (channel === 'threat-intelligence-global') {
           void this.handleIncomingThreat(message)
         } else if (channel.startsWith('threat-intelligence-')) {
@@ -570,7 +561,11 @@ export class GlobalThreatIntelligenceNetwork extends EventEmitter {
   ): Promise<ThreatIntelligence> {
     try {
       if (threat.data?.['encrypted']) {
-        const decryptedData = await decrypt(threat.data['encrypted'])
+        const encryptedData = (
+          threat.data as Record<string, string | undefined>
+        )?.['encrypted']
+        if (!encryptedData) throw new Error('Missing encrypted data')
+        const decryptedData = (await decrypt(encryptedData)) as string
         return JSON.parse(decryptedData)
       }
       return threat

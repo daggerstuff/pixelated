@@ -33,7 +33,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
     try {
       // Call auth service to verify token and set new password
       const response = await authClient.resetPassword.send({
-        newPassword: password,
+        password,
         token,
       })
 

@@ -39,7 +39,7 @@ const mockProgressMetrics = {
   datasetsEvaluated: 5,
   datasetsAcquired: 2,
   integrationPlansCreated: 1,
-  lastUpdated: '2024-01-01T00:00:00Z',
+  lastUpdated: new Date('2024-01-01T00:00:00Z'),
 }
 
 const createWrapper = () => {

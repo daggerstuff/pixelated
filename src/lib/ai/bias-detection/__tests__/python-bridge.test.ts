@@ -681,7 +681,7 @@ describe('analysis methods', () => {
     })
 
     it('should handle connection pool dispose error gracefully', async () => {
-      const errorPool = {
+      const errorPool: any = {
         ...mockPool,
         dispose: vi.fn().mockRejectedValue(new Error('Pool cleanup failed')),
       }
@@ -696,7 +696,7 @@ describe('analysis methods', () => {
     })
 
     it('should release connection in finally block when request fails', async () => {
-      const failPool = {
+      const failPool: any = {
         acquireConnection: vi.fn().mockResolvedValue({ id: 'fail-conn' }),
         releaseConnection: vi.fn(),
       }
@@ -727,7 +727,7 @@ describe('analysis methods', () => {
     })
 
     it('should handle pool without releaseConnection method', async () => {
-      const partialPool = {
+      const partialPool: any = {
         acquireConnection: vi.fn().mockResolvedValue({ id: 'partial-conn' }),
         // No releaseConnection method
       }
@@ -754,7 +754,7 @@ describe('analysis methods', () => {
     })
 
     it('should release pooled connection on retry exhaustion', async () => {
-      const retryPool = {
+      const retryPool: any = {
         acquireConnection: vi.fn().mockResolvedValue({ id: 'retry-conn' }),
         releaseConnection: vi.fn(),
       }

@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validationResult = createExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
-      const { fieldErrors } = validationResult.error.flatten()
+      const { fieldErrors } = z.flattenError(validationResult.error)
       logger.warn('Invalid export request data', {
         errors: fieldErrors,
         userId: currentUser.id,
