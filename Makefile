@@ -73,7 +73,8 @@ docker-logs: ## Tail database container logs
 setup: ## One-command local setup
 	./scripts/setup-dev.sh
 
-install: ## Install all dependencies
+install: ## Install all dependencies (submodules, JS, Python)
+	bash scripts/devops/init-submodules.sh
 	pnpm install && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────

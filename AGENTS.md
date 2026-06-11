@@ -6,7 +6,7 @@
 Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeScript) for the frontend/SSR, and Express/FastAPI/Flask backend services.
 
 ### Runtime Versions
-- **Node.js**: 24.14.1 (see `.nvmrc`)
+- **Node.js**: 24.16.0 (see `.nvmrc`)
 - **pnpm**: 11.3.0 (see `package.json`)
 - **Python**: 3.13 (see `.python-version`)
 - **uv**: Python package and environment manager (always prefer `uv run` for execution)
@@ -26,6 +26,7 @@ pnpm vitest run -c config/vitest.config.ts
 ```
 
 ### Key Commands
+- **Submodules**: `bash scripts/devops/init-submodules.sh` (init + sync + update; run after clone/pull)
 - **Lint**: `pnpm lint` (oxlint; pre-existing warnings expected)
 - **Typecheck**: `pnpm typecheck`
 - **Tests**: `pnpm vitest run -c config/vitest.config.ts`
@@ -102,7 +103,7 @@ Before substantial work, execute the continuity handshake:
 ### Node.js PATH
 Cloud VMs ship `/exec-daemon/node` (v22) ahead of nvm on `PATH`. Prepend Node 24 before running pnpm scripts:
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.14.1/bin:$PATH"
+export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
 ```
 (`~/.bashrc` in this environment is configured to do this in interactive shells.)
 
@@ -134,6 +135,13 @@ DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
   pnpm exec playwright test tests/e2e/infrastructure/ssr-functionality.spec.ts \
   --config=config/playwright.config.ts --project=chromium
 ```
+
+### Submodules
+After clone or when `.gitmodules` changes, initialize and update submodules before `pnpm install`:
+```bash
+bash scripts/devops/init-submodules.sh
+```
+Requires network access and `GITHUB_TOKEN`/`GITHUB_PAT` for private submodule repos when applicable.
 
 ### Long-running dev server
 Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.

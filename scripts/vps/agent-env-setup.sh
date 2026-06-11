@@ -6,7 +6,7 @@
 # (such as Claude Code, Aider, Goose, OpenCode, or CI/CD runner environments).
 #
 # Runtimes installed:
-#   - Node.js (24.14.1) & pnpm (11.3.0) & Bun (latest)
+#   - Node.js (24.16.0) & pnpm (11.3.0) & Bun (latest)
 #   - Python (3.13) & uv (latest)
 #   - Docker containers: MongoDB (6), Redis (7), PostgreSQL (15)
 #   - Foresight MCP Server (synced and registered)
@@ -144,12 +144,12 @@ install_node_stack() {
         sudo -u "$REAL_USER" bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
     fi
 
-    # Load NVM and install Node.js 24.14.1 (matching .nvmrc)
+    # Load NVM and install Node.js 24.16.0 (matching .nvmrc)
     sudo -u "$REAL_USER" bash -c "
         export NVM_DIR=\"\$HOME/.nvm\"
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-        nvm install 24.14.1
-        nvm alias default 24.14.1
+        nvm install 24.16.0
+        nvm alias default 24.16.0
     "
 
     # Install pnpm 11.3.0 globally
@@ -410,7 +410,7 @@ main() {
     echo -e "${GREEN}🎉 AI AGENT CLOUD ENVIRONMENT PROVISIONED SUCCESSFULLY! 🎉${NC}"
     echo -e "=========================================================================="
     echo -e "\n${CYAN}Installed Runtimes:${NC}"
-    echo -e "  - Node:     Node.js 24.14.1 (pnpm 11.3.0)"
+    echo -e "  - Node:     Node.js 24.16.0 (pnpm 11.3.0)"
     echo -e "  - Python:   Python 3.13 (uv manager)"
     echo -e "  - Docker:   MongoDB, Redis, PostgreSQL running"
     echo -e "  - Memory:   Foresight MCP initialized"

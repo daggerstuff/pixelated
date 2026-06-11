@@ -3,7 +3,7 @@
 # Cursor Web & Cloud VM Environment Setup Script - Pixelated Empathy
 #
 # This script provisions a clean Ubuntu 22.04 / 24.04 Cloud VM for remote development,
-# installs all required runtimes (Node 24.14.1, pnpm 11.3.0, python 3.13, uv),
+# installs all required runtimes (Node 24.16.0, pnpm 11.3.0, python 3.13, uv),
 # boots up the required database containers (Mongo, Redis, Postgres),
 # installs the Cursor CLI Tunnel daemon, and sets up a systemd service for persistent access.
 #
@@ -142,13 +142,13 @@ install_node_stack() {
         sudo -u "$REAL_USER" bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash"
     fi
 
-    # Load NVM and install Node.js 24.14.1 (matching .nvmrc)
-    log_info "Installing Node.js 24.14.1..."
+    # Load NVM and install Node.js 24.16.0 (matching .nvmrc)
+    log_info "Installing Node.js 24.16.0..."
     sudo -u "$REAL_USER" bash -c "
         export NVM_DIR=\"\$HOME/.nvm\"
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
-        nvm install 24.14.1
-        nvm alias default 24.14.1
+        nvm install 24.16.0
+        nvm alias default 24.16.0
     "
 
     # Install pnpm 11.3.0 globally
@@ -301,7 +301,7 @@ WorkingDirectory=/home/$REAL_USER
 ExecStart=/usr/local/bin/cursor tunnel --accept-server-license-terms
 Restart=always
 RestartSec=10
-Environment=PATH=/home/$REAL_USER/.local/bin:/home/$REAL_USER/.nvm/versions/node/v24.14.1/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PATH=/home/$REAL_USER/.local/bin:/home/$REAL_USER/.nvm/versions/node/v24.16.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 Environment=HOME=/home/$REAL_USER
 
 [Install]

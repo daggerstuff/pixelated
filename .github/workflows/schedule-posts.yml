@@ -11,7 +11,7 @@ permissions:
 # Environment variables can be defined here
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  NODE_VERSION: 24.14.1
+  NODE_VERSION: 24.16.0
   PNPM_VERSION: 11.5.2
   NODE_ENV: production
 
