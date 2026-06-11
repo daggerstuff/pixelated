@@ -1,6 +1,11 @@
 // @vitest-environment node
 
-import express from 'express'
+import express, {
+  type ErrorRequestHandler,
+  type NextFunction,
+  type Request,
+  type Response,
+} from 'express'
 import request from 'supertest'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -55,18 +60,25 @@ describe('Sentry Express registration', () => {
     })
 
     registerSentryExpressErrorHandler(app, {
-      expressErrorHandler: () => (error, _req, _res, next) => {
-        capturedErrors.push(error instanceof Error ? error.message : 'unknown')
-        next(error)
+      expressErrorHandler:
+        (): ErrorRequestHandler => (error, _req, _res, next) => {
+          capturedErrors.push(
+            error instanceof Error ? error.message : 'unknown',
+          )
+          next(error)
+        },
+    })
+
+    app.use(
+      (error: Error, _req: Request, res: Response, _next: NextFunction) => {
+        res.status(500).json({ error: error.message })
       },
-    })
+    )
 
-    app.use((error: Error, _req, res, _next) => {
-      res.status(500).json({ error: error.message })
-    })
+    const response = await request(app).get('/boom')
 
-    await request(app).get('/boom').expect(500, { error: 'route exploded' })
-
+    expect(response.status).toBe(500)
+    expect(response.body).toEqual({ error: 'route exploded' })
     expect(capturedErrors).toEqual(['route exploded'])
   })
 
