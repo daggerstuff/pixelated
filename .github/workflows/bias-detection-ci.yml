@@ -129,7 +129,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies for CodeQL
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Build for CodeQL
         run: pnpm build
@@ -184,7 +184,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Run ESLint and markdown lint
         continue-on-error: true
@@ -197,8 +197,7 @@ jobs:
       - name: Check formatting
         continue-on-error: true
         env:
-          PR_BASE_SHA:
-            ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -212,8 +211,7 @@ jobs:
     name: TypeScript Tests
     runs-on: ubuntu-latest
     needs: [security-scan, code-quality]
-    if:
-      ${{ needs.security-scan.result == 'success' && needs.code-quality.result
+    if: ${{ needs.security-scan.result == 'success' && needs.code-quality.result
       == 'success' }}
     services:
       postgres:
@@ -276,7 +274,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Setup test environment
         run: |
@@ -393,8 +391,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.cache/pip
-          key:
-            ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
+          key: ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-${{
             hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-${{ env.PYTHON_VERSION }}-
@@ -513,7 +510,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Setup Python for ML service
         uses: actions/setup-python@v6.2.0
