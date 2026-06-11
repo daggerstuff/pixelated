@@ -33,9 +33,9 @@ const updateExportSchema = z.object({
   notes: z.string().optional(),
   completionDetails: z
     .object({
-      downloadUrl: z.string().url().optional(),
+      downloadUrl: z.url().optional(),
       expiresAt: z.string().optional(),
-      encryptionKeyUrl: z.string().url().optional(),
+      encryptionKeyUrl: z.url().optional(),
       fileSize: z.number().optional(),
       fileChecksum: z.string().optional(),
     })

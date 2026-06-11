@@ -41,6 +41,7 @@
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
     "lint:ci": "node scripts/ci/lint-changed.mjs",
     "lint:ci:all": "oxlint -c .oxlintrc.json .",
+    "lint:zod": "node scripts/ci/check-zod-deprecations.mjs",
     "lint:ci:with-markdown": "pnpm lint:ci && pnpm lint:markdown:ci",
     "lint:ci:type-aware": "node scripts/ci/lint-changed.mjs --type-aware",
     "lint:ci:type-aware:all": "pnpm exec oxlint --type-aware -c .oxlintrc.json .",
