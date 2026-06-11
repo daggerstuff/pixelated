@@ -33,8 +33,8 @@ get_changed_files() {
   local staged
   staged=$(git diff --name-only --cached HEAD 2>/dev/null || true)
   
-  # Combine and deduplicate - match file extension properly
-  echo -e "$files\n$staged" | grep -E "\.($pattern)$" | sort -u | grep -v "^$" || true
+  # Combine and deduplicate - match file extension properly, excluding generated playwright reports and test results
+  echo -e "$files\n$staged" | grep -E "\.($pattern)$" | grep -vE "^(config/playwright-report/|config/test-results/)" | sort -u | grep -v "^$" || true
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────

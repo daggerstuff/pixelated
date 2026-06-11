@@ -42,7 +42,7 @@ export class StreamingHandler implements IStreamingHandler {
   public async processStream(
     request: UnifiedProcessingRequest,
     onChunk: (chunk: UnifiedProcessingResponse) => void,
-    onError: (error: Error) => void,
+    _onError?: (error: Error) => void,
   ): Promise<void> {
     try {
       // In a real-world scenario, you would get a stream from the API.
@@ -74,7 +74,9 @@ export class StreamingHandler implements IStreamingHandler {
         onChunk(chunkResponse)
       }
     } catch (error: unknown) {
-      onError(error as Error)
+      if (_onError) {
+        _onError(error as Error)
+      }
     }
   }
 }

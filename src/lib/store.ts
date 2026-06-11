@@ -233,7 +233,7 @@ export const useStore = create<StoreState>()(
   devtools(
     subscribeWithSelector(
       persist(
-        (set, get) =>
+        (set, get): StoreState =>
           ({
             // Original state
             securityLevel: 'hipaa',
@@ -364,13 +364,10 @@ export const useStore = create<StoreState>()(
                   filters: { ...state.uiState.filters, ...filters },
                 },
               })),
-            setSortBy: (sortBy, sortOrder = 'desc') =>
-              set(
-                (state) =>
-                  ({
-                    uiState: { ...state.uiState, sortBy, sortOrder },
-                  }) as any,
-              ),
+            setSortBy: (sortBy, sortOrder: UIState['sortOrder'] = 'desc') =>
+              set((state): Partial<StoreState> => ({
+                uiState: { ...state.uiState, sortBy, sortOrder },
+              })),
 
             // Enhanced actions - Session State
             updateSessionState: (sessionState) =>

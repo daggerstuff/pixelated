@@ -261,12 +261,10 @@ class ModelOptimizer {
     for (const [metric, improvement] of Object.entries(improvements)) {
       if (typeof improvement !== "number") continue;
       const key = metric as keyof ModelMetrics;
+      if (key === 'timestamp') continue; // Skip Date-typed fields
       const currentVal = optimizedMetrics[key];
       if (typeof currentVal === "number") {
-        optimizedMetrics = {
-          ...optimizedMetrics,
-          [key]: currentVal * (1 + improvement),
-        };
+        (optimizedMetrics as unknown as Record<string, number>)[key] = currentVal * (1 + improvement);
       }
     }
 
@@ -284,11 +282,12 @@ class ModelOptimizer {
     return result;
   }
 
-  private calculateExpectedImprovements(strategy: OptimizationStrategy): Partial<ModelMetrics> {
-    const improvements: Partial<ModelMetrics> = {};
+  private calculateExpectedImprovements(strategy: OptimizationStrategy): Record<string, number> {
+    const improvements: Record<string, number> = {};
 
     Object.keys(strategy.expectedImprovement).forEach((metric) => {
       const key = metric as keyof ModelMetrics;
+      if (key === 'timestamp') return; // Skip Date-typed fields
       const expectedChange = strategy.expectedImprovement[key];
       if (expectedChange === undefined) return;
 
@@ -422,6 +421,10 @@ class ModelOptimizer {
           inferenceTime: "stable",
           memoryUsage: "stable",
           privacyScore: "stable",
+          timestamp: "stable",
+          auc: "stable",
+          loss: "stable",
+          epoch: "stable",
         },
         totalImprovements: {},
       };
@@ -435,21 +438,30 @@ class ModelOptimizer {
       inferenceTime: "stable",
       memoryUsage: "stable",
       privacyScore: "stable",
+      timestamp: "stable",
+      auc: "stable",
+      loss: "stable",
+      epoch: "stable",
     };
 
     const totalImprovements: Partial<ModelMetrics> = {};
 
     // Calculate trends for each metric
-    Object.keys(trends).forEach((metric) => {
-      const key = metric as keyof ModelMetrics;
-      const values = this.optimizationHistory.map((h) => h.improvements[key] ?? 0);
+    const numericKeys = Object.keys(trends).filter(
+      (k): k is keyof ModelMetrics => k !== 'timestamp',
+    )
+    numericKeys.forEach((key) => {
+      const values = this.optimizationHistory.map((h) => {
+        const val = h.improvements[key];
+        return typeof val === 'number' ? val : 0;
+      });
       const avgChange = values.reduce((sum, val) => sum + val, 0) / values.length;
 
       if (avgChange > 0.01) trends[key] = "improving";
       else if (avgChange < -0.01) trends[key] = "declining";
       else trends[key] = "stable";
 
-      totalImprovements[key] = values.reduce((sum, val) => sum + val, 0);
+      (totalImprovements as Record<string, number | undefined>)[key] = values.reduce((sum, val) => sum + val, 0);
     });
 
     return {

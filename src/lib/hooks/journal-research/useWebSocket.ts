@@ -103,7 +103,7 @@ export interface UseJournalResearchWebSocketReturn {
   connectionState: WebSocketConnectionState
   isConnected: boolean
   reconnectAttempts: number
-  send: (data: string | ArrayBufferLike | Blob | ArrayBufferView) => void
+  send: (data: string | ArrayBuffer | Blob | ArrayBufferView) => void
   close: () => void
   reconnect: () => void
 }
@@ -251,7 +251,7 @@ export const useJournalResearchWebSocket = ({
   }, [enabled, sessionId, connect])
 
   const send = useCallback(
-    (data: string | ArrayBufferLike | Blob | ArrayBufferView) => {
+    (data: string | ArrayBuffer | Blob | ArrayBufferView) => {
       if (data instanceof Blob) {
         const blobUnsupportedError = new Error(
           'Blob payloads are not supported',
@@ -275,6 +275,7 @@ export const useJournalResearchWebSocket = ({
             data.byteOffset + data.byteLength,
           )
         }
+        // SharedArrayBuffer is not supported
         return new TextEncoder().encode(String(data)).buffer
       })()
 

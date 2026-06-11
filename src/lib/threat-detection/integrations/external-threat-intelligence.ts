@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
 import axios, { AxiosInstance } from 'axios'
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { MongoClient, type Db } from 'mongodb'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'

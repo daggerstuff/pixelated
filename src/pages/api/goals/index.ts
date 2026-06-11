@@ -29,8 +29,8 @@ const progressSnapshotSchema = z.object({
 export const goalSchema = z.object({
   title: z.string().min(1).max(128),
   description: z.string().max(1024),
-  category: z.nativeEnum(GoalCategory),
-  status: z.nativeEnum(GoalStatus),
+  category: z.enum(GoalCategory),
+  status: z.enum(GoalStatus),
   targetDate: z.number().optional(),
   progress: z.number().min(0).max(100),
   checkpoints: z.array(checkpointSchema),
