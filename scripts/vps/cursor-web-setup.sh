@@ -322,7 +322,8 @@ run_workspace_checks() {
         [ -s \"\$NVM_DIR/nvm.sh\" ] && \. \"\$NVM_DIR/nvm.sh\"
         export PATH=\"\$HOME/.local/bin:\$PATH\"
         cd \"$WORKSPACE_DIR\"
-        pnpm install --no-frozen-lockfile
+        chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        scripts/devops/pnpm-install-with-fallback.sh
     "
     log_success "Workspace dependencies successfully installed"
 }

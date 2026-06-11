@@ -47,14 +47,14 @@ export function errorResponse(
   message: string,
   details?: unknown,
 ): Response {
-  const response: any = {
+  const response: Record<string, unknown> = {
     success: false,
     error,
     message,
   }
 
   if (details) {
-    response.details = details
+    response['details'] = details
   }
 
   return jsonResponse(response, status)
