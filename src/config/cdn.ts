@@ -2,13 +2,13 @@ import { z } from 'zod'
 
 export const cdnConfigSchema = z.object({
   // Base CDN URL
-  baseUrl: z.string().url(),
+  baseUrl: z.url(),
 
   // Edge locations configuration
   edgeLocations: z.array(
     z.object({
       region: z.string(),
-      url: z.string().url(),
+      url: z.url(),
       isEnabled: z.boolean(),
     }),
   ),
@@ -39,7 +39,7 @@ export const cdnConfigSchema = z.object({
     warmup: z.object({
       isEnabled: z.boolean(),
       // URLs to warm up after deployment
-      urls: z.array(z.string().url()),
+      urls: z.array(z.url()),
     }),
   }),
 

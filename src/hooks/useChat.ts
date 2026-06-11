@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import type { ChangeEvent, FormEvent } from 'react'
+import type { ChangeEvent } from 'react'
 
 import type { ChatOptions } from '@/types/chat'
 
@@ -17,7 +17,7 @@ export interface UseChatReturn {
   messages: LocalMessage[]
   input: string
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  handleSubmit: (e: React.FormEvent) => Promise<void>
+  handleSubmit: (e: React.SyntheticEvent) => Promise<void>
   isLoading: boolean
   setMessages: React.Dispatch<React.SetStateAction<LocalMessage[]>>
   sendMessage: (content: string) => Promise<string | undefined>
@@ -154,7 +154,7 @@ export function useChat(options: ChatOptions): UseChatReturn {
     }
   }
 
-  const handleSubmit = async (e: FormEvent): Promise<void> => {
+  const handleSubmit = async (e: React.SyntheticEvent): Promise<void> => {
     e.preventDefault()
     await sendMessage(input)
     setInput('')
