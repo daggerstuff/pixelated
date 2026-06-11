@@ -4,16 +4,16 @@
  */
 
 import { promisify } from 'util'
-import { gzip, ungzip } from 'zlib'
+import { gzip, unzip } from 'zlib'
 
 import { getLogger } from '@/lib/logging'
 
 import { createCacheInvalidation } from './invalidation'
 import { getCache } from './redis-cache'
 
-const logger = getLogger('advanced-cache')
+const logger = getLogger({ name: 'advanced-cache' } as any)
 const gzipAsync = promisify(gzip)
-const ungzipAsync = promisify(ungzip)
+const unzipAsync = promisify(unzip)
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -110,7 +110,7 @@ class CacheKeyGenerator {
  * Advanced caching strategy with multi-layer support
  */
 export class AdvancedCacheStrategy {
-  private readonly cache = getCache()
+  private readonly cache = getCache() as any
   private readonly keyGenerator = new CacheKeyGenerator()
   private readonly invalidation = createCacheInvalidation({
     redis: this.cache,
@@ -166,7 +166,7 @@ export class AdvancedCacheStrategy {
       ) {
         try {
           const compressed = Buffer.from(cachedData.substring(3), 'base64')
-          const decompressed = await ungzipAsync(compressed)
+          const decompressed = await unzipAsync(compressed)
           cachedData = JSON.parse(decompressed.toString())
         } catch (error: unknown) {
           logger.warn('Failed to decompress cached data', { key, error })

@@ -55,9 +55,9 @@ const rateLimitConfigs: RateLimitConfig[] = [
  */
 export class RateLimiter {
   private readonly storage: Map<string, number>
-  private readonly defaultLimit: number
-  private readonly windowMs: number
-  private readonly userLimits: Record<string, number>
+  private readonly defaultLimit!: number
+  private readonly windowMs!: number
+  private readonly userLimits!: Record<string, number>
 
   constructor(defaultLimit = 30) {
     this.storage = new Map<string, number>()

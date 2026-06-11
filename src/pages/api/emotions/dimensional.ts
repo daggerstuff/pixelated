@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro'
 
-import type { DimensionalEmotionMap } from '../../../lib/ai/emotions/dimensionalTypes'
+import type { DimensionalEmotion } from '../../../lib/ai/emotions/dimensionalTypes'
 import { protectApi } from '../../../lib/auth/apiAuth'
 import { getEmotionsRepository } from '../../../lib/repositories/emotionsRepository'
 import { getCacheService } from '../../../lib/services/cacheService'

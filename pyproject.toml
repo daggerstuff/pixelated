@@ -126,6 +126,8 @@ dependencies = [
   "undetected-chromedriver>=3.5.5",
   "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
+  "anthropic>=0.107.1",
+  "libcst>=1.8.6",
 ]
 [project.optional-dependencies]
 test = [
@@ -235,6 +237,8 @@ ignore = ["E501", "UP017", "PLR2004"]
 [tool.ruff.lint.per-file-ignores]
 "scripts/verify_stage2_persona_quality.py" = ["E402", "PLC0415"]
 "scripts/task_sync/sync_from_linear.py" = ["T201"]
+"scripts/categorize.py" = ["T201"]
+"scripts/categorize_errors.py" = ["T201"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
 "foresight-mcp/foresight_mcp/server.py" = ["PLR0911", "PLR0912", "PLR0913", "PLR0915"]

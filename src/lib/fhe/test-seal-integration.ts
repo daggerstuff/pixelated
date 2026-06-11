@@ -119,7 +119,7 @@ async function testSEALIntegration() {
 }
 
 // Run the test if this file is executed directly
-if (require.main === module) {
+if (typeof require !== 'undefined' && (require as any).main === module) {
   logger.info('Running SEAL integration test directly')
   testSEALIntegration()
     .then((success) => {
