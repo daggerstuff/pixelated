@@ -58,15 +58,21 @@ and copies `.env.example → .env` if needed.
 
 ### Manual setup
 
-```bash
-chmod +x pnpm install --no-frozen-lockfile
-pnpm install --no-frozen-lockfile
-```
-
-For environments with strict supply-chain policies that may cause ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION errors:
+Ensure prerequisites are installed and Docker is running before proceeding.
 
 ```bash
-PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+# 1. Start database containers (MongoDB, Redis, PostgreSQL)
+docker compose -f docker/docker-compose.db.yml up -d
+
+# 2. Copy and configure environment file
+cp .env.example .env
+
+# 3. Install JS dependencies
+chmod +x scripts/devops/pnpm-install-with-fallback.sh
+scripts/devops/pnpm-install-with-fallback.sh
+
+# 4. Install Python dependencies
+uv sync
 ```
 
 ---
@@ -167,7 +173,7 @@ docker ps --filter "name=mongo" --filter "name=postgres" --filter "name=redis"
 ### Module not found after pulling main
 
 ```bash
-pnpm install --no-frozen-lockfile    # rebuild native deps after dependency changes
+pnpm install    # rebuild native deps after dependency changes
 uv sync         # rebuild Python venv
 ```
 
@@ -176,7 +182,7 @@ uv sync         # rebuild Python venv
 ```bash
 pnpm typecheck
 # If stuck with stale cache:
-rm -rf node_modules/.vite .tsbuildinfo && pnpm install --no-frozen-lockfile
+rm -rf node_modules/.vite .tsbuildinfo && pnpm install
 ```
 
 ### Python tests failing with import errors

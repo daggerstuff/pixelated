@@ -48,7 +48,7 @@ export const mcpMemoryManager = {
 
   async getAllMemories(userId?: string): Promise<MemoryEntry[]> {
     requireUserId(userId)
-    const response = await api.list({ limit: 100, offset: 0 })
+    const response = await api.list({ limit: 100, offset: 0, tags: undefined })
     return response.data.map(toMemoryEntry)
   },
 
@@ -78,7 +78,7 @@ export const mcpMemoryManager = {
 
   async searchByCategory(category: string, userId?: string): Promise<MemoryEntry[]> {
     requireUserId(userId)
-    const response = await api.list({ category, limit: 100, offset: 0 })
+    const response = await api.list({ category, limit: 100, offset: 0, tags: undefined })
     return response.data.map(toMemoryEntry)
   },
 
