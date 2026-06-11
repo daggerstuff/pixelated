@@ -21,7 +21,7 @@ export function simpleMarkdownToHtml(text: string): string {
     .replace(CODE_REGEX, '<code>$1</code>')
     .replace(
       LINK_REGEX,
-      (match, textContent, url) =>
+      (_match, textContent, url) =>
         `<a href="${sanitizeUrl(url)}">${textContent}</a>`,
     )
 }

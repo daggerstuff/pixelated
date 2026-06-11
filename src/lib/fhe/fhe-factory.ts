@@ -152,10 +152,7 @@ const sealFHEService: FHEService = {
       // Deserialize the ciphertext string back to a SealCipherText object
       const seal = sealService.getSeal()
       const context = sealService.getContext()
-      const sealCipherText = seal.CipherText() as unknown as {
-        load: (ctx: unknown, s: string) => void
-        delete: () => void
-      }
+      const sealCipherText = seal.CipherText() as any
       sealCipherText.load(context, ciphertext as string)
 
       // Decrypt the SealCipherText object
@@ -195,16 +192,10 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText() as unknown as {
-        load: (ctx: unknown, s: string) => void
-        delete: () => void
-      }
+      const aCiphertext = seal.CipherText() as any
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText() as unknown as {
-        load: (ctx: unknown, s: string) => void
-        delete: () => void
-      }
+      const bCiphertext = seal.CipherText() as any
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.add(aCiphertext, bCiphertext)
@@ -252,16 +243,10 @@ const sealFHEService: FHEService = {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const aCiphertext = seal.CipherText() as unknown as {
-        load: (ctx: unknown, s: string) => void
-        delete: () => void
-      }
+      const aCiphertext = seal.CipherText() as any
       aCiphertext.load(context, aCiphertextStr as string)
 
-      const bCiphertext = seal.CipherText() as unknown as {
-        load: (ctx: unknown, s: string) => void
-        delete: () => void
-      }
+      const bCiphertext = seal.CipherText() as any
       bCiphertext.load(context, bCiphertextStr as string)
 
       const result = await sealOperations.subtract(aCiphertext, bCiphertext)

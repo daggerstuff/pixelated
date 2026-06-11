@@ -31,13 +31,13 @@ vi.mock('@/lib/stores/journal-research', () => ({
 const mockAcquisition = {
   acquisitionId: 'acq-1',
   sessionId: 'session-1',
-  evaluationId: 'eval-1',
   sourceId: 'source-1',
   status: 'completed' as const,
   downloadUrl: 'https://example.com/data.zip',
-  downloadedAt: '2024-01-01T00:00:00Z',
-  fileSize: 1024000,
-  errorMessage: null,
+  downloadProgress: null,
+  filePath: null,
+  fileSizeMb: null,
+  acquiredDate: new Date('2024-01-01T00:00:00Z'),
 }
 
 const mockAcquisitionList = {
@@ -82,15 +82,13 @@ describe('useAcquisition hooks', () => {
       expandRow: vi.fn<(id: string) => void>(),
       collapseRow: vi.fn<(id: string) => void>(),
     }
-    useAcquisitionStore.mockImplementation(
-      (selector?: (state: typeof storeState) => unknown) =>
-        typeof selector === 'function' ? selector(storeState) : storeState,
-    )
-    ;(
-      useAcquisitionStore as typeof useAcquisitionStore & {
-        getState?: () => typeof storeState
-      }
-    ).getState = () => storeState
+    vi.mocked(useAcquisitionStore).mockImplementation(((
+      selector?: (state: typeof storeState) => unknown,
+    ) =>
+      typeof selector === 'function'
+        ? selector(storeState)
+        : storeState) as any)
+    ;(useAcquisitionStore as any).getState = () => storeState
   })
 
   describe('useAcquisitionListQuery', () => {
@@ -124,17 +122,13 @@ describe('useAcquisition hooks', () => {
           showDownloadFailuresOnly: false,
         },
       }
-      useAcquisitionStore.mockImplementation(
-        (selector?: (state: typeof filteredStoreState) => unknown) =>
-          typeof selector === 'function'
-            ? selector(filteredStoreState)
-            : filteredStoreState,
-      )
-      ;(
-        useAcquisitionStore as typeof useAcquisitionStore & {
-          getState?: () => typeof filteredStoreState
-        }
-      ).getState = () => filteredStoreState
+      vi.mocked(useAcquisitionStore).mockImplementation(((
+        selector?: (state: typeof filteredStoreState) => unknown,
+      ) =>
+        typeof selector === 'function'
+          ? selector(filteredStoreState)
+          : filteredStoreState) as any)
+      ;(useAcquisitionStore as any).getState = () => filteredStoreState
 
       const { result } = renderHook(
         () => useAcquisitionListQuery('session-1'),
@@ -230,13 +224,7 @@ describe('useAcquisition hooks', () => {
       vi.mocked(api.initiateAcquisition).mockResolvedValue(mockAcquisition)
       const setSelectedAcquisitionId = vi.fn<(id: string) => void>()
 
-      ;(
-        useAcquisitionStore as typeof useAcquisitionStore & {
-          getState?: () => {
-            setSelectedAcquisitionId: typeof setSelectedAcquisitionId
-          }
-        }
-      ).getState = () => ({
+      ;(useAcquisitionStore as any).getState = () => ({
         setSelectedAcquisitionId,
       })
 
@@ -248,7 +236,7 @@ describe('useAcquisition hooks', () => {
       )
 
       const payload = {
-        evaluationIds: ['eval-1'],
+        sourceIds: ['source-1'],
       }
 
       result.current.mutate(payload)
@@ -273,7 +261,7 @@ describe('useAcquisition hooks', () => {
       )
 
       result.current.mutate({
-        evaluationIds: ['eval-1'],
+        sourceIds: ['source-1'],
       })
 
       await waitFor(() => {
@@ -352,7 +340,7 @@ describe('useAcquisition hooks', () => {
         collapseRow: vi.fn<(id: string) => void>(),
       }
 
-      useAcquisitionStore.mockReturnValue(mockState)
+      vi.mocked(useAcquisitionStore).mockReturnValue(mockState)
 
       const { result } = renderHook(() => useAcquisitionSelection())
 

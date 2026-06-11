@@ -54,7 +54,7 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           error: 'Invalid request',
-          details: validated.error.format(),
+          details: z.formatError(validated.error),
         }),
         { status: 400 },
       )
