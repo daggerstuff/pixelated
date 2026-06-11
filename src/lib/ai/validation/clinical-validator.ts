@@ -166,7 +166,7 @@ export class ClinicalValidator {
 
     // Check if crisis intervention is recommended when needed
     if (
-      crisisLevel >= 4 &&
+      this.crisisLevelToNumber(crisisLevel) >= 4 &&
       !recommendations.some((r) => r.toLowerCase().includes('crisis'))
     ) {
       return {
@@ -206,7 +206,7 @@ export class ClinicalValidator {
     const missedRiskFactors: string[] = []
 
     // Analyze actual outcome vs predicted
-    if (actualOutcome.toLowerCase().includes('crisis') && assessedLevel < 4) {
+    if (actualOutcome.toLowerCase().includes('crisis') && this.crisisLevelToNumber(assessedLevel) < 4) {
       missedRiskFactors.push('Crisis escalation')
     }
 
@@ -265,6 +265,11 @@ export class ClinicalValidator {
   /**
    * Assess crisis level
    */
+  private crisisLevelToNumber(level: 'low' | 'medium' | 'high' | 'critical'): number {
+    const map: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 }
+    return map[level] ?? 0
+  }
+
   private assessCrisisLevel(
     context: SessionContext,
   ): 'low' | 'medium' | 'high' | 'critical' {

@@ -156,9 +156,7 @@ export type PostSchema = z.infer<typeof postSchema>
 /* Projects */
 const projectSchema = z.object({
   id: z.string().describe('**Required**. Name of the project to be displayed.'),
-  link: z
-    .string()
-    .url('Invalid url.')
+  link: z.url('Invalid url.')
     .describe('**Required**. URL linking to the project page or repository.'),
   desc: z
     .string()
@@ -196,10 +194,8 @@ const streamSchema = z.object({
     .describe(
       '**Required**. Specifies the publication date. See supported formats [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse#examples).',
     ),
-  link: z
-    .string()
-    .url('Invalid url.')
-    .describe('**Required**. Specifies the URL link to the stream.'),
+    link: z.url('Invalid url.')
+      .describe('**Required**. Specifies the URL link to the stream.'),
   radio: z
     .boolean()
     .default(false)
@@ -227,7 +223,7 @@ export const streamsSchema = z.object({
 /* Releases */
 const releaseSchema = z.object({
   id: z.string(),
-  link: z.string().url(),
+  link: z.url(),
   desc: z.string(),
   icon: z.string().regex(/^i-[\w-]+(:?[\w-]+)?$/),
   publishedAt: z.string().optional(),
@@ -246,7 +242,7 @@ export type ReleasesSchema = z.infer<typeof releasesSchema>
 const prSchema = z.object({
   title: z.string(),
   number: z.number(),
-  url: z.string().url(),
+  url: z.url(),
   state: z.enum(['OPEN', 'CLOSED', 'MERGED']),
   isDraft: z.boolean(),
   createdAt: z.string(),
@@ -256,7 +252,7 @@ const prSchema = z.object({
     owner: z.object({
       login: z.string(),
     }),
-    url: z.string().url(),
+    url: z.url(),
     isInOrganization: z.boolean(),
   }),
   bodyHTML: z.string(),

@@ -7,11 +7,14 @@ export function isAstroProduction(): boolean {
     return import.meta.env.PROD
   }
 
-  const nodeEnv = process.env.NODE_ENV
+  const nodeEnv =
+    typeof process !== 'undefined' ? process.env?.['NODE_ENV'] : undefined
   if (nodeEnv === 'development' || nodeEnv === 'test') {
     return false
   }
 
-  // Preview and production SSR builds should filter drafts by default.
-  return true
+  // Only treat an explicit 'production' NODE_ENV as production. Unknown or
+  // absent values default to non-production so browser/non-Node runtimes and
+  // staging/preview instances are not falsely treated as production.
+  return nodeEnv === 'production'
 }

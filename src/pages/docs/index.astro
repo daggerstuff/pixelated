@@ -1,7 +1,6 @@
 ---
 import { getCollection } from 'astro:content'
 import BaseLayout from '@/layouts/BaseLayout.astro'
-import { isAstroProduction } from '@/utils/astro-env'
 
 // Define types for use in the template
 type DocPage = {
@@ -24,7 +23,7 @@ type DocPage = {
 
 // Get all docs and sort by order, then by date
 const docs = await getCollection('docs', ({ data }: DocPage) => {
-  return isAstroProduction() ? !data.draft : true
+  return import.meta.env.PROD ? !data.draft : true
 })
 
 const sortedDocs = docs.sort((a: DocPage, b: DocPage) => {

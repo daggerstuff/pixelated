@@ -21,8 +21,8 @@ export enum EventPriority {
 
 // Schema definitions
 export const EventDataSchema = z.object({
-  type: z.nativeEnum(EventType),
-  priority: z.nativeEnum(EventPriority).default(EventPriority.NORMAL),
+  type: z.enum(EventType),
+  priority: z.enum(EventPriority).default(EventPriority.NORMAL),
   userId: z.string().optional(),
   sessionId: z.string().optional(),
   timestamp: z.number().default(() => Date.now()),

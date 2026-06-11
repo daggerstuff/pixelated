@@ -728,7 +728,15 @@ function calculateConversationQuality(request: ConversationRequest): any {
   } as any
 }
 
-function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): void {
+function mapKnowledgeToDialogue(dialogue: DialogueEntry[]): Array<{
+  dialogueTurn: number
+  appliedKnowledge: Array<{
+    source: string
+    content: string
+    application: string
+    confidence: number
+  }>
+}> {
   return dialogue.map((turn, index) => {
     const ks = turn['knowledgeSource'] as {
       type: string

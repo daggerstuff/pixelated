@@ -883,7 +883,7 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       if (
         (threatData['confidence'] as number) > 0.8 ||
-        (pipelineResults['correlation'] as Record<string, unknown>)?.[
+        ((pipelineResults as Record<string, unknown>)['correlation'] as Record<string, unknown>)?.[
           'confidence'
         ] > 0.8
       ) {
