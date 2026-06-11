@@ -46,4 +46,3 @@ export type {
 
 // Stance Shift and SynthesisResult — upstreamed in PIX-3905
 export type { StanceShift, SynthesisResult } from '@pixelated/memory-schema';
-}
