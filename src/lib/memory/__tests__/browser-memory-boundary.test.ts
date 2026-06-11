@@ -5,7 +5,7 @@
  * PIX-1920: Browser-to-internal-memory-service boundary tests.
  *
  * These tests verify:
- * - mcp-memory-client.ts always uses relative /api/memory/* URLs
+ * - mcp-memory-client.ts always uses relative /api/v1/memory/* URLs
  * - useMemory.ts always delegates to mcpMemoryManager (never localMemoryManager)
  * - No NEXT_PUBLIC_* env vars or internal service URLs leak into browser code
  * - In-process MemoryService is not used in any production memory path
@@ -32,17 +32,13 @@ describe("mcpMemoryManager URL isolation", () => {
     expect(source).not.toMatch(/\bhttps?:\/\//);
   });
 
-  it("uses only relative /api/memory/ paths", async () => {
+  it("uses only relative /api/v1/memory paths via MemoryApiClient", async () => {
     const source = await import("fs").then((fs) =>
       fs.readFileSync(require.resolve("../mcp-memory-client.ts"), "utf8"),
     );
-    const fetchStringArgRe = /fetch\(\s*['"](\/[^'"]+)['"]/g;
-    const matches = source.match(fetchStringArgRe);
-    expect(matches).not.toBeNull();
-    for (const match of matches ?? []) {
-      const url = match.replace(/^fetch\(\s*['"]/, "");
-      expect(url).toMatch(/^\/api\/memory\//);
-    }
+    expect(source).toContain("DEFAULT_MEMORY_API_BASE_URL");
+    expect(source).toContain("/api/v1/memory");
+    expect(source).not.toMatch(/\bfetch\(\s*['"]\/api\/memory\//);
   });
 });
 
