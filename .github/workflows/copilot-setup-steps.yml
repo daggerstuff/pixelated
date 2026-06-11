@@ -49,7 +49,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true
