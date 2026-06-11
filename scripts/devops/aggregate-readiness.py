@@ -40,6 +40,16 @@ def normalize_branch(branch: str) -> str:
 
 
 def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None) -> dict:
+    """Execute a command and return structured result information.
+
+    Args:
+        cmd: Command and arguments as list of strings
+        timeout: Timeout in seconds (default: 300)
+        cwd: Working directory (default: None)
+
+    Returns:
+        Dictionary with status, exit code, stdout, and stderr
+    """
     label = cmd[0] if len(cmd) == 1 else " ".join(cmd)
     logger.info("  ▌ Running: %s", label)
 
@@ -57,6 +67,7 @@ def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None) -> d
         stdout = result.stdout or ""
         stderr = result.stderr or ""
 
+        # Truncate very long outputs to prevent huge JSON files
         stdout_lines = stdout.splitlines()
         stderr_lines = stderr.splitlines()
         if len(stdout_lines) > 50:
