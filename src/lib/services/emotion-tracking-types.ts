@@ -22,7 +22,7 @@ export const EmotionDimensionsSchema = z.object({
  */
 export const EmotionDataPointSchema = EmotionDimensionsSchema.extend({
   /** ISO timestamp of the emotion recording */
-  timestamp: z.string().datetime(),
+  timestamp: z.iso.datetime(),
   /** Optional emotion label */
   label: z.string().optional(),
   /** Optional notes about the emotion */
@@ -38,7 +38,7 @@ export const EmotionPeakSchema = z.object({
   /** The peak value */
   value: EmotionValueSchema,
   /** When the peak occurred */
-  timestamp: z.string().datetime(),
+  timestamp: z.iso.datetime(),
 })
 
 /**

@@ -23,16 +23,16 @@ const milestoneSchema = z.object({
   id: z.string(),
   title: z.string().min(1),
   completed: z.boolean().default(false),
-  completedDate: z.string().datetime().optional(),
+  completedDate: z.iso.datetime().optional(),
   notes: z.string().optional(),
-  dueDate: z.string().datetime().optional(),
+  dueDate: z.iso.datetime().optional(),
 })
 
 const treatmentGoalEnhancedSchema = z.object({
   id: z.string(),
   title: z.string().min(1),
   description: z.string().min(1),
-  targetDate: z.string().datetime(),
+  targetDate: z.iso.datetime(),
   priority: z.enum(['low', 'medium', 'high', 'urgent']).default('medium'),
   status: z
     .enum(['not-started', 'in-progress', 'completed', 'on-hold'])
@@ -51,7 +51,7 @@ const treatmentGoalEnhancedSchema = z.object({
       sessionsCompleted: z.number().default(0),
       exercisesAssigned: z.number().default(0),
       exercisesCompleted: z.number().default(0),
-      lastActivityDate: z.string().datetime().optional(),
+      lastActivityDate: z.iso.datetime().optional(),
     })
     .optional(),
 })
@@ -62,8 +62,8 @@ const treatmentPlanEnhancedSchema = z.object({
   therapistName: z.string().min(1),
   clientId: z.string().min(1),
   therapistId: z.string().min(1),
-  createdDate: z.string().datetime().optional(),
-  lastModified: z.string().datetime().optional(),
+  createdDate: z.iso.datetime().optional(),
+  lastModified: z.iso.datetime().optional(),
   duration: z.number().min(1), // weeks
   status: z.enum(['active', 'completed', 'paused', 'draft']).default('draft'),
   goals: z.array(treatmentGoalEnhancedSchema).min(1),
@@ -73,12 +73,12 @@ const treatmentPlanEnhancedSchema = z.object({
       totalSessions: z.number().default(0),
       completedSessions: z.number().default(0),
       overallProgress: z.number().min(0).max(100).default(0),
-      nextSessionDate: z.string().datetime().optional(),
+      nextSessionDate: z.iso.datetime().optional(),
       riskLevel: z.enum(['low', 'medium', 'high']).default('low'),
       interventionHistory: z
         .array(
           z.object({
-            date: z.string().datetime(),
+            date: z.iso.datetime(),
             intervention: z.string(),
             outcome: z.string(),
             effectiveness: z.number().min(1).max(5),

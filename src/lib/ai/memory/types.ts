@@ -49,8 +49,8 @@ export const EmpathyMetricsSchema = z.object({
  * Memory Object: The atomic unit of our memory system.
  */
 export const MemoryObjectSchema = z.object({
-  id: z.string().uuid(),
-  timestamp: z.string().datetime(),
+  id: z.uuid(),
+  timestamp: z.iso.datetime(),
   scope: MemoryScopeSchema,
   retention: RetentionPolicySchema,
   content: z.string().min(1),

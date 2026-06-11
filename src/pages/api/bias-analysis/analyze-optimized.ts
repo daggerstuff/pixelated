@@ -28,8 +28,8 @@ const AnalyzeBiasRequestSchema = z.object({
     .optional(),
   sessionType: z.enum(['individual', 'group', 'family', 'couples']).optional(),
   therapistNotes: z.string().max(1000).optional(),
-  therapistId: z.string().uuid().optional(),
-  clientId: z.string().uuid().optional(),
+  therapistId: z.uuid().optional(),
+  clientId: z.uuid().optional(),
 })
 
 // Response caching headers

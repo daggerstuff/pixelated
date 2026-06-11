@@ -12,7 +12,7 @@ const logger = createBuildSafeLogger('treatment-plans')
 
 // Zod schemas for update
 const updateTreatmentObjectiveSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   description: z.string().min(1).optional(),
   targetDate: z.string().optional().nullable(),
   status: z
@@ -23,7 +23,7 @@ const updateTreatmentObjectiveSchema = z.object({
 })
 
 const updateTreatmentGoalSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.uuid().optional(),
   description: z.string().min(1).optional(),
   targetDate: z.string().optional().nullable(),
   status: z
