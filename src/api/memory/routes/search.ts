@@ -72,13 +72,51 @@ export const POST = withAuthenticatedMemoryRoute(
   "searching memories",
   async ({ request }, user) => {
     try {
-      const body = await request.json();
-      const query = typeof body.query === "string" ? body.query : body.q;
-      const requestedUserId = body.user_id ?? body.userId;
-      const limit = Number.isFinite(body.limit) && body.limit > 0 ? Math.min(body.limit, 100) : 10;
-      const offset = Number.isFinite(body.offset) && body.offset >= 0 ? body.offset : 0;
-      const category = body.category;
-      const tags = Array.isArray(body.tags) ? body.tags : [];
+      const body: unknown = await request.json();
+
+      if (typeof body !== "object" || body === null) {
+        return jsonError(400, "Bad Request", "Invalid request body");
+      }
+
+      const query =
+        "query" in body && typeof body.query === "string"
+          ? body.query
+          : "q" in body && typeof body.q === "string"
+            ? body.q
+            : "";
+
+      const requestedUserId =
+        "user_id" in body && typeof body.user_id === "string"
+          ? body.user_id
+          : "userId" in body && typeof body.userId === "string"
+            ? body.userId
+            : null;
+
+      const limit =
+        "limit" in body &&
+        typeof body.limit === "number" &&
+        Number.isFinite(body.limit) &&
+        body.limit > 0
+          ? Math.min(Math.floor(body.limit), 100)
+          : 10;
+
+      const offset =
+        "offset" in body &&
+        typeof body.offset === "number" &&
+        Number.isFinite(body.offset) &&
+        body.offset >= 0
+          ? Math.floor(body.offset)
+          : 0;
+
+      const category =
+        "category" in body && typeof body.category === "string" ? body.category : undefined;
+
+      const tags =
+        "tags" in body &&
+        Array.isArray(body.tags) &&
+        body.tags.every((tag: unknown) => typeof tag === "string")
+          ? body.tags
+          : [];
 
       const userError = assertRequestedUser(user.id, requestedUserId);
       if (userError) {

@@ -23,14 +23,6 @@ export const GET = withAuthenticatedMemoryRoute("listing memories", async ({ req
     const requestedUserId = url.searchParams.get("userId");
     const category = url.searchParams.get("category");
     const tags = url.searchParams.getAll("tag");
-    const minImportance = url.searchParams.get("minImportance");
-    const sortBy = url.searchParams.get("sortBy") as
-      | "createdAt"
-      | "updatedAt"
-      | "importance"
-      | "accessedAt"
-      | null;
-    const sortOrder = url.searchParams.get("sortOrder") as "asc" | "desc" | null;
 
     const userError = assertRequestedUser(user.id, requestedUserId);
     if (userError) {
@@ -43,8 +35,6 @@ export const GET = withAuthenticatedMemoryRoute("listing memories", async ({ req
       offset,
       category: category ?? undefined,
       tags: tags.length > 0 ? tags : undefined,
-      sortBy: sortBy ?? undefined,
-      sortOrder: sortOrder ?? undefined,
     });
 
     return jsonResponse({
