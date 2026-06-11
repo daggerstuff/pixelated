@@ -334,7 +334,7 @@
     "@github/copilot-sdk": "1.0.0",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
-    "@playwright/test": "1.61.0-alpha-2026-06-10",
+    "@playwright/test": "1.61.0-alpha-1781023400000",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
