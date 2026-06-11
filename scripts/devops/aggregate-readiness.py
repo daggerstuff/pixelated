@@ -39,13 +39,14 @@ def normalize_branch(branch: str) -> str:
     return branch.replace("/", "-").replace("_", "-").lower()
 
 
-def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None) -> dict:
+def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None, max_retries: int = 3) -> dict:
     """Execute a command and return structured result information.
 
     Args:
         cmd: Command and arguments as list of strings
         timeout: Timeout in seconds (default: 300)
         cwd: Working directory (default: None)
+        max_retries: Maximum number of retry attempts for transient failures (default: 3)
 
     Returns:
         Dictionary with status, exit code, stdout, and stderr
@@ -53,58 +54,78 @@ def run_command(cmd: list[str], timeout: int = 300, cwd: str | None = None) -> d
     label = cmd[0] if len(cmd) == 1 else " ".join(cmd)
     logger.info("  ▌ Running: %s", label)
 
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            cwd=cwd,
-            shell=False,
-            check=False,
-        )
-        exit_code = result.returncode
-        stdout = result.stdout or ""
-        stderr = result.stderr or ""
+    for attempt in range(max_retries + 1):
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=cwd,
+                shell=False,
+                check=False,
+            )
+            exit_code = result.returncode
+            stdout = result.stdout or ""
+            stderr = result.stderr or ""
 
-        # Truncate very long outputs to prevent huge JSON files
-        stdout_lines = stdout.splitlines()
-        stderr_lines = stderr.splitlines()
-        if len(stdout_lines) > 50:
-            stdout = "...\n" + "\n".join(stdout_lines[-50:])
-        if len(stderr_lines) > 20:
-            stderr = "...\n" + "\n".join(stderr_lines[-20:])
+            # Truncate very long outputs to prevent huge JSON files
+            stdout_lines = stdout.splitlines()
+            stderr_lines = stderr.splitlines()
+            if len(stdout_lines) > 50:
+                stdout = "...\n" + "\n".join(stdout_lines[-50:])
+            if len(stderr_lines) > 20:
+                stderr = "...\n" + "\n".join(stderr_lines[-20:])
 
-        return {
-            "status": "pass" if exit_code == 0 else "fail",
-            "exitCode": exit_code,
-            "stdout": stdout,
-            "stderr": stderr,
-        }
-    except subprocess.TimeoutExpired:
-        logger.warning("  ▌ Command timed out after %ds: %s", timeout, label)
-        return {
-            "status": "fail",
-            "exitCode": None,
-            "stdout": "",
-            "stderr": f"Command timed out after {timeout}s",
-        }
-    except FileNotFoundError:
-        logger.warning("  ▌ Command not found: %s", label)
-        return {
-            "status": "skipped",
-            "exitCode": None,
-            "stdout": "",
-            "stderr": f"Command not found: {label}",
-        }
-    except Exception as exc:
-        logger.warning("  ▌ Command error: %s", exc)
-        return {
-            "status": "fail",
-            "exitCode": None,
-            "stdout": "",
-            "stderr": str(exc),
-        }
+            # If successful or this was the last attempt, return the result
+            if exit_code == 0 or attempt == max_retries:
+                return {
+                    "status": "pass" if exit_code == 0 else "fail",
+                    "exitCode": exit_code,
+                    "stdout": stdout,
+                    "stderr": stderr,
+                }
+
+            # Log retry attempt for transient failures
+            logger.warning("  ▌ Attempt %d failed with exit code %d. Retrying...", attempt + 1, exit_code)
+
+        except subprocess.TimeoutExpired:
+            logger.warning("  ▌ Command timed out after %ds: %s", timeout, label)
+            if attempt == max_retries:
+                return {
+                    "status": "fail",
+                    "exitCode": None,
+                    "stdout": "",
+                    "stderr": f"Command timed out after {timeout}s",
+                }
+            logger.warning("  ▌ Retrying timeout command...")
+
+        except FileNotFoundError:
+            logger.warning("  ▌ Command not found: %s", label)
+            return {
+                "status": "skipped",
+                "exitCode": None,
+                "stdout": "",
+                "stderr": f"Command not found: {label}",
+            }
+        except Exception as exc:
+            logger.warning("  ▌ Command error: %s", exc)
+            if attempt == max_retries:
+                return {
+                    "status": "fail",
+                    "exitCode": None,
+                    "stdout": "",
+                    "stderr": str(exc),
+                }
+            logger.warning("  ▌ Retrying after error...")
+
+    # This should never be reached, but just in case
+    return {
+        "status": "fail",
+        "exitCode": None,
+        "stdout": "",
+        "stderr": "Unknown error occurred",
+    }
 
 
 def run_lint(dry_run: bool, cwd: str) -> dict:
@@ -118,7 +139,7 @@ def run_lint(dry_run: bool, cwd: str) -> dict:
             "stdout": "",
             "stderr": "",
         }
-    return run_command(["pnpm", "lint"], cwd=cwd)
+    return run_command(["pnpm", "lint"], cwd=cwd, max_retries=2)
 
 
 def run_typecheck(dry_run: bool, cwd: str) -> dict:
@@ -132,7 +153,7 @@ def run_typecheck(dry_run: bool, cwd: str) -> dict:
             "stdout": "",
             "stderr": "",
         }
-    return run_command(["pnpm", "typecheck"], timeout=600, cwd=cwd)
+    return run_command(["pnpm", "typecheck"], timeout=600, cwd=cwd, max_retries=2)
 
 
 def run_tests(dry_run: bool, cwd: str) -> dict:
@@ -146,7 +167,7 @@ def run_tests(dry_run: bool, cwd: str) -> dict:
             "stdout": "",
             "stderr": "",
         }
-    return run_command(["pnpm", "test:unit"], timeout=600, cwd=cwd)
+    return run_command(["pnpm", "test:unit"], timeout=600, cwd=cwd, max_retries=2)
 
 
 def run_format_check(dry_run: bool, cwd: str) -> dict:
@@ -160,7 +181,7 @@ def run_format_check(dry_run: bool, cwd: str) -> dict:
             "stdout": "",
             "stderr": "",
         }
-    return run_command(["pnpm", "format:check"], cwd=cwd)
+    return run_command(["pnpm", "format:check"], cwd=cwd, max_retries=2)
 
 
 def calculate_summary(validation_lanes: dict) -> dict:
