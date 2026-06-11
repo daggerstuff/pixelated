@@ -65,6 +65,7 @@ allowBuilds:
   utf-8-validate: true
   win-export-certificate-and-key: true
   workerd: true
+minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@iconify-json/lucide@1.2.111'
   - 'path-to-regexp@6.3.0'
@@ -241,8 +242,8 @@ overrides:
   '@opentelemetry/otlp-proto-exporter-base': ^0.51.1
   '@opentelemetry/otlp-transformer>protobufjs': 8.0.2
   '@opentelemetry/otlp-transformer@0.217.0>protobufjs': 8.0.2
-  '@tootallnate/once': ^3.0.1
-  '@typescript-eslint/typescript-estree>minimatch': ^9.0.9
+  '@totallnate/once': ^3.0.1
+  '@typescript-eslint/typescript-estree>minimatch': ^9.0.9,
   '@unocss/astro': ^66.7.0
   '@unocss/core': ^66.7.0
   '@unocss/reset': ^66.7.0
@@ -250,6 +251,7 @@ overrides:
   '@vercel/routing-utils': npm:@vercel/routing-utils@6.2.0
   '@vercel/routing-utils>path-to-regexp': ^6.3.0
   '@vercel/routing-utils>path-to-regexp@<6.3.0': 6.3.0
+
   '@vercel/routing-utils@5.3.3>path-to-regexp': npm:path-to-regexp@6.3.0
   '@vercel/routing-utils@5.3.3>path-to-regexp@6.1.0': npm:path-to-regexp@6.3.0
   astro>devalue: '>=5.8.1'
