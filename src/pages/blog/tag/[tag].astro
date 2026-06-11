@@ -3,7 +3,6 @@ import PostCard from '@/components/blog/PostCard.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import type { CollectionEntry } from 'astro:content'
 import { getCollection } from 'astro:content'
-import { isAstroProduction } from '@/utils/astro-env'
 
 // export const prerender = true;
 
@@ -12,7 +11,7 @@ export async function getStaticPaths() {
   const allBlogPosts = await getCollection(
     "blog",
     ({ data }: CollectionEntry<"blog">["data"]) => {
-      return isAstroProduction() ? data.pubDate <= new Date() : true;
+      return import.meta['env'].PROD ? data.pubDate <= new Date() : true;
     },
   );
 
@@ -44,7 +43,7 @@ if (!tag) {
 const allBlogPosts = await getCollection(
   'blog',
   ({ data }: CollectionEntry<'blog'>['data']) => {
-    return isAstroProduction() ? data.pubDate <= new Date() : true
+    return import.meta.env.PROD ? data.pubDate <= new Date() : true
   },
 )
 

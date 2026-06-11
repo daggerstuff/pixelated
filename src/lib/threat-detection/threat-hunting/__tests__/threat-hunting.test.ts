@@ -97,38 +97,38 @@ function createRedisMock(): IRedisClient {
   let counter = 0
 
   return {
-    get: vi.fn(async (key: string) => strings.get(key) ?? null),
+    get: vi.fn(async (key: string) => strings.get(key) ?? null) as any,
     set: vi.fn(async (key: string, value: string) => {
       strings.set(key, value)
       return 'OK'
-    }),
+    }) as any,
     lrange: vi.fn(async (key: string, start: number, stop: number) => {
       const values = lists.get(key) ?? []
       const normalizedStop = stop === -1 ? values.length : stop + 1
       return values.slice(start, normalizedStop)
-    }),
+    }) as any,
     incr: vi.fn(async () => {
       counter += 1
       return counter
-    }),
-    smembers: vi.fn(async () => []),
-    scan: vi.fn(async () => ['0', []]),
+    }) as any,
+    smembers: vi.fn(async () => []) as any,
+    scan: vi.fn(async () => ['0', []]) as any,
     lpush: vi.fn(async (key: string, ...values: string[]) => {
       const current = lists.get(key) ?? []
       current.unshift(...values)
       lists.set(key, current)
       return current.length
-    }),
+    }) as any,
     lrem: vi.fn(async (key: string, _count: number, element: string) => {
       const current = lists.get(key) ?? []
       const next = current.filter((item) => item !== element)
       lists.set(key, next)
       return current.length - next.length
-    }),
+    }) as any,
     mget: vi.fn(async (keys: string[]) =>
       keys.map((key) => strings.get(key) ?? null),
-    ),
-    quit: vi.fn(async () => 'OK'),
+    ) as any,
+    quit: vi.fn(async () => 'OK') as any,
   }
 }
 
