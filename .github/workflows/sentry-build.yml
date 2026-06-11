@@ -54,10 +54,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: >
-          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
-          { echo "⚠️ Lockfile out of date - refreshing...";
-            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.0.0

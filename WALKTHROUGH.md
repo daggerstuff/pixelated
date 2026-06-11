@@ -59,7 +59,9 @@ and copies `.env.example → .env` if needed.
 ### Manual setup
 
 ```bash
-pnpm install
+git submodule init
+git submodule update
+pnpm install --no-frozen-lockfile
 uv sync
 docker compose -f docker/docker-compose.db.yml up -d
 cp .env.example .env  # then edit MONGODB_URI and DATABASE_URL
@@ -163,7 +165,7 @@ docker ps --filter "name=mongo" --filter "name=postgres" --filter "name=redis"
 ### Module not found after pulling main
 
 ```bash
-pnpm install    # rebuild native deps after dependency changes
+pnpm install --no-frozen-lockfile    # rebuild native deps after dependency changes
 uv sync         # rebuild Python venv
 ```
 
