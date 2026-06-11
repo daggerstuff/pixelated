@@ -19,8 +19,10 @@ import type {
   MemoryScope,
   RetentionPolicy,
   SourceService,
+  StanceShift,
   StrengthTrend,
   GateDecision,
+  SynthesisResult,
   UnifiedMemory,
   UpdateMemoryInput,
 } from './types'
@@ -168,6 +170,26 @@ export const MemoryQueryOptionsSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+export const StanceShiftSchema = z.object({
+  attribute: z.string(),
+  oldValue: z.number(),
+  newValue: z.number(),
+  delta: z.number(),
+  evidenceIds: z.array(z.string()),
+  confidence: z.number().min(0).max(1),
+})
+
+export const SynthesisResultSchema = z.object({
+  mergedIds: z.array(z.string()),
+  newMemoryId: z.string(),
+  stanceShifts: z.array(StanceShiftSchema),
+  compressionRatio: z.number().min(1),
+})
+
+// ---------------------------------------------------------------------------
 // Compile-time compatibility checks (z.infer ↔ canonical TS types)
 // ---------------------------------------------------------------------------
 
@@ -226,6 +248,14 @@ type _CheckMemoryQueryOptions = AssertCompatible<
   z.infer<typeof MemoryQueryOptionsSchema>,
   MemoryQueryOptions
 >
+type _CheckStanceShift = AssertCompatible<
+  z.infer<typeof StanceShiftSchema>,
+  StanceShift
+>
+type _CheckSynthesisResult = AssertCompatible<
+  z.infer<typeof SynthesisResultSchema>,
+  SynthesisResult
+>
 
 // Silence unused-type warnings while keeping compile-time assertions.
 const _schemaCompatibilityChecks: [
@@ -241,7 +271,11 @@ const _schemaCompatibilityChecks: [
   _CheckCreateMemoryInput,
   _CheckUpdateMemoryInput,
   _CheckMemoryQueryOptions,
+  _CheckStanceShift,
+  _CheckSynthesisResult,
 ] = [
+  true,
+  true,
   true,
   true,
   true,
