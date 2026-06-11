@@ -69,6 +69,17 @@ export type {
 } from './types'
 
 // ---------------------------------------------------------------------------
+// Synthesis output types
+// ---------------------------------------------------------------------------
+
+export type {
+  /** Detected change in user/persona behavior across memories. */
+  StanceShift,
+  /** Output of a memory reconciliation pass. */
+  SynthesisResult,
+} from './types'
+
+// ---------------------------------------------------------------------------
 // Input / query shapes
 // ---------------------------------------------------------------------------
 
@@ -98,6 +109,8 @@ export {
   CreateMemoryInputSchema,
   UpdateMemoryInputSchema,
   MemoryQueryOptionsSchema,
+  StanceShiftSchema,
+  SynthesisResultSchema,
 } from './schemas'
 
 // ---------------------------------------------------------------------------
@@ -136,6 +149,10 @@ export {
   hasEmotionalContext,
   hasEmpathyMetrics,
   isEmbedded,
+
+  // Synthesis output guards
+  isStanceShift,
+  isSynthesisResult,
 } from './guards'
 
 // ---------------------------------------------------------------------------

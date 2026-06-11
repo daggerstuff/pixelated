@@ -44,21 +44,6 @@ export type {
   MemoryQueryOptions,
 } from '@pixelated/memory-schema';
 
-// Local-only types not yet in the package. These are Foresight-specific
-// (stance-shift detection, reconciliation synthesis) and should be
-// proposed upstream in a follow-up.
-export interface StanceShift {
-  attribute: string;
-  old_value: number;
-  new_value: number;
-  delta: number;
-  evidence_ids: string[];
-  confidence: number;
-}
-
-export interface SynthesisResult {
-  merged_ids: string[];
-  new_memory_id: string;
-  stance_shifts: StanceShift[];
-  compression_ratio: number;
+// Stance Shift and SynthesisResult — upstreamed in PIX-3905
+export type { StanceShift, SynthesisResult } from '@pixelated/memory-schema';
 }

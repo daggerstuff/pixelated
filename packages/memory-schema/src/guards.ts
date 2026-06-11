@@ -10,8 +10,10 @@ import type {
   UnifiedMemory,
   MemoryScope,
   RetentionPolicy,
+  StanceShift,
   StrengthTrend,
   GateDecision,
+  SynthesisResult,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -170,4 +172,44 @@ export function hasEmpathyMetrics(memory: UnifiedMemory): boolean {
 /** Returns true if the memory has been embedded in vector space. */
 export function isEmbedded(memory: UnifiedMemory): boolean {
   return memory.vectorId !== null
+}
+
+// ---------------------------------------------------------------------------
+// Synthesis output type guards
+// ---------------------------------------------------------------------------
+
+/**
+ * Narrows an unknown value to `StanceShift`. Shallow structural check —
+ * validates required string/number fields and that `evidenceIds` is an
+ * array. Does not recursively validate that each evidence id resolves.
+ */
+export function isStanceShift(value: unknown): value is StanceShift {
+  if (typeof value !== 'object' || value === null) return false
+  const s = value as Record<string, unknown>
+  return (
+    typeof s['attribute'] === 'string' &&
+    typeof s['oldValue'] === 'number' &&
+    typeof s['newValue'] === 'number' &&
+    typeof s['delta'] === 'number' &&
+    Array.isArray(s['evidenceIds']) &&
+    s['evidenceIds'].every((id) => typeof id === 'string') &&
+    typeof s['confidence'] === 'number'
+  )
+}
+
+/**
+ * Narrows an unknown value to `SynthesisResult`. Shallow structural check —
+ * delegates to `isStanceShift` for each entry in `stanceShifts`.
+ */
+export function isSynthesisResult(value: unknown): value is SynthesisResult {
+  if (typeof value !== 'object' || value === null) return false
+  const r = value as Record<string, unknown>
+  return (
+    Array.isArray(r['mergedIds']) &&
+    r['mergedIds'].every((id) => typeof id === 'string') &&
+    typeof r['newMemoryId'] === 'string' &&
+    Array.isArray(r['stanceShifts']) &&
+    r['stanceShifts'].every((s) => isStanceShift(s)) &&
+    typeof r['compressionRatio'] === 'number'
+  )
 }
