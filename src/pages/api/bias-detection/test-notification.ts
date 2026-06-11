@@ -5,7 +5,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('bias-detection-api')
 const biasDetectionEngine = new BiasDetectionEngine()
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   try {
     // Authenticate request
     const authResult = await isAuthenticated(request)

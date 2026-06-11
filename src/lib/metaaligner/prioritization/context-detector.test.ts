@@ -12,6 +12,19 @@ import {
   type ContextDetectionResult,
 } from './context-detector'
 
+// CrisisDetectionResult type used in tests - defined locally since it's not exported from the service module
+interface CrisisDetectionResult {
+  isCrisis: boolean
+  confidence: number
+  category: string
+  riskLevel: string
+  urgency: string
+  detectedTerms: string[]
+  suggestedActions: string[]
+  timestamp: string
+  content: string
+}
+
 // Mock dependencies
 const mockAIService: AIService = {
   getModelInfo: vi.fn().mockReturnValue({

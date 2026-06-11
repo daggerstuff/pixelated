@@ -170,6 +170,7 @@ export class ConfigurationManager extends EventEmitter {
   private config: MultiRegionConfig
   private readonly configWatchers: Map<string, NodeJS.Timeout> = new Map()
   private readonly featureFlagCache: Map<string, boolean> = new Map()
+  private isInitialized = false
 
   constructor(initialConfig: MultiRegionConfig) {
     super()

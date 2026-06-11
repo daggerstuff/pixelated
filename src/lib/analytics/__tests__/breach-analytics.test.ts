@@ -7,7 +7,6 @@ import * as RiskScoring from '@/lib/analytics/risk'
 import { StatisticalAnalysis } from '@/lib/analytics/statistics'
 import * as SecurityTrends from '@/lib/analytics/trends'
 import { fheService } from '@/lib/fhe'
-// No EncryptedData import needed — mock factory returns a string
 import { redis } from '@/lib/redis'
 import type { BreachDetails } from '@/lib/security/breach-notification'
 import { listRecentBreaches } from '@/lib/security/breach-notification'
@@ -26,7 +25,11 @@ vi.mock('@/lib/fhe', () => ({
     encrypt: vi.fn(),
   },
   fheService: {
-    encrypt: vi.fn().mockResolvedValue('mocked_encrypted_data'),
+    encrypt: vi.fn().mockResolvedValue({
+      id: 'enc-1',
+      data: 'mocked_encrypted_data',
+      dataType: 'string',
+    }),
   },
 }))
 
@@ -195,7 +198,11 @@ describe('breachAnalytics', () => {
     ])
     mockedAnalyzeTrends.mockResolvedValue(['increasing', 'stable'])
     mockedCalculateTrend.mockReturnValue(0.15)
-    mockedFheEncrypt.mockResolvedValue('mocked_encrypted_data')
+    mockedFheEncrypt.mockResolvedValue({
+      id: 'enc-1',
+      data: 'mocked_encrypted_data',
+      dataType: 'string',
+    })
   })
 
   afterEach(() => {
@@ -493,7 +500,7 @@ describe('breachAnalytics', () => {
           riskScore: 0.75,
           complianceScore: 0.98,
           notificationEffectiveness: 0.95,
-          encryptedData: 'mocked_encrypted_data',
+          encryptedData: expect.any(String),
         },
       })
       expect(Array.isArray(report.trends)).toBe(true)

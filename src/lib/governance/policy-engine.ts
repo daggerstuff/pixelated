@@ -180,7 +180,3 @@ export class PolicyEngine {
   }
 }
 
-export interface PolicyEvaluationContext {
-  action: string
-  context: Record<string, unknown>
-}
