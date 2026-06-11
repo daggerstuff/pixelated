@@ -11,6 +11,9 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  # pnpm 11.5+ verifies lockfile supply-chain policy on every install; CI uses
+  # trust-lockfile because minimumReleaseAgeExclude does not apply during verification.
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
 
 jobs:
   build:

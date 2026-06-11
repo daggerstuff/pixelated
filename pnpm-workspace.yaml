@@ -191,6 +191,7 @@ minimumReleaseAgeExclude:
   - '@cloudflare/workers-types@4.20260611.1'
   - jotai@2.20.1
   - vue@3.5.38
+  - '@ai-sdk/gateway@3.0.128'
 
 peerDependencyRules:
   ignoreMissing:
