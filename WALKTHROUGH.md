@@ -63,6 +63,12 @@ chmod +x scripts/devops/pnpm-install-with-fallback.sh
 scripts/devops/pnpm-install-with-fallback.sh
 ```
 
+For environments with strict supply-chain policies that may cause ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION errors:
+
+```bash
+PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
+```
+
 ---
 
 ## Running the Application
@@ -161,7 +167,7 @@ docker ps --filter "name=mongo" --filter "name=postgres" --filter "name=redis"
 ### Module not found after pulling main
 
 ```bash
-pnpm install    # rebuild native deps after dependency changes
+scripts/devops/pnpm-install-with-fallback.sh    # rebuild native deps after dependency changes
 uv sync         # rebuild Python venv
 ```
 
@@ -170,7 +176,7 @@ uv sync         # rebuild Python venv
 ```bash
 pnpm typecheck
 # If stuck with stale cache:
-rm -rf node_modules/.vite .tsbuildinfo && pnpm install
+rm -rf node_modules/.vite .tsbuildinfo && scripts/devops/pnpm-install-with-fallback.sh
 ```
 
 ### Python tests failing with import errors
