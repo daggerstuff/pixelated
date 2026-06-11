@@ -1,0 +1,23 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import { TherapyGate } from '@/components/chat/TherapyGate'
+
+export const prerender = false
+---
+
+<BaseLayout
+  title="Gated Therapy Chat"
+  description="Real-time safety gating for therapeutic chat sessions"
+>
+  <main class="container mx-auto max-w-3xl px-4 py-8">
+    <header class="mb-6">
+      <h1 class="text-2xl font-semibold tracking-tight">Gated Therapy Chat</h1>
+      <p class="text-muted-foreground mt-2 text-sm">
+        Crisis-level input is blocked instantly before it enters the session
+        transcript.
+      </p>
+    </header>
+
+    <TherapyGate client:load />
+  </main>
+</BaseLayout>
