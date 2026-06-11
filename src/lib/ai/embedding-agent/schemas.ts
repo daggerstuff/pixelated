@@ -108,7 +108,7 @@ export const EmbeddingResponseSchema = z.object({
   textHash: z.string(),
   cached: z.boolean(),
   processingTimeMs: z.number().nonnegative(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 })
 
 /**
@@ -133,7 +133,7 @@ export const BatchEmbeddingResponseSchema = z.object({
   modelUsed: z.string(),
   dimension: z.number().int().positive(),
   processingTimeMs: z.number().nonnegative(),
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
 })
 
 /**
@@ -174,7 +174,7 @@ export const EmbeddingAgentStatusSchema = z.object({
   uptimeSeconds: z.number().nonnegative(),
   requestsProcessed: z.number().int().nonnegative(),
   averageResponseTimeMs: z.number().nonnegative(),
-  lastRequestAt: z.string().datetime().optional().nullable(),
+  lastRequestAt: z.iso.datetime().optional().nullable(),
 })
 
 /**
@@ -185,7 +185,7 @@ export const HealthCheckResponseSchema = z.object({
   version: z.string(),
   modelLoaded: z.boolean(),
   cacheAvailable: z.boolean(),
-  timestamp: z.string().datetime(),
+  timestamp: z.iso.datetime(),
 })
 
 /**
@@ -195,7 +195,7 @@ export const EmbeddingErrorResponseSchema = z.object({
   error: z.string(),
   message: z.string(),
   details: z.record(z.string(), z.unknown()).optional(),
-  timestamp: z.string().datetime(),
+  timestamp: z.iso.datetime(),
   requestId: z.string().optional(),
 })
 

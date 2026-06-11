@@ -45,7 +45,7 @@ export const backupConfigSchema = z.object({
     // Slack webhook URL
     slackWebhook: z.string().optional(),
     // Email recipients
-    emailRecipients: z.array(z.string().email()).optional(),
+    emailRecipients: z.array(z.email()).optional(),
   }),
 })
 
