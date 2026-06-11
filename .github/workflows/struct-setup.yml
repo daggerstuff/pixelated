@@ -56,7 +56,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: |
+          chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Install Struct CLI
         continue-on-error: true
@@ -111,7 +113,7 @@ jobs:
         run: |
           # Verify the build commands from struct config work
           echo "Testing pre-execution commands..."
-          pnpm install --no-frozen-lockfile --dry-run 2>&1 | head -20
+          scripts/devops/pnpm-install-with-fallback.sh --frozen-lockfile --dry-run 2>&1 | head -20
           echo "Pre-execution commands valid"
 
       - name: Verify Post-Execution Commands

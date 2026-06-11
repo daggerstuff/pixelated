@@ -1,3 +1,8 @@
+packages:
+  - 'packages/*'
+  - 'business-strategy-cms'
+  - 'package'
+
 allowBuilds:
   '@aws-amplify/cli': true
   '@contrast/fn-inspect': true
@@ -174,13 +179,17 @@ minimumReleaseAgeExclude:
   - playwright-core@1.61.0-alpha-2026-06-10
   - playwright@1.61.0-alpha-2026-06-10
   - '@ai-sdk/*'
+  - '@ai-sdk/mcp@1.0.47'
   - '@opentelemetry/*'
-  - '@vue/*'
   - '@types/nodemailer@8.0.1'
-  - ai@6.0.201
+  - '@vue/*'
+  - '@vue/compiler-core@3.5.38'
+  - '@vue/compiler-dom@3.5.38'
+  - '@vue/compiler-sfc@3.5.38'
+  - '@vue/compiler-ssr@3.5.38'
+  - '@cloudflare/workers-types@4.20260611.1'
   - jotai@2.20.1
   - vue@3.5.38
-
 
 peerDependencyRules:
   ignoreMissing:
@@ -205,7 +214,7 @@ peerDependencyRules:
     typescript: ^6.0.3
     zod: '*'
 overrides:
-  '@cloudflare/workers-types': 4.20260610.1
+  '@cloudflare/workers-types': 4.20260611.1
   '@astrojs/react>devalue': ^5.6.4
   '@astrojs/react>rollup': ^4.59.0
   '@astrojs/react>svgo': ^4.0.1
