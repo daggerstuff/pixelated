@@ -17,7 +17,10 @@ USER pwuser
 COPY --chown=pwuser:pwuser package.json pnpm-lock.yaml* ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+COPY ../scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source code
 COPY --chown=pwuser:pwuser . .
