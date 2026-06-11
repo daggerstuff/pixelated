@@ -196,13 +196,13 @@ export function toPublicMemory(
   return PublicMemory.parse({
     id: record.id,
     content: record.content,
-    scope: record.scope ?? 'session',
-    retention: record.retention ?? 'short_term',
-    category: record.category ?? 'general',
-    tags: record.tags ?? [],
-    version: record.version ?? 1,
-    importance: record.importance ?? 0.5,
-    createdAt: record.createdAt ?? new Date().toISOString(),
-    updatedAt: record.updatedAt ?? null,
+    scope: record.scope,
+    retention: record.retention,
+    category: record.category,
+    tags: record.tags,
+    version: record.version,
+    importance: record.importance,
+    createdAt: record.createdAt,
+    updatedAt: record.updatedAt,
   })
 }
