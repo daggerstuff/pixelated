@@ -175,8 +175,8 @@ describe('MemorySystem', () => {
       const synthesis = await memorySystem.reconcile([...historicMemories, ...recentMemories]);
 
       if (!synthesis) throw new Error('Synthesis failed');
-      expect(synthesis.stance_shifts.length).toBeGreaterThan(0);
-      const reciprocityShift = synthesis.stance_shifts.find(s => s.attribute === 'reciprocity');
+      expect(synthesis.stanceShifts.length).toBeGreaterThan(0);
+      const reciprocityShift = synthesis.stanceShifts.find(s => s.attribute === 'reciprocity');
       expect(reciprocityShift?.delta).toBeLessThan(-0.5);
     });
 
@@ -201,11 +201,11 @@ describe('MemorySystem', () => {
       const synthesis = await memorySystem.reconcile([...oldMemories, newImportantMemory]);
       if (!synthesis) throw new Error('Synthesis failed');
 
-      expect(synthesis.merged_ids.length).toBe(5);
-      expect(synthesis.merged_ids.length).toBeGreaterThan(0);
-      expect(synthesis.merged_ids).not.toContain(newImportantMemory.id);
-      expect(synthesis.compression_ratio).toBeGreaterThan(1);
-      expect(synthesis.new_memory_id).toBeDefined();
+      expect(synthesis.mergedIds.length).toBe(5);
+      expect(synthesis.mergedIds.length).toBeGreaterThan(0);
+      expect(synthesis.mergedIds).not.toContain(newImportantMemory.id);
+      expect(synthesis.compressionRatio).toBeGreaterThan(1);
+      expect(synthesis.newMemoryId).toBeDefined();
     });
 
     it('should link vector IDs and archive ghost nodes', async () => {
