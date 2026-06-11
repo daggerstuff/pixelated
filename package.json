@@ -423,7 +423,7 @@
     "satori": "latest",
     "satori-html": "latest",
     "scheduler": "latest",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.0",
     "shiki": "latest",
     "supertest": "latest",
     "terser": "^5.48.0",
