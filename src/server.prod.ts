@@ -14,66 +14,20 @@ import { closeSentry, Sentry, sentryMiddleware } from '../config/instrument.mjs'
 import healthRoutes from './api/routes/health.js'
 import { productionConfig } from './config/production.js'
 import { setPostgresPool, setRedisClient } from './lib/database/connection.js'
+import {
+  getSentryExpressHandlers,
+  hasSentryExpressErrorHandler,
+  registerSentryExpressErrorHandler,
+} from './lib/sentry/express.js'
 import { createBusinessIntelligenceRoutes } from './routes/businessIntelligenceRoutes.js'
 import { createFileRoutes } from './routes/fileRoutes.js'
 import { SocketService } from './services/socketService.js'
 
 const app = express()
-type SentryExpressErrorHandler = (app: express.Application) => void
-type SentryErrorHandler = (
-  options?: Record<string, string>,
-) => express.ErrorRequestHandler
+const sentryHandlers = getSentryExpressHandlers(Sentry)
+const hasSentryErrorHandler = hasSentryExpressErrorHandler(sentryHandlers)
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null
-
-const isSentryExpressErrorHandler = (
-  value: unknown,
-): value is SentryExpressErrorHandler => typeof value === 'function'
-
-const isSentryExpressErrorRequestHandler = (
-  value: unknown,
-): value is SentryErrorHandler => typeof value === 'function'
-
-const getSentryHandlers = (
-  source: unknown,
-): {
-  setupExpressErrorHandler?: SentryExpressErrorHandler
-  expressErrorHandler?: SentryErrorHandler
-} => {
-  if (!isRecord(source)) {
-    return {}
-  }
-
-  const handlers: {
-    setupExpressErrorHandler?: SentryExpressErrorHandler
-    expressErrorHandler?: SentryErrorHandler
-  } = {}
-
-  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
-    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
-  }
-
-  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
-    handlers.expressErrorHandler = source['expressErrorHandler']
-  }
-
-  return handlers
-}
-
-const { setupExpressErrorHandler, expressErrorHandler } =
-  getSentryHandlers(Sentry)
-
-const hasSentryErrorHandler =
-  Boolean(setupExpressErrorHandler) || Boolean(expressErrorHandler)
-
-// The Sentry request handler must be the first middleware on the app
 app.use(sentryMiddleware)
-if (typeof setupExpressErrorHandler === 'function') {
-  setupExpressErrorHandler(app)
-} else if (typeof expressErrorHandler === 'function') {
-  app.use(expressErrorHandler())
-}
 
 // Environment setup
 const PORT = productionConfig.port
@@ -149,6 +103,16 @@ app.use('/api/files', createFileRoutes(db))
 app.use('/api/business-intelligence', createBusinessIntelligenceRoutes(db))
 app.use('/api/health', healthRoutes)
 
+// 404 handler
+app.use((_req, res) => {
+  res.status(404).json({
+    error: 'Not found',
+    message: 'The requested resource was not found',
+  })
+})
+
+registerSentryExpressErrorHandler(app, sentryHandlers)
+
 // SSL configuration
 let server: HttpServer | HttpsServer
 if (isProduction) {
@@ -205,14 +169,6 @@ app.use(
     })
   },
 )
-
-// 404 handler
-app.use((_req, res) => {
-  res.status(404).json({
-    error: 'Not found',
-    message: 'The requested resource was not found',
-  })
-})
 
 const startServer = () => {
   server.listen(PORT, () => {
