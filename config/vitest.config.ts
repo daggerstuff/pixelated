@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { getViteConfig } from "astro/config";
 /// <reference types="vitest" />
 import { defineConfig } from "vitest/config";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 const projectRoot = process.cwd();
 const memorySchemaAlias = {
@@ -228,6 +229,7 @@ export default defineConfig({
         },
       },
       {
+        plugins: [tsconfigPaths()],
         resolve: {
           alias: [
             memorySchemaAlias,
