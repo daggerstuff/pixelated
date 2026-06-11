@@ -59,10 +59,8 @@ and copies `.env.example → .env` if needed.
 ### Manual setup
 
 ```bash
-pnpm install
-uv sync
-docker compose -f docker/docker-compose.db.yml up -d
-cp .env.example .env  # then edit MONGODB_URI and DATABASE_URL
+chmod +x scripts/devops/pnpm-install-with-fallback.sh
+scripts/devops/pnpm-install-with-fallback.sh
 ```
 
 ---

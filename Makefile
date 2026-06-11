@@ -74,7 +74,8 @@ setup: ## One-command local setup
 	./scripts/setup-dev.sh
 
 install: ## Install all dependencies
-	pnpm install && uv sync
+	chmod +x scripts/devops/pnpm-install-with-fallback.sh
+	scripts/devops/pnpm-install-with-fallback.sh && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────
 
