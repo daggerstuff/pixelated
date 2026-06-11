@@ -4,6 +4,7 @@ Unit tests for CI/CD Release Readiness Aggregator and DevOps Readiness Aggregato
 
 import importlib.util
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -181,3 +182,24 @@ def test_run_command_not_found():
     """run_command returns skipped for missing commands."""
     result = run_command_fn(["nonexistent_cmd_xyz"])
     assert result["status"] == "skipped"
+
+
+def test_run_command_timeout(mocker):
+    """run_command handles timeout errors gracefully."""
+    # Mock subprocess.run to raise TimeoutExpired
+    mocker.patch("subprocess.run", side_effect=subprocess.TimeoutExpired(cmd=["fake_cmd"], timeout=1))
+    result = run_command_fn(["fake_cmd"])
+    assert result["status"] == "fail"
+    assert "timed out" in result["stderr"]
+
+
+def test_run_command_generic_exception(mocker):
+    """run_command handles generic exceptions gracefully."""
+    # Mock subprocess.run to raise a generic exception
+    mocker.patch("subprocess.run", side_effect=Exception("Generic error"))
+    result = run_command_fn(["fake_cmd"])
+    assert result["status"] == "fail"
+    assert result["stderr"] == "Generic error"
+    result = run_command_fn(["fake_cmd"])
+    assert result["status"] == "fail"
+    assert result["stderr"] == "Generic error"
