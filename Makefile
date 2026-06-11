@@ -73,8 +73,10 @@ docker-logs: ## Tail database container logs
 setup: ## One-command local setup
 	./scripts/setup-dev.sh
 
-install: ## Install all dependencies
-	pnpm install && uv sync
+install: ## Install all dependencies (submodules, JS, Python)
+	git submodule init
+	git submodule update
+	pnpm install --no-frozen-lockfile && uv sync
 
 # ── Cleanup ─────────────────────────────────────────────
 
