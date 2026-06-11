@@ -119,7 +119,7 @@ export type UpdateMemoryRequest = z.infer<typeof UpdateMemoryRequest>
 
 export const SearchMemoryRequest = z
   .object({
-    query: z.string().min(1).max(1_000),
+    q: z.string().min(1).max(1_000),
     limit: z.number().int().positive().max(100).optional(),
     offset: z.number().int().nonnegative().optional(),
   })
