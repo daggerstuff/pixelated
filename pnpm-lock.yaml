@@ -587,8 +587,8 @@ importers:
         specifier: latest
         version: 1.2.3
       '@playwright/test':
-        specifier: 1.61.0-alpha-2026-06-10
-        version: 1.61.0-alpha-2026-06-10
+        specifier: 1.61.0-alpha-1781023400000
+        version: 1.61.0-alpha-1781023400000
       '@testing-library/dom':
         specifier: latest
         version: 10.4.1
@@ -3599,8 +3599,8 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  '@playwright/test@1.61.0-alpha-2026-06-10':
-    resolution: {integrity: sha512-k+48ui5S6L6ULoPnsomYFda9qMO+uMWfiBCVG2nokcZ45fO/bovEVE9psJ2IOB6aLZdGOliUtKOvl6BwlBjiSw==}
+  '@playwright/test@1.61.0-alpha-1781023400000':
+    resolution: {integrity: sha512-EYeA59CsSOtiQgKTBAyl321SwaWzLYD4wU9GDAt8kFpYCco3sClPZBPdKXdUwlrNqOFAbseUYtiFudxFs/h02w==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -8515,13 +8515,18 @@ packages:
   pkg-types@2.3.1:
     resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
 
+  playwright-core@1.61.0-alpha-1781023400000:
+    resolution: {integrity: sha512-UdtUd9qnCO0zvb8p3OvOZpelY6mA40mTb3NmWGuMtrD+hqqWuorWCPlSGwj7jw/LEB9AxvYLHTL1CJi2flvksg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
   playwright-core@1.61.0-alpha-2026-06-10:
     resolution: {integrity: sha512-Rjov1mjb2vBz2HiiOCAGwUhgA8bOX468tsxzFM745R/cIDWnoQbqzzwmrG3cvqiLnU40MivNLHuRGDiPnnIZUA==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.61.0-alpha-2026-06-10:
-    resolution: {integrity: sha512-xUKR/gCKL2FJlzJ0sJymhFr2E3AOczRxSy+RJM0wy1vznq3HMP7GKu690utl0sIktxatP91sgspStMQXS94L0w==}
+  playwright@1.61.0-alpha-1781023400000:
+    resolution: {integrity: sha512-8TRUG3IvwaAhuVm6k3C5vB7CwC5Fxq76DCCxOgPr6r1dpTedDwxlmdOBUkSZ0zxfxP14jcuPxi86/Trq4eA03w==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -13248,9 +13253,9 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
-  '@playwright/test@1.61.0-alpha-2026-06-10':
+  '@playwright/test@1.61.0-alpha-1781023400000':
     dependencies:
-      playwright: 1.61.0-alpha-2026-06-10
+      playwright: 1.61.0-alpha-1781023400000
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -18938,11 +18943,13 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
+  playwright-core@1.61.0-alpha-1781023400000: {}
+
   playwright-core@1.61.0-alpha-2026-06-10: {}
 
-  playwright@1.61.0-alpha-2026-06-10:
+  playwright@1.61.0-alpha-1781023400000:
     dependencies:
-      playwright-core: 1.61.0-alpha-2026-06-10
+      playwright-core: 1.61.0-alpha-1781023400000
     optionalDependencies:
       fsevents: 2.3.2
 
