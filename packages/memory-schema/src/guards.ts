@@ -5,12 +5,12 @@
  * Safe to use in both Node and browser contexts.
  */
 
+import type { GateDecision } from './gate-types'
 import type {
   UnifiedMemory,
   MemoryScope,
   RetentionPolicy,
   StrengthTrend,
-  GateDecision,
 } from './types'
 
 // ---------------------------------------------------------------------------

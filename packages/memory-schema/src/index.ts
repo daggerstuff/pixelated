@@ -26,11 +26,28 @@ export type {
   RetentionPolicy,
   /** Strength trend set by the temporal decay scheduler. */
   StrengthTrend,
-  /** Gate decision output from the Socratic Gate pre-ingestion evaluation. */
-  GateDecision,
   /** Which service originally wrote this memory row. */
   SourceService,
 } from './types'
+
+export type {
+  /** Gate decision output from the Socratic Gate pre-ingestion evaluation. */
+  GateDecision,
+  /** Extended gating metadata from the Astro Socratic Gate pipeline. */
+  GatingMetadata,
+  /** Result of Socratic Gate evaluation run before memory ingestion. */
+  GateResult,
+  /** Minimal memory payload required for gate evaluation. */
+  GateMemoryInput,
+  /** Input envelope for a Socratic Gate evaluation request. */
+  GateEvaluateInput,
+  /** Output envelope for a Socratic Gate evaluation response. */
+  GateEvaluateOutput,
+  /** Snake_case wire format for Foresight MCP interop. */
+  GateResultWire,
+  GateEvaluateInputWire,
+  GateEvaluateOutputWire,
+} from './gate-types'
 
 // ---------------------------------------------------------------------------
 // Sub-object types
@@ -41,8 +58,6 @@ export type {
   EmotionalContext,
   /** Empathy quality metrics derived from a therapeutic interaction. */
   EmpathyMetrics,
-  /** Result of Socratic Gate evaluation run before memory ingestion. */
-  GateResult,
 } from './types'
 
 // ---------------------------------------------------------------------------
@@ -72,6 +87,22 @@ export type {
   /** Query options for listing / searching memories. */
   MemoryQueryOptions,
 } from './types'
+
+// ---------------------------------------------------------------------------
+// Socratic Gate Zod schemas  (gate-types.ts)
+// ---------------------------------------------------------------------------
+
+export {
+  GateDecisionSchema,
+  GatingMetadataSchema,
+  GateResultSchema,
+  GateResultWireSchema,
+  GateMemoryInputSchema,
+  GateEvaluateInputSchema,
+  GateEvaluateInputWireSchema,
+  GateEvaluateOutputSchema,
+  GateEvaluateOutputWireSchema,
+} from './gate-types'
 
 // ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
