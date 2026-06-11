@@ -6,6 +6,10 @@ import { getViteConfig } from "astro/config";
 import { defineConfig } from "vitest/config";
 
 const projectRoot = process.cwd();
+const memorySchemaAlias = {
+  find: "@pixelated/memory-schema",
+  replacement: path.resolve(projectRoot, "packages/memory-schema/src/index.ts"),
+};
 const baseNodeTestGlobs = [
   "src/tests/health-monitor.test.ts",
   "src/lib/logging/__tests__/audit-logger.test.ts",
@@ -85,6 +89,7 @@ export default defineConfig({
   },
   resolve: {
     alias: [
+      memorySchemaAlias,
       { find: "@/", replacement: `${path.resolve(process.cwd(), "src")}/` },
       {
         find: "react-dom/test-utils",
@@ -147,6 +152,7 @@ export default defineConfig({
         plugins: [react(), ...astroPlugins],
         resolve: {
           alias: [
+            memorySchemaAlias,
             {
               find: "@/",
               replacement: `${path.resolve(process.cwd(), "src")}/`,
@@ -224,6 +230,7 @@ export default defineConfig({
       {
         resolve: {
           alias: [
+            memorySchemaAlias,
             {
               find: "@/",
               replacement: `${path.resolve(process.cwd(), "src")}/`,
