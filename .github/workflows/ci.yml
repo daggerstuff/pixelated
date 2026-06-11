@@ -88,10 +88,8 @@ jobs:
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: >
-          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
-          { echo "⚠️ Lockfile out of date - refreshing...";
-            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
+        run: |
+                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true

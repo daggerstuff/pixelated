@@ -39,7 +39,7 @@ pnpm lint         # oxlint
 pnpm format:check # formatting
 ```
 
-Git hooks run automatically on commit (installed via `pnpm install`).
+Git hooks run automatically on commit (installed via `pnpm install --no-frozen-lockfile`).
 
 ## Testing
 
