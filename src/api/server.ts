@@ -147,6 +147,7 @@ app.use(rateLimiter);
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/readiness", readinessRoutes);
 
 // ============================================================================
 // PROTECTED ROUTES (AUTH REQUIRED)
@@ -162,7 +163,6 @@ app.use("/api/strategic-plans", strategicPlanRoutes);
 app.use("/api/market-research", marketResearchRoutes);
 app.use("/api/sales-opportunities", salesOpportunitiesRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/readiness", readinessRoutes);
 
 // ============================================================================
 // ERROR HANDLING
