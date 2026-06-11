@@ -205,17 +205,24 @@ async function initializeDatabases() {
     console.log("🔄 Connecting to MongoDB...");
     mongoConnection = await connectMongoDB();
     console.log("✅ MongoDB connected");
+  } catch (error: unknown) {
+    console.error("⚠️ MongoDB connection failed (continuing without it):", error);
+  }
 
+  try {
     console.log("🔄 Connecting to PostgreSQL...");
     postgresConnection = await connectPostgreSQL();
     console.log("✅ PostgreSQL connected");
+  } catch (error: unknown) {
+    console.error("⚠️ PostgreSQL connection failed (continuing without it):", error);
+  }
 
+  try {
     console.log("🔄 Connecting to Redis...");
     redisConnection = await connectRedis();
     console.log("✅ Redis connected");
   } catch (error: unknown) {
-    console.error("❌ Database connection failed:", error);
-    process.exit(1);
+    console.error("⚠️ Redis connection failed (continuing without it):", error);
   }
 }
 

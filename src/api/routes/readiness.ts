@@ -15,7 +15,7 @@ const router: Router = express.Router();
  * Aggregate validation lane statuses and return readiness report
  * Combines results from lint, typecheck, tests, and format validation lanes
  */
-router.get("/", async (req: Request, res: Response): Promise<Response> => {
+router.get("/", async (_req: Request, res: Response): Promise<Response> => {
   try {
     // Get the project root directory
     const projectRoot = process.cwd();
@@ -105,7 +105,7 @@ router.get("/", async (req: Request, res: Response): Promise<Response> => {
 /**
  * Generate readiness report in dry-run mode (simulates all checks as passing)
  */
-router.get("/dry-run", async (req: Request, res: Response): Promise<Response> => {
+router.get("/dry-run", async (_req: Request, res: Response): Promise<Response> => {
   try {
     // Get the project root directory
     const projectRoot = process.cwd();
