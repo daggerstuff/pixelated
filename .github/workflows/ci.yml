@@ -89,8 +89,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          chmod +x scripts/devops/pnpm-install-with-fallback.sh
-          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
+                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true
