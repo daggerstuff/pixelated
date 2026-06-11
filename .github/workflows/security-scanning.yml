@@ -6,6 +6,7 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
   GHA_LOCAL_RUN: 'false'
 
 on:
@@ -245,7 +246,9 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
+        run: |
+          chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Run security audit
         run: |

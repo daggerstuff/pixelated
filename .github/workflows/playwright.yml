@@ -11,6 +11,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
 
 jobs:
   test:
@@ -33,7 +34,9 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
+        run: |
+          chmod +x scripts/devops/pnpm-install-with-fallback.sh
+          PNPM_INSTALL_BYPASS_SUPPLY_CHAIN=1 scripts/devops/pnpm-install-with-fallback.sh
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps

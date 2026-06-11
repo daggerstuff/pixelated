@@ -11,6 +11,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
 
 jobs:
   build:

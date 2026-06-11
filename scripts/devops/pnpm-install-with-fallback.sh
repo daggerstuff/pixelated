@@ -84,7 +84,7 @@ main() {
   fi
   
   if [[ "${PNPM_INSTALL_BYPASS_SUPPLY_CHAIN:-}" == "1" ]]; then
-    strategies=("no-supply-chain" "${strategies[@]}")
+    strategies=("trust-lockfile" "${strategies[@]}")
   fi
   
   local overall_success=0
@@ -103,9 +103,9 @@ main() {
       "no-frozen-lockfile")
         args="--no-frozen-lockfile $PNPM_ARGS"
         ;;
-      "no-supply-chain")
+      "trust-lockfile")
         export NODE_OPTIONS="--no-deprecation ${NODE_OPTIONS:-}"
-        args="--no-frozen-lockfile --no-supply-chain $PNPM_ARGS"
+        args="--config.trustLockfile=true --no-frozen-lockfile $PNPM_ARGS"
         ;;
       *)
         args="$PNPM_ARGS"
