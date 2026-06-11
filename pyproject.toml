@@ -127,6 +127,7 @@ dependencies = [
   "localstack>=2026.5.0",
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
+  "libcst>=1.8.6",
 ]
 [project.optional-dependencies]
 test = [
