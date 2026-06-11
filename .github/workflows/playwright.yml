@@ -17,12 +17,12 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: 24.16.0
 
-      - uses: pnpm/action-setup@v4 # v6.0.8
+      - uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
           version: 11.5.2
 
@@ -33,7 +33,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps

@@ -44,7 +44,7 @@ jobs:
       UPSTASH_REDIS_REST_TOKEN: ${{ secrets['UPSTASH_REDIS_REST_TOKEN'] }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -57,12 +57,12 @@ jobs:
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4 # v6.0.8
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
           version: 11.5.2
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.16.0
 
@@ -88,10 +88,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-
 
       - name: Install dependencies
-        run: >
-          NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile ||
-          { echo "⚠️ Lockfile out of date - refreshing...";
-            NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile; }
+        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true

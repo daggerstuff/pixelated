@@ -30,13 +30,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Initialize submodules
         run: bash scripts/devops/init-submodules.sh
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24.16.0
 
@@ -68,7 +68,7 @@ jobs:
           AI_VALIDATION_SECRET: ${{ secrets.AI_VALIDATION_SECRET }}
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4 # v6.0.8
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
           version: 11.5.2
           run_install: false
