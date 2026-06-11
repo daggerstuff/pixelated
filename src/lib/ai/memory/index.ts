@@ -48,7 +48,7 @@ export class MemorySystem {
     // overrides the skeleton fields.
     const memory: MemoryObject = buildMemorySkeleton(
       { content, userId, scope, retention },
-      { id: uuidv4(), ...metadata }
+      { ...metadata, id: uuidv4(), userId }
     );
 
     const gateResult = await this.gate.evaluate(memory, userId);

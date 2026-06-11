@@ -1,3 +1,4 @@
+import { buildMemorySkeleton } from '@pixelated/memory-schema';
 import { MemoryLinker } from '../linker';
 import type { MemoryObject } from '../types';
 
@@ -11,37 +12,28 @@ describe('MemoryLinker', () => {
   // UnifiedMemory has many required fields. The linker tests only
   // exercise id/content/scope/retention/tags/vectorId/isGhost/gist, so
   // we fill the rest with package defaults via buildMemorySkeleton.
-  const mockMemory: MemoryObject = {
-    ...({
-      id: '00000000-0000-4000-a000-000000000000',
+  const mockMemory: MemoryObject = buildMemorySkeleton(
+    {
       content: 'The user is talking about shadow work.',
+      userId: 'test-user',
       scope: 'session',
       retention: 'short_term',
-    } as Partial<MemoryObject>),
-    tenantId: 'test',
-    userId: 'test-user',
-    bankId: 'test',
-    category: 'conversation',
-    version: 1,
-    schemaVersion: '1.0.0',
-    sourceService: 'unknown',
-    importance: 0.5,
-    decayRate: 0.01,
-    strengthTrend: 'stable',
-    activationCount: 0,
-    retrievalCount: 0,
-    isGhost: false,
-    gist: null,
-    synthesizedFrom: [],
-    vectorId: null,
-    emotionalContext: null,
-    empathyMetrics: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: null,
-    accessedAt: null,
-    lastRetrievedAt: null,
-    tags: [],
-  } as MemoryObject;
+      tenantId: 'test',
+      bankId: 'test',
+      tags: [],
+    },
+    {
+      id: '00000000-0000-4000-a000-000000000000',
+      isGhost: false,
+      gist: null,
+      vectorId: null,
+      emotionalContext: null,
+      empathyMetrics: null,
+      updatedAt: null,
+      accessedAt: null,
+      lastRetrievedAt: null,
+    },
+  );
 
   it('should link a vector ID to a memory object', () => {
     const linked = linker.linkVector(mockMemory, 'V-123');
