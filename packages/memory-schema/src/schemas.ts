@@ -8,6 +8,8 @@
 
 import { z } from 'zod'
 
+import { GatingMetadataSchema } from './gate-types'
+
 import type {
   CreateMemoryInput,
   EmotionalContext,
@@ -80,6 +82,7 @@ export const GateResultSchema = z.object({
   reason: z.string(),
   suggestedTags: z.array(z.string()),
   anomalyDetected: z.boolean(),
+  gating: GatingMetadataSchema.optional(),
 })
 
 // ---------------------------------------------------------------------------

@@ -285,4 +285,4 @@ export interface MemoryQueryOptions {
 export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
 
 // Re-export gate types for backward-compatible imports from ./types
-export type { GateDecision, GateResult } from './gate-types'
+export type { GateDecision } from './gate-types'
