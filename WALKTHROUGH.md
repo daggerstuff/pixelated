@@ -58,9 +58,21 @@ and copies `.env.example → .env` if needed.
 
 ### Manual setup
 
+Ensure prerequisites are installed and Docker is running before proceeding.
+
 ```bash
+# 1. Start database containers (MongoDB, Redis, PostgreSQL)
+docker compose -f docker/docker-compose.db.yml up -d
+
+# 2. Copy and configure environment file
+cp .env.example .env
+
+# 3. Install JS dependencies
 chmod +x scripts/devops/pnpm-install-with-fallback.sh
 scripts/devops/pnpm-install-with-fallback.sh
+
+# 4. Install Python dependencies
+uv sync
 ```
 
 ---

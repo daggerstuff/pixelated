@@ -61,8 +61,7 @@ install_with_retry() {
     fi
   done
   
-  # Return 0 for success, 1 for failure (bash convention)
-  return $((1 - success))
+  return $success
 }
 
 # Main execution
@@ -72,6 +71,8 @@ main() {
   # Determine which strategies to use based on environment
   if [[ "${PNPM_INSTALL_FORCE_NO_FROZEN_LOCKFILE:-}" == "1" ]]; then
     strategies=("no-frozen-lockfile")
+  elif [[ "${PNPM_INSTALL_PREFER_FROZEN_LOCKFILE:-}" == "1" ]]; then
+    strategies=("frozen-lockfile" "no-frozen-lockfile")
   else
     # Default strategy: try frozen-lockfile first, then fallback to no-frozen-lockfile
     strategies=("frozen-lockfile" "no-frozen-lockfile")

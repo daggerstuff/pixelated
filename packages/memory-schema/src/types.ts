@@ -103,7 +103,7 @@ export const EmotionalContextSchema = z.object({
   valence: z.number().min(-1).max(1),
   arousal: z.number().min(0).max(1),
   dominance: z.number().min(0).max(1),
-  primaryEmotion: z.string(),
+  primaryEmotion: z.string().min(1),
   intensity: z.number().min(0).max(1),
 })
 
@@ -242,9 +242,9 @@ export interface UnifiedMemory {
 export const UnifiedMemorySchema = z.object({
   // ── Identity ──────────────────────────────────────────────────────────────
   id: z.string().uuid(),
-  tenantId: z.string(),
-  userId: z.string(),
-  bankId: z.string(),
+  tenantId: z.string().min(1),
+  userId: z.string().min(1),
+  bankId: z.string().min(1),
 
   // ── Content ───────────────────────────────────────────────────────────────
   content: z.string().min(1).max(100000),
@@ -278,10 +278,10 @@ export const UnifiedMemorySchema = z.object({
   empathyMetrics: EmpathyMetricsSchema.nullable(),
 
   // ── Timestamps ────────────────────────────────────────────────────────────
-  createdAt: z.string(),
-  updatedAt: z.string().nullable(),
-  accessedAt: z.string().nullable(),
-  lastRetrievedAt: z.string().nullable(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime().nullable(),
+  accessedAt: z.string().datetime().nullable(),
+  lastRetrievedAt: z.string().datetime().nullable(),
 })
 
 // ---------------------------------------------------------------------------
@@ -308,9 +308,9 @@ export interface CreateMemoryInput {
 
 export const CreateMemoryInputSchema = z.object({
   content: z.string().min(1).max(100000),
-  userId: z.string(),
-  tenantId: z.string().optional(),
-  bankId: z.string().optional(),
+  userId: z.string().min(1),
+  tenantId: z.string().min(1).optional(),
+  bankId: z.string().min(1).optional(),
   scope: MemoryScopeSchema.optional(),
   retention: RetentionPolicySchema.optional(),
   category: z.string().optional(),
@@ -372,9 +372,9 @@ export interface MemoryQueryOptions {
 }
 
 export const MemoryQueryOptionsSchema = z.object({
-  userId: z.string(),
-  tenantId: z.string().optional(),
-  bankId: z.string().optional(),
+  userId: z.string().min(1),
+  tenantId: z.string().min(1).optional(),
+  bankId: z.string().min(1).optional(),
   scope: MemoryScopeSchema.optional(),
   retention: RetentionPolicySchema.optional(),
   category: z.string().optional(),
@@ -382,8 +382,8 @@ export const MemoryQueryOptionsSchema = z.object({
   strengthTrend: StrengthTrendSchema.optional(),
   minImportance: z.number().min(0).max(1).optional(),
   search: z.string().optional(),
-  limit: z.number().optional(),
-  offset: z.number().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  offset: z.number().int().min(0).optional(),
   sortBy: z
     .enum(['createdAt', 'updatedAt', 'importance', 'accessedAt'])
     .optional(),

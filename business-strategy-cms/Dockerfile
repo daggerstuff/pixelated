@@ -12,7 +12,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm
 
 # Install dependencies
-COPY ../scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
 RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
     /tmp/pnpm-install-with-fallback.sh && \
     rm /tmp/pnpm-install-with-fallback.sh
