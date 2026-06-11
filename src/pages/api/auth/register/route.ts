@@ -6,7 +6,7 @@ import { userManager, initializeDatabase } from '../../../../lib/db'
 // Register schema
 const RegisterSchema = z.object({
   fullName: z.string().min(2).max(100),
-  email: z.string().email(),
+  email: z.email(),
   password: z.string().min(8),
   termsAccepted: z.boolean(),
 })

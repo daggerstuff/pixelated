@@ -11,7 +11,7 @@ const logger = createBuildSafeLogger('treatment-plans-index')
 // Zod schemas for validation
 const treatmentObjectiveSchema = z.object({
   description: z.string().min(1),
-  targetDate: z.string().datetime().optional().nullable(),
+  targetDate: z.iso.datetime().optional().nullable(),
   status: z
     .enum(['Not Started', 'In Progress', 'Completed', 'On Hold', 'Cancelled'])
     .default('Not Started'),
@@ -21,7 +21,7 @@ const treatmentObjectiveSchema = z.object({
 
 const treatmentGoalSchema = z.object({
   description: z.string().min(1),
-  targetDate: z.string().datetime().optional().nullable(),
+  targetDate: z.iso.datetime().optional().nullable(),
   status: z
     .enum([
       'Not Started',
@@ -37,8 +37,8 @@ const treatmentGoalSchema = z.object({
 const treatmentPlanClientSchema = z.object({
   title: z.string().min(1),
   diagnosis: z.string().optional().nullable(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional().nullable(),
+  startDate: z.iso.datetime().optional(),
+  endDate: z.iso.datetime().optional().nullable(),
   status: z
     .enum(['Draft', 'Active', 'Completed', 'Discontinued', 'Archived'])
     .default('Draft'),

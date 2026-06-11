@@ -1,13 +1,11 @@
 import { z } from 'zod'
 
 const isoDateSchema = z
-  .string()
-  .datetime()
+  .iso.datetime()
   .transform((value) => new Date(value))
 
 const optionalIsoDateSchema = z
-  .string()
-  .datetime()
+  .iso.datetime()
   .transform((value) => new Date(value))
   .optional()
   .nullable()
@@ -66,7 +64,7 @@ export const SourceSchema = z
     authors: z.array(z.string()),
     publication_date: isoDateSchema,
     source_type: z.string(),
-    url: z.string().url(),
+    url: z.url(),
     doi: z.string().optional().nullable(),
     abstract: z.string(),
     keywords: z.array(z.string()),
@@ -353,8 +351,8 @@ export const ReportGeneratePayloadSchema = z.object({
   format: z.enum(['json', 'markdown', 'pdf']).default('json'),
   dateRange: z
     .object({
-      startDate: z.union([z.date(), z.string().datetime()]).optional(),
-      endDate: z.union([z.date(), z.string().datetime()]).optional(),
+      startDate: z.union([z.date(), z.iso.datetime()]).optional(),
+      endDate: z.union([z.date(), z.iso.datetime()]).optional(),
     })
     .optional(),
 })

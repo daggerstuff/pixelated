@@ -17,7 +17,6 @@ const ContactFormSchema = z.object({
     .max(100, 'Name must not exceed 100 characters')
     .regex(/^[a-zA-Z\s\-']+$/, 'Name contains invalid characters'),
   email: z
-    .string()
     .email('Invalid email format')
     .max(100, 'Email must not exceed 100 characters')
     .toLowerCase(),
