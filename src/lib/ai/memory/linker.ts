@@ -15,7 +15,7 @@ export class MemoryLinker {
   linkVector(memory: MemoryObject, vectorId: string): MemoryObject {
     return {
       ...memory,
-      vector_id: vectorId,
+      vectorId,
     };
   }
 
@@ -25,8 +25,8 @@ export class MemoryLinker {
    * and preserves the summary (gist).
    */
   toGhost(memory: MemoryObject): MemoryObject {
-    if (!memory.vector_id) {
-      throw new Error(`Cannot archive memory ${memory.id} without a vector_id.`);
+    if (!memory.vectorId) {
+      throw new Error(`Cannot archive memory ${memory.id} without a vectorId.`);
     }
 
     appLogger.info('Archiving ghost node', { id: memory.id });
@@ -34,7 +34,7 @@ export class MemoryLinker {
     return {
       ...memory,
       content: '[ARCHIVED_GHOST_NODE]', // Redact primary content
-      is_ghost: true,
+      isGhost: true,
       gist: memory.gist ?? this.generateGist(memory.content),
     };
   }
