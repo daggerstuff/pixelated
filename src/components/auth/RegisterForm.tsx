@@ -94,7 +94,6 @@ export function RegisterForm({
       const response = await authClient.signUp.email({
         email,
         password,
-        name: fullName,
       })
 
       if (response.error) {

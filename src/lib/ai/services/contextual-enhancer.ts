@@ -5,6 +5,7 @@ import { PatientPsiProfile } from "../types/patient-psi";
 import { RealTimeAnalyzer } from "./real-time-analyzer";
 
 export class ContextualEnhancer {
+  private readonly analyzer: RealTimeAnalyzer;
   private readonly sessionHistory: Map<string, SessionContext[]> = new Map();
   private readonly progressTracker: Map<string, TherapeuticProgress> = new Map();
   private readonly logger: Logger;

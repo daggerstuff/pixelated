@@ -1,4 +1,4 @@
-import type { PerformanceMetrics } from '../ai/performance'
+import type { ModelPerformanceMetrics as PerformanceMetrics } from '../ai/performance'
 import { logger } from '../logger'
 
 export class PerformanceLogger {

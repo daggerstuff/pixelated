@@ -18,7 +18,7 @@ interface SentryTestProps {
 
 export default function SentryTest({ className = '' }: SentryTestProps) {
   // Only show in development
-  if (import.meta['env'].PROD) {
+  if (import.meta.env.PROD) {
     return null
   }
 

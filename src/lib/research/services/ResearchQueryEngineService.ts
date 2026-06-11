@@ -209,7 +209,7 @@ export class ResearchQueryEngineService {
       }
 
       // Validate consent for data access
-      const consentValid = await consentManagementService.validateConsent(
+      const consentValid = await (consentManagementService as any).validateConsent(
         userId,
         {
           activityType: 'research_query',

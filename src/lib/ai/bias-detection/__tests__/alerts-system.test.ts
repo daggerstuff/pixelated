@@ -1081,11 +1081,11 @@ describe('BiasAlertSystem', () => {
         recipients: ['test'],
       })
 
-      const result: BiasAnalysisResult = {
+      const result = {
         ...mockAnalysisResult,
         overallBiasScore: 0.75,
         sessionId: 'throwing-condition',
-      }
+      } as any as BiasAnalysisResult
 
       await alertSystem.checkAlerts(result)
       // Should still generate alerts from non-throwing rules
@@ -1275,7 +1275,7 @@ describe('BiasAlertSystem', () => {
       ]
 
       for (const r of results) {
-        await alertSystem.checkAlerts(r)
+        await alertSystem.checkAlerts(r as unknown as BiasAnalysisResult)
       }
 
       const stats = await alertSystem.getAlertStatistics()

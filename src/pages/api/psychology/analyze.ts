@@ -548,7 +548,7 @@ function calculateProgressMetrics(
   }
 }
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: { request: Request }) => {
   const startTime = Date.now()
 
   try {

@@ -24,11 +24,12 @@ const mockReport = {
   sessionId: 'session-1',
   reportType: 'summary' as const,
   format: 'json' as const,
-  generatedAt: '2024-01-01T00:00:00Z',
+  generatedDate: new Date('2024-01-01T00:00:00Z'),
   content: {
     summary: 'Test report',
     metrics: {},
   },
+  filePath: null,
 }
 
 const mockReportList = {

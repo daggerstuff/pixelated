@@ -69,11 +69,6 @@ interface MentalHealthChatOptions {
   confidenceThreshold?: number
 }
 
-interface FHEService {
-  encrypt?: (data: string) => Promise<string>
-  decrypt?: (data: string) => Promise<string>
-}
-
 /**
  * Internal analysis conversion function
  */

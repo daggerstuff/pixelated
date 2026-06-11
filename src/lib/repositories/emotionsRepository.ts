@@ -1,4 +1,4 @@
-import type { DimensionalEmotionMap } from '../ai/emotions/dimensionalTypes'
+import type { DimensionalEmotion } from '../ai/emotions/dimensionalTypes'
 
 // Interface for dimensional emotion query parameters
 export interface DimensionalEmotionsQuery {
@@ -12,14 +12,14 @@ export interface DimensionalEmotionsQuery {
 export interface EmotionsRepository {
   getDimensionalEmotions(
     query: DimensionalEmotionsQuery,
-  ): Promise<DimensionalEmotionMap[]>
+  ): Promise<DimensionalEmotion[]>
 }
 
 // Implementation of the emotions repository
 class EmotionsRepositoryImpl implements EmotionsRepository {
   async getDimensionalEmotions(
     query: DimensionalEmotionsQuery,
-  ): Promise<DimensionalEmotionMap[]> {
+  ): Promise<DimensionalEmotion[]> {
     // Implement actual database query here
     console.log(`Querying emotions for client: ${query.clientId}`)
     // This is a placeholder implementation

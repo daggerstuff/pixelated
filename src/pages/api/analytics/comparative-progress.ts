@@ -58,7 +58,7 @@ export const get = async ({ request, cookies }) => {
     const validationResult = requestSchema.safeParse(params)
     if (!validationResult.success) {
       logger.warn('Invalid comparative progress request', {
-        errors: validationResult.error.flatten(),
+        errors: z.flattenError(validationResult.error),
         path: url.pathname,
       })
 
@@ -66,7 +66,7 @@ export const get = async ({ request, cookies }) => {
         JSON.stringify({
           success: false,
           error: 'Invalid request parameters',
-          details: validationResult.error.flatten(),
+          details: z.flattenError(validationResult.error),
         }),
         {
           status: 400,

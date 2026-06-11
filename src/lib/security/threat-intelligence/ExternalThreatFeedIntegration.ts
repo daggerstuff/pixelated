@@ -413,7 +413,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    */
   private async setupRedisPubSub(): Promise<void> {
     try {
-      const subscriber = this.redis['duplicate']()
+      const subscriber = (this.redis as any)['duplicate']()
       await subscriber.connect()
 
       // Subscribe to sync requests

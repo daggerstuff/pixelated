@@ -420,7 +420,12 @@ export function useDocumentation(sessionId: string): UseDocumentationReturn {
           metadata:
             typeof rawResult.metadata === 'object' &&
             rawResult.metadata !== null
-              ? rawResult.metadata
+              ? (rawResult.metadata as {
+                  exportedAt: Date
+                  exportedBy: string
+                  patientId: string
+                  providerId: string
+                })
               : {
                   exportedAt: new Date(),
                   exportedBy: 'system',

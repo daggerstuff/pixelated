@@ -1,11 +1,11 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { generateId } from '../../utils/ids'
-import type {
-  BaaTemplate,
-  BaaTemplateSection,
-  BaaPlaceholder,
-  BusinessAssociateType,
+import {
   ServiceCategory,
+  type BaaTemplate,
+  type BaaTemplateSection,
+  type BaaPlaceholder,
+  type BusinessAssociateType,
 } from './types'
 
 // Initialize logger for PHI audit logging
@@ -532,7 +532,7 @@ export class BaaTemplateService {
         'DATA_ANALYTICS' as any,
         'TELEMEDICINE' as any,
       ],
-      ['DATA_STORAGE', 'SOFTWARE_SERVICES', 'CONSULTING'],
+      [ServiceCategory.DATA_STORAGE, ServiceCategory.SOFTWARE_SERVICES, ServiceCategory.CONSULTING],
       [],
       [],
       true,

@@ -5,23 +5,23 @@ export const supabase = {
       select() {
         return {
           eq: async (
-            key: string,
-            value: unknown,
+            _key: string,
+            _value: unknown,
           ): Promise<{ data: T[]; error: unknown }> => {
             return { data: [], error: null }
           },
         }
       },
-      insert(data: T) {
+      insert(_data: T) {
         return {
           select: async () => ({ data: null, error: null }),
         }
       },
-      update(data: Partial<T>) {
+      update(_data: Partial<T>) {
         return {
           eq: async (
-            key: string,
-            value: unknown,
+            _key: string,
+            _value: unknown,
           ): Promise<{ data: T; error: unknown }> => {
             return { data: null as unknown as T, error: null }
           },
@@ -30,8 +30,8 @@ export const supabase = {
       delete() {
         return {
           eq: async (
-            key: string,
-            value: unknown,
+            _key: string,
+            _value: unknown,
           ): Promise<{ error: unknown }> => {
             return { error: null }
           },
@@ -41,7 +41,7 @@ export const supabase = {
   },
 }
 
-const makeSupabaseClient = (url: string, key: string) => ({
+const makeSupabaseClient = (_url: string, _key: string) => ({
   from: (table: string) => supabase.from(table),
 })
 export { makeSupabaseClient }

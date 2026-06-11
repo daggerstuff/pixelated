@@ -1,7 +1,7 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('default')
-import type { RecommendationContext } from './OutcomeRecommendationEngine'
+import type { RecommendationContext } from './outcome-recommendation-types'
 
 interface TherapySession {
   sessionId: string
@@ -59,12 +59,23 @@ export function collectContext(
       status: input.session.status,
       securityLevel: input.session.securityLevel,
       emotionAnalysisEnabled: input.session.emotionAnalysisEnabled,
+      metadata: {},
     },
-    chatSession: input.chatSession,
-    recentEmotionState: input.recentEmotionState,
+    chatSession: {
+      messages: input.chatSession.messages,
+      metadata: input.chatSession.metadata ?? {},
+    },
+    recentEmotionState: {
+      currentEmotion: input.recentEmotionState.currentEmotion,
+      intensity: input.recentEmotionState.intensity,
+      timestamp: input.recentEmotionState.timestamp,
+      confidence: input.recentEmotionState.confidence,
+      relatedFactors: input.recentEmotionState.relatedFactors,
+      metadata: {},
+    },
     recentInterventions: input.recentInterventions,
     userPreferences: input.userPreferences ?? {},
-    mentalHealthAnalysis: input.mentalHealthAnalysis ?? {},
+    mentalHealthAnalysis: input.mentalHealthAnalysis ?? undefined,
   }
 
   return context
