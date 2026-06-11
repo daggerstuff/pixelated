@@ -95,6 +95,28 @@ export interface GateResult {
   reason: string
   suggestedTags: string[]
   anomalyDetected: boolean
+  /**
+   * Optional detailed gating metadata produced by the safety pipeline
+   * (PII redaction, crisis detection, trauma filtering, consent gate).
+   * Only populated when the caller asks for the full evaluation trace.
+   */
+  gating?: GatingMetadata
+}
+
+/**
+ * Detailed metadata produced by the safety-gating pipeline. Mirrors the
+ * fields the local `SocraticGate` produces in `src/lib/ai/memory/gate.ts`.
+ */
+export interface GatingMetadata {
+  piiRedacted: boolean
+  piiTypes: string[]
+  crisisTier: string
+  crisisFlag: boolean
+  traumaIndicators: string[]
+  traumaSeverity: string
+  consentTier: string
+  consentAllowed: boolean
+  scrubbedContent: string
 }
 
 // ---------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { buildMemorySkeleton } from '@pixelated/memory-schema';
 import { MemorySystem } from '../index';
 import { CrisisDetectionService } from '../../services/crisis-detection';
+import type { MemoryObject } from '../types';
 
 // Mock the dependencies
 vi.mock('../../services/crisis-detection');
@@ -49,6 +51,25 @@ vi.mock('@/lib/memory/gates/trauma-filter', () => ({
   },
 }));
 
+/**
+ * Build a valid UnifiedMemory fixture for the synthesizer tests.
+ * The synthesizer reads emotionalContext, empathyMetrics, and the
+ * numeric fields; we let buildMemorySkeleton fill the rest with
+ * canonical defaults.
+ */
+function makeMemoryFixture(overrides: Partial<MemoryObject>): MemoryObject {
+  const base = buildMemorySkeleton(
+    { content: 'fixture', userId: 'test-user', scope: 'session', retention: 'short_term' },
+    {
+      id: '00000000-0000-4000-a000-000000000000',
+      tags: [],
+      synthesizedFrom: [],
+      isGhost: false,
+    },
+  );
+  return { ...base, ...overrides } as MemoryObject;
+}
+
 describe('MemorySystem', () => {
   let memorySystem: MemorySystem;
   let mockCrisisService: any;
@@ -92,7 +113,7 @@ describe('MemorySystem', () => {
     const result = await memorySystem.ingest(content, 'session', 'short_term', 'test-user-123');
 
     expect(result.gateResult.decision).toBe('active');
-    expect(result.gateResult.crisis_detected).toBe(true);
+    expect(result.gateResult.anomalyDetected).toBe(true);
     expect(result.memory.tags).toContain('CRISIS_SIGNAL');
     expect(result.memory.tags).toContain('TERM_SUICIDE');
   });
@@ -133,29 +154,23 @@ describe('MemorySystem', () => {
 
   describe('Reconciliation & Synthesis', () => {
     it('should detect a stance shift when metrics deviate significantly', async () => {
-      const historicMemories = Array(8).fill(null).map((_, i) => ({
-        id: `00000000-0000-4000-a000-00000000000${i}`,
-        timestamp: new Date(Date.now() - 1000000 - i * 1000).toISOString(),
-        content: 'Good baseline.',
-        scope: 'session' as any,
-        retention: 'short_term' as any,
-        tags: [],
-        synthesized_from: [],
-        is_ghost: false,
-        metrics: { reciprocity: 0.8, validation_accuracy: 0.8, resistance_level: 0.1 }
-      }));
+      const historicMemories = Array(8).fill(null).map((_, i) =>
+        makeMemoryFixture({
+          id: `00000000-0000-4000-a000-00000000000${i}`,
+          content: 'Good baseline.',
+          createdAt: new Date(Date.now() - 1000000 - i * 1000).toISOString(),
+          empathyMetrics: { reciprocity: 0.8, validationAccuracy: 0.8, resistanceLevel: 0.1 },
+        }),
+      );
 
-      const recentMemories = Array(2).fill(null).map((_, i) => ({
-        id: `00000000-0000-4000-b000-00000000000${i}`,
-        timestamp: new Date().toISOString(),
-        content: 'Drop in empathy.',
-        scope: 'session' as any,
-        retention: 'short_term' as any,
-        tags: [],
-        synthesized_from: [],
-        is_ghost: false,
-        metrics: { reciprocity: 0.2, validation_accuracy: 0.2, resistance_level: 0.9 }
-      }));
+      const recentMemories = Array(2).fill(null).map((_, i) =>
+        makeMemoryFixture({
+          id: `00000000-0000-4000-b000-00000000000${i}`,
+          content: 'Drop in empathy.',
+          createdAt: new Date().toISOString(),
+          empathyMetrics: { reciprocity: 0.2, validationAccuracy: 0.2, resistanceLevel: 0.9 },
+        }),
+      );
 
       const synthesis = await memorySystem.reconcile([...historicMemories, ...recentMemories]);
 
@@ -166,29 +181,22 @@ describe('MemorySystem', () => {
     });
 
     it('should identify candidates for merging based on importance/decay', async () => {
-      const oldMemories = Array(5).fill(null).map((_, i) => ({
-        id: `00000000-0000-4000-c000-00000000000${i}`,
-        timestamp: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days old
-        content: 'Vague old memory.',
-        scope: 'session' as any,
-        retention: 'short_term' as any,
-        tags: [],
-        synthesized_from: [],
-        is_ghost: false,
-        emotional_context: { intensity: 0.1, valence: 0, arousal: 0, dominance: 0.5, primary_emotion: 'none' }
-      }));
+      const oldMemories = Array(5).fill(null).map((_, i) =>
+        makeMemoryFixture({
+          id: `00000000-0000-4000-c000-00000000000${i}`,
+          content: 'Vague old memory.',
+          createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days old
+          emotionalContext: { intensity: 0.1, valence: 0, arousal: 0, dominance: 0.5, primaryEmotion: 'none' },
+        }),
+      );
 
-      const newImportantMemory = {
+      const newImportantMemory = makeMemoryFixture({
         id: '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d', // Valid UUID
-        timestamp: new Date().toISOString(),
         content: 'Very important and intense!',
-        scope: 'session' as any,
-        retention: 'short_term' as any,
+        createdAt: new Date().toISOString(),
         tags: ['CRISIS_SIGNAL'],
-        synthesized_from: [],
-        is_ghost: false,
-        emotional_context: { intensity: 1.0, valence: -1, arousal: 1, dominance: 0.8, primary_emotion: 'panic' }
-      };
+        emotionalContext: { intensity: 1.0, valence: -1, arousal: 1, dominance: 0.8, primaryEmotion: 'panic' },
+      });
 
       const synthesis = await memorySystem.reconcile([...oldMemories, newImportantMemory]);
       if (!synthesis) throw new Error('Synthesis failed');
@@ -202,14 +210,14 @@ describe('MemorySystem', () => {
 
     it('should link vector IDs and archive ghost nodes', async () => {
       const { memory } = await memorySystem.ingest('Highly sensitive discovery.', 'trait', 'long_term', 'user1');
-      
+
       // Phase 3: Link to vector store
       const linkedMemory = memorySystem.link(memory, 'v-id-123');
-      expect(linkedMemory.vector_id).toBe('v-id-123');
+      expect(linkedMemory.vectorId).toBe('v-id-123');
 
       // Phase 3: Archive to Ghost Node
       const archived = memorySystem.archive([linkedMemory]);
-      expect(archived?.[0].is_ghost).toBe(true);
+      expect(archived?.[0].isGhost).toBe(true);
       expect(archived?.[0].content).toBe('[ARCHIVED_GHOST_NODE]');
       expect(archived?.[0].gist).toBeDefined();
     });
