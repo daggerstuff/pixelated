@@ -103,7 +103,7 @@ echo "  1. Ensure Node $(grep -oP '\"node\": \">=\K[0-9.]+' package.json || echo
 echo "  2. Ensure pnpm $(grep -oP 'pnpm@\K[0-9.]+' package.json || echo '11.5.2') is installed"
 echo "  3. Clear pnpm cache: pnpm store prune"
 echo "  4. Remove node_modules: rm -rf node_modules"
-echo "  5. Try: pnpm install --no-frozen-lockfile"
+echo "  5. Try: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile"
 echo "  6. If network issues persist, check firewall/proxy settings"
 echo ""
 

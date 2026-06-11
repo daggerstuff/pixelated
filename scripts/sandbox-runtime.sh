@@ -51,7 +51,7 @@ sync_deps() {
     echo "🔗 [Runtime] Syncing all dependencies..."
     uv pip compile pyproject.toml -o requirements.txt > /dev/null 2>&1
     uv lock > /dev/null 2>&1
-    pnpm install --no-frozen-lockfile > /dev/null 2>&1
+    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile > /dev/null 2>&1
 }
 
 # Execute Setup

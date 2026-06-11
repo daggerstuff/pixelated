@@ -23,6 +23,43 @@ export function jsonResponse(payload: unknown, status = 200): Response {
   })
 }
 
+export function successResponse(
+  data: unknown,
+  message = 'Success',
+  status = 200,
+): Response {
+  return jsonResponse(
+    {
+      success: true,
+      data,
+      message,
+    },
+    status,
+  )
+}
+
+/**
+ * Standardized error response format for the memory API
+ */
+export function errorResponse(
+  status: number,
+  error: string,
+  message: string,
+  details?: unknown,
+): Response {
+  const response: any = {
+    success: false,
+    error,
+    message,
+  }
+
+  if (details) {
+    response.details = details
+  }
+
+  return jsonResponse(response, status)
+}
+
 export function jsonError(
   status: number,
   error: string,

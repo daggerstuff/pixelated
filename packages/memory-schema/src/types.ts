@@ -39,11 +39,6 @@ export type RetentionPolicy =
 export type StrengthTrend = 'stable' | 'strengthening' | 'weakening' | 'stale'
 
 /**
- * Gate decision — output of Socratic Gate evaluation before memory ingestion.
- */
-export type GateDecision = 'auto' | 'passive' | 'active' | 'block'
-
-/**
  * Which service originally wrote this memory row.
  * Used for audit trails, debugging, and selective sync.
  */
@@ -288,3 +283,6 @@ export interface MemoryQueryOptions {
 
 /** Current schema version — bump when adding fields to UnifiedMemory */
 export const MEMORY_SCHEMA_VERSION = '1.0.0' as const
+
+// Re-export gate types for backward-compatible imports from ./types
+export type { GateDecision, GateResult } from './gate-types'

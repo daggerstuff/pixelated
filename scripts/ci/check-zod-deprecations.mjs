@@ -66,13 +66,25 @@ const SCAN_IGNORE = [
  * Skips keys whose values are not AST nodes (e.g. `loc`, `range`,
  * `parent`, primitive children).
  */
+const AST_NODE_KEYS = [
+  'body', 'declarations', 'declaration', 'arguments', 'params', 'init',
+  'test', 'consequent', 'alternate', 'left', 'right', 'object', 'callee',
+  'property', 'expression', 'argument', 'block', 'handler', 'finalizer',
+  'update', 'discriminant', 'cases', 'delegate', 'element', 'elements',
+  'properties', 'value', 'key', 'id', 'superClass', 'tag', 'quasis',
+  'expressions', 'specifiers', 'source', 'local', 'exported', 'imported',
+  'operator', 'prefix', 'extra', 'typeAnnotation', 'returnType',
+  'typeParameters', 'paramsType', 'extends', 'implements', 'mixins',
+  'types', 'member', 'qualification',
+]
+
 function walk(node, visit) {
   if (!node || typeof node !== 'object') return
   if (typeof node.type !== 'string') return
   visit(node)
-  for (const key of Object.keys(node)) {
-    if (key === 'parent' || key === 'loc' || key === 'range') continue
+  for (const key of AST_NODE_KEYS) {
     const child = node[key]
+    if (child === undefined) continue
     if (Array.isArray(child)) {
       for (const c of child) walk(c, visit)
     } else if (child && typeof child === 'object' && typeof child.type === 'string') {
@@ -96,8 +108,7 @@ function isZodStringCall(node) {
     node.callee.object?.type === 'Identifier' &&
     node.callee.object.name === 'z' &&
     node.callee.property?.type === 'Identifier' &&
-    node.callee.property.name === 'string' &&
-    node.arguments.length === 0
+    node.callee.property.name === 'string'
   )
 }
 
@@ -177,7 +188,7 @@ async function main() {
     const source = await readFile(file, 'utf8')
     let ast
     try {
-      const result = parseSync(file, source)
+      const result = parseSync(source, { sourceFilename: file })
       ast = result.program
     } catch {
       // Let `pnpm typecheck` report parse errors — we only flag semantic

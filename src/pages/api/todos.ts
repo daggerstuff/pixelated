@@ -5,6 +5,8 @@ import { verifyAuthToken } from '../../utils/auth'
 
 export const prerender = false
 
+const ERROR_MESSAGE = 'An unexpected error occurred'
+
 /**
  * Todos API endpoint
  * GET /api/todos - Get all todos for authenticated user
@@ -43,7 +45,7 @@ export const GET = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch todos',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: ERROR_MESSAGE,
       }),
       {
         status: 500,
@@ -100,7 +102,7 @@ export const POST = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to create todo',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        message: ERROR_MESSAGE,
       }),
       {
         status: 500,

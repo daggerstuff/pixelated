@@ -26,6 +26,7 @@ pnpm vitest run -c config/vitest.config.ts
 ```
 
 ### Key Commands
+- **Submodules**: `git submodule init && git submodule update` (run after clone/pull, before `pnpm install`)
 - **Lint**: `pnpm lint` (oxlint; pre-existing warnings expected)
 - **Typecheck**: `pnpm typecheck`
 - **Tests**: `pnpm vitest run -c config/vitest.config.ts`
@@ -134,6 +135,17 @@ DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
   pnpm exec playwright test tests/e2e/infrastructure/ssr-functionality.spec.ts \
   --config=config/playwright.config.ts --project=chromium
 ```
+
+### Submodules
+After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
+```bash
+git submodule init
+git submodule update
+pnpm install --no-frozen-lockfile
+```
+Use `--no-frozen-lockfile` for local and CI installs to avoid frozen-lockfile retry/failover loops when the lockfile drifts.
+
+For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead of plain `git submodule` commands.
 
 ### Long-running dev server
 Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
