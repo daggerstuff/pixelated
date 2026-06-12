@@ -109,7 +109,10 @@ export function resolveSentryDsn(): string | undefined {
 export const SENTRY_CONFIG = {
   dsn: resolveSentryDsn(),
 
-  environment: import.meta.env.MODE,
+  // Use import.meta.env.DEV (Vite's built-in flag) as the authoritative check
+  // so that running `astro dev --mode production` still reports 'development',
+  // preventing local Vite dev-server errors from being tagged as production.
+  environment: import.meta.env.DEV ? 'development' : import.meta.env.MODE,
   release: resolveSentryRelease('0.0.1'),
 
   // Enable Release Health - automatic session tracking for crash-free metrics
@@ -142,6 +145,16 @@ export const SENTRY_CONFIG = {
 export function beforeSend(event: Event): Event | null {
   if (import.meta.env.DEV) {
     console.log('Sentry event:', event)
+  }
+
+  // Drop events originating from a local Vite dev server (localhost / 127.0.0.1)
+  // so that dev-only errors (e.g. stale Vite dep chunks) never appear in Sentry
+  // regardless of which --mode flag was passed to the dev server.
+  if (typeof window !== 'undefined') {
+    const { hostname } = window.location
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return null
+    }
   }
 
   return event
