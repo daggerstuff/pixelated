@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
 import { PixelatedClient } from './index'
 
 // Mock fetch for testing

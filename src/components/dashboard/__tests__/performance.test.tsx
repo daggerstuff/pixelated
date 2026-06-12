@@ -1,24 +1,17 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
+
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+import { TherapistDashboard } from '../TherapistDashboard'
+
 import '@testing-library/jest-dom/vitest'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
-
-import { TherapistDashboard } from '../TherapistDashboard'
 
 // Local minimal type to avoid relying on path aliases in tests
 interface TherapistSession {

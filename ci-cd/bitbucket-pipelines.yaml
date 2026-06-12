@@ -43,7 +43,8 @@ definitions:
       script:
         - npm install -g pnpm@11.5.2
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
-        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS="" scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm lint
         - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
@@ -54,7 +55,8 @@ definitions:
       script:
         - npm install -g pnpm@11.5.2
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
-        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS="" scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm security:scan
     - step: &playwright-e2e
       name: Playwright Smoke E2E
@@ -64,7 +66,8 @@ definitions:
       script:
         - npm install -g pnpm@11.5.2
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
-        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS="" scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm test:e2e:smoke
     - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud

@@ -2,18 +2,23 @@
   "name": "@pixelated-empathy/sdk",
   "version": "1.0.0",
   "description": "TypeScript SDK for the Pixelated Empathy API",
+  "keywords": [
+    "api",
+    "empathy",
+    "pixelated",
+    "sdk"
+  ],
+  "license": "MIT",
+  "author": "Pixelated Empathy",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src/**/*.ts"
   },
-  "keywords": ["pixelated", "empathy", "api", "sdk"],
-  "author": "Pixelated Empathy",
-  "license": "MIT",
   "devDependencies": {
     "@types/node": "^25.9.3",
     "typescript": "^4.9.0",

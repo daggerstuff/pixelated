@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('health-simple-api')
@@ -29,7 +30,10 @@ export const GET: APIRoute = async () => {
     })
   } catch (error: unknown) {
     logger.error('Error in GET /api/health/simple', {
-      error: error instanceof Error ? { name: error.name, message: error.message, stack: error.stack } : String(error),
+      error:
+        error instanceof Error
+          ? { name: error.name, message: error.message, stack: error.stack }
+          : String(error),
     })
 
     return new Response(
