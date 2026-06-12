@@ -910,7 +910,7 @@ toolz==1.1.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   altair
-torch==2.10.0
+torch==2.12.0
     # via -r src/lib/ai/bias-detection/requirements.txt
 tornado==6.5.5
     # via -r src/lib/ai/bias-detection/requirements.txt
