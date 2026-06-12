@@ -446,7 +446,7 @@
     "viewerjs": "latest",
     "vite": "^8.0.16",
     "vite-tsconfig-paths": "latest",
-    "vitest": "^4.1.8",
+    "vitest": "^3.2.6",
     "vscode-jsonrpc": "9.0.0",
     "wait-on": "latest"
   },
