@@ -68,7 +68,7 @@ const GateMemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
  * Matches the fields read by both TS and Python gate implementations.
  */
 export const GateMemoryInputSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   content: z.string().min(1),
   scope: GateMemoryScopeSchema,
 })
@@ -98,4 +98,6 @@ export type GateEvaluateOutput = z.infer<typeof GateEvaluateOutputSchema>
 export const GateEvaluateOutputWireSchema = z.object({
   result: GateResultWireSchema,
 })
-export type GateEvaluateOutputWire = z.infer<typeof GateEvaluateOutputWireSchema>
+export type GateEvaluateOutputWire = z.infer<
+  typeof GateEvaluateOutputWireSchema
+>
