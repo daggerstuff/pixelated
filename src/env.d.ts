@@ -46,6 +46,17 @@ declare global {
         isAndroid: boolean
         ip: string
       }
+      /**
+       * Permissive fallback for ad-hoc keys written by middleware
+       * (e.g. `context.locals['admin']` in `adminGuard`).
+       *
+       * Astro 5.x's `APIContext.locals` is intentionally free-form — declaring
+       * new shared keys here gives autocomplete and drift detection. Ad-hoc
+       * keys (e.g. middleware-set values) fall through to `unknown`.
+       *
+       * See `src/__tests__/env-locals-contract.type-test.ts` for the contract.
+       */
+      [key: string]: unknown
     }
   }
 }
