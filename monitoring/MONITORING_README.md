@@ -48,7 +48,7 @@ The monitoring system provides:
 
 ### Access Monitoring Services
 
-- **Grafana**: http://localhost:3001 (admin/admin)
+- **Grafana**: http://localhost:3100 (admin/admin)
 - **Prometheus**: http://localhost:9090
 - **Alertmanager**: http://localhost:9093
 
@@ -65,7 +65,7 @@ The monitoring system provides:
 ### Grafana
 
 - **Purpose**: Metrics visualization and dashboards
-- **Port**: 3001
+- **Port**: 3100
 - **Configuration**: `monitoring/grafana/`
 - **Default Login**: admin/admin
 - **Dashboards**: `monitoring/dashboards/`
@@ -377,7 +377,7 @@ rate({job="pixelated-empathy"}[5m])
 curl http://localhost:9090/api/v1/targets
 
 # Check Grafana health
-curl http://localhost:3001/api/health
+curl http://localhost:3100/api/health
 
 # Check Loki logs
 curl http://localhost:3100/ready
@@ -430,7 +430,7 @@ curl -X POST http://localhost:9093/api/v1/alerts
 - name: Check monitoring health
   run: |
     curl -f http://localhost:9090/-/healthy
-    curl -f http://localhost:3001/api/health
+    curl -f http://localhost:3100/api/health
 ```
 
 ### External Services
