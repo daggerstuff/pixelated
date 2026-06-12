@@ -155,7 +155,8 @@ export type PostSchema = z.infer<typeof postSchema>
 /* Projects */
 const projectSchema = z.object({
   id: z.string().describe('**Required**. Name of the project to be displayed.'),
-  link: z.url('Invalid url.')
+  link: z
+    .url('Invalid url.')
     .describe('**Required**. URL linking to the project page or repository.'),
   desc: z
     .string()
@@ -193,8 +194,9 @@ const streamSchema = z.object({
     .describe(
       '**Required**. Specifies the publication date. See supported formats [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse#examples).',
     ),
-    link: z.url('Invalid url.')
-      .describe('**Required**. Specifies the URL link to the stream.'),
+  link: z
+    .url('Invalid url.')
+    .describe('**Required**. Specifies the URL link to the stream.'),
   radio: z
     .boolean()
     .default(false)

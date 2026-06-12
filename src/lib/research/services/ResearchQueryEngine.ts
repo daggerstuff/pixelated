@@ -131,7 +131,9 @@ export class ResearchQueryEngine {
       // Step 7: Log performance metrics
       const metrics: QueryPerformanceMetrics = {
         executionTime: Date.now() - startTime,
-        resultSize: Array.isArray(anonymizedResult.data) ? anonymizedResult.data.length : 0,
+        resultSize: Array.isArray(anonymizedResult.data)
+          ? anonymizedResult.data.length
+          : 0,
         complexityScore: this.calculateComplexityScore(query),
         cacheHit: false,
       }
@@ -677,10 +679,14 @@ export class ResearchQueryEngine {
 
     // Apply anonymization based on level
     const anonymizedData =
-      await this.anonymizationService.anonymizeResearchData(
+      (await this.anonymizationService.anonymizeResearchData(
         result.data as any,
         consentLevel,
-      ) as unknown as { anonymizedData: any; privacyMetrics: any; auditLog: any }
+      )) as unknown as {
+        anonymizedData: any
+        privacyMetrics: any
+        auditLog: any
+      }
 
     return {
       ...result,

@@ -1,11 +1,9 @@
 import { z } from 'zod'
 
-const isoDateSchema = z
-  .iso.datetime()
-  .transform((value) => new Date(value))
+const isoDateSchema = z.iso.datetime().transform((value) => new Date(value))
 
-const optionalIsoDateSchema = z
-  .iso.datetime()
+const optionalIsoDateSchema = z.iso
+  .datetime()
   .transform((value) => new Date(value))
   .optional()
   .nullable()

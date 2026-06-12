@@ -1,3 +1,19 @@
+import {
+  handleGatewayError,
+  jsonError,
+  jsonResponse,
+  parseJson,
+  parseRequestJson,
+  requireAuthenticatedMemoryCaller,
+  toPublicMemory,
+} from '@/lib/memory/contract/route-helpers'
+import {
+  DeleteMemoryResponse,
+  GetMemoryResponse,
+  MemoryIdParam,
+  UpdateMemoryRequest,
+  UpdateMemoryResponse,
+} from '@/lib/memory/contract/v1'
 /**
  * @file src/pages/api/v1/memory/[memoryId].ts
  *
@@ -13,28 +29,9 @@
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 
-import {
-  DeleteMemoryResponse,
-  GetMemoryResponse,
-  MemoryIdParam,
-  UpdateMemoryRequest,
-  UpdateMemoryResponse,
-} from '@/lib/memory/contract/v1'
-import {
-  handleGatewayError,
-  jsonError,
-  jsonResponse,
-  parseJson,
-  parseRequestJson,
-  requireAuthenticatedMemoryCaller,
-  toPublicMemory,
-} from '@/lib/memory/contract/route-helpers'
-
 function resolveMemoryId(
   params: Record<string, string | undefined> | undefined,
-):
-  | { ok: true; memoryId: string }
-  | { ok: false; response: Response } {
+): { ok: true; memoryId: string } | { ok: false; response: Response } {
   // Extract just the memoryId key — Astro may pass other keys in
   // `params`, and `MemoryIdParam` is strict to enforce the contract.
   const memoryId = (params ?? {})['memoryId']

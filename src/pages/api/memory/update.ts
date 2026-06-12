@@ -4,25 +4,25 @@ import {
   jsonResponse,
   toMemoryScope,
   withAuthenticatedMemoryRoute,
-} from "./_shared";
+} from './_shared'
 
 function toUnifiedMemoryFormat(memory: any, userId: string) {
   return {
     id: memory.id,
-    tenantId: memory.tenantId ?? "default",
+    tenantId: memory.tenantId ?? 'default',
     userId: memory.userId ?? userId,
-    bankId: memory.bankId ?? "default",
+    bankId: memory.bankId ?? 'default',
     content: memory.content,
-    scope: memory.scope ?? "session",
-    retention: memory.retention ?? "short_term",
-    category: memory.category ?? "general",
+    scope: memory.scope ?? 'session',
+    retention: memory.retention ?? 'short_term',
+    category: memory.category ?? 'general',
     tags: memory.tags ?? [],
     version: memory.version ?? 1,
-    schemaVersion: memory.schemaVersion ?? "1.0.0",
-    sourceService: memory.sourceService ?? "astro-frontend",
+    schemaVersion: memory.schemaVersion ?? '1.0.0',
+    sourceService: memory.sourceService ?? 'astro-frontend',
     importance: memory.importance ?? 0.5,
     decayRate: memory.decayRate ?? 0.01,
-    strengthTrend: memory.strengthTrend ?? "stable",
+    strengthTrend: memory.strengthTrend ?? 'stable',
     activationCount: memory.activationCount ?? 0,
     retrievalCount: memory.retrievalCount ?? 0,
     isGhost: memory.isGhost ?? false,
@@ -35,29 +35,36 @@ function toUnifiedMemoryFormat(memory: any, userId: string) {
     updatedAt: memory.updatedAt ?? null,
     accessedAt: memory.accessedAt ?? null,
     lastRetrievedAt: memory.lastRetrievedAt ?? null,
-  };
+  }
 }
 
-const handleUpdate = withAuthenticatedMemoryRoute("updating memory", async ({ request }, user) => {
-  const body = await request.json();
-  const { memoryId, content, metadata } = body;
+const handleUpdate = withAuthenticatedMemoryRoute(
+  'updating memory',
+  async ({ request }, user) => {
+    const body = await request.json()
+    const { memoryId, content, metadata } = body
 
-  if (!memoryId || !content) {
-    return jsonError(400, "Bad Request", "memoryId and content parameters are required");
-  }
+    if (!memoryId || !content) {
+      return jsonError(
+        400,
+        'Bad Request',
+        'memoryId and content parameters are required',
+      )
+    }
 
-  const result = await getGateway().updateMemory({
-    ...toMemoryScope(user.id, user.accountId, user.workspaceId),
-    memoryId,
-    content,
-    metadata,
-  });
+    const result = await getGateway().updateMemory({
+      ...toMemoryScope(user.id, user.accountId, user.workspaceId),
+      memoryId,
+      content,
+      metadata,
+    })
 
-  return jsonResponse({
-    success: true,
-    memory: toUnifiedMemoryFormat(result, user.id),
-  });
-});
+    return jsonResponse({
+      success: true,
+      memory: toUnifiedMemoryFormat(result, user.id),
+    })
+  },
+)
 
-export const PUT = handleUpdate;
-export const PATCH = handleUpdate;
+export const PUT = handleUpdate
+export const PATCH = handleUpdate

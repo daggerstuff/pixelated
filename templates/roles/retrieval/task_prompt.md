@@ -1,30 +1,39 @@
 \n\n# Task: {{TASK_TITLE}}
 
 ## Description
+
 {{TASK_DESCRIPTION}}
 
 {{#IF FILES}}
+
 ## Files to work with
-{{FILES}}
-{{/IF}}
+
+{{FILES}} {{/IF}}
 
 {{#IF CONTEXT}}
+
 ## Context
-{{CONTEXT}}
-{{/IF}}
+
+{{CONTEXT}} {{/IF}}
 
 ## Instructions
+
 1. Read existing indexing and retrieval code before adding new pipelines
-2. Define the retrieval contract clearly: what goes in (query), what comes out (ranked results with scores)
-3. Choose chunking strategy based on document structure — don't apply one-size-fits-all
-4. Log retrieval latency and top-k recall metrics; establish a baseline before optimizing
+2. Define the retrieval contract clearly: what goes in (query), what comes out
+   (ranked results with scores)
+3. Choose chunking strategy based on document structure — don't apply
+   one-size-fits-all
+4. Log retrieval latency and top-k recall metrics; establish a baseline before
+   optimizing
 5. Write tests with known queries and expected top results to catch regressions
 6. Run tests before marking complete: `uv run python scripts/run_tests.py -x`
 7. Only modify files listed in your task's `owned_files`
 
 ## If stuck or blocked
+
 - If a curl to the task server fails, retry up to 3 times with 2-second delays
-- If tests fail after your changes, fix the code — do not skip tests or mark complete with failures
+- If tests fail after your changes, fix the code — do not skip tests or mark
+  complete with failures
 - If you cannot determine the fix, mark the task as failed:
   ```bash
   curl -s -X POST http://127.0.0.1:8052/tasks/{{TASK_ID}}/fail \
@@ -34,7 +43,9 @@
 - If blocked by another agent's files, post to the bulletin board and move on
 
 ## Bulletin board
+
 Post discoveries, new APIs, or blockers so other parallel agents stay informed:
+
 ```bash
 curl -s -X POST http://127.0.0.1:8052/bulletin \
   -H "Content-Type: application/json" \
@@ -42,6 +53,7 @@ curl -s -X POST http://127.0.0.1:8052/bulletin \
 ```
 
 ## Done signal
+
 ```bash
 curl -s -X POST http://127.0.0.1:8052/tasks/{{TASK_ID}}/complete \
   -H "Content-Type: application/json" \

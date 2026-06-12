@@ -1,6 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-import { isValidDate, isDiffMonth, isSameYear, getCurrentFormattedTime } from './datetime'
+import {
+  isValidDate,
+  isDiffMonth,
+  isSameYear,
+  getCurrentFormattedTime,
+} from './datetime'
 
 describe('datetime utils', () => {
   describe('getCurrentFormattedTime', () => {

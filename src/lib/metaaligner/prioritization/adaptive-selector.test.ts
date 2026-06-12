@@ -465,7 +465,15 @@ describe('AdaptiveSelector', () => {
     }
     vi.mocked(mockAIService).createChatCompletion.mockResolvedValue(aiResponse)
 
-    const userProfile: { preferences: { objectiveWeightAdjustments: Record<string, number>; preferredObjectives: { objectiveId: string; preferenceStrength: number }[] } } = {
+    const userProfile: {
+      preferences: {
+        objectiveWeightAdjustments: Record<string, number>
+        preferredObjectives: {
+          objectiveId: string
+          preferenceStrength: number
+        }[]
+      }
+    } = {
       preferences: {
         objectiveWeightAdjustments: { empathy: 1.5 },
         preferredObjectives: [

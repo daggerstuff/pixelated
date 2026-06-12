@@ -532,7 +532,11 @@ export class BaaTemplateService {
         'DATA_ANALYTICS' as any,
         'TELEMEDICINE' as any,
       ],
-      [ServiceCategory.DATA_STORAGE, ServiceCategory.SOFTWARE_SERVICES, ServiceCategory.CONSULTING],
+      [
+        ServiceCategory.DATA_STORAGE,
+        ServiceCategory.SOFTWARE_SERVICES,
+        ServiceCategory.CONSULTING,
+      ],
       [],
       [],
       true,

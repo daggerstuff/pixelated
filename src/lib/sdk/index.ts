@@ -18,7 +18,10 @@ export type {
   UpdateMemoryResponse,
 } from '../memory/memory-api-client'
 
-export { MemoryApiClient, MemoryApiClientError } from '../memory/memory-api-client'
+export {
+  MemoryApiClient,
+  MemoryApiClientError,
+} from '../memory/memory-api-client'
 
 export interface SDKConfig {
   apiKey: string

@@ -4,9 +4,7 @@ You are the Manager reviewing completed work from a specialist agent.
 
 ## Task
 
-**Title:** {{TASK_TITLE}}
-**Role:** {{TASK_ROLE}}
-**Description:**
+**Title:** {{TASK_TITLE}} **Role:** {{TASK_ROLE}} **Description:**
 {{TASK_DESCRIPTION}}
 
 ## Completion signals
@@ -26,8 +24,10 @@ You are the Manager reviewing completed work from a specialist agent.
 Review the completed work and decide:
 
 1. **approve** — the work meets acceptance criteria and is ready to merge.
-2. **request_changes** — the work is on the right track but needs specific fixes.
-3. **reject** — the work is fundamentally wrong and should be redone from scratch.
+2. **request_changes** — the work is on the right track but needs specific
+   fixes.
+3. **reject** — the work is fundamentally wrong and should be redone from
+   scratch.
 
 Output a JSON object with exactly these fields:
 
@@ -62,7 +62,8 @@ Output a JSON object with exactly these fields:
 }
 ```
 
-For `follow_up_tasks`, use the same task format as planning (title, description, role, etc.).
-Only include follow-up tasks if the review reveals additional work needed beyond the original scope.
+For `follow_up_tasks`, use the same task format as planning (title, description,
+role, etc.). Only include follow-up tasks if the review reveals additional work
+needed beyond the original scope.
 
 Output ONLY the JSON object. No markdown fences, no explanation before or after.

@@ -13,9 +13,5 @@
     "GCP_WIF_SERVICE_ACCOUNT",
     "GCP_PROJECT_ID"
   ],
-  "requiredChecks": [
-    "build-test",
-    "lint",
-    "typecheck"
-  ]
+  "requiredChecks": ["build-test", "lint", "typecheck"]
 }

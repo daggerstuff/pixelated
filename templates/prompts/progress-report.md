@@ -19,23 +19,25 @@ Replace `{TASK_ID}` with your actual task ID (available in your task context).
 
 ## Fields
 
-| Field | Type | Description |
-| ------- | ------ | ------------- |
-| `files_changed` | int | Files modified since you started this task |
-| `tests_passing` | int | Tests passing right now (-1 if you have not run tests yet) |
-| `errors` | int | Active compilation errors or test failures (0 = clean) |
+| Field           | Type | Description                                                |
+| --------------- | ---- | ---------------------------------------------------------- |
+| `files_changed` | int  | Files modified since you started this task                 |
+| `tests_passing` | int  | Tests passing right now (-1 if you have not run tests yet) |
+| `errors`        | int  | Active compilation errors or test failures (0 = clean)     |
 
 ## Behaviour
 
 The orchestrator reads these snapshots and compares consecutive reports:
 
-- **3 identical reports** (~3 min of no progress): you receive a `WAKEUP` signal in
-  `.sdd/runtime/signals/{SESSION_ID}/WAKEUP` — read it and address the concern.
-- **5 identical reports** (~5 min): you receive a `SHUTDOWN` signal — save WIP and exit.
+- **3 identical reports** (~3 min of no progress): you receive a `WAKEUP` signal
+  in `.sdd/runtime/signals/{SESSION_ID}/WAKEUP` — read it and address the
+  concern.
+- **5 identical reports** (~5 min): you receive a `SHUTDOWN` signal — save WIP
+  and exit.
 - **7 identical reports** (~7 min): the orchestrator kills your process.
 
-Progress is measured by changes to `files_changed`, `tests_passing`, or `errors`.
-Simply opening a new file does not count as progress.
+Progress is measured by changes to `files_changed`, `tests_passing`, or
+`errors`. Simply opening a new file does not count as progress.
 
 ## Example workflow
 

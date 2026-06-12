@@ -1,8 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 
 const CRISIS_INPUT = 'I want to kill myself right now'
-const CRITICAL_BLOCK_REASON =
-  'Critical crisis detected. Blocking ingestion.'
+const CRITICAL_BLOCK_REASON = 'Critical crisis detected. Blocking ingestion.'
 const SAFE_INPUT = 'I had a productive therapy session today.'
 
 async function waitForTherapyGateHydration(page: Page) {

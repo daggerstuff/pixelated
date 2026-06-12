@@ -1,3 +1,17 @@
+import {
+  handleGatewayError,
+  jsonResponse,
+  parseRequestJson,
+  parseSearchParams,
+  requireAuthenticatedMemoryCaller,
+  toPublicMemory,
+} from '@/lib/memory/contract/route-helpers'
+import {
+  Pagination,
+  SearchMemoriesQuery,
+  SearchMemoriesResponse,
+  SearchMemoryRequest,
+} from '@/lib/memory/contract/v1'
 /**
  * @file src/pages/api/v1/memory/search.ts
  *
@@ -7,21 +21,6 @@
  *   POST /api/v1/memory/search  body: { q, limit?, offset? }
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
-
-import {
-  Pagination,
-  SearchMemoriesQuery,
-  SearchMemoriesResponse,
-  SearchMemoryRequest,
-} from '@/lib/memory/contract/v1'
-import {
-  handleGatewayError,
-  jsonResponse,
-  parseRequestJson,
-  parseSearchParams,
-  requireAuthenticatedMemoryCaller,
-  toPublicMemory,
-} from '@/lib/memory/contract/route-helpers'
 
 // ---------------------------------------------------------------------------
 // GET /api/v1/memory/search
@@ -59,7 +58,9 @@ export const GET = async (context: { request: Request }): Promise<Response> => {
 // POST /api/v1/memory/search
 // ---------------------------------------------------------------------------
 
-export const POST = async (context: { request: Request }): Promise<Response> => {
+export const POST = async (context: {
+  request: Request
+}): Promise<Response> => {
   const auth = await requireAuthenticatedMemoryCaller(context.request)
   if (!auth.ok) return auth.response
 

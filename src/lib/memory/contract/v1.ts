@@ -141,7 +141,9 @@ export const ListMemoriesQuery = z
     tags: z
       .union([z.string(), z.array(z.string().min(1).max(64))])
       .optional()
-      .transform((v) => (v === undefined ? undefined : Array.isArray(v) ? v : [v])),
+      .transform((v) =>
+        v === undefined ? undefined : Array.isArray(v) ? v : [v],
+      ),
   })
   .strict()
 export type ListMemoriesQuery = z.infer<typeof ListMemoriesQuery>

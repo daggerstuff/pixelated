@@ -1,0 +1,54 @@
+# NVIDIA NIM for Speech (Automatic Speech Recognition & Text-to-Speech)
+# GPU-optimized by default (uses GPU-accelerated Riva ASR & TTS engines).
+
+services:
+  nim-asr:
+    image: nvcr.io/nim/nvidia/parakeet-ctc-1.1b:latest
+    container_name: nim-asr
+    ports:
+      - '8083:8000'
+    environment:
+      - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NGC_USER_NAME=$$oauthtoken
+      - NIM_MANIFEST_ALLOW_UNSAFE=1
+    volumes:
+      - nim_speech_cache:/opt/nim/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - nemo-network
+
+  nim-tts:
+    image: nvcr.io/nim/nvidia/fastpitch-hifigan:latest
+    container_name: nim-tts
+    ports:
+      - '8084:8000'
+    environment:
+      - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+      - NGC_USER_NAME=$$oauthtoken
+      - NIM_MANIFEST_ALLOW_UNSAFE=1
+    volumes:
+      - nim_speech_cache:/opt/nim/.cache
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    networks:
+      - nemo-network
+
+volumes:
+  nim_speech_cache:
+
+networks:
+  nemo-network:
+    external: true

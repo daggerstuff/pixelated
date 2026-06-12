@@ -67,7 +67,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Run advisory suite
         continue-on-error: true

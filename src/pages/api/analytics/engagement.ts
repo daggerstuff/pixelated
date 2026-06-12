@@ -12,7 +12,13 @@ import type {
 // Disable prerendering since this API route uses request.headers
 export const prerender = false
 
-export const GET = async ({ request, cookies }: { request: Request; cookies: any }) => {
+export const GET = async ({
+  request,
+  cookies,
+}: {
+  request: Request
+  cookies: any
+}) => {
   try {
     // Enforce authentication (throws if not authenticated)
     await requirePageAuth({

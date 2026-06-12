@@ -1,5 +1,9 @@
 import { test, expect, describe, beforeEach } from 'vitest'
-import { ConsentGate, consentGate } from '../../../src/lib/memory/gates/consent-gate'
+
+import {
+  ConsentGate,
+  consentGate,
+} from '../../../src/lib/memory/gates/consent-gate'
 import type { ConsentGateValue } from '../../../src/lib/memory/gates/consent-gate'
 
 describe('ConsentGate', () => {
