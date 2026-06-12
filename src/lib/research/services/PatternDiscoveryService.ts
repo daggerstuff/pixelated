@@ -180,7 +180,12 @@ export class PatternDiscoveryService {
         'data-scientist',
       )
 
-      if (result.data && typeof result.data === 'object' && 'length' in (result.data as any) && (result.data as any).length > 0) {
+      if (
+        result.data &&
+        typeof result.data === 'object' &&
+        'length' in (result.data as any) &&
+        (result.data as any).length > 0
+      ) {
         const trend = this.calculateTrend(result.data as any, metric)
         if (trend) {
           trends.push(trend)

@@ -135,7 +135,9 @@ export class MemoryApiClient {
     return handleResponse<CreateMemoryResponse>(res)
   }
 
-  async list(query: ListMemoriesQuery = { tags: undefined }): Promise<ListMemoriesResponse> {
+  async list(
+    query: ListMemoriesQuery = { tags: undefined },
+  ): Promise<ListMemoriesResponse> {
     const res = await this.request(
       appendQuery('', {
         limit: query.limit,
@@ -235,7 +237,9 @@ export class IngestionGateClient {
   async health(): Promise<Record<string, unknown>> {
     const res = await this.request('/health')
     if (!res.ok) {
-      throw new Error(`Ingestion gate health error ${res.status}: ${res.statusText}`)
+      throw new Error(
+        `Ingestion gate health error ${res.status}: ${res.statusText}`,
+      )
     }
     return (await res.json()) as Record<string, unknown>
   }
