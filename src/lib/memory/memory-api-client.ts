@@ -37,6 +37,7 @@ export type {
 } from '@/lib/memory/contract/v1'
 
 export const DEFAULT_MEMORY_API_BASE_URL = '/api/v1/memory' as const
+export const DEFAULT_INGESTION_GATE_BASE_URL = 'http://127.0.0.1:8100' as const
 
 export interface MemoryApiClientConfig {
   baseUrl?: string
@@ -170,5 +171,72 @@ export class MemoryApiClient {
       method: 'DELETE',
     })
     return handleResponse<DeleteMemoryResponse>(res)
+  }
+}
+
+// ─── Ingestion Gate (PIX-3894) ────────────────────────────────────────────────
+
+export interface IngestRequest {
+  content: string
+  source_id: string
+  user_id?: string
+}
+
+export interface IngestResponse {
+  accepted: boolean
+  report: Record<string, unknown>
+  request_id: string
+}
+
+export interface IngestionGateClientConfig {
+  baseUrl?: string
+  fetchFn?: typeof fetch
+  getHeaders?: () => Record<string, string> | Promise<Record<string, string>>
+}
+
+export class IngestionGateClient {
+  readonly baseUrl: string
+  private readonly fetchFn: typeof fetch
+  private readonly getHeaders?: IngestionGateClientConfig['getHeaders']
+
+  constructor(config: IngestionGateClientConfig = {}) {
+    this.baseUrl = config.baseUrl ?? DEFAULT_INGESTION_GATE_BASE_URL
+    this.fetchFn = config.fetchFn ?? fetch
+    this.getHeaders = config.getHeaders
+  }
+
+  private async request(
+    path: string,
+    init: RequestInit = {},
+  ): Promise<Response> {
+    const extraHeaders = (await this.getHeaders?.()) ?? {}
+    const mergedHeaders = new Headers(init.headers)
+    mergedHeaders.set('Content-Type', 'application/json')
+    for (const [key, val] of Object.entries(extraHeaders)) {
+      mergedHeaders.set(key, val)
+    }
+    return this.fetchFn(`${this.baseUrl}${path}`, {
+      ...init,
+      headers: mergedHeaders,
+    })
+  }
+
+  async ingest(input: IngestRequest): Promise<IngestResponse> {
+    const res = await this.request('/ingest', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+    if (!res.ok) {
+      throw new Error(`Ingestion gate error ${res.status}: ${res.statusText}`)
+    }
+    return (await res.json()) as IngestResponse
+  }
+
+  async health(): Promise<Record<string, unknown>> {
+    const res = await this.request('/health')
+    if (!res.ok) {
+      throw new Error(`Ingestion gate health error ${res.status}: ${res.statusText}`)
+    }
+    return (await res.json()) as Record<string, unknown>
   }
 }
