@@ -883,9 +883,12 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
 
       if (
         (threatData['confidence'] as number) > 0.8 ||
-        ((pipelineResults as Record<string, unknown>)['correlation'] as Record<string, unknown>)?.[
-          'confidence'
-        ] > 0.8
+        (
+          (pipelineResults as Record<string, unknown>)['correlation'] as Record<
+            string,
+            unknown
+          >
+        )?.['confidence'] > 0.8
       ) {
         const responseOrchestrator = this.components.get(
           'response',

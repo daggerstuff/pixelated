@@ -40,8 +40,12 @@ export interface TracingConfig {
  * Get tracing configuration from environment variables
  */
 export function getTracingConfig(): TracingConfig {
-  const envObj = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : (process.env || {});
-  const isProduction = envObj.PROD === true || process.env['NODE_ENV'] === 'production'
+  const envObj =
+    typeof import.meta !== 'undefined' && import.meta.env
+      ? import.meta.env
+      : process.env || {}
+  const isProduction =
+    envObj.PROD === true || process.env['NODE_ENV'] === 'production'
 
   // Default to enabled in production, can be disabled via env var
   const enabled =
@@ -52,8 +56,7 @@ export function getTracingConfig(): TracingConfig {
     enabled,
     serviceName: envObj['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
     serviceVersion: envObj['TRACING_SERVICE_VERSION'] ?? '1.0.0',
-    environment:
-      envObj.MODE || (isProduction ? 'production' : 'development'),
+    environment: envObj.MODE || (isProduction ? 'production' : 'development'),
     exporter: {
       type:
         (envObj['TRACING_EXPORTER_TYPE'] as
@@ -61,8 +64,7 @@ export function getTracingConfig(): TracingConfig {
           | 'console'
           | 'jaeger'
           | 'zipkin') || 'otlp',
-      endpoint:
-        envObj['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
+      endpoint: envObj['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
       headers: envObj['TRACING_EXPORTER_HEADERS']
         ? JSON.parse(envObj['TRACING_EXPORTER_HEADERS'])
         : undefined,

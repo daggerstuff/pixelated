@@ -10,10 +10,10 @@
  * and proper HTTP status codes as defined in the Foresight project.
  */
 
-export { GET as list } from "./list";
-export { POST as create } from "./create";
-export { GET as getById } from "./[memoryId]";
-export { PATCH as updateById } from "./[memoryId]";
-export { DELETE as deleteById } from "./[memoryId]";
-export { GET as search } from "./search";
-export { GET as stats } from "./stats";
+export { GET as list } from './list'
+export { POST as create } from './create'
+export { GET as getById } from './[memoryId]'
+export { PATCH as updateById } from './[memoryId]'
+export { DELETE as deleteById } from './[memoryId]'
+export { GET as search } from './search'
+export { GET as stats } from './stats'

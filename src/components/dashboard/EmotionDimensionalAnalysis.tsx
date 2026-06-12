@@ -102,13 +102,13 @@ const EmotionDimensionalAnalysis: FC<EmotionDimensionalAnalysisProps> = ({
 
   // Performance optimization: Pre-compute formatted date strings to avoid O(N) Date object creations during render map iterations
   const formattedEmotionData = useMemo(() => {
-    return emotionData.map(point => {
-      const date = new Date(point.timestamp);
+    return emotionData.map((point) => {
+      const date = new Date(point.timestamp)
       return {
         ...point,
         timeString: date.toLocaleTimeString(),
         localeString: date.toLocaleString(),
-      };
+      }
     })
   }, [emotionData])
 

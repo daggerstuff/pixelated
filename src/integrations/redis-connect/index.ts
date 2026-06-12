@@ -1,4 +1,5 @@
 import type { AstroIntegration } from 'astro'
+
 import { connectRedis } from '../../lib/database/connection'
 
 export default function redisConnect(): AstroIntegration {

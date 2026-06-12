@@ -99,35 +99,38 @@ router.get('/detailed', async (_req: Request, res: Response) => {
 // READINESS CHECK (for Kubernetes)
 // ============================================================================
 
-router.get('/ready', async (_req: Request, res: Response): Promise<Response> => {
-  try {
-    // Check all critical services
-    const mongo = getMongoConnection()
-    const postgres = getPostgresPool()
+router.get(
+  '/ready',
+  async (_req: Request, res: Response): Promise<Response> => {
+    try {
+      // Check all critical services
+      const mongo = getMongoConnection()
+      const postgres = getPostgresPool()
 
-    if (!mongo || !postgres) {
+      if (!mongo || !postgres) {
+        return res.status(503).json({
+          ready: false,
+          reason: 'Database connections not initialized',
+        })
+      }
+
+      // Test PostgreSQL
+      const client = await postgres.connect()
+      await client.query('SELECT 1')
+      client.release()
+
+      return res.json({
+        ready: true,
+        timestamp: new Date().toISOString(),
+      })
+    } catch (error: unknown) {
       return res.status(503).json({
         ready: false,
-        reason: 'Database connections not initialized',
+        error: (error as Error).message,
       })
     }
-
-    // Test PostgreSQL
-    const client = await postgres.connect()
-    await client.query('SELECT 1')
-    client.release()
-
-    return res.json({
-      ready: true,
-      timestamp: new Date().toISOString(),
-    })
-  } catch (error: unknown) {
-    return res.status(503).json({
-      ready: false,
-      error: (error as Error).message,
-    })
-  }
-})
+  },
+)
 
 // ============================================================================
 // LIVENESS CHECK (for Kubernetes)

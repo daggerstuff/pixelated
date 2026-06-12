@@ -39,7 +39,8 @@ pnpm lint         # oxlint
 pnpm format:check # formatting
 ```
 
-Git hooks run automatically on commit (installed via `scripts/devops/pnpm-install-with-fallback.sh`).
+Git hooks run automatically on commit (installed via
+`scripts/devops/pnpm-install-with-fallback.sh`).
 
 ## Testing
 
