@@ -89,7 +89,7 @@ if monitoring_ps_output="$(docker compose -f docker/docker-compose.monitoring.ym
 		if [[ ${prometheus_status} -ne 0 ]]; then
 			overall_ok=false
 		fi
-		check_service "Grafana" "3001" "/api/health"
+		check_service "Grafana" "3100" "/api/health"
 		grafana_status=$?
 		if [[ ${grafana_status} -ne 0 ]]; then
 			overall_ok=false
@@ -158,7 +158,7 @@ echo "   - Running services: Checked"
 echo "   - Network connectivity: Checked"
 echo ""
 echo "🔧 If services are not running, use './scripts/devops/start-monitoring.sh'"
-echo "📊 Access Grafana at: http://localhost:3001"
+echo "📊 Access Grafana at: http://localhost:3100"
 echo "📈 Access Prometheus at: http://localhost:9090"
 echo "📝 Access Loki at: http://localhost:3100"
 

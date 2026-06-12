@@ -156,7 +156,7 @@ terraform destroy -var-file=environments/development.tfvars
 
 ### Grafana
 
-- URL: [http://localhost:3001](http://localhost:3001)
+- URL: [http://localhost:3100](http://localhost:3100)
 - Default credentials:
   - Username: admin
   - Password: admin
@@ -343,7 +343,7 @@ terraform destroy -var-file=environments/development.tfvars
 
 ### Grafana 2
 
-- URL: [http://localhost:3001](http://localhost:3001)
+- URL: [http://localhost:3100](http://localhost:3100)
 - Default credentials:
   - Username: admin
   - Password: admin

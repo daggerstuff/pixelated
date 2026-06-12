@@ -51,13 +51,13 @@ curl -fsS --connect-timeout 5 --max-time 5 http://localhost:9090/-/healthy >/dev
 
 # Test Grafana connectivity
 echo "🧪 Testing Grafana connectivity..."
-curl -fsS --connect-timeout 5 --max-time 5 http://localhost:3001/api/health >/dev/null || echo "❌ Grafana not ready"
+curl -fsS --connect-timeout 5 --max-time 5 http://localhost:3100/api/health >/dev/null || echo "❌ Grafana not ready"
 
 echo "✅ Monitoring stack startup completed!"
 echo ""
 echo "📊 Access the services at:"
 echo "   Prometheus: http://localhost:9090"
-echo "   Grafana: http://localhost:3001 (admin:${GRAFANA_ADMIN_PASSWORD:-admin})"
+echo "   Grafana: http://localhost:3100 (admin:${GRAFANA_ADMIN_PASSWORD:-admin})"
 echo "   Loki: http://localhost:3100"
 echo "   AlertManager: http://localhost:9093"
 echo ""

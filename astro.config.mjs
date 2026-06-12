@@ -556,6 +556,12 @@ export default defineConfig({
         'src/components/**/*.{ts,tsx,js,jsx,astro}',
         'src/middleware.ts',
       ],
+      // Explicitly pre-bundle zod so Vite always produces a stable dep chunk.
+      // Without this, zod (pulled in transitively via @pixelated/memory-schema)
+      // can produce a stale/missing chunk (e.g. settings-XXXXXXXX.js) after a
+      // lockfile update, causing "Failed to fetch dynamically imported module"
+      // errors on pages that load TherapyGate → memory-schema → zod.
+      include: ['zod'],
       exclude: [
         // ── Server-only source directories ─────────────────────────────────
         'src/lib/security',
