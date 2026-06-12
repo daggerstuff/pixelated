@@ -1,20 +1,19 @@
-# NVIDIA NIM for Retrieval (Embedding & Reranking)
-# GPU-optimized by default (uses TensorRT-LLM and Triton Inference Server).
+# NVIDIA NIM for Speech (Automatic Speech Recognition & Text-to-Speech)
+# GPU-optimized by default (uses GPU-accelerated Riva ASR & TTS engines).
 
 services:
-  nim-embedding:
-    image: nvcr.io/nim/nvidia/nv-embedqa-e5-v5:latest
-    container_name: nim-embedding
+  nim-asr:
+    image: nvcr.io/nim/nvidia/parakeet-ctc-1.1b:latest
+    container_name: nim-asr
     ports:
-      - '8080:8000'
+      - '8083:8000'
     environment:
       - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
       - NIM_MANIFEST_ALLOW_UNSAFE=1
-      - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
-      - nim_model_cache:/opt/nim/.cache
+      - nim_speech_cache:/opt/nim/.cache
     deploy:
       resources:
         reservations:
@@ -25,19 +24,18 @@ services:
     networks:
       - nemo-network
 
-  nim-reranking:
-    image: nvcr.io/nim/nvidia/llama-3.2-nv-rerankqa-1b-v2:latest
-    container_name: nim-reranking
+  nim-tts:
+    image: nvcr.io/nim/nvidia/fastpitch-hifigan:latest
+    container_name: nim-tts
     ports:
-      - '8081:8000'
+      - '8084:8000'
     environment:
       - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
       - NIM_MANIFEST_ALLOW_UNSAFE=1
-      - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
-      - nim_model_cache:/opt/nim/.cache
+      - nim_speech_cache:/opt/nim/.cache
     deploy:
       resources:
         reservations:
@@ -49,7 +47,7 @@ services:
       - nemo-network
 
 volumes:
-  nim_model_cache:
+  nim_speech_cache:
 
 networks:
   nemo-network:
