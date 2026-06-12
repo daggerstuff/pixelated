@@ -1,19 +1,102 @@
+# CPU-Only override configuration for all NeMo services
+# Use this when running on hosts without NVIDIA GPUs.
+# Usage: docker compose -f docker-compose.nemo-retriever.yml -f docker-compose.cpu-override.yml up -d
+
 services:
   nim-embedding:
+    environment:
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
     deploy:
       resources:
         reservations:
           devices: []
+
   nim-reranking:
+    environment:
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
     deploy:
       resources:
         reservations:
           devices: []
+
+  nim-asr:
+    environment:
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
+    deploy:
+      resources:
+        reservations:
+          devices: []
+
+  nim-tts:
+    environment:
+      - NIM_CPU_ONLY=1
+      - NVIDIA_CPU_ONLY=1
+      - CUDA_VISIBLE_DEVICES=""
+      - NVIDIA_VISIBLE_DEVICES=""
+    command: >
+      sh -c "
+        (while true; do 
+          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
+            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
+      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
+          fi
+          sleep 1
+        done) &
+        /opt/nim/start_server.sh
+      "
+    deploy:
+      resources:
+        reservations:
+          devices: []
+
   nemo-customizer:
     deploy:
       resources:
         reservations:
           devices: []
+
   nemo-curator:
     deploy:
       resources:

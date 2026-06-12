@@ -2,7 +2,7 @@
 services:
   training-service:
     build:
-      context: .
+      context: ../
       dockerfile: docker/training-service/Dockerfile
       target: production
     container_name: pixelated-training
