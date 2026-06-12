@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod'
+
 import type { GateDecision } from './gate-types'
 
 // ---------------------------------------------------------------------------
@@ -259,7 +260,7 @@ export interface UnifiedMemory {
 
 export const UnifiedMemorySchema = z.object({
   // ── Identity ──────────────────────────────────────────────────────────────
-  id: z.string().uuid(),
+  id: z.uuid(),
   tenantId: z.string().min(1),
   userId: z.string().min(1),
   bankId: z.string().min(1),
@@ -296,10 +297,10 @@ export const UnifiedMemorySchema = z.object({
   empathyMetrics: EmpathyMetricsSchema.nullable(),
 
   // ── Timestamps ────────────────────────────────────────────────────────────
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime().nullable(),
-  accessedAt: z.string().datetime().nullable(),
-  lastRetrievedAt: z.string().datetime().nullable(),
+  createdAt: z.iso.datetime(),
+  updatedAt: z.iso.datetime().nullable(),
+  accessedAt: z.iso.datetime().nullable(),
+  lastRetrievedAt: z.iso.datetime().nullable(),
 })
 
 // ---------------------------------------------------------------------------
