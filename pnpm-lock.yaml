@@ -102,10 +102,10 @@ importers:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: latest
-        version: 3.0.83(zod@4.4.3)
+        version: 3.0.84(zod@4.4.3)
       '@ai-sdk/mcp':
         specifier: latest
-        version: 1.0.48(zod@4.4.3)
+        version: 1.0.49(zod@4.4.3)
       '@ai-sdk/openai':
         specifier: ^3.0.69
         version: 3.0.70(zod@4.4.3)
@@ -123,28 +123,28 @@ importers:
         version: 2.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@aws-sdk/client-dynamodb':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/client-ec2':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/client-eks':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/client-kms':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/client-rds':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/client-s3':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@aws-sdk/lib-dynamodb':
         specifier: latest
-        version: 3.1067.0(@aws-sdk/client-dynamodb@3.1067.0)
+        version: 3.1068.0(@aws-sdk/client-dynamodb@3.1068.0)
       '@aws-sdk/s3-request-presigner':
         specifier: latest
-        version: 3.1067.0
+        version: 3.1068.0
       '@azure/storage-blob':
         specifier: latest
         version: 12.32.0
@@ -156,7 +156,7 @@ importers:
         version: 0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)
       '@composio/vercel':
         specifier: latest
-        version: 0.9.2(@composio/core@0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.202(zod@4.4.3))
+        version: 0.9.2(@composio/core@0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.203(zod@4.4.3))
       '@google-cloud/storage':
         specifier: ^7.21.0
         version: 7.21.0
@@ -300,7 +300,7 @@ importers:
         version: 2.0.0(react@19.2.7)(vue@3.5.38(typescript@6.0.3))
       ai:
         specifier: latest
-        version: 6.0.202(zod@4.4.3)
+        version: 6.0.203(zod@4.4.3)
       archiver:
         specifier: latest
         version: 8.0.0
@@ -414,7 +414,7 @@ importers:
         version: 9.0.3
       lucide-react:
         specifier: latest
-        version: 1.17.0(react@19.2.7)
+        version: 1.18.0(react@19.2.7)
       medium-zoom:
         specifier: latest
         version: 1.1.0
@@ -1150,20 +1150,20 @@ packages:
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/anthropic@3.0.83':
-    resolution: {integrity: sha512-K4EZaMpZNsflB3dRrOzljEYooW5CI1zFYI/kaNcJ+YJAZe14UOIFL+fC7lg88S21r6RDgFr1Bs9PFFuzZk/4IQ==}
+  '@ai-sdk/anthropic@3.0.84':
+    resolution: {integrity: sha512-BIDaHmCHs6Sr5VUsEkTbbVlAN4GWjg97X9x/IfXyviLtzsXvffui9XIcZugkAi1Ri6FnvI5T5qDGh5YLnSuzRg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/gateway@3.0.128':
-    resolution: {integrity: sha512-t9Dyqk5thSmIzsNvVTQtZZiO3xqKGkk1hX3+GNpYmro+GuEdW+E6mKFHihb9Y1vCEt3rEyd4pbGUcin4D57FfQ==}
+  '@ai-sdk/gateway@3.0.129':
+    resolution: {integrity: sha512-KEQpZGJuCksc4iFxYtVHeHHG7yH0izGFzJLmRZlriI0hFIzJF9bT2AzJoaTHUI6minlxtP0WKYh84dP18o/Cuw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/mcp@1.0.48':
-    resolution: {integrity: sha512-F5Y8gKI4PlcPqa+JTYtcoIJOs2BMyxSvNLh4L4YM6bpLK9uirsN9+i553dEQZIv3HtiY6ZhtcFF311s+u5SDMg==}
+  '@ai-sdk/mcp@1.0.49':
+    resolution: {integrity: sha512-Wab4LSMLi4kYIQelwORvwSS1kRyZ6TOUFQyb2qfcea7aF5blMkIzWNFzvBMJ0UAsHoThZGrMcZSwa2ZQ3jXr0w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -1176,6 +1176,12 @@ packages:
 
   '@ai-sdk/provider-utils@4.0.28':
     resolution: {integrity: sha512-nCtGJY43Kqwoyk0rYLj80a3eyXxcaWwyu+lYZDHgY+U6JbYYyvRdRTSy+XCDIB91rFH0Ul0eMDHmDr+YMYtrSw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^4.3.2
+
+  '@ai-sdk/provider-utils@4.0.29':
+    resolution: {integrity: sha512-uhukHaCBvqkwBHkT8C2PrnqKTCoLn3pdHXqtcR9I8ErH+flbzgW4o7VHSNIup9LRu+WBvZIZDQLsx6rwl2tiOA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -1323,28 +1329,32 @@ packages:
     resolution: {integrity: sha512-zOXUUnilC6lgCsQtp77p/QNPmRlTES9Xi6tlDwbR6kfC/kz5PCzZckgHWm5z+8DskdwuMAbFDq61x3zr10GEEQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-dynamodb@3.1067.0':
-    resolution: {integrity: sha512-jX/bLWCkQ4hxBoaD+Ylv3jnuoOAPMvl1WGflGL0O1/gy+WbdlV000qiAhb/oEG7PIpRHjPLqFJx6jfmLgOW7Tg==}
+  '@aws-sdk/client-dynamodb@3.1068.0':
+    resolution: {integrity: sha512-DOMUWnLSFHaRC0EixpWMnrQcQaV08P5rzAUdRTEkx72NaDRF0Q6+3QdtqX8ocyHfySzwMwOE9/vHRmhNvWHl/g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-ec2@3.1067.0':
-    resolution: {integrity: sha512-f48FPnT1qyef9mFEqzWe95aDS+d5HPlZI3cxnrT2d5ahv3x32hsRr5HMPfmO2QpHZAhP2Y0LxqpCBRuMyTLCnw==}
+  '@aws-sdk/client-ec2@3.1068.0':
+    resolution: {integrity: sha512-5wQACr4zx16ajWl0/iHn8eyWT/PEONKp5MuyRHdff9EY6t6PDaxDKOInWY0ET12RLJQiL3riRFDDrGDhikP9FA==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-eks@3.1067.0':
-    resolution: {integrity: sha512-7oeuFBTsZpELoNfy/2NXASwyCoGrykPXePs77SLkwXUe917t8Lr0HuRIvaaYv1ioHEjGo3ptAimNn8ybVTX4Zw==}
+  '@aws-sdk/client-eks@3.1068.0':
+    resolution: {integrity: sha512-3+6Wpqav1AOJ5Lw8DfqkFfrbgeNSm1Kv0YfvGSALbe0ZvEI9deg7rWKlLQimx72PDxuH8sn+lSSOSfK7/YDsAg==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-kms@3.1067.0':
-    resolution: {integrity: sha512-ChEriP9K/pucwkOVDzbfTbazoOVNB+2G4rCQh+mV7TOIe3hUMJLWQ6XS8q15zQedT0HO4BXW55eOBHl6cz1XTw==}
+  '@aws-sdk/client-kms@3.1068.0':
+    resolution: {integrity: sha512-zqIOH83h6QmcjciQ/xeTh+rOumNJoMjSuyEXlBxUmg9n/8syBcjTJxgB+313gerGAQuBwqMEcgQMWvAhfopyhQ==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/client-rds@3.1067.0':
-    resolution: {integrity: sha512-5paBDWAn9bKf1yo5ZAHf1WGve5/jyGNFfEkWu2jf2lQqnYsgbkZNQWl7AoylU+nAtEgf8xl3GRJrcyZv0PWS6A==}
+  '@aws-sdk/client-rds@3.1068.0':
+    resolution: {integrity: sha512-bmX3pZQK333SNVnAH/QyEedETbMPH7KByfgbDGa5tpDAKCl95oUUiOP6mOocNVMApnTSQHHKeO5mzajxLR4TKg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/client-s3@3.1067.0':
     resolution: {integrity: sha512-3f64o9YWzwJ9WzMIC4JlUQiMOm7R/EtkIDyFdj8yaQXuh8SR9ezz2R32UMpvTlVMtpoPan3Uj8oveAHr2UeExw==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/client-s3@3.1068.0':
+    resolution: {integrity: sha512-lFgaIpxZvloNbJvQ337YPdMXhzI2zJdDw13nATVGnkAGNoNPx4ksD84AQAcuW75hsaaMaIuNmXU9sSx6+FTirA==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/core@3.974.20':
@@ -1391,11 +1401,11 @@ packages:
     resolution: {integrity: sha512-LkwS3ZOUNL5kHzmz3dDx8lE3HOhZmf2VGjbJ/tMUZJYWWl3J0RJTZM7RFz1MLt06WDVvlShcAjY/RzhYlqLL7g==}
     engines: {node: '>=20.0.0'}
 
-  '@aws-sdk/lib-dynamodb@3.1067.0':
-    resolution: {integrity: sha512-UhD45rguoYlmAOs4SBY5LdfT8GdRZ7WSZRGrObD1flhqHH1WS8yVoYOx29LX7D/5rzUaA9CTLuasOri6C3O6Xg==}
+  '@aws-sdk/lib-dynamodb@3.1068.0':
+    resolution: {integrity: sha512-r3ChLc59RYNDfenMm+7GJ23zKRzTG+b3nAUgHt9XOKOCaJ3c203DzkY/m5yNslAhZ1r0ArxDaecd8rqioDXRuQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      '@aws-sdk/client-dynamodb': ^3.1067.0
+      '@aws-sdk/client-dynamodb': ^3.1068.0
 
   '@aws-sdk/lib-storage@3.1067.0':
     resolution: {integrity: sha512-GPM59Kv0RJBXEgR5rhx13S3eXK7pnhw8rYgzk/duWM8XYUfmYs6T6Le15T5eU5AXljBlcMYXsfyBxlZNJnnZJw==}
@@ -1429,6 +1439,10 @@ packages:
 
   '@aws-sdk/s3-request-presigner@3.1067.0':
     resolution: {integrity: sha512-BXoy6vCLR/ns2a09knkFgs18fX+EozyOsxX/eHwEXH3DgRh/w2z24X3bamU0ouc5DAGQRKmLeRcYKd7YasmcpQ==}
+    engines: {node: '>=20.0.0'}
+
+  '@aws-sdk/s3-request-presigner@3.1068.0':
+    resolution: {integrity: sha512-XTUoaBQH3pUlegqdoo7vkrOvlcRhSz/EO0/JYy9qKz4jdsOnPUlPY0p+rKTl27F91Gjgip8OXopiOFxVeN3Yvg==}
     engines: {node: '>=20.0.0'}
 
   '@aws-sdk/signature-v4-multi-region@3.996.34':
@@ -5935,8 +5949,8 @@ packages:
     resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
     engines: {node: '>= 14'}
 
-  ai@6.0.202:
-    resolution: {integrity: sha512-14O7uyHVa5lXyt1RzduRqM1zwOnLBN+EaE+btWiP2R7GLHd5oh+Z9uaebR785V/Y2hXlxvuQGsw2Gj6iHpkxsg==}
+  ai@6.0.203:
+    resolution: {integrity: sha512-2Qi1ZPGF/FnlvnRqntVgRbUYGeA5ZKFYwTtgu8rcUzMmddArM/nLsvCW69Ip99B1cop6XHRHl+GCKk9t9B+GDA==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -8819,8 +8833,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.17.0:
-    resolution: {integrity: sha512-9FA9evdox/JQL5PT57fdA1x/yg8T7knJ98+zjTL3UfKza6pflQUUh3XtaQIHKvnsJw1lmsEyHVlt5jchYxOQ5w==}
+  lucide-react@1.18.0:
+    resolution: {integrity: sha512-LZDb7H/0YfM+RJncD0hDQRCAu+vSGODqpe35TuVI8EuXaRjkczbsx7p8dY4J87F/MUSj6bpYqeI8nw8qXaAdmA==}
     peerDependencies:
       react: ^19.2.4
 
@@ -12048,23 +12062,23 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  '@ai-sdk/anthropic@3.0.83(zod@4.4.3)':
+  '@ai-sdk/anthropic@3.0.84(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.28(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
       zod: 4.4.3
 
-  '@ai-sdk/gateway@3.0.128(zod@4.4.3)':
+  '@ai-sdk/gateway@3.0.129(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.28(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/mcp@1.0.48(zod@4.4.3)':
+  '@ai-sdk/mcp@1.0.49(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.28(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
       pkce-challenge: 5.0.1
       zod: 4.4.3
 
@@ -12075,6 +12089,13 @@ snapshots:
       zod: 4.4.3
 
   '@ai-sdk/provider-utils@4.0.28(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.10
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.1.0
+      zod: 4.4.3
+
+  '@ai-sdk/provider-utils@4.0.29(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@standard-schema/spec': 1.1.0
@@ -12367,7 +12388,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-dynamodb@3.1067.0':
+  '@aws-sdk/client-dynamodb@3.1068.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -12382,7 +12403,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-ec2@3.1067.0':
+  '@aws-sdk/client-ec2@3.1068.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -12396,7 +12417,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-eks@3.1067.0':
+  '@aws-sdk/client-eks@3.1068.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -12409,7 +12430,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-kms@3.1067.0':
+  '@aws-sdk/client-kms@3.1068.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -12422,7 +12443,7 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/client-rds@3.1067.0':
+  '@aws-sdk/client-rds@3.1068.0':
     dependencies:
       '@aws-crypto/sha256-browser': 5.2.0
       '@aws-crypto/sha256-js': 5.2.0
@@ -12437,6 +12458,23 @@ snapshots:
       tslib: 2.8.1
 
   '@aws-sdk/client-s3@3.1067.0':
+    dependencies:
+      '@aws-crypto/sha1-browser': 5.2.0
+      '@aws-crypto/sha256-browser': 5.2.0
+      '@aws-crypto/sha256-js': 5.2.0
+      '@aws-sdk/core': 3.974.20
+      '@aws-sdk/credential-provider-node': 3.972.55
+      '@aws-sdk/middleware-flexible-checksums': 3.974.30
+      '@aws-sdk/middleware-sdk-s3': 3.972.51
+      '@aws-sdk/signature-v4-multi-region': 3.996.34
+      '@aws-sdk/types': 3.973.12
+      '@smithy/core': 3.24.6
+      '@smithy/fetch-http-handler': 5.4.6
+      '@smithy/node-http-handler': 4.7.7
+      '@smithy/types': 4.14.3
+      tslib: 2.8.1
+
+  '@aws-sdk/client-s3@3.1068.0':
     dependencies:
       '@aws-crypto/sha1-browser': 5.2.0
       '@aws-crypto/sha256-browser': 5.2.0
@@ -12560,11 +12598,11 @@ snapshots:
       mnemonist: 0.38.3
       tslib: 2.8.1
 
-  '@aws-sdk/lib-dynamodb@3.1067.0(@aws-sdk/client-dynamodb@3.1067.0)':
+  '@aws-sdk/lib-dynamodb@3.1068.0(@aws-sdk/client-dynamodb@3.1068.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1067.0
+      '@aws-sdk/client-dynamodb': 3.1068.0
       '@aws-sdk/core': 3.974.20
-      '@aws-sdk/util-dynamodb': 3.996.4(@aws-sdk/client-dynamodb@3.1067.0)
+      '@aws-sdk/util-dynamodb': 3.996.4(@aws-sdk/client-dynamodb@3.1068.0)
       '@smithy/core': 3.24.6
       '@smithy/types': 4.14.3
       tslib: 2.8.1
@@ -12641,6 +12679,15 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
+  '@aws-sdk/s3-request-presigner@3.1068.0':
+    dependencies:
+      '@aws-sdk/core': 3.974.20
+      '@aws-sdk/signature-v4-multi-region': 3.996.34
+      '@aws-sdk/types': 3.973.12
+      '@smithy/core': 3.24.6
+      '@smithy/types': 4.14.3
+      tslib: 2.8.1
+
   '@aws-sdk/signature-v4-multi-region@3.996.34':
     dependencies:
       '@aws-sdk/types': 3.973.12
@@ -12662,9 +12709,9 @@ snapshots:
       '@smithy/types': 4.14.3
       tslib: 2.8.1
 
-  '@aws-sdk/util-dynamodb@3.996.4(@aws-sdk/client-dynamodb@3.1067.0)':
+  '@aws-sdk/util-dynamodb@3.996.4(@aws-sdk/client-dynamodb@3.1068.0)':
     dependencies:
-      '@aws-sdk/client-dynamodb': 3.1067.0
+      '@aws-sdk/client-dynamodb': 3.1068.0
       tslib: 2.8.1
 
   '@aws-sdk/util-locate-window@3.965.7':
@@ -13047,10 +13094,10 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  '@composio/vercel@0.9.2(@composio/core@0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.202(zod@4.4.3))':
+  '@composio/vercel@0.9.2(@composio/core@0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3))(ai@6.0.203(zod@4.4.3))':
     dependencies:
       '@composio/core': 0.10.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)
-      ai: 6.0.202(zod@4.4.3)
+      ai: 6.0.203(zod@4.4.3)
 
   '@csstools/color-helpers@6.0.2': {}
 
@@ -17203,11 +17250,11 @@ snapshots:
 
   agent-base@7.1.4: {}
 
-  ai@6.0.202(zod@4.4.3):
+  ai@6.0.203(zod@4.4.3):
     dependencies:
-      '@ai-sdk/gateway': 3.0.128(zod@4.4.3)
+      '@ai-sdk/gateway': 3.0.129(zod@4.4.3)
       '@ai-sdk/provider': 3.0.10
-      '@ai-sdk/provider-utils': 4.0.28(zod@4.4.3)
+      '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
       '@opentelemetry/api': 1.9.1
       zod: 4.4.3
 
@@ -20599,7 +20646,7 @@ snapshots:
     dependencies:
       yallist: 3.1.1
 
-  lucide-react@1.17.0(react@19.2.7):
+  lucide-react@1.18.0(react@19.2.7):
     dependencies:
       react: 19.2.7
 
