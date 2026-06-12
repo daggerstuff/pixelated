@@ -56,10 +56,11 @@ function normalizeSiteUrl(value) {
 }
 
 /**
- * @param {{ ssr: boolean; assets: string[]; filesToDeleteAfterUpload: string[] }} params
+ * Create a scoped Sentry Vite plugin that only applies during production builds.
+ * The plugin uploads source maps and injects debug IDs after the build completes.
+ * @param {{ assets: string[]; filesToDeleteAfterUpload: string[] }} params
  */
 function createScopedSentryVitePlugins({
-  ssr,
   assets,
   filesToDeleteAfterUpload,
 }) {
@@ -76,12 +77,12 @@ function createScopedSentryVitePlugins({
       filesToDeleteAfterUpload,
     },
   })
-
+  // Apply to production builds only — skip upload during dev/watch.
   return plugins.map((plugin) => ({
     ...plugin,
     /** @param {import("vite").ConfigEnv} env */
     apply(_, env) {
-      return env.command === 'build' && Boolean(env.isSsrBuild) === ssr
+      return env.command === 'build'
     },
   }))
 }
