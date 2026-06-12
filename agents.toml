@@ -1,0 +1,9 @@
+version = 1
+agents = ["claude", "cursor", "codex", "vscode", "opencode"]
+
+[trust]
+allow_all = true
+
+[[skills]]
+name = "dotagents"
+source = "getsentry/dotagents"

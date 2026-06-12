@@ -44,13 +44,13 @@ services:
     restart: unless-stopped
 
   pgbouncer:
-    image: edoburu/pgbouncer:1.18
+    image: edoburu/pgbouncer:latest
     container_name: pixelated-pgbouncer
     ports:
       - '6432:6432'
     volumes:
-      - ./docker/postgres/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
-      - ./docker/postgres/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+      - ./postgres/pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./postgres/pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
     environment:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
@@ -60,7 +60,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ['CMD', 'pgbouncer', '-c', '/etc/pgbouncer/pgbouncer.ini', '-d']
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "6432"]
       interval: 30s
       timeout: 10s
       retries: 3
