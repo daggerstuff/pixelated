@@ -278,8 +278,9 @@ export class EducationalContextRecognizer {
         ),
         priorKnowledgeRequired: Array.isArray(parsed.priorKnowledgeRequired)
           ? parsed.priorKnowledgeRequired
-          : [],      metadata: {
-        conceptualDepth: Math.max(
+          : [],
+        metadata: {
+          conceptualDepth: Math.max(
             0,
             Math.min(1, (parsed as any).metadata?.conceptualDepth ?? 0.5),
           ),

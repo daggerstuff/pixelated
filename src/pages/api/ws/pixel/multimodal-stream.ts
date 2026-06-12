@@ -85,7 +85,9 @@ export const GET: APIRoute = async (context) => {
 
   // Rate limiting
   try {
-    await applyRateLimit(context as unknown as Request, 'pixel-ws', { points: 1 })
+    await applyRateLimit(context as unknown as Request, 'pixel-ws', {
+      points: 1,
+    })
   } catch (error: unknown) {
     logger.error('Rate limit exceeded', { error })
     return new Response('Too many connections', { status: 429 })
@@ -98,7 +100,11 @@ export const GET: APIRoute = async (context) => {
     return new Response('Expected WebSocket upgrade', { status: 400 })
   }
 
-  const { socket, response } = (Astro as unknown as { getWebSocket: (ctx: unknown) => { socket: WebSocket; response: Response } }).getWebSocket(context) as unknown as {
+  const { socket, response } = (
+    Astro as unknown as {
+      getWebSocket: (ctx: unknown) => { socket: WebSocket; response: Response }
+    }
+  ).getWebSocket(context) as unknown as {
     socket: WebSocket
     response: Response
   }

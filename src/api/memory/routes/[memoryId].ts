@@ -8,6 +8,8 @@
  * Retrieves, updates, or deletes a specific memory record by its ID.
  */
 
+import { z } from 'zod'
+
 import {
   getGateway,
   jsonError,
@@ -15,7 +17,6 @@ import {
   toMemoryScope,
   withAuthenticatedMemoryRoute,
 } from '../_shared'
-import { z } from 'zod'
 
 // Define the input schema for updating a memory
 const UpdateMemoryRequestSchema = z

@@ -31,7 +31,7 @@ dependencies = [
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
   "pydub>=0.25.1",
-  "pyarrow>=23.0.1",
+  "pyarrow>=22.0.0",
   "hatch>=1.14.1",
   "textstat>=0.7.8",
   "seaborn>=0.13.2",
@@ -128,6 +128,8 @@ dependencies = [
   "python-telegram-bot>=22.7",
   "anthropic>=0.107.1",
   "libcst>=1.8.6",
+  "data-designer>=0.6.1",
+  "nemoguardrails>=0.22.0",
 ]
 [project.optional-dependencies]
 test = [
@@ -241,8 +243,19 @@ ignore = ["E501", "UP017", "PLR2004"]
 "scripts/categorize_errors.py" = ["T201"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
-"foresight-mcp/foresight_mcp/server.py" = ["PLR0911", "PLR0912", "PLR0913", "PLR0915"]
-"foresight-mcp/tests/test_*.py" = ["PLC0415", "ARG001", "PLR0913", "SIM115", "ARG005"]
+"foresight-mcp/foresight_mcp/server.py" = [
+  "PLR0911",
+  "PLR0912",
+  "PLR0913",
+  "PLR0915",
+]
+"foresight-mcp/tests/test_*.py" = [
+  "PLC0415",
+  "ARG001",
+  "PLR0913",
+  "SIM115",
+  "ARG005",
+]
 "foresight-mcp/foresight_mcp/llm_client.py" = ["PLR0913"]
 "foresight-mcp/foresight_mcp/tenant_middleware.py" = ["PLR0912"]
 [tool.ruff.lint.isort]

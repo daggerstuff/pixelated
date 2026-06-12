@@ -2,7 +2,6 @@ import type { AstroCookies } from 'astro'
 
 import type { AuthRole } from '../config/auth.config'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
-import { getIdentityProvider } from './auth/identity-provider'
 import {
   createHIPAACompliantAuditLog,
   AuditEventType,
@@ -10,6 +9,7 @@ import {
   type AuditDetails,
 } from './audit'
 import type { AuditMetadata } from './audit/types'
+import { getIdentityProvider } from './auth/identity-provider'
 
 let warnedAboutDeprecation = false
 

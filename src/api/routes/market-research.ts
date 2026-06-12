@@ -34,13 +34,14 @@ router.get(
 router.post(
   '/',
   asyncHandler(async (_req: Request, res: Response) => {
-    const { title, industry, targetMarket, methodology, budget } = _req.body as {
-      title?: string
-      industry?: string
-      targetMarket?: string
-      methodology?: string
-      budget?: string
-    }
+    const { title, industry, targetMarket, methodology, budget } =
+      _req.body as {
+        title?: string
+        industry?: string
+        targetMarket?: string
+        methodology?: string
+        budget?: string
+      }
     const { user } = _req as unknown as { user: { id: string } }
 
     if (typeof title !== 'string' || typeof industry !== 'string') {

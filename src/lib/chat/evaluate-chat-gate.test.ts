@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import {
-  CRITICAL_BLOCK_REASON,
-  evaluateChatGate,
-} from './evaluate-chat-gate'
+import { CRITICAL_BLOCK_REASON, evaluateChatGate } from './evaluate-chat-gate'
 
 describe('evaluateChatGate', () => {
   it('blocks critical crisis language with the structured gate reason', () => {
