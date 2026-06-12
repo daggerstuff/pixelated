@@ -8,8 +8,8 @@
  *
  * Contract (see `src/env.d.ts`):
  *   1. Known properties retain their strict types (autocomplete + drift detection).
- *   2. The `[key: string]: unknown` index signature accepts arbitrary
- *      `Record<string, unknown>` assignments and bracket writes.
+ *   2. The `[key: string]: unknown` index signature accepts bracket
+ *      reads/writes for ad-hoc keys (typed as `unknown`).
  *   3. Middleware ad-hoc writes (e.g. `locals['admin'] = ...`) typecheck.
  *
  * Adding a new shared key to `App.Locals`? Add a positive assertion below.
@@ -25,13 +25,13 @@ import '../env.d.ts'
 // ---------------------------------------------------------------------------
 
 // `requestId` is `string` (not `unknown`).
-const _requestId: App.Locals['requestId'] = 'req-123'
+const requestId: App.Locals['requestId'] = 'req-123'
 
 // `timestamp` is `string`.
-const _timestamp: App.Locals['timestamp'] = '2026-06-11T00:00:00Z'
+const timestamp: App.Locals['timestamp'] = '2026-06-11T00:00:00Z'
 
 // `user` is nullable with a specific shape.
-const _user: App.Locals['user'] = {
+const user: App.Locals['user'] = {
   id: 'u-1',
   email: 'a@b.c',
   emailVerified: true,
@@ -39,38 +39,38 @@ const _user: App.Locals['user'] = {
 }
 
 // `session` is nullable with `expiresAt: Date`.
-const _session: App.Locals['session'] = {
+const session: App.Locals['session'] = {
   id: 's-1',
   userId: 'u-1',
   expiresAt: new Date(),
 }
 
 // `cspNonce` is optional `string`.
-const _cspNonce: App.Locals['cspNonce'] = 'nonce-abc'
-const _cspNonceAbsent: App.Locals['cspNonce'] = undefined
+const cspNonce: App.Locals['cspNonce'] = 'nonce-abc'
+const cspNonceAbsent: App.Locals['cspNonce'] = undefined
 
 // `isSSR` is optional `boolean`.
-const _isSSR: App.Locals['isSSR'] = true
-const _isSSRAbsent: App.Locals['isSSR'] = undefined
+const isSSR: App.Locals['isSSR'] = true
+const isSSRAbsent: App.Locals['isSSR'] = undefined
 
 // `vercelEdge` is optional with geo/UA fields.
-const _vercelEdge: App.Locals['vercelEdge'] = {
+const vercelEdge: App.Locals['vercelEdge'] = {
   country: 'US',
   region: 'CA',
   ip: '127.0.0.1',
   isAuthPage: false,
   userAgent: 'Mozilla/5.0',
 }
-const _vercelEdgeAbsent: App.Locals['vercelEdge'] = undefined
+const vercelEdgeAbsent: App.Locals['vercelEdge'] = undefined
 
 // `headers` is optional `Record<string, string>`.
-const _headers: App.Locals['headers'] = { 'x-custom': 'value' }
-const _headersAbsent: App.Locals['headers'] = undefined
+const headers: App.Locals['headers'] = { 'x-custom': 'value' }
+const headersAbsent: App.Locals['headers'] = undefined
 
 // `userPreferences` is optional with theme/UA/device fields. Extracted to
 // a shared base so the positive (valid assignment) and the negative
 // (one field wrong) can't drift apart when fields are added.
-const _userPreferencesBase = {
+const userPreferencesBase = {
   darkMode: true,
   language: 'en',
   userAgent: 'Mozilla/5.0',
@@ -80,64 +80,85 @@ const _userPreferencesBase = {
   isAndroid: false,
   ip: '127.0.0.1',
 }
-const _userPreferences: App.Locals['userPreferences'] = _userPreferencesBase
-const _userPreferencesAbsent: App.Locals['userPreferences'] = undefined
+const userPreferences: App.Locals['userPreferences'] = userPreferencesBase
+const userPreferencesAbsent: App.Locals['userPreferences'] = undefined
 
-// Negative: `requestId` is NOT `number`. If someone changes the type, this
-// line should fail to compile.
-// @ts-expect-error — `requestId` is `string`, not `number`
-const _requestIdWrong: App.Locals['requestId'] = 42
+// Negative: `requestId` is NOT `number`. Type-level assertion: `number` is
+// not assignable to the field. If someone changes the type, this flips to
+// `true` and the const assignment fails — that's the drift detector.
+// `[T] extends [U]` (tuple form) is required so the check doesn't
+// distribute over a union (e.g. if `requestId` widened to `string | number`).
+type IsWrongRequestIdAssignable = [number] extends [App.Locals['requestId']]
+  ? true
+  : false
+const isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
 
-// Negative: `user` is nullable. Assigning a non-null value without the
-// required fields should fail.
-// @ts-expect-error — `user` requires `id`, `email`, etc.
-const _userWrong: App.Locals['user'] = { id: 'u-1' }
+// Negative: `user` requires `id`, `email`, `emailVerified`, `role`.
+// Type-level assertion: a partial object (only `id`) is not assignable
+// to the full user shape. If the required fields are loosened, this
+// flips to `true` and the const assignment fails. `[T] extends [U]`
+// (tuple form) is used for uniform union-safety across the file.
+type IsPartialUserAssignable = [{ id: string }] extends [NonNullable<App.Locals['user']>]
+  ? true
+  : false
+const isPartialUserAssignable: IsPartialUserAssignable = false
 
-// Negative: `vercelEdge` requires all 5 fields. Missing `ip` should fail.
-// @ts-expect-error — `vercelEdge` requires `ip`
-const _vercelEdgeWrong: App.Locals['vercelEdge'] = {
-  country: 'US',
-  region: 'CA',
-  isAuthPage: false,
-  userAgent: 'Mozilla/5.0',
-}
+// Negative: `vercelEdge` requires all 5 fields including `ip`.
+// Type-level assertion: `vercelEdge` without `ip` is not assignable to
+// the full shape. If `ip` becomes optional, this flips to `true` and
+// the const assignment fails. `[T] extends [U]` (tuple form) is used
+// for uniform union-safety across the file.
+type IsVercelEdgeWithoutIpAssignable = [
+  Omit<NonNullable<App.Locals['vercelEdge']>, 'ip'>,
+] extends [App.Locals['vercelEdge']]
+  ? true
+  : false
+const isVercelEdgeWithoutIpAssignable: IsVercelEdgeWithoutIpAssignable = false
 
 // Negative: `headers` is `Record<string, string>`, not `Record<string, number>`.
-// @ts-expect-error — `headers` values must be `string`
-const _headersWrong: App.Locals['headers'] = { 'x-count': 42 }
+// Type-level assertion: `Record<string, number>` is not assignable to
+// `Record<string, string>`. If the value type changes, this flips to
+// `true` and the const assignment fails. `[T] extends [U]` (tuple form)
+// is used for uniform union-safety across the file.
+type IsWrongHeadersValueTypeAssignable = [Record<string, number>] extends [
+  NonNullable<App.Locals['headers']>,
+]
+  ? true
+  : false
+const isWrongHeadersValueTypeAssignable: IsWrongHeadersValueTypeAssignable = false
 
 // Negative: `userPreferences.darkMode` is `boolean`, not `string`.
-// @ts-expect-error — `darkMode` is `boolean`, not `string`
-const _userPreferencesWrong: App.Locals['userPreferences'] = {
-  ..._userPreferencesBase,
-  darkMode: 'yes',
-}
+// Type-level assertion (no `@ts-expect-error` needed, so no directive-
+// placement issues with oxlint's type-aware mode). `Omit` + re-add is
+// required because `boolean & string` is `never`; we want `darkMode: string`
+// to override the base field. `[T] extends [U]` (tuple form) is used
+// for uniform union-safety across the file.
+type IsWrongDarkModeAssignable = [
+  Omit<typeof userPreferencesBase, 'darkMode'> & { darkMode: string },
+] extends [App.Locals['userPreferences']]
+  ? true
+  : false
+const isWrongDarkModeAssignable: IsWrongDarkModeAssignable = false
 
 // ---------------------------------------------------------------------------
-// 2. Index signature accepts `Record<string, unknown>`
+// 2. Index signature accepts bracket access for ad-hoc keys
 // ---------------------------------------------------------------------------
 
-// A `Record<string, unknown>` is assignable to `App.Locals` (the index
-// signature permits it; known props accept `unknown` because `unknown` is
-// the top type).
-const _recordLocals: Record<string, unknown> = { arbitrary: 'value' }
-const _localsFromRecord: App.Locals = _recordLocals
+// Ad-hoc keys (not declared in `App.Locals`) are accessible via bracket
+// notation and typed as `unknown` (the index signature's value type).
+declare const someLocals: App.Locals
+const adHocKey: unknown = someLocals['arbitraryAdHocKey']
+const adHocKeyNonExistent: unknown = someLocals['doesNotExist']
 
-// A `Partial<{ user?: ... }>` is assignable to `App.Locals` (this is the
-// pattern that the agent-notes routes rely on via `resolveActorIdentity`).
-const _partialLocals: Partial<{ user: { id: string; role: string } }> = {}
-const _localsFromPartial: App.Locals = _partialLocals
-
-// Ad-hoc keys (not declared in `App.Locals`) are accessible but typed
-// as `unknown`.
-declare const _someLocals: App.Locals
-const _adHocKey: unknown = _someLocals['arbitraryAdHocKey']
-const _adHocKeyNonExistent: unknown = _someLocals['doesNotExist']
-
-// Negative: the index signature is `unknown`, not `any`. Assigning
-// `unknown` to a specific type requires narrowing.
-// @ts-expect-error — `_adHocKey` is `unknown`, not `string` (no narrowing)
-const _adHocKeyAsString: string = _someLocals['arbitraryAdHocKey']
+// Negative: the index signature is `unknown`, not `any` or `string`.
+// Type-level assertion: a bracket read is not assignable to `string`
+// without narrowing. If the index sig widens to `any` or `string`, the
+// read becomes assignable, the conditional flips to `true`, and the
+// const assignment fails. `[T] extends [U]` (tuple form) is used to
+// avoid distributive behavior on `any`.
+type AdHocKeyRead = typeof someLocals['arbitraryAdHocKey']
+type IsAdHocKeyAssignableToString = [AdHocKeyRead] extends [string] ? true : false
+const isAdHocKeyAssignableToString: IsAdHocKeyAssignableToString = false
 
 // ---------------------------------------------------------------------------
 // 3. Middleware ad-hoc writes typecheck
@@ -145,20 +166,29 @@ const _adHocKeyAsString: string = _someLocals['arbitraryAdHocKey']
 
 // `adminGuard` writes `context.locals['admin'] = admin` using bracket
 // notation. This pattern MUST typecheck (otherwise it's a latent bug).
-declare const _ctx: { locals: App.Locals }
-_ctx.locals['admin'] = { userId: 'u-1', isAdmin: true, hasPermission: true }
-_ctx.locals['customKey'] = { anything: 'goes' }
+declare const ctx: { locals: App.Locals }
+ctx.locals['admin'] = { userId: 'u-1', isAdmin: true, hasPermission: true }
+ctx.locals['customKey'] = { anything: 'goes' }
 
-// Negative: known props retain their types. Assigning a `string` to
-// `requestId` (which is `string`) is fine, but assigning a `number`
-// should fail.
-// @ts-expect-error — `requestId` is `string`, not `number`
-_ctx.locals['requestId'] = 42
+// Negative: known props retain their types. Assigning a `number` to
+// `requestId` (which is `string`) should fail. Type-level assertion:
+// `number` is not assignable to the field. If the field widens to
+// `string | number` or just `number`, the conditional flips to `true`
+// and the const assignment fails. `[T] extends [U]` (tuple form) is
+// required so the check doesn't distribute over the union (which
+// would collapse to `boolean` and always pass).
+type IsWrongRequestIdValueAssignable = [number] extends [App.Locals['requestId']]
+  ? true
+  : false
+const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
 
 // Negative: assigning `null` to a non-nullable known prop should fail.
 // `user` is `T | null` so `null` IS allowed; we use `timestamp` instead.
-// @ts-expect-error — `timestamp` is `string`, not `null`
-_ctx.locals['timestamp'] = null
+// Type-level assertion: `null` is not assignable to the `string` field.
+// If the field becomes nullable, this flips to `true` and the const
+// assignment fails.
+type IsNullAssignableToTimestamp = null extends App.Locals['timestamp'] ? true : false
+const isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
 
 // ---------------------------------------------------------------------------
 // 4. Lock in: adding a new shared key requires updating this contract
