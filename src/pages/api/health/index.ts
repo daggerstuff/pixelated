@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro'
+
 import { getRedisClient } from '@/lib/database/connection'
 
 export const GET: APIRoute = async () => {

@@ -8,6 +8,7 @@
 - Evaluation runs are their own commits — never "re-run to reproduce".
 
 ## Experiment tracking
+
 - One run = one config file + one result file.
 - Configs live in YAML under `experiments/`.
 - Results go to `.sdd/metrics/ml/<run_id>.json`.

@@ -209,14 +209,13 @@ export class ResearchQueryEngineService {
       }
 
       // Validate consent for data access
-      const consentValid = await (consentManagementService as any).validateConsent(
-        userId,
-        {
-          activityType: 'research_query',
-          dataTypes: ['therapeutic_sessions', 'emotional_analysis'],
-          purpose: 'research_analysis',
-        },
-      )
+      const consentValid = await (
+        consentManagementService as any
+      ).validateConsent(userId, {
+        activityType: 'research_query',
+        dataTypes: ['therapeutic_sessions', 'emotional_analysis'],
+        purpose: 'research_analysis',
+      })
 
       if (!consentValid.isValid) {
         throw new Error(

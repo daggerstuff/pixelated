@@ -1,3 +1,18 @@
+import {
+  handleGatewayError,
+  jsonResponse,
+  parseRequestJson,
+  parseSearchParams,
+  requireAuthenticatedMemoryCaller,
+  toPublicMemory,
+} from '@/lib/memory/contract/route-helpers'
+import {
+  CreateMemoryRequest,
+  CreateMemoryResponse,
+  ListMemoriesQuery,
+  ListMemoriesResponse,
+  Pagination,
+} from '@/lib/memory/contract/v1'
 /**
  * @file src/pages/api/v1/memory/index.ts
  *
@@ -17,22 +32,6 @@
  *  - return the canonical error envelope on failure
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
-
-import {
-  CreateMemoryRequest,
-  CreateMemoryResponse,
-  ListMemoriesQuery,
-  ListMemoriesResponse,
-  Pagination,
-} from '@/lib/memory/contract/v1'
-import {
-  handleGatewayError,
-  jsonResponse,
-  parseRequestJson,
-  parseSearchParams,
-  requireAuthenticatedMemoryCaller,
-  toPublicMemory,
-} from '@/lib/memory/contract/route-helpers'
 
 // ---------------------------------------------------------------------------
 // GET /api/v1/memory — list
@@ -56,7 +55,8 @@ export const GET = async (context: { request: Request }): Promise<Response> => {
       tags,
     })
 
-    const body: ListMemoriesResponse = {        data: result.memories.map((m) => toPublicMemory(m)),
+    const body: ListMemoriesResponse = {
+      data: result.memories.map((m) => toPublicMemory(m)),
       pagination: Pagination.parse({
         limit,
         offset,
@@ -73,7 +73,9 @@ export const GET = async (context: { request: Request }): Promise<Response> => {
 // POST /api/v1/memory — create
 // ---------------------------------------------------------------------------
 
-export const POST = async (context: { request: Request }): Promise<Response> => {
+export const POST = async (context: {
+  request: Request
+}): Promise<Response> => {
   const auth = await requireAuthenticatedMemoryCaller(context.request)
   if (!auth.ok) return auth.response
 

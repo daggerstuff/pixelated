@@ -184,15 +184,13 @@ describe('hasAnyWorkspaceRole', () => {
   })
 
   it('returns false when none of the required roles match', () => {
-    expect(
-      hasAnyWorkspaceRole(session, 'ws-alpha', ['admin', 'owner']),
-    ).toBe(false)
+    expect(hasAnyWorkspaceRole(session, 'ws-alpha', ['admin', 'owner'])).toBe(
+      false,
+    )
   })
 
   it('returns false when workspace does not match', () => {
-    expect(
-      hasAnyWorkspaceRole(session, 'ws-bravo', ['therapist']),
-    ).toBe(false)
+    expect(hasAnyWorkspaceRole(session, 'ws-bravo', ['therapist'])).toBe(false)
   })
 
   it('returns false when requiredRoles is empty', () => {
@@ -230,7 +228,10 @@ describe('hasWorkspaceAccess', () => {
   it('returns false when session has no workspaceId', () => {
     expect(
       hasWorkspaceAccess(
-        { user: { id: 'u1', role: 'admin' }, expires: '2099-01-01T00:00:00.000Z' },
+        {
+          user: { id: 'u1', role: 'admin' },
+          expires: '2099-01-01T00:00:00.000Z',
+        },
         'ws-alpha',
       ),
     ).toBe(false)

@@ -7,18 +7,16 @@ import type {
   ReflexionResult as LocalReflexionResult,
   VerbalReflection as LocalVerbalReflection,
 } from '../../../src/lib/memory/reflection/reflexion'
-
 import type {
   ActionFeedbackPair,
   ReflexionResult,
   VerbalReflection,
 } from './reflection'
 
-type AssertEqual<A, B> = (<T>() => T extends A ? 1 : 2) extends <
-  T,
->() => T extends B ? 1 : 2
-  ? true
-  : false
+type AssertEqual<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false
 
 export type ReflexionResultCompat = AssertEqual<
   LocalReflexionResult,

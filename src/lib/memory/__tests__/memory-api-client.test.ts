@@ -61,9 +61,7 @@ describe('create()', () => {
   it('posts to /api/v1/memory and returns the v1 envelope', async () => {
     const mockFetch = vi
       .fn()
-      .mockResolvedValue(
-        mockJsonResponse({ data: sampleMemory }, 201),
-      )
+      .mockResolvedValue(mockJsonResponse({ data: sampleMemory }, 201))
     const client = createMockClient(mockFetch)
 
     const result = await client.create({ content: 'Test memory' })
@@ -133,9 +131,9 @@ describe('update()', () => {
 
 describe('delete()', () => {
   it('deletes /api/v1/memory/:id', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(
-      mockJsonResponse({ data: { id: sampleMemory.id } }),
-    )
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValue(mockJsonResponse({ data: { id: sampleMemory.id } }))
     const client = createMockClient(mockFetch)
 
     await client.delete(sampleMemory.id)
@@ -146,9 +144,11 @@ describe('delete()', () => {
   })
 
   it('throws MemoryApiClientError on 404', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(
-      mockError(404, { error: 'not_found', message: 'Not found' }),
-    )
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValue(
+        mockError(404, { error: 'not_found', message: 'Not found' }),
+      )
     const client = createMockClient(mockFetch)
 
     await expect(client.delete(sampleMemory.id)).rejects.toThrow(

@@ -15,4 +15,5 @@ git add -A && git commit -m "feat: <brief summary of what you did>"
 exit 0
 ```
 
-If the task server is unreachable, retry up to 3 times with a 2-second delay before giving up.
+If the task server is unreachable, retry up to 3 times with a 2-second delay
+before giving up.

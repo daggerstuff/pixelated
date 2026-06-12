@@ -105,7 +105,8 @@ export function mapGatewayError(
     return {
       status: 409,
       code: MemoryApiErrorCode.Conflict,
-      message: gatewayMessage || 'The request conflicts with the current state.',
+      message:
+        gatewayMessage || 'The request conflicts with the current state.',
     }
   }
   if (status === 413) {

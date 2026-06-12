@@ -40,7 +40,11 @@ import {
   ProductMemoryGatewayError,
 } from '@/lib/services/product-memory-gateway'
 
-import { GET as getMemoryById, PATCH as patchMemoryById, DELETE as deleteMemoryById } from '../[memoryId]'
+import {
+  GET as getMemoryById,
+  PATCH as patchMemoryById,
+  DELETE as deleteMemoryById,
+} from '../[memoryId]'
 import { GET as listMemories, POST as createMemory } from '../index'
 import { GET as searchGet, POST as searchPost } from '../search'
 
@@ -121,9 +125,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
     vi.clearAllMocks()
     gateway = makeGateway()
     mockGetCurrentUser.mockResolvedValue(makeUser())
-    ;(getProductMemoryGateway as unknown as ReturnType<typeof vi.fn>).mockReturnValue(
-      gateway,
-    )
+    ;(
+      getProductMemoryGateway as unknown as ReturnType<typeof vi.fn>
+    ).mockReturnValue(gateway)
   })
 
   // ------------------------------------------------------------------
@@ -165,7 +169,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
 
       const response = await getMemoryById({
         params: { memoryId: '11111111-1111-4111-8111-111111111111' },
-        request: makeRequest('http://localhost/api/v1/memory/11111111-1111-4111-8111-111111111111'),
+        request: makeRequest(
+          'http://localhost/api/v1/memory/11111111-1111-4111-8111-111111111111',
+        ),
       })
 
       expect(response.status).toBe(200)
@@ -208,7 +214,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
       })
 
       const response = await createMemory({
-        request: makeRequest('http://localhost/api/v1/memory', { content: 'hi' }),
+        request: makeRequest('http://localhost/api/v1/memory', {
+          content: 'hi',
+        }),
       })
 
       expect(response.status).toBe(201)
@@ -295,7 +303,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
       gateway.getMemory.mockResolvedValue(null)
       const response = await getMemoryById({
         params: { memoryId: '11111111-1111-4111-8111-111111111111' },
-        request: makeRequest('http://localhost/api/v1/memory/11111111-1111-4111-8111-111111111111'),
+        request: makeRequest(
+          'http://localhost/api/v1/memory/11111111-1111-4111-8111-111111111111',
+        ),
       })
       expect(response.status).toBe(404)
       const body = (await response.json()) as { error: string; message: string }
@@ -307,7 +317,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
         new ProductMemoryGatewayError('downstream exploded', 502),
       )
       const response = await createMemory({
-        request: makeRequest('http://localhost/api/v1/memory', { content: 'hi' }),
+        request: makeRequest('http://localhost/api/v1/memory', {
+          content: 'hi',
+        }),
       })
       expect(response.status).toBe(502)
       const body = (await response.json()) as { error: string }
@@ -319,7 +331,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
         new ProductMemoryGatewayError('User scope mismatch', 403),
       )
       const response = await createMemory({
-        request: makeRequest('http://localhost/api/v1/memory', { content: 'hi' }),
+        request: makeRequest('http://localhost/api/v1/memory', {
+          content: 'hi',
+        }),
       })
       expect(response.status).toBe(403)
       const body = (await response.json()) as { error: string }
@@ -364,7 +378,9 @@ describe('v1 public memory API contract (PIX-1908)', () => {
       })
 
       const response = await createMemory({
-        request: makeRequest('http://localhost/api/v1/memory', { content: 'hi' }),
+        request: makeRequest('http://localhost/api/v1/memory', {
+          content: 'hi',
+        }),
       })
       expect(response.status).toBe(201)
       expect(gateway.createMemory).toHaveBeenCalledWith(
@@ -376,7 +392,10 @@ describe('v1 public memory API contract (PIX-1908)', () => {
         }),
       )
       // Caller-supplied identity must NOT have leaked into the scope call.
-      const call = gateway.createMemory.mock.calls[0]?.[0] as Record<string, unknown>
+      const call = gateway.createMemory.mock.calls[0]?.[0] as Record<
+        string,
+        unknown
+      >
       expect(call).not.toHaveProperty('tenantId')
     })
 

@@ -59,7 +59,12 @@ export class TaskListManager {
       // Match task items: - [ ] or - [x] or - [X]
       const taskMatch = trimmedLine.match(/^(\s*)-\s*\[([x\sX])\]\s*(.+)$/)
       if (taskMatch) {
-    const [, indent, checkState, content] = taskMatch as [string, string, string, string]
+        const [, indent, checkState, content] = taskMatch as [
+          string,
+          string,
+          string,
+          string,
+        ]
         const level = Math.floor((indent?.length ?? 0) / 2) // Assume 2 spaces per level
         const completed = checkState?.toLowerCase() === 'x'
 
@@ -144,7 +149,8 @@ export class TaskListManager {
           totalTasks,
           completedTasks,
         },
-      }      } catch (error: unknown) {
+      }
+    } catch (error: unknown) {
       logger.error('Failed to load task list', {
         filePath,
         error: error instanceof Error ? String(error) : String(error),

@@ -326,9 +326,9 @@ export class OptimizedBiasQueries {
     params.push(limit, offset)
 
     // Execute main query
-    const result = await executeQuery(query, params, {
+    const result = (await executeQuery(query, params, {
       name: 'getBiasAnalyses',
-    }) as { rows: BiasAnalysisRow[] }
+    })) as { rows: BiasAnalysisRow[] }
     const rows = result.rows
 
     // Get total count for pagination
@@ -339,9 +339,9 @@ export class OptimizedBiasQueries {
       ${whereClause}
     `
 
-    const countResult = await executeQuery(countQuery, params.slice(0, -2), {
+    const countResult = (await executeQuery(countQuery, params.slice(0, -2), {
       name: 'getBiasAnalysesCount',
-    }) as { rows: CountRow[] }
+    })) as { rows: CountRow[] }
     const countRows = countResult.rows
     const total = countRows[0] ? parseInt(countRows[0].total) : 0
 
@@ -374,10 +374,10 @@ export class OptimizedBiasQueries {
       LIMIT 1
     `
 
-    const result = await executeQuery(query, [contentHash], {
+    const result = (await executeQuery(query, [contentHash], {
       name: 'getCachedAnalysis',
       timeout: 2000, // 2 second timeout for cache lookups
-    }) as { rows: unknown[] }
+    })) as { rows: unknown[] }
 
     return result.rows[0] ?? null
   }
@@ -411,9 +411,9 @@ export class OptimizedBiasQueries {
       ORDER BY date DESC
     `
 
-    const result = await executeQuery(query, [therapistId], {
+    const result = (await executeQuery(query, [therapistId], {
       name: 'getBiasTrend',
-    }) as { rows: BiasTrendRow[] }
+    })) as { rows: BiasTrendRow[] }
 
     // Calculate trend
     const dailyScores = result.rows.map((row) => ({
@@ -431,15 +431,11 @@ export class OptimizedBiasQueries {
 
       if (recentWeek.length > 0 && previousWeek.length > 0) {
         const recentAvg =
-          recentWeek.reduce(
-            (sum: number, day) => sum + day.avg_score,
-            0,
-          ) / recentWeek.length
+          recentWeek.reduce((sum: number, day) => sum + day.avg_score, 0) /
+          recentWeek.length
         const previousAvg =
-          previousWeek.reduce(
-            (sum: number, day) => sum + day.avg_score,
-            0,
-          ) / previousWeek.length
+          previousWeek.reduce((sum: number, day) => sum + day.avg_score, 0) /
+          previousWeek.length
 
         avgScoreChange = recentAvg - previousAvg
 
@@ -482,9 +478,9 @@ export class OptimizedBiasQueries {
       LIMIT $1
     `
 
-    const result = await executeQuery(query, [limit], {
+    const result = (await executeQuery(query, [limit], {
       name: 'getHighRiskAnalyses',
-    }) as { rows: unknown[] }
+    })) as { rows: unknown[] }
 
     return result.rows
   }
@@ -512,9 +508,9 @@ export class OptimizedBiasQueries {
       WHERE ba.created_at >= NOW() - INTERVAL '${String(days)} days'
     `
 
-    const result = await executeQuery(query, [], {
+    const result = (await executeQuery(query, [], {
       name: 'getPerformanceMetrics',
-    }) as { rows: PerfMetricsRow[] }
+    })) as { rows: PerfMetricsRow[] }
     const rows = result.rows
     const row = rows[0]
     if (!row) {
@@ -539,9 +535,9 @@ export class OptimizedBiasQueries {
         AND processing_time_ms IS NOT NULL
     `
 
-    const cacheResult = await executeQuery(cacheHitQuery, [], {
+    const cacheResult = (await executeQuery(cacheHitQuery, [], {
       name: 'getCacheHitRate',
-    }) as { rows: CacheHitRow[] }
+    })) as { rows: CacheHitRow[] }
     const cacheHitRows = cacheResult.rows
     const cacheHitRow = cacheHitRows[0]
     const cacheHitRate = cacheHitRow?.cache_hit_rate ?? '0'
@@ -636,9 +632,9 @@ export class DatabaseOptimizer {
       ORDER BY pg_total_relation_size(relid) DESC
     `
 
-    const tableSizeResult = await executeQuery(tableSizeQuery, [], {
+    const tableSizeResult = (await executeQuery(tableSizeQuery, [], {
       name: 'getTableSizes',
-    }) as { rows: TableSizeRow[] }
+    })) as { rows: TableSizeRow[] }
     const tableSizes = tableSizeResult.rows
 
     // Get index usage
@@ -651,9 +647,9 @@ export class DatabaseOptimizer {
       LIMIT 10
     `
 
-    const indexUsageResult = await executeQuery(indexUsageQuery, [], {
+    const indexUsageResult = (await executeQuery(indexUsageQuery, [], {
       name: 'getIndexUsage',
-    }) as { rows: IndexUsageRow[] }
+    })) as { rows: IndexUsageRow[] }
     const indexUsage = indexUsageResult.rows
 
     // Get query performance (if pg_stat_statements is enabled)
@@ -670,9 +666,9 @@ export class DatabaseOptimizer {
         LIMIT 10
       `
 
-      const queryPerfResult = await executeQuery(queryPerfQuery, [], {
+      const queryPerfResult = (await executeQuery(queryPerfQuery, [], {
         name: 'getQueryPerformance',
-      }) as { rows: QueryPerfRow[] }
+      })) as { rows: QueryPerfRow[] }
       queryPerformance = queryPerfResult.rows
     } catch (error: unknown) {
       logger.warn('pg_stat_statements not available', { error })
@@ -696,10 +692,7 @@ export async function monitorQueryPerformance(): Promise<void> {
 
   logger.info('Database performance monitoring', {
     tableCount: stats.table_sizes.length,
-    totalRows: stats.table_sizes.reduce(
-      (sum, table) => sum + table.rows,
-      0,
-    ),
+    totalRows: stats.table_sizes.reduce((sum, table) => sum + table.rows, 0),
     slowQueries: stats.query_performance.length,
   })
 

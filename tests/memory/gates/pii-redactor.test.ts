@@ -1,5 +1,9 @@
 import { test, expect, describe, beforeEach } from 'vitest'
-import { PiiRedactor, piiRedactor } from '../../../src/lib/memory/gates/pii-redactor'
+
+import {
+  PiiRedactor,
+  piiRedactor,
+} from '../../../src/lib/memory/gates/pii-redactor'
 
 describe('PiiRedactor', () => {
   let redactor: PiiRedactor

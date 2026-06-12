@@ -1,14 +1,13 @@
 import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
 import { randomUUID } from 'crypto'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type {
   PythonBridgeRequest,
   PythonBridgeResponse,
   IMHIEvaluationParams,
   MentalLLaMAAnalysisResult,
 } from '../types/index.ts'
-
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('mental-llama-python-bridge')
 
@@ -82,7 +81,9 @@ export class MentalLLaMAPythonBridge {
           .filter(Boolean)
           .forEach((line) => {
             try {
-              const response = JSON.parse(line) as unknown as PythonBridgeResponse & { id?: string }
+              const response = JSON.parse(
+                line,
+              ) as unknown as PythonBridgeResponse & { id?: string }
               if (response?.id && this.requestQueue.has(response.id)) {
                 const { resolve, timeout } = this.requestQueue.get(response.id)!
                 clearTimeout(timeout)
@@ -94,7 +95,10 @@ export class MentalLLaMAPythonBridge {
                 }
               }
             } catch (err: unknown) {
-              logger.error('Failed to parse PythonBridge response', { line, error: String(err) })
+              logger.error('Failed to parse PythonBridge response', {
+                line,
+                error: String(err),
+              })
             }
           })
       })
@@ -149,7 +153,10 @@ export class MentalLLaMAPythonBridge {
       throw new PythonBridgeError('PythonBridge is not functional.')
     }
     const payload = { text, modelParams }
-    const response = await this.sendRequest('analyze_text', payload) as unknown
+    const response = (await this.sendRequest(
+      'analyze_text',
+      payload,
+    )) as unknown
     if (
       response &&
       typeof response === 'object' &&
@@ -199,7 +206,9 @@ export class MentalLLaMAPythonBridge {
       try {
         await this.sendRequest('shutdown', {})
       } catch (e) {
-        logger.warn('Error during PythonBridge shutdown request', { error: String(e) })
+        logger.warn('Error during PythonBridge shutdown request', {
+          error: String(e),
+        })
       }
       this.pythonProcess.kill()
       this.pythonProcess = null
@@ -246,7 +255,8 @@ export class MentalLLaMAPythonBridge {
         reject(new PythonBridgeError(`Request timed out: ${command}`))
       }, this.REQUEST_TIMEOUT_MS)
       this.requestQueue.set(id, { resolve, reject, timeout })
-      try {              this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
+      try {
+        this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
       } catch {
         clearTimeout(timeout)
         this.requestQueue.delete(id)

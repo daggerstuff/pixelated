@@ -11,6 +11,7 @@
  */
 
 import process from 'node:process'
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CrisisProtocol } from '../../src/lib/ai/crisis/CrisisProtocol'

@@ -4,8 +4,8 @@
  */
 /** @vitest-environment node */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import type { AstroCookies, APIContext } from 'astro'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 
 // Mock dependencies using vi.hoisted for better reliability
 const {

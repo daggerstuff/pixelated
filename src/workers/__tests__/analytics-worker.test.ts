@@ -288,9 +288,7 @@ describe('analytics-worker', () => {
       // Find the message handler attached to the *client* mock
       const messageHandler = vi
         .mocked(mockWsClient.once)
-        .mock.calls.find(
-          (call) => call[0] === 'message',
-        )?.[1]
+        .mock.calls.find((call) => call[0] === 'message')?.[1]
 
       if (!messageHandler) {
         throw new Error('Message handler not attached to client')
@@ -329,9 +327,7 @@ describe('analytics-worker', () => {
       simulateConnection(mockWsClient as unknown as WebSocket)
       const messageHandler = vi
         .mocked(mockWsClient.once)
-        .mock.calls.find(
-          (call) => call[0] === 'message',
-        )?.[1]
+        .mock.calls.find((call) => call[0] === 'message')?.[1]
       if (!messageHandler) {
         throw new Error('Message handler not attached')
       }

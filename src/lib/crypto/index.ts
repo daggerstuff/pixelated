@@ -353,9 +353,7 @@ export function createHash(data: string): string {
   if (!data) {
     return ''
   }
-  return (
-    CryptoJS.SHA256(data) as unknown as CryptoStringable
-  ).toString()
+  return (CryptoJS.SHA256(data) as unknown as CryptoStringable).toString()
 }
 
 /**

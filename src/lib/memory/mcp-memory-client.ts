@@ -1,4 +1,5 @@
 import type { PublicMemory } from '@/lib/memory/contract/v1'
+
 import {
   DEFAULT_MEMORY_API_BASE_URL,
   MemoryApiClient,
@@ -36,7 +37,11 @@ export const mcpMemoryManager = {
     return response.data.id
   },
 
-  async updateMemory(memoryId: string, content: string, userId?: string): Promise<void> {
+  async updateMemory(
+    memoryId: string,
+    content: string,
+    userId?: string,
+  ): Promise<void> {
     requireUserId(userId)
     await api.update(memoryId, { content })
   },
@@ -76,9 +81,17 @@ export const mcpMemoryManager = {
     }
   },
 
-  async searchByCategory(category: string, userId?: string): Promise<MemoryEntry[]> {
+  async searchByCategory(
+    category: string,
+    userId?: string,
+  ): Promise<MemoryEntry[]> {
     requireUserId(userId)
-    const response = await api.list({ category, limit: 100, offset: 0, tags: undefined })
+    const response = await api.list({
+      category,
+      limit: 100,
+      offset: 0,
+      tags: undefined,
+    })
     return response.data.map(toMemoryEntry)
   },
 
@@ -93,7 +106,11 @@ export const mcpMemoryManager = {
     return []
   },
 
-  async addUserPreference(userId: string | undefined, key: string, value: unknown): Promise<void> {
+  async addUserPreference(
+    userId: string | undefined,
+    key: string,
+    value: unknown,
+  ): Promise<void> {
     await this.addMemory(
       {
         content: `User preference: ${key} = ${JSON.stringify(value)}`,
@@ -144,11 +161,14 @@ function requireUserId(userId?: string): string {
 }
 
 function toMemoryEntry(memory: PublicMemory): MemoryEntry {
-  const scopeMap: Record<string, 'shared' | 'private' | 'user' | 'global' | undefined> = {
-    'session': 'private',   // Session-scoped memories are private to the session
-    'arc': 'user',          // Arc-scoped memories belong to the user
-    'trait': 'global',      // Trait-scoped memories are globally accessible
-    'fact': 'global'        // Fact-scoped memories are globally accessible
+  const scopeMap: Record<
+    string,
+    'shared' | 'private' | 'user' | 'global' | undefined
+  > = {
+    session: 'private', // Session-scoped memories are private to the session
+    arc: 'user', // Arc-scoped memories belong to the user
+    trait: 'global', // Trait-scoped memories are globally accessible
+    fact: 'global', // Fact-scoped memories are globally accessible
   }
 
   const metadata: MemoryMetadata = {
