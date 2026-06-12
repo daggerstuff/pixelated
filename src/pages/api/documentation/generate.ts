@@ -1,5 +1,6 @@
-import { getCurrentUser } from '@/lib/auth'
 import type { APIContext } from 'astro'
+
+import { getCurrentUser } from '@/lib/auth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import {

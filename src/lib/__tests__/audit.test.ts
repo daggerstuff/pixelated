@@ -352,8 +352,14 @@ describe('audit.ts', () => {
     })
 
     it('merges custom config without throwing and keeps service functional', async () => {
-      const { initializeAuditService, configureAuditService, getAuditLogs, clearAuditLogs, createHIPAACompliantAuditLog, AuditEventType } =
-        await loadAuditModule()
+      const {
+        initializeAuditService,
+        configureAuditService,
+        getAuditLogs,
+        clearAuditLogs,
+        createHIPAACompliantAuditLog,
+        AuditEventType,
+      } = await loadAuditModule()
       clearAuditLogs()
       expect(() => {
         initializeAuditService({ batchSize: 50, debugMode: true })

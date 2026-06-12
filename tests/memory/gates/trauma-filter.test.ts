@@ -1,5 +1,9 @@
 import { test, expect, describe, beforeEach } from 'vitest'
-import { TraumaFilter, traumaFilter } from '../../../src/lib/memory/gates/trauma-filter'
+
+import {
+  TraumaFilter,
+  traumaFilter,
+} from '../../../src/lib/memory/gates/trauma-filter'
 import type { TraumaSeverity } from '../../../src/lib/memory/gates/trauma-filter'
 
 describe('TraumaFilter', () => {

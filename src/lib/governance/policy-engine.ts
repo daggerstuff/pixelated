@@ -179,4 +179,3 @@ export class PolicyEngine {
     return this.loadedVersion
   }
 }
-

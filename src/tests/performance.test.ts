@@ -182,7 +182,7 @@ describe('performance Tests', () => {
             'largest-contentful-paint',
           )
           const lcpStartTime =
-            lcpEntries.length > 0 ? lcpEntries[0]?.startTime ?? 0 : 0
+            lcpEntries.length > 0 ? (lcpEntries[0]?.startTime ?? 0) : 0
           const isLayoutShiftEntry = (
             entry: PerformanceEntry,
           ): entry is PerformanceEntry & { value: number } =>

@@ -104,7 +104,9 @@ const isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
 // partial object (only `id`) is not assignable to the full user shape.
 // If the required fields are loosened, the conditional flips to `true`
 // and the const assignment fails.
-type IsPartialUserAssignable = [{ id: string }] extends [NonNullable<App.Locals['user']>]
+type IsPartialUserAssignable = [{ id: string }] extends [
+  NonNullable<App.Locals['user']>,
+]
   ? true
   : false
 const isPartialUserAssignable: IsPartialUserAssignable = false
@@ -159,8 +161,10 @@ const adHocKeyNonExistent: unknown = someLocals['doesNotExist']
 // read becomes assignable, the conditional flips to `true`, and the
 // const assignment fails. `[T] extends [U]` (tuple form) is used to
 // avoid distributive behavior on `any`.
-type AdHocKeyRead = typeof someLocals['arbitraryAdHocKey']
-type IsAdHocKeyAssignableToString = [AdHocKeyRead] extends [string] ? true : false
+type AdHocKeyRead = (typeof someLocals)['arbitraryAdHocKey']
+type IsAdHocKeyAssignableToString = [AdHocKeyRead] extends [string]
+  ? true
+  : false
 const isAdHocKeyAssignableToString: IsAdHocKeyAssignableToString = false
 
 // ---------------------------------------------------------------------------
@@ -177,7 +181,9 @@ ctx.locals['customKey'] = { anything: 'goes' }
 // `requestId` (which is `string`) should fail. If the field widens to
 // `string | number` or just `number`, the conditional flips to `true`
 // and the const assignment fails.
-type IsWrongRequestIdValueAssignable = [number] extends [App.Locals['requestId']]
+type IsWrongRequestIdValueAssignable = [number] extends [
+  App.Locals['requestId'],
+]
   ? true
   : false
 const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
