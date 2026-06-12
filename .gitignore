@@ -337,9 +337,6 @@ HANDOFF.md
 # Temp symlinks
 latest
 
-# Beads issue tracker (fully removed)
-.beads/
-
 .omc
 .foresight
 job.md
