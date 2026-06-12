@@ -1,0 +1,20 @@
+# NVIDIA NeMo Guardrails for clinical safety gating
+# Provides server for enforcing safety, clinical boundaries, and privacy guardrails.
+
+services:
+  nemo-guardrails:
+    image: nvcr.io/nvidia/nemo-guardrails:24.07
+    container_name: nemo-guardrails
+    ports:
+      - '8082:8000'
+    volumes:
+      - ./nemo-guardrails/config:/config
+    environment:
+      - NVIDIA_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
+    command: ["nemoguardrails", "server", "--config", "/config"]
+    networks:
+      - nemo-network
+
+networks:
+  nemo-network:
+    external: true
