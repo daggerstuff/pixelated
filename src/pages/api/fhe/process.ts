@@ -61,7 +61,10 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     // Initialize FHE service if not already initialized
-    const isProd = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
+    const isProd =
+      typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD
     if (!fheService.isInitialized()) {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
@@ -90,7 +93,10 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       `FHE API error: ${(error as Error).message}`,
     )
 
-    const isProdError = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
+    const isProdError =
+      typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD
     return new Response(
       JSON.stringify({
         success: false,

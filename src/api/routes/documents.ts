@@ -47,7 +47,6 @@ const ensureString = (param: unknown): string => {
 }
 const router: Router = express.Router()
 
-
 router.post(
   '/',
   requirePermission('edit'),
@@ -154,7 +153,6 @@ router.get(
   }),
 )
 
-
 router.get(
   '/:documentId',
   asyncHandler(async (req: unknown, res: unknown) => {
@@ -179,7 +177,6 @@ router.get(
     })
   }),
 )
-
 
 router.put(
   '/:documentId',
@@ -217,7 +214,6 @@ router.put(
   }),
 )
 
-
 router.delete(
   '/:documentId',
   requireRole(['admin', 'manager']),
@@ -243,7 +239,6 @@ router.delete(
     })
   }),
 )
-
 
 router.post(
   '/:documentId/share',
@@ -278,7 +273,6 @@ router.post(
   }),
 )
 
-
 router.post(
   '/:documentId/comments',
   asyncHandler(async (req: unknown, res: unknown) => {
@@ -311,7 +305,6 @@ router.post(
   }),
 )
 
-
 router.get(
   '/:documentId/comments',
   asyncHandler(async (req: unknown, res: unknown) => {
@@ -336,7 +329,6 @@ router.get(
   }),
 )
 
-
 router.get(
   '/:documentId/versions',
   asyncHandler(async (req: unknown, res: unknown) => {
@@ -359,7 +351,6 @@ router.get(
     })
   }),
 )
-
 
 router.get(
   '/:documentId/export',

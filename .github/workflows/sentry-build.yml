@@ -58,7 +58,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4.0.0

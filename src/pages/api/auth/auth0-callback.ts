@@ -92,7 +92,10 @@ export const GET = async ({
     const userRole: string = existingUser?.role ?? 'user' // Default role if we can't fetch real role
 
     // Set cookies for session management
-    const isProd = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD;
+    const isProd =
+      typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD
     cookies.set('auth-token', tokens.accessToken, {
       path: '/',
       httpOnly: true,

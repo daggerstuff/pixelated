@@ -110,7 +110,9 @@ describe('formatDate', () => {
 
   describe('error handling', () => {
     it('throws an error for invalid date strings', () => {
-      expect(() => formatDate('not-a-date')).toThrow('Failed to format date: Error: Invalid date string')
+      expect(() => formatDate('not-a-date')).toThrow(
+        'Failed to format date: Error: Invalid date string',
+      )
     })
   })
 })
