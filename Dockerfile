@@ -119,7 +119,7 @@ RUN for i in 1 2 3; do \
     fi; \
     echo "pnpm install attempt $i failed, retrying in $((i * 2))s..."; \
     sleep $((i * 2)); \
-  done
+  done && \
     pnpm store prune && \
     # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
