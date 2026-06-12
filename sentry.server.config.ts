@@ -1,9 +1,10 @@
-import { init as initServer } from '@sentry/astro'
+import { init as initServer } from "@sentry/astro";
 
-import { initSentry, resolveSentryDsn } from '@/lib/sentry/config'
+import { initSentry, resolveSentryDsn, resolveSentryRelease } from "@/lib/sentry/config";
 
 const serverConfig = initSentry({
   dsn: resolveSentryDsn(),
-})
+  release: resolveSentryRelease(),
+});
 
-initServer(serverConfig)
+initServer(serverConfig);
