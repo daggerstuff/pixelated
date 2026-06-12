@@ -19,13 +19,10 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm@11.5.2
 
 # Install dependencies
-RUN for i in 1 2 3; do \
-    if PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --prod --ignore-scripts; then \
-      break; \
-    fi; \
-    echo "pnpm install attempt $i failed, retrying in $((i * 2))s..."; \
-    sleep $((i * 2)); \
-  done
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    PNPM_INSTALL_ARGS="--prod --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source code
 COPY . .
