@@ -145,11 +145,11 @@ services:
     container_name: pixelated-grafana-multimodal
     restart: unless-stopped
     ports:
-      - '3001:3000' # Different port from text service
+      - '3100:3000' # Different port from text service
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin123
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=http://localhost:3001/grafana/
+      - GF_SERVER_ROOT_URL=http://localhost:3100/grafana/
     volumes:
       - grafana_multimodal_data:/var/lib/grafana
       - ./monitoring/grafana/multimodal-dashboards:/etc/grafana/provisioning/dashboards:ro
