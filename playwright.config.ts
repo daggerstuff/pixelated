@@ -52,23 +52,23 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'] },
     },
   ],
-  webServer:
-    isRemoteUrl || shouldSkipWebServer
-      ? undefined
-      : isCi
-        ? {
-            command: `NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run preview -- --host 127.0.0.1 --port ${webServerPort ?? 4321}`,
-            url: webServerUrl ?? 'http://127.0.0.1:4321',
-            reuseExistingServer: false,
-            timeout: 10 * 60 * 1000,
-          }
-        : {
-            command:
-              webServerPort !== undefined && webServerPort !== 5173
-                ? `NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port ${webServerPort}`
-                : 'NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port 5173',
-            url: webServerUrl ?? 'http://127.0.0.1:5173',
-            reuseExistingServer: true,
-            timeout: 180_000,
-          },
+    webServer:
+      isRemoteUrl || shouldSkipWebServer
+        ? undefined
+        : isCi
+          ? {
+              command: `NODE_ENV=test pnpm run build && NODE_ENV=test ./node_modules/.bin/astro preview --host 0.0.0.0 --port ${webServerPort ?? 4321}`,
+              url: webServerUrl ?? 'http://localhost:4321',
+              reuseExistingServer: false,
+              timeout: 10 * 60 * 1000,
+            }
+          : {
+              command:
+                webServerPort !== undefined && webServerPort !== 5173
+                  ? `NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port ${webServerPort}`
+                  : 'NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port 5173',
+              url: webServerUrl ?? 'http://localhost:5173',
+              reuseExistingServer: true,
+              timeout: 180_000,
+            },
 })
