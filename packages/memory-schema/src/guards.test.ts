@@ -74,7 +74,9 @@ describe('isStanceShift', () => {
       // but the structural guard is intentionally more permissive — it only
       // checks shape, not value ranges. This is by design.
       expect(isStanceShift({ ...validStanceShift, confidence: 1.5 })).toBe(true)
-      expect(isStanceShift({ ...validStanceShift, confidence: -0.1 })).toBe(true)
+      expect(isStanceShift({ ...validStanceShift, confidence: -0.1 })).toBe(
+        true,
+      )
     })
 
     it('returns true for a shift with a unicode attribute name', () => {
@@ -119,7 +121,9 @@ describe('isStanceShift', () => {
     })
 
     it('returns false when attribute is null', () => {
-      expect(isStanceShift({ ...validStanceShift, attribute: null })).toBe(false)
+      expect(isStanceShift({ ...validStanceShift, attribute: null })).toBe(
+        false,
+      )
     })
 
     it('returns false when oldValue is missing', () => {
@@ -128,7 +132,9 @@ describe('isStanceShift', () => {
     })
 
     it('returns false when oldValue is a string', () => {
-      expect(isStanceShift({ ...validStanceShift, oldValue: '0.3' })).toBe(false)
+      expect(isStanceShift({ ...validStanceShift, oldValue: '0.3' })).toBe(
+        false,
+      )
     })
 
     it('returns false when newValue is missing', () => {
@@ -162,9 +168,9 @@ describe('isStanceShift', () => {
     })
 
     it('returns false when evidenceIds is undefined (omitted)', () => {
-      expect(isStanceShift({ ...validStanceShift, evidenceIds: undefined })).toBe(
-        false,
-      )
+      expect(
+        isStanceShift({ ...validStanceShift, evidenceIds: undefined }),
+      ).toBe(false)
     })
 
     it('returns false when evidenceIds contains a non-string element', () => {
@@ -272,9 +278,9 @@ describe('isSynthesisResult', () => {
     })
 
     it('returns false when mergedIds is null', () => {
-      expect(isSynthesisResult({ ...validSynthesisResult, mergedIds: null })).toBe(
-        false,
-      )
+      expect(
+        isSynthesisResult({ ...validSynthesisResult, mergedIds: null }),
+      ).toBe(false)
     })
 
     it('returns false when mergedIds is undefined (omitted)', () => {
@@ -291,7 +297,10 @@ describe('isSynthesisResult', () => {
 
     it('returns false when mergedIds contains a null element', () => {
       expect(
-        isSynthesisResult({ ...validSynthesisResult, mergedIds: ['mem-1', null] }),
+        isSynthesisResult({
+          ...validSynthesisResult,
+          mergedIds: ['mem-1', null],
+        }),
       ).toBe(false)
     })
 

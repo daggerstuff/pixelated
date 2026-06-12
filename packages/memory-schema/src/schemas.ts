@@ -31,12 +31,7 @@ import type {
 // Enumerations
 // ---------------------------------------------------------------------------
 
-export const MemoryScopeSchema = z.enum([
-  'session',
-  'arc',
-  'trait',
-  'fact',
-])
+export const MemoryScopeSchema = z.enum(['session', 'arc', 'trait', 'fact'])
 
 export const RetentionPolicySchema = z.enum([
   'ephemeral',
@@ -193,12 +188,11 @@ export const SynthesisResultSchema = z.object({
 // Compile-time compatibility checks (z.infer ↔ canonical TS types)
 // ---------------------------------------------------------------------------
 
-type AssertCompatible<Inferred, Canonical> =
-  Inferred extends Canonical
-    ? Canonical extends Inferred
-      ? true
-      : never
+type AssertCompatible<Inferred, Canonical> = Inferred extends Canonical
+  ? Canonical extends Inferred
+    ? true
     : never
+  : never
 
 type _CheckMemoryScope = AssertCompatible<
   z.infer<typeof MemoryScopeSchema>,
@@ -258,7 +252,7 @@ type _CheckSynthesisResult = AssertCompatible<
 >
 
 // Silence unused-type warnings while keeping compile-time assertions.
-const _schemaCompatibilityChecks: [
+const schemaCompatibilityChecks: [
   _CheckMemoryScope,
   _CheckRetentionPolicy,
   _CheckStrengthTrend,
@@ -290,4 +284,4 @@ const _schemaCompatibilityChecks: [
   true,
 ]
 
-void _schemaCompatibilityChecks
+void schemaCompatibilityChecks

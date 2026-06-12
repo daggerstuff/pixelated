@@ -186,8 +186,12 @@ const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
 // `user` is `T | null` so `null` IS allowed; we use `timestamp` instead.
 // Type-level assertion: `null` is not assignable to the `string` field.
 // If the field becomes nullable, this flips to `true` and the const
-// assignment fails.
-type IsNullAssignableToTimestamp = null extends App.Locals['timestamp'] ? true : false
+// assignment fails. `[T] extends [U]` (tuple form) is required for
+// uniform union-safety — simple form would collapse to `boolean` if
+// `timestamp` widened to e.g. `string | null | undefined`.
+type IsNullAssignableToTimestamp = [null] extends [App.Locals['timestamp']]
+  ? true
+  : false
 const isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
 
 // ---------------------------------------------------------------------------
