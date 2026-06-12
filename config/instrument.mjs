@@ -243,8 +243,25 @@ Sentry.init({
     /^\//,
   ],
 
-  // Before send hook for filtering sensitive data
+  // Before send hook for filtering sensitive data and dropping local dev errors
   beforeSend: (/** @type {SentryEvent | null} */ event) => {
+    // Drop events originating from a local server (localhost / 127.0.0.1)
+    // so that dev-only errors never appear in Sentry, regardless of which
+    // NODE_ENV was set locally for testing.
+    if (isRecord(event) && isRecord(event.request)) {
+      const url = /** @type {Record<string, unknown>} */ (event.request).url
+      if (typeof url === 'string') {
+        try {
+          const { hostname } = new URL(url)
+          if (hostname === 'localhost' || hostname === '127.0.0.1') {
+            return null
+          }
+        } catch {
+          // Ignore malformed URLs
+        }
+      }
+    }
+
     // Filter out sensitive data from events
     return filterSensitiveFields(event, [
       'password',
