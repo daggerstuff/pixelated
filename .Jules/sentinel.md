@@ -39,3 +39,10 @@
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Learning      | Same as previous entries: sending raw `error` objects or `String(error)` downstream exposes internal logic to the client (CWE-209)                                                                                                                                              |
 | Prevention    | Same as previous entries: always use a server-side logger to record the full error and stack trace. Return a safe, static generic message such as `An unexpected error occurred` to the client                                                                                  |
+
+## 2025-06-12 - [Information Exposure] Prevent sending raw Error messages in Conversation Export API
+
+| Vulnerability | The `src/pages/api/export/conversation.ts` endpoint was serializing `String(error)` into the HTTP 500 JSON response message field. This exposes internal details to the client, constituting a CWE-209 Information Exposure vulnerability |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Learning      | Sending raw `error` objects or `String(error)` downstream exposes internal logic to the client (CWE-209)                                                                                                                                              |
+| Prevention    | Always use a server-side logger to record the full error and stack trace. Return a safe, static generic message such as `An unexpected error occurred` to the client                                                                                  |
