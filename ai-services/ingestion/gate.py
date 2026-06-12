@@ -83,6 +83,10 @@ class _IngestionMockProtocol:
 
         # Gate 1 — Crisis Detection
         report.gate1_crisis = self.crisis.evaluate(sanitized_content)
+        if report.gate1_crisis:
+            for detail in report.gate1_crisis.details:
+                if detail.startswith("tier:"):
+                    report.crisis_tier = detail.split(":", 1)[1].strip()
         if report.gate1_crisis.decision == GateDecision.BLOCK:
             return report
 
