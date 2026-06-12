@@ -3,15 +3,15 @@
 # Passwords should be MD5 hashed: md5(password + username)
 
 # Main application user
-"pixelated" "md5$(echo -n 'dev_password_change_in_prodpixelated' | md5sum | cut -d' ' -f1)"
+"pixelated" "md5003ecf41e8962b211d8dd546cee518d2"
 
 # Service-specific users
-"bias_detection_user" "md5$(echo -n 'bias_detection_passbias_detection_user' | md5sum | cut -d' ' -f1)"
-"ai_service_user" "md5$(echo -n 'ai_service_passai_service_user' | md5sum | cut -d' ' -f1)"
-"analytics_user" "md5$(echo -n 'analytics_passanalytics_user' | md5sum | cut -d' ' -f1)"
+"bias_detection_user" "md55ce78b629f2987cfa091f2f788fba82c"
+"ai_service_user" "md5f0fff56101d30fdcb8d3df928eb0b163"
+"analytics_user" "md51e3a97b6a614a9d1f680c0b28222e708"
 
 # PgBouncer admin user
-"pgbouncer" "md5$(echo -n 'pgbouncer_admin_passwordpgbouncer' | md5sum | cut -d' ' -f1)"
+"pgbouncer" "md5ceae33408451358e99414284c592bf1b"
 
 # Stats user
-"stats" "md5$(echo -n 'stats_passwordstats' | md5sum | cut -d' ' -f1)"
+"stats" "md5a21aaa5cf73e2a4579e5c7abf4cd9440"
