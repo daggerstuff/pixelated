@@ -1,7 +1,7 @@
 # QWEN.md
 
-This file is loaded automatically for Qwen sessions.
-It is concise, practical, and aligned with `~/.hermes/SOUL.md`.
+This file is loaded automatically for Qwen sessions. It is concise, practical,
+and aligned with `~/.hermes/SOUL.md`.
 
 ## 1) Project identity
 
@@ -15,9 +15,10 @@ It is concise, practical, and aligned with `~/.hermes/SOUL.md`.
 
 - No suppression comments to hide issues.
   - `// @ts-ignore`, `# noqa`, `# type: ignore`, `/* eslint-disable */`
-- Allowed exception only: `# type: ignore[import-untyped]` for missing third-party stubs,
-  with a short inline reason.
-- Never include secrets or sensitive patient data in code, logs, tests, or commits.
+- Allowed exception only: `# type: ignore[import-untyped]` for missing
+  third-party stubs, with a short inline reason.
+- Never include secrets or sensitive patient data in code, logs, tests, or
+  commits.
 - Keep therapeutic and privacy context in user-facing output.
 - Do not use `context-mode` or `context-mode_*` workflows.
 - Verify behavior before claiming done.
@@ -47,7 +48,8 @@ It is concise, practical, and aligned with `~/.hermes/SOUL.md`.
 - `pnpm test`, `pnpm test:unit`, `pnpm test:integration`
 - `pnpm test:evals`, `pnpm test:bias-detection`
 - `pnpm e2e`, `pnpm e2e:ui`, `pnpm e2e:debug`
-- `pnpm lint`, `pnpm lint:fix`, `pnpm format`, `pnpm format:check`, `pnpm typecheck`
+- `pnpm lint`, `pnpm lint:fix`, `pnpm format`, `pnpm format:check`,
+  `pnpm typecheck`
 - `pnpm security:check` (security-sensitive changes)
 
 ### Release
@@ -106,12 +108,15 @@ upcoming work, and cross-session state.
 ## 7) Qwen-specific controls
 
 - Use `qwen mcp add` to enable MCPs when needed.
-- For library/framework questions, use `context7` (`resolve-library-id` + `query-docs`).
-- Prefer local project docs when debugging business logic, code review, or testing.
+- For library/framework questions, use `context7` (`resolve-library-id` +
+  `query-docs`).
+- Prefer local project docs when debugging business logic, code review, or
+  testing.
 
 ## 8) MCP profile
 
-- Enabled: context7, rube, linear, brave-search, firecrawl, sentry, playwright, stitch.
+- Enabled: context7, rube, linear, brave-search, firecrawl, sentry, playwright,
+  stitch.
 - Disabled: sequential-thinking, github, e2b-sandbox.
 - Nvidia setup: set `NVIDIA_API_KEY` for model provider calls as configured.
 - Model config location: `.qwen/settings.json` (primary model: `z-ai/glm5`).

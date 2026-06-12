@@ -588,7 +588,10 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: DUMMY_VALID_CSRF_TOKEN, expiresAt: Date.now() + 3600000 }
+          return {
+            token: DUMMY_VALID_CSRF_TOKEN,
+            expiresAt: Date.now() + 3600000,
+          }
         }
         return null
       })
@@ -623,7 +626,10 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: DUMMY_DIFFERENT_TOKEN, expiresAt: Date.now() + 3600000 }
+          return {
+            token: DUMMY_DIFFERENT_TOKEN,
+            expiresAt: Date.now() + 3600000,
+          }
         }
         return null
       })
@@ -671,7 +677,10 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: DUMMY_DIFFERENT_TOKEN, expiresAt: Date.now() + 3600000 }
+          return {
+            token: DUMMY_DIFFERENT_TOKEN,
+            expiresAt: Date.now() + 3600000,
+          }
         }
         return null
       })
@@ -1203,7 +1212,10 @@ describe('Authentication Middleware', () => {
 
       vi.mocked(getFromCache).mockImplementation(async (key) => {
         if (key.startsWith('csrf:')) {
-          return { token: DUMMY_DIFFERENT_TOKEN, expiresAt: Date.now() + 3600000 }
+          return {
+            token: DUMMY_DIFFERENT_TOKEN,
+            expiresAt: Date.now() + 3600000,
+          }
         }
         return null
       })

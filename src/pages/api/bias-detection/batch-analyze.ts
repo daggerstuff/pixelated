@@ -97,15 +97,16 @@ export async function POST({ request }: { request: Request }) {
     })
   } catch (error: unknown) {
     logger.error('Error during batch analyze sessions:', {
-      error: error instanceof Error
-        ? {
-            error,
-            message: error.message,
-            stack: error.stack,
-          }
-        : {
-            error: String(error),
-          },
+      error:
+        error instanceof Error
+          ? {
+              error,
+              message: error.message,
+              stack: error.stack,
+            }
+          : {
+              error: String(error),
+            },
     })
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
