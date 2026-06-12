@@ -28,7 +28,8 @@ export class ProductMemoryClient {
   constructor(defaultAuthConfig?: MemoryAuthConfig) {
     this.api = new MemoryApiClient({
       baseUrl: DEFAULT_MEMORY_API_BASE_URL,
-      fetchFn: (input, init) => this.request(input, init, defaultAuthConfig),
+      fetchFn: (input: RequestInfo | URL, init?: RequestInit) =>
+        this.request(input, init, defaultAuthConfig),
     })
   }
 
@@ -114,7 +115,7 @@ export class ProductMemoryClient {
 
   async getStats(userId?: string): Promise<MemoryStats> {
     requireUserId(userId)
-    const response = await this.api.list({ limit: 100, offset: 0 })
+    const response = await this.api.list({ limit: 100, offset: 0, tags: undefined })
     const categoryCounts: Record<string, number> = {}
     for (const memory of response.data) {
       const cat = memory.category || 'general'
@@ -157,10 +158,18 @@ function requireUserId(userId?: string): string {
 }
 
 function toMemoryEntry(memory: PublicMemory): MemoryEntry {
+  // Map MemoryScope values to MemoryMetadata scope values
+  const scopeMap: Record<string, 'shared' | 'private' | 'user' | 'global' | undefined> = {
+    'session': 'private',   // Session-scoped memories are private to the session
+    'arc': 'user',          // Arc-scoped memories belong to the user
+    'trait': 'global',      // Trait-scoped memories are globally accessible
+    'fact': 'global'        // Fact-scoped memories are globally accessible
+  }
+  
   const metadata: MemoryMetadata = {
     category: memory.category,
     tags: memory.tags,
-    scope: memory.scope,
+    scope: scopeMap[memory.scope],
   }
   return {
     id: memory.id,
