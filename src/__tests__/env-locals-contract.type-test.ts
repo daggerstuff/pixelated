@@ -15,6 +15,15 @@
  * Adding a new shared key to `App.Locals`? Add a positive assertion below.
  * Adding a new ad-hoc key? Add a negative assertion to lock in the
  * "declare it in App.Locals" rule.
+ *
+ * NEGATIVE-ASSERTION CONVENTION: every negative assertion uses the
+ * `[T] extends [U] ? true : false` tuple form (not the simple `T extends U`).
+ * The simple form distributes over unions and can collapse to `boolean`
+ * (e.g. `null extends string | null | undefined` → `true | false | false`
+ * = `boolean`), which silently passes the const-`= false` drift detector.
+ * The tuple form disables distribution, giving a deterministic `true` or
+ * `false` regardless of how wide the union becomes. All 8 negatives below
+ * use this form uniformly — copy the pattern for new negatives.
  */
 
 // Reference the global namespace augmentation from `src/env.d.ts`.
@@ -83,31 +92,27 @@ const userPreferencesBase = {
 const userPreferences: App.Locals['userPreferences'] = userPreferencesBase
 const userPreferencesAbsent: App.Locals['userPreferences'] = undefined
 
-// Negative: `requestId` is NOT `number`. Type-level assertion: `number` is
-// not assignable to the field. If someone changes the type, this flips to
-// `true` and the const assignment fails — that's the drift detector.
-// `[T] extends [U]` (tuple form) is required so the check doesn't
-// distribute over a union (e.g. if `requestId` widened to `string | number`).
+// Negative: `requestId` is NOT `number`. If someone changes the type,
+// the conditional flips to `true` and the const assignment fails — that's
+// the drift detector.
 type IsWrongRequestIdAssignable = [number] extends [App.Locals['requestId']]
   ? true
   : false
 const isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
 
-// Negative: `user` requires `id`, `email`, `emailVerified`, `role`.
-// Type-level assertion: a partial object (only `id`) is not assignable
-// to the full user shape. If the required fields are loosened, this
-// flips to `true` and the const assignment fails. `[T] extends [U]`
-// (tuple form) is used for uniform union-safety across the file.
+// Negative: `user` requires `id`, `email`, `emailVerified`, `role`. A
+// partial object (only `id`) is not assignable to the full user shape.
+// If the required fields are loosened, the conditional flips to `true`
+// and the const assignment fails.
 type IsPartialUserAssignable = [{ id: string }] extends [NonNullable<App.Locals['user']>]
   ? true
   : false
 const isPartialUserAssignable: IsPartialUserAssignable = false
 
-// Negative: `vercelEdge` requires all 5 fields including `ip`.
-// Type-level assertion: `vercelEdge` without `ip` is not assignable to
-// the full shape. If `ip` becomes optional, this flips to `true` and
-// the const assignment fails. `[T] extends [U]` (tuple form) is used
-// for uniform union-safety across the file.
+// Negative: `vercelEdge` requires all 5 fields including `ip`. The
+// shape without `ip` is not assignable to the full shape. If `ip`
+// becomes optional, the conditional flips to `true` and the const
+// assignment fails.
 type IsVercelEdgeWithoutIpAssignable = [
   Omit<NonNullable<App.Locals['vercelEdge']>, 'ip'>,
 ] extends [App.Locals['vercelEdge']]
@@ -116,10 +121,8 @@ type IsVercelEdgeWithoutIpAssignable = [
 const isVercelEdgeWithoutIpAssignable: IsVercelEdgeWithoutIpAssignable = false
 
 // Negative: `headers` is `Record<string, string>`, not `Record<string, number>`.
-// Type-level assertion: `Record<string, number>` is not assignable to
-// `Record<string, string>`. If the value type changes, this flips to
-// `true` and the const assignment fails. `[T] extends [U]` (tuple form)
-// is used for uniform union-safety across the file.
+// If the value type changes, the conditional flips to `true` and the
+// const assignment fails.
 type IsWrongHeadersValueTypeAssignable = [Record<string, number>] extends [
   NonNullable<App.Locals['headers']>,
 ]
@@ -171,12 +174,9 @@ ctx.locals['admin'] = { userId: 'u-1', isAdmin: true, hasPermission: true }
 ctx.locals['customKey'] = { anything: 'goes' }
 
 // Negative: known props retain their types. Assigning a `number` to
-// `requestId` (which is `string`) should fail. Type-level assertion:
-// `number` is not assignable to the field. If the field widens to
+// `requestId` (which is `string`) should fail. If the field widens to
 // `string | number` or just `number`, the conditional flips to `true`
-// and the const assignment fails. `[T] extends [U]` (tuple form) is
-// required so the check doesn't distribute over the union (which
-// would collapse to `boolean` and always pass).
+// and the const assignment fails.
 type IsWrongRequestIdValueAssignable = [number] extends [App.Locals['requestId']]
   ? true
   : false
@@ -184,11 +184,8 @@ const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
 
 // Negative: assigning `null` to a non-nullable known prop should fail.
 // `user` is `T | null` so `null` IS allowed; we use `timestamp` instead.
-// Type-level assertion: `null` is not assignable to the `string` field.
-// If the field becomes nullable, this flips to `true` and the const
-// assignment fails. `[T] extends [U]` (tuple form) is required for
-// uniform union-safety — simple form would collapse to `boolean` if
-// `timestamp` widened to e.g. `string | null | undefined`.
+// If `timestamp` becomes nullable, the conditional flips to `true` and
+// the const assignment fails.
 type IsNullAssignableToTimestamp = [null] extends [App.Locals['timestamp']]
   ? true
   : false
