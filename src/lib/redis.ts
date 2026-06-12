@@ -4,6 +4,7 @@
  */
 
 import Redis from 'ioredis'
+
 import { asRedisOps } from './redis-ops'
 
 type RedisCommand = (...args: any[]) => any

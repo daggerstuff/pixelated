@@ -11,7 +11,8 @@
 - Scan the final image (`trivy image`, `grype`) in CI.
 
 ## Compose / Kubernetes
+
 - Declare readiness and liveness probes separately.
-- Set resource requests and limits; missing limits let one container
-  starve the node.
+- Set resource requests and limits; missing limits let one container starve the
+  node.
 - Prefer rolling updates with `maxUnavailable: 0` for stateless services.

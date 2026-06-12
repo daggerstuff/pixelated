@@ -162,18 +162,16 @@ describe('security.ts facade', () => {
 
   describe('verifySignature', () => {
     it('should return true for valid signature', async () => {
-      const { createSignature, verifySignature, setSecretKey } = await import(
-        '../security'
-      )
+      const { createSignature, verifySignature, setSecretKey } =
+        await import('../security')
       setSecretKey(TEST_SECRET_KEY)
       const sig = createSignature('hello')
       expect(verifySignature('hello', sig)).toBe(true)
     })
 
     it('should return false for invalid signature', async () => {
-      const { createSignature, verifySignature, setSecretKey } = await import(
-        '../security'
-      )
+      const { createSignature, verifySignature, setSecretKey } =
+        await import('../security')
       setSecretKey(TEST_SECRET_KEY)
       const sig = createSignature('hello')
       expect(verifySignature('world', sig)).toBe(false)
@@ -204,9 +202,8 @@ describe('security.ts facade', () => {
 
   describe('encryptSensitiveData / decryptSensitiveData', () => {
     it('should encrypt and decrypt a string round-trip', async () => {
-      const { encryptSensitiveData, decryptSensitiveData } = await import(
-        '../security'
-      )
+      const { encryptSensitiveData, decryptSensitiveData } =
+        await import('../security')
       const plaintext = 'sensitive patient data'
       const encrypted = await encryptSensitiveData(plaintext)
       expect(encrypted).toBeTypeOf('string')
@@ -288,7 +285,8 @@ describe('security.ts facade', () => {
       const result = createSecureToken({ foo: 'bar' }, 3600)
       // Flip a character in the payload portion (before the dot)
       const [payload, sig] = result.split('.') as [string, string]
-      const tamperedPayload = payload.slice(0, -1) + (payload.endsWith('A') ? 'B' : 'A')
+      const tamperedPayload =
+        payload.slice(0, -1) + (payload.endsWith('A') ? 'B' : 'A')
       expect(verifySecureToken(`${tamperedPayload}.${sig}`)).toBeNull()
     })
 

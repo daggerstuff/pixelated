@@ -1,7 +1,9 @@
 ---
 name: bernstein-signal-check
 description: Check for orchestrator signals during work
-whenToUse: Periodically while working, approximately every 60 seconds, or before starting a long-running operation
+whenToUse:
+  Periodically while working, approximately every 60 seconds, or before starting
+  a long-running operation
 ---
 
 Check for orchestrator signals:
@@ -18,4 +20,5 @@ git add -A && git commit -m "[WIP] work in progress" 2>/dev/null || true
 exit 0
 ```
 
-If **WAKEUP** exists: read its contents, address the concern described, then continue your work.
+If **WAKEUP** exists: read its contents, address the concern described, then
+continue your work.

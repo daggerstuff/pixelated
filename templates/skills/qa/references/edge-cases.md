@@ -1,7 +1,6 @@
 # Edge-case checklist (Bernstein)
 
-When writing a new test suite, walk through this list and cover what's
-relevant:
+When writing a new test suite, walk through this list and cover what's relevant:
 
 - Empty input (`[]`, `""`, `None`).
 - Single-element collections.

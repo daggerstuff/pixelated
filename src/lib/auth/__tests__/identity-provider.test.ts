@@ -178,7 +178,9 @@ describe('Auth0IdentityProvider.getUserById', () => {
     }
     mockAuth0GetUserById.mockResolvedValueOnce(auth0User)
     const provider = getIdentityProvider()
-    const result = (await provider.getUserById('auth0|user-1')) as IdentityProviderUser
+    const result = (await provider.getUserById(
+      'auth0|user-1',
+    )) as IdentityProviderUser
     expect(result.id).toBe('auth0|user-1')
     expect(result.email).toBe('user@example.test')
     expect(result.role).toBe('therapist')
@@ -192,7 +194,9 @@ describe('Auth0IdentityProvider.getUserById', () => {
 describe('Auth0IdentityProvider.findInternalIdBySub', () => {
   it('calls query() when no client is provided and returns the mapping', async () => {
     mockQuery.mockResolvedValueOnce({
-      rows: [{ user_id: '00000000-0000-0000-0000-000000000abc', role: 'admin' }],
+      rows: [
+        { user_id: '00000000-0000-0000-0000-000000000abc', role: 'admin' },
+      ],
       rowCount: 1,
     })
     const provider = getIdentityProvider()
@@ -211,7 +215,9 @@ describe('Auth0IdentityProvider.findInternalIdBySub', () => {
 
   it('uses client.query() when a client is provided and skips query()', async () => {
     mockClientQuery.mockResolvedValueOnce({
-      rows: [{ user_id: '11111111-1111-1111-1111-111111111111', role: 'therapist' }],
+      rows: [
+        { user_id: '11111111-1111-1111-1111-111111111111', role: 'therapist' },
+      ],
       rowCount: 1,
     })
     const provider = getIdentityProvider()
@@ -242,7 +248,10 @@ describe('Auth0IdentityProvider.linkSubToInternalId', () => {
   it('issues INSERT INTO auth_accounts via query() with the provider name', async () => {
     mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 1 })
     const provider = getIdentityProvider()
-    await provider.linkSubToInternalId('auth0|new', '00000000-0000-0000-0000-000000000999')
+    await provider.linkSubToInternalId(
+      'auth0|new',
+      '00000000-0000-0000-0000-000000000999',
+    )
     expect(mockQuery).toHaveBeenCalledTimes(1)
     expect(mockClientQuery).not.toHaveBeenCalled()
     const [sql, params] = mockQuery.mock.calls[0] as [string, unknown[]]
@@ -280,22 +289,23 @@ describe('Auth0IdentityProvider.findSubByInternalId', () => {
       rowCount: 1,
     })
     const provider = getIdentityProvider()
-    const result = await provider.findSubByInternalId('00000000-0000-0000-0000-000000000123')
+    const result = await provider.findSubByInternalId(
+      '00000000-0000-0000-0000-000000000123',
+    )
     expect(result).toBe('auth0|found')
     const [sql, params] = mockQuery.mock.calls[0] as [string, unknown[]]
     expect(sql).toContain('FROM auth_accounts')
     expect(sql).toContain('WHERE user_id = $1')
     expect(sql).toContain('AND provider = $2')
-    expect(params).toEqual([
-      '00000000-0000-0000-0000-000000000123',
-      'auth0',
-    ])
+    expect(params).toEqual(['00000000-0000-0000-0000-000000000123', 'auth0'])
   })
 
   it('returns null when no link exists', async () => {
     mockQuery.mockResolvedValueOnce({ rows: [], rowCount: 0 })
     const provider = getIdentityProvider()
-    const result = await provider.findSubByInternalId('00000000-0000-0000-0000-000000000000')
+    const result = await provider.findSubByInternalId(
+      '00000000-0000-0000-0000-000000000000',
+    )
     expect(result).toBeNull()
   })
 })

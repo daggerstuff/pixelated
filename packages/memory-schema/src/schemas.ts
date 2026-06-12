@@ -9,7 +9,6 @@
 import { z } from 'zod'
 
 import { GatingMetadataSchema } from './gate-types'
-
 import type {
   CreateMemoryInput,
   EmotionalContext,

@@ -6,6 +6,8 @@
  * Creates a new memory record in the unified memory system.
  */
 
+import { z } from 'zod'
+
 import {
   getGateway,
   jsonError,
@@ -13,7 +15,6 @@ import {
   toMemoryScope,
   withAuthenticatedMemoryRoute,
 } from '../_shared'
-import { z } from 'zod'
 
 // Define the input schema with Zod validation
 const CreateMemoryRequestSchema = z.object({
