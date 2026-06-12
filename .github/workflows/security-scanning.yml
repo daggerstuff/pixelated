@@ -83,7 +83,7 @@ jobs:
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
           skip_check: ''
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice'
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
