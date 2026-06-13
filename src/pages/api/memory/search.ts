@@ -61,7 +61,6 @@ export const GET = withAuthenticatedMemoryRoute(
       )
     }
 
-    // Search memories
     const result = await getGateway().searchMemories({
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       query,
@@ -71,17 +70,12 @@ export const GET = withAuthenticatedMemoryRoute(
 
     return jsonResponse({
       success: true,
-      memories: result.memories.map((m) => toUnifiedMemoryFormat(m, user.id)),
+      memories: result.memories.map((m: any) =>
+        toUnifiedMemoryFormat(m, user.id),
+      ),
       query,
-      pagination: {
-        limit,
-        offset,
-        total: result.total,
-      },
-      user: {
-        id: user.id,
-        role: user.role,
-      },
+      pagination: { limit, offset, total: result.total },
+      user: { id: user.id, role: user.role },
     })
   },
 )
@@ -119,17 +113,12 @@ export const POST = withAuthenticatedMemoryRoute(
 
     return jsonResponse({
       success: true,
-      memories: result.memories.map((m) => toUnifiedMemoryFormat(m, user.id)),
+      memories: result.memories.map((m: any) =>
+        toUnifiedMemoryFormat(m, user.id),
+      ),
       query,
-      pagination: {
-        limit,
-        offset: 0,
-        total: result.total,
-      },
-      user: {
-        id: user.id,
-        role: user.role,
-      },
+      pagination: { limit, offset: 0, total: result.total },
+      user: { id: user.id, role: user.role },
     })
   },
 )
