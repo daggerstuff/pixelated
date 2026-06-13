@@ -7,14 +7,13 @@ Implements the RBAC hierarchy from ADR-001:
 
 from __future__ import annotations
 
-from enum import Enum
-from functools import wraps
-from typing import Any, Callable
+from collections.abc import Callable
+from enum import StrEnum
 
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 
 
-class UserRole(str, Enum):
+class UserRole(StrEnum):
     """Enumerated user roles with hierarchy level."""
 
     SUPER_ADMIN = "super_admin"
@@ -46,6 +45,7 @@ def role_at_least(minimum_role: UserRole) -> Callable:
         async def admin_endpoint(user: dict = Depends(role_at_least(UserRole.INSTITUTION_ADMIN))):
             ...
     """
+
     async def _role_checker(current_user: dict) -> dict:
         user_role = UserRole(current_user.get("role", "learner"))
         if user_role.level < minimum_role.level:
@@ -54,6 +54,7 @@ def role_at_least(minimum_role: UserRole) -> Callable:
                 detail=f"Requires role at least '{minimum_role.value}', got '{user_role.value}'",
             )
         return current_user
+
     return _role_checker
 
 
@@ -77,6 +78,7 @@ def require_role(*roles: UserRole) -> Callable:
                 detail=f"Requires one of: {[r.value for r in roles]}, got '{user_role}'",
             )
         return current_user
+
     return _role_checker
 
 
@@ -91,6 +93,7 @@ def same_tenant_or_super_admin(target_tenant_id: str) -> Callable:
         ):
             ...
     """
+
     async def _tenant_checker(current_user: dict) -> dict:
         user_role = current_user.get("role", "learner")
         user_tenant = current_user.get("tenant_id")
@@ -100,4 +103,5 @@ def same_tenant_or_super_admin(target_tenant_id: str) -> Callable:
                 detail="Cross-tenant access denied",
             )
         return current_user
+
     return _tenant_checker

@@ -10,15 +10,15 @@ Implements:
 from __future__ import annotations
 
 import hashlib
-from typing import Any
+import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, EmailStr, Field
-from sqlalchemy import select, text
+from pydantic import BaseModel, Field
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.pe.core.dependencies import get_current_user, get_db_session, get_rls_session
-from src.pe.core.rbac import UserRole, require_role, role_at_least, same_tenant_or_super_admin
+from src.pe.core.rbac import UserRole, require_role, role_at_least
 from src.pe.core.security import (
     create_access_token,
     create_refresh_token,
@@ -31,6 +31,7 @@ router = APIRouter(prefix="/auth", tags=["authentication"])
 
 
 # ── Schemas ───────────────────────────────────────────────────────
+
 
 class LoginRequest(BaseModel):
     email: str = Field(..., description="User email address")
@@ -107,12 +108,13 @@ class ApiKeyResponse(BaseModel):
 
 # ── Helpers ───────────────────────────────────────────────────────
 
+
 def _hash_email(email: str) -> str:
     """SHA-256 hash of email for lookups (not PHI)."""
     return hashlib.sha256(email.lower().encode("utf-8")).hexdigest()
 
 
-def _encrypt_email(email: str, key: str) -> bytes:
+def _encrypt_email(email: str, _key: str) -> bytes:
     """Encrypt email at application layer using pgp_sym_encrypt equivalent.
 
     For now, uses a simple XOR-like transform; in production, this would
@@ -123,6 +125,7 @@ def _encrypt_email(email: str, key: str) -> bytes:
 
 
 # ── Auth Endpoints ────────────────────────────────────────────────
+
 
 @router.post("/login", response_model=LoginResponse)
 async def login(
@@ -151,7 +154,7 @@ async def login(
             detail="Invalid email or password",
         )
 
-    user_id, tenant_id, password_hash, display_name, role, is_active = user
+    user_id, tenant_id, password_hash, _display_name, role, is_active = user
 
     if not is_active:
         raise HTTPException(
@@ -259,6 +262,7 @@ async def refresh_token(
 
 
 # ── User Management Endpoints ─────────────────────────────────────
+
 
 @router.post("/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def create_user(
@@ -380,11 +384,12 @@ async def get_current_user_profile(
 
 # ── Institution Management (Super Admin only) ─────────────────────
 
+
 @router.post("/institutions", response_model=InstitutionResponse, status_code=status.HTTP_201_CREATED)
 async def create_institution(
     request: InstitutionCreateRequest,
     session: AsyncSession = Depends(get_db_session),
-    current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
+    _current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
 ):
     """Create a new institution/tenant. Super admin only."""
     result = await session.execute(
@@ -418,7 +423,7 @@ async def create_institution(
 @router.get("/institutions", response_model=list[InstitutionResponse])
 async def list_institutions(
     session: AsyncSession = Depends(get_db_session),
-    current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
+    _current_user: dict = Depends(require_role(UserRole.SUPER_ADMIN)),
 ):
     """List all institutions. Super admin only."""
     result = await session.execute(
@@ -446,6 +451,7 @@ async def list_institutions(
 
 # ── API Key Management ────────────────────────────────────────────
 
+
 @router.post("/api-keys", response_model=ApiKeyResponse, status_code=status.HTTP_201_CREATED)
 async def create_api_key(
     request: ApiKeyCreateRequest,
@@ -453,7 +459,6 @@ async def create_api_key(
     current_user: dict = Depends(role_at_least(UserRole.MANAGER)),
 ):
     """Create an API key for programmatic access."""
-    import secrets
 
     tenant_id = current_user["tenant_id"]
     user_id = current_user["user_id"]

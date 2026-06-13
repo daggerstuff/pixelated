@@ -1,9 +1,7 @@
 """Tests for application configuration."""
 
-import os
-from pathlib import Path
-
 from src.pe.config import Settings, settings
+from src.pe.logging_config import setup_logging
 
 
 class TestSettings:
@@ -47,5 +45,4 @@ class TestLoggingConfig:
 
     def test_setup_logging_no_error(self) -> None:
         """Setting up logging should not raise."""
-        from src.pe.logging_config import setup_logging
         setup_logging("DEBUG")

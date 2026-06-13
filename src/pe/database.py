@@ -8,8 +8,8 @@ Implements the tenant isolation strategy from ADR-001:
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
 
 import structlog
 from sqlalchemy import text
@@ -46,7 +46,7 @@ async_session_factory = async_sessionmaker(
 )
 
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_session() -> AsyncGenerator[AsyncSession]:
     """Yield an async database session."""
     async with async_session_factory() as session:
         try:
@@ -64,7 +64,7 @@ async def rls_session(
     tenant_id: str,
     user_id: str,
     user_role: str,
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """Yield a database session with RLS context set.
 
     Sets the PostgreSQL session-level configuration variables

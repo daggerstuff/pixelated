@@ -9,7 +9,7 @@ Implements the authentication strategy from ADR-001:
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any
 
 import bcrypt
 import jwt

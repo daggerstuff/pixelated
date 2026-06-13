@@ -5,8 +5,9 @@ Multi-tenant clinical simulation platform backend.
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
+from typing import Any
 
 import structlog
 from fastapi import FastAPI, Request
@@ -22,7 +23,7 @@ logger = structlog.get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, Any]:
     """Application lifespan: startup and shutdown events."""
     # Startup
     setup_logging(settings.LOG_LEVEL)

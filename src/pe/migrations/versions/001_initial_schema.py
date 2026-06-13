@@ -13,28 +13,28 @@ This migration applies the full schema from schema-ddl-v1.sql:
 - Indexes and application functions
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects import postgresql
 
 revision: str = "001"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
-def upgrade() -> None:
+def upgrade() -> None:  # noqa: PLR0915
     """Apply the initial database schema."""
-    
+
     # ── Extensions ──────────────────────────────────────────────
     op.execute('CREATE EXTENSION IF NOT EXISTS "pgcrypto"')
     op.execute('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
-    
+
     # ── Schema ──────────────────────────────────────────────────
-    op.execute('CREATE SCHEMA IF NOT EXISTS pe')
-    
+    op.execute("CREATE SCHEMA IF NOT EXISTS pe")
+
     # ── Custom Types ────────────────────────────────────────────
     op.execute("""
         CREATE TYPE pe.user_role AS ENUM (
@@ -67,7 +67,7 @@ def upgrade() -> None:
             'metering.rollup', 'phi_guard.alert', 'admin.action'
         )
     """)
-    
+
     # ── Institutions ────────────────────────────────────────────
     op.create_table(
         "institutions",
@@ -86,7 +86,7 @@ def upgrade() -> None:
         sa.UniqueConstraint("slug"),
         schema="pe",
     )
-    
+
     # ── Institution Settings ────────────────────────────────────
     op.create_table(
         "institution_settings",
@@ -101,7 +101,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["institution_id"], ["pe.institutions.id"], ondelete="CASCADE"),
         schema="pe",
     )
-    
+
     # ── Users ───────────────────────────────────────────────────
     op.create_table(
         "users",
@@ -123,7 +123,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["institution_id"], ["pe.institutions.id"]),
         schema="pe",
     )
-    
+
     # ── API Keys ────────────────────────────────────────────────
     op.create_table(
         "api_keys",
@@ -144,7 +144,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["created_by"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── Scenarios ───────────────────────────────────────────────
     op.create_table(
         "scenarios",
@@ -168,7 +168,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["created_by"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── Simulation Sessions ─────────────────────────────────────
     op.create_table(
         "simulation_sessions",
@@ -197,7 +197,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["learner_id"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── Simulation Messages ─────────────────────────────────────
     op.create_table(
         "simulation_messages",
@@ -217,7 +217,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["session_id"], ["pe.simulation_sessions.id"]),
         schema="pe",
     )
-    
+
     # ── Persona Definitions ─────────────────────────────────────
     op.create_table(
         "persona_definitions",
@@ -244,7 +244,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["created_by"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── Persona Instances ───────────────────────────────────────
     op.create_table(
         "persona_instances",
@@ -263,7 +263,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["persona_definition_id"], ["pe.persona_definitions.id"]),
         schema="pe",
     )
-    
+
     # ── Metering Events ─────────────────────────────────────────
     op.create_table(
         "metering_events",
@@ -286,7 +286,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["session_id"], ["pe.simulation_sessions.id"]),
         schema="pe",
     )
-    
+
     # ── Daily Rollups ───────────────────────────────────────────
     op.create_table(
         "metering_daily_rollups",
@@ -306,7 +306,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["institution_id"], ["pe.institutions.id"]),
         schema="pe",
     )
-    
+
     # ── Billing Periods ─────────────────────────────────────────
     op.create_table(
         "billing_periods",
@@ -327,7 +327,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["institution_id"], ["pe.institutions.id"]),
         schema="pe",
     )
-    
+
     # ── Audit Log ───────────────────────────────────────────────
     op.create_table(
         "audit_log",
@@ -348,7 +348,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["tenant_id"], ["pe.institutions.id"]),
         schema="pe",
     )
-    
+
     # ── PHI Guard Events ────────────────────────────────────────
     op.create_table(
         "phi_guard_events",
@@ -367,7 +367,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["actor_id"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── PHI Guard Allowlist ─────────────────────────────────────
     op.create_table(
         "phi_guard_allowlist",
@@ -383,7 +383,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(["created_by"], ["pe.users.id"]),
         schema="pe",
     )
-    
+
     # ── Functions ───────────────────────────────────────────────
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.current_tenant_id()
@@ -395,7 +395,7 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql STABLE
     """)
-    
+
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.is_super_admin()
         RETURNS BOOLEAN AS $$
@@ -406,7 +406,7 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql STABLE
     """)
-    
+
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.set_session_context(
             p_tenant_id UUID, p_user_id UUID, p_user_role VARCHAR
@@ -418,7 +418,7 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql SECURITY DEFINER
     """)
-    
+
     # ── Audit Hash Function ─────────────────────────────────────
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.compute_audit_hash()
@@ -445,13 +445,13 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql
     """)
-    
+
     op.execute("""
         CREATE TRIGGER trg_audit_hash
             BEFORE INSERT ON pe.audit_log
             FOR EACH ROW EXECUTE FUNCTION pe.compute_audit_hash()
     """)
-    
+
     # ── Immutability triggers ───────────────────────────────────
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.prevent_audit_mutation()
@@ -461,19 +461,19 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql
     """)
-    
+
     op.execute("""
         CREATE TRIGGER trg_prevent_audit_update
             BEFORE UPDATE ON pe.audit_log
             FOR EACH ROW EXECUTE FUNCTION pe.prevent_audit_mutation()
     """)
-    
+
     op.execute("""
         CREATE TRIGGER trg_prevent_audit_delete
             BEFORE DELETE ON pe.audit_log
             FOR EACH ROW EXECUTE FUNCTION pe.prevent_audit_mutation()
     """)
-    
+
     # ── Audit Helper Function ───────────────────────────────────
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.log_audit_event(
@@ -495,7 +495,7 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql SECURITY DEFINER
     """)
-    
+
     # ── Metering Ingestion Function ─────────────────────────────
     op.execute("""
         CREATE OR REPLACE FUNCTION pe.ingest_metering_event(
@@ -519,7 +519,7 @@ def upgrade() -> None:
         END;
         $$ LANGUAGE plpgsql SECURITY DEFINER
     """)
-    
+
     # ── RLS ─────────────────────────────────────────────────────
     op.execute("ALTER TABLE pe.institutions ENABLE ROW LEVEL SECURITY")
     op.execute("ALTER TABLE pe.institution_settings ENABLE ROW LEVEL SECURITY")
@@ -534,7 +534,7 @@ def upgrade() -> None:
     op.execute("ALTER TABLE pe.billing_periods ENABLE ROW LEVEL SECURITY")
     op.execute("ALTER TABLE pe.audit_log ENABLE ROW LEVEL SECURITY")
     op.execute("ALTER TABLE pe.phi_guard_events ENABLE ROW LEVEL SECURITY")
-    
+
     # RLS policy for institutions
     op.execute("""
         CREATE POLICY tenant_isolation_institutions ON pe.institutions
@@ -542,7 +542,7 @@ def upgrade() -> None:
                 pe.is_super_admin() OR id = pe.current_tenant_id()
             )
     """)
-    
+
     # RLS policies for tenant-scoped tables
     op.execute("""
         CREATE POLICY tenant_isolation_institution_settings ON pe.institution_settings
@@ -597,7 +597,7 @@ def upgrade() -> None:
         CREATE POLICY tenant_isolation_phi_guard_events ON pe.phi_guard_events
             FOR ALL USING (pe.is_super_admin() OR institution_id = pe.current_tenant_id())
     """)
-    
+
     # ── Indexes ─────────────────────────────────────────────────
     op.create_index("idx_users_institution", "users", ["institution_id"], schema="pe")
     op.create_index("idx_users_email_hash", "users", ["email_hash"], schema="pe")
@@ -607,7 +607,7 @@ def upgrade() -> None:
     op.create_index("idx_sessions_status", "simulation_sessions", ["status"], schema="pe")
     op.create_index("idx_metering_institution", "metering_events", ["institution_id", "event_timestamp"], schema="pe")
     op.create_index("idx_audit_tenant", "audit_log", ["tenant_id", sa.text("created_at DESC")], schema="pe")
-    
+
     # ── Seed Data: Global Personas ──────────────────────────────
     op.execute("""
         INSERT INTO pe.persona_definitions (id, institution_id, name, persona_type, system_prompt, is_global, version)

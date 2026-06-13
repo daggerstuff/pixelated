@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any, AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.pe.config import settings
+from src.pe.core.security import create_access_token
 from src.pe.database import async_session_factory
 from src.pe.main import app
 
@@ -20,7 +20,7 @@ def anyio_backend() -> str:
 
 
 @pytest.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
+async def client() -> AsyncGenerator[AsyncClient]:
     """Provide an async HTTP client for testing."""
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
@@ -28,7 +28,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest.fixture
-async def db_session() -> AsyncGenerator[AsyncSession, None]:
+async def db_session() -> AsyncGenerator[AsyncSession]:
     """Provide a database session for testing (no RLS)."""
     async with async_session_factory() as session:
         yield session
@@ -43,7 +43,6 @@ def make_test_token(
     role: str = "learner",
 ) -> str:
     """Create a test JWT token for integration tests."""
-    from src.pe.core.security import create_access_token
     return create_access_token(
         user_id=user_id,
         tenant_id=tenant_id,
