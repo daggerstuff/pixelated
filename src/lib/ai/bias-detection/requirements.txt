@@ -110,7 +110,7 @@ cryptography==47.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   great-expectations
-cuda-bindings==12.9.4
+cuda-bindings==13.2.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   torch

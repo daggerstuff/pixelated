@@ -210,3 +210,12 @@ program
       const summary = taskManager.getTaskSummary(taskList)
 
       console.log('📋 Task List Status')
+      console.log(summary)
+    } catch (error: unknown) {
+      console.error(
+        '❌ Status check failed:',
+        error instanceof Error ? error.message : String(error),
+      )
+      void (process as any).exit(1)
+    }
+  })
