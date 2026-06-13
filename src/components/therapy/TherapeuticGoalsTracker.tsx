@@ -152,6 +152,24 @@ export function TherapeuticGoalsTracker({
     [relatedInterventionsByGoalId],
   )
 
+  // ⚡ Bolt: Pre-compute formatted date strings for checkpoints to avoid O(N) Date creations during render
+  const formattedCheckpoints = useMemo(() => {
+    if (!activeGoal) return []
+    return activeGoal.checkpoints.map(cp => ({
+      ...cp,
+      formattedCompletedAt: cp.completedAt ? new Date(cp.completedAt).toLocaleDateString() : ''
+    }))
+  }, [activeGoal])
+
+  // ⚡ Bolt: Pre-compute formatted date strings for progress history to avoid O(N) Date creations during render
+  const formattedProgressHistory = useMemo(() => {
+    if (!activeGoal) return []
+    return activeGoal.progressHistory.slice(-3).map(snapshot => ({
+      ...snapshot,
+      formattedTimestamp: new Date(snapshot.timestamp).toLocaleDateString()
+    }))
+  }, [activeGoal])
+
   // Handle category tab click
   // ⚡ Bolt: Memoize category selection handler to prevent unnecessary re-renders
   const handleCategoryClick = useCallback(
@@ -583,7 +601,7 @@ export function TherapeuticGoalsTracker({
 
           <h5 className="mb-2 text-sm font-medium">Progress Checkpoints</h5>
           <div className="mb-4 space-y-3">
-            {activeGoal.checkpoints.map((checkpoint) => (
+            {formattedCheckpoints.map((checkpoint) => (
               <div
                 key={`checkpoint-${checkpoint.id}`}
                 className="flex items-start"
@@ -616,10 +634,7 @@ export function TherapeuticGoalsTracker({
                   </p>
                   {checkpoint.isCompleted && checkpoint.completedAt && (
                     <p className="text-gray-500 mt-0.5 text-xs">
-                      Completed on{' '}
-                      {checkpoint.completedAt
-                        ? new Date(checkpoint.completedAt).toLocaleDateString()
-                        : ''}
+                      Completed on {checkpoint.formattedCompletedAt}
                     </p>
                   )}
                   {checkpoint.notes && (
@@ -637,13 +652,13 @@ export function TherapeuticGoalsTracker({
             <>
               <h5 className="mb-2 text-sm font-medium">Progress History</h5>
               <div className="mb-4 space-y-2">
-                {activeGoal.progressHistory.slice(-3).map((snapshot) => (
+                {formattedProgressHistory.map((snapshot) => (
                   <div
                     key={`progress-${snapshot.timestamp}-${snapshot.progressPercent}`}
                     className="flex items-center justify-between text-sm"
                   >
                     <span className="text-gray-600">
-                      {new Date(snapshot.timestamp).toLocaleDateString()}
+                      {snapshot.formattedTimestamp}
                     </span>
                     <div className="flex items-center">
                       <div className="bg-gray-200 mr-2 h-1.5 w-16 rounded-full">
