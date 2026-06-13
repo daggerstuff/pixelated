@@ -345,8 +345,8 @@ function computeTrend(
     valences.reduce((s, v) => s + (v - mean) ** 2, 0) / valences.length
   if (variance > 0.04) return 'volatile'
 
-  const valenceTrend = valences[0]! - valences[valences.length - 1]!
-  const dominanceTrend = dominances[0]! - dominances[dominances.length - 1]!
+  const valenceTrend = valences[0] - valences[valences.length - 1]
+  const dominanceTrend = dominances[0] - dominances[dominances.length - 1]
 
   if (valenceTrend < -0.1 && dominanceTrend < -0.1) return 'escalating'
   if (valenceTrend > 0.1 && dominanceTrend > 0.1) return 'de-escalating'
@@ -395,8 +395,8 @@ export class EmotionClassifier {
       }
     }
 
-    const first = results[0]!
-    const last = results[results.length - 1]!
+    const first = results[0]
+    const last = results[results.length - 1]
     const valences = results.map((r) => r.valence)
     const dominances = results.map((r) => r.dominance)
 

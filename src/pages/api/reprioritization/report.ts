@@ -19,7 +19,7 @@ export const GET = withAuthenticatedReprioritizationRoute(
 
     // Handle GET /api/reprioritization/report/:runId
     if (params?.['runId']) {
-      const runId = params['runId'] as string
+      const runId = params['runId']
       const reportData = await redis.get(`reprioritization:report:${runId}`)
 
       if (!reportData) {
@@ -59,7 +59,7 @@ export const GET = withAuthenticatedReprioritizationRoute(
       if (reportData) {
         try {
           const report = parseReport(reportData)
-          const timestamp = new Date(report['timestamp'] as string).getTime()
+          const timestamp = new Date(report['timestamp']).getTime()
           if (timestamp > latestTimestamp) {
             latestTimestamp = timestamp
             latestReport = report

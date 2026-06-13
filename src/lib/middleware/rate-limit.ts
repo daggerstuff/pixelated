@@ -144,8 +144,8 @@ export const rateLimitMiddleware = defineMiddleware(
       const rateLimitResult = rateLimit.check(
         clientIp,
         role,
-        config!.limits,
-        config!.windowMs,
+        config.limits,
+        config.windowMs,
       )
 
       if (!rateLimitResult.allowed) {

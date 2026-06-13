@@ -149,7 +149,7 @@ export class MentalLLaMAPythonBridge {
       throw new PythonBridgeError("PythonBridge is not functional.");
     }
     const payload = { text, modelParams };
-    const response = (await this.sendRequest("analyze_text", payload)) as unknown;
+    const response = (await this.sendRequest("analyze_text", payload));
     if (
       response &&
       typeof response === "object" &&
