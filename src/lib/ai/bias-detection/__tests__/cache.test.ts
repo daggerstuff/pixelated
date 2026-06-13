@@ -2,7 +2,8 @@
  * Unit tests for the Bias Detection Caching Layer
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import type { ParticipantDemographics } from "../types";
 
 import {
   BiasDetectionCache,
@@ -17,306 +18,312 @@ import {
   getCachedDashboardData,
   cacheReport,
   getCachedReport,
-} from '../cache'
+} from "../cache";
 import type {
   BiasAnalysisResult,
   TherapeuticSession,
   BiasDashboardData,
   BiasReport,
-} from '../types'
+} from "../types";
 
 // Mock logger
-vi.mock('../../utils/logger', () => ({
+vi.mock("../../utils/logger", () => ({
   getLogger: () => ({
     info: vi.fn(),
     debug: vi.fn(),
     error: vi.fn(),
     warn: vi.fn(),
   }),
-}))
+}));
 
 // In-memory mock store for simulated Redis operations
 const { mockRedisStore } = vi.hoisted(() => {
-  const store = new Map<string, { data: string; expiry: string | null }>()
+  const store = new Map<string, { data: string; expiry: string | null }>();
   return {
     mockRedisStore: {
       get: vi.fn(async (key: string) => store.get(key)?.data ?? null),
       set: vi.fn(async (key: string, value: string, _ttl?: number) => {
-        store.set(key, { data: value, expiry: null })
+        store.set(key, { data: value, expiry: null });
       }),
-      delete: vi.fn(async (key: string) => { store.delete(key) }),
+      delete: vi.fn(async (key: string) => {
+        store.delete(key);
+      }),
       keys: vi.fn(async (_pattern?: string) => Array.from(store.keys())),
-      clearByPrefix: vi.fn(async (_prefix: string) => { store.clear() }),
-      _reset: () => { store.clear() },
+      clearByPrefix: vi.fn(async (_prefix: string) => {
+        store.clear();
+      }),
+      _reset: () => {
+        store.clear();
+      },
     },
-  }
-})
+  };
+});
 
-vi.mock('../../../services/cacheService', () => ({
+vi.mock("../../../services/cacheService", () => ({
   getCacheService: () => mockRedisStore,
-}))
+}));
 
-describe('BiasDetectionCache', () => {
-  let cache: BiasDetectionCache
+describe("BiasDetectionCache", () => {
+  let cache: BiasDetectionCache;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    mockRedisStore._reset()
+    await resetCacheManager();
+    mockRedisStore._reset();
     cache = new BiasDetectionCache({
       maxSize: 10,
       defaultTtl: 1000, // 1 second for testing
       cleanupInterval: 500,
-    })
-  })
+    });
+  });
 
   afterEach(() => {
-    void cache.destroy()
-  })
+    void cache.destroy();
+  });
 
-  describe('Basic Cache Operations', () => {
-    it('should store and retrieve values', async () => {
-      const key = 'test-key'
-      const value = { data: 'test-value' }
+  describe("Basic Cache Operations", () => {
+    it("should store and retrieve values", async () => {
+      const key = "test-key";
+      const value = { data: "test-value" };
 
-      await cache.set(key, value)
-      const retrieved = await cache.get(key)
+      await cache.set(key, value);
+      const retrieved = await cache.get(key);
 
-      expect(retrieved).toEqual(value)
-    })
+      expect(retrieved).toEqual(value);
+    });
 
-    it('should return null for non-existent keys', async () => {
-      const result = await cache.get('non-existent')
-      expect(result).toBeNull()
-    })
+    it("should return null for non-existent keys", async () => {
+      const result = await cache.get("non-existent");
+      expect(result).toBeNull();
+    });
 
-    it('should check if key exists', async () => {
-      const key = 'exists-key'
-      const value = { data: 'test' }
+    it("should check if key exists", async () => {
+      const key = "exists-key";
+      const value = { data: "test" };
 
-      expect(await cache.has(key)).toBe(false)
+      expect(await cache.has(key)).toBe(false);
 
-      await cache.set(key, value)
-      expect(await cache.has(key)).toBe(true)
-    })
+      await cache.set(key, value);
+      expect(await cache.has(key)).toBe(true);
+    });
 
-    it('should delete specific entries', async () => {
-      const key = 'delete-key'
-      const value = { data: 'test' }
+    it("should delete specific entries", async () => {
+      const key = "delete-key";
+      const value = { data: "test" };
 
-      await cache.set(key, value)
-      expect(await cache.has(key)).toBe(true)
+      await cache.set(key, value);
+      expect(await cache.has(key)).toBe(true);
 
-      const deleted = await cache.delete(key)
-      expect(deleted).toBe(true)
-      expect(await cache.has(key)).toBe(false)
-    })
+      const deleted = await cache.delete(key);
+      expect(deleted).toBe(true);
+      expect(await cache.has(key)).toBe(false);
+    });
 
-    it('should clear all entries', async () => {
-      await cache.set('key1', { data: 'value1' })
-      await cache.set('key2', { data: 'value2' })
+    it("should clear all entries", async () => {
+      await cache.set("key1", { data: "value1" });
+      await cache.set("key2", { data: "value2" });
 
-      expect(await cache.has('key1')).toBe(true)
-      expect(await cache.has('key2')).toBe(true)
+      expect(await cache.has("key1")).toBe(true);
+      expect(await cache.has("key2")).toBe(true);
 
-      await cache.clear()
+      await cache.clear();
 
-      expect(await cache.has('key1')).toBe(false)
-      expect(await cache.has('key2')).toBe(false)
-    })
-  })
+      expect(await cache.has("key1")).toBe(false);
+      expect(await cache.has("key2")).toBe(false);
+    });
+  });
 
-  describe('TTL and Expiration', () => {
-    it('should expire entries after TTL', async () => {
-      const key = 'expire-key'
-      const value = { data: 'test' }
+  describe("TTL and Expiration", () => {
+    it("should expire entries after TTL", async () => {
+      const key = "expire-key";
+      const value = { data: "test" };
 
-      await cache.set(key, value, { ttl: 100 }) // 100ms
-      expect(await cache.has(key)).toBe(true)
+      await cache.set(key, value, { ttl: 100 }); // 100ms
+      expect(await cache.has(key)).toBe(true);
 
       // Wait for expiration
-      await new Promise((resolve) => setTimeout(resolve, 150))
-      expect(await cache.has(key)).toBe(false)
-    })
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      expect(await cache.has(key)).toBe(false);
+    });
 
-    it('should use default TTL when not specified', async () => {
-      const key = 'default-ttl-key'
-      const value = { data: 'test' }
+    it("should use default TTL when not specified", async () => {
+      const key = "default-ttl-key";
+      const value = { data: "test" };
 
-      await cache.set(key, value)
-      expect(await cache.has(key)).toBe(true)
+      await cache.set(key, value);
+      expect(await cache.has(key)).toBe(true);
 
       // Should still exist after short time
-      await new Promise((resolve) => setTimeout(resolve, 50))
-      expect(await cache.has(key)).toBe(true)
-    })
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(await cache.has(key)).toBe(true);
+    });
 
-    it('should return null for expired entries on get', async () => {
-      const key = 'expire-get-key'
-      const value = { data: 'test' }
+    it("should return null for expired entries on get", async () => {
+      const key = "expire-get-key";
+      const value = { data: "test" };
 
-      await cache.set(key, value, { ttl: 50 })
+      await cache.set(key, value, { ttl: 50 });
 
       // Wait for expiration
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const result = await cache.get(key)
-      expect(result).toBeNull()
-    })
-  })
+      const result = await cache.get(key);
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Cache Statistics', () => {
-    it('should track cache statistics', async () => {
-      const stats = cache.getStats()
-      expect(stats).toHaveProperty('totalEntries')
-      expect(stats).toHaveProperty('hitRate')
-      expect(stats).toHaveProperty('missRate')
-      expect(stats).toHaveProperty('evictionCount')
-      expect(stats).toHaveProperty('memoryUsage')
-    })
+  describe("Cache Statistics", () => {
+    it("should track cache statistics", async () => {
+      const stats = cache.getStats();
+      expect(stats).toHaveProperty("totalEntries");
+      expect(stats).toHaveProperty("hitRate");
+      expect(stats).toHaveProperty("missRate");
+      expect(stats).toHaveProperty("evictionCount");
+      expect(stats).toHaveProperty("memoryUsage");
+    });
 
-    it('should update entry count', async () => {
-      const initialStats = cache.getStats()
-      expect(initialStats.totalEntries).toBe(0)
+    it("should update entry count", async () => {
+      const initialStats = cache.getStats();
+      expect(initialStats.totalEntries).toBe(0);
 
-      await cache.set('key1', { data: 'value1' })
-      await cache.set('key2', { data: 'value2' })
+      await cache.set("key1", { data: "value1" });
+      await cache.set("key2", { data: "value2" });
 
-      const updatedStats = cache.getStats()
-      expect(updatedStats.totalEntries).toBe(2)
-    })
+      const updatedStats = cache.getStats();
+      expect(updatedStats.totalEntries).toBe(2);
+    });
 
-    it('should track hit and miss rates', async () => {
-      await cache.set('hit-key', { data: 'value' })
+    it("should track hit and miss rates", async () => {
+      await cache.set("hit-key", { data: "value" });
 
       // Hit
-      await cache.get('hit-key')
+      await cache.get("hit-key");
 
       // Miss
-      await cache.get('miss-key')
+      await cache.get("miss-key");
 
-      const stats = cache.getStats()
-      expect(stats.hitRate).toBeGreaterThan(0)
-      expect(stats.missRate).toBeGreaterThan(0)
-    })
-  })
+      const stats = cache.getStats();
+      expect(stats.hitRate).toBeGreaterThan(0);
+      expect(stats.missRate).toBeGreaterThan(0);
+    });
+  });
 
-  describe('Tag-based Invalidation', () => {
-    it('should invalidate entries by tags', async () => {
-      await cache.set('key1', { data: 'value1' }, { tags: ['tag1', 'tag2'] })
-      await cache.set('key2', { data: 'value2' }, { tags: ['tag2', 'tag3'] })
-      await cache.set('key3', { data: 'value3' }, { tags: ['tag3'] })
+  describe("Tag-based Invalidation", () => {
+    it("should invalidate entries by tags", async () => {
+      await cache.set("key1", { data: "value1" }, { tags: ["tag1", "tag2"] });
+      await cache.set("key2", { data: "value2" }, { tags: ["tag2", "tag3"] });
+      await cache.set("key3", { data: "value3" }, { tags: ["tag3"] });
 
-      expect(await cache.has('key1')).toBe(true)
-      expect(await cache.has('key2')).toBe(true)
-      expect(await cache.has('key3')).toBe(true)
+      expect(await cache.has("key1")).toBe(true);
+      expect(await cache.has("key2")).toBe(true);
+      expect(await cache.has("key3")).toBe(true);
 
-      const invalidated = await cache.invalidateByTags(['tag2'])
-      expect(invalidated).toBe(2) // key1 and key2
+      const invalidated = await cache.invalidateByTags(["tag2"]);
+      expect(invalidated).toBe(2); // key1 and key2
 
-      expect(await cache.has('key1')).toBe(false)
-      expect(await cache.has('key2')).toBe(false)
-      expect(await cache.has('key3')).toBe(true)
-    })
+      expect(await cache.has("key1")).toBe(false);
+      expect(await cache.has("key2")).toBe(false);
+      expect(await cache.has("key3")).toBe(true);
+    });
 
-    it('should return 0 when no entries match tags', async () => {
-      const invalidated = await cache.invalidateByTags(['non-existent-tag'])
-      expect(invalidated).toBe(0)
-    })
-  })
+    it("should return 0 when no entries match tags", async () => {
+      const invalidated = await cache.invalidateByTags(["non-existent-tag"]);
+      expect(invalidated).toBe(0);
+    });
+  });
 
-  describe('Key Management', () => {
-    it('should return all cache keys', async () => {
-      await cache.set('key1', { data: 'value1' })
-      await cache.set('key2', { data: 'value2' })
-      await cache.set('key3', { data: 'value3' })
+  describe("Key Management", () => {
+    it("should return all cache keys", async () => {
+      await cache.set("key1", { data: "value1" });
+      await cache.set("key2", { data: "value2" });
+      await cache.set("key3", { data: "value3" });
 
-      const keys = cache.getKeys()
-      expect(keys).toHaveLength(3)
-      expect(keys).toContain('key1')
-      expect(keys).toContain('key2')
-      expect(keys).toContain('key3')
-    })
+      const keys = cache.getKeys();
+      expect(keys).toHaveLength(3);
+      expect(keys).toContain("key1");
+      expect(keys).toContain("key2");
+      expect(keys).toContain("key3");
+    });
 
-    it('should filter keys by pattern', async () => {
-      await cache.set('user:123', { data: 'user1' })
-      await cache.set('user:456', { data: 'user2' })
-      await cache.set('session:789', { data: 'session1' })
+    it("should filter keys by pattern", async () => {
+      await cache.set("user:123", { data: "user1" });
+      await cache.set("user:456", { data: "user2" });
+      await cache.set("session:789", { data: "session1" });
 
-      const userKeys = cache.getKeysByPattern(/^user:/)
-      expect(userKeys).toHaveLength(2)
-      expect(userKeys).toContain('user:123')
-      expect(userKeys).toContain('user:456')
-    })
-  })
+      const userKeys = cache.getKeysByPattern(/^user:/);
+      expect(userKeys).toHaveLength(2);
+      expect(userKeys).toContain("user:123");
+      expect(userKeys).toContain("user:456");
+    });
+  });
 
-  describe('LRU Eviction', () => {
-    it('should evict entries when max size reached', async () => {
-      const smallCache = new BiasDetectionCache({ maxSize: 3 })
+  describe("LRU Eviction", () => {
+    it("should evict entries when max size reached", async () => {
+      const smallCache = new BiasDetectionCache({ maxSize: 3 });
 
       // Fill cache to capacity
-      await smallCache.set('key1', { data: 'value1' })
-      await smallCache.set('key2', { data: 'value2' })
-      await smallCache.set('key3', { data: 'value3' })
+      await smallCache.set("key1", { data: "value1" });
+      await smallCache.set("key2", { data: "value2" });
+      await smallCache.set("key3", { data: "value3" });
 
       // Verify cache is at capacity
-      expect(smallCache.getStats().totalEntries).toBe(3)
+      expect(smallCache.getStats().totalEntries).toBe(3);
 
       // Add new entry, should trigger eviction
-      await smallCache.set('key4', { data: 'value4' })
+      await smallCache.set("key4", { data: "value4" });
 
       // Cache should still be at max capacity
-      expect(smallCache.getStats().totalEntries).toBe(3)
+      expect(smallCache.getStats().totalEntries).toBe(3);
 
       // New entry should exist
-      expect(await smallCache.has('key4')).toBe(true)
+      expect(await smallCache.has("key4")).toBe(true);
 
       // At least one old entry should be evicted
-      const remainingKeys = smallCache.getKeys()
-      expect(remainingKeys).toHaveLength(3)
-      expect(remainingKeys).toContain('key4')
+      const remainingKeys = smallCache.getKeys();
+      expect(remainingKeys).toHaveLength(3);
+      expect(remainingKeys).toContain("key4");
 
-      void smallCache.destroy()
-    })
-  })
+      void smallCache.destroy();
+    });
+  });
 
-  describe('Cleanup Operations', () => {
-    it('should clean up expired entries', async () => {
-      await cache.set('expire1', { data: 'value1' }, { ttl: 50 })
-      await cache.set('expire2', { data: 'value2' }, { ttl: 50 })
-      await cache.set('persist', { data: 'value3' }, { ttl: 5000 })
+  describe("Cleanup Operations", () => {
+    it("should clean up expired entries", async () => {
+      await cache.set("expire1", { data: "value1" }, { ttl: 50 });
+      await cache.set("expire2", { data: "value2" }, { ttl: 50 });
+      await cache.set("persist", { data: "value3" }, { ttl: 5000 });
 
-      expect(await cache.has('expire1')).toBe(true)
-      expect(await cache.has('expire2')).toBe(true)
-      expect(await cache.has('persist')).toBe(true)
+      expect(await cache.has("expire1")).toBe(true);
+      expect(await cache.has("expire2")).toBe(true);
+      expect(await cache.has("persist")).toBe(true);
 
       // Wait for expiration
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      const cleaned =  cache.cleanup()
-      expect(cleaned).toBe(2)
+      const cleaned = cache.cleanup();
+      expect(cleaned).toBe(2);
 
-      expect(await cache.has('expire1')).toBe(false)
-      expect(await cache.has('expire2')).toBe(false)
-      expect(await cache.has('persist')).toBe(true)
-    })
-  })
-})
+      expect(await cache.has("expire1")).toBe(false);
+      expect(await cache.has("expire2")).toBe(false);
+      expect(await cache.has("persist")).toBe(true);
+    });
+  });
+});
 
-describe('BiasAnalysisCache', () => {
-  let analysisCache: BiasAnalysisCache
-  let mockAnalysisResult: BiasAnalysisResult
-  let mockSession: TherapeuticSession
+describe("BiasAnalysisCache", () => {
+  let analysisCache: BiasAnalysisCache;
+  let mockAnalysisResult: BiasAnalysisResult;
+  let mockSession: TherapeuticSession;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    mockRedisStore._reset()
+    await resetCacheManager();
+    mockRedisStore._reset();
     analysisCache = new BiasAnalysisCache({
       maxSize: 10,
       defaultTtl: 1000,
-    })
+    });
 
     mockAnalysisResult = {
-      sessionId: 'session-123',
+      sessionId: "session-123",
       timestamp: new Date(),
       overallBiasScore: 0.3,
       layerResults: {
@@ -402,7 +409,7 @@ describe('BiasAnalysisCache', () => {
             patientSafety: 0.95,
           },
           temporalAnalysis: {
-            trendDirection: 'stable',
+            trendDirection: "stable",
             changeRate: 0.02,
             seasonalPatterns: [],
             interventionEffectiveness: [],
@@ -411,147 +418,141 @@ describe('BiasAnalysisCache', () => {
         },
       },
       demographics: {
-        age: '25-35',
-        gender: 'female',
-        ethnicity: 'hispanic',
-        primaryLanguage: 'en',
+        age: "25-35",
+        gender: "female",
+        ethnicity: "hispanic",
+        primaryLanguage: "en",
       },
       recommendations: [],
-      alertLevel: 'medium',
+      alertLevel: "medium",
       confidence: 0.85,
-    }
+    };
 
     mockSession = {
-      sessionId: 'session-123',
+      sessionId: "session-123",
       timestamp: new Date(),
       participantDemographics: {
-        age: '25-35',
-        gender: 'female',
-        ethnicity: 'hispanic',
-        primaryLanguage: 'en',
+        age: "25-35",
+        gender: "female",
+        ethnicity: "hispanic",
+        primaryLanguage: "en",
       },
       scenario: {
-        scenarioId: 'scenario-1',
-        type: 'depression',
-        complexity: 'intermediate',
-        tags: ['mood', 'therapy'],
-        description: 'Depression therapy scenario',
+        scenarioId: "scenario-1",
+        type: "depression",
+        complexity: "intermediate",
+        tags: ["mood", "therapy"],
+        description: "Depression therapy scenario",
         learningObjectives: [],
       },
       content: {
-        patientPresentation: 'Patient presents with depressive symptoms',
+        patientPresentation: "Patient presents with depressive symptoms",
         therapeuticInterventions: [],
         patientResponses: [],
-        sessionNotes: 'Initial assessment completed',
+        sessionNotes: "Initial assessment completed",
       },
       aiResponses: [],
       expectedOutcomes: [],
       transcripts: [],
       metadata: {
-        trainingInstitution: 'Test University',
-        traineeId: 'trainee-123',
+        trainingInstitution: "Test University",
+        traineeId: "trainee-123",
         sessionDuration: 60,
-        completionStatus: 'completed',
+        completionStatus: "completed",
       },
-    }
-  })
+    };
+  });
 
   afterEach(() => {
-    void analysisCache.destroy()
-  })
+    void analysisCache.destroy();
+  });
 
-  describe('Analysis Result Caching', () => {
-    it('should cache and retrieve analysis results', async () => {
-      await analysisCache.cacheAnalysisResult('session-123', mockAnalysisResult)
+  describe("Analysis Result Caching", () => {
+    it("should cache and retrieve analysis results", async () => {
+      await analysisCache.cacheAnalysisResult("session-123", mockAnalysisResult);
 
-      const retrieved = await analysisCache.getAnalysisResult('session-123')
-      expect(retrieved).toBeTruthy()
-      expect(retrieved!.sessionId).toBe(mockAnalysisResult.sessionId)
-      expect(retrieved!.overallBiasScore).toBe(
-        mockAnalysisResult.overallBiasScore,
-      )
-      expect(retrieved!.alertLevel).toBe(mockAnalysisResult.alertLevel)
-      expect(retrieved!.confidence).toBe(mockAnalysisResult.confidence)
+      const retrieved = await analysisCache.getAnalysisResult("session-123");
+      expect(retrieved).toBeTruthy();
+      expect(retrieved!.sessionId).toBe(mockAnalysisResult.sessionId);
+      expect(retrieved!.overallBiasScore).toBe(mockAnalysisResult.overallBiasScore);
+      expect(retrieved!.alertLevel).toBe(mockAnalysisResult.alertLevel);
+      expect(retrieved!.confidence).toBe(mockAnalysisResult.confidence);
 
       // Handle timestamp comparison (might be serialized as string)
       const retrievedTimestamp =
-        typeof retrieved!.timestamp === 'string'
+        typeof retrieved!.timestamp === "string"
           ? new Date(retrieved!.timestamp)
-          : retrieved!.timestamp
-      expect(retrievedTimestamp.getTime()).toBe(
-        mockAnalysisResult.timestamp.getTime(),
-      )
-    })
+          : retrieved!.timestamp;
+      expect(retrievedTimestamp.getTime()).toBe(mockAnalysisResult.timestamp.getTime());
+    });
 
-    it('should return null for non-existent analysis results', async () => {
-      const result = await analysisCache.getAnalysisResult('non-existent')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent analysis results", async () => {
+      const result = await analysisCache.getAnalysisResult("non-existent");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Session Caching', () => {
-    it('should cache and retrieve sessions', async () => {
-      await analysisCache.cacheSession(mockSession)
+  describe("Session Caching", () => {
+    it("should cache and retrieve sessions", async () => {
+      await analysisCache.cacheSession(mockSession);
 
-      const retrieved = await analysisCache.getSession('session-123')
-      expect(retrieved).toBeTruthy()
-      expect(retrieved!.sessionId).toBe(mockSession.sessionId)
-      expect(retrieved!.participantDemographics).toEqual(
-        mockSession.participantDemographics,
-      )
-      expect(retrieved!.scenario).toEqual(mockSession.scenario)
+      const retrieved = await analysisCache.getSession("session-123");
+      expect(retrieved).toBeTruthy();
+      expect(retrieved!.sessionId).toBe(mockSession.sessionId);
+      expect(retrieved!.participantDemographics).toEqual(mockSession.participantDemographics);
+      expect(retrieved!.scenario).toEqual(mockSession.scenario);
 
       // Handle timestamp comparison (might be serialized as string)
       const retrievedTimestamp =
-        typeof retrieved!.timestamp === 'string'
+        typeof retrieved!.timestamp === "string"
           ? new Date(retrieved!.timestamp)
-          : retrieved!.timestamp
-      expect(retrievedTimestamp?.getTime()).toBe(mockSession.timestamp?.getTime())
-    })
+          : retrieved!.timestamp;
+      expect(retrievedTimestamp?.getTime()).toBe(mockSession.timestamp?.getTime());
+    });
 
-    it('should return null for non-existent sessions', async () => {
-      const result = await analysisCache.getSession('non-existent')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent sessions", async () => {
+      const result = await analysisCache.getSession("non-existent");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Demographic-based Invalidation', () => {
-    it('should invalidate by demographics', async () => {
-      await analysisCache.cacheSession(mockSession)
-      await analysisCache.cacheAnalysisResult('session-123', mockAnalysisResult)
+  describe("Demographic-based Invalidation", () => {
+    it("should invalidate by demographics", async () => {
+      await analysisCache.cacheSession(mockSession);
+      await analysisCache.cacheAnalysisResult("session-123", mockAnalysisResult);
 
-      expect(await analysisCache.getSession('session-123')).not.toBeNull()
+      expect(await analysisCache.getSession("session-123")).not.toBeNull();
 
       // The tags are constructed as "participant:age:gender", so we need to match the exact format
       const invalidated = await analysisCache.invalidateByDemographics({
-        age: '25-35',
-      })
+        age: "25-35",
+      });
 
-      expect(invalidated).toBeGreaterThan(0)
-    })
-  })
+      expect(invalidated).toBeGreaterThan(0);
+    });
+  });
 
-  describe('Statistics', () => {
-    it('should provide cache statistics', () => {
-      const stats = analysisCache.getStats()
-      expect(stats).toHaveProperty('totalEntries')
-      expect(stats).toHaveProperty('hitRate')
-      expect(stats).toHaveProperty('missRate')
-    })
-  })
-})
+  describe("Statistics", () => {
+    it("should provide cache statistics", () => {
+      const stats = analysisCache.getStats();
+      expect(stats).toHaveProperty("totalEntries");
+      expect(stats).toHaveProperty("hitRate");
+      expect(stats).toHaveProperty("missRate");
+    });
+  });
+});
 
-describe('DashboardCache', () => {
-  let dashboardCache: DashboardCache
-  let mockDashboardData: BiasDashboardData
+describe("DashboardCache", () => {
+  let dashboardCache: DashboardCache;
+  let mockDashboardData: BiasDashboardData;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    mockRedisStore._reset()
+    await resetCacheManager();
+    mockRedisStore._reset();
     dashboardCache = new DashboardCache({
       maxSize: 10,
       defaultTtl: 1000,
-    })
+    });
 
     mockDashboardData = {
       summary: {
@@ -573,109 +574,80 @@ describe('DashboardCache', () => {
         intersectional: [],
       },
       recommendations: [],
-    }
-  })
+    };
+  });
 
   afterEach(() => {
-    void dashboardCache.destroy()
-  })
+    void dashboardCache.destroy();
+  });
 
-  describe('Dashboard Data Caching', () => {
-    it('should cache and retrieve dashboard data', async () => {
-      await dashboardCache.cacheDashboardData(
-        'user-123',
-        '7d',
-        mockDashboardData,
-      )
+  describe("Dashboard Data Caching", () => {
+    it("should cache and retrieve dashboard data", async () => {
+      await dashboardCache.cacheDashboardData("user-123", "7d", mockDashboardData);
 
-      const retrieved = await dashboardCache.getDashboardData('user-123', '7d')
-      expect(retrieved).toEqual(mockDashboardData)
-    })
+      const retrieved = await dashboardCache.getDashboardData("user-123", "7d");
+      expect(retrieved).toEqual(mockDashboardData);
+    });
 
-    it('should return null for non-existent dashboard data', async () => {
-      const result = await dashboardCache.getDashboardData('non-existent', '7d')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent dashboard data", async () => {
+      const result = await dashboardCache.getDashboardData("non-existent", "7d");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('User-based Invalidation', () => {
-    it('should invalidate dashboard data for specific user', async () => {
-      await dashboardCache.cacheDashboardData(
-        'user-123',
-        '7d',
-        mockDashboardData,
-      )
-      await dashboardCache.cacheDashboardData(
-        'user-456',
-        '7d',
-        mockDashboardData,
-      )
+  describe("User-based Invalidation", () => {
+    it("should invalidate dashboard data for specific user", async () => {
+      await dashboardCache.cacheDashboardData("user-123", "7d", mockDashboardData);
+      await dashboardCache.cacheDashboardData("user-456", "7d", mockDashboardData);
 
-      expect(
-        await dashboardCache.getDashboardData('user-123', '7d'),
-      ).not.toBeNull()
-      expect(
-        await dashboardCache.getDashboardData('user-456', '7d'),
-      ).not.toBeNull()
+      expect(await dashboardCache.getDashboardData("user-123", "7d")).not.toBeNull();
+      expect(await dashboardCache.getDashboardData("user-456", "7d")).not.toBeNull();
 
-      const invalidated =
-        await dashboardCache.invalidateUserDashboard('user-123')
-      expect(invalidated).toBe(1)
+      const invalidated = await dashboardCache.invalidateUserDashboard("user-123");
+      expect(invalidated).toBe(1);
 
-      expect(await dashboardCache.getDashboardData('user-123', '7d')).toBeNull()
-      expect(
-        await dashboardCache.getDashboardData('user-456', '7d'),
-      ).not.toBeNull()
-    })
+      expect(await dashboardCache.getDashboardData("user-123", "7d")).toBeNull();
+      expect(await dashboardCache.getDashboardData("user-456", "7d")).not.toBeNull();
+    });
 
-    it('should invalidate all dashboard data', async () => {
-      await dashboardCache.cacheDashboardData(
-        'user-123',
-        '7d',
-        mockDashboardData,
-      )
-      await dashboardCache.cacheDashboardData(
-        'user-456',
-        '30d',
-        mockDashboardData,
-      )
+    it("should invalidate all dashboard data", async () => {
+      await dashboardCache.cacheDashboardData("user-123", "7d", mockDashboardData);
+      await dashboardCache.cacheDashboardData("user-456", "30d", mockDashboardData);
 
-      const invalidated = await dashboardCache.invalidateAllDashboards()
-      expect(invalidated).toBe(2)
+      const invalidated = await dashboardCache.invalidateAllDashboards();
+      expect(invalidated).toBe(2);
 
-      expect(await dashboardCache.getDashboardData('user-123', '7d')).toBeNull()
-      expect(
-        await dashboardCache.getDashboardData('user-456', '30d'),
-      ).toBeNull()
-    })
-  })
-})
+      expect(await dashboardCache.getDashboardData("user-123", "7d")).toBeNull();
+      expect(await dashboardCache.getDashboardData("user-456", "30d")).toBeNull();
+    });
+  });
+});
 
-describe('ReportCache', () => {
-  let reportCache: ReportCache
-  let mockReport: BiasReport
+describe("ReportCache", () => {
+  let reportCache: ReportCache;
+  let mockReport: BiasReport;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    mockRedisStore._reset()
+    await resetCacheManager();
+    mockRedisStore._reset();
     reportCache = new ReportCache({
       maxSize: 10,
       defaultTtl: 1000,
-    })
+    });
 
     mockReport = {
-      reportId: 'report-123',
+      reportId: "report-123",
       generatedAt: new Date(),
       timeRange: {
-        start: new Date('2024-01-01'),
-        end: new Date('2024-01-31'),
+        start: new Date("2024-01-01"),
+        end: new Date("2024-01-31"),
       },
       overallFairnessScore: 0.8,
       executiveSummary: {
         keyFindings: [],
         criticalIssues: [],
         improvementAreas: [],
-        complianceStatus: 'compliant',
+        complianceStatus: "compliant",
       },
       detailedAnalysis: {
         demographicAnalysis: {
@@ -685,7 +657,7 @@ describe('ReportCache', () => {
           riskGroups: [],
         },
         temporalTrends: {
-          overallTrend: 'stable',
+          overallTrend: "stable",
           monthlyMetrics: [],
           seasonalPatterns: [],
           correlationAnalysis: [],
@@ -719,188 +691,182 @@ describe('ReportCache', () => {
       },
       recommendations: [],
       appendices: [],
-    }
-  })
+    };
+  });
 
   afterEach(() => {
-    void reportCache.destroy()
-  })
+    void reportCache.destroy();
+  });
 
-  describe('Report Caching', () => {
-    it('should cache and retrieve reports', async () => {
-      await reportCache.cacheReport('report-123', mockReport)
+  describe("Report Caching", () => {
+    it("should cache and retrieve reports", async () => {
+      await reportCache.cacheReport("report-123", mockReport);
 
-      const retrieved = await reportCache.getReport('report-123')
-      expect(retrieved).toBeTruthy()
-      expect(retrieved!.reportId).toBe(mockReport.reportId)
-      expect(retrieved!.overallFairnessScore).toBe(
-        mockReport.overallFairnessScore,
-      )
+      const retrieved = await reportCache.getReport("report-123");
+      expect(retrieved).toBeTruthy();
+      expect(retrieved!.reportId).toBe(mockReport.reportId);
+      expect(retrieved!.overallFairnessScore).toBe(mockReport.overallFairnessScore);
 
       // Handle Date field comparisons (might be serialized as strings)
       const retrievedGeneratedAt =
-        typeof retrieved?.generatedAt === 'string'
+        typeof retrieved?.generatedAt === "string"
           ? new Date(retrieved.generatedAt)
-          : retrieved?.generatedAt
-      expect(retrievedGeneratedAt?.getTime()).toBe(
-        mockReport.generatedAt?.getTime(),
-      )
+          : retrieved?.generatedAt;
+      expect(retrievedGeneratedAt?.getTime()).toBe(mockReport.generatedAt?.getTime());
 
       const retrievedStart =
-        typeof retrieved?.timeRange?.start === 'string'
+        typeof retrieved?.timeRange?.start === "string"
           ? new Date(retrieved.timeRange.start)
-          : retrieved?.timeRange?.start
-      expect(retrievedStart?.getTime()).toBe(
-        mockReport.timeRange?.start?.getTime(),
-      )
+          : retrieved?.timeRange?.start;
+      expect(retrievedStart?.getTime()).toBe(mockReport.timeRange?.start?.getTime());
 
       const retrievedEnd =
-        typeof retrieved?.timeRange?.end === 'string'
+        typeof retrieved?.timeRange?.end === "string"
           ? new Date(retrieved.timeRange.end)
-          : retrieved?.timeRange?.end
-      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
-    })
+          : retrieved?.timeRange?.end;
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime());
+    });
 
-    it('should return null for non-existent reports', async () => {
-      const result = await reportCache.getReport('non-existent')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent reports", async () => {
+      const result = await reportCache.getReport("non-existent");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Report Invalidation', () => {
-    it('should invalidate specific reports', async () => {
-      await reportCache.cacheReport('report-123', mockReport)
-      await reportCache.cacheReport('report-456', mockReport)
+  describe("Report Invalidation", () => {
+    it("should invalidate specific reports", async () => {
+      await reportCache.cacheReport("report-123", mockReport);
+      await reportCache.cacheReport("report-456", mockReport);
 
-      expect(await reportCache.getReport('report-123')).not.toBeNull()
-      expect(await reportCache.getReport('report-456')).not.toBeNull()
+      expect(await reportCache.getReport("report-123")).not.toBeNull();
+      expect(await reportCache.getReport("report-456")).not.toBeNull();
 
-      const invalidated = await reportCache.invalidateReport('report-123')
-      expect(invalidated).toBe(1)
+      const invalidated = await reportCache.invalidateReport("report-123");
+      expect(invalidated).toBe(1);
 
-      expect(await reportCache.getReport('report-123')).toBeNull()
-      expect(await reportCache.getReport('report-456')).not.toBeNull()
-    })
-  })
-})
+      expect(await reportCache.getReport("report-123")).toBeNull();
+      expect(await reportCache.getReport("report-456")).not.toBeNull();
+    });
+  });
+});
 
-describe('CacheManager', () => {
+describe("CacheManager", () => {
   beforeEach(async () => {
-    await resetCacheManager()
-  })
+    await resetCacheManager();
+  });
 
   afterEach(async () => {
-    await resetCacheManager()
-  })
+    await resetCacheManager();
+  });
 
-  describe('Singleton Pattern', () => {
-    it('should return the same instance', () => {
-      const manager1 = getCacheManager()
-      const manager2 = getCacheManager()
+  describe("Singleton Pattern", () => {
+    it("should return the same instance", () => {
+      const manager1 = getCacheManager();
+      const manager2 = getCacheManager();
 
-      expect(manager1).toBe(manager2)
-    })
+      expect(manager1).toBe(manager2);
+    });
 
-    it('should provide access to all cache types', () => {
-      const manager = getCacheManager()
+    it("should provide access to all cache types", () => {
+      const manager = getCacheManager();
 
-      expect(manager.analysisCache).toBeInstanceOf(BiasAnalysisCache)
-      expect(manager.dashboardCache).toBeInstanceOf(DashboardCache)
-      expect(manager.reportCache).toBeInstanceOf(ReportCache)
-    })
-  })
+      expect(manager.analysisCache).toBeInstanceOf(BiasAnalysisCache);
+      expect(manager.dashboardCache).toBeInstanceOf(DashboardCache);
+      expect(manager.reportCache).toBeInstanceOf(ReportCache);
+    });
+  });
 
-  describe('Combined Statistics', () => {
-    it('should provide combined cache statistics', async () => {
-      const manager = getCacheManager()
+  describe("Combined Statistics", () => {
+    it("should provide combined cache statistics", async () => {
+      const manager = getCacheManager();
 
       // Add some data to different caches
-      await manager.analysisCache.cacheAnalysisResult('session-1', {
-        sessionId: 'session-1',
+      await manager.analysisCache.cacheAnalysisResult("session-1", {
+        sessionId: "session-1",
         timestamp: new Date(),
         overallBiasScore: 0.3,
-        layerResults: {} as BiasAnalysisResult['layerResults'],
-        demographics: {} as unknown,
+        layerResults: {} as BiasAnalysisResult["layerResults"],
+        demographics: {} as ParticipantDemographics | undefined,
         recommendations: [],
-        alertLevel: 'low',
+        alertLevel: "low",
         confidence: 0.8,
-      })
+      });
 
-      const stats = manager.getCombinedStats()
+      const stats = manager.getCombinedStats();
 
-      expect(stats).toHaveProperty('analysis')
-      expect(stats).toHaveProperty('dashboard')
-      expect(stats).toHaveProperty('report')
-      expect(stats).toHaveProperty('total')
+      expect(stats).toHaveProperty("analysis");
+      expect(stats).toHaveProperty("dashboard");
+      expect(stats).toHaveProperty("report");
+      expect(stats).toHaveProperty("total");
 
-      expect(stats.total.totalEntries).toBeGreaterThan(0)
-    })
-  })
+      expect(stats.total.totalEntries).toBeGreaterThan(0);
+    });
+  });
 
-  describe('Cache Management', () => {
-    it('should clear all caches', () => {
-      const manager = getCacheManager()
-
-      // This should not throw
-      expect( async () => manager.clearAll()).not.toThrow()
-    })
-
-    it('should destroy cache manager', () => {
-      const manager = getCacheManager()
+  describe("Cache Management", () => {
+    it("should clear all caches", () => {
+      const manager = getCacheManager();
 
       // This should not throw
-      expect( async () => manager.destroy()).not.toThrow()
-    })
-  })
-})
+      expect(async () => manager.clearAll()).not.toThrow();
+    });
 
-describe('Convenience Functions', () => {
+    it("should destroy cache manager", () => {
+      const manager = getCacheManager();
+
+      // This should not throw
+      expect(async () => manager.destroy()).not.toThrow();
+    });
+  });
+});
+
+describe("Convenience Functions", () => {
   beforeEach(async () => {
-    await resetCacheManager()
-  })
+    await resetCacheManager();
+  });
 
   afterEach(async () => {
-    await resetCacheManager()
-  })
+    await resetCacheManager();
+  });
 
-  describe('Analysis Result Functions', () => {
-    it('should cache and retrieve analysis results', async () => {
+  describe("Analysis Result Functions", () => {
+    it("should cache and retrieve analysis results", async () => {
       const mockResult: BiasAnalysisResult = {
-        sessionId: 'session-123',
+        sessionId: "session-123",
         timestamp: new Date(),
         overallBiasScore: 0.3,
-        layerResults: {} as BiasAnalysisResult['layerResults'],
-        demographics: {} as unknown,
+        layerResults: {} as BiasAnalysisResult["layerResults"],
+        demographics: {} as ParticipantDemographics | undefined,
         recommendations: [],
-        alertLevel: 'medium',
+        alertLevel: "medium",
         confidence: 0.85,
-      }
+      };
 
-      await cacheAnalysisResult('session-123', mockResult)
-      const retrieved = await getCachedAnalysisResult('session-123')
+      await cacheAnalysisResult("session-123", mockResult);
+      const retrieved = await getCachedAnalysisResult("session-123");
 
-      expect(retrieved).toBeTruthy()
-      expect(retrieved!.sessionId).toBe(mockResult.sessionId)
-      expect(retrieved!.overallBiasScore).toBe(mockResult.overallBiasScore)
-      expect(retrieved!.alertLevel).toBe(mockResult.alertLevel)
-      expect(retrieved!.confidence).toBe(mockResult.confidence)
+      expect(retrieved).toBeTruthy();
+      expect(retrieved!.sessionId).toBe(mockResult.sessionId);
+      expect(retrieved!.overallBiasScore).toBe(mockResult.overallBiasScore);
+      expect(retrieved!.alertLevel).toBe(mockResult.alertLevel);
+      expect(retrieved!.confidence).toBe(mockResult.confidence);
 
       // Handle timestamp comparison (might be serialized as string)
       const retrievedTimestamp =
-        typeof retrieved!.timestamp === 'string'
+        typeof retrieved!.timestamp === "string"
           ? new Date(retrieved!.timestamp)
-          : retrieved!.timestamp
-      expect(retrievedTimestamp.getTime()).toBe(mockResult.timestamp.getTime())
-    })
+          : retrieved!.timestamp;
+      expect(retrievedTimestamp.getTime()).toBe(mockResult.timestamp.getTime());
+    });
 
-    it('should return null for non-existent analysis results', async () => {
-      const result = await getCachedAnalysisResult('non-existent')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent analysis results", async () => {
+      const result = await getCachedAnalysisResult("non-existent");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Dashboard Data Functions', () => {
-    it('should cache and retrieve dashboard data', async () => {
+  describe("Dashboard Data Functions", () => {
+    it("should cache and retrieve dashboard data", async () => {
       const mockData: BiasDashboardData = {
         summary: {
           totalSessions: 100,
@@ -921,244 +887,265 @@ describe('Convenience Functions', () => {
           intersectional: [],
         },
         recommendations: [],
-      }
+      };
 
-      await cacheDashboardData('user-123', '7d', mockData)
-      const retrieved = await getCachedDashboardData('user-123', '7d')
+      await cacheDashboardData("user-123", "7d", mockData);
+      const retrieved = await getCachedDashboardData("user-123", "7d");
 
-      expect(retrieved).toEqual(mockData)
-    })
+      expect(retrieved).toEqual(mockData);
+    });
 
-    it('should return null for non-existent dashboard data', async () => {
-      const result = await getCachedDashboardData('non-existent', '7d')
-      expect(result).toBeNull()
-    })
-  })
+    it("should return null for non-existent dashboard data", async () => {
+      const result = await getCachedDashboardData("non-existent", "7d");
+      expect(result).toBeNull();
+    });
+  });
 
-  describe('Report Functions', () => {
-    it('should cache and retrieve reports', async () => {
+  describe("Report Functions", () => {
+    it("should cache and retrieve reports", async () => {
       const mockReport: BiasReport = {
-        reportId: 'report-123',
+        reportId: "report-123",
         generatedAt: new Date(),
         timeRange: {
-          start: new Date('2024-01-01'),
-          end: new Date('2024-01-31'),
+          start: new Date("2024-01-01"),
+          end: new Date("2024-01-31"),
         },
         overallFairnessScore: 0.8,
-        executiveSummary: {} as BiasReport['executiveSummary'],
-        detailedAnalysis: {} as BiasReport['detailedAnalysis'],
+        executiveSummary: {} as BiasReport["executiveSummary"],
+        detailedAnalysis: {} as BiasReport["detailedAnalysis"],
         recommendations: [],
         appendices: [],
-      }
+      };
 
-      await cacheReport('report-123', mockReport)
-      const retrieved = await getCachedReport('report-123')
+      await cacheReport("report-123", mockReport);
+      const retrieved = await getCachedReport("report-123");
 
-      expect(retrieved).toBeTruthy()
-      expect(retrieved!.reportId).toBe(mockReport.reportId)
-      expect(retrieved!.overallFairnessScore).toBe(
-        mockReport.overallFairnessScore,
-      )
+      expect(retrieved).toBeTruthy();
+      expect(retrieved!.reportId).toBe(mockReport.reportId);
+      expect(retrieved!.overallFairnessScore).toBe(mockReport.overallFairnessScore);
 
       // Handle Date field comparisons (might be serialized as strings)
       const retrievedGeneratedAt =
-        typeof retrieved?.generatedAt === 'string'
+        typeof retrieved?.generatedAt === "string"
           ? new Date(retrieved.generatedAt)
-          : retrieved?.generatedAt
-      expect(retrievedGeneratedAt?.getTime()).toBe(
-        mockReport.generatedAt?.getTime(),
-      )
+          : retrieved?.generatedAt;
+      expect(retrievedGeneratedAt?.getTime()).toBe(mockReport.generatedAt?.getTime());
 
       const retrievedStart =
-        typeof retrieved?.timeRange?.start === 'string'
+        typeof retrieved?.timeRange?.start === "string"
           ? new Date(retrieved.timeRange.start)
-          : retrieved?.timeRange?.start
-      expect(retrievedStart?.getTime()).toBe(
-        mockReport.timeRange?.start?.getTime(),
-      )
+          : retrieved?.timeRange?.start;
+      expect(retrievedStart?.getTime()).toBe(mockReport.timeRange?.start?.getTime());
 
       const retrievedEnd =
-        typeof retrieved?.timeRange?.end === 'string'
+        typeof retrieved?.timeRange?.end === "string"
           ? new Date(retrieved.timeRange.end)
-          : retrieved?.timeRange?.end
-      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime())
-    })
+          : retrieved?.timeRange?.end;
+      expect(retrievedEnd?.getTime()).toBe(mockReport.timeRange?.end?.getTime());
+    });
 
-    it('should return null for non-existent reports', async () => {
-      const result = await getCachedReport('non-existent')
-      expect(result).toBeNull()
-    })
-  })
-})
+    it("should return null for non-existent reports", async () => {
+      const result = await getCachedReport("non-existent");
+      expect(result).toBeNull();
+    });
+  });
+});
 
-describe('BiasDetectionCache Edge Cases', () => {
-  let cache: BiasDetectionCache
+describe("BiasDetectionCache Edge Cases", () => {
+  let cache: BiasDetectionCache;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    mockRedisStore._reset()
+    await resetCacheManager();
+    mockRedisStore._reset();
     cache = new BiasDetectionCache({
       maxSize: 5,
       defaultTtl: 1000,
       cleanupInterval: 500,
-    })
-  })
+    });
+  });
 
   afterEach(() => {
-    void cache.destroy()
-  })
+    void cache.destroy();
+  });
 
-  describe('Delete Edge Cases', () => {
-    it('should return false when deleting a non-existent key', async () => {
-      const memCache = new BiasDetectionCache({ maxSize: 5, defaultTtl: 1000, useRedis: false })
-      const result = await memCache.delete('non-existent-key')
-      expect(result).toBe(false)
-      void memCache.destroy()
-    })
+  describe("Delete Edge Cases", () => {
+    it("should return false when deleting a non-existent key", async () => {
+      const memCache = new BiasDetectionCache({ maxSize: 5, defaultTtl: 1000, useRedis: false });
+      const result = await memCache.delete("non-existent-key");
+      expect(result).toBe(false);
+      void memCache.destroy();
+    });
 
-    it('should return true when deleting from memory only', async () => {
-      await cache.set('mem-only', { data: 'test' })
-      const result = await cache.delete('mem-only')
-      expect(result).toBe(true)
-    })
-  })
+    it("should return true when deleting from memory only", async () => {
+      await cache.set("mem-only", { data: "test" });
+      const result = await cache.delete("mem-only");
+      expect(result).toBe(true);
+    });
+  });
 
-  describe('Key Pattern Matching', () => {
-    it('should return empty array when pattern matches no keys', async () => {
-      await cache.set('aaa', { data: 'test' })
-      await cache.set('bbb', { data: 'test' })
+  describe("Key Pattern Matching", () => {
+    it("should return empty array when pattern matches no keys", async () => {
+      await cache.set("aaa", { data: "test" });
+      await cache.set("bbb", { data: "test" });
 
-      const result = cache.getKeysByPattern(/^zzz:/)
-      expect(result).toEqual([])
-    })
-  })
+      const result = cache.getKeysByPattern(/^zzz:/);
+      expect(result).toEqual([]);
+    });
+  });
 
-  describe('Has with expired entry', () => {
-    it('should return false for expired memory entry', async () => {
-      await cache.set('expire-key', { data: 'test' }, { ttl: 10 })
-      await new Promise((resolve) => setTimeout(resolve, 30))
+  describe("Has with expired entry", () => {
+    it("should return false for expired memory entry", async () => {
+      await cache.set("expire-key", { data: "test" }, { ttl: 10 });
+      await new Promise((resolve) => setTimeout(resolve, 30));
 
-      const exists = await cache.has('expire-key')
-      expect(exists).toBe(false)
-    })
-  })
+      const exists = await cache.has("expire-key");
+      expect(exists).toBe(false);
+    });
+  });
 
-  describe('LRU Eviction Edge Cases', () => {
-    it('should evict oldest inserted entry when full (memory-only)', async () => {
-      const small = new BiasDetectionCache({ maxSize: 2, defaultTtl: 50000, useRedis: false })
+  describe("LRU Eviction Edge Cases", () => {
+    it("should evict oldest inserted entry when full (memory-only)", async () => {
+      const small = new BiasDetectionCache({ maxSize: 2, defaultTtl: 50000, useRedis: false });
 
-      await small.set('k1', 'v1')
-      await small.set('k2', 'v2')
+      await small.set("k1", "v1");
+      await small.set("k2", "v2");
 
       // k1 was inserted first → older lastAccessed → should be evicted
-      await small.set('k3', 'v3')
-      const keysAfter = small.getKeys()
+      await small.set("k3", "v3");
+      const keysAfter = small.getKeys();
 
-      expect(keysAfter).toHaveLength(2)
-      expect(keysAfter).toContain('k2')
-      expect(keysAfter).toContain('k3')
-      expect(keysAfter).not.toContain('k1')
-      expect(small.getStats().evictionCount).toBeGreaterThan(0)
+      expect(keysAfter).toHaveLength(2);
+      expect(keysAfter).toContain("k2");
+      expect(keysAfter).toContain("k3");
+      expect(keysAfter).not.toContain("k1");
+      expect(small.getStats().evictionCount).toBeGreaterThan(0);
 
-      await small.destroy()
-    })
-  })
+      await small.destroy();
+    });
+  });
 
-  describe('BiasAnalysisCache Invalidation Edge Cases', () => {
-    let analysisCache: BiasAnalysisCache
+  describe("BiasAnalysisCache Invalidation Edge Cases", () => {
+    let analysisCache: BiasAnalysisCache;
 
     beforeEach(() => {
-      analysisCache = new BiasAnalysisCache({ maxSize: 10, defaultTtl: 1000 })
-    })
+      analysisCache = new BiasAnalysisCache({ maxSize: 10, defaultTtl: 1000 });
+    });
 
     afterEach(() => {
-      void analysisCache.destroy()
-    })
+      void analysisCache.destroy();
+    });
 
-    it('should invalidate by gender demographics', async () => {
+    it("should invalidate by gender demographics", async () => {
       const session: TherapeuticSession = {
-        sessionId: 's1',
+        sessionId: "s1",
         timestamp: new Date(),
-        participantDemographics: { age: '25-35', gender: 'female', ethnicity: 'hispanic', primaryLanguage: 'en' },
-        scenario: { scenarioId: 'sc-1', type: 'depression', complexity: 'intermediate', tags: [], description: '' },
-        content: { patientPresentation: '', therapeuticInterventions: [], patientResponses: [], sessionNotes: '' },
+        participantDemographics: {
+          age: "25-35",
+          gender: "female",
+          ethnicity: "hispanic",
+          primaryLanguage: "en",
+        },
+        scenario: {
+          scenarioId: "sc-1",
+          type: "depression",
+          complexity: "intermediate",
+          tags: [],
+          description: "",
+        },
+        content: {
+          patientPresentation: "",
+          therapeuticInterventions: [],
+          patientResponses: [],
+          sessionNotes: "",
+        },
         aiResponses: [],
         expectedOutcomes: [],
         transcripts: [],
-        metadata: { trainingInstitution: '', traineeId: '', sessionDuration: 30, completionStatus: 'completed' },
-      }
-      await analysisCache.cacheSession(session)
+        metadata: {
+          trainingInstitution: "",
+          traineeId: "",
+          sessionDuration: 30,
+          completionStatus: "completed",
+        },
+      };
+      await analysisCache.cacheSession(session);
 
-      const invalidated = await analysisCache.invalidateByDemographics({ gender: 'female', ethnicity: 'hispanic' })
-      expect(invalidated).toBeGreaterThan(0)
-    })
+      const invalidated = await analysisCache.invalidateByDemographics({
+        gender: "female",
+        ethnicity: "hispanic",
+      });
+      expect(invalidated).toBeGreaterThan(0);
+    });
 
-    it('should return 0 when no demographics match', async () => {
-      const result = await analysisCache.invalidateByDemographics({ age: '99-99', gender: 'unknown' })
-      expect(result).toBe(0)
-    })
-  })
+    it("should return 0 when no demographics match", async () => {
+      const result = await analysisCache.invalidateByDemographics({
+        age: "99-99",
+        gender: "unknown",
+      });
+      expect(result).toBe(0);
+    });
+  });
 
-  describe('CacheManager ClearAll and Destroy', () => {
-    it('should clear all caches without error', async () => {
-      const manager = getCacheManager()
-      await expect(manager.clearAll()).resolves.not.toThrow()
-    })
+  describe("CacheManager ClearAll and Destroy", () => {
+    it("should clear all caches without error", async () => {
+      const manager = getCacheManager();
+      await expect(manager.clearAll()).resolves.not.toThrow();
+    });
 
-    it('should destroy cache manager without error', async () => {
-      const manager = getCacheManager()
-      await expect(manager.destroy()).resolves.not.toThrow()
-    })
-  })
-})
+    it("should destroy cache manager without error", async () => {
+      const manager = getCacheManager();
+      await expect(manager.destroy()).resolves.not.toThrow();
+    });
+  });
+});
 
-describe('DashboardCache Additional Coverage', () => {
-  let dashboardCache: DashboardCache
-
-  beforeEach(async () => {
-    await resetCacheManager()
-    dashboardCache = new DashboardCache({ maxSize: 10, defaultTtl: 1000 })
-  })
-
-  afterEach(() => {
-    void dashboardCache.destroy()
-  })
-
-  it('should get stats without error', () => {
-    const stats = dashboardCache.getStats()
-    expect(stats).toHaveProperty('totalEntries')
-  })
-
-  it('should invalidate all dashboards returning 0 when none cached', async () => {
-    const result = await dashboardCache.invalidateAllDashboards()
-    expect(result).toBe(0)
-  })
-
-  it('should invalidate user dashboard returning 0 for non-existent user', async () => {
-    const result = await dashboardCache.invalidateUserDashboard('non-existent')
-    expect(result).toBe(0)
-  })
-})
-
-describe('ReportCache Additional Coverage', () => {
-  let reportCache: ReportCache
+describe("DashboardCache Additional Coverage", () => {
+  let dashboardCache: DashboardCache;
 
   beforeEach(async () => {
-    await resetCacheManager()
-    reportCache = new ReportCache({ maxSize: 10, defaultTtl: 1000 })
-  })
+    await resetCacheManager();
+    dashboardCache = new DashboardCache({ maxSize: 10, defaultTtl: 1000 });
+  });
 
   afterEach(() => {
-    void reportCache.destroy()
-  })
+    void dashboardCache.destroy();
+  });
 
-  it('should get stats without error', () => {
-    const stats = reportCache.getStats()
-    expect(stats).toHaveProperty('totalEntries')
-  })
+  it("should get stats without error", () => {
+    const stats = dashboardCache.getStats();
+    expect(stats).toHaveProperty("totalEntries");
+  });
 
-  it('should return 0 when invalidating non-existent report', async () => {
-    const result = await reportCache.invalidateReport('non-existent')
-    expect(result).toBe(0)
-  })
-})
+  it("should invalidate all dashboards returning 0 when none cached", async () => {
+    const result = await dashboardCache.invalidateAllDashboards();
+    expect(result).toBe(0);
+  });
+
+  it("should invalidate user dashboard returning 0 for non-existent user", async () => {
+    const result = await dashboardCache.invalidateUserDashboard("non-existent");
+    expect(result).toBe(0);
+  });
+});
+
+describe("ReportCache Additional Coverage", () => {
+  let reportCache: ReportCache;
+
+  beforeEach(async () => {
+    await resetCacheManager();
+    reportCache = new ReportCache({ maxSize: 10, defaultTtl: 1000 });
+  });
+
+  afterEach(() => {
+    void reportCache.destroy();
+  });
+
+  it("should get stats without error", () => {
+    const stats = reportCache.getStats();
+    expect(stats).toHaveProperty("totalEntries");
+  });
+
+  it("should return 0 when invalidating non-existent report", async () => {
+    const result = await reportCache.invalidateReport("non-existent");
+    expect(result).toBe(0);
+  });
+});
