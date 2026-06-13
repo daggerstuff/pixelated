@@ -132,8 +132,8 @@ async function createUserWithLink(
     `SELECT id, role FROM users WHERE email = $1 LIMIT 1`,
     [profile.email],
   )
-  const actualId = upsertResult.rows[0]!.id
-  const actualRole = upsertResult.rows[0]!.role
+  const actualId = upsertResult.rows[0].id
+  const actualRole = upsertResult.rows[0].role
 
   // 2. Link via provider (owns the auth_accounts insert and its `provider` value)
   await provider.linkSubToInternalId(profile.sub, actualId, client)

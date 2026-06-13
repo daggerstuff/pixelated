@@ -227,7 +227,7 @@ export class SealOperations {
                   typeof bAsNumberArray[i],
               )
             }
-            coefArray[i] = bAsNumberArray[i] as number
+            coefArray[i] = bAsNumberArray[i]
           }
           batchEncoder.encode(coefArray, plaintext)
         }
@@ -475,7 +475,7 @@ export class SealOperations {
         if (currentSchemeType === SealSchemeType.CKKS) {
           const scale = Number(BigInt(1) << BigInt(40))
           const ckksEncoder = this.service.getCKKSEncoder()
-          const currentCoeff: number[] = [coefficients[0] as number]
+          const currentCoeff: number[] = [coefficients[0]]
           // Using array with single coefficient
           ckksEncoder.encode(currentCoeff, scale, plaintext)
         } else {
@@ -484,7 +484,7 @@ export class SealOperations {
           const { slotCount } = batchEncoder
           const constArray: number[] = Array.from(
             { length: slotCount },
-            () => coefficients[0] as number,
+            () => coefficients[0],
           )
           batchEncoder.encode(constArray, plaintext)
         }
@@ -512,7 +512,7 @@ export class SealOperations {
         const ckksEncoder = this.service.getCKKSEncoder()
         // Using array with single coefficient
         ckksEncoder.encode(
-          [coefficients[n] as number],
+          [coefficients[n]],
           Number(scale),
           highestCoef,
         )
@@ -520,7 +520,7 @@ export class SealOperations {
         const batchEncoder = this.service.getBatchEncoder()
         const { slotCount } = batchEncoder
         const coefArray: number[] = new Array<number>(slotCount).fill(
-          coefficients[n] as number,
+          coefficients[n],
         )
         batchEncoder.encode(coefArray, highestCoef)
       }
@@ -549,7 +549,7 @@ export class SealOperations {
           const scale = BigInt(1) << BigInt(40)
           const ckksEncoder = this.service.getCKKSEncoder()
           ckksEncoder.encode(
-            [coefficients[i] as number],
+            [coefficients[i]],
             Number(scale),
             nextCoef,
           )
@@ -557,7 +557,7 @@ export class SealOperations {
           const batchEncoder = this.service.getBatchEncoder()
           const { slotCount } = batchEncoder
           const coefArray: number[] = new Array<number>(slotCount).fill(
-            coefficients[i] as number,
+            coefficients[i],
           )
           batchEncoder.encode(coefArray, nextCoef)
         }

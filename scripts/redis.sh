@@ -8,7 +8,7 @@ REDIS_TEST_CMD=(
   pnpm
   vitest
   -c
-  config/vitest.config.ts
+  vitest.config.ts
   src/lib/services/redis/__tests__/RedisService.test.ts
   --coverage.enabled=false
 )

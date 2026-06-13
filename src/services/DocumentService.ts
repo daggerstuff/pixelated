@@ -110,7 +110,7 @@ export class DocumentService {
       data.isPublic ?? false,
     ])
 
-    return this.mapDocumentRow(result.rows[0] as DocumentRow)
+    return this.mapDocumentRow(result.rows[0])
   }
 
   async getDocument(id: string, userId: string): Promise<Document | null> {
@@ -125,7 +125,7 @@ export class DocumentService {
 
     const result = await this.db.query<DocumentRow>(query, [id, userId])
     return result.rows.length > 0
-      ? this.mapDocumentRow(result.rows[0] as DocumentRow)
+      ? this.mapDocumentRow(result.rows[0])
       : null
   }
 
@@ -153,7 +153,7 @@ export class DocumentService {
       id,
     ])
 
-    return this.mapDocumentRow(result.rows[0] as DocumentRow)
+    return this.mapDocumentRow(result.rows[0])
   }
 
   async addCollaborator(
@@ -308,11 +308,11 @@ export class DocumentService {
       createdAt:
         row.created_at instanceof Date
           ? row.created_at
-          : new Date(row.created_at as string),
+          : new Date(row.created_at),
       updatedAt:
         row.updated_at instanceof Date
           ? row.updated_at
-          : new Date(row.updated_at as string),
+          : new Date(row.updated_at),
       version: row.version,
       isPublic: row.is_public,
     }
