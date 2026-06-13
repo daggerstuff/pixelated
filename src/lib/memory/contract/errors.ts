@@ -37,6 +37,7 @@ export const MemoryApiErrorCode = {
   Conflict: 'conflict',
   PayloadTooLarge: 'payload_too_large',
   RateLimited: 'rate_limited',
+  GateBlocked: 'gate_blocked',
 
   // 5xx — server / downstream errors
   InternalError: 'internal_error',
@@ -47,6 +48,10 @@ export const MemoryApiErrorCode = {
 export type MemoryApiErrorCode =
   (typeof MemoryApiErrorCode)[keyof typeof MemoryApiErrorCode]
 
+export const MemoryApiErrorCodeSchema = z.enum([
+  ...Object.values(MemoryApiErrorCode),
+] as [MemoryApiErrorCode, ...MemoryApiErrorCode[]])
+
 /**
  * Canonical error envelope returned by every `/api/v1/memory/*` endpoint
  * on failure.
@@ -55,6 +60,9 @@ export const MemoryApiError = z
   .object({
     error: z.string().min(1),
     message: z.string().min(1),
+    code: MemoryApiErrorCodeSchema.optional(),
+    details: z.record(z.string(), z.unknown()).optional(),
+    requestId: z.string().optional(),
   })
   .strict()
 export type MemoryApiError = z.infer<typeof MemoryApiError>
@@ -153,6 +161,15 @@ export function mapGatewayError(
 export function errorBody(mapping: {
   code: string
   message: string
+  details?: Record<string, unknown>
+  requestId?: string
 }): MemoryApiError {
-  return { error: mapping.code, message: mapping.message }
+  const codeValue = MemoryApiErrorCodeSchema.safeParse(mapping.code)
+  return {
+    error: mapping.code,
+    message: mapping.message,
+    code: codeValue.success ? codeValue.data : undefined,
+    details: mapping.details,
+    requestId: mapping.requestId,
+  }
 }
