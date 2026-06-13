@@ -359,6 +359,12 @@ function buildSpec(): Record<string, unknown> {
     };
   }
 
+  // --- Common gateway errors that apply to every endpoint ---
+  const gatewayErrors: Record<string, Record<string, unknown>> = {
+    "502": errorResponse("Upstream unavailable."),
+    "504": errorResponse("Upstream timeout."),
+  };
+
   // --- Paths ---
   const paths: Record<string, unknown> = {};
 
@@ -406,6 +412,7 @@ function buildSpec(): Record<string, unknown> {
         "403": errorResponse("Forbidden."),
         "429": errorResponse("Rate limited."),
         "500": errorResponse("Internal server error."),
+        ...gatewayErrors,
       },
     },
     post: {
@@ -430,6 +437,7 @@ function buildSpec(): Record<string, unknown> {
         "413": errorResponse("Payload too large."),
         "429": errorResponse("Rate limited."),
         "500": errorResponse("Internal server error."),
+        ...gatewayErrors,
       },
     },
   };

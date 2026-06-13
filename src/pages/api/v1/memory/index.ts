@@ -1,9 +1,7 @@
 import {
-  handleGatewayError,
   jsonResponse,
   parseRequestJson,
   parseSearchParams,
-  requireAuthenticatedMemoryCaller,
   toPublicMemory,
 } from '@/lib/memory/contract/route-helpers'
 import {
@@ -32,53 +30,42 @@ import {
  *  - return the canonical error envelope on failure
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // GET /api/v1/memory — list
 // ---------------------------------------------------------------------------
 
-export const GET = async (context: { request: Request }): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
-
+export const GET = withV1Contract('listMemories', async (context, caller) => {
   const url = new URL(context.request.url)
   const params = parseSearchParams(ListMemoriesQuery, url)
   if (!params.ok) return params.response
   const { limit = 10, offset = 0, category, tags } = params.data
 
-  try {
-    const result = await getProductMemoryGateway().listMemories({
-      ...auth.caller.scope,
+  const result = await getProductMemoryGateway().listMemories({
+    ...caller.scope,
+    limit,
+    offset,
+    category,
+    tags,
+  })
+
+  const body: ListMemoriesResponse = {
+    data: result.memories.map((m) => toPublicMemory(m)),
+    pagination: Pagination.parse({
       limit,
       offset,
-      category,
-      tags,
-    })
-
-    const body: ListMemoriesResponse = {
-      data: result.memories.map((m) => toPublicMemory(m)),
-      pagination: Pagination.parse({
-        limit,
-        offset,
-        total: result.total,
-      }),
-    }
-    return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('listMemories', err)
+      total: result.total,
+    }),
   }
-}
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // POST /api/v1/memory — create
 // ---------------------------------------------------------------------------
 
-export const POST = async (context: {
-  request: Request
-}): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
-
+export const POST = withV1Contract('createMemory', async (context, caller) => {
   const parsed = await parseRequestJson(CreateMemoryRequest, context.request)
   if (!parsed.ok) return parsed.response
   const input = parsed.data
@@ -86,26 +73,22 @@ export const POST = async (context: {
   // The public contract does not accept identity fields; we attach the
   // canonical session-derived scope here. Any caller-supplied identity
   // fields would already have been rejected by the strict Zod schema.
-  try {
-    const record = await getProductMemoryGateway().createMemory({
-      ...auth.caller.scope,
-      content: input.content,
-      metadata: {
-        ...(input.category ? { category: input.category } : {}),
-        ...(input.tags ? { tags: input.tags } : {}),
-        ...(input.scope ? { scope: input.scope } : {}),
-        ...(input.retention ? { retention: input.retention } : {}),
-        ...(typeof input.importance === 'number'
-          ? { importance: input.importance }
-          : {}),
-      },
-    })
+  const record = await getProductMemoryGateway().createMemory({
+    ...caller.scope,
+    content: input.content,
+    metadata: {
+      ...(input.category ? { category: input.category } : {}),
+      ...(input.tags ? { tags: input.tags } : {}),
+      ...(input.scope ? { scope: input.scope } : {}),
+      ...(input.retention ? { retention: input.retention } : {}),
+      ...(typeof input.importance === 'number'
+        ? { importance: input.importance }
+        : {}),
+    },
+  })
 
-    const body: CreateMemoryResponse = {
-      data: toPublicMemory(record),
-    }
-    return jsonResponse(body, 201)
-  } catch (err) {
-    return handleGatewayError('createMemory', err)
+  const body: CreateMemoryResponse = {
+    data: toPublicMemory(record),
   }
-}
+  return jsonResponse(body, 201)
+})
