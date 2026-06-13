@@ -378,7 +378,7 @@ export class ThreatValidationSystemCore
       let validIndicators = 0
 
       for (let i = 0; i < indicators.length; i++) {
-        const indicator = indicators[i]!
+        const indicator = indicators[i]
         const indicatorIssues: string[] = []
 
         // Check required fields
