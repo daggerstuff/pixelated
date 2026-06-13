@@ -1,10 +1,8 @@
 import {
-  handleGatewayError,
   jsonError,
   jsonResponse,
   parseJson,
   parseRequestJson,
-  requireAuthenticatedMemoryCaller,
   toPublicMemory,
 } from '@/lib/memory/contract/route-helpers'
 import {
@@ -28,6 +26,7 @@ import {
  * REST-correct semantics.
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 function resolveMemoryId(
   params: Record<string, string | undefined> | undefined,
@@ -54,48 +53,32 @@ function resolveMemoryId(
 // GET /api/v1/memory/:memoryId
 // ---------------------------------------------------------------------------
 
-export const GET = async (context: {
-  request: Request
-  params?: Record<string, string | undefined>
-}): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
-
+export const GET = withV1Contract('getMemory', async (context, caller) => {
   const id = resolveMemoryId(context.params)
   if (!id.ok) return id.response
 
-  try {
-    const record = await getProductMemoryGateway().getMemory({
-      ...auth.caller.scope,
-      memoryId: id.memoryId,
+  const record = await getProductMemoryGateway().getMemory({
+    ...caller.scope,
+    memoryId: id.memoryId,
+  })
+  if (!record) {
+    return jsonError({
+      status: 404,
+      code: 'not_found',
+      message: 'The requested memory was not found.',
     })
-    if (!record) {
-      return jsonError({
-        status: 404,
-        code: 'not_found',
-        message: 'The requested memory was not found.',
-      })
-    }
-    const body: GetMemoryResponse = {
-      data: toPublicMemory(record),
-    }
-    return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('updateMemory', err)
   }
-}
+  const body: GetMemoryResponse = {
+    data: toPublicMemory(record),
+  }
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // PATCH /api/v1/memory/:memoryId
 // ---------------------------------------------------------------------------
 
-export const PATCH = async (context: {
-  request: Request
-  params?: Record<string, string | undefined>
-}): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
-
+export const PATCH = withV1Contract('updateMemory', async (context, caller) => {
   const id = resolveMemoryId(context.params)
   if (!id.ok) return id.response
 
@@ -103,52 +86,41 @@ export const PATCH = async (context: {
   if (!parsed.ok) return parsed.response
   const input = parsed.data
 
-  try {
-    const record = await getProductMemoryGateway().updateMemory({
-      ...auth.caller.scope,
-      memoryId: id.memoryId,
-      content: input.content,
-      metadata: {
-        ...(input.category ? { category: input.category } : {}),
-        ...(input.tags ? { tags: input.tags } : {}),
-        ...(input.scope ? { scope: input.scope } : {}),
-        ...(input.retention ? { retention: input.retention } : {}),
-        ...(typeof input.importance === 'number'
-          ? { importance: input.importance }
-          : {}),
-      },
-    })
-    const body: UpdateMemoryResponse = {
-      data: toPublicMemory(record),
-    }
-    return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('deleteMemory', err)
+  const record = await getProductMemoryGateway().updateMemory({
+    ...caller.scope,
+    memoryId: id.memoryId,
+    content: input.content,
+    metadata: {
+      ...(input.category ? { category: input.category } : {}),
+      ...(input.tags ? { tags: input.tags } : {}),
+      ...(input.scope ? { scope: input.scope } : {}),
+      ...(input.retention ? { retention: input.retention } : {}),
+      ...(typeof input.importance === 'number'
+        ? { importance: input.importance }
+        : {}),
+    },
+  })
+  const body: UpdateMemoryResponse = {
+    data: toPublicMemory(record),
   }
-}
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // DELETE /api/v1/memory/:memoryId
 // ---------------------------------------------------------------------------
 
-export const DELETE = async (context: {
-  request: Request
-  params?: Record<string, string | undefined>
-}): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
+export const DELETE = withV1Contract(
+  'deleteMemory',
+  async (context, caller) => {
+    const id = resolveMemoryId(context.params)
+    if (!id.ok) return id.response
 
-  const id = resolveMemoryId(context.params)
-  if (!id.ok) return id.response
-
-  try {
     await getProductMemoryGateway().deleteMemory({
-      ...auth.caller.scope,
+      ...caller.scope,
       memoryId: id.memoryId,
     })
     const body: DeleteMemoryResponse = { data: { id: id.memoryId } }
     return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('getMemory', err)
-  }
-}
+  },
+)
