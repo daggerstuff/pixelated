@@ -91,7 +91,7 @@ export class RateLimitAnalyticsService {
         logger.warn('Redis not available, skipping rate limit event recording')
         return
       }
-      const pipeline = redisClient['pipeline']!()
+      const pipeline = redisClient['pipeline']()
 
       // Update daily analytics
       pipeline.hincrby(analyticsKey, `${eventType}_total`, 1)
@@ -145,7 +145,7 @@ export class RateLimitAnalyticsService {
         if (!redisClient) {
           continue
         }
-        const dailyData = (await redisClient['hgetall']!(dailyKey)) ?? {}
+        const dailyData = (await redisClient['hgetall'](dailyKey)) ?? {}
 
         if (Object.keys(dailyData).length > 0) {
           const analyticsEntry: RateLimitAnalytics = {
@@ -207,7 +207,7 @@ export class RateLimitAnalyticsService {
       if (!redisClient) {
         continue
       }
-      const data = (await redisClient['hgetall']!(hourlyKey)) ?? {}
+      const data = (await redisClient['hgetall'](hourlyKey)) ?? {}
 
       if (Object.keys(data).length > 0) {
         hourlyData.push({
@@ -243,7 +243,7 @@ export class RateLimitAnalyticsService {
       if (!redisClient) {
         throw new Error('Redis not available')
       }
-      const ruleKeys = await redisClient['keys']!(
+      const ruleKeys = await redisClient['keys'](
         `${this.analyticsPrefix}*:${today}`,
       )
       let totalRequests = 0
@@ -254,7 +254,7 @@ export class RateLimitAnalyticsService {
       const identifierStats: Record<string, number> = {}
 
       for (const key of ruleKeys) {
-        const data = (await redisClient['hgetall']!(key)) ?? {}
+        const data = (await redisClient['hgetall'](key)) ?? {}
         const ruleName = key.split(':')[1] ?? 'unknown'
 
         const requests = parseInt(data.request_total ?? '0')
@@ -377,7 +377,7 @@ export class RateLimitAnalyticsService {
         return
       }
       const alertKey = `${this.alertPrefix}${Date.now()}`
-      await redisClient['setex']!(alertKey, 86400 * 7, JSON.stringify(alert)) // Keep for 7 days
+      await redisClient['setex'](alertKey, 86400 * 7, JSON.stringify(alert)) // Keep for 7 days
 
       // Execute monitor handlers
       for (const monitor of this.monitors) {
@@ -481,7 +481,7 @@ export class RateLimitAnalyticsService {
       if (!redisClient) {
         return []
       }
-      const alertKeys = await redisClient['keys']!(`${this.alertPrefix}*`)
+      const alertKeys = await redisClient['keys'](`${this.alertPrefix}*`)
       const recentKeys = (alertKeys as string[])
         .map((key: string) => ({
           key,
@@ -496,7 +496,7 @@ export class RateLimitAnalyticsService {
 
       const alerts: RateLimitAlert[] = []
       for (const key of recentKeys) {
-        const alertData = await redisClient['get']!(key)
+        const alertData = await redisClient['get'](key)
         if (alertData) {
           try {
             const parsed = this.parseJsonSafely(alertData)
@@ -668,7 +668,7 @@ export class RateLimitAnalyticsService {
       if (!redisClient) {
         return
       }
-      const keys = await redisClient['keys']!(`${this.analyticsPrefix}*`)
+      const keys = await redisClient['keys'](`${this.analyticsPrefix}*`)
       const keysToDelete = keys.filter((key: string) => {
         const keyDate = key.split(':').pop()
         return keyDate && keyDate < cutoffStr
@@ -676,7 +676,7 @@ export class RateLimitAnalyticsService {
 
       if (keysToDelete.length > 0) {
         for (const key of keysToDelete) {
-          await redisClient['del']!(key)
+          await redisClient['del'](key)
         }
         logger.info('Cleaned up old analytics data:', {
           deletedKeys: keysToDelete.length,

@@ -607,7 +607,7 @@ export class PatientResponseService {
         return candidateResponse
       }
 
-      const firstContradiction = consistencyResult.contradictionsFound[0]!
+      const firstContradiction = consistencyResult.contradictionsFound[0]
 
       let therapeuticResponse = `I find myself wanting to say, "${candidateResponse}". `
       therapeuticResponse += `It's interesting, because I also recall `

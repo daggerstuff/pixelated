@@ -57,7 +57,7 @@ export function getSkillCategory(
   // Substring mapping
   for (const key of Object.keys(SKILL_NAME_MAP)) {
     if (name.includes(key)) {
-      return SKILL_NAME_MAP[key]!
+      return SKILL_NAME_MAP[key]
     }
   }
 

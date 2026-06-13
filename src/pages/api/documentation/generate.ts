@@ -133,7 +133,7 @@ export const POST = async ({ request }: any) => {
     }
 
     // Generate documentation
-    const result = await (documentationService as any).generateDocumentation(section, options);
+    const result = await (documentationService).generateDocumentation(section, options);
 
     return new Response(JSON.stringify(result), {
       status: 200,

@@ -462,7 +462,7 @@ export class ObjectiveWeightingEngine {
     for (const [objectiveId, adjustedWeight] of Object.entries(
       adjustedWeights,
     )) {
-      const baseWeight = baseWeights[objectiveId]!
+      const baseWeight = baseWeights[objectiveId]
 
       if (Math.abs(adjustedWeight - baseWeight) > 0.01) {
         this.adjustmentHistory.push({

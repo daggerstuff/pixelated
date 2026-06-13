@@ -530,7 +530,7 @@ export class AnonymizationPipelineService {
   private getRandomCategory(_originalValue: string): string {
     // Simplified random category selection
     const categories = ['happy', 'sad', 'anxious', 'calm', 'angry', 'neutral']
-    return categories[Math.floor(Math.random() * categories.length)]!
+    return categories[Math.floor(Math.random() * categories.length)]
   }
 
   private reduceTemporalGranularity(date: Date, granularity: string): string {
