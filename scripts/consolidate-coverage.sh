@@ -71,7 +71,7 @@ if [[ "$run_ts" -eq 1 ]]; then
   if timeout "$TIMEOUT" \
     env VITEST_COVERAGE_ENABLED=true \
         VITEST_TARGET_TESTS="${VITEST_TARGET_TESTS:-}" \
-    pnpm vitest run -c config/vitest.config.ts --coverage \
+    pnpm vitest run -c vitest.config.ts --coverage \
     --reporter=verbose 2>&1; then
     ok "TypeScript coverage suite completed"
   else
