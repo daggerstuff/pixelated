@@ -1,1 +1,7 @@
-## 2026-06-13 - Password Hashing Vulnerability | Vulnerability: Storing boolean result instead of password hash | Learning: The verifyPassword function was incorrectly used during registration to generate a hash | Prevention: Ensure hashPassword is used for registration and verifyPassword is used only for authentication
+## 2026-06-13 - Password Hashing Vulnerability
+
+- **Vulnerability**: Storing boolean result instead of password hash
+- **Learning**: The verifyPassword function was incorrectly used
+  during registration to generate a hash
+- **Prevention**: Ensure hashPassword is used for registration and
+  verifyPassword is used only for authentication
