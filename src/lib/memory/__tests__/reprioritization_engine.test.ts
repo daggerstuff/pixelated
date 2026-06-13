@@ -120,9 +120,9 @@ describe('ReprioritizationEngine TS', () => {
       }
       const points = acc.ingestFeedbackDict(report as Record<string, unknown>)
       expect(points).toHaveLength(1)
-      expect(points[0]!.patternId).toBe('fp1')
-      expect(points[0]!.domain).toBe(UpstreamDomain.CURATION)
-      expect(points[0]!.severity).toBe(EvidenceSeverity.HIGH)
+      expect(points[0].patternId).toBe('fp1')
+      expect(points[0].domain).toBe(UpstreamDomain.CURATION)
+      expect(points[0].severity).toBe(EvidenceSeverity.HIGH)
     })
 
     it('getActionablePatterns returns only actionable accumulations', () => {
@@ -232,7 +232,7 @@ describe('ReprioritizationEngine TS', () => {
       const report = makeFeedbackReport('e1', 'high', 0.7)
       const points = engine.loadFeedbackDict(report)
       expect(points).toHaveLength(1)
-      expect(points[0]!.patternId).toBe('e1')
+      expect(points[0].patternId).toBe('e1')
     })
 
     it('runReprioritization creates backlog item for actionable pattern', async () => {
@@ -258,8 +258,8 @@ describe('ReprioritizationEngine TS', () => {
 
       expect(criticalReport.newBacklogItems.length).toBeGreaterThan(0)
       expect(mediumReport.newBacklogItems.length).toBeGreaterThan(0)
-      const criticalScore = criticalReport.newBacklogItems[0]!.priorityScore
-      const mediumScore = mediumReport.newBacklogItems[0]!.priorityScore
+      const criticalScore = criticalReport.newBacklogItems[0].priorityScore
+      const mediumScore = mediumReport.newBacklogItems[0].priorityScore
       expect(criticalScore).toBeGreaterThan(mediumScore)
     })
 
@@ -278,8 +278,8 @@ describe('ReprioritizationEngine TS', () => {
       await engine.runReprioritization()
       const backlog = engine.getBacklog()
       for (let i = 1; i < backlog.length; i++) {
-        expect(backlog[i - 1]!.priorityScore).toBeGreaterThanOrEqual(
-          backlog[i]!.priorityScore,
+        expect(backlog[i - 1].priorityScore).toBeGreaterThanOrEqual(
+          backlog[i].priorityScore,
         )
       }
     })
