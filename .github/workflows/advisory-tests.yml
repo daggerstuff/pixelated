@@ -10,7 +10,7 @@ on:
       - 'src/**'
       - 'ai/**'
       - 'tests/**'
-      - 'config/vitest.config.ts'
+      - 'vitest.config.ts'
       - 'scripts/testing/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
