@@ -244,7 +244,7 @@ class IndexedDBRequestQueue {
 
     try {
       while (this.queue.length > 0) {
-        const request = this.queue[0]! // Get the highest priority request
+        const request = this.queue[0] // Get the highest priority request
 
         try {
           const response = await fetch(request.url, {

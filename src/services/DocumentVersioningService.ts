@@ -185,7 +185,7 @@ export class DocumentVersioningService {
     const fileResult = await db.execute(
       sql`SELECT * FROM files WHERE id = ${fileId} LIMIT 1`,
     )
-    const fileRow = fileResult.rows[0] as Record<string, unknown>
+    const fileRow = fileResult.rows[0]
 
     if (!fileRow) {
       throw new Error('File not found')
@@ -234,7 +234,7 @@ export class DocumentVersioningService {
     return {
       file,
       versions,
-      currentVersion: currentVersion as DocumentVersion,
+      currentVersion: currentVersion,
     }
   }
 
@@ -250,7 +250,7 @@ export class DocumentVersioningService {
       const result = await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${targetVersion} LIMIT 1`,
       )
-      const targetVersionRow = result.rows[0] as Record<string, unknown>
+      const targetVersionRow = result.rows[0]
 
       if (!targetVersionRow) {
         throw new Error('Target version not found')
@@ -274,7 +274,7 @@ export class DocumentVersioningService {
       const result = (await tx.execute(
         sql`SELECT * FROM file_versions WHERE file_id = ${fileId} AND version = ${version} LIMIT 1`,
       )) as unknown as { rows: Record<string, unknown>[] }
-      const versionRow = result.rows[0] as Record<string, unknown>
+      const versionRow = result.rows[0]
 
       if (!versionRow) {
         throw new Error('Version not found')

@@ -415,7 +415,7 @@ export class PatternDiscoveryService {
     const n = x.length;
     const sumX = x.reduce((a, b) => a + b, 0);
     const sumY = y.reduce((a, b) => a + b, 0);
-    const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i]!, 0);
+    const sumXY = x.reduce((sum, xi, i) => sum + xi * y[i], 0);
     const sumXX = x.reduce((sum, xi) => sum + xi * xi, 0);
 
     const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
@@ -424,7 +424,7 @@ export class PatternDiscoveryService {
     const yMean = sumY / n;
     const ssTotal = y.reduce((sum, yi) => sum + Math.pow(yi - yMean, 2), 0);
     const ssResidual = y.reduce(
-      (sum, yi, i) => sum + Math.pow(yi - (slope * x[i]! + intercept), 2),
+      (sum, yi, i) => sum + Math.pow(yi - (slope * x[i] + intercept), 2),
       0,
     );
     const rSquared = 1 - ssResidual / ssTotal;
@@ -438,8 +438,8 @@ export class PatternDiscoveryService {
       direction = "decreasing";
     }
 
-    const firstTimestamp = data[0]!["timestamp"];
-    const lastTimestamp = data[data.length - 1]!["timestamp"];
+    const firstTimestamp = data[0]["timestamp"];
+    const lastTimestamp = data[data.length - 1]["timestamp"];
 
     return {
       metric,
@@ -518,16 +518,16 @@ export class PatternDiscoveryService {
         .map(() => []);
       vectors.forEach((vector, index) => {
         const nearest = this.findNearestCentroid(vector, centroids);
-        clusters[nearest]!.push(index);
+        clusters[nearest].push(index);
       });
 
       // Update centroids
       const newCentroids: number[][] = clusters.map((cluster) => {
-        if (cluster.length === 0) return centroids[clusters.indexOf(cluster)]!;
+        if (cluster.length === 0) return centroids[clusters.indexOf(cluster)];
 
         const sum = Array(features.length).fill(0);
         cluster.forEach((index) => {
-          vectors[index]!.forEach((val, i) => (sum[i] += val));
+          vectors[index].forEach((val, i) => (sum[i] += val));
         });
         return sum.map((val) => val / cluster.length);
       });
@@ -543,14 +543,14 @@ export class PatternDiscoveryService {
     // Create cluster patterns
     return clusters.map((cluster, index) => ({
       clusterId: `cluster_${index + 1}`,
-      centroid: Object.fromEntries(features.map((feature, i) => [feature, centroids[index]![i]!])),
+      centroid: Object.fromEntries(features.map((feature, i) => [feature, centroids[index][i]])),
       members: cluster.map((i) => {
-        const clientId = data[i]!["client_id"];
+        const clientId = data[i]["client_id"];
         return typeof clientId === "string" ? clientId : `client_${i}`;
       }),
       size: cluster.length,
       characteristics: this.describeClusterCharacteristics(
-        cluster.map((i) => data[i]!).filter(Boolean),
+        cluster.map((i) => data[i]).filter(Boolean),
         features,
       ),
     })) as any;
@@ -579,7 +579,7 @@ export class PatternDiscoveryService {
 
     centroids.forEach((centroid, index) => {
       const distance = Math.sqrt(
-        vector.reduce((sum, val, i) => sum + Math.pow(val - centroid[i]!, 2), 0),
+        vector.reduce((sum, val, i) => sum + Math.pow(val - centroid[i], 2), 0),
       );
       if (distance < minDistance) {
         minDistance = distance;
@@ -594,7 +594,7 @@ export class PatternDiscoveryService {
     const threshold = 0.001;
     return oldCentroids.every(
       (old, i) =>
-        Math.sqrt(old.reduce((sum, val, j) => sum + Math.pow(val - newCentroids[i]![j]!, 2), 0)) <
+        Math.sqrt(old.reduce((sum, val, j) => sum + Math.pow(val - newCentroids[i][j], 2), 0)) <
         threshold,
     );
   }

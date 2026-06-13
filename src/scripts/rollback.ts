@@ -94,13 +94,13 @@ async function getLastStableVersion(
       if (tags.length >= 2) {
         const rollbackTag = tags[1]
         console.log(`Using tag ${rollbackTag} for rollback`)
-        return rollbackTag!
+        return rollbackTag
       } else if (tags.length === 1) {
         console.log(`Only one production tag found: ${tags[0]}`)
         // Use it if explicitly allowed through options
         if (options.fallbackBranch === 'use-current-tag') {
           console.log('Using the only available tag for rollback')
-          return tags[0]!
+          return tags[0]
         }
       }
     } else {

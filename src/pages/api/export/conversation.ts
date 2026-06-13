@@ -55,8 +55,8 @@ export const GET: APIRoute = async ({ request }) => {
     logger.error("Export API info error:", error);
     return new Response(
       JSON.stringify({
-        error: "Failed to get endpoint information",
-        message: error instanceof Error ? String(error) : "Unknown error",
+        error: 'Failed to get endpoint information',
+        message: 'An unexpected error occurred',
       }),
       {
         status: 500,
