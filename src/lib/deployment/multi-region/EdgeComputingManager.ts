@@ -2214,7 +2214,7 @@ export class EdgeComputingManager extends EventEmitter {
 
       const statuses: EdgeNodeStatus[] = []
       results.forEach((result, index) => {
-        const location = this.config.locations[index]!
+        const location = this.config.locations[index]
         if (result.status === 'fulfilled') {
           statuses.push(result.value)
         } else {

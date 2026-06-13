@@ -41,11 +41,11 @@ describe('analyzeTherapeuticTechniques', () => {
     )
     expect(result).toHaveProperty('reflection')
     // 0.7 base + 0.3 * (1/3 reflection patterns matched) = 0.8
-    expect(result['reflection']!).toBeCloseTo(0.8, 1)
+    expect(result['reflection']).toBeCloseTo(0.8, 1)
 
     expect(result).toHaveProperty('open_question')
     // 0.7 base + 0.3 * (1/4 open_question patterns matched) = 0.775
-    expect(result['open_question']!).toBeCloseTo(0.775, 3)
+    expect(result['open_question']).toBeCloseTo(0.775, 3)
   })
 })
 

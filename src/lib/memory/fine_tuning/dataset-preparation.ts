@@ -54,7 +54,7 @@ export class DatasetPreparator {
     const result = [...array]
     for (let i = result.length - 1; i > 0; i--) {
       const j = Math.floor(this.nextRandom() * (i + 1))
-      const tmp = result[i]!
+      const tmp = result[i]
       result[i] = result[j]!
       result[j] = tmp
     }
@@ -80,7 +80,7 @@ export class DatasetPreparator {
     const examples: TrainingExample[] = []
     for (const [sessionId, sessionMemories] of Object.entries(sessionGroups)) {
       for (let i = 0; i < sessionMemories.length; i++) {
-        const memory = sessionMemories[i]!
+        const memory = sessionMemories[i]
         const priorContext = sessionMemories
           .slice(0, i)
           .map((m) => m.content)
@@ -111,9 +111,9 @@ export class DatasetPreparator {
     }
     for (const ex of examples) {
       const v = (ex.metadata['valence'] as number) ?? 0
-      if (v < -0.2) buckets['negative']!.push(ex)
-      else if (v > 0.2) buckets['positive']!.push(ex)
-      else buckets['neutral']!.push(ex)
+      if (v < -0.2) buckets['negative'].push(ex)
+      else if (v > 0.2) buckets['positive'].push(ex)
+      else buckets['neutral'].push(ex)
     }
 
     const maxSize = Math.max(...Object.values(buckets).map((b) => b.length), 1)
