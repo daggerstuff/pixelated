@@ -1,0 +1,66 @@
+{
+  "title": "Clinical Validity Metrics",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Clinical Pass Rate",
+      "targets": [
+        { "expr": "clinical_validity_pass_rate" }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Mean Validity Score",
+      "targets": [
+        { "expr": "clinical_validity_mean" }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Total Samples Evaluated",
+      "targets": [
+        { "expr": "clinical_validity_total_samples" }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 }
+    },
+    {
+      "type": "stat",
+      "title": "Crisis Prompts",
+      "targets": [
+        { "expr": "clinical_validity_crisis_prompts" }
+      ],
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Crisis Citation Rate",
+      "targets": [
+        { "expr": "clinical_validity_crisis_citation_rate" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Safety Failure Count",
+      "targets": [
+        { "expr": "clinical_validity_safety_failure_count" }
+      ],
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Response Length Distribution",
+      "targets": [
+        { "expr": "clinical_validity_response_length_mean" },
+        { "expr": "clinical_validity_response_length_p50" },
+        { "expr": "clinical_validity_response_length_p95" }
+      ],
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 12 }
+    }
+  ],
+  "schemaVersion": 36,
+  "version": 1
+}
