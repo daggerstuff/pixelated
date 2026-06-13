@@ -19,10 +19,10 @@ dependencies = [
   "lime",
   "scikit-image>=0.26.0",
   "spacy>=3.8.14", # Updated to latest secure version
-  "nltk>=3.9.3", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip)
+  "nltk>=3.9.4", # Fixes GHSA-pg7x-xvh5-64q5 / CVE-2025-14009 (Zip Slip) and GHSA-7p94-766c-hgjp
   "evaluate",
-  "cryptography>=46.0.5", # Updated to latest secure version
-  "requests>=2.32.4", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
+  "cryptography>=46.0.6", # Updated to latest secure version
+  "requests>=2.33.0", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv>=1.2.1", # Updated to latest secure version
   "click<9.0",
   "numba>=0.63.1",
@@ -33,6 +33,7 @@ dependencies = [
   "pydub>=0.25.1",
   "pyarrow>=22.0.0",
   "hatch>=1.14.1",
+  "Pygments>=2.20.0", # Fixes GHSA-5239-wwwm-4pmq (ReDoS)
   "textstat>=0.7.8",
   "seaborn>=0.13.2",
   "plotly>=6.2.0",
@@ -88,7 +89,7 @@ dependencies = [
   "google-auth-oauthlib>=1.2.1",
   "rich>=13.7.0",
   "ngcsdk>=4.16.0",
-  "onnx>=1.20.1",
+  "onnx>=1.21.0", # Fixes GHSA-hqmj-h5c6-369m, GHSA-p433-9wv8-28xj, GHSA-cmw6-hcpp-c6jp
   "onnxscript>=0.6.2",
   "fastapi>=0.124.4",
   "uvicorn>=0.44.0",

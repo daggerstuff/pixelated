@@ -54,9 +54,10 @@ overrides:
   drizzle-orm: ^0.45.2
   effect: '>=3.20.0'
   esbuild: ^0.28.0
+  ajv: ^8.18.0
   eslint>ajv: ^6.14.0
   eslint>minimatch: ^3.1.4
-  express: '>=4.19.2'
+  express: '>=4.20.0'
   fast-xml-parser: 5.7.0
   follow-redirects: '>=1.16.0'
   glob: ^13.0.0
@@ -71,6 +72,16 @@ overrides:
   kysely: '>=0.28.14'
   langsmith: '>=0.4.6'
   lodash: ^4.18.0
+  multer: ^2.1.1
+  basic-ftp: '>=5.2.0'
+  flatted: ^3.4.2
+  serialize-javascript: ^8.0.0
+  body-parser: '>=1.20.3'
+  express-rate-limit: '>=8.2.2'
+  send: '>=0.19.0'
+  serve-static: '>=1.16.0'
+  handlebars: '>=4.7.9'
+  smol-toml: '>=1.6.1'
   minimatch: ^10.2.3
   node-domexception: ^2.0.1
   node-forge: '>=1.4.0'
@@ -86,7 +97,7 @@ overrides:
   scmp: 2.1.0
   sitemap: ^9.0.0
   socket.io-parser: '>=4.2.6'
-  tar: ^7.5.7
+  tar: ^7.5.11
   tmp: '>=0.2.4'
   undici: ^7.25.0
   unocss: ^66.7.0
@@ -372,13 +383,13 @@ importers:
         specifier: latest
         version: 3.3.0
       express:
-        specifier: '>=4.19.2'
+        specifier: '>=4.20.0'
         version: 5.2.1
       express-openid-connect:
         specifier: ^3.0.0
         version: 3.0.0(express@5.2.1)
       express-rate-limit:
-        specifier: latest
+        specifier: '>=8.2.2'
         version: 8.5.2(express@5.2.1)
       flexsearch:
         specifier: latest
@@ -534,7 +545,7 @@ importers:
         specifier: latest
         version: 3.6.0
       tar:
-        specifier: ^7.5.7
+        specifier: ^7.5.11
         version: 7.5.16
       twilio:
         specifier: latest
@@ -946,10 +957,10 @@ importers:
         specifier: ^17.4.2
         version: 17.4.2
       express:
-        specifier: '>=4.19.2'
+        specifier: '>=4.20.0'
         version: 5.2.1
       express-rate-limit:
-        specifier: ^8.5.1
+        specifier: '>=8.2.2'
         version: 8.5.2(express@5.2.1)
       gray-matter:
         specifier: ^4.0.3
@@ -5903,7 +5914,7 @@ packages:
   ajv-draft-04@1.0.0:
     resolution: {integrity: sha512-mv00Te6nmYbRp5DCwclxtt7yV/joXJPGS7nM+97GdxvuttCOfgI3K4U25zboyeX0O+myI8ERluxQe5wljMmVIw==}
     peerDependencies:
-      ajv: ^8.5.0
+      ajv: ^8.18.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -5911,7 +5922,7 @@ packages:
   ajv-formats@3.0.1:
     resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
     peerDependencies:
-      ajv: ^8.0.0
+      ajv: ^8.18.0
     peerDependenciesMeta:
       ajv:
         optional: true
@@ -7398,13 +7409,13 @@ packages:
     resolution: {integrity: sha512-aJCMwSCNhMQe29SP/BkJsDNj0QGe3bssoeI1veLhlm9q/ZZdGWfhiP6r6wstKNIXLy6nrDiywPMuxb7g+SxgDg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >= 23.0.0}
     peerDependencies:
-      express: '>=4.19.2'
+      express: '>=4.20.0'
 
   express-rate-limit@8.5.2:
     resolution: {integrity: sha512-5Kb34ipNX694DH48vN9irak1Qx30nb0PLYHXfJgw4YEjiC3ZEmZJhwOp+VfiCYwFzvFTdB9QkArYS5kXa2cx2A==}
     engines: {node: '>= 16'}
     peerDependencies:
-      express: '>=4.19.2'
+      express: '>=4.20.0'
 
   express@5.2.1:
     resolution: {integrity: sha512-hIS4idWWai69NezIdRt2xFVofaF4j+6INOpJlVOLDO8zXGpUVEVzIYk12UUi2JzjEzWL3IOAxcTubgz9Po0yXw==}
@@ -13082,7 +13093,7 @@ snapshots:
 
   '@eslint/eslintrc@3.3.5':
     dependencies:
-      ajv: 6.15.0
+      ajv: 8.20.0
       debug: 4.4.3
       espree: 10.4.0
       globals: 14.0.0
@@ -16729,7 +16740,7 @@ snapshots:
       path-to-regexp: 6.3.0
       path-to-regexp-updated: path-to-regexp@6.3.0
     optionalDependencies:
-      ajv: 6.15.0
+      ajv: 8.20.0
 
   '@vercel/speed-insights@2.0.0(react@19.2.7)(vue@3.5.38(typescript@6.0.3))':
     optionalDependencies:
