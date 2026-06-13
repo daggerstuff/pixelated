@@ -40,7 +40,7 @@ export class SessionConsolidator {
     if (memories.length === 0)
       throw new Error('Cannot consolidate empty memory list')
 
-    const first = memories[0]!
+    const first = memories[0]
     const tenantId = first.tenantId
     const sessionId = first.sessionId
     const themes = this.extractThemes(memories)
@@ -91,8 +91,8 @@ export class SessionConsolidator {
       }
     }
 
-    const start = valences[0]!
-    const end = valences[valences.length - 1]!
+    const start = valences[0]
+    const end = valences[valences.length - 1]
     const avg = valences.reduce((s, v) => s + v, 0) / valences.length
     const minV = Math.min(...valences)
     const maxV = Math.max(...valences)

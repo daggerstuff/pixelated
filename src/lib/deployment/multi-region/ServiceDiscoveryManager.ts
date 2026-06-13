@@ -1106,8 +1106,8 @@ export class ServiceDiscoveryManager extends EventEmitter {
         const parts = key.split('/')
         const parsed = toDiscoveredServiceInstance(
           serviceName,
-          parts[parts.length - 2]!,
-          parts[parts.length - 1]!,
+          parts[parts.length - 2],
+          parts[parts.length - 1],
           JSON.parse(value),
         )
 
@@ -1727,7 +1727,7 @@ class LoadBalancer {
   }
 
   private roundRobin(instances: ServiceInstance[]): ServiceInstance {
-    const instance = instances[this.currentIndex % instances.length]!
+    const instance = instances[this.currentIndex % instances.length]
     this.currentIndex++
     return instance
   }
@@ -1741,25 +1741,25 @@ class LoadBalancer {
   private leastConnections(instances: ServiceInstance[]): ServiceInstance {
     // Return instance with least connections
     // This would typically use connection metrics
-    return instances[0]!
+    return instances[0]
   }
 
   private random(instances: ServiceInstance[]): ServiceInstance {
     const index = Math.floor(Math.random() * instances.length)
-    return instances[index]!
+    return instances[index]
   }
 
   private geoProximity(
     instances: ServiceInstance[],
     clientRegion?: string,
   ): ServiceInstance {
-    if (!clientRegion) return instances[0]!
+    if (!clientRegion) return instances[0]
 
     // Find instance in same region or closest region
     const sameRegion = instances.find((i) => i.region === clientRegion)
     if (sameRegion) return sameRegion
 
-    return instances[0]!
+    return instances[0]
   }
 
   updateInstances(instances: ServiceInstance[]): void {

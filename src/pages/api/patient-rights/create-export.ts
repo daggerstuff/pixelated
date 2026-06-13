@@ -30,7 +30,7 @@ async function therapistHasSessionWithPatient(
       ) AS exists`,
       [therapistId, patientId],
     )
-    return result.rows[0]?.exists === true
+    return  result.rows[0]?.exists
   } catch (err) {
     // If DB is unavailable we fail closed — deny access
     logger.error('Failed to verify therapist-patient assignment', {
