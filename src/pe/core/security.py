@@ -9,16 +9,16 @@ Implements the authentication strategy from ADR-001:
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any
 
 import bcrypt
 import jwt
 import structlog
 from pydantic import ValidationError
 
-logger = structlog.get_logger(__name__)
-
 from src.pe.config import settings
+
+logger = structlog.get_logger(__name__)
 
 
 def create_access_token(

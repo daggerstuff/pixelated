@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.pe.core.security import decode_access_token
@@ -14,7 +15,7 @@ from src.pe.database import async_session_factory
 security_scheme = HTTPBearer(auto_error=False)
 
 
-async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_db_session() -> AsyncGenerator[AsyncSession]:
     """Provide an async DB session without RLS context.
 
     For endpoints that need RLS isolation, use `get_rls_session` instead.
@@ -68,14 +69,12 @@ async def get_current_user(
 
 async def get_rls_session(
     current_user: dict = Depends(get_current_user),
-) -> AsyncGenerator[AsyncSession, None]:
+) -> AsyncGenerator[AsyncSession]:
     """Provide a DB session with RLS context set from the JWT.
 
     Sets app.tenant_id, app.user_id, and app.user_role so that
     PostgreSQL RLS policies enforce tenant isolation.
     """
-    from sqlalchemy import text
-
     async with async_session_factory() as session:
         try:
             await session.execute(

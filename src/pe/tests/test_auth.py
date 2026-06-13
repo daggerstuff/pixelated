@@ -3,7 +3,7 @@
 import pytest
 from httpx import AsyncClient
 
-from src.pe.core.security import create_access_token, hash_password
+from src.pe.core.security import create_access_token, hash_password, verify_password
 
 
 class TestAuthEndpoints:
@@ -26,19 +26,25 @@ class TestAuthEndpoints:
     @pytest.mark.asyncio
     async def test_login_invalid_credentials(self, client: AsyncClient):
         """Login with bad credentials should return 401."""
-        response = await client.post("/api/v1/auth/login", json={
-            "email": "nonexistent@test.com",
-            "password": "wrongpassword123",
-        })
+        response = await client.post(
+            "/api/v1/auth/login",
+            json={
+                "email": "nonexistent@test.com",
+                "password": "wrongpassword123",
+            },
+        )
         assert response.status_code == 401
         assert "Invalid email or password" in response.text
 
     @pytest.mark.asyncio
     async def test_refresh_invalid_token(self, client: AsyncClient):
         """Refresh with invalid token should return 401."""
-        response = await client.post("/api/v1/auth/refresh", json={
-            "refresh_token": "invalid-token-here",
-        })
+        response = await client.post(
+            "/api/v1/auth/refresh",
+            json={
+                "refresh_token": "invalid-token-here",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
@@ -56,31 +62,40 @@ class TestAuthEndpoints:
     @pytest.mark.asyncio
     async def test_create_user_no_auth(self, client: AsyncClient):
         """Creating a user without auth should return 401."""
-        response = await client.post("/api/v1/auth/users", json={
-            "email": "test@example.com",
-            "display_name": "Test User",
-            "password": "SecurePass123!",
-            "role": "learner",
-        })
+        response = await client.post(
+            "/api/v1/auth/users",
+            json={
+                "email": "test@example.com",
+                "display_name": "Test User",
+                "password": "SecurePass123!",
+                "role": "learner",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_create_institution_no_auth(self, client: AsyncClient):
         """Creating institution without auth should return 401."""
-        response = await client.post("/api/v1/auth/institutions", json={
-            "name": "Test Medical School",
-            "slug": "test-medical",
-            "institution_type": "medical_school",
-        })
+        response = await client.post(
+            "/api/v1/auth/institutions",
+            json={
+                "name": "Test Medical School",
+                "slug": "test-medical",
+                "institution_type": "medical_school",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_create_api_key_no_auth(self, client: AsyncClient):
         """Creating API key without auth should return 401."""
-        response = await client.post("/api/v1/auth/api-keys", json={
-            "label": "Test Key",
-            "role": "manager",
-        })
+        response = await client.post(
+            "/api/v1/auth/api-keys",
+            json={
+                "label": "Test Key",
+                "role": "manager",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
@@ -104,7 +119,6 @@ class TestSecurityUnit:
 
     def test_password_hashing(self):
         """Password hashing should work correctly."""
-        from src.pe.core.security import hash_password, verify_password
         pw = "TestPassword123!"
         hashed = hash_password(pw)
         assert verify_password(pw, hashed) is True

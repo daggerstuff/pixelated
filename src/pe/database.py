@@ -9,7 +9,6 @@ Implements the tenant isolation strategy from ADR-001:
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Optional
 
 import structlog
 from sqlalchemy import text

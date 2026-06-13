@@ -3,9 +3,9 @@
 import structlog
 from fastapi import APIRouter
 
-logger = structlog.get_logger(__name__)
-
 from src.pe.database import check_connection
+
+logger = structlog.get_logger(__name__)
 
 router = APIRouter(tags=["health"])
 
@@ -20,7 +20,7 @@ async def health_check():
             "version": "0.1.0",
             "database": db_status,
         }
-    except Exception as exc:
+    except Exception:
         logger.exception("Health check failed")
         return {
             "status": "degraded",

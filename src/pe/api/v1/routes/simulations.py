@@ -10,22 +10,26 @@ Implements:
 from __future__ import annotations
 
 import json
+import traceback
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from pydantic import BaseModel, Field
-from sqlalchemy import select, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.pe.core.dependencies import get_current_user, get_db_session, get_rls_session
+from src.pe.core.dependencies import get_rls_session
 from src.pe.core.rbac import UserRole, role_at_least
+from src.pe.core.security import decode_access_token
+from src.pe.database import async_session_factory
 
 router = APIRouter(prefix="/simulations", tags=["simulations"])
 
 
 # ── Schemas ───────────────────────────────────────────────────────
+
 
 class CreateSimulationRequest(BaseModel):
     scenario_id: str = Field(..., description="UUID of the scenario to simulate")
@@ -51,6 +55,7 @@ class SimulationStateUpdate(BaseModel):
 
 
 # ── WebSocket Connection Manager ──────────────────────────────────
+
 
 class ConnectionManager:
     """Manages active WebSocket connections per session."""
@@ -90,11 +95,12 @@ manager = ConnectionManager()
 
 # ── Celery Integration (async stub) ───────────────────────────────
 
+
 async def trigger_celery_chain(
-    session_id: str,
-    user_input: str,
-    tenant_id: str,
-    user_id: str,
+    _session_id: str,
+    _user_input: str,
+    _tenant_id: str,
+    _user_id: str,
 ) -> str | None:
     """Trigger the Celery orchestration chain.
 
@@ -115,6 +121,7 @@ async def trigger_celery_chain(
 
 
 # ── Simulation CRUD Endpoints ─────────────────────────────────────
+
 
 @router.post("", response_model=SimulationResponse, status_code=status.HTTP_201_CREATED)
 async def create_simulation(
@@ -164,7 +171,7 @@ async def create_simulation(
     )
 
     # Create persona instances for each persona in the config
-    for i, persona_ref in enumerate(persona_config):
+    for _i, persona_ref in enumerate(persona_config):
         persona_def_id = persona_ref.get("persona_definition_id") if isinstance(persona_ref, dict) else persona_ref
         if persona_def_id:
             await session.execute(
@@ -441,8 +448,9 @@ async def abort_simulation(
 
 # ── WebSocket Endpoint ─────────────────────────────────────────────
 
+
 @router.websocket("/ws/{session_id}")
-async def simulation_websocket(
+async def simulation_websocket(  # noqa: PLR0912, PLR0915
     ws: WebSocket,
     session_id: str,
     token: str | None = None,
@@ -462,8 +470,6 @@ async def simulation_websocket(
           payload: { message?, state?, vitals?, decision?, results_url?, error? } }
     """
     # Validate token
-    from src.pe.core.security import decode_access_token
-
     if token:
         payload = decode_access_token(token)
         if payload is None:
@@ -477,9 +483,7 @@ async def simulation_websocket(
         return
 
     # Verify session_id belongs to the user's tenant
-    from src.pe.database import async_session_factory
     async with async_session_factory() as verify_session:
-        from sqlalchemy import text
         result = await verify_session.execute(
             text("SELECT id FROM pe.simulation_sessions WHERE id = :sid AND institution_id = :tid"),
             {"sid": session_id, "tid": tenant_id},
@@ -491,9 +495,6 @@ async def simulation_websocket(
     await manager.connect(session_id, ws)
 
     try:
-        # Import session-scoped DB session
-        from src.pe.database import async_session_factory
-
         while True:
             data = await ws.receive_text()
             client_msg = json.loads(data)
@@ -581,10 +582,13 @@ async def simulation_websocket(
                         {"id": session_id},
                     )
                     await db_session.commit()
-                await manager.broadcast(session_id, {
-                    "type": "state_update",
-                    "payload": {"state": {"current": "paused"}},
-                })
+                await manager.broadcast(
+                    session_id,
+                    {
+                        "type": "state_update",
+                        "payload": {"state": {"current": "paused"}},
+                    },
+                )
 
             elif msg_type == "resume":
                 async with async_session_factory() as db_session:
@@ -604,10 +608,13 @@ async def simulation_websocket(
                         {"id": session_id},
                     )
                     await db_session.commit()
-                await manager.broadcast(session_id, {
-                    "type": "state_update",
-                    "payload": {"state": {"current": "active"}},
-                })
+                await manager.broadcast(
+                    session_id,
+                    {
+                        "type": "state_update",
+                        "payload": {"state": {"current": "active"}},
+                    },
+                )
 
             elif msg_type == "end":
                 async with async_session_factory() as db_session:
@@ -624,37 +631,45 @@ async def simulation_websocket(
                         {"id": session_id},
                     )
                     await db_session.commit()
-                await manager.broadcast(session_id, {
-                    "type": "simulation_end",
-                    "payload": {"reason": "user_ended"},
-                })
+                await manager.broadcast(
+                    session_id,
+                    {
+                        "type": "simulation_end",
+                        "payload": {"reason": "user_ended"},
+                    },
+                )
                 break
 
             elif msg_type == "decision_response":
                 # Handle clinical decision responses
                 decision_id = msg_payload.get("decision_id")
                 option_id = msg_payload.get("option_id")
-                await manager.broadcast(session_id, {
-                    "type": "state_update",
-                    "payload": {
-                        "state": {
-                            "current": "assessment",
-                            "variables": {
-                                "decision_id": decision_id,
-                                "selected_option": option_id,
+                await manager.broadcast(
+                    session_id,
+                    {
+                        "type": "state_update",
+                        "payload": {
+                            "state": {
+                                "current": "assessment",
+                                "variables": {
+                                    "decision_id": decision_id,
+                                    "selected_option": option_id,
+                                },
                             },
                         },
                     },
-                })
+                )
 
     except WebSocketDisconnect:
         pass
     except Exception:
-        import traceback
         traceback.print_exc()
-        await manager.broadcast(session_id, {
-            "type": "error",
-            "payload": {"error": "Internal server error"},
-        })
+        await manager.broadcast(
+            session_id,
+            {
+                "type": "error",
+                "payload": {"error": "Internal server error"},
+            },
+        )
     finally:
         manager.disconnect(session_id, ws)

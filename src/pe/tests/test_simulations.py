@@ -1,7 +1,8 @@
 """Tests for simulation session API endpoints."""
 
 import pytest
-from httpx import AsyncClient, ASGITransport
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
 
 from src.pe.core.security import create_access_token
 from src.pe.main import app
@@ -27,18 +28,25 @@ class TestSimulationEndpoints:
     @pytest.mark.asyncio
     async def test_create_simulation_no_auth(self, client: AsyncClient):
         """Creating a simulation without auth should 401."""
-        response = await client.post("/api/v1/simulations", json={
-            "scenario_id": "00000000-0000-0000-0000-000000000001",
-        })
+        response = await client.post(
+            "/api/v1/simulations",
+            json={
+                "scenario_id": "00000000-0000-0000-0000-000000000001",
+            },
+        )
         assert response.status_code == 401
 
     @pytest.mark.asyncio
     async def test_create_simulation_learner_forbidden(self, client: AsyncClient):
         """Learners should not be able to create simulations."""
         headers = {"Authorization": f"Bearer {_make_token('learner')}"}
-        response = await client.post("/api/v1/simulations", json={
-            "scenario_id": "00000000-0000-0000-0000-000000000001",
-        }, headers=headers)
+        response = await client.post(
+            "/api/v1/simulations",
+            json={
+                "scenario_id": "00000000-0000-0000-0000-000000000001",
+            },
+            headers=headers,
+        )
         assert response.status_code == 403
 
     @pytest.mark.asyncio
@@ -140,20 +148,16 @@ class TestWebSocketEndpoint:
     @pytest.mark.asyncio
     async def test_ws_no_token_rejected(self):
         """WebSocket without token should be rejected."""
-        from fastapi.testclient import TestClient
-
         client = TestClient(app)
         with client.websocket_connect(
             "/api/v1/simulations/ws/test-session",
-        ) as ws:
+        ):
             # Should get a close frame
             pass  # We expect the connection to be closed
 
     @pytest.mark.asyncio
     async def test_ws_with_valid_token(self):
         """WebSocket with valid token should connect."""
-        from fastapi.testclient import TestClient
-
         token = _make_token("learner")
         client = TestClient(app)
         try:
@@ -161,11 +165,13 @@ class TestWebSocketEndpoint:
                 f"/api/v1/simulations/ws/test-session?token={token}",
             ) as ws:
                 # Should connect successfully
-                ws.send_json({
-                    "type": "chat_message",
-                    "payload": {"text": "Hello doctor"},
-                    "client_timestamp": "2025-01-01T00:00:00Z",
-                })
+                ws.send_json(
+                    {
+                        "type": "chat_message",
+                        "payload": {"text": "Hello doctor"},
+                        "client_timestamp": "2025-01-01T00:00:00Z",
+                    }
+                )
                 response = ws.receive_json()
                 assert response["type"] in ("message", "error")
         except Exception:

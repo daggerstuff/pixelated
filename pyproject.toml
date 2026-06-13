@@ -237,6 +237,7 @@ ignore = ["E501", "UP017", "PLR2004"]
 "scripts/task_sync/sync_from_linear.py" = ["T201"]
 "tests/python/test_*.py" = ["ARG005"]
 "Stage1_Training_Notebook.ipynb" = ["E402", "PLC0415", "Q000", "I001", "T201"]
+"src/pe/**" = ["B008"]
 [tool.ruff.lint.isort]
 known-first-party = ["ai", "src"]
 combine-as-imports = true
