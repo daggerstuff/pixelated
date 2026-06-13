@@ -15,17 +15,21 @@ import { logger } from '@/lib/logger'
 
 // Helper to synchronously require Node modules in Node-only environments without
 // triggering static bundlers or TypeScript/ESLint `no-require-imports` errors.
-function tryRequireNode(moduleName: string): any | null {
+function tryRequireNode(moduleName: string): unknown {
   try {
     if (typeof window === 'undefined' && typeof process !== 'undefined') {
       // Use eval to avoid bundlers rewriting/including the require call.
-      const globalRequire = (globalThis as any).require
+      const globalRequire: unknown = (globalThis as Record<string, unknown>)[
+        'require'
+      ]
       if (typeof globalRequire === 'function') {
-        return globalRequire(moduleName)
+        return (globalRequire as (...args: unknown[]) => unknown)(moduleName)
       }
 
       // Try to access via global scope
-      const module = (globalThis as any)[moduleName]
+      const module: unknown = (globalThis as Record<string, unknown>)[
+        moduleName
+      ]
       if (module) return module
     }
   } catch (e) {
@@ -407,7 +411,7 @@ class EnhancedStatePersistence {
     this.setStoredValue('form_drafts', drafts)
   }
 
-  getDraft(formId: string): unknown | null {
+  getDraft(formId: string): unknown {
     const drafts = this.getStoredValue('form_drafts', {}) as Record<
       string,
       unknown
@@ -456,8 +460,10 @@ class EnhancedStatePersistence {
           .join('')
       } else {
         // Try synchronous node crypto require (guarded helper avoids bundler/static analysis)
-        const nodeCrypto = tryRequireNode('crypto')
-        if (nodeCrypto && typeof nodeCrypto.randomBytes === 'function') {
+        const nodeCrypto = tryRequireNode('crypto') as {
+          randomBytes?: (size: number) => { toString(encoding: string): string }
+        } | null
+        if (nodeCrypto?.randomBytes) {
           secureSuffix = nodeCrypto.randomBytes(8).toString('hex')
         } else {
           // Fallback deterministic unique-ish suffix using timestamp + counter
@@ -602,7 +608,7 @@ export function useFormDraft(formId: string) {
 
   return {
     saveDraft: (data: unknown) => persistence.saveDraft(formId, data),
-    getDraft: (): unknown | null => persistence.getDraft(formId),
+    getDraft: (): unknown => persistence.getDraft(formId),
     clearDraft: () => persistence.clearDraft(formId),
   }
 }
