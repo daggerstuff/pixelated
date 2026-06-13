@@ -19,6 +19,8 @@ export function jsonResponse(payload: unknown, status = 200): Response {
     status,
     headers: {
       'Content-Type': 'application/json',
+      'Deprecation': 'true',
+      'Sunset': 'Sat, 01 Nov 2025 00:00:00 GMT',
     },
   })
 }
@@ -117,7 +119,7 @@ export function assertRequestedUser(
   return null
 }
 
-type MemoryRouteContext = {
+export type MemoryRouteContext = {
   request: Request
   params?: Record<string, string | undefined>
   cookies?: unknown
@@ -151,6 +153,40 @@ export function withAuthenticatedMemoryRoute<
     } catch (error: unknown) {
       return handleMemoryApiError(action, error)
     }
+  }
+}
+
+/**
+ * Wrap a v1 memory API handler call in a legacy-compatible shim.
+ *
+ * Delegates all auth / validation / gateway work to the v1 handler,
+ * then wraps the response in the legacy envelope format so existing
+ * consumers (and tests) are not broken.
+ *
+ * The returned Response automatically includes `Deprecation: true` and
+ * `Sunset` headers via `jsonResponse`. Error responses are passed through
+ * in the legacy error format.
+ */
+export function legacyV1Shim(
+  v1Handler: (context: MemoryRouteContext) => Promise<Response>,
+  transformSuccess: (
+    v1Body: Record<string, unknown>,
+    status: number,
+  ) => Record<string, unknown>,
+) {
+  return async (context: MemoryRouteContext): Promise<Response> => {
+    const v1Response = await v1Handler(context)
+
+    if (v1Response.status >= 400) {
+      const body = await v1Response.json()
+      return jsonResponse(body, v1Response.status)
+    }
+
+    const body = (await v1Response.json()) as Record<string, unknown>
+    return jsonResponse(
+      transformSuccess(body, v1Response.status),
+      v1Response.status,
+    )
   }
 }
 
