@@ -33,6 +33,7 @@
     "build:heroku": "DEPLOY_TARGET=heroku astro build",
     "build:flyio": "DEPLOY_TARGET=flyio astro build",
     "build:vercel": "DEPLOY_TARGET=vercel astro build",
+    "build:api-docs": "npx tsx scripts/generate-memory-openapi.ts",
     "build:analyze": "astro build && pnpm run analyze:bundle",
     "analyze:bundle": "npx astro-bundle-analyzer dist",
     "format": "oxfmt --write . && prettier --write \"**/*.astro\"",
@@ -448,7 +449,8 @@
     "vite-tsconfig-paths": "latest",
     "vitest": "^4.1.8",
     "vscode-jsonrpc": "9.0.0",
-    "wait-on": "latest"
+    "wait-on": "latest",
+    "yaml": "2.8.4"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
