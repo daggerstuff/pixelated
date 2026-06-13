@@ -1,6 +1,5 @@
 import {
   getGateway,
-  jsonError,
   jsonResponse,
   toMemoryScope,
   withAuthenticatedMemoryRoute,
@@ -13,10 +12,16 @@ export const DELETE = withAuthenticatedMemoryRoute(
     const { memoryId } = body
 
     if (!memoryId) {
-      return jsonError(400, 'Bad Request', 'memoryId parameter is required')
+      return jsonResponse(
+        {
+          success: false,
+          error: 'Bad Request',
+          message: 'memoryId parameter is required',
+        },
+        400,
+      )
     }
 
-    // Delete memory
     await getGateway().deleteMemory({
       ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       memoryId,
