@@ -530,8 +530,8 @@ export class FHEAnalyticsService {
 
       for (let i = 0; i < filteredMessages.length - 1; i++) {
         if (
-          filteredMessages[i]!.role === 'assistant' &&
-          filteredMessages[i + 1]!.role === 'user'
+          filteredMessages[i].role === 'assistant' &&
+          filteredMessages[i + 1].role === 'user'
         ) {
           exchanges.push({
             therapist: filteredMessages[i],
@@ -658,9 +658,9 @@ export class FHEAnalyticsService {
       // Create time windows for trend analysis
       const timeWindows: { startTime: number; endTime: number }[] = []
       if (userMessages.length > 0) {
-        const firstTimestamp = userMessages[0]!.timestamp ?? Date.now()
+        const firstTimestamp = userMessages[0].timestamp ?? Date.now()
         const lastTimestamp =
-          userMessages[userMessages.length - 1]!.timestamp ?? Date.now()
+          userMessages[userMessages.length - 1].timestamp ?? Date.now()
         const duration = lastTimestamp - firstTimestamp
 
         // Create 5 equal time windows or fewer if not enough messages

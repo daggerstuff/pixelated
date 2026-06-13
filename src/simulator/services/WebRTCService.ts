@@ -87,7 +87,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       })
 
       // Get the audio track from the stream
-      const audioTrack = stream.getAudioTracks()[0]!
+      const audioTrack = stream.getAudioTracks()[0]
 
       // Configure audio track constraints for built-in noise suppression and echo cancellation
       audioTrack
@@ -162,7 +162,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       limiter.connect(destination)
 
       // Get the processed audio track
-      const processedAudioTrack = destination.stream.getAudioTracks()[0]!
+      const processedAudioTrack = destination.stream.getAudioTracks()[0]
 
       // Replace the original audio track with the processed one
       // Configure the processed track with the same constraints
@@ -216,7 +216,7 @@ export class WebRTCService implements WebRTCServiceInterface {
       // Calculate average energy level (for demonstration)
       let sum = 0
       for (let i = 0; i < bufferLength; i++) {
-        sum += dataArray[i]!
+        sum += dataArray[i]
       }
       const averageEnergy = sum / bufferLength
 

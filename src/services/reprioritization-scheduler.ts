@@ -49,9 +49,9 @@ export class ReprioritizationScheduler {
   private readonly config: ReprioritizationSchedulerConfig
   private isRunning = false
   private latestReport: ReprioritizationReport | null = null
-  private evidenceCollector: EvidenceCollector
-  private reprioritizationEngine: ReturnType<typeof createEngine>
-  private redisService: RedisService
+  private readonly evidenceCollector: EvidenceCollector
+  private readonly reprioritizationEngine: ReturnType<typeof createEngine>
+  private readonly redisService: RedisService
 
   constructor(config: Partial<ReprioritizationSchedulerConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config }

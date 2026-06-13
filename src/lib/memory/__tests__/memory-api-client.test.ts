@@ -99,7 +99,7 @@ describe("list()", () => {
       tags: undefined,
     });
 
-    const url = mockFetch.mock.calls[0]![0] as string;
+    const url = mockFetch.mock.calls[0][0] as string;
     expect(url).toContain("/api/v1/memory");
     expect(url).toContain("limit=10");
     expect(url).toContain("offset=0");
@@ -134,9 +134,9 @@ describe("update()", () => {
 
     await client.update(sampleMemory.id, { content: "Updated" });
 
-    const url = mockFetch.mock.calls[0]![0] as string;
+    const url = mockFetch.mock.calls[0][0] as string;
     expect(url).toBe(`/api/v1/memory/${sampleMemory.id}`);
-    expect((mockFetch.mock.calls[0]![1] as RequestInit).method).toBe("PATCH");
+    expect((mockFetch.mock.calls[0][1] as RequestInit).method).toBe("PATCH");
   });
 });
 
@@ -149,9 +149,9 @@ describe("delete()", () => {
 
     await client.delete(sampleMemory.id);
 
-    const url = mockFetch.mock.calls[0]![0] as string;
+    const url = mockFetch.mock.calls[0][0] as string;
     expect(url).toBe(`/api/v1/memory/${sampleMemory.id}`);
-    expect((mockFetch.mock.calls[0]![1] as RequestInit).method).toBe("DELETE");
+    expect((mockFetch.mock.calls[0][1] as RequestInit).method).toBe("DELETE");
   });
 
   it("throws MemoryApiClientError on 404", async () => {
