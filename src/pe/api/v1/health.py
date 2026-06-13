@@ -1,6 +1,9 @@
 """Health check endpoint and API route registration."""
 
+import structlog
 from fastapi import APIRouter
+
+logger = structlog.get_logger(__name__)
 
 from src.pe.database import check_connection
 
@@ -18,10 +21,11 @@ async def health_check():
             "database": db_status,
         }
     except Exception as exc:
+        logger.exception("Health check failed")
         return {
             "status": "degraded",
             "version": "0.1.0",
-            "database": {"connected": False, "error": str(exc)},
+            "database": {"connected": False, "error": "Database connection failed"},
         }
 
 

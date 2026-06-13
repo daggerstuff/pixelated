@@ -79,7 +79,7 @@ class ConnectionManager:
         for ws in self._connections[session_id]:
             try:
                 await ws.send_text(payload)
-            except Exception:
+            except WebSocketDisconnect:
                 stale.add(ws)
         for ws in stale:
             self._connections[session_id].discard(ws)
@@ -449,7 +449,7 @@ async def simulation_websocket(
 ):
     """WebSocket endpoint for live simulation interaction.
 
-    Connection: ws://host/api/v1/simulations/ws/{session_id}?token={jwt}
+    Connection: wss://host/api/v1/simulations/ws/{session_id}?token={jwt}
 
     Client sends ClientMessage:
         { type: "chat_message" | "decision_response" | "pause" | "resume" | "end",
@@ -476,6 +476,18 @@ async def simulation_websocket(
         await ws.close(code=4001, reason="Missing authentication token")
         return
 
+    # Verify session_id belongs to the user's tenant
+    from src.pe.database import async_session_factory
+    async with async_session_factory() as verify_session:
+        from sqlalchemy import text
+        result = await verify_session.execute(
+            text("SELECT id FROM pe.simulation_sessions WHERE id = :sid AND institution_id = :tid"),
+            {"sid": session_id, "tid": tenant_id},
+        )
+        if not result.fetchone():
+            await ws.close(code=4003, reason="Session not found or access denied")
+            return
+
     await manager.connect(session_id, ws)
 
     try:
@@ -493,6 +505,10 @@ async def simulation_websocket(
 
                 # Save the learner's message
                 async with async_session_factory() as db_session:
+                    await db_session.execute(
+                        text("SELECT pe.set_session_context(:tid, :uid, :role)"),
+                        {"tid": tenant_id, "uid": user_id, "role": user_role},
+                    )
                     await db_session.execute(
                         text("""
                             INSERT INTO pe.simulation_messages
@@ -553,6 +569,10 @@ async def simulation_websocket(
             elif msg_type == "pause":
                 async with async_session_factory() as db_session:
                     await db_session.execute(
+                        text("SELECT pe.set_session_context(:tid, :uid, :role)"),
+                        {"tid": tenant_id, "uid": user_id, "role": user_role},
+                    )
+                    await db_session.execute(
                         text("""
                             UPDATE pe.simulation_sessions
                             SET status = 'paused', paused_at = NOW()
@@ -568,6 +588,10 @@ async def simulation_websocket(
 
             elif msg_type == "resume":
                 async with async_session_factory() as db_session:
+                    await db_session.execute(
+                        text("SELECT pe.set_session_context(:tid, :uid, :role)"),
+                        {"tid": tenant_id, "uid": user_id, "role": user_role},
+                    )
                     await db_session.execute(
                         text("""
                             UPDATE pe.simulation_sessions
@@ -587,6 +611,10 @@ async def simulation_websocket(
 
             elif msg_type == "end":
                 async with async_session_factory() as db_session:
+                    await db_session.execute(
+                        text("SELECT pe.set_session_context(:tid, :uid, :role)"),
+                        {"tid": tenant_id, "uid": user_id, "role": user_role},
+                    )
                     await db_session.execute(
                         text("""
                             UPDATE pe.simulation_sessions
@@ -621,10 +649,12 @@ async def simulation_websocket(
 
     except WebSocketDisconnect:
         pass
-    except Exception as exc:
+    except Exception:
+        import traceback
+        traceback.print_exc()
         await manager.broadcast(session_id, {
             "type": "error",
-            "payload": {"error": f"Internal error: {str(exc)}"},
+            "payload": {"error": "Internal server error"},
         })
     finally:
         manager.disconnect(session_id, ws)

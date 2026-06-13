@@ -70,7 +70,7 @@ def require_role(*roles: UserRole) -> Callable:
     allowed_roles = set(roles)
 
     async def _role_checker(current_user: dict) -> dict:
-        user_role = current_user.get("role", "learner")
+        user_role = UserRole(current_user.get("role", "learner"))
         if user_role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
