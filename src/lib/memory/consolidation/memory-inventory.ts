@@ -123,9 +123,9 @@ export class MemoryInventory {
       positive: [],
     }
     for (const m of this.memories) {
-      if (m.emotions.valence < -0.2) buckets['negative']!.push(m)
-      else if (m.emotions.valence > 0.2) buckets['positive']!.push(m)
-      else buckets['neutral']!.push(m)
+      if (m.emotions.valence < -0.2) buckets['negative'].push(m)
+      else if (m.emotions.valence > 0.2) buckets['positive'].push(m)
+      else buckets['neutral'].push(m)
     }
     return Object.fromEntries(
       Object.entries(buckets)
