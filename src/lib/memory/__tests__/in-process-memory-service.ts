@@ -93,7 +93,7 @@ export class InProcessMemoryService {
     )
     if (memoryIndex === -1) return null
 
-    const memory = this.memories[memoryIndex]!
+    const memory = this.memories[memoryIndex]
     const updateTime = new Date()
 
     // Archive the current latest version

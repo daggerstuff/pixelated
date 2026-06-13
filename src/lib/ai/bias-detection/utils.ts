@@ -328,7 +328,7 @@ export function calculateFairnessMetrics(
   const tprs: number[] = []
   const fprs: number[] = []
   for (const g of groups) {
-    const m = groupMetrics[g]!
+    const m = groupMetrics[g]
     const { tp, fp, tn, fn } = m
     const total = tp + fp + tn + fn
     const pr = total > 0 ? (tp + fp) / total : 0

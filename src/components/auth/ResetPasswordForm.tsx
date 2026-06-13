@@ -1,66 +1,64 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import { authClient } from '@/lib/auth-client'
+import { authClient } from "@/lib/auth-client";
 
 interface ResetPasswordFormProps {
-  token: string
-  email: string
+  token: string;
+  email: string;
 }
 
 export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
+    e.preventDefault();
+    setError(null);
 
     // Basic validation
     if (password.length < 8) {
-      setError('Password must be at least 8 characters')
-      return
+      setError("Password must be at least 8 characters");
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
+      setError("Passwords do not match");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Call auth service to verify token and set new password
-      const response = await authClient.resetPassword.send({
+      const response = await (authClient.resetPassword.send as any)({
         password,
         token,
-      })
+      });
 
-      if (!('error' in response && response.error)) {
+      if (!("error" in response && response.error)) {
         // Dispatch custom event that the parent page is listening for
-        const event = new CustomEvent('password-reset-success')
-        document.dispatchEvent(event)
+        const event = new CustomEvent("password-reset-success");
+        document.dispatchEvent(event);
       } else {
         throw new Error(
-          (response as { error?: { message?: string } }).error?.message ??
-            'Password reset failed',
-        )
+          (response as { error?: { message?: string } }).error?.message ?? "Password reset failed",
+        );
       }
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err?.message || String(err) : 'An error occurred'
-      setError(message)
+      const message = err instanceof Error ? err?.message || String(err) : "An error occurred";
+      setError(message);
 
       // Dispatch error event
-      const event = new CustomEvent('password-reset-error', {
+      const event = new CustomEvent("password-reset-error", {
         detail: { message },
-      })
-      document.dispatchEvent(event)
+      });
+      document.dispatchEvent(event);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="reset-password-form">
@@ -80,9 +78,7 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
             type="password"
             className="w-full rounded border p-2"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPassword(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             required
             disabled={isLoading}
             minLength={8}
@@ -119,9 +115,9 @@ export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
           className="bg-teal-600 text-white hover:bg-teal-700 w-full rounded px-4 py-2 transition-colors"
           disabled={isLoading}
         >
-          {isLoading ? 'Resetting Password...' : 'Reset Password'}
+          {isLoading ? "Resetting Password..." : "Reset Password"}
         </button>
       </form>
     </div>
-  )
+  );
 }

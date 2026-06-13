@@ -533,7 +533,7 @@ export class Auth0WebAuthnService {
     const credentials = await this.getUserWebAuthnCredentials(userId)
     return (
       credentials.length > 0 ? credentials[0] : null
-    ) as WebAuthnCredential | null
+    )
   }
 
   /**

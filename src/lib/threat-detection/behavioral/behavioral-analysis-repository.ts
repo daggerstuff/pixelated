@@ -106,8 +106,8 @@ export class BehavioralAnalysisRepository {
     const match = timeframe.match(/^(\d+)([hdm])$/)
     if (!match) return 0
 
-    const value = parseInt(match[1]!, 10)
-    const unit = match[2]!
+    const value = parseInt(match[1], 10)
+    const unit = match[2]
 
     // Switch is exhaustive: the regex guard on line ~106 ensures unit is
     // one of 'h', 'd', or 'm', so the default branch is unreachable at

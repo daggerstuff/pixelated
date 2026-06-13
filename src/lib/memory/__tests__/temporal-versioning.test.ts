@@ -43,7 +43,7 @@ describe('InProcessMemoryService temporal versioning', () => {
       content: 'I live in NYC',
       isLatest: false,
     })
-    expect(history[0]!.validUntil).toEqual(updated!.validFrom)
+    expect(history[0].validUntil).toEqual(updated!.validFrom)
     expect(history[1]).toMatchObject({
       content: 'I live in SF',
       isLatest: true,

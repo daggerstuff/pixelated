@@ -65,6 +65,7 @@ const renderComponent = (props = {}) => {
     </WebSocketProvider>,
   )
 }
+})
 
 describe('PipelineDashboard', () => {
   const mockProps = defaultMockProps

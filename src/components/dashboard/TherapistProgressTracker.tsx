@@ -12,6 +12,14 @@ interface TherapistProgressTrackerProps {
   className?: string
 }
 
+// Performance optimization: Extract static object mappings or arrays outside the component function to module-level scope to prevent unnecessary memory allocations on every render.
+const FALLBACK_SKILLS: SkillProgress[] = [
+  { skill: 'Active Listening', score: 85, trend: 'up' },
+  { skill: 'Empathy', score: 78, trend: 'stable' },
+  { skill: 'Questioning', score: 92, trend: 'up' },
+  { skill: 'Reflection', score: 71, trend: 'down' },
+]
+
 export function TherapistProgressTracker({
   session,
   className,
@@ -47,16 +55,8 @@ export function TherapistProgressTracker({
     }))
   }
 
-  // Fallback mock data if hook returns nothing
-  const fallbackSkills: SkillProgress[] = [
-    { skill: 'Active Listening', score: 85, trend: 'up' },
-    { skill: 'Empathy', score: 78, trend: 'stable' },
-    { skill: 'Questioning', score: 92, trend: 'up' },
-    { skill: 'Reflection', score: 71, trend: 'down' },
-  ]
-
   const effectiveSkills =
-    skillProgress && skillProgress.length > 0 ? skillProgress : fallbackSkills
+    skillProgress && skillProgress.length > 0 ? skillProgress : FALLBACK_SKILLS
 
   return (
     <div
