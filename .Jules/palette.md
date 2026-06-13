@@ -1,3 +1,4 @@
 ## 2024-10-27 - Escape Key on Modals | Learning: Overlay elements should explicitly capture the Escape key for closure in React components without relying solely on framework defaults | Action: Added explicit conditional handler within existing keydown event listener in HeaderReact.tsx
+
 ## 2025-03-01 - Accessible Conditional Form Inputs | Learning: Radio buttons controlling collapsible regions should use aria-expanded and aria-controls, and submit buttons should use aria-busy during async processing. | Action: Added dynamic aria-expanded and aria-busy attributes in DataDeletionRequestForm.astro
 ## 2026-06-12 - Escape Key on Custom Modals | Learning: Custom overlay elements like the manage crisis flag modal should explicitly capture the Escape key for closure to ensure basic keyboard accessibility. | Action: Added dynamic useEffect listening for Escape key in CrisisSessionFlagsManager.tsx

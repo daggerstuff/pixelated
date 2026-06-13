@@ -110,7 +110,11 @@ export const SECURITY_CONFIG = {
     allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
   },
   csrf: {
-    enabled: process.env['NODE_ENV'] === 'production' || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD),
+    enabled:
+      process.env['NODE_ENV'] === 'production' ||
+      (typeof import.meta !== 'undefined' &&
+        import.meta.env &&
+        import.meta.env.PROD),
     secret:
       process.env['CSRF_SECRET'] ??
       import.meta.env['CSRF_SECRET'] ??
@@ -236,7 +240,10 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
   const errors: string[] = []
 
   const isProd =
-    process.env['NODE_ENV'] === 'production' || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD)
+    process.env['NODE_ENV'] === 'production' ||
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD)
 
   // Validate JWT secret (Unify with ensureJwtSecret behavior - Review suggestion)
   try {
@@ -264,9 +271,15 @@ export function validateAuthConfig(): { valid: boolean; errors: string[] } {
  */
 export function getEnvironmentConfig() {
   const isDevelopment =
-    process.env['NODE_ENV'] === 'development' || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV)
+    process.env['NODE_ENV'] === 'development' ||
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.DEV)
   const isProduction =
-    process.env['NODE_ENV'] === 'production' || (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.PROD)
+    process.env['NODE_ENV'] === 'production' ||
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD)
   const isTest = process.env['NODE_ENV'] === 'test'
 
   return {

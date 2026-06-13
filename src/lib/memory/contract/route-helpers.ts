@@ -103,7 +103,9 @@ export function parseSearchParams<T>(
   for (const [key, value] of url.searchParams.entries()) {
     if (key in obj) {
       const existing = obj[key]
-      obj[key] = Array.isArray(existing) ? [...existing, value] : [existing, value]
+      obj[key] = Array.isArray(existing)
+        ? [...existing, value]
+        : [existing, value]
     } else {
       obj[key] = value
     }
@@ -122,7 +124,10 @@ export interface AuthenticatedMemoryCaller {
 
 export async function requireAuthenticatedMemoryCaller(
   request: Request,
-): Promise<{ ok: true; caller: AuthenticatedMemoryCaller } | { ok: false; response: Response }> {
+): Promise<
+  | { ok: true; caller: AuthenticatedMemoryCaller }
+  | { ok: false; response: Response }
+> {
   const user = await getCurrentUser(request)
   if (!user) {
     return {
@@ -164,10 +169,7 @@ function logRouteError(action: string, error: unknown): void {
   console.error(`[memory-api-v1] ${action} failed: ${name}: ${message}`)
 }
 
-export function handleGatewayError(
-  action: string,
-  error: unknown,
-): Response {
+export function handleGatewayError(action: string, error: unknown): Response {
   if (error instanceof ProductMemoryGatewayError) {
     logRouteError(action, error)
     const mapping = mapGatewayError(error.status, error.message)

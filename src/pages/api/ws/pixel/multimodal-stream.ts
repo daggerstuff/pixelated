@@ -15,47 +15,42 @@
  *   }
  */
 
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute, APIContext } from "astro";
 
-import { applyRateLimit } from '@/lib/api/rate-limit'
-import { getSession } from '@/lib/auth/session'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { applyRateLimit } from "@/lib/api/rate-limit";
+import { getSession } from "@/lib/auth/session";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('pixel-ws-multimodal')
+const logger = createBuildSafeLogger("pixel-ws-multimodal");
 
 interface StreamMessage {
-  type: 'audio-chunk' | 'text-input' | 'start-session' | 'end-session' | 'ping'
-  sessionId: string
-  timestamp: number
+  type: "audio-chunk" | "text-input" | "start-session" | "end-session" | "ping";
+  sessionId: string;
+  timestamp: number;
   data?: {
-    chunk?: ArrayBuffer
-    text?: string
-    metadata?: Record<string, unknown>
-  }
+    chunk?: ArrayBuffer;
+    text?: string;
+    metadata?: Record<string, unknown>;
+  };
 }
 
 interface StreamResponse {
-  type:
-    | 'audio-received'
-    | 'analysis-partial'
-    | 'analysis-complete'
-    | 'error'
-    | 'pong'
-  sessionId: string
-  timestamp: number
+  type: "audio-received" | "analysis-partial" | "analysis-complete" | "error" | "pong";
+  sessionId: string;
+  timestamp: number;
   data?: {
-    transcription?: string
-    confidence?: number
+    transcription?: string;
+    confidence?: number;
     emotions?: {
-      valence: number
-      arousal: number
-      dominance: number
-    }
-    eqScores?: number[]
-    biasDetected?: boolean
-    biasScore?: number
-    error?: string
-  }
+      valence: number;
+      arousal: number;
+      dominance: number;
+    };
+    eqScores?: number[];
+    biasDetected?: boolean;
+    biasScore?: number;
+    error?: string;
+  };
 }
 
 /**
@@ -64,53 +59,59 @@ interface StreamResponse {
 const activeConnections = new Map<
   string,
   {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
+    ws: WebSocket;
+    sessionId: string;
+    userId: string;
+    startTime: number;
+    audioBuffer: Uint8Array;
+    transcriptionBuffer: string[];
   }
->()
+>();
 
 /**
  * Main WebSocket handler for multimodal streaming
  */
 export const GET: APIRoute = async (context) => {
-  const session = await getSession(context as unknown as Request)
+  const session = await getSession(context as unknown as Request);
 
   if (!session?.user) {
-    return new Response('Unauthorized', { status: 401 })
+    return new Response("Unauthorized", { status: 401 });
   }
 
   // Rate limiting
   try {
-    await applyRateLimit(context as unknown as Request, 'pixel-ws', { points: 1 })
+    await applyRateLimit(context as unknown as Request, "pixel-ws");
   } catch (error: unknown) {
-    logger.error('Rate limit exceeded', { error })
-    return new Response('Too many connections', { status: 429 })
+    logger.error("Rate limit exceeded", { error });
+    return new Response("Too many connections", { status: 429 });
   }
 
   // Check if the environment supports WebSocket
-  if (
-    !context.request.headers.get('upgrade')?.toLowerCase().includes('websocket')
-  ) {
-    return new Response('Expected WebSocket upgrade', { status: 400 })
+  if (!context.request.headers.get("upgrade")?.toLowerCase().includes("websocket")) {
+    return new Response("Expected WebSocket upgrade", { status: 400 });
   }
 
-  const { socket, response } = (Astro as unknown as { getWebSocket: (ctx: unknown) => { socket: WebSocket; response: Response } }).getWebSocket(context) as unknown as {
-    socket: WebSocket
-    response: Response
-  }
-  const connectionId = crypto.randomUUID()
-  const sessionId =
-    context.url.searchParams.get('sessionId') ?? crypto.randomUUID()
+  const { socket, response } = (
+    globalThis as unknown as {
+      Astro: {
+        getWebSocket: (ctx: unknown) => {
+          socket: WebSocket;
+          response: Response;
+        };
+      };
+    }
+  ).Astro.getWebSocket(context) as {
+    socket: WebSocket;
+    response: Response;
+  };
+  const connectionId = crypto.randomUUID();
+  const sessionId = context.url.searchParams.get("sessionId") ?? crypto.randomUUID();
 
-  logger.info('WebSocket connection opened', {
+  logger.info("WebSocket connection opened", {
     connectionId,
     sessionId,
     userId: session.user.id,
-  })
+  });
 
   // Store connection metadata
   const connectionData = {
@@ -120,47 +121,47 @@ export const GET: APIRoute = async (context) => {
     startTime: Date.now(),
     audioBuffer: new Uint8Array(),
     transcriptionBuffer: [] as string[],
-  }
+  };
 
-  activeConnections.set(connectionId, connectionData)
+  activeConnections.set(connectionId, connectionData);
 
   // Setup message handler
   socket.onmessage = async (event) => {
     try {
-      const message = parseMessage(event.data)
+      const message = parseMessage(event.data);
 
       switch (message.type) {
-        case 'start-session':
-          await handleStartSession(socket, message, connectionData)
-          break
+        case "start-session":
+          await handleStartSession(socket, message, connectionData);
+          break;
 
-        case 'audio-chunk':
-          await handleAudioChunk(socket, message, connectionData)
-          break
+        case "audio-chunk":
+          await handleAudioChunk(socket, message, connectionData);
+          break;
 
-        case 'text-input':
-          await handleTextInput(socket, message, connectionData)
-          break
+        case "text-input":
+          await handleTextInput(socket, message, connectionData);
+          break;
 
-        case 'end-session':
-          await handleEndSession(socket, message, connectionData)
-          break
+        case "end-session":
+          await handleEndSession(socket, message, connectionData);
+          break;
 
-        case 'ping':
+        case "ping":
           sendMessage(socket, {
-            type: 'pong',
+            type: "pong",
             sessionId: message.sessionId,
             timestamp: Date.now(),
-          })
-          break
+          });
+          break;
 
         default:
-          logger.warn('Unknown message type', { type: message.type })
+          logger.warn("Unknown message type", { type: message.type });
       }
     } catch (error: unknown) {
-      logger.error('Error processing message', { error })
+      logger.error("Error processing message", { error });
       sendMessage(socket, {
-        type: 'error',
+        type: "error",
         sessionId: connectionData.sessionId,
         timestamp: Date.now(),
         data: {
@@ -168,56 +169,56 @@ export const GET: APIRoute = async (context) => {
             error instanceof Error
               ? error instanceof Error
                 ? error.message
-                : 'Unknown error'
-              : 'Unknown error',
+                : "Unknown error"
+              : "Unknown error",
         },
-      })
+      });
     }
-  }
+  };
 
   // Cleanup on close
   socket.onclose = () => {
-    activeConnections.delete(connectionId)
-    logger.info('WebSocket connection closed', { connectionId, sessionId })
-  }
+    activeConnections.delete(connectionId);
+    logger.info("WebSocket connection closed", { connectionId, sessionId });
+  };
 
   socket.onerror = (error) => {
-    logger.error('WebSocket error', { connectionId, sessionId, error })
-    activeConnections.delete(connectionId)
-  }
+    logger.error("WebSocket error", { connectionId, sessionId, error });
+    activeConnections.delete(connectionId);
+  };
 
   // Set connection timeout (15 minutes)
   setTimeout(
     () => {
       if (activeConnections.has(connectionId)) {
-        socket.close()
-        activeConnections.delete(connectionId)
-        logger.warn('WebSocket connection timeout', { connectionId, sessionId })
+        socket.close();
+        activeConnections.delete(connectionId);
+        logger.warn("WebSocket connection timeout", { connectionId, sessionId });
       }
     },
     15 * 60 * 1000,
-  )
+  );
 
-  return response
-}
+  return response;
+};
 
 /**
  * Parse incoming message
  */
 function parseMessage(data: string | ArrayBuffer): StreamMessage {
-  if (typeof data === 'string') {
-    return JSON.parse(data) as StreamMessage
+  if (typeof data === "string") {
+    return JSON.parse(data) as StreamMessage;
   }
 
   // For binary data (audio chunks), wrap in default message
   return {
-    type: 'audio-chunk',
-    sessionId: '',
+    type: "audio-chunk",
+    sessionId: "",
     timestamp: Date.now(),
     data: {
       chunk: data,
     },
-  }
+  };
 }
 
 /**
@@ -225,9 +226,9 @@ function parseMessage(data: string | ArrayBuffer): StreamMessage {
  */
 function sendMessage(socket: WebSocket, message: StreamResponse) {
   try {
-    socket.send(JSON.stringify(message))
+    socket.send(JSON.stringify(message));
   } catch (error: unknown) {
-    logger.error('Error sending message', { error })
+    logger.error("Error sending message", { error });
   }
 }
 
@@ -238,27 +239,27 @@ async function handleStartSession(
   socket: WebSocket,
   message: StreamMessage,
   connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
+    ws: WebSocket;
+    sessionId: string;
+    userId: string;
+    startTime: number;
+    audioBuffer: Uint8Array;
+    transcriptionBuffer: string[];
   },
 ) {
-  logger.info('Session started', { sessionId: message.sessionId })
+  logger.info("Session started", { sessionId: message.sessionId });
 
-  connectionData.transcriptionBuffer = []
-  connectionData.audioBuffer = new Uint8Array()
+  connectionData.transcriptionBuffer = [];
+  connectionData.audioBuffer = new Uint8Array();
 
   sendMessage(socket, {
-    type: 'audio-received',
+    type: "audio-received",
     sessionId: message.sessionId,
     timestamp: Date.now(),
     data: {
-      transcription: 'Session ready for audio streaming',
+      transcription: "Session ready for audio streaming",
     },
-  })
+  });
 }
 
 /**
@@ -268,47 +269,47 @@ async function handleAudioChunk(
   socket: WebSocket,
   message: StreamMessage,
   connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
+    ws: WebSocket;
+    sessionId: string;
+    userId: string;
+    startTime: number;
+    audioBuffer: Uint8Array;
+    transcriptionBuffer: string[];
   },
 ) {
   if (!message.data?.chunk) {
-    logger.warn('Audio chunk missing data')
-    return
+    logger.warn("Audio chunk missing data");
+    return;
   }
 
-  const audioData = new Uint8Array(message.data.chunk)
-  const previousLength = connectionData.audioBuffer.length
-  const newBuffer = new Uint8Array(previousLength + audioData.length)
-  newBuffer.set(connectionData.audioBuffer)
-  newBuffer.set(audioData, previousLength)
-  connectionData.audioBuffer = newBuffer
+  const audioData = new Uint8Array(message.data.chunk);
+  const previousLength = connectionData.audioBuffer.length;
+  const newBuffer = new Uint8Array(previousLength + audioData.length);
+  newBuffer.set(connectionData.audioBuffer);
+  newBuffer.set(audioData, previousLength);
+  connectionData.audioBuffer = newBuffer;
 
-  logger.debug('Audio chunk received', {
+  logger.debug("Audio chunk received", {
     sessionId: message.sessionId,
     chunkSize: audioData.length,
     totalSize: newBuffer.length,
-  })
+  });
 
   // Send acknowledgment
   sendMessage(socket, {
-    type: 'audio-received',
+    type: "audio-received",
     sessionId: message.sessionId,
     timestamp: Date.now(),
     data: {
       transcription: `Received ${audioData.length} bytes`,
     },
-  })
+  });
 
   // Simulate real-time transcription/analysis
   // In production, this would send chunks to Whisper/speech recognition service
   if (newBuffer.length > 4096) {
     // Process accumulated audio (simulated)
-    await processAudioChunk(socket, message.sessionId, newBuffer.slice(0, 4096))
+    await processAudioChunk(socket, message.sessionId, newBuffer.slice(0, 4096));
   }
 }
 
@@ -319,30 +320,30 @@ async function handleTextInput(
   socket: WebSocket,
   message: StreamMessage,
   connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
+    ws: WebSocket;
+    sessionId: string;
+    userId: string;
+    startTime: number;
+    audioBuffer: Uint8Array;
+    transcriptionBuffer: string[];
   },
 ) {
-  const text = message.data?.text ?? ''
+  const text = message.data?.text ?? "";
 
   if (!text) {
-    logger.warn('Empty text input')
-    return
+    logger.warn("Empty text input");
+    return;
   }
 
-  connectionData.transcriptionBuffer.push(text)
+  connectionData.transcriptionBuffer.push(text);
 
-  logger.debug('Text input received', {
+  logger.debug("Text input received", {
     sessionId: message.sessionId,
     textLength: text.length,
-  })
+  });
 
   // Simulate analysis
-  await analyzeText(socket, message.sessionId, text)
+  await analyzeText(socket, message.sessionId, text);
 }
 
 /**
@@ -352,26 +353,26 @@ async function handleEndSession(
   socket: WebSocket,
   message: StreamMessage,
   connectionData: {
-    ws: WebSocket
-    sessionId: string
-    userId: string
-    startTime: number
-    audioBuffer: Uint8Array
-    transcriptionBuffer: string[]
+    ws: WebSocket;
+    sessionId: string;
+    userId: string;
+    startTime: number;
+    audioBuffer: Uint8Array;
+    transcriptionBuffer: string[];
   },
 ) {
-  const fullTranscription = connectionData.transcriptionBuffer.join(' ')
+  const fullTranscription = connectionData.transcriptionBuffer.join(" ");
 
-  logger.info('Session ended', {
+  logger.info("Session ended", {
     sessionId: message.sessionId,
     durationMs: Date.now() - connectionData.startTime,
     audioSize: connectionData.audioBuffer.length,
     transcriptionLength: fullTranscription.length,
-  })
+  });
 
   // Send final analysis
   sendMessage(socket, {
-    type: 'analysis-complete',
+    type: "analysis-complete",
     sessionId: message.sessionId,
     timestamp: Date.now(),
     data: {
@@ -380,26 +381,22 @@ async function handleEndSession(
       biasDetected: false,
       biasScore: 0.15,
     },
-  })
+  });
 }
 
 /**
  * Process audio chunk (simulated)
  * In production, sends to Whisper/audio emotion service
  */
-async function processAudioChunk(
-  socket: WebSocket,
-  sessionId: string,
-  audioBuffer: Uint8Array,
-) {
+async function processAudioChunk(socket: WebSocket, sessionId: string, audioBuffer: Uint8Array) {
   try {
     // Simulate speech recognition delay
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100));
 
-    const simulatedTranscription = `Audio segment with ${audioBuffer.length} bytes`
+    const simulatedTranscription = `Audio segment with ${audioBuffer.length} bytes`;
 
     sendMessage(socket, {
-      type: 'analysis-partial',
+      type: "analysis-partial",
       sessionId,
       timestamp: Date.now(),
       data: {
@@ -411,18 +408,18 @@ async function processAudioChunk(
           dominance: 0.7,
         },
       },
-    })
+    });
   } catch (error: unknown) {
-    logger.error('Error processing audio chunk', { error })
+    logger.error("Error processing audio chunk", { error });
 
     sendMessage(socket, {
-      type: 'error',
+      type: "error",
       sessionId,
       timestamp: Date.now(),
       data: {
-        error: 'Failed to process audio',
+        error: "Failed to process audio",
       },
-    })
+    });
   }
 }
 
@@ -432,13 +429,13 @@ async function processAudioChunk(
 async function analyzeText(socket: WebSocket, sessionId: string, text: string) {
   try {
     // Simulate analysis delay
-    await new Promise((resolve) => setTimeout(resolve, 200))
+    await new Promise((resolve) => setTimeout(resolve, 200));
 
-    const eqScores = calculateEQScores(text)
-    const { detected: biasDetected, score: biasScore } = detectBias(text)
+    const eqScores = calculateEQScores(text);
+    const { detected: biasDetected, score: biasScore } = detectBias(text);
 
     sendMessage(socket, {
-      type: 'analysis-partial',
+      type: "analysis-partial",
       sessionId,
       timestamp: Date.now(),
       data: {
@@ -447,18 +444,18 @@ async function analyzeText(socket: WebSocket, sessionId: string, text: string) {
         biasDetected,
         biasScore,
       },
-    })
+    });
   } catch (error: unknown) {
-    logger.error('Error analyzing text', { error })
+    logger.error("Error analyzing text", { error });
 
     sendMessage(socket, {
-      type: 'error',
+      type: "error",
       sessionId,
       timestamp: Date.now(),
       data: {
-        error: 'Failed to analyze text',
+        error: "Failed to analyze text",
       },
-    })
+    });
   }
 }
 
@@ -467,14 +464,14 @@ async function analyzeText(socket: WebSocket, sessionId: string, text: string) {
  */
 function calculateEQScores(text: string): number[] {
   // In production, call actual Pixel model
-  const positiveWords = ['happy', 'good', 'great', 'excellent', 'love']
-  const negativeWords = ['sad', 'bad', 'poor', 'hate', 'angry']
-  const empathyWords = ['understand', 'feel', 'sorry', 'support', 'care']
+  const positiveWords = ["happy", "good", "great", "excellent", "love"];
+  const negativeWords = ["sad", "bad", "poor", "hate", "angry"];
+  const empathyWords = ["understand", "feel", "sorry", "support", "care"];
 
-  const textLower = text.toLowerCase()
-  const hasPositive = positiveWords.some((w) => textLower.includes(w))
-  const hasNegative = negativeWords.some((w) => textLower.includes(w))
-  const hasEmpathy = empathyWords.some((w) => textLower.includes(w))
+  const textLower = text.toLowerCase();
+  const hasPositive = positiveWords.some((w) => textLower.includes(w));
+  const hasNegative = negativeWords.some((w) => textLower.includes(w));
+  const hasEmpathy = empathyWords.some((w) => textLower.includes(w));
 
   return [
     hasPositive ? 0.8 : 0.5, // emotional_awareness
@@ -482,7 +479,7 @@ function calculateEQScores(text: string): number[] {
     hasNegative ? 0.4 : 0.7, // emotional_regulation
     0.75, // social_awareness
     0.7, // relationship_management
-  ]
+  ];
 }
 
 /**
@@ -491,23 +488,23 @@ function calculateEQScores(text: string): number[] {
 function detectBias(text: string): { detected: boolean; score: number } {
   // In production, call actual bias detection service
   const biasKeywords = [
-    'always',
-    'never',
-    'typical',
-    'natural',
-    'born',
-    'inherent',
-    'stereotype',
-    'obviously',
-  ]
+    "always",
+    "never",
+    "typical",
+    "natural",
+    "born",
+    "inherent",
+    "stereotype",
+    "obviously",
+  ];
 
-  const textLower = text.toLowerCase()
-  const biasCount = biasKeywords.filter((w) => textLower.includes(w)).length
+  const textLower = text.toLowerCase();
+  const biasCount = biasKeywords.filter((w) => textLower.includes(w)).length;
 
-  const score = Math.min(biasCount * 0.15, 1.0)
-  const detected = score > 0.3
+  const score = Math.min(biasCount * 0.15, 1.0);
+  const detected = score > 0.3;
 
-  return { detected, score }
+  return { detected, score };
 }
 
 /**
@@ -516,9 +513,7 @@ function detectBias(text: string): { detected: boolean; score: number } {
 export function getConnectionStats() {
   return {
     activeConnections: activeConnections.size,
-    totalSessions: Array.from(activeConnections.values()).map(
-      (c) => c.sessionId,
-    ),
+    totalSessions: Array.from(activeConnections.values()).map((c) => c.sessionId),
     uptime: Date.now(),
-  }
+  };
 }

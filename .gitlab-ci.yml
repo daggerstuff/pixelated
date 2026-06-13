@@ -32,14 +32,14 @@ validate:dependencies:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Validating dependencies..."
     - >
-      PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile ||
-      { echo "⚠️ Lockfile out of date - refreshing...";
+      PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile || {
+      echo "⚠️ Lockfile out of date - refreshing...";
         PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile; }
     - pnpm audit --audit-level moderate
   rules:
@@ -63,8 +63,8 @@ validate:lint:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running lint validation..."
@@ -96,8 +96,8 @@ validate:typecheck:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running typecheck validation..."
@@ -128,8 +128,8 @@ test:integration:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running integration tests..."
@@ -356,8 +356,8 @@ coverage:report:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils curl >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      curl > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
     - curl -LsSf https://astral.sh/uv/install.sh | sh
     - export PATH="$HOME/.local/bin:$PATH"

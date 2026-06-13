@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+
 import { PixelatedClient } from './index'
 
 // Mock fetch for testing
@@ -252,7 +253,7 @@ describe('SDK Contract Tests', () => {
       } as any)
 
       await expect(() => client.system.getHealth()).rejects.toThrow(
-        'API request failed',
+        'Invalid API key',
       )
     })
 

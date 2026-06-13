@@ -27,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     concurrency:
-      group: codeql-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}-${{ matrix.language }}
+      group:
+        codeql-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name
+        }}-${{ matrix.language }}
     strategy:
       fail-fast: false
       matrix:
@@ -96,7 +98,7 @@ jobs:
       - name: Install JavaScript dependencies
         if: matrix.language == 'javascript'
         run: |
-                    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --ignore-scripts
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile --ignore-scripts
 
       - name: Autobuild JavaScript/TypeScript
         if: matrix.language == 'javascript'
