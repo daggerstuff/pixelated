@@ -11,7 +11,7 @@ export async function getStaticPaths() {
   const allBlogPosts = await getCollection(
     "blog",
     ({ data }: CollectionEntry<"blog">["data"]) => {
-      return import.meta.env.PROD ? data.pubDate <= new Date() : true;
+      return import.meta['env'].PROD ? data.pubDate <= new Date() : true;
     },
   );
 

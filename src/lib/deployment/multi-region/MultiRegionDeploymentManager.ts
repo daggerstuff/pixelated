@@ -124,6 +124,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
   private readonly configurationManager: ConfigurationManager
   private readonly cloudProviderManager: CloudProviderManager
   private readonly healthMonitor: HealthMonitor
+  private readonly deploymentOrchestrator: DeploymentOrchestrator
   private readonly deploymentStatuses: Map<string, DeploymentStatus> = new Map()
   private isInitialized = false
 
@@ -417,7 +418,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
 
       const statuses: DeploymentStatus[] = []
       results.forEach((result, index) => {
-        const region = this.config.regions[index]!
+        const region = this.config.regions[index]
         if (result.status === 'fulfilled') {
           statuses.push(result.value)
         } else {

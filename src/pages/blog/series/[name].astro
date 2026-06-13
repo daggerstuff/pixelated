@@ -10,7 +10,7 @@ type BlogPost = CollectionEntry<'blog'>
 /*
 export async function getStaticPaths() {
   const allBlogPosts = await getCollection("blog", ({ data }: BlogPost) =>
-    import.meta.env.PROD ? !data.draft : true,
+    import.meta['env'].PROD ? !data.draft : true,
   );
 
   const allSeries = [

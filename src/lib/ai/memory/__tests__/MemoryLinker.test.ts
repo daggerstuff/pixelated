@@ -1,3 +1,4 @@
+import { buildMemorySkeleton } from '@pixelated/memory-schema';
 import { MemoryLinker } from '../linker';
 import type { MemoryObject } from '../types';
 
@@ -8,20 +9,35 @@ describe('MemoryLinker', () => {
     linker = new MemoryLinker();
   });
 
-  const mockMemory: MemoryObject = {
-    id: '00000000-0000-4000-a000-000000000000',
-    timestamp: new Date().toISOString(),
-    content: 'The user is talking about shadow work.',
-    scope: 'session',
-    retention: 'short_term',
-    tags: [],
-    synthesized_from: [],
-    is_ghost: false,
-  };
+  // UnifiedMemory has many required fields. The linker tests only
+  // exercise id/content/scope/retention/tags/vectorId/isGhost/gist, so
+  // we fill the rest with package defaults via buildMemorySkeleton.
+  const mockMemory: MemoryObject = buildMemorySkeleton(
+    {
+      content: 'The user is talking about shadow work.',
+      userId: 'test-user',
+      scope: 'session',
+      retention: 'short_term',
+      tenantId: 'test',
+      bankId: 'test',
+      tags: [],
+    },
+    {
+      id: '00000000-0000-4000-a000-000000000000',
+      isGhost: false,
+      gist: null,
+      vectorId: null,
+      emotionalContext: null,
+      empathyMetrics: null,
+      updatedAt: null,
+      accessedAt: null,
+      lastRetrievedAt: null,
+    },
+  );
 
   it('should link a vector ID to a memory object', () => {
     const linked = linker.linkVector(mockMemory, 'V-123');
-    expect(linked.vector_id).toBe('V-123');
+    expect(linked.vectorId).toBe('V-123');
     expect(linked.id).toBe(mockMemory.id);
   });
 
@@ -29,9 +45,9 @@ describe('MemoryLinker', () => {
     const linked = linker.linkVector(mockMemory, 'V-123');
     const ghost = linker.toGhost(linked);
 
-    expect(ghost.is_ghost).toBe(true);
+    expect(ghost.isGhost).toBe(true);
     expect(ghost.content).toBe('[ARCHIVED_GHOST_NODE]');
-    expect(ghost.vector_id).toBe('V-123');
+    expect(ghost.vectorId).toBe('V-123');
     expect(ghost.gist).toContain('shadow work');
   });
 
@@ -42,7 +58,7 @@ describe('MemoryLinker', () => {
   it('should limit gist length for ghost nodes', () => {
     const longMemory = {
       ...mockMemory,
-      vector_id: 'V-456',
+      vectorId: 'V-456',
       content: 'One two three four five six seven eight nine ten eleven twelve thirteen.'
     };
     const ghost = linker.toGhost(longMemory);

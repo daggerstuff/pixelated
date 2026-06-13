@@ -1,10 +1,10 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import type { UnifiedMemory } from '@pixelated/memory-schema'
 
 import {
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
-  type InternalMemoryRecord,
 } from './internal-memory-service-client'
 
 export type McpMemoryTransportLike = Pick<
@@ -68,7 +68,10 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
       throw new InternalMemoryServiceError(
         'MCP transport connection failed',
         503,
-        { launcherPath: this.launcherPath, error: String(err) },
+        {
+          launcherPath: this.launcherPath,
+          error: String(err),
+        },
       )
     }
   }
@@ -114,7 +117,9 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
       const result = await client.callTool(
         { name: toolName, arguments: args },
         undefined,
-        { signal: controller.signal },
+        {
+          signal: controller.signal,
+        },
       )
 
       clearTimeout(timeoutId)
@@ -191,6 +196,7 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
       retention: input.metadata?.['retention'] ?? 'short_term',
       emotional_context: input.metadata?.['emotional_context'],
       metrics: input.metadata?.['metrics'],
+      source_service: 'astro-frontend',
     })
 
     return { memory_id: result.memory_id }
@@ -210,9 +216,9 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
     agentId?: string
     runId?: string
     includeShared?: boolean
-  }): Promise<{ memories: InternalMemoryRecord[]; count: number }> {
+  }): Promise<{ memories: UnifiedMemory[]; count: number }> {
     const result = await this.callTool<{
-      memories: InternalMemoryRecord[]
+      memories: UnifiedMemory[]
       count: number
     }>('list_memories', {
       limit: input.limit,
@@ -249,9 +255,9 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
     runId?: string
     includeShared?: boolean
     min_importance?: number
-  }): Promise<{ memories: InternalMemoryRecord[]; count: number }> {
+  }): Promise<{ memories: UnifiedMemory[]; count: number }> {
     const result = await this.callTool<{
-      memories: InternalMemoryRecord[]
+      memories: UnifiedMemory[]
       count: number
     }>('query_memories', {
       query: input.query,
@@ -286,18 +292,9 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
     runId?: string
     includeShared?: boolean
     min_importance?: number
-  }): Promise<InternalMemoryRecord | null> {
+  }): Promise<UnifiedMemory | null> {
     try {
-      const result = await this.callTool<{
-        id: string
-        content: string
-        memory?: string
-        metadata?: InternalMemoryMetadata
-        created_at?: string
-        updated_at?: string
-        createdAt?: string
-        updatedAt?: string
-      }>('get_memory', {
+      const result = await this.callTool<UnifiedMemory>('get_memory', {
         memory_id: input.memoryId,
         user_id: input.userId,
         account_id: input.accountId,
@@ -311,13 +308,7 @@ export class McpMemoryTransport implements McpMemoryTransportLike {
         min_importance: input.min_importance ?? 0.1,
       })
 
-      return {
-        id: result.id,
-        content: result.content ?? result.memory ?? '',
-        metadata: result.metadata ?? {},
-        createdAt: result.createdAt ?? result.created_at,
-        updatedAt: result.updatedAt ?? result.updated_at,
-      }
+      return result
     } catch (err: unknown) {
       if (
         err instanceof InternalMemoryServiceError &&

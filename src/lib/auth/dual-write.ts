@@ -17,8 +17,10 @@
  */
 
 import { auth0UserService } from '../../services/auth0.service'
-
-import type { IdentityProvider, IdentityProviderUser } from './identity-provider'
+import type {
+  IdentityProvider,
+  IdentityProviderUser,
+} from './identity-provider'
 
 export interface DualWriteDiscrepancy {
   userId: string

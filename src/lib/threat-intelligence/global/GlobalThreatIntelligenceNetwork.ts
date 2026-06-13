@@ -99,6 +99,11 @@ export class GlobalThreatIntelligenceNetworkCore
   private validationSystem!: ThreatValidationSystem
 
   private readonly existingResponseOrchestrator?: AdvancedResponseOrchestrator
+  private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
+  private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
+
+  private isInitialized = false
+  private db: any = null
 
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly threatProcessingQueue: string[] = []

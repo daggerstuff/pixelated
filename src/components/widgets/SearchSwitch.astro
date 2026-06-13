@@ -456,7 +456,7 @@ const maxItems = parseSearchTuple(maxItemsPerPage, 'maxItemsPerPage')
         for (const result of fakeResults) {
           this.#content.innerHTML += `
             <a href="${this.#results?.dataset['base']}" class="search-result-item">
-              <div class="search-result-title">${result.meta.title}</div>
+              <div class="search-result-title">${result.meta['title']}</div>
               <div class="search-result-excerpt">${result.excerpt}</div>
             </a>`
         }

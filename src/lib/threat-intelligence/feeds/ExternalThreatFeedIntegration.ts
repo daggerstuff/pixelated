@@ -1441,8 +1441,8 @@ class TAXIIFeedProcessor implements FeedProcessor {
       | undefined
     if (extRefs && extRefs.length > 0) {
       return (
-        ((extRefs[0] as Record<string, unknown>)['url'] as string) ??
-        ((extRefs[0] as Record<string, unknown>)['external_id'] as string)
+        ((extRefs[0])['url'] as string) ??
+        ((extRefs[0])['external_id'] as string)
       )
     }
     return obj['id'] as string

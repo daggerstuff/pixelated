@@ -1,6 +1,12 @@
-import { resolveInternalMemoryServiceConfig } from '../server/internal-memory-service-auth'
 import {
-  InternalMemoryServiceClient,
+  buildMemorySkeleton,
+  isUnifiedMemory,
+  memoryInputDefaults,
+  type CreateMemoryInput,
+  type UnifiedMemory,
+} from '@pixelated/memory-schema'
+
+import {
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
@@ -10,13 +16,7 @@ import { createMemoryTransport } from '../server/memory-transport-factory'
 import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
 import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
-export interface ProductMemoryRecord {
-  id: string
-  content: string
-  metadata: Record<string, unknown>
-  createdAt?: string
-  updatedAt?: string
-}
+export type ProductMemoryRecord = UnifiedMemory
 
 export interface ProductMemoryScope {
   userId: string
@@ -35,6 +35,8 @@ export interface ProductMemoryListOptions extends ProductMemoryScope {
   offset?: number
   category?: string
   tags?: string[]
+  scope?: string
+  retention?: string
 }
 
 export interface ProductMemorySearchOptions extends ProductMemoryListOptions {
@@ -78,16 +80,22 @@ export class ProductMemoryGatewayError extends Error {
 
 type Caller = { userId: string; tenantId?: string }
 
-type InternalMemoryServiceClientLike = Pick<
-  InternalMemoryServiceClient,
-  | 'addMemory'
-  | 'listMemories'
-  | 'searchMemories'
-  | 'updateMemory'
-  | 'getMemory'
-  | 'deleteMemory'
-  | 'getMemoryStats'
->
+type InternalMemoryServiceClientLike = {
+  addMemory: (input: any) => Promise<{ memory_id: string }>
+  listMemories: (
+    input: any,
+  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
+  searchMemories: (
+    input: any,
+  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
+  updateMemory: (input: any) => Promise<void>
+  getMemory: (input: any) => Promise<UnifiedMemory | null>
+  deleteMemory: (input: any) => Promise<void>
+  getMemoryStats: (input: any) => Promise<{
+    totalMemories: number
+    categoryCounts: Record<string, number>
+  }>
+}
 
 type CallContext = {
   correlationId: string
@@ -119,11 +127,13 @@ export class ProductMemoryGateway {
         metadata,
       }),
     )
-    return {
-      id: response.memory_id,
+    return buildProductMemoryRecord({
+      memoryId: response.memory_id,
       content: input.content,
+      userId: input.userId,
+      tenantId: this.caller?.tenantId,
       metadata,
-    }
+    })
   }
 
   async listMemories(
@@ -138,10 +148,14 @@ export class ProductMemoryGateway {
         offset: pagination.offset,
         category: options.category,
         tags: options.tags,
+        scope: options.scope,
+        retention: options.retention,
       }),
     )
     return {
-      memories: response.memories.map(mapProductMemoryRecord),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
     }
   }
@@ -156,10 +170,17 @@ export class ProductMemoryGateway {
         ...toInternalScope(options),
         query: options.query,
         limit: pagination.limit,
+        offset: pagination.offset,
+        category: options.category,
+        tags: options.tags,
+        scope: options.scope,
+        retention: options.retention,
       }),
     )
     return {
-      memories: response.memories.map(mapProductMemoryRecord),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
     }
   }
@@ -178,11 +199,14 @@ export class ProductMemoryGateway {
         metadata,
       }),
     )
-    return {
-      id: input.memoryId,
+    return buildProductMemoryRecord({
+      memoryId: input.memoryId,
       content: input.content,
+      userId: input.userId,
+      tenantId: this.caller?.tenantId,
       metadata,
-    }
+      updatedAt: new Date().toISOString(),
+    })
   }
 
   async getMemory(
@@ -196,7 +220,7 @@ export class ProductMemoryGateway {
           ...toInternalScope(input),
         }),
       )
-      return memory ? mapProductMemoryRecord(memory) : null
+      return memory ? mapProductMemoryRecord(memory, input.userId) : null
     } catch (err) {
       if (
         err instanceof ProductMemoryGatewayError &&
@@ -273,7 +297,7 @@ export class ProductMemoryGateway {
   }
 
   private async runCall<T>(
-    ctx: CallContext,
+    _ctx: CallContext,
     call: () => Promise<T>,
   ): Promise<T> {
     try {
@@ -338,16 +362,119 @@ function toJsonValue(value: unknown): JsonValue | undefined {
   return undefined
 }
 
-function mapProductMemoryRecord(
-  memory: InternalMemoryRecord,
-): ProductMemoryRecord {
-  return {
-    id: memory.id,
-    content: memory.content ?? memory.memory ?? '',
-    metadata: memory.metadata ?? {},
-    createdAt: memory.createdAt ?? memory.created_at,
-    updatedAt: memory.updatedAt ?? memory.updated_at,
+function metadataCategory(
+  metadata: InternalMemoryMetadata,
+): string | undefined {
+  return typeof metadata['category'] === 'string'
+    ? metadata['category']
+    : undefined
+}
+
+function metadataTags(metadata: InternalMemoryMetadata): string[] | undefined {
+  if (!Array.isArray(metadata['tags'])) {
+    return undefined
   }
+  const tags = metadata['tags'].filter(
+    (tag): tag is string => typeof tag === 'string',
+  )
+  return tags.length > 0 ? tags : undefined
+}
+
+function metadataImportance(
+  metadata: InternalMemoryMetadata,
+): number | undefined {
+  return typeof metadata['importance'] === 'number'
+    ? metadata['importance']
+    : undefined
+}
+
+function createMemoryInputFromMetadata(
+  base: { content: string; userId: string; tenantId?: string },
+  metadata: InternalMemoryMetadata,
+): CreateMemoryInput {
+  const input: CreateMemoryInput = {
+    content: base.content,
+    userId: base.userId,
+  }
+  if (base.tenantId) {
+    input.tenantId = base.tenantId
+  }
+  const category = metadataCategory(metadata)
+  if (category) {
+    input.category = category
+  }
+  const tags = metadataTags(metadata)
+  if (tags) {
+    input.tags = tags
+  }
+  const importance = metadataImportance(metadata)
+  if (importance !== undefined) {
+    input.importance = importance
+  }
+  return input
+}
+
+function buildProductMemoryRecord(input: {
+  memoryId: string
+  content: string
+  userId: string
+  tenantId?: string
+  metadata?: InternalMemoryMetadata
+  updatedAt?: string
+}): ProductMemoryRecord {
+  const metadata = input.metadata ?? {}
+  return buildMemorySkeleton(
+    memoryInputDefaults(
+      createMemoryInputFromMetadata(
+        {
+          content: input.content,
+          userId: input.userId,
+          tenantId: input.tenantId,
+        },
+        metadata,
+      ),
+    ),
+    {
+      id: input.memoryId,
+      sourceService: 'astro-frontend',
+      updatedAt: input.updatedAt ?? null,
+    },
+  )
+}
+
+function legacyInternalRecordToUnifiedMemory(
+  memory: InternalMemoryRecord,
+  userId: string,
+): UnifiedMemory {
+  const metadata = memory.metadata ?? {}
+  return buildMemorySkeleton(
+    memoryInputDefaults(
+      createMemoryInputFromMetadata(
+        {
+          content: memory.content ?? memory.memory ?? '',
+          userId,
+        },
+        metadata,
+      ),
+    ),
+    {
+      id: memory.id,
+      sourceService: 'foresight',
+      createdAt:
+        memory.createdAt ?? memory.created_at ?? new Date().toISOString(),
+      updatedAt: memory.updatedAt ?? memory.updated_at ?? null,
+    },
+  )
+}
+
+function mapProductMemoryRecord(
+  memory: InternalMemoryRecord | UnifiedMemory,
+  userId: string,
+): ProductMemoryRecord {
+  if (isUnifiedMemory(memory)) {
+    return memory
+  }
+  return legacyInternalRecordToUnifiedMemory(memory, userId)
 }
 
 let gatewaySingleton: ProductMemoryGateway | null = null
@@ -359,9 +486,7 @@ let gatewaySingleton: ProductMemoryGateway | null = null
  * has a caller context for tenant isolation and audit logging.
  */
 export function getProductMemoryGateway(): ProductMemoryGateway {
-  gatewaySingleton ??= new ProductMemoryGateway(
-    new InternalMemoryServiceClient(resolveInternalMemoryServiceConfig()),
-  )
+  gatewaySingleton ??= new ProductMemoryGateway(createMemoryTransport())
   return gatewaySingleton
 }
 

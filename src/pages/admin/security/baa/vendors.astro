@@ -63,7 +63,7 @@ if (businessAssociateService.getAllBusinessAssociates().length === 0) {
 const businessAssociates = businessAssociateService.searchBusinessAssociates(
   searchQuery,
   (type as BusinessAssociateType) || undefined,
-  compliance || undefined,
+  (compliance as ComplianceLevel) || undefined,
 )
 
 // Generate options for select fields

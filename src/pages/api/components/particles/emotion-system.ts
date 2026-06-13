@@ -203,7 +203,7 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for real-time particle updates
  */
-export const POST: APIRoute = (protectRoute()(
+export const POST: APIRoute = protectRoute()(
   async (context: AuthAPIContext) => {
     try {
       const { locals, request } = context
@@ -241,7 +241,9 @@ export const POST: APIRoute = (protectRoute()(
           emotion,
           intensity: Math.max(0, Math.min(1, intensity)),
           sessionId,
-          particleCount: Array.isArray(particleUpdates) ? particleUpdates.length : 0,
+          particleCount: Array.isArray(particleUpdates)
+            ? particleUpdates.length
+            : 0,
         },
         recommendations: generateEmotionRecommendations(
           String(emotion),
@@ -270,10 +272,7 @@ export const POST: APIRoute = (protectRoute()(
       return new Response(
         JSON.stringify({
           error: 'Internal server error',
-          message:
-            error instanceof Error
-              ? error.message
-              : 'Unknown error',
+          message: error instanceof Error ? error.message : 'Unknown error',
         }),
         {
           status: 500,
@@ -282,10 +281,17 @@ export const POST: APIRoute = (protectRoute()(
       )
     }
   },
-) as any)
+) as any
 
 // Helper functions
-function calculateEmotionProfile(sessionEmotions: { primaryEmotion?: string; emotion?: string; confidence?: number; intensity?: number }[]) {
+function calculateEmotionProfile(
+  sessionEmotions: {
+    primaryEmotion?: string
+    emotion?: string
+    confidence?: number
+    intensity?: number
+  }[],
+) {
   const emotionCounts = new Map<
     string,
     { count: number; totalIntensity: number }
@@ -419,7 +425,12 @@ function getVisualSettings(complexity: 'low' | 'medium' | 'high') {
 
 function generateEmotionParticles(
   config: ParticleSystemConfig,
-  emotionProfile: { dominantEmotion: string; emotionMix: Record<string, number>; averageIntensity: number; volatility: number },
+  emotionProfile: {
+    dominantEmotion: string
+    emotionMix: Record<string, number>
+    averageIntensity: number
+    volatility: number
+  },
 ): ParticleConfig[] {
   const particles: ParticleConfig[] = []
   const { particleCount, emotion } = config
@@ -435,7 +446,7 @@ function generateEmotionParticles(
     let cumulative = 0
 
     for (const entry of Object.entries(emotionProfile.emotionMix)) {
-      const [emo, percentage] = entry as [string, number]
+      const [emo, percentage] = entry
       cumulative += percentage
       if (rand <= cumulative) {
         particleEmotion = emo as ParticleConfig['emotion']

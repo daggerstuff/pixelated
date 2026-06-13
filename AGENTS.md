@@ -6,7 +6,7 @@
 Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeScript) for the frontend/SSR, and Express/FastAPI/Flask backend services.
 
 ### Runtime Versions
-- **Node.js**: 24.14.1 (see `.nvmrc`)
+- **Node.js**: 24.16.0 (see `.nvmrc`)
 - **pnpm**: 11.3.0 (see `package.json`)
 - **Python**: 3.13 (see `.python-version`)
 - **uv**: Python package and environment manager (always prefer `uv run` for execution)
@@ -26,6 +26,7 @@ pnpm vitest run -c config/vitest.config.ts
 ```
 
 ### Key Commands
+- **Submodules**: `git submodule init && git submodule update` (run after clone/pull, before `pnpm install`)
 - **Lint**: `pnpm lint` (oxlint; pre-existing warnings expected)
 - **Typecheck**: `pnpm typecheck`
 - **Tests**: `pnpm vitest run -c config/vitest.config.ts`
@@ -97,6 +98,60 @@ Before substantial work, execute the continuity handshake:
 
 ---
 
+## Cursor Cloud specific instructions
+
+### Node.js PATH
+Cloud VMs ship `/exec-daemon/node` (v22) ahead of nvm on `PATH`. Prepend Node 24 before running pnpm scripts:
+```bash
+export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
+```
+(`~/.bashrc` in this environment is configured to do this in interactive shells.)
+
+### Docker
+- Cloud VMs may not have Docker preinstalled. If `docker info` fails, install Docker CE and start `dockerd` manually (systemd often cannot start the service here):
+  ```bash
+  sudo dockerd >/tmp/dockerd.log 2>&1 &
+  ```
+  Use `sudo docker` / `sudo -E docker compose` unless your user is in the `docker` group.
+- Compose files require secrets on the command line (not only in `.env`):
+  ```bash
+  export POSTGRES_PASSWORD=dev_password_change_in_prod
+  export REDIS_PASSWORD=dev_redis_password
+  export PGBOUNCER_PASSWORD=dev_pgbouncer_password
+  sudo -E docker compose -f docker/docker-compose.db.yml up -d postgres redis
+  sudo docker network create docker_web 2>/dev/null || true
+  sudo docker compose -f docker/docker-compose.local-mongo.yml up -d
+  ```
+- Redis binds to `127.0.0.1:6379` with `--requirepass`; use `redis://:dev_redis_password@127.0.0.1:6379/0` in `.env` and test overrides.
+
+### Local `.env` bootstrap
+If `.env` is missing, derive Postgres user/db from the running container and write local URLs (see `WALKTHROUGH.md`). Do not commit `.env`.
+
+### E2E against an already-running dev server
+Install browsers once per VM: `pnpm exec playwright install chromium`
+
+```bash
+DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
+  pnpm exec playwright test tests/e2e/infrastructure/ssr-functionality.spec.ts \
+  --config=config/playwright.config.ts --project=chromium
+```
+
+### Submodules
+After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
+```bash
+git submodule init
+git submodule update
+pnpm install --no-frozen-lockfile
+```
+Use `--no-frozen-lockfile` for local and CI installs to avoid frozen-lockfile retry/failover loops when the lockfile drifts.
+
+For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead of plain `git submodule` commands.
+
+### Long-running dev server
+Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
+
+---
+
 ## Delivery Checks (Task Completion Contract)
 
 Before ending a turn and finishing a task, perform the following checks:
@@ -104,5 +159,3 @@ Before ending a turn and finishing a task, perform the following checks:
 2. **Review Diffs**: Ensure edits are minimal, clean, safe, and do not contain suppression comments.
 3. **Execute Verification Command**: Run a target check (e.g. `pnpm lint`, `pnpm typecheck`, or targeted tests).
 4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose the next steps.
-
-

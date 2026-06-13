@@ -142,6 +142,18 @@ export async function connectRedis(): Promise<Redis> {
 }
 
 // ============================================================================
+// SETTERS
+// ============================================================================
+
+export function setPostgresPool(pool: Pool | null): void {
+  postgresPool = pool
+}
+
+export function setRedisClient(client: Redis | null): void {
+  redisClient = client
+}
+
+// ============================================================================
 // GETTERS
 // ============================================================================
 
@@ -244,28 +256,4 @@ export async function withMongoSession<T>(
   } finally {
     await session.endSession()
   }
-}
-
-// ============================================================================
-// SETTERS & SAFE GETTERS
-// ============================================================================
-
-export function setPostgresPool(pool: Pool): void {
-  postgresPool = pool
-}
-
-export function setRedisClient(client: typeof redisClient): void {
-  redisClient = client
-}
-
-export function getMongoConnectionSafe(): MongoConnection | null {
-  return mongoConnection
-}
-
-export function getPostgresPoolSafe(): Pool | null {
-  return postgresPool
-}
-
-export function getRedisClientSafe(): Redis | null {
-  return redisClient
 }

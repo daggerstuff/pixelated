@@ -1,18 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 
 import { mcpMemoryManager } from '../lib/memory/mcp-memory-client'
-import {
-  memoryManager as localMemoryManager,
-  type MemoryEntry,
-  type SearchOptions,
-  type MemoryStats,
+import type {
+  MemoryEntry,
+  SearchOptions,
+  MemoryStats,
 } from '../lib/memory/memory-client'
 
-const memoryManager =
-  process.env['NEXT_PUBLIC_USE_LOCAL_MEMORY'] === 'true' ||
-  process.env['NEXT_PUBLIC_USE_MCP_MEMORY'] === 'false'
-    ? localMemoryManager
-    : mcpMemoryManager
+// PIX-1920 / PIX-3903: Route through mcpMemoryManager → /api/v1/memory/* gateway.
+// No env-var override is allowed — localMemoryManager is test/dev only.
+const memoryManager = mcpMemoryManager
 
 interface UseMemoryOptions {
   userId?: string

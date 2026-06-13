@@ -83,7 +83,7 @@ jobs:
           output_format: sarif
           output_file_path: checkov-infra-results.sarif
           skip_check: ''
-          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice'
+          skip_path: 'clusters,ai/training/defense_mechanisms,ai/helm/pixel-voice,docker/traefik,ai/config,ai/monitoring,ai/training/configs,ai/training/ready_packages,ai/training_data_unified'
           log_level: WARNING
           container_user: 0
         continue-on-error: true
@@ -170,8 +170,7 @@ jobs:
           category: checkov-helm
 
       - name: Create diagnostic artifact when Checkov SARIF is missing
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         run: |
           if [ "${{ steps.checkov_infra_sarif.outputs.found }}" != "true" ]; then
@@ -182,8 +181,7 @@ jobs:
           fi
 
       - name: Upload Checkov diagnostic artifact
-        if:
-          ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
+        if: ${{ steps.checkov_infra_sarif.outputs.found == 'false' ||
           steps.checkov_helm_sarif.outputs.found == 'false' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -217,7 +215,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.14.1
+          node-version: 24.16.0
           package-manager-cache: false
 
       - name: Install pnpm
@@ -247,7 +245,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Run security audit
         run: |

@@ -28,7 +28,7 @@ Follow [Conventional Commits](https://www.conventionalcommits.org/):
 feat: add emotion timeline visualization
 fix: resolve race condition in session save
 docs: update WALKTHROUGH with troubleshooting section
-chore: bump pnpm to 11.3.0
+chore: bump pnpm to 11.5.2
 ```
 
 ## Before Pushing
@@ -39,7 +39,8 @@ pnpm lint         # oxlint
 pnpm format:check # formatting
 ```
 
-Git hooks run automatically on commit (installed via `pnpm install`).
+Git hooks run automatically on commit (installed via
+`scripts/devops/pnpm-install-with-fallback.sh`).
 
 ## Testing
 

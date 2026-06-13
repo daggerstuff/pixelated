@@ -61,7 +61,7 @@ export async function getStaticPaths() {
 
   // Get all blog posts
   const posts = await getCollection("blog", (entry: any) => {
-    return import.meta.env.PROD ? !entry.data.draft : true;
+    return import.meta['env'].PROD ? !entry.data.draft : true;
   });
 
   // Sort by date - newest first
@@ -76,7 +76,7 @@ export async function getStaticPaths() {
 const { page } = Astro.props;
 */
 
-const pageParam = Astro.params.page || '1'
+const pageParam = Astro.params['page'] || '1'
 const currentPage = parseInt(pageParam, 10)
 const pageSize = 20
 

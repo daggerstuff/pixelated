@@ -1,4 +1,4 @@
-FROM node:24.14.1-alpine AS builder
+FROM node:24.16.0-alpine AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,10 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source code
 COPY . .
@@ -18,7 +21,7 @@ COPY . .
 RUN pnpm build
 
 # Production stage
-FROM node:24.14.1-alpine AS production
+FROM node:24.16.0-alpine AS production
 
 WORKDIR /app
 
@@ -36,7 +39,10 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm
 
 # Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    PNPM_INSTALL_ARGS="--prod" /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy built application from builder stage
 COPY --from=builder /app/dist ./dist

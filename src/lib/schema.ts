@@ -139,7 +139,6 @@ export const postSchema = z.object({
       'Specifies the Open Graph (OG) image for social media sharing. To auto-generate OG image, delete the field or set to `true`. To disable it, set the field to `false`. To use a custom image, provide the full filename from `/public/og-images/`.',
     ),
   redirect: z
-    .string()
     .url('Invalid url.')
     .optional()
     .describe('Defines a URL to redirect the post.'),
@@ -157,7 +156,6 @@ export type PostSchema = z.infer<typeof postSchema>
 const projectSchema = z.object({
   id: z.string().describe('**Required**. Name of the project to be displayed.'),
   link: z
-    .string()
     .url('Invalid url.')
     .describe('**Required**. URL linking to the project page or repository.'),
   desc: z
@@ -197,7 +195,6 @@ const streamSchema = z.object({
       '**Required**. Specifies the publication date. See supported formats [here](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse#examples).',
     ),
   link: z
-    .string()
     .url('Invalid url.')
     .describe('**Required**. Specifies the URL link to the stream.'),
   radio: z
@@ -227,7 +224,7 @@ export const streamsSchema = z.object({
 /* Releases */
 const releaseSchema = z.object({
   id: z.string(),
-  link: z.string().url(),
+  link: z.url(),
   desc: z.string(),
   icon: z.string().regex(/^i-[\w-]+(:?[\w-]+)?$/),
   publishedAt: z.string().optional(),
@@ -246,7 +243,7 @@ export type ReleasesSchema = z.infer<typeof releasesSchema>
 const prSchema = z.object({
   title: z.string(),
   number: z.number(),
-  url: z.string().url(),
+  url: z.url(),
   state: z.enum(['OPEN', 'CLOSED', 'MERGED']),
   isDraft: z.boolean(),
   createdAt: z.string(),
@@ -256,7 +253,7 @@ const prSchema = z.object({
     owner: z.object({
       login: z.string(),
     }),
-    url: z.string().url(),
+    url: z.url(),
     isInOrganization: z.boolean(),
   }),
   bodyHTML: z.string(),

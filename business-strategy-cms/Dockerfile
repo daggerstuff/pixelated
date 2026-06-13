@@ -1,4 +1,4 @@
-FROM node:24.14.1-alpine
+FROM node:24.16.0-alpine
 
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
@@ -12,7 +12,10 @@ COPY package.json pnpm-lock.yaml ./
 RUN npm install -g pnpm
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source code
 COPY . .

@@ -10,10 +10,9 @@ import { randomUUID } from 'node:crypto'
 
 import type { PoolClient } from 'pg'
 
-import { query } from '../db'
 import { auth0UserService } from '../../services/auth0.service'
+import { query } from '../db'
 import { validateToken } from './auth0-jwt-service'
-
 import type {
   IdentityProvider,
   IdentityProviderUser,
@@ -63,8 +62,8 @@ export class Auth0IdentityProvider implements IdentityProvider {
       : await query<{ user_id: string; role: string }>(sql, params)
     if (result.rows.length === 0) return null
     return {
-      internalId: result.rows[0]!.user_id,
-      role: result.rows[0]!.role,
+      internalId: result.rows[0].user_id,
+      role: result.rows[0].role,
     }
   }
 

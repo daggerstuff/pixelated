@@ -1,4 +1,4 @@
-image: node:24.14.1-bullseye-slim
+image: node:24.16.0-bullseye-slim
 
 clone:
   depth: full
@@ -37,31 +37,37 @@ definitions:
         - uv run pytest -q tests/python/test_quality_scoring_stub.py
     - step: &lint-oxlint
       name: Lint & Oxlint
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - npm install -g pnpm@11.5.2
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm lint
         - pnpm exec oxlint --type-aware -c .oxlintrc.json .
     - step: &security-scan
       name: Security Scan
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - npm install -g pnpm@11.5.2
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm security:scan
     - step: &playwright-e2e
       name: Playwright Smoke E2E
-      image: node:24.14.1-bullseye-slim
+      image: node:24.16.0-bullseye-slim
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.3.0
-        - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+        - npm install -g pnpm@11.5.2
+        - chmod +x scripts/devops/pnpm-install-with-fallback.sh
+        - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
+          scripts/devops/pnpm-install-with-fallback.sh
         - pnpm test:e2e:smoke
     - step: &build-test-sonarcloud
       name: Build, test and analyze on SonarCloud
@@ -73,7 +79,7 @@ definitions:
         - docker
       script:
         - echo "Installing dependencies"
-        - npm install -g pnpm@11.3.0
+        - npm install -g pnpm@11.5.2
         - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
         - echo "Run tests and build"
         - pnpm test --silent

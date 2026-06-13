@@ -23,7 +23,7 @@ install_tools() {
 
     if ! command -v pnpm &> /dev/null; then
         echo "📦 [Runtime] Installing pnpm..."
-        curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=11.3.0 sh - > /dev/null 2>&1
+        curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=11.5.2 sh - > /dev/null 2>&1
     fi
 }
 
@@ -51,7 +51,7 @@ sync_deps() {
     echo "🔗 [Runtime] Syncing all dependencies..."
     uv pip compile pyproject.toml -o requirements.txt > /dev/null 2>&1
     uv lock > /dev/null 2>&1
-    pnpm install --no-frozen-lockfile > /dev/null 2>&1
+    PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile > /dev/null 2>&1
 }
 
 # Execute Setup

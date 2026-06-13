@@ -298,7 +298,7 @@ export class AutomatedThreatResponseOrchestratorCore
 
       // Select the best matching strategy based on priority and conditions
       matchingStrategies.sort((a, b) => b.priority - a.priority)
-      return matchingStrategies[0]!
+      return matchingStrategies[0]
     } catch (error: unknown) {
       logger.error('Failed to select response strategy:', { error })
       return this.getDefaultStrategy(threat)
@@ -593,7 +593,7 @@ export class AutomatedThreatResponseOrchestratorCore
       },
     }
 
-    return defaultStrategies[severity] ?? defaultStrategies['medium']!
+    return defaultStrategies[severity] ?? defaultStrategies['medium']
   }
 
   private async generateResponseActions(

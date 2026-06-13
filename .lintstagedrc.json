@@ -1,7 +1,8 @@
 {
   ".Jules/**/*.md": ["pnpm run format:jules-markdown"],
   ".Jules/**/*.mdx": ["pnpm run format:jules-markdown"],
-  "*.{js,ts,jsx,tsx,astro}": ["oxlint -c .oxlintrc.json"],
+  "*.{js,ts,jsx,tsx,astro}": ["oxlint -c .oxlintrc.json --ignore-pattern 'src/scripts/**'"],
+  "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
   ],

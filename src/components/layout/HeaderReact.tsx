@@ -29,9 +29,13 @@ export function Header({
       } else if (e.key === 'Escape') {
         // Only close if not focused on search modal to preserve two-step escape behavior
         // First Escape clears search query (handled by SearchBox), second closes modal
-        const searchModal = document.querySelector('[class*="fixed inset-0"][class*="z-50"]')
-        const isFocusInSearchModal = searchModal?.contains(document.activeElement)
-        
+        const searchModal = document.querySelector(
+          '[class*="fixed inset-0"][class*="z-50"]',
+        )
+        const isFocusInSearchModal = searchModal?.contains(
+          document.activeElement,
+        )
+
         if (!isFocusInSearchModal) {
           setIsSearchOpen(false)
         }

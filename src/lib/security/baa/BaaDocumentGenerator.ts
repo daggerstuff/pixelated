@@ -1,9 +1,9 @@
 import { generateId } from '../../utils/ids'
-import type {
-  BaaTemplate,
-  BaaDocument,
-  BusinessAssociate,
+import {
   BaaStatus,
+  type BaaTemplate,
+  type BaaDocument,
+  type BusinessAssociate,
 } from './types'
 
 /**

@@ -1,4 +1,5 @@
-import { InternalMemoryServiceClient } from '../server/internal-memory-service-client'
+import type { UnifiedMemory } from '@pixelated/memory-schema'
+
 import {
   ProductMemoryGatewayError,
   type ProductMemoryDeleteInput,
@@ -6,10 +7,9 @@ import {
   toInternalScope,
 } from './product-memory-gateway'
 
-type InternalMemoryServiceClientLike = Pick<
-  InternalMemoryServiceClient,
-  'getMemory'
->
+type InternalMemoryServiceClientLike = {
+  getMemory: (input: any) => Promise<UnifiedMemory | null>
+}
 
 export async function assertOwnedMemoryAccessible(
   client: InternalMemoryServiceClientLike,

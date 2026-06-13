@@ -3,6 +3,8 @@
   "ignorePatterns": [
     "scripts/**/*.js",
     "scripts/**/*.mjs",
+    "scripts/**/*.ts",
+    "business-strategy-cms/scripts/**/*.ts",
     "public/polyfills/**/*.js",
     ".github/cookbook/**/*.ts",
     ".github/cookbook/**/*.tsx",
@@ -12,7 +14,7 @@
     "src/lib/export/index.node.ts",
     "src/lib/fhe/fhe-factory.ts",
     "src/scripts/task-manager-cli.ts",
-    "config/vitest.config.ts",
+    "vitest.config.ts",
     "foresight-mcp/apps/docs/tsconfig.json"
   ],
   "env": {

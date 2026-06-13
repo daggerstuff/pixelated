@@ -6,77 +6,70 @@
  * to enable end-to-end request tracking across microservices.
  */
 
-import { resourceFromAttributes, type Resource } from '@opentelemetry/resources'
+import { resourceFromAttributes, type Resource } from "@opentelemetry/resources";
 import {
   SEMRESATTRS_SERVICE_NAME,
   SEMRESATTRS_SERVICE_VERSION,
   SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
   SEMRESATTRS_SERVICE_INSTANCE_ID,
-} from '@opentelemetry/semantic-conventions'
+} from "@opentelemetry/semantic-conventions";
 
 export interface TracingConfig {
-  enabled: boolean
-  serviceName: string
-  serviceVersion: string
-  environment: string
+  enabled: boolean;
+  serviceName: string;
+  serviceVersion: string;
+  environment: string;
   exporter: {
-    type: 'otlp' | 'console' | 'jaeger' | 'zipkin'
-    endpoint?: string
-    headers?: Record<string, string>
-  }
+    type: "otlp" | "console" | "jaeger" | "zipkin";
+    endpoint?: string;
+    headers?: Record<string, string>;
+  };
   sampling: {
-    ratio: number // 0.0 to 1.0
-  }
+    ratio: number; // 0.0 to 1.0
+  };
   instrumentation: {
-    http: boolean
-    express: boolean
-    mongodb: boolean
-    postgres: boolean
-    redis: boolean
-  }
+    http: boolean;
+    express: boolean;
+    mongodb: boolean;
+    postgres: boolean;
+    redis: boolean;
+  };
 }
 
 /**
  * Get tracing configuration from environment variables
  */
 export function getTracingConfig(): TracingConfig {
-  const isProduction = import.meta.env.PROD
+  const envObj = typeof import.meta !== "undefined" ? import.meta.env : process.env || {};
+  const isProduction = envObj.PROD === true || process.env["NODE_ENV"] === "production";
 
   // Default to enabled in production, can be disabled via env var
   const enabled =
-    import.meta.env['TRACING_ENABLED'] !== 'false' &&
-    (isProduction || import.meta.env['TRACING_ENABLED'] === 'true')
+    envObj["TRACING_ENABLED"] !== "false" && (isProduction || envObj["TRACING_ENABLED"] === "true");
 
   return {
     enabled,
-    serviceName: import.meta.env['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
-    serviceVersion: import.meta.env['TRACING_SERVICE_VERSION'] ?? '1.0.0',
-    environment:
-      import.meta.env.MODE || (isProduction ? 'production' : 'development'),
+    serviceName: envObj["TRACING_SERVICE_NAME"] ?? "pixelated-empathy",
+    serviceVersion: envObj["TRACING_SERVICE_VERSION"] ?? "1.0.0",
+    environment: envObj.MODE || (isProduction ? "production" : "development"),
     exporter: {
-      type:
-        (import.meta.env['TRACING_EXPORTER_TYPE'] as
-          | 'otlp'
-          | 'console'
-          | 'jaeger'
-          | 'zipkin') || 'otlp',
-      endpoint:
-        import.meta.env['TRACING_EXPORTER_ENDPOINT'] ?? 'http://localhost:4318',
-      headers: import.meta.env['TRACING_EXPORTER_HEADERS']
-        ? JSON.parse(import.meta.env['TRACING_EXPORTER_HEADERS'])
+      type: (envObj["TRACING_EXPORTER_TYPE"] as "otlp" | "console" | "jaeger" | "zipkin") || "otlp",
+      endpoint: envObj["TRACING_EXPORTER_ENDPOINT"] ?? "http://localhost:4318",
+      headers: envObj["TRACING_EXPORTER_HEADERS"]
+        ? JSON.parse(envObj["TRACING_EXPORTER_HEADERS"])
         : undefined,
     },
     sampling: {
-      ratio: parseFloat(import.meta.env['TRACING_SAMPLING_RATIO'] ?? '1.0'),
+      ratio: parseFloat(envObj["TRACING_SAMPLING_RATIO"] ?? "1.0"),
     },
     instrumentation: {
-      http: import.meta.env['TRACING_INSTRUMENT_HTTP'] !== 'false',
-      express: import.meta.env['TRACING_INSTRUMENT_EXPRESS'] !== 'false',
-      mongodb: import.meta.env['TRACING_INSTRUMENT_MONGODB'] !== 'false',
-      postgres: import.meta.env['TRACING_INSTRUMENT_POSTGRES'] !== 'false',
-      redis: import.meta.env['TRACING_INSTRUMENT_REDIS'] !== 'false',
+      http: envObj["TRACING_INSTRUMENT_HTTP"] !== "false",
+      express: envObj["TRACING_INSTRUMENT_EXPRESS"] !== "false",
+      mongodb: envObj["TRACING_INSTRUMENT_MONGODB"] !== "false",
+      postgres: envObj["TRACING_INSTRUMENT_POSTGRES"] !== "false",
+      redis: envObj["TRACING_INSTRUMENT_REDIS"] !== "false",
     },
-  }
+  };
 }
 
 /**
@@ -88,7 +81,7 @@ export function createResource(config: TracingConfig): Resource {
     [SEMRESATTRS_SERVICE_VERSION]: config.serviceVersion,
     [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: config.environment,
     [SEMRESATTRS_SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
-  })
+  });
 }
 
 /**
@@ -97,5 +90,5 @@ export function createResource(config: TracingConfig): Resource {
 export function getSamplerConfig(config: TracingConfig) {
   return {
     ratio: Math.max(0, Math.min(1, config.sampling.ratio)),
-  }
+  };
 }

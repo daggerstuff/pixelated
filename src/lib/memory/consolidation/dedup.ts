@@ -52,15 +52,15 @@ export class SemanticDeduplicator {
 
     for (let i = 0; i < memories.length; i++) {
       if (used.has(i)) continue
-      const clusterMembers: MemoryBlock[] = [memories[i]!]
+      const clusterMembers: MemoryBlock[] = [memories[i]]
       const clusterScores = [1.0]
       used.add(i)
 
       for (let j = i + 1; j < memories.length; j++) {
         if (used.has(j)) continue
-        const sim = this.cosine(vectors[i]!, vectors[j]!)
+        const sim = this.cosine(vectors[i], vectors[j])
         if (sim >= this.threshold) {
-          clusterMembers.push(memories[j]!)
+          clusterMembers.push(memories[j])
           clusterScores.push(sim)
           used.add(j)
         }
@@ -70,7 +70,7 @@ export class SemanticDeduplicator {
         const rep: MemoryBlock = clusterMembers.reduce(
           (a: MemoryBlock, b: MemoryBlock) =>
             b.importance.raw > a.importance.raw ? b : a,
-          clusterMembers[0]!,
+          clusterMembers[0],
         )
         const cluster: DedupCluster = {
           clusterId: `cluster_${clusters.length}`,
@@ -82,7 +82,7 @@ export class SemanticDeduplicator {
         clusters.push(cluster)
         unique.push(this.mergeCluster(cluster))
       } else {
-        unique.push(memories[i]!)
+        unique.push(memories[i])
       }
     }
 

@@ -245,6 +245,15 @@ export interface WorkflowExecution extends BaseEntity {
     createdAt: Date
     isInternal: boolean
   }[]
+
+  // Execution history log
+  history?: {
+    stepId: string
+    action: string
+    userId: UserId
+    timestamp: Date
+    details?: Record<string, unknown>
+  }[]
 }
 
 export interface WorkflowTemplate extends BaseEntity {

@@ -16,14 +16,15 @@ export const GET = withAuthenticatedMemoryRoute(
     }
 
     const stats = await getGateway().getMemoryStats({
-      ...toMemoryScope(user.id),
+      ...toMemoryScope(user.id, user.accountId, user.workspaceId),
       limit: 500,
       offset: 0,
     })
 
     return jsonResponse({
       success: true,
-      ...stats,
+      totalMemories: stats.totalMemories,
+      categoryCounts: stats.categoryCounts,
       recentActivity: [],
     })
   },
