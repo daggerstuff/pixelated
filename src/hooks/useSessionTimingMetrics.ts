@@ -20,8 +20,8 @@ type SetMemory = React.Dispatch<
 export function useSessionTimingMetrics(
   sessionState: 'idle' | 'active' | 'paused' | 'ended',
   setMemory: SetMemory,
-  sessionStartTimeRef: React.MutableRefObject<number>,
-  lastActiveTimeRef: React.MutableRefObject<number>,
+  sessionStartTimeRef: { current: number },
+  lastActiveTimeRef: { current: number },
 ) {
   useEffect(() => {
     const interval = setInterval(() => {

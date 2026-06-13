@@ -24,7 +24,8 @@ export const GET = withAuthenticatedMemoryRoute(
 
     return jsonResponse({
       success: true,
-      ...stats,
+      totalMemories: stats.totalMemories,
+      categoryCounts: stats.categoryCounts,
       recentActivity: [],
     })
   },

@@ -43,7 +43,7 @@ and workflows so you can contribute confidently.
 ### Prerequisites
 
 - Node.js ≥ 24 (see `.nvmrc`) — install via `nvm install`
-- pnpm ≥ 11.3.0
+- pnpm ≥ 11.5.2
 - Python 3.13 + [uv](https://github.com/astral-sh/uv)
 - Docker (must be running)
 
@@ -58,11 +58,21 @@ and copies `.env.example → .env` if needed.
 
 ### Manual setup
 
+Ensure prerequisites are installed and Docker is running before proceeding.
+
 ```bash
-pnpm install
-uv sync
+# 1. Start database containers (MongoDB, Redis, PostgreSQL)
 docker compose -f docker/docker-compose.db.yml up -d
-cp .env.example .env  # then edit MONGODB_URI and DATABASE_URL
+
+# 2. Copy and configure environment file
+cp .env.example .env
+
+# 3. Install JS dependencies
+chmod +x scripts/devops/pnpm-install-with-fallback.sh
+scripts/devops/pnpm-install-with-fallback.sh
+
+# 4. Install Python dependencies
+uv sync
 ```
 
 ---

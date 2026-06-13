@@ -25,6 +25,11 @@ import {
   disconnectPostgreSQL,
   disconnectRedis,
 } from '../lib/database/connection'
+import {
+  getSentryExpressHandlers,
+  hasSentryExpressErrorHandler,
+  registerSentryExpressErrorHandler,
+} from '../lib/sentry/express'
 import { authMiddleware } from './middleware/auth'
 import { errorHandler, notFoundHandler } from './middleware/error-handler'
 import { requestLogger } from './middleware/logger'
@@ -34,6 +39,7 @@ import documentRoutes from './routes/documents'
 import healthRoutes from './routes/health'
 import marketResearchRoutes from './routes/market-research'
 import projectRoutes from './routes/projects'
+import readinessRoutes from './routes/readiness'
 import salesOpportunitiesRoutes from './routes/sales-opportunities'
 import strategicPlanRoutes from './routes/strategic-plans'
 import userRoutes from './routes/users'
@@ -46,71 +52,11 @@ app.set('trust proxy', 1)
 const PORT = parseInt(process.env['PORT'] ?? '5000', 10)
 const NODE_ENV = process.env['NODE_ENV'] ?? 'development'
 
-type SentryExpressErrorHandler = (app: express.Application) => void
-type SentryErrorHandler = (
-  options?: Record<string, string>,
-) => express.ErrorRequestHandler
-type SentryCaptureHandler = (error: unknown) => void
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null
-
-const isSentryExpressErrorHandler = (
-  value: unknown,
-): value is SentryExpressErrorHandler => typeof value === 'function'
-
-const isSentryExpressErrorRequestHandler = (
-  value: unknown,
-): value is SentryErrorHandler => typeof value === 'function'
-
-const isSentryCaptureHandler = (
-  value: unknown,
-): value is SentryCaptureHandler => typeof value === 'function'
-
-const getSentryHandlers = (
-  source: unknown,
-): {
-  setupExpressErrorHandler?: SentryExpressErrorHandler
-  expressErrorHandler?: SentryErrorHandler
-  captureException?: SentryCaptureHandler
-} => {
-  if (!isRecord(source)) {
-    return {}
-  }
-
-  const handlers: {
-    setupExpressErrorHandler?: SentryExpressErrorHandler
-    expressErrorHandler?: SentryErrorHandler
-    captureException?: SentryCaptureHandler
-  } = {}
-
-  if (isSentryExpressErrorHandler(source['setupExpressErrorHandler'])) {
-    handlers.setupExpressErrorHandler = source['setupExpressErrorHandler']
-  }
-
-  if (isSentryExpressErrorRequestHandler(source['expressErrorHandler'])) {
-    handlers.expressErrorHandler = source['expressErrorHandler']
-  }
-
-  if (isSentryCaptureHandler(source['captureException'])) {
-    handlers.captureException = source['captureException']
-  }
-
-  return handlers
-}
-
-const { setupExpressErrorHandler, expressErrorHandler, captureException } =
-  getSentryHandlers(Sentry)
-
-const hasSentryErrorHandler =
-  !!setupExpressErrorHandler || !!expressErrorHandler
+const sentryHandlers = getSentryExpressHandlers(Sentry)
+const hasSentryErrorHandler = hasSentryExpressErrorHandler(sentryHandlers)
+const { captureException } = sentryHandlers
 
 app.use(sentryMiddleware)
-if (typeof setupExpressErrorHandler === 'function') {
-  setupExpressErrorHandler(app)
-} else if (typeof expressErrorHandler === 'function') {
-  app.use(expressErrorHandler())
-}
 
 // ============================================================================
 // SECURITY MIDDLEWARE
@@ -160,6 +106,7 @@ app.use(rateLimiter)
 
 app.use('/api/health', healthRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/readiness', readinessRoutes)
 
 // ============================================================================
 // PROTECTED ROUTES (AUTH REQUIRED)
@@ -181,6 +128,7 @@ app.use('/api/users', userRoutes)
 // ============================================================================
 
 // 404 handler
+registerSentryExpressErrorHandler(app, sentryHandlers)
 app.use(notFoundHandler)
 
 // Global error handler (must be last)
@@ -217,17 +165,30 @@ async function initializeDatabases() {
     console.log('🔄 Connecting to MongoDB...')
     mongoConnection = await connectMongoDB()
     console.log('✅ MongoDB connected')
+  } catch (error: unknown) {
+    console.error(
+      '⚠️ MongoDB connection failed (continuing without it):',
+      error,
+    )
+  }
 
+  try {
     console.log('🔄 Connecting to PostgreSQL...')
     postgresConnection = await connectPostgreSQL()
     console.log('✅ PostgreSQL connected')
+  } catch (error: unknown) {
+    console.error(
+      '⚠️ PostgreSQL connection failed (continuing without it):',
+      error,
+    )
+  }
 
+  try {
     console.log('🔄 Connecting to Redis...')
     redisConnection = await connectRedis()
     console.log('✅ Redis connected')
   } catch (error: unknown) {
-    console.error('❌ Database connection failed:', error)
-    process.exit(1)
+    console.error('⚠️ Redis connection failed (continuing without it):', error)
   }
 }
 

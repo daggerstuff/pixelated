@@ -1,4 +1,5 @@
 import { test, expect, describe, beforeEach } from 'vitest'
+
 import {
   CrisisDetector,
   crisisDetector,

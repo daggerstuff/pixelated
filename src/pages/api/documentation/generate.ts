@@ -1,64 +1,59 @@
-import { getCurrentUser } from '@/lib/auth'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import type { APIContext } from "astro";
 
-import {
-  AIMessage,
-  AIServiceOptions,
-  createLLMService,
-} from '../../../lib/ai/AIService'
-import { AIRepository } from '../../../lib/db/ai/repository'
-import { DocumentationService } from '../../../lib/documentation'
+import { getCurrentUser } from "@/lib/auth";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 
-const logger = createBuildSafeLogger('documentation-api')
+import { AIMessage, AIServiceOptions, createLLMService } from "../../../lib/ai/AIService";
+import { AIRepository } from "../../../lib/db/ai/repository";
+import { DocumentationService } from "../../../lib/documentation";
+
+const logger = createBuildSafeLogger("documentation-api");
 
 // Instantiate dependencies for DocumentationService
-const repository = new AIRepository()
+const repository = new AIRepository();
 
 function resolveSafeLlmBaseUrl(): string | undefined {
   return (
-    process.env['LLM_BASE_URL'] ??
-    process.env['LLM_API_URL'] ??
-    process.env['OPENAI_BASE_URL'] ??
-    'https://api.openai.com/v1'
-  )
+    process.env["LLM_BASE_URL"] ??
+    process.env["LLM_API_URL"] ??
+    process.env["OPENAI_BASE_URL"] ??
+    "https://api.openai.com/v1"
+  );
 }
 const llmConfig = {
-  apiKey: process.env['LLM_API_KEY'] ?? 'dummy-key',
+  apiKey: process.env["LLM_API_KEY"] ?? "dummy-key",
   baseUrl: resolveSafeLlmBaseUrl(),
-}
+};
 // Create the base service
-const baseAiService = createLLMService(llmConfig)
+const baseAiService = createLLMService(llmConfig);
 // Add a stub getModelInfo to satisfy the AIService interface
 const aiService = {
   ...baseAiService,
   getModelInfo: () => ({
-    id: 'dummy-model',
-    name: 'Dummy Model',
-    provider: 'llm',
-    capabilities: ['chat'],
+    id: "dummy-model",
+    name: "Dummy Model",
+    provider: "llm",
+    capabilities: ["chat"],
     contextWindow: 2048,
     maxTokens: 1024,
   }),
-  generateCompletion: async (
-    messages: AIMessage[],
-    options: AIServiceOptions | undefined,
-  ) => {
-    const result = await baseAiService.generateCompletion(messages, options)
-    if ('id' in result) {
-      return result
+  generateCompletion: async (messages: AIMessage[], options: AIServiceOptions | undefined) => {
+    const result = await baseAiService.generateCompletion(messages, options);
+    if ("id" in result) {
+      return result;
     }
     // Convert plain result to minimal AICompletion
     return {
-      id: 'dummy-completion',
+      id: "dummy-completion",
       created: Date.now(),
-      model: 'dummy-model',
+      model: "dummy-model",
       choices: [
         {
           message: {
-            role: 'assistant' as const,
+            role: "assistant" as const,
             content: result.content,
           },
-          finishReason: 'stop' as const,
+          finishReason: "stop" as const,
         },
       ],
       usage: result.usage ?? {
@@ -66,103 +61,100 @@ const aiService = {
         completionTokens: 0,
         totalTokens: 0,
       },
-      provider: 'llm',
+      provider: "llm",
       content: result.content,
-    } as import('../../../lib/ai/models/ai-types').AICompletion
+    } as import("../../../lib/ai/models/ai-types").AICompletion;
   },
-}
-const documentationService = new DocumentationService(repository, aiService)
+};
+const documentationService = new (DocumentationService as any)(repository, aiService);
 
-export const POST = async ({ request }: APIContext) => {
+export const POST = async ({ request }: any) => {
   try {
     // Authenticate request
     // To get cookies in Astro API route, use the request.headers
     // We'll create a minimal cookies API compatible with getCurrentUser
-    const cookieHeader = request.headers.get('cookie') ?? ''
+    const cookieHeader = request.headers.get("cookie") ?? "";
     const cookies = {
       get: (name: string) => {
-        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`))
-        return match ? { value: match[1] } : undefined
+        const match = cookieHeader.match(new RegExp(`${name}=([^;]+)`));
+        return match ? { value: match[1] } : undefined;
       },
-    }
+    };
 
-    const user = await getCurrentUser(cookies as any)
+    const user = await getCurrentUser(cookies as any);
     if (!user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
-          message: 'You must be authenticated to access this endpoint',
+          error: "Unauthorized",
+          message: "You must be authenticated to access this endpoint",
         }),
         {
           status: 401,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         },
-      )
+      );
     }
 
     // Check admin permission
-    if (user.role !== 'admin') {
+    if (user.role !== "admin") {
       return new Response(
         JSON.stringify({
-          error: 'Forbidden',
-          message: 'You do not have permission to generate documentation',
+          error: "Forbidden",
+          message: "You do not have permission to generate documentation",
         }),
         {
           status: 403,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         },
-      )
+      );
     }
 
     // Parse request body
-    const body = await request.json()
-    const { section, options } = body
+    const body = await request.json();
+    const { section, options } = body;
 
     if (!section) {
       return new Response(
         JSON.stringify({
-          error: 'Bad Request',
-          message: 'section parameter is required',
+          error: "Bad Request",
+          message: "section parameter is required",
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         },
-      )
+      );
     }
 
     // Generate documentation
-    const result = await (documentationService as any).generateDocumentation(
-      section,
-      options,
-    )
+    const result = await (documentationService as any).generateDocumentation(section, options);
 
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-    })
+    });
   } catch (error: unknown) {
-    logger.error('Error generating documentation:', error)
+    logger.error("Error generating documentation:", error);
 
     return new Response(
       JSON.stringify({
-        error: 'Internal Server Error',
-        message: error instanceof Error ? String(error) : 'Unknown error',
+        error: "Internal Server Error",
+        message: error instanceof Error ? String(error) : "Unknown error",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       },
-    )
+    );
   }
-}
+};

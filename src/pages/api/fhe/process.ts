@@ -61,11 +61,15 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     // Initialize FHE service if not already initialized
+    const isProd =
+      typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD
     if (!fheService.isInitialized()) {
       await fheService.initialize({
         mode: EncryptionMode.FHE,
         securityLevel: 'high',
-        enableDebug: !import.meta.env.PROD,
+        enableDebug: !isProd,
       })
     }
 
@@ -89,11 +93,15 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
       `FHE API error: ${(error as Error).message}`,
     )
 
+    const isProdError =
+      typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Failed to process encrypted data',
-        message: !import.meta.env.PROD ? (error as Error).message : undefined,
+        message: !isProdError ? (error as Error).message : undefined,
       }),
       { status: 500, headers: { 'Content-Type': 'application/json' } },
     )

@@ -2,11 +2,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
 import { DeveloperApiKeyManager } from './developer-api-keys'
-import { query } from './index'
+import { query, DbQueryResult } from './index'
 
 vi.mock('./index', () => ({
   query: vi.fn(),
 }))
+
+type QueryResultRow = Record<string, unknown>
 
 type MockQueryResult<TRow> = {
   rows: TRow[]
@@ -19,8 +21,8 @@ type MockQueryResult<TRow> = {
 const createMockQueryResult = <TRow>(
   rows: TRow[],
   rowCount = rows.length,
-): MockQueryResult<TRow> => ({
-  rows,
+): DbQueryResult<QueryResultRow> => ({
+  rows: rows as unknown as QueryResultRow[],
   rowCount,
   command: 'SELECT',
   oid: 0,

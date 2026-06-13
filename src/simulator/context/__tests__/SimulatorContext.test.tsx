@@ -20,21 +20,17 @@ class UseSimulatorErrorBoundary extends Component<{
   children: ReactNode
   onError: (error: Error) => void
 }> {
-  state = { hasError: false }
-
+  override state = { hasError: false }
   static getDerivedStateFromError() {
     return { hasError: true }
   }
-
-  componentDidCatch(error: Error) {
+  override componentDidCatch(error: Error) {
     this.props.onError(error)
   }
-
-  render() {
+  override render() {
     if (this.state.hasError) {
       return null
     }
-
     return this.props.children
   }
 }
@@ -57,7 +53,7 @@ describe('SimulatorContext', () => {
     renderHook(() => useSimulator(), { wrapper: errorBoundary })
 
     expect(capturedError).toBeDefined()
-    expect(capturedError?.message).toBe(
+    expect(capturedError!.message).toBe(
       'useSimulator must be used within a SimulatorProvider',
     )
   })

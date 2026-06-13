@@ -1,4 +1,4 @@
-import { Redis } from 'ioredis'
+import Redis from 'ioredis'
 import { Pool } from 'pg'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -124,7 +124,9 @@ export class DocumentService {
     `
 
     const result = await this.db.query<DocumentRow>(query, [id, userId])
-    return result.rows.length > 0 ? this.mapDocumentRow(result.rows[0] as DocumentRow) : null
+    return result.rows.length > 0
+      ? this.mapDocumentRow(result.rows[0] as DocumentRow)
+      : null
   }
 
   async updateDocument(

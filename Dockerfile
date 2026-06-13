@@ -1,11 +1,11 @@
 # Single, clean multi-stage Dockerfile for building and running Pixelated
 
-FROM node:24.14.1-bookworm-slim AS base
+FROM node:24.16.0-bookworm-slim AS base
 
 # Builder stage: install deps and run the static build
 FROM base AS builder
 ENV NODE_ENV=production
-ARG PNPM_VERSION=11.3.0
+ARG PNPM_VERSION=11.5.2
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
@@ -43,35 +43,9 @@ COPY patches ./patches
 COPY config/package/.npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
-# Retry logic with fallback for lockfile mismatches
-RUN ( \
-    INSTALL_SUCCESS=0; \
-    for i in 1 2 3; do \
-    echo "Attempt $i: Installing dependencies with frozen lockfile..." && \
-    if pnpm install --frozen-lockfile --prod=false --ignore-scripts; then \
-    echo "✅ Dependencies installed successfully" && \
-    INSTALL_SUCCESS=1 && \
-    break; \
-    else \
-    EXIT_CODE=$?; \
-    echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
-    if [ $i -eq 3 ]; then \
-    echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
-    if pnpm install --no-frozen-lockfile --prod=false --ignore-scripts; then \
-    echo "✅ Dependencies installed with lockfile update" && \
-    INSTALL_SUCCESS=1 && \
-    break; \
-    fi; \
-    else \
-    sleep 2; \
-    fi; \
-    fi; \
-    done; \
-    if [ "$INSTALL_SUCCESS" -ne 1 ]; then \
-    echo "❌ Failed to install dependencies after all attempts" && \
-    exit 1; \
-    fi \
-    )
+# Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)
+RUN pnpm install --frozen-lockfile --ignore-scripts || \
+    pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source and run the build
 COPY . .
@@ -100,7 +74,7 @@ WORKDIR /app
 
 # Install pnpm and build tools needed for native dependencies (like better-sqlite3)
 # Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=11.3.0
+ARG PNPM_VERSION=11.5.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     make \
@@ -134,37 +108,10 @@ COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/patches ./patches
 COPY --from=builder /app/.npmrc ./.npmrc
 
-# Install production dependencies with retry logic and clean up in a single layer
-RUN ( \
-    INSTALL_SUCCESS=0; \
-    for i in 1 2 3; do \
-    echo "Attempt $i: Installing production dependencies with frozen lockfile..." && \
-    if pnpm install --prod --frozen-lockfile --ignore-scripts; then \
-    echo "✅ Production dependencies installed successfully" && \
-    INSTALL_SUCCESS=1 && \
-    break; \
-    else \
-    EXIT_CODE=$?; \
-    echo "❌ Attempt $i failed (exit code: $EXIT_CODE)" && \
-    if [ $i -eq 3 ]; then \
-    echo "⚠️ Falling back to --no-frozen-lockfile to resolve lockfile mismatch..." && \
-    if pnpm install --prod --no-frozen-lockfile --ignore-scripts; then \
-    echo "✅ Production dependencies installed with lockfile update" && \
-    INSTALL_SUCCESS=1 && \
-    break; \
-    fi; \
-    else \
-    sleep 2; \
-    fi; \
-    fi; \
-    done; \
-    if [ "$INSTALL_SUCCESS" -ne 1 ]; then \
-    echo "❌ Failed to install production dependencies after all attempts" && \
-    exit 1; \
-    fi \
-    ) && \
+# Install production dependencies; fallback to --no-frozen-lockfile if lockfile drifts in CI
+RUN (pnpm install --frozen-lockfile --prod --ignore-scripts || \
+    pnpm install --no-frozen-lockfile --prod --ignore-scripts) && \
     pnpm store prune && \
-    # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.test.*" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.spec.*" -exec rm -rf {} + 2>/dev/null || true && \
@@ -175,7 +122,6 @@ RUN ( \
     find node_modules -name "CHANGELOG*" -delete && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    # Remove build tools after native modules are built
     apt-get purge -y --auto-remove python3 make g++ git && \
     rm -rf /tmp/* /root/.npm /root/.cache
 

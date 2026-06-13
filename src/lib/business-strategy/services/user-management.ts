@@ -22,7 +22,7 @@ export class UserManagementService extends BaseService {
    */
   async getUser(id: UserId): Promise<User | null> {
     try {
-      const result = await this.db.postgresql.pool.query(
+      const result = await this.db.postgresql.pool.query<User>(
         `SELECT * FROM ${this.db.postgresql.schema}.${this.tableNames.users} WHERE id = $1`,
         [id],
       )
@@ -44,7 +44,7 @@ export class UserManagementService extends BaseService {
     // For now, return a basic check
     const user = await this.getUser(userId)
     if (!user) return false
-    if (user.role === 'admin') return true
+    if (user.role === 'administrator') return true
 
     // Real implementation would check permission table
     return true

@@ -3,6 +3,26 @@
  * Official JavaScript/TypeScript SDK for the Pixelated Empathy API
  */
 
+import { MemoryApiClient } from '../memory/memory-api-client'
+
+export type {
+  CreateMemoryRequest,
+  CreateMemoryResponse,
+  DeleteMemoryResponse,
+  ListMemoriesQuery,
+  ListMemoriesResponse,
+  PublicMemory,
+  SearchMemoryRequest,
+  SearchMemoriesResponse,
+  UpdateMemoryRequest,
+  UpdateMemoryResponse,
+} from '../memory/memory-api-client'
+
+export {
+  MemoryApiClient,
+  MemoryApiClientError,
+} from '../memory/memory-api-client'
+
 export interface SDKConfig {
   apiKey: string
   baseUrl?: string
@@ -134,5 +154,26 @@ export class PixelatedEmpathy {
         return this.request('/health')
       },
     }
+  }
+
+  /**
+   * Memory API — thin pass-through to the canonical v1 memory client.
+   */
+  get memory(): MemoryApiClient {
+    const apiV1Root = this.baseUrl.replace(/\/$/, '')
+
+    return new MemoryApiClient({
+      baseUrl: `${apiV1Root}/memory`,
+      getHeaders: () => ({ 'X-API-Key': this.apiKey }),
+      fetchFn: async (input, init) => {
+        const controller = new AbortController()
+        const id = setTimeout(() => controller.abort(), this.timeout)
+        try {
+          return await fetch(input, { ...init, signal: controller.signal })
+        } finally {
+          clearTimeout(id)
+        }
+      },
+    })
   }
 }

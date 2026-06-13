@@ -1,5 +1,8 @@
 import { BiasDetectionEngine } from '../../../lib/ai/bias-detection/BiasDetectionEngine'
 import type { TherapeuticSession as SessionData } from '../../../lib/ai/bias-detection/types'
+import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
+
+const logger = createBuildSafeLogger('bias-detection-batch-analyze')
 
 type BatchBody = { sessions?: SessionData[]; options?: Record<string, unknown> }
 
@@ -93,7 +96,19 @@ export async function POST({ request }: { request: Request }) {
       },
     })
   } catch (error: unknown) {
-    return new Response(JSON.stringify({ error: (error as Error).message }), {
+    logger.error('Error during batch analyze sessions:', {
+      error:
+        error instanceof Error
+          ? {
+              error,
+              message: error.message,
+              stack: error.stack,
+            }
+          : {
+              error: String(error),
+            },
+    })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json',

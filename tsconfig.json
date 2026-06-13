@@ -15,7 +15,8 @@
       "@components/*": ["./src/components/*"],
       "@layouts/*": ["./src/layouts/*"],
       "@utils/*": ["./src/utils/*"],
-      "@types/*": ["./src/types/*"]
+      "@types/*": ["./src/types/*"],
+      "@pixelated/memory-schema": ["./packages/memory-schema/src"]
     },
     "allowJs": true,
     "resolveJsonModule": true,
@@ -40,7 +41,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true,
-    "noPropertyAccessFromIndexSignature": false,
+    "noPropertyAccessFromIndexSignature": true,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -69,6 +70,7 @@
     "./vitest.setup.ts",
     "./api/**/*.ts",
     "./plugins/**/*.ts",
+    "./packages/memory-schema/src/**/*.ts",
     "./types/**/*.d.ts",
     "./.astro-env.d.ts",
     "./src/types/declarations.d.ts",

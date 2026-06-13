@@ -1,6 +1,7 @@
 # Bitnami Common Library Chart
 
-A [Helm Library Chart](https://helm.sh/docs/topics/library_charts/#helm) for grouping common logic between Bitnami charts.
+A [Helm Library Chart](https://helm.sh/docs/topics/library_charts/#helm) for
+grouping common logic between Bitnami charts.
 
 ## TL;DR
 
@@ -19,18 +20,22 @@ helm dependency update
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: { { include "common.names.fullname" . } }
 data:
-  myvalue: "Hello World"
+  myvalue: 'Hello World'
 ```
 
-Looking to use our applications in production? Try [VMware Tanzu Application Catalog](https://bitnami.com/enterprise), the commercial edition of the Bitnami catalog.
+Looking to use our applications in production? Try
+[VMware Tanzu Application Catalog](https://bitnami.com/enterprise), the
+commercial edition of the Bitnami catalog.
 
 ## Introduction
 
-This chart provides a common template helpers which can be used to develop new charts using [Helm](https://helm.sh) package manager.
+This chart provides a common template helpers which can be used to develop new
+charts using [Helm](https://helm.sh) package manager.
 
-Bitnami charts can be used with [Kubeapps](https://kubeapps.dev/) for deployment and management of Helm Charts in clusters.
+Bitnami charts can be used with [Kubeapps](https://kubeapps.dev/) for deployment
+and management of Helm Charts in clusters.
 
 ## Prerequisites
 
@@ -61,7 +66,9 @@ tag:
 
 pullPolicy:
   type: string
-  description: Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  description:
+    Specify a imagePullPolicy. Defaults to 'Always' if image tag is 'latest',
+    else set to 'IfNotPresent'
 
 pullSecrets:
   type: array
@@ -126,7 +133,9 @@ name:
   description: Name of the existing secret.
   example: mySecret
 keyMapping:
-  description: Mapping between the expected key name and the name of the key in the existing secret.
+  description:
+    Mapping between the expected key name and the name of the key in the
+    existing secret.
   type: object
 
 ## An instance would be:
@@ -137,7 +146,8 @@ keyMapping:
 
 #### Example of use
 
-When we store sensitive data for a deployment in a secret, some times we want to give to users the possibility of using theirs existing secrets.
+When we store sensitive data for a deployment in a secret, some times we want to
+give to users the possibility of using theirs existing secrets.
 
 ```yaml
 # templates/secret.yaml
@@ -145,24 +155,34 @@ When we store sensitive data for a deployment in a secret, some times we want to
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: { { include "common.names.fullname" . } }
   labels:
-    app: {{ include "common.names.fullname" . }}
+    app: { { include "common.names.fullname" . } }
 type: Opaque
 data:
-  password: {{ .Values.password | b64enc | quote }}
+  password: { { .Values.password | b64enc | quote } }
+
 
 # templates/dpl.yaml
 ---
 ...
-      env:
-        - name: PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: {{ include "common.secrets.name" (dict "existingSecret" .Values.existingSecret "context" $) }}
-              key: {{ include "common.secrets.key" (dict "existingSecret" .Values.existingSecret "key" "password") }}
+env:
+  - name: PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: {
+            {
+              include "common.secrets.name" (dict "existingSecret"
+              .Values.existingSecret "context" $),
+            },
+          }
+        key: {
+            {
+              include "common.secrets.key" (dict "existingSecret"
+              .Values.existingSecret "key" "password"),
+            },
+          }
 ...
-
 # values.yaml
 ---
 name: mySecret
@@ -198,19 +218,33 @@ helm install test mychart --set path.to.value00="",path.to.value01=""
 
 ### To 1.0.0
 
-[On November 13, 2020, Helm v2 support was formally finished](https://github.com/helm/charts#status-of-the-project), this major version is the result of the required changes applied to the Helm Chart to be able to incorporate the different features added in Helm v3 and to be consistent with the Helm project itself regarding the Helm v2 EOL.
+[On November 13, 2020, Helm v2 support was formally finished](https://github.com/helm/charts#status-of-the-project),
+this major version is the result of the required changes applied to the Helm
+Chart to be able to incorporate the different features added in Helm v3 and to
+be consistent with the Helm project itself regarding the Helm v2 EOL.
 
 #### What changes were introduced in this major version?
 
-- Previous versions of this Helm Chart use `apiVersion: v1` (installable by both Helm 2 and 3), this Helm Chart was updated to `apiVersion: v2` (installable by Helm 3 only). [Here](https://helm.sh/docs/topics/charts/#the-apiversion-field) you can find more information about the `apiVersion` field.
-- Use `type: library`. [Here](https://v3.helm.sh/docs/faq/#library-chart-support) you can find more information.
-- The different fields present in the *Chart.yaml* file has been ordered alphabetically in a homogeneous way for all the Bitnami Helm Charts
+- Previous versions of this Helm Chart use `apiVersion: v1` (installable by both
+  Helm 2 and 3), this Helm Chart was updated to `apiVersion: v2` (installable by
+  Helm 3 only). [Here](https://helm.sh/docs/topics/charts/#the-apiversion-field)
+  you can find more information about the `apiVersion` field.
+- Use `type: library`.
+  [Here](https://v3.helm.sh/docs/faq/#library-chart-support) you can find more
+  information.
+- The different fields present in the _Chart.yaml_ file has been ordered
+  alphabetically in a homogeneous way for all the Bitnami Helm Charts
 
 #### Considerations when upgrading to this version
 
-- If you want to upgrade to this version from a previous one installed with Helm v3, you shouldn't face any issues
-- If you want to upgrade to this version using Helm v2, this scenario is not supported as this version doesn't support Helm v2 anymore
-- If you installed the previous version with Helm v2 and wants to upgrade to this version with Helm v3, please refer to the [official Helm documentation](https://helm.sh/docs/topics/v2_v3_migration/#migration-use-cases) about migrating from Helm v2 to v3
+- If you want to upgrade to this version from a previous one installed with Helm
+  v3, you shouldn't face any issues
+- If you want to upgrade to this version using Helm v2, this scenario is not
+  supported as this version doesn't support Helm v2 anymore
+- If you installed the previous version with Helm v2 and wants to upgrade to
+  this version with Helm v3, please refer to the
+  [official Helm documentation](https://helm.sh/docs/topics/v2_v3_migration/#migration-use-cases)
+  about migrating from Helm v2 to v3
 
 #### Useful links
 
@@ -220,16 +254,16 @@ helm install test mychart --set path.to.value00="",path.to.value01=""
 
 ## License
 
-Copyright &copy; 2024 Broadcom. The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
+Copyright &copy; 2024 Broadcom. The term "Broadcom" refers to Broadcom Inc.
+and/or its subsidiaries.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at
 
 <http://www.apache.org/licenses/LICENSE-2.0>
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+Unless required by applicable law or agreed to in writing, software distributed
+under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+CONDITIONS OF ANY KIND, either express or implied. See the License for the
+specific language governing permissions and limitations under the License.

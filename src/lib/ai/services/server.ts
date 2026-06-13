@@ -17,11 +17,13 @@ import {
 } from '../providers'
 import type { AIProviderType } from '../providers'
 
+function formatErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error ? error.message : fallback
+}
+
 const appLogger = createBuildSafeLogger('ai-server')
 
 const AI_SERVICE_PORT = parseInt(process.env['PORT'] ?? '8002', 10)
-
-
 
 type HttpResponse = NodeServerResponse
 type HttpRequest = IncomingMessage
@@ -73,6 +75,10 @@ class AIServer {
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     })
     res.end(JSON.stringify(data))
+  }
+
+  private captureCaughtError(error: unknown): void {
+    Sentry.captureException(error)
   }
 
   private getProviderPreference(): AIProviderType[] {
@@ -220,6 +226,7 @@ class AIServer {
       })
      } catch (error: unknown) {
        appLogger.error('Health check failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Health check failed'),
@@ -301,6 +308,7 @@ class AIServer {
       })
      } catch (error: unknown) {
        appLogger.error('Chat completion failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Chat completion failed'),
@@ -407,6 +415,7 @@ Respond in JSON format with the following structure:
       })
      } catch (error: unknown) {
        appLogger.error('Emotion analysis failed:', error)
+       this.captureCaughtError(error)
        this.sendJsonResponse(res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Emotion analysis failed'),
@@ -495,6 +504,7 @@ Respond in JSON format with the following structure:
       res.end()
      } catch (error: unknown) {
        appLogger.error('Streaming chat failed:', error)
+       this.captureCaughtError(error)
        if (!res.headersSent) {
          this.sendJsonResponse(res, 500, {
            success: false,
@@ -620,6 +630,7 @@ Respond in JSON format with the following structure:
       apiMetrics.error('/ai-service', errorType)
       apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)
+      this.captureCaughtError(error)
       this.sendJsonResponse(res, 500, {
         success: false,
         error: 'Internal server error',

@@ -20,7 +20,7 @@ function safeLog(level: 'info' | 'error', message: string, data?: unknown) {
 }
 
 // Execute startup logic in Astro's server context
-if (import.meta.env.SSR) {
+if (import.meta['env'].SSR) {
   try {
     await initializeApplication()
     safeLog('info', 'Application started successfully')

@@ -1,5 +1,5 @@
 # NVIDIA NIM for Retrieval (Embedding & Reranking)
-# Part of Priority #3
+# GPU-optimized by default (uses TensorRT-LLM and Triton Inference Server).
 
 services:
   nim-embedding:
@@ -11,26 +11,17 @@ services:
       - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
-      - NIM_CPU_ONLY=1
-      - NVIDIA_CPU_ONLY=1
       - NIM_MANIFEST_ALLOW_UNSAFE=1
-      - CUDA_VISIBLE_DEVICES=""
-      - NVIDIA_VISIBLE_DEVICES=""
       - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
       - nim_model_cache:/opt/nim/.cache
-      - ./scripts/skip-lib-check.sh:/opt/nim/start_server.d/32-ld-library-path.sh:ro
-    command: >
-      sh -c "
-        (while true; do 
-          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
-            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
-      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
-          fi
-          sleep 1
-        done) &
-        /opt/nim/start_server.sh
-      "
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     networks:
       - nemo-network
 
@@ -43,26 +34,17 @@ services:
       - NGC_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NIM_API_KEY=${NVIDIA_API_KEY:?NVIDIA_API_KEY must be set for NeMo services}
       - NGC_USER_NAME=$$oauthtoken
-      - NIM_CPU_ONLY=1
-      - NVIDIA_CPU_ONLY=1
       - NIM_MANIFEST_ALLOW_UNSAFE=1
-      - CUDA_VISIBLE_DEVICES=""
-      - NVIDIA_VISIBLE_DEVICES=""
       - NIM_MODEL_PROFILE=f7391ddbcb95b2406853526b8e489fedf20083a2420563ca3e65358ff417b10f
     volumes:
       - nim_model_cache:/opt/nim/.cache
-      - ./scripts/skip-lib-check.sh:/opt/nim/start_server.d/32-ld-library-path.sh:ro
-    command: >
-      sh -c "
-        (while true; do 
-          if [ -d /opt/nim/tmp/run/triton-model-repository ]; then
-            find /opt/nim/tmp/run/triton-model-repository -name config.pbtxt
-      -exec sed -i 's/kind: KIND_GPU/kind: KIND_CPU/g' {} +
-          fi
-          sleep 1
-        done) &
-        /opt/nim/start_server.sh
-      "
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     networks:
       - nemo-network
 

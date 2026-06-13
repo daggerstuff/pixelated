@@ -105,7 +105,7 @@ const title = `Temporal Analysis - ${client.name}`
         <div class="bg-white rounded-lg shadow-sm mb-8">
           <DynamicEmotionTemporalAnalysisChart
             client:load
-            data={placeholderData}
+            data={{ ...placeholderData, emotions: [] }}
             clientId={safeClientId}
             height={500}
           />

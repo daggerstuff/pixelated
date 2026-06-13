@@ -7,7 +7,7 @@ import type {
   UnifiedProcessingRequest,
   UnifiedProcessingResponse,
   IUnifiedMetaAlignerAPI,
-} from '../api/unified-api'
+} from "../api/unified-api";
 
 /**
  * Defines the interface for the BatchProcessor.
@@ -19,115 +19,107 @@ export interface IBatchProcessor {
    * @param request - The processing request.
    * @returns A promise that resolves to the processing response.
    */
-  process(request: UnifiedProcessingRequest): Promise<UnifiedProcessingResponse>
+  process(request: UnifiedProcessingRequest): Promise<UnifiedProcessingResponse>;
 }
 
-import { getAiServiceLogger } from '@/lib/logging/standardized-logger'
+import { getAiServiceLogger } from "@/lib/logging/standardized-logger";
 
-import { CircuitBreaker } from '../error-handling/circuit-breaker'
+import { CircuitBreaker } from "../error-handling/circuit-breaker";
 
-const logger = getAiServiceLogger('batch-processor')
+const logger = getAiServiceLogger("batch-processor");
 
 /**
  * Configuration options for the BatchProcessor.
  */
 export interface BatchProcessorConfig {
-  batchSize?: number
-  timeout?: number
+  batchSize?: number;
+  timeout?: number;
 }
 
 /**
  * Metrics for the BatchProcessor.
  */
 export interface BatchProcessorMetrics {
-  requestsProcessed: number
-  batchesProcessed: number
-  averageBatchSize: number
+  requestsProcessed: number;
+  batchesProcessed: number;
+  averageBatchSize: number;
 }
 
 /**
  * The BatchProcessor class.
  */
 export class BatchProcessor implements IBatchProcessor {
-  private readonly queue: UnifiedProcessingRequest[] = []
-  private readonly config: BatchProcessorConfig
-  private timeoutId: NodeJS.Timeout | null = null
-  private readonly circuitBreaker: CircuitBreaker
+  private readonly queue: UnifiedProcessingRequest[] = [];
+  private readonly config: BatchProcessorConfig;
+  private timeoutId: NodeJS.Timeout | null = null;
+  private readonly circuitBreaker: CircuitBreaker;
   private readonly metrics: BatchProcessorMetrics = {
     requestsProcessed: 0,
     batchesProcessed: 0,
     averageBatchSize: 0,
-  }
+  };
 
   constructor(api: IUnifiedMetaAlignerAPI, config: BatchProcessorConfig = {}) {
-    ;(this as any).api = api
+    (this as any).api = api;
     this.config = {
       batchSize: 10,
       timeout: 1000,
       ...config,
-    }
-    this.circuitBreaker = new CircuitBreaker()
+    };
+    this.circuitBreaker = new CircuitBreaker();
   }
 
-  public async process(
-    request: UnifiedProcessingRequest,
-  ): Promise<UnifiedProcessingResponse> {
-    this.queue.push(request)
+  public async process(request: UnifiedProcessingRequest): Promise<UnifiedProcessingResponse> {
+    this.queue.push(request);
 
-    if (this.queue.length >= this?.config.batchSize) {
-      void this.flush()
+    if (this.queue.length >= (this.config.batchSize ?? 10)) {
+      void this.flush();
     }
 
-    this.timeoutId ??= setTimeout(async () => this.flush(), this.config.timeout)
+    this.timeoutId ??= setTimeout(async () => this.flush(), this.config.timeout ?? 1000);
 
     // This is a simplified implementation. In a real-world scenario, you would
     // need to return a promise that resolves with the response for this specific request.
     // This would require a more complex mechanism to map responses back to requests.
-    return Promise.resolve({} as UnifiedProcessingResponse)
+    return Promise.resolve({} as UnifiedProcessingResponse);
   }
 
   private async flush(): Promise<void> {
     if (this.timeoutId) {
-      clearTimeout(this.timeoutId)
-      this.timeoutId = null
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
     }
 
     if (this.queue.length === 0) {
-      return
+      return;
     }
 
-    const batch = this.queue.splice(0, this.config.batchSize)
-    const optimizedBatch = this.optimizeBatch(batch)
+    const batch = this.queue.splice(0, this.config.batchSize);
+    const optimizedBatch = this.optimizeBatch(batch);
 
-    logger.info(`Processing batch of size ${optimizedBatch.length}`)
-    this.metrics.requestsProcessed += optimizedBatch.length
-    this.metrics.batchesProcessed++
-    this.metrics.averageBatchSize =
-      this.metrics.requestsProcessed / this.metrics.batchesProcessed
+    logger.info(`Processing batch of size ${optimizedBatch.length}`);
+    this.metrics.requestsProcessed += optimizedBatch.length;
+    this.metrics.batchesProcessed++;
+    this.metrics.averageBatchSize = this.metrics.requestsProcessed / this.metrics.batchesProcessed;
 
     try {
       await this.circuitBreaker.fire(async () => {
         // In a real-world scenario, you would call the API to process the batch.
         // return this.api.processBatch(optimizedBatch);
-        return Promise.resolve()
-      })
+        return Promise.resolve();
+      });
     } catch (error: unknown) {
-      logger.error(
-        'Batch processing failed due to circuit breaker being open',
-        { error },
-      )
+      logger.error("Batch processing failed due to circuit breaker being open", { error });
     }
   }
 
-  private optimizeBatch(
-    batch: UnifiedProcessingRequest[],
-  ): UnifiedProcessingRequest[] {
+  private optimizeBatch(batch: UnifiedProcessingRequest[]): UnifiedProcessingRequest[] {
     // Placeholder for batch optimization logic.
     // This could involve sorting requests by context, complexity, or other factors.
-    return batch
+    return batch;
   }
 
   public getMetrics(): BatchProcessorMetrics {
-    return this.metrics
+    return this.metrics;
   }
 }

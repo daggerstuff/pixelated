@@ -1,79 +1,76 @@
 import { defineConfig, devices } from '@playwright/test'
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
+const isCi = !!process.env['CI']
+const shouldSkipWebServer =
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === '1' ||
+  process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+const baseURL =
+  process.env['BASE_URL'] ??
+  (isCi ? 'http://127.0.0.1:4321' : 'http://127.0.0.1:5173')
+
+let webServerUrl: string | undefined
+let webServerPort: number | undefined
+let isRemoteUrl = false
+
+try {
+  const url = new URL(baseURL)
+  const hostname = url.hostname.toLowerCase()
+  const explicitPort = url.port ? Number.parseInt(url.port, 10) : null
+
+  isRemoteUrl =
+    hostname !== 'localhost' &&
+    hostname !== '127.0.0.1' &&
+    !hostname.startsWith('127.') &&
+    hostname !== '::1'
+
+  if (!isRemoteUrl) {
+    webServerPort = explicitPort ?? (isCi ? 4321 : 5173)
+    webServerUrl =
+      explicitPort !== null
+        ? baseURL
+        : `${url.protocol}//${url.hostname}:${webServerPort}`
+  }
+} catch {
+  isRemoteUrl = true
+}
+
 export default defineConfig({
   testDir: './e2e',
-  /* Run tests in files in parallel */
   fullyParallel: true,
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
-  forbidOnly: !!process.env['CI'],
-  /* Retry on CI only */
-  retries: process.env['CI'] ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env['CI'] ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  forbidOnly: isCi,
+  retries: isCi ? 2 : 0,
+  workers: isCi ? 1 : undefined,
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  timeout: 30_000,
   use: {
-    /* Base URL to use in actions like `await page.goto('')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    baseURL,
     trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
   },
-
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
-    },
-
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
-
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
-
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
   ],
-
-  /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer:
+    isRemoteUrl || shouldSkipWebServer
+      ? undefined
+      : isCi
+        ? {
+            command: `NODE_ENV=test pnpm run build && NODE_ENV=test ./node_modules/.bin/astro preview --host 0.0.0.0 --port ${webServerPort ?? 4321}`,
+            url: webServerUrl ?? 'http://127.0.0.1:4321',
+            reuseExistingServer: false,
+            timeout: 10 * 60 * 1000,
+          }
+        : {
+            command:
+              webServerPort !== undefined && webServerPort !== 5173
+                ? `NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port ${webServerPort}`
+                : 'NODE_ENV=development ./node_modules/.bin/astro dev --host 127.0.0.1 --port 5173',
+            url: webServerUrl ?? 'http://127.0.0.1:5173',
+            reuseExistingServer: true,
+            timeout: 180_000,
+          },
 })

@@ -1,4 +1,40 @@
 #!/usr/bin/env bash
+set -euo pipefail
+
+# ── Helpers ────────────────────────────────────────────────────────────────────
+
+ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+FIX="${FIX:-true}"
+ERRORS=0
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+section() { echo -e "\n${BLUE}▶${NC} $*"; }
+info()    { echo -e "  ${BLUE}ℹ${NC} $*"; }
+warn()    { echo -e "  ${YELLOW}⚠${NC} $*"; }
+error()   { echo -e "  ${RED}✗${NC} $*"; }
+success() { echo -e "  ${GREEN}✓${NC} $*"; }
+
+# Get changed files in a repo matching a regex pattern
+get_changed_files() {
+  local repo="$1"
+  local pattern="$2"
+  
+  cd "$repo"
+  
+  # Get staged + unstaged files
+  local files
+  files=$(git diff --name-only HEAD 2>/dev/null || true)
+  local staged
+  staged=$(git diff --name-only --cached HEAD 2>/dev/null || true)
+  
+  # Combine and deduplicate - match file extension properly, excluding generated playwright reports and test results
+  echo -e "$files\n$staged" | grep -E "\.($pattern)$" | grep -vE "^(config/playwright-report/|config/test-results/)" | sort -u | grep -v "^$" || true
 }
 
 # ── TypeScript / JavaScript linting ──────────────────────────────────────────
@@ -124,6 +160,18 @@ process_repo() {
 
   success "${repo_name} lint complete"
 }
+
+# ── Parse args ────────────────────────────────────────────────────────────────
+TARGET_REPO=""
+for arg in "$@"; do
+  case $arg in
+    --check-only) FIX="false" ;;
+    --fix) FIX="true" ;;
+    --repo=*) TARGET_REPO="${arg#*=}" ;;
+    --repo) shift; TARGET_REPO="$1" ;;
+    *) warn "Unknown arg: $arg" ;;
+  esac
+done
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 section "Pixelated Lint & Format — Changed Files"

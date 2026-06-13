@@ -197,20 +197,19 @@ const { nprogress, mediumZoom } = FEATURES
     <Footer />
     <ToTopButton />
     <script is:inline nonce={cspNonce}>
-      function _speedInsightsBeforeSend(data: any) {
+      function _speedInsightsBeforeSend(data) {
         console.log('Speed Insights before send', data)
         return data
       }
     </script>
     <script>
       // Generate table of contents from headings
-      document.addEventListener('astro:page-load', (_event: Event) => {
+      document.addEventListener('astro:page-load', (_event) => {
         const headings = document.querySelectorAll(
           '.docs-content h2, .docs-content h3',
         )
         const tocContainer = document.getElementById('on-this-page')
-        const usedIds = new Set<string>()
-
+        const usedIds = new Set()
         if (tocContainer) {
           tocContainer.innerHTML = ''
 

@@ -5,13 +5,14 @@
 
 import { EventEmitter } from 'events'
 
-import { Pool, PoolClient, PoolConfig } from 'pg'
+import { Pool, PoolClient } from 'pg'
+import type { PoolConfig } from 'pg'
 
-import { getLogger } from '../logging'
+import { getLogger, type LoggerOptions } from '../logging'
 
 // Note: PoolEvents interface extracted to pool-events.ts for future event system implementation
 
-const logger = getLogger('connection-pool')
+const logger = getLogger({ prefix: 'connection-pool' } as LoggerOptions)
 
 // Connection pool configuration
 interface OptimizedPoolConfig extends PoolConfig {
@@ -38,7 +39,7 @@ interface OptimizedPoolConfig extends PoolConfig {
 }
 
 // Pool metrics interface
-interface PoolMetrics {
+export interface PoolMetrics {
   totalConnections: number
   idleConnections: number
   waitingClients: number
@@ -123,32 +124,39 @@ export class OptimizedConnectionPool extends EventEmitter {
       this.pool = new Pool(this.config as import('pg').PoolConfig)
 
       // Set up event listeners
-      this.pool['on']('connect', (client) => {
-        logger.debug('New client connected to database')
-        this.metrics.totalConnections++
-        this.updateMetrics()
-        this.emit('connection-acquired', client)
-      })
-
-      this.pool['on']('remove', (client) => {
-        logger.debug('Client removed from pool')
-        this.metrics.totalConnections = Math.max(
-          0,
-          this.metrics.totalConnections - 1,
-        )
-        this.updateMetrics()
-        this.emit('connection-released', client)
-      })
-
-      this.pool['on']('error', (error: unknown, client?: unknown) => {
-        logger.error('Pool error', {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          client: !!client,
-        })
-        this.metrics.failedQueries++
-        this.updateHealthScore()
-        this.emit('connection-error', error, client)
-      })
+      ;(this.pool as unknown as EventEmitter).on(
+        'connect',
+        (client: PoolClient) => {
+          logger.debug('New client connected to database')
+          this.metrics.totalConnections++
+          this.updateMetrics()
+          this.emit('connection-acquired' as string, client)
+        },
+      )
+      ;(this.pool as unknown as EventEmitter).on(
+        'remove',
+        (client: PoolClient) => {
+          logger.debug('Client removed from pool')
+          this.metrics.totalConnections = Math.max(
+            0,
+            this.metrics.totalConnections - 1,
+          )
+          this.updateMetrics()
+          this.emit('connection-released' as string, client)
+        },
+      )
+      ;(this.pool as unknown as EventEmitter).on(
+        'error',
+        (error: Error, client?: PoolClient) => {
+          logger.error('Pool error', {
+            error: error instanceof Error ? error.message : 'Unknown error',
+            client: !!client,
+          })
+          this.metrics.failedQueries++
+          this.updateHealthScore()
+          this.emit('connection-error', error, client)
+        },
+      )
 
       logger.info('Connection pool initialized', {
         min: this.config.min,

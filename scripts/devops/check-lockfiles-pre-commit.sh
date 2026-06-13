@@ -5,7 +5,7 @@ set -euo pipefail
 # Defensive toolchain pinning: this script shells out to `pnpm`, which on
 # many developer machines is a /bin/sh wrapper that does `exec node`. If
 # PATH resolves `node` to a system Node v20 (missing `node:sqlite`) and
-# pnpm is >= 11.3.0 (which requires Node >= 22.13), pnpm crashes before
+# pnpm is >= 11.5.2 (which requires Node >= 22.13), pnpm crashes before
 # even checking the lockfile. Pin to the nvm-managed node when one is
 # available so pnpm always finds a compatible runtime.
 if [ -z "${NVM_DIR:-}" ]; then

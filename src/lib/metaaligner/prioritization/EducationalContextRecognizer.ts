@@ -282,7 +282,7 @@ export class EducationalContextRecognizer {
         metadata: {
           conceptualDepth: Math.max(
             0,
-            Math.min(1, parsed.metadata?.conceptualDepth ?? 0.5),
+            Math.min(1, (parsed as any).metadata?.conceptualDepth ?? 0.5),
           ),
           practicalApplications: Array.isArray(
             (parsed as any).metadata?.practicalApplications,

@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest'
 import {
   parseJsonSafely,
   validateAnalysisResults,
-  _validateCrisisDetectionResponse,
+  validateCrisisDetectionResponse,
   parseApiResponse,
 } from './json-validator'
 
@@ -31,6 +31,62 @@ describe('json-validator', () => {
     it('returns error for invalid object', () => {
       expect(validateAnalysisResults(null).success).toBe(false)
       expect(validateAnalysisResults({}).success).toBe(false)
+    })
+  })
+
+  describe('validateCrisisDetectionResponse', () => {
+    it('validates a correct object', () => {
+      const valid = {
+        assessment: {
+          overallRisk: 'low',
+          suicidalIdeation: {},
+          selfHarm: {},
+          agitation: {},
+          substanceUse: {},
+        },
+        riskFactors: [],
+        protectiveFactors: [],
+        recommendations: {},
+        resources: {},
+        metadata: { confidenceScore: 0.9 },
+      }
+      expect(validateCrisisDetectionResponse(valid).success).toBe(true)
+    })
+
+    it('returns error for invalid overall risk value', () => {
+      const invalid = {
+        assessment: {
+          overallRisk: 'invalid_risk',
+          suicidalIdeation: {},
+          selfHarm: {},
+          agitation: {},
+          substanceUse: {},
+        },
+        riskFactors: [],
+        protectiveFactors: [],
+        recommendations: {},
+        resources: {},
+        metadata: { confidenceScore: 0.9 },
+      }
+      expect(validateCrisisDetectionResponse(invalid).success).toBe(false)
+    })
+
+    it('returns error for missing required properties', () => {
+      const invalid = {
+        assessment: {
+          overallRisk: 'low',
+          suicidalIdeation: {},
+          selfHarm: {},
+          agitation: {},
+          substanceUse: {},
+        },
+        riskFactors: [],
+        protectiveFactors: [],
+        recommendations: {},
+        resources: {},
+        // Missing metadata
+      }
+      expect(validateCrisisDetectionResponse(invalid).success).toBe(false)
     })
   })
 

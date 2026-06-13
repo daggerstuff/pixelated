@@ -179,8 +179,3 @@ export class PolicyEngine {
     return this.loadedVersion
   }
 }
-
-export interface PolicyEvaluationContext {
-  action: string
-  context: Record<string, unknown>
-}

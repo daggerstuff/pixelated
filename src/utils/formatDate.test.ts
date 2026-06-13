@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 
-import { formatDate, isValidDate } from './formatDate'
+import { formatDate, isValidDate, getStartOf } from './formatDate'
 
 describe('isValidDate', () => {
   it('validates edge cases like leap years, out-of-bounds, and empty inputs', () => {
@@ -106,5 +106,50 @@ describe('formatDate', () => {
       const date = new Date('2023-05-15T10:00:00Z')
       expect(formatDate(date.toISOString())).toBe('May 15, 2023')
     })
+  })
+
+  describe('error handling', () => {
+    it('throws an error for invalid date strings', () => {
+      expect(() => formatDate('not-a-date')).toThrow(
+        'Failed to format date: Error: Invalid date string',
+      )
+    })
+  })
+})
+
+describe('getStartOf', () => {
+  it('gets the start of the day correctly', () => {
+    const date = new Date(2023, 4, 15, 15, 30, 45, 123) // May 15, 2023 local time
+    const startOfDay = getStartOf(date, 'day')
+    expect(startOfDay.getHours()).toBe(0)
+    expect(startOfDay.getMinutes()).toBe(0)
+    expect(startOfDay.getSeconds()).toBe(0)
+    expect(startOfDay.getMilliseconds()).toBe(0)
+    expect(startOfDay.getDate()).toBe(15)
+  })
+
+  it('gets the start of the week correctly', () => {
+    const date = new Date(2023, 4, 17, 15, 30, 45, 123) // May 17, 2023 is a Wednesday
+    const startOfWeek = getStartOf(date, 'week')
+    expect(startOfWeek.getDay()).toBe(0) // Sunday
+    expect(startOfWeek.getDate()).toBe(14) // May 14, 2023
+    expect(startOfWeek.getHours()).toBe(0)
+  })
+
+  it('gets the start of the month correctly', () => {
+    const date = new Date(2023, 4, 15, 15, 30, 45, 123) // May 15, 2023 local time
+    const startOfMonth = getStartOf(date, 'month')
+    expect(startOfMonth.getDate()).toBe(1)
+    expect(startOfMonth.getMonth()).toBe(4) // May is index 4
+    expect(startOfMonth.getHours()).toBe(0)
+  })
+
+  it('gets the start of the year correctly', () => {
+    const date = new Date(2023, 4, 15, 15, 30, 45, 123) // May 15, 2023 local time
+    const startOfYear = getStartOf(date, 'year')
+    expect(startOfYear.getDate()).toBe(1)
+    expect(startOfYear.getMonth()).toBe(0) // January
+    expect(startOfYear.getFullYear()).toBe(2023)
+    expect(startOfYear.getHours()).toBe(0)
   })
 })

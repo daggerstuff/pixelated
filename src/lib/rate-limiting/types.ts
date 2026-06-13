@@ -167,7 +167,7 @@ export interface DDoSProtectionConfig {
 
 export interface RateLimitMiddlewareConfig {
   /** Rule sets to apply */
-  ruleSets?: RateLimitRuleSet[]
+  ruleSets: RateLimitRuleSet[]
   /** Bypass rules */
   bypassRules?: RateLimitBypassRule[]
   /** DDoS protection configuration */

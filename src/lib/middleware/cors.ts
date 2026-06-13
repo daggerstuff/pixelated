@@ -64,7 +64,12 @@ export const corsOptions = {
  * Get the appropriate CORS configuration based on environment
  */
 function getConfig() {
-  return import.meta.env.PROD ? corsOptions.production : corsOptions.development
+  const isProd =
+    (typeof import.meta !== 'undefined' &&
+      import.meta.env &&
+      import.meta.env.PROD) ||
+    process.env['NODE_ENV'] === 'production'
+  return isProd ? corsOptions.production : corsOptions.development
 }
 
 /**

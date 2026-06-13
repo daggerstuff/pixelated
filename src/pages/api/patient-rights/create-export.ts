@@ -51,7 +51,7 @@ const createExportSchema = z.object({
     .min(1, 'At least one data section must be selected'),
   recipientType: z.enum(['patient', 'provider', 'research']),
   recipientName: z.string().min(1, 'Recipient name is required'),
-  recipientEmail: z.string().email('Valid email address is required'),
+  recipientEmail: z.email('Valid email address is required'),
   notes: z.string().optional(),
   includeEncryptionKey: z.boolean().optional().default(true),
 })
@@ -85,7 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
     const validationResult = createExportSchema.safeParse(requestData)
 
     if (!validationResult.success) {
-      const { fieldErrors } = validationResult.error.flatten()
+      const { fieldErrors } = z.flattenError(validationResult.error)
       logger.warn('Invalid export request data', {
         errors: fieldErrors,
         userId: currentUser.id,

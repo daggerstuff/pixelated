@@ -5,7 +5,7 @@
  * workflows, approvals, and automated tasks.
  */
 
-import type { UserId, DocumentId } from '../types/common'
+import type { UserId, DocumentId, WorkflowId } from '../types/common'
 import type { WorkflowExecution } from '../types/workflow-engine'
 import { BaseService } from './base-service'
 
@@ -32,16 +32,24 @@ export class WorkflowEngineService extends BaseService {
 
     const execution: WorkflowExecution = {
       id: executionId,
-      workflowId,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      createdBy: userId,
+      lastModifiedBy: userId,
+      workflowId: workflowId as WorkflowId,
+      workflowVersion: 1,
       documentId,
-      status: 'running',
-      currentStepId: 'step-1', // Default first step
+      status: 'in-progress',
+      currentStep: 'step-1',
       startedAt: timestamp,
-      startedBy: userId,
+      data: {},
       context: {
         triggeredBy: userId,
-        documentId,
+        triggerType: 'manual',
       },
+      steps: [],
+      notifications: [],
+      comments: [],
       history: [
         {
           stepId: 'start',
@@ -86,7 +94,7 @@ export class WorkflowEngineService extends BaseService {
 
       // Update MongoDB execution record
       await this.db.mongodb.database
-        .collection(this.db.mongodb.collections.workflows)
+        .collection<WorkflowExecution>(this.db.mongodb.collections.workflows)
         .updateOne(
           { id: executionId },
           {
@@ -96,7 +104,7 @@ export class WorkflowEngineService extends BaseService {
                 action: 'approved',
                 userId,
                 timestamp,
-                details: { feedback },
+                details: feedback ? { feedback } : undefined,
               },
             },
           },

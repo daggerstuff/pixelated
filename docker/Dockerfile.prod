@@ -1,5 +1,5 @@
 # Production Dockerfile for Business Strategy CMS
-FROM node:24.14.1-alpine AS base
+FROM node:24.16.0-alpine AS base
 
 # Install build dependencies for sharp and other native modules
 RUN apk add --no-cache \
@@ -16,10 +16,13 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install pnpm
-RUN npm install -g pnpm@11.3.0
+RUN npm install -g pnpm@11.5.2
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
+RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
+    PNPM_INSTALL_ARGS="--prod --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
+    rm /tmp/pnpm-install-with-fallback.sh
 
 # Copy source code
 COPY . .

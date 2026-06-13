@@ -1,16 +1,15 @@
-import { spawn, ChildProcessWithoutNullStreams } from 'child_process'
-import { randomUUID } from 'crypto'
+import { spawn, ChildProcessWithoutNullStreams } from "child_process";
+import { randomUUID } from "crypto";
 
+import { createBuildSafeLogger } from "../logging/build-safe-logger";
 import type {
   PythonBridgeRequest,
   PythonBridgeResponse,
   IMHIEvaluationParams,
   MentalLLaMAAnalysisResult,
-} from '../types/index.ts'
+} from "../ai/mental-llama/types/index";
 
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
-
-const logger = createBuildSafeLogger('mental-llama-python-bridge')
+const logger = createBuildSafeLogger("mental-llama-python-bridge");
 
 /**
  * Custom error for features not implemented or unavailable in the Python bridge.
@@ -18,8 +17,8 @@ const logger = createBuildSafeLogger('mental-llama-python-bridge')
 
 class PythonBridgeError extends Error {
   constructor(message: string) {
-    super(message)
-    this.name = 'PythonBridgeError'
+    super(message);
+    this.name = "PythonBridgeError";
   }
 }
 
@@ -32,28 +31,27 @@ class PythonBridgeError extends Error {
  */
 
 export class MentalLLaMAPythonBridge {
-  private pythonProcess: ChildProcessWithoutNullStreams | null = null
-  private isInitialized = false
-  private isFunctional = false
-  private readonly pythonScriptPath: string
+  private pythonProcess: ChildProcessWithoutNullStreams | null = null;
+  private isInitialized = false;
+  private isFunctional = false;
+  private readonly pythonScriptPath: string;
   private readonly requestQueue: Map<
     string,
     {
-      resolve: (value: unknown) => void
-      reject: (reason?: unknown) => void
-      timeout: NodeJS.Timeout
+      resolve: (value: unknown) => void;
+      reject: (reason?: unknown) => void;
+      timeout: NodeJS.Timeout;
     }
-  > = new Map()
-  private readonly REQUEST_TIMEOUT_MS = 20000
-  public pythonBridgeDisabled: boolean = false
+  > = new Map();
+  private readonly REQUEST_TIMEOUT_MS = 20000;
+  public pythonBridgeDisabled: boolean = false;
 
   constructor(pythonScriptPath?: string) {
-    this.pythonScriptPath =
-      pythonScriptPath ?? './scripts/mental_llama_python_handler.py'
-    this.pythonBridgeDisabled = false
-    logger.info('MentalLLaMAPythonBridge instance created.', {
+    this.pythonScriptPath = pythonScriptPath ?? "./scripts/mental_llama_python_handler.py";
+    this.pythonBridgeDisabled = false;
+    logger.info("MentalLLaMAPythonBridge instance created.", {
       scriptPath: this.pythonScriptPath,
-    })
+    });
   }
 
   /**
@@ -65,67 +63,72 @@ export class MentalLLaMAPythonBridge {
     if (this.isInitialized) {
       logger.info(
         `PythonBridge already attempted initialization. Functional: ${this.isFunctional}`,
-      )
-      return this.isFunctional
+      );
+      return this.isFunctional;
     }
-    logger.info('Attempting to initialize PythonBridge...')
+    logger.info("Attempting to initialize PythonBridge...");
     try {
-      this.pythonProcess = spawn('python3', [this.pythonScriptPath], {
-        stdio: ['pipe', 'pipe', 'pipe'] as const,
-      }) as unknown as ChildProcessWithoutNullStreams
-      this.pythonProcess.stdout.setEncoding('utf-8')
-      this.pythonProcess.stderr.setEncoding('utf-8')
+      this.pythonProcess = spawn("python3", [this.pythonScriptPath], {
+        stdio: ["pipe", "pipe", "pipe"] as const,
+      }) as unknown as ChildProcessWithoutNullStreams;
+      this.pythonProcess.stdout.setEncoding("utf-8");
+      this.pythonProcess.stderr.setEncoding("utf-8");
 
-      this.pythonProcess.stdout.on('data', (data: string) => {
+      this.pythonProcess.stdout.on("data", (data: string) => {
         data
           .split(/\r?\n/)
           .filter(Boolean)
           .forEach((line) => {
             try {
-              const response = JSON.parse(line) as unknown as PythonBridgeResponse & { id?: string }
+              const response = JSON.parse(line) as unknown as PythonBridgeResponse & {
+                id?: string;
+              };
               if (response?.id && this.requestQueue.has(response.id)) {
-                const { resolve, timeout } = this.requestQueue.get(response.id)!
-                clearTimeout(timeout)
-                this.requestQueue.delete(response.id)
+                const { resolve, timeout } = this.requestQueue.get(response.id)!;
+                clearTimeout(timeout);
+                this.requestQueue.delete(response.id);
                 if (response.success) {
-                  resolve(response.data)
+                  resolve(response.data);
                 } else {
-                  resolve(response) // Let caller handle error
+                  resolve(response); // Let caller handle error
                 }
               }
             } catch (err: unknown) {
-              logger.error('Failed to parse PythonBridge response', { line, error: String(err) })
+              logger.error("Failed to parse PythonBridge response", {
+                line,
+                error: String(err),
+              });
             }
-          })
-      })
+          });
+      });
 
-      this.pythonProcess.stderr.on('data', (data: string) => {
-        logger.error('PythonBridge stderr:', data)
-      })
+      this.pythonProcess.stderr.on("data", (data: string) => {
+        logger.error("PythonBridge stderr:", data);
+      });
 
-      this.pythonProcess.on('close', (code) => {
-        logger.warn(`PythonBridge process closed with code ${code}`)
-        this.isFunctional = false
-        this.isInitialized = false
-      })
+      this.pythonProcess.on("close", (code) => {
+        logger.warn(`PythonBridge process closed with code ${code}`);
+        this.isFunctional = false;
+        this.isInitialized = false;
+      });
 
-      this.pythonProcess.on('error', (err: Error) => {
-        logger.error('PythonBridge process error:', { error: String(err) })
-        this.isFunctional = false
-        this.isInitialized = false
-      })
+      this.pythonProcess.on("error", (err: Error) => {
+        logger.error("PythonBridge process error:", { error: String(err) });
+        this.isFunctional = false;
+        this.isInitialized = false;
+      });
 
       // Optionally, send a ping or health check here
-      this.isInitialized = true
-      this.isFunctional = true
-      logger.info('PythonBridge initialized and functional.')
-      return true
+      this.isInitialized = true;
+      this.isFunctional = true;
+      logger.info("PythonBridge initialized and functional.");
+      return true;
     } catch (error: unknown) {
-      logger.error('PythonBridge initialization failed.', { error })
-      this.isInitialized = true
-      this.isFunctional = false
-      this.pythonProcess = null
-      return false
+      logger.error("PythonBridge initialization failed.", { error });
+      this.isInitialized = true;
+      this.isFunctional = false;
+      this.pythonProcess = null;
+      return false;
     }
   }
 
@@ -142,26 +145,20 @@ export class MentalLLaMAPythonBridge {
     modelParams?: Record<string, unknown>,
   ): Promise<MentalLLaMAAnalysisResult | null> {
     if (!this.isFunctional) {
-      logger.error(
-        'PythonBridge is not functional. Cannot analyze text with Python model.',
-        {},
-      )
-      throw new PythonBridgeError('PythonBridge is not functional.')
+      logger.error("PythonBridge is not functional. Cannot analyze text with Python model.", {});
+      throw new PythonBridgeError("PythonBridge is not functional.");
     }
-    const payload = { text, modelParams }
-    const response = await this.sendRequest('analyze_text', payload) as unknown
+    const payload = { text, modelParams };
+    const response = (await this.sendRequest("analyze_text", payload)) as unknown;
     if (
       response &&
-      typeof response === 'object' &&
-      'hasMentalHealthIssue' in (response as Record<string, unknown>)
+      typeof response === "object" &&
+      "hasMentalHealthIssue" in (response as Record<string, unknown>)
     ) {
-      return response as MentalLLaMAAnalysisResult
+      return response as MentalLLaMAAnalysisResult;
     }
-    logger.error(
-      'Unexpected response from PythonBridge analyzeTextWithPythonModel',
-      response,
-    )
-    return null
+    logger.error("Unexpected response from PythonBridge analyzeTextWithPythonModel", response);
+    return null;
   }
 
   /**
@@ -171,20 +168,15 @@ export class MentalLLaMAPythonBridge {
    * @throws {PythonBridgeError} if the bridge is not functional.
    */
 
-  public async runIMHIEvaluation(
-    params: IMHIEvaluationParams,
-  ): Promise<unknown> {
+  public async runIMHIEvaluation(params: IMHIEvaluationParams): Promise<unknown> {
     if (!this.isFunctional) {
-      logger.error(
-        'PythonBridge is not functional. Cannot run IMHI evaluation.',
-        {},
-      )
-      throw new PythonBridgeError('PythonBridge is not functional.')
+      logger.error("PythonBridge is not functional. Cannot run IMHI evaluation.", {});
+      throw new PythonBridgeError("PythonBridge is not functional.");
     }
     return this.sendRequest(
-      'run_imhi_evaluation',
+      "run_imhi_evaluation",
       params as unknown as Record<string, unknown>,
-    ) as unknown
+    ) as unknown;
   }
 
   /**
@@ -194,19 +186,21 @@ export class MentalLLaMAPythonBridge {
    */
 
   public async shutdown(): Promise<void> {
-    logger.info('Shutting down PythonBridge...')
+    logger.info("Shutting down PythonBridge...");
     if (this.pythonProcess) {
       try {
-        await this.sendRequest('shutdown', {})
+        await this.sendRequest("shutdown", {});
       } catch (e) {
-        logger.warn('Error during PythonBridge shutdown request', { error: String(e) })
+        logger.warn("Error during PythonBridge shutdown request", {
+          error: String(e),
+        });
       }
-      this.pythonProcess.kill()
-      this.pythonProcess = null
+      this.pythonProcess.kill();
+      this.pythonProcess = null;
     }
-    this.isInitialized = false
-    this.isFunctional = false
-    logger.info('PythonBridge shut down.')
+    this.isInitialized = false;
+    this.isFunctional = false;
+    logger.info("PythonBridge shut down.");
   }
 
   /**
@@ -215,7 +209,7 @@ export class MentalLLaMAPythonBridge {
    * @returns {boolean} True if the bridge is ready, false otherwise.
    */
   public isReady(): boolean {
-    return this.isInitialized && this.isFunctional
+    return this.isInitialized && this.isFunctional;
   }
 
   /**
@@ -225,35 +219,31 @@ export class MentalLLaMAPythonBridge {
    * @param payload Payload object
    * @returns {Promise<unknown>} The response from the Python process.
    */
-  private async sendRequest(
-    command: string,
-    payload: Record<string, unknown>,
-  ): Promise<unknown> {
+  private async sendRequest(command: string, payload: Record<string, unknown>): Promise<unknown> {
     if (!this.pythonProcess || !this.isFunctional) {
-      return Promise.reject(
-        new PythonBridgeError('Python process not running.'),
-      )
+      return Promise.reject(new PythonBridgeError("Python process not running."));
     }
-    const id = randomUUID()
+    const id = randomUUID();
     const request: PythonBridgeRequest & { id: string } = {
       command,
       payload,
       id,
-    }
+    };
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        this.requestQueue.delete(id)
-        reject(new PythonBridgeError(`Request timed out: ${command}`))
-      }, this.REQUEST_TIMEOUT_MS)
-      this.requestQueue.set(id, { resolve, reject, timeout })
-      try {              this.pythonProcess!.stdin.write(JSON.stringify(request) + '\n')
+        this.requestQueue.delete(id);
+        reject(new PythonBridgeError(`Request timed out: ${command}`));
+      }, this.REQUEST_TIMEOUT_MS);
+      this.requestQueue.set(id, { resolve, reject, timeout });
+      try {
+        this.pythonProcess!.stdin.write(JSON.stringify(request) + "\n");
       } catch {
-        clearTimeout(timeout)
-        this.requestQueue.delete(id)
-        reject(new PythonBridgeError('Failed to write to Python process.'))
+        clearTimeout(timeout);
+        this.requestQueue.delete(id);
+        reject(new PythonBridgeError("Failed to write to Python process."));
       }
-    })
+    });
   }
 }
 
-export default MentalLLaMAPythonBridge
+export default MentalLLaMAPythonBridge;

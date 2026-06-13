@@ -13,8 +13,9 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
   GHA_LOCAL_RUN: 'false'
-  NODE_VERSION: 24.14.1
+  NODE_VERSION: 24.16.0
   PNPM_VERSION: 11.5.2
   NODE_ENV: test
   DISABLE_AUTH: 'true'
@@ -56,7 +57,7 @@ jobs:
           npm install -g node-gyp
 
       - name: Install dependencies
-        run: NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Install Playwright browsers
         if: ${{ env['GHA_LOCAL_RUN'] != 'true' }}

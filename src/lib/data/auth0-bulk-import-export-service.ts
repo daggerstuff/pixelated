@@ -327,7 +327,7 @@ export class Auth0BulkImportExportService {
             },
             (err, output) => {
               if (err) reject(err)
-              else resolve(output)
+              else resolve(output as Array<Record<string, string>>)
             },
           )
         },
@@ -338,9 +338,7 @@ export class Auth0BulkImportExportService {
         email: record['email'],
         name: record['name'],
         user_id: record['user_id'],
-        email_verified:
-          record['email_verified'] === 'true' ||
-          record['email_verified'] === true,
+        email_verified: record['email_verified'] === 'true',
         app_metadata: record['app_metadata']
           ? JSON.parse(record['app_metadata'])
           : undefined,
@@ -417,16 +415,16 @@ export class Auth0BulkImportExportService {
         // Transform users to export format
         const users: UserExportData[] = response.users.map(
           (user: UserExportData) => ({
-            user_id: user.user_id,
-            email: user.email,
-            email_verified: user.email_verified,
+            user_id: String(user.user_id ?? ''),
+            email: String(user.email ?? ''),
+            email_verified: Boolean(user.email_verified),
             name: user.name,
             nickname: user.nickname,
             picture: user.picture,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
+            created_at: String(user.created_at ?? ''),
+            updated_at: String(user.updated_at ?? ''),
             last_login: user.last_login,
-            logins_count: user.logins_count,
+            logins_count: Number(user.logins_count ?? 0),
             app_metadata: options.includeMetadata
               ? user.app_metadata
               : undefined,
@@ -530,33 +528,34 @@ export class Auth0BulkImportExportService {
 
         // Transform users to export format
         const users: UserExportData[] = response.users.map(
-          (user: UserExportData) => ({
-            user_id: user.user_id,
-            email: user.email,
-            email_verified: user.email_verified,
-            name: user.name,
-            nickname: user.nickname,
-            picture: user.picture,
-            created_at: user.created_at,
-            updated_at: user.updated_at,
-            last_login: user.last_login,
-            logins_count: user.logins_count,
-            app_metadata: options.includeMetadata
-              ? JSON.stringify(user.app_metadata)
-              : undefined,
-            user_metadata: options.includeMetadata
-              ? JSON.stringify(user.user_metadata)
-              : undefined,
-            identities: options.includeIdentities
-              ? JSON.stringify(user.identities)
-              : undefined,
-            roles: options.includeRoles
-              ? JSON.stringify(user.roles)
-              : undefined,
-            permissions: options.includeRoles
-              ? JSON.stringify(user.permissions)
-              : undefined,
-          }),
+          (user: UserExportData) =>
+            ({
+              user_id: String(user.user_id ?? ''),
+              email: String(user.email ?? ''),
+              email_verified: Boolean(user.email_verified),
+              name: user.name,
+              nickname: user.nickname,
+              picture: user.picture,
+              created_at: String(user.created_at ?? ''),
+              updated_at: String(user.updated_at ?? ''),
+              last_login: user.last_login,
+              logins_count: Number(user.logins_count ?? 0),
+              app_metadata: options.includeMetadata
+                ? JSON.stringify(user.app_metadata)
+                : undefined,
+              user_metadata: options.includeMetadata
+                ? JSON.stringify(user.user_metadata)
+                : undefined,
+              identities: options.includeIdentities
+                ? JSON.stringify(user.identities)
+                : undefined,
+              roles: options.includeRoles
+                ? JSON.stringify(user.roles)
+                : undefined,
+              permissions: options.includeRoles
+                ? JSON.stringify(user.permissions)
+                : undefined,
+            }) as UserExportData,
         )
 
         allUsers.push(...users)

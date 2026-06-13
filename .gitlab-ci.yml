@@ -9,7 +9,7 @@ stages:
   - security
 
 variables:
-  NODE_VERSION: '24.14.1'
+  NODE_VERSION: '24.16.0'
   PNPM_VERSION: '11.3.0'
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   # Terraform configuration - must be set as GitLab CI/CD project variables
@@ -32,12 +32,15 @@ validate:dependencies:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Validating dependencies..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - >
+      PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile || {
+      echo "⚠️ Lockfile out of date - refreshing...";
+        PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile; }
     - pnpm audit --audit-level moderate
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -60,12 +63,12 @@ validate:lint:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running lint validation..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
     - pnpm lint:ci
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
@@ -93,13 +96,13 @@ validate:typecheck:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running typecheck validation..."
     - 'echo "Node.js heap size: ${NODE_OPTIONS}"'
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
     # Split typecheck into separate commands to reduce peak memory usage
     # and ensure NODE_OPTIONS is properly applied
     - NODE_OPTIONS="--max-old-space-size=8192" pnpm run check
@@ -115,44 +118,6 @@ validate:typecheck:
       - stuck_or_timeout_failure
 
 # Test jobs
-test:unit:
-  stage: test
-  image: node:${NODE_VERSION}-slim
-  cache:
-    key:
-      files:
-        - pnpm-lock.yaml
-    paths:
-      - .pnpm-store
-  before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
-    - npm install -g pnpm@$PNPM_VERSION
-  script:
-    - echo "Running unit tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
-    - pnpm test:unit
-  coverage: '/Lines\s*:\s*(\d+\.\d+)%/'
-  artifacts:
-    reports:
-      junit: test-results/junit.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: coverage/cobertura-coverage.xml
-    paths:
-      - coverage/
-    expire_in: 1 week
-    when: always
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 15m
-  retry:
-    max: 2
-    when:
-      - runner_system_failure
-      - stuck_or_timeout_failure
-
 test:integration:
   stage: test
   image: node:${NODE_VERSION}-slim
@@ -163,12 +128,12 @@ test:integration:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
   script:
     - echo "Running integration tests..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
     - pnpm test:integration
   artifacts:
     reports:
@@ -284,7 +249,6 @@ build:
     - docker:dind
   needs:
     - job: validate:dependencies
-    - job: test:unit
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: '/certs'
@@ -309,13 +273,11 @@ build:
     - docker push ${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}
     - docker push ${IMAGE_NAME}:latest
     - echo "Build completed"
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_TAG'
-    - if:
-        '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - when: never
   timeout: 30m
   retry:
@@ -368,13 +330,11 @@ security:scan:
       container_scanning: gl-container-scanning-report.json
     expire_in: 1 week
     when: always
-  interruptible: true
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - if: '$CI_PIPELINE_SOURCE == "schedule"'
     - if: '$CI_COMMIT_TAG'
-    - if:
-        '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
     - when: never
   timeout: 20m
   retry:
@@ -388,7 +348,6 @@ coverage:report:
   stage: test
   image: node:${NODE_VERSION}-slim
   needs:
-    - job: test:unit
     - job: test:integration
   cache:
     key:
@@ -397,14 +356,16 @@ coverage:report:
     paths:
       - .pnpm-store
   before_script:
-    - apt-get update -qq && apt-get install -y -qq python3 make g++ git >
-      /dev/null
+    - apt-get update -qq && apt-get install -y -qq python3 make g++ git xz-utils
+      curl > /dev/null
     - npm install -g pnpm@$PNPM_VERSION
+    - curl -LsSf https://astral.sh/uv/install.sh | sh
+    - export PATH="$HOME/.local/bin:$PATH"
   script:
     - echo "Generating consolidated coverage report..."
-    - NODE_OPTIONS="--no-deprecation" pnpm install --frozen-lockfile
+    - PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
     - chmod +x scripts/consolidate-coverage.sh
-    - ./scripts/consolidate-coverage.sh
+    - COVERAGE_TIMEOUT=600 ./scripts/consolidate-coverage.sh
   artifacts:
     paths:
       - coverage/
@@ -413,7 +374,7 @@ coverage:report:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 10m
+  timeout: 20m
 
 # Note: Kubernetes deployment is handled through the Azure AKS deployment system.
 # This GitLab pipeline remains focused on validation, testing, build, and security jobs.

@@ -1,269 +1,209 @@
 /**
- * Unit tests for src/lib/memory/memory-api-client.ts — PIX-510 Task 4.
- * Uses a mock fetch to test client logic without needing a running server.
+ * Unit tests for src/lib/memory/memory-api-client.ts — PIX-3903.
  */
 
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi } from "vitest";
 
-import { MemoryApiClient, MemoryApiError } from '../memory-api-client'
+import {
+  DEFAULT_MEMORY_API_BASE_URL,
+  DEFAULT_INGESTION_GATE_BASE_URL,
+  IngestionGateClient,
+  MemoryApiClient,
+  MemoryApiClientError,
+} from "../memory-api-client";
 
-// ─── Mock fetch factory ───────────────────────────────────────────────────────
-
-type MockFetch = ReturnType<typeof vi.fn>
+type MockFetch = ReturnType<typeof vi.fn>;
 
 function createMockClient(mockFetch: MockFetch) {
   return new MemoryApiClient({
-    baseUrl: 'http://test:8000',
     fetchFn: mockFetch as unknown as typeof fetch,
-  })
+  });
 }
 
 function mockJsonResponse(data: unknown, status = 200) {
   return Promise.resolve(
     new Response(JSON.stringify(data), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     }),
-  ) as unknown as Response
-}
-
-function mockNoContent(status = 204) {
-  return Promise.resolve(new Response(null, { status })) as unknown as Response
+  ) as unknown as Response;
 }
 
 function mockError(status: number, body: unknown = {}) {
   return Promise.resolve(
     new Response(JSON.stringify(body), {
       status,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     }),
-  ) as unknown as Response
+  ) as unknown as Response;
 }
 
-// ─── Health ───────────────────────────────────────────────────────────────────
+const sampleMemory = {
+  id: "00000000-0000-4000-8000-000000000001",
+  content: "Test memory",
+  scope: "session" as const,
+  retention: "short_term" as const,
+  category: "general",
+  tags: ["test"],
+  version: 1,
+  importance: 0.5,
+  createdAt: "2026-01-01T00:00:00.000Z",
+  updatedAt: null,
+};
 
-describe('health()', () => {
-  it('returns health status', async () => {
+describe("MemoryApiClient defaults", () => {
+  it("uses /api/v1/memory as the default base URL", () => {
+    const client = new MemoryApiClient();
+    expect(client.baseUrl).toBe(DEFAULT_MEMORY_API_BASE_URL);
+    expect(client.baseUrl).toBe("/api/v1/memory");
+  });
+});
+
+describe("IngestionGateClient defaults", () => {
+  it("uses /api/ingestion/gate as the default base URL", () => {
+    const client = new IngestionGateClient();
+    expect(client.baseUrl).toBe(DEFAULT_INGESTION_GATE_BASE_URL);
+    expect(client.baseUrl).toBe("/api/ingestion/gate");
+  });
+});
+
+describe("create()", () => {
+  it("posts to /api/v1/memory and returns the v1 envelope", async () => {
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse({ data: sampleMemory }, 201));
+    const client = createMockClient(mockFetch);
+
+    const result = await client.create({ content: "Test memory" });
+
+    expect(result.data.id).toBe(sampleMemory.id);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/v1/memory",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
+
+describe("list()", () => {
+  it("gets /api/v1/memory with query params", async () => {
     const mockFetch = vi.fn().mockResolvedValue(
       mockJsonResponse({
-        status: 'ok',
-        memory_count: 42,
-        scorer_latency_ms: 0.01,
-        classifier_latency_ms: 0.02,
+        data: [sampleMemory],
+        pagination: { limit: 10, offset: 0, total: 1 },
       }),
-    )
-    const client = createMockClient(mockFetch)
-    const result = await client.health()
-    expect(result.status).toBe('ok')
-    expect(result.memoryCount).toBe(42)
-    expect(result.scorerLatencyMs).toBe(0.01)
-  })
-})
+    );
+    const client = createMockClient(mockFetch);
 
-// ─── Create ────────────────────────────────────────────────────────────────────
-
-describe('create()', () => {
-  it('creates a memory block', async () => {
-    const mockBlock = {
-      id: 'mem_123',
-      tenantId: 't1',
-      sessionId: 's1',
-      content: 'Test memory',
-      timestamp: Date.now(),
-      importance: {
-        raw: 0.5,
-        recency: 0.9,
-        relevance: 0.5,
-        emotionalWeight: 1,
-        actionability: 0.5,
-      },
-      emotions: { valence: 0.5, arousal: 0.5, categories: ['joy'] },
-      gating: {
-        piiStatus: 'absent',
-        crisisFlag: false,
-        traumaIndicators: [],
-        consentGate: 'open',
-      },
-      consolidation: {
-        phase: 'raw',
-        lastProcessed: Date.now(),
-        remCycles: 3,
-        schemaReferences: [],
-      },
-    }
-    const mockFetch = vi
-      .fn()
-      .mockResolvedValue(mockJsonResponse(mockBlock, 201))
-    const client = createMockClient(mockFetch)
-
-    const result = await client.create({
-      tenantId: 't1',
-      sessionId: 's1',
-      content: 'Test memory',
-    })
-
-    expect(result.id).toBe('mem_123')
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://test:8000/memories',
-      expect.objectContaining({ method: 'POST' }),
-    )
-  })
-})
-
-// ─── Search ────────────────────────────────────────────────────────────────────
-
-describe('search()', () => {
-  it('builds correct query params', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse([]))
-    const client = createMockClient(mockFetch)
-
-    await client.search({
-      tenantId: 't1',
-      minImportance: 0.5,
-      crisisOnly: true,
+    await client.list({
       limit: 10,
-      offset: 5,
-    })
+      offset: 0,
+      category: "general",
+      tags: undefined,
+    });
 
-    const call = mockFetch.mock.calls[0]!
-    const url = call[0] as string
-    expect(url).toContain('tenant_id=t1')
-    expect(url).toContain('min_importance=0.5')
-    expect(url).toContain('crisis_only=true')
-    expect(url).toContain('limit=10')
-    expect(url).toContain('offset=5')
-  })
+    const url = mockFetch.mock.calls[0]![0] as string;
+    expect(url).toContain("/api/v1/memory");
+    expect(url).toContain("limit=10");
+    expect(url).toContain("offset=0");
+    expect(url).toContain("category=general");
+  });
+});
 
-  it('returns empty array for unknown tenant', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse([]))
-    const client = createMockClient(mockFetch)
-    const result = await client.search({ tenantId: 'unknown' })
-    expect(result).toHaveLength(0)
-  })
-})
+describe("search()", () => {
+  it("posts to /api/v1/memory/search", async () => {
+    const mockFetch = vi.fn().mockResolvedValue(
+      mockJsonResponse({
+        data: [sampleMemory],
+        query: "test",
+        pagination: { limit: 10, offset: 0, total: 1 },
+      }),
+    );
+    const client = createMockClient(mockFetch);
 
-// ─── Get ──────────────────────────────────────────────────────────────────────
+    await client.search({ q: "test", limit: 10 });
 
-describe('get()', () => {
-  it('fetches a single memory by id', async () => {
-    const mockBlock = {
-      id: 'mem_123',
-      tenantId: 't1',
-      sessionId: 's1',
-      content: 'Test',
-      timestamp: 0,
-      importance: {
-        raw: 0.5,
-        recency: 0,
-        relevance: 0,
-        emotionalWeight: 1,
-        actionability: 0.5,
-      },
-      emotions: { valence: 0.5, arousal: 0.5, categories: [] },
-      gating: {
-        piiStatus: 'absent',
-        crisisFlag: false,
-        traumaIndicators: [],
-        consentGate: 'open',
-      },
-      consolidation: {
-        phase: 'raw',
-        lastProcessed: 0,
-        remCycles: 0,
-        schemaReferences: [],
-      },
-    }
-    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockBlock))
-    const client = createMockClient(mockFetch)
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/v1/memory/search",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
 
-    const result = await client.get('mem_123', 't1')
+describe("update()", () => {
+  it("patches /api/v1/memory/:id", async () => {
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse({ data: sampleMemory }));
+    const client = createMockClient(mockFetch);
 
-    expect(result.id).toBe('mem_123')
-    const call = mockFetch.mock.calls[0]!
-    const url = call[0] as string
-    expect(url).toContain('mem_123')
-    expect(url).toContain('tenant_id=t1')
-  })
-})
+    await client.update(sampleMemory.id, { content: "Updated" });
 
-// ─── Delete ───────────────────────────────────────────────────────────────────
+    const url = mockFetch.mock.calls[0]![0] as string;
+    expect(url).toBe(`/api/v1/memory/${sampleMemory.id}`);
+    expect((mockFetch.mock.calls[0]![1] as RequestInit).method).toBe("PATCH");
+  });
+});
 
-describe('delete()', () => {
-  it('sends DELETE request', async () => {
-    const mockFetch = vi.fn().mockResolvedValue(mockNoContent())
-    const client = createMockClient(mockFetch)
-
-    await client.delete('mem_123', 't1')
-
-    const call = mockFetch.mock.calls[0]!
-    expect((call[1] as RequestInit).method).toBe('DELETE')
-  })
-
-  it('throws MemoryApiError on 404', async () => {
+describe("delete()", () => {
+  it("deletes /api/v1/memory/:id", async () => {
     const mockFetch = vi
       .fn()
-      .mockResolvedValue(mockError(404, { detail: 'Not found' }))
-    const client = createMockClient(mockFetch)
+      .mockResolvedValue(mockJsonResponse({ data: { id: sampleMemory.id } }));
+    const client = createMockClient(mockFetch);
 
-    await expect(client.delete('nonexistent', 't1')).rejects.toThrow(
-      MemoryApiError,
-    )
-  })
-})
+    await client.delete(sampleMemory.id);
 
-// ─── Score ─────────────────────────────────────────────────────────────────────
+    const url = mockFetch.mock.calls[0]![0] as string;
+    expect(url).toBe(`/api/v1/memory/${sampleMemory.id}`);
+    expect((mockFetch.mock.calls[0]![1] as RequestInit).method).toBe("DELETE");
+  });
 
-describe('score()', () => {
-  it('returns score response', async () => {
-    const mockScore = {
-      id: 'mem_123',
-      importance: {
-        raw: 0.72,
-        recency: 0.85,
-        relevance: 0.91,
-        emotionalWeight: 2.0,
-        actionability: 0.5,
-      },
-      components: {
-        recency: 0.85,
-        relevance: 0.91,
-        emotionalWeight: 2.0,
-        actionability: 0.5,
-      },
-    }
-    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockScore))
-    const client = createMockClient(mockFetch)
+  it("throws MemoryApiClientError on 404", async () => {
+    const mockFetch = vi
+      .fn()
+      .mockResolvedValue(mockError(404, { error: "not_found", message: "Not found" }));
+    const client = createMockClient(mockFetch);
 
-    const result = await client.score('mem_123', 't1')
+    await expect(client.delete(sampleMemory.id)).rejects.toThrow(MemoryApiClientError);
+  });
+});
 
-    expect(result.id).toBe('mem_123')
-    expect(result.components['recency']).toBe(0.85)
-  })
-})
+describe("ingest()", () => {
+  it("posts to /api/ingestion/gate/ingest", async () => {
+    const mockFetch = vi.fn().mockResolvedValue(
+      mockJsonResponse({
+        accepted: true,
+        report: { passed: true },
+        request_id: "req-1",
+      }),
+    );
+    const client = new IngestionGateClient({
+      fetchFn: mockFetch as unknown as typeof fetch,
+    });
 
-// ─── Trajectory ───────────────────────────────────────────────────────────────
+    const result = await client.ingest({
+      content: "Test memory",
+      source_id: "source-1",
+      user_id: "user-1",
+    });
 
-describe('trajectory()', () => {
-  it('returns trajectory data', async () => {
-    const mockTraj = {
-      sessionId: 's1',
-      memoryCount: 3,
-      trend: 'escalating',
-      crisisIndicators: [],
-      maxIntensity: 0.8,
-      trajectory: [
-        { memoryId: 'm1', valence: 0.6, arousal: 0.5, dominance: 0.7 },
-        { memoryId: 'm2', valence: 0.5, arousal: 0.6, dominance: 0.6 },
-        { memoryId: 'm3', valence: 0.4, arousal: 0.8, dominance: 0.4 },
-      ],
-    }
-    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse(mockTraj))
-    const client = createMockClient(mockFetch)
+    expect(result.accepted).toBe(true);
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/ingestion/gate/ingest",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+});
 
-    const result = await client.trajectory('s1', 't1')
+describe("health()", () => {
+  it("gets /api/ingestion/gate/health", async () => {
+    const mockFetch = vi.fn().mockResolvedValue(mockJsonResponse({ status: "healthy" }));
+    const client = new IngestionGateClient({
+      fetchFn: mockFetch as unknown as typeof fetch,
+    });
 
-    expect(result.sessionId).toBe('s1')
-    expect(result.trend).toBe('escalating')
-    expect(result.trajectory).toHaveLength(3)
-  })
-})
+    const result = await client.health();
+
+    expect(result["status"]).toBe("healthy");
+    expect(mockFetch).toHaveBeenCalledWith(
+      "/api/ingestion/gate/health",
+      expect.objectContaining({}),
+    );
+  });
+});
