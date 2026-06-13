@@ -89,9 +89,9 @@ describe('MemoryInventory', () => {
     )
 
     const catalog = inventory.buildCatalog()
-    expect(catalog.byImportance[0]!.id).toBe('high')
-    expect(catalog.byImportance[1]!.id).toBe('mid')
-    expect(catalog.byImportance[2]!.id).toBe('low')
+    expect(catalog.byImportance[0].id).toBe('high')
+    expect(catalog.byImportance[1].id).toBe('mid')
+    expect(catalog.byImportance[2].id).toBe('low')
   })
 
   test('groups by session', () => {
@@ -100,8 +100,8 @@ describe('MemoryInventory', () => {
     inventory.addMemory(makeMemory({ sessionId: 'sess_b' }))
 
     const catalog = inventory.buildCatalog()
-    expect(catalog.bySession['sess_a']!.count).toBe(2)
-    expect(catalog.bySession['sess_b']!.count).toBe(1)
+    expect(catalog.bySession['sess_a'].count).toBe(2)
+    expect(catalog.bySession['sess_b'].count).toBe(1)
   })
 
   test('groups by valence', () => {
@@ -116,9 +116,9 @@ describe('MemoryInventory', () => {
     )
 
     const catalog = inventory.buildCatalog()
-    expect(catalog.byValence['negative']!.count).toBe(1)
-    expect(catalog.byValence['neutral']!.count).toBe(1)
-    expect(catalog.byValence['positive']!.count).toBe(1)
+    expect(catalog.byValence['negative'].count).toBe(1)
+    expect(catalog.byValence['neutral'].count).toBe(1)
+    expect(catalog.byValence['positive'].count).toBe(1)
   })
 
   test('tenant isolation', () => {

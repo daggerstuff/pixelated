@@ -236,3 +236,4 @@ class MockFHEService {
 
 async function main() {
   console.log(`🧠 MentalArena Data Generation v${VERSION}`)
+}

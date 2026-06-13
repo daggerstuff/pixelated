@@ -225,7 +225,7 @@ export function useTreatmentPlans(params: {
     if (params.autoSave && isDirty && data && data.length > 0) {
       const autoSaveTimer = setTimeout(() => {
         // Auto-save the first plan (assuming it's being edited)
-        void saveTreatmentPlan(data[0] as Record<string, unknown>)
+        void saveTreatmentPlan(data[0])
       }, 5000) // Auto-save after 5 seconds of inactivity
 
       return () => clearTimeout(autoSaveTimer)

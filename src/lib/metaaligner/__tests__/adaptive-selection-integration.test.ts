@@ -311,7 +311,7 @@ describe('Adaptive Selection Integration Tests', () => {
 
       for (let i = 0; i < conversation.length; i++) {
         const turn = conversation[i]
-        const detection = await contextDetector.detectContext(turn!.text)
+        const detection = await contextDetector.detectContext(turn.text)
 
         // Context detection may vary based on mock, so we'll be flexible
         const event: ContextEvent = {
@@ -435,8 +435,8 @@ describe('Adaptive Selection Integration Tests', () => {
 
         expect(switchObserver).toHaveBeenCalled()
         const callArgs = switchObserver.mock.calls[0]
-        expect(callArgs![0]).toBeInstanceOf(Array) // objectives
-        expect(callArgs![1]).toHaveProperty('toContext')
+        expect(callArgs[0]).toBeInstanceOf(Array) // objectives
+        expect(callArgs[1]).toHaveProperty('toContext')
       }
     })
   })
@@ -454,7 +454,7 @@ describe('Adaptive Selection Integration Tests', () => {
       ]
 
       for (let i = 0; i < queries.length; i++) {
-        const detection = await contextDetector.detectContext(queries[i]!)
+        const detection = await contextDetector.detectContext(queries[i])
 
         const event: ContextEvent = {
           turnId: i + 1,

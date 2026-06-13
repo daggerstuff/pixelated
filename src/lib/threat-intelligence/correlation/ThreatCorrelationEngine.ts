@@ -301,8 +301,8 @@ export class ThreatCorrelationEngineCore
       for (let i = 0; i < threats.length; i++) {
         for (let j = i + 1; j < threats.length; j++) {
           const correlation = await this.correlateThreatPair(
-            threats[i]!,
-            threats[j]!,
+            threats[i],
+            threats[j],
           )
           if (
             correlation &&
@@ -486,24 +486,24 @@ export class ThreatCorrelationEngineCore
     }
 
     for (let j = 0; j <= str1.length; j++) {
-      matrix[0]![j] = j
+      matrix[0][j] = j
     }
 
     for (let i = 1; i <= str2.length; i++) {
       for (let j = 1; j <= str1.length; j++) {
         if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
-          matrix[i]![j] = matrix[i - 1]![j - 1]!
+          matrix[i][j] = matrix[i - 1][j - 1]!
         } else {
-          matrix[i]![j] = Math.min(
-            matrix[i - 1]![j - 1]! + 1,
-            matrix[i]![j - 1]! + 1,
-            matrix[i - 1]![j]! + 1,
+          matrix[i][j] = Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1,
           )
         }
       }
     }
 
-    return matrix[str2.length]![str1.length]!
+    return matrix[str2.length][str1.length]
   }
 
   private compareSeverity(severity1: string, severity2: string): number {
@@ -1462,7 +1462,7 @@ export class ThreatCorrelationEngineCore
 
       for (const group of groups) {
         if (group.length === 1) {
-          mergedCorrelations.push(group[0]!)
+          mergedCorrelations.push(group[0])
         } else {
           const merged = await this.mergeCorrelationGroup(group)
           if (merged) {
