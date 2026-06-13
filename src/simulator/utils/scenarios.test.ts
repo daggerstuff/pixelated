@@ -12,6 +12,28 @@ describe('scenarios utilities', () => {
         expect(scenario.domain).toBe(TherapeuticDomain.ANXIETY)
       })
     })
+
+    it('returns scenarios filtered by difficulty only', async () => {
+      const result = await filterScenarios(undefined, ScenarioDifficulty.BEGINNER)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.difficulty).toBe(ScenarioDifficulty.BEGINNER)
+      })
+    })
+
+    it('returns scenarios filtered by both domain and difficulty', async () => {
+      const result = await filterScenarios(TherapeuticDomain.DEPRESSION, ScenarioDifficulty.BEGINNER)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.domain).toBe(TherapeuticDomain.DEPRESSION)
+        expect(scenario.difficulty).toBe(ScenarioDifficulty.BEGINNER)
+      })
+    })
+
+    it('returns all scenarios when no filter params provided', async () => {
+      const result = await filterScenarios()
+      expect(result.length).toBe(5)
+    })
   })
 
   describe('getRecommendedScenario', () => {
