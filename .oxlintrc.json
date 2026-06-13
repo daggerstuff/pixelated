@@ -14,6 +14,7 @@
     "src/lib/export/index.node.ts",
     "src/lib/fhe/fhe-factory.ts",
     "src/scripts/task-manager-cli.ts",
+    "tests/pending-implementation/**/*.tsx",
     "vitest.config.ts",
     "foresight-mcp/apps/docs/tsconfig.json"
   ],
