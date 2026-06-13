@@ -272,7 +272,7 @@ class InterventionEngine {
 
     // Select top interventions (max 3)
     for (let i = 0; i < Math.min(3, applicableRules.length); i++) {
-      const rule = applicableRules[i]!
+      const rule = applicableRules[i]
       selectedInterventions.push(...rule.suggestions)
 
       reasoning.push(

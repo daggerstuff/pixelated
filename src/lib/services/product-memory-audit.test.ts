@@ -47,7 +47,7 @@ describe('product-memory-audit', () => {
       expect(consoleErrorSpy).not.toHaveBeenCalled()
 
       // Verify the logged JSON contains the event data
-      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0]![0])
+      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0][0])
       expect(loggedJson).toMatchObject(event)
     })
 
@@ -68,7 +68,7 @@ describe('product-memory-audit', () => {
       expect(consoleInfoSpy).not.toHaveBeenCalled()
 
       // Verify the logged JSON contains the event data
-      const loggedJson = JSON.parse(consoleErrorSpy.mock.calls[0]![0])
+      const loggedJson = JSON.parse(consoleErrorSpy.mock.calls[0][0])
       expect(loggedJson).toMatchObject(event)
     })
 
@@ -87,7 +87,7 @@ describe('product-memory-audit', () => {
       logger.log(event)
 
       expect(consoleInfoSpy).toHaveBeenCalled()
-      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0]![0])
+      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0][0])
       expect(loggedJson.latencyMs).toBe(150)
     })
 
@@ -106,7 +106,7 @@ describe('product-memory-audit', () => {
       logger.log(event)
 
       expect(consoleInfoSpy).toHaveBeenCalled()
-      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0]![0])
+      const loggedJson = JSON.parse(consoleInfoSpy.mock.calls[0][0])
       expect(loggedJson.details).toEqual({ key: 'value', number: 42 })
     })
   })

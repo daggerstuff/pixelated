@@ -80,14 +80,14 @@ export class PatternDetector {
           themeValences[theme] = []
         }
         themeSessions[theme].push(s.sessionId)
-        themeValences[theme]!.push(s.emotionalArc.avgValence)
+        themeValences[theme].push(s.emotionalArc.avgValence)
       }
     }
 
     const results: RecurringTheme[] = []
     for (const [theme, sessionList] of Object.entries(themeSessions)) {
       if (sessionList.length < this.minFreq) continue
-      const valences = themeValences[theme]!
+      const valences = themeValences[theme]
       let trend: 'improving' | 'declining' | 'stable' = 'stable'
       if (valences.length >= 2) {
         const mid = Math.floor(valences.length / 2)

@@ -211,8 +211,8 @@ export const getRecommendedScenario = async (
 
   // Return a matching difficulty scenario if available, otherwise any available scenario
   return matchingDifficulty.length > 0
-    ? matchingDifficulty[Math.floor(Math.random() * matchingDifficulty.length)]!
-    : availableScenarios[Math.floor(Math.random() * availableScenarios.length)]!
+    ? matchingDifficulty[Math.floor(Math.random() * matchingDifficulty.length)]
+    : availableScenarios[Math.floor(Math.random() * availableScenarios.length)]
 }
 
 // Example PHI audit logging - uncomment and customize as needed

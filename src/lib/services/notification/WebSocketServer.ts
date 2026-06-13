@@ -1,40 +1,40 @@
-import type { IncomingMessage } from 'http'
+import type { IncomingMessage } from "http";
 
-import type { WebSocket } from 'ws'
-import { WebSocketServer as WSServer } from 'ws'
-import { z } from 'zod'
+import type { WebSocket } from "ws";
+import { WebSocketServer as WSServer } from "ws";
+import { z } from "zod";
 
-import * as logger from '../../logging/build-safe-logger'
-import type { NotificationService } from './NotificationService'
+import * as logger from "../../logging/build-safe-logger";
+import type { NotificationService } from "./NotificationService";
 // Supabase admin import removed - migrate to MongoDB/auth provider
 
 // Define message types using Zod for runtime validation
 const BaseMessageSchema = z.object({
   type: z.string(),
-})
+});
 
 const MarkReadMessageSchema = BaseMessageSchema.extend({
-  type: z.literal('mark_read'),
+  type: z.literal("mark_read"),
   notificationId: z.string(),
-})
+});
 
 const GetNotificationsMessageSchema = BaseMessageSchema.extend({
-  type: z.literal('get_notifications'),
+  type: z.literal("get_notifications"),
   limit: z.number().optional(),
   offset: z.number().optional(),
-})
+});
 
-const ClientMessageSchema = z.discriminatedUnion('type', [
+const ClientMessageSchema = z.discriminatedUnion("type", [
   MarkReadMessageSchema,
   GetNotificationsMessageSchema,
-])
+]);
 
-type ClientMessage = z.infer<typeof ClientMessageSchema>
+type ClientMessage = z.infer<typeof ClientMessageSchema>;
 
 // Server message types
 interface ServerMessage {
-  type: string
-  [key: string]: unknown
+  type: string;
+  [key: string]: unknown;
 }
 
 /**
@@ -50,42 +50,40 @@ interface ServerMessage {
  * Authorization header as a Bearer token.
  */
 export class WebSocketServer {
-  private readonly wss: WSServer
-  private readonly notificationService: NotificationService
+  private readonly wss: WSServer;
+  private readonly notificationService: NotificationService;
 
   constructor(port: number, notificationService: NotificationService) {
-    this.notificationService = notificationService
-    this.wss = new WSServer({ port })
+    this.notificationService = notificationService;
+    this.wss = new WSServer({ port });
 
-    this.wss.on('connection', this.handleConnection.bind(this))
-    this.wss.on('error', this.handleServerError.bind(this))
+    this.wss.on("connection", this.handleConnection.bind(this));
+    this.wss.on("error", this.handleServerError.bind(this));
 
-    logger
-      .createBuildSafeLogger('websocket')
-      .info('WebSocket server started', { port })
+    logger.createBuildSafeLogger("websocket").info("WebSocket server started", { port });
   }
 
   /**
    * Delegate event listeners to internal WebSocket server
    */
   public on(event: string, listener: (...args: any[]) => void): void {
-    this.wss.on(event, listener)
+    this.wss.on(event, listener);
   }
 
   /**
    * Close the server
    */
-  public close(): void {
-    this.wss.close()
+  public shutdown(): void {
+    this.wss.close();
   }
 
   /**
    * Handle server-level errors
    */
   private handleServerError(error: Error): void {
-    logger.createBuildSafeLogger('websocket').error('WebSocket server error', {
+    logger.createBuildSafeLogger("websocket").error("WebSocket server error", {
       error: String(error),
-    })
+    });
   }
 
   /**
@@ -93,13 +91,11 @@ export class WebSocketServer {
    */
   private sendMessage(ws: WebSocket, message: ServerMessage): void {
     try {
-      ws.send(JSON.stringify(message))
+      ws.send(JSON.stringify(message));
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Failed to send message to client', {
-          error: error instanceof Error ? String(error) : String(error),
-        })
+      logger.createBuildSafeLogger("websocket").error("Failed to send message to client", {
+        error: error instanceof Error ? String(error) : String(error),
+      });
     }
   }
 
@@ -108,24 +104,24 @@ export class WebSocketServer {
    */
   private sendError(ws: WebSocket, message: string): void {
     this.sendMessage(ws, {
-      type: 'error',
+      type: "error",
       message,
-    })
+    });
   }
 
   /**
    * Extract auth token from request
    */
   private getAuthToken(req: IncomingMessage): string | null {
-    const header = req.headers['authorization']
+    const header = req.headers["authorization"];
     if (!header) {
-      return null
+      return null;
     }
-    const [type, token] = header.split(' ')
-    if (type !== 'Bearer' || !token) {
-      return null
+    const [type, token] = header.split(" ");
+    if (type !== "Bearer" || !token) {
+      return null;
     }
-    return token
+    return token;
   }
 
   /**
@@ -136,21 +132,19 @@ export class WebSocketServer {
       // Use Supabase admin client to verify the token and get user information
       // TODO: Replace with MongoDB/auth provider implementation for token verification and user lookup
       // For now, simulate a user ID
-      const userId = 'mock-user-id'
+      const userId = "mock-user-id";
       logger
-        .createBuildSafeLogger('websocket')
-        .info('Token verified successfully (Supabase removed)', {
+        .createBuildSafeLogger("websocket")
+        .info("Token verified successfully (Supabase removed)", {
           userId,
-          role: 'user',
-        })
-      return userId
+          role: "user",
+        });
+      return userId;
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Token verification failed', {
-          error: error instanceof Error ? String(error) : String(error),
-        })
-      throw new Error('Invalid token', { cause: error })
+      logger.createBuildSafeLogger("websocket").error("Token verification failed", {
+        error: error instanceof Error ? String(error) : String(error),
+      });
+      throw new Error("Invalid token", { cause: error });
     }
   }
 
@@ -158,20 +152,20 @@ export class WebSocketServer {
    * Handle new WebSocket connection
    */
   private handleConnection(ws: WebSocket, req: IncomingMessage): void {
-    const token = this.getAuthToken(req)
+    const token = this.getAuthToken(req);
     if (!token) {
-      this.sendError(ws, 'No authentication token provided')
-      ws.close(1008, 'Unauthorized - No token provided')
-      return
+      this.sendError(ws, "No authentication token provided");
+      ws.close(1008, "Unauthorized - No token provided");
+      return;
     }
 
     this.verifyToken(token)
       .then((userId: string) => this.setupAuthenticatedConnection(userId, ws))
       .catch((error: unknown) => {
-        const message = error instanceof Error ? String(error) : String(error)
-        this.sendError(ws, `Authentication failed: ${message}`)
-        ws.close(1008, 'Unauthorized - Token verification failed')
-      })
+        const message = error instanceof Error ? String(error) : String(error);
+        this.sendError(ws, `Authentication failed: ${message}`);
+        ws.close(1008, "Unauthorized - Token verification failed");
+      });
   }
 
   /**
@@ -179,45 +173,39 @@ export class WebSocketServer {
    */
   private setupAuthenticatedConnection(userId: string, ws: WebSocket): void {
     if (!userId) {
-      this.sendError(ws, 'Invalid user ID')
-      ws.close(1008, 'Unauthorized - Invalid user ID')
-      return
+      this.sendError(ws, "Invalid user ID");
+      ws.close(1008, "Unauthorized - Invalid user ID");
+      return;
     }
 
-    this.notificationService.registerClient(userId, ws as unknown as WebSocket)
-    logger
-      .createBuildSafeLogger('websocket')
-      .info('WebSocket client connected', { userId })
+    this.notificationService.registerClient(userId, ws as unknown as WebSocket);
+    logger.createBuildSafeLogger("websocket").info("WebSocket client connected", { userId });
 
-    ws.on('message', (data: string) =>
-      this.handleClientMessage(userId, data, ws),
-    )
-    ws.on('close', () => this.handleClientDisconnection(userId))
-    ws.on('error', (error: Error) => this.handleClientError(userId, error))
+    ws.on("message", (data: string) => this.handleClientMessage(userId, data, ws));
+    ws.on("close", () => this.handleClientDisconnection(userId));
+    ws.on("error", (error: Error) => this.handleClientError(userId, error));
 
-    void this.sendUnreadCount(userId, ws)
+    void this.sendUnreadCount(userId, ws);
   }
 
   /**
    * Handle client disconnection
    */
   private handleClientDisconnection(userId: string): void {
-    this.notificationService.unregisterClient(userId)
-    logger
-      .createBuildSafeLogger('websocket')
-      .info('WebSocket client disconnected', {
-        userId,
-      })
+    this.notificationService.unregisterClient(userId);
+    logger.createBuildSafeLogger("websocket").info("WebSocket client disconnected", {
+      userId,
+    });
   }
 
   /**
    * Handle client-level errors
    */
   private handleClientError(userId: string, error: Error): void {
-    logger.createBuildSafeLogger('websocket').error('WebSocket client error', {
+    logger.createBuildSafeLogger("websocket").error("WebSocket client error", {
       userId,
       error: String(error),
-    })
+    });
   }
 
   /**
@@ -225,38 +213,30 @@ export class WebSocketServer {
    */
   private async sendUnreadCount(userId: string, ws: WebSocket): Promise<void> {
     try {
-      const count = await this.notificationService.getUnreadCount(userId)
-      this.sendMessage(ws, { type: 'unreadCount', count })
+      const count = await this.notificationService.getUnreadCount(userId);
+      this.sendMessage(ws, { type: "unreadCount", count });
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Failed to send unread count', {
-          userId,
-          error: error instanceof Error ? String(error) : String(error),
-        })
+      logger.createBuildSafeLogger("websocket").error("Failed to send unread count", {
+        userId,
+        error: error instanceof Error ? String(error) : String(error),
+      });
     }
   }
 
   /**
    * Handle client message
    */
-  private handleClientMessage(
-    userId: string,
-    data: string,
-    ws: WebSocket,
-  ): void {
+  private handleClientMessage(userId: string, data: string, ws: WebSocket): void {
     try {
-      const message: unknown = JSON.parse(data) as unknown
-      const validatedMessage = ClientMessageSchema.parse(message)
-      void this.processMessage(userId, validatedMessage, ws)
+      const message: unknown = JSON.parse(data) as unknown;
+      const validatedMessage = ClientMessageSchema.parse(message);
+      void this.processMessage(userId, validatedMessage, ws);
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Invalid message received', {
-          userId,
-          error: error instanceof Error ? String(error) : String(error),
-        })
-      this.sendError(ws, 'Invalid message format')
+      logger.createBuildSafeLogger("websocket").error("Invalid message received", {
+        userId,
+        error: error instanceof Error ? String(error) : String(error),
+      });
+      this.sendError(ws, "Invalid message format");
     }
   }
 
@@ -268,8 +248,8 @@ export class WebSocketServer {
     notificationId: string,
     ws: WebSocket,
   ): Promise<void> {
-    await this.notificationService.markAsRead(userId, notificationId)
-    await this.sendUnreadCount(userId, ws)
+    await this.notificationService.markAsRead(userId, notificationId);
+    await this.sendUnreadCount(userId, ws);
   }
 
   /**
@@ -284,8 +264,8 @@ export class WebSocketServer {
       userId,
       message.limit,
       message.offset,
-    )
-    this.sendMessage(ws, { type: 'notifications', data: notifications })
+    );
+    this.sendMessage(ws, { type: "notifications", data: notifications });
   }
 
   /**
@@ -298,25 +278,23 @@ export class WebSocketServer {
   ): Promise<void> {
     try {
       switch (message.type) {
-        case 'mark_read':
-          await this.handleMarkRead(userId, message.notificationId, ws)
-          break
-        case 'get_notifications':
-          await this.handleGetNotifications(userId, message, ws)
-          break
+        case "mark_read":
+          await this.handleMarkRead(userId, message.notificationId, ws);
+          break;
+        case "get_notifications":
+          await this.handleGetNotifications(userId, message, ws);
+          break;
         default: {
-          const { type } = message as { type: string }
-          this.sendError(ws, `Unknown type: ${type}`)
+          const { type } = message as { type: string };
+          this.sendError(ws, `Unknown type: ${type}`);
         }
       }
     } catch (error: unknown) {
-      logger
-        .createBuildSafeLogger('websocket')
-        .error('Error processing message', {
-          userId,
-          error: error instanceof Error ? String(error) : String(error),
-        })
-      this.sendError(ws, 'Error processing message')
+      logger.createBuildSafeLogger("websocket").error("Error processing message", {
+        userId,
+        error: error instanceof Error ? String(error) : String(error),
+      });
+      this.sendError(ws, "Error processing message");
     }
   }
 }

@@ -466,7 +466,7 @@ srsly==2.5.3
     #   spacy
     #   thinc
     #   weasel
-starlette==1.0.0
+starlette==1.0.1
     # via
     #   bias-detection-service (pyproject.toml)
     #   fastapi
