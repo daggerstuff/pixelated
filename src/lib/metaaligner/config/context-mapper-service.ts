@@ -202,7 +202,7 @@ export class ContextMapperService {
 
     // Sort by precedence (lower number = higher precedence)
     mappings.sort((a, b) => a.precedence - b.precedence)
-    const winner = mappings[0]!
+    const winner = mappings[0]
 
     // Find applicable precedence rule
     let reason = `Resolved by precedence: ${winner.context} has precedence ${winner.precedence}`

@@ -471,7 +471,7 @@ export class AutomatedFailoverOrchestrator extends EventEmitter {
       regionScores.sort((a, b) => b.score - a.score)
 
       this.logger.info('Backup region scores', { regionScores })
-      return regionScores[0]!.region
+      return regionScores[0].region
     } catch (error: unknown) {
       this.logger.error('Failed to select best backup region', { error })
       return null

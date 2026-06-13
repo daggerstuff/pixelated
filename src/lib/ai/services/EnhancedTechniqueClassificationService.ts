@@ -754,9 +754,9 @@ void this.trainAdvancedClassificationModel()
       matrix[i] = []
       for (let j = 0; j < size; j++) {
         if (i === j) {
-          matrix[i]![j] = Math.random() * 20 + 80 // True positives: 80-100
+          matrix[i][j] = Math.random() * 20 + 80 // True positives: 80-100
         } else {
-          matrix[i]![j] = Math.random() * 10 // False positives: 0-10
+          matrix[i][j] = Math.random() * 10 // False positives: 0-10
         }
       }
     }

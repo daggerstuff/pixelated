@@ -1,9 +1,41 @@
 import { describe, it, expect } from 'vitest'
 
-import { ScenarioDifficulty } from '../types'
-import { getRecommendedScenario } from './scenarios'
+import { ScenarioDifficulty, TherapeuticDomain } from '../types'
+import { getRecommendedScenario, filterScenarios } from './scenarios'
 
 describe('scenarios utilities', () => {
+  describe('filterScenarios', () => {
+    it('returns scenarios filtered by a specific domain', async () => {
+      const result = await filterScenarios(TherapeuticDomain.ANXIETY)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.domain).toBe(TherapeuticDomain.ANXIETY)
+      })
+    })
+
+    it('returns scenarios filtered by difficulty only', async () => {
+      const result = await filterScenarios(undefined, ScenarioDifficulty.BEGINNER)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.difficulty).toBe(ScenarioDifficulty.BEGINNER)
+      })
+    })
+
+    it('returns scenarios filtered by both domain and difficulty', async () => {
+      const result = await filterScenarios(TherapeuticDomain.DEPRESSION, ScenarioDifficulty.BEGINNER)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.domain).toBe(TherapeuticDomain.DEPRESSION)
+        expect(scenario.difficulty).toBe(ScenarioDifficulty.BEGINNER)
+      })
+    })
+
+    it('returns all scenarios when no filter params provided', async () => {
+      const result = await filterScenarios()
+      expect(result.length).toBe(5)
+    })
+  })
+
   describe('getRecommendedScenario', () => {
     it('returns null if all available scenarios are completed', async () => {
       const completedIds = [

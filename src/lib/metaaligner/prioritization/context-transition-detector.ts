@@ -227,11 +227,11 @@ export class ContextTransitionDetector {
     let transitions = 0
     let crisisElevations = 0
     let totalConfidence =
-      this.history.length > 0 ? this.history[0]!.confidence : 0
+      this.history.length > 0 ? this.history[0].confidence : 0
 
     for (let i = 1; i < this.history.length; i++) {
-      const prev = this.history[i - 1]!
-      const curr = this.history[i]!
+      const prev = this.history[i - 1]
+      const curr = this.history[i]
 
       if (prev.contextType !== curr.contextType) {
         transitions++
