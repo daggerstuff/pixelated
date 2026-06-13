@@ -6,4 +6,4 @@
 
 ## 2024-11-20 - Pre-computation of formatting strings | Learning: Repeated object instantiation like `new Date()` combined with string formatting within mapping functions in render components creates performance impacts | Action: Extract string pre-computation into a mapped structure inside a useMemo.
 
-## 2024-11-20 - TherapeuticGoalsTracker Pre-computation of Date strings | Learning: Repeated new Date() combined with string formatting within mapping functions in render components creates small memory allocations and performance impacts | Action: Extract string pre-computation into a mapped structure inside a useMemo.
+## 2024-11-20 - Date Pre-compute for Checkpoints | Learning: Pre-compute date strings to avoid new Date() in render | Action: Extract pre-computation into useMemo
