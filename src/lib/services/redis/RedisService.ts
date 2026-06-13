@@ -1418,8 +1418,8 @@ export class RedisService extends EventEmitter implements IRedisService {
             typeof result[i + 1] === 'string'
           ) {
             arr.push({
-              value: result[i] as string,
-              score: Number(result[i + 1] as string),
+              value: result[i],
+              score: Number(result[i + 1]),
             })
           } else {
             logger.debug(

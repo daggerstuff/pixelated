@@ -140,7 +140,7 @@ export function useTransform<T>(
 ): MotionValue<T> {
   // The output range should always have at least one element; use the first
   // entry as the static initial value for this stub implementation.
-  const initial: T = outputRange[0]!
+  const initial: T = outputRange[0]
   return useMotionValue(initial)
 }
 

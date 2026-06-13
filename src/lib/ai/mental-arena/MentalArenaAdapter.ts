@@ -319,7 +319,7 @@ export class MentalArenaAdapter {
           }
 
           disorderConversations.forEach((conversation, index) => {
-            const validation = validations[index]!
+            const validation = validations[index]
             processedResults.validationResults.push(validation)
 
             if (validation.isValid) {

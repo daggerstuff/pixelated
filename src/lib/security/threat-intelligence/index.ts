@@ -804,8 +804,8 @@ export class ThreatIntelligenceNetwork extends EventEmitter {
       }
 
       if (
-        ((threatData as Record<string, unknown>)["confidence"] as number) > 0.8 ||
-        (((pipelineResults as Record<string, unknown>)["correlation"] as Record<string, unknown>)?.[
+        ((threatData)["confidence"] as number) > 0.8 ||
+        (((pipelineResults)["correlation"] as Record<string, unknown>)?.[
           "confidence"
         ] as number) > 0.8
       ) {

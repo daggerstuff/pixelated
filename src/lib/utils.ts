@@ -116,7 +116,7 @@ function bytesToUint32BE(bytes: Uint8Array): number {
   if (bytes.length < 4) {
     throw new Error(ERRORS.BYTES_TO_UINT32BE_SHORT)
   }
-  return (bytes[0]! << 24) | (bytes[1]! << 16) | (bytes[2]! << 8) | bytes[3]!
+  return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3]
 }
 
 /**
@@ -413,8 +413,8 @@ export function shuffle<T>(input: readonly T[]): T[] {
     const j = secureRandomInt(i + 1)
     // No need for bounds check: arr is dense (checked above)
     // The preceding assertDense() guarantees no holes, safe to non-null '!'.
-    const temp: T = denseArr[i] as T
-    denseArr[i] = denseArr[j] as T
+    const temp: T = denseArr[i]
+    denseArr[i] = denseArr[j]
     denseArr[j] = temp
   }
   return denseArr

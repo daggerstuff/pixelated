@@ -158,7 +158,7 @@ const TreatmentPlanManager: React.FC<TreatmentPlanManagerProps> = ({
   // ⚡ Bolt: Memoize O(N) progress calculation to prevent recalculation on tab changes
   // Moved before early return to comply with Rules of Hooks
   const overallProgress = useMemo(() => {
-    if (!currentPlan || !currentPlan.goals.length) return 0
+    if (!currentPlan?.goals.length) return 0
     return Math.round(
       currentPlan.goals.reduce((sum, goal) => sum + goal.progress, 0) /
         currentPlan.goals.length,

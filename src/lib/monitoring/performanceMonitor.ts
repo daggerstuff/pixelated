@@ -279,7 +279,7 @@ class PerformanceMonitor {
   private checkAlerts(): void {
     if (this.metrics.length === 0) return
 
-    const latest = this.metrics[this.metrics.length - 1]!
+    const latest = this.metrics[this.metrics.length - 1]
 
     // Check response time
     if (latest.responseTime > this.config.alertThresholds.responseTime) {
@@ -381,7 +381,7 @@ class PerformanceMonitor {
    */
   getCurrentMetrics(): PerformanceMetrics | null {
     return this.metrics.length > 0
-      ? this.metrics[this.metrics.length - 1]!
+      ? this.metrics[this.metrics.length - 1]
       : null
   }
 
