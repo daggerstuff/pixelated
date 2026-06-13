@@ -79,6 +79,84 @@ git_with_auth() {
 }
 
 # ---------------------------------------------------------------------------
+# Submodule Recovery
+# ---------------------------------------------------------------------------
+# When a submodule's pinned commit has been force-pushed out of the remote,
+# fall back to the configured branch (or remote HEAD) so CI can proceed.
+# ---------------------------------------------------------------------------
+
+recover_submodule() {
+  local name="$1"
+  local path="$2"
+  local url="$3"
+  local branch="${4:-}"
+
+  echo "##[warning]Recovering submodule '${name}' at '${path}'..."
+
+  if [[ -n "${branch}" ]]; then
+    echo "  → Trying remote branch '${branch}'..."
+    if git_with_auth submodule update --force --init --remote "${path}" 2>/dev/null; then
+      run git -C "${path}" checkout "${branch}" 2>/dev/null || true
+      echo "  ✅ Recovered via remote tracking (branch: ${branch})"
+      return 0
+    fi
+  else
+    echo "  → Trying remote HEAD..."
+    if git_with_auth submodule update --force --init --remote "${path}" 2>/dev/null; then
+      echo "  ✅ Recovered via remote tracking (HEAD)"
+      return 0
+    fi
+  fi
+
+  echo "  → Trying direct clone..."
+  run rm -rf "${path}" 2>/dev/null || true
+  run mkdir -p "$(dirname "${path}")" 2>/dev/null || true
+
+  if [[ -n "${branch}" ]]; then
+    if git_with_auth clone --branch "${branch}" --single-branch "${url}" "${path}" 2>/dev/null; then
+      echo "  ✅ Recovered via direct clone (branch: ${branch})"
+      return 0
+    fi
+  fi
+
+  if git_with_auth clone --single-branch "${url}" "${path}" 2>/dev/null; then
+    echo "  ✅ Recovered via direct clone (default branch)"
+    return 0
+  fi
+
+  echo "  ❌ Failed to recover submodule '${name}'"
+  return 1
+}
+
+recover_failed_submodules() {
+  local all_recovered=true
+
+  for name in ${SUBMODULE_NAMES}; do
+    path="$(git config -f .gitmodules --get "submodule.${name}.path" || echo "${name}")"
+    url="$(git config -f .gitmodules --get "submodule.${name}.url")"
+    branch="$(git config -f .gitmodules --get "submodule.${name}.branch" || echo "")"
+
+    # Check submodule status: leading '-' means pinned commit is not fetched
+    local status_line
+    status_line=$(git submodule status -- "${path}" 2>/dev/null || true)
+    local status_char="${status_line:0:1}"
+
+    if [[ "${status_char}" == "-" ]]; then
+      if ! recover_submodule "${name}" "${path}" "${url}" "${branch}"; then
+        all_recovered=false
+      fi
+    fi
+  done
+
+  if [[ "${all_recovered}" == "false" ]]; then
+    echo "##[error]One or more submodules could not be recovered"
+    return 1
+  fi
+
+  echo "✅ All submodules recovered successfully"
+}
+
+# ---------------------------------------------------------------------------
 # Main Execution
 # ---------------------------------------------------------------------------
 configure_credentials
@@ -128,7 +206,10 @@ done
 echo "📥 Updating submodules (depth=1)..."
 if ! git_with_auth submodule update --recursive --force --depth 1; then
   echo "##[warning]Shallow submodule update failed. Retrying with full history..."
-  git_with_auth submodule update --recursive --force
+  if ! git_with_auth submodule update --recursive --force; then
+    echo "##[warning]Full submodule update failed. Attempting per-submodule recovery..."
+    recover_failed_submodules
+  fi
 fi
 
 echo "✅ Submodule initialization complete!"
