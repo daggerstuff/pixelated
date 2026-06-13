@@ -1,9 +1,7 @@
 import {
-  handleGatewayError,
   jsonResponse,
   parseRequestJson,
   parseSearchParams,
-  requireAuthenticatedMemoryCaller,
   toPublicMemory,
 } from '@/lib/memory/contract/route-helpers'
 import {
@@ -21,56 +19,46 @@ import {
  *   POST /api/v1/memory/search  body: { q, limit?, offset? }
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // GET /api/v1/memory/search
 // ---------------------------------------------------------------------------
 
-export const GET = async (context: { request: Request }): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
-
+export const GET = withV1Contract('searchMemories', async (context, caller) => {
   const url = new URL(context.request.url)
   const params = parseSearchParams(SearchMemoriesQuery, url)
   if (!params.ok) return params.response
   const { q, limit = 10, offset = 0 } = params.data
 
-  try {
-    const result = await getProductMemoryGateway().searchMemories({
-      ...auth.caller.scope,
-      query: q,
-      limit,
-      offset,
-    })
+  const result = await getProductMemoryGateway().searchMemories({
+    ...caller.scope,
+    query: q,
+    limit,
+    offset,
+  })
 
-    const body: SearchMemoriesResponse = {
-      data: result.memories.map((m) => toPublicMemory(m)),
-      query: q,
-      pagination: Pagination.parse({ limit, offset, total: result.total }),
-    }
-    return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('searchMemories', err)
+  const body: SearchMemoriesResponse = {
+    data: result.memories.map((m) => toPublicMemory(m)),
+    query: q,
+    pagination: Pagination.parse({ limit, offset, total: result.total }),
   }
-}
+  return jsonResponse(body)
+})
 
 // ---------------------------------------------------------------------------
 // POST /api/v1/memory/search
 // ---------------------------------------------------------------------------
 
-export const POST = async (context: {
-  request: Request
-}): Promise<Response> => {
-  const auth = await requireAuthenticatedMemoryCaller(context.request)
-  if (!auth.ok) return auth.response
+export const POST = withV1Contract(
+  'searchMemories',
+  async (context, caller) => {
+    const parsed = await parseRequestJson(SearchMemoryRequest, context.request)
+    if (!parsed.ok) return parsed.response
+    const { q, limit = 10, offset = 0 } = parsed.data
 
-  const parsed = await parseRequestJson(SearchMemoryRequest, context.request)
-  if (!parsed.ok) return parsed.response
-  const { q, limit = 10, offset = 0 } = parsed.data
-
-  try {
     const result = await getProductMemoryGateway().searchMemories({
-      ...auth.caller.scope,
+      ...caller.scope,
       query: q,
       limit,
       offset,
@@ -82,7 +70,5 @@ export const POST = async (context: {
       pagination: Pagination.parse({ limit, offset, total: result.total }),
     }
     return jsonResponse(body)
-  } catch (err) {
-    return handleGatewayError('searchMemories', err)
-  }
-}
+  },
+)
