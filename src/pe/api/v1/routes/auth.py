@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import secrets
+import warnings
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -115,12 +116,16 @@ def _hash_email(email: str) -> str:
 
 
 def _encrypt_email(email: str, _key: str) -> bytes:
-    """Encrypt email at application layer using pgp_sym_encrypt equivalent.
+    """DEV-ONLY stub — does NOT actually encrypt.
 
-    For now, uses a simple XOR-like transform; in production, this would
-    use pgcrypto's pgp_sym_encrypt() at the DB level.
+    WARNING: This is a development placeholder that stores plaintext bytes.
+    In production, implement pgp_sym_encrypt() at the DB level or
+    replace with real application-layer encryption before deployment.
     """
-    # Placeholder — real implementation uses pgp_sym_encrypt()
+    warnings.warn(
+        "_encrypt_email is a DEV-ONLY stub that stores plaintext — implement real encryption before production use",
+        stacklevel=2,
+    )
     return email.encode("utf-8")
 
 
@@ -459,7 +464,6 @@ async def create_api_key(
     current_user: dict = Depends(role_at_least(UserRole.MANAGER)),
 ):
     """Create an API key for programmatic access."""
-
     tenant_id = current_user["tenant_id"]
     user_id = current_user["user_id"]
 

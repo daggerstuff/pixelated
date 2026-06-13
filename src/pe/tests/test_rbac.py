@@ -21,7 +21,8 @@ class TestRBAC:
     def test_role_at_least_passes(self) -> None:
         """Should pass when role meets minimum."""
         checker = role_at_least(UserRole.EDUCATOR)
-        asyncio.run(checker({"role": "manager", "tenant_id": "t1", "user_id": "u1"}))
+        result = asyncio.run(checker({"role": "manager", "tenant_id": "t1", "user_id": "u1"}))
+        assert result["role"] == "manager"
 
     def test_role_at_least_fails(self) -> None:
         """Should raise when role below minimum."""
