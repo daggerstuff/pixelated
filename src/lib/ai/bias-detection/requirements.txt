@@ -667,7 +667,7 @@ pure-eval==0.2.3
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   stack-data
-pyarrow==23.0.1
+pyarrow==24.0.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   datasets
@@ -910,9 +910,9 @@ toolz==1.1.0
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   altair
-torch==2.10.0
+torch==2.12.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-tornado==6.5.5
+tornado==6.5.6
     # via -r src/lib/ai/bias-detection/requirements.txt
 tqdm==4.67.1
     # via
