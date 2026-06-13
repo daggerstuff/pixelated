@@ -13,9 +13,12 @@ from typing import Any
 
 import bcrypt
 import jwt
+import structlog
 from pydantic import ValidationError
 
 from src.pe.config import settings
+
+logger = structlog.get_logger(__name__)
 
 
 def create_access_token(
@@ -117,7 +120,11 @@ def hash_password(password: str) -> str:
 
 def verify_password(password: str, hashed: str) -> bool:
     """Verify a password against its bcrypt hash."""
-    return bcrypt.checkpw(
-        password.encode("utf-8"),
-        hashed.encode("utf-8"),
-    )
+    try:
+        return bcrypt.checkpw(
+            password.encode("utf-8"),
+            hashed.encode("utf-8"),
+        )
+    except (ValueError, TypeError) as exc:
+        logger.warning("verify_password failed", error=str(exc))
+        return False

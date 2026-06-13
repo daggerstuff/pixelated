@@ -8,7 +8,6 @@ Implements the tenant isolation strategy from ADR-001:
 
 from __future__ import annotations
 
-from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import structlog
@@ -46,49 +45,7 @@ async_session_factory = async_sessionmaker(
 )
 
 
-async def get_session() -> AsyncGenerator[AsyncSession]:
-    """Yield an async database session."""
-    async with async_session_factory() as session:
-        try:
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
-
 @asynccontextmanager
-async def rls_session(
-    tenant_id: str,
-    user_id: str,
-    user_role: str,
-) -> AsyncGenerator[AsyncSession]:
-    """Yield a database session with RLS context set.
-
-    Sets the PostgreSQL session-level configuration variables
-    that RLS policies rely on for tenant isolation.
-
-    Usage:
-        async with rls_session(tenant_id, user_id, user_role) as session:
-            result = await session.execute(query)
-    """
-    async with async_session_factory() as session:
-        try:
-            await session.execute(
-                text("SELECT pe.set_session_context(:tenant_id, :user_id, :user_role)"),
-                {"tenant_id": tenant_id, "user_id": user_id, "user_role": user_role},
-            )
-            yield session
-            await session.commit()
-        except Exception:
-            await session.rollback()
-            raise
-        finally:
-            await session.close()
-
-
 async def check_connection() -> dict:
     """Verify database connectivity and return server info.
 
