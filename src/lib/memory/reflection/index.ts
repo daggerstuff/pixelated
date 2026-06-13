@@ -41,3 +41,19 @@ export type {
   OutcomeEvaluator,
   ReflectionOutcome,
 } from "./outcome-evaluator";
+
+export { proposeGuidanceUpdate, NoopGuidanceWriter } from "./guidance-writer";
+export type {
+  GuidanceWriter,
+  ProposeGuidanceOptions,
+  ProposeGuidanceResult,
+} from "./guidance-writer";
+
+export {
+  ReflectionMetricsRecorder,
+  defaultRecorder,
+} from "./reflection-metrics";
+export type {
+  ReflectionMetricsInput,
+  ReflectionMetricsAggregate,
+} from "./reflection-metrics";

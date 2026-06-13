@@ -13,13 +13,13 @@
 // Schema version — single source of truth
 // ---------------------------------------------------------------------------
 
-export { MEMORY_SCHEMA_VERSION } from './types'
+export { MEMORY_SCHEMA_VERSION } from "./types";
 
 // ---------------------------------------------------------------------------
 // Canonical enum value sets (for Zod, guards, OpenAPI)
 // ---------------------------------------------------------------------------
 
-export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from './enums'
+export { MEMORY_SCOPE_VALUES, RETENTION_POLICY_VALUES } from "./enums";
 
 // ---------------------------------------------------------------------------
 // Primitive enum types
@@ -36,7 +36,7 @@ export type {
   GateDecision,
   /** Which service originally wrote this memory row. */
   SourceService,
-} from './types'
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Sub-object types
@@ -51,7 +51,7 @@ export type {
   GateResult,
   /** Detailed metadata produced by the safety-gating pipeline (PII, crisis, trauma, consent). */
   GatingMetadata,
-} from './types'
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Canonical memory object
@@ -66,7 +66,7 @@ export type {
    *  - TypeScript in-memory:  this interface directly
    */
   UnifiedMemory,
-} from './types'
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Synthesis output types
@@ -77,7 +77,7 @@ export type {
   StanceShift,
   /** Output of a memory reconciliation pass. */
   SynthesisResult,
-} from './types'
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Input / query shapes
@@ -90,7 +90,7 @@ export type {
   UpdateMemoryInput,
   /** Query options for listing / searching memories. */
   MemoryQueryOptions,
-} from './types'
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Zod runtime validation schemas  (schemas.ts)
@@ -111,7 +111,7 @@ export {
   MemoryQueryOptionsSchema,
   StanceShiftSchema,
   SynthesisResultSchema,
-} from './schemas'
+} from "./schemas";
 
 // ---------------------------------------------------------------------------
 // Runtime type guards & predicates  (guards.ts)
@@ -123,37 +123,30 @@ export {
   isRetentionPolicy,
   isStrengthTrend,
   isGateDecision,
-
   // Structural guard
   isUnifiedMemory,
-
   // Scope predicates
   isSessionMemory,
   isArcMemory,
   isTraitMemory,
   isFactMemory,
-
   // Retention predicates
   isEphemeral,
   isPermanent,
-
   // Ghost / synthesis predicates
   isGhostMemory,
   isSynthesized,
-
   // Strength / decay predicates
   isStale,
   isStrengthening,
-
   // Emotional / clinical predicates
   hasEmotionalContext,
   hasEmpathyMetrics,
   isEmbedded,
-
   // Synthesis output guards
   isStanceShift,
   isSynthesisResult,
-} from './guards'
+} from "./guards";
 
 // ---------------------------------------------------------------------------
 // Reflection loop contracts  (reflection.ts)
@@ -168,7 +161,7 @@ export {
   ReflexionResultSchema,
   actionFeedbackPairToReflectionContext,
   verbalReflectionToInsights,
-} from './reflection'
+} from "./reflection";
 
 export type {
   ReflectionOutcome,
@@ -177,7 +170,10 @@ export type {
   ActionFeedbackPair,
   VerbalReflection,
   ReflexionResult,
-} from './reflection'
+  ReflectionMetrics,
+} from "./reflection";
+
+export { ReflectionMetricsSchema } from "./reflection";
 
 // ---------------------------------------------------------------------------
 // Factory defaults & construction helpers  (defaults.ts)
@@ -189,27 +185,23 @@ export {
    * canonical defaults. Provided fields override defaults.
    */
   memoryInputDefaults,
-
   /**
    * Baseline neutral EmotionalContext — all dimensions at their midpoints.
    * Use as a starting point before running emotion detection.
    */
   NEUTRAL_EMOTIONAL_CONTEXT,
-
   /**
    * Constructs a minimal valid UnifiedMemory from a CreateMemoryInput.
    * Does NOT persist — intended for tests, stubs, and in-memory implementations.
    */
   buildMemorySkeleton,
-
   /**
    * Clamps an importance score to the valid [0, 1] range.
    */
   clampImportance,
-
   /**
    * Applies one tick of exponential decay to an importance score.
    * `nextImportance = importance * (1 − decayRate)^hours`
    */
   applyImportanceDecay,
-} from './defaults'
+} from "./defaults";
