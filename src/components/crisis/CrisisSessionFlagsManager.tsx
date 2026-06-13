@@ -26,6 +26,24 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
   )
   const [updating, setUpdating] = useState<string | null>(null)
 
+  // Close modal on Escape key press
+  useEffect(() => {
+    if (!selectedFlag) {
+      return undefined
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedFlag(null)
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [selectedFlag])
+
   const loadFlags = useCallback(async () => {
     try {
       setLoading(true)
