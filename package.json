@@ -448,7 +448,8 @@
     "vite-tsconfig-paths": "latest",
     "vitest": "^4.1.8",
     "vscode-jsonrpc": "9.0.0",
-    "wait-on": "latest"
+    "wait-on": "latest",
+    "yaml": "2.8.4"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
