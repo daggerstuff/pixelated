@@ -5,9 +5,22 @@ import {
   isDiffMonth,
   isSameYear,
   getCurrentFormattedTime,
+  formatDate,
 } from './datetime'
 
 describe('datetime utils', () => {
+  describe('formatDate', () => {
+    it('formats a valid date string correctly', () => {
+      const formatted = formatDate('2024-03-15T12:00:00Z')
+      expect(typeof formatted).toBe('string')
+      expect(formatted).toMatch(/2024/)
+    })
+
+    it('throws an Error for an invalid date string', () => {
+      expect(() => formatDate('invalid date')).toThrow('Invalid Date')
+    })
+  })
+
   describe('getCurrentFormattedTime', () => {
     beforeEach(() => {
       vi.useFakeTimers()
