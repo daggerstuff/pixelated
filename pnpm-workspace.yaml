@@ -269,9 +269,10 @@ overrides:
   drizzle-orm: ^0.45.2
   effect: '>=3.20.0'
   esbuild: ^0.28.0
+  ajv: ^8.18.0
   eslint>ajv: ^6.14.0
   eslint>minimatch: ^3.1.4
-  express: '>=4.19.2'
+  express: '>=4.20.0'
   fast-xml-parser: 5.7.0
   follow-redirects: '>=1.16.0'
   glob: ^13.0.0
@@ -286,6 +287,16 @@ overrides:
   kysely: '>=0.28.14'
   langsmith: '>=0.4.6'
   lodash: ^4.18.0
+  multer: ^2.1.1
+  basic-ftp: '>=5.2.0'
+  flatted: ^3.4.2
+  serialize-javascript: ^8.0.0
+  body-parser: '>=1.20.3'
+  express-rate-limit: '>=8.2.2'
+  send: '>=0.19.0'
+  serve-static: '>=1.16.0'
+  handlebars: '>=4.7.9'
+  smol-toml: '>=1.6.1'
   minimatch: ^10.2.3
   node-domexception: ^2.0.1
   node-forge: '>=1.4.0'
@@ -301,7 +312,7 @@ overrides:
   scmp: 2.1.0
   sitemap: ^9.0.0
   socket.io-parser: '>=4.2.6'
-  tar: ^7.5.7
+  tar: ^7.5.11
   tmp: '>=0.2.4'
   undici: ^7.25.0
   unocss: ^66.7.0
