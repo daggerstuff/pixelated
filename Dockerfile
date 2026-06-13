@@ -43,10 +43,9 @@ COPY patches ./patches
 COPY config/package/.npmrc ./.npmrc
 
 # Install all dependencies (dev + prod) required for build
-COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
-RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
-    PNPM_INSTALL_ARGS="--prod=false --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
-    rm /tmp/pnpm-install-with-fallback.sh
+# Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)
+RUN pnpm install --frozen-lockfile --ignore-scripts || \
+    pnpm install --no-frozen-lockfile --ignore-scripts
 
 # Copy source and run the build
 COPY . .
@@ -109,13 +108,10 @@ COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /app/patches ./patches
 COPY --from=builder /app/.npmrc ./.npmrc
 
-# Install production dependencies with smart fallback approach
-COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh
-RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
-    PNPM_INSTALL_ARGS="--prod --ignore-scripts" /tmp/pnpm-install-with-fallback.sh && \
-    rm /tmp/pnpm-install-with-fallback.sh && \
+# Install production dependencies; fallback to --no-frozen-lockfile if lockfile drifts in CI
+RUN (pnpm install --frozen-lockfile --prod --ignore-scripts || \
+    pnpm install --no-frozen-lockfile --prod --ignore-scripts) && \
     pnpm store prune && \
-    # Remove unnecessary files to reduce layer size
     find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.test.*" -exec rm -rf {} + 2>/dev/null || true && \
     find node_modules -type d -name "*.spec.*" -exec rm -rf {} + 2>/dev/null || true && \
@@ -126,7 +122,6 @@ RUN chmod +x /tmp/pnpm-install-with-fallback.sh && \
     find node_modules -name "CHANGELOG*" -delete && \
     find node_modules -name "LICENSE*" -delete && \
     find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    # Remove build tools after native modules are built
     apt-get purge -y --auto-remove python3 make g++ git && \
     rm -rf /tmp/* /root/.npm /root/.cache
 
