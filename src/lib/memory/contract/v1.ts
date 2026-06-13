@@ -60,6 +60,36 @@ export const RetentionPolicy = z.enum(RETENTION_POLICY_VALUES)
 export type RetentionPolicy = RetentionPolicyType
 
 // ---------------------------------------------------------------------------
+// Identity / scope envelope — the canonical workspace tenancy model.
+//
+// These fields are resolved server-side from the authenticated session and
+// API key. They NEVER appear in request bodies (enforced by .strict() on
+// every request schema). They appear in response envelopes so consumers can
+// confirm which scope the operation was executed under.
+// ---------------------------------------------------------------------------
+
+export const MemoryApiScope = z.enum(['product', 'developer'])
+export type MemoryApiScope = z.infer<typeof MemoryApiScope>
+
+export const MemoryApiRole = z.enum([
+  'owner',
+  'clinician',
+  'member',
+  'observer',
+])
+export type MemoryApiRole = z.infer<typeof MemoryApiRole>
+
+export const IdentityScope = z
+  .object({
+    workspaceId: z.string().min(1),
+    userId: z.string().min(1),
+    scope: MemoryApiScope,
+    role: MemoryApiRole,
+  })
+  .strict()
+export type IdentityScope = z.infer<typeof IdentityScope>
+
+// ---------------------------------------------------------------------------
 // Core resource — the PUBLIC memory record.
 //
 // This is a STRICT SUBSET of the internal `UnifiedMemory` type. It contains
@@ -120,14 +150,24 @@ export const UpdateMemoryRequest = z
   .strict()
 export type UpdateMemoryRequest = z.infer<typeof UpdateMemoryRequest>
 
-export const SearchMemoryRequest = z
+export const DeleteMemoryRequest = z.object({}).strict()
+export type DeleteMemoryRequest = z.infer<typeof DeleteMemoryRequest>
+
+export const SearchMemoriesRequest = z
   .object({
     q: z.string().min(1).max(1_000),
     limit: z.number().int().positive().max(100).optional(),
     offset: z.number().int().nonnegative().optional(),
   })
   .strict()
-export type SearchMemoryRequest = z.infer<typeof SearchMemoryRequest>
+export type SearchMemoriesRequest = z.infer<typeof SearchMemoriesRequest>
+
+/**
+ * @deprecated Use SearchMemoriesRequest instead. This alias will be removed
+ * in the next contract version.
+ */
+export const SearchMemoryRequest = SearchMemoriesRequest
+export type SearchMemoryRequest = SearchMemoriesRequest
 
 // ---------------------------------------------------------------------------
 // Query parameters (string-typed at the boundary; coerced in handlers)
@@ -173,6 +213,7 @@ export type Pagination = z.infer<typeof Pagination>
 export const CreateMemoryResponse = z
   .object({
     data: PublicMemory,
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type CreateMemoryResponse = z.infer<typeof CreateMemoryResponse>
@@ -180,6 +221,7 @@ export type CreateMemoryResponse = z.infer<typeof CreateMemoryResponse>
 export const GetMemoryResponse = z
   .object({
     data: PublicMemory,
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type GetMemoryResponse = z.infer<typeof GetMemoryResponse>
@@ -187,6 +229,7 @@ export type GetMemoryResponse = z.infer<typeof GetMemoryResponse>
 export const UpdateMemoryResponse = z
   .object({
     data: PublicMemory,
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type UpdateMemoryResponse = z.infer<typeof UpdateMemoryResponse>
@@ -194,6 +237,7 @@ export type UpdateMemoryResponse = z.infer<typeof UpdateMemoryResponse>
 export const DeleteMemoryResponse = z
   .object({
     data: z.object({ id: z.uuid() }).strict(),
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type DeleteMemoryResponse = z.infer<typeof DeleteMemoryResponse>
@@ -202,6 +246,7 @@ export const ListMemoriesResponse = z
   .object({
     data: z.array(PublicMemory),
     pagination: Pagination,
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type ListMemoriesResponse = z.infer<typeof ListMemoriesResponse>
@@ -211,6 +256,7 @@ export const SearchMemoriesResponse = z
     data: z.array(PublicMemory),
     query: z.string(),
     pagination: Pagination,
+    identity: IdentityScope.optional(),
   })
   .strict()
 export type SearchMemoriesResponse = z.infer<typeof SearchMemoriesResponse>
