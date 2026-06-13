@@ -1,9 +1,19 @@
 import { describe, it, expect } from 'vitest'
 
-import { ScenarioDifficulty } from '../types'
-import { getRecommendedScenario } from './scenarios'
+import { ScenarioDifficulty, TherapeuticDomain } from '../types'
+import { getRecommendedScenario, filterScenarios } from './scenarios'
 
 describe('scenarios utilities', () => {
+  describe('filterScenarios', () => {
+    it('returns scenarios filtered by a specific domain', async () => {
+      const result = await filterScenarios(TherapeuticDomain.ANXIETY)
+      expect(result.length).toBeGreaterThan(0)
+      result.forEach((scenario) => {
+        expect(scenario.domain).toBe(TherapeuticDomain.ANXIETY)
+      })
+    })
+  })
+
   describe('getRecommendedScenario', () => {
     it('returns null if all available scenarios are completed', async () => {
       const completedIds = [
