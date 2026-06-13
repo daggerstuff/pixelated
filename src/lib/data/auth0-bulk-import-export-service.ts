@@ -317,7 +317,7 @@ export class Auth0BulkImportExportService {
   ): Promise<ImportResult> {
     try {
       // Parse CSV data
-      const      records = await new Promise<Array<Record<string, string>>>(
+      const records = await new Promise<Array<Record<string, string>>>(
         (resolve, reject) => {
           parse(
             csvData,
@@ -337,8 +337,8 @@ export class Auth0BulkImportExportService {
       const users: UserImportData[] = records.map((record) => ({
         email: record['email'],
         name: record['name'],
-        user_id: record['user_id'],              email_verified:
-          record['email_verified'] === 'true',
+        user_id: record['user_id'],
+        email_verified: record['email_verified'] === 'true',
         app_metadata: record['app_metadata']
           ? JSON.parse(record['app_metadata'])
           : undefined,
@@ -431,15 +431,9 @@ export class Auth0BulkImportExportService {
             user_metadata: options.includeMetadata
               ? user.user_metadata
               : undefined,
-            identities: options.includeIdentities
-              ? user.identities
-              : undefined,
-            roles: options.includeRoles
-              ? user.roles
-              : undefined,
-            permissions: options.includeRoles
-              ? user.permissions
-              : undefined,
+            identities: options.includeIdentities ? user.identities : undefined,
+            roles: options.includeRoles ? user.roles : undefined,
+            permissions: options.includeRoles ? user.permissions : undefined,
           }),
         )
 

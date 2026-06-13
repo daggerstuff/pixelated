@@ -87,7 +87,7 @@ services:
     image: grafana/grafana:latest
     container_name: pixelated-grafana
     ports:
-      - "3001:3000"
+      - "3100:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./monitoring/grafana:/etc/grafana/provisioning
@@ -450,7 +450,7 @@ setup_monitoring() {
 check_service_health() {
     log_info "Checking monitoring service health..."
     
-    local services=("prometheus:9090" "grafana:3001" "alertmanager:9093")
+    local services=("prometheus:9090" "grafana:3100" "alertmanager:9093")
     
     for service in "${services[@]}"; do
         local name=$(echo "$service" | cut -d':' -f1)
@@ -468,7 +468,7 @@ show_monitoring_info() {
     log_info "Monitoring services information:"
     echo ""
     echo "  Prometheus:   http://localhost:9090"
-    echo "  Grafana:      http://localhost:3001 (admin/admin)"
+    echo "  Grafana:      http://localhost:3100 (admin/admin)"
     echo "  Alertmanager: http://localhost:9093"
     echo "  Node Exporter: http://localhost:9100"
     echo "  cAdvisor:     http://localhost:8080"

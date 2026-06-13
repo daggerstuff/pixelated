@@ -2,7 +2,7 @@
 services:
   training-service:
     build:
-      context: .
+      context: ../
       dockerfile: docker/training-service/Dockerfile
       target: production
     container_name: pixelated-training
@@ -116,7 +116,7 @@ services:
       - ./monitoring/grafana/dashboards/training:/etc/grafana/provisioning/dashboards:ro
       - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
     ports:
-      - '3001:3000'
+      - '3100:3000'
     networks:
       - training-net
 

@@ -3,10 +3,9 @@
  * Supports PostgreSQL with connection pooling and migration management
  */
 
+import { createHash } from 'crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
-
-import { createHash } from 'crypto'
 
 import { Pool, PoolClient } from 'pg'
 

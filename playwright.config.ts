@@ -5,7 +5,9 @@ const shouldSkipWebServer =
   process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === '1' ||
   process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
-const baseURL = process.env['BASE_URL'] ?? 'http://127.0.0.1:5173'
+const baseURL =
+  process.env['BASE_URL'] ??
+  (isCi ? 'http://127.0.0.1:4321' : 'http://127.0.0.1:5173')
 
 let webServerUrl: string | undefined
 let webServerPort: number | undefined
@@ -57,7 +59,7 @@ export default defineConfig({
       ? undefined
       : isCi
         ? {
-            command: `NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run preview -- --host 127.0.0.1 --port ${webServerPort ?? 4321}`,
+            command: `NODE_ENV=test pnpm run build && NODE_ENV=test ./node_modules/.bin/astro preview --host 0.0.0.0 --port ${webServerPort ?? 4321}`,
             url: webServerUrl ?? 'http://127.0.0.1:4321',
             reuseExistingServer: false,
             timeout: 10 * 60 * 1000,

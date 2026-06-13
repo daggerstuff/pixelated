@@ -1,7 +1,7 @@
+import type { GateResult } from '@pixelated/memory-schema'
 import { useCallback, useState } from 'react'
 
 import { evaluateChatGate } from '@/lib/chat/evaluate-chat-gate'
-import type { GateResult } from '@pixelated/memory-schema'
 import { cn } from '@/lib/utils'
 
 interface TherapyGateMessage {

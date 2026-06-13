@@ -13,7 +13,10 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { IdentityProvider, IdentityProviderUser } from '../identity-provider'
+import type {
+  IdentityProvider,
+  IdentityProviderUser,
+} from '../identity-provider'
 
 const { mockGetUserById } = vi.hoisted(() => ({
   mockGetUserById: vi.fn(),
@@ -25,7 +28,9 @@ vi.mock('../../../services/auth0.service', () => ({
 
 import { dualWriteGetUserById, shouldDualWrite } from '../dual-write'
 
-function makeUser(overrides: Partial<IdentityProviderUser> = {}): IdentityProviderUser {
+function makeUser(
+  overrides: Partial<IdentityProviderUser> = {},
+): IdentityProviderUser {
   return {
     id: 'auth0|user-1',
     email: 'a@b.test',
@@ -120,9 +125,11 @@ describe('dualWriteGetUserById', () => {
   it('returns mismatch with field-level discrepancies', async () => {
     process.env['AUTH_DUAL_WRITE'] = 'true'
     const provider = makeProvider(
-      vi.fn().mockResolvedValueOnce(
-        makeUser({ role: 'therapist', email: 'provider@b.test' }),
-      ),
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          makeUser({ role: 'therapist', email: 'provider@b.test' }),
+        ),
     )
     mockGetUserById.mockResolvedValueOnce({
       id: 'auth0|user-1',

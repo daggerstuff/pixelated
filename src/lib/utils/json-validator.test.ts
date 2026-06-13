@@ -42,13 +42,13 @@ describe('json-validator', () => {
           suicidalIdeation: {},
           selfHarm: {},
           agitation: {},
-          substanceUse: {}
+          substanceUse: {},
         },
         riskFactors: [],
         protectiveFactors: [],
         recommendations: {},
         resources: {},
-        metadata: { confidenceScore: 0.9 }
+        metadata: { confidenceScore: 0.9 },
       }
       expect(validateCrisisDetectionResponse(valid).success).toBe(true)
     })
@@ -60,13 +60,13 @@ describe('json-validator', () => {
           suicidalIdeation: {},
           selfHarm: {},
           agitation: {},
-          substanceUse: {}
+          substanceUse: {},
         },
         riskFactors: [],
         protectiveFactors: [],
         recommendations: {},
         resources: {},
-        metadata: { confidenceScore: 0.9 }
+        metadata: { confidenceScore: 0.9 },
       }
       expect(validateCrisisDetectionResponse(invalid).success).toBe(false)
     })
@@ -78,12 +78,12 @@ describe('json-validator', () => {
           suicidalIdeation: {},
           selfHarm: {},
           agitation: {},
-          substanceUse: {}
+          substanceUse: {},
         },
         riskFactors: [],
         protectiveFactors: [],
         recommendations: {},
-        resources: {}
+        resources: {},
         // Missing metadata
       }
       expect(validateCrisisDetectionResponse(invalid).success).toBe(false)

@@ -18,7 +18,8 @@ exit 0
 
 ## If WAKEUP exists
 
-Read the file, address the concern (save progress, report status), then continue working.
+Read the file, address the concern (save progress, report status), then continue
+working.
 
 ## Writing heartbeats
 
