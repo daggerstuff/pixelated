@@ -6,4 +6,3 @@
 
 ## 2024-11-20 - Pre-computation of formatting strings | Learning: Repeated object instantiation like `new Date()` combined with string formatting within mapping functions in render components creates performance impacts | Action: Extract string pre-computation into a mapped structure inside a useMemo.
 
-## 2024-11-20 - Fallback Data Extraction | Learning: Array literal creation within functional components creates minor performance impacts and memory allocations during render cycles | Action: Extracted static fallback array `FALLBACK_SKILLS` from `TherapistProgressTracker` to static module scope.
