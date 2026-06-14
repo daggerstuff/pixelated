@@ -84,7 +84,7 @@ export const POST: APIRoute = async ({ request }) => {
       : {}),
   }
 
-  const updated = await reconcileStatus(store, remoteId, freshStatus)
+  const updated = await reconcileStatus(store, remoteId, freshStatus, patch)
   const status = updated?.status ?? freshStatus
 
   if (!updated) {
@@ -123,31 +123,42 @@ interface WebhookPayload {
   create_time?: string
 }
 
-function statusFromOpenAI(event: WebhookPayload): FineTuningStatus {
+function statusFromOpenAI(event: WebhookPayload): FineTuningStatus | null {
   const t = event.event ?? ''
   if (t.endsWith('.succeeded')) return 'succeeded'
   if (t.endsWith('.failed')) return 'failed'
   if (t.endsWith('.cancelled') || t.endsWith('.canceled')) return 'cancelled'
   if (t.endsWith('.running')) return 'running'
   if (t.endsWith('.queued') || t.endsWith('.validating_files')) return 'queued'
-  // OpenAI added a new status we don't know — preserve by re-fetching
-  // from the store below; caller handles the null return path.
-  return 'running'
+  // OpenAI added a new status we don't know — return null to preserve existing state
+  return null
 }
 
 /** Fetch the current status from store so unknown events don't regress state. */
 async function reconcileStatus(
   store: JobStore,
   remoteId: string,
-  fresh: FineTuningStatus,
+  fresh: FineTuningStatus | null,
+  patch: Partial<FineTuningJob>,
 ): Promise<FineTuningJob | null> {
   const existing = await store.getByRemoteId(remoteId)
   if (!existing) return null
+
+  // If we couldn't determine the status from the event, preserve existing status
+  const statusToUse = fresh ?? existing.status
+
+  // If we have a fresh status and it's running but existing is not running,
+  // preserve the known terminal state to prevent regression
   if (fresh === 'running' && existing.status !== 'running') {
-    // Unknown event type — preserve the known terminal state.
     return store.updateStatus(existing.id, existing.status, {
+      ...patch,
       updatedAt: new Date(),
     })
   }
-  return store.updateStatus(existing.id, fresh)
+
+  // Otherwise, update with the fresh status and apply the patch
+  return store.updateStatus(existing.id, statusToUse, {
+    ...patch,
+    updatedAt: new Date(),
+  })
 }

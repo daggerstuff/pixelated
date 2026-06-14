@@ -67,13 +67,25 @@ export class FineTuningOrchestrator {
     paths: TrainingDatasetReference,
     backend: FineTuningBackend,
   ): string {
+    // Determine the appropriate dataset path for the backend
     if (backend === "openai") {
-      if (!paths.openai) throw new Error("OpenAI dataset path not set");
-      return paths.openai;
+      // For OpenAI flows, check OpenAI path first
+      if (paths.openai) return paths.openai;
+      // Fall back to HuggingFace path if OpenAI not available
+      if (paths.huggingface) return paths.huggingface;
+      throw new Error("No dataset path available for OpenAI backend");
     }
-    // For non-OpenAI backends prefer the backend-specific path so a
-    // co-present openai path does not accidentally feed the wrong
-    // format into HuggingFace (or whichever backend).
+    
+    if (backend === "huggingface") {
+      // For HuggingFace flows, check HuggingFace path first
+      if (paths.huggingface) return paths.huggingface;
+      // Fall back to OpenAI path if HuggingFace not available
+      if (paths.openai) return paths.openai;
+      throw new Error("No dataset path available for HuggingFace backend");
+    }
+    
+    // For local and dry-run backends, prefer HuggingFace over OpenAI
+    // (arbitrary choice - could be configured or based on other factors)
     if (paths.huggingface) return paths.huggingface;
     if (paths.openai) return paths.openai;
     throw new Error("No dataset path available");
