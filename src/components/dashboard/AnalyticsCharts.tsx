@@ -31,10 +31,7 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div
-    className="bg-red-50 border-red-200 rounded-lg border p-4"
-    role="alert"
-  >
+  <div className="bg-red-50 border-red-200 rounded-lg border p-4" role="alert">
     <div className="flex items-center justify-between">
       <div>
         <h4 className="text-red-800 font-medium">
@@ -352,10 +349,16 @@ export const AnalyticsCharts: FC = () => {
           <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
 
           {/* Session Activity Chart */}
-          <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
+          <SessionChart
+            data={data?.sessionMetrics ?? []}
+            isLoading={isLoading}
+          />
 
           {/* Skill Progress */}
-          <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
+          <SkillProgress
+            data={data?.skillProgress ?? []}
+            isLoading={isLoading}
+          />
 
           {/* Data freshness indicator */}
           {data && !isLoading && (
