@@ -5,60 +5,58 @@
  * using the PixelMultimodalChatPage abstraction.
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from "@playwright/test";
 
-import { PixelMultimodalChatPage } from './pages/PixelMultimodalChatPage'
+import { PixelMultimodalChatPage } from "./pages/PixelMultimodalChatPage";
 
-test.describe('Pixel Multimodal Chat - Core Flows', () => {
-  let chatPage: PixelMultimodalChatPage
+test.describe("Pixel Multimodal Chat - Core Flows", () => {
+  let chatPage: PixelMultimodalChatPage;
 
   test.beforeEach(async ({ page }) => {
-    chatPage = new PixelMultimodalChatPage(page)
-    await chatPage.goto()
-  })
+    chatPage = new PixelMultimodalChatPage(page);
+    await chatPage.goto();
+  });
 
-  test.describe('Text-Only Communication', () => {
-    test('complete text conversation flow', async () => {
-      await chatPage.sendTextMessage('Hello, I need help with anxiety')
+  test.describe("Text-Only Communication", () => {
+    test("complete text conversation flow", async () => {
+      await chatPage.sendTextMessage("Hello, I need help with anxiety");
 
-      const response = await chatPage.getLatestMessageContent()
-      expect(response.length).toBeGreaterThan(20)
+      const response = await chatPage.getLatestMessageContent();
+      expect(response.length).toBeGreaterThan(20);
 
       // Verify emotions are displayed
-      const emotions = await chatPage.getEmotionMetrics()
-      expect(emotions.valence).toBeGreaterThanOrEqual(0)
-      expect(emotions.valence).toBeLessThanOrEqual(1)
-    })
+      const emotions = await chatPage.getEmotionMetrics();
+      expect(emotions.valence).toBeGreaterThanOrEqual(0);
+      expect(emotions.valence).toBeLessThanOrEqual(1);
+    });
 
-    test('multi-turn conversation', async () => {
-      await chatPage.sendTextMessage('I feel overwhelmed')
-      await chatPage.sendTextMessage('It is affecting my work')
-      await chatPage.sendTextMessage('What should I do?')
+    test("multi-turn conversation", async () => {
+      await chatPage.sendTextMessage("I feel overwhelmed");
+      await chatPage.sendTextMessage("It is affecting my work");
+      await chatPage.sendTextMessage("What should I do?");
 
-      const messageCount = await chatPage.getMessageCount()
-      expect(messageCount).toBeGreaterThanOrEqual(6) // 3 user + 3 assistant
-    })
+      const messageCount = await chatPage.getMessageCount();
+      expect(messageCount).toBeGreaterThanOrEqual(6); // 3 user + 3 assistant
+    });
 
-    test('error recovery', async () => {
-      await chatPage.mockInferenceError()
-      await chatPage.sendTextMessage('Test error', { waitForResponse: false })
+    test("error recovery", async () => {
+      await chatPage.mockInferenceError();
+      await chatPage.sendTextMessage("Test error", { waitForResponse: false });
 
-      const hasError = await chatPage.hasError()
-      expect(hasError).toBe(true)
+      const hasError = await chatPage.hasError();
+      expect(hasError).toBe(true);
 
-      const errorMsg = await chatPage.getErrorMessage()
-      expect(errorMsg).toContain('error')
-    })
+      const errorMsg = await chatPage.getErrorMessage();
+      expect(errorMsg).toContain("error");
+    });
 
-    test('should propagate behavioral pattern from /api/ai/pixel/infer payload', async () => {
-      let mockedResponse: {
-        behavioral_pattern?: string
-        behavioral_pattern_confidence?: number
-      } | null = null
+    test("should propagate behavioral pattern from /api/ai/pixel/infer payload", async () => {
+      let mockedResponse: Record<string, unknown> | null = null;
+      const getResponse = () => mockedResponse;
 
-      await chatPage.page.route('**/api/ai/pixel/infer', (route) => {
-        const payload = {
-          response: 'I can help you work through this.',
+      await chatPage.page.route("**/api/ai/pixel/infer", (route) => {
+        const payload: Record<string, unknown> = {
+          response: "I can help you work through this.",
           eq_scores: {
             emotional_awareness: 0.88,
             empathy_recognition: 0.84,
@@ -68,191 +66,189 @@ test.describe('Pixel Multimodal Chat - Core Flows', () => {
             overall_eq: 0.82,
           },
           confidence: 0.93,
-          persona_mode: 'therapy',
-          behavioral_pattern: 'adaptive_reflection',
+          persona_mode: "therapy",
+          behavioral_pattern: "adaptive_reflection",
           behavioral_pattern_confidence: 0.91,
           latency_ms: 145,
-        }
-        mockedResponse = payload
+        };
+        mockedResponse = payload;
         void route.fulfill({
           status: 200,
-          contentType: 'application/json',
+          contentType: "application/json",
           body: JSON.stringify(payload),
-        })
-      })
+        });
+      });
 
-      await chatPage.sendTextMessage('I need to process what happened today.')
+      await chatPage.sendTextMessage("I need to process what happened today.");
 
       await expect(
         chatPage.page.locator('[data-testid="multimodal-behavioral-pattern"]'),
-      ).toHaveText('adaptive_reflection')
+      ).toHaveText("adaptive_reflection");
 
-      expect(mockedResponse?.behavioral_pattern).toBe('adaptive_reflection')
-      expect(mockedResponse?.behavioral_pattern_confidence).toBeGreaterThan(0.9)
-    })
-  })
+      expect(getResponse()?.behavioral_pattern).toBe("adaptive_reflection");
+      expect(getResponse()?.behavioral_pattern_confidence).toBeGreaterThan(0.9);
+    });
+  });
 
-  test.describe('Streaming Communication', () => {
-    test('enable streaming and send message', async () => {
-      await chatPage.enableStreaming()
-      await chatPage.sendTextMessage('Explain cognitive behavioral therapy')
+  test.describe("Streaming Communication", () => {
+    test("enable streaming and send message", async () => {
+      await chatPage.enableStreaming();
+      await chatPage.sendTextMessage("Explain cognitive behavioral therapy");
 
       // Streaming response should arrive
-      const response = await chatPage.getLatestMessageContent()
-      expect(response.length).toBeGreaterThan(0)
-    })
+      const response = await chatPage.getLatestMessageContent();
+      expect(response.length).toBeGreaterThan(0);
+    });
 
-    test('toggle between streaming and REST modes', async () => {
+    test("toggle between streaming and REST modes", async () => {
       // Start with REST
-      await chatPage.sendTextMessage('First message')
+      await chatPage.sendTextMessage("First message");
 
       // Switch to streaming
-      await chatPage.enableStreaming()
-      await chatPage.sendTextMessage('Second message')
+      await chatPage.enableStreaming();
+      await chatPage.sendTextMessage("Second message");
 
       // Switch back to REST
-      await chatPage.disableStreaming()
-      await chatPage.sendTextMessage('Third message')
+      await chatPage.disableStreaming();
+      await chatPage.sendTextMessage("Third message");
 
-      const messageCount = await chatPage.getMessageCount()
-      expect(messageCount).toBeGreaterThanOrEqual(6)
-    })
-  })
+      const messageCount = await chatPage.getMessageCount();
+      expect(messageCount).toBeGreaterThanOrEqual(6);
+    });
+  });
 
-  test.describe('Audio Recording', () => {
-    test('record audio with permission', async () => {
-      await chatPage.grantMicrophonePermission()
-      await chatPage.recordAudio(2000) // 2 seconds
+  test.describe("Audio Recording", () => {
+    test("record audio with permission", async () => {
+      await chatPage.grantMicrophonePermission();
+      await chatPage.recordAudio(2000); // 2 seconds
 
-      const duration = await chatPage.getRecordingDuration()
-      expect(duration).toMatch(/00:0[2-9]/) // At least 2 seconds
-    })
+      const duration = await chatPage.getRecordingDuration();
+      expect(duration).toMatch(/00:0[2-9]/); // At least 2 seconds
+    });
 
-    test('handle missing microphone permission', async () => {
-      await chatPage.denyMicrophonePermission()
-      await chatPage.startRecording()
+    test("handle missing microphone permission", async () => {
+      await chatPage.denyMicrophonePermission();
+      await chatPage.startRecording();
 
       // Should show error
-      const errorMsg = await chatPage.getErrorMessage()
-      expect(errorMsg.toLowerCase()).toMatch(/microphone|permission/)
-    })
-  })
+      const errorMsg = await chatPage.getErrorMessage();
+      expect(errorMsg.toLowerCase()).toMatch(/microphone|permission/);
+    });
+  });
 
-  test.describe('Crisis Detection', () => {
-    test('detect suicidal ideation', async () => {
-      await chatPage.sendTextMessage(
-        'I have been thinking about killing myself',
-      )
+  test.describe("Crisis Detection", () => {
+    test("detect suicidal ideation", async () => {
+      await chatPage.sendTextMessage("I have been thinking about killing myself");
 
-      const hasCrisis = await chatPage.hasCrisisFlag()
-      expect(hasCrisis).toBe(true)
-    })
+      const hasCrisis = await chatPage.hasCrisisFlag();
+      expect(hasCrisis).toBe(true);
+    });
 
-    test('show crisis resources', async () => {
-      await chatPage.sendTextMessage('I want to harm myself')
+    test("show crisis resources", async () => {
+      await chatPage.sendTextMessage("I want to harm myself");
 
-      const { crisisResources } = chatPage
-      await expect(crisisResources).toBeVisible({ timeout: 5000 })
-    })
+      const { crisisResources } = chatPage;
+      await expect(crisisResources).toBeVisible({ timeout: 5000 });
+    });
 
-    test('do not flag normal therapeutic discussion', async () => {
-      await chatPage.sendTextMessage('I am feeling stressed about work')
+    test("do not flag normal therapeutic discussion", async () => {
+      await chatPage.sendTextMessage("I am feeling stressed about work");
 
-      const hasCrisis = await chatPage.hasCrisisFlag()
-      expect(hasCrisis).toBe(false)
-    })
-  })
+      const hasCrisis = await chatPage.hasCrisisFlag();
+      expect(hasCrisis).toBe(false);
+    });
+  });
 
-  test.describe('Message Persistence', () => {
-    test('persist messages across reload', async ({ page }) => {
-      const uniqueMsg = `Test ${Date.now()}`
-      await chatPage.sendTextMessage(uniqueMsg)
+  test.describe("Message Persistence", () => {
+    test("persist messages across reload", async ({ page }) => {
+      const uniqueMsg = `Test ${Date.now()}`;
+      await chatPage.sendTextMessage(uniqueMsg);
 
-      await page.reload()
-      await chatPage.waitForLoad()
+      await page.reload();
+      await chatPage.waitForLoad();
 
-      const messages = chatPage.getUserMessage()
-      await expect(messages).toContainText(uniqueMsg)
-    })
+      const messages = chatPage.getUserMessage();
+      await expect(messages).toContainText(uniqueMsg);
+    });
 
-    test('maintain conversation history order', async ({ page }) => {
-      await chatPage.sendTextMessage('First')
-      await chatPage.sendTextMessage('Second')
-      await chatPage.sendTextMessage('Third')
+    test("maintain conversation history order", async ({ page }) => {
+      await chatPage.sendTextMessage("First");
+      await chatPage.sendTextMessage("Second");
+      await chatPage.sendTextMessage("Third");
 
-      await page.reload()
-      await chatPage.waitForLoad()
+      await page.reload();
+      await chatPage.waitForLoad();
 
-      const userMessages = chatPage.getUserMessage()
-      await expect(userMessages.nth(0)).toContainText('First')
-      await expect(userMessages.nth(1)).toContainText('Second')
-      await expect(userMessages.nth(2)).toContainText('Third')
-    })
-  })
+      const userMessages = chatPage.getUserMessage();
+      await expect(userMessages.nth(0)).toContainText("First");
+      await expect(userMessages.nth(1)).toContainText("Second");
+      await expect(userMessages.nth(2)).toContainText("Third");
+    });
+  });
 
-  test.describe('Keyboard Navigation', () => {
-    test('send with Enter key', async () => {
-      await chatPage.typeMessage('Test Enter key')
-      await chatPage.pressEnter()
+  test.describe("Keyboard Navigation", () => {
+    test("send with Enter key", async () => {
+      await chatPage.typeMessage("Test Enter key");
+      await chatPage.pressEnter();
 
-      const lastMessage = chatPage.getUserMessage().last()
-      await expect(lastMessage).toContainText('Test Enter key')
-    })
+      const lastMessage = chatPage.getUserMessage().last();
+      await expect(lastMessage).toContainText("Test Enter key");
+    });
 
-    test('send streaming with Ctrl+Enter', async () => {
-      await chatPage.enableStreaming()
-      await chatPage.typeMessage('Test Ctrl+Enter')
-      await chatPage.pressCtrlEnter()
+    test("send streaming with Ctrl+Enter", async () => {
+      await chatPage.enableStreaming();
+      await chatPage.typeMessage("Test Ctrl+Enter");
+      await chatPage.pressCtrlEnter();
 
-      const lastMessage = chatPage.getUserMessage().last()
-      await expect(lastMessage).toContainText('Test Ctrl+Enter')
-    })
+      const lastMessage = chatPage.getUserMessage().last();
+      await expect(lastMessage).toContainText("Test Ctrl+Enter");
+    });
 
-    test('cancel recording with Escape', async () => {
-      await chatPage.grantMicrophonePermission()
-      await chatPage.startRecording()
-      await chatPage.pressEscape()
+    test("cancel recording with Escape", async () => {
+      await chatPage.grantMicrophonePermission();
+      await chatPage.startRecording();
+      await chatPage.pressEscape();
 
-      const isRecording = await chatPage.recordingIndicator.isVisible()
-      expect(isRecording).toBe(false)
-    })
-  })
+      const isRecording = await chatPage.recordingIndicator.isVisible();
+      expect(isRecording).toBe(false);
+    });
+  });
 
-  test.describe('Accessibility', () => {
-    test('verify ARIA labels and keyboard navigation', async () => {
-      await chatPage.verifyAccessibility()
-    })
+  test.describe("Accessibility", () => {
+    test("verify ARIA labels and keyboard navigation", async () => {
+      await chatPage.verifyAccessibility();
+    });
 
-    test('mobile responsive layout', async () => {
-      await chatPage.verifyMobileLayout()
-    })
-  })
+    test("mobile responsive layout", async () => {
+      await chatPage.verifyMobileLayout();
+    });
+  });
 
-  test.describe('Performance', () => {
-    test('fast response time', async () => {
+  test.describe("Performance", () => {
+    test("fast response time", async () => {
       await chatPage.mockInferenceResponse({
-        text: 'Quick response',
+        text: "Quick response",
         latency: 150,
-      })
+      });
 
-      const startTime = Date.now()
-      await chatPage.sendTextMessage('Performance test')
-      const responseTime = Date.now() - startTime
+      const startTime = Date.now();
+      await chatPage.sendTextMessage("Performance test");
+      const responseTime = Date.now() - startTime;
 
-      expect(responseTime).toBeLessThan(1000) // Including render time
-    })
+      expect(responseTime).toBeLessThan(1000); // Including render time
+    });
 
-    test('handle large message history', async ({ page }) => {
+    test("handle large message history", async ({ page }) => {
       // Inject 50 messages
       for (let i = 0; i < 10; i++) {
         await chatPage.sendTextMessage(`Message ${i + 1}`, {
           waitForResponse: false,
-        })
-        await page.waitForTimeout(100)
+        });
+        await page.waitForTimeout(100);
       }
 
-      const count = await chatPage.getMessageCount()
-      expect(count).toBeGreaterThan(10)
-    })
-  })
-})
+      const count = await chatPage.getMessageCount();
+      expect(count).toBeGreaterThan(10);
+    });
+  });
+});
