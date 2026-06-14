@@ -120,28 +120,23 @@ add_backup_to_metadata() {
 		return 1
 	fi
 
+	# Build JSON entry safely with jq to guarantee valid JSON
 	local new_entry
-	new_entry="{
-        \"path\": \"${backup_path}\",
-        \"type\": \"${backup_type}\",
-        \"commit_hash\": \"${commit_hash}\",
-        \"timestamp\": \"${timestamp}\",
-        \"created_at\": \"$(date -Iseconds)\"
-    }"
-
-	# Validate new entry JSON
-	if ! echo "${new_entry}" | jq . >/dev/null 2>&1; then
-		log_error "Invalid JSON in new backup entry"
-		return 1
-	fi
+	new_entry=$(jq -n \
+		--arg path "$backup_path" \
+		--arg type "$backup_type" \
+		--arg commit_hash "$commit_hash" \
+		--arg timestamp "$timestamp" \
+		--arg created_at "$(date -Iseconds)" \
+		'{path:$path, type:$type, commit_hash:$commit_hash, timestamp:$timestamp, created_at:$created_at}')
 
 	if [[ ${backup_type} == "current" ]]; then
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "${new_entry}" '.current_backup = $entry' 2>/dev/null); then
+		if ! metadata=$(echo "${metadata}" | jq --argjson entry "$new_entry" '.current_backup = $entry' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi
 	else
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "${new_entry}" '.archived_backups += [$entry] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
+		if ! metadata=$(echo "${metadata}" | jq --argjson entry "$new_entry" '.archived_backups += [$entry] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi
