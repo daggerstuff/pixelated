@@ -1,0 +1,21 @@
+{
+  "report_type": "deduplication_and_normalization",
+  "created_at": "2026-06-13",
+  "original_samples": 125876,
+  "exact_duplicates_removed": 6136,
+  "near_duplicates_collapsed": 0,
+  "final_count": 119740,
+  "reduction_percentage": 4.9,
+  "normalization": {
+    "chatml_format_applied": true,
+    "boundary_validation": "passed",
+    "schema_validation": "passed"
+  },
+  "jaccard_threshold": 0.85,
+  "methods": {
+    "exact_dedup": "SHA-256 content hash",
+    "near_dedup": "Jaccard similarity > 0.85"
+  },
+  "output_directory": "dataset_deduped",
+  "status": "completed"
+}
