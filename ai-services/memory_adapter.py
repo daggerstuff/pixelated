@@ -26,6 +26,7 @@ try:
         CreateMemoryInput,
         EmotionalContext,
         EmpathyMetrics,
+        MemoryCreateOptions,
         MemoryScope,
         RetentionPolicy,
         SourceService,
@@ -71,11 +72,14 @@ class UnifiedMemoryAdapter:
         adapter.ensure_indexes()  # call once at startup
 
         # Store a new memory
+        options = MemoryCreateOptions(
+            category="crisis",
+            source_service=SourceService.AI_SERVICES,
+        )
         memory = UnifiedMemory.create(
             content="Patient disclosed history of childhood trauma.",
             user_id="user-123",
-            category="crisis",
-            source_service=SourceService.AI_SERVICES,
+            options=options,
         )
         memory_id = adapter.save_memory(memory)
 
