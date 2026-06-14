@@ -10,17 +10,6 @@ import {
 } from '@/lib/db'
 import { getOptimizedBiasDetectionService } from '@/lib/services/bias-detection-optimized'
 
-/**
- * Interface for bias results
- */
-interface BiasAnalysisResult {
-  overallBiasScore: number
-  alertLevel: 'low' | 'medium' | 'high' | 'critical'
-  confidence: number
-  layerResults: Record<string, any>
-  detectedBiases: string[]
-  recommendations: string[]
-}
 
 /**
  * Validation schema for analysis request

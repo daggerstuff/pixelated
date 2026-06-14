@@ -305,9 +305,10 @@ function generateFeedbackMessage(
     case FeedbackType.FRAMEWORK_ADHERENCE:
     case FeedbackType.INTERVENTION_TIMING:
       return `Thank you for your response. Continue practicing different techniques to develop your skills.`
+    default:
+      return `Thank you for your response. Continue practicing different techniques to develop your skills.`
   }
 
-  return 'Thank you for your response. Continue practicing different techniques to develop your skills.'
 }
 
 /**
@@ -385,10 +386,11 @@ function generateAlternativeResponses(
         "I hear that this has been challenging for you. Could you share more about how it's affecting your daily life?",
         'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
       ]
+    default:
+      return [
+        "I hear that this has been challenging for you. Could you share more about how it's affecting your daily life?",
+        'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
+      ]
   }
 
-  return [
-    "I hear that this has been challenging for you. Could you share more about how it's affecting your daily life?",
-    'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
-  ]
 }
