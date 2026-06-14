@@ -21,10 +21,10 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Logging functions
-log_info() { echo -e "${GREEN}[BACKUP]${NC} $1"; }
-log_warning() { echo -e "${YELLOW}[BACKUP WARNING]${NC} $1"; }
-log_error() { echo -e "${RED}[BACKUP ERROR]${NC} $1"; }
-log_debug() { echo -e "${BLUE}[BACKUP DEBUG]${NC} $1"; }
+log_info() { echo -e "${GREEN}[BACKUP]${NC} $1" >&2; }
+log_warning() { echo -e "${YELLOW}[BACKUP WARNING]${NC} $1" >&2; }
+log_error() { echo -e "${RED}[BACKUP ERROR]${NC} $1" >&2; }
+log_debug() { echo -e "${BLUE}[BACKUP DEBUG]${NC} $1" >&2; }
 
 # Generate timestamp for backup naming
 generate_timestamp() {
