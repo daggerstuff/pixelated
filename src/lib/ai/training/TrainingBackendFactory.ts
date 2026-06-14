@@ -35,8 +35,8 @@ export class MemoryCostTracker implements CostTracker {
     costUsd: number,
     _tokens?: number,
   ): Promise<void> {
-    this.totals.set(job.model.includes("gpt-3.5") ? "openai" : (job as unknown as { backend?: string }).backend as FineTuningBackend ?? "openai",
-      (this.totals.get("openai") ?? 0) + costUsd);
+    const bucket = job.backend ?? "openai";
+    this.totals.set(bucket, (this.totals.get(bucket) ?? 0) + costUsd);
     this.perJob.set(job.id, costUsd);
   }
 

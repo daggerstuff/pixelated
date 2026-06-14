@@ -160,7 +160,7 @@ describe("FineTuningOrchestrator", () => {
           { openai: openaiPath, huggingface: huggingfacePath },
           { model: "meta-llama/Llama-2-7b", nEpochs: 3, backend: "huggingface" },
         ),
-      ).rejects.toThrow(/HuggingFace (backend|fine-tuning)/);
+      ).rejects.toThrow(/HuggingFace backend script not found/);
     });
 
     test("local backend throws", async () => {

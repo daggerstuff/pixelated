@@ -71,8 +71,11 @@ export class FineTuningOrchestrator {
       if (!paths.openai) throw new Error("OpenAI dataset path not set");
       return paths.openai;
     }
-    if (paths.openai) return paths.openai;
+    // For non-OpenAI backends prefer the backend-specific path so a
+    // co-present openai path does not accidentally feed the wrong
+    // format into HuggingFace (or whichever backend).
     if (paths.huggingface) return paths.huggingface;
+    if (paths.openai) return paths.openai;
     throw new Error("No dataset path available");
   }
 
