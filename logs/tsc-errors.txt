@@ -1,0 +1,86 @@
+src/api/middleware/__tests__/auth.middleware.test.ts(57,22): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(76,22): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(90,22): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(111,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(120,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(137,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(158,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(167,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/api/middleware/__tests__/auth.middleware.test.ts(181,18): error TS2345: Argument of type 'MockAuthRequest' is not assignable to parameter of type 'Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>'.
+src/components/auth/ResetPasswordForm.tsx(36,9): error TS2353: Object literal may only specify known properties, and 'password' does not exist in type '{ email: string; redirectTo?: string | undefined; }'.
+src/components/layout/index.ts(1,35): error TS2307: Cannot find module './Footer.astro' or its corresponding type declarations.
+src/components/ui/astro-icon-components.ts(1,18): error TS2307: Cannot find module './IconFallback.astro' or its corresponding type declarations.
+src/lib/ai/bias-detection/__tests__/BiasDetectionEngine.performance.test.ts(181,22): error TS2352: Conversion of type '() => undefined' to type 'SuiteAPI' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/lib/ai/bias-detection/__tests__/cache.test.ts(823,9): error TS2322: Type 'unknown' is not assignable to type 'ParticipantDemographics | undefined'.
+src/lib/ai/bias-detection/__tests__/cache.test.ts(873,9): error TS2322: Type 'unknown' is not assignable to type 'ParticipantDemographics | undefined'.
+src/lib/ai/bias-detection/__tests__/config.test.ts(580,24): error TS2739: Type '{ preprocessing: number; }' is missing the following properties from type 'BiasLayerWeights': modelLevel, interactive, evaluation
+src/lib/ai/bias-detection/__tests__/metrics-collector.test.ts(612,14): error TS18048: 'metrics.performance_metrics' is possibly 'undefined'.
+src/lib/ai/bias-detection/intelligent-cache.ts(466,47): error TS2558: Expected 0 type arguments, but got 1.
+src/lib/backup/verify.ts(412,29): error TS2571: Object is of type 'unknown'.
+src/lib/database/indexingStrategy.ts(269,11): error TS2783: 'table' is specified more than once, so this usage will be overwritten.
+src/lib/documentation/useDocumentation.ts(413,15): error TS2322: Type '{ errors?: unknown[] | undefined; data?: {} | null | undefined; success: boolean; format: any; metadata: { exportedAt: Date; exportedBy: string; patientId: string; providerId: string; }; }' is not assignable to type 'EHRExportResult'.
+src/lib/hooks/journal-research/useWebSocket.ts(265,13): error TS2322: Type 'string | ArrayBuffer | SharedArrayBuffer' is not assignable to type 'string | ArrayBuffer'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(26,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(37,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(51,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(67,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(82,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(94,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(109,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(112,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/browser-memory-boundary.test.ts(120,31): error TS2339: Property 'resolve' does not exist on type '(specifier: string) => unknown'.
+src/lib/memory/__tests__/memory-api-client.test.ts(89,23): error TS2345: Argument of type '{ limit: number; offset: number; category: string; }' is not assignable to parameter of type '{ tags: string[] | undefined; limit?: number | undefined; offset?: number | undefined; category?: string | undefined; }'.
+src/lib/mental-health/__tests__/service.test.ts(35,14): error TS18048: 'result.analysis.indicators' is possibly 'undefined'.
+src/lib/metaaligner/batch/batch-processor.ts(77,30): error TS2532: Object is possibly 'undefined'.
+src/lib/research/services/PatternDiscoveryService.ts(152,24): error TS2339: Property 'map' does not exist on type '{}'.
+src/lib/security/threat-intelligence/index.ts(886,9): error TS2571: Object is of type 'unknown'.
+src/lib/server-only/MentalLLaMAPythonBridge.ts(9,8): error TS2307: Cannot find module '../types/index.ts' or its corresponding type declarations.
+src/lib/services/analytics/__tests__/ComparativeProgressService.test.ts(13,7): error TS2415: Class 'TestComparativeProgressService' incorrectly extends base class 'ComparativeProgressService'.
+src/lib/services/bias-detection-optimized.ts(416,22): error TS2554: Expected 0 arguments, but got 1.
+src/lib/services/cdn-optimizer.ts(305,40): error TS2345: Argument of type '{ width?: number | undefined; height?: number | undefined; quality?: number | undefined; format?: string | undefined; } | undefined' is not assignable to parameter of type '{ width?: number | undefined; height?: number | undefined; quality?: number | undefined; format?: "webp" | "avif" | "jpeg" | "png" | undefined; } | undefined'.
+src/lib/services/performance-optimizer.ts(396,42): error TS2345: Argument of type '(items: T[]) => Promise<void>' is not assignable to parameter of type '(items: unknown[]) => Promise<void>'.
+src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts(114,7): error TS2322: Type 'RedisMockClient | Redis' is not assignable to type 'RedisService | Redis'.
+src/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts(325,9): error TS2322: Type 'RedisMockClient | Redis' is not assignable to type 'RedisService | Redis'.
+src/lib/services/redis/__tests__/PatternRecognition.integration.test.ts(5,3): error TS2459: Module '"../../../ai/services/pattern-recognition-types"' declares 'TherapySession' locally, but it is not exported.
+src/lib/services/redis/__tests__/PatternRecognition.integration.test.ts(10,23): error TS2304: Cannot find name 'ExtendedFHEService'.
+src/lib/services/websocket/BiasWebSocketServer.ts(595,9): error TS2322: Type '{ date: string; time?: string | undefined; biasScore: number; sessionCount: number; alertCount: number; demographicBreakdown?: Record<string, number> | undefined; }[]' is not assignable to type 'BiasTrendData[]'.
+src/lib/services/websocket/BiasWebSocketServer.ts(626,9): error TS2353: Object literal may only specify known properties, and 'changedServices' does not exist in type '{ status: "error" | "healthy" | "authentication_failed" | "unhealthy" | "degraded" | "heartbeat" | "authenticated"; timestamp: Date; services?: { pythonService: { status: "up" | "down"; lastCheck: Date; }; database: { ...; }; cache: { ...; }; alertSystem: { ...; }; } | undefined; ... 4 more ...; permissions?: string...'.
+src/lib/state/jotai-persistence.ts(244,5): error TS2347: Untyped function calls may not accept type arguments.
+src/lib/state/persistence.ts(22,3): error TS2322: Type 'Storage | null' is not assignable to type 'Storage'.
+src/lib/state/persistence.ts(24,24): error TS2341: Property 'getStorage' is private and only accessible within class 'StorageManager'.
+src/lib/threat-detection/__tests__/phase8-integration.test.ts(235,9): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'string'.
+src/lib/threat-detection/__tests__/phase8-integration.test.ts(238,14): error TS18047: 'result' is possibly 'null'.
+src/lib/threat-detection/integrations/index.ts(139,58): error TS2304: Cannot find name 'ThreatData'.
+src/lib/threat-detection/integrations/threat-detection-service.ts(89,10): error TS2339: Property 'rateLimiter' does not exist on type 'ThreatDetectionService'.
+src/lib/threat-intelligence/config/ThreatIntelligenceConfig.ts(1116,16): error TS2304: Cannot find name 'Db'.
+src/lib/threat-intelligence/edge/EdgeThreatDetectionSystem.ts(412,40): error TS2339: Property 'regions' does not exist on type 'EdgeDetectionConfig'.
+src/lib/validation/validateRequestBody.ts(5,15): error TS2305: Module '"astro"' has no exported member 'Request'.
+src/lib/websocket/__tests__/server.test.ts(68,28): error TS2339: Property 'OPEN' does not exist on type 'Mock<Procedure>'.
+src/lib/websocket/__tests__/server.test.ts(132,32): error TS2571: Object is of type 'unknown'.
+src/load-tests/breach-notification.load.ts(6,15): error TS2614: Module '"k6/http"' has no exported member 'RefinedResponse'. Did you mean to use 'import RefinedResponse from "k6/http"' instead?
+src/pages/api/admin.bak/backup/recovery-test.ts(173,47): error TS2345: Argument of type 'string' is not assignable to parameter of type 'AdminPermission | undefined'.
+src/pages/api/agent-notes/handoffs.ts(83,47): error TS2345: Argument of type 'Locals' is not assignable to parameter of type 'Partial<{ user?: { id?: string | null | undefined; role?: string | null | undefined; } | undefined; }>'.
+src/pages/api/agent-notes/syntheses.ts(59,47): error TS2345: Argument of type 'Locals' is not assignable to parameter of type 'Partial<{ user?: { id?: string | null | undefined; role?: string | null | undefined; } | undefined; }>'.
+src/pages/api/agent-notes/turns.ts(205,7): error TS2345: Argument of type 'TurnQueryParams & Record<string, unknown>' is not assignable to parameter of type 'TurnQuery | undefined'.
+src/pages/api/ai/embeddings/batch.ts(132,20): error TS2304: Cannot find name 'z'.
+src/pages/api/ai/embeddings/embed.ts(143,20): error TS2304: Cannot find name 'z'.
+src/pages/api/ai/embeddings/search.ts(132,20): error TS2304: Cannot find name 'z'.
+src/pages/api/ai/validation/history.ts(29,25): error TS2339: Property 'purpose' does not exist on type '{}'.
+src/pages/api/ai/validation/history.ts(30,24): error TS2339: Property 'scope' does not exist on type '{}'.
+src/pages/api/analytics/engagement.ts(20,7): error TS2353: Object literal may only specify known properties, and 'cookies' does not exist in type '{ request: Request; }'.
+src/pages/api/analytics/treatment-forecast.ts(53,7): error TS2741: Property 'sessionId' is missing in type '{ id: string; clientId: string; therapistId: string; status: "active" | "completed" | "cancelled" | "scheduled"; securityLevel: "maximum" | "standard" | "enhanced"; emotionAnalysisEnabled: boolean; metadata: any; }' but required in type 'TherapySession'.
+src/pages/api/analytics/treatment-forecast.ts(55,7): error TS2322: Type '{ currentEmotion: string; intensity: number; timestamp: Date; confidence: number; metadata: any; relatedFactors?: string[] | undefined; } | null' is not assignable to type 'EmotionState'.
+src/pages/api/auth/auth0-particle-emotion-system.ts(170,7): error TS2322: Type 'string | null' is not assignable to type 'string | undefined'.
+src/pages/api/auth/auth0-sessions.ts(213,64): error TS2322: Type '{ clientId?: string | undefined; therapistId?: string | undefined; startDate?: Date | undefined; endDate?: Date | undefined; status?: string | undefined; }' is not assignable to type 'AuditDetailValue'.
+src/pages/api/bias-detection/submit-batch-job.ts(8,3): error TS2554: Expected 0 arguments, but got 1.
+src/pages/api/documentation/generate.ts(75,55): error TS2554: Expected 0 arguments, but got 2.
+src/pages/api/emotions/dimensional.ts(110,40): error TS2552: Cannot find name 'DimensionalEmotionMap'. Did you mean 'DimensionalEmotion'?
+src/pages/api/export/conversation.ts(221,11): error TS2749: 'ExportFormat' refers to a value, but is being used as a type here. Did you mean 'typeof ExportFormat'?
+src/pages/api/export/conversation.ts(232,43): error TS2749: 'ExportFormat' refers to a value, but is being used as a type here. Did you mean 'typeof ExportFormat'?
+src/pages/api/fhe/rotate-keys.ts(13,5): error TS2554: Expected 0-1 arguments, but got 2.
+src/pages/api/patient-rights/request-export.ts(51,15): error TS2339: Property 'errors' does not exist on type 'ZodError<{ patientId: string; formats: ("json" | "csv" | "pdf")[]; dataTypes: string[]; reason: string; priority: "high" | "normal"; }>'.
+src/pages/api/ws/pixel/multimodal-stream.ts(88,71): error TS2353: Object literal may only specify known properties, and 'points' does not exist in type '{ limits?: Record<string, number> | undefined; windowMs?: number | undefined; strictIpValidation?: boolean | undefined; trackSuspiciousActivity?: boolean | undefined; }'.
+src/pages/api/ws/pixel/multimodal-stream.ts(101,33): error TS2708: Cannot use namespace 'Astro' as a value.
+src/routes/auth.routes.ts(4,26): error TS2554: Expected 1 arguments, but got 0.
+src/routes/auth.routes.ts(5,10): error TS2339: Property 'post' does not exist on type '(options?: RouterOptions | undefined) => Router'.
+src/tests/ai/crisis-detection.test.ts(260,9): error TS2353: Object literal may only specify known properties, and 'defaultPrompt' does not exist in type 'CrisisDetectionConfig'.
