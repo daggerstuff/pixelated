@@ -153,14 +153,14 @@ describe("FineTuningOrchestrator", () => {
   });
 
   describe("error backends", () => {
-    test("huggingface backend throws", async () => {
+    test("huggingface backend throws when script missing", async () => {
       const orch = new FineTuningOrchestrator();
       await expect(
         orch.startFromPrepared(
           { openai: openaiPath, huggingface: huggingfacePath },
           { model: "meta-llama/Llama-2-7b", nEpochs: 3, backend: "huggingface" },
         ),
-      ).rejects.toThrow("HuggingFace fine-tuning backend not yet implemented");
+      ).rejects.toThrow(/HuggingFace (backend|fine-tuning)/);
     });
 
     test("local backend throws", async () => {
