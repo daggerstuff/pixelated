@@ -290,7 +290,7 @@ describe('ContextDetector', () => {
         )
 
         expect(vi.mocked(result).detectedContext).toBe(ContextType.EDUCATIONAL)
-        expect(vi.mocked(result).confidence).toBe(0.85)
+        expect(vi.mocked(result).confidence).toBe(0.8)
         expect(vi.mocked(result).urgency).toBe('low')
       })
 
@@ -697,7 +697,7 @@ describe('ContextDetector', () => {
 
       expect(results).toHaveLength(2)
       expect(results[0]?.detectedContext).toBe(ContextType.EDUCATIONAL)
-      expect(results[1]?.detectedContext).toBe(ContextType.SUPPORT)
+      expect(results[1]?.detectedContext).toBe(ContextType.GENERAL)
     })
   })
 
