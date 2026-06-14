@@ -512,6 +512,22 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
 
     def fake_linear_query(query: str, variables: dict[str, object] | None = None):
         calls.append((query.split("(", 1)[0], dict(variables or {})))
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                    {"id": "state-done", "name": "Done", "type": "completed"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
         if "issueCreate" in query:
             assert variables is not None
             input_payload = variables.get("input")
@@ -519,11 +535,13 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
             assert input_payload["teamId"] == "team-1"
             assert input_payload["projectId"] == "proj-1"
             assert input_payload["parentId"] == "parent-1"
+            assert input_payload["stateId"] == "state-backlog"
             return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-new"}}}}
         assert variables is not None
         input_payload = variables.get("input")
         assert isinstance(input_payload, dict)
         assert variables.get("id") == "lin-existing"
+        assert input_payload["stateId"] == "state-done"
         return {"data": {"issueUpdate": {"success": True, "issue": {"id": "lin-existing"}}}}
 
     monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
@@ -548,7 +566,8 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
 
     assert create_response == {"id": "lin-new"}
     assert update_response == {"id": "lin-existing"}
-    assert len(calls) == 2
+    assert len(calls) == 4
+    assert [call[0] for call in calls] == ["query { project", "mutation", "query { project", "mutation"]
 
 
 def test_apply_github_action_updates_and_creates_issues(monkeypatch) -> None:
@@ -861,6 +880,10 @@ def test_apply_linear_action_includes_priority(monkeypatch) -> None:
     monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1"},
+    )
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
         {"bug": "label-uuid-1", "enhancement": "label-uuid-2"},
     )
 
@@ -874,7 +897,9 @@ def test_apply_linear_action_includes_priority(monkeypatch) -> None:
         }
     )
 
-    assert sent_variables[0]["input"]["priority"] == 1
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["priority"] == 1
 
 
 def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
@@ -884,6 +909,21 @@ def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
     sent_variables: list[dict[str, object]] = []
 
     def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
         sent_variables.append(dict(variables or {}))
         return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
 
@@ -903,7 +943,60 @@ def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
         }
     )
 
-    assert sent_variables[0]["input"]["labelIds"] == ["label-uuid-1", "label-uuid-2"]
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["labelIds"] == ["label-uuid-1", "label-uuid-2"]
+
+
+def test_apply_linear_action_resolves_state_id_from_canonical_status(monkeypatch) -> None:
+    monkeypatch.setenv("LINEAR_API_KEY", "token")
+    monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
+    monkeypatch.setenv("LINEAR_PROJECT_ID", "proj-1")
+    sent_variables: list[dict[str, object]] = []
+
+    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                    {"id": "state-todo", "name": "Todo", "type": "unstarted"},
+                                    {"id": "state-progress", "name": "In Progress", "type": "started"},
+                                    {"id": "state-done", "name": "Done", "type": "completed"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
+        sent_variables.append(dict(variables or {}))
+        return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1"},
+    )
+
+    apply_linear_action(
+        {
+            "action": "create",
+            "title": "Workflow issue",
+            "body": "Needs mapped state",
+            "status": "open",
+            "priority_label": "high",
+            "labels": ["bug"],
+        }
+    )
+
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["stateId"] == "state-backlog"
+    assert input_payload["priority"] == 1
 
 
 def test_resolve_linear_label_ids_populates_cache_on_first_call(monkeypatch) -> None:
