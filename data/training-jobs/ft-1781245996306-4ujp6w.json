@@ -1,0 +1,8 @@
+{
+  "id": "ft-1781245996306-4ujp6w",
+  "model": "test-model",
+  "status": "succeeded",
+  "createdAt": "2026-06-12T06:33:16.306Z",
+  "fineTunedModel": "test-model:dry-run-ft-17812",
+  "backend": "dry-run"
+}
