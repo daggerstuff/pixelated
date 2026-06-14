@@ -1,0 +1,65 @@
+{
+  "staging_directory": "dataset_staging",
+  "created_at": "2026-06-13",
+  "sources": {
+    "s3": {
+      "description": "S3 pixel-data bucket contents",
+      "inventory_file": "s3_inventory.json",
+      "key_prefixes": [
+        "final_dataset/",
+        "compiled_dataset/",
+        "processed_ready/"
+      ],
+      "note": "S3 data accessed via rclone remote HetznerS3:pixel-data"
+    },
+    "local_training_data": {
+      "description": "Local training data files",
+      "inventory_file": "local_inventory.json",
+      "key_directories": [
+        "ai/training/data/",
+        "data/therapeutic/"
+      ]
+    },
+    "synthetic_data": {
+      "description": "Synthetic generated data",
+      "files": [
+        "ai/data/generated/dpo_preference_pairs_10k.jsonl",
+        "ai/data/generated/nightmare_fuel.jsonl",
+        "ai/data/generated/niche_categories_5k.jsonl"
+      ],
+      "vetting_report": "synth_vetting_report.json"
+    },
+    "books_converted": {
+      "description": "Converted clinical books",
+      "directory": "ai/training/data/books_converted/",
+      "conversion_report": "ai/training/data/books_converted/conversion_report.json",
+      "total_pairs": 1488
+    },
+    "google_drive": {
+      "description": "Google Drive training data",
+      "scan_report": "gdrive_scan_report.json",
+      "key_folders": [
+        "datasets",
+        "final_model"
+      ],
+      "note": "Merged datasets and model files available via gdrive: remote"
+    }
+  },
+  "provenance": {
+    "description": "Each sample in the final dataset will be traceable to its source",
+    "tracking_fields": [
+      "source_file",
+      "source_type",
+      "line_number",
+      "original_path"
+    ]
+  },
+  "assembly_status": "manifest_created",
+  "next_steps": [
+    "Run dedup_normalize.py on assembled corpus",
+    "Clean repetitions",
+    "Score all samples with clinical validity scorer",
+    "Generate quality report",
+    "Assemble final subset"
+  ]
+}
