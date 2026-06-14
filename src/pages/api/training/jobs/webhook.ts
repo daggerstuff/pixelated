@@ -147,9 +147,12 @@ async function reconcileStatus(
   // If we couldn't determine the status from the event, preserve existing status
   const statusToUse = fresh ?? existing.status
 
-  // If we have a fresh status and it's running but existing is not running,
+  // If we have a fresh status and it's running but existing is already terminal,
   // preserve the known terminal state to prevent regression
-  if (fresh === 'running' && existing.status !== 'running') {
+  const isTerminal = (status: FineTuningStatus) => 
+    status === 'succeeded' || status === 'failed' || status === 'cancelled';
+  
+  if (fresh === 'running' && isTerminal(existing.status)) {
     return store.updateStatus(existing.id, existing.status, {
       ...patch,
       updatedAt: new Date(),
