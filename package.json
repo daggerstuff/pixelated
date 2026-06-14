@@ -65,7 +65,7 @@
     "test:coverage": "NODE_ENV=test vitest run -c config/vitest.config.ts --coverage",
     "test:watch": "vitest watch",
     "test:all": "node scripts/testing/local-test-runner.cjs",
-    "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_similarity_search_standalone.py",
+    "test:evals": "uv run pytest -q tests/test_therapy_bench_persistence.py tests/test_faiss_standalone.py tests/test_relevance_scorer_standalone.py",
     "test:hipaa": "node scripts/consolidated-test.js hipaa",
     "test:crypto": "node scripts/consolidated-test.js crypto",
     "test:backup": "node scripts/consolidated-test.js backup",
@@ -461,7 +461,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.5.2",
+  "packageManager": "pnpm@11.6.0",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
