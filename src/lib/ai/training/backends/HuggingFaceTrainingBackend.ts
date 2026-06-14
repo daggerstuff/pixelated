@@ -135,7 +135,7 @@ export class HuggingFaceTrainingBackend extends TrainingBackend {
         "--python",
         "3.13",
         "python",
-        "ai/training/finetune_model.py",
+        this.scriptPath,
         "--model",
         config.model,
         "--dataset",

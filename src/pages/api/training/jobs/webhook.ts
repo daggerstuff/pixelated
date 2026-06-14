@@ -1,9 +1,13 @@
 import type { APIRoute } from 'astro'
 
-import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 import { OpenAITrainingBackend } from '../../../../lib/ai/training/backends/OpenAITrainingBackend'
 import { getDefaultJobStore } from '../../../../lib/ai/training/job-store'
-import type { FineTuningStatus } from '../../../../lib/ai/training/types'
+import type { JobStore } from '../../../../lib/ai/training/job-store'
+import type {
+  FineTuningJob,
+  FineTuningStatus,
+} from '../../../../lib/ai/training/types'
+import { createBuildSafeLogger } from '../../../../lib/logging/build-safe-logger'
 
 const trainingLogger = createBuildSafeLogger('training-webhook')
 
@@ -39,13 +43,10 @@ export const POST: APIRoute = async ({ request }) => {
     trainingLogger.error(
       'OPENAI_FT_WEBHOOK_SECRET not configured; rejecting inbound webhook',
     )
-    return new Response(
-      JSON.stringify({ error: 'webhook not configured' }),
-      {
-        status: 503,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    )
+    return new Response(JSON.stringify({ error: 'webhook not configured' }), {
+      status: 503,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   const verifier = new OpenAITrainingBackend({
@@ -71,65 +72,82 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const store = getDefaultJobStore()
-  const updated = await store.updateStatus(
-    payload.id,
-    statusFromOpenAI(payload.status),
-    {
-      remoteId: payload.id,
-      model: payload.model,
-      fineTunedModel: payload.fine_tuned_model,
-      error: payload.error?.message,
-    },
-  )
+  const remoteId = payload.data?.id ?? payload.id
+  const freshStatus = statusFromOpenAI(payload)
+  const patch = {
+    ...(payload.data?.model ? { model: payload.data.model } : {}),
+    ...(payload.data?.fine_tuned_model
+      ? { fineTunedModel: payload.data.fine_tuned_model }
+      : {}),
+    ...(payload.data?.error?.message
+      ? { error: payload.data.error.message }
+      : {}),
+  }
+
+  const updated = await reconcileStatus(store, remoteId, freshStatus)
+  const status = updated?.status ?? freshStatus
 
   if (!updated) {
-    trainingLogger.warn('Webhook for unknown job', { id: payload.id })
-    // 202 to avoid OpenAI retries — we don't want to surface unknown-job
-    // 4xx back to the backend.
+    trainingLogger.warn('Webhook for unknown job', { id: remoteId })
     return new Response(JSON.stringify({ accepted: true, known: false }), {
       status: 202,
       headers: { 'Content-Type': 'application/json' },
     })
   }
 
-  trainingLogger.info('Webhook applied', {
-    id: payload.id,
-    status: payload.status,
-  })
-  return new Response(JSON.stringify({ accepted: true, status: updated.status }), {
+  trainingLogger.info('Webhook applied', { id: remoteId, status })
+  return new Response(JSON.stringify({ accepted: true, status }), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   })
 }
 
-/** Minimal shape of the OpenAI fine-tuning webhook payload. */
+/** Minimal shape of the OpenAI Standard Webhooks payload. */
 interface WebhookPayload {
-  id: string;
-  status?: string;
-  model?: string;
-  fine_tuned_model?: string;
-  error?: { message?: string };
+  /** Top-level id is always the fine-tuning job id (OpenAI's remote id). */
+  id: string
+  /**
+   * Event type string, e.g. `fine_tuning.job.succeeded`, `fine_tuning.job.failed`.
+   * This is the canonical status source for Standard Webhooks.
+   */
+  event: string
+  /** Container for the job data — all job fields live here. */
+  data: {
+    id: string
+    status?: string
+    model?: string
+    fine_tuned_model?: string
+    error?: { message?: string }
+  }
+  /** ISO-8601 timestamp of the event. */
+  create_time?: string
 }
 
-function statusFromOpenAI(rawStatus: string | undefined): FineTuningStatus {
-  switch (rawStatus) {
-    case 'validating_files':
-    case 'queued':
-      return 'queued'
-    case 'running':
-      return 'running'
-    case 'succeeded':
-      return 'succeeded'
-    case 'failed':
-      return 'failed'
-    case 'cancelled':
-    case 'canceled':
-      return 'cancelled'
-    case undefined:
-      // No status field in payload — fall through with running as sentinel.
-      return 'running'
-    default:
-      // Unknown / unrecognised status — keep current state but persist.
-      return 'running'
+function statusFromOpenAI(event: WebhookPayload): FineTuningStatus {
+  const t = event.event ?? ''
+  if (t.endsWith('.succeeded')) return 'succeeded'
+  if (t.endsWith('.failed')) return 'failed'
+  if (t.endsWith('.cancelled') || t.endsWith('.canceled')) return 'cancelled'
+  if (t.endsWith('.running')) return 'running'
+  if (t.endsWith('.queued') || t.endsWith('.validating_files')) return 'queued'
+  // OpenAI added a new status we don't know — preserve by re-fetching
+  // from the store below; caller handles the null return path.
+  return 'running'
+}
+
+/** Fetch the current status from store so unknown events don't regress state. */
+async function reconcileStatus(
+  store: JobStore,
+  remoteId: string,
+  fresh: FineTuningStatus,
+): Promise<FineTuningJob | null> {
+  const existing = await store.getByRemoteId(remoteId)
+  if (!existing) return null
+  if (fresh === 'running' && existing.status !== 'running') {
+    // Unknown event type — preserve the known terminal state.
+    return store.updateStatus(existing.id, existing.status, {
+      updatedAt: new Date(),
+    })
   }
+  return store.updateStatus(existing.id, fresh)
 }

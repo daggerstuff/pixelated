@@ -178,11 +178,24 @@ export class OpenAITrainingBackend extends TrainingBackend {
   ): boolean {
     if (!this.opts.webhookSecret || !signature) return false;
     try {
-      const expected = createHmac("sha256", this.opts.webhookSecret)
-        .update(rawBody)
-        .digest("hex");
-      const a = Buffer.from(signature);
-      const b = Buffer.from(expected);
+      // OpenAI Standard Webhooks: signature = hex(HMAC-SHA256(secret, "{id}.{timestamp}.{body}"))
+      // Header format: "t={timestamp},v1={hex_sig}"
+      const parts = Object.fromEntries(
+        signature.split(',').map((p) => p.split('=') as [string, string]),
+      );
+      const timestamp = parts['t'];
+      const hexSig = parts['v1'];
+      if (!timestamp || !hexSig) return false;
+
+      const age = Date.now() / 1000 - Number(timestamp);
+      if (age > 300) return false; // 5-minute tolerance
+
+      const signedPayload = `${this.opts.webhookSecret}.${timestamp}.${rawBody}`;
+      const expected = createHmac('sha256', this.opts.webhookSecret)
+        .update(signedPayload)
+        .digest('hex');
+      const a = Buffer.from(hexSig, 'hex');
+      const b = Buffer.from(expected, 'hex');
       return a.length === b.length && timingSafeEqual(a, b);
     } catch {
       return false;

@@ -36,9 +36,7 @@ describe("FineTuningOrchestrator refactor", () => {
   });
 
   afterAll(() => {
-    try {
-      rmSync(testDir, { recursive: true, force: true });
-    } catch {}
+    rmSync(testDir, { recursive: true, force: true });
   });
 
   test("startFromPrepared records backend on the persisted job", async () => {
