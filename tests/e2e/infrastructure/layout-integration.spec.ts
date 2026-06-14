@@ -66,7 +66,8 @@ test.describe('Layout Component Integration Tests', () => {
     await expect(page.locator('div.article-list')).toBeVisible()
 
     // Verify that article cards are rendered
-    await expect(page.locator('.article-card')).toHaveCount.greaterThan(0)
+    const cardCount = await page.locator('.article-card').count()
+    expect(cardCount).toBeGreaterThan(0)
   })
 
   test('Error boundary catches errors correctly', async ({ page }) => {
