@@ -767,6 +767,7 @@ def _resolve_linear_state_id(status: str, project_id: str) -> str | None:
         return None
 
     candidates = _canonical_linear_status_candidates(status)
+    result = None
     for candidate in candidates:
         for node in nodes:
             if not isinstance(node, Mapping):
@@ -775,8 +776,11 @@ def _resolve_linear_state_id(status: str, project_id: str) -> str | None:
             node_name = str(node.get("name") or "").strip().lower()
             node_type = str(node.get("type") or "").strip().lower().replace("_", " ")
             if node_id and candidate in {node_name, node_type}:
-                return node_id
-    return None
+                result = node_id
+                break
+        if result is not None:
+            break
+    return result
 
 
 def build_linear_headers(token: str) -> dict[str, str]:
@@ -1408,28 +1412,25 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
     if state_id:
         input_payload["stateId"] = state_id
 
-    mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
-    key = "issueCreate"
-
     if action_type == "create":
-        team_id = resolve_linear_team_id()
-        if team_id:
-            input_payload["teamId"] = team_id
-        if project_id:
-            input_payload["projectId"] = project_id
-        parent_issue_id = resolve_linear_parent_issue_id()
-        if parent_issue_id:
-            input_payload["parentId"] = parent_issue_id
+        mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
+        key = "issueCreate"
+        variables: dict[str, Any] = {"input": input_payload}
+        optional_fields = {
+            "teamId": resolve_linear_team_id(),
+            "projectId": project_id,
+            "parentId": resolve_linear_parent_issue_id(),
+        }
+        for field, value in optional_fields.items():
+            if value:
+                input_payload[field] = value
     else:
         mutation = (
             "mutation($id: String!, $input: IssueUpdateInput!) { "
             "issueUpdate(id: $id, input: $input) { success issue { id title } } }"
         )
         key = "issueUpdate"
-
-    variables: dict[str, Any] = {"input": input_payload}
-    if action_type != "create":
-        variables["id"] = target_id
+        variables: dict[str, Any] = {"input": input_payload, "id": target_id}
 
     response = _extract_graphql_payload(_linear_graphql_query(mutation, variables))
     container = response.get(key)
@@ -1440,10 +1441,8 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         return {}
 
     issue_id = _coerce_provider_target_id(issue.get("id"))
-    if issue_id:
-        return {"id": issue_id}
-    if target_id:
-        return {"id": target_id}
+    if issue_id or target_id:
+        return {"id": issue_id or target_id}
     return {}
 
 
