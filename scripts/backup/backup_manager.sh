@@ -131,12 +131,14 @@ add_backup_to_metadata() {
 		'{path:$path, type:$type, commit_hash:$commit_hash, timestamp:$timestamp, created_at:$created_at}')
 
 	if [[ ${backup_type} == "current" ]]; then
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "$new_entry" '.current_backup = $entry' 2>/dev/null); then
+		# Use raw JSON via fromjson to avoid argjson parsing issues
+		if ! metadata=$(echo "${metadata}" | jq --arg entry "$new_entry" '.current_backup = ($entry|fromjson)' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi
 	else
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "$new_entry" '.archived_backups += [$entry] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
+		# Append archived backup entry safely
+		if ! metadata=$(echo "${metadata}" | jq --arg entry "$new_entry" '.archived_backups += [($entry|fromjson)] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi
