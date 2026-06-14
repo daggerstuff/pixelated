@@ -34,7 +34,6 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
   <div
     className="bg-red-50 border-red-200 rounded-lg border p-4"
     role="alert"
-    aria-live="assertive"
   >
     <div className="flex items-center justify-between">
       <div>
@@ -328,24 +327,13 @@ export const AnalyticsCharts: FC = () => {
     setFilters((prev) => ({ ...prev, timeRange }))
   }, [])
 
-  // Render error state
-  if (error && !isLoading) {
-    return (
-      <div className="analytics-charts space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Analytics Overview</h2>
-          <TimeRangeSelector
-            value={filters.timeRange}
-            onChange={handleTimeRangeChange}
-          />
-        </div>
-        <ErrorDisplay error={error} onRetry={handleRetry} />
-      </div>
-    )
-  }
-
   return (
     <div className="analytics-charts space-y-6">
+      {/* Persistent ARIA live region for assertive announcements like errors */}
+      <div aria-live="assertive" className="sr-only">
+        {error && !isLoading ? 'Unable to load analytics data' : ''}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Analytics Overview</h2>
@@ -355,20 +343,27 @@ export const AnalyticsCharts: FC = () => {
         />
       </div>
 
-      {/* Summary Statistics */}
-      <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
+      {/* Render error state */}
+      {error && !isLoading ? (
+        <ErrorDisplay error={error} onRetry={handleRetry} />
+      ) : (
+        <>
+          {/* Summary Statistics */}
+          <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
 
-      {/* Session Activity Chart */}
-      <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
+          {/* Session Activity Chart */}
+          <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
 
-      {/* Skill Progress */}
-      <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
+          {/* Skill Progress */}
+          <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
 
-      {/* Data freshness indicator */}
-      {data && !isLoading && (
-        <div className="text-gray-500 text-center text-xs">
-          Data updated {new Date().toLocaleTimeString()}
-        </div>
+          {/* Data freshness indicator */}
+          {data && !isLoading && (
+            <div className="text-gray-500 text-center text-xs">
+              Data updated {new Date().toLocaleTimeString()}
+            </div>
+          )}
+        </>
       )}
     </div>
   )
