@@ -2,10 +2,17 @@
 
 from __future__ import annotations
 
+import re
+import warnings
 from pathlib import Path
 from typing import Literal
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Known insecure default values that MUST be replaced in production
+INSECURE_DEFAULTS = {"change-me-in-production", "changeme", "secret", "password", "123456"}
+HEX_KEY_PATTERN = re.compile(r"^[a-fA-F0-9]{64}$")  # 32-byte hex = 64 chars
 
 
 class Settings(BaseSettings):
@@ -53,6 +60,19 @@ class Settings(BaseSettings):
 
     # ── Paths ────────────────────────────────────────────────────
     PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent.parent
+
+    @field_validator("JWT_SECRET_KEY", "ENCRYPTION_KEY")
+    @classmethod
+    def _check_insecure_defaults(cls, v: str, info) -> str:
+        """Warn if security-sensitive fields use known insecure defaults."""
+        if v.lower() in INSECURE_DEFAULTS:
+            warnings.warn(
+                f"[CONFIG SECURITY] {info.field_name} uses an insecure default value. "
+                f"Set a strong, unique value via environment variable in production!",
+                UserWarning,
+                stacklevel=2,
+            )
+        return v
 
     @property
     def database_url_sync(self) -> str:
