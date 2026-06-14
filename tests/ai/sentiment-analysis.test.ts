@@ -1,5 +1,5 @@
-import type { AIService } from '@/lib/ai/models/types'
-import { SentimentAnalysisService } from '@/lib/ai/services/sentiment-analysis'
+import type { AIService } from "@/lib/ai/models/types";
+import { SentimentAnalysisService } from "@/lib/ai/services/sentiment-analysis";
 
 // Properly typed mock AI service
 const mockAIService: AIService = {
@@ -12,15 +12,15 @@ const mockAIService: AIService = {
     new ReadableStream({
       start(controller) {
         controller.enqueue({
-          id: 'test-id',
-          model: 'test-model',
+          id: "test-id",
+          model: "test-model",
           choices: [
             {
               message: {
-                role: 'assistant' as const,
-                content: 'test content',
+                role: "assistant" as const,
+                content: "test content",
               },
-              finishReason: 'stop',
+              finishReason: "stop",
             },
           ],
           usage: {
@@ -28,301 +28,269 @@ const mockAIService: AIService = {
             completionTokens: 20,
             totalTokens: 30,
           },
-        })
-        controller.close()
+        });
+        controller.close();
       },
     }),
   ),
   dispose: vi.fn(),
-}
+};
 
-describe('sentimentAnalysisService', () => {
-  let sentimentService: SentimentAnalysisService
+describe("sentimentAnalysisService", () => {
+  let sentimentService: SentimentAnalysisService;
 
   beforeEach(() => {
-    vi.resetAllMocks()
+    vi.resetAllMocks();
     sentimentService = new SentimentAnalysisService({
       aiService: mockAIService,
-      model: 'test-model',
-    })
-  })
+      model: "test-model",
+    });
+  });
 
-  describe('analyzeSentiment', () => {
-    it('should analyze sentiment correctly for positive text', async () => {
+  describe("analyzeSentiment", () => {
+    it("should analyze sentiment correctly for positive text", async () => {
       // Mock the AI service response
-      ;(
-        mockAIService.createChatCompletion
-      ).mockResolvedValue({
+      mockAIService.createChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          sentiment: 'positive',
+          sentiment: "positive",
           score: 0.85,
-          explanation: 'The text expresses happiness and gratitude.',
+          explanation: "The text expresses happiness and gratitude.",
         }),
-        model: 'test-model',
-        provider: 'openai',
-        id: 'mock-id',
+        model: "test-model",
+        provider: "openai",
+        id: "mock-id",
         created: Date.now(),
-        choices: [{ message: { role: 'assistant', content: 'mock content' } }],
+        choices: [{ message: { role: "assistant", content: "mock content" } }],
         usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
-      })
+      });
 
       const result = await sentimentService.analyzeSentiment(
-        'I am feeling great today! Thank you for your help.',
-      )
+        "I am feeling great today! Thank you for your help.",
+      );
 
       // Verify the result
       expect(result).toEqual({
-        sentiment: 'positive',
+        sentiment: "positive",
         score: 0.85,
-        explanation: 'The text expresses happiness and gratitude.',
-        model: 'test-model',
+        explanation: "The text expresses happiness and gratitude.",
+        model: "test-model",
         processingTime: expect.any(Number),
-      })
+      });
 
       // Verify the AI service was called with correct parameters
       expect(mockAIService.createChatCompletion).toHaveBeenCalledWith(
         expect.arrayContaining([
-          expect.objectContaining({ role: 'system' }),
+          expect.objectContaining({ role: "system" }),
           expect.objectContaining({
-            role: 'user',
-            content: expect.stringContaining(
-              'I am feeling great today! Thank you for your help.',
-            ),
+            role: "user",
+            content: expect.stringContaining("I am feeling great today! Thank you for your help."),
           }),
         ]),
-        expect.objectContaining({ model: 'test-model' }),
-      )
-    })
+        expect.objectContaining({ model: "test-model" }),
+      );
+    });
 
-    it('should analyze sentiment correctly for negative text', async () => {
+    it("should analyze sentiment correctly for negative text", async () => {
       // Mock the AI service response
-      ;(
-        mockAIService.createChatCompletion
-      ).mockResolvedValue({
+      mockAIService.createChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          sentiment: 'negative',
+          sentiment: "negative",
           score: 0.75,
-          explanation: 'The text expresses frustration and disappointment.',
+          explanation: "The text expresses frustration and disappointment.",
         }),
-        model: 'test-model',
-        provider: 'openai',
-        id: 'mock-id',
+        model: "test-model",
+        provider: "openai",
+        id: "mock-id",
         created: Date.now(),
-        choices: [{ message: { role: 'assistant', content: 'mock content' } }],
+        choices: [{ message: { role: "assistant", content: "mock content" } }],
         usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
-      })
+      });
 
       const result = await sentimentService.analyzeSentiment(
-        'I am really frustrated with this situation. Nothing is working.',
-      )
+        "I am really frustrated with this situation. Nothing is working.",
+      );
 
       // Verify the result
       expect(result).toEqual({
-        sentiment: 'negative',
+        sentiment: "negative",
         score: 0.75,
-        explanation: 'The text expresses frustration and disappointment.',
-        model: 'test-model',
+        explanation: "The text expresses frustration and disappointment.",
+        model: "test-model",
         processingTime: expect.any(Number),
-      })
-    })
+      });
+    });
 
-    it('should analyze sentiment correctly for neutral text', async () => {
+    it("should analyze sentiment correctly for neutral text", async () => {
       // Mock the AI service response
-      ;(
-        mockAIService.createChatCompletion
-      ).mockResolvedValue({
+      mockAIService.createChatCompletion.mockResolvedValue({
         content: JSON.stringify({
-          sentiment: 'neutral',
+          sentiment: "neutral",
           score: 0.1,
           explanation: "The text is factual and doesn't express emotion.",
         }),
-        model: 'test-model',
-        provider: 'openai',
-        id: 'mock-id',
+        model: "test-model",
+        provider: "openai",
+        id: "mock-id",
         created: Date.now(),
-        choices: [{ message: { role: 'assistant', content: 'mock content' } }],
+        choices: [{ message: { role: "assistant", content: "mock content" } }],
         usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
-      })
+      });
 
       const result = await sentimentService.analyzeSentiment(
-        'The sky is blue. The temperature is 72 degrees.',
-      )
+        "The sky is blue. The temperature is 72 degrees.",
+      );
 
       // Verify the result
       expect(result).toEqual({
-        sentiment: 'neutral',
+        sentiment: "neutral",
         score: 0.1,
         explanation: "The text is factual and doesn't express emotion.",
-        model: 'test-model',
+        model: "test-model",
         processingTime: expect.any(Number),
-      })
-    })
+      });
+    });
 
-    it('should handle invalid JSON responses', async () => {
+    it("should handle invalid JSON responses", async () => {
       // Mock the AI service response with invalid JSON
-      ;(
-        mockAIService.createChatCompletion
-      ).mockResolvedValue({
-        content: 'Not a valid JSON response',
-        model: 'test-model',
-        provider: 'openai',
-        id: 'mock-id',
+      mockAIService.createChatCompletion.mockResolvedValue({
+        content: "Not a valid JSON response",
+        model: "test-model",
+        provider: "openai",
+        id: "mock-id",
         created: Date.now(),
         choices: [
           {
             message: {
-              role: 'assistant',
-              content: 'Not a valid JSON response',
+              role: "assistant",
+              content: "Not a valid JSON response",
             },
           },
         ],
         usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
-      })
+      });
 
-      await expect(
-        sentimentService.analyzeSentiment('Test text'),
-      ).rejects.toThrow()
-    })
+      await expect(sentimentService.analyzeSentiment("Test text")).rejects.toThrow();
+    });
 
-    it('should handle AI service errors', async () => {
+    it("should handle AI service errors", async () => {
       // Mock the AI service to throw an error
-      ;(
-        mockAIService.createChatCompletion
-      ).mockRejectedValue(new Error('AI service error'))
+      mockAIService.createChatCompletion.mockRejectedValue(new Error("AI service error"));
 
-      await expect(
-        sentimentService.analyzeSentiment('Test text'),
-      ).rejects.toThrow('AI service error')
-    })
-  })
+      await expect(sentimentService.analyzeSentiment("Test text")).rejects.toThrow(
+        "AI service error",
+      );
+    });
+  });
 
-  describe('analyzeBatch', () => {
-    it('should analyze multiple texts in parallel', async () => {
+  describe("analyzeBatch", () => {
+    it("should analyze multiple texts in parallel", async () => {
       // Mock the AI service response for multiple calls
-      ;vi.mocked(mockAIService.createChatCompletion)
+      vi.mocked(mockAIService.createChatCompletion)
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            sentiment: 'positive',
+            sentiment: "positive",
             score: 0.85,
-            explanation: 'Positive text',
+            explanation: "Positive text",
           }),
-          model: 'test-model',
-          provider: 'openai',
-          id: 'mock-id',
+          model: "test-model",
+          provider: "openai",
+          id: "mock-id",
           created: Date.now(),
-          choices: [
-            { message: { role: 'assistant', content: 'mock content' } },
-          ],
+          choices: [{ message: { role: "assistant", content: "mock content" } }],
           usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
         })
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            sentiment: 'negative',
+            sentiment: "negative",
             score: 0.75,
-            explanation: 'Negative text',
+            explanation: "Negative text",
           }),
-          model: 'test-model',
-          provider: 'openai',
-          id: 'mock-id',
+          model: "test-model",
+          provider: "openai",
+          id: "mock-id",
           created: Date.now(),
-          choices: [
-            { message: { role: 'assistant', content: 'mock content' } },
-          ],
+          choices: [{ message: { role: "assistant", content: "mock content" } }],
           usage: { totalTokens: 100, promptTokens: 50, completionTokens: 50 },
-        })
+        });
 
-      const results = await sentimentService.analyzeBatch([
-        'I am happy',
-        'I am sad',
-      ])
+      const results = await sentimentService.analyzeBatch(["I am happy", "I am sad"]);
 
       // Verify the results
-      expect(results).toHaveLength(2)
-      expect(results[0].label).toBe('positive')
-      expect(results[1].label).toBe('negative')
+      expect(results).toHaveLength(2);
+      expect(results[0].label).toBe("positive");
+      expect(results[1].label).toBe("negative");
 
       // Verify the AI service was called twice
-      expect(mockAIService.createChatCompletion).toHaveBeenCalledTimes(2)
-    })
+      expect(mockAIService.createChatCompletion).toHaveBeenCalledTimes(2);
+    });
 
-    it('should handle errors in batch processing', async () => {
+    it("should handle errors in batch processing", async () => {
       // Mock the AI service to succeed for first call and fail for second
-      ;vi.mocked(mockAIService.createChatCompletion)
+      vi.mocked(mockAIService.createChatCompletion)
         .mockResolvedValueOnce({
           content: JSON.stringify({
-            sentiment: 'positive',
+            sentiment: "positive",
             score: 0.85,
-            explanation: 'Positive text',
+            explanation: "Positive text",
           }),
-          model: 'test-model',
+          model: "test-model",
           usage: {
             total_tokens: 100,
             prompt_tokens: 50,
             completion_tokens: 50,
           },
         })
-        .mockRejectedValueOnce(new Error('AI service error'))
+        .mockRejectedValueOnce(new Error("AI service error"));
 
-      await expect(
-        sentimentService.analyzeBatch(['I am happy', 'I am sad']),
-      ).rejects.toThrow()
-    })
-  })
+      await expect(sentimentService.analyzeBatch(["I am happy", "I am sad"])).rejects.toThrow();
+    });
+  });
 
-  describe('constructor', () => {
-    it('should use default model if not provided', () => {
+  describe("constructor", () => {
+    it("should use default model if not provided", () => {
       const service = new SentimentAnalysisService({
         aiService: {
           ...mockAIService,
-          createChatCompletion: async (messages, options) => {
+          createChatCompletion: async (messages: any, options?: any) => {
             // Ensure all messages have the required name property
-            const messagesWithName = messages.map((msg) => ({
+            const messagesWithName = messages.map((msg: any) => ({
               ...msg,
-              name: msg.name ?? '', // Add default empty name if missing
-            }))
+              name: msg.name ?? "", // Add default empty name if missing
+            }));
             return {
-              ...(await mockAIService.createChatCompletion(
-                messagesWithName,
-                options,
-              )),
-              provider: 'openai', // Add required provider property
-            }
+              ...(await mockAIService.createChatCompletion(messagesWithName, options)),
+              provider: "openai", // Add required provider property
+            };
           },
         },
-      })
+      });
 
       // Use a non-public method to test the model
-      expect(
-        (service as unknown as { config: { model: string } }).config.model,
-      ).toBe('gpt-4o')
-    })
+      expect((service as unknown as { config: { model: string } }).config.model).toBe("gpt-4o");
+    });
 
-    it('should use custom system prompt if provided', () => {
-      const customPrompt = 'Custom system prompt'
+    it("should use custom system prompt if provided", () => {
+      const customPrompt = "Custom system prompt";
       const service = new SentimentAnalysisService({
         aiService: {
           ...mockAIService,
-          createChatCompletion: async (messages, options) => {
-            const messagesWithName = messages.map((msg) => ({
+          createChatCompletion: async (messages: any, options?: any) => {
+            const messagesWithName = messages.map((msg: any) => ({
               ...msg,
-              name: msg.name ?? '',
-            }))
+              name: msg.name ?? "",
+            }));
             return {
-              ...(await mockAIService.createChatCompletion(
-                messagesWithName,
-                options,
-              )),
-              provider: 'openai', // Add required provider property
-            }
+              ...(await mockAIService.createChatCompletion(messagesWithName, options)),
+              provider: "openai", // Add required provider property
+            };
           },
         },
         defaultPrompt: customPrompt,
-      })
+      });
 
       expect(
-        (service as unknown as { config: { defaultPrompt: string } }).config
-          .defaultPrompt,
-      ).toBe(customPrompt)
-    })
-  })
-})
+        (service as unknown as { config: { defaultPrompt: string } }).config.defaultPrompt,
+      ).toBe(customPrompt);
+    });
+  });
+});
