@@ -173,9 +173,10 @@ test.describe("Regression Test Suite", () => {
 
       // Check memory usage doesn't spike excessively
       const metrics = await page.evaluate(() => {
+        const mem = (performance as unknown as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory
         return {
-          usedJSHeapSize: performance.memory?.usedJSHeapSize ?? 0,
-          totalJSHeapSize: performance.memory?.totalJSHeapSize ?? 0,
+          usedJSHeapSize: mem?.usedJSHeapSize ?? 0,
+          totalJSHeapSize: mem?.totalJSHeapSize ?? 0,
         };
       });
 
@@ -251,13 +252,17 @@ test.describe("Regression Test Suite", () => {
       await testUtils.loginAsTestUser(page);
       await page.goto("/profile");
 
-      // Try to upload a malicious file
-      const maliciousFile = Buffer.from('<?php echo "malicious"; ?>', "utf8");
-      await page.setInputFiles('[data-testid="avatar-upload"]', {
+      // Try to upload a malicious file - use the legacy object format
+      const maliciousFile = {
         name: "malicious.php",
         mimeType: "application/x-php",
-        buffer: maliciousFile,
-      });
+        buffer: new Uint8Array([0x3c, 0x3f, 0x70, 0x68, 0x70]) as any,
+      };
+      await page.setInputFiles('[data-testid="avatar-upload"]', {
+        name: maliciousFile.name,
+        mimeType: maliciousFile.mimeType,
+        buffer: maliciousFile.buffer,
+      } as any);
 
       // Should show error for invalid file type
       await expect(page.locator(".error-message")).toContainText("Invalid file type");
@@ -275,24 +280,20 @@ export class RegressionTestUtils {
       await route.continue();
     });
   }
-
   static async simulateMemoryPressure(page: any) {
     await page.evaluate(() => {
       // Create memory pressure
-      const arrays: any[] = [];
+      const arrays: unknown[] = [];
       for (let i = 0; i < 100; i++) {
         arrays.push(new Array(10000).fill("memory-pressure-test"));
       }
-      window.memoryPressureArrays = arrays;
+      (window as unknown as Record<string, unknown>).memoryPressureArrays = arrays;
     });
   }
 
   static async cleanupMemoryPressure(page: any) {
     await page.evaluate(() => {
-      delete window.memoryPressureArrays;
-      if (window.gc) {
-        window.gc();
-      }
+      delete (window as unknown as Record<string, unknown>).memoryPressureArrays;
     });
   }
 }
