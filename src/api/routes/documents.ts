@@ -4,8 +4,6 @@
 import express, { Router, Request, Response } from 'express'
 
 import { getPostgresPool } from '../../lib/database/connection'
-// COMMENTED OUT: Legacy auth middleware - using Astro Auth0 instead
-// import { requirePermission, requireRole } from '../middleware/auth'
 import { BusinessDocument } from '../../lib/database/mongodb/schemas'
 import {
   asyncHandler,
@@ -31,7 +29,6 @@ const ensureString = (param: unknown): string => {
     return param
   }
   if (param && typeof param === 'object') {
-    // Handle ParsedQs or other objects
     const values = Object.values(param)
     if (values.length > 0) {
       const firstValue = values[0]
@@ -60,14 +57,12 @@ router.post(
     }
     const { title, type, category, content, description } = expressReq.body
 
-    // Validation
     if (!title || !type || !category) {
       throw new ValidationError(
         'Missing required fields: title, type, category',
       )
     }
 
-    // Create document
     const document = await documentService.createDocument(
       {
         title,
@@ -114,7 +109,6 @@ router.get(
     const pageLimit = Math.min(100, parseInt(limit) || 20)
     const skip = (pageNum - 1) * pageLimit
 
-    // Build query filter
     const filter: Record<string, unknown> = {
       $or: [
         { owner: userId },
@@ -131,7 +125,6 @@ router.get(
       filter['$text'] = { $search: search }
     }
 
-    // Query
     const documents = await BusinessDocument.find(filter)
       .skip(skip)
       .limit(pageLimit)
