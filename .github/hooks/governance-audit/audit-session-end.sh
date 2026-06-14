@@ -24,22 +24,22 @@ if [[ -f "$LOG_FILE" ]]; then
   SESSION_START=$(grep '"session_start"' "$LOG_FILE" 2>/dev/null | tail -1 | jq -r '.timestamp' 2>/dev/null || echo "")
   if [[ -n "$SESSION_START" ]]; then
     # Count events after session start
-    TOTAL=$(awk -v start="$SESSION_START" -F'"timestamp":"' '{split($2,a,"\""); if(a[1]>=start) count++} END{print count+0}' "$LOG_FILE" 2>/dev/null || echo 0)
-    THREATS=$(awk -v start="$SESSION_START" -F'"timestamp":"' '{split($2,a,"\""); if(a[1]>=start && /threat_detected/) count++} END{print count+0}' "$LOG_FILE" 2>/dev/null || echo 0)
+    TOTAL=$(awk -v start="$SESSION_START" -F'"timestamp":"' '{split($2,a,"\""); if(a[1]>=start) count++} END{print count+0}' "$LOG_FILE" 2>/dev/null || true)
+    THREATS=$(awk -v start="$SESSION_START" -F'"timestamp":"' '{split($2,a,"\""); if(a[1]>=start && /threat_detected/) count++} END{print count+0}' "$LOG_FILE" 2>/dev/null || true)
   else
-    TOTAL=$(wc -l < "$LOG_FILE" 2>/dev/null || echo 0)
-    THREATS=$(grep -c '"threat_detected"' "$LOG_FILE" 2>/dev/null || echo 0)
+    TOTAL=$(wc -l < "$LOG_FILE" 2>/dev/null || true)
+    THREATS=$(grep -c '"threat_detected"' "$LOG_FILE" 2>/dev/null || true)
   fi
 fi
 
-jq -Rn \
+jq -Rnc \
   --arg timestamp "$TIMESTAMP" \
-  --argjson total "$TOTAL" \
-  --argjson threats "$THREATS" \
-  '{"timestamp":$timestamp,"event":"session_end","total_events":$total,"threats_detected":$threats}' \
+  --arg total "$TOTAL" \
+  --arg threats "$THREATS" \
+  '{"timestamp":$timestamp,"event":"session_end","total_events":($total|tonumber? // 0),"threats_detected":($threats|tonumber? // 0)}' \
   >> "$LOG_FILE"
 
-if [[ "$THREATS" -gt 0 ]]; then
+if [[ "${THREATS:-0}" -gt 0 ]]; then
   echo "⚠️ Session ended: $THREATS threat(s) detected in $TOTAL events"
 else
   echo "✅ Session ended: $TOTAL events, no threats"
