@@ -40,6 +40,10 @@ export class MemoryJobStore implements JobStore {
   private readonly remoteIndex = new Map<string, string>();
 
   async put(job: FineTuningJob): Promise<FineTuningJob> {
+    const previous = this.jobs.get(job.id);
+    if (previous?.remoteId && previous.remoteId !== job.remoteId) {
+      this.remoteIndex.delete(previous.remoteId);
+    }
     this.jobs.set(job.id, { ...job });
     if (job.remoteId) {
       this.remoteIndex.set(job.remoteId, job.id);
@@ -74,6 +78,13 @@ export class MemoryJobStore implements JobStore {
       status,
       updatedAt: new Date(),
     };
+    // Keep the remoteIndex consistent if remoteId changed.
+    if (existing.remoteId && existing.remoteId !== updated.remoteId) {
+      this.remoteIndex.delete(existing.remoteId);
+    }
+    if (updated.remoteId) {
+      this.remoteIndex.set(updated.remoteId, updated.id);
+    }
     this.jobs.set(id, updated);
     return { ...updated };
   }
