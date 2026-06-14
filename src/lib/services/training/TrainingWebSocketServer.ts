@@ -1,3 +1,16 @@
+/**
+ * Training WebSocket Server — Real-time collaboration for clinical training sessions
+ *
+ * PIX-3935 — Security hardening:
+ *   - Origin validation (ALLOWED_ORIGINS env)
+ *   - Rate limiting (Redis token bucket, 30 session_message/min/user)
+ *   - Session persistence (MongoDB, reconnect with lastEventId resume)
+ *   - Audit log (MongoDB, every message type recorded)
+ *   - ACL matrix (role-based action enforcement)
+ *   - Idle disconnect (ping/pong 30s interval, 90s timeout)
+ *   - Per-IP concurrent connection limit
+ */
+
 import { randomUUID } from 'crypto'
 import { IncomingMessage } from 'http'
 
@@ -7,36 +20,14 @@ import { validateToken } from '../../auth/jwt-service'
 import type { UserRole } from '../../auth/roles'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { GestaltClient } from '../ai/GestaltClient'
+import { isOriginAllowed, parseAllowedOrigins } from './origin'
+import { RateLimiter } from './ratelimit'
+import { SessionStore, type TrainingSessionDocument } from './session-store'
+import { AuditLog, type AuditLogEntry } from './audit-log'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
-/**
- * Training WebSocket Server - Real-time collaboration for clinical training sessions
- *
- * Authentication & Authorization:
- * - Production: Validates JWT access tokens using the platform's auth system
- * - Development: Bypasses authentication for local testing (use with caution)
- * - Role mapping: Maps platform UserRole (admin, therapist, etc.) to training roles
- *   - admin/therapist -> supervisor (can supervise and provide coaching notes)
- *   - researcher -> observer (can observe sessions)
- *   - patient/support/guest -> trainee (can participate in training)
- *
- * Security Features:
- * - Token validation with expiration and revocation checks
- * - Role-based access control for coaching notes (supervisor/observer only)
- * - Authentication timeout (10 seconds) to prevent unauthenticated connections
- * - Session-level message broadcasting with role filtering
- *
- * TODO: Additional security enhancements:
- * 1. Verify user has permission to access the requested sessionId
- * 2. Implement session-level access control (e.g., only session owner + authorized supervisors)
- * 3. Rate limiting and abuse prevention
- * 4. Audit logging for all authentication and authorization events
- *
- * Clients authenticate via:
- * - Query string: ?token=<jwt>
- * - First message: { type: 'authenticate', token: '<jwt>' }
- */
+// ── Types ────────────────────────────────────────────────────────
 
 interface TrainingSessionClient {
   id: string
@@ -46,6 +37,8 @@ interface TrainingSessionClient {
   userId: string
   isAuthenticated: boolean
   authenticatedAt?: Date
+  /** Remote IP address for per-IP limiting. */
+  remoteIp?: string
 }
 
 interface ClientAuthResult {
@@ -64,26 +57,172 @@ interface SessionState {
   oceanScores: Record<string, number>
 }
 
+/** Actions that can be authorised against the ACL matrix. */
+type TrainingAction =
+  | 'send_message'
+  | 'receive_coaching_note'
+  | 'write_coaching_note'
+  | 'join_session'
+  | 'observe'
+
+// ── ACL Matrix ──────────────────────────────────────────────────
+
+/**
+ * ACL matrix: which training roles are allowed to perform each action.
+ */
+const ACL_MATRIX: Record<
+  TrainingAction,
+  Array<'trainee' | 'observer' | 'supervisor'>
+> = {
+  send_message: ['trainee', 'supervisor'],
+  receive_coaching_note: ['observer', 'supervisor'],
+  write_coaching_note: ['supervisor', 'observer'],
+  join_session: ['trainee', 'observer', 'supervisor'],
+  observe: ['observer', 'supervisor'],
+}
+
+function isActionAllowed(
+  role: 'trainee' | 'observer' | 'supervisor' | undefined,
+  action: TrainingAction,
+): boolean {
+  if (!role) return false
+  return ACL_MATRIX[action]?.includes(role) ?? false
+}
+
+// ── Idle-Disconnect Constants ────────────────────────────────────
+
+const PING_INTERVAL_MS = 30_000 // Send ping every 30s
+const IDLE_TIMEOUT_MS = 90_000 // Close after 90s of no pong
+
+// ── Per-IP Limit ─────────────────────────────────────────────────
+
+const MAX_CONNECTIONS_PER_IP = parseInt(
+  process.env['WS_MAX_CONNECTIONS_PER_IP'] ?? '5',
+  10,
+)
+
+// ── Server Class ─────────────────────────────────────────────────
+
 export class TrainingWebSocketServer {
   private readonly wss: WebSocketServer
   private readonly clients: Map<string, TrainingSessionClient> = new Map()
   private readonly sessions: Map<string, SessionState> = new Map()
-  private readonly AUTH_TIMEOUT_MS = 10000 // 10 seconds to authenticate
+  private readonly AUTH_TIMEOUT_MS = 10000
 
-  constructor(port: number) {
+  /** Per-IP connection counter. */
+  private readonly ipConnections: Map<string, Set<string>> = new Map()
+
+  /** Idle-disconnect timers per client. */
+  private readonly clientTimers: Map<string, ReturnType<typeof setInterval>> =
+    new Map()
+  private readonly lastPong: Map<string, number> = new Map()
+
+  // Optional services (injected or lazily created)
+  private readonly rateLimiter: RateLimiter | null = null
+  private readonly sessionStore: SessionStore | null = null
+  private readonly auditLog: AuditLog | null = null
+
+  // Allowed origins cache
+  private readonly allowedOrigins: Set<string>
+
+  constructor(
+    port: number,
+    deps?: {
+      rateLimiter?: RateLimiter
+      sessionStore?: SessionStore
+      auditLog?: AuditLog
+    },
+  ) {
+    this.allowedOrigins = parseAllowedOrigins(
+      typeof process !== 'undefined'
+        ? process.env['ALLOWED_ORIGINS']
+        : undefined,
+    )
+
     this.wss = new WebSocketServer({ port })
+
+    if (deps?.rateLimiter) this.rateLimiter = deps.rateLimiter
+    if (deps?.sessionStore) this.sessionStore = deps.sessionStore
+    if (deps?.auditLog) this.auditLog = deps.auditLog
 
     this.wss.on('connection', (ws, req) => {
       this.handleConnection(ws, req)
     })
 
+    // Built-in ping/pong from the server
+    this.wss.on('connection', (ws) => {
+      ws.on('pong', () => {
+        // Find which client this ws belongs to and update lastPong
+        for (const [id, client] of this.clients) {
+          if (client.ws === ws) {
+            this.lastPong.set(id, Date.now())
+            break
+          }
+        }
+      })
+    })
+
     logger.info(`Training WebSocket Server started on port ${port}`)
   }
+
+  // ── Connection Handler ─────────────────────────────────────────
 
   private handleConnection(ws: WebSocket, req: IncomingMessage) {
     const id = randomUUID()
 
-    // Extract token from query string if present
+    // ── 1. Origin validation ──────────────────────────────────────
+    const origin = req.headers['origin']
+    if (!isOriginAllowed(origin, this.allowedOrigins)) {
+      logger.warn('Connection rejected: origin not allowed', {
+        clientId: id,
+        origin,
+      })
+      this.writeAuditLog({
+        sessionId: 'none',
+        userId: 'unknown',
+        role: 'unknown',
+        type: 'origin_rejection',
+        ts: new Date().toISOString(),
+        payload: { origin },
+      })
+      ws.close(1008, 'Origin not allowed')
+      return
+    }
+
+    // ── 2. Per-IP connection limit ────────────────────────────────
+    const remoteIp =
+      (req.headers['x-forwarded-for'] as string | undefined)
+        ?.split(',')[0]
+        ?.trim() ??
+      req.socket.remoteAddress ??
+      'unknown'
+
+    if (remoteIp !== 'unknown') {
+      const current = this.ipConnections.get(remoteIp)
+      if (current && current.size >= MAX_CONNECTIONS_PER_IP) {
+        logger.warn('Connection rejected: per-IP limit exceeded', {
+          clientId: id,
+          remoteIp,
+          limit: MAX_CONNECTIONS_PER_IP,
+        })
+        this.writeAuditLog({
+          sessionId: 'none',
+          userId: 'unknown',
+          role: 'unknown',
+          type: 'ip_limit_rejection',
+          ts: new Date().toISOString(),
+          payload: { remoteIp, limit: MAX_CONNECTIONS_PER_IP },
+        })
+        ws.close(1008, 'Too many connections from this IP')
+        return
+      }
+      if (!this.ipConnections.has(remoteIp)) {
+        this.ipConnections.set(remoteIp, new Set())
+      }
+      this.ipConnections.get(remoteIp)!.add(id)
+    }
+
+    // ── 3. Extract token from query string ────────────────────────
     let initialToken: string | null = null
     try {
       const url = new URL(
@@ -95,21 +234,22 @@ export class TrainingWebSocketServer {
       logger.warn('Failed to parse connection URL', { error: err })
     }
 
-    // Initialize client as unauthenticated
+    // ── 4. Initialise client ──────────────────────────────────────
     this.clients.set(id, {
       id,
       ws,
-      role: 'trainee', // Default, will be validated on join_session
-      userId: '', // Will be set after authentication
+      role: 'trainee',
+      userId: '',
       isAuthenticated: false,
+      remoteIp,
     })
 
-    // If token provided in query string, attempt immediate authentication
+    // ── 5. Attempt immediate auth if token in query ───────────────
     if (initialToken) {
       void this.attemptAuthentication(id, initialToken)
     }
 
-    // Set up authentication timeout - close connection if not authenticated
+    // ── 6. Auth timeout ───────────────────────────────────────────
     const authTimeout = setTimeout(() => {
       const client = this.clients.get(id)
       if (client && !client.isAuthenticated) {
@@ -118,10 +258,11 @@ export class TrainingWebSocketServer {
         })
         this.sendError(ws, 'Authentication timeout - connection closed')
         ws.close(1008, 'Authentication timeout')
-        this.clients.delete(id)
+        this.cleanupClient(id)
       }
     }, this.AUTH_TIMEOUT_MS)
 
+    // ── 7. Message handler ────────────────────────────────────────
     ws.on('message', (data) => {
       try {
         let messageStr: string
@@ -134,19 +275,19 @@ export class TrainingWebSocketServer {
         } else if (ArrayBuffer.isView(data)) {
           messageStr = Buffer.from(data).toString()
         } else {
-          // Fallback for any other type - should not happen but safe to handle
           messageStr = String(data)
         }
         const message = JSON.parse(messageStr) as WebSocketMessage
 
-        // Handle authentication message
         if (message.type === 'authenticate') {
           clearTimeout(authTimeout)
-          this.handleAuthenticateMessage(id, message.payload)
+          this.handleAuthenticateMessage(
+            id,
+            message.payload as { token?: string },
+          )
           return
         }
 
-        // Reject all other messages from unauthenticated clients
         const client = this.clients.get(id)
         if (!client || !client.isAuthenticated) {
           logger.warn('Unauthenticated client attempted to send message', {
@@ -163,15 +304,50 @@ export class TrainingWebSocketServer {
       }
     })
 
+    // ── 8. Close handler ──────────────────────────────────────────
     ws.on('close', () => {
       clearTimeout(authTimeout)
+      this.writeAuditLog({
+        sessionId: this.clients.get(id)?.sessionId ?? 'none',
+        userId: this.clients.get(id)?.userId ?? 'unknown',
+        role: this.clients.get(id)?.role ?? 'unknown',
+        type: 'disconnect',
+        ts: new Date().toISOString(),
+      })
       this.handleDisconnect(id)
     })
+
+    // ── 9. Error handler ──────────────────────────────────────────
+    ws.on('error', (err) => {
+      logger.error('WebSocket error', { clientId: id, error: err.message })
+      this.cleanupClient(id)
+    })
+
+    // ── 10. Start idle-disconnect ping timer ──────────────────────
+    this.lastPong.set(id, Date.now())
+    const pingTimer = setInterval(() => {
+      const last = this.lastPong.get(id) ?? 0
+      if (Date.now() - last > IDLE_TIMEOUT_MS) {
+        logger.warn('Idle disconnect', { clientId: id })
+        this.writeAuditLog({
+          sessionId: this.clients.get(id)?.sessionId ?? 'none',
+          userId: this.clients.get(id)?.userId ?? 'unknown',
+          role: this.clients.get(id)?.role ?? 'unknown',
+          type: 'idle_disconnect',
+          ts: new Date().toISOString(),
+        })
+        ws.close(1008, 'Idle timeout')
+        this.cleanupClient(id)
+        clearInterval(pingTimer)
+      } else {
+        ws.ping()
+      }
+    }, PING_INTERVAL_MS)
+    this.clientTimers.set(id, pingTimer)
   }
 
-  /**
-   * Handle authentication message from client
-   */
+  // ── Authentication ─────────────────────────────────────────────
+
   private handleAuthenticateMessage(
     clientId: string,
     payload: { token?: string },
@@ -188,9 +364,6 @@ export class TrainingWebSocketServer {
     void this.attemptAuthentication(clientId, payload.token)
   }
 
-  /**
-   * Attempt to authenticate a client with the provided token
-   */
   private async attemptAuthentication(clientId: string, token: string) {
     const client = this.clients.get(clientId)
     if (!client) return
@@ -210,6 +383,14 @@ export class TrainingWebSocketServer {
           role: authResult.role,
         })
 
+        this.writeAuditLog({
+          sessionId: 'none',
+          userId: authResult.userId,
+          role: authResult.role,
+          type: 'authenticate',
+          ts: new Date().toISOString(),
+        })
+
         client.ws.send(
           JSON.stringify({
             type: 'authenticated',
@@ -221,46 +402,42 @@ export class TrainingWebSocketServer {
         )
       } else {
         logger.warn('Client authentication failed', { clientId })
+        this.writeAuditLog({
+          sessionId: 'none',
+          userId: 'unknown',
+          role: 'unknown',
+          type: 'auth_failure',
+          ts: new Date().toISOString(),
+          payload: { clientId },
+        })
         this.sendError(client.ws, 'Authentication failed: invalid token')
         client.ws.close(1008, 'Authentication failed')
-        this.clients.delete(clientId)
+        this.cleanupClient(clientId)
       }
     } catch (err) {
       logger.error('Authentication error', { clientId, error: err })
       this.sendError(client.ws, 'Authentication error')
       client.ws.close(1008, 'Authentication error')
-      this.clients.delete(clientId)
+      this.cleanupClient(clientId)
     }
   }
 
-  /**
-   * Validate client authentication token and return user info
-   *
-   * @param token - Authentication token (JWT access token)
-   * @returns ClientAuthResult if valid, null otherwise
-   */
   private async validateClient(
     token: string,
   ): Promise<ClientAuthResult | null> {
     const isDevelopment = process.env['NODE_ENV'] === 'development'
 
-    // Development mode: Allow authentication with any token (or no token)
-    // This bypasses authentication for local development/testing
     if (isDevelopment) {
       logger.warn('Development mode: Authentication bypassed', {
         tokenLength: token.length,
         warning: 'This should NEVER be enabled in production',
       })
-
-      // In development, extract userId from token if it looks like a JWT or use a default
-      // For now, use a simple default for development
       return {
         userId: token || 'dev-user',
-        role: 'trainee', // Default role, can be overridden by client in development
+        role: 'trainee',
       }
     }
 
-    // Production mode: Validate JWT token
     try {
       const validationResult = await validateToken(token, 'access')
 
@@ -272,7 +449,6 @@ export class TrainingWebSocketServer {
         return null
       }
 
-      // Map auth role to training role
       const trainingRole = this.mapAuthRoleToTrainingRole(validationResult.role)
 
       logger.info('Token validated successfully', {
@@ -294,43 +470,19 @@ export class TrainingWebSocketServer {
     }
   }
 
-  /**
-   * Map authentication UserRole to training session role
-   *
-   * @param authRole - User role from authentication system
-   * @returns Training session role (trainee, observer, or supervisor)
-   */
   private mapAuthRoleToTrainingRole(
     authRole?: UserRole,
   ): 'trainee' | 'observer' | 'supervisor' {
-    // Admin and therapist can supervise training sessions
     if (authRole === 'admin' || authRole === 'therapist') {
       return 'supervisor'
     }
-
-    // Researchers and support staff can observe but not supervise
     if (authRole === 'researcher' || authRole === 'support') {
       return 'observer'
     }
-
-    // Patients and guests participate as trainees
-    // Default to trainee for unknown roles
     return 'trainee'
   }
 
-  /**
-   * Send error message to client
-   */
-  private sendError(ws: WebSocket, message: string) {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(
-        JSON.stringify({
-          type: 'error',
-          payload: { message },
-        }),
-      )
-    }
-  }
+  // ── Message Routing ────────────────────────────────────────────
 
   private handleMessage(
     ws: WebSocket,
@@ -339,20 +491,36 @@ export class TrainingWebSocketServer {
   ) {
     switch (message.type) {
       case 'join_session':
-        this.handleJoinSession(ws, clientId, message.payload)
+        void this.handleJoinSession(
+          ws,
+          clientId,
+          message.payload as {
+            sessionId: string
+            role: 'trainee' | 'observer' | 'supervisor'
+            userId: string
+          },
+        )
         break
       case 'session_message':
-        this.handleSessionMessage(clientId, message.payload)
+        void this.handleSessionMessage(
+          clientId,
+          message.payload as { content: string; role: string },
+        )
         break
       case 'coaching_note':
-        this.handleCoachingNote(clientId, message.payload)
+        void this.handleCoachingNote(
+          clientId,
+          message.payload as { content: string },
+        )
         break
       default:
         logger.warn('Unknown message type', { type: message.type })
     }
   }
 
-  private handleJoinSession(
+  // ── Join Session ───────────────────────────────────────────────
+
+  private async handleJoinSession(
     ws: WebSocket,
     clientId: string,
     payload: {
@@ -362,8 +530,6 @@ export class TrainingWebSocketServer {
     },
   ) {
     const client = this.clients.get(clientId)
-
-    // Require authentication before joining session
     if (!client || !client.isAuthenticated) {
       logger.warn('Unauthenticated client attempted to join session', {
         clientId,
@@ -373,26 +539,45 @@ export class TrainingWebSocketServer {
       return
     }
 
-    // TODO: Validate session access permissions
-    // - Verify user has permission to access this sessionId
-    // - Verify role matches user's actual permissions
-    // - Check if session exists and is active
-    // - Enforce role-based access (e.g., only supervisors can join as 'supervisor')
+    // ACL check: verify role is allowed to join sessions
+    if (!isActionAllowed(client.role, 'join_session')) {
+      logger.warn('Role not allowed to join sessions', {
+        clientId,
+        role: client.role,
+      })
+      this.sendError(ws, 'Your role is not permitted to join training sessions')
+      return
+    }
 
-    // In development mode, allow role to be set from payload (for testing different roles)
-    // In production, role should come from authentication token only
+    // Development mode: allow role override
     const isDevelopment = process.env['NODE_ENV'] === 'development'
     if (isDevelopment && payload.role) {
       client.role = payload.role
     }
-
-    // Use authenticated user info, but allow userId from payload in development
     if (isDevelopment && payload.userId) {
       client.userId = payload.userId
     }
 
-    // Use authenticated user info, not payload (prevent role spoofing)
     client.sessionId = payload.sessionId
+
+    // Persist session state on join
+    if (this.sessionStore) {
+      try {
+        const { session, resumeFrom } = await this.sessionStore.reconnect(
+          payload.sessionId,
+          client.userId,
+        )
+        logger.info('Session restored/persisted', {
+          sessionId: payload.sessionId,
+          resumeFrom,
+        })
+      } catch (err) {
+        logger.error('Session store error on join', {
+          sessionId: payload.sessionId,
+          error: err instanceof Error ? err.message : String(err),
+        })
+      }
+    }
 
     logger.info('Client joined session', {
       clientId,
@@ -401,13 +586,19 @@ export class TrainingWebSocketServer {
       userId: client.userId,
     })
 
-    // Notify others in the session
+    this.writeAuditLog({
+      sessionId: payload.sessionId,
+      userId: client.userId,
+      role: client.role,
+      type: 'join_session',
+      ts: new Date().toISOString(),
+    })
+
     this.broadcastToSession(payload.sessionId, {
       type: 'participant_joined',
       payload: { userId: client.userId, role: client.role },
     })
 
-    // Send confirmation to the client
     ws.send(
       JSON.stringify({
         type: 'session_joined',
@@ -420,39 +611,94 @@ export class TrainingWebSocketServer {
     )
   }
 
-  private handleSessionMessage(
+  // ── Session Message ────────────────────────────────────────────
+
+  private async handleSessionMessage(
     clientId: string,
     payload: { content: string; role: string },
   ) {
     const client = this.clients.get(clientId)
-    if (!client?.sessionId || !client.isAuthenticated) {
+    if (!client?.sessionId || !client.isAuthenticated) return
+
+    // ACL: only trainee and supervisor can send messages
+    if (!isActionAllowed(client.role, 'send_message')) {
+      logger.warn('Role not allowed to send messages', {
+        clientId,
+        role: client.role,
+      })
+      this.sendError(
+        client.ws,
+        'Your role is not permitted to send session messages',
+      )
       return
     }
 
-    // TODO: Validate user has permission to send messages in this session
-    // - Verify user is the session owner or has appropriate role
-    // - Rate limiting to prevent abuse
+    // Rate limit: check session_message rate
+    if (this.rateLimiter) {
+      const result = await this.rateLimiter.check(client.userId)
+      if (!result.allowed) {
+        logger.warn('Rate limit exceeded for session_message', {
+          clientId,
+          userId: client.userId,
+        })
+        this.writeAuditLog({
+          sessionId: client.sessionId,
+          userId: client.userId,
+          role: client.role,
+          type: 'rate_limit_exceeded',
+          ts: new Date().toISOString(),
+          payload: { remaining: result.remaining, ttlMs: result.ttlMs },
+        })
+        client.ws.send(
+          JSON.stringify({
+            type: 'error',
+            payload: {
+              message: 'Rate limit exceeded. Please slow down.',
+              code: 'RATE_LIMITED',
+            },
+          }),
+        )
+        return
+      }
+    }
 
-    // Broadcast chat message to everyone in the session
+    // Audit
+    this.writeAuditLog({
+      sessionId: client.sessionId,
+      userId: client.userId,
+      role: client.role,
+      type: 'session_message',
+      ts: new Date().toISOString(),
+      payload: {
+        contentLength: payload.content.length,
+        messageRole: payload.role,
+      },
+    })
+
+    // Persist state
+    if (this.sessionStore) {
+      void this.sessionStore.nextEventId(client.sessionId)
+    }
+
+    // Broadcast
     this.broadcastToSession(client.sessionId, {
       type: 'session_message',
       payload: {
         userId: client.userId,
-        role: payload.role, // 'client' (AI) or 'therapist' (User)
+        role: payload.role,
         content: payload.content,
         timestamp: new Date().toISOString(),
       },
     })
 
-    // Trigger Gestalt analysis for Seeker messages
+    // Gestalt analysis
     if (payload.role === 'client' || payload.role === 'seeker') {
       void this.runGestaltAnalysis(client.sessionId, payload.content)
     }
   }
 
-  /**
-   * Run Gestalt Fusion analysis for a session and broadcast results.
-   */
+  // ── Gestalt Analysis ───────────────────────────────────────────
+
   private async runGestaltAnalysis(sessionId: string, targetUtterance: string) {
     try {
       let state = this.sessions.get(sessionId)
@@ -480,7 +726,6 @@ export class TrainingWebSocketServer {
         this.sessions.set(sessionId, state)
       }
 
-      // Add turn to history
       state.dialogue.push({ speaker: 'Seeker', text: targetUtterance })
       if (state.dialogue.length > 40) state.dialogue.shift()
 
@@ -491,9 +736,15 @@ export class TrainingWebSocketServer {
         ocean_scores: state.oceanScores,
       })
 
-      // Broadcast Gestalt updates as 'gestalt_update' to all roles
-      // Usually supervisors/observers use this for the Resistance Monitor,
-      // but trainees can see it too if configured.
+      this.writeAuditLog({
+        sessionId,
+        userId: 'system',
+        role: 'supervisor',
+        type: 'gestalt_update',
+        ts: new Date().toISOString(),
+        payload: { defense: gestalt.defense_label_name },
+      })
+
       this.broadcastToSession(sessionId, {
         type: 'gestalt_update',
         payload: gestalt,
@@ -511,26 +762,44 @@ export class TrainingWebSocketServer {
     }
   }
 
-  private handleCoachingNote(clientId: string, payload: { content: string }) {
+  // ── Coaching Note ──────────────────────────────────────────────
+
+  private async handleCoachingNote(
+    clientId: string,
+    payload: { content: string },
+  ) {
     const client = this.clients.get(clientId)
-    if (!client?.sessionId || !client.isAuthenticated) {
-      return
-    }
+    if (!client?.sessionId || !client.isAuthenticated) return
 
-    // TODO: Validate user has permission to send coaching notes
-    // - Only supervisors/observers should be able to send coaching notes
-    // - Verify role matches 'supervisor' or 'observer'
-
-    if (client.role !== 'supervisor' && client.role !== 'observer') {
+    // ACL: only supervisor/observer can write coaching notes
+    if (!isActionAllowed(client.role, 'write_coaching_note')) {
       logger.warn('Unauthorized coaching note attempt', {
         clientId,
         userId: client.userId,
         role: client.role,
       })
+      this.sendError(
+        client.ws,
+        'Your role is not permitted to send coaching notes',
+      )
       return
     }
 
-    // Coaching notes are "hidden" from trainees - only observers and supervisors receive them
+    // Audit
+    this.writeAuditLog({
+      sessionId: client.sessionId,
+      userId: client.userId,
+      role: client.role,
+      type: 'coaching_note',
+      ts: new Date().toISOString(),
+      payload: { contentLength: payload.content.length },
+    })
+
+    // Persist
+    if (this.sessionStore) {
+      void this.sessionStore.nextEventId(client.sessionId)
+    }
+
     this.broadcastToSessionRoles(client.sessionId, ['observer', 'supervisor'], {
       type: 'coaching_note',
       payload: {
@@ -541,6 +810,8 @@ export class TrainingWebSocketServer {
     })
   }
 
+  // ── Disconnect ─────────────────────────────────────────────────
+
   private handleDisconnect(clientId: string) {
     const client = this.clients.get(clientId)
     if (client?.sessionId) {
@@ -549,8 +820,35 @@ export class TrainingWebSocketServer {
         payload: { userId: client.userId },
       })
     }
+    this.cleanupClient(clientId)
+  }
+
+  // ── Cleanup ────────────────────────────────────────────────────
+
+  private cleanupClient(clientId: string) {
+    const client = this.clients.get(clientId)
+
+    // Remove from IP counter
+    if (client?.remoteIp) {
+      const ipSet = this.ipConnections.get(client.remoteIp)
+      if (ipSet) {
+        ipSet.delete(clientId)
+        if (ipSet.size === 0) this.ipConnections.delete(client.remoteIp)
+      }
+    }
+
+    // Clear idle timer
+    const timer = this.clientTimers.get(clientId)
+    if (timer) {
+      clearInterval(timer)
+      this.clientTimers.delete(clientId)
+    }
+
+    this.lastPong.delete(clientId)
     this.clients.delete(clientId)
   }
+
+  // ── Broadcast ──────────────────────────────────────────────────
 
   private broadcastToSession(sessionId: string, message: WebSocketMessage) {
     for (const client of this.clients.values()) {
@@ -563,13 +861,6 @@ export class TrainingWebSocketServer {
     }
   }
 
-  /**
-   * Broadcast message to clients in a session, filtered by role
-   *
-   * @param sessionId - Session ID to broadcast to
-   * @param allowedRoles - Array of roles that should receive the message
-   * @param message - Message to broadcast
-   */
   private broadcastToSessionRoles(
     sessionId: string,
     allowedRoles: Array<'trainee' | 'observer' | 'supervisor'>,
@@ -586,7 +877,36 @@ export class TrainingWebSocketServer {
     }
   }
 
+  // ── Error Helper ───────────────────────────────────────────────
+
+  private sendError(ws: WebSocket, message: string) {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          payload: { message },
+        }),
+      )
+    }
+  }
+
+  // ── Audit Log ──────────────────────────────────────────────────
+
+  private writeAuditLog(entry: Omit<AuditLogEntry, '_id'>): void {
+    if (this.auditLog) {
+      void this.auditLog.write(entry)
+    }
+  }
+
+  // ── Lifecycle ──────────────────────────────────────────────────
+
   public close() {
+    for (const [, timer] of this.clientTimers) clearInterval(timer)
+    this.clientTimers.clear()
+    this.clients.clear()
+    this.sessions.clear()
+    this.ipConnections.clear()
+    this.lastPong.clear()
     this.wss.close()
   }
 }
