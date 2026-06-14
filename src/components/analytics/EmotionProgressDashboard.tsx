@@ -18,73 +18,74 @@ interface EmotionProgressDashboardProps {
   timeRange?: 'week' | 'month' | 'quarter' | 'year'
 }
 
+// Extracted static mockData and helper functions outside component to prevent unnecessary memory allocations on each render.
+// Mock data for demo purposes
+const mockData: EmotionProgressData[] = [
+  {
+    date: '2024-01-01',
+    overallProgress: 65,
+    valenceScore: 72,
+    arousalStability: 68,
+    dominanceGains: 58,
+    riskFactors: 25,
+    goalProgress: 70,
+  },
+  {
+    date: '2024-01-08',
+    overallProgress: 72,
+    valenceScore: 75,
+    arousalStability: 74,
+    dominanceGains: 65,
+    riskFactors: 20,
+    goalProgress: 78,
+  },
+  {
+    date: '2024-01-15',
+    overallProgress: 78,
+    valenceScore: 80,
+    arousalStability: 76,
+    dominanceGains: 72,
+    riskFactors: 18,
+    goalProgress: 82,
+  },
+  {
+    date: '2024-01-22',
+    overallProgress: 85,
+    valenceScore: 82,
+    arousalStability: 84,
+    dominanceGains: 79,
+    riskFactors: 15,
+    goalProgress: 88,
+  },
+]
+
+const getProgressColor = (score: number) => {
+  if (score >= 80) {
+    return 'text-green-600 bg-green-100'
+  } else if (score >= 60) {
+    return 'text-yellow-600 bg-yellow-100'
+  } else {
+    return 'text-red-600 bg-red-100'
+  }
+}
+
+const getRiskColor = (risk: number) => {
+  if (risk <= 20) {
+    return 'text-green-600 bg-green-100'
+  } else if (risk <= 40) {
+    return 'text-yellow-600 bg-yellow-100'
+  } else {
+    return 'text-red-600 bg-red-100'
+  }
+}
+
 const EmotionProgressDashboard: FC<EmotionProgressDashboardProps> = ({
   data = [],
   isLoading = false,
   error = null,
   timeRange = 'month',
 }) => {
-  // Mock data for demo purposes
-  const mockData: EmotionProgressData[] = [
-    {
-      date: '2024-01-01',
-      overallProgress: 65,
-      valenceScore: 72,
-      arousalStability: 68,
-      dominanceGains: 58,
-      riskFactors: 25,
-      goalProgress: 70,
-    },
-    {
-      date: '2024-01-08',
-      overallProgress: 72,
-      valenceScore: 75,
-      arousalStability: 74,
-      dominanceGains: 65,
-      riskFactors: 20,
-      goalProgress: 78,
-    },
-    {
-      date: '2024-01-15',
-      overallProgress: 78,
-      valenceScore: 80,
-      arousalStability: 76,
-      dominanceGains: 72,
-      riskFactors: 18,
-      goalProgress: 82,
-    },
-    {
-      date: '2024-01-22',
-      overallProgress: 85,
-      valenceScore: 82,
-      arousalStability: 84,
-      dominanceGains: 79,
-      riskFactors: 15,
-      goalProgress: 88,
-    },
-  ]
-
   const displayData = data.length > 0 ? data : mockData
-
-  const getProgressColor = (score: number) => {
-    if (score >= 80) {
-      return 'text-green-600 bg-green-100'
-    } else if (score >= 60) {
-      return 'text-yellow-600 bg-yellow-100'
-    } else {
-      return 'text-red-600 bg-red-100'
-    }
-  }
-
-  const getRiskColor = (risk: number) => {
-    if (risk <= 20) {
-      return 'text-green-600 bg-green-100'
-    } else if (risk <= 40) {
-      return 'text-yellow-600 bg-yellow-100'
-    } else {
-      return 'text-red-600 bg-red-100'
-    }
-  }
 
   if (isLoading) {
     return (
