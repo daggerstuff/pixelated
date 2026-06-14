@@ -91,12 +91,12 @@ if [[ ${#THREATS_FOUND[@]} -gt 0 ]]; then
     fi
     FIRST=false
 
-    THREATS_JSON+=$(jq -Rn \
+    THREATS_JSON+=$(jq -Rnc \
       --arg cat "$category" \
       --arg sev "$severity" \
       --arg desc "$description" \
       --arg ev "$evidence" \
-      '{"category":$cat,"severity":($sev|tonumber),"description":$desc,"evidence":$ev}')
+      '{"category":$cat,"severity":($sev|tonumber? // 0.0),"description":$desc,"evidence":$ev}')
 
     # Track max severity
     if (( $(echo "$severity > $MAX_SEVERITY" | bc -l 2>/dev/null || echo 0) )); then
@@ -105,13 +105,13 @@ if [[ ${#THREATS_FOUND[@]} -gt 0 ]]; then
   done
   THREATS_JSON+="]"
 
-  jq -Rn \
+  jq -Rnc \
     --arg timestamp "$TIMESTAMP" \
     --arg level "$LEVEL" \
     --arg max_severity "$MAX_SEVERITY" \
-    --argjson threats "$THREATS_JSON" \
-    --argjson count "${#THREATS_FOUND[@]}" \
-    '{"timestamp":$timestamp,"event":"threat_detected","governance_level":$level,"threat_count":$count,"max_severity":($max_severity|tonumber),"threats":$threats}' \
+    --arg threats "$THREATS_JSON" \
+    --arg count "${#THREATS_FOUND[@]}" \
+    '{"timestamp":$timestamp,"event":"threat_detected","governance_level":$level,"threat_count":($count|tonumber? // 0),"max_severity":($max_severity|tonumber? // 0.0),"threats":($threats|fromjson? // [])}' \
     >> "$LOG_FILE"
 
   echo "⚠️ Governance: ${#THREATS_FOUND[@]} threat signal(s) detected (max severity: $MAX_SEVERITY)"
@@ -126,7 +126,7 @@ if [[ ${#THREATS_FOUND[@]} -gt 0 ]]; then
     exit 1
   fi
 else
-  jq -Rn \
+  jq -Rnc \
     --arg timestamp "$TIMESTAMP" \
     --arg level "$LEVEL" \
     '{"timestamp":$timestamp,"event":"prompt_scanned","governance_level":$level,"status":"clean"}' \
