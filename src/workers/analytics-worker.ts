@@ -177,13 +177,7 @@ async function shutdown(signal: string): Promise<void> {
     // In test environment, exit immediately to avoid timing issues
     if (process.env['NODE_ENV'] === 'test' || process.env['VITEST']) {
       process.exit(0)
-      return
     }
-
-    // Allow time for cleanup in production
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    process.exit(0)
   } catch (error: unknown) {
     logger.error('Error during shutdown:', error)
     process.exit(1)
