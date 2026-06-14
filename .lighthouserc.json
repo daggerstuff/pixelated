@@ -1,0 +1,26 @@
+{
+  "ci": {
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.9 }],
+        "categories:accessibility": ["error", { "minScore": 0.9 }],
+        "categories:best-practices": ["error", { "minScore": 0.85 }]
+      }
+    },
+    "collect": {
+      "numberOfRuns": 3,
+      "url": [
+        "http://127.0.0.1:4323/",
+        "http://127.0.0.1:4323/dashboard?perf=1",
+        "http://127.0.0.1:4323/training-session"
+      ],
+      "settings": {
+        "preset": "desktop",
+        "chromeFlags": "--no-sandbox --disable-dev-shm-usage"
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
