@@ -28,13 +28,6 @@ export interface PrivacyEngineResult {
   recommendations: string[]
 }
 
-/**
- * Advanced Privacy-Preserving AI Engine
- */
-interface GlobalModel {
-  weights: number[]
-  metadata: Record<string, unknown>
-}
 
 class PrivacyEngine {
   private readonly federatedConfig: FederatedLearningConfig
