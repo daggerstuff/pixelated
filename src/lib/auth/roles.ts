@@ -39,6 +39,7 @@ export type PermissionCategory =
   | 'content_management'
   | 'analytics'
   | 'security'
+  | 'training'
 
 /**
  * 6-Role Permission Matrix for Mental Health Platform
@@ -54,7 +55,6 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
     isAssignable: false, // Only through secure admin creation process
     requiresApproval: false,
   },
-
   therapist: {
     name: 'therapist',
     displayName: 'Mental Health Professional',
@@ -74,6 +74,9 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'read:patient_history',
       'manage:therapy_goals',
       'access:crisis_intervention_tools',
+      // Training pipeline permissions — PIX-3938
+      'read:own_training_sessions',
+      'write:training_feedback',
     ],
     restrictions: [
       'cannot_delete_patient_data',
@@ -130,6 +133,10 @@ export const ROLE_DEFINITIONS: Record<UserRole, RoleDefinition> = {
       'manage:research_projects',
       'access:statistical_tools',
       'read:aggregated_insights',
+      // Training pipeline permissions — PIX-3938
+      'start:training_jobs',
+      'read:training_jobs',
+      'manage:training_data',
     ],
     restrictions: [
       'cannot_access_identifiable_patient_data',
@@ -310,6 +317,60 @@ export const PERMISSION_DEFINITIONS: Record<string, Permission> = {
     name: 'manage:security_settings',
     description: 'Configure security settings and policies',
     category: 'security',
+    requiresMFA: true,
+    auditRequired: true,
+  },
+
+  // Training Pipeline Permissions — PIX-3938
+  'manage:fine_tuning': {
+    name: 'manage:fine_tuning',
+    description: 'Create, cancel, and monitor fine-tuning jobs',
+    category: 'training',
+    requiresMFA: true,
+    auditRequired: true,
+  },
+  'start:training_jobs': {
+    name: 'start:training_jobs',
+    description: 'Submit training jobs for execution',
+    category: 'training',
+    auditRequired: true,
+  },
+  'read:training_jobs': {
+    name: 'read:training_jobs',
+    description: 'View training job status and results',
+    category: 'training',
+    auditRequired: true,
+  },
+  'cancel:training_jobs': {
+    name: 'cancel:training_jobs',
+    description: 'Cancel running training jobs',
+    category: 'training',
+    requiresMFA: true,
+    auditRequired: true,
+  },
+  'manage:training_sessions': {
+    name: 'manage:training_sessions',
+    description: 'Create and update fishbowl training sessions',
+    category: 'training',
+    requiresMFA: true,
+    auditRequired: true,
+  },
+  'read:own_training_sessions': {
+    name: 'read:own_training_sessions',
+    description: 'View your own training sessions',
+    category: 'training',
+    auditRequired: true,
+  },
+  'write:training_feedback': {
+    name: 'write:training_feedback',
+    description: 'Submit coaching feedback on training sessions',
+    category: 'training',
+    auditRequired: true,
+  },
+  'manage:training_data': {
+    name: 'manage:training_data',
+    description: 'Merge and prepare training datasets',
+    category: 'training',
     requiresMFA: true,
     auditRequired: true,
   },
