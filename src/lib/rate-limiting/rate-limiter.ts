@@ -7,11 +7,6 @@ import { createBuildSafeLogger } from "../logging/build-safe-logger";
 import { redis } from "../redis";
 import type { RateLimitConfig, RateLimitResult, AttackPattern, RateLimitRule } from "./types";
 
-interface Pipeline {
-  incr(key: string): Pipeline;
-  expire(key: string, seconds: number): Pipeline;
-  exec(): Promise<any>;
-}
 
 const logger = createBuildSafeLogger("rate-limiter");
 
