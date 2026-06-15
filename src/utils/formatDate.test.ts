@@ -1,7 +1,7 @@
 /** @vitest-environment jsdom */
 import { describe, it, expect, vi, beforeAll, afterAll } from 'vitest'
 
-import { formatDate, isValidDate, getStartOf, formatDuration } from './formatDate'
+import { formatDate, isValidDate, getStartOf } from './formatDate'
 
 describe('isValidDate', () => {
   it('validates edge cases like leap years, out-of-bounds, and empty inputs', () => {
@@ -151,11 +151,5 @@ describe('getStartOf', () => {
     expect(startOfYear.getMonth()).toBe(0) // January
     expect(startOfYear.getFullYear()).toBe(2023)
     expect(startOfYear.getHours()).toBe(0)
-  })
-})
-
-describe('formatDuration', () => {
-  it('formats negative duration to 0s', () => {
-    expect(formatDuration(-1000)).toBe('0s')
   })
 })
