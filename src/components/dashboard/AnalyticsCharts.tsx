@@ -327,7 +327,7 @@ export const AnalyticsCharts: FC = () => {
   return (
     <div className="analytics-charts space-y-6">
       {/* Persistent ARIA live region for assertive announcements like errors */}
-      <div aria-live="assertive" className="sr-only">
+      <div aria-live="assertive" aria-atomic="true" className="sr-only">
         {error && !isLoading ? 'Unable to load analytics data' : ''}
       </div>
 
