@@ -117,7 +117,7 @@ importers:
         version: 3.0.84(zod@4.4.3)
       '@ai-sdk/mcp':
         specifier: latest
-        version: 1.0.50(zod@4.4.3)
+        version: 1.0.51(zod@4.4.3)
       '@ai-sdk/openai':
         specifier: ^3.0.71
         version: 3.0.71(zod@4.4.3)
@@ -324,7 +324,7 @@ importers:
         version: 5.12.0
       axios:
         specifier: '>=1.15.1'
-        version: 1.17.0
+        version: 1.18.0
       bcryptjs:
         specifier: latest
         version: 3.0.3
@@ -946,7 +946,7 @@ importers:
         version: 3.1067.0
       axios:
         specifier: '>=1.15.1'
-        version: 1.17.0
+        version: 1.18.0
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -1184,8 +1184,8 @@ packages:
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/mcp@1.0.50':
-    resolution: {integrity: sha512-iLqDZ62ezEjBhTJgiAQ4D2tHG1q7INVhPx0uOPnxJTxxqVUzN4KqeWAd6j5hYNhsPqC7TPGRQHQqAa1Z/lu2jg==}
+  '@ai-sdk/mcp@1.0.51':
+    resolution: {integrity: sha512-03JEdJtB+K/I7a85GWJjrB+ypYY++ZFDTp2YJ5Wd0e0raZdFpBLvvX9LJIxPF1LRbs7PMtx6TIS1YMP0Dece+w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -6098,8 +6098,8 @@ packages:
     resolution: {integrity: sha512-s7iGf5GaVMxEG0ENN9x+xTr7GFZCb1ZP/1uATUpCEK2X78nDB3RwbtFCo9pGAf9ru+VwoQ464DkaLEeRM08wJA==}
     engines: {node: '>=4'}
 
-  axios@1.17.0:
-    resolution: {integrity: sha512-J8SwNxprqqpbfenehxWYXE7CW+wM1BB4w3+N+g+/Wx40xM4rsLrfPmHHxSWIxJLYDgSY/HqlFPIYb2/S3rxafw==}
+  axios@1.18.0:
+    resolution: {integrity: sha512-E32NzpYKp++W7XRe52rHiXV2ehxmh3wbdgO7MHeFM+vqxLBYHzt0ElkiImtOBxtOmyp0yoC8C6uESVV84Y2/hw==}
 
   axobject-query@4.1.0:
     resolution: {integrity: sha512-qIj0G9wZbMGNLjLmg1PT6v2mE9AH2zlnADJD/2tC6E00hgmhUOfEB6greHPAfLRSufHqROIUTkw6E+M3lH0PTQ==}
@@ -11848,7 +11848,7 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/mcp@1.0.50(zod@4.4.3)':
+  '@ai-sdk/mcp@1.0.51(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
@@ -17193,7 +17193,7 @@ snapshots:
 
   axe-core@4.12.1: {}
 
-  axios@1.17.0:
+  axios@1.18.0:
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3)
       form-data: 4.0.6
@@ -22987,7 +22987,7 @@ snapshots:
 
   twilio@6.0.2:
     dependencies:
-      axios: 1.17.0
+      axios: 1.18.0
       dayjs: 1.11.21
       https-proxy-agent: 5.0.1
       jsonwebtoken: 9.0.3
@@ -23613,7 +23613,7 @@ snapshots:
 
   wait-on@9.0.10:
     dependencies:
-      axios: 1.17.0
+      axios: 1.18.0
       joi: 17.13.4
       lodash: 4.18.1
       minimist: 1.2.8
