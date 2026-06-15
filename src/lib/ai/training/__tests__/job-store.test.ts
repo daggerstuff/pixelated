@@ -67,7 +67,7 @@ describe("MemoryJobStore", () => {
     expect(onlyAlice[0]?.id).toBe("alice-1");
   });
 
-  test("rejects unknown listByOwner silently when none match", async () => {
+  test("returns empty array when ownerId matches no jobs", async () => {
     await store.put(makeJob({ id: "x" }));
     const out = await store.listByOwner("nobody");
     expect(out).toEqual([]);
