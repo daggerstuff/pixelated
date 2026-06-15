@@ -31,7 +31,7 @@ uvicorn[standard]==0.34.0
 pydantic==2.13.4
 
 # Utilities
-cryptography==48.0.1
+cryptography==49.0.0
 python-dateutil==2.9.0
 pyyaml==6.0.3
 requests==2.34.2
