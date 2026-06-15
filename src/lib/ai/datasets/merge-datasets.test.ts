@@ -39,14 +39,23 @@ describe("merge-datasets", () => {
 });
 
 describe("mergedDatasetExists", () => {
+  const projectMergedDir = join(process.cwd(), "data", "merged");
+
+  beforeEach(() => {
+    rmSync(projectMergedDir, { recursive: true, force: true });
+    mkdirSync(projectMergedDir, { recursive: true });
+  });
+
+  afterEach(() => {
+    rmSync(projectMergedDir, { recursive: true, force: true });
+  });
+
   it("should return false when no merged dataset exists", () => {
     const exists = mergedDatasetExists("nonexistent-" + Date.now() + ".jsonl");
     expect(exists).toBe(false);
   });
 
   it("should return true for a created merged dataset", () => {
-    const projectMergedDir = join(process.cwd(), "data", "merged");
-    mkdirSync(projectMergedDir, { recursive: true });
     const testFile = join(projectMergedDir, "test-exists.jsonl");
     writeFileSync(testFile, '{"test":"data"}', "utf-8");
 
