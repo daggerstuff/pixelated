@@ -8,6 +8,13 @@ import {
   HybridDeduplication,
 } from "../../utils/deduplication";
 import { securePathJoin } from "../../utils/server";
+import {
+  type DatasetProvenance,
+  collectSourceDatasetIds,
+  computeInputHash,
+  generateMergeRunId,
+  getDefaultProvenanceStore,
+} from "./provenance";
 
 const logger = createBuildSafeLogger("default");
 
@@ -21,14 +28,18 @@ export interface DatasetMergeStats {
   categoriesCount: number;
   qualityScoreAverage: number;
   processingTimeMs: number;
+  /** Provenance record for this merge operation (only when mergedByUserId is provided). */
+  provenance?: DatasetProvenance;
 }
 
 export interface MergeDatasetOptions {
-  outputFormat: "jsonl" | "json" | "csv";
-  removeDuplicates: boolean;
-  qualityThreshold: number;
+  outputFormat?: "jsonl" | "json" | "csv";
+  removeDuplicates?: boolean;
+  qualityThreshold?: number;
   maxSamples?: number;
   categories?: string[];
+  /** When set, provenance metadata is created and persisted for this merge run. */
+  mergedByUserId?: string;
 }
 
 interface ConversationRecord {
@@ -183,7 +194,7 @@ function recordToCSVRow(record: ConversationRecord, headers: string[]): string {
   return values.join(",");
 }
 
- async function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
+async function awaitStreamFinish(stream: NodeJS.WritableStream): Promise<void> {
   return new Promise((resolve, reject) => {
     stream.once("finish", resolve);
     stream.once("error", reject);
@@ -201,15 +212,24 @@ export async function mergeAllDatasets(
 
   logger.info("Starting dataset merge process", { options });
 
+  const {
+    outputFormat = "jsonl",
+    removeDuplicates = true,
+    qualityThreshold = 0.7,
+    maxSamples,
+    mergedByUserId,
+  } = options;
+  const categoriesFilter = options.categories;
+
   const normalizedDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
   const outputDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "merged");
   mkdirSync(outputDir, { recursive: true });
 
-  const outputPath = getMergedDatasetPath(options.outputFormat);
+  const outputPath = getMergedDatasetPath(outputFormat);
   const writeStream = createWriteStream(outputPath, "utf-8");
-  const writer = createWriter(options.outputFormat, writeStream);
+  const writer = createWriter(outputFormat, writeStream);
 
-  const dedup: DeduplicationStrategy | null = options.removeDuplicates
+  const dedup: DeduplicationStrategy | null = removeDuplicates
     ? new HybridDeduplication(BLOOM_FILTER_THRESHOLD, {
         onCapacityWarning: (msg) => logger.warn(msg),
       })
@@ -222,6 +242,9 @@ export async function mergeAllDatasets(
   let qualitySum = 0;
   let qualityCount = 0;
   let memoryWarned = false;
+
+  // Collect source dataset identifiers for provenance
+  const sourcePaths: string[] = mergedByUserId ? collectSourceDatasetIds(normalizedDir) : [];
 
   writer.init();
 
@@ -236,7 +259,7 @@ export async function mergeAllDatasets(
       if (!line.trim()) continue;
 
       try {
-        const record: ConversationRecord = JSON.parse(line);
+        const record = JSON.parse(line) as ConversationRecord;
         totalSamples++;
 
         if (dedup?.has(record.conversation_id)) {
@@ -245,12 +268,12 @@ export async function mergeAllDatasets(
         }
 
         const qualityScore = record.metadata?.quality_score ?? 0.5;
-        if (qualityScore < options.qualityThreshold) {
+        if (qualityScore < qualityThreshold) {
           continue;
         }
 
-        if (options.maxSamples && mergedSamples >= options.maxSamples) {
-          logger.info(`Reached maxSamples limit: ${options.maxSamples}`);
+        if (maxSamples && mergedSamples >= maxSamples) {
+          logger.info(`Reached maxSamples limit: ${maxSamples}`);
           break outerLoop;
         }
 
@@ -272,7 +295,7 @@ export async function mergeAllDatasets(
         writer.writeRecord(record, mergedSamples);
         mergedSamples++;
       } catch (parseError) {
-        logger.debug(`Skipping malformed line: ${parseError}`);
+        logger.debug(`Skipping malformed line: ${String(parseError)}`);
       }
     }
   }
@@ -293,6 +316,34 @@ export async function mergeAllDatasets(
   };
 
   logger.info("Dataset merge completed", { stats });
+
+  // Create provenance record if a user initiated this merge
+  if (mergedByUserId) {
+    const mergeRunId = generateMergeRunId();
+    const inputHash = computeInputHash(sourcePaths);
+
+    const provenance: DatasetProvenance = {
+      mergeRunId,
+      sourceDatasetIds: sourcePaths,
+      mergedAt: new Date().toISOString(),
+      mergedByUserId,
+      qualityThresholdUsed: qualityThreshold,
+      dedupStrategy: removeDuplicates ? "hybrid-bloom" : "none",
+      inputHash,
+      childRunIds: [],
+    };
+
+    try {
+      const store = getDefaultProvenanceStore();
+      await store.create(provenance);
+      stats.provenance = provenance;
+      logger.info("Provenance record created", { mergeRunId });
+    } catch (error: unknown) {
+      // Non-fatal: provenance persistence failure should not block the merge
+      logger.error("Failed to persist provenance record", { error });
+    }
+  }
+
   return stats;
 }
 
@@ -355,7 +406,6 @@ async function validateJSONDataset(filePath: string, errors: string[]): Promise<
     const recordLine = trimmed.startsWith(",") ? trimmed.slice(1).trim() : trimmed;
 
     for (const char of recordLine) {
-
       if (escapeNext) {
         currentRecord += char;
         escapeNext = false;
@@ -384,8 +434,8 @@ async function validateJSONDataset(filePath: string, errors: string[]): Promise<
 
     if (braceDepth === 0 && currentRecord.trim()) {
       try {
-        const record = JSON.parse(currentRecord.trim());
-        if (!record.conversation_id || !Array.isArray(record.messages)) {
+        const record = JSON.parse(currentRecord.trim()) as Record<string, unknown>;
+        if (!record["conversation_id"] || !Array.isArray(record["messages"])) {
           errors.push(`Record near line ${lineNumber}: Missing required fields`);
         }
         sampleCount++;
@@ -446,8 +496,8 @@ async function validateJSONLDataset(filePath: string, errors: string[]): Promise
     if (!line.trim()) continue;
 
     try {
-      const record = JSON.parse(line);
-      if (!record.conversation_id || !Array.isArray(record.messages)) {
+      const record = JSON.parse(line) as Record<string, unknown>;
+      if (!record["conversation_id"] || !Array.isArray(record["messages"])) {
         errors.push(`Line ${lineNumber}: Missing required fields`);
       }
       sampleCount++;
@@ -496,7 +546,7 @@ export async function validateMergedDataset(filePath: string): Promise<{
         break;
     }
   } catch (error: unknown) {
-    errors.push(`Read error: ${error}`);
+    errors.push(`Read error: ${String(error)}`);
   }
 
   const isValid = errors.length === 0;
