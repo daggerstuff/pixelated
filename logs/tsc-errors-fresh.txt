@@ -1,0 +1,2362 @@
+$ NODE_OPTIONS='--max-old-space-size=8192' astro check && NODE_OPTIONS='--max-old-space-size=8192' tsc --noEmit
+🟢 Using Node adapter for standard deployment
+09:57:59 [@astrojs/node] Enabling sessions with filesystem storage
+09:58:00 [content] Syncing content
+09:58:00 [content] Synced content
+09:58:00 [types] Generated 1.03s
+09:58:00 [check] Getting diagnostics for Astro files in /home/vivi/pixelated...
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m198[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isNullAssignableToTimestamp' is declared but its value is never read.
+
+[7m198[0m const isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m189[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isWrongRequestIdValueAssignable' is declared but its value is never read.
+
+[7m189[0m const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m168[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isAdHocKeyAssignableToString' is declared but its value is never read.
+
+[7m168[0m const isAdHocKeyAssignableToString: IsAdHocKeyAssignableToString = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m156[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'adHocKeyNonExistent' is declared but its value is never read.
+
+[7m156[0m const adHocKeyNonExistent: unknown = someLocals['doesNotExist']
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m155[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'adHocKey' is declared but its value is never read.
+
+[7m155[0m const adHocKey: unknown = someLocals['arbitraryAdHocKey']
+[7m   [0m [93m      ~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m146[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isWrongDarkModeAssignable' is declared but its value is never read.
+
+[7m146[0m const isWrongDarkModeAssignable: IsWrongDarkModeAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m133[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isWrongHeadersValueTypeAssignable' is declared but its value is never read.
+
+[7m133[0m const isWrongHeadersValueTypeAssignable: IsWrongHeadersValueTypeAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m123[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isVercelEdgeWithoutIpAssignable' is declared but its value is never read.
+
+[7m123[0m const isVercelEdgeWithoutIpAssignable: IsVercelEdgeWithoutIpAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m112[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isPartialUserAssignable' is declared but its value is never read.
+
+[7m112[0m const isPartialUserAssignable: IsPartialUserAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m101[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isWrongRequestIdAssignable' is declared but its value is never read.
+
+[7m101[0m const isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m93[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'userPreferencesAbsent' is declared but its value is never read.
+
+[7m93[0m const userPreferencesAbsent: App.Locals['userPreferences'] = undefined
+[7m  [0m [93m      ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m92[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'userPreferences' is declared but its value is never read.
+
+[7m92[0m const userPreferences: App.Locals['userPreferences'] = userPreferencesBase
+[7m  [0m [93m      ~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m77[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'headersAbsent' is declared but its value is never read.
+
+[7m77[0m const headersAbsent: App.Locals['headers'] = undefined
+[7m  [0m [93m      ~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m76[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'headers' is declared but its value is never read.
+
+[7m76[0m const headers: App.Locals['headers'] = { 'x-custom': 'value' }
+[7m  [0m [93m      ~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m73[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'vercelEdgeAbsent' is declared but its value is never read.
+
+[7m73[0m const vercelEdgeAbsent: App.Locals['vercelEdge'] = undefined
+[7m  [0m [93m      ~~~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m66[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'vercelEdge' is declared but its value is never read.
+
+[7m66[0m const vercelEdge: App.Locals['vercelEdge'] = {
+[7m  [0m [93m      ~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m63[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isSSRAbsent' is declared but its value is never read.
+
+[7m63[0m const isSSRAbsent: App.Locals['isSSR'] = undefined
+[7m  [0m [93m      ~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m62[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'isSSR' is declared but its value is never read.
+
+[7m62[0m const isSSR: App.Locals['isSSR'] = true
+[7m  [0m [93m      ~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m59[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'cspNonceAbsent' is declared but its value is never read.
+
+[7m59[0m const cspNonceAbsent: App.Locals['cspNonce'] = undefined
+[7m  [0m [93m      ~~~~~~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m58[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'cspNonce' is declared but its value is never read.
+
+[7m58[0m const cspNonce: App.Locals['cspNonce'] = 'nonce-abc'
+[7m  [0m [93m      ~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m51[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'session' is declared but its value is never read.
+
+[7m51[0m const session: App.Locals['session'] = {
+[7m  [0m [93m      ~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m43[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'user' is declared but its value is never read.
+
+[7m43[0m const user: App.Locals['user'] = {
+[7m  [0m [93m      ~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m40[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'timestamp' is declared but its value is never read.
+
+[7m40[0m const timestamp: App.Locals['timestamp'] = '2026-06-11T00:00:00Z'
+[7m  [0m [93m      ~~~~~~~~~[0m
+[96msrc/__tests__/env-locals-contract.type-test.ts[0m:[93m37[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'requestId' is declared but its value is never read.
+
+[7m37[0m const requestId: App.Locals['requestId'] = 'req-123'
+[7m  [0m [93m      ~~~~~~~~~[0m
+
+[96msrc/api/memory/routes/[memoryId].ts[0m:[93m177[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m177[0m   async ({ params, request }, user) => {
+[7m   [0m [93m                   ~~~~~~~[0m
+[96msrc/api/memory/routes/[memoryId].ts[0m:[93m64[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m64[0m   async ({ params, request }, user) => {
+[7m  [0m [93m                   ~~~~~~~[0m
+
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m384[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m384[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m383[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m383[0m       req: TestRequest,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m374[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m374[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m365[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m365[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m241[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m241[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m240[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m240[0m       req: TestRequest,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m210[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m210[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m209[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m209[0m       req: TestRequest,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m201[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m201[0m       res: MockResponse,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m200[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m200[0m       req: TestRequest,
+[7m   [0m [93m      ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m170[0m:[93m45[0m - [93mwarning[0m[90m ts(6133): [0m'next' is declared but its value is never read.
+
+[7m170[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m                                            ~~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m170[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m170[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m       ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m133[0m:[93m26[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m133[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m                         ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m133[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m133[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m       ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m127[0m:[93m26[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m127[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m                         ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m127[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m127[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m       ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m121[0m:[93m26[0m - [93mwarning[0m[90m ts(6133): [0m'res' is declared but its value is never read.
+
+[7m121[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m                         ~~~[0m
+[96msrc/api/middleware/__tests__/middleware-stack.integration.test.ts[0m:[93m121[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m121[0m       (req: TestRequest, res: MockResponse, next: NextFunction) => {
+[7m   [0m [93m       ~~~[0m
+
+[96msrc/api/routes/market-research.ts[0m:[93m115[0m:[93m23[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m115[0m   asyncHandler(async (req: Request, res: Response) => {
+[7m   [0m [93m                      ~~~[0m
+
+[96msrc/hooks/useChatWithMemory.ts[0m:[93m54[0m:[93m31[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m54[0m         } as unknown as React.FormEvent<HTMLFormElement>
+[7m  [0m [93m                              ~~~~~~~~~[0m
+
+[96msrc/hooks/useComparativeProgress.ts[0m:[93m47[0m:[93m17[0m - [93mwarning[0m[90m ts(80004): [0mJSDoc types may be moved to TypeScript types.
+
+[7m47[0m export function useComparativeProgress(
+[7m  [0m [93m                ~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/store.ts[0m:[93m531[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'value' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m531[0m             updatePerformanceMetric: (metric, value) =>
+[7m   [0m [93m                                              ~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m531[0m:[93m39[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'metric' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m531[0m             updatePerformanceMetric: (metric, value) =>
+[7m   [0m [93m                                      ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m497[0m:[93m33[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'featureName' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m497[0m             trackFeatureUsage: (featureName) =>
+[7m   [0m [93m                                ~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m489[0m:[93m26[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'formId' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m489[0m             clearDraft: (formId) =>
+[7m   [0m [93m                         ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m485[0m:[93m24[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'formId' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m485[0m             getDraft: (formId) => {
+[7m   [0m [93m                       ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m478[0m:[93m33[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'data' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m478[0m             saveDraft: (formId, data) =>
+[7m   [0m [93m                                ~~~~[0m
+[96msrc/lib/store.ts[0m:[93m478[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'formId' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m478[0m             saveDraft: (formId, data) =>
+[7m   [0m [93m                        ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m469[0m:[93m35[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'id' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m469[0m             removeOfflineAction: (id) =>
+[7m   [0m [93m                                  ~~[0m
+[96msrc/lib/store.ts[0m:[93m456[0m:[93m40[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'payload' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m456[0m             queueOfflineAction: (type, payload) =>
+[7m   [0m [93m                                       ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m456[0m:[93m34[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'type' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m456[0m             queueOfflineAction: (type, payload) =>
+[7m   [0m [93m                                 ~~~~[0m
+[96msrc/lib/store.ts[0m:[93m431[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'query' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m431[0m             addSearchHistory: (query) =>
+[7m   [0m [93m                               ~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m417[0m:[93m29[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'item' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m417[0m             addRecentItem: (item) =>
+[7m   [0m [93m                            ~~~~[0m
+[96msrc/lib/store.ts[0m:[93m408[0m:[93m29[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'tab' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m408[0m             removeOpenTab: (tab) =>
+[7m   [0m [93m                            ~~~[0m
+[96msrc/lib/store.ts[0m:[93m394[0m:[93m26[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'tab' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m394[0m             addOpenTab: (tab) =>
+[7m   [0m [93m                         ~~~[0m
+[96msrc/lib/store.ts[0m:[93m387[0m:[93m35[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'workspace' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m387[0m             setCurrentWorkspace: (workspace) =>
+[7m   [0m [93m                                  ~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m379[0m:[93m31[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'route' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m379[0m             setCurrentRoute: (route) =>
+[7m   [0m [93m                              ~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m375[0m:[93m34[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'sessionState' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m375[0m             updateSessionState: (sessionState) =>
+[7m   [0m [93m                                 ~~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m367[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'sortBy' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m367[0m             setSortBy: (sortBy, sortOrder: UIState['sortOrder'] = 'desc') =>
+[7m   [0m [93m                        ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m360[0m:[93m29[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'filters' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m360[0m             updateFilters: (filters) =>
+[7m   [0m [93m                            ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m356[0m:[93m27[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'viewMode' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m356[0m             setViewMode: (viewMode) =>
+[7m   [0m [93m                          ~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m352[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'layout' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m352[0m             setLayout: (layout) =>
+[7m   [0m [93m                        ~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m348[0m:[93m28[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'tab' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m348[0m             setActiveTab: (tab) =>
+[7m   [0m [93m                           ~~~[0m
+[96msrc/lib/store.ts[0m:[93m337[0m:[93m29[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'uiState' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m337[0m             updateUIState: (uiState) =>
+[7m   [0m [93m                            ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m328[0m:[93m37[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'privacy' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m328[0m             updatePrivacySettings: (privacy) =>
+[7m   [0m [93m                                    ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m318[0m:[93m43[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'accessibility' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m318[0m             updateAccessibilitySettings: (accessibility) =>
+[7m   [0m [93m                                          ~~~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m308[0m:[93m42[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'notifications' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m308[0m             updateNotificationSettings: (notifications) =>
+[7m   [0m [93m                                         ~~~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m304[0m:[93m27[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'language' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m304[0m             setLanguage: (language) =>
+[7m   [0m [93m                          ~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m300[0m:[93m24[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'theme' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m300[0m             setTheme: (theme) =>
+[7m   [0m [93m                       ~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m296[0m:[93m33[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'preferences' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m296[0m             updatePreferences: (preferences) =>
+[7m   [0m [93m                                ~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m262[0m:[93m28[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'service' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m262[0m             setAIService: (service) => set({ aiService: service }),
+[7m   [0m [93m                           ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m260[0m:[93m33[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'initialized' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m260[0m             setFHEInitialized: (initialized) =>
+[7m   [0m [93m                                ~~~~~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m258[0m:[93m36[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'enabled' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m258[0m             setEncryptionEnabled: (enabled) =>
+[7m   [0m [93m                                   ~~~~~~~[0m
+[96msrc/lib/store.ts[0m:[93m257[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'level' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m257[0m             setSecurityLevel: (level) => set({ securityLevel: level }),
+[7m   [0m [93m                               ~~~~~[0m
+
+[96msrc/lib/supabase.ts[0m:[93m3[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'table' is declared but its value is never read.
+
+[7m3[0m   from<T>(table: string) {
+[7m [0m [93m          ~~~~~[0m
+
+[96msrc/lib/ai/interventionEngine.ts[0m:[93m127[0m:[93m21[0m - [93mwarning[0m[90m ts(6133): [0m'session' is declared but its value is never read.
+
+[7m127[0m         condition: (session, patient) => {
+[7m   [0m [93m                    ~~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/BiasDetectionEngine.ts[0m:[93m838[0m:[93m26[0m - [93mwarning[0m[90m ts(6133): [0m'options' is declared but its value is never read.
+
+[7m838[0m   async getDashboardData(options: { timeRange?: string; includeDetails?: boolean } = {}): Promise<{
+[7m   [0m [93m                         ~~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/audit.ts[0m:[93m464[0m:[93m62[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m464[0m     return `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                             ~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/cache.ts[0m:[93m901[0m:[93m15[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'cacheData' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m901[0m           let cacheData
+[7m   [0m [93m              ~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/cache.ts[0m:[93m538[0m:[93m15[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'cacheData' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m538[0m           let cacheData
+[7m   [0m [93m              ~~~~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/connection-pool.ts[0m:[93m114[0m:[93m65[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m114[0m     const id = `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                ~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/performance-optimizer.ts[0m:[93m537[0m:[93m59[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m537[0m       id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                          ~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/python-bridge.ts[0m:[93m151[0m:[93m66[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m151[0m       const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                 ~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/redis-pool-manager.ts[0m:[93m268[0m:[93m73[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m268[0m     const id = `${this.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                        ~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/__tests__/performance-optimizer.test.ts[0m:[93m9[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
+
+[7m  9[0m import {
+[7m   [0m [93m~~~~~~~~[0m
+[7m 10[0m   ConnectionPoolManager,
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m...[0m 
+[7m 17[0m   type PerformanceOptimizerConfig,
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m 18[0m } from '../performance-optimizer'
+[7m   [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/ai/bias-detection/__tests__/performance-optimizer.test.ts[0m:[93m7[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
+
+[7m7[0m import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/ai/bias-detection/__tests__/python-bridge.test.ts[0m:[93m579[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'e' is declared but its value is never read.
+
+[7m579[0m           reject: (e: Error) => resolve(),
+[7m   [0m [93m                   ~[0m
+[96msrc/lib/ai/bias-detection/__tests__/python-bridge.test.ts[0m:[93m578[0m:[93m21[0m - [93mwarning[0m[90m ts(6133): [0m'v' is declared but its value is never read.
+
+[7m578[0m           resolve: (v: unknown) => resolve(),
+[7m   [0m [93m                    ~[0m
+
+[96msrc/lib/ai/crisis/PixelCrisisDetector.ts[0m:[93m147[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'text' is declared but its value is never read.
+
+[7m147[0m     text: string,
+[7m   [0m [93m    ~~~~[0m
+
+[96msrc/lib/ai/mental-llama/client-adapter.ts[0m:[93m34[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'route' is declared but its value is never read.
+
+[7m34[0m     route: string,
+[7m  [0m [93m    ~~~~~[0m
+
+[96msrc/lib/ai/mental-llama/createProductionLLMInvoker.ts[0m:[93m288[0m:[93m71[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m288[0m     const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                      ~~~~~~[0m
+
+[96msrc/lib/ai/providers/EmotionLlamaProvider.ts[0m:[93m539[0m:[93m64[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m539[0m     return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                               ~~~~~~[0m
+[96msrc/lib/ai/providers/EmotionLlamaProvider.ts[0m:[93m259[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'originalText' is declared but its value is never read.
+
+[7m259[0m     originalText: string,
+[7m   [0m [93m    ~~~~~~~~~~~~[0m
+
+[96msrc/lib/ai/security/crisis-detection.ts[0m:[93m126[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'category' is declared but its value is never read.
+
+[7m126[0m   category: CrisisSignal['category'],
+[7m   [0m [93m  ~~~~~~~~[0m
+
+[96msrc/lib/ai/services/AutomatedEscalationService.ts[0m:[93m352[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'action' is declared but its value is never read.
+
+[7m352[0m     action: EscalationAction,
+[7m   [0m [93m    ~~~~~~[0m
+
+[96msrc/lib/ai/services/EnhancedTechniqueClassificationService.ts[0m:[93m637[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'emotion' is declared but its value is never read.
+
+[7m637[0m     emotion: EmotionAnalysis,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/ai/services/EnhancedTechniqueClassificationService.ts[0m:[93m584[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'context' is declared but its value is never read.
+
+[7m584[0m     context: any,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/ai/services/EnhancedTechniqueClassificationService.ts[0m:[93m583[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'primary' is declared but its value is never read.
+
+[7m583[0m     primary: any,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/ai/services/EnhancedTechniqueClassificationService.ts[0m:[93m545[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'primary' is declared but its value is never read.
+
+[7m545[0m     primary: any,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/ai/services/EnhancedTechniqueClassificationService.ts[0m:[93m522[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'emotion' is declared but its value is never read.
+
+[7m522[0m     emotion: EmotionAnalysis,
+[7m   [0m [93m    ~~~~~~~[0m
+
+[96msrc/lib/ai/services/InterventionAnalysisService.ts[0m:[93m323[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'currentEmotion' is declared but its value is never read.
+
+[7m323[0m     currentEmotion: EmotionAnalysis,
+[7m   [0m [93m    ~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/ai/services/PromptOptimizerService.ts[0m:[93m349[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'prevMessage' is declared but its value is never read.
+
+[7m349[0m     prevMessage: ConversationContext['messages'][0],
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+
+[96msrc/lib/ai/services/contextual-enhancer.ts[0m:[93m8[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'analyzer' is declared but its value is never read.
+
+[7m8[0m   private readonly analyzer: RealTimeAnalyzer;
+[7m [0m [93m                   ~~~~~~~~[0m
+
+[96msrc/lib/ai/validation/clinical-validator.ts[0m:[93m327[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'riskFactors' is declared but its value is never read.
+
+[7m327[0m     riskFactors: string[],
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+
+[96msrc/lib/analytics/universal-demo-analytics.ts[0m:[93m355[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'properties' is declared but its value is never read.
+
+[7m355[0m     properties: Record<string, unknown> = {},
+[7m   [0m [93m    ~~~~~~~~~~[0m
+[96msrc/lib/analytics/universal-demo-analytics.ts[0m:[93m257[0m:[93m44[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m257[0m       container.addEventListener('click', (e) => {
+[7m   [0m [93m                                           ~[0m
+[96msrc/lib/analytics/universal-demo-analytics.ts[0m:[93m234[0m:[93m44[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m234[0m         element.addEventListener('click', (e) => {
+[7m   [0m [93m                                           ~[0m
+
+[96msrc/lib/auth/auth0-impersonation-service.ts[0m:[93m437[0m:[93m61[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m437[0m         id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                            ~~~~~~[0m
+[96msrc/lib/auth/auth0-impersonation-service.ts[0m:[93m304[0m:[93m61[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m304[0m         id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                            ~~~~~~[0m
+[96msrc/lib/auth/auth0-impersonation-service.ts[0m:[93m219[0m:[93m61[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m219[0m         id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                            ~~~~~~[0m
+[96msrc/lib/auth/auth0-impersonation-service.ts[0m:[93m188[0m:[93m83[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m188[0m       const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                                  ~~~~~~[0m
+
+[96msrc/lib/auth/session-management.ts[0m:[93m76[0m:[93m70[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m76[0m   const sessionId = `sess_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m  [0m [93m                                                                     ~~~~~~[0m
+
+[96msrc/lib/auth/__tests__/training-permissions.test.ts[0m:[93m20[0m:[93m49[0m - [93mwarning[0m[90m ts(6133): [0m'ROLE_DEFINITIONS' is declared but its value is never read.
+
+[7m20[0m import { hasPermission, PERMISSION_DEFINITIONS, ROLE_DEFINITIONS } from "../roles";
+[7m  [0m [93m                                                ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/backup/verify.ts[0m:[93m245[0m:[93m17[0m - [93mwarning[0m[90m ts(6133): [0m'verifyBackupContents' is declared but its value is never read.
+
+[7m245[0m   private async verifyBackupContents(backupPath: string): Promise<void> {
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/business-strategy/services/user-management.ts[0m:[93m41[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'action' is declared but its value is never read.
+
+[7m41[0m     action: string,
+[7m  [0m [93m    ~~~~~~[0m
+[96msrc/lib/business-strategy/services/user-management.ts[0m:[93m40[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'resource' is declared but its value is never read.
+
+[7m40[0m     resource: string,
+[7m  [0m [93m    ~~~~~~~~[0m
+
+[96msrc/lib/collaboration/collaborationManager.ts[0m:[93m285[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'sessionId' is declared but its value is never read.
+
+[7m285[0m     sessionId: string,
+[7m   [0m [93m    ~~~~~~~~~[0m
+[96msrc/lib/collaboration/collaborationManager.ts[0m:[93m255[0m:[93m71[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m255[0m     const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+[7m   [0m [93m                                                                      ~~~~~~[0m
+[96msrc/lib/collaboration/collaborationManager.ts[0m:[93m123[0m:[93m73[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m123[0m     const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+[7m   [0m [93m                                                                        ~~~~~~[0m
+[96msrc/lib/collaboration/collaborationManager.ts[0m:[93m80[0m:[93m74[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m80[0m     const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+[7m  [0m [93m                                                                         ~~~~~~[0m
+
+[96msrc/lib/crypto/encryption.ts[0m:[93m105[0m:[93m45[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(start?: number | undefined, end?: number | undefined): Buffer<ArrayBuffer>' of 'encryptedBuffer.slice' is deprecated.
+
+[7m105[0m       const encryptedData = encryptedBuffer.slice(
+[7m   [0m [93m                                            ~~~~~[0m
+[96msrc/lib/crypto/encryption.ts[0m:[93m104[0m:[93m39[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(start?: number | undefined, end?: number | undefined): Buffer<ArrayBuffer>' of 'encryptedBuffer.slice' is deprecated.
+
+[7m104[0m       const authTag = encryptedBuffer.slice(encryptedBuffer.length - 16)
+[7m   [0m [93m                                      ~~~~~[0m
+
+[96msrc/lib/database/indexingStrategy.ts[0m:[93m47[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'config' is declared but its value is never read.
+
+[7m47[0m   constructor(config: DatabaseConfig) {
+[7m  [0m [93m              ~~~~~~[0m
+
+[96msrc/lib/db/developer-api-keys.test.ts[0m:[93m13[0m:[93m6[0m - [93mwarning[0m[90m ts(6196): [0m'MockQueryResult' is declared but never used.
+
+[7m13[0m type MockQueryResult<TRow> = {
+[7m  [0m [93m     ~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/db/developer-api-keys.ts[0m:[93m298[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'reason' is declared but its value is never read.
+
+[7m298[0m     reason: string,
+[7m   [0m [93m    ~~~~~~[0m
+
+[96msrc/lib/deployment/productionManager.ts[0m:[93m719[0m:[93m32[0m - [93mwarning[0m[90m ts(6133): [0m'env' is declared but its value is never read.
+
+[7m719[0m     this.environments.forEach((env, name) => {
+[7m   [0m [93m                               ~~~[0m
+[96msrc/lib/deployment/productionManager.ts[0m:[93m388[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'environment' is declared but its value is never read.
+
+[7m388[0m     environment: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+[96msrc/lib/deployment/productionManager.ts[0m:[93m359[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'environment' is declared but its value is never read.
+
+[7m359[0m     environment: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+[96msrc/lib/deployment/productionManager.ts[0m:[93m168[0m:[93m77[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m168[0m     const deploymentId = `deploy_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+[7m   [0m [93m                                                                            ~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/ConfigurationManager.ts[0m:[93m173[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
+
+[7m173[0m   private isInitialized = false
+[7m   [0m [93m          ~~~~~~~~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m26[0m:[93m38[0m - [93mwarning[0m[90m ts(6133): [0m'recordType' is declared but its value is never read.
+
+[7m26[0m   async deleteRecord(domain: string, recordType: string): Promise<void> {
+[7m  [0m [93m                                     ~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m26[0m:[93m22[0m - [93mwarning[0m[90m ts(6133): [0m'domain' is declared but its value is never read.
+
+[7m26[0m   async deleteRecord(domain: string, recordType: string): Promise<void> {
+[7m  [0m [93m                     ~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m21[0m:[93m21[0m - [93mwarning[0m[90m ts(6133): [0m'domain' is declared but its value is never read.
+
+[7m21[0m   async listRecords(domain: string): Promise<unknown[]> {
+[7m  [0m [93m                    ~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m16[0m:[93m35[0m - [93mwarning[0m[90m ts(6133): [0m'recordType' is declared but its value is never read.
+
+[7m16[0m   async getRecord(domain: string, recordType: string): Promise<unknown> {
+[7m  [0m [93m                                  ~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m16[0m:[93m19[0m - [93mwarning[0m[90m ts(6133): [0m'domain' is declared but its value is never read.
+
+[7m16[0m   async getRecord(domain: string, recordType: string): Promise<unknown> {
+[7m  [0m [93m                  ~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m11[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'value' is declared but its value is never read.
+
+[7m11[0m     value: string,
+[7m  [0m [93m    ~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m10[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'recordType' is declared but its value is never read.
+
+[7m10[0m     recordType: string,
+[7m  [0m [93m    ~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m9[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'domain' is declared but its value is never read.
+
+[7m9[0m     domain: string,
+[7m [0m [93m    ~~~~~~[0m
+[96msrc/lib/deployment/multi-region/DNSClient.ts[0m:[93m4[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'config' is declared but its value is never read.
+
+[7m4[0m   constructor(config: unknown) {
+[7m [0m [93m              ~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/GlobalTrafficRoutingManager.ts[0m:[93m521[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'requestType' is declared but its value is never read.
+
+[7m521[0m     requestType: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/GlobalTrafficRoutingManager.ts[0m:[93m414[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'requestType' is declared but its value is never read.
+
+[7m414[0m     requestType: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+[96msrc/lib/deployment/multi-region/GlobalTrafficRoutingManager.ts[0m:[93m356[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'requestType' is declared but its value is never read.
+
+[7m356[0m     requestType: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/HealthMonitor.ts[0m:[93m88[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
+
+[7m88[0m   private isInitialized = false
+[7m  [0m [93m          ~~~~~~~~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/MultiRegionDeploymentManager.ts[0m:[93m127[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'deploymentOrchestrator' is declared but its value is never read.
+
+[7m127[0m   private readonly deploymentOrchestrator: DeploymentOrchestrator
+[7m   [0m [93m                   ~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/deployment/multi-region/ServiceDiscoveryManager.ts[0m:[93m462[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'config' is declared but its value is never read.
+
+[7m462[0m     config: NonNullable<ServiceDiscoveryConfig['etcd']>,
+[7m   [0m [93m    ~~~~~~[0m
+
+[96msrc/lib/fhe/fhe-service.ts[0m:[93m134[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'options' is declared but its value is never read.
+
+[7m134[0m     options?: any,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/fhe/fhe-service.ts[0m:[93m90[0m:[93m40[0m - [93mwarning[0m[90m ts(6133): [0m'options' is declared but its value is never read.
+
+[7m90[0m   public async encrypt(value: unknown, options?: any): Promise<EncryptedData> {
+[7m  [0m [93m                                       ~~~~~~~[0m
+
+[96msrc/lib/fhe/index.ts[0m:[93m69[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'data' is declared but its value is never read.
+
+[7m69[0m       data: string,
+[7m  [0m [93m      ~~~~[0m
+
+[96msrc/lib/fhe/parameter-optimizer.ts[0m:[93m585[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'basePreset' is declared but its value is never read.
+
+[7m585[0m     basePreset: string,
+[7m   [0m [93m    ~~~~~~~~~~[0m
+[96msrc/lib/fhe/parameter-optimizer.ts[0m:[93m505[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'basePreset' is declared but its value is never read.
+
+[7m505[0m     basePreset: string,
+[7m   [0m [93m    ~~~~~~~~~~[0m
+[96msrc/lib/fhe/parameter-optimizer.ts[0m:[93m471[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'basePreset' is declared but its value is never read.
+
+[7m471[0m     basePreset: string,
+[7m   [0m [93m    ~~~~~~~~~~[0m
+
+[96msrc/lib/fhe/seal-context.ts[0m:[93m198[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'schemeType' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m198[0m     let schemeType
+[7m   [0m [93m        ~~~~~~~~~~[0m
+
+[96msrc/lib/fhe/mock/mock-fhe-service.ts[0m:[93m253[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'params' is declared but its value is never read.
+
+[7m253[0m     params?: Record<string, unknown>,
+[7m   [0m [93m    ~~~~~~[0m
+
+[96msrc/lib/memory/__tests__/browser-memory-boundary.test.ts[0m:[93m17[0m:[93m32[0m - [93mwarning[0m[90m ts(6133): [0m'vi' is declared but its value is never read.
+
+[7m17[0m import { describe, expect, it, vi } from "vitest";
+[7m  [0m [93m                               ~~[0m
+
+[96msrc/lib/memory/reflection/reflection-metrics.test.ts[0m:[93m13[0m:[93m34[0m - [93mwarning[0m[90m ts(6133): [0m'vi' is declared but its value is never read.
+
+[7m13[0m import { describe, test, expect, vi } from "vitest";
+[7m  [0m [93m                                 ~~[0m
+
+[96msrc/lib/mental-health/__tests__/service.test.ts[0m:[93m63[0m:[93m57[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'i' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m63[0m       expect((result as any).analysis?.indicators.some((i) => i.type === "crisis")).toBe(true);
+[7m  [0m [93m                                                        ~[0m
+
+[96msrc/lib/metaaligner/core/dynamic-weighting-benchmark.ts[0m:[93m466[0m:[93m12[0m - [93mwarning[0m[90m ts(6133): [0m'suite' is declared but its value is never read.
+
+[7m466[0m     .then((suite) => {
+[7m   [0m [93m           ~~~~~[0m
+
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m772[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
+
+[7m772[0m       const transition = detectContextTransition(prev, curr)
+[7m   [0m [93m                         ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m748[0m:[93m26[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(prev: ContextEvent, curr: ContextEvent): ContextTransition' of 'detectContextTransition' is deprecated.
+
+[7m748[0m       const transition = detectContextTransition(prev, curr)
+[7m   [0m [93m                         ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/metaaligner/prioritization/context-transition-detector.test.ts[0m:[93m6[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'detectContextTransition' is deprecated.
+
+[7m6[0m   detectContextTransition,
+[7m [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/metaaligner/prioritization/objective-switcher.test.ts[0m:[93m12[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'ObjectiveSwitcherConfig' is declared but its value is never read.
+
+[7m12[0m   type ObjectiveSwitcherConfig,
+[7m  [0m [93m       ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/metaaligner/prioritization/objective-switcher.test.ts[0m:[93m11[0m:[93m8[0m - [93mwarning[0m[90m ts(6133): [0m'SwitchMetadata' is declared but its value is never read.
+
+[7m11[0m   type SwitchMetadata,
+[7m  [0m [93m       ~~~~~~~~~~~~~~[0m
+[96msrc/lib/metaaligner/prioritization/objective-switcher.test.ts[0m:[93m10[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'ObjectiveSwitchObserver' is declared but its value is never read.
+
+[7m10[0m   ObjectiveSwitchObserver,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/metaaligner/prioritization/objective-switcher.ts[0m:[93m193[0m:[93m72[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m193[0m     const auditId = `switch_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                       ~~~~~~[0m
+
+[96msrc/lib/middleware/rate-limit.ts[0m:[93m62[0m:[93m15[0m - [93mwarning[0m[90m ts(6133): [0m'defaultLimit' is declared but its value is never read.
+
+[7m62[0m   constructor(defaultLimit = 30) {
+[7m  [0m [93m              ~~~~~~~~~~~~[0m
+[96msrc/lib/middleware/rate-limit.ts[0m:[93m60[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'userLimits' is declared but its value is never read.
+
+[7m60[0m   private readonly userLimits!: Record<string, number>
+[7m  [0m [93m                   ~~~~~~~~~~[0m
+[96msrc/lib/middleware/rate-limit.ts[0m:[93m59[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'windowMs' is declared but its value is never read.
+
+[7m59[0m   private readonly windowMs!: number
+[7m  [0m [93m                   ~~~~~~~~[0m
+[96msrc/lib/middleware/rate-limit.ts[0m:[93m58[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'defaultLimit' is declared but its value is never read.
+
+[7m58[0m   private readonly defaultLimit!: number
+[7m  [0m [93m                   ~~~~~~~~~~~~[0m
+
+[96msrc/lib/monitoring/ai-monitoring-service.ts[0m:[93m418[0m:[93m17[0m - [93mwarning[0m[90m ts(6133): [0m'sendWebhookNotification' is declared but its value is never read.
+
+[7m418[0m   private async sendWebhookNotification(alert: Alert): Promise<void> {
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/monitoring/ai-monitoring-service.ts[0m:[93m413[0m:[93m17[0m - [93mwarning[0m[90m ts(6133): [0m'sendEmailNotification' is declared but its value is never read.
+
+[7m413[0m   private async sendEmailNotification(alert: Alert): Promise<void> {
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/monitoring/ai-monitoring-service.ts[0m:[93m408[0m:[93m17[0m - [93mwarning[0m[90m ts(6133): [0m'sendSlackNotification' is declared but its value is never read.
+
+[7m408[0m   private async sendSlackNotification(alert: Alert): Promise<void> {
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/monitoring/ai-monitoring-service.ts[0m:[93m240[0m:[93m63[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m240[0m       id: `pattern_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                              ~~~~~~[0m
+[96msrc/lib/monitoring/ai-monitoring-service.ts[0m:[93m219[0m:[93m63[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m219[0m       id: `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                              ~~~~~~[0m
+
+[96msrc/lib/monitoring/performanceMonitor.ts[0m:[93m337[0m:[93m61[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m337[0m       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+[7m   [0m [93m                                                            ~~~~~~[0m
+
+[96msrc/lib/monitoring/service.ts[0m:[93m152[0m:[93m26[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entry' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m152[0m         entries.forEach((entry) => {
+[7m   [0m [93m                         ~~~~~[0m
+[96msrc/lib/monitoring/service.ts[0m:[93m150[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m150[0m       new PerformanceObserver((entryList) => {
+[7m   [0m [93m                               ~~~~~~~~~[0m
+[96msrc/lib/monitoring/service.ts[0m:[93m144[0m:[93m26[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entry' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m144[0m         entries.forEach((entry) => {
+[7m   [0m [93m                         ~~~~~[0m
+[96msrc/lib/monitoring/service.ts[0m:[93m142[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m142[0m       new PerformanceObserver((entryList) => {
+[7m   [0m [93m                               ~~~~~~~~~[0m
+[96msrc/lib/monitoring/service.ts[0m:[93m133[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m133[0m       new PerformanceObserver((entryList) => {
+[7m   [0m [93m                               ~~~~~~~~~[0m
+
+[96msrc/lib/monitoring/setup.ts[0m:[93m76[0m:[93m36[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entry' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m76[0m         list.getEntries().forEach((entry) => {
+[7m  [0m [93m                                   ~~~~~[0m
+[96msrc/lib/monitoring/setup.ts[0m:[93m75[0m:[93m49[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'list' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m75[0m       const observer = new PerformanceObserver((list) => {
+[7m  [0m [93m                                                ~~~~[0m
+
+[96msrc/lib/rate-limiting/rate-limiter.ts[0m:[93m241[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'identifier' is declared but its value is never read.
+
+[7m241[0m     identifier: string,
+[7m   [0m [93m    ~~~~~~~~~~[0m
+[96msrc/lib/rate-limiting/rate-limiter.ts[0m:[93m99[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'rule' is declared but its value is never read.
+
+[7m99[0m     rule: RateLimitRule,
+[7m  [0m [93m    ~~~~[0m
+
+[96msrc/lib/rate-limiting/__tests__/rate-limiter.test.ts[0m:[93m46[0m:[93m53[0m - [93mwarning[0m[90m ts(6133): [0m'sec' is declared but its value is never read.
+
+[7m46[0m       setex: vi.fn().mockImplementation(async (key, sec, val) => {
+[7m  [0m [93m                                                    ~~~[0m
+
+[96msrc/lib/research/services/AnonymizationPipelineService.ts[0m:[93m475[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'k' is declared but its value is never read.
+
+[7m475[0m     k: number,
+[7m   [0m [93m    ~[0m
+
+[96msrc/lib/research/services/EvidenceGenerationService.ts[0m:[93m42[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'queryEngine' is declared but its value is never read.
+
+[7m42[0m   private readonly queryEngine: ResearchQueryEngine | null = null
+[7m  [0m [93m                   ~~~~~~~~~~~[0m
+[96msrc/lib/research/services/EvidenceGenerationService.ts[0m:[93m41[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'patternService' is declared but its value is never read.
+
+[7m41[0m   private readonly patternService: PatternDiscoveryService | null = null
+[7m  [0m [93m                   ~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/research/services/PatternDiscoveryService.ts[0m:[93m564[0m:[93m11[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'index' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m564[0m       let index;
+[7m   [0m [93m          ~~~~~[0m
+
+[96msrc/lib/research/services/ResearchQueryEngine.ts[0m:[93m498[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'userId' is declared but its value is never read.
+
+[7m498[0m     userId: string,
+[7m   [0m [93m    ~~~~~~[0m
+[96msrc/lib/research/services/ResearchQueryEngine.ts[0m:[93m41[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'hipaaService' is declared but its value is never read.
+
+[7m41[0m   private readonly hipaaService: HIPAADataService
+[7m  [0m [93m                   ~~~~~~~~~~~~[0m
+
+[96msrc/lib/sdk/foresight.ts[0m:[93m228[0m:[93m20[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m228[0m     id: z.string().uuid(),
+[7m   [0m [93m                   ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m221[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m221[0m     memoryId: z.string().uuid(),
+[7m   [0m [93m                         ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m204[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m204[0m     memoryId: z.string().uuid(),
+[7m   [0m [93m                         ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m129[0m:[93m26[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m129[0m     memoryId: z.string().uuid(),
+[7m   [0m [93m                         ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m111[0m:[93m20[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m111[0m     id: z.string().uuid(),
+[7m   [0m [93m                   ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m104[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m104[0m     relatedMemoryId: z.string().uuid().optional(),
+[7m   [0m [93m                                ~~~~[0m
+[96msrc/lib/sdk/foresight.ts[0m:[93m59[0m:[93m18[0m - [93mwarning[0m[90m ts(6385): [0m'(params?: string | { abort?: boolean | undefined; version?: "v1" | "v4" | "v2" | "v3" | "v8" | "v5" | "v6" | "v7" | undefined; error?: string | $ZodErrorMap<$ZodIssueInvalidStringFormat> | undefined; message?: string | undefined; } | undefined): ZodString' is deprecated.
+
+[7m59[0m   id: z.string().uuid(),
+[7m  [0m [93m                 ~~~~[0m
+
+[96msrc/lib/sdk/index.ts[0m:[93m211[0m:[93m30[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'init' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m211[0m       fetchFn: async (input, init) => {
+[7m   [0m [93m                             ~~~~[0m
+[96msrc/lib/sdk/index.ts[0m:[93m211[0m:[93m23[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'input' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m211[0m       fetchFn: async (input, init) => {
+[7m   [0m [93m                      ~~~~~[0m
+[96msrc/lib/sdk/index.ts[0m:[93m190[0m:[93m30[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'init' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m190[0m       fetchFn: async (input, init) => {
+[7m   [0m [93m                             ~~~~[0m
+[96msrc/lib/sdk/index.ts[0m:[93m190[0m:[93m23[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'input' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m190[0m       fetchFn: async (input, init) => {
+[7m   [0m [93m                      ~~~~~[0m
+
+[96msrc/lib/sdk/__tests__/foresight.test.ts[0m:[93m17[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'SubscribeFilter' is declared but its value is never read.
+
+[7m17[0m   SubscribeFilter,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~[0m
+[96msrc/lib/sdk/__tests__/foresight.test.ts[0m:[93m15[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'UpdateMemoryInput' is declared but its value is never read.
+
+[7m15[0m   UpdateMemoryInput,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/sdk/__tests__/foresight.test.ts[0m:[93m14[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'ListMemoriesInput' is declared but its value is never read.
+
+[7m14[0m   ListMemoriesInput,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/sdk/__tests__/foresight.test.ts[0m:[93m13[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'SearchMemoriesInput' is declared but its value is never read.
+
+[7m13[0m   SearchMemoriesInput,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/security/encryptionManager.ts[0m:[93m107[0m:[93m67[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m107[0m     const keyId = `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                                  ~~~~~~[0m
+
+[96msrc/lib/security/phiDetection.ts[0m:[93m414[0m:[93m11[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'match' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m414[0m       let match
+[7m   [0m [93m          ~~~~~[0m
+
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m1821[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'data' is declared but its value is never read.
+
+[7m1821[0m     data: string,
+[7m    [0m [93m    ~~~~[0m
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m440[0m:[93m56[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'message' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m440[0m       await subscriber.subscribe('feed:status', async (message) => {
+[7m   [0m [93m                                                       ~~~~~~~[0m
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m420[0m:[93m54[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'message' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m420[0m       await subscriber.subscribe('feed:sync', async (message) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m303[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'_requestsThisDay' is declared but its value is never read.
+
+[7m303[0m   private _requestsThisDay = 0
+[7m   [0m [93m          ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m302[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'_requestsThisHour' is declared but its value is never read.
+
+[7m302[0m   private _requestsThisHour = 0
+[7m   [0m [93m          ~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/security/threat-intelligence/ExternalThreatFeedIntegration.ts[0m:[93m301[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'_requestsThisMinute' is declared but its value is never read.
+
+[7m301[0m   private _requestsThisMinute = 0
+[7m   [0m [93m          ~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/security/threat-intelligence/ThreatCorrelationEngine.ts[0m:[93m1788[0m:[93m12[0m - [93mwarning[0m[90m ts(6385): [0m'(options?: CountOptions | undefined): Promise<number>' is deprecated.
+
+[7m1788[0m           .count(),
+[7m    [0m [93m           ~~~~~[0m
+[96msrc/lib/security/threat-intelligence/ThreatCorrelationEngine.ts[0m:[93m922[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'threats' is declared but its value is never read.
+
+[7m922[0m     threats: ThreatData[],
+[7m   [0m [93m    ~~~~~~~[0m
+
+[96msrc/lib/security/threat-intelligence/ThreatHuntingSystem.ts[0m:[93m1222[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'executionLog' is declared but its value is never read.
+
+[7m1222[0m     executionLog: ExecutionLogEntry[],
+[7m    [0m [93m    ~~~~~~~~~~~~[0m
+
+[96msrc/lib/server/internal-memory-service-client.ts[0m:[93m86[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'actorSecret' is deprecated.
+
+[7m86[0m       config.actorSecret,
+[7m  [0m [93m             ~~~~~~~~~~~[0m
+
+[96msrc/lib/services/bias-detection-optimized.ts[0m:[93m363[0m:[93m9[0m - [93mwarning[0m[90m ts(6133): [0m'timedOut' is declared but its value is never read.
+
+[7m363[0m     let timedOut = false;
+[7m   [0m [93m        ~~~~~~~~[0m
+
+[96msrc/lib/services/analytics/AnalyticsService.ts[0m:[93m32[0m:[93m60[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m32[0m   return `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m  [0m [93m                                                           ~~~~~~[0m
+
+[96msrc/lib/services/email/EmailService.ts[0m:[93m56[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'resend' is declared but its value is never read.
+
+[7m56[0m   private readonly resend: Resend | undefined
+[7m  [0m [93m                   ~~~~~~[0m
+
+[96msrc/lib/services/redis/__tests__/CacheInvalidation.integration.test.ts[0m:[93m7[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'RedisMockClient' is declared but its value is never read.
+
+[7m7[0m import type { RedisMockClient } from "../redis-operation-types";
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/services/redis/__tests__/run-tests.ts[0m:[93m152[0m:[93m17[0m - [93mwarning[0m[90m ts(6385): [0m'NodeRequire' is deprecated.
+
+[7m152[0m if ((require as NodeRequire).main === module) {
+[7m   [0m [93m                ~~~~~~~~~~~[0m
+
+[96msrc/lib/services/websocket/BiasWebSocketServer.ts[0m:[93m815[0m:[93m63[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m815[0m     return `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+[7m   [0m [93m                                                              ~~~~~~[0m
+
+[96msrc/lib/state/jotai-persistence.ts[0m:[93m203[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'key' is declared but its value is never read.
+
+[7m203[0m   subscribe(key: string, callback: (value: Value) => void, initialValue: Value): () => void {
+[7m   [0m [93m            ~~~[0m
+
+[96msrc/lib/stores/journal-research/notificationStore.ts[0m:[93m54[0m:[93m59[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m54[0m           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+[7m  [0m [93m                                                          ~~~~~~[0m
+
+[96msrc/lib/testing/performance-benchmarks.ts[0m:[93m475[0m:[93m17[0m - [93mwarning[0m[90m ts(6385): [0m'NodeRequire' is deprecated.
+
+[7m475[0m if ((require as NodeRequire).main === module) {
+[7m   [0m [93m                ~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/response-orchestration.ts[0m:[93m892[0m:[93m32[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'config' is declared but its value is never read.
+
+[7m892[0m   constructor(private readonly config: OrchestrationConfig) {
+[7m   [0m [93m                               ~~~~~~[0m
+
+[96msrc/lib/threat-detection/behavioral/behavioral-analysis-service.ts[0m:[93m111[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'timeframe' is declared but its value is never read.
+
+[7m111[0m     timeframe?: string,
+[7m   [0m [93m    ~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/behavioral/analyzers/ml-anomaly-detector.ts[0m:[93m338[0m:[93m64[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m338[0m     return `anomaly_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                               ~~~~~~[0m
+
+[96msrc/lib/threat-detection/integrations/api-middleware.ts[0m:[93m257[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m257[0m     req: Request,
+[7m   [0m [93m    ~~~[0m
+
+[96msrc/lib/threat-detection/integrations/production-system.ts[0m:[93m833[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'rateLimiter' is declared but its value is never read.
+
+[7m833[0m   rateLimiter: unknown,
+[7m   [0m [93m  ~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/integrations/threat-detection-service.ts[0m:[93m72[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'rateLimiter' is declared but its value is never read.
+
+[7m72[0m   private readonly rateLimiter: DistributedRateLimiter;
+[7m  [0m [93m                   ~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/integrations/utils.ts[0m:[93m614[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'identifier' is declared but its value is never read.
+
+[7m614[0m   identifier: string,
+[7m   [0m [93m  ~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/integrations/utils.ts[0m:[93m328[0m:[93m12[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(ip: string): boolean' of 'isSuspiciousIPSync' is deprecated.
+
+[7m328[0m     return isSuspiciousIPSync(ip)
+[7m   [0m [93m           ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/integrations/utils.ts[0m:[93m299[0m:[93m12[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(ip: string): boolean' of 'isSuspiciousIPSync' is deprecated.
+
+[7m299[0m     return isSuspiciousIPSync(ip)
+[7m   [0m [93m           ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/integrations/utils.ts[0m:[93m173[0m:[93m7[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(ip: string): boolean' of 'isSuspiciousIPSync' is deprecated.
+
+[7m173[0m       isSuspiciousIPSync(threatData.riskFactors['ip'])
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/integrations/utils.ts[0m:[93m60[0m:[93m63[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m60[0m   return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m  [0m [93m                                                              ~~~~~~[0m
+
+[96msrc/lib/threat-detection/ml-model-serving/model-server.ts[0m:[93m681[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'featureSetId' is declared but its value is never read.
+
+[7m681[0m     featureSetId: string,
+[7m   [0m [93m    ~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/ml-model-serving/model-server.ts[0m:[93m655[0m:[93m7[0m - [93mwarning[0m[90m ts(6196): [0m'RedisFeatureStore' is declared but never used.
+
+[7m655[0m class RedisFeatureStore implements FeatureStore {
+[7m   [0m [93m      ~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/ml-model-serving/model-server.ts[0m:[93m612[0m:[93m61[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m612[0m     return `pred_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                            ~~~~~~[0m
+
+[96msrc/lib/threat-detection/monitoring/alert-utils.ts[0m:[93m262[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'alerts' is declared but its value is never read.
+
+[7m262[0m   alerts: Alert[],
+[7m   [0m [93m  ~~~~~~[0m
+
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m1698[0m:[93m32[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'config' is declared but its value is never read.
+
+[7m1698[0m   constructor(private readonly config: PropagationConfig) {
+[7m    [0m [93m                               ~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m1515[0m:[93m32[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'config' is declared but its value is never read.
+
+[7m1515[0m   constructor(private readonly config: NoveltyConfig) {
+[7m    [0m [93m                               ~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m1205[0m:[93m32[0m - [93mwarning[0m[90m ts(6138): [0mProperty '_mongoClient' is declared but its value is never read.
+
+[7m1205[0m   constructor(private readonly _mongoClient: MongoClient) {}
+[7m    [0m [93m                               ~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m767[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'context' is declared but its value is never read.
+
+[7m767[0m     context: SecurityContext,
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m766[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'threats' is declared but its value is never read.
+
+[7m766[0m     threats: Threat[],
+[7m   [0m [93m    ~~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m663[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'currentFeatures' is declared but its value is never read.
+
+[7m663[0m     currentFeatures: ThreatFeatures,
+[7m   [0m [93m    ~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m163[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'modelRegistry' is declared but its value is never read.
+
+[7m163[0m   private modelRegistry!: ThreatModelRegistry;
+[7m   [0m [93m          ~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-detection/predictive/predictive-threat-intelligence.ts[0m:[93m162[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'riskAssessor' is declared but its value is never read.
+
+[7m162[0m   private riskAssessor!: ProbabilisticRiskAssessor;
+[7m   [0m [93m          ~~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/threat-hunting/threat-hunting-service.ts[0m:[93m266[0m:[93m33[0m - [93mwarning[0m[90m ts(6133): [0m'limit' is declared but its value is never read.
+
+[7m266[0m   async getRecentInvestigations(limit?: number): Promise<Investigation[]> {
+[7m   [0m [93m                                ~~~~~[0m
+[96msrc/lib/threat-detection/threat-hunting/threat-hunting-service.ts[0m:[93m39[0m:[93m22[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'aiService' is declared but its value is never read.
+
+[7m39[0m     private readonly aiService: any,
+[7m  [0m [93m                     ~~~~~~~~~[0m
+
+[96msrc/lib/threat-detection/threat-hunting/threat-ml-inference-manager.ts[0m:[93m50[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'data' is declared but its value is never read.
+
+[7m50[0m     data: any,
+[7m  [0m [93m    ~~~~[0m
+[96msrc/lib/threat-detection/threat-hunting/threat-ml-inference-manager.ts[0m:[93m8[0m:[93m22[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'redis' is declared but its value is never read.
+
+[7m8[0m     private readonly redis: IRedisClient,
+[7m [0m [93m                     ~~~~~[0m
+
+[96msrc/lib/threat-detection/threat-hunting/threat-query-provider.ts[0m:[93m92[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'query' is declared but its value is never read.
+
+[7m92[0m     query: Record<string, unknown>,
+[7m  [0m [93m    ~~~~~[0m
+[96msrc/lib/threat-detection/threat-hunting/threat-query-provider.ts[0m:[93m86[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'query' is declared but its value is never read.
+
+[7m86[0m     query: Record<string, unknown>,
+[7m  [0m [93m    ~~~~~[0m
+[96msrc/lib/threat-detection/threat-hunting/threat-query-provider.ts[0m:[93m21[0m:[93m22[0m - [93mwarning[0m[90m ts(6138): [0mProperty 'mongoClient' is declared but its value is never read.
+
+[7m21[0m     private readonly mongoClient: IMongoClient,
+[7m  [0m [93m                     ~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-intelligence/global/GlobalThreatIntelligenceNetwork.ts[0m:[93m106[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'db' is declared but its value is never read.
+
+[7m106[0m   private db: any = null
+[7m   [0m [93m          ~~[0m
+[96msrc/lib/threat-intelligence/global/GlobalThreatIntelligenceNetwork.ts[0m:[93m105[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'isInitialized' is declared but its value is never read.
+
+[7m105[0m   private isInitialized = false
+[7m   [0m [93m          ~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-intelligence/global/GlobalThreatIntelligenceNetwork.ts[0m:[93m103[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'existingPredictiveService' is declared but its value is never read.
+
+[7m103[0m   private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
+[7m   [0m [93m                   ~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-intelligence/global/GlobalThreatIntelligenceNetwork.ts[0m:[93m102[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'existingIntelligenceService' is declared but its value is never read.
+
+[7m102[0m   private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
+[7m   [0m [93m                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/threat-intelligence/hunting/ThreatHuntingSystem.ts[0m:[93m1892[0m:[93m7[0m - [93mwarning[0m[90m ts(7027): [0mUnreachable code detected.
+
+[7m1892[0m       return results
+[7m    [0m [93m      ~~~~~~~~~~~~~~[0m
+[96msrc/lib/threat-intelligence/hunting/ThreatHuntingSystem.ts[0m:[93m114[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'MalwareSignature' is declared but never used.
+
+[7m114[0m interface MalwareSignature extends Document {
+[7m   [0m [93m          ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/tracing/config.ts[0m:[93m83[0m:[93m6[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_INSTANCE_ID' is deprecated.
+
+[7m83[0m     [SEMRESATTRS_SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
+[7m  [0m [93m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m82[0m:[93m6[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_DEPLOYMENT_ENVIRONMENT' is deprecated.
+
+[7m82[0m     [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: config.environment,
+[7m  [0m [93m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m81[0m:[93m6[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_VERSION' is deprecated.
+
+[7m81[0m     [SEMRESATTRS_SERVICE_VERSION]: config.serviceVersion,
+[7m  [0m [93m     ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m80[0m:[93m6[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_NAME' is deprecated.
+
+[7m80[0m     [SEMRESATTRS_SERVICE_NAME]: config.serviceName,
+[7m  [0m [93m     ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m14[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_INSTANCE_ID' is deprecated.
+
+[7m14[0m   SEMRESATTRS_SERVICE_INSTANCE_ID,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m13[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_DEPLOYMENT_ENVIRONMENT' is deprecated.
+
+[7m13[0m   SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m12[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_VERSION' is deprecated.
+
+[7m12[0m   SEMRESATTRS_SERVICE_VERSION,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/config.ts[0m:[93m11[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'SEMRESATTRS_SERVICE_NAME' is deprecated.
+
+[7m11[0m   SEMRESATTRS_SERVICE_NAME,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/tracing/middleware.ts[0m:[93m122[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_STATUS_CODE' is deprecated.
+
+[7m122[0m       [ATTR_HTTP_STATUS_CODE]: response.status,
+[7m   [0m [93m       ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m87[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_TARGET' is deprecated.
+
+[7m87[0m       [ATTR_HTTP_TARGET]: url.pathname + url.search,
+[7m  [0m [93m       ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m86[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_SCHEME' is deprecated.
+
+[7m86[0m       [ATTR_HTTP_SCHEME]: url.protocol.replace(':', ''),
+[7m  [0m [93m       ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m85[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_URL' is deprecated.
+
+[7m85[0m       [ATTR_HTTP_URL]: url.toString(),
+[7m  [0m [93m       ~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m84[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_METHOD' is deprecated.
+
+[7m84[0m       [ATTR_HTTP_METHOD]: method,
+[7m  [0m [93m       ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m20[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_STATUS_CODE' is deprecated.
+
+[7m20[0m   ATTR_HTTP_STATUS_CODE,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m18[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_TARGET' is deprecated.
+
+[7m18[0m   ATTR_HTTP_TARGET,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m17[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_SCHEME' is deprecated.
+
+[7m17[0m   ATTR_HTTP_SCHEME,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m16[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_URL' is deprecated.
+
+[7m16[0m   ATTR_HTTP_URL,
+[7m  [0m [93m  ~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/middleware.ts[0m:[93m15[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'ATTR_HTTP_METHOD' is deprecated.
+
+[7m15[0m   ATTR_HTTP_METHOD,
+[7m  [0m [93m  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/tracing/utils.ts[0m:[93m188[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m188[0m       [SemanticAttributes.HTTP_URL]: url,
+[7m   [0m [93m       ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m187[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m187[0m       [SemanticAttributes.HTTP_METHOD]: method,
+[7m   [0m [93m       ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m181[0m:[93m10[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m181[0m         [SemanticAttributes.HTTP_URL]: url,
+[7m   [0m [93m         ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m180[0m:[93m10[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m180[0m         [SemanticAttributes.HTTP_METHOD]: method,
+[7m   [0m [93m         ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m161[0m:[93m8[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m161[0m       [SemanticAttributes.DB_SYSTEM]: 'postgresql',
+[7m   [0m [93m       ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m155[0m:[93m10[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m155[0m         [SemanticAttributes.DB_SQL_TABLE]: table,
+[7m   [0m [93m         ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m154[0m:[93m10[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m154[0m         [SemanticAttributes.DB_OPERATION]: operation,
+[7m   [0m [93m         ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/lib/tracing/utils.ts[0m:[93m8[0m:[93m10[0m - [93mwarning[0m[90m ts(6385): [0m'SemanticAttributes' is deprecated.
+
+[7m8[0m import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+[7m [0m [93m         ~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/middleware/auth.ts[0m:[93m125[0m:[93m7[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'validation' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m125[0m   let validation
+[7m   [0m [93m      ~~~~~~~~~~[0m
+
+[96msrc/middleware/upload.ts[0m:[93m15[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'req' is declared but its value is never read.
+
+[7m15[0m   req: Request,
+[7m  [0m [93m  ~~~[0m
+
+[96msrc/pages/api/dashboard.ts[0m:[93m27[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'user' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m27[0m     let user
+[7m  [0m [93m        ~~~~[0m
+
+[96msrc/pages/api/admin.bak/backup/recovery-test.ts[0m:[93m1[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'AdminPermission' is declared but its value is never read.
+
+[7m1[0m import { AdminPermission } from "@/lib/admin";
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/api/ai/high-risk-detections.ts[0m:[93m25[0m:[93m29[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m25[0m export const GET = async ({ request, url }) => {
+[7m  [0m [93m                            ~~~~~~~[0m
+
+[96msrc/pages/api/ai/performance-metrics.ts[0m:[93m52[0m:[93m10[0m - [93mwarning[0m[90m ts(6196): [0m'RawMetric' is declared but never used.
+
+[7m52[0m     type RawMetric = {
+[7m  [0m [93m         ~~~~~~~~~[0m
+
+[96msrc/pages/api/ai/usage-stats.ts[0m:[93m30[0m:[93m39[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m30[0m export const GET: APIRoute = async ({ request, cookies, url }) => {
+[7m  [0m [93m                                      ~~~~~~~[0m
+
+[96msrc/pages/api/ai/datasets/__tests__/prepare.auth.test.ts[0m:[93m178[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'body' is declared but its value is never read.
+
+[7m178[0m     const body = (await response.json()) as Record<string, unknown>;
+[7m   [0m [93m          ~~~~[0m
+
+[96msrc/pages/api/ai/embeddings/batch.ts[0m:[93m45[0m:[93m37[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m45[0m export const GET: APIRoute = async ({ request }: APIContext) => {
+[7m  [0m [93m                                    ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/ai/embeddings/embed.ts[0m:[93m42[0m:[93m37[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m42[0m export const GET: APIRoute = async ({ request }: APIContext) => {
+[7m  [0m [93m                                    ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/auth/auth0-enhanced-treatment-plans.ts[0m:[93m531[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'updatedPlan' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m531[0m     let updatedPlan
+[7m   [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/auth/auth0-risk-correlations.ts[0m:[93m72[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'requestBody' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m72[0m     let requestBody
+[7m  [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/auth/signin.ts[0m:[93m23[0m:[93m7[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'clientInfo' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m23[0m   let clientInfo
+[7m  [0m [93m      ~~~~~~~~~~[0m
+
+[96msrc/pages/api/auth/signup.ts[0m:[93m27[0m:[93m7[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'clientInfo' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m27[0m   let clientInfo
+[7m  [0m [93m      ~~~~~~~~~~[0m
+
+[96msrc/pages/api/bias-detection/submit-batch-job.ts[0m:[93m6[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'engine' is declared but its value is never read.
+
+[7m6[0m const engine = new BiasDetectionEngine();
+[7m [0m [93m      ~~~~~~[0m
+
+[96msrc/pages/api/components/treatment-plans/enhanced.ts[0m:[93m405[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'updatedPlan' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m405[0m     let updatedPlan
+[7m   [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/demos/bias-detection/websocket.ts[0m:[93m150[0m:[93m76[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m150[0m               connectionId: `ws_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+[7m   [0m [93m                                                                           ~~~~~~[0m
+
+[96msrc/pages/api/developer/api-keys/index.ts[0m:[93m21[0m:[93m36[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m21[0m export const GET = withAuth(async (request, session) => {
+[7m  [0m [93m                                   ~~~~~~~[0m
+
+[96msrc/pages/api/documentation/generate.ts[0m:[93m1[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'APIContext' is declared but its value is never read.
+
+[7m1[0m import type { APIContext } from "astro";
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/api/examples/profiling-demo.ts[0m:[93m20[0m:[93m27[0m - [93mwarning[0m[90m ts(7044): [0mParameter '_' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m20[0m export const GET = async (_) => {
+[7m  [0m [93m                          ~[0m
+
+[96msrc/pages/api/memory/[memoryId].ts[0m:[93m17[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'request' is declared but its value is never read.
+
+[7m17[0m   async ({ params, request }, user) => {
+[7m  [0m [93m                   ~~~~~~~[0m
+
+[96msrc/pages/api/notifications/preferences.ts[0m:[93m3[0m:[93m10[0m - [93mwarning[0m[90m ts(6133): [0m'isAuthenticated' is declared but its value is never read.
+
+[7m3[0m import { isAuthenticated, getCurrentUser } from '@/lib/auth'
+[7m [0m [93m         ~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/api/patient-rights/export-request.ts[0m:[93m60[0m:[93m15[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m60[0m         .map((e) => e.message)
+[7m  [0m [93m              ~[0m
+[96msrc/pages/api/patient-rights/export-request.ts[0m:[93m29[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'requestBody' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m29[0m     let requestBody
+[7m  [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/patient-rights/export-status.ts[0m:[93m90[0m:[93m52[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'downloadUrl' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m90[0m     let status, progress, estimatedCompletionTime, downloadUrl
+[7m  [0m [93m                                                   ~~~~~~~~~~~[0m
+[96msrc/pages/api/patient-rights/export-status.ts[0m:[93m90[0m:[93m27[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'estimatedCompletionTime' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m90[0m     let status, progress, estimatedCompletionTime, downloadUrl
+[7m  [0m [93m                          ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/api/patient-rights/export-status.ts[0m:[93m90[0m:[93m17[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'progress' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m90[0m     let status, progress, estimatedCompletionTime, downloadUrl
+[7m  [0m [93m                ~~~~~~~~[0m
+[96msrc/pages/api/patient-rights/export-status.ts[0m:[93m90[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'status' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m90[0m     let status, progress, estimatedCompletionTime, downloadUrl
+[7m  [0m [93m        ~~~~~~[0m
+
+[96msrc/pages/api/patient-rights/request-export.ts[0m:[93m25[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'requestBody' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m25[0m     let requestBody;
+[7m  [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/pattern-analysis/cross-session.ts[0m:[93m35[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'requestBody' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m35[0m     let requestBody
+[7m  [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/pattern-analysis/risk-correlations.ts[0m:[93m30[0m:[93m9[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'requestBody' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m30[0m     let requestBody
+[7m  [0m [93m        ~~~~~~~~~~~[0m
+
+[96msrc/pages/api/psychology/generate-scenario.ts[0m:[93m251[0m:[93m63[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m251[0m   return `scenario_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                              ~~~~~~[0m
+
+[96msrc/pages/api/v1/memory/consolidate.ts[0m:[93m20[0m:[93m64[0m - [93mwarning[0m[90m ts(6133): [0m'context' is declared but its value is never read.
+
+[7m20[0m export const POST = withV1Contract("consolidateMemory", async (context, caller) => {
+[7m  [0m [93m                                                               ~~~~~~~[0m
+
+[96msrc/services/BusinessIntelligenceService.ts[0m:[93m527[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'userId' is declared but its value is never read.
+
+[7m527[0m     userId: string,
+[7m   [0m [93m    ~~~~~~[0m
+
+[96msrc/simulator/hooks/useSimulator.ts[0m:[93m351[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'response' is declared but its value is never read.
+
+[7m351[0m   response: string,
+[7m   [0m [93m  ~~~~~~~~[0m
+
+[96msrc/test/react-compat.ts[0m:[93m37[0m:[93m15[0m - [93mwarning[0m[90m ts(7016): [0mCould not find a declaration file for module '../../node_modules/react/index.js'. '/home/vivi/pixelated/node_modules/react/index.js' implicitly has an 'any' type.
+
+[7m37[0m export * from '../../node_modules/react/index.js'
+[7m  [0m [93m              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/test/react-compat.ts[0m:[93m3[0m:[93m26[0m - [93mwarning[0m[90m ts(7016): [0mCould not find a declaration file for module '../../node_modules/react/index.js'. '/home/vivi/pixelated/node_modules/react/index.js' implicitly has an 'any' type.
+
+[7m3[0m import * as ReactNS from '../../node_modules/react/index.js'
+[7m [0m [93m                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/tests/performance.test.ts[0m:[93m501[0m:[93m17[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(text: string, options?: { delay?: number | undefined; noWaitAfter?: boolean | undefined; timeout?: number | undefined; } | undefined): Promise<void>' of 'input.type' is deprecated.
+
+[7m501[0m     await input.type('Test input')
+[7m   [0m [93m                ~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m230[0m:[93m53[0m - [93mwarning[0m[90m ts(6385): [0m'loadEventStart' is deprecated.
+
+[7m230[0m             loadEvent: timing.loadEventEnd - timing.loadEventStart,
+[7m   [0m [93m                                                    ~~~~~~~~~~~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m230[0m:[93m31[0m - [93mwarning[0m[90m ts(6385): [0m'loadEventEnd' is deprecated.
+
+[7m230[0m             loadEvent: timing.loadEventEnd - timing.loadEventStart,
+[7m   [0m [93m                              ~~~~~~~~~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m229[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'domComplete' is deprecated.
+
+[7m229[0m             domComplete: timing.domComplete,
+[7m   [0m [93m                                ~~~~~~~~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m228[0m:[93m22[0m - [93mwarning[0m[90m ts(6385): [0m'domContentLoadedEventStart' is deprecated.
+
+[7m228[0m               timing.domContentLoadedEventStart,
+[7m   [0m [93m                     ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m227[0m:[93m22[0m - [93mwarning[0m[90m ts(6385): [0m'domContentLoadedEventEnd' is deprecated.
+
+[7m227[0m               timing.domContentLoadedEventEnd -
+[7m   [0m [93m                     ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/tests/performance.test.ts[0m:[93m179[0m:[93m38[0m - [93mwarning[0m[90m ts(6385): [0m'timing' is deprecated.
+
+[7m179[0m           const timing = performance.timing
+[7m   [0m [93m                                     ~~~~~~[0m
+
+[96msrc/tests/ai/crisis-detection.test.ts[0m:[93m244[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'customPrompt' is declared but its value is never read.
+
+[7m244[0m       const customPrompt = "Custom crisis detection prompt";
+[7m   [0m [93m            ~~~~~~~~~~~~[0m
+
+[96msrc/utils/performance-optimization.ts[0m:[93m182[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m182[0m     const observer = new PerformanceObserver((entryList) => {
+[7m   [0m [93m                                              ~~~~~~~~~[0m
+[96msrc/utils/performance-optimization.ts[0m:[93m154[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m154[0m     const observer = new PerformanceObserver((entryList) => {
+[7m   [0m [93m                                              ~~~~~~~~~[0m
+[96msrc/utils/performance-optimization.ts[0m:[93m126[0m:[93m24[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entry' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m126[0m       entries.forEach((entry) => {
+[7m   [0m [93m                       ~~~~~[0m
+[96msrc/utils/performance-optimization.ts[0m:[93m123[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m123[0m     const observer = new PerformanceObserver((entryList) => {
+[7m   [0m [93m                                              ~~~~~~~~~[0m
+[96msrc/utils/performance-optimization.ts[0m:[93m88[0m:[93m47[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'entryList' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m88[0m     const observer = new PerformanceObserver((entryList) => {
+[7m  [0m [93m                                              ~~~~~~~~~[0m
+
+[96msrc/utils/post.ts[0m:[93m3[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'isAstroProduction' is declared but its value is never read.
+
+[7m3[0m import { isAstroProduction } from "@/utils/astro-env";
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/utils/request.test.ts[0m:[93m79[0m:[93m11[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'error' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m79[0m       let error
+[7m  [0m [93m          ~~~~~[0m
+
+[96msrc/utils/offline/indexedDBRequestQueue.ts[0m:[93m161[0m:[93m60[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m161[0m     return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m   [0m [93m                                                           ~~~~~~[0m
+
+[96msrc/utils/offline/offlineManager.ts[0m:[93m69[0m:[93m65[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m69[0m             id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+[7m  [0m [93m                                                                ~~~~~~[0m
+
+[96msrc/utils/offline/requestQueue.ts[0m:[93m52[0m:[93m60[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m52[0m     return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+[7m  [0m [93m                                                           ~~~~~~[0m
+
+[96msrc/utils/offline/__tests__/indexedDBRequestQueue.test.ts[0m:[93m78[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m78[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m  [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/offline/__tests__/indexedDBRequestQueue.test.ts[0m:[93m78[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m78[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m  [0m [93m                                             ~~~~~~[0m
+
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m442[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m442[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m442[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m442[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m398[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m398[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m398[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m398[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m349[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m349[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m349[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m349[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m302[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m302[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m302[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m302[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m259[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m259[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m259[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m259[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m219[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m219[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m219[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m219[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m154[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m154[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m154[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m154[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m124[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m124[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m124[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m124[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m99[0m:[93m54[0m - [93mwarning[0m[90m ts(6133): [0m'version' is declared but its value is never read.
+
+[7m99[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m  [0m [93m                                                     ~~~~~~~[0m
+[96msrc/utils/storage/__tests__/indexedDBStorage.test.ts[0m:[93m99[0m:[93m46[0m - [93mwarning[0m[90m ts(6133): [0m'dbName' is declared but its value is never read.
+
+[7m99[0m       mockIndexedDB.open.mockImplementation((dbName, version) => {
+[7m  [0m [93m                                             ~~~~~~[0m
+
+[96msrc/utils/sync/tabSyncManager.ts[0m:[93m658[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'targetTabId' is declared but its value is never read.
+
+[7m658[0m     targetTabId?: string,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+[96msrc/utils/sync/tabSyncManager.ts[0m:[93m526[0m:[93m25[0m - [93mwarning[0m[90m ts(6133): [0m'local' is declared but its value is never read.
+
+[7m526[0m       onConflict: (key, local, remote) => remote, // Default to remote value
+[7m   [0m [93m                        ~~~~~[0m
+[96msrc/utils/sync/tabSyncManager.ts[0m:[93m526[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'key' is declared but its value is never read.
+
+[7m526[0m       onConflict: (key, local, remote) => remote, // Default to remote value
+[7m   [0m [93m                   ~~~[0m
+
+[96msrc/components/AIChatReact.tsx[0m:[93m35[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m35[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/BlogSearch.tsx[0m:[93m52[0m:[93m14[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m52[0m     e: React.FormEvent<HTMLFormElement>,
+[7m  [0m [93m             ~~~~~~~~~[0m
+
+[96msrc/components/TrainingSession.tsx[0m:[93m126[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m126[0m   const handleFeedbackSubmit = async (e: React.FormEvent) => {
+[7m   [0m [93m                                               ~~~~~~~~~[0m
+
+[96msrc/components/admin/EvidenceAssistantPanel.tsx[0m:[93m37[0m:[93m44[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m37[0m   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+[7m  [0m [93m                                           ~~~~~~~~~[0m
+
+[96msrc/components/admin/backup/BackupLocationTab.tsx[0m:[93m86[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m86[0m   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+[7m  [0m [93m                                 ~~~~~~~~~[0m
+
+[96msrc/components/admin/bias-detection/BiasCharts.tsx[0m:[93m73[0m:[93m18[0m - [93mwarning[0m[90m ts(6385): [0m'Cell' is deprecated.
+
+[7m73[0m                 <Cell
+[7m  [0m [93m                 ~~~~[0m
+[96msrc/components/admin/bias-detection/BiasCharts.tsx[0m:[93m11[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'Cell' is deprecated.
+
+[7m11[0m   Cell,
+[7m  [0m [93m  ~~~~[0m
+
+[96msrc/components/ai/MultiAgentThoughtUI.tsx[0m:[93m152[0m:[93m36[0m - [93mwarning[0m[90m ts(6133): [0m'index' is declared but its value is never read.
+
+[7m152[0m         {activities.map((activity, index) => (
+[7m   [0m [93m                                   ~~~~~[0m
+
+[96msrc/components/analytics/TreatmentForecastForm.tsx[0m:[93m57[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m57[0m   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/auth/Login.tsx[0m:[93m26[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m26[0m   const handleSubmit = async (e: FormEvent) => {
+[7m  [0m [93m                                 ~~~~~~~~~[0m
+[96msrc/components/auth/Login.tsx[0m:[93m5[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m5[0m   FormEvent,
+[7m [0m [93m  ~~~~~~~~~[0m
+
+[96msrc/components/auth/LoginForm.tsx[0m:[93m202[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m202[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m   [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/auth/PasswordResetRequestForm.tsx[0m:[93m11[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m11[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/auth/Register.tsx[0m:[93m38[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m38[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/auth/RegisterForm.tsx[0m:[93m79[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m79[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/auth/ResetPasswordForm.tsx[0m:[93m16[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m16[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+[96msrc/components/auth/ResetPasswordForm.tsx[0m:[93m10[0m:[93m44[0m - [93mwarning[0m[90m ts(6133): [0m'email' is declared but its value is never read.
+
+[7m10[0m export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
+[7m  [0m [93m                                           ~~~~~[0m
+
+[96msrc/components/chat/ChatContainer.tsx[0m:[93m85[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m85[0m   function handleSubmit(e: FormEvent) {
+[7m  [0m [93m                           ~~~~~~~~~[0m
+[96msrc/components/chat/ChatContainer.tsx[0m:[93m1[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m1[0m import type { ChangeEvent, FormEvent } from 'react'
+[7m [0m [93m                           ~~~~~~~~~[0m
+
+[96msrc/components/chat/ChatInput.tsx[0m:[93m11[0m:[93m23[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m11[0m   onSubmit: (e: React.FormEvent) => void
+[7m  [0m [93m                      ~~~~~~~~~[0m
+
+[96msrc/components/chat/PixelEnhancedChat.tsx[0m:[93m78[0m:[93m21[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m78[0m     async (e: React.FormEvent) => {
+[7m  [0m [93m                    ~~~~~~~~~[0m
+
+[96msrc/components/chat/TherapyChatClient.tsx[0m:[93m137[0m:[93m46[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m137[0m   const handleSecureSubmit = async (e: React.FormEvent) => {
+[7m   [0m [93m                                             ~~~~~~~~~[0m
+
+[96msrc/components/chat/TherapyChatSystem.tsx[0m:[93m569[0m:[93m71[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m569[0m               void handleSubmit({ preventDefault: () => {} } as React.FormEvent)
+[7m   [0m [93m                                                                      ~~~~~~~~~[0m
+[96msrc/components/chat/TherapyChatSystem.tsx[0m:[93m168[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m168[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m   [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/chat/TherapyGate.tsx[0m:[93m23[0m:[93m19[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m23[0m     (event: React.FormEvent) => {
+[7m  [0m [93m                  ~~~~~~~~~[0m
+
+[96msrc/components/demos/bias-detection/SessionInputForm.tsx[0m:[93m65[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m65[0m   const handleSubmit = (e: React.FormEvent) => {
+[7m  [0m [93m                                 ~~~~~~~~~[0m
+
+[96msrc/components/journal-research/forms/DiscoveryForm.tsx[0m:[93m47[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m47[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/journal-research/forms/EvaluationForm.tsx[0m:[93m64[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m64[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/journal-research/forms/SessionForm.tsx[0m:[93m97[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m97[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/journal-research/shared/ProgressBar.tsx[0m:[93m28[0m:[93m53[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m28[0m   const id = `progress-${Math.random().toString(36).substr(2, 9)}`
+[7m  [0m [93m                                                    ~~~~~~[0m
+
+[96msrc/components/patient/PatientFileViewer.tsx[0m:[93m3[0m:[93m35[0m - [93mwarning[0m[90m ts(6133): [0m'_patientModel' is declared but its value is never read.
+
+[7m3[0m export function PatientFileViewer({
+[7m [0m [93m                                  ~[0m
+[7m4[0m   _patientModel,
+[7m [0m [93m~~~~~~~~~~~~~~~~[0m
+[7m5[0m }: {
+[7m [0m [93m~[0m
+
+[96msrc/components/profile/ProfileComponent.tsx[0m:[93m41[0m:[93m40[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m41[0m   const handleSubmit = async (e: React.FormEvent) => {
+[7m  [0m [93m                                       ~~~~~~~~~[0m
+
+[96msrc/components/research/DatasetSearch.tsx[0m:[93m32[0m:[93m41[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m32[0m   const handleSearch = async (e?: React.FormEvent) => {
+[7m  [0m [93m                                        ~~~~~~~~~[0m
+
+[96msrc/components/research/SearchInterface.tsx[0m:[93m88[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m88[0m   const handleSearch = (e: React.FormEvent) => {
+[7m  [0m [93m                                 ~~~~~~~~~[0m
+
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m470[0m:[93m30[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'name' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m470[0m           formatter={(value, name) => {
+[7m   [0m [93m                             ~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m470[0m:[93m23[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'value' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m470[0m           formatter={(value, name) => {
+[7m   [0m [93m                      ~~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m426[0m:[93m38[0m - [93mwarning[0m[90m ts(7044): [0mParameter '_props' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m426[0m             formatter={(value, name, _props) => {
+[7m   [0m [93m                                     ~~~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m426[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'name' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m426[0m             formatter={(value, name, _props) => {
+[7m   [0m [93m                               ~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m426[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'value' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m426[0m             formatter={(value, name, _props) => {
+[7m   [0m [93m                        ~~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m354[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'name' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m354[0m             formatter={(value, name) => {
+[7m   [0m [93m                               ~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m354[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'value' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m354[0m             formatter={(value, name) => {
+[7m   [0m [93m                        ~~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m283[0m:[93m32[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'name' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m283[0m             formatter={(value, name) => {
+[7m   [0m [93m                               ~~~~[0m
+[96msrc/components/session/EmotionTemporalAnalysisChart.tsx[0m:[93m283[0m:[93m25[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'value' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m283[0m             formatter={(value, name) => {
+[7m   [0m [93m                        ~~~~~[0m
+
+[96msrc/components/therapy/TherapeuticGoalsTracker.tsx[0m:[93m303[0m:[93m44[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m303[0m   async function handleFormSubmit(e: React.FormEvent) {
+[7m   [0m [93m                                           ~~~~~~~~~[0m
+
+[96msrc/components/therapy/TreatmentPlanManager.tsx[0m:[93m531[0m:[93m44[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m531[0m   const handleUpdatePlan = async (e: React.FormEvent) => {
+[7m   [0m [93m                                           ~~~~~~~~~[0m
+[96msrc/components/therapy/TreatmentPlanManager.tsx[0m:[93m472[0m:[93m44[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m472[0m   const handleCreatePlan = async (e: React.FormEvent) => {
+[7m   [0m [93m                                           ~~~~~~~~~[0m
+
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m560[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m560[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
+[7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m559[0m:[93m17[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m559[0m       ws: React.MutableRefObject<WebSocket | null>,
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m519[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m519[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
+[7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m518[0m:[93m17[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m518[0m       ws: React.MutableRefObject<WebSocket | null>,
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m316[0m:[93m33[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m316[0m       isAuthenticatedRef: React.MutableRefObject<boolean>,
+[7m   [0m [93m                                ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m315[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m315[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
+[7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m277[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m277[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
+[7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m238[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'currentRole' is declared but its value is never read.
+
+[7m238[0m       currentRole: 'trainee' | 'observer',
+[7m   [0m [93m      ~~~~~~~~~~~[0m
+[96msrc/components/training/TrainingSessionComponent.tsx[0m:[93m237[0m:[93m35[0m - [93mwarning[0m[90m ts(6385): [0m'MutableRefObject' is deprecated.
+
+[7m237[0m       locallyAddedMessages: React.MutableRefObject<Set<string>>,
+[7m   [0m [93m                                  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/treatment/TreatmentPlanner.tsx[0m:[93m25[0m:[93m48[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m25[0m   async function fetchRecommendations(e: React.FormEvent<HTMLFormElement>) {
+[7m  [0m [93m                                               ~~~~~~~~~[0m
+
+[96msrc/components/ui/BiasDetectionForm.tsx[0m:[93m170[0m:[93m21[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m170[0m     async (e: React.FormEvent) => {
+[7m   [0m [93m                    ~~~~~~~~~[0m
+
+[96msrc/components/ui/EnhancedMentalHealthChat.tsx[0m:[93m366[0m:[93m17[0m - [93mwarning[0m[90m ts(6385): [0m'onKeyPress' is deprecated.
+
+[7m366[0m                 onKeyPress={handleKeyPress}
+[7m   [0m [93m                ~~~~~~~~~~[0m
+
+[96msrc/components/ui/LazyChart.tsx[0m:[93m69[0m:[93m28[0m - [93mwarning[0m[90m ts(6385): [0m'Cell' is deprecated.
+
+[7m69[0m   return { default: module.Cell }
+[7m  [0m [93m                           ~~~~[0m
+
+[96msrc/components/ui/MobileFormValidation.tsx[0m:[93m310[0m:[93m29[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m310[0m         onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+[7m   [0m [93m                            ~~~~~~~~~[0m
+[96msrc/components/ui/MobileFormValidation.tsx[0m:[93m225[0m:[93m34[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m225[0m   const handleSubmit = (e: React.FormEvent) => {
+[7m   [0m [93m                                 ~~~~~~~~~[0m
+
+[96msrc/components/ui/avatar.tsx[0m:[93m16[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'size' is declared but its value is never read.
+
+[7m16[0m   size = 'md',
+[7m  [0m [93m  ~~~~[0m
+
+[96msrc/components/ui/form/MobileFormValidation.tsx[0m:[93m366[0m:[93m31[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m366[0m           onSubmit: (e: React.FormEvent<HTMLFormElement>) => {
+[7m   [0m [93m                              ~~~~~~~~~[0m
+[96msrc/components/ui/form/MobileFormValidation.tsx[0m:[93m241[0m:[93m15[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m241[0m     (e: React.FormEvent) => {
+[7m   [0m [93m              ~~~~~~~~~[0m
+
+[96msrc/simulator/components/EnhancedSimulationContainer.tsx[0m:[93m171[0m:[93m15[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m171[0m     (e: React.FormEvent) => {
+[7m   [0m [93m              ~~~~~~~~~[0m
+
+[96msrc/simulator/components/SimulationContainer.tsx[0m:[93m154[0m:[93m21[0m - [93mwarning[0m[90m ts(6385): [0m'FormEvent' is deprecated.
+
+[7m154[0m     async (e: React.FormEvent) => {
+[7m   [0m [93m                    ~~~~~~~~~[0m
+
+[96msrc/components/BrutalistFooter.astro[0m:[93m190[0m:[93m34[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'item' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m190[0m             reviewStandards.map((item) => (
+[7m   [0m [93m                                 ~~~~[0m
+
+[96msrc/components/EnterpriseFooter.astro[0m:[93m286[0m:[93m37[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m286[0m     link.addEventListener('click', (e) => {
+[7m   [0m [93m                                    ~[0m
+
+[96msrc/components/EnterpriseHeader.astro[0m:[93m207[0m:[93m37[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m207[0m     link.addEventListener('click', (e) => {
+[7m   [0m [93m                                    ~[0m
+
+[96msrc/components/ProfessionalHero.astro[0m:[93m8[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'HeroStage' is declared but its value is never read.
+
+[7m8[0m import HeroStage from '@/components/homepage/HeroStage.astro'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/ProfessionalHero.astro[0m:[93m7[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'HeroContent' is declared but its value is never read.
+
+[7m7[0m import HeroContent from '@/components/homepage/HeroContent.astro'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/ProfessionalHero.astro[0m:[93m6[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'HeroAtmosphere' is declared but its value is never read.
+
+[7m6[0m import HeroAtmosphere from '@/components/homepage/HeroAtmosphere.astro'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/admin/DLPRulesManager.astro[0m:[93m158[0m:[93m45[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m158[0m     document.addEventListener('dlp:error', (e) => {
+[7m   [0m [93m                                            ~[0m
+[96msrc/components/admin/DLPRulesManager.astro[0m:[93m150[0m:[93m50[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m150[0m     document.addEventListener('dlp:rule-saved', (e) => {
+[7m   [0m [93m                                                 ~[0m
+[96msrc/components/admin/DLPRulesManager.astro[0m:[93m142[0m:[93m52[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m142[0m     document.addEventListener('dlp:rule-updated', (e) => {
+[7m   [0m [93m                                                   ~[0m
+
+[96msrc/components/analytics/AdvancedFilteringComponent.astro[0m:[93m822[0m:[93m46[0m - [93mwarning[0m[90m ts(7044): [0mParameter '_event' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m822[0m       applyButton.addEventListener('click', (_event) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+[96msrc/components/analytics/AdvancedFilteringComponent.astro[0m:[93m779[0m:[93m46[0m - [93mwarning[0m[90m ts(7044): [0mParameter '_event' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m779[0m       resetButton.addEventListener('click', (_event) => {
+[7m   [0m [93m                                             ~~~~~~[0m
+
+[96msrc/components/analytics/RybbitAnalytics.astro[0m:[93m39[0m:[93m15[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m39[0m       <script src={scriptUrl} data-site-id={siteId} defer nonce={nonce} />
+[7m  [0m [93m              ~~~[0m
+
+[96msrc/components/dashboard/TherapyProgressCharts.astro[0m:[93m41[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'COLORS' is declared but its value is never read.
+
+[7m41[0m const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
+[7m  [0m [93m      ~~~~~~[0m
+[96msrc/components/dashboard/TherapyProgressCharts.astro[0m:[93m35[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'pieData' is declared but its value is never read.
+
+[7m35[0m const pieData = [
+[7m  [0m [93m      ~~~~~~~[0m
+[96msrc/components/dashboard/TherapyProgressCharts.astro[0m:[93m27[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'engagementData' is declared but its value is never read.
+
+[7m27[0m const engagementData = filteredSessions.map((session: any) => ({
+[7m  [0m [93m      ~~~~~~~~~~~~~~[0m
+[96msrc/components/dashboard/TherapyProgressCharts.astro[0m:[93m8[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'timeRange' is declared but its value is never read.
+
+[7m8[0m const timeRange: '7d' | '30d' | '90d' | 'all' = '30d'
+[7m [0m [93m      ~~~~~~~~~[0m
+
+[96msrc/components/security/FHEDemo.astro[0m:[93m10[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'CardFooter' is declared but its value is never read.
+
+[7m10[0m import CardFooter from '@/components/ui/CardFooter.astro'
+[7m  [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/security/FHEDemo.astro[0m:[93m275[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'encrypted' is declared but its value is never read.
+
+[7m275[0m     encrypted: string,
+[7m   [0m [93m    ~~~~~~~~~[0m
+
+[96msrc/components/security/SecurityDashboard.astro[0m:[93m231[0m:[93m9[0m - [93mwarning[0m[90m ts(6133): [0m'mockStats' is declared but its value is never read.
+
+[7m231[0m   const mockStats: SecurityStats = {
+[7m   [0m [93m        ~~~~~~~~~[0m
+
+[96msrc/components/ui/BrutalistModal.astro[0m:[93m140[0m:[93m40[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m140[0m     overlay.addEventListener('click', (e) => {
+[7m   [0m [93m                                       ~[0m
+
+[96msrc/components/ui/Surface.astro[0m:[93m2[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'Props' is declared but never used.
+
+[7m2[0m interface Props {
+[7m [0m [93m          ~~~~~[0m
+
+[96msrc/components/ui/ThemeToggle.astro[0m:[93m221[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'systemIcon' is declared but its value is never read.
+
+[7m221[0m     const systemIcon = document.getElementById('system-icon-unified')
+[7m   [0m [93m          ~~~~~~~~~~[0m
+[96msrc/components/ui/ThemeToggle.astro[0m:[93m220[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'moonIcon' is declared but its value is never read.
+
+[7m220[0m     const moonIcon = document.getElementById('moon-icon-unified')
+[7m   [0m [93m          ~~~~~~~~[0m
+[96msrc/components/ui/ThemeToggle.astro[0m:[93m219[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'sunIcon' is declared but its value is never read.
+
+[7m219[0m     const sunIcon = document.getElementById('sun-icon-unified')
+[7m   [0m [93m          ~~~~~~~[0m
+
+[96msrc/components/views/RenderPage.astro[0m:[93m14[0m:[93m5[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'tocComponent' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m14[0m let tocComponent
+[7m  [0m [93m    ~~~~~~~~~~~~[0m
+[96msrc/components/views/RenderPage.astro[0m:[93m13[0m:[93m5[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'contentResult' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m13[0m let contentResult
+[7m  [0m [93m    ~~~~~~~~~~~~~[0m
+
+[96msrc/components/views/RenderPost.astro[0m:[93m14[0m:[93m5[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'tocComponent' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m14[0m let tocComponent
+[7m  [0m [93m    ~~~~~~~~~~~~[0m
+[96msrc/components/views/RenderPost.astro[0m:[93m13[0m:[93m5[0m - [93mwarning[0m[90m ts(7043): [0mVariable 'contentResult' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m13[0m let contentResult
+[7m  [0m [93m    ~~~~~~~~~~~~~[0m
+
+[96msrc/components/widgets/ImageViewer.astro[0m:[93m31[0m:[93m9[0m - [93mwarning[0m[90m ts(6133): [0m'cleanup' is declared but its value is never read.
+
+[7m31[0m   const cleanup = initImageViewer(this)
+[7m  [0m [93m        ~~~~~~~[0m
+
+[96msrc/components/widgets/ShareLink.astro[0m:[93m12[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'Props' is declared but never used.
+
+[7m12[0m interface Props {
+[7m  [0m [93m          ~~~~~[0m
+
+[96msrc/layouts/BlogLayout.astro[0m:[93m142[0m:[93m16[0m - [93mwarning[0m[90m ts(6133): [0m'speedInsightsBeforeSend' is declared but its value is never read.
+
+[7m142[0m       function speedInsightsBeforeSend(data) {
+[7m   [0m [93m               ~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/layouts/BlogLayout.astro[0m:[93m78[0m:[93m17[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m78[0m         <script src="/js/nprogress-and-zoom.js" type="module" />
+[7m  [0m [93m                ~~~[0m
+
+[96msrc/layouts/ChatLayout.astro[0m:[93m35[0m:[93m17[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m35[0m         <script src="/js/nprogress-and-zoom.js" type="module" />
+[7m  [0m [93m                ~~~[0m
+
+[96msrc/layouts/DashboardLayout.astro[0m:[93m194[0m:[93m38[0m - [93mwarning[0m[90m ts(6133): [0m'event' is declared but its value is never read.
+
+[7m194[0m         .addEventListener('change', (event) => {
+[7m   [0m [93m                                     ~~~~~[0m
+[96msrc/layouts/DashboardLayout.astro[0m:[93m77[0m:[93m15[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m77[0m       <script src="/js/nprogress-and-zoom.js" type="module" />
+[7m  [0m [93m              ~~~[0m
+
+[96msrc/layouts/DocumentationLayout.astro[0m:[93m200[0m:[93m16[0m - [93mwarning[0m[90m ts(6133): [0m'_speedInsightsBeforeSend' is declared but its value is never read.
+
+[7m200[0m       function _speedInsightsBeforeSend(data) {
+[7m   [0m [93m               ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/layouts/DocumentationLayout.astro[0m:[93m62[0m:[93m17[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m62[0m         <script src="/js/nprogress-and-zoom.js" type="module" />
+[7m  [0m [93m                ~~~[0m
+
+[96msrc/layouts/TabbedLayout.astro[0m:[93m28[0m:[93m20[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'tab' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m28[0m         {tabs.map((tab) => (
+[7m  [0m [93m                   ~~~[0m
+[96msrc/layouts/TabbedLayout.astro[0m:[93m6[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Tabs' is declared but its value is never read.
+
+[7m6[0m import type { Tabs } from '@/types'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/layouts/TailusLayout.astro[0m:[93m74[0m:[93m16[0m - [93mwarning[0m[90m ts(6133): [0m'_speedInsightsBeforeSend' is declared but its value is never read.
+
+[7m74[0m       function _speedInsightsBeforeSend(data) {
+[7m  [0m [93m               ~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/layouts/TailusLayout.astro[0m:[93m43[0m:[93m17[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m43[0m         <script src="/js/nprogress-and-zoom.js" type="module" />
+[7m  [0m [93m                ~~~[0m
+
+[96msrc/pages/admin-test.astro[0m:[93m5[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'mockUser' is declared but its value is never read.
+
+[7m5[0m const mockUser = {
+[7m [0m [93m      ~~~~~~~~[0m
+
+[96msrc/pages/nightmare-fuel-demo.astro[0m:[93m611[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'sessionActive' is declared but its value is never read.
+
+[7m611[0m   let sessionActive = false
+[7m   [0m [93m      ~~~~~~~~~~~~~[0m
+[96msrc/pages/nightmare-fuel-demo.astro[0m:[93m594[0m:[93m27[0m - [93mwarning[0m[90m ts(6133): [0m'index' is declared but its value is never read.
+
+[7m594[0m     elements.forEach((el, index) => {
+[7m   [0m [93m                          ~~~~~[0m
+
+[96msrc/pages/reset-password-confirm.astro[0m:[93m98[0m:[93m54[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'event' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m98[0m   document.addEventListener('password-reset-error', (event) => {
+[7m  [0m [93m                                                     ~~~~~[0m
+
+[96msrc/pages/reset-password.astro[0m:[93m58[0m:[93m62[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'event' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m58[0m   document.addEventListener('password-reset-request-error', (event) => {
+[7m  [0m [93m                                                             ~~~~~[0m
+
+[96msrc/pages/admin/ai-performance.astro[0m:[93m18[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'operationTypes' is declared but its value is never read.
+
+[7m18[0m const operationTypes: AIOperationType[] = [
+[7m  [0m [93m      ~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/admin/compatibility-dashboard.astro[0m:[93m185[0m:[93m17[0m - [93mwarning[0m[90m ts(6196): [0m'ChartConfiguration' is declared but never used.
+
+[7m185[0m   import type { ChartConfiguration, TooltipItem } from 'chart.js'
+[7m   [0m [93m                ~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/admin/data-transfer.astro[0m:[93m410[0m:[93m36[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'e' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m410[0m       ?.addEventListener('click', (e) => {
+[7m   [0m [93m                                   ~[0m
+
+[96msrc/pages/admin/demo-analytics.astro[0m:[93m583[0m:[93m27[0m - [93mwarning[0m[90m ts(6133): [0m'data' is declared but its value is never read.
+
+[7m583[0m     calculateSignificance(data: any) {
+[7m   [0m [93m                          ~~~~[0m
+[96msrc/pages/admin/demo-analytics.astro[0m:[93m561[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'_totalSessions' is declared but its value is never read.
+
+[7m561[0m       const _totalSessions = data.summary.unique_sessions
+[7m   [0m [93m            ~~~~~~~~~~~~~~[0m
+[96msrc/pages/admin/demo-analytics.astro[0m:[93m377[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'data' is declared but its value is never read.
+
+[7m377[0m     private data: any = {
+[7m   [0m [93m            ~~~~[0m
+[96msrc/pages/admin/demo-analytics.astro[0m:[93m376[0m:[93m13[0m - [93mwarning[0m[90m ts(6133): [0m'eventSource' is declared but its value is never read.
+
+[7m376[0m     private eventSource: EventSource | null = null
+[7m   [0m [93m            ~~~~~~~~~~~[0m
+
+[96msrc/pages/admin/performance-dashboard.astro[0m:[93m7[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'config' is declared but its value is never read.
+
+[7m7[0m const config = getMonitoringConfig()
+[7m [0m [93m      ~~~~~~[0m
+
+[96msrc/pages/admin/security/baa/management.astro[0m:[93m6[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'BusinessAssociateType' is declared but its value is never read.
+
+[7m6[0m   BusinessAssociateType,
+[7m [0m [93m  ~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/admin/security/baa/management.astro[0m:[93m5[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'BaaStatus' is declared but its value is never read.
+
+[7m5[0m   BaaStatus,
+[7m [0m [93m  ~~~~~~~~~[0m
+
+[96msrc/pages/admin/security/baa/templates.astro[0m:[93m8[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
+
+[7m 8[0m import {
+[7m  [0m [93m~~~~~~~~[0m
+[7m 9[0m   BusinessAssociateType,
+[7m  [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m10[0m   ServiceCategory,
+[7m  [0m [93m~~~~~~~~~~~~~~~~~~[0m
+[7m11[0m } from '../../../../lib/security/baa/types'
+[7m  [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/admin/security/baa/templates.astro[0m:[93m4[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
+
+[7m4[0m import {
+[7m [0m [93m~~~~~~~~[0m
+[7m5[0m   standardSections,
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~[0m
+[7m6[0m   standardPlaceholders,
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~[0m
+[7m7[0m } from '../../../../lib/security/baa/templates/hipaa-standard'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/components/ui-showcase.astro[0m:[93m3[0m:[93m1[0m - [93mwarning[0m[90m ts(6192): [0mAll imports in import declaration are unused.
+
+[7m3[0m import { Target, TrendingUp } from 'lucide-react'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/dashboard/patient.astro[0m:[93m16[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Users' is declared but its value is never read.
+
+[7m16[0m import { Users } from 'lucide-react'
+[7m  [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/dashboard/bias-detection/analytics.astro[0m:[93m6[0m:[93m20[0m - [93mwarning[0m[90m ts(6133): [0m'Search' is declared but its value is never read.
+
+[7m6[0m import { ChartBar, Search, Target, TrendingUp } from 'lucide-react'
+[7m [0m [93m                   ~~~~~~[0m
+
+[96msrc/pages/demo/bias-detection.astro[0m:[93m6[0m:[93m44[0m - [93mwarning[0m[90m ts(6133): [0m'TrendingUp' is declared but its value is never read.
+
+[7m6[0m import { ChartBar, Rocket, Search, Target, TrendingUp } from 'lucide-react'
+[7m [0m [93m                                           ~~~~~~~~~~[0m
+[96msrc/pages/demo/bias-detection.astro[0m:[93m6[0m:[93m10[0m - [93mwarning[0m[90m ts(6133): [0m'ChartBar' is declared but its value is never read.
+
+[7m6[0m import { ChartBar, Rocket, Search, Target, TrendingUp } from 'lucide-react'
+[7m [0m [93m         ~~~~~~~~[0m
+[96msrc/pages/demo/bias-detection.astro[0m:[93m506[0m:[93m67[0m - [93mwarning[0m[90m ts(6385): [0m'(from: number, length?: number | undefined): string' is deprecated.
+
+[7m506[0m           'demo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
+[7m   [0m [93m                                                                  ~~~~~~[0m
+
+[96msrc/pages/demo/chat.astro[0m:[93m5[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'BrutalistBadge' is declared but its value is never read.
+
+[7m5[0m import BrutalistBadge from '@/components/ui/BrutalistBadge.astro'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/demo/chat.astro[0m:[93m504[0m:[93m11[0m - [93mwarning[0m[90m ts(6133): [0m'_chatDemo' is declared but its value is never read.
+
+[7m504[0m     const _chatDemo = new ChatDemoInterface()
+[7m   [0m [93m          ~~~~~~~~~[0m
+
+[96msrc/pages/demo/clinical-vault-trainer.astro[0m:[93m3[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'Target' is declared but its value is never read.
+
+[7m3[0m import { Target } from 'lucide-react'
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/dev/accessibility-test.astro[0m:[93m14[0m:[93m11[0m - [93mwarning[0m[90m ts(6196): [0m'LoadingIndicatorProps' is declared but never used.
+
+[7m14[0m interface LoadingIndicatorProps {
+[7m  [0m [93m          ~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/pages/dev/browser-compatibility-test.astro[0m:[93m6[0m:[93m15[0m - [93mwarning[0m[90m ts(6196): [0m'CompatibilityIssue' is declared but never used.
+
+[7m6[0m import type { CompatibilityIssue, TestSections } from '../../types/testing'
+[7m [0m [93m              ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/dev/browser-compatibility-test.astro[0m:[93m5[0m:[93m25[0m - [93mwarning[0m[90m ts(6133): [0m'SEVERITY_STYLES' is declared but its value is never read.
+
+[7m5[0m import { LOADING_SIZES, SEVERITY_STYLES } from '../../constants/testing'
+[7m [0m [93m                        ~~~~~~~~~~~~~~~[0m
+[96msrc/pages/dev/browser-compatibility-test.astro[0m:[93m375[0m:[93m5[0m - [93mwarning[0m[90m ts(6133): [0m'removeIssue' is declared but its value is never read.
+
+[7m375[0m     removeIssue,
+[7m   [0m [93m    ~~~~~~~~~~~[0m
+
+[96msrc/pages/docs/[...slug].astro[0m:[93m26[0m:[93m4[0m - [93mwarning[0m[90m ts(7044): [0mParameter 'doc' implicitly has an 'any' type, but a better type may be inferred from usage.
+
+[7m26[0m   (doc) => !doc.data.draft && (doc.data.slug || doc.slug) === slug,
+[7m  [0m [93m   ~~~[0m
+
+[96msrc/pages/journal-research/sessions/[sessionId].astro[0m:[93m7[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'user' is declared but its value is never read.
+
+[7m7[0m const { user } = Astro.props as { user: any }
+[7m [0m [93m      ~~~~~~~~[0m
+
+[96msrc/pages/journal-research/sessions/index.astro[0m:[93m7[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'user' is declared but its value is never read.
+
+[7m7[0m const { user } = Astro.props as { user: any }
+[7m [0m [93m      ~~~~~~~~[0m
+
+[96meslint.config.js[0m:[93m17[0m:[93m25[0m - [93mwarning[0m[90m ts(6387): [0mThe signature '(...configs: InfiniteDepthConfigWithExtends[]): ConfigArray' of 'tseslint.config' is deprecated.
+
+[7m17[0m export default tseslint.config(
+[7m  [0m [93m                        ~~~~~~[0m
+
+[96muno.config.ts[0m:[93m47[0m:[93m5[0m - [93mwarning[0m[90m ts(6385): [0m'presetUno' is deprecated.
+
+[7m47[0m     presetUno(),
+[7m  [0m [93m    ~~~~~~~~~[0m
+[96muno.config.ts[0m:[93m3[0m:[93m3[0m - [93mwarning[0m[90m ts(6385): [0m'presetUno' is deprecated.
+
+[7m3[0m   presetUno,
+[7m [0m [93m  ~~~~~~~~~[0m
+
+[96mastro.config.mjs[0m:[93m30[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'sentryRelease' is declared but its value is never read.
+
+[7m30[0m const sentryRelease = process.env.SENTRY_RELEASE ?? process.env.npm_package_version ?? undefined;
+[7m  [0m [93m      ~~~~~~~~~~~~~[0m
+
+Result (2468 files): 
+- 0 errors
+- 0 warnings
+- 516 hints
+

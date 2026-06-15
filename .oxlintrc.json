@@ -16,7 +16,8 @@
     "src/scripts/task-manager-cli.ts",
     "tests/pending-implementation/**/*.tsx",
     "vitest.config.ts",
-    "foresight-mcp/apps/docs/tsconfig.json"
+    "foresight-mcp/apps/docs/tsconfig.json",
+    "foresight-mcp/apps/docs/**"
   ],
   "env": {
     "browser": true,
