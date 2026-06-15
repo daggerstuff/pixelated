@@ -365,6 +365,7 @@ export function TherapeuticGoalsTracker({
       <div className="mb-4 flex gap-1 overflow-x-auto pb-2">
         <Button
           size="sm"
+          aria-pressed={activeTab === 'all'}
           variant={activeTab === 'all' ? 'default' : 'outline'}
           onClick={() => handleCategoryClick('all')}
           className="whitespace-nowrap text-xs"
@@ -375,6 +376,7 @@ export function TherapeuticGoalsTracker({
           <Button
             key={category}
             size="sm"
+            aria-pressed={activeTab === category}
             variant={activeTab === category ? 'default' : 'outline'}
             onClick={() => handleCategoryClick(category)}
             className="whitespace-nowrap text-xs"
