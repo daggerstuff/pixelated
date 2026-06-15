@@ -65,7 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    const stats = await mergeAllDatasets();
+    const stats = await mergeAllDatasets({ mergedByUserId: user.id });
 
     if (!stats) {
       logger.error("Dataset merge failed via API call");
@@ -81,16 +81,24 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
+    const responseHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (stats.provenance) {
+      responseHeaders["X-Dataset-Provenance"] = stats.provenance.mergeRunId;
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
         message: "Datasets merged successfully",
         stats,
+        provenance: stats.provenance ?? null,
         datasetPath: getMergedDatasetPath(),
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: responseHeaders,
       },
     );
   } catch (error: unknown) {
