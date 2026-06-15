@@ -201,6 +201,7 @@
     "@microsoft/clarity": "latest",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.77.0",
     "@opentelemetry/context-async-hooks": "latest",
     "@opentelemetry/exporter-metrics-otlp-http": "latest",
     "@opentelemetry/exporter-trace-otlp-grpc": "latest",
