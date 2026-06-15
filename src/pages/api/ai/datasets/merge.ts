@@ -1,100 +1,132 @@
-import type { APIRoute } from 'astro'
+import type { APIRoute } from "astro";
 
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+import { getCurrentUser } from "@/lib/auth";
+import { hasPermission, type UserRole } from "@/lib/auth/roles";
+import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
+import { logSecurityEvent } from "@/lib/security";
 
 import {
   mergeAllDatasets,
   mergedDatasetExists,
   getMergedDatasetPath,
-} from '../../../../lib/ai/datasets/merge-datasets'
-const logger = createBuildSafeLogger('dataset-merge')
+} from "../../../../lib/ai/datasets/merge-datasets";
+const logger = createBuildSafeLogger("dataset-merge");
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    // Check request authentication (implement proper auth here)
-    const authHeader = request.headers.get('Authorization')
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const user = await getCurrentUser(request);
+    if (!user) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Unauthorized',
+          error: "Unauthorized",
+          message: "Valid authentication required",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    // Parse request body
-    const body = await request.json()
-    const { force = false } = body
+    if (!hasPermission(user.role as UserRole, "manage:training_data")) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Forbidden",
+          message: "Insufficient permissions to manage training data",
+        }),
+        {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
 
-    // Check if dataset already exists and force is not enabled
+    logSecurityEvent("training_data_access", user.id, {
+      op: "merge",
+      role: user.role,
+    });
+
+    const body = (await request.json()) as { force?: boolean };
+    const { force = false } = body;
+
     if (mergedDatasetExists() && !force) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Dataset already exists. Use force: true to recreate.',
+          error: "Dataset already exists. Use force: true to recreate.",
           datasetPath: getMergedDatasetPath(),
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    // Start the merge process
-    const stats = await mergeAllDatasets()
+    const stats = await mergeAllDatasets();
 
     if (!stats) {
-      logger.error('Dataset merge failed via API call')
+      logger.error("Dataset merge failed via API call");
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Failed to merge datasets. Check server logs for details.',
+          error: "Failed to merge datasets. Check server logs for details.",
         }),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
-      )
+      );
     }
 
-    // Return success response with stats
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Datasets merged successfully',
+        message: "Datasets merged successfully",
         stats,
         datasetPath: getMergedDatasetPath(),
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error(`Error in dataset merge API: ${error}`)
+    logger.error(`Error in dataset merge API: ${String(error)}`);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'An unexpected error occurred',
+        error: "An unexpected error occurred",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
 
-// Also allow GET to check dataset status
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ request }) => {
   try {
-    const exists = mergedDatasetExists()
+    const user = await getCurrentUser(request);
+    if (!user) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Unauthorized",
+          message: "Valid authentication required",
+        }),
+        {
+          status: 401,
+          headers: { "Content-Type": "application/json" },
+        },
+      );
+    }
+
+    const exists = mergedDatasetExists();
 
     return new Response(
       JSON.stringify({
@@ -103,21 +135,21 @@ export const GET: APIRoute = async () => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   } catch (error: unknown) {
-    logger.error(`Error in dataset status API: ${error}`)
+    logger.error(`Error in dataset status API: ${String(error)}`);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'An unexpected error occurred',
+        error: "An unexpected error occurred",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
-    )
+    );
   }
-}
+};
