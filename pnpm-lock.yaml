@@ -123,13 +123,13 @@ importers:
         version: 3.0.71(zod@4.4.3)
       '@astrojs/node':
         specifier: ^10.1.4
-        version: 10.1.4(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 10.1.4(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@astrojs/react':
         specifier: latest
-        version: 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+        version: 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       '@astrojs/vercel':
         specifier: '>=10.0.2'
-        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.52)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
+        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.52)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.18.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -255,7 +255,7 @@ importers:
         version: 1.2.9(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sentry/astro':
         specifier: latest
-        version: 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(rollup@4.62.0)
+        version: 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.62.0)
       '@sentry/node':
         specifier: latest
         version: 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))
@@ -273,7 +273,7 @@ importers:
         version: 5.3.0(rollup@4.62.0)
       '@spotlightjs/astro':
         specifier: latest
-        version: 3.2.6(@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(rollup@4.62.0))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 3.2.6(@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.62.0))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@tanstack/react-query':
         specifier: latest
         version: 5.101.0(react@19.2.7)
@@ -574,7 +574,7 @@ importers:
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.4)(typescript@6.0.3)
       '@astrojs/markdoc':
         specifier: latest
-        version: 1.0.6(@types/react@19.2.17)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)
+        version: 1.0.6(@types/react@19.2.17)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)
       '@astrojs/rss':
         specifier: latest
         version: 4.0.18
@@ -661,7 +661,7 @@ importers:
         version: 5.0.9
       '@unocss/astro':
         specifier: ^66.7.0
-        version: 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@unocss/core':
         specifier: ^66.7.0
         version: 66.7.2
@@ -670,7 +670,7 @@ importers:
         version: 66.7.2
       '@vitejs/plugin-react':
         specifier: ^6.0.2
-        version: 6.0.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 6.0.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       '@vitest/coverage-v8':
         specifier: ^4.1.8
         version: 4.1.8(vitest@4.1.8)
@@ -679,7 +679,7 @@ importers:
         version: 1.6.20(@typescript-eslint/eslint-plugin@8.61.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.8)
       astro:
         specifier: ^6.4.6
-        version: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+        version: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       astro-eslint-parser:
         specifier: latest
         version: 1.4.0
@@ -904,7 +904,7 @@ importers:
         version: 8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
       unocss:
         specifier: ^66.7.0
-        version: 66.7.2(@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 66.7.2(@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       url-polyfill:
         specifier: latest
         version: 1.1.14
@@ -919,13 +919,13 @@ importers:
         version: 1.11.7
       vite:
         specifier: ^7
-        version: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+        version: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       vite-tsconfig-paths:
         specifier: latest
-        version: 6.1.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 6.1.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vitest:
         specifier: ^4.1.8
-        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+        version: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       vscode-jsonrpc:
         specifier: 9.0.0
         version: 9.0.0
@@ -934,7 +934,7 @@ importers:
         version: 9.0.10
       yaml:
         specifier: npm:yaml@2.8.4
-        version: 2.8.4
+        version: 2.9.0
 
   business-strategy-cms:
     dependencies:
@@ -12156,12 +12156,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@1.0.6(@types/react@19.2.17)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)':
+  '@astrojs/markdoc@1.0.6(@types/react@19.2.17)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/prism': 4.0.2
       '@markdoc/markdoc': 0.5.7(@types/react@19.2.17)(react@19.2.7)
-      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.1
       github-slugger: 2.0.0
       htmlparser2: 10.1.0
@@ -12191,10 +12191,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@astrojs/node@10.1.4(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@astrojs/node@10.1.4(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
-      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -12204,17 +12204,17 @@ snapshots:
     dependencies:
       prismjs: 1.30.0
 
-  '@astrojs/react@5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)':
+  '@astrojs/react@5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@types/react': 19.2.17
       '@types/react-dom': 19.2.3(@types/react@19.2.17)
-      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       devalue: 5.8.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       ultrahtml: 1.6.0
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -12243,14 +12243,14 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.52)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
+  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.52)(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@vercel/analytics': 1.6.1(react@19.2.7)(vue@3.5.38(typescript@6.0.3))
       '@vercel/functions': 3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6))
       '@vercel/nft': 1.10.2(rollup@4.62.0)
       '@vercel/routing-utils': 6.2.0
-      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
       esbuild: 0.28.1
       tinyglobby: 0.2.17
     transitivePeerDependencies:
@@ -15641,13 +15641,13 @@ snapshots:
     dependencies:
       '@sentry/core': 10.57.0
 
-  '@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(rollup@4.62.0)':
+  '@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.62.0)':
     dependencies:
       '@sentry/browser': 10.57.0
       '@sentry/core': 10.57.0
       '@sentry/node': 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))
       '@sentry/vite-plugin': 5.3.0(rollup@4.62.0)
-      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@opentelemetry/exporter-trace-otlp-http'
       - encoding
@@ -16004,11 +16004,11 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
-  '@spotlightjs/astro@3.2.6(@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(rollup@4.62.0))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@spotlightjs/astro@3.2.6(@sentry/astro@10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.62.0))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
-      '@sentry/astro': 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(rollup@4.62.0)
+      '@sentry/astro': 10.57.0(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))(rollup@4.62.0)
       '@spotlightjs/spotlight': 3.0.2
-      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      astro: 6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -16587,13 +16587,13 @@ snapshots:
 
   '@ungap/structured-clone@1.3.1': {}
 
-  '@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@unocss/core': 66.7.2
       '@unocss/reset': 66.7.2
-      '@unocss/vite': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      '@unocss/vite': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     optionalDependencies:
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@unocss/cli@66.7.2':
     dependencies:
@@ -16713,7 +16713,7 @@ snapshots:
     dependencies:
       '@unocss/core': 66.7.2
 
-  '@unocss/vite@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@unocss/vite@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@unocss/config': 66.7.2
@@ -16724,7 +16724,7 @@ snapshots:
       pathe: 2.0.3
       tinyglobby: 0.2.17
       unplugin-utils: 0.3.1
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@unrs/resolver-binding-android-arm-eabi@1.12.2':
     optional: true
@@ -16874,7 +16874,7 @@ snapshots:
       react: 19.2.7
       vue: 3.5.38(typescript@6.0.3)
 
-  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -16882,14 +16882,14 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitejs/plugin-react@6.0.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
+  '@vitejs/plugin-react@6.0.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   '@vitest/coverage-v8@4.1.8(vitest@4.1.8)':
     dependencies:
@@ -16903,7 +16903,7 @@ snapshots:
       obug: 2.1.3
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
 
   '@vitest/eslint-plugin@1.6.20(@typescript-eslint/eslint-plugin@8.61.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.8)':
     dependencies:
@@ -16913,7 +16913,7 @@ snapshots:
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.61.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
       typescript: 6.0.3
-      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      vitest: 4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -16925,15 +16925,6 @@ snapshots:
       '@vitest/utils': 4.1.8
       chai: 6.2.2
       tinyrainbow: 3.1.0
-
-  '@vitest/mocker@4.1.8(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))':
-    dependencies:
-      '@vitest/spy': 4.1.8
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      msw: 2.14.6(@types/node@25.9.3)(typescript@6.0.3)
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
 
   '@vitest/mocker@4.1.8(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
@@ -17300,7 +17291,7 @@ snapshots:
       valid-filename: 4.0.0
       zod: 4.4.3
 
-  astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4):
+  astro@6.4.6(@azure/storage-blob@12.32.0)(@types/node@25.9.3)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
       '@astrojs/internal-helpers': 0.10.0
@@ -17352,8 +17343,8 @@ snapshots:
       unist-util-visit: 5.1.0
       unstorage: 1.17.5(@azure/storage-blob@12.32.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.52)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)
       vfile: 6.0.3
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
-      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
+      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
       xxhash-wasm: 1.1.0
       yargs-parser: 22.0.0
       zod: 4.4.3
@@ -23531,7 +23522,7 @@ snapshots:
       unist-util-is: 6.0.1
       unist-util-visit-parents: 6.0.2
 
-  unocss@66.7.2(@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)):
+  unocss@66.7.2(@unocss/astro@66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@unocss/cli': 66.7.2
       '@unocss/core': 66.7.2
@@ -23549,9 +23540,9 @@ snapshots:
       '@unocss/transformer-compile-class': 66.7.2
       '@unocss/transformer-directives': 66.7.2
       '@unocss/transformer-variant-group': 66.7.2
-      '@unocss/vite': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      '@unocss/vite': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     optionalDependencies:
-      '@unocss/astro': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
+      '@unocss/astro': 66.7.2(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
     transitivePeerDependencies:
       - vite
 
@@ -23706,32 +23697,15 @@ snapshots:
 
   viewerjs@1.11.7: {}
 
-  vite-tsconfig-paths@6.1.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)):
+  vite-tsconfig-paths@6.1.1(typescript@6.0.3)(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@6.0.3)
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
-
-  vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4):
-    dependencies:
-      esbuild: 0.28.1
-      fdir: 6.5.0(picomatch@4.0.4)
-      picomatch: 4.0.4
-      postcss: 8.5.15
-      rollup: 4.62.0
-      tinyglobby: 0.2.17
-    optionalDependencies:
-      '@types/node': 25.9.3
-      fsevents: 2.3.3
-      jiti: 2.7.0
-      lightningcss: 1.32.0
-      terser: 5.48.0
-      tsx: 4.22.4
-      yaml: 2.8.4
 
   vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0):
     dependencies:
@@ -23750,39 +23724,9 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)):
+  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     optionalDependencies:
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
-
-  vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)):
-    dependencies:
-      '@vitest/expect': 4.1.8
-      '@vitest/mocker': 4.1.8(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))
-      '@vitest/pretty-format': 4.1.8
-      '@vitest/runner': 4.1.8
-      '@vitest/snapshot': 4.1.8
-      '@vitest/spy': 4.1.8
-      '@vitest/utils': 4.1.8
-      es-module-lexer: 2.1.0
-      expect-type: 1.3.0
-      magic-string: 0.30.21
-      obug: 2.1.3
-      pathe: 2.0.3
-      picomatch: 4.0.4
-      std-env: 4.1.0
-      tinybench: 2.9.0
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.0
-      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@opentelemetry/api': 1.9.1
-      '@types/node': 25.9.3
-      '@vitest/coverage-v8': 4.1.8(vitest@4.1.8)
-      jsdom: 29.1.1(@noble/hashes@1.8.0)
-    transitivePeerDependencies:
-      - msw
+      vite: 7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
 
   vitest@4.1.8(@opentelemetry/api@1.9.1)(@types/node@25.9.3)(@vitest/coverage-v8@4.1.8)(jsdom@29.1.1(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@25.9.3)(typescript@6.0.3))(vite@7.3.5(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
