@@ -219,7 +219,7 @@ export async function mergeAllDatasets(
     maxSamples,
     mergedByUserId,
   } = options;
-  const categoriesFilter = options.categories;
+  const __categoriesFilter = options.categories;
 
   const normalizedDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
   const outputDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "merged");

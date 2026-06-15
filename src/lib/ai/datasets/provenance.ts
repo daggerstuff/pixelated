@@ -99,7 +99,7 @@ export class MemoryProvenanceStore implements IProvenanceStore {
   }> {
     const current = this.records.get(runId);
     if (!current) {
-      throw new Error(`Provenance record not found: ${runId}`);
+      throw new ProvenanceNotFoundError(runId);
     }
 
     const parent = current.parentMergeRunId
@@ -173,7 +173,7 @@ export class MongoProvenanceStore implements IProvenanceStore {
     const col = await this.collection();
     const current = await col.findOne({ mergeRunId: runId });
     if (!current) {
-      throw new Error(`Provenance record not found: ${runId}`);
+      throw new ProvenanceNotFoundError(runId);
     }
 
     const parent = current.parentMergeRunId
@@ -182,7 +182,14 @@ export class MongoProvenanceStore implements IProvenanceStore {
 
     const children = await col.find({ parentMergeRunId: runId }).toArray();
 
-    return { current, parent, children };
+    return {
+      current: { ...current, childRunIds: [...current.childRunIds] },
+      parent: parent ? { ...parent, childRunIds: [...parent.childRunIds] } : null,
+      children: children.map((c: IProvenanceNode) => ({
+        ...c,
+        childRunIds: [...c.childRunIds],
+      })),
+    };
   }
 
   async addChildRunId(parentRunId: string, childRunId: string): Promise<void> {
@@ -230,6 +237,17 @@ export function setProvenanceStore(store: IProvenanceStore | null): void {
 }
 
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Custom error types
+// ---------------------------------------------------------------------------
+
+export class ProvenanceNotFoundError extends Error {
+  constructor(runId: string) {
+    super(`Provenance record not found: ${runId}`);
+    this.name = "ProvenanceNotFoundError";
+  }
+}
+
 // Helpers
 // ---------------------------------------------------------------------------
 
@@ -258,7 +276,11 @@ export function generateMergeRunId(): string {
  * directory (used as sourceDatasetIds).
  */
 export function collectSourceDatasetIds(normalizedDir: string): string[] {
-  const entries = readdirSync(normalizedDir, { withFileTypes: true });
+    if (!existsSync(normalizedDir)) {
+    logger.warn("Dataset source directory does not exist, returning empty list", { normalizedDir });
+    return [];
+  }
+const entries = readdirSync(normalizedDir, { withFileTypes: true });
   const paths: string[] = [];
 
   for (const entry of entries) {
