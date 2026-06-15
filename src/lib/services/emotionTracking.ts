@@ -41,10 +41,11 @@ export async function fetchSessionEmotionData(
   },
 ): Promise<EmotionDataPoint[]> {
   try {
-    const url = new URL(
-      `/api/sessions/${sessionId}/emotions`,
-      window.location.origin,
-    )
+    const origin =
+      typeof window !== 'undefined'
+        ? window.location.origin
+        : 'http://localhost:4321'
+    const url = new URL(`/api/sessions/${sessionId}/emotions`, origin)
     if (options?.timeRange) {
       url.searchParams.append('start', options.timeRange[0].toISOString())
       url.searchParams.append('end', options.timeRange[1].toISOString())
