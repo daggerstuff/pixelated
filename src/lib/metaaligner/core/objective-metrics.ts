@@ -459,15 +459,14 @@ export class ObjectiveMetricsEngine {
   ): number {
     // Simple heuristic for how well an objective fits the context
     let fit = 0.5 // Base fit
-
     // Adjust based on objective type and context
     switch (context.detectedContext) {
-      case 'crisis':
+      case ContextType.CRISIS:
         if (objective.id === 'safety' || objective.id === 'empathy') {
           fit += 0.4
         }
         break
-      case 'clinical_assessment':
+      case ContextType.CLINICAL_ASSESSMENT:
         if (
           objective.id === 'correctness' ||
           objective.id === 'professionalism'
@@ -475,7 +474,7 @@ export class ObjectiveMetricsEngine {
           fit += 0.4
         }
         break
-      case 'educational':
+      case ContextType.EDUCATIONAL:
         if (
           objective.id === 'informativeness' ||
           objective.id === 'correctness'
@@ -483,27 +482,19 @@ export class ObjectiveMetricsEngine {
           fit += 0.4
         }
         break
-      // SUPPORT, INFORMATIONAL, GENERAL use default base fit
-      case ContextType.CRISIS: {
-        throw new Error('Not implemented yet: ContextType.CRISIS case')
-      }
-      case ContextType.EDUCATIONAL: {
-        throw new Error('Not implemented yet: ContextType.EDUCATIONAL case')
-      }
-      case ContextType.SUPPORT: {
-        throw new Error('Not implemented yet: ContextType.SUPPORT case')
-      }
-      case ContextType.CLINICAL_ASSESSMENT: {
-        throw new Error(
-          'Not implemented yet: ContextType.CLINICAL_ASSESSMENT case',
-        )
-      }
-      case ContextType.INFORMATIONAL: {
-        throw new Error('Not implemented yet: ContextType.INFORMATIONAL case')
-      }
-      case ContextType.GENERAL: {
-        throw new Error('Not implemented yet: ContextType.GENERAL case')
-      }
+      case ContextType.SUPPORT:
+        if (objective.id === 'empathy' || objective.id === 'therapeutic_rapport') {
+          fit += 0.4
+        }
+        break
+      case ContextType.INFORMATIONAL:
+        if (objective.id === 'informativeness' || objective.id === 'clarity') {
+          fit += 0.4
+        }
+        break
+      case ContextType.GENERAL:
+        // General context - no special adjustments
+        break
       default:
         break
     }
