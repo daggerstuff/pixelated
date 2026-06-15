@@ -117,7 +117,7 @@ importers:
         version: 3.0.84(zod@4.4.3)
       '@ai-sdk/mcp':
         specifier: latest
-        version: 1.0.50(zod@4.4.3)
+        version: 1.0.51(zod@4.4.3)
       '@ai-sdk/openai':
         specifier: ^3.0.71
         version: 3.0.71(zod@4.4.3)
@@ -580,7 +580,7 @@ importers:
         version: 4.0.18
       '@axe-core/playwright':
         specifier: ^4.11.3
-        version: 4.11.3(playwright-core@1.61.0-alpha-1781023400000)
+        version: 4.11.3(playwright-core@1.61.0-beta-1781293360000)
       '@eslint/css':
         specifier: latest
         version: 1.3.0
@@ -606,8 +606,8 @@ importers:
         specifier: latest
         version: 1.2.3
       '@playwright/test':
-        specifier: 1.61.0-alpha-1781023400000
-        version: 1.61.0-alpha-1781023400000
+        specifier: 1.61.0-beta-1781293360000
+        version: 1.61.0-beta-1781293360000
       '@testing-library/dom':
         specifier: latest
         version: 10.4.1
@@ -1184,8 +1184,8 @@ packages:
     peerDependencies:
       zod: ^4.3.2
 
-  '@ai-sdk/mcp@1.0.50':
-    resolution: {integrity: sha512-iLqDZ62ezEjBhTJgiAQ4D2tHG1q7INVhPx0uOPnxJTxxqVUzN4KqeWAd6j5hYNhsPqC7TPGRQHQqAa1Z/lu2jg==}
+  '@ai-sdk/mcp@1.0.51':
+    resolution: {integrity: sha512-03JEdJtB+K/I7a85GWJjrB+ypYY++ZFDTp2YJ5Wd0e0raZdFpBLvvX9LJIxPF1LRbs7PMtx6TIS1YMP0Dece+w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^4.3.2
@@ -4201,8 +4201,8 @@ packages:
     resolution: {integrity: sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==}
     engines: {node: ^14.18.0 || >=16.0.0}
 
-  '@playwright/test@1.61.0-alpha-1781023400000':
-    resolution: {integrity: sha512-EYeA59CsSOtiQgKTBAyl321SwaWzLYD4wU9GDAt8kFpYCco3sClPZBPdKXdUwlrNqOFAbseUYtiFudxFs/h02w==}
+  '@playwright/test@1.61.0-beta-1781293360000':
+    resolution: {integrity: sha512-VVXdNXSWDYLAIQ83fuFdIEfXpGl/8H/IIaLiFn+q9GY/utWSJsU2mhsQT6/ARu3Roy0MRPJYJjzcqXTFKYT1aQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -9687,13 +9687,13 @@ packages:
   pkg-types@2.3.1:
     resolution: {integrity: sha512-y+ichcgc2LrADuhLNAx8DFjVfgz91pRxfZdI3UDhxHvcVEZsenLO+7XaU5vOp0u/7V/wZ+plyuQxtrDlZJ+yeg==}
 
-  playwright-core@1.61.0-alpha-1781023400000:
-    resolution: {integrity: sha512-UdtUd9qnCO0zvb8p3OvOZpelY6mA40mTb3NmWGuMtrD+hqqWuorWCPlSGwj7jw/LEB9AxvYLHTL1CJi2flvksg==}
+  playwright-core@1.61.0-beta-1781293360000:
+    resolution: {integrity: sha512-KZTwZ1yb+pEZdmkRz0MMSv2Z9SVQiwlnpuaCrc3O54mM4JCcYdeT8Asav5PL5q3M7joU8xW2OiPwVG76e33rdw==}
     engines: {node: '>=18'}
     hasBin: true
 
-  playwright@1.61.0-alpha-1781023400000:
-    resolution: {integrity: sha512-8TRUG3IvwaAhuVm6k3C5vB7CwC5Fxq76DCCxOgPr6r1dpTedDwxlmdOBUkSZ0zxfxP14jcuPxi86/Trq4eA03w==}
+  playwright@1.61.0-beta-1781293360000:
+    resolution: {integrity: sha512-iMyssByRZ4VYc/ApnSuFm6jLnWY4yl5ejZ72Moj9kYOhCXnfrTzA4O7OW5qUKHeYCO9cqahzvj22RTZ2ztp+cg==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -11848,7 +11848,7 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
-  '@ai-sdk/mcp@1.0.50(zod@4.4.3)':
+  '@ai-sdk/mcp@1.0.51(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 3.0.10
       '@ai-sdk/provider-utils': 4.0.29(zod@4.4.3)
@@ -12492,10 +12492,10 @@ snapshots:
 
   '@aws/lambda-invoke-store@0.2.4': {}
 
-  '@axe-core/playwright@4.11.3(playwright-core@1.61.0-alpha-1781023400000)':
+  '@axe-core/playwright@4.11.3(playwright-core@1.61.0-beta-1781293360000)':
     dependencies:
       axe-core: 4.11.4
-      playwright-core: 1.61.0-alpha-1781023400000
+      playwright-core: 1.61.0-beta-1781293360000
 
   '@azure/abort-controller@2.1.2':
     dependencies:
@@ -15055,9 +15055,9 @@ snapshots:
 
   '@pkgr/core@0.3.6': {}
 
-  '@playwright/test@1.61.0-alpha-1781023400000':
+  '@playwright/test@1.61.0-beta-1781293360000':
     dependencies:
-      playwright: 1.61.0-alpha-1781023400000
+      playwright: 1.61.0-beta-1781293360000
 
   '@polka/url@1.0.0-next.29': {}
 
@@ -21484,11 +21484,11 @@ snapshots:
       exsolve: 1.0.8
       pathe: 2.0.3
 
-  playwright-core@1.61.0-alpha-1781023400000: {}
+  playwright-core@1.61.0-beta-1781293360000: {}
 
-  playwright@1.61.0-alpha-1781023400000:
+  playwright@1.61.0-beta-1781293360000:
     dependencies:
-      playwright-core: 1.61.0-alpha-1781023400000
+      playwright-core: 1.61.0-beta-1781293360000
     optionalDependencies:
       fsevents: 2.3.2
 
