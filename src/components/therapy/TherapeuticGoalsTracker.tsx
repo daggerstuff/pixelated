@@ -155,18 +155,20 @@ export function TherapeuticGoalsTracker({
   // ⚡ Bolt: Pre-compute formatted date strings for checkpoints to avoid O(N) Date creations during render
   const formattedCheckpoints = useMemo(() => {
     if (!activeGoal) return []
-    return activeGoal.checkpoints.map(cp => ({
+    return activeGoal.checkpoints.map((cp) => ({
       ...cp,
-      formattedCompletedAt: cp.completedAt ? new Date(cp.completedAt).toLocaleDateString() : ''
+      formattedCompletedAt: cp.completedAt
+        ? new Date(cp.completedAt).toLocaleDateString()
+        : '',
     }))
   }, [activeGoal])
 
   // ⚡ Bolt: Pre-compute formatted date strings for progress history to avoid O(N) Date creations during render
   const formattedProgressHistory = useMemo(() => {
     if (!activeGoal) return []
-    return activeGoal.progressHistory.slice(-3).map(snapshot => ({
+    return activeGoal.progressHistory.slice(-3).map((snapshot) => ({
       ...snapshot,
-      formattedTimestamp: new Date(snapshot.timestamp).toLocaleDateString()
+      formattedTimestamp: new Date(snapshot.timestamp).toLocaleDateString(),
     }))
   }, [activeGoal])
 
