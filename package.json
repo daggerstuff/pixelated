@@ -461,7 +461,7 @@
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.6.0",
+  "packageManager": "pnpm@11.5.2",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
