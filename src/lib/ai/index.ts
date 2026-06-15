@@ -59,6 +59,11 @@ export interface AIService {
 // Mock AI Service implementation
 import crypto from 'crypto'
 
+// Production AIService backed by the FineTuningOrchestrator (PIX-3937).
+// MockAIService is retained and exported for tests / explicit dev overrides;
+// the production default below resolves to `FineTuningAIService`.
+import { FineTuningAIService } from './training/aiservice'
+
 /**
  * Generates a cryptographically secure random float between 0 (inclusive) and 1 (exclusive).
  * Uses Node.js crypto.randomBytes for secure randomness.
@@ -70,7 +75,14 @@ function secureRandomFloat(): number {
   return uint / 2 ** 32
 }
 
-class MockAIService implements AIService {
+/**
+ * In-process mock `AIService`. Useful for unit tests, local development
+ * without backend credentials, and documenting the legacy mock shape. Callers
+ * can opt-in via `createMockAIService()` or `setAIServiceForTesting(...)`.
+ * The production default returned by `getAIService()` is the
+ * `FineTuningAIService` — never this mock.
+ */
+export class MockAIService implements AIService {
   private initialized = false
 
   async initialize(): Promise<void> {
@@ -117,15 +129,52 @@ class MockAIService implements AIService {
   }
 }
 
-// Default AI service instance
-let aiServiceInstance: AIService | null = null
+/** Build a fresh `MockAIService` instance (test helper). */
+export function createMockAIService(): AIService {
+  return new MockAIService()
+}
 
 /**
- * Get the default AI service instance
+ * Resolve the production singleton. Defaults to the orchestrator-backed
+ * `FineTuningAIService` (PIX-3937). Tests can force the mock via
+ * `setAIServiceForTesting(new MockAIService())` or by setting the
+ * `PIX_AI_USE_MOCK=1` environment variable.
+ */
+let aiServiceInstance: AIService | null = null
+
+function shouldUseMockByDefault(): boolean {
+  // Tests run under NODE_ENV=test; the explicit flag wins for ad-hoc dev.
+  return (
+    process.env['PIX_AI_USE_MOCK'] === '1' ||
+    process.env['NODE_ENV'] === 'test'
+  )
+}
+
+/**
+ * Get the default AI service instance. Production callers always receive the
+ * `FineTuningAIService` (built once and cached) so the underlying job store
+ * and cost tracker are shared across the app.
  */
 export function getAIService(): AIService {
-  aiServiceInstance ??= new MockAIService();
+  if (aiServiceInstance) return aiServiceInstance
+  aiServiceInstance = shouldUseMockByDefault()
+    ? new MockAIService()
+    : new FineTuningAIService()
   return aiServiceInstance
+}
+
+/**
+ * Replace the cached AI service. Intended for tests; production code should
+ * never need to invoke this. Pass-through to reset by calling twice (once
+ * with null is not supported: pass the desired replacement).
+ */
+export function setAIServiceForTesting(service: AIService): void {
+  aiServiceInstance = service
+}
+
+/** Reset the cached service. Test-only helper. */
+export function resetAIServiceForTesting(): void {
+  aiServiceInstance = null
 }
 
 import { initArizeTracing } from './tracing/arize-setup'
@@ -140,3 +189,4 @@ export async function initializeAI(): Promise<void> {
   const service = getAIService()
   await service.initialize()
 }
+
