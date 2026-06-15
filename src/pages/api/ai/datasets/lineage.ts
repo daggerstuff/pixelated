@@ -3,7 +3,7 @@ import type { APIRoute } from "astro";
 import { getCurrentUser } from "@/lib/auth";
 import { hasPermission, type UserRole } from "@/lib/auth/roles";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
-import { getDefaultProvenanceStore } from "@/lib/ai/datasets/provenance";
+import { ProvenanceNotFoundError, getDefaultProvenanceStore } from "@/lib/ai/datasets/provenance";
 
 const logger = createBuildSafeLogger("dataset-lineage");
 
@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ url, request }) => {
     const msg = error instanceof Error ? error.message : String(error);
 
     // Distinguish "not found" from unexpected errors
-    if (msg.includes("Provenance record not found")) {
+    if (error instanceof ProvenanceNotFoundError) {
       return new Response(
         JSON.stringify({
           success: false,
