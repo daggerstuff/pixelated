@@ -68,7 +68,7 @@ export const { ObjectId } = mongodb
 export const crypto = {
   randomUUID: () => {
     // Use the Web Crypto API if available
-    if (window.crypto?.randomUUID) {
+    if (typeof window !== 'undefined' && window.crypto?.randomUUID) {
       return window.crypto.randomUUID()
     }
 
@@ -94,20 +94,21 @@ export const crypto = {
   },
 
   // Add subtle crypto API for modern browsers
-  subtle: window?.crypto
-    ? window.crypto.subtle
-    : {
-        digest: async (_algorithm: string, _data: BufferSource) => {
-          console.warn(
-            'crypto.subtle.digest fallback used - limited functionality',
-          )
-          return new Uint8Array(32) // Return dummy hash
+  subtle:
+    typeof window !== 'undefined' && window.crypto
+      ? window.crypto.subtle
+      : {
+          digest: async (_algorithm: string, _data: BufferSource) => {
+            console.warn(
+              'crypto.subtle.digest fallback used - limited functionality',
+            )
+            return new Uint8Array(32) // Return dummy hash
+          },
         },
-      },
 
   // Add randomBytes implementation
   randomBytes: (size: number) => {
-    if (window?.crypto) {
+    if (typeof window !== 'undefined' && window.crypto) {
       const bytes = new Uint8Array(size)
       window.crypto.getRandomValues(bytes)
       return {
