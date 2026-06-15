@@ -344,8 +344,7 @@ test.describe("Theme Compatibility Tests", () => {
               duration: entry.duration,
               size: entry.transferSize,
             }));
-        })
-        .slice();
+        });
 
       // CSS files should load quickly
       for (const entry of performanceEntries) {
