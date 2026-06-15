@@ -245,7 +245,7 @@
     "archiver": "latest",
     "astro-icon": "latest",
     "auth0": "^5.12.0",
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "bcryptjs": "latest",
     "better-sqlite3": "latest",
     "browserify-zlib": "latest",
