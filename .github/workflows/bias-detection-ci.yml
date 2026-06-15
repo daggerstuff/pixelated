@@ -317,6 +317,13 @@ jobs:
           flags: typescript
           name: typescript-coverage
 
+      - name: Upload coverage to Qlty
+        continue-on-error: true
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/lcov.info
+
   python-tests:
     name: Python ML Tests
     runs-on: ubuntu-latest

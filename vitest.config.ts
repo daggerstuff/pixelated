@@ -28,6 +28,7 @@ const baseNodeTestGlobs = [
   'src/lib/services/notification/__tests__/NotificationService.test.ts',
   'src/lib/__tests__/security-implementation.test.ts',
   'src/lib/ai/__tests__/getAIService.test.ts',
+  'src/lib/ai/services/__tests__/FineTuningAIService.test.ts',
 ] as const
 
 const ciNodeTestGlobs = process.env['CI']
@@ -293,7 +294,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       enabled: coverageEnabled,
-      reporter: ['text', 'json', 'html', 'cobertura'],
+      reporter: ['text', 'json', 'html', 'cobertura', 'lcov'],
       reportsDirectory: './coverage',
       thresholds: {
         // PIX-223+: Thresholds raised after boosting BiasDetectionEngine (57%→88%),

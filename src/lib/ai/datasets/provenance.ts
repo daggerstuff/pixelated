@@ -12,7 +12,7 @@
 
 import { randomUUID } from "node:crypto";
 import { createHash } from "node:crypto";
-import { readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 import mongodb from "@/config/mongodb.config";
@@ -185,7 +185,7 @@ export class MongoProvenanceStore implements IProvenanceStore {
     return {
       current: { ...current, childRunIds: [...current.childRunIds] },
       parent: parent ? { ...parent, childRunIds: [...parent.childRunIds] } : null,
-      children: children.map((c: IProvenanceNode) => ({
+      children: children.map((c: DatasetProvenance) => ({
         ...c,
         childRunIds: [...c.childRunIds],
       })),
