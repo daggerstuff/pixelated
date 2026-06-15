@@ -89,9 +89,17 @@ def decode_access_token(token: str) -> dict[str, Any] | None:
             algorithms=[settings.JWT_ALGORITHM],
         )
         if payload.get("type") != "access":
+            logger.warning("decode_access_token invalid type", expected="access", actual=payload.get("type"))
             return None
         return payload
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValidationError):
+    except jwt.ExpiredSignatureError:
+        logger.debug("decode_access_token expired", error="token_expired")
+        return None
+    except jwt.InvalidTokenError as exc:
+        logger.debug("decode_access_token invalid", error=str(exc))
+        return None
+    except ValidationError as exc:
+        logger.warning("decode_access_token validation error", error=str(exc))
         return None
 
 
@@ -104,9 +112,17 @@ def decode_refresh_token(token: str) -> dict[str, Any] | None:
             algorithms=[settings.JWT_ALGORITHM],
         )
         if payload.get("type") != "refresh":
+            logger.warning("decode_refresh_token invalid type", expected="refresh", actual=payload.get("type"))
             return None
         return payload
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, ValidationError):
+    except jwt.ExpiredSignatureError:
+        logger.debug("decode_refresh_token expired", error="token_expired")
+        return None
+    except jwt.InvalidTokenError as exc:
+        logger.debug("decode_refresh_token invalid", error=str(exc))
+        return None
+    except ValidationError as exc:
+        logger.warning("decode_refresh_token validation error", error=str(exc))
         return None
 
 
