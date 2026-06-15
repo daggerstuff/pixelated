@@ -155,18 +155,20 @@ export function TherapeuticGoalsTracker({
   // ⚡ Bolt: Pre-compute formatted date strings for checkpoints to avoid O(N) Date creations during render
   const formattedCheckpoints = useMemo(() => {
     if (!activeGoal) return []
-    return activeGoal.checkpoints.map(cp => ({
+    return activeGoal.checkpoints.map((cp) => ({
       ...cp,
-      formattedCompletedAt: cp.completedAt ? new Date(cp.completedAt).toLocaleDateString() : ''
+      formattedCompletedAt: cp.completedAt != null
+        ? new Date(cp.completedAt).toLocaleDateString()
+        : '',
     }))
   }, [activeGoal])
 
   // ⚡ Bolt: Pre-compute formatted date strings for progress history to avoid O(N) Date creations during render
   const formattedProgressHistory = useMemo(() => {
     if (!activeGoal) return []
-    return activeGoal.progressHistory.slice(-3).map(snapshot => ({
+    return activeGoal.progressHistory.slice(-3).map((snapshot) => ({
       ...snapshot,
-      formattedTimestamp: new Date(snapshot.timestamp).toLocaleDateString()
+      formattedTimestamp: new Date(snapshot.timestamp).toLocaleDateString(),
     }))
   }, [activeGoal])
 
@@ -362,9 +364,11 @@ export function TherapeuticGoalsTracker({
       </Card>
 
       {/* Category filter */}
-      <div className="mb-4 flex gap-1 overflow-x-auto pb-2">
+      <div className="mb-4 flex gap-1 overflow-x-auto pb-2" role="tablist">
         <Button
           size="sm"
+          role="tab"
+          aria-selected={activeTab === 'all'}
           variant={activeTab === 'all' ? 'default' : 'outline'}
           onClick={() => handleCategoryClick('all')}
           className="whitespace-nowrap text-xs"
@@ -375,6 +379,8 @@ export function TherapeuticGoalsTracker({
           <Button
             key={category}
             size="sm"
+            role="tab"
+            aria-selected={activeTab === category}
             variant={activeTab === category ? 'default' : 'outline'}
             onClick={() => handleCategoryClick(category)}
             className="whitespace-nowrap text-xs"
