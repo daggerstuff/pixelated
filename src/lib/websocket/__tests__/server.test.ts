@@ -3,17 +3,8 @@ import type { WebSocket } from 'ws'
 import { fheService } from '../../fhe'
 import TherapyChatWebSocketServer from '../server'
 
-// Define mock interface for FHEService
-interface MockFHEService {
-  initialize: ReturnType<typeof vi.fn>
-  processEncrypted: ReturnType<typeof vi.fn>
-}
-
 // Define the mock type correctly based on vi.fn() return type
 type MockFn = ReturnType<typeof vi.fn>
-
-// Cast fheService to our mock type
-const mockedFHEService = fheService as unknown as MockFHEService
 
 // Mock FHE module with proper implementation
 vi.mock("../../fhe", () => ({
