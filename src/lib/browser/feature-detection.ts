@@ -51,7 +51,8 @@ export const FEATURES: Record<string, FeatureDefinition> = {
   CSSVariables: {
     name: 'CSSVariables',
     description: 'Support for CSS custom properties',
-    detectionFn: () => window.CSS?.supports?.('--a', '0'),
+    detectionFn: () =>
+      typeof window !== 'undefined' && window.CSS?.supports?.('--a', '0'),
   },
   Fetch: {
     name: 'Fetch',
