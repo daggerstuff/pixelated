@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 if TYPE_CHECKING:
@@ -121,6 +122,14 @@ app = FastAPI(
     title="Memory Ingestion Gate",
     description="PIX-3894: Async FastAPI ingestion gate controller for the 5-gate pipeline",
     version="1.0.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 protocol = _IngestionMockProtocol()
