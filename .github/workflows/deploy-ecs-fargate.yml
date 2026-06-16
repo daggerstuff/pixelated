@@ -52,22 +52,20 @@ jobs:
       - name: Stop any active CodeDeploy deployment
         continue-on-error: true
         run: |
-          # List active deployments (requires codedeploy:ListDeployments)
-          DEPLOY_ID=$(aws deploy list-deployments \
-            --application-name pixelated-empathy-ecs \
-            --deployment-group-name pixelated-empathy-ecs-dg \
-            --include-only-statuses Created Queued InProgress \
-            --query 'deployments[0]' --output text 2>/dev/null || echo "")
-          if [ "$DEPLOY_ID" != "None" ] && [ -n "$DEPLOY_ID" ]; then
-            echo "Stopping active deployment: $DEPLOY_ID"
-            aws deploy stop-deployment --deployment-id "$DEPLOY_ID" --auto-rollback-enabled
-            echo "Waiting 15s for rollback to settle..."
-            sleep 15
-          else
-            echo "No active deployment listed, attempting to stop known stale deployment d-SZHO4XU1K"
-            aws deploy stop-deployment --deployment-id "d-SZHO4XU1K" --auto-rollback-enabled 2>/dev/null || echo "Deployment d-SZHO4XU1K already finished or not found"
-            sleep 5
-          fi
+          # Try to get active deployment from previous error by polling GetDeployment
+          # We only have StopDeployment + GetDeployment, not ListDeployments
+          for TRY_ID in d-YBT1OLU1K d-SZHO4XU1K; do
+            STATUS=$(aws deploy get-deployment --deployment-id "$TRY_ID" --query 'deploymentInfo.status' --output text 2>/dev/null || echo "UNKNOWN")
+            echo "Deployment $TRY_ID status: $STATUS"
+            if [ "$STATUS" = "Created" ] || [ "$STATUS" = "Queued" ] || [ "$STATUS" = "InProgress" ]; then
+              echo "Stopping active deployment: $TRY_ID"
+              aws deploy stop-deployment --deployment-id "$TRY_ID" --auto-rollback-enabled
+              echo "Waiting 15s for rollback..."
+              sleep 15
+              break
+            fi
+          done
+          echo "Done checking deployments."
 
       - name: Determine image tag
         id: vars
