@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { hasPermission, type UserRole } from "@/lib/auth/roles";
 import { createBuildSafeLogger } from "@/lib/logging/build-safe-logger";
 import { logSecurityEvent } from "@/lib/security";
+import { getDefaultProvenanceStore } from "@/lib/ai/datasets/provenance";
 
 import { mergedDatasetExists } from "../../../../lib/ai/datasets/merge-datasets";
 import {
@@ -54,8 +55,9 @@ export const POST: APIRoute = async ({ request }) => {
     const body = (await request.json()) as {
       format?: string;
       force?: boolean;
+      parentMergeRunId?: string;
     };
-    const { format = "all", force = false } = body;
+    const { format = "all", force = false, parentMergeRunId } = body;
 
     if (!mergedDatasetExists()) {
       return new Response(
@@ -90,14 +92,29 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
+    // Validate parentMergeRunId before calling prepare functions
+    if (parentMergeRunId) {
+      const store = getDefaultProvenanceStore();
+      const mergeExists = await store.exists(parentMergeRunId);
+      if (!mergeExists) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: `parentMergeRunId "${parentMergeRunId}" not found in provenance store.`,
+          }),
+          { status: 400, headers: { "Content-Type": "application/json" } },
+        );
+      }
+    }
+
     let result: DatasetPaths | null = null;
     if (format === "all") {
-      result = await prepareAllFormats();
+      result = await prepareAllFormats(undefined, undefined, parentMergeRunId);
     } else if (format === "openai") {
-      const openaiPath = await prepareForOpenAI();
+      const openaiPath = await prepareForOpenAI(undefined, undefined, parentMergeRunId);
       result = { openai: openaiPath, huggingface: null };
     } else if (format === "huggingface") {
-      const huggingfacePath = await prepareForHuggingFace();
+      const huggingfacePath = await prepareForHuggingFace(undefined, undefined, parentMergeRunId);
       result = { openai: null, huggingface: huggingfacePath };
     } else {
       return new Response(
@@ -144,18 +161,22 @@ export const POST: APIRoute = async ({ request }) => {
       },
     );
   } catch (error: unknown) {
-    logger.error(`Error in dataset preparation API: ${String(error)}`);
+    const msg = error instanceof Error ? error.message : String(error);
 
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: "An unexpected error occurred",
-      }),
-      {
-        status: 500,
+    // Distinguish provenance validation errors
+    if (msg.includes("parentMergeRunId") || msg.includes("not found in provenance store")) {
+      return new Response(JSON.stringify({ success: false, error: msg }), {
+        status: 400,
         headers: { "Content-Type": "application/json" },
-      },
-    );
+      });
+    }
+
+    logger.error(`Error in dataset preparation API: ${msg}`);
+
+    return new Response(JSON.stringify({ success: false, error: "An unexpected error occurred" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 };
 

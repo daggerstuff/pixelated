@@ -27,7 +27,7 @@ jobs:
           echo "✅ Version $VERSION validated in CHANGELOG.md"
 
       - name: Run tests
-        run: node --test test/*.test.cjs
+        run: node --test tests/*.test.cjs
 
       - name: Check no .ai-team/ or .squad/ files are tracked
         run: |

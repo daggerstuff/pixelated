@@ -32,7 +32,7 @@ env:
   TRACE_TRIVY_DEPRECATION: ${{ vars.TRACE_TRIVY_DEPRECATION || 'false' }}
   NODE_VERSION: 24.16.0
   PYTHON_VERSION: 3.13.13
-  PNPM_VERSION: 11.5.2
+  PNPM_VERSION: 11.6.0
   REDIS_URL: ${{ secrets['REDIS_URL'] }}
   UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}
   UPSTASH_REDIS_REST_TOKEN: ${{ secrets['UPSTASH_REDIS_REST_TOKEN'] }}
@@ -316,6 +316,13 @@ jobs:
           files: ./coverage/lcov.info
           flags: typescript
           name: typescript-coverage
+
+      - name: Upload coverage to Qlty
+        continue-on-error: true
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/lcov.info
 
   python-tests:
     name: Python ML Tests
