@@ -12,6 +12,7 @@ import {
   UpdateMemoryRequest,
   UpdateMemoryResponse,
 } from '@/lib/memory/contract/v1'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 /**
  * @file src/pages/api/v1/memory/[memoryId].ts
  *
@@ -26,7 +27,6 @@ import {
  * REST-correct semantics.
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 function resolveMemoryId(
   params: Record<string, string | undefined> | undefined,
