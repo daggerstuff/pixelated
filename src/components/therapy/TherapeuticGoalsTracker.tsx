@@ -157,7 +157,7 @@ export function TherapeuticGoalsTracker({
     if (!activeGoal) return []
     return activeGoal.checkpoints.map((cp) => ({
       ...cp,
-formattedCompletedAt: cp.completedAt != null
+      formattedCompletedAt: cp.completedAt != null
         ? new Date(cp.completedAt).toLocaleDateString()
         : '',
     }))
