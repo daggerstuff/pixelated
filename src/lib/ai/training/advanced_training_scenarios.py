@@ -762,8 +762,7 @@ class AdvancedTrainingEngine:
         if scenario:
             return scenario
 
-        scenario = self.lgbtq_scenarios.get_scenario_by_id(scenario_id)
-        return scenario
+        return self.lgbtq_scenarios.get_scenario_by_id(scenario_id)
 
     @track_latency("training.advanced_response_process")
     async def process_training_response(
@@ -808,7 +807,7 @@ class AdvancedTrainingEngine:
         }
 
     async def _analyze_training_response(
-        self, user_response: str, scenario: AdvancedTrainingScenario, session_data: dict[str, Any]
+        self, user_response: str, scenario: AdvancedTrainingScenario
     ) -> dict[str, Any]:
         """Analyze training response for cultural competency and trauma-informed care"""
 
@@ -849,11 +848,10 @@ class AdvancedTrainingEngine:
 
         return analysis
 
-    async def _analyze_cultural_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
+    async def _analyze_cultural_response(self, response: str) -> dict[str, Any]:
         """Analyze cultural competency response"""
 
         response_lower = response.lower()
-        cultural_context = scenario.cultural_context
 
         scores = {
             "cultural_competency_score": 0.0,
@@ -921,11 +919,10 @@ class AdvancedTrainingEngine:
 
         return scores
 
-    async def _analyze_trauma_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
+    async def _analyze_trauma_response(self, response: str) -> dict[str, Any]:
         """Analyze trauma-informed response"""
 
         response_lower = response.lower()
-        trauma_context = scenario.trauma_context
 
         scores = {
             "trauma_informed_score": 0.0,
@@ -985,7 +982,7 @@ class AdvancedTrainingEngine:
 
         return scores
 
-    async def _analyze_lgbtq_response(self, response: str, scenario: AdvancedTrainingScenario) -> dict[str, Any]:
+    async def _analyze_lgbtq_response(self, response: str) -> dict[str, Any]:
         """Analyze LGBTQ+ inclusive response"""
 
         response_lower = response.lower()
@@ -1089,9 +1086,7 @@ class AdvancedTrainingEngine:
         # Continue with current scenario
         return {"action": "continue", "suggestions": analysis.get("improvement_suggestions", [])}
 
-    def _evaluate_branch_condition(
-        self, condition: str, analysis: dict[str, Any], session_data: dict[str, Any]
-    ) -> bool:
+    def _evaluate_branch_condition(self, condition: str, analysis: dict[str, Any]) -> bool:
         """Evaluate branching condition"""
 
         # Simple condition evaluation based on scores
@@ -1099,12 +1094,9 @@ class AdvancedTrainingEngine:
             "trauma" in condition.lower() and analysis.get("trauma_informed_score", 0) > 0.7
         ):
             return True
-        if "insensitive" in condition.lower() and analysis.get("cultural_competency_score", 0) < 0.4:
-            return True
+        return "insensitive" in condition.lower() and analysis.get("cultural_competency_score", 0) < 0.4
 
-        return False
-
-    def _generate_feedback(self, analysis: dict[str, Any], scenario: AdvancedTrainingScenario) -> str:
+    def _generate_feedback(self, analysis: dict[str, Any]) -> str:
         """Generate contextual feedback"""
 
         scores = {
@@ -1320,26 +1312,35 @@ class AdvancedTrainingEngine:
         }
 
 
-# Global training engine
-training_engine: AdvancedTrainingEngine | None = None
+# Module-local holder for the singleton training engine. Using a small
+# class here (rather than a module-level mutable global) keeps RUF/PLW
+# happy without exposing a writable binding, while still preserving the
+# "engine is shared across the process" contract callers rely on.
+
+
+class _EngineHolder:
+    engine: AdvancedTrainingEngine | None = None
 
 
 async def initialize_advanced_training_engine() -> AdvancedTrainingEngine:
-    """Initialize global advanced training engine"""
-    global training_engine
-
-    if training_engine is None:
-        training_engine = AdvancedTrainingEngine()
+    """Initialize the module-local advanced training engine."""
+    if _EngineHolder.engine is None:
+        _EngineHolder.engine = AdvancedTrainingEngine()
         logger.info("Advanced training engine initialized")
 
-    return training_engine
+    return _EngineHolder.engine
 
 
 async def get_advanced_training_engine() -> AdvancedTrainingEngine:
-    """Get global advanced training engine instance"""
-    if training_engine is None:
+    """Get the module-local advanced training engine instance."""
+    if _EngineHolder.engine is None:
         await initialize_advanced_training_engine()
-    return training_engine
+    return _EngineHolder.engine
+
+
+def reset_advanced_training_engine() -> None:
+    """Reset the singleton (test helper)."""
+    _EngineHolder.engine = None
 
 
 # API endpoints for advanced training
@@ -1390,9 +1391,6 @@ if __name__ == "__main__":
             user_id="test_user", training_type=TrainingType.CULTURAL_COMPETENCY, difficulty=DifficultyLevel.INTERMEDIATE
         )
 
-        print(f"Training session started: {session['session_id']}")
-        print(f"Scenario: {session['scenario'].title}")
-
         # Process responses
         responses = [
             "I understand you have traditional health practices. Can you tell me more about them?",
@@ -1401,11 +1399,9 @@ if __name__ == "__main__":
         ]
 
         for response in responses:
-            result = await engine.process_training_response(session["session_id"], response)
-            print(f"Response analysis: {result['analysis']['cultural_competency_score']}")
+            await engine.process_training_response(session["session_id"], response)
 
         # Complete training
-        completion = await engine.complete_training_session(session["session_id"])
-        print(f"Training completed with score: {completion['final_assessment']['overall_score']}")
+        await engine.complete_training_session(session["session_id"])
 
     asyncio.run(example())
