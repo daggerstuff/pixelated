@@ -446,7 +446,7 @@ importers:
         version: 1.11.0
       multer:
         specifier: ^2.1.1
-        version: 2.1.1
+        version: 2.2.0
       nanoid:
         specifier: ^5.1.11
         version: 5.1.11
@@ -987,7 +987,7 @@ importers:
         version: 9.7.0
       multer:
         specifier: ^2.1.1
-        version: 2.1.1
+        version: 2.2.0
       multer-s3:
         specifier: ^3.0.1
         version: 3.0.1(@aws-sdk/client-s3@3.1067.0)
@@ -9871,8 +9871,8 @@ packages:
     peerDependencies:
       '@aws-sdk/client-s3': ^3.0.0
 
-  multer@2.1.1:
-    resolution: {integrity: sha512-mo+QTzKlx8R7E5ylSXxWzGoXoZbOsRMpyitcht8By2KHvMbf3tjwosZ/Mu/XYU6UuJ3VZnODIrak5ZrPiPyB6A==}
+  multer@2.2.0:
+    resolution: {integrity: sha512-6rdyFg2kLrMh9Jee7/BMPuV9lEAd7lLW2YUpF9/YxR7njyoUwwQ0ZPh3TaIY50Sw6vlyD2HW3wGOkTS4P79xrQ==}
     engines: {node: '>= 10.16.0'}
 
   mute-stream@3.0.0:
@@ -22584,7 +22584,7 @@ snapshots:
       html-comment-regex: 1.1.2
       run-parallel: 1.2.0
 
-  multer@2.1.1:
+  multer@2.2.0:
     dependencies:
       append-field: 1.0.0
       busboy: 1.6.0
