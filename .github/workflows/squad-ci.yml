@@ -21,4 +21,4 @@ jobs:
           node-version: 24.16.0
 
       - name: Run tests
-        run: node --test test/*.test.cjs
+        run: node --test tests/*.test.cjs
