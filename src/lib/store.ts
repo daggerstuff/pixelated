@@ -156,7 +156,7 @@ interface StoreState {
 
   // Enhanced Actions - Form Drafts
   saveDraft: (formId: string, data: unknown) => void
-  getDraft: (formId: string) => unknown | null
+  getDraft: (formId: string) => unknown
   clearDraft: (formId: string) => void
   clearAllDrafts: () => void
 
@@ -233,8 +233,14 @@ export const useStore = create<StoreState>()(
   devtools(
     subscribeWithSelector(
       persist(
-        (set, get): StoreState =>
-          ({
+        (_set, _get): StoreState => {
+          const set = _set as unknown as (
+            partial: StoreState | Partial<StoreState> | ((state: StoreState) => StoreState | Partial<StoreState>),
+            replace?: false,
+          ) => void
+          const get = _get as unknown as () => StoreState
+
+          return {
             // Original state
             securityLevel: 'hipaa',
             encryptionEnabled: true,
@@ -538,7 +544,8 @@ export const useStore = create<StoreState>()(
                   },
                 },
               })),
-          }) as any,
+          } as StoreState
+        },
         {
           name: 'therapy-state-enhanced',
           partialize: (state) => ({

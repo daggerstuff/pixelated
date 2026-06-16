@@ -52,10 +52,16 @@ interface DialogTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
   ({ children, ...props }, ref) => {
-    const { onOpenChange } = React.useContext(DialogContext)
+    const { open, onOpenChange } = React.useContext(DialogContext)
 
     return (
-      <button ref={ref} onClick={() => onOpenChange(true)} {...props}>
+      <button
+        ref={ref}
+        onClick={() => onOpenChange(true)}
+        {...props}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+      >
         {children}
       </button>
     )
