@@ -58,9 +58,9 @@ const DialogTrigger = React.forwardRef<HTMLButtonElement, DialogTriggerProps>(
       <button
         ref={ref}
         onClick={() => onOpenChange(true)}
+        {...props}
         aria-haspopup="dialog"
         aria-expanded={open}
-        {...props}
       >
         {children}
       </button>
