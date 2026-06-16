@@ -108,6 +108,7 @@ overrides:
   yaml@2.7.1: npm:yaml@2.8.4
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   zod: ^4.3.2
+  ws: '>=8.21.0'
 
 importers:
 
@@ -561,7 +562,7 @@ importers:
         specifier: latest
         version: 3.5.38(typescript@6.0.3)
       ws:
-        specifier: ^8.21.0
+        specifier: '>=8.21.0'
         version: 8.21.0(utf-8-validate@6.0.6)
       zod:
         specifier: ^4.3.2
@@ -6283,7 +6284,7 @@ packages:
     engines: {node: '>= 20'}
     peerDependencies:
       '@aws-sdk/credential-provider-web-identity': '*'
-      ws: '>=8'
+      ws: '>=8.21.0'
     peerDependenciesMeta:
       '@aws-sdk/credential-provider-web-identity':
         optional: true
@@ -10107,7 +10108,7 @@ packages:
     resolution: {integrity: sha512-0H5dEGFmmLv6KSd0W1w2nyL8WsLkX6yoLeQpU+dZAOuGcany5qkYQMmj35ZrKgb6yiyYqpUzFOpR8mZQkgqeEQ==}
     hasBin: true
     peerDependencies:
-      ws: ^8.18.0
+      ws: '>=8.21.0'
       zod: ^4.3.2
     peerDependenciesMeta:
       ws:
@@ -12327,18 +12328,6 @@ packages:
   write-file-atomic@5.0.1:
     resolution: {integrity: sha512-+QU2zd6OTD8XWIJCbffaiQeH9U73qIqafo1x6V1snCWYGJf6cVE0cDR4D8xRzcEnfI21IFrUPzPGtcPf8AC+Rw==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
-  ws@8.20.1:
-    resolution: {integrity: sha512-It4dO0K5v//JtTXuPkfEOaI3uUN87iYPnqo/ZzqCoG3g8uhA66QUMs/SrM0YK7/NAu+r4LMh/9dq2A7k+rHs+w==}
-    engines: {node: '>=10.0.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: '>=5.0.2'
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   ws@8.21.0:
     resolution: {integrity: sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==}
@@ -19717,7 +19706,7 @@ snapshots:
       '@socket.io/component-emitter': 3.1.2
       debug: 4.4.3
       engine.io-parser: 5.2.3
-      ws: 8.20.1(utf-8-validate@6.0.6)
+      ws: 8.21.0(utf-8-validate@6.0.6)
       xmlhttprequest-ssl: 2.1.2
     transitivePeerDependencies:
       - bufferutil
@@ -19737,7 +19726,7 @@ snapshots:
       cors: 2.8.6
       debug: 4.4.3
       engine.io-parser: 5.2.3
-      ws: 8.20.1(utf-8-validate@6.0.6)
+      ws: 8.21.0(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -24197,7 +24186,7 @@ snapshots:
   socket.io-adapter@2.5.7(utf-8-validate@6.0.6):
     dependencies:
       debug: 4.4.3
-      ws: 8.20.1(utf-8-validate@6.0.6)
+      ws: 8.21.0(utf-8-validate@6.0.6)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -25511,10 +25500,6 @@ snapshots:
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 4.1.0
-
-  ws@8.20.1(utf-8-validate@6.0.6):
-    optionalDependencies:
-      utf-8-validate: 6.0.6
 
   ws@8.21.0(utf-8-validate@6.0.6):
     optionalDependencies:
