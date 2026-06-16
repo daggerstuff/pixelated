@@ -67,7 +67,7 @@ variable "container_port" {
 variable "health_check_path" {
   description = "Health check endpoint path."
   type        = string
-  default     = "/health"
+  default     = "/api/health/"
 }
 
 variable "acm_certificate_arn" {
