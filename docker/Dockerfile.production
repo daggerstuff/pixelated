@@ -1,4 +1,4 @@
-# Production Dockerfile for Business Strategy CMS
+# Production Dockerfile for Pixelated Empathy
 # Base stage for shared environment (no build tools)
 ARG NODE_IMAGE=node:24.16.0-bookworm-slim
 FROM ${NODE_IMAGE} AS base

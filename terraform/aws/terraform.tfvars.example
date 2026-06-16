@@ -1,0 +1,31 @@
+aws_region = "us-east-1"
+app_name   = "pixelated-empathy"
+environment = "staging"
+
+# VPC
+vpc_cidr            = "10.0.0.0/16"
+public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+availability_zones  = ["us-east-1a", "us-east-1b"]
+
+# ECS
+ecs_cpu           = "256"
+ecs_memory        = "512"
+ecs_desired_count = 1
+
+# Redis
+redis_node_type = "cache.t3.micro"
+
+# Container
+container_port     = 4321
+health_check_path  = "/health"
+
+# GitHub
+github_org = "daggerstuff"
+
+# --- Secrets (set actual values) ---
+secret_database_url        = "postgresql://user:password@neon-host:5432/pixelated_empathy"
+secret_redis_url           = ""
+secret_jwt_secret          = "change-me-to-a-strong-random-secret"
+secret_api_key             = "change-me-to-an-api-key"
+secret_sentry_dsn          = ""
+secret_auth0_client_secret = ""
