@@ -177,6 +177,7 @@ resource "aws_iam_policy" "github_actions" {
           "codedeploy:CreateDeployment",
           "codedeploy:GetDeployment",
           "codedeploy:GetDeploymentConfig",
+          "codedeploy:ListDeployments",
           "codedeploy:StopDeployment",
         ]
         Resource = "*"
