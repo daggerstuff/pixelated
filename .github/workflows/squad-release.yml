@@ -20,7 +20,7 @@ jobs:
           node-version: 22
 
       - name: Run tests
-        run: node --test test/*.test.cjs
+        run: node --test tests/*.test.cjs
 
       - name: Validate version consistency
         run: |

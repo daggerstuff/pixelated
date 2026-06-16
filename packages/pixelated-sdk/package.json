@@ -19,9 +19,13 @@
     "test:watch": "vitest",
     "lint": "eslint src/**/*.ts"
   },
+  "dependencies": {
+    "@pixelated/memory-schema": "workspace:*",
+    "zod": "^3.24.4"
+  },
   "devDependencies": {
     "@types/node": "^25.9.3",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.0"
+    "vitest": "^4.1.9"
   }
 }
