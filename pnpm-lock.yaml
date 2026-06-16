@@ -64,7 +64,6 @@ overrides:
   h3: '>=1.15.9'
   hono: ^4.12.14
   ip-address: '>=10.1.1'
-  js-yaml: '>=4.1.2'
   joi: 17.13.4
   jsonwebtoken: ^9.0.0
   jws: '>=4.0.1'
@@ -111,6 +110,7 @@ overrides:
   ws: '>=8.21.0'
   markdown-it: '>=14.1.2'
   '@opentelemetry/core': '>=2.8.0'
+  js-yaml: '>=4.1.2'
 
 importers:
 
