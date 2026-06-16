@@ -119,14 +119,14 @@ export const blogSearch: BlogSearchInterface = {
     this._posts.push(doc)
 
     // If client is available, also add to search index
-    if (typeof window !== 'undefined' && window.searchClient) {
+    if (typeof window !== 'undefined' && window.searchClient?.importDocuments) {
       window.searchClient.importDocuments([doc])
     }
   },
 
   search(query: string): SearchResult[] {
     // In browser, use the real search client
-    if (typeof window !== 'undefined' && window.searchClient) {
+    if (typeof window !== 'undefined' && window.searchClient?.search) {
       return window.searchClient.search(query)
     }
 
