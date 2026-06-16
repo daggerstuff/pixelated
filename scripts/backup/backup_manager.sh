@@ -21,10 +21,10 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Logging functions
-log_info() { echo -e "${GREEN}[BACKUP]${NC} $1"; }
-log_warning() { echo -e "${YELLOW}[BACKUP WARNING]${NC} $1"; }
-log_error() { echo -e "${RED}[BACKUP ERROR]${NC} $1"; }
-log_debug() { echo -e "${BLUE}[BACKUP DEBUG]${NC} $1"; }
+log_info() { echo -e "${GREEN}[BACKUP]${NC} $1" >&2; }
+log_warning() { echo -e "${YELLOW}[BACKUP WARNING]${NC} $1" >&2; }
+log_error() { echo -e "${RED}[BACKUP ERROR]${NC} $1" >&2; }
+log_debug() { echo -e "${BLUE}[BACKUP DEBUG]${NC} $1" >&2; }
 
 # Generate timestamp for backup naming
 generate_timestamp() {
@@ -120,28 +120,25 @@ add_backup_to_metadata() {
 		return 1
 	fi
 
+	# Build JSON entry safely with jq to guarantee valid JSON
 	local new_entry
-	new_entry="{
-        \"path\": \"${backup_path}\",
-        \"type\": \"${backup_type}\",
-        \"commit_hash\": \"${commit_hash}\",
-        \"timestamp\": \"${timestamp}\",
-        \"created_at\": \"$(date -Iseconds)\"
-    }"
-
-	# Validate new entry JSON
-	if ! echo "${new_entry}" | jq . >/dev/null 2>&1; then
-		log_error "Invalid JSON in new backup entry"
-		return 1
-	fi
+	new_entry=$(jq -n \
+		--arg path "$backup_path" \
+		--arg type "$backup_type" \
+		--arg commit_hash "$commit_hash" \
+		--arg timestamp "$timestamp" \
+		--arg created_at "$(date -Iseconds)" \
+		'{path:$path, type:$type, commit_hash:$commit_hash, timestamp:$timestamp, created_at:$created_at}')
 
 	if [[ ${backup_type} == "current" ]]; then
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "${new_entry}" '.current_backup = $entry' 2>/dev/null); then
+		# Use raw JSON via fromjson to avoid argjson parsing issues
+		if ! metadata=$(echo "${metadata}" | jq --arg entry "$new_entry" '.current_backup = ($entry|fromjson)' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi
 	else
-		if ! metadata=$(echo "${metadata}" | jq --argjson entry "${new_entry}" '.archived_backups += [$entry] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
+		# Append archived backup entry safely
+		if ! metadata=$(echo "${metadata}" | jq --arg entry "$new_entry" '.archived_backups += [($entry|fromjson)] | .backup_count = (.archived_backups | length)' 2>/dev/null); then
 			log_error "Failed to update metadata with jq"
 			return 1
 		fi

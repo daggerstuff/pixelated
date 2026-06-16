@@ -9,21 +9,16 @@
  * PIX-3897 / PIX-1914 (Sprint 4: Reflection & Learning)
  */
 
-import { z } from 'zod'
+import { z } from "zod";
 
 // ---------------------------------------------------------------------------
 // Shared primitives
 // ---------------------------------------------------------------------------
 
 /** Outcome of a reflected action (mirrors FeedbackType in reflexion.ts). */
-export const ReflectionOutcomeSchema = z.enum([
-  'success',
-  'failure',
-  'partial',
-  'neutral',
-])
+export const ReflectionOutcomeSchema = z.enum(["success", "failure", "partial", "neutral"]);
 
-export type ReflectionOutcome = z.infer<typeof ReflectionOutcomeSchema>
+export type ReflectionOutcome = z.infer<typeof ReflectionOutcomeSchema>;
 
 // ---------------------------------------------------------------------------
 // Output — single insight unit
@@ -45,9 +40,9 @@ export const ReflectionInsightSchema = z.object({
   evidenceIds: z.array(z.string()),
   /** Service-specific metadata (never store PHI here). */
   metadata: z.record(z.string(), z.unknown()).optional(),
-})
+});
 
-export type ReflectionInsight = z.infer<typeof ReflectionInsightSchema>
+export type ReflectionInsight = z.infer<typeof ReflectionInsightSchema>;
 
 // ---------------------------------------------------------------------------
 // Input — per-action reflection context
@@ -66,9 +61,9 @@ export const ReflectionContextSchema = z.object({
   cognitivePatterns: z.array(z.string()),
   /** Prior or derived insights attached to this context. */
   insights: z.array(ReflectionInsightSchema),
-})
+});
 
-export type ReflectionContext = z.infer<typeof ReflectionContextSchema>
+export type ReflectionContext = z.infer<typeof ReflectionContextSchema>;
 
 // ---------------------------------------------------------------------------
 // Reflexion engine result (structural mirror of reflexion.ts)
@@ -80,9 +75,9 @@ export const ActionFeedbackPairSchema = z.object({
   feedbackType: ReflectionOutcomeSchema,
   timestampMs: z.number(),
   sessionId: z.string(),
-})
+});
 
-export type ActionFeedbackPair = z.infer<typeof ActionFeedbackPairSchema>
+export type ActionFeedbackPair = z.infer<typeof ActionFeedbackPairSchema>;
 
 export const VerbalReflectionSchema = z.object({
   reflectionId: z.string(),
@@ -91,9 +86,9 @@ export const VerbalReflectionSchema = z.object({
   whatToChange: z.array(z.string()),
   sourcePairs: z.array(ActionFeedbackPairSchema),
   confidence: z.number(),
-})
+});
 
-export type VerbalReflection = z.infer<typeof VerbalReflectionSchema>
+export type VerbalReflection = z.infer<typeof VerbalReflectionSchema>;
 
 /**
  * Zod mirror of `ReflexionResult` in src/lib/memory/reflection/reflexion.ts.
@@ -104,9 +99,28 @@ export const ReflexionResultSchema = z.object({
   contextUpdates: z.array(z.string()),
   memoriesToUpdate: z.array(z.string()),
   elapsedMs: z.number(),
-})
+});
 
-export type ReflexionResult = z.infer<typeof ReflexionResultSchema>
+export type ReflexionResult = z.infer<typeof ReflexionResultSchema>;
+
+// ---------------------------------------------------------------------------
+// Metrics — per-reflection-run instrumentation
+// ---------------------------------------------------------------------------
+
+export const ReflectionMetricsSchema = z.object({
+  /** LLM tokens consumed during this reflection run. */
+  tokenCost: z.number().nonnegative(),
+  /** Wall-clock time for the reflection generation call in milliseconds. */
+  generationLatencyMs: z.number().nonnegative(),
+  /** Number of revision/retry cycles this reflection required. */
+  revisionCount: z.number().int().nonnegative(),
+  /** Rolling user approval rate for the last 30 days (0..1). */
+  userApprovalRate: z.number().min(0).max(1),
+  /** ISO-8601 timestamp of the recording. */
+  recordedAt: z.string(),
+});
+
+export type ReflectionMetrics = z.infer<typeof ReflectionMetricsSchema>;
 
 // ---------------------------------------------------------------------------
 // Bridges between context pairs and reflexion result
@@ -116,9 +130,9 @@ export type ReflexionResult = z.infer<typeof ReflexionResultSchema>
 export function actionFeedbackPairToReflectionContext(
   pair: ActionFeedbackPair,
   options?: {
-    actionId?: string
-    cognitivePatterns?: string[]
-    insights?: ReflectionInsight[]
+    actionId?: string;
+    cognitivePatterns?: string[];
+    insights?: ReflectionInsight[];
   },
 ): ReflectionContext {
   return {
@@ -128,48 +142,40 @@ export function actionFeedbackPairToReflectionContext(
     userFeedback: pair.feedback,
     cognitivePatterns: options?.cognitivePatterns ?? [],
     insights: options?.insights ?? [],
-  }
+  };
 }
 
 /** Map a verbal reflection section into a canonical insight. */
-export function verbalReflectionToInsights(
-  reflection: VerbalReflection,
-): ReflectionInsight[] {
-  const insights: ReflectionInsight[] = []
+export function verbalReflectionToInsights(reflection: VerbalReflection): ReflectionInsight[] {
+  const insights: ReflectionInsight[] = [];
 
   for (const summary of reflection.whatWentWell) {
     insights.push({
       summary,
-      insightType: 'success',
+      insightType: "success",
       confidence: reflection.confidence,
-      evidenceIds: reflection.sourcePairs.map(
-        (pair) => `${pair.sessionId}:${pair.timestampMs}`,
-      ),
-    })
+      evidenceIds: reflection.sourcePairs.map((pair) => `${pair.sessionId}:${pair.timestampMs}`),
+    });
   }
 
   for (const summary of reflection.whatWentWrong) {
     insights.push({
       summary,
-      insightType: 'failure',
+      insightType: "failure",
       confidence: reflection.confidence,
-      evidenceIds: reflection.sourcePairs.map(
-        (pair) => `${pair.sessionId}:${pair.timestampMs}`,
-      ),
-    })
+      evidenceIds: reflection.sourcePairs.map((pair) => `${pair.sessionId}:${pair.timestampMs}`),
+    });
   }
 
   for (const recommendedAction of reflection.whatToChange) {
     insights.push({
       summary: recommendedAction,
-      insightType: 'improvement',
+      insightType: "improvement",
       confidence: reflection.confidence,
       recommendedAction,
-      evidenceIds: reflection.sourcePairs.map(
-        (pair) => `${pair.sessionId}:${pair.timestampMs}`,
-      ),
-    })
+      evidenceIds: reflection.sourcePairs.map((pair) => `${pair.sessionId}:${pair.timestampMs}`),
+    });
   }
 
-  return insights
+  return insights;
 }

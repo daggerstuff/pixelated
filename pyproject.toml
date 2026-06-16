@@ -24,7 +24,7 @@ dependencies = [
   "cryptography>=46.0.6", # Updated to latest secure version
   "requests>=2.33.0", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv>=1.2.1", # Updated to latest secure version
-  "click<9.0",
+  
   "numba>=0.63.1",
   "faiss-cpu>=1.11.0",
   "matplotlib>=3.10.3",
@@ -99,8 +99,6 @@ dependencies = [
   "ray>=2.55.0",
   "pydantic>=2.12.5",
   "clickhouse-driver>=0.2.10",
-  # pydantic-ai removed from core runtime dependencies to avoid incompatible telemetry resolver constraints
-  # until a compatible 1.82+ + traceloop/opentelemetry stack is adopted.
   "nest-asyncio>=1.6.0",
   "google-genai>=1.61.0",
   "e2b>=2.6.1",
@@ -302,6 +300,8 @@ exclude_lines = [
 members = ["./", "tools/gdrive-dataset-manager"]
 exclude = ["ai"]
 [tool.uv]
+# Prefer best-available version over newest-first for more deterministic resolution
+# across different OS/arch combinations (e.g., cross-platform wheels).
 index-strategy = "unsafe-best-match"
 concurrent-downloads = 1 # Download one package at a time for slower connections
 # Note: Increase timeout via environment variable: UV_HTTP_TIMEOUT=300 uv sync

@@ -10,7 +10,7 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -36,7 +36,7 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, Any]:
 
     yield
 
-    # Shutdown
+    logger.info("application_shutting_down", phase="drain")
     await close_db()
     logger.info("application_stopped")
 
@@ -56,8 +56,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
 
 
@@ -83,16 +83,38 @@ async def log_requests(request: Request, call_next: Any) -> Any:
 # ── Exception Handlers ────────────────────────────────────────────
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
-    """Catch-all exception handler."""
+    """Catch-all exception handler with error classification."""
+    error_type = type(exc).__name__
+    error_category = "internal_error"
+
+    if isinstance(exc, (ValueError, TypeError)):
+        error_category = "validation_error"
+        status_code = 422
+    elif isinstance(exc, (HTTPException,)):
+        error_category = "http_error"
+        status_code = exc.status_code if hasattr(exc, "status_code") else 500
+    elif "timeout" in str(exc).lower() or "timed out" in str(exc).lower():
+        error_category = "timeout_error"
+        status_code = 504
+    else:
+        status_code = 500
+
     logger.error(
         "unhandled_exception",
         path=request.url.path,
         error=str(exc),
+        error_type=error_type,
+        error_category=error_category,
         exc_info=True,
     )
+
+    detail_message = "Internal server error"
+    if settings.DEBUG:
+        detail_message = f"{error_category}: {exc!s}"
+
     return JSONResponse(
-        status_code=500,
-        content={"detail": "Internal server error"},
+        status_code=status_code,
+        content={"detail": detail_message, "error_category": error_category},
     )
 
 
@@ -108,3 +130,9 @@ async def root() -> dict:
         "version": "0.1.0",
         "docs": "/docs",
     }
+
+
+@app.get("/health")
+async def health() -> dict:
+    """Health check endpoint."""
+    return {"status": "ok", "name": settings.APP_NAME}

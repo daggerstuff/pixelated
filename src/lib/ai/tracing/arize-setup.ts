@@ -19,7 +19,7 @@ const ARIZE_CONFIG = {
     'ak-1c94aa3a-e12e-404a-8408-73ae0da9b729-uhchi5XKZqHsMUmph5WyF9ynK-FGKYfH',
   MODEL_ID: 'pixelated-empathy-gym',
   MODEL_VERSION: '0.1.0',
-  ENDPOINT: 'otlp.arize.com',
+  ENDPOINT: 'https://otlp.arize.com/v1/traces',
 }
 
 let tracer: Tracer | null = null

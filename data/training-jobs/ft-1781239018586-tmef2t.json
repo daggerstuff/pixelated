@@ -1,0 +1,9 @@
+{
+  "id": "ft-1781239018586-tmef2t",
+  "model": "local-model",
+  "status": "succeeded",
+  "createdAt": "2026-06-12T04:36:58.586Z",
+  "backend": "local",
+  "progress": 100,
+  "fineTunedModel": "local-model:local-ft-17812"
+}

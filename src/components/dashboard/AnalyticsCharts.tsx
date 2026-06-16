@@ -31,11 +31,7 @@ interface ErrorDisplayProps {
 }
 
 const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
-  <div
-    className="bg-red-50 border-red-200 rounded-lg border p-4"
-    role="alert"
-    aria-live="assertive"
-  >
+  <div className="bg-red-50 border-red-200 rounded-lg border p-4" role="alert">
     <div className="flex items-center justify-between">
       <div>
         <h4 className="text-red-800 font-medium">
@@ -53,7 +49,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
       </div>
       <button
         onClick={onRetry}
-        className="bg-red-600 text-white hover:bg-red-700 rounded px-3 py-1 text-sm transition-colors"
+        className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
       >
         Retry
       </button>
@@ -93,7 +89,7 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
             role="radio"
             onClick={() => onChange(option.value)}
             aria-checked={value === option.value}
-            className={`rounded px-3 py-1 text-sm transition-colors ${
+            className={`rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 focus-visible:ring-blue-500 ${
               value === option.value
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -328,24 +324,13 @@ export const AnalyticsCharts: FC = () => {
     setFilters((prev) => ({ ...prev, timeRange }))
   }, [])
 
-  // Render error state
-  if (error && !isLoading) {
-    return (
-      <div className="analytics-charts space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Analytics Overview</h2>
-          <TimeRangeSelector
-            value={filters.timeRange}
-            onChange={handleTimeRangeChange}
-          />
-        </div>
-        <ErrorDisplay error={error} onRetry={handleRetry} />
-      </div>
-    )
-  }
-
   return (
     <div className="analytics-charts space-y-6">
+      {/* Persistent ARIA live region for assertive announcements like errors */}
+      <div aria-live="assertive" aria-atomic="true" className="sr-only">
+        {error && !isLoading ? 'Unable to load analytics data' : ''}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold">Analytics Overview</h2>
@@ -355,20 +340,33 @@ export const AnalyticsCharts: FC = () => {
         />
       </div>
 
-      {/* Summary Statistics */}
-      <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
+      {/* Render error state */}
+      {error && !isLoading ? (
+        <ErrorDisplay error={error} onRetry={handleRetry} />
+      ) : (
+        <>
+          {/* Summary Statistics */}
+          <SummaryStats data={data?.summaryStats ?? []} isLoading={isLoading} />
 
-      {/* Session Activity Chart */}
-      <SessionChart data={data?.sessionMetrics ?? []} isLoading={isLoading} />
+          {/* Session Activity Chart */}
+          <SessionChart
+            data={data?.sessionMetrics ?? []}
+            isLoading={isLoading}
+          />
 
-      {/* Skill Progress */}
-      <SkillProgress data={data?.skillProgress ?? []} isLoading={isLoading} />
+          {/* Skill Progress */}
+          <SkillProgress
+            data={data?.skillProgress ?? []}
+            isLoading={isLoading}
+          />
 
-      {/* Data freshness indicator */}
-      {data && !isLoading && (
-        <div className="text-gray-500 text-center text-xs">
-          Data updated {new Date().toLocaleTimeString()}
-        </div>
+          {/* Data freshness indicator */}
+          {data && !isLoading && (
+            <div className="text-gray-500 text-center text-xs">
+              Data updated {new Date().toLocaleTimeString()}
+            </div>
+          )}
+        </>
       )}
     </div>
   )

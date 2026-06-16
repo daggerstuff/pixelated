@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { verifyPassword } from '../../../../lib/auth/utils'
+import { hashPassword } from '../../../../lib/auth/utils'
 import { userManager, initializeDatabase } from '../../../../lib/db'
 
 // Register schema
@@ -48,7 +48,7 @@ export async function POST({ request }: { request: Request }) {
     }
 
     // Hash password
-    const hashedPassword = await verifyPassword(password, '') // This will hash the password
+    const hashedPassword = await hashPassword(password) // This will hash the password
 
     // Split full name
     const nameParts = fullName.split(' ')

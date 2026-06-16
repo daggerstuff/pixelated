@@ -2,6 +2,7 @@ import { createReadStream, createWriteStream, existsSync, mkdirSync } from "node
 import { createInterface } from "node:readline";
 import { ALLOWED_DIRECTORIES, safeJoin } from "../../../utils/path-security";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+import { getDefaultProvenanceStore } from "./provenance";
 
 const logger = createBuildSafeLogger("default");
 
@@ -80,11 +81,42 @@ async function* findNormalizedFiles(baseDir: string): AsyncGenerator<string> {
   }
 }
 
-export async function prepareForOpenAI(sourceDir?: string, outputDir?: string): Promise<string | null> {
+/**
+ * Validate that a parentMergeRunId exists in the provenance store.
+ * Throws if the run ID is missing or not found.
+ */
+async function validateParentMergeRunId(parentMergeRunId?: string): Promise<void> {
+  if (!parentMergeRunId) {
+    throw new Error(
+      "parentMergeRunId is required. Provide the mergeRunId from a previous merge operation.",
+    );
+  }
+
+  const store = getDefaultProvenanceStore();
+  const exists = await store.exists(parentMergeRunId);
+
+  if (!exists) {
+    throw new Error(
+      `parentMergeRunId "${parentMergeRunId}" not found in provenance store. ` +
+        "Ensure the merge run exists and the ID is correct.",
+    );
+  }
+}
+
+export async function prepareForOpenAI(
+  sourceDir?: string,
+  outputDir?: string,
+  parentMergeRunId?: string,
+): Promise<string | null> {
   try {
     logger.info("Preparing dataset for OpenAI fine-tuning format");
 
-    const normalizedDir = sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
+    if (parentMergeRunId) {
+      await validateParentMergeRunId(parentMergeRunId);
+    }
+
+    const normalizedDir =
+      sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
     const outDir = outputDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
     const outputPath = safeJoin(outDir, "openai_dataset.jsonl");
 
@@ -104,7 +136,7 @@ export async function prepareForOpenAI(sourceDir?: string, outputDir?: string): 
         if (!line.trim()) continue;
 
         try {
-          const record: Pix32Record = JSON.parse(line);
+          const record = JSON.parse(line) as Pix32Record;
 
           const messages: OpenAITrainingExample["messages"] = [
             { role: "system", content: SYSTEM_PROMPT },
@@ -125,7 +157,7 @@ export async function prepareForOpenAI(sourceDir?: string, outputDir?: string): 
           writeStream.write(JSON.stringify({ messages }) + "\n");
           recordCount++;
         } catch (parseError) {
-          logger.debug(`Skipping malformed line: ${parseError}`);
+          logger.debug(`Skipping malformed line: ${String(parseError)}`);
           skippedCount++;
         }
       }
@@ -136,16 +168,25 @@ export async function prepareForOpenAI(sourceDir?: string, outputDir?: string): 
     logger.info(`OpenAI dataset prepared: ${recordCount} records, ${skippedCount} skipped`);
     return outputPath;
   } catch (error: unknown) {
-    logger.error(`Failed to prepare OpenAI dataset: ${error}`);
+    logger.error(`Failed to prepare OpenAI dataset: ${String(error)}`);
     return null;
   }
 }
 
-export async function prepareForHuggingFace(sourceDir?: string, outputDir?: string): Promise<string | null> {
+export async function prepareForHuggingFace(
+  sourceDir?: string,
+  outputDir?: string,
+  parentMergeRunId?: string,
+): Promise<string | null> {
   try {
     logger.info("Preparing dataset for HuggingFace format");
 
-    const normalizedDir = sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
+    if (parentMergeRunId) {
+      await validateParentMergeRunId(parentMergeRunId);
+    }
+
+    const normalizedDir =
+      sourceDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "ai", "data", "normalized");
     const outDir = outputDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
     const outputPath = safeJoin(outDir, "huggingface_dataset.jsonl");
 
@@ -165,7 +206,7 @@ export async function prepareForHuggingFace(sourceDir?: string, outputDir?: stri
         if (!line.trim()) continue;
 
         try {
-          const record: Pix32Record = JSON.parse(line);
+          const record = JSON.parse(line) as Pix32Record;
 
           const conversations = record.messages.map((msg) => ({
             from: mapRoleToHuggingFace(msg.role),
@@ -180,13 +221,13 @@ export async function prepareForHuggingFace(sourceDir?: string, outputDir?: stri
           const hfRecord: HuggingFaceRecord = {
             conversations,
             source: record.source,
-            quality_score: (record.metadata?.['quality_score'] as number) ?? 0.5,
+            quality_score: (record.metadata?.["quality_score"] as number) ?? 0.5,
           };
 
           writeStream.write(JSON.stringify(hfRecord) + "\n");
           recordCount++;
         } catch (parseError) {
-          logger.debug(`Skipping malformed line: ${parseError}`);
+          logger.debug(`Skipping malformed line: ${String(parseError)}`);
           skippedCount++;
         }
       }
@@ -197,14 +238,18 @@ export async function prepareForHuggingFace(sourceDir?: string, outputDir?: stri
     logger.info(`HuggingFace dataset prepared: ${recordCount} records, ${skippedCount} skipped`);
     return outputPath;
   } catch (error: unknown) {
-    logger.error(`Failed to prepare HuggingFace dataset: ${error}`);
+    logger.error(`Failed to prepare HuggingFace dataset: ${String(error)}`);
     return null;
   }
 }
 
-export async function prepareAllFormats(sourceDir?: string, outputDir?: string): Promise<DatasetPaths> {
-  const openaiPath = await prepareForOpenAI(sourceDir, outputDir);
-  const huggingfacePath = await prepareForHuggingFace(sourceDir, outputDir);
+export async function prepareAllFormats(
+  sourceDir?: string,
+  outputDir?: string,
+  parentMergeRunId?: string,
+): Promise<DatasetPaths> {
+  const openaiPath = await prepareForOpenAI(sourceDir, outputDir, parentMergeRunId);
+  const huggingfacePath = await prepareForHuggingFace(sourceDir, outputDir, parentMergeRunId);
 
   return {
     openai: openaiPath,

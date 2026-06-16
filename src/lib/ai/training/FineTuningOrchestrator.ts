@@ -75,16 +75,14 @@ export class FineTuningOrchestrator {
       if (paths.huggingface) return paths.huggingface;
       throw new Error("No dataset path available for OpenAI backend");
     }
-    
-    if (backend === "huggingface") {
+if (backend === "huggingface") {
       // For HuggingFace flows, check HuggingFace path first
       if (paths.huggingface) return paths.huggingface;
       // Fall back to OpenAI path if HuggingFace not available
       if (paths.openai) return paths.openai;
       throw new Error("No dataset path available for HuggingFace backend");
     }
-    
-    // For local and dry-run backends, prefer HuggingFace over OpenAI
+// For local and dry-run backends, prefer HuggingFace over OpenAI
     // (arbitrary choice - could be configured or based on other factors)
     if (paths.huggingface) return paths.huggingface;
     if (paths.openai) return paths.openai;

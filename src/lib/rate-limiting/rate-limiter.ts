@@ -12,12 +12,6 @@ import type {
   RateLimitRule,
 } from './types'
 
-interface Pipeline {
-  incr(key: string): Pipeline
-  expire(key: string, seconds: number): Pipeline
-  exec(): Promise<any>
-}
-
 const logger = createBuildSafeLogger('rate-limiter')
 
 /**

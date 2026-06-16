@@ -1,0 +1,8 @@
+{
+  "id": "ft-1781238789273-35f096",
+  "model": "meta-llama/Llama-2-7b",
+  "status": "running",
+  "createdAt": "2026-06-12T04:33:09.273Z",
+  "backend": "huggingface",
+  "progress": 0
+}
