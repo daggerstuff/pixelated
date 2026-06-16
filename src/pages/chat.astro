@@ -18,6 +18,13 @@ export const prerender = false
       </p>
     </header>
 
-    <TherapyGate client:load />
+    <TherapyGate client:load gateApiUrl="/api/ingestion/gate" />
+
+<script>
+  import { triggerTherapyGateSubmit } from "@/components/chat/therapy-gate-trigger";
+  window.pixelatedSubmit = async (...args: unknown[]) => {
+    await triggerTherapyGateSubmit(...args);
+  };
+</script>
   </main>
 </BaseLayout>
