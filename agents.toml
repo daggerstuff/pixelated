@@ -7,3 +7,7 @@ allow_all = true
 [[skills]]
 name = "dotagents"
 source = "getsentry/dotagents"
+
+[[skills]]
+name = "agentmail"
+source = "agentmail-to/agentmail-skills"
