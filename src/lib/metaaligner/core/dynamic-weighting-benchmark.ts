@@ -347,7 +347,7 @@ function calculateBenchmarkStats(
   const p50Index = Math.floor(times.length * 0.5)
   const p95Index = Math.floor(times.length * 0.95)
   const p99Index = Math.floor(times.length * 0.99)
-  const passedThreshold = (sorted[p99Index]) < thresholdMs
+  const passedThreshold = sorted[p99Index] < thresholdMs
 
   return {
     testName,
@@ -459,8 +459,7 @@ export function exportVisualizationDataForGraphing(
 }
 
 // Run benchmark if executed directly
-const isMainModule =
-  (require('module') as unknown as { main: unknown })['main'] === module
+const isMainModule = (require('module') as { main: unknown })['main'] === module
 if (isMainModule) {
   runBenchmarkSuite()
     .then((suite) => {
