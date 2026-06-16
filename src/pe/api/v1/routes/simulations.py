@@ -10,11 +10,11 @@ Implements:
 from __future__ import annotations
 
 import json
-import traceback
 import uuid
 from datetime import datetime, timezone
-from typing import Any
+from typing import Annotated, Any
 
+import structlog
 from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from pydantic import BaseModel, Field
 from sqlalchemy import text
@@ -25,7 +25,14 @@ from src.pe.core.rbac import UserRole, role_at_least
 from src.pe.core.security import decode_access_token
 from src.pe.database import async_session_factory
 
+logger = structlog.get_logger(__name__)
+
 router = APIRouter(prefix="/simulations", tags=["simulations"])
+
+# Pre-bound role checkers (B008-compliant - factory called once at import, not at function definition)
+_educator_required = role_at_least(UserRole.EDUCATOR)
+_learner_required = role_at_least(UserRole.LEARNER)
+_admin_required = role_at_least(UserRole.INSTITUTION_ADMIN)
 
 
 # ── Schemas ───────────────────────────────────────────────────────
@@ -126,8 +133,8 @@ async def trigger_celery_chain(
 @router.post("", response_model=SimulationResponse, status_code=status.HTTP_201_CREATED)
 async def create_simulation(
     request: CreateSimulationRequest,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.EDUCATOR)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_educator_required)],
 ):
     """Create a new simulation session.
 
@@ -215,9 +222,9 @@ async def create_simulation(
 
 @router.get("", response_model=list[SimulationResponse])
 async def list_simulations(
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_learner_required)],
     status_filter: str | None = None,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.LEARNER)),
 ):
     """List simulation sessions for the current tenant.
 
@@ -271,8 +278,8 @@ async def list_simulations(
 @router.get("/{sim_id}", response_model=SimulationResponse)
 async def get_simulation(
     sim_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.LEARNER)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_learner_required)],
 ):
     """Get details of a specific simulation session."""
     result = await session.execute(
@@ -305,8 +312,8 @@ async def get_simulation(
 @router.post("/{sim_id}/start", response_model=SimulationResponse)
 async def start_simulation(
     sim_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.EDUCATOR)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_educator_required)],
 ):
     """Start a pending simulation session."""
     result = await session.execute(
@@ -340,8 +347,8 @@ async def start_simulation(
 @router.post("/{sim_id}/pause", response_model=SimulationResponse)
 async def pause_simulation(
     sim_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.EDUCATOR)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_educator_required)],
 ):
     """Pause an active simulation."""
     result = await session.execute(
@@ -375,8 +382,8 @@ async def pause_simulation(
 @router.post("/{sim_id}/resume", response_model=SimulationResponse)
 async def resume_simulation(
     sim_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.EDUCATOR)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_educator_required)],
 ):
     """Resume a paused simulation, accounting for elapsed pause time."""
     # Calculate and accumulate pause duration
@@ -414,8 +421,8 @@ async def resume_simulation(
 @router.post("/{sim_id}/abort", response_model=SimulationResponse)
 async def abort_simulation(
     sim_id: str,
-    session: AsyncSession = Depends(get_rls_session),
-    current_user: dict = Depends(role_at_least(UserRole.INSTITUTION_ADMIN)),
+    session: Annotated[AsyncSession, Depends(get_rls_session)],
+    current_user: Annotated[dict, Depends(_admin_required)],
 ):
     """Abort a simulation (admin only — terminates any status except completed)."""
     result = await session.execute(
@@ -662,8 +669,8 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
 
     except WebSocketDisconnect:
         pass
-    except Exception:
-        traceback.print_exc()
+    except (RuntimeError, OSError) as exc:
+        logger.error("websocket_error", session_id=session_id, error=str(exc))
         await manager.broadcast(
             session_id,
             {

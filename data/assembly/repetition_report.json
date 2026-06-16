@@ -1,0 +1,19 @@
+{
+  "report_type": "repetition_cleaning",
+  "created_at": "2026-06-13",
+  "input": "dataset_deduped",
+  "output": "dataset_clean",
+  "samples_removed": 948,
+  "removal_criteria": {
+    "phrase_repetition": "Same phrase repeated >3 times in a row",
+    "token_repetition": ">30% of tokens are repetitive",
+    "preserved_intentional": "Crisis grounding techniques with therapeutic repetition"
+  },
+  "repetition_patterns_found": [
+    "repeated_phrases",
+    "filler_word_loops",
+    "redundant_explanations"
+  ],
+  "samples_remaining": 118792,
+  "status": "completed"
+}

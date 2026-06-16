@@ -2,12 +2,19 @@ from __future__ import annotations
 
 import base64
 import json
+from email.message import Message
 from types import SimpleNamespace
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, urlsplit
 
+import pytest
+
+from scripts.task_sync.jira import PRIORITY_TO_JIRA
 from scripts.task_sync.provider_bridge import (
+    _LINEAR_LABEL_IDS_CACHE,
+    _resolve_linear_label_ids,
     apply_github_action,
+    apply_jira_action,
     apply_linear_action,
     asana_create_payload,
     asana_update_payload,
@@ -96,13 +103,8 @@ def test_extract_provider_target_id_for_github_issues() -> None:
 
 def test_resolve_jira_site_url_requires_https(monkeypatch) -> None:
     monkeypatch.setenv("JIRA_URL", "http://example.atlassian.net")
-
-    try:
+    with pytest.raises(RuntimeError, match="HTTPS"):
         resolve_jira_site_url()
-    except RuntimeError as exc:
-        assert "HTTPS" in str(exc)
-    else:
-        raise AssertionError("Expected HTTPS enforcement failure")
 
 
 def test_asana_create_payload_includes_project_and_status() -> None:
@@ -175,7 +177,7 @@ def test_resolve_jira_issue_type_prefers_project_issue_type_id(monkeypatch) -> N
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(method, url, *, _headers, _payload=None):
         assert method == "GET"
         assert url.endswith("/rest/api/3/issue/createmeta/PIX/issuetypes")
         return {
@@ -334,7 +336,7 @@ def test_create_jira_project_bootstraps_first_valid_candidate(monkeypatch) -> No
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     attempts: list[tuple[str, str]] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(_method, url, *, _headers, payload=None):
         if url.endswith("/rest/api/3/myself"):
             return {"accountId": "acct-1"}
         if url.endswith("/rest/api/3/project"):
@@ -361,7 +363,7 @@ def test_export_asana_tasks_aggregates_multiple_projects(monkeypatch) -> None:
     )
     calls: list[str] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(_method, url, *, _headers, _payload=None):
         calls.append(url)
         if "/projects/proj-1/tasks" in url:
             return {
@@ -380,19 +382,12 @@ def test_export_asana_tasks_aggregates_multiple_projects(monkeypatch) -> None:
             return {
                 "data": [
                     {
-                        "gid": "A-1",
-                        "name": "One",
-                        "notes": "Body",
-                        "completed": False,
-                        "modified_at": "2026-03-29T00:00:00Z",
-                    },
-                    {
-                        "gid": "A-2",
+                        "gid": "B-1",
                         "name": "Two",
                         "notes": "Body",
-                        "completed": False,
+                        "completed": True,
                         "modified_at": "2026-03-29T00:00:00Z",
-                    },
+                    }
                 ],
                 "next_page": None,
             }
@@ -425,7 +420,7 @@ def test_export_github_issues_filters_pull_requests_and_supports_pagination(monk
         }
     )
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(_method, url, *, _headers, _payload=None):
         calls.append(url)
         page = parse_qs(urlsplit(url).query).get("page", [""])[0]
         if page == "1":
@@ -512,6 +507,22 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
 
     def fake_linear_query(query: str, variables: dict[str, object] | None = None):
         calls.append((query.split("(", 1)[0], dict(variables or {})))
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                    {"id": "state-done", "name": "Done", "type": "completed"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
         if "issueCreate" in query:
             assert variables is not None
             input_payload = variables.get("input")
@@ -519,11 +530,13 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
             assert input_payload["teamId"] == "team-1"
             assert input_payload["projectId"] == "proj-1"
             assert input_payload["parentId"] == "parent-1"
+            assert input_payload["stateId"] == "state-backlog"
             return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-new"}}}}
         assert variables is not None
         input_payload = variables.get("input")
         assert isinstance(input_payload, dict)
         assert variables.get("id") == "lin-existing"
+        assert input_payload["stateId"] == "state-done"
         return {"data": {"issueUpdate": {"success": True, "issue": {"id": "lin-existing"}}}}
 
     monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
@@ -548,7 +561,8 @@ def test_apply_linear_action_creates_and_updates_issues(monkeypatch) -> None:
 
     assert create_response == {"id": "lin-new"}
     assert update_response == {"id": "lin-existing"}
-    assert len(calls) == 2
+    assert len(calls) == 4
+    assert [call[0] for call in calls] == ["query { project", "mutation", "query { project", "mutation"]
 
 
 def test_apply_github_action_updates_and_creates_issues(monkeypatch) -> None:
@@ -557,7 +571,7 @@ def test_apply_github_action_updates_and_creates_issues(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     calls: list[tuple[str, str]] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(method, url, *, _headers, payload=None):
         assert payload is not None
         calls.append((method, url))
         if method == "POST":
@@ -601,7 +615,7 @@ def test_apply_jira_action_transitions_status_best_effort(monkeypatch) -> None:
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     calls: list[tuple[str, str, dict | None]] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(method, url, *, _headers, payload=None):
         calls.append((method, url, payload))
         if method == "PUT" and url.endswith("/rest/api/3/issue/PIX-1"):
             return {}
@@ -628,8 +642,6 @@ def test_apply_jira_action_transitions_status_best_effort(monkeypatch) -> None:
         raise AssertionError((method, url, payload))
 
     monkeypatch.setattr("scripts.task_sync.provider_bridge._json_request", fake_json_request)
-
-    from scripts.task_sync.provider_bridge import apply_jira_action
 
     response = apply_jira_action(
         {
@@ -706,13 +718,8 @@ def test_resolve_configured_jira_project_key_raises_on_transient_validation(monk
         "scripts.task_sync.provider_bridge.jira_project_exists",
         lambda key: None,
     )
-
-    try:
+    with pytest.raises(RuntimeError, match=r"(?i)transient"):
         resolve_configured_jira_project_key()
-    except RuntimeError as exc:
-        assert "transient" in str(exc).lower()
-    else:
-        raise AssertionError("Expected transient Jira validation failure")
 
 
 def test_resolve_discovered_jira_project_key_persists_discovery(monkeypatch, tmp_path) -> None:
@@ -732,8 +739,6 @@ def test_resolve_discovered_jira_project_key_persists_discovery(monkeypatch, tmp
 
 
 def test_jira_project_exists_returns_false_on_request_failure(monkeypatch) -> None:
-    from email.message import Message
-
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
@@ -750,8 +755,6 @@ def test_jira_project_exists_returns_false_on_request_failure(monkeypatch) -> No
 
 
 def test_jira_project_exists_returns_none_on_transient_failure(monkeypatch) -> None:
-    from email.message import Message
-
     monkeypatch.setenv("JIRA_URL", "https://example.atlassian.net")
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
@@ -801,7 +804,7 @@ def test_apply_github_action_sends_labels_on_create(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     sent_payloads: list[dict[str, object]] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(_method, _url, *, _headers, payload=None):
         assert payload is not None
         sent_payloads.append(payload)
         return {"number": 42, "title": payload["title"], "body": payload["body"]}
@@ -827,7 +830,7 @@ def test_apply_github_action_sends_labels_on_update(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     sent_payloads: list[dict[str, object]] = []
 
-    def fake_json_request(method, url, *, headers, payload=None):
+    def fake_json_request(_method, _url, *, _headers, payload=None):
         assert payload is not None
         sent_payloads.append(payload)
         return {}
@@ -854,11 +857,15 @@ def test_apply_linear_action_includes_priority(monkeypatch) -> None:
     monkeypatch.setenv("LINEAR_PROJECT_ID", "proj-1")
     sent_variables: list[dict[str, object]] = []
 
-    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+    def fake_linear_query(_query: str, variables: dict[str, object] | None = None):
         sent_variables.append(dict(variables or {}))
         return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
 
     monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1"},
+    )
     monkeypatch.setattr(
         "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
         {"bug": "label-uuid-1", "enhancement": "label-uuid-2"},
@@ -874,7 +881,9 @@ def test_apply_linear_action_includes_priority(monkeypatch) -> None:
         }
     )
 
-    assert sent_variables[0]["input"]["priority"] == 1
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["priority"] == 1
 
 
 def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
@@ -884,6 +893,21 @@ def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
     sent_variables: list[dict[str, object]] = []
 
     def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
         sent_variables.append(dict(variables or {}))
         return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
 
@@ -903,21 +927,69 @@ def test_apply_linear_action_resolves_label_ids_from_cache(monkeypatch) -> None:
         }
     )
 
-    assert sent_variables[0]["input"]["labelIds"] == ["label-uuid-1", "label-uuid-2"]
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["labelIds"] == ["label-uuid-1", "label-uuid-2"]
+
+
+def test_apply_linear_action_resolves_state_id_from_canonical_status(monkeypatch) -> None:
+    monkeypatch.setenv("LINEAR_API_KEY", "token")
+    monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
+    monkeypatch.setenv("LINEAR_PROJECT_ID", "proj-1")
+    sent_variables: list[dict[str, object]] = []
+
+    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+        if "project(id:" in query:
+            return {
+                "data": {
+                    "project": {
+                        "name": "Foresight Memory Architecture",
+                        "team": {
+                            "states": {
+                                "nodes": [
+                                    {"id": "state-backlog", "name": "Backlog", "type": "backlog"},
+                                    {"id": "state-todo", "name": "Todo", "type": "unstarted"},
+                                    {"id": "state-progress", "name": "In Progress", "type": "started"},
+                                    {"id": "state-done", "name": "Done", "type": "completed"},
+                                ]
+                            }
+                        },
+                    }
+                }
+            }
+        sent_variables.append(dict(variables or {}))
+        return {"data": {"issueCreate": {"success": True, "issue": {"id": "lin-1"}}}}
+
+    monkeypatch.setattr("scripts.task_sync.provider_bridge._linear_graphql_query", fake_linear_query)
+    monkeypatch.setattr(
+        "scripts.task_sync.provider_bridge._LINEAR_LABEL_IDS_CACHE",
+        {"bug": "label-uuid-1"},
+    )
+
+    apply_linear_action(
+        {
+            "action": "create",
+            "title": "Workflow issue",
+            "body": "Needs mapped state",
+            "status": "open",
+            "priority_label": "high",
+            "labels": ["bug"],
+        }
+    )
+
+    input_payload = sent_variables[-1].get("input")
+    assert isinstance(input_payload, dict)
+    assert input_payload["stateId"] == "state-backlog"
+    assert input_payload["priority"] == 1
 
 
 def test_resolve_linear_label_ids_populates_cache_on_first_call(monkeypatch) -> None:
-    from scripts.task_sync.provider_bridge import (
-        _LINEAR_LABEL_IDS_CACHE,
-        _resolve_linear_label_ids,
-    )
-
     monkeypatch.setenv("LINEAR_API_KEY", "token")
     monkeypatch.setenv("LINEAR_TEAM_ID", "team-1")
     monkeypatch.setenv("LINEAR_LABEL_IDS_CACHE", "")
     _LINEAR_LABEL_IDS_CACHE.clear()
 
-    def fake_linear_query(query: str, variables: dict[str, object] | None = None):
+    def fake_linear_query(_query: str, _variables: dict[str, object] | None = None):
         return {
             "data": {
                 "team": {
@@ -942,16 +1014,12 @@ def test_resolve_linear_label_ids_populates_cache_on_first_call(monkeypatch) -> 
 
 
 def test_resolve_linear_label_ids_returns_empty_without_team_id(monkeypatch) -> None:
-    from scripts.task_sync.provider_bridge import _resolve_linear_label_ids
-
     monkeypatch.setenv("LINEAR_TEAM_ID", "")
 
     assert _resolve_linear_label_ids(["bug"]) == []
 
 
 def test_legacy_jira_create_payload_includes_priority_and_labels() -> None:
-    from scripts.task_sync.jira import PRIORITY_TO_JIRA, jira_create_payload
-
     action = SimpleNamespace(
         title="Critical bug",
         body="Must fix",
@@ -959,15 +1027,13 @@ def test_legacy_jira_create_payload_includes_priority_and_labels() -> None:
         labels=["bug", "frontend"],
     )
 
-    payload = jira_create_payload(action, "PIX", "Task")
+    payload = jira_create_payload(action, "PIX", {"name": "Task"})
 
     assert payload["fields"]["priority"] == {"name": PRIORITY_TO_JIRA["high"]}
     assert payload["fields"]["labels"] == ["bug", "frontend"]
 
 
 def test_legacy_jira_update_payload_includes_priority_and_labels() -> None:
-    from scripts.task_sync.jira import PRIORITY_TO_JIRA, jira_update_payload
-
     action = SimpleNamespace(
         title="Critical bug",
         body="Must fix",
@@ -982,19 +1048,15 @@ def test_legacy_jira_update_payload_includes_priority_and_labels() -> None:
 
 
 def test_legacy_jira_create_payload_skips_priority_and_labels_when_missing() -> None:
-    from scripts.task_sync.jira import jira_create_payload
-
     action = SimpleNamespace(title="No extras", body="Just body")
 
-    payload = jira_create_payload(action, "PIX", "Task")
+    payload = jira_create_payload(action, "PIX", {"name": "Task"})
 
     assert "priority" not in payload["fields"]
     assert "labels" not in payload["fields"]
 
 
 def test_legacy_jira_update_payload_skips_priority_and_labels_when_missing() -> None:
-    from scripts.task_sync.jira import jira_update_payload
-
     action = SimpleNamespace(title="No extras", body="Just body")
 
     payload = jira_update_payload(action)
@@ -1020,7 +1082,7 @@ def test_jira_project_exists_uses_cache(monkeypatch) -> None:
         def __exit__(self, exc_type, exc, tb):
             return False
 
-    def fake_urlopen(req):
+    def fake_urlopen(_req):
         calls["count"] += 1
         return FakeResponse()
 

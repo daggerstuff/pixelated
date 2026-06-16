@@ -119,6 +119,8 @@ export class DashboardUpdater {
 
 // Initialize dashboard updates when DOM is loaded
 export function initDashboardUpdates() {
+  if (typeof window === 'undefined') return
+
   const dashboard = new DashboardUpdater()
   dashboard.startUpdates()
 

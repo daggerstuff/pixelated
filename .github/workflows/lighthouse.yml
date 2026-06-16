@@ -1,0 +1,159 @@
+name: Lighthouse CI
+
+permissions:
+  contents: read
+  pull-requests: write
+
+on:
+  pull_request:
+    branches: [staging]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.lighthouserc.json'
+      - '.github/workflows/lighthouse.yml'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  PNPM_CONFIG_TRUST_LOCKFILE: 'true'
+  NODE_VERSION: 24.16.0
+  PNPM_VERSION: 11.6.0
+  LHCI_PORT: 4323
+
+jobs:
+  lighthouse:
+    name: Lighthouse Audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: false
+
+      - name: Initialize submodules
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash scripts/devops/init-submodules.sh
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 build-essential
+          npm install -g node-gyp
+
+      - name: Get pnpm store path
+        id: pnpm-store
+        run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache pnpm store
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+        with:
+          path: ${{ steps.pnpm-store.outputs.path }}
+          key: ${{ runner.os }}-pnpm-lhci-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-lhci-
+
+      - name: Install dependencies
+        run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+
+      - name: Build Astro site
+        run: pnpm run build
+
+      - name: Install Lighthouse CI
+        run: npm install -g @lhci/cli@0.15.x
+
+      - name: Start preview server
+        run: |
+          nohup env HOST=127.0.0.1 PORT="${LHCI_PORT}" WEBSITES_PORT="${LHCI_PORT}" \
+            pnpm run start > /tmp/pixelated-preview.log 2>&1 &
+          echo "PREVIEW_PID=$!" >> "$GITHUB_ENV"
+
+          echo "Waiting for preview server on port ${LHCI_PORT}..."
+          for attempt in $(seq 1 60); do
+            if curl -sS --connect-timeout 2 --max-time 5 \
+                "http://127.0.0.1:${LHCI_PORT}/" > /dev/null 2>&1; then
+              echo "Preview server ready at http://127.0.0.1:${LHCI_PORT}"
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Preview server failed to start within 60s"
+          tail -n 80 /tmp/pixelated-preview.log || true
+          exit 1
+
+      - name: Run Lighthouse CI
+        run: lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: Stop preview server
+        if: always()
+        run: |
+          if [[ -n "${PREVIEW_PID:-}" ]] && kill -0 "${PREVIEW_PID}" > /dev/null 2>&1; then
+            kill "${PREVIEW_PID}" 2>/dev/null || true
+            wait "${PREVIEW_PID}" 2>/dev/null || true
+          fi
+
+      - name: Upload LHCI results
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: lhci-report-${{ github.run_id }}
+          path: .lighthouseci
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Post Lighthouse report to PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const lhciDir = path.join(process.cwd(), '.lighthouseci');
+            let reportLinks = [];
+
+            try {
+              const files = fs.readdirSync(lhciDir);
+              const htmlFiles = files.filter(f => f.endsWith('.html'));
+
+              for (const file of htmlFiles) {
+                const name = path.basename(file, '.html');
+                reportLinks.push(`- ${name}`);
+              }
+            } catch (e) {
+              reportLinks.push('- Report files not found (see artifacts)');
+            }
+
+            const body = `## Lighthouse CI Results\n\n` +
+              `**Routes audited:** \`/\`, \`/dashboard?perf=1\`, \`/training-session\`\n\n` +
+              `**Thresholds:** Performance \u226590 | Accessibility \u226590 | Best Practices \u226585\n\n` +
+              `### Reports\n${reportLinks.join('\n') || '- See workflow artifacts for details'}\n\n` +
+              `>Reports are also available as [workflow artifacts](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body
+            });
