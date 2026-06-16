@@ -69,9 +69,10 @@ function isNodeEnvironment(): boolean {
 
 // Use Node crypto via guarded require when available; fallback to runtime checks for browsers
 const nodeCrypto = tryRequireNode('crypto')
-const nodeCryptoRandomBytes = isNonNullObject(nodeCrypto)
-  ? nodeCrypto['randomBytes']
-  : undefined
+const nodeCryptoRandomBytes =
+  isNonNullObject(nodeCrypto) && typeof nodeCrypto['randomBytes'] === 'function'
+    ? (nodeCrypto['randomBytes'] as (size: number) => Uint8Array)
+    : undefined
 
 /**
  * Type guard for checking if value is a non-null object
@@ -96,8 +97,8 @@ export function getRandomBytes(size: number): Uint8Array {
   } else {
     // Node.js environment
     try {
-      if (typeof nodeCryptoRandomBytes === 'function') {
-        return new Uint8Array(nodeCryptoRandomBytes(size))
+      if (nodeCryptoRandomBytes) {
+        return nodeCryptoRandomBytes(size)
       }
       throw new Error(ERRORS.NODE_CRYPTO_UNAVAILABLE)
     } catch {
@@ -438,8 +439,8 @@ export function deepClone<T>(obj: T): T {
     return new Date(obj.getTime()) as T
   }
 
-  if (obj instanceof Array) {
-    return obj.map((item) => deepClone(item)) as T
+  if (Array.isArray(obj)) {
+    return obj.map((item: unknown) => deepClone(item)) as unknown as T
   }
 
   if (isObject(obj)) {
@@ -906,7 +907,7 @@ export function getStorageItem<T>(key: string, defaultValue: T): T {
 
   try {
     const item = localStorage.getItem(key)
-    return item !== null ? JSON.parse(item) : defaultValue
+    return item !== null ? (JSON.parse(item) as unknown as T) : defaultValue
   } catch {
     return defaultValue
   }
