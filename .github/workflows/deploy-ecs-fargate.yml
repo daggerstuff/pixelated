@@ -78,6 +78,18 @@ jobs:
           done
           echo "Done."
 
+      - name: Fix ALB target group health check path
+        continue-on-error: true
+        run: |
+          for TG in pixelated-empathy-staging-tg pixelated-empathy-staging-green; do
+            echo "Updating health check for $TG..."
+            aws elbv2 modify-target-group \
+              --target-group-name "$TG" \
+              --health-check-path "/api/health/" 2>/dev/null && \
+              echo "  Updated $TG to /api/health/" || \
+              echo "  Skipped $TG (not found or already correct)"
+          done
+
       - name: Determine image tag
         id: vars
         run: |
