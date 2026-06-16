@@ -348,7 +348,6 @@ export default defineConfig({
           '@opentelemetry/exporter-trace-otlp-http',
           '@opentelemetry/exporter-metrics-otlp-http',
           '@opentelemetry/otlp-transformer',
-          /^@opentelemetry\//,
         ],
         /** @param {RollupLog} warning */
         /** @param {(warning: RollupLog) => void} warn */
@@ -495,7 +494,6 @@ export default defineConfig({
         '@opentelemetry/exporter-trace-otlp-http',
         '@opentelemetry/exporter-metrics-otlp-http',
         '@opentelemetry/otlp-transformer',
-        /^@opentelemetry\//,
       ],
     },
     optimizeDeps: {
@@ -611,6 +609,7 @@ export default defineConfig({
     const base = [
       react({
         include: ['**/react/*', '**/components/**/*'],
+        experimentalReactChildren: true,
       }),
     ]
     if (MIN_DEV) return base

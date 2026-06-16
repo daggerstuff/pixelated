@@ -732,6 +732,57 @@ def resolve_linear_parent_issue_id() -> str:
     return _strip_env("LINEAR_PARENT_ISSUE_ID")
 
 
+def _linear_project_workflow_query(project_id: str) -> str:
+    return f'query {{ project(id: "{project_id}") {{ name team {{ states {{ nodes {{ id name type }} }} }} }} }}'
+
+
+def _canonical_linear_status_candidates(status: str) -> tuple[str, ...]:
+    normalized = status.strip().lower().replace("-", " ").replace("_", " ")
+    if normalized in {"closed", "done", "resolved", "complete", "completed", "cancelled", "canceled"}:
+        return ("done", "closed", "completed", "canceled", "cancelled", "duplicate")
+    if normalized in {"review", "in review", "under review"}:
+        return ("review", "in review", "under review")
+    if normalized in {"in progress", "doing", "active", "started"}:
+        return ("in progress", "doing", "active", "started")
+    if normalized in {"triage"}:
+        return ("triage",)
+    return ("backlog", "todo", "to do", "open", "unstarted")
+
+
+def _resolve_linear_state_id(status: str, project_id: str) -> str | None:
+    if not project_id:
+        return None
+    response = _extract_graphql_payload(_linear_graphql_query(_linear_project_workflow_query(project_id)))
+    project = response.get("project")
+    if not isinstance(project, Mapping):
+        return None
+    team = project.get("team")
+    if not isinstance(team, Mapping):
+        return None
+    states = team.get("states")
+    if not isinstance(states, Mapping):
+        return None
+    nodes = states.get("nodes")
+    if not isinstance(nodes, list):
+        return None
+
+    candidates = _canonical_linear_status_candidates(status)
+    result = None
+    for candidate in candidates:
+        for node in nodes:
+            if not isinstance(node, Mapping):
+                continue
+            node_id = _coerce_provider_target_id(node.get("id"))
+            node_name = str(node.get("name") or "").strip().lower()
+            node_type = str(node.get("type") or "").strip().lower().replace("_", " ")
+            if node_id and candidate in {node_name, node_type}:
+                result = node_id
+                break
+        if result is not None:
+            break
+    return result
+
+
 def build_linear_headers(token: str) -> dict[str, str]:
     auth = token if token.startswith("lin_api_") else f"Bearer {token}"
     return {
@@ -1091,11 +1142,11 @@ def export_jira_issues() -> list[dict[str, Any]]:
     headers = build_jira_auth_header(resolve_jira_user(), resolve_jira_token())
     project_key = resolve_jira_project_key(create_if_missing=True)
     jql = jira_search_jql(project_key)
-    
+
     issues: list[dict[str, Any]] = []
     next_page_token = None
     max_results = 100
-    
+
     while True:
         params = {
             "jql": jql,
@@ -1104,16 +1155,16 @@ def export_jira_issues() -> list[dict[str, Any]]:
         }
         if next_page_token:
             params["nextPageToken"] = next_page_token
-            
+
         url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(params)}"
         payload = _json_request("GET", url, headers=headers)
         batch = payload.get("issues", [])
         issues.extend(batch)
-        
+
         if payload.get("isLast") or not payload.get("nextPageToken"):
             break
         next_page_token = payload.get("nextPageToken")
-        
+
     return issues
 
 
@@ -1355,29 +1406,31 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         if label_ids:
             input_payload["labelIds"] = label_ids
 
-    mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
-    key = "issueCreate"
+    desired_status = str(action.get("status") or "").strip()
+    project_id = resolve_linear_project_id()
+    state_id = _resolve_linear_state_id(desired_status, project_id) if desired_status and project_id else None
+    if state_id:
+        input_payload["stateId"] = state_id
 
     if action_type == "create":
-        team_id = resolve_linear_team_id()
-        if team_id:
-            input_payload["teamId"] = team_id
-        project_id = resolve_linear_project_id()
-        if project_id:
-            input_payload["projectId"] = project_id
-        parent_issue_id = resolve_linear_parent_issue_id()
-        if parent_issue_id:
-            input_payload["parentId"] = parent_issue_id
+        mutation = "mutation($input: IssueCreateInput!) { issueCreate(input: $input) { success issue { id title } } }"
+        key = "issueCreate"
+        variables: dict[str, Any] = {"input": input_payload}
+        optional_fields = {
+            "teamId": resolve_linear_team_id(),
+            "projectId": project_id,
+            "parentId": resolve_linear_parent_issue_id(),
+        }
+        for field, value in optional_fields.items():
+            if value:
+                input_payload[field] = value
     else:
         mutation = (
             "mutation($id: String!, $input: IssueUpdateInput!) { "
             "issueUpdate(id: $id, input: $input) { success issue { id title } } }"
         )
         key = "issueUpdate"
-
-    variables: dict[str, Any] = {"input": input_payload}
-    if action_type != "create":
-        variables["id"] = target_id
+        variables: dict[str, Any] = {"input": input_payload, "id": target_id}
 
     response = _extract_graphql_payload(_linear_graphql_query(mutation, variables))
     container = response.get(key)
@@ -1388,10 +1441,8 @@ def apply_linear_action(action: Mapping[str, Any]) -> dict[str, Any]:
         return {}
 
     issue_id = _coerce_provider_target_id(issue.get("id"))
-    if issue_id:
-        return {"id": issue_id}
-    if target_id:
-        return {"id": target_id}
+    if issue_id or target_id:
+        return {"id": issue_id or target_id}
     return {}
 
 

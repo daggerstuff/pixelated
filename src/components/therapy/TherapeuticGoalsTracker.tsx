@@ -157,7 +157,7 @@ export function TherapeuticGoalsTracker({
     if (!activeGoal) return []
     return activeGoal.checkpoints.map((cp) => ({
       ...cp,
-      formattedCompletedAt: cp.completedAt
+formattedCompletedAt: cp.completedAt != null
         ? new Date(cp.completedAt).toLocaleDateString()
         : '',
     }))
@@ -364,9 +364,11 @@ export function TherapeuticGoalsTracker({
       </Card>
 
       {/* Category filter */}
-      <div className="mb-4 flex gap-1 overflow-x-auto pb-2">
+      <div className="mb-4 flex gap-1 overflow-x-auto pb-2" role="tablist">
         <Button
           size="sm"
+          role="tab"
+          aria-selected={activeTab === 'all'}
           variant={activeTab === 'all' ? 'default' : 'outline'}
           onClick={() => handleCategoryClick('all')}
           className="whitespace-nowrap text-xs"
@@ -377,6 +379,8 @@ export function TherapeuticGoalsTracker({
           <Button
             key={category}
             size="sm"
+            role="tab"
+            aria-selected={activeTab === category}
             variant={activeTab === category ? 'default' : 'outline'}
             onClick={() => handleCategoryClick(category)}
             className="whitespace-nowrap text-xs"
