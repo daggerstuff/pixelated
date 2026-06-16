@@ -15,7 +15,7 @@
  *   }
  */
 
-import type { APIRoute, APIContext } from 'astro'
+import type { APIRoute } from "astro";
 
 import { applyRateLimit } from '@/lib/api/rate-limit'
 import { getSession } from '@/lib/auth/session'

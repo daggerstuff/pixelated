@@ -240,7 +240,10 @@ export async function initBrowserSearch(
       // Use dynamic import with module specifier pattern that Vite can analyze
       // First attempt - standard import path for ESM
       const flexsearchPath = 'flexsearch'
-      const flexsearch = await import(flexsearchPath)
+      const flexsearch = (await import(flexsearchPath)) as {
+        default?: { Document?: FlexSearchDocumentConstructor }
+        Document?: FlexSearchDocumentConstructor
+      }
       Document = (flexsearch.default?.Document ??
         flexsearch.Document) as FlexSearchDocumentConstructor
     } catch (err: unknown) {
@@ -251,9 +254,11 @@ export async function initBrowserSearch(
       try {
         // Second attempt - alternate path for CommonJS fallback
         const documentModulePath = 'flexsearch/dist/module/document'
-        const documentModule = await import(documentModulePath)
+        const documentModule = (await import(documentModulePath)) as {
+          default: FlexSearchDocumentConstructor
+        }
         // Use default export as the Document class
-        Document = documentModule.default as FlexSearchDocumentConstructor
+        Document = documentModule.default
       } catch (docErr) {
         console.error(
           'Failed to load flexsearch Document from alternate path:',
