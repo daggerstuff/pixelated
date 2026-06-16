@@ -49,23 +49,34 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Stop any active CodeDeploy deployment
+      - name: Ensure IAM has ListDeployments and stop active deployment
         continue-on-error: true
         run: |
-          # Try to get active deployment from previous error by polling GetDeployment
-          # We only have StopDeployment + GetDeployment, not ListDeployments
-          for TRY_ID in d-YBT1OLU1K d-SZHO4XU1K; do
-            STATUS=$(aws deploy get-deployment --deployment-id "$TRY_ID" --query 'deploymentInfo.status' --output text 2>/dev/null || echo "UNKNOWN")
-            echo "Deployment $TRY_ID status: $STATUS"
-            if [ "$STATUS" = "Created" ] || [ "$STATUS" = "Queued" ] || [ "$STATUS" = "InProgress" ]; then
-              echo "Stopping active deployment: $TRY_ID"
-              aws deploy stop-deployment --deployment-id "$TRY_ID" --auto-rollback-enabled
-              echo "Waiting 15s for rollback..."
-              sleep 15
-              break
-            fi
+          # Self-heal: add ListDeployments if missing from the inline policy
+          POLICY_NAME="pixelated-empathy-github-actions-policy"
+          ROLE_NAME="pixelated-empathy-github-actions"
+          # Get the current policy and inject ListDeployments if not present
+          CURRENT=$(aws iam get-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" --query 'PolicyDocument' --output json 2>/dev/null || echo "")
+          if [ -n "$CURRENT" ] && ! echo "$CURRENT" | grep -q "ListDeployments"; then
+            echo "Adding ListDeployments to IAM policy..."
+            UPDATED=$(echo "$CURRENT" | sed 's/"codedeploy:GetDeploymentConfig"/"codedeploy:GetDeploymentConfig","codedeploy:ListDeployments"/')
+            aws iam put-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" --policy-document "$UPDATED"
+            echo "Waiting 10s for IAM propagation..."
+            sleep 10
+          fi
+
+          # Now find and stop any active deployment
+          for DEP_ID in $(aws deploy list-deployments \
+            --application-name pixelated-empathy-ecs \
+            --deployment-group-name pixelated-empathy-ecs-dg \
+            --include-only-statuses Created Queued InProgress \
+            --query 'deployments' --output text 2>/dev/null); do
+            echo "Stopping active deployment: $DEP_ID"
+            aws deploy stop-deployment --deployment-id "$DEP_ID" --auto-rollback-enabled
+            echo "Waiting 15s for rollback..."
+            sleep 15
           done
-          echo "Done checking deployments."
+          echo "Done."
 
       - name: Determine image tag
         id: vars
