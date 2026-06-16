@@ -49,6 +49,22 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      - name: Stop any active CodeDeploy deployment
+        run: |
+          DEPLOY_ID=$(aws deploy list-deployments \
+            --application-name pixelated-empathy-ecs \
+            --deployment-group-name pixelated-empathy-ecs-dg \
+            --include-only-statuses Created Queued InProgress \
+            --query 'deployments[0]' --output text)
+          if [ "$DEPLOY_ID" != "None" ] && [ -n "$DEPLOY_ID" ]; then
+            echo "Stopping active deployment: $DEPLOY_ID"
+            aws deploy stop-deployment --deployment-id "$DEPLOY_ID" --auto-rollback-enabled
+            echo "Waiting 15s for rollback to settle..."
+            sleep 15
+          else
+            echo "No active deployment found, proceeding."
+          fi
+
       - name: Determine image tag
         id: vars
         run: |
