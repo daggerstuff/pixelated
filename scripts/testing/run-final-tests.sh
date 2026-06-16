@@ -27,7 +27,7 @@ echo -e "${GREEN}🧪 Running Security Tests...${NC}"
 npm install --save-dev supertest autocannon
 
 # Run security tests
-npm test -- tests/security.test.js
+npm test -- tests/security.test.cjs
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Security tests passed!${NC}"
@@ -39,7 +39,7 @@ fi
 echo -e "${GREEN}⚡ Running Load Tests...${NC}"
 
 # Run load tests
-node tests/load.test.js
+node tests/load.test.cjs
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Load tests passed!${NC}"
