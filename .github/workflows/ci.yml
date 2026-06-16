@@ -33,7 +33,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       TRIVY_STRICT_GATE: false
-      VITEST_COVERAGE_ENABLED: false
+      VITEST_COVERAGE_ENABLED: true
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
       UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}
@@ -55,7 +55,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
-          version: 11.5.2
+          version: 11.6.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -110,6 +110,13 @@ jobs:
           # Timeout prevents hanging integration tests (no Redis/Auth0 in CI)
           # from consuming the entire job budget. The step continues regardless.
           timeout 10m pnpm test || true
+
+      - name: Upload coverage to Qlty
+        continue-on-error: true
+        uses: qltysh/qlty-action/coverage@v2
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/lcov.info
 
       - name: Build Docker image
         id: build-image
@@ -171,5 +178,3 @@ jobs:
             echo "Trivy strict gate is enabled and critical/high findings were detected."
             exit 1
           fi
-
-
