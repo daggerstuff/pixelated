@@ -86,7 +86,7 @@ export class MonitoringService {
         "https://cdn.jsdelivr.net/npm/@grafana/faro-web-sdk@latest/dist/bundle/faro-web-sdk.js";
       script.async = true;
       script.onload = () => {
-        if ((window as any).faro) {
+        if ((window as any)?.faro) {
           (window as any).faro.init({
             url: this.config.grafana.url,
             apiKey,
@@ -128,7 +128,7 @@ export class MonitoringService {
 
   private initializePerformanceObservers() {
     // Performance Observer for Core Web Vitals
-    if ("PerformanceObserver" in window) {
+    if (typeof window !== 'undefined' && "PerformanceObserver" in window) {
       // Largest Contentful Paint
       new PerformanceObserver((entryList) => {
         const entries = entryList.getEntries();
@@ -157,7 +157,7 @@ export class MonitoringService {
   }
 
   private reportWebVital(metric: string, entry: PerformanceEntry): void {
-    if ((window as any).faro) {
+    if ((window as any)?.faro) {
       (window as any).faro.api.pushMeasurement(metric, {
         value: entry.startTime,
         unit: "ms",
@@ -173,7 +173,7 @@ export class MonitoringService {
       resources: performance.getEntriesByType("resource") as PerformanceResourceTiming[],
     };
 
-    if ((window as any).faro) {
+    if ((window as any)?.faro) {
       (window as any).faro.api.pushMeasurement("performance", {
         value: metrics,
       });
@@ -223,6 +223,8 @@ export class MonitoringService {
   }
 
   private setupAlertHandlers() {
+    if (typeof window === 'undefined') return;
+
     window.addEventListener("error", (event) => {
       void this.triggerAlert("error", {
         message: event.message,
@@ -254,7 +256,7 @@ export class MonitoringService {
 
     try {
       // Send to Grafana
-      if ((window as any).faro) {
+      if ((window as any)?.faro) {
         (window as any).faro.api.pushError(new Error(data.message), {
           type,
           level: data.level,
