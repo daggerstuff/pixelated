@@ -61,13 +61,25 @@ jobs:
           echo "IMAGE_TAG=${IMAGE_TAG:0:7}" >> $GITHUB_ENV
           echo "image_tag=${IMAGE_TAG:0:7}" >> $GITHUB_OUTPUT
 
+      - name: Resolve image URI for redeploy
+        if: inputs.image_tag != ''
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          IMAGE_URI="$ECR_REGISTRY/$ECR_REPOSITORY:${{ steps.vars.outputs.image_tag }}"
+          echo "Using existing image: $IMAGE_URI"
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+
       - name: Set up QEMU (multi-arch build support)
+        if: inputs.image_tag == ''
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
+        if: inputs.image_tag == ''
         uses: docker/setup-buildx-action@v3
 
       - name: Build and push ARM64 image
+        if: inputs.image_tag == ''
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
