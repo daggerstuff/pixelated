@@ -3085,8 +3085,8 @@ packages:
   '@opencode-ai/sdk@1.17.3':
     resolution: {integrity: sha512-oXrEjOuP3+J9pPNw3cmOnRma/xiVQ4WIIvGd6YkhPQgqqi2PnD/b1qfNY0AMead3QfNhKwKdDM4QFJdN2LpByg==}
 
-  '@opencode-ai/sdk@1.17.7':
-    resolution: {integrity: sha512-7q7StGM+N0OwUgRsmDc8Gyz3hMIH1XGig+qZ4lzWUpmSgFEjLx8U7R14GXY7KiMJVdbVf6FeaYloRz2Rcsma4A==}
+  '@opencode-ai/sdk@1.17.6':
+    resolution: {integrity: sha512-kCzdd9Git2sjDjXSHj4mMWuU1RXZ38d7gFEcq2rzlVz7XV6PPwNw8pelWsk99La2CtDkpfoW5lfHnpCaK6/oBQ==}
 
   '@opentelemetry/api-logs@0.213.0':
     resolution: {integrity: sha512-zRM5/Qj6G84Ej3F1yt33xBVY/3tnMxtL1fiDIxYbDWYaZ/eudVw3/PBiZ8G7JwUxXxjW8gU4g6LnOyfGKYHYgw==}
@@ -15162,7 +15162,7 @@ snapshots:
     dependencies:
       cross-spawn: 7.0.6
 
-  '@opencode-ai/sdk@1.17.7':
+  '@opencode-ai/sdk@1.17.6':
     dependencies:
       cross-spawn: 7.0.6
 
@@ -17671,7 +17671,7 @@ snapshots:
     dependencies:
       '@anthropic-ai/tokenizer': 0.0.4
       '@opencode-ai/plugin': 1.17.3
-      '@opencode-ai/sdk': 1.17.7
+      '@opencode-ai/sdk': 1.17.6
       '@opentui/core': 0.2.16(typescript@6.0.3)(web-tree-sitter@0.25.10)
       '@opentui/solid': 0.2.16(solid-js@1.9.13)(typescript@6.0.3)(web-tree-sitter@0.25.10)
       jsonc-parser: 3.3.1
