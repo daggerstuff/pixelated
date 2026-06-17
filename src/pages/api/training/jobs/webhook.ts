@@ -149,7 +149,7 @@ async function reconcileStatus(
 
   // If we have a fresh status and it's running but existing is already terminal,
   // preserve the known terminal state to prevent regression
-  const isTerminal = (status: FineTuningStatus) =>
+const isTerminal = (status: FineTuningStatus) =>
     status === 'succeeded' || status === 'failed' || status === 'cancelled';
 
   if (fresh === 'running' && isTerminal(existing.status)) {
