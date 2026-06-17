@@ -204,10 +204,8 @@ jobs:
         run: |
           gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
 
-      - name: Push Docker image to Google Artifact Registry
-        if:
-          github.event_name == 'push' || github.event_name ==
-          'workflow_dispatch'
+      - name: Push Docker image to Google Artifact Registry (staging :latest)
+        if: github.event_name == 'push'
         env:
           GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
         run: |
