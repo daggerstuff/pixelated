@@ -24,21 +24,21 @@ import {
   handleGatewayError,
   requireAuthenticatedMemoryCaller,
   type AuthenticatedMemoryCaller,
-} from "@/lib/memory/contract/route-helpers";
+} from '@/lib/memory/contract/route-helpers'
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
 export interface V1RouteContext {
-  request: Request;
-  params?: Record<string, string | undefined>;
+  request: Request
+  params?: Record<string, string | undefined>
 }
 
 export type V1AuthHandler<TContext extends V1RouteContext> = (
   context: TContext,
   caller: AuthenticatedMemoryCaller,
-) => Promise<Response>;
+) => Promise<Response>
 
 // ---------------------------------------------------------------------------
 // Middleware
@@ -59,13 +59,13 @@ export function withV1Contract<TContext extends V1RouteContext>(
   handler: V1AuthHandler<TContext>,
 ): (context: TContext) => Promise<Response> {
   return async (context: TContext): Promise<Response> => {
-    const auth = await requireAuthenticatedMemoryCaller(context.request);
-    if (!auth.ok) return auth.response;
+    const auth = await requireAuthenticatedMemoryCaller(context.request)
+    if (!auth.ok) return auth.response
 
     try {
-      return await handler(context, auth.caller);
+      return await handler(context, auth.caller)
     } catch (err) {
-      return handleGatewayError(action, err);
+      return handleGatewayError(action, err)
     }
-  };
+  }
 }

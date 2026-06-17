@@ -15,7 +15,7 @@ describe("getAIService factory (S2: mock-vs-prod dispatch)", () => {
   it("returns MockAIService when PRODUCTION_AI_SERVICE is not set", async () => {
     vi.stubEnv("PRODUCTION_AI_SERVICE", "");
     const mod = await import("../index");
-    mod.resetAIService();
+    mod.resetAIServiceForTesting();
     const svc = await mod.getAIService();
     const status = await svc.getStatus();
     expect(status.activeModels).toEqual(["mock-model-v1"]);
@@ -25,7 +25,7 @@ describe("getAIService factory (S2: mock-vs-prod dispatch)", () => {
   it("returns FineTuningAIService when PRODUCTION_AI_SERVICE=true", async () => {
     vi.stubEnv("PRODUCTION_AI_SERVICE", "true");
     const mod = await import("../index");
-    mod.resetAIService();
+    mod.resetAIServiceForTesting();
     const svc = await mod.getAIService();
     const status = await svc.getStatus();
     expect(Array.isArray(status.activeModels)).toBe(true);

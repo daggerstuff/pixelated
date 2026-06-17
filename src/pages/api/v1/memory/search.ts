@@ -10,6 +10,7 @@ import {
   SearchMemoriesResponse,
   SearchMemoryRequest,
 } from '@/lib/memory/contract/v1'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 /**
  * @file src/pages/api/v1/memory/search.ts
  *
@@ -19,7 +20,6 @@ import {
  *   POST /api/v1/memory/search  body: { q, limit?, offset? }
  */
 import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
-import { withV1Contract } from '@/lib/middleware/with-v1-contract'
 
 // ---------------------------------------------------------------------------
 // GET /api/v1/memory/search

@@ -3,13 +3,13 @@
 #   PostgreSQL + Redis + FastAPI backend + Celery worker + Frontend
 
 x-common-env: &common-env
-  PE_DATABASE_URL: "postgresql+asyncpg://pe:pe_dev_password@postgres:5432/pixelated_empathy"
-  PE_REDIS_URL: "redis://redis:6379/0"
-  PE_JWT_SECRET_KEY: "dev-jwt-secret-change-in-production"
-  PE_ENCRYPTION_KEY: "dev-encryption-key-change-in-production"
-  PE_LOG_LEVEL: "DEBUG"
+  PE_DATABASE_URL: 'postgresql+asyncpg://pe:pe_dev_password@postgres:5432/pixelated_empathy'
+  PE_REDIS_URL: 'redis://redis:6379/0'
+  PE_JWT_SECRET_KEY: 'dev-jwt-secret-change-in-production'
+  PE_ENCRYPTION_KEY: 'dev-encryption-key-change-in-production'
+  PE_LOG_LEVEL: 'DEBUG'
   PE_CORS_ORIGINS: '["http://localhost:3000","http://localhost:5173","http://frontend:5173"]'
-  PE_DEBUG: "true"
+  PE_DEBUG: 'true'
 
 services:
   # ── PostgreSQL ──────────────────────────────────────────────────
@@ -21,12 +21,12 @@ services:
       POSTGRES_PASSWORD: pe_dev_password
       POSTGRES_DB: pixelated_empathy
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/init-db.sql:/docker-entrypoint-initdb.d/01-init-schema.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pe -d pixelated_empathy"]
+      test: ['CMD-SHELL', 'pg_isready -U pe -d pixelated_empathy']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -37,9 +37,9 @@ services:
     image: redis:7-alpine
     container_name: pe-redis
     ports:
-      - "6379:6379"
+      - '6379:6379'
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 3s
       retries: 10
@@ -53,7 +53,7 @@ services:
     environment:
       <<: *common-env
     ports:
-      - "8000:8000"
+      - '8000:8000'
     volumes:
       - ./src/pe:/app/src/pe:ro
       - ./pyproject.toml:/app/pyproject.toml:ro
@@ -66,7 +66,7 @@ services:
       sh -c "alembic -c src/pe/migrations/alembic.ini upgrade head &&
              uvicorn src.pe.main:app --host 0.0.0.0 --port 8000 --reload"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/api/v1/health']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -80,8 +80,8 @@ services:
     container_name: pe-celery-worker
     environment:
       <<: *common-env
-      CELERY_BROKER_URL: "redis://redis:6379/1"
-      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+      CELERY_BROKER_URL: 'redis://redis:6379/1'
+      CELERY_RESULT_BACKEND: 'redis://redis:6379/1'
     volumes:
       - ./src/pe:/app/src/pe:ro
     depends_on:
@@ -100,8 +100,8 @@ services:
     container_name: pe-celery-beat
     environment:
       <<: *common-env
-      CELERY_BROKER_URL: "redis://redis:6379/1"
-      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
+      CELERY_BROKER_URL: 'redis://redis:6379/1'
+      CELERY_RESULT_BACKEND: 'redis://redis:6379/1'
     volumes:
       - ./src/pe:/app/src/pe:ro
     depends_on:
@@ -119,10 +119,10 @@ services:
       dockerfile: Dockerfile.dev
     container_name: pe-frontend
     environment:
-      VITE_API_BASE_URL: "http://localhost:8000"
-      VITE_WS_URL: "ws://localhost:8000"
+      VITE_API_BASE_URL: 'http://localhost:8000'
+      VITE_WS_URL: 'ws://localhost:8000'
     ports:
-      - "5173:5173"
+      - '5173:5173'
     depends_on:
       backend:
         condition: service_started

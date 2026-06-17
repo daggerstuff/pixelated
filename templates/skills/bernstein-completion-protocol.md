@@ -1,7 +1,8 @@
 ---
 name: bernstein-completion-protocol
 description: Report task completion to the Bernstein orchestrator
-whenToUse: When you have finished all assigned tasks and are ready to report completion
+whenToUse:
+  When you have finished all assigned tasks and are ready to report completion
 ---
 
 Mark each task complete by posting to the Bernstein task server:

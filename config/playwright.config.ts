@@ -6,10 +6,11 @@ const shouldSkipWebServer =
   process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
 // Get base URL from environment or default to localhost
-// Default to port 3000 for local dev, 4321 for CI (preview server)
+// Default to port 5173 for local dev (matches Astro dev script in package.json),
+// 4321 for CI (preview server). Override via BASE_URL.
 const baseURL =
   process.env['BASE_URL'] ??
-  (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
+  (isCi ? 'http://localhost:4321' : 'http://localhost:5173')
 
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
@@ -35,8 +36,8 @@ try {
   // If localhost, extract port for webServer configuration
   if (!isRemoteUrl) {
     // Use explicit port if provided, otherwise use default based on CI context
-    // (3000 for dev, 4321 for preview/CI)
-    webServerPort = explicitPort ?? (isCi ? 4321 : 3000)
+    // (5173 for dev, 4321 for preview/CI)
+    webServerPort = explicitPort ?? (isCi ? 4321 : 5173)
 
     // Construct webServerUrl with the correct port
     // If the original URL had a port, use it; otherwise construct with the determined port
@@ -173,13 +174,13 @@ export default defineConfig({
           }
         : {
             // Local/dev flow should keep the fast dev server with HMR.
-            // Use port from BASE_URL if specified, otherwise use default (3000 from package.json dev script)
+            // Use port from BASE_URL if specified, otherwise use default (5173 from package.json dev script)
             // Astro dev command accepts --port flag and also respects PORT/ASTRO_PORT env vars
             command:
-              webServerPort !== undefined && webServerPort !== 3000
+              webServerPort !== undefined && webServerPort !== 5173
                 ? `ASTRO_PORT=${webServerPort} pnpm dev --port ${webServerPort}`
                 : 'pnpm dev',
-            url: webServerUrl ?? 'http://localhost:3000',
+            url: webServerUrl ?? 'http://localhost:5173',
             reuseExistingServer: true,
             timeout: 180 * 1000,
           },

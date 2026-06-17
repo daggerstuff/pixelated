@@ -14,7 +14,10 @@ describe('scenarios utilities', () => {
     })
 
     it('returns scenarios filtered by difficulty only', async () => {
-      const result = await filterScenarios(undefined, ScenarioDifficulty.BEGINNER)
+      const result = await filterScenarios(
+        undefined,
+        ScenarioDifficulty.BEGINNER,
+      )
       expect(result.length).toBeGreaterThan(0)
       result.forEach((scenario) => {
         expect(scenario.difficulty).toBe(ScenarioDifficulty.BEGINNER)
@@ -22,7 +25,10 @@ describe('scenarios utilities', () => {
     })
 
     it('returns scenarios filtered by both domain and difficulty', async () => {
-      const result = await filterScenarios(TherapeuticDomain.DEPRESSION, ScenarioDifficulty.BEGINNER)
+      const result = await filterScenarios(
+        TherapeuticDomain.DEPRESSION,
+        ScenarioDifficulty.BEGINNER,
+      )
       expect(result.length).toBeGreaterThan(0)
       result.forEach((scenario) => {
         expect(scenario.domain).toBe(TherapeuticDomain.DEPRESSION)
