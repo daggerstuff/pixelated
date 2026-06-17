@@ -183,6 +183,8 @@ jobs:
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-          codedeploy-appspec: .aws/appspec.json
-          codedeploy-application: pixelated-empathy-ecs
-          codedeploy-deployment-group: pixelated-empathy-ecs-dg
+          # CODE-DEPLOY TEMPORARILY DISABLED: deployment group actionOnTimeout is STOP_DEPLOYMENT,
+          # causing 5-min timeout failures. Re-enable after fixing deployment group config.
+          # codedeploy-appspec: .aws/appspec.json
+          # codedeploy-application: pixelated-empathy-ecs
+          # codedeploy-deployment-group: pixelated-empathy-ecs-dg
