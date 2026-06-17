@@ -217,14 +217,18 @@ export class LocalTrainingBackend extends TrainingBackend {
       }
 
       proc.on("close", (code) => {
+        const scriptOutput = parseLocalScriptOutput(stdout);
         if (code === 0) {
+          const fineTunedModel =
+            scriptOutput?.fineTunedModel ??
+            `${config.model}:local:${jobId.slice(0, 8)}`;
           resolve({
             id: jobId,
             remoteId: jobId,
             model: config.model,
             status: "succeeded",
             createdAt: new Date(),
-            fineTunedModel: `${config.model}:local:${jobId.slice(0, 8)}`,
+            fineTunedModel,
           });
         } else {
           this.log(`script exited with code ${code}`, { stderr });
@@ -261,6 +265,7 @@ export class LocalTrainingBackend extends TrainingBackend {
     try {
       interface OpenAIStatusResponse {
         id: string;
+        model: string;
         status: string;
         trained_model?: string;
         error?: { message: string };
@@ -273,7 +278,7 @@ export class LocalTrainingBackend extends TrainingBackend {
       return {
         id: remoteId,
         remoteId,
-        model: remoteJob.id,
+        model: remoteJob.model,
         status: this.mapOpenAIStatus(remoteJob.status),
         createdAt: new Date(),
         fineTunedModel: remoteJob.trained_model,
@@ -292,6 +297,7 @@ export class LocalTrainingBackend extends TrainingBackend {
     try {
       interface OpenAICancelResponse {
         id: string;
+        model: string;
         status: string;
       }
 
@@ -303,7 +309,7 @@ export class LocalTrainingBackend extends TrainingBackend {
       return {
         id: remoteId,
         remoteId,
-        model: remoteJob.id,
+        model: remoteJob.model,
         status: this.mapOpenAIStatus(remoteJob.status),
         createdAt: new Date(),
       };
@@ -358,4 +364,30 @@ export class LocalTrainingBackend extends TrainingBackend {
         return "queued";
     }
   }
+}
+
+/**
+ * Parse the final JSON line emitted by the local fine-tuning subprocess.
+ *
+ * The script convention is to print `{"fine_tuned_model": "...", "status": "..."}`
+ * on success. If we cannot extract the model identifier, return `null` so the
+ * caller can synthesise a fallback id.
+ */
+function parseLocalScriptOutput(stdout: string): { fineTunedModel: string } | null {
+  const lines = stdout.split(/\r?\n/);
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const line = lines[i];
+    if (!line) continue;
+    const trimmed = line.trim();
+    if (!trimmed.startsWith("{")) continue;
+    try {
+      const payload = JSON.parse(trimmed) as { fine_tuned_model?: unknown };
+      if (typeof payload.fine_tuned_model === "string") {
+        return { fineTunedModel: payload.fine_tuned_model };
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
 }
