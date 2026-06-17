@@ -184,22 +184,30 @@ jobs:
             --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "Registered task def: $TASK_DEF_ARN"
 
-          # Build appspec with replaced task definition ARN
-          cat .aws/appspec.json | sed "s|<TASK_DEFINITION>|$TASK_DEF_ARN|g" > /tmp/appspec.yaml
+          # Build appspec with replaced task definition ARN, write to temp file
+          python3 -c "
+          import json, sys
+          with open('.aws/appspec.json') as f:
+              appspec = json.load(f)
+          appspec['Resources'][0]['TargetService']['Properties']['TaskDefinition'] = '$TASK_DEF_ARN'
+          with open('/tmp/appspec.json', 'w') as f:
+              json.dump(appspec, f)
+          print('Appspec written to /tmp/appspec.json')
+          "
 
-          # Compute SHA256 of the appspec file
-          APPSPEC_SHA=$(sha256sum /tmp/appspec.yaml | cut -d' ' -f1)
-
-          # Write the revision JSON to a file first (avoids shell quoting issues)
-          cat > /tmp/revision.json << 'REVEOF'
-          {
-            "revisionType": "AppSpecContent",
-            "appSpecContent": {
-              "sha256": "APPSPEC_SHA256"
-            }
+          # Build revision JSON using Python to avoid shell quoting issues
+          python3 -c "
+          import json
+          with open('/tmp/appspec.json') as f:
+              appspec = json.load(f)
+          revision = {
+              'revisionType': 'AppSpecContent',
+              'appSpecContent': {'content': json.dumps(appspec)}
           }
-          REVEOF
-          sed -i "s|APPSPEC_SHA256|$APPSPEC_SHA|g" /tmp/revision.json
+          with open('/tmp/revision.json', 'w') as f:
+              json.dump(revision, f)
+          print('Revision written to /tmp/revision.json')
+          "
 
           # Trigger CodeDeploy deployment with auto-rollback on failure
           DEPLOYMENT_ID=$(aws deploy create-deployment \
