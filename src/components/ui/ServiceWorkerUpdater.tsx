@@ -57,9 +57,9 @@ export const ServiceWorkerUpdater: FC<ServiceWorkerUpdaterProps> = ({
             <div className="border-gray-200 dark:border-gray-700 flex border-l">
               <button
                 onClick={() => {
-                  window.location.reload()
                   toast.dismiss(t.id)
                   onUpdateComplete?.()
+                  window.location.reload()
                 }}
                 className="border-transparent text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 focus:ring-indigo-500 flex w-full items-center justify-center rounded-none rounded-r-lg border p-4 text-sm font-medium focus:outline-none focus:ring-2"
               >
