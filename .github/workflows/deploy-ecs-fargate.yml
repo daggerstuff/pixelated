@@ -176,15 +176,53 @@ jobs:
           container-name: pixelated-empathy-api
           image: ${{ env.IMAGE_URI }}
 
-      - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
-          # CODE-DEPLOY TEMPORARILY DISABLED: deployment group actionOnTimeout is STOP_DEPLOYMENT,
-          # causing 5-min timeout failures. Re-enable after fixing deployment group config.
-          # codedeploy-appspec: .aws/appspec.json
-          # codedeploy-application: pixelated-empathy-ecs
-          # codedeploy-deployment-group: pixelated-empathy-ecs-dg
+      - name: Deploy via CodeDeploy
+        run: |
+          # Register the new task definition and get the ARN
+          TASK_DEF_ARN=$(aws ecs register-task-definition \
+            --cli-input-json file://${{ steps.render-task-def.outputs.task-definition }} \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "Registered task def: $TASK_DEF_ARN"
+
+          # Read appspec and replace TASK_DEFINITION placeholder
+          APPSPEC=$(cat .aws/appspec.json | sed "s|<TASK_DEFINITION>|$TASK_DEF_ARN|g")
+
+          # Trigger CodeDeploy deployment with auto-rollback on failure
+          DEPLOYMENT_ID=$(aws deploy create-deployment \
+            --application-name pixelated-empathy-ecs \
+            --deployment-group-name pixelated-empathy-ecs-dg \
+            --revision '{"revisionType":"AppSpecContent","appSpecContent":{"content":"'$(echo "$APPSPEC" | base64 -w 0)'"}}' \
+            --auto-rollback-configuration '{"enabled":true,"events":["DEPLOYMENT_FAILURE"]}' \
+            --query 'deploymentId' --output text)
+          echo "Deployment triggered: $DEPLOYMENT_ID"
+
+          # Poll deployment status for up to 20 minutes
+          echo "Waiting for CodeDeploy deployment $DEPLOYMENT_ID..."
+          for i in $(seq 1 120); do
+            STATUS=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
+              --query 'deploymentInfo.status' --output text)
+            OVERVIEW=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
+              --query 'deploymentInfo.deploymentOverview' --output text)
+            echo "[$i] Status: $STATUS | Overview: $OVERVIEW"
+
+            case "$STATUS" in
+              Succeeded)
+                echo "Deployment succeeded!"
+                exit 0
+                ;;
+              Failed|Stopped)
+                echo "Deployment failed with status: $STATUS"
+                aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
+                  --query 'deploymentInfo.errorInformation.message' --output text
+                exit 1
+                ;;
+              Ready)
+                # Deployment is waiting for manual approval/notification
+                echo "Deployment in Ready state — attempting to continue..."
+                # Wait a bit longer; with CONTINUE_DEPLOYMENT config it should proceed
+                ;;
+            esac
+            sleep 10
+          done
+          echo "Deployment timed out after 20 minutes"
+          exit 1
