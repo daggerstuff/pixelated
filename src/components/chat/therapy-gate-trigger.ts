@@ -18,16 +18,34 @@ export async function triggerTherapyGateSubmit() {
     const res = await fetch(gateUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [{ role: 'user', content: message }] }),
+      body: JSON.stringify({
+        content: message,
+        source_id: `chat-${Date.now()}`,
+      }),
     })
+    if (!res.ok) {
+      throw new Error(`Gate API returned ${res.status}`)
+    }
     const data = await res.json()
-    if (data.report?.blocked) {
+    const blocked = Boolean(data.report?.blocked || data.accepted === false)
+    if (blocked) {
       const blockEl = document.createElement('div')
       blockEl.setAttribute('role', 'alert')
       blockEl.setAttribute('data-testid', 'safety-block')
       blockEl.className =
         'border-red-300 bg-red-50 text-red-900 rounded-lg border px-4 py-3 shadow-sm'
-      blockEl.innerHTML = `<p class="font-semibold">Message blocked for safety</p>${data.report.gates?.gate1?.reason ? `<p data-testid="gate-result-reason" class="mt-1 text-sm">${data.report.gates.gate1.reason}</p>` : ''}`
+      const title = document.createElement('p')
+      title.className = 'font-semibold'
+      title.textContent = 'Message blocked for safety'
+      blockEl.appendChild(title)
+      const reason = data.report?.gates?.gate1?.reason
+      if (typeof reason === 'string' && reason.length > 0) {
+        const reasonEl = document.createElement('p')
+        reasonEl.setAttribute('data-testid', 'gate-result-reason')
+        reasonEl.className = 'mt-1 text-sm'
+        reasonEl.textContent = reason
+        blockEl.appendChild(reasonEl)
+      }
       chatHistory?.appendChild(blockEl)
     } else {
       const msgEl = document.createElement('div')
@@ -39,7 +57,7 @@ export async function triggerTherapyGateSubmit() {
     }
     window.dispatchEvent(
       new CustomEvent('gate-submit-result', {
-        detail: { blocked: data.report?.blocked ?? false, message },
+        detail: { blocked, message },
       }),
     )
   } catch {

@@ -45,14 +45,6 @@ export function TherapyGate({ className, gateApiUrl }: TherapyGateProps) {
     }
     const rawValue = textarea.value
     const trimmed = rawValue.trim()
-    console.log(
-      '[TherapyGate] Raw textarea value:',
-      JSON.stringify(rawValue),
-      'trimmed:',
-      trimmed,
-      'helper value:',
-      helper?.value,
-    )
     if (!trimmed) {
       console.log('[TherapyGate] Empty input, returning')
       if (form) form.setAttribute('data-submit-error', 'empty-or-submitting')
