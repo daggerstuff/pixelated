@@ -1,7 +1,7 @@
 export async function triggerTherapyGateSubmit() {
   const fn = (window as any).handleTherapyGateSubmit
   if (typeof fn === 'function') {
-    fn()
+    await fn()
     return
   }
   const textarea = document.querySelector(
@@ -63,7 +63,7 @@ export async function triggerTherapyGateSubmit() {
   } catch {
     window.dispatchEvent(
       new CustomEvent('gate-submit-result', {
-        detail: { blocked: false, message, error: true },
+        detail: { blocked: true, message, error: true },
       }),
     )
   }
