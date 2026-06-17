@@ -66,7 +66,10 @@ export class LocalTrainingBackend extends TrainingBackend {
       opts?.apiKey ?? LOCAL_API_KEY;
     this.model =
       opts?.model ?? LOCAL_MODEL;
-    this.scriptPath = opts?.scriptPath ?? null;
+    this.scriptPath =
+      opts?.scriptPath ??
+      process.env["LOCAL_TRAINING_SCRIPT_PATH"] ??
+      null;
   }
 
   private get useScript(): boolean {
@@ -382,7 +385,10 @@ function parseLocalScriptOutput(stdout: string): { fineTunedModel: string } | nu
     if (!trimmed.startsWith("{")) continue;
     try {
       const payload = JSON.parse(trimmed) as { fine_tuned_model?: unknown };
-      if (typeof payload.fine_tuned_model === "string") {
+      if (
+        typeof payload.fine_tuned_model === "string" &&
+        payload.fine_tuned_model.trim().length > 0
+      ) {
         return { fineTunedModel: payload.fine_tuned_model };
       }
     } catch {

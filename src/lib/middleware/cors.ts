@@ -80,12 +80,20 @@ function isOriginAllowed(
   return config.allowedOrigins.some((allowedOrigin) => {
     if (allowedOrigin.includes('*')) {
       const pattern = new RegExp(
-        `^${allowedOrigin.replace('*', '[a-zA-Z0-9-]+')}\$`,
+        `^${allowedOrigin
+          .split('*')
+          .map(escapeRegExp)
+          .join('[a-zA-Z0-9-]+')}$`,
       )
       return pattern.test(origin)
     }
     return allowedOrigin === origin
   })
+}
+
+/** Escape user-supplied regex meta-characters before injecting into a pattern. */
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
 /**
