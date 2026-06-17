@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, beforeAll, vi, afterEach, type Mock } from "vitest";
 
 import { FineTuningAIService } from "../FineTuningAIService";
-import { getAIService, resetAIService } from "../../index";
+import { getAIService, resetAIServiceForTesting } from "../../index";
 import type {
   TrainingOrchestratorLike,
   ModelInfo,
@@ -286,7 +286,7 @@ describe("FineTuningAIService (S5: processText provider delegation)", () => {
 
 describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
   afterEach(() => {
-    resetAIService();
+    resetAIServiceForTesting();
   });
 
   it("returns MockAIService by default (no env var)", async () => {
@@ -328,7 +328,7 @@ describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
     const svc2 = await getAIService();
     expect(svc2).toBe(svc1); // same cached instance
 
-    resetAIService();
+    resetAIServiceForTesting();
     const svc3 = await getAIService();
     expect(svc3).not.toBe(svc1); // new instance after reset
 
