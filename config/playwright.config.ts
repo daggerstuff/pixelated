@@ -6,10 +6,11 @@ const shouldSkipWebServer =
   process.env['DISABLE_PLAYWRIGHT_WEBSERVER'] === 'true'
 
 // Get base URL from environment or default to localhost
-// Default to port 3000 for local dev, 4321 for CI (preview server)
+// Default to port 5173 for local dev (matches Astro dev script in package.json),
+// 4321 for CI (preview server). Override via BASE_URL.
 const baseURL =
   process.env['BASE_URL'] ??
-  (isCi ? 'http://localhost:4321' : 'http://localhost:3000')
+  (isCi ? 'http://localhost:4321' : 'http://localhost:5173')
 
 // Parse URL to extract hostname and port
 let webServerUrl: string | undefined
