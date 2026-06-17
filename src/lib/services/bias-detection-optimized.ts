@@ -172,12 +172,7 @@ export class OptimizedBiasDetectionService {
       logger.error('Bias analysis failed', {
         analysisId,
         processingTime,
-        error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -271,12 +266,7 @@ export class OptimizedBiasDetectionService {
       }
     } catch (error: unknown) {
       logger.error('Engine analysis failed', {
-        error:
-          error instanceof Error
-            ? error instanceof Error
-              ? error.message
-              : 'Unknown error'
-            : String(error),
+        error: error instanceof Error ? error.message : String(error),
       })
       throw error
     }
@@ -387,11 +377,18 @@ export class OptimizedBiasDetectionService {
       })
 
       try {
+        // Sequential inserts required: `bias_analyses.session_id` has a
+        // foreign-key constraint to `sessions(id)`, and PostgreSQL enforces
+        // FK constraints at statement execution time even inside a
+        // transaction. Running these in Promise.all risks `insertAnalysisRecord`
+        // attempting to reference a sessions row that has not yet been
+        // committed, producing an FK violation. Sequential awaits guarantee
+        // the parent row is visible before the child is inserted.
         await Promise.race([
-          Promise.all([
-            this.insertSessionRecord(client, data),
-            this.insertAnalysisRecord(client, data),
-          ]),
+          (async () => {
+            await this.insertSessionRecord(client, data)
+            await this.insertAnalysisRecord(client, data)
+          })(),
           timeoutPromise,
         ])
         await client.query('COMMIT')
@@ -532,6 +529,7 @@ export class OptimizedBiasDetectionService {
       alertLevel: string
       confidence: number
       processingTimeMs: number
+      failed: boolean
     }>
   > {
     const batchSize = PERFORMANCE_CONFIG.ML_CONFIG.BATCH_SIZE
@@ -541,6 +539,7 @@ export class OptimizedBiasDetectionService {
       alertLevel: string
       confidence: number
       processingTimeMs: number
+      failed: boolean
     }> = []
 
     // Process in batches to avoid overwhelming the system
@@ -561,6 +560,7 @@ export class OptimizedBiasDetectionService {
             alertLevel: result.alertLevel,
             confidence: result.confidence,
             processingTimeMs: processingTime,
+            failed: false,
           }
         } catch (error: unknown) {
           logger.error('Batch analysis failed for text', { analysisId, error })
@@ -570,6 +570,7 @@ export class OptimizedBiasDetectionService {
             alertLevel: 'low',
             confidence: 0,
             processingTimeMs: Math.round(performance.now() - startTime),
+            failed: true,
           }
         }
       })
