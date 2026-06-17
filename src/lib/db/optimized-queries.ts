@@ -406,12 +406,12 @@ export class OptimizedBiasQueries {
         COUNT(CASE WHEN ba.alert_level IN ('high', 'critical') THEN 1 END) as high_alerts
       FROM bias_analyses ba
       WHERE ba.therapist_id = $1 
-        AND ba.created_at >= NOW() - INTERVAL '${String(days)} days'
+        AND ba.created_at >= NOW() - make_interval(days => $2::int)
       GROUP BY DATE(ba.created_at)
       ORDER BY date DESC
     `
 
-    const result = (await executeQuery(query, [therapistId], {
+    const result = (await executeQuery(query, [therapistId, days], {
       name: 'getBiasTrend',
     })) as { rows: BiasTrendRow[] }
 
@@ -505,10 +505,10 @@ export class OptimizedBiasQueries {
         ) as fast_queries_pct,
         COUNT(CASE WHEN ba.processing_time_ms > 5000 THEN 1 END) as slow_queries
       FROM bias_analyses ba
-      WHERE ba.created_at >= NOW() - INTERVAL '${String(days)} days'
+      WHERE ba.created_at >= NOW() - make_interval(days => $1::int)
     `
 
-    const result = (await executeQuery(query, [], {
+    const result = (await executeQuery(query, [days], {
       name: 'getPerformanceMetrics',
     })) as { rows: PerfMetricsRow[] }
     const rows = result.rows
