@@ -173,8 +173,8 @@ export class AdvancedPredictiveThreatIntelligence
   private noveltyDetector!: NoveltyDetector
   private propagationModeler!: PropagationModeler
   seasonalAnalyzer!: SeasonalAnalyzer
-  private readonly riskAssessor!: ProbabilisticRiskAssessor
-  private readonly modelRegistry!: ThreatModelRegistry
+  private riskAssessor!: ProbabilisticRiskAssessor
+  private modelRegistry!: ThreatModelRegistry
 
   constructor(
     private readonly config: {
@@ -205,8 +205,8 @@ export class AdvancedPredictiveThreatIntelligence
       this.config.propagationConfig,
     )
     this.seasonalAnalyzer = new StatisticalSeasonalAnalyzer()
-    this['riskAssessor'] = new ProbabilisticRiskAssessor()
-    this['modelRegistry'] = new ThreatModelRegistry(this.mongoClient)
+    this.riskAssessor = new ProbabilisticRiskAssessor()
+    this.modelRegistry = new ThreatModelRegistry(this.mongoClient)
 
     await this.mongoClient.connect()
     this.emit('services_initialized')
