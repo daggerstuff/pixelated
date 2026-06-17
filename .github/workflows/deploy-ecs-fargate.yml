@@ -50,13 +50,13 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Ensure IAM has ListDeployments and stop active deployment
-        continue-on-error: true
+        continue-on-error: false
         run: |
           # Self-heal: add ListDeployments if missing from the inline policy
           POLICY_NAME="pixelated-empathy-github-actions-policy"
           ROLE_NAME="pixelated-empathy-github-actions"
           # Get the current policy and inject ListDeployments if not present
-          CURRENT=$(aws iam get-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" --query 'PolicyDocument' --output json 2>/dev/null || echo "")
+          CURRENT=$(aws iam get-role-policy --role-name "$ROLE_NAME" --policy-name "$POLICY_NAME" --query 'PolicyDocument' --output json || echo "")
           if [ -n "$CURRENT" ] && ! echo "$CURRENT" | grep -q "ListDeployments"; then
             echo "Adding ListDeployments to IAM policy..."
             UPDATED=$(echo "$CURRENT" | sed 's/"codedeploy:GetDeploymentConfig"/"codedeploy:GetDeploymentConfig","codedeploy:ListDeployments"/')
@@ -65,17 +65,48 @@ jobs:
             sleep 10
           fi
 
-          # Now find and stop any active deployment
-          for DEP_ID in $(aws deploy list-deployments \
+          # Diagnostic: show all deployment statuses
+          echo "=== Current deployments ==="
+          aws deploy list-deployments \
             --application-name pixelated-empathy-ecs \
             --deployment-group-name pixelated-empathy-ecs-dg \
-            --include-only-statuses Created Queued InProgress \
-            --query 'deployments' --output text 2>/dev/null); do
-            echo "Stopping active deployment: $DEP_ID"
-            aws deploy stop-deployment --deployment-id "$DEP_ID" --auto-rollback-enabled
-            echo "Waiting 15s for rollback..."
-            sleep 15
-          done
+            --query 'deployments' --output text || true
+
+          # Now find and stop any active deployment (exclude terminal states)
+          ACTIVE=$(aws deploy list-deployments \
+            --application-name pixelated-empathy-ecs \
+            --deployment-group-name pixelated-empathy-ecs-dg \
+            --query 'deployments' --output text || true)
+
+          if [ -n "$ACTIVE" ]; then
+            for DEP_ID in $ACTIVE; do
+              STATUS=$(aws deploy get-deployment --deployment-id "$DEP_ID" --query 'deploymentInfo.status' --output text)
+              echo "Deployment $DEP_ID status: $STATUS"
+              if [ "$STATUS" != "Succeeded" ] && [ "$STATUS" != "Failed" ] && [ "$STATUS" != "Stopped" ]; then
+                echo "Stopping deployment $DEP_ID (status: $STATUS)..."
+                aws deploy stop-deployment --deployment-id "$DEP_ID" --auto-rollback-enabled || true
+              fi
+            done
+            echo "Waiting 30s for rollbacks to settle..."
+            sleep 30
+          fi
+          # Second sweep: any new rollback deployments that became active
+          ACTIVE2=$(aws deploy list-deployments \
+            --application-name pixelated-empathy-ecs \
+            --deployment-group-name pixelated-empathy-ecs-dg \
+            --query 'deployments' --output text || true)
+          if [ -n "$ACTIVE2" ]; then
+            for DEP_ID in $ACTIVE2; do
+              STATUS=$(aws deploy get-deployment --deployment-id "$DEP_ID" --query 'deploymentInfo.status' --output text)
+              echo "Post-stop deployment $DEP_ID status: $STATUS"
+              if [ "$STATUS" != "Succeeded" ] && [ "$STATUS" != "Failed" ] && [ "$STATUS" != "Stopped" ]; then
+                echo "Stopping post-rollback deployment $DEP_ID..."
+                aws deploy stop-deployment --deployment-id "$DEP_ID" --auto-rollback-enabled || true
+              fi
+            done
+            echo "Waiting 30s for second round to settle..."
+            sleep 30
+          fi
           echo "Done."
 
       - name: Fix ALB target group health check path
@@ -85,8 +116,8 @@ jobs:
             echo "Updating health check for $TG..."
             aws elbv2 modify-target-group \
               --target-group-name "$TG" \
-              --health-check-path "/api/health/" 2>/dev/null && \
-              echo "  Updated $TG to /api/health/" || \
+              --health-check-path "/health" 2>/dev/null && \
+              echo "  Updated $TG to /health" || \
               echo "  Skipped $TG (not found or already correct)"
           done
 
