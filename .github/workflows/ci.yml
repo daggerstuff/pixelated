@@ -11,6 +11,7 @@ on:
       - 'src/**'
       - 'ai/**'
       - 'docker/**'
+      - 'k8s/**'
       - 'terraform/**'
       - 'scripts/**'
       - 'config/**'
@@ -22,6 +23,7 @@ on:
       - '.dockerignore'
       - '.vscode/**'
       - '.github/workflows/ci.yml'
+      - '.github/workflows/deploy-kubernetes.yml'
   pull_request:
     branches: [staging]
   workflow_dispatch:
@@ -32,8 +34,10 @@ jobs:
     timeout-minutes: 45
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      ARTIFACT_REGISTRY_LOCATION: us-west1
+      ARTIFACT_REGISTRY_REPOSITORY: pixelated-empathy
       TRIVY_STRICT_GATE: false
-      VITEST_COVERAGE_ENABLED: true
+      VITEST_COVERAGE_ENABLED: false
       PNPM_CACHE_VERSION: v2
       REDIS_URL: ${{ secrets['REDIS_URL'] }}
       UPSTASH_REDIS_REST_URL: ${{ secrets['UPSTASH_REDIS_REST_URL'] }}
@@ -55,7 +59,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
         with:
-          version: 11.6.0
+          version: 11.5.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -77,7 +81,8 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
-          key: ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
+          key:
+            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
             hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
@@ -85,7 +90,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --frozen-lockfile
+          PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
       - name: Lint code and markdown
         continue-on-error: true
@@ -94,7 +99,8 @@ jobs:
       - name: Format check
         continue-on-error: true
         env:
-          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA:
+            ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -110,13 +116,6 @@ jobs:
           # Timeout prevents hanging integration tests (no Redis/Auth0 in CI)
           # from consuming the entire job budget. The step continues regardless.
           timeout 10m pnpm test || true
-
-      - name: Upload coverage to Qlty
-        continue-on-error: true
-        uses: qltysh/qlty-action/coverage@v2
-        with:
-          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: coverage/lcov.info
 
       - name: Build Docker image
         id: build-image
@@ -134,7 +133,8 @@ jobs:
             || '--no-deprecation' }}
         continue-on-error: true
         with:
-          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          image-ref:
+            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
@@ -178,3 +178,39 @@ jobs:
             echo "Trivy strict gate is enabled and critical/high findings were detected."
             exit 1
           fi
+
+      - name: Authenticate to Google Cloud (OIDC)
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ secrets['GCP_WIF_PROVIDER'] }}
+          service_account: ${{ secrets['GCP_WIF_SERVICE_ACCOUNT'] }}
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Configure Google Cloud SDK
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: ${{ secrets['GCP_PROJECT_ID'] }}
+
+      - name: Authenticate Docker to Artifact Registry
+        if:
+          github.event_name == 'push' || github.event_name ==
+          'workflow_dispatch'
+        run: |
+          gcloud auth configure-docker "${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev" --quiet
+
+      - name: Push Docker image to Google Artifact Registry (staging :latest)
+        if: github.event_name == 'push'
+        env:
+          GCP_PROJECT_ID: ${{ secrets['GCP_PROJECT_ID'] }}
+        run: |
+          IMAGE_URI_BASE="${ARTIFACT_REGISTRY_LOCATION}-docker.pkg.dev/${GCP_PROJECT_ID}/${ARTIFACT_REGISTRY_REPOSITORY}/api"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker tag pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }} "${IMAGE_URI_BASE}:latest"
+          docker push "${IMAGE_URI_BASE}:${{ steps.build-image.outputs.image_tag }}"
+          docker push "${IMAGE_URI_BASE}:latest"

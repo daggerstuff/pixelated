@@ -27,8 +27,8 @@ vi.mock('@/lib/services/product-memory-gateway', () => ({
 }))
 
 import { getCurrentUser } from '@/lib/auth'
-import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 import { PublicMemory } from '@/lib/memory/contract/v1'
+import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 
 import {
   GET as getMemoryById,

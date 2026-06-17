@@ -35,6 +35,15 @@ vi.mock('@/lib/services/product-memory-gateway', () => ({
 }))
 
 import { getCurrentUser } from '@/lib/auth'
+import { MemoryApiError } from '@/lib/memory/contract/errors'
+import {
+  CreateMemoryResponse,
+  DeleteMemoryResponse,
+  GetMemoryResponse,
+  ListMemoriesResponse,
+  SearchMemoriesResponse,
+  UpdateMemoryResponse,
+} from '@/lib/memory/contract/v1'
 import {
   getProductMemoryGateway,
   ProductMemoryGatewayError,
@@ -47,16 +56,6 @@ import {
 } from '../[memoryId]'
 import { GET as listMemories, POST as createMemory } from '../index'
 import { GET as searchGet, POST as searchPost } from '../search'
-
-import {
-  CreateMemoryResponse,
-  DeleteMemoryResponse,
-  GetMemoryResponse,
-  ListMemoriesResponse,
-  SearchMemoriesResponse,
-  UpdateMemoryResponse,
-} from '@/lib/memory/contract/v1'
-import { MemoryApiError } from '@/lib/memory/contract/errors'
 
 const mockGetCurrentUser = vi.mocked(getCurrentUser)
 

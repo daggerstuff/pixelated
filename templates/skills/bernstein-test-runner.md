@@ -1,7 +1,8 @@
 ---
 name: bernstein-test-runner
 description: Run project tests correctly to avoid memory leaks and failures
-whenToUse: When running tests, checking test results, or verifying code correctness
+whenToUse:
+  When running tests, checking test results, or verifying code correctness
 ---
 
 **IMPORTANT**: Always use the project's test runner script, never run pytest
