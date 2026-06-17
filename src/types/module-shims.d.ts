@@ -341,7 +341,7 @@ declare module 'pg' {
       query: string,
       values?: unknown[],
     ): Promise<QueryResult<T>>
-    release(): void
+    release(err?: Error | boolean): void
   }
 
   interface PoolConfig extends Record<string, any> {
