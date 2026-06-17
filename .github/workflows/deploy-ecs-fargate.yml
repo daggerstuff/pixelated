@@ -184,14 +184,28 @@ jobs:
             --query 'taskDefinition.taskDefinitionArn' --output text)
           echo "Registered task def: $TASK_DEF_ARN"
 
-          # Read appspec and replace TASK_DEFINITION placeholder
-          APPSPEC=$(cat .aws/appspec.json | sed "s|<TASK_DEFINITION>|$TASK_DEF_ARN|g")
+          # Build appspec with replaced task definition ARN
+          cat .aws/appspec.json | sed "s|<TASK_DEFINITION>|$TASK_DEF_ARN|g" > /tmp/appspec.yaml
+
+          # Compute SHA256 of the appspec file
+          APPSPEC_SHA=$(sha256sum /tmp/appspec.yaml | cut -d' ' -f1)
+
+          # Write the revision JSON to a file first (avoids shell quoting issues)
+          cat > /tmp/revision.json << 'REVEOF'
+          {
+            "revisionType": "AppSpecContent",
+            "appSpecContent": {
+              "sha256": "APPSPEC_SHA256"
+            }
+          }
+          REVEOF
+          sed -i "s|APPSPEC_SHA256|$APPSPEC_SHA|g" /tmp/revision.json
 
           # Trigger CodeDeploy deployment with auto-rollback on failure
           DEPLOYMENT_ID=$(aws deploy create-deployment \
             --application-name pixelated-empathy-ecs \
             --deployment-group-name pixelated-empathy-ecs-dg \
-            --revision '{"revisionType":"AppSpecContent","appSpecContent":{"content":"'$(echo "$APPSPEC" | base64 -w 0)'"}}' \
+            --revision file:///tmp/revision.json \
             --auto-rollback-configuration '{"enabled":true,"events":["DEPLOYMENT_FAILURE"]}' \
             --query 'deploymentId' --output text)
           echo "Deployment triggered: $DEPLOYMENT_ID"
@@ -217,9 +231,7 @@ jobs:
                 exit 1
                 ;;
               Ready)
-                # Deployment is waiting for manual approval/notification
-                echo "Deployment in Ready state — attempting to continue..."
-                # Wait a bit longer; with CONTINUE_DEPLOYMENT config it should proceed
+                echo "Deployment in Ready state — continuing..."
                 ;;
             esac
             sleep 10
