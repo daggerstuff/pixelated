@@ -7,6 +7,7 @@ import {
 } from './lib/auth/auth0-middleware'
 import { corsMiddleware } from './lib/middleware/cors'
 import { generateCspNonce } from './lib/middleware/csp'
+import { rateLimitMiddleware } from './lib/middleware/rate-limit'
 import { securityHeaders } from './lib/middleware/securityHeaders'
 import { tracingMiddleware } from './lib/tracing/middleware'
 import { markSpanError } from './lib/tracing/utils'
@@ -117,10 +118,12 @@ const projectAuthMiddleware: MiddlewareHandler = defineMiddleware(
 
 // Single, clean middleware sequence
 // Tracing middleware is first to capture all requests
+// Rate limiting is placed after auth so we can use role-based limits
 export const onRequest = sequence(
   tracingMiddleware,
   generateCspNonce,
   securityHeaders,
   corsMiddleware,
   projectAuthMiddleware,
+  rateLimitMiddleware,
 )
