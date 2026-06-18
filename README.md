@@ -6,102 +6,86 @@
 [![Focus](https://img.shields.io/badge/Focus-Clinical%20AI-blue.svg?style=flat-square)](https://pixelatedempathy.com)
 [![Status](https://img.shields.io/badge/Status-Early%20Access-green.svg?style=flat-square)](https://pixelatedempathy.com/contact)
 
-> We believe every high-stakes conversation should have a safe place to improve.
+> A clinical AI platform for practicing, analyzing, and improving emotionally complex conversations.
 
-Pixelated Empathy is a **clinical AI platform** for practicing, analyzing, and
-improving emotionally complex conversations.
+Pixelated Empathy builds tooling for teams in high-stakes, human-centered environments.
+The platform combines simulated conversation practice, emotional signal analysis, and review workflows.
 
-Our mission is to help organizations and practitioners build stronger, safer,
-more empathic communication through applied AI—especially where outcomes affect
-human wellbeing.
+## Overview
 
----
+- [Repository Scope](#repository-scope)
+- [What the Platform Prioritizes](#what-the-platform-prioritizes)
+- [Journal Dataset Research Workflow](#journal-dataset-research-workflow)
+- [Documentation](#documentation)
+- [Trust Safety and Quality](#trust-safety-and-quality)
+- [External Links](#external-links)
 
-## 🚀 What this repository is
+## Repository Scope
 
-This repo is the core workspace for the Pixelated Empathy product direction:
+This repository is the primary product workspace for Pixelated Empathy. It brings together application code, AI systems, and internal operational tooling in one place.
 
-- **AI services** (`ai/`): training, inference, and emotional intelligence
-  models
-- **Product application** (`src/`): Astro + React web and API surfaces
-- **Operational tooling** (`scripts/`): pipelines, automation, and developer
-  workflows
-- **Research workflow interface** (`/journal-research`): dataset discovery and
-  curation
-- **Integration interfaces**: MCP and service connectors used by partner tools
+| Area                 | Purpose                                                              |
+| -------------------- | -------------------------------------------------------------------- |
+| [ai/](ai/)           | Model training, inference, evaluation, and research pipelines        |
+| [src/](src/)         | Astro and React application surfaces, APIs, and shared product logic |
+| [public/](public/)   | Brand assets and static media                                        |
+| [scripts/](scripts/) | Repeatable automation and operational utilities                      |
+| [docs/](docs/)       | Product, platform, API, compliance, and knowledge documentation      |
 
-If you are looking for blockchain or on-chain components, those run in separate
-repositories and integrate with this core stack.
+If you are looking for blockchain or other on-chain components, those integrations live in separate repositories and connect to this platform at the service boundary.
 
-## 🎯 What problem we are solving
+## What the Platform Prioritizes
 
-Most AI tooling can parse text; much less can interpret _why_ a conversation
-changes direction, escalates, calms down, or leaves someone unsupported.
+Pixelated Empathy is designed around a narrow problem: helping people prepare for conversations where judgment, timing, and emotional accuracy matter.
 
-Pixelated Empathy focuses on:
+- Simulated rehearsal for therapeutic, support, and other high-impact dialogue
+- Emotional and conversational analysis that makes turning points easier to inspect
+- Coaching and review workflows that translate difficult interactions into measurable improvement
+- Operational visibility that supports iteration without overwhelming teams with noise
 
-- Simulating and evaluating realistic therapeutic and support scenarios
-- Making emotional dynamics visible without overloading teams with noise
-- Turning difficult conversations into measurable coaching moments
-- Supporting training, review, and iteration before real-world impact
+## Core Principles
 
-## 🧠 Core principles
+- **Human-centered**: emotional context, relational cues, and timing matter as much as literal wording.
+- **Safe rehearsal**: teams should be able to practice rare or difficult scenarios without exposing real people to risk.
+- **Interpretability**: outputs should support human judgment, not replace it.
+- **Modularity**: research, runtime systems, and product surfaces should evolve independently without fragmenting the underlying intelligence layer.
 
-- **Human-centered first**: emotional context, timing, and relational cues
-  matter as much as words.
-- **Safe rehearsal**: teams can practice rare, high-impact interactions in a
-  protected environment.
-- **Interpretability over opacity**: outputs are designed to inform decisions,
-  not replace professional judgment.
-- **Modular design**: each layer can evolve independently while sharing a common
-  conversation intelligence foundation.
+## Journal Dataset Research Workflow
 
-## 📚 Journal Dataset Research Pipeline
+The repository includes a dedicated research workflow for discovering, evaluating, and integrating journal datasets that support the platform's emotional intelligence systems.
 
-Pixelated Empathy includes a dedicated pipeline for sourcing and evaluating
-research datasets:
+- Application entry points live under [src/pages/journal-research/](src/pages/journal-research/).
+- Shared UI and state logic live under [src/components/journal-research/](src/components/journal-research/) and [src/lib/api/journal-research/](src/lib/api/journal-research/).
+- Supporting research assets and process notes live under [ai/sourcing/journal/](ai/sourcing/journal/).
 
-- **Web interface** for human-guided review in `/journal-research`
-- **MCP server** for agent-based orchestration
-- **CLI tools** for automation workflows
-- **Backend research engine** for discovery, scoring, and integration planning
+## Documentation
 
-Detailed process documentation:
-[Journal Dataset Research Pipeline Documentation](ai/sourcing/journal/docs/README.md)
+For product and platform context, start with these repository resources:
 
-## 🧱 Repository map
+- [docs/index.mdx](docs/index.mdx) for the documentation site's landing content
+- [docs/platform/overview.mdx](docs/platform/overview.mdx) for the platform overview
+- [docs/compliance/security.mdx](docs/compliance/security.mdx) for security posture
+- [docs/compliance/hipaa.mdx](docs/compliance/hipaa.mdx) for healthcare compliance context
+- [docs/api-reference/introduction.mdx](docs/api-reference/introduction.mdx) for API documentation entry points
 
-- `ai/` — ML models, inference, and core emotional analysis logic
-- `src/` — frontend, API, and app integration code
-- `public/` — assets and visual identity
-- `scripts/` — operational utilities and repeatable task entry points
+## Trust Safety and Quality
 
-## 🔒 Trust and quality commitments
+This repository supports clinical and emotionally sensitive workflows. That shapes how the system is designed and documented.
 
-- Clear architectural boundaries between research, runtime, and product surface
-- Emphasis on reliability and operational safety in high-stakes contexts
-- Documentation-first approach for collaborators and reviewers
-- Progressive accessibility and readability updates to keep the repo easy to
-  understand for new contributors
+- Architectural boundaries separate research, runtime, and user-facing product surfaces.
+- Safety, privacy, and reviewability are treated as product requirements, not add-ons.
+- Documentation is maintained as a first-class artifact so collaborators can evaluate intent and system shape quickly.
+- Accessibility and readability improvements are part of the ongoing maintenance standard for both product and documentation surfaces.
 
-## 🌐 Explore the mission
+## External Links
 
 - [Company website](https://pixelatedempathy.com)
 - [Request enterprise access](https://pixelatedempathy.com/contact)
-- [View case studies](https://pixelatedempathy.com/case-studies)
-- [Meet the team](https://pixelatedempathy.com/team)
+- [Case studies](https://pixelatedempathy.com/case-studies)
+- [Team](https://pixelatedempathy.com/team)
 
-## 📝 Notes for readers
+## License
 
-This README is intentionally informational and strategic. It is written to
-answer: "Who are we?", "What are we building?", and "Why does this work matter?"
-before you look for implementation details.
+Pixelated Empathy is proprietary software. See [LICENSE](LICENSE).
 
----
-
-Built with: Astro, React, Node.js, TypeScript, MongoDB, Redis, and modern test
-and browser tooling.
-
-© 2026 Pixelated Empathy. Engineered with purpose.
-
-# Test change
+© 2026 Pixelated Empathy.
