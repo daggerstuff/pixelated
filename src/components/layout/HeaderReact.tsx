@@ -182,6 +182,7 @@ export function Header({
                 </button>
               </div>
               <SearchBox
+                autoFocus={true}
                 placeholder="Search content..."
                 maxResults={8}
                 minQueryLength={2}
