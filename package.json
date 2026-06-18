@@ -289,7 +289,7 @@
     "nanoid": "^5.1.11",
     "node-cron": "latest",
     "node-seal": "latest",
-    "nodemailer": "^9.0.0",
+    "nodemailer": "^9.0.1",
     "p5": "latest",
     "path-browserify": "latest",
     "pg": "^8.21.0",
