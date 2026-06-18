@@ -5,7 +5,9 @@
 
 ## Purpose
 
-This index enables **lazy loading** of skill definitions. Instead of loading all skill files at startup (which consumes 70-100K tokens), only this lightweight index is loaded initially. Individual skill details are loaded on-demand when referenced.
+This index enables **lazy loading** of skill definitions. Instead of loading all skill files at startup
+(which consumes 70-100K tokens), only this lightweight index is loaded. Individual skill details are loaded
+on-demand when referenced.
 
 ## Lazy Loading Directive
 
@@ -590,4 +592,4 @@ This index replaces the eager loading pattern in `START_HERE.md`. The startup se
 
 ---
 
-*End of Skills Index*
+## *End of Skills Index*
