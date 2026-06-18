@@ -20,6 +20,18 @@ import type { TherapeuticGoal } from '@/lib/ai/types/TherapeuticGoals'
 const GOAL_CATEGORIES = Object.values(GoalCategory)
 const GOAL_STATUSES = Object.values(GoalStatus)
 
+// ⚡ Bolt: Extract static mapping to module scope to avoid O(N) switch statement evaluations during render
+const CATEGORY_LABELS: Record<GoalCategory, string> = {
+  [GoalCategory.EMOTIONAL_REGULATION]: 'Emotional Regulation',
+  [GoalCategory.COGNITIVE_RESTRUCTURING]: 'Cognitive Restructuring',
+  [GoalCategory.BEHAVIORAL_CHANGE]: 'Behavioral Change',
+  [GoalCategory.SYMPTOM_REDUCTION]: 'Symptom Reduction',
+  [GoalCategory.RELATIONSHIP_IMPROVEMENT]: 'Relationship Improvement',
+  [GoalCategory.COPING_SKILLS]: 'Coping Skills',
+  [GoalCategory.TRAUMA_RECOVERY]: 'Trauma Recovery',
+  [GoalCategory.LIFESTYLE_CHANGES]: 'Lifestyle Changes',
+}
+
 interface TherapeuticGoalsTrackerProps {
   patientModel: CognitiveModel
   currentSession: TherapySession
@@ -385,28 +397,7 @@ export function TherapeuticGoalsTracker({
             onClick={() => handleCategoryClick(category)}
             className="whitespace-nowrap text-xs"
           >
-            {(() => {
-              switch (category) {
-                case GoalCategory.EMOTIONAL_REGULATION:
-                  return 'Emotional Regulation'
-                case GoalCategory.COGNITIVE_RESTRUCTURING:
-                  return 'Cognitive Restructuring'
-                case GoalCategory.BEHAVIORAL_CHANGE:
-                  return 'Behavioral Change'
-                case GoalCategory.SYMPTOM_REDUCTION:
-                  return 'Symptom Reduction'
-                case GoalCategory.RELATIONSHIP_IMPROVEMENT:
-                  return 'Relationship Improvement'
-                case GoalCategory.COPING_SKILLS:
-                  return 'Coping Skills'
-                case GoalCategory.TRAUMA_RECOVERY:
-                  return 'Trauma Recovery'
-                case GoalCategory.LIFESTYLE_CHANGES:
-                  return 'Lifestyle Changes'
-                default:
-                  return category
-              }
-            })()}
+            {CATEGORY_LABELS[category as GoalCategory] || category}
           </Button>
         ))}
       </div>
@@ -466,28 +457,7 @@ export function TherapeuticGoalsTracker({
               >
                 {GOAL_CATEGORIES.map((cat) => (
                   <option key={cat} value={cat}>
-                    {(() => {
-                      switch (cat) {
-                        case GoalCategory.EMOTIONAL_REGULATION:
-                          return 'Emotional Regulation'
-                        case GoalCategory.COGNITIVE_RESTRUCTURING:
-                          return 'Cognitive Restructuring'
-                        case GoalCategory.BEHAVIORAL_CHANGE:
-                          return 'Behavioral Change'
-                        case GoalCategory.SYMPTOM_REDUCTION:
-                          return 'Symptom Reduction'
-                        case GoalCategory.RELATIONSHIP_IMPROVEMENT:
-                          return 'Relationship Improvement'
-                        case GoalCategory.COPING_SKILLS:
-                          return 'Coping Skills'
-                        case GoalCategory.TRAUMA_RECOVERY:
-                          return 'Trauma Recovery'
-                        case GoalCategory.LIFESTYLE_CHANGES:
-                          return 'Lifestyle Changes'
-                        default:
-                          return cat
-                      }
-                    })()}
+                    {CATEGORY_LABELS[cat as GoalCategory] || cat}
                   </option>
                 ))}
               </select>
