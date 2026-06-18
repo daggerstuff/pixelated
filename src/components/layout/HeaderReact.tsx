@@ -110,6 +110,7 @@ export function Header({
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 aria-label="Search"
                 aria-expanded={isSearchOpen || false}
+                aria-haspopup="dialog"
                 title="Search (Cmd+K)"
               >
                 <svg
@@ -150,11 +151,16 @@ export function Header({
 
       {/* Search Modal with FlexSearch */}
       {isSearchOpen && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 px-4 pt-16 backdrop-blur-sm">
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center bg-background/80 px-4 pt-16 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-modal-title"
+        >
           <div className="bg-card border-border w-full max-w-lg rounded-lg border shadow-lg">
             <div className="p-4">
               <div className="mb-4 flex items-center justify-between">
-                <h3 className="text-lg font-medium">Search</h3>
+                <h3 id="search-modal-title" className="text-lg font-medium">Search</h3>
                 <button
                   type="button"
                   className="text-muted-foreground bg-transparent hover:bg-accent ml-auto inline-flex items-center rounded-lg p-1.5 text-sm hover:text-foreground"
@@ -176,6 +182,7 @@ export function Header({
                 </button>
               </div>
               <SearchBox
+                autoFocus={true}
                 placeholder="Search content..."
                 maxResults={8}
                 minQueryLength={2}
