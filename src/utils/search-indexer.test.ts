@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { processContent } from './search-indexer'
 
 describe('processContent', () => {
@@ -26,6 +27,8 @@ Content here`
   it('removes Markdown syntax from content', () => {
     const input = `This is **bold** and *italic*. It has ~~strikethrough~~ and \`inline code\`.`
     const output = processContent(input)
-    expect(output).toBe('This is bold and italic. It has strikethrough and inline code.')
+    expect(output).toBe(
+      'This is bold and italic. It has strikethrough and inline code.',
+    )
   })
 })
