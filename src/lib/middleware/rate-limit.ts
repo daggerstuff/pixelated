@@ -6,15 +6,24 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 // Initialize logger
 const logger = createBuildSafeLogger('rate-limit')
 
+function safeParseInt(
+  value: string | undefined,
+  fallback: number,
+): number {
+  if (value === undefined || value === '') return fallback
+  const parsed = parseInt(value, 10)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
 // Read rate limit configuration from environment variables
 // Falls back to defaults if not set (60 second window, 100 requests max)
-const RATE_LIMIT_WINDOW_MS = parseInt(
-  process.env['RATE_LIMIT_WINDOW_MS'] || '60000',
-  10,
+const RATE_LIMIT_WINDOW_MS = safeParseInt(
+  process.env['RATE_LIMIT_WINDOW_MS'],
+  60_000,
 )
-const RATE_LIMIT_MAX_REQUESTS = parseInt(
-  process.env['RATE_LIMIT_MAX_REQUESTS'] || '100',
-  10,
+const RATE_LIMIT_MAX_REQUESTS = safeParseInt(
+  process.env['RATE_LIMIT_MAX_REQUESTS'],
+  100,
 )
 
 // Rate limit configuration for different API endpoints
@@ -138,7 +147,7 @@ export const rateLimitMiddleware = defineMiddleware(
       const { pathname } = new URL(request.url)
 
       // Exempt health check endpoints from rate limiting (per PIX-3944 requirements)
-      if (pathname.includes('/health') || pathname.endsWith('/health')) {
+      if (pathname === '/health' || pathname.endsWith('/health')) {
         return next()
       }
 
