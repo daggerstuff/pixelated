@@ -79,6 +79,7 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
     return (
       <div
         className="flex space-x-2"
+        role="group"
         aria-label="Time range filters"
       >
         {TIME_RANGE_OPTIONS.map((option) => (
