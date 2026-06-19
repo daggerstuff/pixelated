@@ -1,11 +1,20 @@
 /**
  * Session management utilities for authentication system
  * Handles session verification, user info retrieval, and token management
+ *
+ * Session cache supports two backends controlled by USE_REDIS_SESSIONS env var:
+ *   - true:  Redis-backed (via src/lib/redis.ts) — required for horizontal scaling
+ *   - false: In-process Map (legacy, default)
+ *
+ * When USE_REDIS_SESSIONS=true, reads check Redis first and fall back to the
+ * in-process cache for a dual-write migration window. Writes always go to both
+ * backends so the migration is zero-downtime.
  */
 
 import { userManager } from '../db'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
+import { getFromCache, setInCache, removeFromCache } from '../redis'
 
 /**
  * Lightweight session shape returned by getSession and consumed by middleware
@@ -38,24 +47,144 @@ export interface Session {
 export type SessionData = Session
 
 /**
- * Short-lived in-process cache for validated Auth0 tokens.
+ * Session cache constants.
  *
- * Keyed by the raw token string. Each entry stores the resolved Session and
- * the epoch millisecond time when this cache entry should be evicted (30 s
- * before the token's actual expiry, matching the Auth0 clock-skew allowance).
+ * SESSION_CACHE_EVICT_BUFFER_MS: Re-validate this early before token expiry.
+ *   Protects against in-flight PHI exposure on a medical platform if the token
+ *   expires mid-request. The 5-second floor means a revoked token is accepted
+ *   for at most ~5 s after revocation.
  *
- * This avoids a full Auth0 round-trip on every request for the same token
- * without sacrificing revocation safety — the 30-second floor means a
- * revoked token is accepted for at most ~30 s after revocation in the worst
- * case. Tighten SESSION_CACHE_EVICT_BUFFER_MS if stricter revocation is required.
+ * SESSION_CACHE_MAX_TTL_MS: Hard ceiling — re-validate every 5 minutes even if
+ *   the token is still technically valid. Detects administrative revocation.
  */
+const SESSION_CACHE_EVICT_BUFFER_MS = 5 * 1_000
+const SESSION_CACHE_MAX_TTL_MS = 5 * 60 * 1_000
+
+/** A cached session entry with an absolute eviction timestamp. */
 interface TokenCacheEntry {
   session: Session
   evictAt: number
 }
-const SESSION_CACHE_EVICT_BUFFER_MS = 5 * 1_000 // Reduced from 30s to 5s for stricter verification
-const SESSION_CACHE_MAX_TTL_MS = 5 * 60 * 1_000 // Re-validate every 5 minutes even if token is still valid
+
+/** In-process fallback cache (used in all modes, primary storage when USE_REDIS_SESSIONS=false). */
 const tokenCache = new Map<string, TokenCacheEntry>()
+
+/** Redis cache key prefix for session entries. */
+const REDIS_SESSION_KEY_PREFIX = 'session:token:'
+
+/** Whether the Redis-backed session cache is enabled. */
+const useRedisSessions = () =>
+  process.env['USE_REDIS_SESSIONS'] === 'true' ||
+  process.env['USE_REDIS_SESSIONS'] === '1'
+
+/**
+ * Compute the shared eviction timestamp for a token validation result.
+ */
+function computeEvictAt(result: TokenPayload): number {
+  const tokenExpiresAt = result.expiresAt
+    ? result.expiresAt * 1000
+    : Date.now() + 60 * 60 * 1_000
+  return Math.min(
+    tokenExpiresAt - SESSION_CACHE_EVICT_BUFFER_MS,
+    Date.now() + SESSION_CACHE_MAX_TTL_MS,
+  )
+}
+
+/**
+ * Build a full Session object from a validated token payload and eviction time.
+ */
+function buildSession(result: TokenPayload, evictAt: number): Session | null {
+  const baseSession = getSessionFromToken(result)
+  if (!baseSession) return null
+  return {
+    ...baseSession,
+    expires: new Date(evictAt).toISOString(),
+  }
+}
+
+/** Redis TTL in seconds. Matches the in-memory eviction window. */
+function redisTtlSeconds(evictAt: number): number {
+  return Math.max(60, Math.ceil((evictAt - Date.now()) / 1000))
+}
+
+// ── Cache storage helpers ───────────────────────────────────────────
+
+function cacheGet(token: string): TokenCacheEntry | undefined {
+  return tokenCache.get(token)
+}
+
+function cacheSet(token: string, entry: TokenCacheEntry): void {
+  tokenCache.set(token, entry)
+}
+
+function cacheDelete(token: string): void {
+  tokenCache.delete(token)
+}
+
+async function redisGet(token: string): Promise<TokenCacheEntry | null> {
+  const raw = await getFromCache<{ session: Session; evictAt: number }>(
+    `${REDIS_SESSION_KEY_PREFIX}${token}`,
+  )
+  if (!raw || typeof raw.evictAt !== 'number') return null
+  return raw as TokenCacheEntry
+}
+
+async function redisSet(token: string, entry: TokenCacheEntry): Promise<void> {
+  await setInCache(
+    `${REDIS_SESSION_KEY_PREFIX}${token}`,
+    entry,
+    redisTtlSeconds(entry.evictAt),
+  )
+}
+
+async function redisDelete(token: string): Promise<void> {
+  await removeFromCache(`${REDIS_SESSION_KEY_PREFIX}${token}`)
+}
+
+// ── Backend-agnostic helpers used by getSession ─────────────────────
+
+/**
+ * Check both backends for a cached session entry. Returns the entry if
+ * found in either backend and not yet expired. Redis is checked first
+ * when USE_REDIS_SESSIONS is enabled.
+ */
+async function lookupCachedSession(
+  token: string,
+): Promise<TokenCacheEntry | null> {
+  // Check in-process cache first (fast path in all modes)
+  const mem = cacheGet(token)
+  if (mem && Date.now() < mem.evictAt) return mem
+  if (mem) cacheDelete(token)
+
+  // Check Redis when enabled
+  if (useRedisSessions()) {
+    const remote = await redisGet(token)
+    if (remote && Date.now() < remote.evictAt) {
+      // Warm the in-process cache from Redis for subsequent fast hits
+      cacheSet(token, remote)
+      return remote
+    }
+    if (remote) {
+      // Stale Redis entry — clean it up
+      await redisDelete(token)
+    }
+  }
+
+  return null
+}
+
+/**
+ * Store a session entry in both backends.
+ */
+async function storeSession(
+  token: string,
+  entry: TokenCacheEntry,
+): Promise<void> {
+  cacheSet(token, entry)
+  if (useRedisSessions()) {
+    await redisSet(token, entry)
+  }
+}
 
 /**
  * Minimal JWT payload shape used internally when building a Session from a
@@ -245,10 +374,18 @@ export function hasWorkspaceAccess(
  *   2. ?token= query parameter (WebSocket handshake)
  *   3. auth_token / auth-token cookie
  *
- * On the first call for a given token the full Auth0 JWT validation round-trip
- * is performed. Successful results are cached in-process until 30 s before the
- * token's expiry time (see SESSION_CACHE_EVICT_BUFFER_MS). Subsequent calls
- * with the same token bypass the network and return from the cache.
+ * Cache strategy (controlled by USE_REDIS_SESSIONS env var):
+ *
+ *   USE_REDIS_SESSIONS=false (default):
+ *     In-process Map cache with per-token TTL. Every request
+ *     for the same token returns from memory until the eviction
+ *     window expires, then re-validates against Auth0.
+ *
+ *   USE_REDIS_SESSIONS=true:
+ *     Redis-backed cache with the same eviction window. The
+ *     in-process Map is still used as a fast L1 cache, so hot
+ *     tokens never touch the network. Redis serves as the L2
+ *     cache for other instances in a horizontally scaled fleet.
  *
  * @param request - The incoming Web API Request
  * @returns A Session or null when unauthenticated
@@ -257,42 +394,20 @@ export async function getSession(request: Request): Promise<Session | null> {
   const token = extractTokenFromRequest(request)
   if (!token) return null
 
-  // --- Cache hit path ---
-  const cached = tokenCache.get(token)
-  if (cached) {
-    if (Date.now() < cached.evictAt) {
-      return cached.session
-    }
-    // Entry has passed its eviction threshold — remove and re-validate
-    tokenCache.delete(token)
-  }
+  // --- L1 / L2 cache check ---
+  const cached = await lookupCachedSession(token)
+  if (cached) return cached.session
 
   // --- Cache miss: authoritative Auth0 round-trip ---
   try {
     const result = await validateToken(token, 'access')
     if (!result.valid || !result.userId) return null
 
-    // Cache until SESSION_CACHE_EVICT_BUFFER_MS before token expiry, but enforce
-    // a maximum session cache TTL to detect administrative revocation.
-    const tokenExpiresAt = result.expiresAt
-      ? result.expiresAt * 1000
-      : Date.now() + 60 * 60 * 1_000
-    const evictAt = Math.min(
-      tokenExpiresAt - SESSION_CACHE_EVICT_BUFFER_MS,
-      Date.now() + SESSION_CACHE_MAX_TTL_MS,
-    )
+    const evictAt = computeEvictAt(result)
+    const session = buildSession(result, evictAt)
+    if (!session) return null
 
-    const baseSession = getSessionFromToken(result)
-    if (!baseSession) return null
-
-    const session: Session = {
-      ...baseSession,
-      // Use the calculated eviction time for the session object's expiration
-      // to avoid returning a session that claims to be valid but is evicted.
-      expires: new Date(evictAt).toISOString(),
-    }
-
-    tokenCache.set(token, { session, evictAt })
+    await storeSession(token, { session, evictAt })
 
     return session
   } catch {
