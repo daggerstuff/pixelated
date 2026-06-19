@@ -79,16 +79,15 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
     return (
       <div
         className="flex space-x-2"
-        role="radiogroup"
-        aria-label="Select time range"
+        role="group"
+        aria-label="Time range filters"
       >
         {TIME_RANGE_OPTIONS.map((option) => (
           <button
             key={option.value}
             type="button"
-            role="radio"
             onClick={() => onChange(option.value)}
-            aria-checked={value === option.value}
+            aria-pressed={value === option.value}
             className={`rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 focus-visible:ring-blue-500 ${
               value === option.value
                 ? 'bg-blue-600 text-white'
