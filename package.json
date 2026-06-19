@@ -344,7 +344,7 @@
     "@eslint/json": "latest",
     "@eslint/markdown": "latest",
     "@fontsource/inter": "latest",
-    "@github/copilot-sdk": "1.0.1",
+    "@github/copilot-sdk": "1.0.2",
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@playwright/test": "1.61.0",
@@ -457,7 +457,8 @@
     "vitest": "^4.1.9",
     "vscode-jsonrpc": "9.0.0",
     "wait-on": "latest",
-    "yaml": "2.8.4"
+    "wrangler": "^4.101.0",
+    "yaml": "2.9.0"
   },
   "peerDependencies": {
     "hono": "^4.12.14"
