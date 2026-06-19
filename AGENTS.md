@@ -62,6 +62,19 @@ pnpm vitest run -c config/vitest.config.ts
 
 ---
 
+## Coding Standards
+Follow the conventions documented in:
+- `.factory/rules/typescript.md` - TypeScript and React patterns
+- `.factory/rules/astro.md` - Astro 6 component, routing, and SSR rules
+- `.factory/rules/python.md` - Python/uv toolchain and ruff/pyright conventions
+- `.factory/rules/testing.md` - Vitest, Playwright, and pytest patterns
+- `.factory/rules/security.md` - HIPAA, secrets, auth/gating, threat modeling
+
+## Personal Preferences
+Refer to `~/.factory/memories.md` for personal coding preferences and past decisions.
+
+---
+
 ## Foresight Memory & Continuity System
 
 **Foresight is the persistent brain for AI agents.** AI sessions are stateless—without Foresight, each session starts fresh, repeating mistakes and forgetting decisions.
