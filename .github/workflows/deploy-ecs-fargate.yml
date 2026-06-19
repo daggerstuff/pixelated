@@ -176,73 +176,13 @@ jobs:
           container-name: pixelated-empathy-api
           image: ${{ env.IMAGE_URI }}
 
-      - name: Deploy via CodeDeploy
-        run: |
-          # Register the new task definition and get the ARN
-          TASK_DEF_ARN=$(aws ecs register-task-definition \
-            --cli-input-json file://${{ steps.render-task-def.outputs.task-definition }} \
-            --query 'taskDefinition.taskDefinitionArn' --output text)
-          echo "Registered task def: $TASK_DEF_ARN"
-
-          # Build appspec with replaced task definition ARN, write to temp file
-          python3 -c "
-          import json, sys
-          with open('.aws/appspec.json') as f:
-              appspec = json.load(f)
-          appspec['Resources'][0]['TargetService']['Properties']['TaskDefinition'] = '$TASK_DEF_ARN'
-          with open('/tmp/appspec.json', 'w') as f:
-              json.dump(appspec, f)
-          print('Appspec written to /tmp/appspec.json')
-          "
-
-          # Build revision JSON using Python to avoid shell quoting issues
-          python3 -c "
-          import json
-          with open('/tmp/appspec.json') as f:
-              appspec = json.load(f)
-          revision = {
-              'revisionType': 'AppSpecContent',
-              'appSpecContent': {'content': json.dumps(appspec)}
-          }
-          with open('/tmp/revision.json', 'w') as f:
-              json.dump(revision, f)
-          print('Revision written to /tmp/revision.json')
-          "
-
-          # Trigger CodeDeploy deployment with auto-rollback on failure
-          DEPLOYMENT_ID=$(aws deploy create-deployment \
-            --application-name pixelated-empathy-ecs \
-            --deployment-group-name pixelated-empathy-ecs-dg \
-            --revision file:///tmp/revision.json \
-            --auto-rollback-configuration '{"enabled":true,"events":["DEPLOYMENT_FAILURE"]}' \
-            --query 'deploymentId' --output text)
-          echo "Deployment triggered: $DEPLOYMENT_ID"
-
-          # Poll deployment status for up to 20 minutes
-          echo "Waiting for CodeDeploy deployment $DEPLOYMENT_ID..."
-          for i in $(seq 1 120); do
-            STATUS=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
-              --query 'deploymentInfo.status' --output text)
-            OVERVIEW=$(aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
-              --query 'deploymentInfo.deploymentOverview' --output text)
-            echo "[$i] Status: $STATUS | Overview: $OVERVIEW"
-
-            case "$STATUS" in
-              Succeeded)
-                echo "Deployment succeeded!"
-                exit 0
-                ;;
-              Failed|Stopped)
-                echo "Deployment failed with status: $STATUS"
-                aws deploy get-deployment --deployment-id "$DEPLOYMENT_ID" \
-                  --query 'deploymentInfo.errorInformation.message' --output text
-                exit 1
-                ;;
-              Ready)
-                echo "Deployment in Ready state — continuing..."
-                ;;
-            esac
-            sleep 10
-          done
-          echo "Deployment timed out after 20 minutes"
-          exit 1
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+          codedeploy-appspec: .aws/appspec.json
+          codedeploy-application: pixelated-empathy-ecs
+          codedeploy-deployment-group: pixelated-empathy-ecs-dg
