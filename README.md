@@ -8,8 +8,10 @@
 
 > A clinical AI platform for practicing, analyzing, and improving emotionally complex conversations.
 
-Pixelated Empathy builds tooling for teams in high-stakes, human-centered environments.
-The platform combines simulated conversation practice, emotional signal analysis, and review workflows.
+Pixelated Empathy builds tooling for teams that operate in high-stakes, human-centered
+environments. The platform combines simulated conversation practice, emotional signal
+analysis, and review workflows so organizations can improve communication before real-world
+harm occurs.
 
 ## Overview
 
