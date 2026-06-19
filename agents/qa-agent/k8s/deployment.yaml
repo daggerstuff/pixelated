@@ -1,0 +1,97 @@
+# qa-agent (PIX-3958) K8s manifest.
+#
+# Deploys the qa-agent as a long-running Node service. Two deployments
+# ride on the same image:
+#
+#   * qa-agent          : daily-review scheduler entry
+#   * qa-agent-worker   : ephemeral worker (set replicas to 0 if not used)
+#
+# Replace the placeholder image tag at deploy time.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qa-agent
+  namespace: pixelated
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qa-agent
+  template:
+    metadata:
+      labels:
+        app: qa-agent
+    spec:
+      containers:
+        - name: agent
+          image: ghcr.io/pixelated/qa-agent:PLACEHOLDER
+          ports:
+            - containerPort: 2000
+              name: http
+          env:
+            - name: PORT
+              value: "2000"
+            - name: NODE_ENV
+              value: production
+            - name: AI_GATEWAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vercel-ai-gateway
+                  key: api-key
+            - name: FORESIGHT_MCP_URL
+              value: http://foresight-mcp:8765
+            - name: SLACK_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-bot
+                  key: bot-token
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-bot
+                  key: signing-secret
+            - name: LINEAR_AGENT_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: access-token
+            - name: LINEAR_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: webhook-secret
+          readinessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qa-agent
+  namespace: pixelated
+spec:
+  selector:
+    app: qa-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: 2000
+---
+# Cron reroutes "30 23 * * *" if the platform is Vercel: Vercel Cron is
+# automatically wired by eve. Outside Vercel, deployers must point their
+# host's scheduler at POST /eve/v1/dev/schedules/daily-review.

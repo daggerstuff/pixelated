@@ -1,0 +1,45 @@
+{
+  "name": "session-agent",
+  "version": "0.0.0",
+  "type": "module",
+  "imports": {
+    "#*": "./agent/*",
+    "#evals/*": "./evals/*"
+  },
+  "scripts": {
+    "build": "eve build",
+    "dev": "eve dev",
+    "start": "eve start",
+    "typecheck": "tsgo",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@vercel/connect": "0.2.2",
+    "ai": "7.0.0-beta.178",
+    "eve": "^0.11.5",
+    "workers-ai-provider": "^3.2.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/express": "5.x",
+    "@types/node": "24.x",
+    "@typescript/native-preview": "7.0.0-dev.20260523.1",
+    "@vitest/coverage-v8": "^4.1.9",
+    "express": "5.x",
+    "vitest": "^4.1.9"
+  },
+  "peerDependencies": {
+    "express": "5.x"
+  },
+  "overrides": {
+    "ai": "7.0.0-beta.178"
+  },
+  "resolutions": {
+    "ai": "7.0.0-beta.178"
+  },
+  "engines": {
+    "node": "24.x"
+  }
+}
