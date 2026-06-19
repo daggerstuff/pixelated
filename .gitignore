@@ -377,4 +377,4 @@ agents.lock
 .agents/.gitignore
 
 scripts/hetzner
-scripts/memory/mcp-config.json
+hackathon/pixelated_email_dump.json
