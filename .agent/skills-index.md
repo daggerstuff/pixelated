@@ -5,7 +5,9 @@
 
 ## Purpose
 
-This index enables **lazy loading** of skill definitions. Instead of loading all skill files at startup (which consumes 70-100K tokens), only this lightweight index is loaded initially. Individual skill details are loaded on-demand when referenced.
+This index enables **lazy loading** of skill definitions. Instead of loading all skill files at startup
+(which consumes 70-100K tokens), only this lightweight index is loaded. Individual skill details are loaded
+on-demand when referenced.
 
 ## Lazy Loading Directive
 
@@ -33,6 +35,10 @@ This index enables **lazy loading** of skill definitions. Instead of loading all
 - **git-push** (`pixelated` · v1.0.0)
   > Intelligently group, stage, commit, and push all 4 repos (submodules first, then main) with semantic commit message generation. Trigger: `/git:push` or "commit and push everything".
   > Path: `.agent/skills/git-push/SKILL.md`
+
+- **pr-churn** (`pixelated` · v1.0.0)
+  > Executes the automated Pull Request Processing Workflow to process and merge open PRs across all daggerstuff repositories using E2B sandboxes. Trigger: `/pr:churn` or "churn open PRs".
+  > Path: `.agent/skills/pr-churn/SKILL.md`
 
 - **accessibility-compliance-accessibility-audit** (`unspecified` · v4.1.0-fractal)
   > You are an accessibility expert specializing in WCAG compliance, inclusive design, and assistive technology compatibi...
@@ -590,4 +596,4 @@ This index replaces the eager loading pattern in `START_HERE.md`. The startup se
 
 ---
 
-*End of Skills Index*
+## *End of Skills Index*
