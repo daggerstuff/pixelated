@@ -128,11 +128,11 @@ lint_py_files() {
   if command -v uv &>/dev/null; then
     info "    Running ruff check (via uv)..."
     if [[ "$FIX" == "true" ]]; then
-      uv run ruff check --fix "${file_arr[@]}" 2>&1 || { error "    ruff check errors in ${repo_name}"; ERRORS=$((ERRORS+1)); }
-      uv run ruff format "${file_arr[@]}" 2>&1 || warn "    ruff format had warnings"
+      uv run --active ruff check --fix "${file_arr[@]}" 2>&1 || { error "    ruff check errors in ${repo_name}"; ERRORS=$((ERRORS+1)); }
+      uv run --active ruff format "${file_arr[@]}" 2>&1 || warn "    ruff format had warnings"
     else
-      uv run ruff check "${file_arr[@]}" 2>&1 || { error "    ruff check errors in ${repo_name}"; ERRORS=$((ERRORS+1)); }
-      uv run ruff format --check "${file_arr[@]}" 2>&1 || { error "    ruff format issues in ${repo_name}"; ERRORS=$((ERRORS+1)); }
+      uv run --active ruff check "${file_arr[@]}" 2>&1 || { error "    ruff check errors in ${repo_name}"; ERRORS=$((ERRORS+1)); }
+      uv run --active ruff format --check "${file_arr[@]}" 2>&1 || { error "    ruff format issues in ${repo_name}"; ERRORS=$((ERRORS+1)); }
     fi
   elif command -v ruff &>/dev/null; then
     info "    Running ruff check..."
