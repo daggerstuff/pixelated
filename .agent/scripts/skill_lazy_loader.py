@@ -48,6 +48,13 @@ COMPRESSED_INDEX = AGENT_ROOT / "skills-index-compressed.json"
 TOOL_CATEGORIES = AGENT_ROOT / "tool-categories.json"
 SKILLS_DIR = AGENT_ROOT / "skills"
 
+# Global user-level skill stores. Mirrors `build_compressed_index.py` so
+# the loader resolves skills that live in `~/.agents/skills/` or
+# `~/.factory/skills/` (skill catalog installed per-machine rather than
+# tracked in this repo).
+GLOBAL_SKILLS_DIR = Path.home() / ".agents" / "skills"
+GLOBAL_RELAY_DIR = Path.home() / ".factory" / "skills"
+
 
 def _is_within(path: Path, base: Path) -> bool:
     try:
@@ -245,7 +252,14 @@ class SkillLazyLoader:
             return handle
 
     def _resolve_skill_file_path(self, skill_name: str, metadata: dict[str, Any] | None) -> Path | None:
-        """Resolve `SKILL.md` with repo-safe fallbacks."""
+        """Resolve `SKILL.md` with repo-safe fallbacks.
+
+        Acceptable locations:
+        - Anything under the project-local `.agent/` root.
+        - Anything under the project repo root.
+        - Anything under the global user-level stores
+          (`~/.agents/skills/`, `~/.factory/skills/`).
+        """
 
         candidates: list[Path] = []
 
@@ -260,13 +274,14 @@ class SkillLazyLoader:
                     candidates.append((AGENT_ROOT / candidate).resolve())
 
         candidates.append((SKILLS_DIR / skill_name / "SKILL.md").resolve())
+        candidates.append((GLOBAL_SKILLS_DIR / skill_name / "SKILL.md").resolve())
+        candidates.append((GLOBAL_RELAY_DIR / skill_name / "SKILL.md").resolve())
 
+        allowed_bases = (AGENT_ROOT, REPO_ROOT, GLOBAL_SKILLS_DIR, GLOBAL_RELAY_DIR)
         for candidate in candidates:
-            if (
-                candidate.exists()
-                and candidate.is_file()
-                and (_is_within(candidate, AGENT_ROOT) or _is_within(candidate, REPO_ROOT))
-            ):
+            if not (candidate.exists() and candidate.is_file()):
+                continue
+            if any(_is_within(candidate, base) for base in allowed_bases):
                 return candidate
 
         return None
