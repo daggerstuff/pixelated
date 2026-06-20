@@ -6,25 +6,23 @@
  * workers-ai-provider package.
  */
 
-import { createWorkersAI } from "workers-ai-provider";
+import { createWorkersAI } from 'workers-ai-provider'
 
-const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
-const apiKey = process.env.CLOUDFLARE_AI_API_KEY;
+const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+const apiKey = process.env.CLOUDFLARE_AI_API_KEY
 
 if (!accountId || !apiKey) {
   console.warn(
-    "[workers-ai] CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_AI_API_KEY not set. " +
-      "Workers AI tools will fall back to stub responses.",
-  );
+    '[workers-ai] CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_AI_API_KEY not set. ' +
+      'Workers AI tools will fall back to stub responses.',
+  )
 }
 
 const workersai =
-  accountId && apiKey
-    ? createWorkersAI({ accountId, apiKey })
-    : null;
+  accountId && apiKey ? createWorkersAI({ accountId, apiKey }) : null
 
-export const MODEL = "@cf/meta/llama-3.2-3b-instruct";
+export const MODEL = '@cf/meta/llama-3.2-3b-instruct'
 
 export function getModel() {
-  return workersai ? workersai(MODEL) : null;
+  return workersai ? workersai(MODEL) : null
 }
