@@ -22,6 +22,12 @@ on-demand when referenced.
 
 ## Skills Catalog
 
+### Workflow Pillars (load first when scope is non-trivial)
+
+- **droid-workflow** (`pixelated` · v1.0.0)
+  > Use this when work spans ≥5 files, ≥1 day, or crosses a feature boundary. Teaches Specification Mode, Missions, the prompt shape, and the Mission Control recovery playbook. Reference: `IMPLEMENTATION_PLAN.template.md` and `.factory/rules/droid-workflow.md`. **Load this skill before any Spec or Mission kicks off.**
+  > Path: `.agent/skills/droid-workflow/SKILL.md`
+
 ### Populated Skills (with documentation)
 
 - **ab-test-setup** (`unspecified` · v4.1.0-fractal)
