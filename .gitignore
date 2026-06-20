@@ -378,4 +378,4 @@ agents.lock
 .agents/.gitignore
 
 scripts/hetzner
-hackathon/pixelated_email_dump.json
+hackathon/
