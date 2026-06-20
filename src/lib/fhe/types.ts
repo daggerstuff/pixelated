@@ -39,6 +39,7 @@ export enum FHEOperation {
   // Text analysis operations
   SENTIMENT = 'sentiment',
   CATEGORIZE = 'categorize',
+  EMOTION_CLASSIFY = 'emotion_classify',
   SUMMARIZE = 'summarize',
   TOKENIZE = 'tokenize',
   FILTER = 'filter',

@@ -111,6 +111,79 @@ Before substantial work, execute the continuity handshake:
 
 ---
 
+## Droid Workflow: Spec Mode & Missions
+
+For non-trivial work, prefer Droid's two structured workflows. Treat them as
+the default shape of any multi-step change rather than ad-hoc prompting.
+
+### Specification Mode (single-feature planning)
+
+Use when a feature is well-scoped but still benefits from explicit approval
+before code lands.
+
+- **Trigger**: complex/single-feature work (touching ≥1 framework surface area
+  or any change spanning a feature boundary).
+- **How**: press **Shift+Tab** before sending the prompt, or invoke `/spec`.
+  Droid produces a plan, you approve it, then it executes.
+- **Output**: an in-repo `IMPLEMENTATION_PLAN.md` (or scoped filename) for
+  auditability.
+- **Prompt shape**: state the goal in one sentence, list constraints and
+  related files, name the verification command (`pnpm test:unit`,
+  `pnpm lint`, targeted Playwright spec, etc.).
+- **Best practice**: keep phases to 1-2 days of work each; one behavior per
+  phase; one concrete verification per phase. ([Implementing Large
+  Features guide](https://docs.factory.ai/cli/user-guides/implementing-large-features))
+
+### Missions (multi-feature orchestration)
+
+Use when work decomposes into multiple features, multiple milestones, or
+multiple subagents working in parallel.
+
+- **Trigger**: large refactors (50+ files), component migrations, big
+  multi-feature implementations (10+ files), or anything where the planning
+  phase is the actual value.
+- **How**: invoke `/missions`. Droid collaborates on the plan, derives
+  features + milestones, leverages existing skills (and develops new ones if
+  needed), then hands the approved plan to Mission Control for orchestration.
+- **Inheritance**: your MCPs, skills, hooks, custom droids, and `AGENTS.md`
+  carry into missions automatically.
+- **Stay engaged**: treat yourself as the PM. Pause and redirect when:
+  - a worker is stuck ("mark this complete and move to the next feature");
+  - a milestone is blocked ("re-assess and tell me what's blocking");
+  - the plan needs to change ("drop X, add Y, re-plan remaining milestones").
+  See `~/.factory/missions/README.md` for the full recovery playbook.
+- **Heuristic for cost**: roughly `#features + 2 × #milestones` worker runs.
+  Plan validation upfront is cheaper than rework after.
+- **Headless mode**: `droid exec --mission -f mission.md` for CI / scheduled
+  missions. Tunes via `--worker-model`, `--validator-model`,
+  `--worker-reasoning-effort`, `--validator-reasoning-effort`.
+
+### How to Talk to a Droid (always-on principles)
+
+Apply these to every prompt — Spec Mode, Missions, or direct work. Pulled
+from the [How to Talk to a Droid guide](https://docs.factory.ai/cli/getting-started/how-to-talk-to-a-droid).
+
+- **Be explicit about the goal.** State the outcome up front.
+- **Provide context.** Include file paths, error messages, ticket links.
+- **Choose the approach.** Spec for complex single features, Missions for
+  multi-feature work, direct for routine fixes.
+- **Define success.** Name the verification command, the expected output,
+  and the surface to check.
+- **Reference files directly.** Use `@file.ts` or full paths.
+- **Set boundaries.** "Only modify files in the auth directory" contained the
+  scope.
+- **Reference external resources by URL.** Droid fetches them.
+- **Break large projects up.** New sessions per phase or feature.
+
+### Soft recommendation
+
+Spec Mode and Missions are *recommended* workflows — not hard gates. Small,
+clarified, well-scoped tasks can be completed directly. Treat the bar as
+"would I benefit from writing this down before code lands?" If yes, use Spec
+or Mission.
+
+---
+
 ## Cursor Cloud specific instructions
 
 ### Node.js PATH
