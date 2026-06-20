@@ -4,6 +4,12 @@ import { z } from "zod";
 // Final approval gate — promote to production. Only reachable after
 // Gate 4 resolves positively.
 
+interface PromoteToProductionInput {
+  staging_release_id: string;
+  image_tag: string;
+  release_notes?: string;
+}
+
 export default defineTool({
   description:
     "Promote a model to the production environment. Only callable after " +
@@ -14,7 +20,7 @@ export default defineTool({
     image_tag: z.string().min(1),
     release_notes: z.string().max(2000).optional(),
   }),
-  async execute(input) {
+  async execute(input: PromoteToProductionInput) {
     return {
       production_release_id: `release-${Date.now().toString(36)}`,
       staging_release_id: input.staging_release_id,
