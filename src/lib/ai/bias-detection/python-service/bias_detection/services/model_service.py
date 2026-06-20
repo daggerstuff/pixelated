@@ -55,8 +55,11 @@ def _load_transformers() -> None:
         from transformers import (
             AutoTokenizer,
             BertModel,
-            TFBertForSequenceClassification,
         )
+        try:
+            from transformers import TFBertForSequenceClassification
+        except Exception:
+            TFBertForSequenceClassification = None
 
         TRANSFORMERS_AVAILABLE = True
     except Exception:
@@ -424,6 +427,30 @@ class TensorFlowModelService(ModelService):
             "max_sequence_length": self.max_length,
             "batch_size": self.batch_size,
         }
+# Try to import torch and define base class for module-level serialization compatibility
+try:
+    import torch
+    _Module = torch.nn.Module
+except ImportError:
+    torch = None
+    _Module = object
+
+class BiasDetectionModel(_Module):
+    def __init__(self, num_labels: int = 17):
+        super().__init__()
+        # Import dynamically to avoid early import failures
+        from transformers import BertModel
+        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        self.classifier = torch.nn.Linear(
+            self.bert.config.hidden_size, num_labels
+        )
+        self.dropout = torch.nn.Dropout(0.1)
+
+    def forward(self, input_ids, attention_mask):
+        outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
+        pooled_output = outputs.pooler_output
+        pooled_output = self.dropout(pooled_output)
+        return self.classifier(pooled_output)
 
 
 class PyTorchModelService(ModelService):
@@ -464,7 +491,7 @@ class PyTorchModelService(ModelService):
             model_file = self.model_path / "model.pt"
             torch = self._torch
             if model_file.exists():
-                self.model = torch.load(model_file, map_location=self.device)
+                self.model = torch.load(model_file, map_location=self.device, weights_only=False)
             else:
                 # Create basic model if not found
                 self.model = self._create_basic_model()
@@ -542,21 +569,6 @@ class PyTorchModelService(ModelService):
             raise ImportError(
                 "transformers BertModel is not available for PyTorch model creation."
             )
-
-        class BiasDetectionModel(torch.nn.Module):
-            def __init__(self, num_labels: int = len(BiasType.__members__)):
-                super().__init__()
-                self.bert = BertModel.from_pretrained("bert-base-uncased")
-                self.classifier = torch.nn.Linear(
-                    self.bert.config.hidden_size, num_labels
-                )
-                self.dropout = torch.nn.Dropout(0.1)
-
-            def forward(self, input_ids, attention_mask):
-                outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
-                pooled_output = outputs.pooler_output
-                pooled_output = self.dropout(pooled_output)
-                return self.classifier(pooled_output)
 
         return BiasDetectionModel()
 
