@@ -79,6 +79,7 @@ const OPERATION_COMPLEXITY: Record<FHEOperation, number> = {
   [FHEOperation.KEYWORD_DENSITY]: 6,
   [FHEOperation.READING_LEVEL]: 7,
   [FHEOperation.ANALYZE]: 8,
+  [FHEOperation.EMOTION_CLASSIFY]: 9,
 }
 
 /**
