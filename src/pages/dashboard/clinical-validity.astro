@@ -51,6 +51,31 @@ try {
   error = err instanceof Error ? err.message : 'Failed to fetch data'
   console.error('Failed to fetch clinical validity data:', err)
 }
+
+// Calculate rolling 7-day average and check for degradation
+let showDegradationAlert = false
+let degradationDetails = {
+  currentPassRate: data.passRate,
+  rollingAverage: 0,
+  degradationPercentage: 0
+}
+
+if (data.weeklyTrend && data.weeklyTrend.length > 0) {
+  // Calculate rolling 7-day average from weeklyTrend
+  const sum = data.weeklyTrend.reduce((total, day) => total + day.passRate, 0)
+  const rollingAverage = sum / data.weeklyTrend.length
+  
+  degradationDetails.rollingAverage = rollingAverage
+  degradationDetails.currentPassRate = data.passRate
+  
+  // Check if current pass rate is more than 10 percentage points below rolling average
+  // currentPassRate < (rollingAverage - 0.10)
+  const degradationThreshold = rollingAverage - 0.10
+  showDegradationAlert = data.passRate < degradationThreshold
+  
+  // Calculate degradation in percentage points (absolute difference)
+  degradationDetails.degradationPercentage = (rollingAverage - data.passRate) * 100
+}
 ---
 
 <DashboardLayout
@@ -65,6 +90,61 @@ try {
         Monitor scoring performance across 6 clinical dimensions and annotation queue status
       </p>
     </div>
+
+    <!-- Degradation Alert -->
+    {showDegradationAlert && (
+      <div 
+        class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-orange-950/30 to-orange-900/20 border-orange-800 relative"
+        role="alert"
+        aria-labelledby="degradation-alert-title"
+        aria-describedby="degradation-alert-description"
+      >
+        <div class="flex items-start gap-3">
+          <!-- Icon -->
+          <div class="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
+            <svg 
+              class="w-5 h-5 text-orange-400" 
+              fill="currentColor" 
+              viewBox="0 0 20 20" 
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1">
+            <h3 id="degradation-alert-title" class="text-lg font-semibold text-orange-200 mb-1">
+              Performance Degradation Detected
+            </h3>
+            <p id="degradation-alert-description" class="text-orange-300/90 mb-3">
+              Clinical validity pass rate has dropped {degradationDetails.degradationPercentage.toFixed(1)} percentage points below the 7-day rolling average (more than 10% threshold).
+              Current: {(degradationDetails.currentPassRate * 100).toFixed(1)}% vs Average: {(degradationDetails.rollingAverage * 100).toFixed(1)}%
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button 
+                class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                onclick="console.log('Investigate degradation')"
+              >
+                Investigate
+              </button>
+              <button 
+                class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium rounded-lg transition-colors border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
+                onclick="this.closest('[role=\"alert\"]').style.display = 'none'"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Accessibility: hidden live region for screen readers -->
+        <div aria-live="assertive" class="sr-only">
+          Alert: Performance degradation detected. Clinical validity pass rate has dropped {degradationDetails.degradationPercentage.toFixed(1)} percentage points below the 7-day rolling average.
+        </div>
+      </div>
+    )}
 
     <!-- Error State -->
     {error && (
