@@ -51,14 +51,23 @@ const sealScheme = new SealScheme(SealSchemeType.BFV)
 // Initialize tenant service instances map and default service instance
 const MAX_TENANT_SERVICES = 100
 const tenantServiceInstances = new Map<string, FHEService>()
+const tenantServiceLastAccessed = new Map<string, number>()
 let defaultServiceInstance: FHEService | null = null
 
 function evictLRUTenant(): void {
-  const oldest = tenantServiceInstances.keys().next().value
+  let oldest: string | undefined
+  let oldestTime = Infinity
+  for (const [tenantId, lastAccessed] of tenantServiceLastAccessed) {
+    if (lastAccessed < oldestTime) {
+      oldestTime = lastAccessed
+      oldest = tenantId
+    }
+  }
   if (oldest) {
     tenantServiceInstances.delete(oldest)
+    tenantServiceLastAccessed.delete(oldest)
     logger.warn(
-      `FHE tenant map reached ${MAX_TENANT_SERVICES} limit, evicted tenant ${oldest.slice(-8)}`,
+      `FHE tenant map reached ${MAX_TENANT_SERVICES} limit, evicted LRU tenant ${oldest.slice(-8)} (idle ${Date.now() - oldestTime}ms)`,
     )
   }
 }
@@ -68,6 +77,7 @@ function storeTenantService(tenantId: string, service: FHEService): void {
     evictLRUTenant()
   }
   tenantServiceInstances.set(tenantId, service)
+  tenantServiceLastAccessed.set(tenantId, Date.now())
 }
 
 // Initialize tenant manager (placeholder - actual implementation would be more complex)
@@ -532,6 +542,7 @@ export async function getTenantFHEService(
   if (tenantServiceInstances.has(tenantId)) {
     const existing = tenantServiceInstances.get(tenantId)
     if (existing) {
+      tenantServiceLastAccessed.set(tenantId, Date.now())
       logger.info(`Using existing FHE service for tenant ${tenantId}`)
       return existing
     }
