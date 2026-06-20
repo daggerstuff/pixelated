@@ -1,0 +1,185 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import { 
+  ClipboardList, 
+  XCircle
+} from 'lucide-react'
+
+// Mock data for display
+const mockPendingItems = [
+  {
+    id: 1,
+    sample_text: "The therapist used cognitive restructuring techniques to challenge negative automatic thoughts...",
+    original_score: 0.52,
+    per_dimension_scores: {
+      technique: 0.85,
+      alliance: 0.78,
+      structure: 0.82,
+      cultural: 0.65,
+      ebp: 0.71,
+      dsm5: 0.58
+    },
+    routing_reason: "Borderline clinical validity score requires expert review",
+    status: "pending",
+    created_at: "2026-06-20T10:30:03.128324Z"
+  },
+  {
+    id: 2,
+    sample_text: "Client expressed feelings of anxiety and worry about upcoming life events...",
+    original_score: 0.48,
+    per_dimension_scores: {
+      technique: 0.72,
+      alliance: 0.65,
+      structure: 0.68,
+      cultural: 0.55,
+      ebp: 0.62,
+      dsm5: 0.70
+    },
+    routing_reason: "Mid-range score needs validation",
+    status: "pending",
+    created_at: "2026-06-20T10:30:03.235513Z"
+  }
+]
+
+const pendingItems = mockPendingItems
+---
+
+<DashboardLayout
+  title="Annotation Queue | Pixelated Empathy Dashboard"
+  description="Expert review interface for clinical validity annotation queue"
+  showSidebar={true}
+>
+  <div class="container mx-auto py-6 px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-2">
+        <ClipboardList class="w-8 h-8 text-accent" />
+        <h1 class="text-3xl font-bold tracking-tight">Annotation Queue</h1>
+      </div>
+      <p class="text-muted-foreground">
+        Review borderline clinical validity samples and submit expert scores
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left column: Pending items list -->
+      <div class="lg:col-span-2">
+        <Card class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">Pending Items</h2>
+            <span class="px-3 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent">
+              {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {pendingItems.length > 0 ? (
+            <div class="space-y-4">
+              {pendingItems.map((item) => (
+                <div 
+                  key={item.id}
+                  class="p-4 border rounded-lg border-border"
+                >
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 class="font-medium">Sample #{item.id}</h3>
+                      <p class="text-xs text-muted-foreground mt-1">
+                        Added {new Date(item.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-lg font-semibold">
+                        {(item.original_score * 100).toFixed(1)}%
+                      </div>
+                      <div class="text-xs text-muted-foreground">Original Score</div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
+                  </div>
+
+                  {item.routing_reason && (
+                    <div class="mb-3">
+                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                        {item.routing_reason}
+                      </span>
+                    </div>
+                  )}
+
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                    {Object.entries(item.per_dimension_scores).map(([dimension, score]) => (
+                      <div key={dimension} class="flex items-center justify-between">
+                        <span class="text-muted-foreground capitalize">{dimension}:</span>
+                        <span class="font-medium">{(score * 100).toFixed(0)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-12">
+              <XCircle class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 class="text-lg font-medium mb-2">No pending items</h3>
+              <p class="text-muted-foreground">All annotation queue items have been reviewed.</p>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <!-- Right column: Stats and instructions -->
+      <div>
+        <Card class="p-6">
+          <h2 class="text-xl font-semibold mb-6">Queue Statistics</h2>
+          
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="text-center p-3 rounded-lg bg-surface/50">
+              <div class="text-2xl font-bold">{pendingItems.length}</div>
+              <div class="text-xs text-muted-foreground">Pending</div>
+            </div>
+            <div class="text-center p-3 rounded-lg bg-surface/50">
+              <div class="text-2xl font-bold">
+                {pendingItems.length > 0 
+                  ? (pendingItems.reduce((sum, item) => sum + item.original_score, 0) / pendingItems.length * 100).toFixed(1)
+                  : '0.0'
+                }%
+              </div>
+              <div class="text-xs text-muted-foreground">Avg Score</div>
+            </div>
+          </div>
+
+          <div class="text-sm text-muted-foreground">
+            <p>Annotation API: <span class="font-medium text-accent">Running on port 3102</span></p>
+            <p class="mt-2">Use POST /queue/submit to submit reviews</p>
+          </div>
+        </Card>
+
+        {/* Instructions */}
+        <Card class="p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4">Review Guidelines</h3>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <span class="text-accent font-medium">•</span>
+              <span>Borderline samples (0.4-0.6 score) require expert review</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent font-medium">•</span>
+              <span>Assess clinical validity across all dimensions</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent font-medium">•</span>
+              <span>Submit scores via the annotation API</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-accent font-medium">•</span>
+              <span>Use your assigned reviewer ID</span>
+            </li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
