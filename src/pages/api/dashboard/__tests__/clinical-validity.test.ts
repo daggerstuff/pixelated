@@ -3,35 +3,51 @@ import { GET } from '../clinical-validity'
 
 // Mock child_process
 vi.mock('child_process', () => ({
-  spawn: vi.fn(() => ({
-    stdout: { on: vi.fn() },
-    stderr: { on: vi.fn() },
-    on: vi.fn((event, callback) => {
-      if (event === 'close') {
-        setTimeout(() => callback(0), 0)
-      }
-      return this
-    }),
-  })),
+  spawn: vi.fn(() => {
+    const mockProcess = {
+      stdout: { 
+        on: vi.fn((event, callback) => {
+          if (event === 'data') {
+            // Simulate benchmark output
+            setTimeout(() => callback(JSON.stringify({
+              scorer_version: "3.0.0",
+              total_sample_count: 691,
+              scored_sample_count: 133,
+              missing_transcript_count: 1,
+              csv_checksums: {},
+              overall: {
+                pearson_correlation: 0.078,
+                spearman_correlation: 0.0397,
+                mae: 0.75
+              },
+              per_dimension: {
+                technique: { pearson: 0.4273 },
+                alliance: { pearson: 0.6532 },
+                structure: { pearson: 0.3809 },
+                cultural: { pearson: 0.0 },
+                ebp: { pearson: 0.8546 },
+                dsm5: { pearson: 0.5 }
+              },
+              per_channel: {}
+            })), 0)
+          }
+        })
+      },
+      stderr: { on: vi.fn() },
+      on: vi.fn((event, callback) => {
+        if (event === 'close') {
+          setTimeout(() => callback(0), 10)
+        }
+        return mockProcess
+      }),
+    }
+    return mockProcess
+  }),
 }))
 
 // Mock fs/promises
 vi.mock('fs/promises', () => ({
-  readFile: vi.fn(() => Promise.resolve(JSON.stringify({
-    overall: { pass_rate: 0.75 },
-    per_dimension_breakdown: {
-      technique: 0.85,
-      alliance: 0.78,
-      structure: 0.82,
-      cultural: 0.65,
-      ebp: 0.71,
-      dsm5: 0.58
-    },
-    historical_trend: [
-      { date: '2026-06-13', passRate: 0.68, queueDepth: 12 },
-      { date: '2026-06-14', passRate: 0.70, queueDepth: 13 }
-    ]
-  }))),
+  readFile: vi.fn(() => Promise.reject(new Error('File not found'))),
 }))
 
 // Mock fetch for annotation API
@@ -101,19 +117,29 @@ describe('Clinical Validity API', () => {
     expect(typeof data.metadata.dataSource).toBe('string')
   })
 
-  it('handles errors gracefully and returns mock data', async () => {
-    // Mock fetch to fail
-    ;(global.fetch as any).mockImplementationOnce(() =>
-      Promise.reject(new Error('Network error'))
-    )
+  it('handles errors gracefully and returns 500', async () => {
+    // Mock spawn to fail (simulate benchmark failure)
+    const { spawn } = await import('child_process')
+    vi.mocked(spawn).mockImplementationOnce(() => {
+      const mockProcess = {
+        stdout: { on: vi.fn() },
+        stderr: { on: vi.fn() },
+        on: vi.fn((event, callback) => {
+          if (event === 'close') {
+            setTimeout(() => callback(1), 10) // Non-zero exit code
+          }
+          return mockProcess
+        }),
+      }
+      return mockProcess as any
+    })
 
     const url = new URL('http://localhost/api/dashboard/clinical-validity')
     const request = new Request(url.toString())
     const response = await GET({ url: url } as any)
     const data = await response.json()
 
-    expect(response.status).toBe(200) // Still returns 200 with mock data
-    expect(data.passRate).toBeDefined()
-    expect(data.metadata.error).toBeDefined()
+    expect(response.status).toBe(500) // Returns 500 when scorer fails
+    expect(data.error).toBeDefined()
   })
 })
