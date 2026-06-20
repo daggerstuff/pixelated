@@ -182,8 +182,8 @@ class TensorFlowModelService(ModelService):
                 logger.warning(f"Model path {self.model_path} does not exist")
                 await self._download_pretrained_model()
 
-            # Load model — tf is guaranteed non-None here (constructor raises if TF unavailable)
-            assert tf is not None, "TensorFlow must be available"
+            if tf is None:
+                raise RuntimeError("TensorFlow must be available")
             self.model = tf.keras.models.load_model(str(self.model_path))
 
             # Load tokenizer
@@ -545,51 +545,27 @@ class PyTorchModelService(ModelService):
         logger.info("Pretrained model downloaded and saved")
 
     def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
-        """Load a persisted PyTorch model, migrating legacy full-object pickles."""
+        """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
         try:
-            checkpoint = self._load_torch_checkpoint(model_file, weights_only=True)
+            checkpoint = self._load_torch_checkpoint(model_file)
             return self._restore_model_from_checkpoint(checkpoint)
         except Exception as state_dict_error:
             logger.warning(
-                "Failed to load PyTorch state-dict checkpoint; trying legacy model pickle.",
+                "Failed to load PyTorch state-dict checkpoint; regenerating model.",
                 model_path=str(model_file),
                 error=str(state_dict_error),
-            )
-
-        try:
-            legacy_model = self._load_torch_checkpoint(model_file, weights_only=False)
-        except Exception as legacy_error:
-            logger.warning(
-                "Failed to load legacy PyTorch model pickle; regenerating model.",
-                model_path=str(model_file),
-                error=str(legacy_error),
             )
             model = self._create_basic_model()
             self._save_model(model)
             return model
 
-        if isinstance(legacy_model, dict):
-            model = self._restore_model_from_checkpoint(legacy_model)
-        else:
-            model = legacy_model
-
-        logger.info(
-            "Loaded legacy PyTorch model pickle; rewriting as state-dict checkpoint.",
-            model_path=str(model_file),
-        )
-        self._save_model(model)
-        return model
-
-    def _load_torch_checkpoint(self, model_file: Path, *, weights_only: bool) -> Any:
+    def _load_torch_checkpoint(self, model_file: Path) -> Any:
         torch = self._torch
-        try:
-            return torch.load(
-                model_file,
-                map_location=self.device,
-                weights_only=weights_only,
-            )
-        except TypeError:
-            return torch.load(model_file, map_location=self.device)
+        return torch.load(
+            model_file,
+            map_location=self.device,
+            weights_only=True,
+        )
 
     def _restore_model_from_checkpoint(self, checkpoint: Any) -> torch.nn.Module:
         if not isinstance(checkpoint, dict):

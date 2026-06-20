@@ -1,3 +1,5 @@
+import tempfile
+import unittest
 from pathlib import Path
 from typing import Any
 
@@ -57,63 +59,76 @@ def create_service(fake_torch: FakeTorch, model_path: Path) -> PyTorchModelServi
     return service
 
 
-def test_save_model_persists_state_dict_checkpoint(tmp_path: Path) -> None:
-    fake_torch = FakeTorch()
-    service = create_service(fake_torch, tmp_path)
-    model = FakeModel()
+class TestPyTorchModelServicePersistence(unittest.TestCase):
+    def test_save_model_persists_state_dict_checkpoint(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            model_path = Path(temp_dir)
+            fake_torch = FakeTorch()
+            service = create_service(fake_torch, model_path)
+            model = FakeModel()
 
-    service._save_model(model)
+            service._save_model(model)
 
-    assert fake_torch.saved_path == str(tmp_path / "model.pt")
-    assert fake_torch.saved_checkpoint["format"] == PYTORCH_CHECKPOINT_FORMAT
-    assert fake_torch.saved_checkpoint["state_dict"] == model.state_dict()
-    assert fake_torch.saved_checkpoint is not model
+            self.assertEqual(fake_torch.saved_path, str(model_path / "model.pt"))
+            self.assertEqual(
+                fake_torch.saved_checkpoint["format"],
+                PYTORCH_CHECKPOINT_FORMAT,
+            )
+            self.assertEqual(
+                fake_torch.saved_checkpoint["state_dict"],
+                model.state_dict(),
+            )
+            self.assertIsNot(fake_torch.saved_checkpoint, model)
 
+    def test_load_saved_model_restores_state_dict_checkpoint(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            state_dict = {"classifier.weight": "restored"}
+            fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": state_dict}])
+            service = create_service(fake_torch, Path(temp_dir))
+            model = FakeModel()
+            service._create_basic_model = lambda: model
 
-def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None:
-    state_dict = {"classifier.weight": "restored"}
-    fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": state_dict}])
-    service = create_service(fake_torch, tmp_path)
-    model = FakeModel()
-    service._create_basic_model = lambda: model
+            loaded_model = service._load_saved_model(Path(temp_dir) / "model.pt")
 
-    loaded_model = service._load_saved_model(tmp_path / "model.pt")
+            self.assertIs(loaded_model, model)
+            self.assertEqual(model.loaded_state_dict, state_dict)
+            self.assertTrue(fake_torch.load_calls[0]["weights_only"])
 
-    assert loaded_model is model
-    assert model.loaded_state_dict == state_dict
-    assert fake_torch.load_calls[0]["weights_only"] is True
+    def test_load_saved_model_regenerates_unloadable_legacy_pickle(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fake_torch = FakeTorch(
+                [
+                    AttributeError(
+                        "Can't get local object 'PyTorchModelService._create_basic_model.<locals>.BiasDetectionModel'"
+                    ),
+                ]
+            )
+            service = create_service(fake_torch, Path(temp_dir))
+            model = FakeModel()
+            service._create_basic_model = lambda: model
 
+            loaded_model = service._load_saved_model(Path(temp_dir) / "model.pt")
 
-def test_load_saved_model_regenerates_unloadable_legacy_pickle(
-    tmp_path: Path,
-) -> None:
-    fake_torch = FakeTorch(
-        [
-            RuntimeError("state dict load failed"),
-            AttributeError(
-                "Can't get local object 'PyTorchModelService._create_basic_model.<locals>.BiasDetectionModel'"
-            ),
-        ]
-    )
-    service = create_service(fake_torch, tmp_path)
-    model = FakeModel()
-    service._create_basic_model = lambda: model
+            self.assertIs(loaded_model, model)
+            self.assertTrue(fake_torch.load_calls[0]["weights_only"])
+            self.assertEqual(
+                fake_torch.saved_checkpoint["state_dict"],
+                model.state_dict(),
+            )
 
-    loaded_model = service._load_saved_model(tmp_path / "model.pt")
+    def test_load_saved_model_regenerates_full_model_pickle(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            fake_torch = FakeTorch([RuntimeError("unsupported global")])
+            service = create_service(fake_torch, Path(temp_dir))
+            model = FakeModel()
+            service._create_basic_model = lambda: model
 
-    assert loaded_model is model
-    assert fake_torch.load_calls[0]["weights_only"] is True
-    assert fake_torch.load_calls[1]["weights_only"] is False
-    assert fake_torch.saved_checkpoint["state_dict"] == model.state_dict()
+            loaded_model = service._load_saved_model(Path(temp_dir) / "model.pt")
 
-
-def test_load_saved_model_rewrites_loadable_legacy_model(tmp_path: Path) -> None:
-    legacy_model = FakeModel()
-    fake_torch = FakeTorch([RuntimeError("state dict load failed"), legacy_model])
-    service = create_service(fake_torch, tmp_path)
-
-    loaded_model = service._load_saved_model(tmp_path / "model.pt")
-
-    assert loaded_model is legacy_model
-    assert fake_torch.load_calls[1]["weights_only"] is False
-    assert fake_torch.saved_checkpoint["state_dict"] == legacy_model.state_dict()
+            self.assertIs(loaded_model, model)
+            self.assertEqual(len(fake_torch.load_calls), 1)
+            self.assertTrue(fake_torch.load_calls[0]["weights_only"])
+            self.assertEqual(
+                fake_torch.saved_checkpoint["state_dict"],
+                model.state_dict(),
+            )
