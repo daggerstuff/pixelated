@@ -10,10 +10,8 @@ describe('data utilities', () => {
 
     it('throws error for invalid tuple', () => {
       expect(() => parseTuple(undefined, 'test')).toThrow()
-      // @ts-expect-error
-      expect(() => parseTuple([true], 'test')).toThrow()
-      // @ts-expect-error
-      expect(() => parseTuple(null, 'test')).toThrow()
+      expect(() => parseTuple([true] as any, 'test')).toThrow()
+      expect(() => parseTuple(null as any, 'test')).toThrow()
     })
   })
 })
