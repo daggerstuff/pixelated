@@ -36,7 +36,14 @@ export class SealContext {
     this.contextOptions = options // Store the full options object
     this.parameters = options.params
     this.scheme = options.scheme
-    this.securityLevel = options.params.securityLevel ?? 'tc128'
+    // Default to tc256 (256-bit security level) for HIPAA-grade clinical data protection
+    this.securityLevel = options.params.securityLevel ?? 'tc256'
+    if (!options.params.securityLevel) {
+      logger.warn(
+        `[SealContext] Using default tc256 security level. ` +
+          `Explicitly set securityLevel in SealContextOptions for production.`,
+      )
+    }
   }
 
   /**

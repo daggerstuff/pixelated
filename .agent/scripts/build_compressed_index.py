@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -38,113 +39,37 @@ COMPRESSED_INDEX = AGENT_ROOT / "skills-index-compressed.json"
 GENERATOR = "pixelated/.agent/scripts/build_compressed_index.py"
 SCHEMA_VERSION = "2.0"
 
+# Global user-level skill stores. Skills installed via `droid mcp add`,
+# Factory's plugin installer, or `dotagents` land under
+# `~/.agents/skills/` (canonical). `~/.factory/skills/` is a relay
+# directory of symlinks pointing at the same canonical store.
+GLOBAL_SKILLS_DIR = Path.home() / ".agents" / "skills"
+GLOBAL_RELAY_DIR = Path.home() / ".factory" / "skills"
 
-CATEGORY_PATTERNS: dict[str, list[str]] = {
-    "frontend": [
-        "frontend",
-        "ui",
-        "ux",
-        "react",
-        "nextjs",
-        "tailwind",
-        "web-design",
-        "radix",
-        "wcag",
-        "accessibility",
-    ],
-    "backend": [
-        "backend",
-        "api",
-        "fastapi",
-        "nodejs",
-        "auth",
-        "service",
-    ],
-    "devops": [
-        "devops",
-        "ci",
-        "cd",
-        "docker",
-        "kubernetes",
-        "k8s",
-        "terraform",
-        "deploy",
-        "workflow",
-        "vercel",
-        "monorepo",
-    ],
-    "security": [
-        "security",
-        "audit",
-        "compliance",
-        "sast",
-        "hardening",
-        "xss",
-        "penetration",
-        "pentest",
-    ],
-    "testing": [
-        "test",
-        "testing",
-        "playwright",
-        "e2e",
-        "tdd",
-        "verification",
-        "debug",
-    ],
-    "ai": [
-        "ai",
-        "agent",
-        "rag",
-        "langchain",
-        "langgraph",
-        "ml",
-        "mlops",
-        "prompt",
-        "memory",
-        "vector",
-    ],
-    "data": [
-        "database",
-        "postgres",
-        "sql",
-        "nosql",
-        "analytics",
-        "observability",
-        "prometheus",
-        "grafana",
-    ],
-    "automation": [
-        "automation",
-        "orchestration",
-        "mcp",
-        "subagent",
-        "parallel",
-        "n8n",
-        "zapier",
-    ],
-    "documentation": [
-        "documentation",
-        "documenter",
-        "readme",
-        "mermaid",
-        "planning",
-    ],
-    "language": [
-        "python",
-        "typescript",
-        "javascript",
-        "bash",
-        "shell",
-    ],
+
+CATEGORY_PATTERNS: dict[str, str] = {
+    # Workflow / orchestration skills (Droid Spec + Missions) MUST match
+    # before any other category, so a skill named "droid-workflow" doesn't
+    # fall through to `devops` (which also contains "workflow").
+    "workflow": "droid-workflow,spec,mission,factory-mission",
+    "frontend": "frontend,ui,ux,react,nextjs,tailwind,web-design,radix,wcag,accessibility",
+    "backend": "backend,api,fastapi,nodejs,auth,service",
+    "devops": "devops,ci,cd,docker,kubernetes,k8s,terraform,deploy,vercel,monorepo",
+    "security": "security,audit,compliance,sast,hardening,xss,penetration,pentest",
+    "testing": "test,testing,playwright,e2e,tdd,verification,debug",
+    "ai": "ai,agent,rag,langchain,langgraph,ml,mlops,prompt,memory,vector",
+    "data": "database,postgres,sql,nosql,analytics,observability,prometheus,grafana",
+    "automation": "automation,orchestration,mcp,subagent,parallel,n8n,zapier",
+    "documentation": "documentation,documenter,readme,mermaid,planning",
+    "language": "python,typescript,javascript,bash,shell",
 }
 
 
 def guess_category(skill_name: str) -> str:
     name = skill_name.lower()
-    for category, patterns in CATEGORY_PATTERNS.items():
-        for pat in patterns:
-            if pat in name:
+    for category, pattern in CATEGORY_PATTERNS.items():
+        for pat in pattern.split(","):
+            if pat and pat in name:
                 return category
     return "general"
 
@@ -152,6 +77,7 @@ def guess_category(skill_name: str) -> str:
 def strip_frontmatter(content: str) -> tuple[dict[str, str], str]:
     """
     Naive YAML frontmatter parser for simple key:value fields.
+    Supports folded scalars (description: >) by joining indented continuation lines.
     Returns (frontmatter_dict, remaining_content).
     """
     if not content.startswith("---\n"):
@@ -165,12 +91,33 @@ def strip_frontmatter(content: str) -> tuple[dict[str, str], str]:
     rest = content[match.end() :]
 
     data: dict[str, str] = {}
-    for line in raw.splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or ":" not in line:
+    lines = raw.splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or ":" not in stripped:
+            i += 1
             continue
-        key, value = line.split(":", 1)
-        data[key.strip()] = value.strip().strip('"').strip("'")
+        key, value = stripped.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        if value == ">":
+            collected = []
+            i += 1
+            while i < len(lines):
+                nxt = lines[i]
+                if not nxt.strip():
+                    i += 1
+                    break
+                if not nxt.startswith((" ", "\t")):
+                    break
+                collected.append(nxt.strip())
+                i += 1
+            data[key] = " ".join(collected).strip().strip('"').strip("'")
+            continue
+        data[key] = value.strip('"').strip("'")
+        i += 1
     return data, rest
 
 
@@ -198,7 +145,7 @@ def extract_summary(skill_file: Path) -> tuple[str, dict[str, str]]:
         s = line.strip()
         if not s:
             continue
-        if s.startswith("#") or s.startswith("-") or s.startswith(">"):
+        if s.startswith(("#", "-", ">")):
             continue
         if len(s) < 20:
             continue
@@ -217,28 +164,88 @@ def stable_now_utc() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
-def list_skill_dirs() -> list[Path]:
-    if not SKILLS_DIR.exists():
+def _iter_skill_dirs(source: Path, _dedupe: set | None = None) -> list[Path]:
+    """Iterate skill directories under `source` following symlinks safely.
+
+    Returns directories in name-sorted order. Symlinks and nested repos
+    are resolved once and cached in `_dedupe` to prevent cycles.
+    """
+    if _dedupe is None:
+        _dedupe = set()
+    if not source.exists():
         return []
-    return sorted([p for p in SKILLS_DIR.iterdir() if p.is_dir()], key=lambda p: p.name)
+    out: list[Path] = []
+    for p in sorted(source.iterdir(), key=lambda q: q.name):
+        if not p.is_dir() and not p.is_symlink():
+            continue
+        real = p.resolve()
+        if real in _dedupe or not real.exists() or not real.is_dir():
+            continue
+        _dedupe.add(real)
+        out.append(p)
+    return out
+
+
+def list_skill_dirs() -> list[Path]:
+    """List project-local skill directories (`.agent/skills/`)."""
+    return _iter_skill_dirs(repo_root_skills_dir())
+
+
+def repo_root_skills_dir() -> Path:
+    return SKILLS_DIR
+
+
+def list_global_skill_dirs() -> list[Path]:
+    """Discover globally installed skills from both canonical and relay paths.
+
+    Deduplicates across sources by real path. Skips directories that look
+    like the nested skill-index subrepo (no SKILL.md, has package.json).
+    """
+    dedupe: set = set()
+    out: list[Path] = []
+    sources = [
+        ("global", GLOBAL_SKILLS_DIR),
+        ("global_relay", GLOBAL_RELAY_DIR),
+    ]
+    for _label, src in sources:
+        for p in _iter_skill_dirs(src, dedupe):
+            if not (p / "SKILL.md").exists() and (p / "package.json").exists():
+                # Looks like a subrepo holding skill sources, not a skill itself.
+                continue
+            out.append(p)
+    return out
 
 
 def scan_skills() -> tuple[dict[str, Any], dict[str, int]]:
+    """Scan both project-local and global skill stores.
+
+    Skills from `~/.agents/skills/` (canonical) and `~/.factory/skills/`
+    (relay) are merged in. Project-local skills take precedence on name
+    conflicts; each entry carries a `scope` field (`local` or `global`)
+    identifying its source.
+    """
     skills: dict[str, Any] = {}
     totals = {"total": 0, "populated": 0, "missing": 0, "errors": 0}
 
-    for skill_dir in list_skill_dirs():
+    def _scan(skill_dir: Path, scope: str) -> None:
         totals["total"] += 1
         skill_name = skill_dir.name
         skill_file = skill_dir / "SKILL.md"
 
         summary, frontmatter = extract_summary(skill_file)
         category = guess_category(skill_name)
-        rel_path = (
-            skill_file.relative_to(REPO_ROOT).as_posix()
-            if skill_file.exists()
-            else (skill_dir / "SKILL.md").relative_to(REPO_ROOT).as_posix()
-        )
+
+        # Repo-relative path when inside the repo, else absolute string.
+        if skill_file.exists():
+            try:
+                rel_path = skill_file.relative_to(REPO_ROOT).as_posix()
+            except ValueError:
+                rel_path = str(skill_file)
+        else:
+            try:
+                rel_path = (skill_dir / "SKILL.md").relative_to(REPO_ROOT).as_posix()
+            except ValueError:
+                rel_path = str(skill_dir / "SKILL.md")
 
         status = "populated"
         if not skill_file.exists():
@@ -254,20 +261,30 @@ def scan_skills() -> tuple[dict[str, Any], dict[str, int]]:
                 status = "error"
                 totals["errors"] += 1
 
-        entry = {
+        entry: dict[str, Any] = {
             "name": skill_name,
             "summary": summary,
             "category": category,
             "path": rel_path,
             "status": status,
+            "scope": scope,
         }
 
-        # Preserve lightweight useful frontmatter keys if present
         for k in ("version", "model", "trigger", "description"):
             if frontmatter.get(k):
                 entry[k] = frontmatter[k]
 
-        skills[skill_name] = entry
+        # Project-local entries override global ones on name conflict.
+        if scope == "local" or skill_name not in skills:
+            skills[skill_name] = entry
+
+    # Pass 1: global skills (lower precedence).
+    for skill_dir in list_global_skill_dirs():
+        _scan(skill_dir, "global")
+
+    # Pass 2: project-local skills (higher precedence).
+    for skill_dir in list_skill_dirs():
+        _scan(skill_dir, "local")
 
     return skills, totals
 
@@ -286,6 +303,11 @@ def build_index() -> dict[str, Any]:
     char_count = len(skills_json)
     token_estimate = max(1, char_count // 4) if skills else 0
 
+    # Workflow skills get promoted into `workflow_skills_first` so
+    # orchestrators (Droid Spec Mode, Missions) can preload them.
+    workflow_names = [n for n, v in skills.items() if v.get("category") == "workflow"]
+    workflow_names.sort()
+
     index: dict[str, Any] = {
         "$schema": "https://json-schema.org/draft-07/schema",
         "version": SCHEMA_VERSION,
@@ -293,6 +315,7 @@ def build_index() -> dict[str, Any]:
         "generator": GENERATOR,
         "repo_root": REPO_ROOT.as_posix(),
         "description": "Compressed skill metadata for low-token startup context. Load full SKILL.md on-demand.",
+        "workflow_skills_first": workflow_names,
         "startup": {
             "mode": "lazy",
             "default_load": [".agents/skills-index-compressed.json"],
@@ -324,7 +347,7 @@ def write_index(index: dict[str, Any]) -> None:
 
 def main() -> int:
     if not SKILLS_DIR.exists():
-        print(f"Error: skills directory not found: {SKILLS_DIR}")
+        sys.stdout.write(f"Error: skills directory not found: {SKILLS_DIR}\n")
         return 1
 
     index = build_index()
@@ -333,19 +356,19 @@ def main() -> int:
     stats = index.get("stats", {})
     startup = index.get("startup", {})
 
-    print(f"Repo root: {REPO_ROOT}")
-    print(f"Skills dir: {SKILLS_DIR}")
-    print(f"Wrote: {COMPRESSED_INDEX}")
-    print(
-        "Stats: total={total}, populated={populated}, missing={missing}, errors={errors}".format(
+    sys.stdout.write(f"Repo root: {REPO_ROOT}\n")
+    sys.stdout.write(f"Skills dir: {SKILLS_DIR}\n")
+    sys.stdout.write(f"Wrote: {COMPRESSED_INDEX}\n")
+    sys.stdout.write(
+        "Stats: total={total}, populated={populated}, missing={missing}, errors={errors}\n".format(
             total=stats.get("total", 0),
             populated=stats.get("populated", 0),
             missing=stats.get("missing", 0),
             errors=stats.get("errors", 0),
         )
     )
-    print(
-        "Startup tokens estimate: {tok} (target <= {target}) | within_target={ok}".format(
+    sys.stdout.write(
+        "Startup tokens estimate: {tok} (target <= {target}) | within_target={ok}\n".format(
             tok=startup.get("estimated_index_tokens", 0),
             target=startup.get("target_startup_tokens_max", 20000),
             ok=startup.get("within_target", False),
