@@ -36,8 +36,7 @@
     "test": "readonly"
   },
   "options": {
-    "typeAware": true,
-    "typeCheck": true
+    "typeAware": true
   },
   "plugins": ["import", "typescript", "react", "vitest"],
   "categories": {
@@ -387,6 +386,26 @@
       "rules": {
         "typescript/no-unsafe-member-access": "off",
         "@typescript-eslint/no-unsafe-member-access": "off"
+      }
+    },
+    {
+      // Agents use eve module imports whose ambient declarations (e.g.,
+      // eve/tools, eve/channels/eve) live in .eve/types/. oxlint cannot resolve
+      // these declarations, causing TS2307 (Cannot find module) cascades into
+      // TS2741, TS7006, TS2322, TS7031. TypeScript typecheck (pnpm typecheck)
+      // catches real type errors.
+      "files": ["agents/**/*.ts", "agents/**/*.tsx"],
+      "rules": {
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-return": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
       }
     }
   ]

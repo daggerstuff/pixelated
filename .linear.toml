@@ -1,0 +1,6 @@
+# linear cli
+# https://github.com/schpet/linear-cli
+
+workspace = "pixelated"
+team_id = "PIX"
+issue_sort = "priority"
