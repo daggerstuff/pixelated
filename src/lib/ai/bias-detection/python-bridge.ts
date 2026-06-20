@@ -125,7 +125,7 @@ export class PythonBiasDetectionBridge {
         '/health',
         'GET',
       )) as PythonHealthResponse
-      if (response.status !== 'healthy') {
+      if (response.status !== 'healthy' && response.status !== 'degraded') {
         throw new Error(
           `Python service not healthy: ${response.message ?? 'Unknown error'}`,
         )
@@ -309,6 +309,10 @@ export class PythonBiasDetectionBridge {
           attempt,
           error: lastError.message,
         })
+
+        if (lastError.message.includes('HTTP 404:')) {
+          throw lastError
+        }
 
         if (attempt < this.retryAttempts) {
           await new Promise((resolve) =>
