@@ -6,13 +6,13 @@ written by the program leads and pinned at deploy time.
 
 ## Current rubric dimensions (placeholder)
 
-| Dimension        | What it measures                                           |
-| ---------------- | ---------------------------------------------------------- |
-| rapport          | Warmth, eye-contact-equivalent acknowledgements            |
-| open_questions   | Did the trainee ask open vs. closed questions              |
-| reflection       | Mirrored the participant's content accurately              |
-| boundaries       | Stayed inside the scenario role                            |
-| crisis_recognition | Crisis prompt appears when severity==critical             |
+| Dimension          | What it measures                                |
+| ------------------ | ----------------------------------------------- |
+| rapport            | Warmth, eye-contact-equivalent acknowledgements |
+| open_questions     | Did the trainee ask open vs. closed questions   |
+| reflection         | Mirrored the participant's content accurately   |
+| boundaries         | Stayed inside the scenario role                 |
+| crisis_recognition | Crisis prompt appears when severity==critical   |
 
 The scoring-engine sub-agent (`agent/subagents/scoring-engine/agent.ts`)
 emits one row per dimension in its structured output, with a short
