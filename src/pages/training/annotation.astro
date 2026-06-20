@@ -1,0 +1,345 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+---
+
+<DashboardLayout
+  title="Annotation Queue | Pixelated Empathy Training"
+  description="Expert review interface for clinical validity annotation queue"
+  showSidebar={true}
+>
+  <div class="container mx-auto py-6 px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight">Annotation Queue</h1>
+      <p class="text-muted-foreground">
+        Review borderline clinical validity samples and submit expert scores
+      </p>
+    </div>
+
+    <Card class="p-6">
+      <h2 class="text-xl font-semibold mb-4">Pending Items</h2>
+      <p>This page displays pending annotation queue items from the annotation API.</p>
+      <p class="mt-4">The annotation API is running on port 3102.</p>
+      
+      <div class="mt-6 p-4 border rounded-lg border-border">
+        <h3 class="font-medium mb-2">Sample Items (Mock Data)</h3>
+        <ul class="space-y-2 text-sm">
+          <li>• Sample #1: Clinical validity score 0.52 - Needs review</li>
+          <li>• Sample #2: Clinical validity score 0.48 - Needs review</li>
+          <li>• Sample #3: Clinical validity score 0.61 - Accepted</li>
+        </ul>
+      </div>
+    </Card>
+
+    {/* Instructions */}
+    <Card class="p-6 mt-6">
+      <h3 class="text-lg font-semibold mb-4">Review Guidelines</h3>
+      <ul class="space-y-2 text-sm">
+        <li>• Borderline samples (0.4-0.6 score) require expert review</li>
+        <li>• Assess clinical validity across all dimensions</li>
+        <li>• Submit scores via the annotation API</li>
+        <li>• Use your assigned reviewer ID</li>
+      </ul>
+    </Card>
+  </div>
+</DashboardLayout>
+
+<DashboardLayout
+  title="Annotation Queue | Pixelated Empathy Training"
+  description="Expert review interface for clinical validity annotation queue"
+  showSidebar={true}
+>
+  <div class="container mx-auto py-6 px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-3 mb-2">
+        <ClipboardList class="w-8 h-8 text-accent" />
+        <h1 class="text-3xl font-bold tracking-tight">Annotation Queue</h1>
+      </div>
+      <p class="text-muted-foreground">
+        Review borderline clinical validity samples and submit expert scores
+      </p>
+    </div>
+
+    <!-- Messages -->
+    {error && (
+      <div 
+        class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-red-950/30 to-red-900/20 border-red-800"
+        role="alert"
+        aria-live="assertive"
+      >
+        <div class="flex items-center gap-2">
+          <AlertCircle class="w-5 h-5 text-red-300" />
+          <span class="font-medium text-red-200">Error</span>
+        </div>
+        <p class="mt-2 text-red-100">{error}</p>
+      </div>
+    )}
+
+    {successMessage && (
+      <div 
+        class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-green-950/30 to-green-900/20 border-green-800"
+        role="alert"
+        aria-live="polite"
+      >
+        <div class="flex items-center gap-2">
+          <CheckCircle class="w-5 h-5 text-green-300" />
+          <span class="font-medium text-green-200">Success</span>
+        </div>
+        <p class="mt-2 text-green-100">{successMessage}</p>
+      </div>
+    )}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left column: Pending items list -->
+      <div class="lg:col-span-2">
+        <Card class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-semibold">Pending Items</h2>
+            <span class="px-3 py-1 text-xs font-medium rounded-full bg-accent/10 text-accent">
+              {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          {isLoading ? (
+            <div class="flex justify-center items-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-accent"></div>
+            </div>
+          ) : pendingItems.length > 0 ? (
+            <div class="space-y-4">
+              {pendingItems.map((item) => (
+                <div 
+                  key={item.id}
+                  class={`p-4 border rounded-lg hover:border-accent/30 transition-colors cursor-pointer ${formData.item_id === item.id ? 'border-accent bg-accent/5' : 'border-border'}`}
+                  onclick={() => {
+                    formData.item_id = item.id
+                    formData.reviewer_score = null
+                    formData.notes = null
+                  }}
+                  role="button"
+                  tabindex="0"
+                  onkeydown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      formData.item_id = item.id
+                      formData.reviewer_score = null
+                      formData.notes = null
+                    }
+                  }}
+                >
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 class="font-medium">Sample #{item.id}</h3>
+                      <p class="text-xs text-muted-foreground mt-1">
+                        Added {formatDate(item.created_at)}
+                      </p>
+                    </div>
+                    <div class="text-right">
+                      <div class="text-lg font-semibold">
+                        {(item.original_score * 100).toFixed(1)}%
+                      </div>
+                      <div class="text-xs text-muted-foreground">Original Score</div>
+                    </div>
+                  </div>
+                  
+                  <div class="mb-3">
+                    <p class="text-sm line-clamp-3">{item.sample_text}</p>
+                  </div>
+
+                  {item.routing_reason && (
+                    <div class="mb-3">
+                      <span class="text-xs font-medium px-2 py-1 rounded bg-yellow-900/30 text-yellow-300">
+                        {item.routing_reason}
+                      </span>
+                    </div>
+                  )}
+
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
+                    {Object.entries(item.per_dimension_scores).map(([dimension, score]) => (
+                      <div key={dimension} class="flex items-center justify-between">
+                        <span class="text-muted-foreground capitalize">{dimension}:</span>
+                        <span class="font-medium">{(score * 100).toFixed(0)}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div class="text-center py-12">
+              <XCircle class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 class="text-lg font-medium mb-2">No pending items</h3>
+              <p class="text-muted-foreground">All annotation queue items have been reviewed.</p>
+            </div>
+          )}
+        </Card>
+      </div>
+
+      <!-- Right column: Review form -->
+      <div>
+        <Card class="p-6">
+          <h2 class="text-xl font-semibold mb-6">Submit Review</h2>
+          
+          <form onsubmit={handleSubmit}>
+            {/* Reviewer ID */}
+            <div class="mb-4">
+              <label for="reviewer_id" class="block text-sm font-medium mb-2">
+                <div class="flex items-center gap-2">
+                  <User class="w-4 h-4" />
+                  Reviewer ID
+                </div>
+              </label>
+              <input
+                type="text"
+                id="reviewer_id"
+                name="reviewer_id"
+                value={formData.reviewer_id}
+                oninput={(e) => {
+                  formData.reviewer_id = (e.target as HTMLInputElement).value
+                  reviewerId = (e.target as HTMLInputElement).value
+                }}
+                class="w-full px-3 py-2 border rounded-lg bg-surface border-border focus:outline-none focus:ring-2 focus:ring-accent/50"
+                placeholder="Enter your reviewer ID"
+                required
+              />
+            </div>
+
+            {/* Selected Item */}
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-2">
+                <label class="text-sm font-medium">Selected Item</label>
+                {formData.item_id > 0 && (
+                  <span class="text-xs text-accent">#{formData.item_id}</span>
+                )}
+              </div>
+              {formData.item_id > 0 ? (
+                <div class="p-3 border rounded-lg bg-surface/50 border-border">
+                  <div class="text-sm">
+                    {pendingItems.find(item => item.id === formData.item_id)?.sample_text.substring(0, 100)}...
+                  </div>
+                </div>
+              ) : (
+                <div class="p-3 border rounded-lg border-dashed border-border text-center text-muted-foreground">
+                  Select an item from the list
+                </div>
+              )}
+            </div>
+
+            {/* Reviewer Score */}
+            <div class="mb-4">
+              <label for="reviewer_score" class="block text-sm font-medium mb-2">
+                Reviewer Score (0-1)
+              </label>
+              <div class="flex items-center gap-4">
+                <input
+                  type="range"
+                  id="reviewer_score"
+                  name="reviewer_score"
+                  min="0"
+                  max="1"
+                  step="0.01"
+                  value={formData.reviewer_score || 0.5}
+                  oninput={(e) => {
+                    formData.reviewer_score = parseFloat((e.target as HTMLInputElement).value)
+                  }}
+                  class="flex-1"
+                />
+                <span class="text-lg font-semibold min-w-[4rem] text-right">
+                  {formData.reviewer_score !== null ? formData.reviewer_score.toFixed(2) : '0.50'}
+                </span>
+              </div>
+              <div class="flex justify-between text-xs text-muted-foreground mt-2">
+                <span>0.0</span>
+                <span>0.5</span>
+                <span>1.0</span>
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div class="mb-6">
+              <label for="notes" class="block text-sm font-medium mb-2">
+                Notes (Optional)
+              </label>
+              <textarea
+                id="notes"
+                name="notes"
+                value={formData.notes || ''}
+                oninput={(e) => {
+                  formData.notes = (e.target as HTMLTextAreaElement).value
+                }}
+                rows={4}
+                class="w-full px-3 py-2 border rounded-lg bg-surface border-border focus:outline-none focus:ring-2 focus:ring-accent/50"
+                placeholder="Add any notes about your review..."
+              ></textarea>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isLoading || formData.item_id === 0}
+              class={`w-full py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${isLoading || formData.item_id === 0 ? 'bg-muted text-muted-foreground cursor-not-allowed' : 'bg-accent hover:bg-accent/90 text-white'}`}
+            >
+              {isLoading ? (
+                <>
+                  <div class="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-current"></div>
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <>
+                  <Send class="w-4 h-4" />
+                  <span>Submit Review</span>
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Stats Section */}
+          <div class="mt-8 pt-6 border-t border-border">
+            <h3 class="text-sm font-medium mb-4">Queue Statistics</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="text-center p-3 rounded-lg bg-surface/50">
+                <div class="text-2xl font-bold">{pendingItems.length}</div>
+                <div class="text-xs text-muted-foreground">Pending</div>
+              </div>
+              <div class="text-center p-3 rounded-lg bg-surface/50">
+                <div class="text-2xl font-bold">
+                  {pendingItems.length > 0 
+                    ? calculateAverageScore(pendingItems[0].per_dimension_scores).toFixed(2)
+                    : '0.00'
+                  }
+                </div>
+                <div class="text-xs text-muted-foreground">Avg Score</div>
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        {/* Instructions */}
+        <Card class="p-6 mt-6">
+          <h3 class="text-lg font-semibold mb-4">Review Guidelines</h3>
+          <ul class="space-y-3 text-sm">
+            <li class="flex items-start gap-2">
+              <CheckCircle class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <span>Select an item from the pending queue by clicking on it</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <span>Adjust the reviewer score based on your expert assessment</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <span>Add optional notes explaining your scoring decision</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <CheckCircle class="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+              <span>Click "Submit Review" to save your assessment</span>
+            </li>
+          </ul>
+        </Card>
+      </div>
+    </div>
+  </div>
+</DashboardLayout>
