@@ -1,6 +1,12 @@
 import { defineTool } from "eve/tools";
 import { z } from "zod";
 
+interface SummarizeCohortInput {
+  cohort_id: string;
+  rubric_version: string;
+  since: string;
+}
+
 export default defineTool({
   description:
     "Aggregate per-cohort scores over the QA review window. Returns the " +
@@ -11,7 +17,7 @@ export default defineTool({
     rubric_version: z.string().min(1),
     since: z.string().datetime(),
   }),
-  async execute(input) {
+  async execute(input: SummarizeCohortInput) {
     return {
       cohort_id: input.cohort_id,
       rubric_version: input.rubric_version,
