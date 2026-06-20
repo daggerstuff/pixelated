@@ -79,11 +79,11 @@ function parseAnalysis(raw: string): {
       pattern_flags: Array.isArray(parsed.pattern_flags)
         ? parsed.pattern_flags.map(
             (f: { type?: string; severity?: string; description?: string }) => ({
-              type: String(f.type ?? "unknown"),
+              type: f.type ?? "unknown",
               severity: ["low", "medium", "high"].includes(f.severity ?? "")
                 ? (f.severity as "low" | "medium" | "high")
                 : "low",
-              description: String(f.description ?? "").slice(0, 80),
+              description: (f.description ?? "").slice(0, 80),
             }),
           )
         : [],

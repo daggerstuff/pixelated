@@ -33,13 +33,13 @@ wait, the agent parks durably (Eve sessions survive restarts).
 
 ## Allowed tool calls per state
 
-| State                | Allowed tools                                                       |
-| -------------------- | ------------------------------------------------------------------- |
-| Dataset Curation     | curate_dataset, check_pipeline_health                                |
-| Training Launch      | run_training, check_pipeline_health                                  |
-| Evaluation           | run_evaluation                                                      |
-| Promotion            | promote_to_staging, promote_to_production, rollback_model            |
-| Any                  | ask_question, and `evaluator` sub-agent tooling                      |
+| State            | Allowed tools                                             |
+| ---------------- | --------------------------------------------------------- |
+| Dataset Curation | curate_dataset, check_pipeline_health                     |
+| Training Launch  | run_training, check_pipeline_health                       |
+| Evaluation       | run_evaluation                                            |
+| Promotion        | promote_to_staging, promote_to_production, rollback_model |
+| Any              | ask_question, and `evaluator` sub-agent tooling           |
 
 ## Prompt-line short cuts
 

@@ -5,16 +5,16 @@ in Pixelated Empathy's Eve workflow.
 
 ## What's in this slice
 
-| Slot                 | File                                                                                |
-| -------------------- | ----------------------------------------------------------------------------------- |
-| Runtime config       | `agent/agent.ts`                                                                    |
-| Standing rules       | `agent/instructions.md`, `agent/instructions/clinical-rules.md`, `agent/instructions/session-flow.md` |
-| Tool: lifecycle      | `agent/tools/start_session.ts`                                                      |
-| Tool: turn ingest    | `agent/tools/process_message.ts`                                                    |
-| Channel (HTTP)       | `agent/channels/http.ts`                                                            |
-| Sub-agent (emotion)  | `agent/subagents/emotion-analyzer/{agent.ts,instructions.md}`                       |
-| Connection slot      | `agent/connections/foresight.ts`                                                    |
-| Connection slot      | `agent/connections/memory-mcp.ts`                                                   |
+| Slot                | File                                                                                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------- |
+| Runtime config      | `agent/agent.ts`                                                                                      |
+| Standing rules      | `agent/instructions.md`, `agent/instructions/clinical-rules.md`, `agent/instructions/session-flow.md` |
+| Tool: lifecycle     | `agent/tools/start_session.ts`                                                                        |
+| Tool: turn ingest   | `agent/tools/process_message.ts`                                                                      |
+| Channel (HTTP)      | `agent/channels/http.ts`                                                                              |
+| Sub-agent (emotion) | `agent/subagents/emotion-analyzer/{agent.ts,instructions.md}`                                         |
+| Connection slot     | `agent/connections/foresight.ts`                                                                      |
+| Connection slot     | `agent/connections/memory-mcp.ts`                                                                     |
 
 ## Status
 

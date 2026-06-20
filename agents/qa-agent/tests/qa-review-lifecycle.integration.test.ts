@@ -70,7 +70,13 @@ async function scoreSession(input: z.infer<typeof scoreSessionSchema>) {
     rubric_version: input.rubric_version,
     state: "REVIEWED",
     scored_at: new Date().toISOString(),
-    placeholder_dimensions: ["rapport", "open_questions", "reflection", "boundaries", "crisis_recognition"],
+    placeholder_dimensions: [
+      "rapport",
+      "open_questions",
+      "reflection",
+      "boundaries",
+      "crisis_recognition",
+    ],
   };
 }
 
@@ -85,10 +91,10 @@ async function detectPatterns(input: z.infer<typeof detectPatternsSchema>) {
   };
 }
 
-let _gapCounter = 0;
+let gapCounter = 0;
 async function flagGap(input: z.infer<typeof flagGapSchema>) {
-  _gapCounter++;
-  const identifier = `QA-${Date.now().toString(36)}${_gapCounter}`.toUpperCase();
+  gapCounter++;
+  const identifier = `QA-${Date.now().toString(36)}${gapCounter}`.toUpperCase();
   return {
     ticket_identifier: identifier,
     ticket_url_stub: `https://linear.app/pixelated/issue/${identifier}`,
@@ -135,7 +141,11 @@ describe("QA review lifecycle integration", () => {
 
     const scoredIds = (fetch.sessions as string[]).map((s) => s);
     for (const sid of scoredIds) {
-      const scored = await scoreSession({ session_id: sid, cohort_id: cohortId, rubric_version: rubricVersion });
+      const scored = await scoreSession({
+        session_id: sid,
+        cohort_id: cohortId,
+        rubric_version: rubricVersion,
+      });
       expect(scored.state).toBe("REVIEWED");
     }
   });
@@ -144,9 +154,23 @@ describe("QA review lifecycle integration", () => {
     const sid = "550e8400-e29b-41d4-a716-446655440000";
 
     const fetch = await fetchSessions({ since, limit: 50 });
-    const scored = await scoreSession({ session_id: sid, cohort_id: cohortId, rubric_version: rubricVersion });
-    const patterns = await detectPatterns({ session_id: sid, cohort_id: cohortId });
-    const gap = await flagGap({ session_id: sid, cohort_id: cohortId, rationale: "Test", priority: 2 });
+    const scored = await scoreSession({
+      session_id: sid,
+      cohort_id: cohortId,
+      rubric_version: rubricVersion,
+    });
+    const patterns = await detectPatterns({
+      session_id: sid,
+      cohort_id: cohortId,
+      reference_period_days: 30,
+    });
+    const gap = await flagGap({
+      session_id: sid,
+      cohort_id: cohortId,
+      rationale: "Test",
+      priority: 2,
+      labels: [],
+    });
 
     expect(scored.cohort_id).toBe(cohortId);
     expect(patterns.cohort_id).toBe(cohortId);
@@ -173,7 +197,13 @@ describe("QA review lifecycle integration", () => {
     ];
     const gaps = await Promise.all(
       sids.map((sid) =>
-        flagGap({ session_id: sid, cohort_id: cohortId, rationale: "Gap found", priority: 1 }),
+        flagGap({
+          session_id: sid,
+          cohort_id: cohortId,
+          rationale: "Gap found",
+          priority: 1,
+          labels: [],
+        }),
       ),
     );
 
@@ -220,7 +250,11 @@ describe("QA review lifecycle integration", () => {
 
   it("should default emotion recommendation to hold", async () => {
     const sid = "550e8400-e29b-41d4-a716-446655440000";
-    const patterns = await detectPatterns({ session_id: sid, cohort_id: cohortId });
+    const patterns = await detectPatterns({
+      session_id: sid,
+      cohort_id: cohortId,
+      reference_period_days: 30,
+    });
     expect(patterns.recommendation).toBe("hold");
   });
 
@@ -238,8 +272,20 @@ describe("QA review lifecycle integration", () => {
 
   it("should generate unique ticket identifiers for each gap", async () => {
     const sid = "550e8400-e29b-41d4-a716-446655440000";
-    const gap1 = await flagGap({ session_id: sid, cohort_id: cohortId, rationale: "Gap 1", priority: 1 });
-    const gap2 = await flagGap({ session_id: sid, cohort_id: cohortId, rationale: "Gap 2", priority: 2 });
+    const gap1 = await flagGap({
+      session_id: sid,
+      cohort_id: cohortId,
+      rationale: "Gap 1",
+      priority: 1,
+      labels: [],
+    });
+    const gap2 = await flagGap({
+      session_id: sid,
+      cohort_id: cohortId,
+      rationale: "Gap 2",
+      priority: 2,
+      labels: [],
+    });
     expect(gap1.ticket_identifier).not.toBe(gap2.ticket_identifier);
   });
 });
