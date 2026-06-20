@@ -5,17 +5,19 @@ import { z } from "zod";
 // agent asks this tool to retrieve the most recent durable session state so
 // the agent can pick up without dropping context.
 
+const SCHEMA = z.object({
+  session_id: z.string().uuid(),
+  max_turns: z.number().int().min(1).max(200).default(50),
+});
+
 export default defineTool({
   description:
     "Reconstruct a session's recent durable state by replaying the last " +
     "transcript turns stored in Foresight. Returns up to `max_turns` " +
     "prior turns plus the last persisted `state`. On first session this " +
     "returns an empty list and state `NEW`.",
-  inputSchema: z.object({
-    session_id: z.string().uuid(),
-    max_turns: z.number().int().min(1).max(200).default(50),
-  }),
-  async execute(input) {
+  inputSchema: SCHEMA,
+  async execute(input: z.infer<typeof SCHEMA>) {
     return {
       session_id: input.session_id,
       last_state: "ACTIVE",

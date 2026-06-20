@@ -4,6 +4,12 @@ import { z } from "zod";
 // Pull completed session records from Foresight / Mongo since the last
 // review cursor. Backs the qa-agent's daily-review schedule.
 
+interface FetchSessionsInput {
+  since: string;
+  limit: number;
+  cursor?: string;
+}
+
 export default defineTool({
   description:
     "List rehearsDated rehearsal sessions since the last successful QA " +
@@ -17,7 +23,7 @@ export default defineTool({
     limit: z.number().int().min(1).max(200).default(50),
     cursor: z.string().optional(),
   }),
-  async execute(input) {
+  async execute(input: FetchSessionsInput) {
     return {
       since: input.since,
       limit: input.limit,

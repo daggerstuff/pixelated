@@ -4,6 +4,17 @@ import { z } from "zod";
 // Launch SFT/DPO/GRPO training via training-infra MCP. Returns the job id
 // so the orchestrator can poll progress.
 
+interface RunTrainingInput {
+  curation_run_id: string;
+  model_id: string;
+  method: "sft" | "dpo" | "grpo";
+  hyperparams: {
+    epochs: number;
+    batch_size: number;
+    learning_rate: number;
+  };
+}
+
 export default defineTool({
   description:
     "Launch an SFT/DPO/GRPO training job on the training infrastructure. " +
@@ -21,7 +32,7 @@ export default defineTool({
       })
       .default(() => ({ epochs: 3, batch_size: 8, learning_rate: 5e-5 })),
   }),
-  async execute(input) {
+  async execute(input: RunTrainingInput) {
     return {
       training_job_id: `train-${Date.now().toString(36)}`,
       curation_run_id: input.curation_run_id,

@@ -3,6 +3,17 @@ import { z } from "zod";
 import { generateText } from "ai";
 import { getModel } from "./workers-ai.js";
 
+interface GenerateReportInput {
+  cohort_id: string;
+  rubric_version: string;
+  scoring_session_ids: string[];
+  linear_ticket_references: Array<{
+    session_id: string;
+    ticket_identifier: string;
+    priority: number;
+  }>;
+}
+
 const SCHEMA = z.object({
   cohort_id: z.string().min(1),
   rubric_version: z.string().min(1),
@@ -26,7 +37,7 @@ export default defineTool({
     "is available, includes a pacing profile across the cohort showing " +
     "aggregate stuck patterns and technique-switching frequency.",
   inputSchema: SCHEMA,
-  async execute(input) {
+  async execute(input: GenerateReportInput) {
     const model = getModel();
     let pacingProfile: string | null = null;
 
@@ -43,8 +54,11 @@ export default defineTool({
           `"technique_diversity":"low|medium|high","recommendation":"max 160 chars"}`;
         const { text } = await generateText({ model, prompt });
         const cleaned = (text.match(/\{[\s\S]*\}/) ?? [text])[0];
-        const parsed = JSON.parse(cleaned);
-        pacingProfile = parsed.cohort_pacing_summary ?? null;
+        const parsed = JSON.parse(cleaned) as {
+          cohort_pacing_summary?: unknown;
+        };
+        pacingProfile =
+          typeof parsed.cohort_pacing_summary === "string" ? parsed.cohort_pacing_summary : null;
       } catch {
         // pacing profile is advisory; swallow failures
       }

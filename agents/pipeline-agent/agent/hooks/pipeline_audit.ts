@@ -10,11 +10,21 @@ export default defineHook({
       // TODO(disable-no-console): replace with structured logger once
       // the pipeline-event MCP is wired for persistent storage.
       // eslint-disable-next-line no-console
-      console.info("[pipeline-audit] action result:", event.data.status);
+      const eventData = (event as { data?: unknown }).data;
+      console.info(
+        "[pipeline-audit] action result:",
+        typeof eventData === "object" && eventData !== null && "status" in eventData
+          ? (eventData as { status?: unknown }).status
+          : eventData,
+      );
     },
     "message.completed"(event, _ctx) {
       // eslint-disable-next-line no-console
-      console.info("[pipeline-audit] message completed:", event.type);
+      const eventType = (event as { type?: unknown }).type;
+      console.info(
+        "[pipeline-audit] message completed:",
+        typeof eventType === "string" ? eventType : eventType,
+      );
     },
   },
 });

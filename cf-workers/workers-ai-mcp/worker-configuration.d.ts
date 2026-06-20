@@ -1,4 +1,4 @@
 interface Env {
-  AI: Ai;
-  ENVIRONMENT: string;
+  AI: Ai
+  ENVIRONMENT: string
 }

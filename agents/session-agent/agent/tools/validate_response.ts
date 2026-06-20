@@ -6,18 +6,20 @@ import { z } from "zod";
 // crisis-prompt rules from agent/instructions/clinical-rules.md in case
 // the parent model drifted.
 
+const SCHEMA = z.object({
+  session_id: z.string().uuid(),
+  draft: z.string().min(1).max(8000),
+  requires_crisis_prompt: z.boolean(),
+});
+
 export default defineTool({
   description:
     "Repair a draft response against the clinical-rules harness. Strips " +
     "diagnostic language, ensures a crisis prompt was delivered when " +
     "needed, and clamps length. Returns the cleaned response and a diff " +
     "summary.",
-  inputSchema: z.object({
-    session_id: z.string().uuid(),
-    draft: z.string().min(1).max(8000),
-    requires_crisis_prompt: z.boolean(),
-  }),
-  async execute(input) {
+  inputSchema: SCHEMA,
+  async execute(input: z.infer<typeof SCHEMA>) {
     let response = input.draft.trim();
     const changes: string[] = [];
 

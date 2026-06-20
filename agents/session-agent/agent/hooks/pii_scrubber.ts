@@ -8,7 +8,7 @@ import { defineHook } from "eve/hooks";
 export default defineHook({
   events: {
     "message.completed"(event) {
-      const text = event.data.message ?? "";
+      const text = event.data?.message ?? "";
       if (typeof text === "string") {
         // TODO(disable-no-console): replace with structured logger
         // eslint-disable-next-line no-console
