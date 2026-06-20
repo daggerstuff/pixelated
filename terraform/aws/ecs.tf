@@ -1,7 +1,8 @@
 # --- CloudWatch Log Group ---
 resource "aws_cloudwatch_log_group" "api" {
   name              = local.log_group_name
-  retention_in_days = 30
+  retention_in_days = var.log_retention_days
+  kms_key_id        = aws_kms_key.cloudwatch.arn
 
   tags = local.common_tags
 }
@@ -12,7 +13,7 @@ resource "aws_ecs_cluster" "main" {
 
   setting {
     name  = "containerInsights"
-    value = "disabled"
+    value = "enabled"
   }
 
   tags = local.common_tags
@@ -28,16 +29,16 @@ resource "aws_ecs_task_definition" "api" {
     operating_system_family = "LINUX"
     cpu_architecture        = "ARM64"
   }
-  cpu                      = var.ecs_cpu
-  memory                   = var.ecs_memory
-  execution_role_arn       = aws_iam_role.ecs_execution.arn
-  task_role_arn            = aws_iam_role.ecs_task.arn
+  cpu                = var.ecs_cpu
+  memory             = var.ecs_memory
+  execution_role_arn = aws_iam_role.ecs_execution.arn
+  task_role_arn      = aws_iam_role.ecs_task.arn
 
   container_definitions = jsonencode([
     {
-      name         = "${var.app_name}-api"
-      image        = "${aws_ecr_repository.api.repository_url}:latest"
-      essential    = true
+      name      = "${var.app_name}-api"
+      image     = "${aws_ecr_repository.api.repository_url}:latest"
+      essential = true
       portMappings = [
         {
           containerPort = var.container_port
@@ -45,20 +46,20 @@ resource "aws_ecs_task_definition" "api" {
         }
       ]
       environment = [
-        { name = "APP_NAME",   value = var.app_name },
-        { name = "NODE_ENV",   value = "production" },
-        { name = "PORT",       value = tostring(var.container_port) },
-        { name = "HOST",       value = "0.0.0.0" },
+        { name = "APP_NAME", value = var.app_name },
+        { name = "NODE_ENV", value = "production" },
+        { name = "PORT", value = tostring(var.container_port) },
+        { name = "HOST", value = "0.0.0.0" },
         { name = "CORS_ORIGIN", value = "https://pixelatedempathy.com,https://www.pixelatedempathy.com" },
       ]
       secrets = concat(
         [for k in local.ssm_secret_names : {
-          name       = k
-          valueFrom  = aws_ssm_parameter.app_params[k].arn
+          name      = k
+          valueFrom = aws_ssm_parameter.app_params[k].arn
         }],
         [for k in local.sm_secret_names : {
-          name       = k
-          valueFrom  = aws_secretsmanager_secret.app_secrets[k].arn
+          name      = k
+          valueFrom = aws_secretsmanager_secret.app_secrets[k].arn
         }],
       )
       healthCheck = {
@@ -78,9 +79,9 @@ resource "aws_ecs_task_definition" "api" {
       }
       ulimits = [
         {
-          name        = "nofile"
-          softLimit   = 65536
-          hardLimit   = 65536
+          name      = "nofile"
+          softLimit = 65536
+          hardLimit = 65536
         }
       ]
     }
@@ -112,9 +113,8 @@ resource "aws_ecs_service" "api" {
   }
 
   network_configuration {
-    subnets         = aws_subnet.public[*].id
+    subnets         = aws_subnet.private[*].id
     security_groups = [aws_security_group.ecs.id]
-    assign_public_ip = true
   }
 
   load_balancer {
