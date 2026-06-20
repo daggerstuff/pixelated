@@ -5,6 +5,12 @@ import { z } from "zod";
 // Runs a smoke-test probe after deploy; the orchestrator verifies the
 // smoke outcome before opening Gate 4.
 
+interface PromoteToStagingInput {
+  training_job_id: string;
+  model_uri: string;
+  image_tag: string;
+}
+
 export default defineTool({
   description:
     "Promote a model to the staging environment via K8s MCP. Runs a " +
@@ -16,7 +22,7 @@ export default defineTool({
     model_uri: z.string().min(1),
     image_tag: z.string().min(1),
   }),
-  async execute(input) {
+  async execute(input: PromoteToStagingInput) {
     return {
       training_job_id: input.training_job_id,
       model_uri: input.model_uri,

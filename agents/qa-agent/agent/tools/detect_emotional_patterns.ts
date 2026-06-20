@@ -17,6 +17,12 @@ interface EmotionalAnalysisResult {
   model: string;
 }
 
+interface DetectPatternsInput {
+  session_id: string;
+  cohort_id: string;
+  reference_period_days: number;
+}
+
 const SCHEMA = z.object({
   session_id: z.string().uuid(),
   cohort_id: z.string().min(1),
@@ -29,7 +35,7 @@ export default defineTool({
     "using Workers AI. Returns pattern flags (anomalies, spikes, distress) " +
     "and a recommendation.",
   inputSchema: SCHEMA,
-  async execute(input) {
+  async execute(input: DetectPatternsInput) {
     const model = getModel();
     if (!model) {
       return {
@@ -74,23 +80,40 @@ function parseAnalysis(raw: string): {
 } {
   try {
     const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0];
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned) as {
+      pattern_flags?: unknown;
+      recommendation?: unknown;
+    };
     return {
       pattern_flags: Array.isArray(parsed.pattern_flags)
-        ? parsed.pattern_flags.map(
-            (f: { type?: string; severity?: string; description?: string }) => ({
-              type: f.type ?? "unknown",
-              severity: ["low", "medium", "high"].includes(f.severity ?? "")
-                ? (f.severity as "low" | "medium" | "high")
+        ? (parsed.pattern_flags as unknown[])
+            .map(
+              (f: unknown) =>
+                f as {
+                  type?: unknown;
+                  severity?: unknown;
+                  description?: unknown;
+                },
+            )
+            .map((f) => ({
+              type: typeof f.type === "string" ? f.type : "unknown",
+              severity: ["low", "medium", "high"].includes(
+                typeof f.severity === "string" ? f.severity : "",
+              )
+                ? ((typeof f.severity === "string" ? f.severity : "low") as
+                    | "low"
+                    | "medium"
+                    | "high")
                 : "low",
-              description: (f.description ?? "").slice(0, 80),
-            }),
-          )
+              description: typeof f.description === "string" ? f.description.slice(0, 80) : "",
+            }))
         : [],
       recommendation: ["hold", "review", "escalate", "flag_supervisor"].includes(
-        parsed.recommendation,
+        typeof parsed.recommendation === "string" ? parsed.recommendation : "",
       )
-        ? parsed.recommendation
+        ? typeof parsed.recommendation === "string"
+          ? parsed.recommendation
+          : "hold"
         : "hold",
     };
   } catch {
