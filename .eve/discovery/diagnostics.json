@@ -1,0 +1,490 @@
+{
+  "diagnostics": [
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".agent/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.agent",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".agents/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.agents",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".astro/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.astro",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".aws/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.aws",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".claude/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.claude",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".codegraph/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.codegraph",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".cursor/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.cursor",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".eve/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.eve",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".factory/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.factory",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".foresight/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.foresight",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".git/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.git",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".github/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.github",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".gitlab/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.gitlab",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".husky/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.husky",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".hypothesis/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.hypothesis",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".Jules/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.Jules",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".omc/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.omc",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".omo/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.omo",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".omx/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.omx",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".opencode/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.opencode",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".pi/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.pi",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".pytest_cache/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.pytest_cache",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".qlty/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.qlty",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".ruff_cache/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.ruff_cache",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".sisyphus/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.sisyphus",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".venv/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.venv",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".vercel/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.vercel",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \".vscode/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/.vscode",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"agents/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/agents",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"ai/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/ai",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"ai-services/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/ai-services",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"artifacts/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/artifacts",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"astro/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/astro",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"aws/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/aws",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"bin/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/bin",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"business-strategy/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/business-strategy",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"business-strategy-cms/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/business-strategy-cms",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"checkpoints/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/checkpoints",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"ci-cd/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/ci-cd",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"collections/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/collections",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"config/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/config",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"coverage/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/coverage",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"data/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/data",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"db/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/db",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"deploy/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/deploy",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"dist/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/dist",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"docker/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/docker",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"docs/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/docs",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"e2e/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/e2e",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"exports/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/exports",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"foresight-mcp/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/foresight-mcp",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"k8s/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/k8s",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"logs/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/logs",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"metoro-exporter/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/metoro-exporter",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"monitoring/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/monitoring",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"node_modules/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/node_modules",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"notebooks/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/notebooks",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"package/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/package",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"packages/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/packages",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"patches/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/patches",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"performance/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/performance",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"performance-results/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/performance-results",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"pixelated.egg-info/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/pixelated.egg-info",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"playwright-report/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/playwright-report",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"plugins/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/plugins",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"public/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/public",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"scripts/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/scripts",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"security/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/security",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"src/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/src",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"templates/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/templates",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"terraform/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/terraform",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"test-results/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/test-results",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"tests/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/tests",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"tmp/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/tmp",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"training/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/training",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"types/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/types",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"utils/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/utils",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/unsupported-directory",
+      "message": "Ignoring unsupported directory \"workflow/\" in the agent root.",
+      "sourcePath": "/home/vivi/pixelated/workflow",
+      "severity": "warning"
+    },
+    {
+      "code": "discover/required-instructions-missing",
+      "message": "Expected authored instructions at \"instructions.md\", \"instructions.ts\", \"instructions.cts\", \"instructions.mts\", \"instructions.js\", \"instructions.cjs\", \"instructions.mjs\", or \"instructions/\" directory.",
+      "sourcePath": "/home/vivi/pixelated",
+      "severity": "error"
+    },
+    {
+      "code": "discover/skill-markdown-missing",
+      "message": "Expected \"/home/vivi/pixelated/skills/ui-ux-pro-max/SKILL.md\" to exist for the \"ui-ux-pro-max\" skill.",
+      "sourcePath": "/home/vivi/pixelated/skills/ui-ux-pro-max",
+      "severity": "error"
+    }
+  ],
+  "kind": "eve-discovery-diagnostics",
+  "summary": {
+    "errors": 2,
+    "warnings": 78
+  },
+  "version": 1
+}
