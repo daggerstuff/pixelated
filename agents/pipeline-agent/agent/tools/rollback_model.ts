@@ -5,6 +5,12 @@ import { z } from "zod";
 // has crossed Gate 4 and the monitoring window is still active. Records
 // a pipeline_event for traceability.
 
+interface RollbackModelInput {
+  current_release_id: string;
+  previous_release_id: string;
+  reason: string;
+}
+
 export default defineTool({
   description:
     "Rollback the production deployment to the previous good release. " +
@@ -16,7 +22,7 @@ export default defineTool({
     previous_release_id: z.string().min(1),
     reason: z.string().max(1000),
   }),
-  async execute(input) {
+  async execute(input: RollbackModelInput) {
     return {
       rolled_back_to: input.previous_release_id,
       from_release: input.current_release_id,

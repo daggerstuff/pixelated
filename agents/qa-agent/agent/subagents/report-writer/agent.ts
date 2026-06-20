@@ -1,13 +1,13 @@
-import { defineAgent } from "eve";
-import { z } from "zod";
+import { defineAgent } from 'eve'
+import { z } from 'zod'
 
 export default defineAgent({
   description:
-    "Specialist sub-agent that turns a structured session score into a short " +
-    "trainer-facing report. Emits headline, strengths, gaps, rubric items, " +
-    "and an optional next-session hint. Use this whenever the QA agent has " +
-    "produced scores and is ready to summarize.",
-  model: "anthropic/claude-sonnet-4.6",
+    'Specialist sub-agent that turns a structured session score into a short ' +
+    'trainer-facing report. Emits headline, strengths, gaps, rubric items, ' +
+    'and an optional next-session hint. Use this whenever the QA agent has ' +
+    'produced scores and is ready to summarize.',
+  model: 'anthropic/claude-sonnet-4.6',
   outputSchema: z.object({
     headline: z.string().max(280),
     strengths: z.array(z.string().max(160)).min(1).max(3),
@@ -21,4 +21,4 @@ export default defineAgent({
     ),
     next_session_hint: z.string().max(160).optional(),
   }),
-});
+})
