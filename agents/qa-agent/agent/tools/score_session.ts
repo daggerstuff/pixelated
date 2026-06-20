@@ -79,10 +79,7 @@ export default defineTool({
     const { text } = await generateText({ model, prompt });
     const result = parseScore(text);
 
-    const totalScore = result.dimensions.reduce(
-      (sum, d) => sum + d.score,
-      0,
-    );
+    const totalScore = result.dimensions.reduce((sum, d) => sum + d.score, 0);
     const maxTotal = DIMENSIONS.length * 10;
 
     return {
@@ -109,19 +106,14 @@ function parseScore(raw: string): {
     const parsed = JSON.parse(cleaned);
     return {
       dimensions: Array.isArray(parsed.dimensions)
-        ? parsed.dimensions.map(
-            (d: { name?: string; score?: number; rationale?: string }) => ({
-              name: DIMENSIONS.includes(d.name as (typeof DIMENSIONS)[number])
-                ? (d.name as (typeof DIMENSIONS)[number])
-                : "unknown",
-              score:
-                typeof d.score === "number"
-                  ? Math.max(0, Math.min(10, d.score))
-                  : 0,
-              max_score: 10,
-              rationale: String(d.rationale ?? "").slice(0, 60),
-            }),
-          )
+        ? parsed.dimensions.map((d: { name?: string; score?: number; rationale?: string }) => ({
+            name: DIMENSIONS.includes(d.name as (typeof DIMENSIONS)[number])
+              ? (d.name as (typeof DIMENSIONS)[number])
+              : "unknown",
+            score: typeof d.score === "number" ? Math.max(0, Math.min(10, d.score)) : 0,
+            max_score: 10,
+            rationale: (d.rationale ?? "").slice(0, 60),
+          }))
         : DIMENSIONS.map((name) => ({
             name,
             score: 0,
@@ -129,9 +121,7 @@ function parseScore(raw: string): {
             rationale: "Failed to parse model output.",
           })),
       risk_flags: Array.isArray(parsed.risk_flags)
-        ? parsed.risk_flags.filter(
-            (f: unknown): f is string => typeof f === "string",
-          )
+        ? parsed.risk_flags.filter((f: unknown): f is string => typeof f === "string")
         : [],
     };
   } catch {

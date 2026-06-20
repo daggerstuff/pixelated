@@ -67,7 +67,7 @@ export default defineTool({
     const result: AnalyzeEmotionResult = {
       session_id: input.session_id,
       emotion,
-      pace: pace && pace.stuck ? pace : undefined,
+      pace: pace?.stuck ? pace : undefined,
       analyzer: model
         ? "session-agent.tools.analyze_emotion:workers-ai:v1"
         : "session-agent.tools.analyze_emotion:fallback:v1",
@@ -89,9 +89,7 @@ async function analyzeEmotion(
   input: z.infer<typeof SCHEMA>,
   model: NonNullable<ReturnType<typeof getModel>>,
 ): Promise<EmotionSignal> {
-  const ctx = input.previous_turn_text
-    ? `Previous turn: "${input.previous_turn_text}"\n\n`
-    : "";
+  const ctx = input.previous_turn_text ? `Previous turn: "${input.previous_turn_text}"\n\n` : "";
 
   const prompt =
     `${ctx}Analyze the emotional content of the text below. ` +
@@ -140,12 +138,7 @@ function parseEmotionJson(raw: string): EmotionSignal {
 function normalizedRiskFlags(
   flags: unknown,
 ): Array<"distress" | "crisis_ideation" | "harm_to_others" | "medical_emergency"> {
-  const valid = new Set([
-    "distress",
-    "crisis_ideation",
-    "harm_to_others",
-    "medical_emergency",
-  ]);
+  const valid = new Set(["distress", "crisis_ideation", "harm_to_others", "medical_emergency"]);
   if (!Array.isArray(flags)) return [];
   return flags.filter(
     (f): f is "distress" | "crisis_ideation" | "harm_to_others" | "medical_emergency" =>
