@@ -68,6 +68,9 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
   '@sentry/node-cpu-profiler': true
+  '@mongodb-js/zstd': true
+  core-js-pure: true
+  node-liblzma: true
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
