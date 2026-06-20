@@ -5,6 +5,14 @@ import { z } from "zod";
 // Sets the right labels, priority, and project; ties back to the source
 // session so the trainer can pull up the transcript in one click.
 
+interface FlagGapInput {
+  session_id: string;
+  cohort_id: string;
+  rationale: string;
+  priority: number;
+  labels: string[];
+}
+
 export default defineTool({
   description:
     "Create or update a Linear review ticket for a session that needs " +
@@ -17,7 +25,7 @@ export default defineTool({
     priority: z.number().int().min(0).max(4),
     labels: z.array(z.string()).default([]),
   }),
-  async execute(input) {
+  async execute(input: FlagGapInput) {
     const identifier = `QA-${Date.now().toString(36).toUpperCase()}`;
     return {
       ticket_identifier: identifier,
