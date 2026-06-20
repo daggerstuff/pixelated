@@ -6,40 +6,42 @@ import { z } from "zod";
 // "everything emotion tlanalysis results are stored in Foresight memory
 // for longitudinal tracking."
 
+const SCHEMA = z.object({
+  session_id: z.string().uuid(),
+  trainee_id: z.string().min(1),
+  scenario_id: z.string().min(1),
+  state: z.enum(["ACTIVE", "CLOSING", "CLOSED"]),
+  transcripts: z
+    .array(
+      z.object({
+        role: z.enum(["trainee", "participant", "supervisor"]),
+        text: z.string(),
+        timestamp: z.string().datetime(),
+      }),
+    )
+    .min(1),
+  emotion_rollups: z
+    .array(
+      z.object({
+        primary_emotion: z.string(),
+        intensity: z.number(),
+        valence: z.number(),
+        risk_flags: z.array(z.string()),
+        timestamp: z.string().datetime(),
+      }),
+    )
+    .default([]),
+  summary: z.string().max(2000).optional(),
+});
+
 export default defineTool({
   description:
     "Persist the current session transcript, summary, and emotion rollups " +
     "into both Foresight (semantic, queryable) and MongoDB (durable). " +
     "Called automatically at session boundary and also on supervisor " +
     "demand.",
-  inputSchema: z.object({
-    session_id: z.string().uuid(),
-    trainee_id: z.string().min(1),
-    scenario_id: z.string().min(1),
-    state: z.enum(["ACTIVE", "CLOSING", "CLOSED"]),
-    transcripts: z
-      .array(
-        z.object({
-          role: z.enum(["trainee", "participant", "supervisor"]),
-          text: z.string(),
-          timestamp: z.string().datetime(),
-        }),
-      )
-      .min(1),
-    emotion_rollups: z
-      .array(
-        z.object({
-          primary_emotion: z.string(),
-          intensity: z.number(),
-          valence: z.number(),
-          risk_flags: z.array(z.string()),
-          timestamp: z.string().datetime(),
-        }),
-      )
-      .default([]),
-    summary: z.string().max(2000).optional(),
-  }),
-  async execute(input) {
+  inputSchema: SCHEMA,
+  async execute(input: z.infer<typeof SCHEMA>) {
     return {
       session_id: input.session_id,
       persisted_at: new Date().toISOString(),
@@ -60,8 +62,7 @@ export default defineTool({
       mongo_stub: {
         collection: "sessions",
         document_id: input.session_id,
-        note:
-          "Mongo upsert via the session-mcp (TODO) is not yet wired.",
+        note: "Mongo upsert via the session-mcp (TODO) is not yet wired.",
       },
       summary_written: input.summary ? true : false,
     };

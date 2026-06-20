@@ -11,97 +11,107 @@
 // against the bundled eve build output. All session logic lives inside
 // the eve agent, not here.
 
-import { Router, type Request, type Response as ExpressResponse } from "express";
+import { Router, type Request, type Response as ExpressResponse } from 'express'
 
-type BodyInit = { method: string; headers: Record<string, string>; body?: string };
+type BodyInit = {
+  method: string
+  headers: Record<string, string>
+  body?: string
+}
 
 async function fetchUpstream(
   origin: string,
   path: string,
   req: Request,
 ): Promise<Response> {
-  const url = new URL(path, origin);
+  const url = new URL(path, origin)
   const init: BodyInit = {
     method: req.method,
-    headers: { "content-type": "application/json" },
-  };
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    init.body = JSON.stringify(req.body ?? {});
+    headers: { 'content-type': 'application/json' },
   }
-  return fetch(url, init);
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
+    init.body = JSON.stringify(req.body ?? {})
+  }
+  return fetch(url, init)
 }
 
-export function mountSessionAgentRouter(opts: {
-  agentOrigin: string; // base URL where the eve agent listens, e.g. http://127.0.0.1:2000
-  requireApiKey?: () => boolean;
-} = { agentOrigin: "http://127.0.0.1:2000" }): Router {
-  const router = Router();
+export function mountSessionAgentRouter(
+  opts: {
+    agentOrigin: string // base URL where the eve agent listens, e.g. http://127.0.0.1:2000
+    requireApiKey?: () => boolean
+  } = { agentOrigin: 'http://127.0.0.1:2000' },
+): Router {
+  const router = Router()
 
-  router.post("/session/start", async (req, res: ExpressResponse) => {
+  router.post('/session/start', async (req, res: ExpressResponse) => {
     if (opts.requireApiKey && !opts.requireApiKey()) {
-      res.status(403).send("forbidden");
-      return;
+      res.status(403).send('forbidden')
+      return
     }
-    const upstream = await fetchUpstream(opts.agentOrigin, "/eve/v1/session", req);
-    res.status(upstream.status);
-    res.send(await upstream.text());
-  });
+    const upstream = await fetchUpstream(
+      opts.agentOrigin,
+      '/eve/v1/session',
+      req,
+    )
+    res.status(upstream.status)
+    res.send(await upstream.text())
+  })
 
-  router.post("/session/:id/message", async (req, res: ExpressResponse) => {
+  router.post('/session/:id/message', async (req, res: ExpressResponse) => {
     if (opts.requireApiKey && !opts.requireApiKey()) {
-      res.status(403).send("forbidden");
-      return;
+      res.status(403).send('forbidden')
+      return
     }
     const upstream = await fetchUpstream(
       opts.agentOrigin,
       `/eve/v1/session/${req.params.id}`,
       req,
-    );
-    res.status(upstream.status);
-    res.send(await upstream.text());
-  });
+    )
+    res.status(upstream.status)
+    res.send(await upstream.text())
+  })
 
-  router.post("/session/:id/intervene", async (req, res: ExpressResponse) => {
+  router.post('/session/:id/intervene', async (req, res: ExpressResponse) => {
     if (opts.requireApiKey && !opts.requireApiKey()) {
-      res.status(403).send("forbidden");
-      return;
+      res.status(403).send('forbidden')
+      return
     }
     const upstream = await fetchUpstream(
       opts.agentOrigin,
       `/eve/v1/session/${req.params.id}`,
       req,
-    );
-    res.status(upstream.status);
-    res.send(await upstream.text());
-  });
+    )
+    res.status(upstream.status)
+    res.send(await upstream.text())
+  })
 
   // SSE forwarder; pass-through.
-  router.get("/session/:id/stream", async (req, res: ExpressResponse) => {
+  router.get('/session/:id/stream', async (req, res: ExpressResponse) => {
     if (opts.requireApiKey && !opts.requireApiKey()) {
-      res.status(403).send("forbidden");
-      return;
+      res.status(403).send('forbidden')
+      return
     }
-    res.setHeader("Content-Type", "text/event-stream; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
+    res.setHeader('Cache-Control', 'no-store')
 
     const upstream = await fetchUpstream(
       opts.agentOrigin,
       `/eve/v1/session/${req.params.id}/stream`,
       req,
-    );
+    )
     if (!upstream.body) {
-      res.status(204).end();
-      return;
+      res.status(204).end()
+      return
     }
-    const reader = upstream.body.getReader();
+    const reader = upstream.body.getReader()
     while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      const { done, value } = await reader.read()
+      if (done) break
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      res.write(Buffer.from(value));
+      res.write(Buffer.from(value))
     }
-    res.end();
-  });
+    res.end()
+  })
 
-  return router;
+  return router
 }

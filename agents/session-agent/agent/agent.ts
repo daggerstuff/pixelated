@@ -1,8 +1,8 @@
-import { defineAgent } from "eve";
-import { z } from "zod";
+import { defineAgent } from 'eve'
+import { z } from 'zod'
 
 export default defineAgent({
-  model: "anthropic/claude-opus-4.8",
+  model: 'anthropic/claude-opus-4.8',
   compaction: {
     // Rehearsal sessions routinely exceed 30 minutes. Compact framing (state
     // transitions, tool summaries) earlier than the framework default so the
@@ -12,19 +12,19 @@ export default defineAgent({
   outputSchema: z.object({
     session_id: z.string().uuid().optional(),
     state: z.enum([
-      "NEW",
-      "RECOVERING",
-      "ACTIVE",
-      "AWAITING_SUPERVISOR",
-      "CLOSING",
-      "CLOSED",
+      'NEW',
+      'RECOVERING',
+      'ACTIVE',
+      'AWAITING_SUPERVISOR',
+      'CLOSING',
+      'CLOSED',
     ]),
     reply: z
       .string()
       .max(2000)
       .describe(
-        "The single in-character reply the supervisor-approved participant " +
-          "produces for this turn. Never narration, never out-of-character.",
+        'The single in-character reply the supervisor-approved participant ' +
+          'produces for this turn. Never narration, never out-of-character.',
       ),
     emotion: z
       .object({
@@ -33,10 +33,10 @@ export default defineAgent({
         valence: z.number().min(-1).max(1),
         risk_flags: z.array(
           z.enum([
-            "crisis_ideation",
-            "harm_to_others",
-            "medical_emergency",
-            "distress",
+            'crisis_ideation',
+            'harm_to_others',
+            'medical_emergency',
+            'distress',
           ]),
         ),
         confidence: z.number().min(0).max(1),
@@ -54,8 +54,8 @@ export default defineAgent({
       .max(10)
       .optional()
       .describe(
-        "Optional non-PII notes the agent wants Foresight to retain for " +
-          "longitudinal tracking across sessions.",
+        'Optional non-PII notes the agent wants Foresight to retain for ' +
+          'longitudinal tracking across sessions.',
       ),
   }),
-});
+})
