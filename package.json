@@ -348,7 +348,6 @@
     "@iconify-json/ri": "latest",
     "@iconify-json/uil": "latest",
     "@playwright/test": "1.61.0",
-    "@schpet/linear-cli": "^2.0.0",
     "@testing-library/dom": "latest",
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
