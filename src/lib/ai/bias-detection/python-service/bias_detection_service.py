@@ -87,6 +87,7 @@ async def analyze_bias():
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
+@app.route("/health", methods=["GET"])
 @app.route("/api/v1/health", methods=["GET"])
 async def health_check():
     """Service health check status."""
