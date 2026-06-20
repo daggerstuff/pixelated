@@ -21,6 +21,7 @@ interface AnalyzeEmotionResult {
   analyzer: string;
   evaluated_at: string;
   model: string;
+  [key: string]: unknown;
 }
 
 const SCHEMA = z.object({
@@ -50,7 +51,7 @@ export default defineTool({
     "and attaches pacing observations as a persistent_note. " +
     "Falls back to neutral stub when Workers AI credentials are missing.",
   inputSchema: SCHEMA,
-  async execute(input) {
+  async execute(input: z.infer<typeof SCHEMA>) {
     const model = getModel();
 
     const [emotion, pace] = await Promise.all([
@@ -119,16 +120,29 @@ function fallbackEmotion(): EmotionSignal {
 // ── Parsing helpers ──────────────────────────────────────────────────
 
 function parseEmotionJson(raw: string): EmotionSignal {
+  interface EmotionJson {
+    primary_emotion?: unknown;
+    intensity?: unknown;
+    valence?: unknown;
+    risk_flags?: unknown;
+    confidence?: unknown;
+    evidence_span?: unknown;
+  }
+
   try {
     const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0];
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned) as EmotionJson;
     return {
-      primary_emotion: parsed.primary_emotion ?? "neutral",
+      primary_emotion:
+        typeof parsed.primary_emotion === "string" ? parsed.primary_emotion : "neutral",
       intensity: clamp(parsed.intensity, 0, 1),
       valence: clamp(parsed.valence, -1, 1),
       risk_flags: normalizedRiskFlags(parsed.risk_flags),
       confidence: clamp(parsed.confidence, 0, 1),
-      evidence_span: String(parsed.evidence_span ?? "").slice(0, 120),
+      evidence_span: (typeof parsed.evidence_span === "string" ? parsed.evidence_span : "").slice(
+        0,
+        120,
+      ),
     };
   } catch {
     return fallbackEmotion();
