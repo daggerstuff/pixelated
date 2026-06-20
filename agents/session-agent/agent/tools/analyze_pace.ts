@@ -46,6 +46,7 @@ export interface PaceResult {
   suggestion: string;
   conversation_flow: string;
   model: string;
+  [key: string]: unknown;
 }
 
 /** Direct async pace analysis, importable by other tools. */
@@ -53,9 +54,7 @@ export async function analyzePace(input: PaceInput): Promise<PaceResult | null> 
   const model = getModel();
   if (!model) return null;
 
-  const turnsText = input.recent_turns
-    .map((t) => `[${t.role}] ${t.text}`)
-    .join("\n---\n");
+  const turnsText = input.recent_turns.map((t) => `[${t.role}] ${t.text}`).join("\n---\n");
 
   const prompt =
     `You are a clinical training supervisor monitoring a therapy rehearsal session.\n` +
@@ -78,45 +77,56 @@ export async function analyzePace(input: PaceInput): Promise<PaceResult | null> 
   };
 }
 
-function parsePaceJson(raw: string): Omit<PaceResult, "session_id" | "analyzed_at" | "model"> {
+function parsePaceJson(raw: string) {
+  interface PaceJson {
+    stuck?: unknown;
+    pattern?: unknown;
+    consecutive_same_technique?: unknown;
+    suggestion?: unknown;
+    conversation_flow?: unknown;
+  }
+
   try {
     const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0];
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned) as PaceJson;
     const patterns = ["reflection_loop", "topic_avoidance", "rapid_fire", "normal"] as const;
     return {
       stuck: typeof parsed.stuck === "boolean" ? parsed.stuck : false,
-      pattern: (patterns as readonly string[]).includes(parsed.pattern)
+      pattern: (patterns as readonly string[]).includes(
+        typeof parsed.pattern === "string" ? parsed.pattern : "",
+      )
         ? (parsed.pattern as PaceResult["pattern"])
         : "normal",
       consecutive_same_technique:
         typeof parsed.consecutive_same_technique === "number"
           ? Math.max(0, parsed.consecutive_same_technique)
           : 0,
-      suggestion: String(parsed.suggestion ?? "").slice(0, 160),
-      conversation_flow: String(parsed.conversation_flow ?? "").slice(0, 200),
+      suggestion: (typeof parsed.suggestion === "string" ? parsed.suggestion : "").slice(0, 160),
+      conversation_flow: (typeof parsed.conversation_flow === "string"
+        ? parsed.conversation_flow
+        : ""
+      ).slice(0, 200),
     };
   } catch {
-    return emptyPace();
+    return emptyPace("unknown", "@cf/meta/llama-3.2-3b-instruct");
   }
 }
 
-function emptyPace() {
+function emptyPace(sessionId: string, model: string): PaceResult {
   return {
+    session_id: sessionId,
+    analyzed_at: new Date().toISOString(),
     stuck: false,
-    pattern: "normal" as const,
+    pattern: "normal",
     consecutive_same_technique: 0,
     suggestion: "",
     conversation_flow: "",
+    model,
   };
 }
 
 function emptyResult(sessionId: string): PaceResult {
-  return {
-    session_id: sessionId,
-    analyzed_at: new Date().toISOString(),
-    ...emptyPace(),
-    model: "none",
-  };
+  return emptyPace(sessionId, "none");
 }
 
 // ── Eve tool definition ─────────────────────────────────────────────
@@ -142,7 +152,7 @@ export default defineTool({
     "Call this after generating the reply -- the result is supervisory " +
     "metadata that does not gate the response.",
   inputSchema: SCHEMA,
-  async execute(input) {
+  async execute(input: z.infer<typeof SCHEMA>) {
     const result = await analyzePace(input);
     if (!result) {
       return {

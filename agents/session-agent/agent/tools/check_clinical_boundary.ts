@@ -13,6 +13,7 @@ interface ClinicalBoundaryResult {
   evaluator: string;
   evaluated_at: string;
   model: string;
+  [key: string]: unknown;
 }
 
 const RISK_CRITERIA = [
@@ -27,9 +28,7 @@ const RISK_CRITERIA = [
 const SCHEMA = z.object({
   session_id: z.string().uuid(),
   turn_text: z.string().min(1),
-  category: z
-    .enum(["crisis", "boundary", "scope", "privacy"])
-    .default("boundary"),
+  category: z.enum(["crisis", "boundary", "scope", "privacy"]).default("boundary"),
 });
 
 export default defineTool({
@@ -39,7 +38,7 @@ export default defineTool({
     "risk criteria. Falls back to regex heuristic when AI credentials " +
     "are missing.",
   inputSchema: SCHEMA,
-  async execute(input) {
+  async execute(input: z.infer<typeof SCHEMA>) {
     const model = getModel();
 
     if (model) {
@@ -89,24 +88,32 @@ function parseBoundaryJson(raw: string): {
   boundary_passed: boolean;
   escalate_to_supervisor: boolean;
 } {
+  interface BoundaryJson {
+    severity?: unknown;
+    flagged_risk_criteria?: unknown;
+    boundary_passed?: unknown;
+    escalate_to_supervisor?: unknown;
+  }
+
   try {
     const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0];
-    const parsed = JSON.parse(cleaned);
+    const parsed = JSON.parse(cleaned) as BoundaryJson;
+    const severityStr = typeof parsed.severity === "string" ? parsed.severity : "";
     return {
-      severity: ["none", "warning", "critical"].includes(parsed.severity)
-        ? parsed.severity
+      severity: ["none", "warning", "critical"].includes(severityStr)
+        ? (parsed.severity as "none" | "warning" | "critical")
         : "none",
       flagged_risk_criteria: Array.isArray(parsed.flagged_risk_criteria)
-        ? parsed.flagged_risk_criteria
+        ? parsed.flagged_risk_criteria.filter((f): f is string => typeof f === "string")
         : [],
       boundary_passed:
         typeof parsed.boundary_passed === "boolean"
           ? parsed.boundary_passed
-          : parsed.severity !== "critical",
+          : severityStr !== "critical",
       escalate_to_supervisor:
         typeof parsed.escalate_to_supervisor === "boolean"
           ? parsed.escalate_to_supervisor
-          : parsed.severity === "critical",
+          : severityStr === "critical",
     };
   } catch {
     return {
@@ -118,9 +125,7 @@ function parseBoundaryJson(raw: string): {
   }
 }
 
-function heuristicEvaluate(
-  input: z.infer<typeof SCHEMA>,
-): ClinicalBoundaryResult {
+function heuristicEvaluate(input: z.infer<typeof SCHEMA>): ClinicalBoundaryResult {
   const lower = input.turn_text.toLowerCase();
   const flagged: Array<string> = [];
 
