@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
   "description": "Compressed skill metadata for low-token startup context. Load full SKILL.md on-demand.",
-  "generated_at_utc": "2026-06-20T11:54:03+00:00",
+  "generated_at_utc": "2026-06-20T15:18:37+00:00",
   "generator": "pixelated/.agent/scripts/build_compressed_index.py",
   "repo_root": "/home/vivi/pixelated",
   "skills": {
