@@ -781,7 +781,7 @@ class PyTorchModelService(ModelService):
 class KeywordBiasModelService(ModelService):
     """Dependency-free fallback model for degraded local inference."""
 
-    KEYWORDS: dict[BiasType, tuple[str, ...]] = {
+    KEYWORDS: ClassVar[dict[BiasType, tuple[str, ...]]] = {
         BiasType.GENDER: ("he", "she", "man", "woman", "male", "female"),
         BiasType.RACIAL: ("black", "white", "asian", "hispanic", "latino", "race"),
         BiasType.AGE: ("young", "old", "elderly", "youth", "teen", "senior"),
