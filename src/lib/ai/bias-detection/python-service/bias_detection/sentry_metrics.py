@@ -103,6 +103,15 @@ def _event_titles(event: dict[str, Any]) -> list[str]:
     if isinstance(message, str) and message.strip():
         titles.append(message.strip())
 
+    logentry = event.get("logentry")
+    if isinstance(logentry, dict):
+        formatted = logentry.get("formatted")
+        if isinstance(formatted, str) and formatted.strip():
+            titles.append(formatted.strip())
+        message_text = logentry.get("message")
+        if isinstance(message_text, str) and message_text.strip():
+            titles.append(message_text.strip())
+
     exception = event.get("exception")
     if not isinstance(exception, dict):
         return titles

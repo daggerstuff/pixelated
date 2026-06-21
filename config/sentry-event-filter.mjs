@@ -20,7 +20,12 @@ export const sentryEventTitles = (event) => {
     return []
   }
 
-  const titles = [optionalString(event.message)]
+  const titles = []
+  const msg = optionalString(event.message)
+  if (msg !== undefined) {
+    titles.push(msg)
+  }
+
   const exception = isRecord(event.exception) ? event.exception : undefined
   const values = Array.isArray(exception?.values) ? exception.values : []
 
@@ -29,10 +34,13 @@ export const sentryEventTitles = (event) => {
       continue
     }
 
-    titles.push(optionalString(value.value))
+    const title = optionalString(value.value)
+    if (title !== undefined) {
+      titles.push(title)
+    }
   }
 
-  return titles.filter((title) => title !== undefined)
+  return titles
 }
 
 /** @param {unknown} event @returns {boolean} */

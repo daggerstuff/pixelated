@@ -44,4 +44,26 @@ describe('Sentry event filtering', () => {
       }),
     ).toBe(false)
   })
+
+  it('drops lowercase test: prefix events', () => {
+    expect(
+      isSyntheticSentryTestEvent({
+        message: 'test: lowercase test message',
+      }),
+    ).toBe(true)
+  })
+
+  it('drops uppercase TEST: prefix events', () => {
+    expect(
+      isSyntheticSentryTestEvent({
+        message: 'TEST: uppercase test message',
+      }),
+    ).toBe(true)
+  })
+
+  it('handles events with no titles gracefully', () => {
+    expect(sentryEventTitles({})).toEqual([])
+    expect(sentryEventTitles(null)).toEqual([])
+    expect(sentryEventTitles(42)).toEqual([])
+  })
 })
