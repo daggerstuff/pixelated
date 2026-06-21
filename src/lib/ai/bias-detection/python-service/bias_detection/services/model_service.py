@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -118,65 +119,6 @@ def _load_torch() -> Any | None:
 def _ml_services_enabled() -> bool:
     flag = os.getenv("BIAS_DETECTION_DISABLE_LOCAL_ML_SERVICES", "").lower().strip()
     return flag not in {"1", "true", "yes", "on"}
-
-
-def _download_pretrained_with_retry(
-    loader: Any,
-    *,
-    repo: str,
-    timeout: float,
-    max_attempts: int,
-    sleep_seconds: float = 1.0,
-) -> Any:
-    """Download a pretrained model with a bounded retry budget.
-
-    The Hub client used by ``transformers`` honors ``HF_HUB_DOWNLOAD_TIMEOUT``
-    and accepts per-call ``timeout=`` kwargs. We set the env-level timeout so
-    retries are not unbounded, then route through tenacity so the retry policy
-    is centralized. Network or auth failures are surfaced as ``RuntimeError``
-    so the caller can decide whether to skip the model or fail the whole service.
-    """
-    from tenacity import (  # noqa: PLC0415
-        retry,
-        retry_if_exception_type,
-        stop_after_attempt,
-        wait_exponential,
-    )
-
-    attempts = max(1, int(max_attempts))
-    sleep_seconds = max(0.0, float(sleep_seconds))
-
-    @retry(
-        stop=stop_after_attempt(attempts),
-        wait=wait_exponential(multiplier=sleep_seconds, min=sleep_seconds, max=10),
-        retry=retry_if_exception_type(Exception),
-        reraise=True,
-    )
-    def _call() -> Any:
-        logger.info(
-            "Attempting pretrained model download",
-            repo=repo,
-            timeout=timeout,
-        )
-        os.environ.setdefault("HF_HUB_DOWNLOAD_TIMEOUT", str(timeout))
-        try:
-            return loader.from_pretrained(repo, timeout=timeout)
-        except TypeError:
-            # Older transformers builds don't accept the timeout kwarg.
-            return loader.from_pretrained(repo)
-
-    try:
-        return _call()
-    except Exception as exc:
-        logger.warning(
-            "Pretrained model download exhausted retries",
-            repo=repo,
-            max_attempts=attempts,
-            error=str(exc),
-        )
-        raise RuntimeError(
-            f"Failed to download pretrained model {repo!r} after {attempts} attempt(s)"
-        ) from exc
 
 
 logger = structlog.get_logger(__name__)
@@ -293,21 +235,8 @@ class TensorFlowModelService(ModelService):
         # Save tokenizer
         _load_transformers()
         if AutoTokenizer is not None:
-            try:
-                tokenizer = _download_pretrained_with_retry(
-                    AutoTokenizer,
-                    repo="bert-base-uncased",
-                    timeout=float(
-                        getattr(settings, "model_timeout", 30)
-                    ),
-                    max_attempts=3,
-                )
-                tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
-            except Exception as download_error:
-                logger.warning(
-                    "Skipping tokenizer persistence; falling back to BasicTokenizer.",
-                    error=str(download_error),
-                )
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
         else:
             logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model.")
 
@@ -318,23 +247,9 @@ class TensorFlowModelService(ModelService):
         _load_transformers()
         if TFBertForSequenceClassification is None:
             raise ImportError("TFBertForSequenceClassification is not available in the installed transformers version.")
-        # Use the local cache first to avoid a Hub round-trip; retry with the
-        # bounded helper if the network is reachable but slow.
-        try:
-            return TFBertForSequenceClassification.from_pretrained(
-                "bert-base-uncased",
-                num_labels=len(BiasType.__members__),
-                local_files_only=True,
-            )
-        except Exception:
-            return _download_pretrained_with_retry(
-                TFBertForSequenceClassification,
-                repo="bert-base-uncased",
-                timeout=float(
-                    getattr(settings, "model_timeout", 30)
-                ),
-                max_attempts=3,
-            )
+        return TFBertForSequenceClassification.from_pretrained(
+            "bert-base-uncased", num_labels=len(BiasType.__members__)
+        )
 
     def _create_basic_tokenizer(self) -> Any:
         """Create basic tokenizer"""
@@ -515,43 +430,12 @@ except ImportError:
 
 
 class BiasDetectionModel(_Module):
-    HUGGINGFACE_REPO = "bert-base-uncased"
-    HUGGINGFACE_DOWNLOAD_TIMEOUT = 30.0
-    HUGGINGFACE_MAX_ATTEMPTS = 3
-
     def __init__(self, num_labels: int = 17):
         super().__init__()
-        # Lazily import transformers so a missing package fails fast but cleanly.
+        # Import dynamically to avoid early import failures
         from transformers import BertModel  # noqa: PLC0415
 
-        # Prefer a locally cached BERT (no Hub round-trip). Fall back to a
-        # network call with a tight timeout + retry budget so an outage here
-        # cannot block service startup indefinitely.
-        try:
-            self.bert = BertModel.from_pretrained(
-                self.HUGGINGFACE_REPO,
-                local_files_only=True,
-            )
-        except Exception as cache_error:
-            logger.warning(
-                "BERT weights not present in local cache; attempting remote download",
-                repo=self.HUGGINGFACE_REPO,
-                error=str(cache_error),
-            )
-            try:
-                self.bert = _download_pretrained_with_retry(
-                    BertModel,
-                    repo=self.HUGGINGFACE_REPO,
-                    timeout=self.HUGGINGFACE_DOWNLOAD_TIMEOUT,
-                    max_attempts=self.HUGGINGFACE_MAX_ATTEMPTS,
-                )
-            except Exception as download_error:
-                raise RuntimeError(
-                    "Failed to download BERT weights from HuggingFace Hub. "
-                    "Pre-stage the model locally or restore the checkpoint to "
-                    "avoid blocking service initialization."
-                ) from download_error
-
+        self.bert = BertModel.from_pretrained("bert-base-uncased")
         self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
         self.dropout = torch.nn.Dropout(0.1)
 
@@ -608,33 +492,20 @@ class PyTorchModelService(ModelService):
                 # Create basic model if not found
                 self.model = self._create_basic_model()
 
-            # Load tokenizer. Network errors here must not bubble up; we
-            # treat them as a prompt to fall back to the BasicTokenizer so
-            # the bias-detection service can still initialize.
+            # Load tokenizer
             tokenizer_path = self.model_path / "tokenizer"
-            _load_transformers()
-            if AutoTokenizer is not None:
-                try:
-                    if tokenizer_path.exists():
-                        self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
-                    else:
-                        self.tokenizer = _download_pretrained_with_retry(
-                            AutoTokenizer,
-                            repo="bert-base-uncased",
-                            timeout=float(
-                                getattr(settings, "model_timeout", 30)
-                            ),
-                            max_attempts=3,
-                        )
-                except Exception as tokenizer_error:
-                    logger.warning(
-                        "Failed to load AutoTokenizer from HuggingFace Hub; "
-                        "falling back to BasicTokenizer.",
-                        error=str(tokenizer_error),
-                    )
+            if tokenizer_path.exists():
+                _load_transformers()
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                else:
                     self.tokenizer = self._create_basic_tokenizer()
             else:
-                self.tokenizer = self._create_basic_tokenizer()
+                _load_transformers()
+                if AutoTokenizer is not None:
+                    self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+                else:
+                    self.tokenizer = self._create_basic_tokenizer()
 
             self.model.to(self.device)
             self.model.eval()
@@ -671,32 +542,18 @@ class PyTorchModelService(ModelService):
         # Save model
         self._save_model(model)
 
-        # Save tokenizer. Network access is optional: if the Hub is unreachable
-        # we degrade gracefully and rely on the BasicTokenizer fallback at inference.
+        # Save tokenizer
         _load_transformers()
         if AutoTokenizer is not None:
-            try:
-                tokenizer = _download_pretrained_with_retry(
-                    AutoTokenizer,
-                    repo="bert-base-uncased",
-                    timeout=float(
-                        getattr(settings, "model_timeout", 30)
-                    ),
-                    max_attempts=3,
-                )
-                tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
-            except Exception as download_error:
-                logger.warning(
-                    "Skipping tokenizer persistence; falling back to BasicTokenizer.",
-                    error=str(download_error),
-                )
+            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
         else:
             logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model.")
 
         logger.info("Pretrained model downloaded and saved")
 
     def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
-        """Load a persisted PyTorch state-dict checkpoint, regenerating unreadable files."""
+        """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
             return self._restore_model_from_checkpoint(checkpoint)
@@ -921,16 +778,125 @@ class PyTorchModelService(ModelService):
         }
 
 
+class KeywordBiasModelService(ModelService):
+    """Dependency-free fallback model for degraded local inference."""
+
+    KEYWORDS: ClassVar[dict[BiasType, tuple[str, ...]]] = {
+        BiasType.GENDER: ("he", "she", "man", "woman", "male", "female"),
+        BiasType.RACIAL: ("black", "white", "asian", "hispanic", "latino", "race"),
+        BiasType.AGE: ("young", "old", "elderly", "youth", "teen", "senior"),
+        BiasType.RELIGIOUS: ("christian", "muslim", "jewish", "hindu", "buddhist"),
+        BiasType.SOCIOECONOMIC: ("poor", "wealthy", "low-income", "privileged"),
+        BiasType.ABILITY: ("disabled", "disability", "handicapped", "able-bodied"),
+        BiasType.SEXUAL_ORIENTATION: ("gay", "lesbian", "straight", "bisexual"),
+        BiasType.POLITICAL: ("liberal", "conservative", "democrat", "republican"),
+        BiasType.GEOGRAPHIC: ("urban", "rural", "foreign", "local"),
+        BiasType.LANGUAGE: ("accent", "english", "non-native", "fluent"),
+        BiasType.EDUCATIONAL: ("college", "degree", "educated", "uneducated"),
+        BiasType.HEALTH: ("healthy", "sick", "illness", "medical"),
+        BiasType.APPEARANCE: ("attractive", "overweight", "thin", "beautiful"),
+        BiasType.FAMILY_STATUS: ("married", "single", "parent", "children"),
+        BiasType.VETERAN_STATUS: ("veteran", "military", "served"),
+        BiasType.IMMIGRATION: ("immigrant", "citizen", "visa", "undocumented"),
+        BiasType.CRIMINAL_HISTORY: ("felon", "criminal", "convicted", "record"),
+    }
+
+    def __init__(self):
+        super().__init__(settings.model_cache_dir, "keyword_bias_fallback")
+        self.max_length = settings.max_sequence_length
+        self.batch_size = settings.batch_size
+
+    async def load_model(self) -> bool:
+        start_time = time.time()
+        self.model = self.KEYWORDS
+        self.tokenizer = "regex_keyword_matcher"
+        self.is_loaded = True
+        self.load_time = time.time() - start_time
+        logger.info(
+            "Keyword bias fallback model loaded",
+            model_name=self.model_name,
+            keyword_groups=len(self.KEYWORDS),
+        )
+        return True
+
+    async def predict(self, text: str) -> dict[str, Any]:
+        await self.ensure_model_loaded()
+        start_time = time.time()
+        normalized_text = text.lower()
+        tokens = set(re.findall(r"[a-z]+(?:-[a-z]+)?", normalized_text))
+        results: list[dict[str, Any]] = []
+
+        for bias_type, keywords in self.KEYWORDS.items():
+            evidence = [
+                keyword
+                for keyword in keywords
+                if keyword in tokens or (
+                    " " in keyword and keyword in normalized_text
+                )
+            ]
+            if not evidence:
+                continue
+
+            score = min(0.95, 0.35 + (0.15 * len(evidence)))
+            confidence = min(0.9, 0.45 + (0.1 * len(evidence)))
+            confidence_level = self._confidence_level(confidence)
+            results.append(
+                {
+                    "bias_type": bias_type,
+                    "score": score,
+                    "confidence": confidence,
+                    "confidence_level": confidence_level,
+                    "evidence": evidence[:3],
+                    "explanation": (
+                        f"Keyword fallback detected {bias_type.value} bias signals "
+                        f"with {confidence_level.value} confidence"
+                    ),
+                }
+            )
+
+        return {
+            "model_name": self.model_name,
+            "framework": "keyword",
+            "processing_time_ms": int((time.time() - start_time) * 1000),
+            "results": results,
+            "text_hash": self._get_text_hash(text),
+        }
+
+    def _confidence_level(self, confidence: float) -> ConfidenceLevel:
+        if confidence >= 0.8:
+            return ConfidenceLevel.VERY_HIGH
+        if confidence >= 0.6:
+            return ConfidenceLevel.HIGH
+        if confidence >= 0.4:
+            return ConfidenceLevel.MEDIUM
+        return ConfidenceLevel.LOW
+
+    def get_model_info(self) -> dict[str, Any]:
+        return {
+            "name": self.model_name,
+            "framework": "keyword",
+            "version": "1.0.0",
+            "loaded": self.is_loaded,
+            "load_time_ms": int(self.load_time * 1000),
+            "model_path": str(self.model_path),
+            "max_sequence_length": self.max_length,
+            "batch_size": self.batch_size,
+            "fallback": True,
+        }
+
+
 class ModelEnsembleService:
     """Ensemble service combining multiple models"""
 
     def __init__(self):
         self.services = []
+        self.keyword_service = KeywordBiasModelService()
         if not _ml_services_enabled():
             logger.info("Skipping local ML model services due test-time configuration.")
             self.tf_service = None
             self.pt_service = None
             self.nvidia_service = None
+            self.services.append(self.keyword_service)
             return
 
         # Only add TensorFlow service if available
@@ -973,44 +939,39 @@ class ModelEnsembleService:
             self.nvidia_service = None
 
     async def load_all_models(self) -> bool:
-        """Load all models, degrading gracefully when a service fails.
-
-        The service is treated as loaded if at least one configured model
-        service loads successfully. Failures are logged with enough context
-        to triage upstream issues (checkpoint corruption, HuggingFace outage,
-        missing optional dependency) but they do not tear down the whole
-        bias-detection service.
-        """
+        """Load all models"""
+        results = []
         if not self.services:
-            logger.warning("No model services are configured.")
-            return False
-
-        results: list[bool] = []
-        failures: list[str] = []
-        for service in self.services:
-            try:
-                result = await service.load_model()
-            except Exception as exc:  # noqa: BLE001
-                logger.error(
-                    "Model service raised during load; continuing with remaining services",
-                    model=getattr(service, "model_name", service.__class__.__name__),
-                    error=str(exc),
-                )
-                failures.append(getattr(service, "model_name", service.__class__.__name__))
-                continue
-            results.append(result)
-            if not result:
-                failures.append(getattr(service, "model_name", service.__class__.__name__))
-
-        if failures:
             logger.warning(
-                "One or more model services failed to load; degrading gracefully",
-                failed=failures,
-                successful=sum(1 for r in results if r),
-                total=len(self.services),
+                "No local ML model services are configured; using keyword fallback."
             )
-
-        return any(results)
+            self.services.append(self.keyword_service)
+        for service in self.services:
+            result = await service.load_model()
+            results.append(result)
+        if not any(results) and self.keyword_service not in self.services:
+            logger.warning(
+                "All optional local ML model services failed to load; "
+                "using keyword fallback."
+            )
+            fallback_loaded = await self.keyword_service.load_model()
+            self.services.append(self.keyword_service)
+            results.append(fallback_loaded)
+        if not any(results):
+            logger.error("All configured model services failed to load.")
+            return False
+        if not all(results):
+            failed_models = [
+                service.model_name
+                for service, loaded in zip(self.services, results, strict=True)
+                if not loaded
+            ]
+            logger.warning(
+                "One or more optional model services failed to load; "
+                "continuing with available models.",
+                failed_models=failed_models,
+            )
+        return True
 
     def has_configured_services(self) -> bool:
         """Return whether any local ML model services are configured."""
@@ -1035,7 +996,7 @@ class ModelEnsembleService:
         combined_results = self._combine_results(results)
 
         # Use first available service for text hash
-        hash_service = self.tf_service or self.pt_service
+        hash_service = self.tf_service or self.pt_service or self.keyword_service
         if hash_service is None:
             raise RuntimeError("No model service is available for predictions.")
         return {
