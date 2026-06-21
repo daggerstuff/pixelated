@@ -555,24 +555,71 @@ class PyTorchModelService(ModelService):
         """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
-            return self._restore_model_from_checkpoint(checkpoint)
-        except Exception as state_dict_error:
-            logger.warning(
-                "Failed to load PyTorch state-dict checkpoint; regenerating model.",
-                model_path=str(model_file),
-                error=str(state_dict_error),
-            )
-            model = self._create_basic_model()
-            self._save_model(model)
-            return model
+        except Exception as safe_load_error:
+            legacy_model = self._load_legacy_full_model(model_file, safe_load_error)
+            if legacy_model is not None:
+                return legacy_model
 
-    def _load_torch_checkpoint(self, model_file: Path) -> Any:
+            state_dict_error = safe_load_error
+        else:
+            try:
+                return self._restore_model_from_checkpoint(checkpoint)
+            except Exception as restore_error:
+                state_dict_error = restore_error
+
+        logger.warning(
+            "Failed to load PyTorch state-dict checkpoint; regenerating model.",
+            model_path=str(model_file),
+            error=str(state_dict_error),
+        )
+        model = self._create_basic_model()
+        self._save_model(model)
+        return model
+
+    def _load_torch_checkpoint(self, model_file: Path, *, weights_only: bool = True) -> Any:
         torch = self._torch
         return torch.load(
             model_file,
             map_location=self.device,
-            weights_only=True,
+            weights_only=weights_only,
         )
+
+    def _load_legacy_full_model(
+        self, model_file: Path, state_dict_error: Exception
+    ) -> torch.nn.Module | None:
+        try:
+            legacy_model = self._load_torch_checkpoint(model_file, weights_only=False)
+        except Exception as legacy_error:
+            logger.warning(
+                "Failed to load legacy PyTorch full-model pickle; regenerating model.",
+                model_path=str(model_file),
+                safe_load_error=str(state_dict_error),
+                error=str(legacy_error),
+            )
+            return None
+
+        if not hasattr(legacy_model, "state_dict"):
+            logger.warning(
+                "Legacy PyTorch checkpoint did not contain a model; regenerating model.",
+                model_path=str(model_file),
+                checkpoint_type=type(legacy_model).__name__,
+            )
+            return None
+
+        try:
+            self._save_model(legacy_model)
+            logger.info(
+                "Migrated legacy PyTorch full-model pickle to state-dict checkpoint.",
+                model_path=str(model_file),
+            )
+        except Exception as save_error:
+            logger.warning(
+                "Loaded legacy PyTorch full-model pickle but failed to migrate checkpoint.",
+                model_path=str(model_file),
+                error=str(save_error),
+            )
+
+        return legacy_model
 
     def _restore_model_from_checkpoint(self, checkpoint: Any) -> torch.nn.Module:
         if not isinstance(checkpoint, dict):

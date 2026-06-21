@@ -18,6 +18,11 @@ class FakeModel:
         self.loaded_state_dict = state_dict
 
 
+class RejectingModel(FakeModel):
+    def load_state_dict(self, state_dict: dict[str, str]) -> None:
+        raise RuntimeError("invalid state dict")
+
+
 class FakeTorch:
     def __init__(self, load_results: list[Any] | None = None) -> None:
         self.load_results = load_results or []
@@ -47,6 +52,7 @@ class FakeTorch:
     def save(self, checkpoint: dict[str, Any], path: str) -> None:
         self.saved_checkpoint = checkpoint
         self.saved_path = path
+        Path(path).write_text("checkpoint")
 
 
 def create_service(fake_torch: FakeTorch, model_path: Path) -> PyTorchModelService:
@@ -84,7 +90,9 @@ def test_save_model_persists_state_dict_checkpoint(tmp_path: Path) -> None:
 
     service._save_model(model)
 
-    require_equal(fake_torch.saved_path, str(tmp_path / "model.pt"))
+    require_equal(fake_torch.saved_path, str(tmp_path / "model.pt.tmp"))
+    require_true((tmp_path / "model.pt").exists())
+    require_true(not (tmp_path / "model.pt.tmp").exists())
     require_equal(
         fake_torch.saved_checkpoint["format"],
         PYTORCH_CHECKPOINT_FORMAT,
@@ -101,7 +109,7 @@ def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None
     fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": state_dict}])
     service = create_service(fake_torch, tmp_path)
     model = FakeModel()
-    service._create_basic_model = lambda: model
+    service._create_basic_model = lambda num_labels=None: model
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
@@ -110,13 +118,34 @@ def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None
     require_true(fake_torch.load_calls[0]["weights_only"])
 
 
+def test_load_saved_model_regenerates_invalid_safe_checkpoint(tmp_path: Path) -> None:
+    fake_torch = FakeTorch(
+        [{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": {"bad": "state"}}]
+    )
+    service = create_service(fake_torch, tmp_path)
+    model = RejectingModel()
+    service._create_basic_model = lambda num_labels=None: model
+
+    loaded_model = service._load_saved_model(tmp_path / "model.pt")
+
+    require_is(loaded_model, model)
+    require_equal(len(fake_torch.load_calls), 1)
+    require_true(fake_torch.load_calls[0]["weights_only"])
+    require_equal(
+        fake_torch.saved_checkpoint["state_dict"],
+        model.state_dict(),
+    )
+
+
 def test_load_saved_model_regenerates_unloadable_legacy_pickle(
     tmp_path: Path,
 ) -> None:
     fake_torch = FakeTorch(
         [
+            RuntimeError("Weights only load failed"),
             AttributeError(
-                "Can't get local object 'PyTorchModelService._create_basic_model.<locals>.BiasDetectionModel'"
+                "Can't get local object "
+                "'PyTorchModelService._create_basic_model.<locals>.BiasDetectionModel'"
             ),
         ]
     )
@@ -128,23 +157,47 @@ def test_load_saved_model_regenerates_unloadable_legacy_pickle(
 
     require_is(loaded_model, model)
     require_true(fake_torch.load_calls[0]["weights_only"])
+    require_true(not fake_torch.load_calls[1]["weights_only"])
     require_equal(
         fake_torch.saved_checkpoint["state_dict"],
         model.state_dict(),
     )
 
 
-def test_load_saved_model_regenerates_full_model_pickle(tmp_path: Path) -> None:
-    fake_torch = FakeTorch([RuntimeError("unsupported global")])
-    service = create_service(fake_torch, tmp_path)
+def test_load_saved_model_migrates_full_model_pickle(tmp_path: Path) -> None:
     model = FakeModel()
-    service._create_basic_model = lambda: model
+    fake_torch = FakeTorch([RuntimeError("Weights only load failed"), model])
+    service = create_service(fake_torch, tmp_path)
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
     require_is(loaded_model, model)
-    require_equal(len(fake_torch.load_calls), 1)
+    require_equal(len(fake_torch.load_calls), 2)
     require_true(fake_torch.load_calls[0]["weights_only"])
+    require_true(not fake_torch.load_calls[1]["weights_only"])
+    require_equal(
+        fake_torch.saved_checkpoint["state_dict"],
+        model.state_dict(),
+    )
+
+
+def test_load_saved_model_regenerates_unsupported_full_model_pickle(tmp_path: Path) -> None:
+    fake_torch = FakeTorch(
+        [
+            RuntimeError("Weights only load failed"),
+            RuntimeError("unsupported global"),
+        ]
+    )
+    service = create_service(fake_torch, tmp_path)
+    model = FakeModel()
+    service._create_basic_model = lambda num_labels=None: model
+
+    loaded_model = service._load_saved_model(tmp_path / "model.pt")
+
+    require_is(loaded_model, model)
+    require_equal(len(fake_torch.load_calls), 2)
+    require_true(fake_torch.load_calls[0]["weights_only"])
+    require_true(not fake_torch.load_calls[1]["weights_only"])
     require_equal(
         fake_torch.saved_checkpoint["state_dict"],
         model.state_dict(),
