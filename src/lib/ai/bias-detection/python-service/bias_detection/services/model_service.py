@@ -120,6 +120,65 @@ def _ml_services_enabled() -> bool:
     return flag not in {"1", "true", "yes", "on"}
 
 
+def _download_pretrained_with_retry(
+    loader: Any,
+    *,
+    repo: str,
+    timeout: float,
+    max_attempts: int,
+    sleep_seconds: float = 1.0,
+) -> Any:
+    """Download a pretrained model with a bounded retry budget.
+
+    The Hub client used by ``transformers`` honors ``HF_HUB_DOWNLOAD_TIMEOUT``
+    and accepts per-call ``timeout=`` kwargs. We set the env-level timeout so
+    retries are not unbounded, then route through tenacity so the retry policy
+    is centralized. Network or auth failures are surfaced as ``RuntimeError``
+    so the caller can decide whether to skip the model or fail the whole service.
+    """
+    from tenacity import (  # noqa: PLC0415
+        retry,
+        retry_if_exception_type,
+        stop_after_attempt,
+        wait_exponential,
+    )
+
+    attempts = max(1, int(max_attempts))
+    sleep_seconds = max(0.0, float(sleep_seconds))
+
+    @retry(
+        stop=stop_after_attempt(attempts),
+        wait=wait_exponential(multiplier=sleep_seconds, min=sleep_seconds, max=10),
+        retry=retry_if_exception_type(Exception),
+        reraise=True,
+    )
+    def _call() -> Any:
+        logger.info(
+            "Attempting pretrained model download",
+            repo=repo,
+            timeout=timeout,
+        )
+        os.environ.setdefault("HF_HUB_DOWNLOAD_TIMEOUT", str(timeout))
+        try:
+            return loader.from_pretrained(repo, timeout=timeout)
+        except TypeError:
+            # Older transformers builds don't accept the timeout kwarg.
+            return loader.from_pretrained(repo)
+
+    try:
+        return _call()
+    except Exception as exc:
+        logger.warning(
+            "Pretrained model download exhausted retries",
+            repo=repo,
+            max_attempts=attempts,
+            error=str(exc),
+        )
+        raise RuntimeError(
+            f"Failed to download pretrained model {repo!r} after {attempts} attempt(s)"
+        ) from exc
+
+
 logger = structlog.get_logger(__name__)
 
 PYTORCH_CHECKPOINT_FORMAT = "bias-detection-pytorch-state-dict"
@@ -234,8 +293,21 @@ class TensorFlowModelService(ModelService):
         # Save tokenizer
         _load_transformers()
         if AutoTokenizer is not None:
-            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+            try:
+                tokenizer = _download_pretrained_with_retry(
+                    AutoTokenizer,
+                    repo="bert-base-uncased",
+                    timeout=float(
+                        getattr(settings, "model_timeout", 30)
+                    ),
+                    max_attempts=3,
+                )
+                tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+            except Exception as download_error:
+                logger.warning(
+                    "Skipping tokenizer persistence; falling back to BasicTokenizer.",
+                    error=str(download_error),
+                )
         else:
             logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for TensorFlow model.")
 
@@ -246,9 +318,23 @@ class TensorFlowModelService(ModelService):
         _load_transformers()
         if TFBertForSequenceClassification is None:
             raise ImportError("TFBertForSequenceClassification is not available in the installed transformers version.")
-        return TFBertForSequenceClassification.from_pretrained(
-            "bert-base-uncased", num_labels=len(BiasType.__members__)
-        )
+        # Use the local cache first to avoid a Hub round-trip; retry with the
+        # bounded helper if the network is reachable but slow.
+        try:
+            return TFBertForSequenceClassification.from_pretrained(
+                "bert-base-uncased",
+                num_labels=len(BiasType.__members__),
+                local_files_only=True,
+            )
+        except Exception:
+            return _download_pretrained_with_retry(
+                TFBertForSequenceClassification,
+                repo="bert-base-uncased",
+                timeout=float(
+                    getattr(settings, "model_timeout", 30)
+                ),
+                max_attempts=3,
+            )
 
     def _create_basic_tokenizer(self) -> Any:
         """Create basic tokenizer"""
@@ -429,12 +515,43 @@ except ImportError:
 
 
 class BiasDetectionModel(_Module):
+    HUGGINGFACE_REPO = "bert-base-uncased"
+    HUGGINGFACE_DOWNLOAD_TIMEOUT = 30.0
+    HUGGINGFACE_MAX_ATTEMPTS = 3
+
     def __init__(self, num_labels: int = 17):
         super().__init__()
-        # Import dynamically to avoid early import failures
+        # Lazily import transformers so a missing package fails fast but cleanly.
         from transformers import BertModel  # noqa: PLC0415
 
-        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        # Prefer a locally cached BERT (no Hub round-trip). Fall back to a
+        # network call with a tight timeout + retry budget so an outage here
+        # cannot block service startup indefinitely.
+        try:
+            self.bert = BertModel.from_pretrained(
+                self.HUGGINGFACE_REPO,
+                local_files_only=True,
+            )
+        except Exception as cache_error:
+            logger.warning(
+                "BERT weights not present in local cache; attempting remote download",
+                repo=self.HUGGINGFACE_REPO,
+                error=str(cache_error),
+            )
+            try:
+                self.bert = _download_pretrained_with_retry(
+                    BertModel,
+                    repo=self.HUGGINGFACE_REPO,
+                    timeout=self.HUGGINGFACE_DOWNLOAD_TIMEOUT,
+                    max_attempts=self.HUGGINGFACE_MAX_ATTEMPTS,
+                )
+            except Exception as download_error:
+                raise RuntimeError(
+                    "Failed to download BERT weights from HuggingFace Hub. "
+                    "Pre-stage the model locally or restore the checkpoint to "
+                    "avoid blocking service initialization."
+                ) from download_error
+
         self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
         self.dropout = torch.nn.Dropout(0.1)
 
@@ -491,20 +608,33 @@ class PyTorchModelService(ModelService):
                 # Create basic model if not found
                 self.model = self._create_basic_model()
 
-            # Load tokenizer
+            # Load tokenizer. Network errors here must not bubble up; we
+            # treat them as a prompt to fall back to the BasicTokenizer so
+            # the bias-detection service can still initialize.
             tokenizer_path = self.model_path / "tokenizer"
-            if tokenizer_path.exists():
-                _load_transformers()
-                if AutoTokenizer is not None:
-                    self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
-                else:
+            _load_transformers()
+            if AutoTokenizer is not None:
+                try:
+                    if tokenizer_path.exists():
+                        self.tokenizer = AutoTokenizer.from_pretrained(str(tokenizer_path))
+                    else:
+                        self.tokenizer = _download_pretrained_with_retry(
+                            AutoTokenizer,
+                            repo="bert-base-uncased",
+                            timeout=float(
+                                getattr(settings, "model_timeout", 30)
+                            ),
+                            max_attempts=3,
+                        )
+                except Exception as tokenizer_error:
+                    logger.warning(
+                        "Failed to load AutoTokenizer from HuggingFace Hub; "
+                        "falling back to BasicTokenizer.",
+                        error=str(tokenizer_error),
+                    )
                     self.tokenizer = self._create_basic_tokenizer()
             else:
-                _load_transformers()
-                if AutoTokenizer is not None:
-                    self.tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-                else:
-                    self.tokenizer = self._create_basic_tokenizer()
+                self.tokenizer = self._create_basic_tokenizer()
 
             self.model.to(self.device)
             self.model.eval()
@@ -541,18 +671,32 @@ class PyTorchModelService(ModelService):
         # Save model
         self._save_model(model)
 
-        # Save tokenizer
+        # Save tokenizer. Network access is optional: if the Hub is unreachable
+        # we degrade gracefully and rely on the BasicTokenizer fallback at inference.
         _load_transformers()
         if AutoTokenizer is not None:
-            tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
-            tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+            try:
+                tokenizer = _download_pretrained_with_retry(
+                    AutoTokenizer,
+                    repo="bert-base-uncased",
+                    timeout=float(
+                        getattr(settings, "model_timeout", 30)
+                    ),
+                    max_attempts=3,
+                )
+                tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
+            except Exception as download_error:
+                logger.warning(
+                    "Skipping tokenizer persistence; falling back to BasicTokenizer.",
+                    error=str(download_error),
+                )
         else:
             logger.warning("AutoTokenizer unavailable; skipping tokenizer persistence for PyTorch model.")
 
         logger.info("Pretrained model downloaded and saved")
 
     def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
-        """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
+        """Load a persisted PyTorch state-dict checkpoint, regenerating unreadable files."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
             return self._restore_model_from_checkpoint(checkpoint)
@@ -829,15 +973,44 @@ class ModelEnsembleService:
             self.nvidia_service = None
 
     async def load_all_models(self) -> bool:
-        """Load all models"""
-        results = []
+        """Load all models, degrading gracefully when a service fails.
+
+        The service is treated as loaded if at least one configured model
+        service loads successfully. Failures are logged with enough context
+        to triage upstream issues (checkpoint corruption, HuggingFace outage,
+        missing optional dependency) but they do not tear down the whole
+        bias-detection service.
+        """
         if not self.services:
             logger.warning("No model services are configured.")
             return False
+
+        results: list[bool] = []
+        failures: list[str] = []
         for service in self.services:
-            result = await service.load_model()
+            try:
+                result = await service.load_model()
+            except Exception as exc:  # noqa: BLE001
+                logger.error(
+                    "Model service raised during load; continuing with remaining services",
+                    model=getattr(service, "model_name", service.__class__.__name__),
+                    error=str(exc),
+                )
+                failures.append(getattr(service, "model_name", service.__class__.__name__))
+                continue
             results.append(result)
-        return all(results)
+            if not result:
+                failures.append(getattr(service, "model_name", service.__class__.__name__))
+
+        if failures:
+            logger.warning(
+                "One or more model services failed to load; degrading gracefully",
+                failed=failures,
+                successful=sum(1 for r in results if r),
+                total=len(self.services),
+            )
+
+        return any(results)
 
     def has_configured_services(self) -> bool:
         """Return whether any local ML model services are configured."""
