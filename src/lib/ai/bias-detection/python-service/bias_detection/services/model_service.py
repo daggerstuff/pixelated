@@ -435,11 +435,17 @@ except ImportError:
     torch = None
     _Module = object
 
+# Ensure transformers are loaded at module level for pickle serialization
+_load_transformers()
+
 class BiasDetectionModel(_Module):
     def __init__(self, num_labels: int = 17):
         super().__init__()
-        # Import dynamically to avoid early import failures
-        from transformers import BertModel
+        # Use module-level BertModel to avoid pickle serialization issues
+        if BertModel is None:
+            raise ImportError(
+                "transformers BertModel is not available. Install it with: pip install transformers"
+            )
         self.bert = BertModel.from_pretrained("bert-base-uncased")
         self.classifier = torch.nn.Linear(
             self.bert.config.hidden_size, num_labels
