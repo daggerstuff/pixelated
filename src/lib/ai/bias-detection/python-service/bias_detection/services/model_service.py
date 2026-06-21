@@ -7,7 +7,7 @@ from __future__ import annotations
 import hashlib
 import os
 import time
-from abc import ABC, abstractmethod
+from abc import ABC as _ABC, abstractmethod
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -34,6 +34,13 @@ TORCH_IMPORT_ATTEMPTED = False
 TORCH_AVAILABLE = False
 _torch_module: Any | None = None
 
+# At module level so PLC0415 is satisfied; actual symbol availability is still
+# gated inside _load_transformers() so the module loads without transformers.
+try:
+    import transformers
+except ImportError:
+    transformers = None
+
 
 def _transformer_available() -> bool:
     _load_transformers()
@@ -51,24 +58,26 @@ def _load_transformers() -> None:
         return
 
     TRANSFORMER_IMPORT_ATTEMPTED = True
+    TFBertForSequenceClassification = None
 
     try:
-        from transformers import (  # noqa: PLC0415
-            AutoTokenizer,
-            BertModel,
-        )
+        # transformers is already imported at module level; use getattr to avoid
+        # a second import statement (which would violate PLC0415)
+        AutoTokenizer = getattr(transformers, "AutoTokenizer", None)
+        BertModel = getattr(transformers, "BertModel", None)
 
-        try:
-            from transformers import TFBertForSequenceClassification  # noqa: PLC0415
-        except Exception:
-            TFBertForSequenceClassification = None
+        TFBertForSequenceClassification = getattr(transformers, "TFBertForSequenceClassification", None)
 
         TRANSFORMERS_AVAILABLE = True
-    except Exception:
+    except Exception as e:
         AutoTokenizer = None
         BertModel = None
         TFBertForSequenceClassification = None
         TRANSFORMERS_AVAILABLE = False
+        logger.warning(
+            "transformers import failed — PyTorch-backed inference will be unavailable",
+            exc_info=e,
+        )
 
 
 def _load_tensorflow() -> Any | None:
@@ -174,9 +183,7 @@ def _download_pretrained_with_retry(
             max_attempts=attempts,
             error=str(exc),
         )
-        raise RuntimeError(
-            f"Failed to download pretrained model {repo!r} after {attempts} attempt(s)"
-        ) from exc
+        raise RuntimeError(f"Failed to download pretrained model {repo!r} after {attempts} attempt(s)") from exc
 
 
 logger = structlog.get_logger(__name__)
@@ -185,7 +192,7 @@ PYTORCH_CHECKPOINT_FORMAT = "bias-detection-pytorch-state-dict"
 PYTORCH_CHECKPOINT_VERSION = 1
 
 
-class ModelService(ABC):
+class ModelService(_ABC):
     """Abstract base class for model services"""
 
     def __init__(self, model_path: str, model_name: str):
@@ -297,9 +304,7 @@ class TensorFlowModelService(ModelService):
                 tokenizer = _download_pretrained_with_retry(
                     AutoTokenizer,
                     repo="bert-base-uncased",
-                    timeout=float(
-                        getattr(settings, "model_timeout", 30)
-                    ),
+                    timeout=float(getattr(settings, "model_timeout", 30)),
                     max_attempts=3,
                 )
                 tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
@@ -330,9 +335,7 @@ class TensorFlowModelService(ModelService):
             return _download_pretrained_with_retry(
                 TFBertForSequenceClassification,
                 repo="bert-base-uncased",
-                timeout=float(
-                    getattr(settings, "model_timeout", 30)
-                ),
+                timeout=float(getattr(settings, "model_timeout", 30)),
                 max_attempts=3,
             )
 
@@ -504,29 +507,26 @@ class TensorFlowModelService(ModelService):
         }
 
 
-# Try to import torch and define base class for module-level serialization compatibility
+# Try to import torch for model creation.
+# When torch is unavailable, BiasDetectionModel raises ImportError at construction time
+# rather than at class-definition time, so we always inherit from _ABC here.
 try:
     import torch
-
-    _Module = torch.nn.Module
 except ImportError:
     torch = None
-    _Module = object  # type: ignore[assignment]
 
 
-class BiasDetectionModel(_Module):
+class BiasDetectionModel:
     HUGGINGFACE_REPO = "bert-base-uncased"
     HUGGINGFACE_DOWNLOAD_TIMEOUT = 30.0
     HUGGINGFACE_MAX_ATTEMPTS = 3
 
     def __init__(self, num_labels: int = 17):
         super().__init__()
-        # Lazily import transformers so a missing package fails fast but cleanly.
+        if torch is None:
+            raise ImportError("torch is required to use BiasDetectionModel")
         from transformers import BertModel  # noqa: PLC0415
 
-        # Prefer a locally cached BERT (no Hub round-trip). Fall back to a
-        # network call with a tight timeout + retry budget so an outage here
-        # cannot block service startup indefinitely.
         try:
             self.bert = BertModel.from_pretrained(
                 self.HUGGINGFACE_REPO,
@@ -621,15 +621,12 @@ class PyTorchModelService(ModelService):
                         self.tokenizer = _download_pretrained_with_retry(
                             AutoTokenizer,
                             repo="bert-base-uncased",
-                            timeout=float(
-                                getattr(settings, "model_timeout", 30)
-                            ),
+                            timeout=float(getattr(settings, "model_timeout", 30)),
                             max_attempts=3,
                         )
                 except Exception as tokenizer_error:
                     logger.warning(
-                        "Failed to load AutoTokenizer from HuggingFace Hub; "
-                        "falling back to BasicTokenizer.",
+                        "Failed to load AutoTokenizer from HuggingFace Hub; falling back to BasicTokenizer.",
                         error=str(tokenizer_error),
                     )
                     self.tokenizer = self._create_basic_tokenizer()
@@ -679,9 +676,7 @@ class PyTorchModelService(ModelService):
                 tokenizer = _download_pretrained_with_retry(
                     AutoTokenizer,
                     repo="bert-base-uncased",
-                    timeout=float(
-                        getattr(settings, "model_timeout", 30)
-                    ),
+                    timeout=float(getattr(settings, "model_timeout", 30)),
                     max_attempts=3,
                 )
                 tokenizer.save_pretrained(str(self.model_path / "tokenizer"))
@@ -695,7 +690,7 @@ class PyTorchModelService(ModelService):
 
         logger.info("Pretrained model downloaded and saved")
 
-    def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
+    def _load_saved_model(self, model_file: Path) -> Any:
         """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
@@ -712,13 +707,14 @@ class PyTorchModelService(ModelService):
 
     def _load_torch_checkpoint(self, model_file: Path) -> Any:
         torch = self._torch
+        assert torch is not None
         return torch.load(
             model_file,
             map_location=self.device,
             weights_only=True,
         )
 
-    def _restore_model_from_checkpoint(self, checkpoint: Any) -> torch.nn.Module:
+    def _restore_model_from_checkpoint(self, checkpoint: Any) -> Any:
         if not isinstance(checkpoint, dict):
             raise TypeError(f"Unexpected checkpoint type {type(checkpoint)!r}; expected a state-dict dict")
 
@@ -731,7 +727,7 @@ class PyTorchModelService(ModelService):
         model.load_state_dict(state_dict)
         return model
 
-    def _save_model(self, model: torch.nn.Module) -> None:
+    def _save_model(self, model: Any) -> None:
         checkpoint = {
             "format": PYTORCH_CHECKPOINT_FORMAT,
             "format_version": PYTORCH_CHECKPOINT_VERSION,
@@ -739,13 +735,14 @@ class PyTorchModelService(ModelService):
             "state_dict": model.state_dict(),
         }
         torch = self._torch
+        assert torch is not None
         # Save atomically: write to temp then rename so a crash never leaves a corrupt file
         tmp_path = self.model_path / "model.pt.tmp"
         final_path = self.model_path / "model.pt"
         torch.save(checkpoint, str(tmp_path))
         tmp_path.rename(final_path)
 
-    def _create_basic_model(self, num_labels: int | None = None) -> torch.nn.Module:
+    def _create_basic_model(self, num_labels: int | None = None) -> Any:
         """Create a basic bias detection model"""
         # Simple BERT-based model for bias detection using top-level BertModel
         _load_transformers()
@@ -843,7 +840,7 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -990,7 +987,7 @@ class ModelEnsembleService:
         for service in self.services:
             try:
                 result = await service.load_model()
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 logger.error(
                     "Model service raised during load; continuing with remaining services",
                     model=getattr(service, "model_name", service.__class__.__name__),
@@ -1093,9 +1090,9 @@ class ModelEnsembleService:
 
     def get_ensemble_info(self) -> dict[str, Any]:
         """Get ensemble service information"""
-        info = {"ensemble_service": True, "models": []}
+        out = {"ensemble_service": True, "models": []}
 
         for service in self.services:
-            info["models"].append(service.get_model_info())
+            out["models"].append(service.get_model_info())
 
-        return info
+        return out
