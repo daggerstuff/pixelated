@@ -46,11 +46,10 @@ export class ThreatQueryProvider {
   ): Promise<HuntFinding[]> {
     try {
       const findings: HuntFinding[] = []
-      const rawPattern = (query['patternMatch'] as string) || 'rate_limit:*'
+      const rawPattern = typeof query['patternMatch'] === 'string' ? query['patternMatch'] : 'rate_limit:*'
       const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-      const pattern = sanitizedSuffix.includes(':')
-        ? sanitizedSuffix
-        : `rate_limit:${sanitizedSuffix}`
+      const cleanSuffix = sanitizedSuffix.replace(/^rate_limit:/, '')
+      const pattern = `rate_limit:${cleanSuffix}`
 
       if (query['patternMatch'] || query['scanEnabled']) {
         const [_nextCursor, keys] = await this.redis.scan(
