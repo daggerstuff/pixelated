@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import time
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -777,16 +778,125 @@ class PyTorchModelService(ModelService):
         }
 
 
+class KeywordBiasModelService(ModelService):
+    """Dependency-free fallback model for degraded local inference."""
+
+    KEYWORDS: dict[BiasType, tuple[str, ...]] = {
+        BiasType.GENDER: ("he", "she", "man", "woman", "male", "female"),
+        BiasType.RACIAL: ("black", "white", "asian", "hispanic", "latino", "race"),
+        BiasType.AGE: ("young", "old", "elderly", "youth", "teen", "senior"),
+        BiasType.RELIGIOUS: ("christian", "muslim", "jewish", "hindu", "buddhist"),
+        BiasType.SOCIOECONOMIC: ("poor", "wealthy", "low-income", "privileged"),
+        BiasType.ABILITY: ("disabled", "disability", "handicapped", "able-bodied"),
+        BiasType.SEXUAL_ORIENTATION: ("gay", "lesbian", "straight", "bisexual"),
+        BiasType.POLITICAL: ("liberal", "conservative", "democrat", "republican"),
+        BiasType.GEOGRAPHIC: ("urban", "rural", "foreign", "local"),
+        BiasType.LANGUAGE: ("accent", "english", "non-native", "fluent"),
+        BiasType.EDUCATIONAL: ("college", "degree", "educated", "uneducated"),
+        BiasType.HEALTH: ("healthy", "sick", "illness", "medical"),
+        BiasType.APPEARANCE: ("attractive", "overweight", "thin", "beautiful"),
+        BiasType.FAMILY_STATUS: ("married", "single", "parent", "children"),
+        BiasType.VETERAN_STATUS: ("veteran", "military", "served"),
+        BiasType.IMMIGRATION: ("immigrant", "citizen", "visa", "undocumented"),
+        BiasType.CRIMINAL_HISTORY: ("felon", "criminal", "convicted", "record"),
+    }
+
+    def __init__(self):
+        super().__init__(settings.model_cache_dir, "keyword_bias_fallback")
+        self.max_length = settings.max_sequence_length
+        self.batch_size = settings.batch_size
+
+    async def load_model(self) -> bool:
+        start_time = time.time()
+        self.model = self.KEYWORDS
+        self.tokenizer = "regex_keyword_matcher"
+        self.is_loaded = True
+        self.load_time = time.time() - start_time
+        logger.info(
+            "Keyword bias fallback model loaded",
+            model_name=self.model_name,
+            keyword_groups=len(self.KEYWORDS),
+        )
+        return True
+
+    async def predict(self, text: str) -> dict[str, Any]:
+        await self.ensure_model_loaded()
+        start_time = time.time()
+        normalized_text = text.lower()
+        tokens = set(re.findall(r"[a-z]+(?:-[a-z]+)?", normalized_text))
+        results: list[dict[str, Any]] = []
+
+        for bias_type, keywords in self.KEYWORDS.items():
+            evidence = [
+                keyword
+                for keyword in keywords
+                if keyword in tokens or (
+                    " " in keyword and keyword in normalized_text
+                )
+            ]
+            if not evidence:
+                continue
+
+            score = min(0.95, 0.35 + (0.15 * len(evidence)))
+            confidence = min(0.9, 0.45 + (0.1 * len(evidence)))
+            confidence_level = self._confidence_level(confidence)
+            results.append(
+                {
+                    "bias_type": bias_type,
+                    "score": score,
+                    "confidence": confidence,
+                    "confidence_level": confidence_level,
+                    "evidence": evidence[:3],
+                    "explanation": (
+                        f"Keyword fallback detected {bias_type.value} bias signals "
+                        f"with {confidence_level.value} confidence"
+                    ),
+                }
+            )
+
+        return {
+            "model_name": self.model_name,
+            "framework": "keyword",
+            "processing_time_ms": int((time.time() - start_time) * 1000),
+            "results": results,
+            "text_hash": self._get_text_hash(text),
+        }
+
+    def _confidence_level(self, confidence: float) -> ConfidenceLevel:
+        if confidence >= 0.8:
+            return ConfidenceLevel.VERY_HIGH
+        if confidence >= 0.6:
+            return ConfidenceLevel.HIGH
+        if confidence >= 0.4:
+            return ConfidenceLevel.MEDIUM
+        return ConfidenceLevel.LOW
+
+    def get_model_info(self) -> dict[str, Any]:
+        return {
+            "name": self.model_name,
+            "framework": "keyword",
+            "version": "1.0.0",
+            "loaded": self.is_loaded,
+            "load_time_ms": int(self.load_time * 1000),
+            "model_path": str(self.model_path),
+            "max_sequence_length": self.max_length,
+            "batch_size": self.batch_size,
+            "fallback": True,
+        }
+
+
 class ModelEnsembleService:
     """Ensemble service combining multiple models"""
 
     def __init__(self):
         self.services = []
+        self.keyword_service = KeywordBiasModelService()
         if not _ml_services_enabled():
             logger.info("Skipping local ML model services due test-time configuration.")
             self.tf_service = None
             self.pt_service = None
             self.nvidia_service = None
+            self.services.append(self.keyword_service)
             return
 
         # Only add TensorFlow service if available
@@ -832,12 +942,36 @@ class ModelEnsembleService:
         """Load all models"""
         results = []
         if not self.services:
-            logger.warning("No model services are configured.")
-            return False
+            logger.warning(
+                "No local ML model services are configured; using keyword fallback."
+            )
+            self.services.append(self.keyword_service)
         for service in self.services:
             result = await service.load_model()
             results.append(result)
-        return all(results)
+        if not any(results) and self.keyword_service not in self.services:
+            logger.warning(
+                "All optional local ML model services failed to load; "
+                "using keyword fallback."
+            )
+            fallback_loaded = await self.keyword_service.load_model()
+            self.services.append(self.keyword_service)
+            results.append(fallback_loaded)
+        if not any(results):
+            logger.error("All configured model services failed to load.")
+            return False
+        if not all(results):
+            failed_models = [
+                service.model_name
+                for service, loaded in zip(self.services, results, strict=True)
+                if not loaded
+            ]
+            logger.warning(
+                "One or more optional model services failed to load; "
+                "continuing with available models.",
+                failed_models=failed_models,
+            )
+        return True
 
     async def predict_ensemble(self, text: str) -> dict[str, Any]:
         """Make ensemble prediction using multiple models"""
@@ -858,7 +992,7 @@ class ModelEnsembleService:
         combined_results = self._combine_results(results)
 
         # Use first available service for text hash
-        hash_service = self.tf_service or self.pt_service
+        hash_service = self.tf_service or self.pt_service or self.keyword_service
         if hash_service is None:
             raise RuntimeError("No model service is available for predictions.")
         return {
