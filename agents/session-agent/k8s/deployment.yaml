@@ -1,0 +1,107 @@
+# Conversation Rehearsal Session Orchestrator eve agent.
+#
+# Deploys the agent as a long-running Node service via the eve standard
+# Nitro build output. Two deployments run in this manifest:
+#
+#   * session-agent       (the orchestrator app)
+#   * session-agent-mc    (model-context sidecar, optional — pulls from
+#                          FORESIGHT_MCP_URL via local stdio->http bridge)
+#
+# Replace the placeholder image tag with the release pipeline's output.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: session-agent
+  namespace: pixelated
+  labels:
+    app: session-agent
+    eve-version: "0.11"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: session-agent
+  template:
+    metadata:
+      labels:
+        app: session-agent
+    spec:
+      containers:
+        - name: agent
+          image: ghcr.io/pixelated/session-agent:PLACEHOLDER
+          ports:
+            - containerPort: 2000
+              name: http
+          env:
+            - name: PORT
+              value: "2000"
+            - name: NODE_ENV
+              value: production
+            - name: AI_GATEWAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vercel-ai-gateway
+                  key: api-key
+            - name: FORESIGHT_MCP_URL
+              value: http://foresight-mcp:8765
+            - name: PIXELATED_SESSION_MCP_URL
+              value: http://session-mcp:8766
+          readinessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: session-agent
+  namespace: pixelated
+spec:
+  selector:
+    app: session-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: 2000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: session-agent
+  namespace: pixelated
+  annotations:
+    # Auth is handled inside the agent; the ingress passes through.
+    nginx.ingress.kubernetes.io/proxy-body-size: 4m
+spec:
+  rules:
+    - host: agents.pixelated.internal
+      http:
+        paths:
+          - path: /eve/v1/session
+            pathType: Prefix
+            backend:
+              service:
+                name: session-agent
+                port:
+                  number: 80
+          - path: /eve/v1/health
+            pathType: Prefix
+            backend:
+              service:
+                name: session-agent
+                port:
+                  number: 80

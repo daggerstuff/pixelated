@@ -10,7 +10,6 @@ allowBuilds:
   '@contrast/fn-inspect': true
   '@dwmkerr/terminal-ai': true
   '@letta-ai/letta-code': true
-  '@schpet/linear-cli': true
   '@modelcontextprotocol/ext-apps': false
   '@newrelic/native-metrics': true
   '@parcel/watcher': true
@@ -68,6 +67,10 @@ allowBuilds:
   win-export-certificate-and-key: true
   workerd: true
   '@sentry/node-cpu-profiler': true
+  '@mongodb-js/zstd': true
+  core-js-pure: true
+  node-liblzma: true
+  '@schpet/linear-cli': set this to true or false
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
@@ -322,4 +325,5 @@ overrides:
   yaml@2.7.1: npm:yaml@2.8.4
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   zod: ^4.3.2
+  solid-js: 1.9.12
   ws: '>=8.21.0'
