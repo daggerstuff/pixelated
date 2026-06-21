@@ -491,7 +491,10 @@ class PyTorchModelService(ModelService):
             model_file = self.model_path / "model.pt"
             torch = self._torch
             if model_file.exists():
-                self.model = torch.load(model_file, map_location=self.device, weights_only=False)
+                # Instantiate model first, then load state dict (avoids pickle issues)
+                self.model = self._create_basic_model()
+                state_dict = torch.load(model_file, map_location=self.device, weights_only=False)
+                self.model.load_state_dict(state_dict)
             else:
                 # Create basic model if not found
                 self.model = self._create_basic_model()
@@ -543,9 +546,9 @@ class PyTorchModelService(ModelService):
         # Create and save a basic bias detection model
         model = self._create_basic_model()
 
-        # Save model
+        # Save model state dict (avoids pickle serialization issues with custom classes)
         torch = self._torch
-        torch.save(model, str(self.model_path / "model.pt"))
+        torch.save(model.state_dict(), str(self.model_path / "model.pt"))
 
         # Save tokenizer
         _load_transformers()
