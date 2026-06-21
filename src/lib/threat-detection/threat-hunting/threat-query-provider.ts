@@ -114,9 +114,10 @@ export class ThreatQueryProvider {
     const skip = (page - 1) * limit
 
     // P3.1 SECURITY FIX: Sanitize input and strictly prefix with 'threat:'.
-    const rawPattern = (searchData['patternMatch'] as string) || '*'
+    const rawPattern = typeof searchData['patternMatch'] === 'string' ? searchData['patternMatch'] : '*'
     const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-    const pattern = `threat:${sanitizedSuffix}`
+    const cleanSuffix = sanitizedSuffix.replace(/^threat:/, '')
+    const pattern = `threat:${cleanSuffix}`
 
     this.pruneCache()
 
