@@ -1,3 +1,5 @@
+import { isSyntheticSentryTestEvent } from './sentry-event-filter.mjs'
+
 // instrument.mjs — Comprehensive Sentry Node.js instrumentation for production builds
 try {
   await import('dotenv/config')
@@ -17,7 +19,7 @@ const createStubScope = () => ({
 
 /** @typedef {{ end: () => void }} SentrySpan */
 /** @typedef {{ data?: unknown }} SentryRequest */
-/** @typedef {{ request?: SentryRequest }} SentryEvent */
+/** @typedef {{ request?: SentryRequest, message?: unknown, exception?: { values?: unknown } }} SentryEvent */
 /** @typedef {{ category?: string; level?: string; [key: string]: unknown }} SentryBreadcrumb */
 /** @typedef {{ setTags: (tags: Record<string, string>) => void; setExtras: (extras: Record<string, unknown>) => void; setUser: (user: SentryUser) => void }} SentryScope */
 /** @typedef {{ id?: string; email?: string; username?: string }} SentryUser */
@@ -245,6 +247,10 @@ Sentry.init({
 
   // Before send hook for filtering sensitive data and dropping local dev errors
   beforeSend: (/** @type {SentryEvent | null} */ event) => {
+    if (isSyntheticSentryTestEvent(event)) {
+      return null
+    }
+
     // Drop events originating from a local server (localhost / 127.0.0.1)
     // so that dev-only errors never appear in Sentry, regardless of which
     // NODE_ENV was set locally for testing.
