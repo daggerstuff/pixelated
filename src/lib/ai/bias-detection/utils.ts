@@ -739,3 +739,22 @@ export function formatTimestamp(timestamp: Date | string | number): string {
     return 'Invalid date'
   }
 }
+
+export function getAllowedOrigin(origin: string | undefined): string {
+  const allowedOriginsEnv = process.env['ALLOWED_ORIGINS']
+  if (!allowedOriginsEnv) {
+    return '' // Strict default
+  }
+
+  const allowedOrigins = allowedOriginsEnv.split(',').map((o) => o.trim())
+
+  if (allowedOrigins.includes('*')) {
+    return '*'
+  }
+
+  if (origin && allowedOrigins.includes(origin)) {
+    return origin
+  }
+
+  return ''
+}
