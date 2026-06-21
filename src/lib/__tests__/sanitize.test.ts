@@ -17,7 +17,7 @@ describe('sanitizeUrl', () => {
   });
 
   it('rejects dangerous and invalid URLs', () => {
-    expect(sanitizeUrl('java' + 'script:alert("XSS")')).toBe('#');
+    expect(sanitizeUrl('javascript:alert("XSS")')).toBe('#'); // oxlint-disable-next-line
     expect(sanitizeUrl('data:text/html,<script>alert("XSS")</script>')).toBe('#');
     expect(sanitizeUrl('vbscript:msgbox("XSS")')).toBe('#');
     expect(sanitizeUrl('//protocol-relative.com')).toBe('#');
