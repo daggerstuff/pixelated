@@ -271,8 +271,60 @@ class TestBiasDetectionService(unittest.TestCase):
                 ),
             ):
                 initialized = await self.service.initialize()
-                assert initialized is True
-                assert self.service.is_initialized is True
+                assert initialized is True  # nosec
+                assert self.service.is_initialized is True  # nosec
+
+        asyncio.run(run())
+
+    def test_initialize_allows_startup_without_configured_model_services(self):
+        async def run():
+            self.service.model_service.services = []
+            with (
+                patch.object(
+                    cache_service, "connect", new_callable=AsyncMock, return_value=True
+                ),
+                patch.object(
+                    self.service.database_service,
+                    "connect",
+                    new_callable=AsyncMock,
+                    return_value=True,
+                ),
+                patch.object(
+                    self.service.model_service,
+                    "load_all_models",
+                    new_callable=AsyncMock,
+                    return_value=False,
+                ),
+            ):
+                initialized = await self.service.initialize()
+                assert initialized is True  # nosec
+                assert self.service.is_initialized is True  # nosec
+
+        asyncio.run(run())
+
+    def test_initialize_fails_when_configured_model_services_fail_to_load(self):
+        async def run():
+            self.service.model_service.services = [MagicMock()]
+            with (
+                patch.object(
+                    cache_service, "connect", new_callable=AsyncMock, return_value=True
+                ),
+                patch.object(
+                    self.service.database_service,
+                    "connect",
+                    new_callable=AsyncMock,
+                    return_value=True,
+                ),
+                patch.object(
+                    self.service.model_service,
+                    "load_all_models",
+                    new_callable=AsyncMock,
+                    return_value=False,
+                ),
+            ):
+                initialized = await self.service.initialize()
+                assert initialized is False  # nosec
+                assert self.service.is_initialized is False  # nosec
 
         asyncio.run(run())
 

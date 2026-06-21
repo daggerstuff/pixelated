@@ -204,8 +204,13 @@ class BiasDetectionService:
             # Load models
             models_loaded = await self.model_service.load_all_models()
             if not models_loaded:
-                logger.error("Model loading failed")
-                return False
+                if self.model_service.has_configured_services():
+                    logger.error("Model loading failed")
+                    return False
+
+                logger.warning(
+                    "No local ML model services configured; starting in degraded mode"
+                )
 
             self.is_initialized = True
             logger.info("Bias detection service initialized successfully")
