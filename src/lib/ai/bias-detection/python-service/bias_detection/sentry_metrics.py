@@ -97,6 +97,39 @@ def before_send_metric(metric: dict[str, Any], _hint: Any) -> dict[str, Any] | N
     return metric
 
 
+def _event_titles(event: dict[str, Any]) -> list[str]:
+    titles: list[str] = []
+    message = event.get("message")
+    if isinstance(message, str) and message.strip():
+        titles.append(message.strip())
+
+    exception = event.get("exception")
+    if not isinstance(exception, dict):
+        return titles
+
+    values = exception.get("values")
+    if not isinstance(values, list):
+        return titles
+
+    for value in values:
+        if not isinstance(value, dict):
+            continue
+
+        exception_value = value.get("value")
+        if isinstance(exception_value, str) and exception_value.strip():
+            titles.append(exception_value.strip())
+
+    return titles
+
+
+def before_send_event(event: dict[str, Any], _hint: Any) -> dict[str, Any] | None:
+    """Drop synthetic Sentry smoke-test events before they reach production."""
+    if any(title.lower().startswith("test:") for title in _event_titles(event)):
+        return None
+
+    return event
+
+
 def init_sentry(
     *,
     dsn: str | None = None,
@@ -142,6 +175,7 @@ def init_sentry(
         profiles_sample_rate=s_config.profiles_sample_rate,
         # Metrics support (enabled by default in SDK 2.44.0+)
         before_send_metric=before_send_metric,
+        before_send=before_send_event,
         # Additional options
         send_default_pii=True,
         # Add Flask integration if available
@@ -604,6 +638,7 @@ __all__ = [
     "BiasMetrics",
     "ServiceMetrics",
     "api_metrics",
+    "before_send_event",
     "bias_metrics",
     "count_metric",
     "distribution_metric",
