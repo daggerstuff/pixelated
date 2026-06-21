@@ -839,6 +839,10 @@ class ModelEnsembleService:
             results.append(result)
         return all(results)
 
+    def has_configured_services(self) -> bool:
+        """Return whether any local ML model services are configured."""
+        return bool(self.services)
+
     async def predict_ensemble(self, text: str) -> dict[str, Any]:
         """Make ensemble prediction using multiple models"""
         await self.load_all_models()

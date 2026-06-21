@@ -276,6 +276,58 @@ class TestBiasDetectionService(unittest.TestCase):
 
         asyncio.run(run())
 
+    def test_initialize_allows_startup_without_configured_model_services(self):
+        async def run():
+            self.service.model_service.services = []
+            with (
+                patch.object(
+                    cache_service, "connect", new_callable=AsyncMock, return_value=True
+                ),
+                patch.object(
+                    self.service.database_service,
+                    "connect",
+                    new_callable=AsyncMock,
+                    return_value=True,
+                ),
+                patch.object(
+                    self.service.model_service,
+                    "load_all_models",
+                    new_callable=AsyncMock,
+                    return_value=False,
+                ),
+            ):
+                initialized = await self.service.initialize()
+                assert initialized is True
+                assert self.service.is_initialized is True
+
+        asyncio.run(run())
+
+    def test_initialize_fails_when_configured_model_services_fail_to_load(self):
+        async def run():
+            self.service.model_service.services = [MagicMock()]
+            with (
+                patch.object(
+                    cache_service, "connect", new_callable=AsyncMock, return_value=True
+                ),
+                patch.object(
+                    self.service.database_service,
+                    "connect",
+                    new_callable=AsyncMock,
+                    return_value=True,
+                ),
+                patch.object(
+                    self.service.model_service,
+                    "load_all_models",
+                    new_callable=AsyncMock,
+                    return_value=False,
+                ),
+            ):
+                initialized = await self.service.initialize()
+                assert initialized is False
+                assert self.service.is_initialized is False
+
+        asyncio.run(run())
+
     def test_analyze_bias_returns_expected_payload(self):
         async def run():
             self.service.is_initialized = True
