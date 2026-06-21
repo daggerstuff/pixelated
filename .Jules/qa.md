@@ -1,0 +1,1 @@
+## 2026-06-21 - API Key Validation Timeout Test | Pattern: Time Dependent Testing with vitest | Action: Used `vi.useFakeTimers()` along with `vi.advanceTimersByTimeAsync()` to properly fast-forward through timeouts instead of waiting for natural timeouts to complete, especially useful when racing promises or mocking promise rejections.
