@@ -1,4 +1,4 @@
-import React, { useState, FC } from 'react'
+import React, { useState, useMemo, FC } from 'react'
 
 import type { TreatmentRecommendation } from '../../lib/ai/services/RecommendationService'
 import RecommendationDisplay from '../ai/RecommendationDisplay'
@@ -64,10 +64,12 @@ const TreatmentPlanner: FC<TreatmentPlannerProps> = ({
     }
   }
 
-  const filteredRecommendations =
-    filter === 'all'
+  // ⚡ Bolt: Memoize filtered recommendations to prevent O(N) filtering array allocations on every render
+  const filteredRecommendations = useMemo(() => {
+    return filter === 'all'
       ? recommendations
       : recommendations.filter((rec) => rec.priority === filter)
+  }, [filter, recommendations])
 
   return (
     <>
