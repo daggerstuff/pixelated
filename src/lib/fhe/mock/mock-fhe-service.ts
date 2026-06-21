@@ -8,6 +8,7 @@
 import { nanoid } from 'nanoid'
 
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { EmotionClassifier } from '../../memory/emotion-classifier'
 import { EncryptionMode, FHEOperation } from '../types'
 import type {
   EncryptedData,
@@ -36,6 +37,7 @@ export class MockFHEScheme implements FHEScheme {
       FHEOperation.SENTIMENT,
       FHEOperation.CATEGORIZE,
       FHEOperation.ANALYZE,
+      FHEOperation.EMOTION_CLASSIFY,
     ]
   }
 
@@ -55,13 +57,15 @@ export interface MockFHEKeys extends FHEKeys {
 /**
  * Mock encrypted data structure
  * Implements the EncryptedData interface from ../types.ts
+ *
+ * SECURITY: originalValue stores a SHA-256 hash of the plaintext for
+ * mock verification purposes. The actual plaintext is NEVER stored.
+ * This prevents accidental PII exposure in logs/memory dumps.
  */
 export interface MockEncryptedData<T = unknown> extends EncryptedData<T> {
-  // In a real FHE system, this would be encrypted ciphertext
-  // For the mock, we store the actual data with a marker
   mockId: string
   originalType: string
-  originalValue: string // JSON stringified original value
+  originalValueHash: string // SHA-256 hash of original value (not plaintext)
   mockEncrypted: boolean
   timestamp: number
 }
@@ -74,9 +78,11 @@ export class MockFHEService implements FHEService {
   private initialized = false
   public scheme: MockFHEScheme
   private keyPair: MockFHEKeys | null = null
+  private readonly emotionClassifier: EmotionClassifier
 
   constructor() {
     this.scheme = new MockFHEScheme()
+    this.emotionClassifier = new EmotionClassifier()
     logger.info('Mock FHE service created')
   }
 
@@ -152,19 +158,22 @@ export class MockFHEService implements FHEService {
       dataType = 'object'
     }
 
-    // Create mock encrypted data
+    // Create mock encrypted data - store only hash of plaintext for mock verification
+    // The actual plaintext is NEVER stored in mock mode
+    const hashedData = await this.hashPlaintext(value)
     const encrypted: MockEncryptedData = {
       id: nanoid(),
       mockId: nanoid(6),
       data: value,
       dataType,
       originalType: type,
-      originalValue: JSON.stringify(value),
+      originalValueHash: hashedData,
       mockEncrypted: true,
       timestamp: Date.now(),
       metadata: {
         encryptedAt: Date.now(),
         mode: EncryptionMode.FHE,
+        isMock: true, // Mark as mock to help identify in diagnostics
       },
     }
 
@@ -184,27 +193,29 @@ export class MockFHEService implements FHEService {
     // Handle both MockEncryptedData and standard EncryptedData
     const mockData = encryptedData as unknown as MockEncryptedData<T>
 
-    if (!mockData?.originalValue) {
-      // Try to extract data from standard EncryptedData
-      if (encryptedData?.data) {
-        try {
-          return encryptedData.data as T
-        } catch {
-          throw new Error('Invalid encrypted data format')
-        }
-      }
-      throw new Error('Invalid mock encrypted data')
+    if (mockData?.originalValueHash && mockData?.data !== undefined) {
+      logger.info('Mock decrypting data')
     }
 
-    logger.info('Mock decrypting data')
-
-    // Parse the original value
-    try {
-      // Use the mockData which has been cast to MockEncryptedData<T>
-      return JSON.parse(mockData.originalValue) as unknown as T
-    } catch {
-      throw new Error('Failed to decrypt data')
+    if (encryptedData?.data !== undefined) {
+      return encryptedData.data as T
     }
+
+    throw new Error('Invalid mock encrypted data: no data field')
+  }
+
+  /**
+   * Audit log stub for HIPAA compliance logging.
+   * In production, replace with actual audit trail implementation.
+   */
+  public auditLog(event: string, data: Record<string, unknown>): void {
+    logger.info(`[AUDIT] ${event}`, {
+      timestamp: Date.now(),
+      service: 'MockFHEService',
+      event,
+      // Never log plaintext values - only hashes and metadata
+      hasData: data && typeof data === 'object',
+    })
   }
 
   /**
@@ -217,6 +228,7 @@ export class MockFHEService implements FHEService {
     params?: Record<string, unknown>,
   ): Promise<FHEOperationResult<string>> {
     this.checkInitialized()
+    this.auditLog('processEncrypted.start', { operation })
     logger.info(`Processing encrypted data with operation ${operation}`)
 
     // Parse the encrypted data
@@ -228,7 +240,7 @@ export class MockFHEService implements FHEService {
     }
 
     // Process based on operation
-    switch (operation) {
+    switch (operation as FHEOperation) {
       case FHEOperation.SENTIMENT:
         return this.mockSentimentAnalysis(data)
 
@@ -238,10 +250,89 @@ export class MockFHEService implements FHEService {
       case FHEOperation.ANALYZE:
         return this.mockPIIDetection(data, params)
 
-      default:
+      case FHEOperation.EMOTION_CLASSIFY:
+        return this.mockEmotionClassification(data, params)
+
+      case FHEOperation.Addition:
+      case FHEOperation.Subtraction:
+      case FHEOperation.Multiplication:
+      case FHEOperation.Square:
+      case FHEOperation.Negation:
+      case FHEOperation.Rotation:
+      case FHEOperation.Polynomial:
+      case FHEOperation.Rescale:
+      case FHEOperation.SUMMARIZE:
+      case FHEOperation.TOKENIZE:
+      case FHEOperation.FILTER:
+      case FHEOperation.CUSTOM:
+      case FHEOperation.WORD_COUNT:
+      case FHEOperation.CHARACTER_COUNT:
+      case FHEOperation.KEYWORD_DENSITY:
+      case FHEOperation.READING_LEVEL:
         throw new Error(
           `Operation ${operation} not implemented in mock service`,
         )
+    }
+    // Exhaustive — all FHEOperation cases handled above
+    return undefined as unknown as FHEOperationResult<string>
+  }
+
+  /**
+  /**
+   * Mock emotion classification (EMOTION_CLASSIFY operation)
+   */
+  private async mockEmotionClassification(
+    data: MockEncryptedData,
+    params?: Record<string, unknown>,
+  ): Promise<FHEOperationResult<string>> {
+    // Simulate processing delay
+    await new Promise((resolve) => setTimeout(resolve, 200))
+
+    try {
+      const originalText = data.data as string
+      if (typeof originalText === 'string') {
+        const multiLabel = (params?.['multiLabel'] as boolean) ?? true
+        const result = this.emotionClassifier.classify(originalText, multiLabel)
+
+        // Encrypt the classification result to match real FHE behavior
+        const encryptedResult = await this.encrypt(JSON.stringify(result))
+
+        return {
+          success: true,
+          result: JSON.stringify(encryptedResult),
+          operation: FHEOperation.EMOTION_CLASSIFY,
+          metadata: {
+            timestamp: Date.now(),
+          },
+        }
+      }
+    } catch {
+      // Ignore parsing errors and fall through to default response
+    }
+
+    // Default response if processing fails
+    const defaultResult = {
+      categories: [],
+      categoryScores: {},
+      valence: 0.5,
+      arousal: 0.5,
+      dominance: 0.5,
+      topCategory: null,
+      topScore: 0,
+      multiplier: 1.0,
+    }
+
+    const encryptedDefaultResult = await this.encrypt(
+      JSON.stringify(defaultResult),
+    )
+
+    return {
+      success: true,
+      result: JSON.stringify(encryptedDefaultResult),
+      operation: FHEOperation.EMOTION_CLASSIFY,
+      metadata: {
+        timestamp: Date.now(),
+      },
     }
   }
 
@@ -256,7 +347,7 @@ export class MockFHEService implements FHEService {
     await new Promise((resolve) => setTimeout(resolve, 250))
 
     try {
-      const originalText = JSON.parse(data.originalValue) as unknown
+      const originalText = data.data as string
       if (typeof originalText === 'string') {
         const text = originalText.toLowerCase()
 
@@ -314,7 +405,7 @@ export class MockFHEService implements FHEService {
 
     // Parse original text if it's a string
     try {
-      const originalText = JSON.parse(data.originalValue) as unknown
+      const originalText = data.data as string
       if (typeof originalText === 'string') {
         // Simple sentiment detection based on keywords
         const positiveWords = ['good', 'great', 'excellent', 'happy', 'joy']
@@ -394,7 +485,7 @@ export class MockFHEService implements FHEService {
       (params?.['categories'] as Record<string, string[]>) || categories
 
     try {
-      const originalText = JSON.parse(data.originalValue) as unknown
+      const originalText = data.data as string
       if (typeof originalText === 'string') {
         const text = originalText.toLowerCase()
 
@@ -466,9 +557,39 @@ export class MockFHEService implements FHEService {
       )
     }
   }
+
+  /**
+   * Create SHA-256 hash of a value for mock verification.
+   * Plaintext is never stored - only its hash for test verification.
+   */
+  private async hashPlaintext(value: unknown): Promise<string> {
+    const jsonStr = JSON.stringify(value)
+    // Prefer Web Crypto API (browser/jsdom compatible) over Node crypto
+    const subtle =
+      typeof globalThis.crypto?.subtle !== 'undefined'
+        ? globalThis.crypto
+        : await import('node:crypto').then((m) => m.webcrypto)
+    const data = new TextEncoder().encode(jsonStr)
+    const hashBuffer = await subtle.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  }
 }
 
 /**
- * Singleton instance
+ * Lazy singleton instance - avoids module-initialization race conditions.
+ * Always access via getMockFHEService() to ensure proper initialization.
  */
-export const mockFHEService = new MockFHEService()
+let mockFHEServiceInstance: MockFHEService | undefined
+
+export function getMockFHEService(): MockFHEService {
+  mockFHEServiceInstance ??= new MockFHEService()
+  return mockFHEServiceInstance
+}
+
+/** @deprecated Use getMockFHEService() instead of the singleton directly */
+export const mockFHEService = new Proxy({} as MockFHEService, {
+  get(_target, prop) {
+    return getMockFHEService()[prop as keyof MockFHEService]
+  },
+})

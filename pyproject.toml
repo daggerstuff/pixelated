@@ -24,7 +24,6 @@ dependencies = [
   "cryptography>=46.0.6", # Updated to latest secure version
   "requests>=2.33.0", # Fixes CVE-2024-47081 (.netrc credentials leak via malicious URLs)
   "python-dotenv>=1.2.1", # Updated to latest secure version
-  
   "numba>=0.63.1",
   "faiss-cpu>=1.11.0",
   "matplotlib>=3.10.3",
@@ -129,6 +128,7 @@ dependencies = [
   "libcst>=1.8.6",
   "data-designer>=0.6.1",
   "nemoguardrails>=0.22.0",
+  "pinecone-client>=6.0.0",
 ]
 [project.optional-dependencies]
 test = [

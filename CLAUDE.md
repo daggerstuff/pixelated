@@ -36,6 +36,12 @@
   `manage_subconscious` (`list`, `get` for `pending_items` and
   `project_context`) and `search_memories` for active/upcoming work.
   - If these calls are unavailable, pause edits and switch to the local continuity fallback.
+- **Prefer Droid's structured workflows** for non-trivial code:
+  - **Spec Mode** (`Shift+Tab` or `/spec`) for well-scoped single features — produces an
+    `IMPLEMENTATION_PLAN.md` for auditability.
+  - **Missions** (`/missions`) for multi-feature refactors or 50+ file work — produces a
+    milestones-backed plan and orchestration via Mission Control.
+  - See "Droid Workflow" section in root `AGENTS.md` for triggers and the PM playbook.
 
 ### ⚠️ Ask first
 

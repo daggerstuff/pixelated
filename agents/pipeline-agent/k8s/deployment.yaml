@@ -1,0 +1,93 @@
+# pipeline-agent (PIX-3959) K8s manifest.
+#
+# Deploys the pipeline orchestrator as a long-running Node service with a
+# cron-scheduled entry (weekly-train.ts). Outside Vercel, point the host
+# scheduler at POST /eve/v1/dev/schedules/weekly-train.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipeline-agent
+  namespace: pixelated
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pipeline-agent
+  template:
+    metadata:
+      labels:
+        app: pipeline-agent
+    spec:
+      containers:
+        - name: agent
+          image: ghcr.io/pixelated/pipeline-agent:PLACEHOLDER
+          ports:
+            - containerPort: 2000
+              name: http
+          env:
+            - name: PORT
+              value: "2000"
+            - name: NODE_ENV
+              value: production
+            - name: AI_GATEWAY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vercel-ai-gateway
+                  key: api-key
+            - name: SLACK_BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: slack-bot
+                  key: bot-token
+            - name: SLACK_SIGNING_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: slack-bot
+                  key: signing-secret
+            - name: LINEAR_AGENT_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: access-token
+            - name: LINEAR_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: linear-agent
+                  key: webhook-secret
+            - name: TRAINING_INFRA_MCP_URL
+              value: http://training-infra-mcp:8766
+            - name: K8S_MCP_URL
+              value: http://k8s-mcp:8767
+            - name: FORESIGHT_MCP_URL
+              value: http://foresight-mcp:8765
+          readinessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /eve/v1/health
+              port: 2000
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: "2"
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipeline-agent
+  namespace: pixelated
+spec:
+  selector:
+    app: pipeline-agent
+  ports:
+    - name: http
+      port: 80
+      targetPort: 2000
