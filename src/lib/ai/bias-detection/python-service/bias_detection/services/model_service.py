@@ -19,8 +19,6 @@ from bias_detection.models import BiasType, ConfidenceLevel
 
 if TYPE_CHECKING:
     import torch
-    from torch import Tensor as TorchTensor
-    from torch.nn import Module as ModuleBase
 
 TRANSFORMER_IMPORT_ATTEMPTED = False
 TRANSFORMERS_AVAILABLE = False
@@ -124,6 +122,9 @@ def _ml_services_enabled() -> bool:
 
 logger = structlog.get_logger(__name__)
 
+PYTORCH_CHECKPOINT_FORMAT = "bias-detection-pytorch-state-dict"
+PYTORCH_CHECKPOINT_VERSION = 1
+
 
 class ModelService(ABC):
     """Abstract base class for model services"""
@@ -181,8 +182,8 @@ class TensorFlowModelService(ModelService):
                 logger.warning(f"Model path {self.model_path} does not exist")
                 await self._download_pretrained_model()
 
-            # Load model — tf is guaranteed non-None here (constructor raises if TF unavailable)
-            assert tf is not None, "TensorFlow must be available"
+            if tf is None:
+                raise RuntimeError("TensorFlow must be available")
             self.model = tf.keras.models.load_model(str(self.model_path))
 
             # Load tokenizer
@@ -417,26 +418,23 @@ class TensorFlowModelService(ModelService):
         }
 
 
-# Define base class — TYPE_CHECKING uses torch.nn.Module so type checker sees the proper class.
-# At runtime, torch may be None and we fall back to object so the class is still defined.
+# Try to import torch and define base class for module-level serialization compatibility
 try:
     import torch
 
-    _Module: type[ModuleBase] = torch.nn.Module  # type: ignore[assignment]
+    _Module = torch.nn.Module
 except ImportError:
     torch = None
     _Module = object  # type: ignore[assignment]
 
 
-class BiasDetectionModel(_Module):  # type: ignore[reportGeneralTypeIssues]
+class BiasDetectionModel(_Module):
     def __init__(self, num_labels: int = 17):
         super().__init__()
         # Import dynamically to avoid early import failures
         from transformers import BertModel  # noqa: PLC0415
 
         self.bert = BertModel.from_pretrained("bert-base-uncased")
-        # torch is the module-level variable loaded by the import above; assert guards pyright
-        assert torch is not None
         self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
         self.dropout = torch.nn.Dropout(0.1)
 
@@ -468,31 +466,6 @@ class PyTorchModelService(ModelService):
         torch = self._torch
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    def _validate_model_file(self, model_file: Path) -> bool:
-        """Check that model_file is a valid PyTorch ZIP archive containing data.pkl."""
-        import zipfile  # noqa: PLC0415
-
-        if not model_file.exists() or model_file.stat().st_size == 0:
-            return False
-        try:
-            with zipfile.ZipFile(model_file, "r") as zf:
-                names = zf.namelist()
-            return any(n.endswith("data.pkl") for n in names)
-        except Exception:
-            return False
-
-    def _load_state_dict_from_file(self, model_file: Path, torch: Any) -> BiasDetectionModel:
-        """Reconstruct a BiasDetectionModel from a state_dict checkpoint.
-
-        Loads the parameters with weights_only=True (PyTorch 2.6+ safe)
-        because the checkpoint is a plain state_dict and never embeds the
-        BiasDetectionModel class reference.
-        """
-        assert torch is not None
-        model = BiasDetectionModel()
-        model.load_state_dict(torch.load(model_file, map_location=self.device, weights_only=True))
-        return model
-
     async def load_model(self) -> bool:  # noqa: PLR0912
         """Load PyTorch model"""
         try:
@@ -512,27 +485,8 @@ class PyTorchModelService(ModelService):
 
             # Load model
             model_file = self.model_path / "model.pt"
-            torch = self._torch
             if model_file.exists():
-                if not self._validate_model_file(model_file):
-                    logger.warning(
-                        "model.pt failed integrity check (corrupt or incomplete); regenerating",
-                        model_path=str(self.model_path),
-                    )
-                    model_file.unlink()
-                    await self._download_pretrained_model()
-
-                try:
-                    self.model = self._load_state_dict_from_file(model_file, torch)
-                except Exception as load_exc:
-                    logger.warning(
-                        f"PyTorch model file failed to load ({load_exc}); regenerating",
-                        model_path=str(model_file),
-                        error=str(load_exc),
-                    )
-                    model_file.unlink(missing_ok=True)
-                    await self._download_pretrained_model()
-                    self.model = self._load_state_dict_from_file(model_file, torch)
+                self.model = self._load_saved_model(model_file)
             else:
                 # Create basic model if not found
                 self.model = self._create_basic_model()
@@ -584,18 +538,8 @@ class PyTorchModelService(ModelService):
         # Create and save a basic bias detection model
         model = self._create_basic_model()
 
-        # Save model atomically: write to a temp file then rename so a crash
-        # mid-write never leaves a corrupt model.pt on disk.
-        # Save the state_dict only (not the full model object) so the
-        # checkpoint never embeds a custom class reference. This keeps the
-        # round-trip compatible with PyTorch 2.6+ where torch.load defaults
-        # to weights_only=True and would otherwise reject custom globals.
-        torch = self._torch
-        assert torch is not None
-        tmp_path = self.model_path / "model.pt.tmp"
-        final_path = self.model_path / "model.pt"
-        torch.save(model.state_dict(), str(tmp_path))
-        tmp_path.rename(final_path)
+        # Save model
+        self._save_model(model)
 
         # Save tokenizer
         _load_transformers()
@@ -607,14 +551,67 @@ class PyTorchModelService(ModelService):
 
         logger.info("Pretrained model downloaded and saved")
 
-    def _create_basic_model(self) -> BiasDetectionModel:
+    def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
+        """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
+        try:
+            checkpoint = self._load_torch_checkpoint(model_file)
+            return self._restore_model_from_checkpoint(checkpoint)
+        except Exception as state_dict_error:
+            logger.warning(
+                "Failed to load PyTorch state-dict checkpoint; regenerating model.",
+                model_path=str(model_file),
+                error=str(state_dict_error),
+            )
+            model = self._create_basic_model()
+            self._save_model(model)
+            return model
+
+    def _load_torch_checkpoint(self, model_file: Path) -> Any:
+        torch = self._torch
+        return torch.load(
+            model_file,
+            map_location=self.device,
+            weights_only=True,
+        )
+
+    def _restore_model_from_checkpoint(self, checkpoint: Any) -> torch.nn.Module:
+        if not isinstance(checkpoint, dict):
+            raise TypeError(f"Unexpected checkpoint type {type(checkpoint)!r}; expected a state-dict dict")
+
+        state_dict = checkpoint.get("state_dict")
+        if state_dict is None:
+            state_dict = checkpoint
+
+        num_labels = checkpoint.get("num_labels", len(BiasType.__members__))
+        model = self._create_basic_model(num_labels=num_labels)
+        model.load_state_dict(state_dict)
+        return model
+
+    def _save_model(self, model: torch.nn.Module) -> None:
+        checkpoint = {
+            "format": PYTORCH_CHECKPOINT_FORMAT,
+            "format_version": PYTORCH_CHECKPOINT_VERSION,
+            "num_labels": len(BiasType.__members__),
+            "state_dict": model.state_dict(),
+        }
+        torch = self._torch
+        # Save atomically: write to temp then rename so a crash never leaves a corrupt file
+        tmp_path = self.model_path / "model.pt.tmp"
+        final_path = self.model_path / "model.pt"
+        torch.save(checkpoint, str(tmp_path))
+        tmp_path.rename(final_path)
+
+    def _create_basic_model(self, num_labels: int | None = None) -> torch.nn.Module:
         """Create a basic bias detection model"""
         # Simple BERT-based model for bias detection using top-level BertModel
         _load_transformers()
         if BertModel is None:
             raise ImportError("transformers BertModel is not available for PyTorch model creation.")
 
-        return BiasDetectionModel()
+        kwargs = {}
+        if num_labels is not None:
+            kwargs["num_labels"] = num_labels
+        return BiasDetectionModel(**kwargs)
 
     def _create_basic_tokenizer(self, max_length: int | None = None) -> Any:
         max_length = max_length or self.max_length
@@ -702,7 +699,7 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: TorchTensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
