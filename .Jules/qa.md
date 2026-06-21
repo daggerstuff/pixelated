@@ -1,1 +1,2 @@
+## YYYY-MM-DD - Test _encrypt_email in auth routes | Pattern: Missing module mocking in unit tests | Action: Use patch.dict on sys.modules or direct function import bypass for uninstalled FastAPI
 ## 2026-06-21 - API Key Validation Timeout Test | Pattern: Time Dependent Testing with vitest | Action: Used `vi.useFakeTimers()` along with `vi.advanceTimersByTimeAsync()` to properly fast-forward through timeouts instead of waiting for natural timeouts to complete, especially useful when racing promises or mocking promise rejections.
