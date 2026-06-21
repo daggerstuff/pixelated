@@ -18,6 +18,11 @@ class FakeModel:
         self.loaded_state_dict = state_dict
 
 
+class RejectingModel(FakeModel):
+    def load_state_dict(self, _state_dict: dict[str, str]) -> None:
+        raise RuntimeError("invalid state dict")
+
+
 class FakeTorch:
     def __init__(self, load_results: list[Any] | None = None) -> None:
         self.load_results = load_results or []
@@ -47,6 +52,7 @@ class FakeTorch:
     def save(self, checkpoint: dict[str, Any], path: str) -> None:
         self.saved_checkpoint = checkpoint
         self.saved_path = path
+        Path(path).write_text("checkpoint")
 
 
 def create_service(fake_torch: FakeTorch, model_path: Path) -> PyTorchModelService:
@@ -55,6 +61,13 @@ def create_service(fake_torch: FakeTorch, model_path: Path) -> PyTorchModelServi
     service.device = "cpu"
     service.model_path = model_path
     return service
+
+
+def basic_model_factory(model: FakeModel):
+    def create_basic_model(**_kwargs):
+        return model
+
+    return create_basic_model
 
 
 def require_equal(actual: Any, expected: Any) -> None:
@@ -84,7 +97,9 @@ def test_save_model_persists_state_dict_checkpoint(tmp_path: Path) -> None:
 
     service._save_model(model)
 
-    require_equal(fake_torch.saved_path, str(tmp_path / "model.pt"))
+    require_equal(fake_torch.saved_path, str(tmp_path / "model.pt.tmp"))
+    require_true((tmp_path / "model.pt").exists())
+    require_true(not (tmp_path / "model.pt.tmp").exists())
     require_equal(
         fake_torch.saved_checkpoint["format"],
         PYTORCH_CHECKPOINT_FORMAT,
@@ -101,7 +116,7 @@ def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None
     fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": state_dict}])
     service = create_service(fake_torch, tmp_path)
     model = FakeModel()
-    service._create_basic_model = lambda: model
+    service._create_basic_model = basic_model_factory(model)
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
@@ -110,23 +125,16 @@ def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None
     require_true(fake_torch.load_calls[0]["weights_only"])
 
 
-def test_load_saved_model_regenerates_unloadable_legacy_pickle(
-    tmp_path: Path,
-) -> None:
-    fake_torch = FakeTorch(
-        [
-            AttributeError(
-                "Can't get local object 'PyTorchModelService._create_basic_model.<locals>.BiasDetectionModel'"
-            ),
-        ]
-    )
+def test_load_saved_model_regenerates_invalid_safe_checkpoint(tmp_path: Path) -> None:
+    fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": {"bad": "state"}}])
     service = create_service(fake_torch, tmp_path)
-    model = FakeModel()
-    service._create_basic_model = lambda: model
+    model = RejectingModel()
+    service._create_basic_model = basic_model_factory(model)
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
     require_is(loaded_model, model)
+    require_equal(len(fake_torch.load_calls), 1)
     require_true(fake_torch.load_calls[0]["weights_only"])
     require_equal(
         fake_torch.saved_checkpoint["state_dict"],
@@ -134,11 +142,17 @@ def test_load_saved_model_regenerates_unloadable_legacy_pickle(
     )
 
 
-def test_load_saved_model_regenerates_full_model_pickle(tmp_path: Path) -> None:
-    fake_torch = FakeTorch([RuntimeError("unsupported global")])
+def test_load_saved_model_regenerates_when_safe_checkpoint_load_fails(
+    tmp_path: Path,
+) -> None:
+    fake_torch = FakeTorch(
+        [
+            RuntimeError("Weights only load failed"),
+        ]
+    )
     service = create_service(fake_torch, tmp_path)
     model = FakeModel()
-    service._create_basic_model = lambda: model
+    service._create_basic_model = basic_model_factory(model)
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
