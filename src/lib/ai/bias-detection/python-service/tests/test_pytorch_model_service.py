@@ -144,7 +144,7 @@ def test_load_saved_model_regenerates_invalid_safe_checkpoint(tmp_path: Path) ->
     )
 
 
-def test_load_saved_model_regenerates_unloadable_legacy_pickle(
+def test_load_saved_model_regenerates_when_safe_checkpoint_load_fails(
     tmp_path: Path,
 ) -> None:
     fake_torch = FakeTorch(
