@@ -1,2 +1,1 @@
-## YYYY-MM-DD - Test _encrypt_email in auth routes | Pattern: Missing module mocking in unit tests | Action: Use patch.dict on sys.modules or direct function import bypass for uninstalled FastAPI
-## 2026-06-21 - API Key Validation Timeout Test | Pattern: Time Dependent Testing with vitest | Action: Used `vi.useFakeTimers()` along with `vi.advanceTimersByTimeAsync()` to properly fast-forward through timeouts instead of waiting for natural timeouts to complete, especially useful when racing promises or mocking promise rejections.
+## 2025-02-27 - Test RBAC Dependency | Pattern: Missing Dependency Test | Action: Added explicit test case for `same_tenant_or_super_admin` in `src/pe/tests/test_rbac.py`
