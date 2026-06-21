@@ -5,7 +5,8 @@ Generates a hub-and-spoke memory pattern for lazy loading.
 """
 
 import re
-from datetime import datetime
+import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 SKILLS_DIR = Path(".agents/skills")
@@ -19,35 +20,58 @@ def extract_yaml_frontmatter(content):
         return None
     yaml_text = yaml_match.group(1)
     metadata = {}
-    for line in yaml_text.split("\n"):
-        line = line.strip()
-        if not line or line.startswith("#"):
+    lines = yaml_text.split("\n")
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            i += 1
             continue
-        if ":" in line:
-            key, value = line.split(":", 1)
-            key = key.strip()
-            value = value.strip().strip('"').strip("'")
-            metadata[key] = value
+        if ":" not in stripped:
+            i += 1
+            continue
+        key, value = stripped.split(":", 1)
+        key = key.strip()
+        value = value.strip()
+        # Folded scalar ">" — accumulate following indented lines.
+        if value == ">":
+            collected = []
+            i += 1
+            while i < len(lines):
+                nxt = lines[i]
+                if not nxt.strip():
+                    i += 1
+                    break
+                if not nxt.startswith((" ", "\t")):
+                    break
+                collected.append(nxt.strip())
+                i += 1
+            metadata[key] = " ".join(collected).strip().strip('"').strip("'")
+            continue
+        # Plain key:value
+        metadata[key] = value.strip('"').strip("'")
+        i += 1
     return metadata
 
 
 def extract_short_description(content, max_length=120):
     """Extract a concise description from the skill content."""
-    # Try getting from YAML description first
+    # Try getting from YAML description first; support folded scalars (">").
     yaml_meta = extract_yaml_frontmatter(content)
     if yaml_meta and "description" in yaml_meta:
-        desc = yaml_meta["description"]
-        if len(desc) > max_length:
-            desc = desc[: max_length - 3] + "..."
-        return desc
+        desc = yaml_meta["description"].replace("\n", " ").strip()
+        if desc:
+            if len(desc) > max_length:
+                desc = desc[: max_length - 3] + "..."
+            return desc
 
-    # Fallback: get first paragraph after frontmatter
     after_frontmatter = re.sub(r"^---\n.*?\n---\n", "", content, flags=re.DOTALL)
     paragraphs = [p.strip() for p in after_frontmatter.split("\n\n") if p.strip()]
     for para in paragraphs:
         if not para.startswith("#") and len(para) > 20:
             if len(para) > max_length:
-                para = para[: max_length - 3] + "..."
+                return para[: max_length - 3] + "..."
             return para
 
     return "No description available."
@@ -60,7 +84,7 @@ def scan_skills():
     populated = 0
 
     if not SKILLS_DIR.exists():
-        print(f"Error: {SKILLS_DIR} does not exist")
+        sys.stdout.write(f"Error: {SKILLS_DIR} does not exist\n")
         return skills, total_dirs, populated
 
     for skill_dir in sorted(SKILLS_DIR.iterdir()):
@@ -120,9 +144,9 @@ def scan_skills():
     return skills, total_dirs, populated
 
 
-def generate_index(skills, total_dirs, populated):
+def generate_index(skills, _total_dirs, populated):
     """Generate the skills-index.md content."""
-    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     total_skills = len(skills)
 
     lines = [
@@ -197,17 +221,17 @@ def generate_index(skills, total_dirs, populated):
 
 
 def main():
-    print("Scanning .agents/skills/ directory...")
+    sys.stdout.write("Scanning .agents/skills/ directory...\n")
     skills, total_dirs, populated = scan_skills()
-    print(f"Found {total_dirs} skill directories, {populated} populated")
+    sys.stdout.write(f"Found {total_dirs} skill directories, {populated} populated\n")
 
     index_content = generate_index(skills, total_dirs, populated)
     INDEX_FILE.write_text(index_content)
-    print(f"Wrote skills index to {INDEX_FILE}")
-    print(f"Index size: {len(index_content):,} characters (~{len(index_content) // 4:,} tokens)")
+    sys.stdout.write(f"Wrote skills index to {INDEX_FILE}\n")
+    sys.stdout.write(f"Index size: {len(index_content):,} characters (~{len(index_content) // 4:,} tokens)\n")
     return True
 
 
 if __name__ == "__main__":
     success = main()
-    exit(0 if success else 1)
+    sys.exit(0 if success else 1)

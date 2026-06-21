@@ -1,0 +1,43 @@
+{
+  "agentRoot": "/home/vivi/pixelated",
+  "appRoot": "/home/vivi/pixelated",
+  "channels": [],
+  "connections": [],
+  "config": {
+    "compaction": {},
+    "model": {
+      "id": "anthropic/claude-sonnet-4.6",
+      "routing": {
+        "kind": "gateway",
+        "target": "anthropic"
+      },
+      "contextWindowTokens": 1000000
+    },
+    "name": "pixelated"
+  },
+  "diagnosticsSummary": {
+    "errors": 2,
+    "warnings": 78
+  },
+  "disabledFrameworkTools": [],
+  "workflowEnabled": false,
+  "dynamicInstructions": [],
+  "dynamicSkills": [],
+  "dynamicTools": [],
+  "hooks": [],
+  "remoteAgents": [],
+  "sandbox": null,
+  "sandboxWorkspaces": [],
+  "schedules": [],
+  "skills": [],
+  "tools": [],
+  "workspaceResourceRoot": {
+    "contentHash": "5777dd4d87493e836b5597e87f6b3d07482c551341171ea7836996b231207c7b",
+    "logicalPath": "workspace-resources/__root__",
+    "rootEntries": []
+  },
+  "kind": "eve-agent-compiled-manifest",
+  "subagentEdges": [],
+  "subagents": [],
+  "version": 29
+}
