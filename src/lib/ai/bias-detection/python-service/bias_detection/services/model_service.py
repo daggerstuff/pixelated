@@ -696,7 +696,7 @@ class PyTorchModelService(ModelService):
         logger.info("Pretrained model downloaded and saved")
 
     def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
-        """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
+        """Load a persisted PyTorch state-dict checkpoint, regenerating unreadable files."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
             return self._restore_model_from_checkpoint(checkpoint)
