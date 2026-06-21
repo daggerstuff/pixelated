@@ -88,3 +88,5 @@ export function createFHESystem(options: FHEOptions = {}): FHESystem {
 export type { FHEService, FHEOperationResult, EncryptedData } from './types'
 export { FHEOperation } from './types'
 export { RealFHEService, realFHEService as fheService } from './fhe-service'
+export { FHEEmotionClassifier } from './fhe-emotion-classifier'
+export { createEmotionClassifierFHEService } from './fhe-emotion-classifier'
