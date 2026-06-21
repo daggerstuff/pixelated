@@ -39,8 +39,13 @@ ARG APP_UID=1000
 ARG APP_GID=1000
 
 # Install runtime dependencies
+# libgomp1, libstdc++6, libgcc-s1 are required by the `tokenizers` Rust native
+# extension which `transformers` depends on. Without them the import fails silently.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    libgomp1 \
+    libstdc++6 \
+    libgcc-s1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Create app user
