@@ -157,6 +157,13 @@ export function beforeSend(event: Event): Event | null {
     }
   }
 
+  // Drop synthetic test events whose title begins with "Test:" to prevent
+  // manually-fired SDK smoke-tests from polluting the production project.
+  const title = event.message ?? event.exception?.values?.[0]?.value ?? ''
+  if (/^Test:/i.test(title)) {
+    return null
+  }
+
   return event
 }
 
