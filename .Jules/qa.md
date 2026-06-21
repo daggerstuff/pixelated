@@ -1,0 +1,1 @@
+## 2024-05-18 - Added sanitizeUrl Edge Case Tests | Pattern: Isolated utility testing with pure functions | Action: Create focused tests validating valid, relative, invalid, and spaced inputs without relying on external UI scaffolding.
