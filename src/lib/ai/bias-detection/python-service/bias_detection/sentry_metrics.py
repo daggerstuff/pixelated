@@ -97,37 +97,44 @@ def before_send_metric(metric: dict[str, Any], _hint: Any) -> dict[str, Any] | N
     return metric
 
 
-def _event_titles(event: dict[str, Any]) -> list[str]:
-    titles: list[str] = []
+def _push_message_title(titles: list[str], event: dict[str, Any]) -> None:
     message = event.get("message")
     if isinstance(message, str) and message.strip():
         titles.append(message.strip())
 
-    logentry = event.get("logentry")
-    if isinstance(logentry, dict):
-        formatted = logentry.get("formatted")
-        if isinstance(formatted, str) and formatted.strip():
-            titles.append(formatted.strip())
-        message_text = logentry.get("message")
-        if isinstance(message_text, str) and message_text.strip():
-            titles.append(message_text.strip())
 
+def _push_logentry_titles(titles: list[str], event: dict[str, Any]) -> None:
+    logentry = event.get("logentry")
+    if not isinstance(logentry, dict):
+        return
+    formatted = logentry.get("formatted")
+    if isinstance(formatted, str) and formatted.strip():
+        titles.append(formatted.strip())
+    message_text = logentry.get("message")
+    if isinstance(message_text, str) and message_text.strip():
+        titles.append(message_text.strip())
+
+
+def _push_exception_titles(titles: list[str], event: dict[str, Any]) -> None:
     exception = event.get("exception")
     if not isinstance(exception, dict):
-        return titles
-
+        return
     values = exception.get("values")
     if not isinstance(values, list):
-        return titles
-
+        return
     for value in values:
         if not isinstance(value, dict):
             continue
+        exc_value = value.get("value")
+        if isinstance(exc_value, str) and exc_value.strip():
+            titles.append(exc_value.strip())
 
-        exception_value = value.get("value")
-        if isinstance(exception_value, str) and exception_value.strip():
-            titles.append(exception_value.strip())
 
+def _event_titles(event: dict[str, Any]) -> list[str]:
+    titles: list[str] = []
+    _push_message_title(titles, event)
+    _push_logentry_titles(titles, event)
+    _push_exception_titles(titles, event)
     return titles
 
 
@@ -647,7 +654,6 @@ __all__ = [
     "BiasMetrics",
     "ServiceMetrics",
     "api_metrics",
-    "before_send_event",
     "bias_metrics",
     "count_metric",
     "distribution_metric",
