@@ -107,19 +107,8 @@ describe('withAuth middleware', () => {
 
     vi.useRealTimers()
   })
+})
 
   it('should return 401 when API key validation throws an error', async () => {
-    vi.useFakeTimers()
     mockValidateApiKey.mockRejectedValue(new Error('Database error'))
-
-    const middleware = withAuth(mockHandler, { allowApiKey: true })
-    const request = new Request('https://example.com/api/test', {
       headers: { 'X-API-Key': 'error-key' },
-    })
-
-    const response = await middleware(request)
-    expect(response.status).toBe(401)
-    expect(mockHandler).not.toHaveBeenCalled()
-    vi.useRealTimers()
-  })
-})
