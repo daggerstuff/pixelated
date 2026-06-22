@@ -59,7 +59,7 @@ test.describe("User Experience Features", () => {
     // Check for transition elements after navigation
     const checkForTransition = async () => {
       hasTransition = await page.evaluate(() => {
-        return window._hasTransition === true;
+        return  window._hasTransition;
       });
 
       // Reset the flag for next check
