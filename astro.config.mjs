@@ -11,8 +11,10 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import { loadEnv, createLogger } from 'vite'
 
 /** @typedef {import("rollup").RollupLog} RollupLog */
-const isVercelDeploy =
-  process.env.DEPLOY_TARGET === 'vercel' || !!process.env.VERCEL
+// Vercel is not used by this codebase. ECS Fargate requires the Node adapter.
+// Force the Node adapter regardless of any Vercel-provided env vars
+// (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
+const isVercelDeploy = false
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
