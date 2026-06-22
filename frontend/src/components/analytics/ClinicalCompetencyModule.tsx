@@ -18,7 +18,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
     const point: any = { state: state.split('→')[0].trim() }
     cohorts.forEach((cohort, i) => {
       const match = data.find(d => d.state === state && d.cohort === cohort)
-      if (match) point[cohort || 'All'] = match.medianTimeSeconds
+      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
     })
     return point
   })
@@ -36,7 +36,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
               <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} formatter={(value: number) => [`${value}s`, undefined]} />
               <Legend wrapperStyle={{ fontSize: '11px' }} />
               {cohorts.map((cohort, i) => (
-                <Line key={cohort} type="monotone" dataKey={cohort || 'All'} stroke={colors[i]} strokeWidth={2} dot={{ r: 3 }} />
+                <Line key={cohort} type="monotone" dataKey={cohort ?? 'All'} stroke={colors[i]} strokeWidth={2} dot={{ r: 3 }} />
               ))}
             </LineChart>
           </ResponsiveContainer>

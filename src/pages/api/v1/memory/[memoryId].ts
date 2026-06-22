@@ -33,7 +33,7 @@ function resolveMemoryId(
 ): { ok: true; memoryId: string } | { ok: false; response: Response } {
   // Extract just the memoryId key — Astro may pass other keys in
   // `params`, and `MemoryIdParam` is strict to enforce the contract.
-  const memoryId = (params ?? {})['memoryId']
+  const memoryId = params?.['memoryId']
   if (typeof memoryId !== 'string') {
     return {
       ok: false,

@@ -293,7 +293,7 @@ describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
     const original = process.env["PRODUCTION_AI_SERVICE"];
     delete process.env["PRODUCTION_AI_SERVICE"];
 
-    const svc = await getAIService();
+    const svc =  getAIService();
     await svc.initialize();
     // MockAIService has a specific processText shape — verify mock behaviour
     const result = await svc.processText("hello");
@@ -308,7 +308,7 @@ describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
     const original = process.env["PRODUCTION_AI_SERVICE"];
     process.env["PRODUCTION_AI_SERVICE"] = "true";
 
-    const svc = await getAIService();
+    const svc =  getAIService();
     // Production service should not return { processed: true } — it delegates
     // to providers which will fail in test env. Verify the class name.
     expect(svc.constructor.name).toBe("FineTuningAIService");
@@ -324,12 +324,12 @@ describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
     const original = process.env["PRODUCTION_AI_SERVICE"];
     delete process.env["PRODUCTION_AI_SERVICE"];
 
-    const svc1 = await getAIService();
-    const svc2 = await getAIService();
+    const svc1 =  getAIService();
+    const svc2 =  getAIService();
     expect(svc2).toBe(svc1); // same cached instance
 
     resetAIServiceForTesting();
-    const svc3 = await getAIService();
+    const svc3 =  getAIService();
     expect(svc3).not.toBe(svc1); // new instance after reset
 
     if (original !== undefined) {
@@ -341,7 +341,7 @@ describe("getAIService() factory (S6: mock-vs-prod env-var swap)", () => {
     const original = process.env["PRODUCTION_AI_SERVICE"];
     process.env["PRODUCTION_AI_SERVICE"] = "1";
 
-    const svc = await getAIService();
+    const svc =  getAIService();
     await svc.initialize();
     // "1" is not "true" — should still get MockAIService
     const result = await svc.processText("test");

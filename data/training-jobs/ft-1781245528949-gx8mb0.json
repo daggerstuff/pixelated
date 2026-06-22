@@ -1,8 +1,0 @@
-{
-  "id": "ft-1781245528949-gx8mb0",
-  "model": "test-model",
-  "status": "succeeded",
-  "createdAt": "2026-06-12T06:25:28.949Z",
-  "fineTunedModel": "test-model:dry-run-ft-17812",
-  "backend": "dry-run"
-}

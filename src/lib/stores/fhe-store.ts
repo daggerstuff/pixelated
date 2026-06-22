@@ -403,6 +403,7 @@ export const useFHEStore = create<FHEState>()((set, get) => {
             case FHEOperation.ANALYZE: {
               throw new Error('Not implemented yet: FHEOperation.ANALYZE case')
             }
+            case FHEOperation.EMOTION_CLASSIFY: { throw new Error('Not implemented yet: FHEOperation.EMOTION_CLASSIFY case') }
             default:
               throw new Error(`Operation ${operation} not implemented`)
           }

@@ -20,7 +20,7 @@ describe("useMultimodalPixel Hook - Unit Tests", () => {
 
     // Setup fetch mock
     mockFetch = vi.fn();
-    global.fetch = mockFetch as any;
+    global.fetch = mockFetch;
 
     // Setup WebSocket mock
     mockWebSocket = {
