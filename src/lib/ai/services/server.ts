@@ -9,6 +9,7 @@ import { closeSentry, Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { safeJsonParse } from '../../utils/json-extraction'
 import { apiMetrics, emotionMetrics } from '../../sentry/utils'
+import { getAllowedOrigin } from '../bias-detection/utils'
 import type { AIMessage, AIServiceOptions } from '../models/ai-types'
 import {
   getAIServiceByProvider,
@@ -64,13 +65,14 @@ class AIServer {
    }
 
    private sendJsonResponse(
+    req: HttpRequest,
     res: HttpResponse,
     statusCode: number,
     data: ServerResponse,
   ): void {
     res.writeHead(statusCode, {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': getAllowedOrigin(req.headers.origin),
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     })
@@ -196,7 +198,7 @@ class AIServer {
     return this.parseProvider(value)
   }
 
-  private async handleHealthCheck(res: HttpResponse): Promise<void> {
+  private async handleHealthCheck(req: HttpRequest, res: HttpResponse): Promise<void> {
     try {
       const availableProviders = getAvailableProviders()
       const services = availableProviders.map((provider) => {
@@ -215,7 +217,7 @@ class AIServer {
         }
       })
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           status: 'healthy',
@@ -227,7 +229,7 @@ class AIServer {
      } catch (error: unknown) {
        appLogger.error('Health check failed:', error)
        this.captureCaughtError(error)
-       this.sendJsonResponse(res, 500, {
+       this.sendJsonResponse(req, res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Health check failed'),
        })
@@ -235,6 +237,7 @@ class AIServer {
   }
 
   private async handleChatCompletion(
+    req: HttpRequest,
     res: HttpResponse,
     body: AIServiceRequestBody,
   ): Promise<void> {
@@ -245,7 +248,7 @@ class AIServer {
       const parsedProvider = this.parseProvider(provider)
 
       if (!parsedMessages) {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error: 'Messages array is required',
         })
@@ -260,7 +263,7 @@ class AIServer {
         service = getAIServiceByProvider(parsedProvider)
         selectedProvider = parsedProvider
         if (!service) {
-          this.sendJsonResponse(res, 400, {
+          this.sendJsonResponse(req, res, 400, {
             success: false,
             error: `Requested provider '${parsedProvider}' is not available. Available providers: ${getAvailableProviders().join(', ')}`,
           })
@@ -278,7 +281,7 @@ class AIServer {
         }
 
         if (!service) {
-          this.sendJsonResponse(res, 503, {
+          this.sendJsonResponse(req, res, 503, {
             success: false,
             error:
               'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
@@ -299,7 +302,7 @@ class AIServer {
         parsedOptions,
       )
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           ...completion,
@@ -309,7 +312,7 @@ class AIServer {
      } catch (error: unknown) {
        appLogger.error('Chat completion failed:', error)
        this.captureCaughtError(error)
-       this.sendJsonResponse(res, 500, {
+       this.sendJsonResponse(req, res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Chat completion failed'),
        })
@@ -317,7 +320,7 @@ class AIServer {
   }
 
   private async handleEmotionAnalysis(
-    _unused: HttpRequest,
+    req: HttpRequest,
     res: HttpResponse,
     body: AIServiceRequestBody,
   ): Promise<void> {
@@ -327,7 +330,7 @@ class AIServer {
       const parsedOptions = this.parseOptions(options)
 
       if (!text || typeof text !== 'string') {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error: 'Text is required for emotion analysis',
         })
@@ -340,7 +343,7 @@ class AIServer {
       if (parsedProvider) {
         service = getAIServiceByProvider(parsedProvider)
         if (!service) {
-          this.sendJsonResponse(res, 400, {
+          this.sendJsonResponse(req, res, 400, {
             success: false,
             error: `Requested provider '${parsedProvider}' is not available. Available providers: ${getAvailableProviders().join(', ')}`,
           })
@@ -357,7 +360,7 @@ class AIServer {
         }
 
         if (!service) {
-          this.sendJsonResponse(res, 503, {
+          this.sendJsonResponse(req, res, 503, {
             success: false,
             error:
               'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
@@ -405,7 +408,7 @@ Respond in JSON format with the following structure:
         analysisResult = { rawResponse: completion.content }
       }
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           analysis: analysisResult,
@@ -416,7 +419,7 @@ Respond in JSON format with the following structure:
      } catch (error: unknown) {
        appLogger.error('Emotion analysis failed:', error)
        this.captureCaughtError(error)
-       this.sendJsonResponse(res, 500, {
+       this.sendJsonResponse(req, res, 500, {
          success: false,
          error: formatErrorMessage(error, 'Emotion analysis failed'),
        })
@@ -424,7 +427,7 @@ Respond in JSON format with the following structure:
   }
 
   private async handleStreamingChat(
-    _unused: HttpRequest,
+    req: HttpRequest,
     res: HttpResponse,
     body: AIServiceRequestBody,
   ): Promise<void> {
@@ -435,7 +438,7 @@ Respond in JSON format with the following structure:
       const parsedProvider = this.parseProvider(provider)
 
       if (!parsedMessages) {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error: 'Messages array is required',
         })
@@ -448,7 +451,7 @@ Respond in JSON format with the following structure:
       if (parsedProvider) {
         service = getAIServiceByProvider(parsedProvider)
         if (!service) {
-          this.sendJsonResponse(res, 400, {
+          this.sendJsonResponse(req, res, 400, {
             success: false,
             error: `Requested provider '${parsedProvider}' is not available. Available providers: ${getAvailableProviders().join(', ')}`,
           })
@@ -465,7 +468,7 @@ Respond in JSON format with the following structure:
         }
 
         if (!service) {
-          this.sendJsonResponse(res, 503, {
+          this.sendJsonResponse(req, res, 503, {
             success: false,
             error:
               'No AI providers are currently available. Please configure API keys for the LLM API, OpenAI, Anthropic, or Hugging Face.',
@@ -479,7 +482,7 @@ Respond in JSON format with the following structure:
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': 'no-cache',
         Connection: 'keep-alive',
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': getAllowedOrigin(req.headers.origin),
         'Access-Control-Allow-Headers': 'Cache-Control',
       })
 
@@ -506,7 +509,7 @@ Respond in JSON format with the following structure:
        appLogger.error('Streaming chat failed:', error)
        this.captureCaughtError(error)
        if (!res.headersSent) {
-         this.sendJsonResponse(res, 500, {
+         this.sendJsonResponse(req, res, 500, {
            success: false,
            error: formatErrorMessage(error, 'Streaming failed'),
          })
@@ -560,7 +563,7 @@ Respond in JSON format with the following structure:
     // Handle CORS preflight
     if (requestMethod === 'OPTIONS') {
       res.writeHead(200, {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': getAllowedOrigin(req.headers.origin),
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       })
@@ -571,12 +574,12 @@ Respond in JSON format with the following structure:
     try {
       switch (`${requestMethod} ${path}`) {
         case 'GET /health':
-          await this.handleHealthCheck(res)
+          await this.handleHealthCheck(req, res)
           break
 
         case 'POST /chat': {
       const chatBody = await this.parseRequestBody(req)
-          await this.handleChatCompletion(res, chatBody)
+          await this.handleChatCompletion(req, res, chatBody)
           const durationMs = Date.now() - startTime
            apiMetrics.request('/ai-service/chat', 'POST', res.statusCode ?? 200)
           apiMetrics.responseTime('/ai-service/chat', durationMs, 'POST')
@@ -617,7 +620,7 @@ Respond in JSON format with the following structure:
         }
 
         default:
-          this.sendJsonResponse(res, 404, {
+          this.sendJsonResponse(req, res, 404, {
             success: false,
             error: 'Endpoint not found',
           })
@@ -631,7 +634,7 @@ Respond in JSON format with the following structure:
       apiMetrics.responseTime('/ai-service', durationMs, method)
       appLogger.error('Request handling error:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error: 'Internal server error',
       })
@@ -646,7 +649,7 @@ Respond in JSON format with the following structure:
             appLogger.error('Unhandled request error:', error)
             Sentry.captureException(error)
             if (!res.headersSent) {
-              this.sendJsonResponse(res, 500, {
+              this.sendJsonResponse(req, res, 500, {
                 success: false,
                 error: 'Internal server error',
               })

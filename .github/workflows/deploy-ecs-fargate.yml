@@ -149,7 +149,7 @@ jobs:
 
       - name: Set up Docker Buildx
         if: inputs.image_tag == ''
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build and push ARM64 image
         if: inputs.image_tag == ''
