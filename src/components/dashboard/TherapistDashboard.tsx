@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { useTherapistAnalytics } from '@/hooks/useTherapistAnalytics'
 import { cn } from '@/lib/utils'
@@ -40,30 +40,6 @@ export function TherapistDashboard({
     )
   }
 
-  // Skip link state for accessibility
-  const [showSkipLink, setShowSkipLink] = useState(false)
-
-  // Handle keyboard navigation for skip links
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Tab') {
-        setShowSkipLink(true)
-      }
-    }
-
-    const handleMouseDown = () => {
-      setShowSkipLink(false)
-    }
-
-    document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('mousedown', handleMouseDown)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('mousedown', handleMouseDown)
-    }
-  }, [])
-
   // Use therapist analytics hook
   const defaultFilters: AnalyticsFilters = { timeRange: '30d' }
   const { data: therapistData } = useTherapistAnalytics(
@@ -83,21 +59,19 @@ export function TherapistDashboard({
       </nav>
 
       {/* Skip to main content link for keyboard users */}
-      {showSkipLink && (
-        <a
-          href="#main-content"
-          className="focus:ring-primary sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2"
-          onClick={(e) => {
-            e.preventDefault()
-            const mainContent = document.getElementById('main-content')
-            if (mainContent) {
-              mainContent.focus()
-            }
-          }}
-        >
-          Skip to main content
-        </a>
-      )}
+      <a
+        href="#main-content"
+        className="focus:ring-primary sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-background focus:p-4 focus:text-foreground focus:underline focus:ring-2"
+        onClick={(e) => {
+          e.preventDefault()
+          const mainContent = document.getElementById('main-content')
+          if (mainContent) {
+            mainContent.focus()
+          }
+        }}
+      >
+        Skip to main content
+      </a>
 
       <section
         id="main-content"

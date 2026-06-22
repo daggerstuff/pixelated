@@ -34,6 +34,30 @@ variable "availability_zones" {
   default     = ["us-east-1a", "us-east-1b"]
 }
 
+variable "private_subnet_cidrs" {
+  description = "Private subnet CIDR blocks for ECS and ElastiCache (one per AZ)."
+  type        = list(string)
+  default     = ["10.0.11.0/24", "10.0.12.0/24"]
+}
+
+variable "log_retention_days" {
+  description = "CloudWatch log retention in days."
+  type        = number
+  default     = 365
+}
+
+variable "hetzner_s3_bucket" {
+  description = "Hetzner Object Storage bucket name for ALB access logs."
+  type        = string
+  default     = "pixel-data"
+}
+
+variable "hetzner_s3_endpoint" {
+  description = "Hetzner Object Storage API endpoint for ALB access logs (no trailing slash)."
+  type        = string
+  default     = "hel1.your-objectstorage.com"
+}
+
 variable "ecs_cpu" {
   description = "ECS task CPU units (256 = 0.25 vCPU)."
   type        = string

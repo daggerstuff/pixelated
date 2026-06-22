@@ -18,8 +18,8 @@ type MockQueryResult<TRow> = {
   fields: unknown[]
 }
 
-const createMockQueryResult = <TRow>(
-  rows: TRow[],
+const createMockQueryResult = (
+  rows: unknown[],
   rowCount = rows.length,
 ): DbQueryResult<QueryResultRow> => ({
   rows: rows as unknown as QueryResultRow[],

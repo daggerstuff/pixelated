@@ -11,6 +11,9 @@
  * bare module specifiers. We instead use a safe global shim when available.
  */
 
+const IS_DEV = typeof import.meta !== 'undefined' && import.meta.env ? !!import.meta.env.DEV : (typeof process !== 'undefined' && process.env?.['NODE_ENV'] === 'development');
+const ENV_MODE = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env.MODE : (typeof process !== 'undefined' && process.env?.['NODE_ENV'] || 'production');
+
 type SentryShim = {
   captureException: (error: unknown) => void
   captureMessage: (message: string) => void
@@ -55,7 +58,7 @@ function getSentry(): SentryShim | null {
       return (window as any).Sentry as SentryShim
     }
   } catch (error: unknown) {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn('[Sentry] Failed to access global Sentry object:', error)
     }
   }
@@ -149,7 +152,7 @@ export function startTransaction(
 ): { setData: () => void; finish: () => void } {
   // Sentry Astro does not support manual transactions.
   // This function is a no-op for compatibility.
-  if (import.meta.env.DEV) {
+  if (IS_DEV) {
     console.warn(
       '[Sentry] startTransaction is not supported in @sentry/astro and will be ignored.',
     )
@@ -172,7 +175,7 @@ export function testSentryIntegration() {
     test: {
       timestamp: new Date().toISOString(),
       purpose: 'Integration test',
-      environment: import.meta.env.MODE,
+      environment: ENV_MODE,
     },
   })
 
@@ -198,7 +201,7 @@ export const performance = {
   measurePageLoad: (
     _pageName: string,
   ): { setData: () => void; finish: () => void } => {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn(
         '[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.',
       )
@@ -216,7 +219,7 @@ export const performance = {
     _endpoint: string,
     _method: string = 'GET',
   ): { setData: () => void; finish: () => void } => {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn(
         '[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.',
       )
@@ -269,7 +272,7 @@ export function countMetric(
     if (!Sentry) return
     Sentry.metrics.count(name, value, { attributes })
   } catch (error: unknown) {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn('[Sentry Metrics] Failed to emit count metric:', error)
     }
   }
@@ -302,7 +305,7 @@ export function gaugeMetric(
     if (!Sentry) return
     Sentry.metrics.gauge(name, value, { attributes, unit })
   } catch (error: unknown) {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
     }
   }
@@ -348,7 +351,7 @@ export function distributionMetric(
       unit: options?.unit,
     })
   } catch (error: unknown) {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn(
         '[Sentry Metrics] Failed to emit distribution metric:',
         error,
@@ -523,7 +526,7 @@ export async function flushMetrics(): Promise<void> {
       await client.flush()
     }
   } catch (error: unknown) {
-    if (import.meta.env.DEV) {
+    if (IS_DEV) {
       console.warn('[Sentry Metrics] Failed to flush metrics:', error)
     }
   }

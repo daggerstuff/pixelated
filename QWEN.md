@@ -101,9 +101,13 @@ upcoming work, and cross-session state.
 ## 6) Delivery sequence
 
 1. Restate goal and constraints.
-2. Apply the minimal edit.
-3. Run the smallest relevant check.
-4. Report result, risk, and next concrete step.
+2. Choose the workflow for the change:
+   - **Routine fix** → edit directly, verify with one concrete command.
+   - **Single feature, well-scoped** → `/spec` (writes `IMPLEMENTATION_PLAN.md`).
+   - **Multi-feature refactor / 50+ file change** → `/missions`.
+3. Apply the minimal edit.
+4. Run the smallest relevant check.
+5. Report result, risk, and next concrete step.
 
 ## 7) Qwen-specific controls
 
@@ -112,6 +116,20 @@ upcoming work, and cross-session state.
   `query-docs`).
 - Prefer local project docs when debugging business logic, code review, or
   testing.
+
+## 8) Droid workflow (Spec + Missions)
+
+See root `AGENTS.md` "Droid Workflow" section. Quick reference:
+
+- **`/spec`** — single-feature planning with explicit approval; writes
+  `IMPLEMENTATION_PLAN.md`.
+- **`/missions`** — multi-feature plan → milestones → Mission Control
+  orchestration; inherit MCP, skills, hooks, custom droids, and `AGENTS.md`.
+- **Headless missions** — `droid exec --mission -f mission.md` for CI /
+  scheduled runs; tune with `--worker-model`, `--validator-model`,
+  `--worker-reasoning-effort`, `--validator-reasoning-effort`.
+- **Recovery** — pause and redirect if a worker spins or a milestone blocks;
+  see `~/.factory/missions/README.md` for the recovery playbook.
 
 ## 8) MCP profile
 

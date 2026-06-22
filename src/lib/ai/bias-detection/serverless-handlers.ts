@@ -5,6 +5,7 @@
  * Production: Includes serverless bias detection handler for real endpoint deployment.
  */
 import { BiasDetectionEngine } from './BiasDetectionEngine'
+import { getAllowedOrigin } from './utils'
 
 /**
  * Creates a serverless-compatible handler wrapper
@@ -28,7 +29,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         statusCode: response.statusCode ?? 200,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           ...response.headers,
@@ -42,7 +43,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         statusCode: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
         },
         body: JSON.stringify({
           error: 'Internal server error',
@@ -68,7 +69,7 @@ export const detectBiasServerlessHandler = createServerlessHandler(
   async (req) => {
     // CORS preflight and method guard
     if (req.method === 'OPTIONS') {
-      return createCorsResponse()
+      return createCorsResponse(req)
     }
     if (req.method !== 'POST') {
       return {
@@ -117,11 +118,11 @@ export const detectBiasServerlessHandler = createServerlessHandler(
 /**
  * Creates CORS preflight response
  */
-export function createCorsResponse() {
+export function createCorsResponse(event: any) {
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',

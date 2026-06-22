@@ -48,6 +48,9 @@
 .ruff_cache/
 .tox/
 MANIFEST
+
+# === DATA DIRECTORY (GENERATED FILES) ===
+data/
 build/
 develop-eggs/
 dist/

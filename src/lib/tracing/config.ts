@@ -54,7 +54,7 @@ export function getTracingConfig(): TracingConfig {
     enabled,
     serviceName: envObj['TRACING_SERVICE_NAME'] ?? 'pixelated-empathy',
     serviceVersion: envObj['TRACING_SERVICE_VERSION'] ?? '1.0.0',
-    environment: envObj.MODE || (isProduction ? 'production' : 'development'),
+    environment: envObj.MODE ?? (isProduction ? 'production' : 'development'),
     exporter: {
       type:
         (envObj['TRACING_EXPORTER_TYPE'] as

@@ -1,0 +1,396 @@
+---
+export const prerender = false
+
+import DashboardLayout from '@/layouts/DashboardLayout.astro'
+import Card from '@/components/ui/Card.astro'
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  PieChart,
+  Clock,
+  Activity
+} from 'lucide-react'
+
+// Mock data - will be replaced with real API data
+const mockData = {
+  passRate: 0.72,
+  scoreDistribution: {
+    technique: 0.85,
+    alliance: 0.78,
+    structure: 0.82,
+    cultural: 0.65,
+    ebp: 0.71,
+    dsm5: 0.58
+  },
+  queueDepth: 14,
+  weeklyTrend: [
+    { date: '2026-06-13', passRate: 0.68, queueDepth: 12 },
+    { date: '2026-06-14', passRate: 0.70, queueDepth: 13 },
+    { date: '2026-06-15', passRate: 0.69, queueDepth: 11 },
+    { date: '2026-06-16', passRate: 0.71, queueDepth: 12 },
+    { date: '2026-06-17', passRate: 0.72, queueDepth: 13 },
+    { date: '2026-06-18', passRate: 0.73, queueDepth: 14 },
+    { date: '2026-06-19', passRate: 0.72, queueDepth: 14 }
+  ]
+}
+
+// Fetch data from API
+let data = mockData
+let isLoading = false
+let error: string | null = null
+
+try {
+  const response = await fetch('/api/dashboard/clinical-validity')
+  if (response.ok) {
+    data = await response.json()
+  } else {
+    error = `API returned ${response.status}: ${response.statusText}`
+  }
+} catch (err) {
+  error = err instanceof Error ? err.message : 'Failed to fetch data'
+  console.error('Failed to fetch clinical validity data:', err)
+}
+
+// Calculate rolling 7-day average and check for degradation
+let showDegradationAlert = false
+let degradationDetails = {
+  currentPassRate: data.passRate,
+  rollingAverage: 0,
+  degradationPercentage: 0
+}
+
+if (data.weeklyTrend && data.weeklyTrend.length > 0) {
+  // Calculate rolling 7-day average from weeklyTrend
+  const sum = data.weeklyTrend.reduce((total, day) => total + day.passRate, 0)
+  const rollingAverage = sum / data.weeklyTrend.length
+  
+  degradationDetails.rollingAverage = rollingAverage
+  degradationDetails.currentPassRate = data.passRate
+  
+  // Check if current pass rate is more than 10 percentage points below rolling average
+  // currentPassRate < (rollingAverage - 0.10)
+  const degradationThreshold = rollingAverage - 0.10
+  showDegradationAlert = data.passRate < degradationThreshold
+  
+  // Calculate degradation in percentage points (absolute difference)
+  degradationDetails.degradationPercentage = (rollingAverage - data.passRate) * 100
+}
+---
+
+<DashboardLayout
+  title="Clinical Validity Dashboard | Pixelated Empathy"
+  description="Monitor clinical validity pass rates, per-dimension score distributions, annotation queue depth, and 7-day trends"
+>
+  <div class="container mx-auto py-6 px-4">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight mb-2">Clinical Validity Dashboard</h1>
+      <p class="text-muted-foreground">
+        Monitor scoring performance across 6 clinical dimensions and annotation queue status
+      </p>
+    </div>
+
+    <!-- Degradation Alert -->
+    {showDegradationAlert && (
+      <div 
+        class="mb-6 p-4 border rounded-lg bg-gradient-to-r from-orange-950/30 to-orange-900/20 border-orange-800 relative"
+        role="alert"
+        aria-labelledby="degradation-alert-title"
+        aria-describedby="degradation-alert-description"
+      >
+        <div class="flex items-start gap-3">
+          <!-- Icon -->
+          <div class="flex-shrink-0 p-2 bg-orange-500/20 rounded-lg">
+            <svg 
+              class="w-5 h-5 text-orange-400" 
+              fill="currentColor" 
+              viewBox="0 0 20 20" 
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+            </svg>
+          </div>
+          
+          <!-- Content -->
+          <div class="flex-1">
+            <h3 id="degradation-alert-title" class="text-lg font-semibold text-orange-200 mb-1">
+              Performance Degradation Detected
+            </h3>
+            <p id="degradation-alert-description" class="text-orange-300/90 mb-3">
+              Clinical validity pass rate has dropped {degradationDetails.degradationPercentage.toFixed(1)} percentage points below the 7-day rolling average (more than 10% threshold).
+              Current: {(degradationDetails.currentPassRate * 100).toFixed(1)}% vs Average: {(degradationDetails.rollingAverage * 100).toFixed(1)}%
+            </p>
+            <div class="flex flex-wrap gap-2">
+              <button 
+                class="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                onclick="console.log('Investigate degradation')"
+              >
+                Investigate
+              </button>
+              <button 
+                class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium rounded-lg transition-colors border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
+                onclick="this.closest('[role=\'alert\']').style.display = 'none'"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Accessibility: hidden live region for screen readers -->
+        <div aria-live="assertive" class="sr-only">
+          Alert: Performance degradation detected. Clinical validity pass rate has dropped {degradationDetails.degradationPercentage.toFixed(1)} percentage points below the 7-day rolling average.
+        </div>
+      </div>
+    )}
+
+    <!-- Error State -->
+    {error && (
+      <div class="mb-6 p-4 bg-red-950/20 border border-red-800 rounded-lg">
+        <p class="text-red-300 font-medium">Unable to load dashboard data</p>
+        <p class="text-red-400 text-sm mt-1">{error}</p>
+        <p class="text-muted-foreground text-sm mt-2">
+          Showing mock data for demonstration. Ensure the clinical validity API endpoint is running.
+        </p>
+      </div>
+    )}
+
+    <!-- Loading State -->
+    {isLoading && (
+      <div class="mb-6 p-4 bg-blue-950/20 border border-blue-800 rounded-lg">
+        <p class="text-blue-300 font-medium">Loading dashboard data...</p>
+      </div>
+    )}
+
+    <!-- Key Metrics Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <!-- Current Pass Rate -->
+      <Card class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-green-500/20 rounded-lg">
+            <TrendingUp class="w-5 h-5 text-green-400" />
+          </div>
+          <h3 class="text-lg font-semibold">Current Pass Rate</h3>
+        </div>
+        <div class="text-3xl font-bold mb-1">{(data.passRate * 100).toFixed(1)}%</div>
+        <p class="text-muted-foreground text-sm mb-2">Samples scoring ≥ 0.6</p>
+        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+          <TrendingUp class="w-4 h-4" /> +2.1%
+        </div>
+      </Card>
+
+      <!-- Queue Depth -->
+      <Card class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-blue-500/20 rounded-lg">
+            <Users class="w-5 h-5 text-blue-400" />
+          </div>
+          <h3 class="text-lg font-semibold">Queue Depth</h3>
+        </div>
+        <div class="text-3xl font-bold mb-1">{data.queueDepth}</div>
+        <p class="text-muted-foreground text-sm mb-2">Samples awaiting review</p>
+        <div class="text-blue-400 text-sm font-medium flex items-center gap-1">
+          <span>+1</span>
+        </div>
+      </Card>
+
+      <!-- 7-Day Avg -->
+      <Card class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-purple-500/20 rounded-lg">
+            <Activity class="w-5 h-5 text-purple-400" />
+          </div>
+          <h3 class="text-lg font-semibold">7-Day Avg</h3>
+        </div>
+        <div class="text-3xl font-bold mb-1">
+          {(data.weeklyTrend.reduce((sum, day) => sum + day.passRate, 0) / data.weeklyTrend.length * 100).toFixed(1)}%
+        </div>
+        <p class="text-muted-foreground text-sm mb-2">Weekly average pass rate</p>
+        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+          <TrendingUp class="w-4 h-4" /> +1.5%
+        </div>
+      </Card>
+
+      <!-- Total Scored -->
+      <Card class="p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="p-2 bg-orange-500/20 rounded-lg">
+            <BarChart3 class="w-5 h-5 text-orange-400" />
+          </div>
+          <h3 class="text-lg font-semibold">Total Scored</h3>
+        </div>
+        <div class="text-3xl font-bold mb-1">1,247</div>
+        <p class="text-muted-foreground text-sm mb-2">Samples evaluated</p>
+        <div class="text-green-400 text-sm font-medium flex items-center gap-1">
+          <TrendingUp class="w-4 h-4" /> +42
+        </div>
+      </Card>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <!-- Score Distribution -->
+      <Card class="lg:col-span-2">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Per-Dimension Score Distribution</h2>
+            <PieChart class="w-5 h-5 text-muted-foreground" />
+          </div>
+          <p class="text-muted-foreground mb-6">
+            Breakdown across 6 clinical validity dimensions
+          </p>
+          
+          <div class="space-y-4">
+            {Object.entries(data.scoreDistribution).map(([dimension, score]) => {
+              const width = `${score * 100}%`
+              const scorePercent = (score * 100).toFixed(1)
+              let colorClass = "bg-green-500"
+              if (score < 0.6) colorClass = "bg-yellow-500"
+              if (score < 0.4) colorClass = "bg-red-500"
+              
+              return (
+                <div>
+                  <div class="flex justify-between text-sm mb-1">
+                    <span class="font-medium capitalize">{dimension}</span>
+                    <span class="font-mono">{scorePercent}%</span>
+                  </div>
+                  <div class="h-2 bg-surface rounded-full overflow-hidden">
+                    <div 
+                      class={`h-full ${colorClass} rounded-full transition-all duration-500`}
+                      style={`width: ${width}`}
+                    />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </Card>
+
+      <!-- Queue Status -->
+      <Card>
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold">Annotation Queue</h2>
+            <Clock class="w-5 h-5 text-muted-foreground" />
+          </div>
+          
+          <div class="text-center mb-6">
+            <div class="text-5xl font-bold mb-2">{data.queueDepth}</div>
+            <p class="text-muted-foreground">samples awaiting review</p>
+          </div>
+
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-sm">High priority</span>
+              <span class="font-semibold">3</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm">Medium priority</span>
+              <span class="font-semibold">7</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-sm">Low priority</span>
+              <span class="font-semibold">4</span>
+            </div>
+          </div>
+
+          <button class="w-full mt-6 bg-accent hover:bg-accent-hover text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
+            Review Next Sample
+          </button>
+        </div>
+      </Card>
+    </div>
+
+    <!-- 7-Day Trend -->
+    <Card class="mb-8">
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-semibold">7-Day Trend</h2>
+          <BarChart3 class="w-5 h-5 text-muted-foreground" />
+        </div>
+        <p class="text-muted-foreground mb-6">
+          Pass rate and queue depth trends over the past week
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-border">
+                <th class="text-left py-3 px-4 font-medium">Date</th>
+                <th class="text-left py-3 px-4 font-medium">Pass Rate</th>
+                <th class="text-left py-3 px-4 font-medium">Queue Depth</th>
+                <th class="text-left py-3 px-4 font-medium">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.weeklyTrend.map((day, index) => {
+                const passRatePercent = (day.passRate * 100).toFixed(1)
+                let status = "Good"
+                let statusColor = "text-green-500"
+                
+                if (day.passRate < 0.65) {
+                  status = "Needs attention"
+                  statusColor = "text-yellow-500"
+                }
+                if (day.passRate < 0.55) {
+                  status = "Critical"
+                  statusColor = "text-red-500"
+                }
+                
+                return (
+                  <tr class="border-b border-border last:border-0 hover:bg-surface/50">
+                    <td class="py-3 px-4">{day.date}</td>
+                    <td class="py-3 px-4 font-mono">{passRatePercent}%</td>
+                    <td class="py-3 px-4">{day.queueDepth}</td>
+                    <td class={`py-3 px-4 font-medium ${statusColor}`}>{status}</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </Card>
+
+    <!-- Info Panel -->
+    <Card class="bg-surface/50">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold mb-3">About Clinical Validity Scoring</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <h4 class="font-medium mb-2">6 Dimensions</h4>
+            <ul class="text-sm text-muted-foreground space-y-1">
+              <li>• Technique: Therapeutic modality detection</li>
+              <li>• Alliance: Collaboration & validation</li>
+              <li>• Structure: Assessment & planning</li>
+              <li>• Cultural: Cultural awareness</li>
+              <li>• EBP: Evidence-based practice</li>
+              <li>• DSM-5: Clinical diagnosis alignment</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-medium mb-2">Scoring Thresholds</h4>
+            <ul class="text-sm text-muted-foreground space-y-1">
+              <li>• Accept: ≥ 0.6 (pass through)</li>
+              <li>• Borderline: 0.4 - 0.6 (needs review)</li>
+              <li>• Reject: &lt; 0.4 (filtered out)</li>
+              <li>• Current target: ≥ 50% pass rate</li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-medium mb-2">Data Sources</h4>
+            <ul class="text-sm text-muted-foreground space-y-1">
+              <li>• ClinicalValidityScorer v4</li>
+              <li>• 241 pre-labeled validation samples</li>
+              <li>• SDG pipeline outputs</li>
+              <li>• Annotation queue API</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </Card>
+  </div>
+</DashboardLayout>

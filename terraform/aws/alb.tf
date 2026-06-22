@@ -29,6 +29,14 @@ resource "aws_lb" "api" {
   security_groups    = [aws_security_group.alb.id]
   subnets            = aws_subnet.public[*].id
 
+  access_logs {
+    bucket = var.hetzner_s3_bucket
+    prefix = "alb-logs"
+  }
+
+  drop_invalid_header_fields = true
+  enable_deletion_protection = true
+
   tags = local.common_tags
 }
 
@@ -124,13 +132,13 @@ resource "aws_codedeploy_app" "ecs" {
 # --- CodeDeploy Deployment Group ---
 resource "aws_codedeploy_deployment_group" "ecs" {
   app_name               = aws_codedeploy_app.ecs.name
-  deployment_group_name   = local.codedeploy_dg_name
-  service_role_arn        = aws_iam_role.codedeploy.arn
-  deployment_config_name  = "CodeDeployDefault.ECSAllAtOnce"
+  deployment_group_name  = local.codedeploy_dg_name
+  service_role_arn       = aws_iam_role.codedeploy.arn
+  deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
 
   alarm_configuration {
     enabled = true
-    alarms  = [
+    alarms = [
       aws_cloudwatch_metric_alarm.alb_5xx_high.alarm_name,
       aws_cloudwatch_metric_alarm.alb_target_response_time_high.alarm_name,
       aws_cloudwatch_metric_alarm.ecs_cpu_high.alarm_name,

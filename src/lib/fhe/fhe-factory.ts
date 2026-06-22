@@ -7,6 +7,10 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import {
+  FHEEmotionClassifier,
+  createEmotionClassifierFHEService as createEmotionClassifierService,
+} from './fhe-emotion-classifier'
 import { mockFHEService } from './mock/mock-fhe-service'
 import { SealOperations } from './seal-operations'
 import { SealScheme } from './seal-scheme'
@@ -45,8 +49,36 @@ const sealOperations = new SealOperations(sealService)
 const sealScheme = new SealScheme(SealSchemeType.BFV)
 
 // Initialize tenant service instances map and default service instance
+const MAX_TENANT_SERVICES = 100
 const tenantServiceInstances = new Map<string, FHEService>()
+const tenantServiceLastAccessed = new Map<string, number>()
 let defaultServiceInstance: FHEService | null = null
+
+function evictLRUTenant(): void {
+  let oldest: string | undefined
+  let oldestTime = Infinity
+  for (const [tenantId, lastAccessed] of tenantServiceLastAccessed) {
+    if (lastAccessed < oldestTime) {
+      oldestTime = lastAccessed
+      oldest = tenantId
+    }
+  }
+  if (oldest) {
+    tenantServiceInstances.delete(oldest)
+    tenantServiceLastAccessed.delete(oldest)
+    logger.warn(
+      `FHE tenant map reached ${MAX_TENANT_SERVICES} limit, evicted LRU tenant ${oldest.slice(-8)} (idle ${Date.now() - oldestTime}ms)`,
+    )
+  }
+}
+
+function storeTenantService(tenantId: string, service: FHEService): void {
+  if (tenantServiceInstances.size >= MAX_TENANT_SERVICES) {
+    evictLRUTenant()
+  }
+  tenantServiceInstances.set(tenantId, service)
+  tenantServiceLastAccessed.set(tenantId, Date.now())
+}
 
 // Initialize tenant manager (placeholder - actual implementation would be more complex)
 const tenantManager = {
@@ -447,6 +479,10 @@ export async function getFHEService(
     // In dev or when encryption is disabled, use mock
     if (isDevelopment || !useEncryption) {
       selectedImplementation = FHEImplementation.Mock
+      logger.warn(
+        'FHE factory auto-fell back to Mock implementation. ' +
+          'Set NODE_ENV=production and useEncryption=true for production FHE.',
+      )
     } else {
       // In production, use SEAL by default
       selectedImplementation = FHEImplementation.SEAL
@@ -504,15 +540,19 @@ export async function getTenantFHEService(
 ): Promise<FHEService> {
   // Check if we already have a service instance for this tenant
   if (tenantServiceInstances.has(tenantId)) {
-    logger.info(`Using existing FHE service for tenant ${tenantId}`)
-    return tenantServiceInstances.get(tenantId)!
+    const existing = tenantServiceInstances.get(tenantId)
+    if (existing) {
+      tenantServiceLastAccessed.set(tenantId, Date.now())
+      logger.info(`Using existing FHE service for tenant ${tenantId}`)
+      return existing
+    }
   }
 
   // Get tenant configuration
   const tenant = tenantManager.getTenant(tenantId)
   if (!tenant) {
     logger.warn(
-      `Tenant ${tenantId} not registered, registering with default configuration`,
+      `Tenant ${tenantId.slice(-8)} not registered, registering with default configuration`,
     )
 
     // Auto-register tenant with default configuration
@@ -558,7 +598,7 @@ export async function getTenantFHEService(
     }
 
     // Store the service instance for future use
-    tenantServiceInstances.set(tenantId, tenantService)
+    storeTenantService(tenantId, tenantService)
     return tenantService
   }
 
@@ -580,7 +620,7 @@ export async function getTenantFHEService(
     ): Promise<EncryptedData> => {
       // Track operation for rate limiting
       if (!tenantManager.trackOperation(tenantId)) {
-        throw new Error(`Rate limit exceeded for tenant ${tenantId}`)
+        throw new Error('Rate limit exceeded')
       }
 
       // Add tenant ID to the metadata
@@ -609,7 +649,7 @@ export async function getTenantFHEService(
         encryptedData.metadata['tenantId'] !== tenantId
       ) {
         logger.warn(
-          `Tenant ${tenantId} attempted to decrypt data owned by tenant ${encryptedData.metadata['tenantId']}`,
+          `Tenant ${tenantId.slice(-8)} attempted to decrypt data owned by tenant ${String(encryptedData.metadata['tenantId']).slice(-8)}`,
         )
         throw new Error(
           'Access denied: cannot decrypt data from another tenant',
@@ -621,7 +661,7 @@ export async function getTenantFHEService(
   }
 
   // Cache the service instance
-  tenantServiceInstances.set(tenantId, tenantService)
+  storeTenantService(tenantId, tenantService)
   return tenantService
 }
 
@@ -629,7 +669,9 @@ export async function getTenantFHEService(
  * Get the default FHE service for the current environment
  */
 export async function getDefaultFHEService(): Promise<FHEService> {
-  defaultServiceInstance ??= await getFHEService()
+  if (!defaultServiceInstance) {
+    defaultServiceInstance = await getFHEService()
+  }
   return defaultServiceInstance
 }
 
