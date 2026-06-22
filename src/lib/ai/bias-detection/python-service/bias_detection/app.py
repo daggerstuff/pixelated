@@ -32,8 +32,10 @@ async def lifespan(_app: FastAPI):
     logger.info("Starting bias detection service", version=settings.app_version)
     initialized = await deps.bias_detection_service.initialize()
     if not initialized:
-        logger.error("Failed to initialize bias detection service")
-        raise RuntimeError("Service initialization failed")
+        logger.warning(
+            "Bias detection service initialized with degraded functionality "
+            "(some components failed). Health endpoints will report details."
+        )
     logger.info("Bias detection service started successfully")
     try:
         yield
