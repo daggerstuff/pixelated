@@ -38,7 +38,7 @@ const mockData = {
 // Fetch data from API
 let data = mockData
 let isLoading = false
-let error = null
+let error: string | null = null
 
 try {
   const response = await fetch('/api/dashboard/clinical-validity')
@@ -131,7 +131,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
               </button>
               <button 
                 class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-200 font-medium rounded-lg transition-colors border border-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
-                onclick="this.closest('[role=\"alert\"]').style.display = 'none'"
+                onclick="this.closest('[role=\'alert\']').style.display = 'none'"
               >
                 Dismiss
               </button>
@@ -251,7 +251,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
               if (score < 0.4) colorClass = "bg-red-500"
               
               return (
-                <div key={dimension}>
+                <div>
                   <div class="flex justify-between text-sm mb-1">
                     <span class="font-medium capitalize">{dimension}</span>
                     <span class="font-mono">{scorePercent}%</span>
@@ -341,7 +341,7 @@ if (data.weeklyTrend && data.weeklyTrend.length > 0) {
                 }
                 
                 return (
-                  <tr key={index} class="border-b border-border last:border-0 hover:bg-surface/50">
+                  <tr class="border-b border-border last:border-0 hover:bg-surface/50">
                     <td class="py-3 px-4">{day.date}</td>
                     <td class="py-3 px-4 font-mono">{passRatePercent}%</td>
                     <td class="py-3 px-4">{day.queueDepth}</td>

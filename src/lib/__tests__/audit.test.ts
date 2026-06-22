@@ -30,7 +30,7 @@ describe('audit.ts', () => {
     const storage = {
       getItem: (key: string) => (store.has(key) ? store.get(key)! : null),
       setItem: (key: string, value: string) => {
-        store.set(key, String(value))
+        store.set(key, value)
       },
       removeItem: (key: string) => {
         store.delete(key)
