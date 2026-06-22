@@ -136,8 +136,18 @@ def _event_titles(event: dict[str, Any]) -> list[str]:
 
 def before_send_event(event: dict[str, Any], _hint: Any) -> dict[str, Any] | None:
     """Drop synthetic Sentry smoke-test events before they reach production."""
-    if any(title.lower().startswith("test:") for title in _event_titles(event)):
-        return None
+    titles = _event_titles(event)
+    for title in titles:
+        lower = title.lower()
+        # Drop synthetic smoke-test events
+        if lower.startswith("test:"):
+            return None
+        # Drop known-safe checkpoint deserialisation errors — the service
+        # handles these gracefully by regenerating the model.  See the
+        # module-level _create_basic_model stub in model_service.py for
+        # details.
+        if "_create_basic_model" in lower and "cannot import name" in lower:
+            return None
 
     return event
 
