@@ -10,7 +10,6 @@ allowBuilds:
   '@contrast/fn-inspect': true
   '@dwmkerr/terminal-ai': true
   '@letta-ai/letta-code': true
-  '@schpet/linear-cli': true
   '@modelcontextprotocol/ext-apps': false
   '@newrelic/native-metrics': true
   '@parcel/watcher': true
@@ -71,6 +70,7 @@ allowBuilds:
   '@mongodb-js/zstd': true
   core-js-pure: true
   node-liblzma: true
+  '@schpet/linear-cli': set this to true or false
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
   - '@ai-sdk/*'
@@ -189,8 +189,6 @@ minimumReleaseAgeExclude:
   - jsonwebtoken@9.0.0
   - markdownlint@0.41.0
   - mongoose@9.7.0
-  - nodemailer@8.0.4
-  - nodemailer@8.0.5
   - sharp@0.35.0
   - tinyglobby@0.2.17
   - vue@3.5.38
@@ -303,7 +301,7 @@ overrides:
   node-domexception: ^2.0.1
   node-forge: '>=1.4.0'
   node-gyp: ^10.0.0
-  nodemailer: ^8.0.7
+  nodemailer: ^9.0.1
   openai: npm:openai@6.37.0
   path-to-regexp: 6.3.0
   picomatch: '>=4.0.4'
@@ -325,4 +323,5 @@ overrides:
   yaml@2.7.1: npm:yaml@2.8.4
   yaml@>=2.0.0 <2.8.3: ^2.8.3
   zod: ^4.3.2
+  solid-js: 1.9.12
   ws: '>=8.21.0'

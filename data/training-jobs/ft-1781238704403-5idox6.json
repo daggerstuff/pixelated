@@ -1,9 +1,0 @@
-{
-  "id": "ft-1781238704403-5idox6",
-  "model": "meta-llama/Llama-2-7b",
-  "status": "succeeded",
-  "createdAt": "2026-06-12T04:31:44.403Z",
-  "backend": "huggingface",
-  "progress": 100,
-  "fineTunedModel": "pixelated/fine-tuned-meta-llama-Llama-2-7b-ft-17812"
-}

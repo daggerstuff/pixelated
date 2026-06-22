@@ -96,7 +96,7 @@ export const GET = async ({
     cookies.set('auth-token', tokens.accessToken, {
       path: '/',
       httpOnly: true,
-      secure: !!isProd,
+      secure: isProd,
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60, // 7 days
     })
@@ -106,7 +106,7 @@ export const GET = async ({
       cookies.set('refresh-token', tokens.refreshToken, {
         path: '/',
         httpOnly: true,
-        secure: !!isProd,
+        secure: isProd,
         sameSite: 'lax',
         maxAge: 30 * 24 * 60 * 60, // 30 days
       })

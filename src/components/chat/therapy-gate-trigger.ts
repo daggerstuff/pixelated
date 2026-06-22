@@ -11,7 +11,7 @@ export async function triggerTherapyGateSubmit() {
     '[data-testid="chat-history"]',
   ) as HTMLElement | null
   if (!textarea?.value.trim()) return
-  const gateUrl = (window as any).__gateApiUrl || '/api/ingestion/gate'
+  const gateUrl = (window as any).gateApiUrl ?? '/api/ingestion/gate'
   const message = textarea.value
   textarea.value = ''
   try {
@@ -27,7 +27,7 @@ export async function triggerTherapyGateSubmit() {
       throw new Error(`Gate API returned ${res.status}`)
     }
     const data = await res.json()
-    const blocked = Boolean(data.report?.blocked || data.accepted === false)
+    const blocked = Boolean(data.report?.blocked ?? data.accepted === false)
     if (blocked) {
       const blockEl = document.createElement('div')
       blockEl.setAttribute('role', 'alert')

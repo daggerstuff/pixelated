@@ -692,7 +692,7 @@ export class ThreatCorrelationEngineCore
         attribution1.actor === attribution2.actor) ??
         (attribution1.campaign &&
           attribution2.campaign &&
-          attribution1.campaign === attribution2.campaign)) ||
+          attribution1.campaign === attribution2.campaign)) ??
       (attribution1.family &&
         attribution2.family &&
         attribution1.family === attribution2.family)
