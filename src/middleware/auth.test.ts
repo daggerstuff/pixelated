@@ -108,7 +108,3 @@ describe('withAuth middleware', () => {
     vi.useRealTimers()
   })
 })
-
-  it('should return 401 when API key validation throws an error', async () => {
-    mockValidateApiKey.mockRejectedValue(new Error('Database error'))
-      headers: { 'X-API-Key': 'error-key' },
