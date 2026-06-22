@@ -46,7 +46,7 @@ export const mcpMemoryManager = {
     const response = await api.create({
       content: input.content,
       ...(input.metadata?.category
-        ? { category: String(input.metadata.category) }
+        ? { category: input.metadata.category }
         : {}),
       ...(input.metadata?.tags ? { tags: input.metadata.tags } : {}),
     })
