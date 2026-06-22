@@ -21,7 +21,7 @@ import { MEMORY_API_CONTRACT_VERSION, PublicMemory } from './v1'
 // Response helpers — every v1 route returns one of these two shapes.
 // ---------------------------------------------------------------------------
 
-export function jsonResponse<T>(payload: T, status = 200): Response {
+export function jsonResponse(payload: unknown, status = 200): Response {
   return new Response(JSON.stringify(payload), {
     status,
     headers: {

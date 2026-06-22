@@ -16,7 +16,7 @@ describe("getAIService factory (S2: mock-vs-prod dispatch)", () => {
     vi.stubEnv("PRODUCTION_AI_SERVICE", "");
     const mod = await import("../index");
     mod.resetAIServiceForTesting();
-    const svc = await mod.getAIService();
+    const svc =  mod.getAIService();
     const status = await svc.getStatus();
     expect(status.activeModels).toEqual(["mock-model-v1"]);
     await svc.dispose();
@@ -26,7 +26,7 @@ describe("getAIService factory (S2: mock-vs-prod dispatch)", () => {
     vi.stubEnv("PRODUCTION_AI_SERVICE", "true");
     const mod = await import("../index");
     mod.resetAIServiceForTesting();
-    const svc = await mod.getAIService();
+    const svc =  mod.getAIService();
     const status = await svc.getStatus();
     expect(Array.isArray(status.activeModels)).toBe(true);
     await svc.dispose();

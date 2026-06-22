@@ -35,7 +35,7 @@ async function getQueueStats(): Promise<number> {
     
     if (response.ok) {
       const data = await response.json()
-      return data.pending || 0
+      return data.pending ?? 0
     }
   } catch (error) {
     console.warn('Failed to fetch annotation queue stats:', error)
@@ -87,7 +87,7 @@ async function runBenchmark(): Promise<{
           
           // Calculate pass rate from benchmark results
           // Use correlation score as a proxy for pass rate (normalized to 0-1)
-          const correlationScore = result.overall?.pearson_correlation || 0
+          const correlationScore = result.overall?.pearson_correlation ?? 0
           const passRate = Math.max(0.1, Math.min(0.9, 0.5 + correlationScore * 0.5))
           
           // Extract score distribution from benchmark per_dimension metrics
@@ -96,7 +96,7 @@ async function runBenchmark(): Promise<{
           if (result.per_dimension) {
             // Convert correlation scores to display scores (0-1 range)
             Object.keys(result.per_dimension).forEach(dim => {
-              const corr = result.per_dimension[dim]?.pearson || 0
+              const corr = result.per_dimension[dim]?.pearson ?? 0
               // Map correlation [-1, 1] to score [0.3, 0.9]
               scoreDistribution[dim] = 0.6 + corr * 0.3
             })
@@ -106,7 +106,7 @@ async function runBenchmark(): Promise<{
           const dimensions = ['technique', 'alliance', 'structure', 'cultural', 'ebp', 'dsm5']
           dimensions.forEach(dim => {
             if (!scoreDistribution[dim]) {
-              scoreDistribution[dim] = mockData.scoreDistribution[dim] || 0.5
+              scoreDistribution[dim] = mockData.scoreDistribution[dim] ?? 0.5
             }
           })
           
@@ -153,9 +153,9 @@ async function readBenchmarkFile(): Promise<{
     const result = JSON.parse(data)
     
     return {
-      passRate: result.overall?.pass_rate || mockData.passRate,
-      scoreDistribution: result.per_dimension_breakdown || mockData.scoreDistribution,
-      weeklyTrend: result.historical_trend?.slice(-7) || mockData.weeklyTrend
+      passRate: result.overall?.pass_rate ?? mockData.passRate,
+      scoreDistribution: result.per_dimension_breakdown ?? mockData.scoreDistribution,
+      weeklyTrend: result.historical_trend?.slice(-7) ?? mockData.weeklyTrend
     }
   } catch (error) {
     console.warn('Failed to read benchmark file:', error)

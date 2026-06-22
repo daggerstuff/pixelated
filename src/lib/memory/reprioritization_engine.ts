@@ -666,7 +666,7 @@ export class ReprioritizationEngine {
 
     for (const accumulation of actionable) {
       if (accumulation.evidencePoints.length === 0) continue;
-      const latestPoint = accumulation.evidencePoints[accumulation.evidencePoints.length - 1]!;
+      const latestPoint = accumulation.evidencePoints[accumulation.evidencePoints.length - 1];
       const [score, tier] = this.calculator.calculatePriority(
         accumulation.totalWeight,
         latestPoint.severity,
