@@ -290,7 +290,9 @@ router.get('/me', (req: Request, res: Response) => {
  * Body: { refreshToken: string }
  */
 router.post('/refresh', async (req: Request, res: Response) => {
-  const { refreshToken } = req.body as { refreshToken?: unknown }
+  const { refreshToken } = (req.body ?? {}) as {
+    refreshToken?: unknown
+  }
 
   if (!refreshToken || typeof refreshToken !== 'string') {
     res.status(400).json({

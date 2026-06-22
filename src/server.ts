@@ -150,6 +150,24 @@ app.use(
 // Create Socket.IO service
 const socketService = new SocketService(server, redis, db)
 
+// Global error handlers for unhandled rejections and exceptions
+process.on('unhandledRejection', (reason: unknown) => {
+  console.warn(
+    'Unhandled Rejection:',
+    reason instanceof Error ? reason.message : String(reason),
+  )
+  if (!hasSentryErrorHandler) {
+    Sentry.captureException(reason instanceof Error ? reason : new Error(String(reason)))
+  }
+})
+
+process.on('uncaughtException', (error: Error) => {
+  console.error('Uncaught Exception:', error.message)
+  if (!hasSentryErrorHandler) {
+    Sentry.captureException(error)
+  }
+})
+
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully')
