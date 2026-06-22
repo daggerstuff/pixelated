@@ -29,17 +29,22 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
   const states = [...new Set(data.map((d) => d.state))]
   const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
 
+  // Build O(1) lookup map for O(n) chart construction
+  const dataByKey = new Map<string, StateVelocityDataPoint>()
+  data.forEach((d) => {
+    dataByKey.set(`${d.state}::${d.cohort}`, d)
+  })
+
   const chartData = states.map((state) => {
     const point: Record<string, string | number> = {
       state: state.split('→')[0].trim(),
     }
-    cohorts.forEach((cohort, i) => {
-      const match = data.find((d) => d.state === state && d.cohort === cohort)
+    cohorts.forEach((cohort) => {
+      const match = dataByKey.get(`${state}::${cohort}`)
       if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
     })
     return point
   })
-
   return (
     <Card>
       <CardHeader>
