@@ -114,7 +114,7 @@ class DatabaseService:
     async def _initialize_schema(self) -> None:
         """Initialize database schema"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not initialized")
+            logger.warning("PostgreSQL pool not initialized")
             return
 
         try:
@@ -256,7 +256,9 @@ class DatabaseService:
     async def store_analysis(self, analysis: BiasAnalysisResponse) -> bool:
         """Store bias analysis result"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available for store_analysis")
+            logger.warning(
+                "PostgreSQL pool not available for store_analysis"
+            )
             return False
 
         try:
@@ -351,7 +353,7 @@ class DatabaseService:
     async def get_analysis_by_id(self, analysis_id: str) -> dict[str, Any] | None:
         """Get analysis by ID"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return None
 
         try:
@@ -378,7 +380,7 @@ class DatabaseService:
     ) -> dict[str, Any] | None:
         """Get analysis by request ID"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return None
 
         try:
@@ -405,7 +407,7 @@ class DatabaseService:
     ) -> list[dict[str, Any]]:
         """Get analyses for a user"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return []
 
         try:
@@ -433,7 +435,7 @@ class DatabaseService:
     async def get_analytics_summary(self, days: int = 30) -> dict[str, Any]:
         """Get analytics summary for the last N days"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return {}
 
         try:
@@ -508,7 +510,7 @@ class DatabaseService:
     ) -> bool:
         """Track API usage"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return False
 
         try:
@@ -557,7 +559,7 @@ class DatabaseService:
     ) -> bool:
         """Update model performance metrics"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return False
 
         try:
@@ -651,7 +653,7 @@ class DatabaseService:
     async def get_model_metrics(self, model_name: str) -> dict[str, Any] | None:
         """Get model performance metrics"""
         if not self.pg_pool:
-            logger.error("PostgreSQL pool not available")
+            logger.warning("PostgreSQL pool not available")
             return None
 
         try:
