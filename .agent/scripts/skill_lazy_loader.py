@@ -252,17 +252,27 @@ class SkillLazyLoader:
             return handle
 
     def _resolve_skill_file_path(self, skill_name: str, metadata: dict[str, Any] | None) -> Path | None:
-        """Resolve `SKILL.md` with repo-safe fallbacks.
+        """Resolve `SKILL.md` with global-first precedence.
 
-        Acceptable locations:
-        - Anything under the project-local `.agent/` root.
-        - Anything under the project repo root.
-        - Anything under the global user-level stores
-          (`~/.agents/skills/`, `~/.factory/skills/`).
+        Lookup order (first existing match wins):
+            1. `~/.agents/skills/<name>/SKILL.md`  (canonical global)
+            2. `~/.factory/skills/<name>/SKILL.md` (relay)
+            3. Path from index metadata (legacy `.agents/`, custom)
+            4. `.agent/skills/<name>/SKILL.md` (project-local fill-in)
+
+        Project-local is only consulted as a fill-in because the index
+        always favours globals on name conflict. To intentionally diverge
+        from a global install, place the customised SKILL.md under
+        `~/.agents/skills/` rather than in the repo-local `.agent/skills/`.
         """
 
         candidates: list[Path] = []
 
+        # Globals win first.
+        candidates.append((GLOBAL_SKILLS_DIR / skill_name / "SKILL.md").resolve())
+        candidates.append((GLOBAL_RELAY_DIR / skill_name / "SKILL.md").resolve())
+
+        # Metadata-driven path (legacy local, custom discovered dirs).
         if isinstance(metadata, dict):
             raw_path = metadata.get("path")
             if isinstance(raw_path, str) and raw_path.strip():
@@ -273,9 +283,8 @@ class SkillLazyLoader:
                     candidates.append((REPO_ROOT / candidate).resolve())
                     candidates.append((AGENT_ROOT / candidate).resolve())
 
-        candidates.append((SKILLS_DIR / skill_name / "SKILL.md").resolve())
-        candidates.append((GLOBAL_SKILLS_DIR / skill_name / "SKILL.md").resolve())
-        candidates.append((GLOBAL_RELAY_DIR / skill_name / "SKILL.md").resolve())
+        # Final repo-local fallback for fill-in scenarios.
+        candidates.append((AGENT_ROOT / "skills" / skill_name / "SKILL.md").resolve())
 
         allowed_bases = (AGENT_ROOT, REPO_ROOT, GLOBAL_SKILLS_DIR, GLOBAL_RELAY_DIR)
         for candidate in candidates:

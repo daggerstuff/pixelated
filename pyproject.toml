@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.13"
 dependencies = [
-  "flask",
+  "flask[async]",
   "flask-cors>=6.0.2", # Updated to latest secure version
   "pandas",
   "numpy",
@@ -104,7 +104,7 @@ dependencies = [
   "lancedb>=0.30.2",
   "openai-whisper>=20250625",
   "faster-whisper>=1.2.0",
-  "kernels>=0.12.1",
+  "kernels>=0.12.1,<0.13",
   "peft>=0.10.0",
   "accelerate>=0.28.0",
   "bitsandbytes>=0.43.0",
@@ -129,6 +129,7 @@ dependencies = [
   "data-designer>=0.6.1",
   "nemoguardrails>=0.22.0",
   "pinecone-client>=6.0.0",
+  "ruff>=0.15.17",
 ]
 [project.optional-dependencies]
 test = [
@@ -328,3 +329,13 @@ dev = [
   "sourcery>=1.37.0; sys_platform == 'darwin'",
   "types-requests>=2.32.4.20260107",
 ]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu" }]
+torchvision = [{ index = "pytorch-cpu" }]
+torchaudio = [{ index = "pytorch-cpu" }]

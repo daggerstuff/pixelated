@@ -934,7 +934,7 @@ traitlets==5.14.3
     #   matplotlib-inline
 transformers==5.8.0
     # via -r src/lib/ai/bias-detection/requirements.txt
-triton==3.6.0
+triton==3.7.1
     # via
     #   -r src/lib/ai/bias-detection/requirements.txt
     #   torch

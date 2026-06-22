@@ -217,12 +217,18 @@ def list_global_skill_dirs() -> list[Path]:
 
 
 def scan_skills() -> tuple[dict[str, Any], dict[str, int]]:
-    """Scan both project-local and global skill stores.
+    """Scan global + project-local skill stores with global-first precedence.
 
-    Skills from `~/.agents/skills/` (canonical) and `~/.factory/skills/`
-    (relay) are merged in. Project-local skills take precedence on name
-    conflicts; each entry carries a `scope` field (`local` or `global`)
-    identifying its source.
+    Precedence (lowest -> highest):
+        1. `~/.factory/skills/`  (relay)
+        2. `~/.agents/skills/`   (canonical global)
+        3. `.agents/skills/`     (legacy project-local)
+        4. `.agent/skills/`      (current project-local)
+
+    Globals always win. Project-local skills only fill a slot when no
+    global with the same name exists. To intentionally diverge from the
+    global install, place the customised SKILL.md in `~/.agents/skills/`
+    (or its relay) — not in the project's `.agent/skills/`.
     """
     skills: dict[str, Any] = {}
     totals = {"total": 0, "populated": 0, "missing": 0, "errors": 0}
@@ -235,7 +241,6 @@ def scan_skills() -> tuple[dict[str, Any], dict[str, int]]:
         summary, frontmatter = extract_summary(skill_file)
         category = guess_category(skill_name)
 
-        # Repo-relative path when inside the repo, else absolute string.
         if skill_file.exists():
             try:
                 rel_path = skill_file.relative_to(REPO_ROOT).as_posix()
@@ -274,17 +279,20 @@ def scan_skills() -> tuple[dict[str, Any], dict[str, int]]:
             if frontmatter.get(k):
                 entry[k] = frontmatter[k]
 
-        # Project-local entries override global ones on name conflict.
-        if scope == "local" or skill_name not in skills:
+        if scope == "global":
             skills[skill_name] = entry
+        else:
+            # Locals fill gaps only — globals always win.
+            skills.setdefault(skill_name, entry)
 
-    # Pass 1: global skills (lower precedence).
+    # Globals first (canonical + relay), then locals fill any remaining gaps.
     for skill_dir in list_global_skill_dirs():
         _scan(skill_dir, "global")
 
-    # Pass 2: project-local skills (higher precedence).
     for skill_dir in list_skill_dirs():
         _scan(skill_dir, "local")
+
+    return skills, totals
 
     return skills, totals
 

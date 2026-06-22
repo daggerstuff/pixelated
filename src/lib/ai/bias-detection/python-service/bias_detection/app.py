@@ -10,8 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from . import app_exceptions, deps
-from . import middleware as app_middleware
+from . import app_exceptions, deps, middleware as app_middleware
 from .bootstrap import configure
 from .config import settings
 from .routers import (
@@ -21,6 +20,7 @@ from .routers import (
     health_router,
     models_router,
 )
+from .services.model_service import _load_transformers, _transformer_available
 
 configure()
 logger = structlog.get_logger(__name__)
@@ -30,6 +30,16 @@ logger = structlog.get_logger(__name__)
 async def lifespan(_app: FastAPI):
     """Startup and shutdown lifecycle (replaces deprecated on_event)."""
     logger.info("Starting bias detection service", version=settings.app_version)
+    # Eagerly check that `transformers` is importable so any environment
+    # misconfiguration (e.g. missing native libs for the `tokenizers` Rust
+    # extension) is surfaced immediately at startup, not lazily on first request.
+    _load_transformers()
+    if not _transformer_available():
+        raise RuntimeError(
+            "transformers is not importable — check that libgomp1/libstdc++6 are "
+            "installed and that the transformers package is present in the environment. "
+            "See logged warnings above for the exact import error."
+        )
     initialized = await deps.bias_detection_service.initialize()
     if not initialized:
         logger.error("Failed to initialize bias detection service")
