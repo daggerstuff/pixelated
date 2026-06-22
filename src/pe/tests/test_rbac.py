@@ -44,8 +44,8 @@ class TestRBAC:
             asyncio.run(checker({"role": "manager", "tenant_id": "t1", "user_id": "u1"}))
         assert exc.value.status_code == 403
 
-    def test_same_tenant_or_super_admin_passes_for_super_admin(self) -> None:
-        """Should pass for super_admin even if tenant_id differs."""
-        checker = same_tenant_or_super_admin("target_tenant")
-        result = asyncio.run(checker({"role": "super_admin", "tenant_id": "different_tenant", "user_id": "u1"}))
-        assert result["role"] == "super_admin"
+    def test_same_tenant_or_super_admin_passes_for_same_tenant(self) -> None:
+        """Should pass when user belongs to the target tenant."""
+        checker = same_tenant_or_super_admin("t1")
+        result = asyncio.run(checker({"role": "learner", "tenant_id": "t1", "user_id": "u1"}))
+        assert result["tenant_id"] == "t1"
