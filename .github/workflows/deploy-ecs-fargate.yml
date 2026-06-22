@@ -145,7 +145,7 @@ jobs:
 
       - name: Set up QEMU (multi-arch build support)
         if: inputs.image_tag == ''
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
 
       - name: Set up Docker Buildx
         if: inputs.image_tag == ''
