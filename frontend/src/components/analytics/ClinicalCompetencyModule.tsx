@@ -6,22 +6,27 @@ import type { StateVelocityDataPoint, InterventionRate, DeEscalationDataPoint, O
 import { DEMO_COMPETENCY } from '@/services/analyticsV2Service'
 import { BarChart, Bar } from 'recharts'
 import { AlertTriangle, Activity } from 'lucide-react'
+import { useMemo } from 'react'
 
 // State Transition Velocity Chart
 function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
   // Group by cohort
-  const states = [...new Set(data.map(d => d.state))]
-  const cohorts = [...new Set(data.map(d => d.cohort).filter(Boolean))]
-  const colors = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
+  const { states, cohorts, colors, chartData } = useMemo(() => {
+    // ⚡ Bolt: Memoize expensive array maps and filters to prevent recalculation on every render
+    const states = [...new Set(data.map(d => d.state))]
+    const cohorts = [...new Set(data.map(d => d.cohort).filter(Boolean))]
+    const colors = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
 
-  const chartData = states.map(state => {
-    const point: any = { state: state.split('→')[0].trim() }
-    cohorts.forEach((cohort, i) => {
-      const match = data.find(d => d.state === state && d.cohort === cohort)
-      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+    const chartData = states.map(state => {
+      const point: any = { state: state.split('→')[0].trim() }
+      cohorts.forEach((cohort, i) => {
+        const match = data.find(d => d.state === state && d.cohort === cohort)
+        if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+      })
+      return point
     })
-    return point
-  })
+    return { states, cohorts, colors, chartData }
+  }, [data])
 
   return (
     <Card>
