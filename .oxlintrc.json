@@ -146,6 +146,8 @@
           "_encryptSensitive",
           "_wireEvents",
           "__v",
+          "__categoriesFilter",
+          "__gateApiUrl",
           "_failures",
           "_realTimeAnalyzer",
           "__dirname",
