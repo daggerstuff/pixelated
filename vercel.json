@@ -1,6 +1,6 @@
 {
   "buildCommand": "pnpm exec astro build",
-  "outputDirectory": ".vercel/output",
+  "outputDirectory": "dist",
   "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "astro",
   "regions": ["iad1"]
