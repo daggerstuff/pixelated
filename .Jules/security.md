@@ -1,0 +1,1 @@
+## 2026-06-21 - Overly Permissive CORS Policy in AI Services API | Pattern: Hardcoded `*` in Access-Control-Allow-Origin | Action: Used a whitelist approach for `Access-Control-Allow-Origin` by creating and using `getAllowedOrigin` utility function to safely validate origins based on environment variable configuration.
