@@ -132,5 +132,5 @@ export function extractAndParseJson(text: string): unknown | null {
   if (!jsonString) {
     return null
   }
-  return safeJsonParse<unknown>(jsonString)
+  return safeJsonParse(jsonString)
 }

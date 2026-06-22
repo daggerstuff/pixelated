@@ -98,7 +98,7 @@ describe('safeJsonParse', () => {
     }
 
     const input = '{"name": "test", "count": 42}'
-    const result = safeJsonParse<TestType>(input)
+    const result = safeJsonParse(input)
     expect(result).toEqual({ name: 'test', count: 42 })
   })
 })
@@ -132,7 +132,7 @@ describe('extractAndParseJson', () => {
 
     const input =
       'Result: {"category": "anxiety", "confidence": 0.9, "reasoning": "signs of worry"}'
-    const result = extractAndParseJson<LLMResponse>(input)
+    const result = extractAndParseJson(input)
     expect(result).toEqual({
       category: 'anxiety',
       confidence: 0.9,

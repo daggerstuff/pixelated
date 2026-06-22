@@ -65,7 +65,7 @@ export class AnalyticsDataService {
 
     try {
       // Check cache first
-      const cachedData = this.getCachedData<AnalyticsChartData>(cacheKey)
+      const cachedData = this.getCachedData(cacheKey) as AnalyticsChartData | null
       if (cachedData) {
         logger.debug('Returning cached analytics data')
         return cachedData
