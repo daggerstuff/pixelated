@@ -5,6 +5,8 @@ Tests for NVIDIA API service
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
+
 from bias_detection.services.nvidia_api_service import (
     NvidiaAPIService,
     kimi_chat_completion,
@@ -119,8 +121,16 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         mock_client_instance = AsyncMock()
         mock_httpx_client.return_value.__aenter__.return_value = mock_client_instance
 
-        mock_response = MagicMock()
-        mock_response.raise_for_status = MagicMock(side_effect=Exception("HTTP Error"))
+        mock_request = MagicMock(spec=httpx.Request)
+        mock_response = MagicMock(spec=httpx.Response)
+        mock_response.status_code = 500
+        mock_response.text = '{"error": "Internal Server Error"}'
+
+        mock_response.raise_for_status = MagicMock(
+            side_effect=httpx.HTTPStatusError(
+                "HTTP Error", request=mock_request, response=mock_response
+            )
+        )
         mock_client_instance.post.return_value = mock_response
 
         # Create service instance
@@ -128,7 +138,7 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         service.api_key = self.mock_api_key
 
         # Call method and expect exception
-        with self.assertRaises(Exception):
+        with self.assertRaises(httpx.HTTPStatusError):
             await service.chat_completion(self.mock_messages)
 
     @patch("bias_detection.services.nvidia_api_service.httpx.AsyncClient")

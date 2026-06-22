@@ -138,7 +138,7 @@ class Recommendation(BaseModel):
     type: str = Field(description="Type of recommendation")
     description: str = Field(description="Detailed recommendation description")
     priority: str = Field(description="Priority: high, medium, low")
-    implementation_difficulty: str = Field(description="Difficulty: easy, medium, hard")
+    implementation_difficulty: str = Field(description="Difficulty: low, medium, high")
     estimated_impact: str = Field(description="Expected impact: low, medium, high")
     examples: list[str] = Field(
         default_factory=list, description="Example implementations"

@@ -21,7 +21,6 @@ TRANSFORMER_IMPORT_ATTEMPTED = False
 TRANSFORMERS_AVAILABLE = False
 AutoTokenizer = None
 BertModel = None
-TFBertForSequenceClassification = None
 
 TENSORFLOW_IMPORT_ATTEMPTED = False
 TENSORFLOW_AVAILABLE = False
@@ -44,7 +43,6 @@ def _load_transformers() -> None:
     global TRANSFORMERS_AVAILABLE
     global AutoTokenizer
     global BertModel
-    global TFBertForSequenceClassification
 
     if TRANSFORMER_IMPORT_ATTEMPTED:
         return
@@ -55,14 +53,16 @@ def _load_transformers() -> None:
         from transformers import (
             AutoTokenizer,
             BertModel,
-            TFBertForSequenceClassification,
         )
 
         TRANSFORMERS_AVAILABLE = True
-    except Exception:
+    except Exception as exc:
+        logger = structlog.get_logger(__name__)
+        logger.warning(
+            "Failed to import transformers", error=str(exc), exc_info=True
+        )
         AutoTokenizer = None
         BertModel = None
-        TFBertForSequenceClassification = None
         TRANSFORMERS_AVAILABLE = False
 
 
@@ -462,9 +462,24 @@ class PyTorchModelService(ModelService):
 
             # Load model
             model_file = self.model_path / "model.pt"
+            state_file = self.model_path / "model_state.pt"
             torch = self._torch
-            if model_file.exists():
-                self.model = torch.load(model_file, map_location=self.device)
+            if state_file.exists():
+                # Load via state_dict (avoids pickling nested class path issues)
+                self.model = self._create_basic_model()
+                state_dict = torch.load(state_file, map_location=self.device, weights_only=True)
+                self.model.load_state_dict(state_dict)
+            elif model_file.exists():
+                # Legacy full-model pickle — try state_dict first, fall back on pickle error
+                try:
+                    self.model = self._create_basic_model()
+                    state_dict = torch.load(
+                        model_file, map_location=self.device, weights_only=True
+                    )
+                    self.model.load_state_dict(state_dict)
+                except Exception:
+                    # Full-model pickle legacy fallback
+                    self.model = torch.load(model_file, map_location=self.device)
             else:
                 # Create basic model if not found
                 self.model = self._create_basic_model()
@@ -516,9 +531,10 @@ class PyTorchModelService(ModelService):
         # Create and save a basic bias detection model
         model = self._create_basic_model()
 
-        # Save model
+        # Save model via state_dict (avoids pickling nested class path issues)
+        state_path = str(self.model_path / "model_state.pt")
         torch = self._torch
-        torch.save(model, str(self.model_path / "model.pt"))
+        torch.save(model.state_dict(), state_path)
 
         # Save tokenizer
         _load_transformers()
@@ -534,8 +550,7 @@ class PyTorchModelService(ModelService):
 
     def _create_basic_model(self) -> torch.nn.Module:
         """Create a basic bias detection model"""
-        # Simple BERT-based model for bias detection using top-level BertModel
-
+        # Simple BERT-based model for bias detection
         torch = self._torch
         _load_transformers()
         if BertModel is None:
