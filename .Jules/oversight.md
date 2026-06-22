@@ -1,0 +1,1 @@
+## 2026-06-22 - Data Privacy Oversight | Data Type: PII (userId/sessionId) | Rule: User IDs and Session IDs should not be logged directly via console.log; they must be securely handled or removed to ensure compliance and proper masking.
