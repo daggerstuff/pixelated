@@ -1,8 +1,0 @@
-{
-  "id": "ft-1781246028525-91g49i",
-  "model": "gpt-4o",
-  "status": "succeeded",
-  "createdAt": "2026-06-12T06:33:48.525Z",
-  "fineTunedModel": "gpt-4o:dry-run-ft-17812",
-  "backend": "dry-run"
-}

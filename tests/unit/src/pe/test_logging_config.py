@@ -1,9 +1,7 @@
-import logging
 from unittest.mock import MagicMock, patch
 
-import structlog
-
 from src.pe.logging_config import setup_logging
+
 
 @patch("src.pe.logging_config.logging.getLogger")
 @patch("src.pe.logging_config.logging.StreamHandler")
@@ -32,6 +30,7 @@ def test_setup_logging_default_info(mock_configure, mock_stream_handler, mock_ge
     # Verify noisy libraries are quieted
     mock_get_logger.assert_any_call("uvicorn.access")
     mock_get_logger.assert_any_call("asyncpg")
+
 
 @patch("src.pe.logging_config.logging.getLogger")
 @patch("src.pe.logging_config.logging.StreamHandler")
