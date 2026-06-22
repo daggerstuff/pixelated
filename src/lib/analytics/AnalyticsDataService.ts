@@ -411,10 +411,7 @@ export class AnalyticsDataService {
     return categoryMap[skillName as keyof typeof categoryMap] || 'technical'
   }
 
-  /**
-   * Cache management
-   */
-  private getCachedData<T = unknown>(key: string): T | null {
+  private getCachedData(key: string): unknown | null {
     const entry = this.cache.get(key)
     if (!entry) {
       return null
@@ -426,7 +423,7 @@ export class AnalyticsDataService {
       return null
     }
 
-    return entry.data as T
+    return entry.data as unknown
   }
 
   private setCachedData(key: string, data: unknown, ttl: number): void {
