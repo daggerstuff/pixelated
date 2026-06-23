@@ -170,7 +170,6 @@ async function checkSessionAccess(
 ): Promise<boolean> {
   // In a real implementation, this would check the database for access permissions
   // For this example, we'll assume the check passes
-  console.log(`Checking access for user ${userId} to session ${sessionId}`)
   return true
 }
 

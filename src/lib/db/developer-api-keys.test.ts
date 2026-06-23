@@ -18,8 +18,8 @@ type MockQueryResult<TRow> = {
   fields: unknown[]
 }
 
-const createMockQueryResult = <TRow>(
-  rows: TRow[],
+const createMockQueryResult = (
+  rows: unknown[],
   rowCount = rows.length,
 ): DbQueryResult<QueryResultRow> => ({
   rows: rows as unknown as QueryResultRow[],
@@ -80,7 +80,7 @@ describe('DeveloperApiKeyManager', () => {
 
     it('should return invalid for non-existent key', async () => {
       mockQuery.mockResolvedValueOnce(
-        createMockQueryResult<{ id: string }>([], 0),
+        createMockQueryResult([], 0),
       )
 
       const result = await manager.validateApiKey('dev_invalid')

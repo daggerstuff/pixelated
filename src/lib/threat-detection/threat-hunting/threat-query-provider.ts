@@ -46,11 +46,10 @@ export class ThreatQueryProvider {
   ): Promise<HuntFinding[]> {
     try {
       const findings: HuntFinding[] = []
-      const rawPattern = (query['patternMatch'] as string) || 'rate_limit:*'
+      const rawPattern = typeof query['patternMatch'] === 'string' ? query['patternMatch'] : 'rate_limit:*'
       const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-      const pattern = sanitizedSuffix.includes(':')
-        ? sanitizedSuffix
-        : `rate_limit:${sanitizedSuffix}`
+      const cleanSuffix = sanitizedSuffix.replace(/^rate_limit:/, '')
+      const pattern = `rate_limit:${cleanSuffix}`
 
       if (query['patternMatch'] || query['scanEnabled']) {
         const [_nextCursor, keys] = await this.redis.scan(
@@ -114,9 +113,10 @@ export class ThreatQueryProvider {
     const skip = (page - 1) * limit
 
     // P3.1 SECURITY FIX: Sanitize input and strictly prefix with 'threat:'.
-    const rawPattern = (searchData['patternMatch'] as string) || '*'
+    const rawPattern = typeof searchData['patternMatch'] === 'string' ? searchData['patternMatch'] : '*'
     const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
-    const pattern = `threat:${sanitizedSuffix}`
+    const cleanSuffix = sanitizedSuffix.replace(/^threat:/, '')
+    const pattern = `threat:${cleanSuffix}`
 
     this.pruneCache()
 
