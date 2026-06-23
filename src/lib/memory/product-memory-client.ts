@@ -54,7 +54,7 @@ export class ProductMemoryClient {
     const response = await this.api.create({
       content: input.content,
       ...(input.metadata?.category
-        ? { category: String(input.metadata.category) }
+        ? { category: input.metadata.category }
         : {}),
       ...(input.metadata?.tags ? { tags: input.metadata.tags } : {}),
     })

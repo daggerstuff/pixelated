@@ -5,7 +5,7 @@ import asyncio
 import pytest
 from fastapi import HTTPException
 
-from src.pe.core.rbac import UserRole, require_role, role_at_least
+from src.pe.core.rbac import UserRole, require_role, role_at_least, same_tenant_or_super_admin
 
 
 class TestRBAC:
@@ -43,3 +43,9 @@ class TestRBAC:
         with pytest.raises(HTTPException) as exc:
             asyncio.run(checker({"role": "manager", "tenant_id": "t1", "user_id": "u1"}))
         assert exc.value.status_code == 403
+
+    def test_same_tenant_or_super_admin_passes_for_same_tenant(self) -> None:
+        """Should pass when user belongs to the target tenant."""
+        checker = same_tenant_or_super_admin("t1")
+        result = asyncio.run(checker({"role": "learner", "tenant_id": "t1", "user_id": "u1"}))
+        assert result["tenant_id"] == "t1"
