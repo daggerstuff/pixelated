@@ -1,47 +1,47 @@
-import type { WebSocket } from 'ws'
-import { z } from 'zod'
+import type { WebSocket } from "ws";
+import { z } from "zod";
 
-import { config } from '../../../config/env.config'
+import { config } from "../../../config/env.config";
 // RoutingContext is used only in the CrisisAlertContext interface which extends it
 // The interface will be used structurally without requiring the named export
-type RoutingContext = Record<string, unknown>
-import { EmailService, type EmailConfig } from '../../../lib/email'
-import { createBuildSafeLogger } from '../../../lib/logging/build-safe-logger'
-import { redis } from '../../../lib/redis'
-import { asRedisOps } from '../../../lib/redis-ops'
-import { generateVAPIDKeys, sendNotification } from './pushUtils'
-import type { PushSubscription } from './pushUtils'
-import { sendSMS, isValidPhoneNumber } from './smsUtils'
+type RoutingContext = Record<string, unknown>;
+import { EmailService, type EmailConfig } from "../../../lib/email";
+import { createBuildSafeLogger } from "../../../lib/logging/build-safe-logger";
+import { redis } from "../../../lib/redis";
+import { asRedisOps } from "../../../lib/redis-ops";
+import { generateVAPIDKeys, sendNotification } from "./pushUtils";
+import type { PushSubscription } from "./pushUtils";
+import { sendSMS, isValidPhoneNumber } from "./smsUtils";
 
 // Create a logger instance
-const logger = createBuildSafeLogger('NotificationService')
+const logger = createBuildSafeLogger("NotificationService");
 
 // Crisis Alert Template ID
-const CRISIS_ALERT_TEMPLATE_ID = 'crisis_alert_v1'
+const CRISIS_ALERT_TEMPLATE_ID = "crisis_alert_v1";
 
 // Notification channel types
 export const NotificationChannel = {
-  IN_APP: 'in_app',
-  PUSH: 'push',
-  EMAIL: 'email',
-  SMS: 'sms',
-} as const
+  IN_APP: "in_app",
+  PUSH: "push",
+  EMAIL: "email",
+  SMS: "sms",
+} as const;
 
 // Notification priority levels
 export const NotificationPriority = {
-  LOW: 'low',
-  NORMAL: 'normal',
-  HIGH: 'high',
-  URGENT: 'urgent',
-} as const
+  LOW: "low",
+  NORMAL: "normal",
+  HIGH: "high",
+  URGENT: "urgent",
+} as const;
 
 // Notification status types
 export const NotificationStatus = {
-  PENDING: 'pending',
-  DELIVERED: 'delivered',
-  FAILED: 'failed',
-  READ: 'read',
-} as const
+  PENDING: "pending",
+  DELIVERED: "delivered",
+  FAILED: "failed",
+  READ: "read",
+} as const;
 
 // Notification template schema
 const NotificationTemplateSchema = z.object({
@@ -63,9 +63,9 @@ const NotificationTemplateSchema = z.object({
     NotificationPriority.URGENT,
   ]),
   metadata: z.record(z.string(), z.unknown()).optional(),
-})
+});
 
-type NotificationTemplate = z.infer<typeof NotificationTemplateSchema>
+type NotificationTemplate = z.infer<typeof NotificationTemplateSchema>;
 
 // Notification data schema
 const NotificationDataSchema = z.object({
@@ -90,9 +90,9 @@ const NotificationDataSchema = z.object({
       NotificationPriority.URGENT,
     ])
     .optional(),
-})
+});
 
-type NotificationData = z.infer<typeof NotificationDataSchema>
+type NotificationData = z.infer<typeof NotificationDataSchema>;
 
 // Notification item schema
 const NotificationItemSchema = z.object({
@@ -126,24 +126,24 @@ const NotificationItemSchema = z.object({
   deliveredAt: z.number().nullable(),
   readAt: z.number().nullable(),
   error: z.string().nullable(),
-})
+});
 
-type NotificationItem = z.infer<typeof NotificationItemSchema>
+type NotificationItem = z.infer<typeof NotificationItemSchema>;
 
 // Export the NotificationItem type
-export type { NotificationItem }
+export type { NotificationItem };
 
 /**
  * Defines the context for a crisis alert.
  */
 export interface CrisisAlertContext extends RoutingContext {
-  timestamp: string // ISO 8601 timestamp
-  textSample: string // A sample of the text that triggered the crisis
-  decisionDetails?: Record<string, unknown> // Details from the routing decision
-  userId: string
-  sessionId: string
-  sessionType: string
-  explicitTaskHint: string
+  timestamp: string; // ISO 8601 timestamp
+  textSample: string; // A sample of the text that triggered the crisis
+  decisionDetails?: Record<string, unknown>; // Details from the routing decision
+  userId: string;
+  sessionId: string;
+  sessionType: string;
+  explicitTaskHint: string;
 }
 
 /**
@@ -158,99 +158,97 @@ export interface ICrisisNotificationHandler {
    * @returns Promise<void> Resolves when the alert has been dispatched, or rejects on failure.
    * @throws Error if the notification dispatch fails and cannot be handled gracefully.
    */
-  sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void>
+  sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void>;
 
   // Potentially other notification methods can be added here, e.g.:
   // sendSystemNotification(message: string, level: 'info' | 'warn' | 'error'): Promise<void>;
 }
 
 export class NotificationService {
-  private readonly emailService: EmailService
-  private readonly wsClients: Map<string, WebSocket>
-  private readonly templates: Map<string, NotificationTemplate>
-  private vapidKeys: { publicKey: string; privateKey: string } | null = null
-  private readonly queueKey = 'notification_queue'
-  private readonly processingKey = 'notification_processing'
-  private readonly subscriptionKey = 'push_subscriptions'
+  private readonly emailService: EmailService;
+  private readonly wsClients: Map<string, WebSocket>;
+  private readonly templates: Map<string, NotificationTemplate>;
+  private vapidKeys: { publicKey: string; privateKey: string } | null = null;
+  private readonly queueKey = "notification_queue";
+  private readonly processingKey = "notification_processing";
+  private readonly subscriptionKey = "push_subscriptions";
 
   constructor() {
     const emailConfig: EmailConfig = {
-      provider: 'smtp',
-      fromEmail: config.email.from() ?? 'noreply@example.com',
-      fromName: 'Pixelated Empathy',
-      smtpHost: process.env['SMTP_HOST'],
-      smtpPort: Number.parseInt(process.env['SMTP_PORT'] ?? '587'),
-      smtpUser: process.env['SMTP_USER'],
-      smtpPassword: process.env['SMTP_PASSWORD'],
-      apiKey: process.env['EMAIL_API_KEY'],
-    }
-    this.emailService = new EmailService(emailConfig)
-    this.wsClients = new Map()
-    this.templates = new Map()
+      provider: "smtp",
+      fromEmail: config.email.from() ?? "noreply@example.com",
+      fromName: "Pixelated Empathy",
+      smtpHost: process.env["SMTP_HOST"],
+      smtpPort: Number.parseInt(process.env["SMTP_PORT"] ?? "587"),
+      smtpUser: process.env["SMTP_USER"],
+      smtpPassword: process.env["SMTP_PASSWORD"],
+      apiKey: process.env["EMAIL_API_KEY"],
+    };
+    this.emailService = new EmailService(emailConfig);
+    this.wsClients = new Map();
+    this.templates = new Map();
     this.initializeVAPIDKeys().catch((error) => {
-      logger.error('Failed to initialize VAPID keys', {
+      logger.error("Failed to initialize VAPID keys", {
         error:
           error instanceof Error
             ? error instanceof Error
               ? error.message
-              : 'Unknown error'
+              : "Unknown error"
             : String(error),
-      })
-    })
+      });
+    });
     this.initializeCrisisTemplate().catch((error) => {
-      logger.error('Failed to initialize crisis template', {
+      logger.error("Failed to initialize crisis template", {
         error:
           error instanceof Error
             ? error instanceof Error
               ? error.message
-              : 'Unknown error'
+              : "Unknown error"
             : String(error),
-      })
-    })
+      });
+    });
   }
 
   private async initializeVAPIDKeys() {
     // Try to get existing VAPID keys from config
-    const publicKey = config.notifications.vapidPublicKey()
-    const privateKey = config.notifications.vapidPrivateKey()
+    const publicKey = config.notifications.vapidPublicKey();
+    const privateKey = config.notifications.vapidPrivateKey();
 
     if (publicKey && privateKey) {
-      this.vapidKeys = { publicKey, privateKey }
+      this.vapidKeys = { publicKey, privateKey };
     } else {
       // Generate new VAPID keys if not configured
-      this.vapidKeys = await generateVAPIDKeys()
-      logger.info('Generated new VAPID keys')
+      this.vapidKeys = await generateVAPIDKeys();
+      logger.info("Generated new VAPID keys");
     }
   }
 
   private async initializeCrisisTemplate(): Promise<void> {
     if (!this.templates.has(CRISIS_ALERT_TEMPLATE_ID)) {
       // adminEmail may not be present on config.notifications type, but is expected here.
-      const adminEmail = (config.notifications as any).adminEmail?.()
+      const adminEmail = (config.notifications as any).adminEmail?.();
       if (!adminEmail) {
         logger.warn(
-          'Admin email not configured. Crisis email alerts will not be sent by default template.',
-        )
+          "Admin email not configured. Crisis email alerts will not be sent by default template.",
+        );
       }
       const crisisTemplate: NotificationTemplate = {
         id: CRISIS_ALERT_TEMPLATE_ID,
-        title: 'CRITICAL ALERT: Potential Crisis Detected',
+        title: "CRITICAL ALERT: Potential Crisis Detected",
         // Body can be simple, actual details will be in the data payload
-        body: 'A potential user crisis has been detected by the MentalLLaMA system. Urgent review required. Details: {{textSample}} UserID: {{userId}} SessionID: {{sessionId}} Timestamp: {{timestamp}}',
+        body: "A potential user crisis has been detected by the MentalLLaMA system. Urgent review required. Details: {{textSample}} UserID: {{userId}} SessionID: {{sessionId}} Timestamp: {{timestamp}}",
         channels: adminEmail ? [NotificationChannel.EMAIL] : [], // Add other channels like SMS if admin phone is configured
         priority: NotificationPriority.URGENT,
         metadata: { isCrisisAlert: true },
-      }
+      };
       try {
-        await this.registerTemplate(crisisTemplate)
-        logger.info(
-          `Default crisis alert template '${CRISIS_ALERT_TEMPLATE_ID}' registered.`,
-        )
+        await this.registerTemplate(crisisTemplate);
+        logger.info(`Default crisis alert template '${CRISIS_ALERT_TEMPLATE_ID}' registered.`);
       } catch (error: unknown) {
         logger.error(
           `Failed to register default crisis alert template: ${CRISIS_ALERT_TEMPLATE_ID}`,
           { error },
-        )
+        );
       }
     }
   }
@@ -260,32 +258,32 @@ export class NotificationService {
    */
   registerClient(userId: string, ws: WebSocket): void {
     // Clean up any existing connection
-    const existingWs = this.wsClients.get(userId)
+    const existingWs = this.wsClients.get(userId);
     if (existingWs) {
-      existingWs.close()
-      this.wsClients.delete(userId)
+      existingWs.close();
+      this.wsClients.delete(userId);
     }
 
     // Register new connection
-    this.wsClients.set(userId, ws)
+    this.wsClients.set(userId, ws);
 
     // Handle cleanup on close
-    ws.on('close', () => {
+    ws.on("close", () => {
       // Only delete if this is still the registered client
       if (this.wsClients.get(userId) === ws) {
-        this.wsClients.delete(userId)
+        this.wsClients.delete(userId);
       }
-    })
+    });
   }
 
   /**
    * Unregister a WebSocket client for a user
    */
   unregisterClient(userId: string): void {
-    const ws = this.wsClients.get(userId)
+    const ws = this.wsClients.get(userId);
     if (ws) {
-      ws.close()
-      this.wsClients.delete(userId)
+      ws.close();
+      this.wsClients.delete(userId);
     }
   }
 
@@ -294,10 +292,10 @@ export class NotificationService {
    */
   async registerTemplate(template: NotificationTemplate): Promise<void> {
     // Validate template
-    NotificationTemplateSchema.parse(template)
+    NotificationTemplateSchema.parse(template);
 
     // Store template
-    this.templates.set(template.id, template)
+    this.templates.set(template.id, template);
 
     // If template includes email channel, register email template
     if (template.channels.includes(NotificationChannel.EMAIL)) {
@@ -305,8 +303,8 @@ export class NotificationService {
         alias: template.id,
         subject: template.title,
         htmlBody: template.body,
-        from: config.email.from() ?? 'noreply@example.com',
-      })
+        from: config.email.from() ?? "noreply@example.com",
+      });
     }
   }
 
@@ -315,12 +313,12 @@ export class NotificationService {
    */
   async queueNotification(data: NotificationData): Promise<string> {
     // Validate notification data
-    NotificationDataSchema.parse(data)
+    NotificationDataSchema.parse(data);
 
     // Get template
-    const template = this.templates.get(data.templateId)
+    const template = this.templates.get(data.templateId);
     if (!template) {
-      throw new Error(`Template ${data.templateId} not found`)
+      throw new Error(`Template ${data.templateId} not found`);
     }
 
     // Create notification item
@@ -338,37 +336,35 @@ export class NotificationService {
       deliveredAt: null,
       readAt: null,
       error: null,
-    }
+    };
 
     // Add to queue
-    await asRedisOps(redis).lpush(this.queueKey, JSON.stringify(notification))
+    await asRedisOps(redis).lpush(this.queueKey, JSON.stringify(notification));
 
-    logger.info('Notification queued', {
+    logger.info("Notification queued", {
       id: notification.id,
       userId: notification.userId,
       templateId: notification.templateId,
       channels: notification.channels,
-    })
+    });
 
-    return notification.id
+    return notification.id;
   }
 
   /**
    * Start processing notifications at a specific interval
    */
   async startProcessing(interval: number): Promise<void> {
-    logger.info(
-      `Starting notification processing loop (interval: ${interval}ms)`,
-    )
+    logger.info(`Starting notification processing loop (interval: ${interval}ms)`);
     while (true) {
       try {
-        await this.processQueue()
+        await this.processQueue();
       } catch (error: unknown) {
-        logger.error('Error in notification processing loop', {
+        logger.error("Error in notification processing loop", {
           error: error instanceof Error ? String(error) : String(error),
-        })
+        });
       }
-      await new Promise((resolve) => setTimeout(resolve, interval))
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
   }
 
@@ -378,80 +374,86 @@ export class NotificationService {
   async processQueue(): Promise<void> {
     while (true) {
       // Move item from queue to processing
-      const item = await asRedisOps(redis).rpoplpush(
-        this.queueKey,
-        this.processingKey,
-      )
+      const item = await asRedisOps(redis).rpoplpush(this.queueKey, this.processingKey);
       if (!item) {
-        break
+        break;
       }
 
-      const notification = NotificationItemSchema.parse(
-        JSON.parse(item) as unknown,
-      )
+      let parsedItem: unknown;
+      try {
+        parsedItem = JSON.parse(item);
+      } catch (parseError) {
+        logger.error("Failed to parse notification queue item, removing from processing", {
+          error: parseError instanceof Error ? parseError.message : String(parseError),
+          item: item.substring(0, 200),
+        });
+        await asRedisOps(redis).lrem(this.processingKey, 1, item);
+        continue;
+      }
+
+      const notification = NotificationItemSchema.parse(parsedItem);
 
       try {
         // Process each channel
         for (const channel of notification.channels) {
           switch (channel) {
             case NotificationChannel.IN_APP:
-              await this.deliverInApp(notification)
-              break
+              await this.deliverInApp(notification);
+              break;
             case NotificationChannel.PUSH:
-              await this.deliverPush(notification)
-              break
+              await this.deliverPush(notification);
+              break;
             case NotificationChannel.EMAIL:
-              await this.deliverEmail(notification)
-              break
+              await this.deliverEmail(notification);
+              break;
             case NotificationChannel.SMS:
-              await this.deliverSMS(notification)
-              break
+              await this.deliverSMS(notification);
+              break;
           }
         }
 
         // Update status
-        notification.status = NotificationStatus.DELIVERED
-        notification.deliveredAt = Date.now()
+        notification.status = NotificationStatus.DELIVERED;
+        notification.deliveredAt = Date.now();
 
         // Store delivered notification
         await asRedisOps(redis).hset(
           `notifications:${notification.userId}`,
           notification.id,
           JSON.stringify(notification),
-        )
+        );
 
         // Remove from processing queue
-        await asRedisOps(redis).lrem(this.processingKey, 1, item)
+        await asRedisOps(redis).lrem(this.processingKey, 1, item);
 
-        logger.info('Notification delivered', {
+        logger.info("Notification delivered", {
           id: notification.id,
           userId: notification.userId,
           templateId: notification.templateId,
           channels: notification.channels,
-        })
+        });
       } catch (error: unknown) {
         // Update status and error
-        notification.status = NotificationStatus.FAILED
-        notification.error =
-          error instanceof Error ? String(error) : String(error)
+        notification.status = NotificationStatus.FAILED;
+        notification.error = error instanceof Error ? String(error) : String(error);
 
         // Store failed notification
         await asRedisOps(redis).hset(
           `notifications:${notification.userId}`,
           notification.id,
           JSON.stringify(notification),
-        )
+        );
 
         // Remove from processing queue
-        await asRedisOps(redis).lrem(this.processingKey, 1, item)
+        await asRedisOps(redis).lrem(this.processingKey, 1, item);
 
-        logger.error('Notification delivery failed', {
+        logger.error("Notification delivery failed", {
           id: notification.id,
           userId: notification.userId,
           templateId: notification.templateId,
           channels: notification.channels,
           error: notification.error,
-        })
+        });
       }
     }
   }
@@ -460,122 +462,120 @@ export class NotificationService {
    * Mark a notification as read
    */
   async markAsRead(userId: string, notificationId: string): Promise<void> {
-    const notification = await asRedisOps(redis).hget(
-      `notifications:${userId}`,
-      notificationId,
-    )
+    const notification = await asRedisOps(redis).hget(`notifications:${userId}`, notificationId);
     if (!notification) {
-      throw new Error('Notification not found')
+      throw new Error("Notification not found");
     }
 
-    const parsed = NotificationItemSchema.parse(
-      JSON.parse(notification) as NotificationItem,
-    )
-    parsed.status = NotificationStatus.READ
-    parsed.readAt = Date.now()
+    let parsedNotification: unknown;
+    try {
+      parsedNotification = JSON.parse(notification);
+    } catch (parseError) {
+      logger.error("Failed to parse notification data for markAsRead", {
+        error: parseError instanceof Error ? parseError.message : String(parseError),
+        userId,
+        notificationId,
+      });
+      throw new Error("Failed to parse notification data");
+    }
 
-    await asRedisOps(redis).hset(
-      `notifications:${userId}`,
-      notificationId,
-      JSON.stringify(parsed),
-    )
+    const parsed = NotificationItemSchema.parse(parsedNotification);
+    parsed.status = NotificationStatus.READ;
+    parsed.readAt = Date.now();
+
+    await asRedisOps(redis).hset(`notifications:${userId}`, notificationId, JSON.stringify(parsed));
   }
 
   /**
    * Get notifications for a user
    */
-  async getNotifications(
-    userId: string,
-    limit = 50,
-    offset = 0,
-  ): Promise<NotificationItem[]> {
-    const notifications = await asRedisOps(redis).hgetall(
-      `notifications:${userId}`,
-    )
+  async getNotifications(userId: string, limit = 50, offset = 0): Promise<NotificationItem[]> {
+    const notifications = await asRedisOps(redis).hgetall(`notifications:${userId}`);
     if (!notifications) {
-      return []
+      return [];
     }
 
     return Object.values(notifications)
-      .map((n) =>
-        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
-      )
+      .map((n) => {
+        try {
+          return NotificationItemSchema.parse(JSON.parse(n) as NotificationItem);
+        } catch {
+          return null;
+        }
+      })
+      .filter((n): n is NotificationItem => n !== null)
       .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(offset, offset + limit)
+      .slice(offset, offset + limit);
   }
 
   /**
    * Get unread notification count for a user
    */
   async getUnreadCount(userId: string): Promise<number> {
-    const notifications = await asRedisOps(redis).hgetall(
-      `notifications:${userId}`,
-    )
+    const notifications = await asRedisOps(redis).hgetall(`notifications:${userId}`);
     if (!notifications) {
-      return 0
+      return 0;
     }
 
     return Object.values(notifications)
-      .map((n) =>
-        NotificationItemSchema.parse(JSON.parse(n) as NotificationItem),
-      )
-      .filter((n) => n.status !== NotificationStatus.READ).length
+      .map((n) => {
+        try {
+          return NotificationItemSchema.parse(JSON.parse(n) as NotificationItem);
+        } catch {
+          return null;
+        }
+      })
+      .filter((n): n is NotificationItem => n !== null)
+      .filter((n) => n.status !== NotificationStatus.READ).length;
   }
 
   /**
    * Deliver notification via WebSocket
    */
   private async deliverInApp(notification: NotificationItem): Promise<void> {
-    const ws = this.wsClients.get(notification.userId)
+    const ws = this.wsClients.get(notification.userId);
     if (!ws) {
-      return
+      return;
     }
 
     ws.send(
       JSON.stringify({
-        type: 'notification',
+        type: "notification",
         data: notification,
       }),
-    )
+    );
   }
 
   /**
    * Store a push subscription for a user
    */
-  async storePushSubscription(
-    userId: string,
-    subscription: PushSubscription,
-  ): Promise<void> {
-    await asRedisOps(redis).hset(
-      this.subscriptionKey,
-      userId,
-      JSON.stringify(subscription),
-    )
-    logger.info('Push subscription stored', { userId })
+  async storePushSubscription(userId: string, subscription: PushSubscription): Promise<void> {
+    await asRedisOps(redis).hset(this.subscriptionKey, userId, JSON.stringify(subscription));
+    logger.info("Push subscription stored", { userId });
   }
 
   /**
    * Remove a push subscription for a user
    */
   async removePushSubscription(userId: string): Promise<void> {
-    await asRedisOps(redis).hdel(this.subscriptionKey, userId)
-    logger.info('Push subscription removed', { userId })
+    await asRedisOps(redis).hdel(this.subscriptionKey, userId);
+    logger.info("Push subscription removed", { userId });
   }
 
   /**
    * Get a user's push subscription
    */
-  private async getPushSubscription(
-    userId: string,
-  ): Promise<PushSubscription | null> {
-    const subscription = await asRedisOps(redis).hget(
-      this.subscriptionKey,
-      userId,
-    )
+  private async getPushSubscription(userId: string): Promise<PushSubscription | null> {
+    const subscription = await asRedisOps(redis).hget(this.subscriptionKey, userId);
     if (!subscription) {
-      return null
+      return null;
     }
-    return JSON.parse(subscription) as PushSubscription | null
+    try {
+      return JSON.parse(subscription) as PushSubscription;
+    } catch {
+      logger.error("Failed to parse push subscription", { userId });
+      return null;
+    }
   }
 
   /**
@@ -583,16 +583,16 @@ export class NotificationService {
    */
   private async deliverPush(notification: NotificationItem): Promise<void> {
     if (!this.vapidKeys) {
-      logger.warn('Push notification skipped - VAPID keys not initialized')
-      return
+      logger.warn("Push notification skipped - VAPID keys not initialized");
+      return;
     }
 
-    const subscription = await this.getPushSubscription(notification.userId)
+    const subscription = await this.getPushSubscription(notification.userId);
     if (!subscription) {
-      logger.info('No push subscription found for user', {
+      logger.info("No push subscription found for user", {
         userId: notification.userId,
-      })
-      return
+      });
+      return;
     }
 
     try {
@@ -602,33 +602,30 @@ export class NotificationService {
         data: notification.data,
         timestamp: notification.createdAt,
         notificationId: notification.id,
-        icon: '/icon.png',
-        badge: '/badge.png',
+        icon: "/icon.png",
+        badge: "/badge.png",
         tag: notification.id,
-      }
+      };
 
-      await sendNotification(subscription, payload, this.vapidKeys)
+      await sendNotification(subscription, payload, this.vapidKeys);
 
-      logger.info('Push notification sent', {
+      logger.info("Push notification sent", {
         userId: notification.userId,
         notificationId: notification.id,
-      })
+      });
     } catch (error: unknown) {
-      if (
-        error instanceof Error &&
-        error?.name === 'ExpiredSubscriptionError'
-      ) {
-        await this.removePushSubscription(notification.userId)
-        logger.info('Removed expired push subscription', {
+      if (error instanceof Error && error?.name === "ExpiredSubscriptionError") {
+        await this.removePushSubscription(notification.userId);
+        logger.info("Removed expired push subscription", {
           userId: notification.userId,
-        })
+        });
       } else {
-        logger.error('Failed to send push notification', {
+        logger.error("Failed to send push notification", {
           userId: notification.userId,
           notificationId: notification.id,
           error: error instanceof Error ? String(error) : String(error),
-        })
-        throw error
+        });
+        throw error;
       }
     }
   }
@@ -641,7 +638,7 @@ export class NotificationService {
       to: notification.userId, // Assuming userId is email address
       templateAlias: notification.templateId,
       templateModel: notification.data,
-    })
+    });
   }
 
   /**
@@ -650,19 +647,19 @@ export class NotificationService {
   private async deliverSMS(notification: NotificationItem): Promise<void> {
     // Validate phone number format (assuming userId is the phone number for SMS)
     if (!isValidPhoneNumber(notification.userId)) {
-      throw new Error('Invalid phone number format')
+      throw new Error("Invalid phone number format");
     }
 
     // Construct the message
-    const message = `${notification.title}\n\n${notification.body}`
+    const message = `${notification.title}\n\n${notification.body}`;
 
     // Send the SMS
-    await sendSMS(notification.userId, message)
+    await sendSMS(notification.userId, message);
 
-    logger.info('SMS notification sent', {
+    logger.info("SMS notification sent", {
       to: notification.userId,
       notificationId: notification.id,
-    })
+    });
   }
 
   /**
@@ -672,11 +669,11 @@ export class NotificationService {
    * @throws Error if queuing the notification fails.
    */
   async sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void> {
-    logger.warn('Dispatching crisis alert via NotificationService:', {
+    logger.warn("Dispatching crisis alert via NotificationService:", {
       userId: alertContext.userId,
       sessionId: alertContext.sessionId,
       timestamp: alertContext.timestamp,
-    })
+    });
 
     const {
       userId,
@@ -686,46 +683,42 @@ export class NotificationService {
       timestamp,
       textSample,
       decisionDetails,
-    } = alertContext
+    } = alertContext;
 
     const notificationData: NotificationData = {
       // For system alerts like crisis, userId might be an admin or a system user ID.
       // Or, if it's about a specific user, use their ID for context, but the notification itself goes to admins.
       // For this implementation, let's assume the template handles targeting admins.
       // If no specific admin user ID, we rely on the template's channel configuration (e.g., admin email).
-      userId: userId || 'system_crisis_monitoring', // Use provided userId or fallback
+      userId: userId || "system_crisis_monitoring", // Use provided userId or fallback
       templateId: CRISIS_ALERT_TEMPLATE_ID,
       data: {
-        userId: userId || 'N/A',
-        sessionId: sessionId || 'N/A',
-        sessionType: sessionType || 'N/A',
-        explicitTaskHint:
-          typeof explicitTaskHint === 'string' ? explicitTaskHint : 'N/A',
+        userId: userId || "N/A",
+        sessionId: sessionId || "N/A",
+        sessionType: sessionType || "N/A",
+        explicitTaskHint: typeof explicitTaskHint === "string" ? explicitTaskHint : "N/A",
         timestamp,
         textSample,
-        decisionDetails: JSON.stringify(decisionDetails) || 'N/A',
+        decisionDetails: JSON.stringify(decisionDetails) || "N/A",
         // Add any other critical pieces of information from alertContext
       },
       priority: NotificationPriority.URGENT, // Ensure it's marked as urgent
       // Channels can be overridden here if needed, but typically template defines them
-    }
+    };
 
     try {
-      const notificationId = await this.queueNotification(notificationData)
-      logger.info(
-        `Crisis alert queued successfully. Notification ID: ${notificationId}`,
-        { userId, sessionId },
-      )
+      const notificationId = await this.queueNotification(notificationData);
+      logger.info(`Crisis alert queued successfully. Notification ID: ${notificationId}`, {
+        userId,
+        sessionId,
+      });
     } catch (error: unknown) {
-      logger.error('Failed to queue crisis alert notification.', {
+      logger.error("Failed to queue crisis alert notification.", {
         error,
         alertContext,
-      })
+      });
       // Rethrow to indicate failure to dispatch, allowing caller to handle
-      throw new Error(
-        'Failed to dispatch crisis alert via NotificationService.',
-        { cause: error },
-      )
+      throw new Error("Failed to dispatch crisis alert via NotificationService.", { cause: error });
     }
   }
 }
@@ -736,13 +729,13 @@ export class NotificationService {
  * (e.g., email, SMS, PagerDuty, Slack, dedicated monitoring dashboard).
  */
 export class ConsoleNotificationService implements ICrisisNotificationHandler {
-  private readonly logger = console // Or use a more sophisticated logger
+  private readonly logger = console; // Or use a more sophisticated logger
 
   async sendCrisisAlert(alertContext: CrisisAlertContext): Promise<void> {
     this.logger.error(
-      'CRISIS ALERT DISPATCHED (ConsoleNotificationService):',
+      "CRISIS ALERT DISPATCHED (ConsoleNotificationService):",
       JSON.stringify(alertContext, null, 2),
-    )
+    );
     // In a real implementation, this would make an API call, send an email, etc.
     // For example:
     // await sendToPagerDuty({ ... });
