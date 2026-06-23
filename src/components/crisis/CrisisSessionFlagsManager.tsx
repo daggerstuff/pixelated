@@ -162,8 +162,8 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="border-blue-600 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+      <div className="flex items-center justify-center p-8" role="status" aria-live="polite">
+        <div className="border-blue-600 h-8 w-8 animate-spin rounded-full border-b-2" aria-hidden="true"></div>
         <span className="ml-2">Loading crisis flags...</span>
       </div>
     )

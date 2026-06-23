@@ -5531,7 +5531,7 @@ requires-dist = [
     { name = "isort", marker = "extra == 'dev'" },
     { name = "kaggle", specifier = ">=1.8.2" },
     { name = "keras", specifier = ">=3.12.0" },
-    { name = "kernels", specifier = ">=0.12.1,<0.13" },
+    { name = "kernels", specifier = ">=0.12.1,<0.16" },
     { name = "lancedb", specifier = ">=0.30.2" },
     { name = "langsmith-fetch", specifier = ">=0.3.1" },
     { name = "libcst", specifier = ">=1.8.6" },

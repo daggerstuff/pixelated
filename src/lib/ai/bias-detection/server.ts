@@ -7,6 +7,7 @@ import { Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { BiasDetectionEngine } from './BiasDetectionEngine'
 import type { TherapeuticSession } from './types'
+import { getAllowedOrigin } from './utils'
 
 const appLogger = createBuildSafeLogger('bias-detection-server')
 
@@ -28,14 +29,14 @@ class BiasDetectionServer {
     this.engine = new BiasDetectionEngine()
   }
 
-  private sendJsonResponse(
+  private sendJsonResponse(req: IncomingMessage,
     res: NodeServerResponse,
     statusCode: number,
     data: ApiResponse,
   ): void {
     res.writeHead(statusCode, {
       'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': getAllowedOrigin(req.headers.origin),
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     })
@@ -46,7 +47,7 @@ class BiasDetectionServer {
     Sentry.captureException(error)
   }
 
-  private async handleHealthCheck(res: NodeServerResponse): Promise<void> {
+  private async handleHealthCheck(req: IncomingMessage, res: NodeServerResponse): Promise<void> {
     try {
       const engineHealth = await this.engine.getHealthStatus()
       const serverHealth = {
@@ -63,7 +64,7 @@ class BiasDetectionServer {
       const overallHealth =
         engineHealthy && this.isRunning ? 'healthy' : 'degraded'
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           status: overallHealth,
@@ -78,14 +79,14 @@ class BiasDetectionServer {
     } catch (error: unknown) {
       appLogger.error('Health check failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Health check failed',
       })
     }
   }
 
-  private async handleBiasAnalysis(
+  private async handleBiasAnalysis(req: IncomingMessage,
     res: NodeServerResponse,
     body: unknown,
   ): Promise<void> {
@@ -93,7 +94,7 @@ class BiasDetectionServer {
       const { session } = body as { session: TherapeuticSession }
 
       if (!session?.sessionId) {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error: 'Session data with sessionId is required',
         })
@@ -106,7 +107,7 @@ class BiasDetectionServer {
         !session.content ||
         !session.aiResponses
       ) {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error:
             'Session must include participantDemographics, content, and aiResponses',
@@ -124,7 +125,7 @@ class BiasDetectionServer {
       const result = await this.engine.analyzeSession(sessionData)
       const processingTime = Date.now() - startTime
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           ...result,
@@ -134,14 +135,14 @@ class BiasDetectionServer {
     } catch (error: unknown) {
       appLogger.error('Bias analysis failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Bias analysis failed',
       })
     }
   }
 
-  private async handleBatchAnalysis(
+  private async handleBatchAnalysis(req: IncomingMessage,
     res: NodeServerResponse,
     body: unknown,
   ): Promise<void> {
@@ -157,7 +158,7 @@ class BiasDetectionServer {
       }
 
       if (!sessions || !Array.isArray(sessions) || sessions.length === 0) {
-        this.sendJsonResponse(res, 400, {
+        this.sendJsonResponse(req, res, 400, {
           success: false,
           error: 'Array of sessions is required',
         })
@@ -167,7 +168,7 @@ class BiasDetectionServer {
       // Validate each session
       for (const session of sessions) {
         if (!session.sessionId) {
-          this.sendJsonResponse(res, 400, {
+          this.sendJsonResponse(req, res, 400, {
             success: false,
             error: 'All sessions must include sessionId',
           })
@@ -190,7 +191,7 @@ class BiasDetectionServer {
       })
       const processingTime = Date.now() - startTime
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: {
           results: result.results,
@@ -205,14 +206,14 @@ class BiasDetectionServer {
     } catch (error: unknown) {
       appLogger.error('Batch analysis failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : 'Batch analysis failed',
       })
     }
   }
 
-  private async handleDashboardData(
+  private async handleDashboardData(req: IncomingMessage,
     res: NodeServerResponse,
     body: unknown,
   ): Promise<void> {
@@ -227,14 +228,14 @@ class BiasDetectionServer {
         includeDetails,
       })
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: dashboardData,
       })
     } catch (error: unknown) {
       appLogger.error('Dashboard data retrieval failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error:
           error instanceof Error
@@ -244,7 +245,7 @@ class BiasDetectionServer {
     }
   }
 
-  private async handleGetSessionAnalysis(
+  private async handleGetSessionAnalysis(req: IncomingMessage,
     res: NodeServerResponse,
     sessionId: string,
   ): Promise<void> {
@@ -252,21 +253,21 @@ class BiasDetectionServer {
       const result = await this.engine.getSessionAnalysis(sessionId)
 
       if (!result) {
-        this.sendJsonResponse(res, 404, {
+        this.sendJsonResponse(req, res, 404, {
           success: false,
           error: `Analysis result not found for session ${sessionId}`,
         })
         return
       }
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: result,
       })
     } catch (error: unknown) {
       appLogger.error('Session analysis retrieval failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error:
           error instanceof Error
@@ -276,18 +277,18 @@ class BiasDetectionServer {
     }
   }
 
-  private async handlePerformanceStats(res: NodeServerResponse): Promise<void> {
+  private async handlePerformanceStats(req: IncomingMessage, res: NodeServerResponse): Promise<void> {
     try {
       const stats = await this.engine.getPerformanceStats()
 
-      this.sendJsonResponse(res, 200, {
+      this.sendJsonResponse(req, res, 200, {
         success: true,
         data: stats,
       })
     } catch (error: unknown) {
       appLogger.error('Performance stats retrieval failed:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error:
           error instanceof Error
@@ -325,7 +326,7 @@ class BiasDetectionServer {
     // Handle CORS preflight
     if (method === 'OPTIONS') {
       res.writeHead(200, {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': getAllowedOrigin(req.headers.origin),
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       })
@@ -336,40 +337,40 @@ class BiasDetectionServer {
     try {
       switch (`${method} ${path}`) {
         case 'GET /health':
-          await this.handleHealthCheck(res)
+          await this.handleHealthCheck(req, res)
           break
 
         case 'POST /analyze': {
           const analyzeBody = await this.parseRequestBody(req)
-          await this.handleBiasAnalysis(res, analyzeBody)
+          await this.handleBiasAnalysis(req, res, analyzeBody)
           break
         }
 
         case 'POST /analyze/batch': {
           const batchBody = await this.parseRequestBody(req)
-          await this.handleBatchAnalysis(res, batchBody)
+          await this.handleBatchAnalysis(req, res, batchBody)
           break
         }
 
         case 'GET /dashboard': {
           const dashboardBody = await this.parseRequestBody(req)
-          await this.handleDashboardData(res, dashboardBody)
+          await this.handleDashboardData(req, res, dashboardBody)
           break
         }
 
         case 'GET /performance':
-          await this.handlePerformanceStats(res)
+          await this.handlePerformanceStats(req, res)
           break
 
         default: {
           // Handle dynamic routes like /session/{sessionId}
           if (method === 'GET' && path?.startsWith('/session/')) {
             const sessionId = path.substring('/session/'.length)
-            await this.handleGetSessionAnalysis(res, sessionId)
+            await this.handleGetSessionAnalysis(req, res, sessionId)
             break
           }
 
-          this.sendJsonResponse(res, 404, {
+          this.sendJsonResponse(req, res, 404, {
             success: false,
             error: 'Endpoint not found',
           })
@@ -378,7 +379,7 @@ class BiasDetectionServer {
     } catch (error: unknown) {
       appLogger.error('Request handling error:', error)
       this.captureCaughtError(error)
-      this.sendJsonResponse(res, 500, {
+      this.sendJsonResponse(req, res, 500, {
         success: false,
         error: 'Internal server error',
       })
@@ -395,7 +396,7 @@ class BiasDetectionServer {
           appLogger.error('Unhandled request error:', error)
           this.captureCaughtError(error)
           if (!res.headersSent) {
-            this.sendJsonResponse(res, 500, {
+            this.sendJsonResponse(req, res, 500, {
               success: false,
               error: 'Internal server error',
             })

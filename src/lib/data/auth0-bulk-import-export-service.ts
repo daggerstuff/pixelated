@@ -415,16 +415,16 @@ export class Auth0BulkImportExportService {
         // Transform users to export format
         const users: UserExportData[] = response.users.map(
           (user: UserExportData) => ({
-            user_id: String(user.user_id ?? ''),
-            email: String(user.email ?? ''),
-            email_verified: Boolean(user.email_verified),
+            user_id: (user.user_id ?? ''),
+            email: (user.email ?? ''),
+            email_verified: user.email_verified,
             name: user.name,
             nickname: user.nickname,
             picture: user.picture,
-            created_at: String(user.created_at ?? ''),
-            updated_at: String(user.updated_at ?? ''),
+            created_at: (user.created_at ?? ''),
+            updated_at: (user.updated_at ?? ''),
             last_login: user.last_login,
-            logins_count: Number(user.logins_count ?? 0),
+            logins_count: (user.logins_count ?? 0),
             app_metadata: options.includeMetadata
               ? user.app_metadata
               : undefined,
@@ -530,16 +530,16 @@ export class Auth0BulkImportExportService {
         const users: UserExportData[] = response.users.map(
           (user: UserExportData) =>
             ({
-              user_id: String(user.user_id ?? ''),
-              email: String(user.email ?? ''),
-              email_verified: Boolean(user.email_verified),
+              user_id: (user.user_id ?? ''),
+              email: (user.email ?? ''),
+              email_verified: user.email_verified,
               name: user.name,
               nickname: user.nickname,
               picture: user.picture,
-              created_at: String(user.created_at ?? ''),
-              updated_at: String(user.updated_at ?? ''),
+              created_at: (user.created_at ?? ''),
+              updated_at: (user.updated_at ?? ''),
               last_login: user.last_login,
-              logins_count: Number(user.logins_count ?? 0),
+              logins_count: (user.logins_count ?? 0),
               app_metadata: options.includeMetadata
                 ? JSON.stringify(user.app_metadata)
                 : undefined,

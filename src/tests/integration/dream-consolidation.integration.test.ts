@@ -358,7 +358,7 @@ describe('FlaskBlueprint contract', () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch')
     fetchSpy.mockImplementation((_url, options) => {
       return new Promise((_resolve, reject) => {
-        const { signal } = options || {}
+        const { signal } = options ?? {}
         if (signal?.aborted) {
           reject(new DOMException('The user aborted a request.', 'AbortError'))
           return

@@ -219,6 +219,24 @@ async function startServer() {
   }
 }
 
+// Global error handlers for unhandled rejections and exceptions
+process.on('unhandledRejection', (reason: unknown) => {
+  console.warn(
+    'Unhandled Rejection:',
+    reason instanceof Error ? reason.message : String(reason),
+  )
+  if (captureException) {
+    captureException(reason instanceof Error ? reason : new Error(String(reason)))
+  }
+})
+
+process.on('uncaughtException', (error: Error) => {
+  console.error('Uncaught Exception:', error.message)
+  if (captureException) {
+    captureException(error)
+  }
+})
+
 // Graceful shutdown
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully...')

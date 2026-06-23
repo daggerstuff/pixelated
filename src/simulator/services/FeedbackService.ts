@@ -500,9 +500,37 @@ export class FeedbackService implements FeedbackServiceInterface {
     // Perform various analyses on the audio data
     this.analyzeAudioCharacteristics(audioData)
 
+    // Calculate RMS (loudness) for energy
+    let sumSquares = 0
+    for (const sample of audioData) {
+      sumSquares += sample * sample
+    }
+    const rms = Math.sqrt(sumSquares / audioData.length)
+
+    // Calculate zero-crossing rate for valence
+    let zeroCrossings = 0
+    for (let i = 1; i < audioData.length; i++) {
+      const current = audioData[i]
+      const previous = audioData[i - 1]
+      if ((current >= 0 && previous < 0) || (current < 0 && previous >= 0)) {
+        zeroCrossings++
+      }
+    }
+    const zcr = zeroCrossings / (audioData.length - 1)
+
+    // Normalize values
+    const energy = Math.max(0, Math.min(1, rms * 10))
+    const valence = Math.max(0, Math.min(1, zcr * 5))
+    // Approximate dominance based on energy
+    const dominance = Math.max(0, Math.min(1, energy * 0.8 + 0.2))
+
     // Update emotion state based on audio characteristics
-    // TODO: Extract actual emotion data from audioData and pass to updateEmotionState
-    // this.updateEmotionState(extractedEmotions, Date.now())
+    const extractedEmotions = [
+      { type: 'energy', confidence: 0.8, intensity: energy },
+      { type: 'valence', confidence: 0.7, intensity: valence },
+      { type: 'dominance', confidence: 0.6, intensity: dominance }
+    ]
+    this.updateEmotionState(extractedEmotions, Date.now())
 
     // Update speech patterns
     this.detectSpeechPatterns(audioData)

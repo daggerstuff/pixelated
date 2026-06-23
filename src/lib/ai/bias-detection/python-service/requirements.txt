@@ -27,6 +27,8 @@ anyio==4.13.0
     #   httpx
     #   starlette
     #   watchfiles
+asgiref==3.11.1
+    # via flask
 asyncpg==0.31.0
     # via bias-detection-service (pyproject.toml)
 attrs==26.1.0

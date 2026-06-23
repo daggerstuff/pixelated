@@ -117,7 +117,7 @@ function generateHumanReadableSummary(report: ReprioritizationReport): string {
     (change) =>
       ['urgent', 'high', 'medium', 'low', 'backlog'].indexOf(change.newTier) >
       ['urgent', 'high', 'medium', 'low', 'backlog'].indexOf(
-        change.previousTier || 'backlog',
+        change.previousTier ?? 'backlog',
       ),
   ).length
 
