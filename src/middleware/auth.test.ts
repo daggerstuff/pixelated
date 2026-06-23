@@ -82,4 +82,43 @@ describe('withAuth middleware', () => {
     expect(response.status).toBe(401)
     expect(mockHandler).not.toHaveBeenCalled()
   })
+
+  it('should return 401 when API key validation times out', async () => {
+    vi.useFakeTimers()
+
+    // Make validateApiKey never resolve so it triggers the timeout
+    mockValidateApiKey.mockImplementation(() => new Promise(() => {}))
+
+    const middleware = withAuth(mockHandler, { allowApiKey: true })
+    const request = new Request('https://example.com/api/test', {
+      headers: { 'X-API-Key': 'timeout-key' },
+    })
+
+    const responsePromise = middleware(request)
+
+    // Advance timers to trigger the 5000ms timeout
+    await vi.advanceTimersByTimeAsync(5000)
+    // Let the event loop tick
+    await Promise.resolve()
+
+    const response = await responsePromise
+    expect(response.status).toBe(401)
+    expect(mockHandler).not.toHaveBeenCalled()
+
+    vi.useRealTimers()
+  })
+  it('should return 401 when API key validation throws an error', async () => {
+    vi.useFakeTimers()
+    mockValidateApiKey.mockRejectedValue(new Error('Database error'))
+
+    const middleware = withAuth(mockHandler, { allowApiKey: true })
+    const request = new Request('https://example.com/api/test', {
+      headers: { 'X-API-Key': 'error-key' },
+    })
+
+    const response = await middleware(request)
+    expect(response.status).toBe(401)
+    expect(mockHandler).not.toHaveBeenCalled()
+    vi.useRealTimers()
+  })
 })

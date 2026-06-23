@@ -44,6 +44,7 @@ Pixelated Empathy is designed around a narrow problem: helping people prepare fo
 - Emotional and conversational analysis that makes turning points easier to inspect
 - Coaching and review workflows that translate difficult interactions into measurable improvement
 - Operational visibility that supports iteration without overwhelming teams with noise
+- **Closed-loop clinical validity pipeline** (Mission 3/3): Expert review, staged promotion, pilot scorer integration. See [docs/clinical-validity/feedback-loop.md](docs/clinical-validity/feedback-loop.md).
 
 ## Core Principles
 
