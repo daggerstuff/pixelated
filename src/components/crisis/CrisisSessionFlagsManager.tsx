@@ -331,10 +331,15 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
 
       {/* Flag Management Modal */}
       {selectedFlag && allowManagement && (
-        <div className="bg-gray-600 fixed inset-0 z-50 h-full w-full overflow-y-auto bg-opacity-50">
-          <div className="bg-white relative top-20 mx-auto w-96 rounded-md border p-5 shadow-lg">
+        <div
+          className="bg-gray-600 fixed inset-0 z-50 h-full w-full overflow-y-auto bg-opacity-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="bg-white relative top-20 mx-auto w-96 rounded-md border p-5 shadow-lg" role="document">
             <div className="mt-3">
-              <h3 className="text-gray-900 mb-4 text-lg font-medium">
+              <h3 id="modal-title" className="text-gray-900 mb-4 text-lg font-medium">
                 Manage Crisis Flag
               </h3>
 
