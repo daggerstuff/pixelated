@@ -1,0 +1,5 @@
+## 2025-02-19 - Dialog ARIA Roles
+
+**Learning:** Modal overlays must include `role="dialog"`, `aria-modal="true"`, and `aria-labelledby`. The inner container needs `role="document"` for maximum screen reader compatibility. Error states need `role="alert"` and `aria-live="assertive"` to be immediately announced.
+
+**Action:** Added these properties to `CrisisSessionFlagsManager` to fix missing a11y roles.
