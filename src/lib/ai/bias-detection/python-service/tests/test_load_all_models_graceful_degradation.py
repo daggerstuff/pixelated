@@ -12,11 +12,8 @@ from __future__ import annotations
 
 import asyncio
 import importlib
-from pathlib import Path
 
 import pytest
-
-from bias_detection.services import model_service
 from bias_detection.services.model_service import (
     ModelEnsembleService,
     _download_pretrained_with_retry,
@@ -89,7 +86,7 @@ def test_download_pretrained_with_retry_raises_runtime_error_after_exhausting_at
 
     calls = {"n": 0}
 
-    def _fail(repo: str, **kwargs):  # noqa: D401
+    def _fail(repo: str, **kwargs):
         calls["n"] += 1
         raise ConnectionError("hub unreachable")
 

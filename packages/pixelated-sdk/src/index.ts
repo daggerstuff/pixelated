@@ -138,12 +138,12 @@ export class PixelatedClient {
   private readonly retryDelay: number;
 
   constructor(config: PixelatedConfig = {}) {
-    this.baseUrl = config.baseUrl || "https://api.pixelatedempathy.com/api/v1";
+    this.baseUrl = config.baseUrl ?? "https://api.pixelatedempathy.com/api/v1";
     this.apiKey = config.apiKey;
     this.jwt = config.jwt;
-    this.timeout = config.timeout || 30000;
-    this.maxRetries = config.maxRetries || 3;
-    this.retryDelay = config.retryDelay || 1000;
+    this.timeout = config.timeout ?? 30000;
+    this.maxRetries = config.maxRetries ?? 3;
+    this.retryDelay = config.retryDelay ?? 1000;
   }
 
   /**
@@ -193,9 +193,9 @@ export class PixelatedClient {
         const errorData = await this.parseResponse(response).catch(() => ({}));
         const error: ApiError = {
           name: "ApiError",
-          message: errorData.error || `API Error: ${response.statusText}`,
+          message: errorData.error ?? `API Error: ${response.statusText}`,
           status: response.status,
-          code: errorData.code || "UNKNOWN",
+          code: errorData.code ?? "UNKNOWN",
           details: errorData.details,
         };
         throw error;

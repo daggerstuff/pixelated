@@ -1,9 +1,0 @@
-{
-  "id": "ft-1781238832960-csmtfx",
-  "model": "local-model",
-  "status": "succeeded",
-  "createdAt": "2026-06-12T04:33:52.960Z",
-  "backend": "local",
-  "progress": 100,
-  "fineTunedModel": "local-model:local-ft-17812"
-}
