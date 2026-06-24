@@ -288,6 +288,9 @@ tsconfig*.json
 !mdx-components.js
 !patches/
 !.npmrc
+# Workspace member package.json files needed for pnpm workspace resolution
+!business-strategy-cms/package.json
+!package/package.json
 
 # Exclude deployment backups from Docker context
 deployment-backup*/
