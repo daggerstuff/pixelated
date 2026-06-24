@@ -71,8 +71,10 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          curl -sSL https://get.civo.com | bash
-          echo "$HOME/.civo/bin" >> $GITHUB_PATH
+          CIVO_VERSION=$(curl -sL https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // "v1.1.14"')
+          curl -sL "https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz" -o /tmp/civo.tar.gz
+          tar xzf /tmp/civo.tar.gz -C /usr/local/bin/ civo
+          civo --version
 
       - name: Configure Civo
         run: |
