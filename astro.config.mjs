@@ -237,7 +237,7 @@ const adapter = (() => {
   }
   console.log("🟢 Using Node adapter for standard deployment");
   return node({
-    mode: "standalone",
+    mode: "middleware",
   });
 })();
 
