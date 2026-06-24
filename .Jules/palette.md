@@ -1,0 +1,1 @@
+## 2026-06-24 - Missing Focus Indicator on Error Button | Learning: Error state buttons often miss focus indicators because they are conditionally rendered. | Action: Added visible focus rings to Try Again button.
