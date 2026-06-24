@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # Production Deployment Script for Business Strategy CMS
-# Supports multiple cloud platforms: Vercel, AWS, Legacy DigitalOcean, Hetzner AI
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -43,107 +42,7 @@ deploy_vercel() {
     echo -e "${GREEN}✅ Successfully deployed to Vercel!${NC}"
 }
 
-# Function to deploy to AWS
-deploy_aws() {
-    run_redis_hardening_audit
-    echo -e "${YELLOW}🎯 Deploying to AWS ECS...${NC}"
-    
-    # Check if AWS CLI is installed
-    if ! command -v aws &> /dev/null; then
-        echo -e "${RED}AWS CLI is required but not installed.${NC}"
-        echo "Install it from: https://aws.amazon.com/cli/"
-        exit 1
-    fi
-    
-    # Check AWS credentials
-    if ! aws sts get-caller-identity &> /dev/null; then
-        echo -e "${RED}AWS credentials not configured.${NC}"
-        echo "Run: aws configure"
-        exit 1
-    fi
-    
-    # Build Docker image
-    echo -e "${YELLOW}🐳 Building Docker image...${NC}"
-    docker build -t business-strategy-cms -f docker/Dockerfile.prod .
-    
-    # Tag and push to ECR
-    AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-    AWS_REGION=${AWS_REGION:-us-east-1}
-    ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/business-strategy-cms"
-    
-    aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URI}
-    docker tag business-strategy-cms:latest ${ECR_URI}:latest
-    docker push ${ECR_URI}:latest
-    
-    # Deploy to ECS
-    aws ecs update-service --cluster business-strategy-cms --service business-strategy-cms --force-new-deployment
-    echo -e "${GREEN}✅ Successfully deployed to AWS ECS!${NC}"
-}
 
-# Function to deploy to DigitalOcean (legacy)
-deploy_digitalocean() {
-    run_redis_hardening_audit
-    local enable_legacy_doctl="${ENABLE_LEGACY_DOCTL:-0}"
-
-    echo -e "${YELLOW}⚠️  Legacy flow: This DigitalOcean deployment path is deprecated.${NC}"
-    echo "   Use only when running in legacy environments."
-    if [[ "${enable_legacy_doctl}" != "1" ]]; then
-        echo -e "${YELLOW}⚠️  Set ENABLE_LEGACY_DOCTL=1 to opt in to DigitalOcean (legacy) deployment.${NC}"
-        return 1
-    fi
-
-    echo -e "${YELLOW}🎯 Deploying to DigitalOcean App Platform (legacy flow)...${NC}"
-    
-    # Check if doctl is installed
-    local doctl_cli="${DOCTL_CLI:-doctl}"
-
-    if ! command -v "${doctl_cli}" &> /dev/null; then
-        echo -e "${RED}doctl is required but not installed.${NC}"
-        echo "Install it from: https://docs.digitalocean.com/reference/doctl/"
-        exit 1
-    fi
-    
-    # Create app specification
-    cat > app.yaml << EOF
-name: business-strategy-cms
-services:
-- name: api
-  source_dir: /
-  github:
-    repo: your-username/business-strategy-cms
-    branch: main
-  run_command: node src/server.prod.ts
-  environment_slug: node-js
-  instance_count: 2
-  instance_size_slug: basic-xxs
-  routes:
-  - path: /
-  envs:
-  - key: NODE_ENV
-    value: production
-  - key: DATABASE_URL
-    scope: RUN_TIME
-    value: \${DATABASE_URL}
-  - key: JWT_SECRET
-    scope: RUN_TIME
-    value: \${JWT_SECRET}
-  - key: AWS_ACCESS_KEY_ID
-    scope: RUN_TIME
-    value: \${AWS_ACCESS_KEY_ID}
-  - key: AWS_SECRET_ACCESS_KEY
-    scope: RUN_TIME
-    value: \${AWS_SECRET_ACCESS_KEY}
-  - key: AWS_REGION
-    scope: RUN_TIME
-    value: \${AWS_REGION}
-  - key: AWS_S3_BUCKET
-    scope: RUN_TIME
-    value: \${AWS_S3_BUCKET}
-EOF
-    
-    "${doctl_cli}" apps create --spec app.yaml
-    echo -e "${GREEN}✅ Successfully deployed to DigitalOcean (legacy flow)!${NC}"
-}
 
 # Function to run production tests
 run_tests() {
@@ -165,25 +64,17 @@ run_tests() {
 main() {
     echo -e "${GREEN}Business Strategy CMS Production Deployment${NC}"
     echo "Select deployment platform:"
-    echo "1) Vercel (Recommended for serverless)"
-    echo "2) AWS ECS (Scalable containers)"
-    echo "3) DigitalOcean (legacy flow, opt-in via ENABLE_LEGACY_DOCTL=1)"
-    echo "4) Run tests only"
+    echo "1) Vercel"
+    echo "2) Run tests only"
     echo ""
     
-    read -p "Enter your choice (1-4): " choice
+    read -p "Enter your choice (1-2): " choice
     
     case $choice in
         1)
             deploy_vercel
             ;;
         2)
-            deploy_aws
-            ;;
-        3)
-            deploy_digitalocean
-            ;;
-        4)
             run_tests
             ;;
         *)
@@ -196,10 +87,6 @@ main() {
 # Check if running in CI/CD
 if [[ "$1" == "--vercel" ]]; then
     deploy_vercel
-elif [[ "$1" == "--aws" ]]; then
-    deploy_aws
-elif [[ "$1" == "--digitalocean" ]]; then
-    deploy_digitalocean
 elif [[ "$1" == "--test" ]]; then
     run_tests
 else

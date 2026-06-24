@@ -41,6 +41,11 @@ COPY pnpm-workspace.yaml ./
 # Include patch files and npm configuration required during installation
 COPY patches ./patches
 COPY config/package/.npmrc ./.npmrc
+# Copy workspace member package.jsons so pnpm can resolve the workspace
+COPY packages/pixelated-sdk/package.json ./packages/pixelated-sdk/package.json
+COPY packages/memory-schema/package.json ./packages/memory-schema/package.json
+COPY business-strategy-cms/package.json ./business-strategy-cms/package.json
+COPY package/package.json ./package/package.json
 
 # Install all dependencies (dev + prod) required for build
 # Retry with --no-frozen-lockfile if --frozen-lockfile fails (lockfile drift in CI)
@@ -57,6 +62,7 @@ RUN mkdir -p /app/templates
 COPY scripts/utils/start-server.mjs /app/start-server.mjs
 COPY scripts/utils/start-server-config.mjs /app/start-server-config.mjs
 COPY config/instrument.mjs /app/instrument.mjs
+COPY config/sentry-event-filter.mjs /app/sentry-event-filter.mjs
 
 # Limit Node.js memory usage to prevent OOM on small VPS
 # Increased to 10GB for Docker builds (will be enforced by host)
@@ -72,58 +78,15 @@ RUN find /app/node_modules -type f -name "*.map" -delete && \
 FROM base AS runtime
 WORKDIR /app
 
-# Install pnpm and build tools needed for native dependencies (like better-sqlite3)
-# Update all packages first to patch known vulnerabilities
-ARG PNPM_VERSION=11.5.2
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    make \
-    g++ \
-    git \
-    curl \
-    && PNPM_SUCCESS=0; \
-    for i in 1 2 3 4 5; do \
-    echo "Attempt $i: Installing pnpm@$PNPM_VERSION..." && \
-    if npm install -g pnpm@$PNPM_VERSION && pnpm --version; then \
-    echo "✅ pnpm@$PNPM_VERSION installed successfully" && \
-    PNPM_SUCCESS=1 && \
-    break; \
-    else \
-    echo "❌ Attempt $i failed, waiting before retry..." && \
-    sleep $((i * 2)); \
-    fi; \
-    done; \
-    if [ "$PNPM_SUCCESS" -ne 1 ]; then \
-    echo "❌ Failed to install pnpm after 5 attempts" && \
-    exit 1; \
-    fi \
-    && rm -rf /var/lib/apt/lists/*
+# Install only curl (needed for healthcheck)
+RUN apt-get update && apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create non-root user
 RUN groupadd -g 1001 astro && useradd -u 1001 -g astro -m astro
 
-# Copy package files and install production dependencies
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
-COPY --from=builder /app/patches ./patches
-COPY --from=builder /app/.npmrc ./.npmrc
-
-# Install production dependencies; fallback to --no-frozen-lockfile if lockfile drifts in CI
-RUN (pnpm install --frozen-lockfile --prod --ignore-scripts || \
-    pnpm install --no-frozen-lockfile --prod --ignore-scripts) && \
-    pnpm store prune && \
-    find node_modules -type d -name "__tests__" -exec rm -rf {} + 2>/dev/null || true && \
-    find node_modules -type d -name "*.test.*" -exec rm -rf {} + 2>/dev/null || true && \
-    find node_modules -type d -name "*.spec.*" -exec rm -rf {} + 2>/dev/null || true && \
-    find node_modules -type f -name "*.map" -delete && \
-    find node_modules -type f -name "*.ts" ! -path "*/types/*" -delete && \
-    find node_modules -type f -name "*.tsx" ! -path "*/types/*" -delete && \
-    find node_modules -name "README.md" -delete && \
-    find node_modules -name "CHANGELOG*" -delete && \
-    find node_modules -name "LICENSE*" -delete && \
-    find node_modules -name ".github" -type d -exec rm -rf {} + 2>/dev/null || true && \
-    apt-get purge -y --auto-remove python3 make g++ git && \
-    rm -rf /tmp/* /root/.npm /root/.cache
+# Copy all dependencies from builder (includes workspace packages)
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy built output and public assets from builder
 COPY --from=builder --chown=astro:astro /app/dist ./dist
@@ -132,6 +95,7 @@ COPY --from=builder --chown=astro:astro /app/templates ./templates
 COPY --from=builder --chown=astro:astro /app/start-server.mjs ./start-server.mjs
 COPY --from=builder --chown=astro:astro /app/start-server-config.mjs ./start-server-config.mjs
 COPY --from=builder --chown=astro:astro /app/instrument.mjs ./instrument.mjs
+COPY --from=builder --chown=astro:astro /app/sentry-event-filter.mjs ./sentry-event-filter.mjs
 USER astro
 
 EXPOSE 4321
