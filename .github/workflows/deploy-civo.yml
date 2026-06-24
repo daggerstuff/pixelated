@@ -96,6 +96,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
+          mkdir -p ~/.kube
           civo kubernetes config pixelated-cluster > ~/.kube/config
           chmod 600 ~/.kube/config
 
