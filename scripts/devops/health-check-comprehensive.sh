@@ -39,14 +39,14 @@ check_deployment_health() {
     echo "🔍 Checking deployment health..."
     
     # Check deployment status
-    if ! kubectl get deployment $GKE_DEPLOYMENT_NAME >/dev/null 2>&1; then
+    if ! kubectl get deployment $DEPLOYMENT_NAME >/dev/null 2>&1; then
         echo "❌ Deployment not found"
         return 1
     fi
     
     # Get deployment conditions
-    AVAILABLE=$(kubectl get deployment $GKE_DEPLOYMENT_NAME -o json | jq '.status.conditions[] | select(.type == "Available") | .status')
-    PROGRESSING=$(kubectl get deployment $GKE_DEPLOYMENT_NAME -o json | jq '.status.conditions[] | select(.type == "Progressing") | .status')
+    AVAILABLE=$(kubectl get deployment $DEPLOYMENT_NAME -o json | jq '.status.conditions[] | select(.type == "Available") | .status')
+    PROGRESSING=$(kubectl get deployment $DEPLOYMENT_NAME -o json | jq '.status.conditions[] | select(.type == "Progressing") | .status')
     
     if [ "$AVAILABLE" != "True" ]; then
         echo "❌ Deployment not available"
@@ -66,13 +66,13 @@ check_service_health() {
     echo "🔍 Checking service health..."
     
     # Check service exists
-    if ! kubectl get service $GKE_SERVICE_NAME >/dev/null 2>&1; then
+    if ! kubectl get service $SERVICE_NAME >/dev/null 2>&1; then
         echo "❌ Service not found"
         return 1
     fi
     
     # Get service endpoints
-    ENDPOINTS=$(kubectl get endpoints $GKE_SERVICE_NAME -o json | jq '.subsets[]?.addresses | length')
+    ENDPOINTS=$(kubectl get endpoints $SERVICE_NAME -o json | jq '.subsets[]?.addresses | length')
     
     if [ "$ENDPOINTS" -eq 0 ]; then
         echo "❌ No healthy endpoints for service"
@@ -87,7 +87,7 @@ check_application_health() {
     echo "🔍 Checking application health via HTTP..."
     
     # Try to access the health endpoint
-    SERVICE_IP=$(kubectl get service $GKE_SERVICE_NAME -o json | jq -r '.spec.clusterIP')
+    SERVICE_IP=$(kubectl get service $SERVICE_NAME -o json | jq -r '.spec.clusterIP')
     
     # Test internal connectivity
     if kubectl run health-check --image=curlimages/curl:latest --rm -i --restart=Never -- \
@@ -121,8 +121,8 @@ check_external_connectivity() {
     echo "🔍 Checking external connectivity..."
     
     # Only check if external URL is configured
-    if [ -n "${GKE_ENVIRONMENT_URL:-}" ]; then
-        if curl -f --connect-timeout 10 --max-time 30 "${GKE_ENVIRONMENT_URL}/api/health" >/dev/null 2>&1; then
+    if [ -n "${ENVIRONMENT_URL:-}" ]; then
+        if curl -f --connect-timeout 10 --max-time 30 "${ENVIRONMENT_URL}/api/health" >/dev/null 2>&1; then
             echo "✅ External connectivity check passed"
             return 0
         else
