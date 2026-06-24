@@ -77,8 +77,9 @@ jobs:
           civo --version
 
       - name: Configure Civo
-        run: |
-          echo "${{ secrets.CIVO_API_KEY }}" | civo account set-api-key --yes
+        env:
+          CIVO_API_KEY: ${{ secrets.CIVO_API_KEY }}
+        run: civo apikey save --load-from-env -y
 
       - name: Wait for cluster to be ready
         run: |
