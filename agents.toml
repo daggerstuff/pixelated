@@ -11,3 +11,11 @@ source = "getsentry/dotagents"
 [[skills]]
 name = "agentmail"
 source = "agentmail-to/agentmail-skills"
+
+[[skills]]
+name = "astro"
+source = "path:.agents/skills/astro"
+
+[[skills]]
+name = "cloudflare-deploy"
+source = "path:.agents/skills/cloudflare-deploy"
