@@ -189,13 +189,20 @@ export function AcquisitionDetail({
                   Download Progress
                 </p>
                 <div className="mt-2">
-                  <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
+                  <div
+                    className="bg-muted h-2 w-full overflow-hidden rounded-full"
+                    role="progressbar"
+                    aria-valuenow={acquisition.downloadProgress}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label="Download Progress"
+                  >
                     <div
                       className="bg-primary h-full transition-all"
                       style={{ width: `${acquisition.downloadProgress}%` }}
                     />
                   </div>
-                  <p className="mt-1 text-sm">
+                  <p className="mt-1 text-sm" aria-hidden="true">
                     {acquisition.downloadProgress}%
                   </p>
                 </div>
