@@ -19,6 +19,7 @@ fi
 
 # NIM endpoint (OpenAI-compatible)
 export COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"
+export NVIDIA_API_KEY="${NVIDIA_API_KEY:-${NVIDIA_NIM_API_KEY:-${NVIDIA_TOKEN:-}}}"
 export COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"
 export COPILOT_PROVIDER_TYPE="openai"
 
@@ -82,7 +83,7 @@ is_forbidden_model() {
 # Wire model — exact ID sent to Nvidia NIM. Environment can override these
 # values if you need to temporarily switch providers/models.
 export NIM_DEFAULT_MODEL="${NIM_DEFAULT_MODEL:-openai/gpt-oss-120b}"
-export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-2.7}")"
+export NIM_MODEL_SEQUENCE="$(_nim_byok_sanitize_model_sequence "${NIM_MODEL_SEQUENCE:-openai/gpt-oss-120b nvidia/llama-3.3-nemotron-super-49b-v1.5 z-ai/glm-5.1 deepseek-ai/deepseek-v3.2 moonshotai/kimi-k2.6 minimaxai/minimax-m2.7}")"
 export COPILOT_MODEL="$(_nim_byok_sanitize_model "${COPILOT_MODEL:-${NIM_DEFAULT_MODEL}}")"
 
 # Provider model ID used by Copilot's BYOK wiring.
@@ -112,4 +113,4 @@ echo "  NIM default:     ${NIM_DEFAULT_MODEL}"
 echo "  GLM-5.1:         z-ai/glm-5.1"
 echo "  DeepSeek V3.2:   deepseek-ai/deepseek-v3.2"
 echo "  Kimi K2.6:       moonshotai/kimi-k2.6"
-echo "  MiniMax 2.7:     minimaxai/minimax-2.7"
+echo "  MiniMax 2.7:     minimaxai/minimax-m2.7"

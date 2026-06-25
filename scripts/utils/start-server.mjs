@@ -3,7 +3,9 @@
 import process from "process";
 import { createServer } from "http";
 import { createServer as createHttpsServer } from "https";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Try to import Sentry from either the local development path or the production path
 /** @typedef {import('../../config/instrument.mjs').SentryInstance} SentryInstance */
@@ -95,6 +97,96 @@ if (!isSSRModule(ssrModuleCandidate)) {
 }
 const ssrModule = ssrModuleCandidate;
 const ssrHandler = ssrModule.handler;
+
+// ── Static file middleware for Astro middleware mode ────────────────────
+// When @astrojs/node runs in "middleware" mode, entry.mjs exports only the
+// SSR handler — it does NOT serve dist/client/ static files.  We need to
+// check dist/client/ for matching files before falling through to SSR.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.resolve(__dirname, "dist/client");
+
+const MIME_TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".json": "application/json",
+  ".svg": "image/svg+xml",
+  ".ico": "image/x-icon",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".woff": "font/woff",
+  ".woff2": "font/woff2",
+  ".ttf": "font/ttf",
+  ".eot": "application/vnd.ms-fontobject",
+  ".map": "application/json",
+  ".txt": "text/plain; charset=utf-8",
+  ".xml": "application/xml",
+  ".pdf": "application/pdf",
+};
+
+/** @param {string} filePath */
+function getMimeType(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  return MIME_TYPES[ext] || "application/octet-stream";
+}
+
+/** @param {string} urlPath @returns {string | null} */
+function resolveStaticFile(urlPath) {
+  const normalized = urlPath.split("?")[0].split("#")[0];
+
+  // Resolve against clientDist, default to index.html for root
+  const filePath = path.join(clientDist, normalized === "/" ? "index.html" : normalized);
+
+  // Prevent directory traversal — resolved path must stay inside clientDist
+  if (!filePath.startsWith(clientDist)) return null;
+
+  // Try exact match first (must be a file with an extension)
+  if (existsSync(filePath) && path.extname(filePath)) {
+    return filePath;
+  }
+
+  // Try + .html (Astro outputs clean URLs like /about.html for /about)
+  const withHtml = filePath + ".html";
+  if (existsSync(withHtml) && path.extname(withHtml)) {
+    return withHtml;
+  }
+
+  return null;
+}
+
+/** @type {import('http').RequestListener} */
+function staticAwareHandler(req, res) {
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return ssrHandler(req, res);
+  }
+
+  const staticPath = resolveStaticFile(req.url ?? "/");
+  if (staticPath) {
+    try {
+      const content = readFileSync(staticPath);
+      const contentType = getMimeType(staticPath);
+      // Immutable cache for hashed assets (everything under /assets/),
+      // no-cache for everything else (HTML, etc.)
+      const cacheControl = staticPath.includes("/assets/")
+        ? "public, max-age=31536000, immutable"
+        : "no-cache";
+      res.writeHead(200, {
+        "Content-Type": contentType,
+        "Content-Length": content.length,
+        "Cache-Control": cacheControl,
+      });
+      res.end(content);
+      return;
+    } catch {
+      // File disappeared between existsSync and readFileSync — fall through to SSR
+    }
+  }
+
+  ssrHandler(req, res);
+}
 
 const rawPort = process.env.PORT ?? process.env.WEBSITES_PORT;
 const parsedPort = rawPort !== undefined ? Number(rawPort) : NaN;
@@ -220,7 +312,7 @@ function tryListen(portToTry, retriesLeft, delay = baseDelay) {
 
   // Create a fresh server for this listen attempt. We keep a reference in
   // activeRetryServer so we can clean it up on the next retry.
-  const retryServer = createServer(ssrHandler);
+  const retryServer = createServer(staticAwareHandler);
   activeRetryServer = retryServer;
 
   const onListening = () => {
@@ -326,7 +418,7 @@ tryListen(initialPort, maxRetries);
     const cert = readFileSync(httpsCertPath, "utf8");
     const key = readFileSync(httpsKeyPath, "utf8");
 
-    const httpsServer = createHttpsServer({ key, cert }, ssrHandler);
+    const httpsServer = createHttpsServer({ key, cert }, staticAwareHandler);
     httpsServer.listen(httpsPort, host, () => {
       console.log(`HTTPS server running at https://${host}:${httpsPort}`);
     });

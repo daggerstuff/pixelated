@@ -35,14 +35,17 @@ jobs:
       - name: Determine image tag
         id: vars
         run: |
-          IMAGE_TAG="${{ github.ref_name }}-${GITHUB_SHA:0:7}"
-          IMAGE_TAG=$(echo "$IMAGE_TAG" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-')
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            IMAGE_TAG="production"
+          else
+            IMAGE_TAG="${{ github.ref_name }}"
+          fi
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
-          echo "Built image tag: $IMAGE_TAG"
+          echo "Built image tag: $IMAGE_TAG (branch: ${{ github.ref_name }})"
 
       - name: Build and push
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
@@ -71,18 +74,21 @@ jobs:
 
       - name: Install Civo CLI
         run: |
-          curl -sSL https://get.civo.com | bash
-          echo "$HOME/.civo/bin" >> $GITHUB_PATH
+          CIVO_VERSION=$(curl -sL https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // "v1.1.14"')
+          curl -sL "https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz" -o /tmp/civo.tar.gz
+          tar xzf /tmp/civo.tar.gz -C /usr/local/bin/ civo
+          civo --version
 
       - name: Configure Civo
-        run: |
-          echo "${{ secrets.CIVO_API_KEY }}" | civo account set-api-key --yes
+        env:
+          CIVO_API_KEY: ${{ secrets.CIVO_API_KEY }}
+        run: civo apikey save --load-from-env -y
 
       - name: Wait for cluster to be ready
         run: |
           echo "Waiting for pixelated-cluster to be ready..."
           for i in {1..30}; do
-            STATUS=$(civo kubernetes show pixelated-cluster -o json | jq -r '.conditions[] | select(.type=="ControlPlaneAccessible") | .status')
+            STATUS=$(civo kubernetes show pixelated-cluster -o json | jq -r '.conditions[] | select(.type=="ControlPlaneConnectivity") | .status // empty')
             if [ "$STATUS" == "True" ]; then
               echo "✅ Cluster is ready"
               break
@@ -93,6 +99,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
+          mkdir -p ~/.kube
           civo kubernetes config pixelated-cluster > ~/.kube/config
           chmod 600 ~/.kube/config
 
