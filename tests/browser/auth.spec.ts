@@ -69,8 +69,16 @@ test('login form shows validation errors', async ({ page }) => {
 
   // Wait for React to flush state updates - wait for error text content to appear
   // Use a more explicit wait that checks for actual text content
+  await page.waitForFunction(
+    () => {
+      const emailErrorEl = document.getElementById('email-error')
+      return (
+        emailErrorEl?.textContent?.trim()?.length > 0
+      )
+    },
+    { timeout: 10000 },
+  )
 
-  // Now verify the errors are visible and contain the expected text
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
   await expect(passwordError).toContainText(/required|password/i, {
     timeout: 5000,
