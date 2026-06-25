@@ -144,33 +144,6 @@ PYTORCH_CHECKPOINT_FORMAT = "bias-detection-pytorch-state-dict"
 PYTORCH_CHECKPOINT_VERSION = 1
 
 
-def _create_basic_model(*args: Any, **kwargs: Any) -> None:
-    """Module-level stub for pickle-deserialization compatibility.
-
-    Legacy checkpoints saved by ``torch.save`` (or the old TensorFlow
-    serializer) may embed a global reference to
-    ``model_service._create_basic_model`` in their pickle state.  When
-    ``torch.load(weights_only=True)`` encounters such a reference at
-    startup, it tries to resolve it via ``import`` and raises
-    ``ImportError`` because ``_create_basic_model`` has always been an
-    *instance* method on ``TensorFlowModelService`` /
-    ``PyTorchModelService``, never a module-level name.
-
-    This stub exists solely so the import resolution succeeds, after
-    which the checkpoint will fail the ``isinstance(…, dict)`` guard in
-    ``_restore_model_from_checkpoint`` and be handled by the existing
-    fallback path that regenerates the model.
-
-    Callers should always use ``self._create_basic_model()`` on a
-    concrete service instance instead.
-    """
-    raise AttributeError(
-        "_create_basic_model is not a module-level function. "
-        "Use service._create_basic_model() on a TensorFlowModelService "
-        "or PyTorchModelService instance."
-    )
-
-
 class ModelService(ABC):
     """Abstract base class for model services"""
 

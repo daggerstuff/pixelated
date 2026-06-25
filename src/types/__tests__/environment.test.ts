@@ -14,19 +14,19 @@ describe('getEnvironmentVariable', () => {
   })
 
   it('should return the environment variable value when it exists', () => {
-    process.env.PUBLIC_SITE_URL = 'https://example.com'
+    process.env['PUBLIC_SITE_URL'] = 'https://example.com'
     const result = getEnvironmentVariable('PUBLIC_SITE_URL')
     expect(result).toBe('https://example.com')
   })
 
   it('should return the default value when the environment variable does not exist', () => {
-    delete process.env.PUBLIC_SITE_URL
+    delete process.env['PUBLIC_SITE_URL']
     const result = getEnvironmentVariable('PUBLIC_SITE_URL', 'https://default.com' as any)
     expect(result).toBe('https://default.com')
   })
 
   it('should return undefined when the environment variable does not exist and no default value is provided', () => {
-    delete process.env.PUBLIC_SITE_URL
+    delete process.env['PUBLIC_SITE_URL']
     const result = getEnvironmentVariable('PUBLIC_SITE_URL')
     expect(result).toBeUndefined()
   })
