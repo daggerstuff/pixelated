@@ -1,42 +1,98 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Avatar } from '@/components/ui/avatar'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts'
-import type { StateVelocityDataPoint, InterventionRate, DeEscalationDataPoint, OSCEScoreRow } from '@/types/analytics'
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
+import type {
+  StateVelocityDataPoint,
+  InterventionRate,
+  DeEscalationDataPoint,
+  OSCEScoreRow,
+} from '@/types/analytics'
 import { DEMO_COMPETENCY } from '@/services/analyticsV2Service'
 import { BarChart, Bar } from 'recharts'
 import { AlertTriangle, Activity } from 'lucide-react'
+// Static color palette for state velocity chart
+const STATE_COLORS = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
 
 // State Transition Velocity Chart
 function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
   // Group by cohort
-  const states = [...new Set(data.map(d => d.state))]
-  const cohorts = [...new Set(data.map(d => d.cohort).filter(Boolean))]
-  const colors = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
+  const states = [...new Set(data.map((d) => d.state))]
+  const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
 
-  const chartData = states.map(state => {
-    const point: any = { state: state.split('→')[0].trim() }
-    cohorts.forEach((cohort, i) => {
-      const match = data.find(d => d.state === state && d.cohort === cohort)
+  // Build O(1) lookup map for O(n) chart construction
+  const dataByKey = new Map<string, StateVelocityDataPoint>()
+  data.forEach((d) => {
+    dataByKey.set(`${d.state}::${d.cohort}`, d)
+  })
+
+  const chartData = states.map((state) => {
+    const point: Record<string, string | number> = {
+      state: state.split('→')[0].trim(),
+    }
+    cohorts.forEach((cohort) => {
+      const match = dataByKey.get(`${state}::${cohort}`)
       if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
     })
     return point
   })
-
   return (
     <Card>
-      <CardHeader><CardTitle className="text-sm">State Transition Velocity</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle className="text-sm">State Transition Velocity</CardTitle>
+      </CardHeader>
       <CardContent>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-              <XAxis dataKey="state" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={{ stroke: 'hsl(var(--border))' }} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} width={50} unit="s" />
-              <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} formatter={(value: number) => [`${value}s`, undefined]} />
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+              />
+              <XAxis
+                dataKey="state"
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tickLine={false}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+              />
+              <YAxis
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tickLine={false}
+                axisLine={false}
+                width={50}
+                unit="s"
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                }}
+                formatter={(value: number) => [`${value}s`, undefined]}
+              />
               <Legend wrapperStyle={{ fontSize: '11px' }} />
               {cohorts.map((cohort, i) => (
-                <Line key={cohort} type="monotone" dataKey={cohort ?? 'All'} stroke={colors[i]} strokeWidth={2} dot={{ r: 3 }} />
+                <Line
+                  key={cohort}
+                  type="monotone"
+                  dataKey={cohort ?? 'All'}
+                  stroke={colors[i]}
+                  strokeWidth={2}
+                  dot={{ r: 3 }}
+                />
               ))}
             </LineChart>
           </ResponsiveContainer>
@@ -57,10 +113,14 @@ function InterventionRateCard({ data }: { data: InterventionRate }) {
       <CardContent>
         <div className="space-y-3">
           <div>
-            <span className={`text-3xl font-bold ${data.rate > 5 ? 'text-red-600' : data.rate > 2 ? 'text-amber-600' : 'text-green-600'}`}>
+            <span
+              className={`text-3xl font-bold ${data.rate > 5 ? 'text-red-600' : data.rate > 2 ? 'text-amber-600' : 'text-green-600'}`}
+            >
               {data.rate}%
             </span>
-            <p className="text-xs text-muted-foreground">Of all learner turns triggered InputGuard</p>
+            <p className="text-xs text-muted-foreground">
+              Of all learner turns triggered InputGuard
+            </p>
           </div>
           <div className="flex justify-between text-xs text-muted-foreground border-t pt-2">
             <span>{data.totalTurns.toLocaleString()} total turns</span>
@@ -76,16 +136,53 @@ function InterventionRateCard({ data }: { data: InterventionRate }) {
 function DeEscalationChart({ data }: { data: DeEscalationDataPoint[] }) {
   return (
     <Card>
-      <CardHeader><CardTitle className="text-sm">De-escalation Efficacy</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle className="text-sm">De-escalation Efficacy</CardTitle>
+      </CardHeader>
       <CardContent>
         <div className="h-64">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
-              <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} unit="%" />
-              <YAxis dataKey="scenario" type="category" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} tickLine={false} axisLine={false} width={110} />
-              <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', fontSize: '12px' }} formatter={(value: number) => [`${value}%`, 'Success Rate']} />
-              <Bar dataKey="successRate" radius={[0, 4, 4, 0]} barSize={18} fill="#059669" />
+            <BarChart
+              data={data}
+              margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+              layout="vertical"
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+                horizontal={false}
+              />
+              <XAxis
+                type="number"
+                domain={[0, 100]}
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tickLine={false}
+                axisLine={false}
+                unit="%"
+              />
+              <YAxis
+                dataKey="scenario"
+                type="category"
+                tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
+                tickLine={false}
+                axisLine={false}
+                width={110}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                }}
+                formatter={(value: number) => [`${value}%`, 'Success Rate']}
+              />
+              <Bar
+                dataKey="successRate"
+                radius={[0, 4, 4, 0]}
+                barSize={18}
+                fill="#059669"
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -98,23 +195,52 @@ function DeEscalationChart({ data }: { data: DeEscalationDataPoint[] }) {
 function OSCETable({ data }: { data: OSCEScoreRow[] }) {
   return (
     <Card>
-      <CardHeader><CardTitle className="text-sm">OSCE Proxy Scores</CardTitle></CardHeader>
+      <CardHeader>
+        <CardTitle className="text-sm">OSCE Proxy Scores</CardTitle>
+      </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y">
           <div className="grid grid-cols-6 gap-2 px-4 py-2 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
-            <div className="col-span-2">Learner</div><div className="col-span-1">Info Extr.</div><div className="col-span-1">Comms</div><div className="col-span-1">Crit. Items</div><div className="col-span-1">Turns</div>
+            <div className="col-span-2">Learner</div>
+            <div className="col-span-1">Info Extr.</div>
+            <div className="col-span-1">Comms</div>
+            <div className="col-span-1">Crit. Items</div>
+            <div className="col-span-1">Turns</div>
           </div>
           {data.map((row) => (
-            <div key={row.learnerName} className="grid grid-cols-6 gap-2 px-4 py-2.5 items-center hover:bg-muted/50 text-xs">
+            <div
+              key={row.learnerName}
+              className="grid grid-cols-6 gap-2 px-4 py-2.5 items-center hover:bg-muted/50 text-xs"
+            >
               <div className="col-span-2 flex items-center gap-2">
-                <Avatar size="sm" alt={row.learnerName} fallback={row.learnerName.split(' ').map(n => n[0]).join('')} />
+                <Avatar
+                  size="sm"
+                  alt={row.learnerName}
+                  fallback={row.learnerName
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')}
+                />
                 <span className="font-medium truncate">{row.learnerName}</span>
               </div>
               <div className="col-span-1">
-                <Badge variant={row.infoExtractionRate >= 90 ? 'success' : row.infoExtractionRate >= 75 ? 'warning' : 'destructive'} className="text-[10px]">{row.infoExtractionRate}%</Badge>
+                <Badge
+                  variant={
+                    row.infoExtractionRate >= 90
+                      ? 'success'
+                      : row.infoExtractionRate >= 75
+                        ? 'warning'
+                        : 'destructive'
+                  }
+                  className="text-[10px]"
+                >
+                  {row.infoExtractionRate}%
+                </Badge>
               </div>
               <div className="col-span-1">{row.communicationScore}</div>
-              <div className="col-span-1">{row.criticalItemsFound}/{row.criticalItemsTotal}</div>
+              <div className="col-span-1">
+                {row.criticalItemsFound}/{row.criticalItemsTotal}
+              </div>
               <div className="col-span-1">{row.totalTurns}</div>
             </div>
           ))}
@@ -131,8 +257,12 @@ export function ClinicalCompetencyModule() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2"><StateVelocityChart data={data.stateVelocities} /></div>
-        <div className="lg:col-span-1"><InterventionRateCard data={data.interventionRate} /></div>
+        <div className="lg:col-span-2">
+          <StateVelocityChart data={data.stateVelocities} />
+        </div>
+        <div className="lg:col-span-1">
+          <InterventionRateCard data={data.interventionRate} />
+        </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <DeEscalationChart data={data.deEscalationEfficacy} />
