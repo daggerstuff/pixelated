@@ -1,0 +1,134 @@
+name: Deploy to Civo K3s
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: pixelatedempathy/api
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.vars.outputs.image_tag }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Determine image tag
+        id: vars
+        run: |
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            IMAGE_TAG="production"
+          else
+            IMAGE_TAG="${{ github.ref_name }}"
+          fi
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
+          echo "Built image tag: $IMAGE_TAG (branch: ${{ github.ref_name }})"
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }}, ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64
+
+      - name: Image digest
+        run: echo ${{ steps.build.outputs.digest }}
+
+  deploy-civo:
+    needs: [build-and-push]
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    environment:
+      name: civo
+      url: https://pixelatedempathy.com
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install Civo CLI
+        run: |
+          CIVO_VERSION=$(curl -sL https://api.github.com/repos/civo/cli/releases/latest | jq -r '.tag_name // "v1.1.14"')
+          curl -sL "https://github.com/civo/cli/releases/download/${CIVO_VERSION}/civo-${CIVO_VERSION#v}-linux-amd64.tar.gz" -o /tmp/civo.tar.gz
+          tar xzf /tmp/civo.tar.gz -C /usr/local/bin/ civo
+          civo --version
+
+      - name: Configure Civo
+        env:
+          CIVO_API_KEY: ${{ secrets.CIVO_API_KEY }}
+        run: civo apikey save --load-from-env -y
+
+      - name: Wait for cluster to be ready
+        run: |
+          echo "Waiting for pixelated-cluster to be ready..."
+          for i in {1..30}; do
+            STATUS=$(civo kubernetes show pixelated-cluster -o json | jq -r '.conditions[] | select(.type=="ControlPlaneConnectivity") | .status // empty')
+            if [ "$STATUS" == "True" ]; then
+              echo "✅ Cluster is ready"
+              break
+            fi
+            echo "Attempt $i/30: Cluster not ready yet, waiting..."
+            sleep 20
+          done
+
+      - name: Update kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          civo kubernetes config pixelated-cluster > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Install kubectl and kustomize
+        run: |
+          curl -sLO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+
+          curl -sLO "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+          chmod +x install_kustomize.sh
+          ./install_kustomize.sh
+          sudo mv kustomize /usr/local/bin/
+
+      - name: Deploy to Civo
+        run: |
+          kubectl apply -f k8s/civo/namespace.yaml
+          kubectl set image deployment/pixelated-empathy pixelated-empathy=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.build-and-push.outputs.image_tag }} -n pixelated-empathy
+
+          echo "Waiting for rollout..."
+          kubectl rollout status deployment/pixelated-empathy -n pixelated-empathy --timeout=300s
+
+      - name: Verify deployment
+        run: |
+          echo "=== Pod status ==="
+          kubectl get pods -n pixelated-empathy
+
+          echo "=== Service status ==="
+          kubectl get svc -n pixelated-empathy
+
+          echo "=== Ingress status ==="
+          kubectl get ingress -n pixelated-empathy
