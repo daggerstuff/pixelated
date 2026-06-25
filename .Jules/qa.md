@@ -1,1 +1,0 @@
-## 2025-02-18 - Memory Stats Endpoint Tests | Pattern: Extracted standard getGateway mocking pattern from [memoryId].test.ts. Uses `vi.mock('../_shared', ...)` to stub the gateway implementation since Vitest isolates memory routes per file. Also mocks `getCurrentUser`. | Action: Re-use this same mocking strategy when testing other endpoints in `src/api/memory/routes/`.
