@@ -70,10 +70,18 @@ test('login form shows validation errors', async ({ page }) => {
   // Wait for React to flush state updates - wait for error text content to appear
   // Use a more explicit wait that checks for actual text content
 
-  // Need to wait until the style block is removed or errors are actually visible text
-  // The span starts with style="display: none;"
-  await expect(emailError).toBeVisible({ timeout: 10000 })
-  await expect(passwordError).toBeVisible({ timeout: 10000 })
+  // Wait for error text content to appear (elements exist as hidden empty divs initially)
+  await page.waitForFunction(
+    () => {
+      const emailError = document.getElementById('email-error')
+      const passwordError = document.getElementById('password-error')
+      return (
+        emailError?.textContent?.trim().length > 0 &&
+        passwordError?.textContent?.trim().length > 0
+      )
+    },
+    { timeout: 10000 }
+  )
 
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
   await expect(passwordError).toContainText(/required|password/i, {
@@ -155,9 +163,15 @@ test('login page has proper transitions', async ({ page }) => {
 
   // Wait for React to process the state update and render the reset password heading
   // Use waitForFunction to explicitly wait for the heading element to appear in the DOM
-  const heading = page.locator('[data-testid="reset-password-heading"]')
-  await expect(heading).toBeVisible({ timeout: 15000 })
-  await expect(heading).toContainText('Reset Password')
+  await page.waitForFunction(
+    () => {
+      const heading = document.querySelector(
+        '[data-testid="reset-password-heading"]',
+      )
+      return heading !== null && heading.textContent?.includes('Reset Password')
+    },
+    { timeout: 15000 },
+  )
 
   // Now verify the heading is visible
   const resetPasswordHeading = page
