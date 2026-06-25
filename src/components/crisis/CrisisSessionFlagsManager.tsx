@@ -6,6 +6,41 @@ import type {
   UserSessionStatus,
 } from '../../lib/ai/crisis/types'
 
+// Performance optimization: Moved pure helper functions outside component to prevent recreation on every render
+const getSeverityColor = (severity: string) => {
+  switch (severity) {
+    case 'critical':
+      return 'text-red-600 bg-red-50'
+    case 'high':
+      return 'text-orange-600 bg-orange-50'
+    case 'medium':
+      return 'text-yellow-600 bg-yellow-50'
+    case 'low':
+      return 'text-green-600 bg-green-50'
+    default:
+      return 'text-gray-600 bg-gray-50'
+  }
+}
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'pending':
+      return 'text-red-600 bg-red-50'
+    case 'under_review':
+      return 'text-blue-600 bg-blue-50'
+    case 'reviewed':
+      return 'text-green-600 bg-green-50'
+    case 'resolved':
+      return 'text-green-700 bg-green-100'
+    case 'escalated':
+      return 'text-purple-600 bg-purple-50'
+    case 'dismissed':
+      return 'text-gray-600 bg-gray-50'
+    default:
+      return 'text-gray-600 bg-gray-50'
+  }
+}
+
 interface CrisisSessionFlagsManagerProps {
   userId?: string
   showPendingOnly?: boolean
@@ -123,40 +158,6 @@ export const CrisisSessionFlagsManager: FC<CrisisSessionFlagsManagerProps> = ({
       )
     } finally {
       setUpdating(null)
-    }
-  }
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical':
-        return 'text-red-600 bg-red-50'
-      case 'high':
-        return 'text-orange-600 bg-orange-50'
-      case 'medium':
-        return 'text-yellow-600 bg-yellow-50'
-      case 'low':
-        return 'text-green-600 bg-green-50'
-      default:
-        return 'text-gray-600 bg-gray-50'
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'text-red-600 bg-red-50'
-      case 'under_review':
-        return 'text-blue-600 bg-blue-50'
-      case 'reviewed':
-        return 'text-green-600 bg-green-50'
-      case 'resolved':
-        return 'text-green-700 bg-green-100'
-      case 'escalated':
-        return 'text-purple-600 bg-purple-50'
-      case 'dismissed':
-        return 'text-gray-600 bg-gray-50'
-      default:
-        return 'text-gray-600 bg-gray-50'
     }
   }
 
