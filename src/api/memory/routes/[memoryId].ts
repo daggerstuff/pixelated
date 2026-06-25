@@ -160,10 +160,7 @@ export const PATCH = withAuthenticatedMemoryRoute(
         return jsonError(
           400,
           'Validation Error',
-          'Invalid request body: ' +
-            error.issues
-              .map((e) => `${e.path.join('.')}: ${e.message}`)
-              .join(', '),
+          'Invalid request body format or content',
         )
       }
 
