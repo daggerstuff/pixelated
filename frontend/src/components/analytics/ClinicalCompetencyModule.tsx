@@ -20,31 +20,39 @@ import type {
 import { DEMO_COMPETENCY } from '@/services/analyticsV2Service'
 import { BarChart, Bar } from 'recharts'
 import { AlertTriangle, Activity } from 'lucide-react'
+import { useMemo } from 'react'
+
 // Static color palette for state velocity chart
 const STATE_COLORS = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
+const colors = STATE_COLORS
 
 // State Transition Velocity Chart
 function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
-  // Group by cohort
-  const states = [...new Set(data.map((d) => d.state))]
-  const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
+  // Group by cohort and build chart data - wrapped in useMemo to prevent expensive operations on every render
+  const { cohorts, chartData } = useMemo(() => {
+    const states = [...new Set(data.map((d) => d.state))]
+    const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
 
-  // Build O(1) lookup map for O(n) chart construction
-  const dataByKey = new Map<string, StateVelocityDataPoint>()
-  data.forEach((d) => {
-    dataByKey.set(`${d.state}::${d.cohort}`, d)
-  })
-
-  const chartData = states.map((state) => {
-    const point: Record<string, string | number> = {
-      state: state.split('→')[0].trim(),
-    }
-    cohorts.forEach((cohort) => {
-      const match = dataByKey.get(`${state}::${cohort}`)
-      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+    // Build O(1) lookup map for O(n) chart construction
+    const dataByKey = new Map<string, StateVelocityDataPoint>()
+    data.forEach((d) => {
+      dataByKey.set(`${d.state}::${d.cohort}`, d)
     })
-    return point
-  })
+
+    const chartData = states.map((state) => {
+      const point: Record<string, string | number> = {
+        state: state.split('→')[0].trim(),
+      }
+      cohorts.forEach((cohort) => {
+        const match = dataByKey.get(`${state}::${cohort}`)
+        if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+      })
+      return point
+    })
+
+    return { cohorts, chartData }
+  }, [data])
+
   return (
     <Card>
       <CardHeader>
