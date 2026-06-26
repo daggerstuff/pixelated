@@ -2,14 +2,30 @@
  * Type declarations for test-datasets module
  */
 
-import type { TherapeuticSession, ParticipantDemographics, TrainingScenario, SessionContent } from '../../src/lib/ai/bias-detection/types'
+import type {
+  TherapeuticSession,
+  ParticipantDemographics,
+  TrainingScenario,
+  SessionContent,
+} from '../../src/lib/ai/bias-detection/types'
 
-export type { TherapeuticSession, ParticipantDemographics, TrainingScenario, SessionContent }
+export type {
+  TherapeuticSession,
+  ParticipantDemographics,
+  TrainingScenario,
+  SessionContent,
+}
 
 export interface BiasTestCase {
   id: string
   text: string
-  category: 'gender' | 'racial' | 'cultural' | 'age' | 'disability' | 'socioeconomic'
+  category:
+    | 'gender'
+    | 'racial'
+    | 'cultural'
+    | 'age'
+    | 'disability'
+    | 'socioeconomic'
   expectedBiasScore: number
   expectedSeverity: 'none' | 'low' | 'medium' | 'high' | 'critical'
   keywords: string[]
@@ -39,7 +55,7 @@ export const TEST_DATASET_STATS: TestDatasetStats = {
   biasedCases: 0,
   neutralCases: 0,
   byCategory: {},
-  bySeverity: {}
+  bySeverity: {},
 }
 export const GENDER_BIAS_TESTS: BiasTestCase[] = []
 export const RACIAL_BIAS_TESTS: BiasTestCase[] = []

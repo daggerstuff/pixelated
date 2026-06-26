@@ -121,6 +121,10 @@ export const PATCH = withAuthenticatedMemoryRoute(
         memoryId,
       })
 
+      if (!existing) {
+        return jsonError(404, 'Not Found', 'Memory not found')
+      }
+
       // Update memory using the gateway
       const result = await getGateway().updateMemory({
         ...toMemoryScope(user.id, user.accountId, user.workspaceId),

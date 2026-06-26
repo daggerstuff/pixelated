@@ -84,15 +84,18 @@ export const POST: APIRoute = async ({ params, request }) => {
       forwardedHeaders['X-Promoter-Role'] = promoterRole
     }
 
-    const apiResponse = await fetch(`http://localhost:3102/queue/${itemId}/promote`, {
-      method: 'POST',
-      headers: forwardedHeaders,
-      body: JSON.stringify({
-        promoter_id: body.promoter_id,
-        target_stage: body.target_stage ?? null,
-        notes: body.notes ?? null,
-      }),
-    })
+    const apiResponse = await fetch(
+      `http://localhost:3102/queue/${itemId}/promote`,
+      {
+        method: 'POST',
+        headers: forwardedHeaders,
+        body: JSON.stringify({
+          promoter_id: body.promoter_id,
+          target_stage: body.target_stage ?? null,
+          notes: body.notes ?? null,
+        }),
+      },
+    )
 
     if (apiResponse.ok) {
       const data = await apiResponse.json()
@@ -124,7 +127,9 @@ export const POST: APIRoute = async ({ params, request }) => {
         },
       )
     } else {
-      console.error(`Annotation API promote error: ${apiResponse.status} ${apiResponse.statusText}`)
+      console.error(
+        `Annotation API promote error: ${apiResponse.status} ${apiResponse.statusText}`,
+      )
       return new Response(
         JSON.stringify({ error: 'Failed to promote annotation' }),
         {

@@ -6,13 +6,13 @@ stage transition.
 
 ## What's in this slice
 
-| Slot                 | File                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| Runtime config       | `agent/agent.ts`                                                                      |
-| Standing rules       | `agent/instructions.md`                                                               |
-| Tool: evaluation     | `agent/tools/run_evaluation.ts` (gated via `always()`)                                |
-| Channel (Slack)      | `agent/channels/slack-events.ts`                                                      |
-| Sub-agent            | `agent/subagents/evaluator/{agent.ts,instructions.md}`                                |
+| Slot             | File                                                   |
+| ---------------- | ------------------------------------------------------ |
+| Runtime config   | `agent/agent.ts`                                       |
+| Standing rules   | `agent/instructions.md`                                |
+| Tool: evaluation | `agent/tools/run_evaluation.ts` (gated via `always()`) |
+| Channel (Slack)  | `agent/channels/slack-events.ts`                       |
+| Sub-agent        | `agent/subagents/evaluator/{agent.ts,instructions.md}` |
 
 ## Status
 
@@ -21,13 +21,12 @@ Vertical slice. The orchestrator is parked at gate boundaries; only the
 
 ## Not yet wired (TODOs)
 
-- The remaining pipeline tools (curate_dataset, run_training, promote_to_*,
+- The remaining pipeline tools (curate*dataset, run_training, promote_to*\*,
   rollback_model, check_pipeline_health).
 - Schedule (weekly cron) — root-only, not yet authored.
 - K8s MCP connection for promotion.
 - Slack approval buttons -> input response wiring.
-- Linear channel for blocker tickets (separate from QA agent's chatops
-  channel).
+- Linear channel for blocker tickets (separate from QA agent's chatops channel).
 
 ## How to develop
 

@@ -6,18 +6,19 @@ Empathy monorepo.
 
 ## What's in this slice
 
-| Slot                 | File                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| Runtime config       | `agent/agent.ts`                                                                      |
-| Standing rules       | `agent/instructions.md`                                                               |
-| Tool: scoring        | `agent/tools/score_session.ts`                                                        |
-| Channel (Linear)     | `agent/channels/linear-chatops.ts`                                                    |
-| Sub-agent            | `agent/subagents/report-writer/{agent.ts,instructions.md}`                            |
-| Default eve channel  | `agent/channels/eve.ts` (auto-generated)                                              |
+| Slot                | File                                                       |
+| ------------------- | ---------------------------------------------------------- |
+| Runtime config      | `agent/agent.ts`                                           |
+| Standing rules      | `agent/instructions.md`                                    |
+| Tool: scoring       | `agent/tools/score_session.ts`                             |
+| Channel (Linear)    | `agent/channels/linear-chatops.ts`                         |
+| Sub-agent           | `agent/subagents/report-writer/{agent.ts,instructions.md}` |
+| Default eve channel | `agent/channels/eve.ts` (auto-generated)                   |
 
 ## Status
 
-Vertical slice — enough to stand up the agent and verify the scaffolding pattern.
+Vertical slice — enough to stand up the agent and verify the scaffolding
+pattern.
 
 Tool returns structure-only payloads (no real Foresight or Mongo writes).
 
@@ -41,5 +42,6 @@ pnpm build
 
 ## Source of truth
 
-Eve docs at `node_modules/eve/docs/` — read `agent-config.md`, `tools/overview.mdx`,
-and `subagents.mdx` first if you touch this directory for the first time.
+Eve docs at `node_modules/eve/docs/` — read `agent-config.md`,
+`tools/overview.mdx`, and `subagents.mdx` first if you touch this directory for
+the first time.

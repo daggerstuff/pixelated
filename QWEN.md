@@ -103,7 +103,8 @@ upcoming work, and cross-session state.
 1. Restate goal and constraints.
 2. Choose the workflow for the change:
    - **Routine fix** → edit directly, verify with one concrete command.
-   - **Single feature, well-scoped** → `/spec` (writes `IMPLEMENTATION_PLAN.md`).
+   - **Single feature, well-scoped** → `/spec` (writes
+     `IMPLEMENTATION_PLAN.md`).
    - **Multi-feature refactor / 50+ file change** → `/missions`.
 3. Apply the minimal edit.
 4. Run the smallest relevant check.
@@ -128,8 +129,8 @@ See root `AGENTS.md` "Droid Workflow" section. Quick reference:
 - **Headless missions** — `droid exec --mission -f mission.md` for CI /
   scheduled runs; tune with `--worker-model`, `--validator-model`,
   `--worker-reasoning-effort`, `--validator-reasoning-effort`.
-- **Recovery** — pause and redirect if a worker spins or a milestone blocks;
-  see `~/.factory/missions/README.md` for the recovery playbook.
+- **Recovery** — pause and redirect if a worker spins or a milestone blocks; see
+  `~/.factory/missions/README.md` for the recovery playbook.
 
 ## 8) MCP profile
 

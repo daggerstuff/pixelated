@@ -10,10 +10,10 @@
  *   translate_text         - Translate text to a target language
  */
 
-import { createMcpHandler } from 'agents/mcp'
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
-import { z } from 'zod'
 import type { AiTextGenerationOutput } from '@cloudflare/workers-types'
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
+import { createMcpHandler } from 'agents/mcp'
+import { z } from 'zod'
 
 function text(raw: unknown): string {
   const out = raw as AiTextGenerationOutput

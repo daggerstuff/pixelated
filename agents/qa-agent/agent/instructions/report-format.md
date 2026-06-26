@@ -11,26 +11,28 @@ A `home` view with three blocks:
 3. **Actions** — buttons named "Open ticket" (deep-link) and "Acknowledge".
 
 The Block Kit payload is produced by the report-writer sub-agent with the
-`outputSchema: SlackBlock` constraint enforced by the agent's
-`outputSchema` definition. The agent has access to ref IDs in the
-buttons; it never inlines ticket identifiers into the body.
+`outputSchema: SlackBlock` constraint enforced by the agent's `outputSchema`
+definition. The agent has access to ref IDs in the buttons; it never inlines
+ticket identifiers into the body.
 
 ## Linear Markdown comment fallback
 
 If Slack delivery is delayed or fails, the same digest is dropped into the
-"Training Pipeline Improvements" project as a project update with the
-title `Daily QA Digest — {cohort_id} — {date}` and the canonical body
-template below. The agent emits this path only on a Slack delivery
-failure.
+"Training Pipeline Improvements" project as a project update with the title
+`Daily QA Digest — {cohort_id} — {date}` and the canonical body template below.
+The agent emits this path only on a Slack delivery failure.
 
 ```md
 ## Cohort
+
 {cohort_id}
 
 ## Top priority sessions
+
 - [{ticket_identifier}]: {rationale}
 
 ## Sources
+
 - {session_id}
 ```
 
@@ -42,6 +44,5 @@ failure.
 
 ## What is still TODO
 
-- Replace the Block Kit shape once the supervisor-side layout lock-in
-  lands.
+- Replace the Block Kit shape once the supervisor-side layout lock-in lands.
 - Add a `force_markdown_only` flag for the Slack thread reply path.

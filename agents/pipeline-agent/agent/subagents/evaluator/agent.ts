@@ -1,6 +1,6 @@
 import { defineAgent } from 'eve'
-import { z } from 'zod'
 import { createWorkersAI } from 'workers-ai-provider'
+import { z } from 'zod'
 
 const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
 const apiKey = process.env.CLOUDFLARE_AI_API_KEY
