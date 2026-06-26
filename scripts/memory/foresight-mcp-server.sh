@@ -62,5 +62,13 @@ fi
 
 export UV_CACHE_DIR="/home/vivi/.gemini/tmp/uv-cache"
 
+# Force the project-local venv (foresight-mcp/.venv) regardless of any
+# ambient VIRTUAL_ENV — agent transports frequently run with the workspace
+# .venv exported, which lacks the full fastmcp.server package and causes
+# ImportError on lazy task-routing imports. --no-active guarantees uv creates
+# or reuses ONLY the project's own .venv.
+unset VIRTUAL_ENV
+unset VIRTUAL_ENV_DIR
+
 cd "${FORESIGHT_ROOT}"
-exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --active -m foresight_mcp "$@"
+exec "${UV_BIN}" run --project "${FORESIGHT_ROOT}" --no-active -m foresight_mcp "$@"
