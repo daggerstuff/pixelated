@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { AlertTriangle, Activity } from 'lucide-react'
 import {
   LineChart,
@@ -26,26 +27,31 @@ const STATE_COLORS = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
 
 // State Transition Velocity Chart
 function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
-  // Group by cohort
-  const states = [...new Set(data.map((d) => d.state))]
-  const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
+  // Memoize the data transformation to avoid expensive O(n) recalculations on every render
+  const { chartData, cohorts } = useMemo(() => {
+    // Group by cohort
+    const states = [...new Set(data.map((d) => d.state))]
+    const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
 
-  // Build O(1) lookup map for O(n) chart construction
-  const dataByKey = new Map<string, StateVelocityDataPoint>()
-  data.forEach((d) => {
-    dataByKey.set(`${d.state}::${d.cohort}`, d)
-  })
-
-  const chartData = states.map((state) => {
-    const point: Record<string, string | number> = {
-      state: state.split('→')[0].trim(),
-    }
-    cohorts.forEach((cohort) => {
-      const match = dataByKey.get(`${state}::${cohort}`)
-      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+    // Build O(1) lookup map for O(n) chart construction
+    const dataByKey = new Map<string, StateVelocityDataPoint>()
+    data.forEach((d) => {
+      dataByKey.set(`${d.state}::${d.cohort}`, d)
     })
-    return point
-  })
+
+    const chartData = states.map((state) => {
+      const point: Record<string, string | number> = {
+        state: state.split('→')[0].trim(),
+      }
+      cohorts.forEach((cohort) => {
+        const match = dataByKey.get(`${state}::${cohort}`)
+        if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+      })
+      return point
+    })
+    return { chartData, cohorts }
+  }, [data])
+
   return (
     <Card>
       <CardHeader>
@@ -90,7 +96,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
                   key={cohort}
                   type="monotone"
                   dataKey={cohort ?? 'All'}
-                  stroke={colors[i]}
+                  stroke={STATE_COLORS[i % STATE_COLORS.length]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
