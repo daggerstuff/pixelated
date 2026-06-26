@@ -393,6 +393,7 @@
     "globby": "latest",
     "gray-matter": "latest",
     "hastscript": "latest",
+    "headroom-ai": "^0.22.4",
     "hono": "^4.12.26",
     "html-entities": "latest",
     "ioredis-mock": "latest",
