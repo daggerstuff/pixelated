@@ -13,7 +13,13 @@ export interface CrisisTestSession {
 export interface CrisisTestCase {
   id: string
   text: string
-  type: 'suicidal_ideation' | 'self_harm' | 'panic_attack' | 'substance_abuse' | 'psychotic_symptoms' | 'non_crisis'
+  type:
+    | 'suicidal_ideation'
+    | 'self_harm'
+    | 'panic_attack'
+    | 'substance_abuse'
+    | 'psychotic_symptoms'
+    | 'non_crisis'
   severity: 'none' | 'low' | 'medium' | 'high' | 'critical'
   keywords: string[]
   crisisType?: string
@@ -38,14 +44,17 @@ export interface CrisisTestDatasetStats {
 
 // Use Map to match test expectations (.has() and .get() methods)
 export const ALL_CRISIS_TEST_CASES: CrisisTestCase[] = []
-export const CRISIS_GROUND_TRUTH_LABELS = new Map<string, CrisisGroundTruthLabel>()
+export const CRISIS_GROUND_TRUTH_LABELS = new Map<
+  string,
+  CrisisGroundTruthLabel
+>()
 export const CRISIS_TEST_DATASET_STATS: CrisisTestDatasetStats = {
   total: 0,
   crisisCases: 0,
   nonCrisisCases: 0,
   byType: {},
   bySeverity: {},
-  totalCases: 0
+  totalCases: 0,
 }
 export const SUICIDAL_IDEATION_TESTS: CrisisTestCase[] = []
 export const SELF_HARM_TESTS: CrisisTestCase[] = []

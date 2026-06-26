@@ -20,10 +20,10 @@ import { validateToken } from '../../auth/jwt-service'
 import type { UserRole } from '../../auth/roles'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { GestaltClient } from '../ai/GestaltClient'
+import { AuditLog, type AuditLogEntry } from './audit-log'
 import { isOriginAllowed, parseAllowedOrigins } from './origin'
 import { RateLimiter } from './ratelimit'
 import { SessionStore, type TrainingSessionDocument } from './session-store'
-import { AuditLog, type AuditLogEntry } from './audit-log'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 

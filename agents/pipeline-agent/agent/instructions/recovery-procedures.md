@@ -1,7 +1,7 @@
 # Recovery procedures
 
-When a tool call returns an error, the orchestrator follows the
-recovery contract in the table below.
+When a tool call returns an error, the orchestrator follows the recovery
+contract in the table below.
 
 | Stage             | Retry policy                                                |
 | ----------------- | ----------------------------------------------------------- |
@@ -13,7 +13,6 @@ recovery contract in the table below.
 | Smoke Test        | rerun; on second failure ask operator to abort or ignore    |
 | Production Deploy | abort on any error and emit `pipeline_event=deploy_aborted` |
 
-Each retry emits a `pipeline_event=retry` with the tool name, attempt
-number, and error class. After the retries are exhausted, the
-orchestrator transitions to `FAILED` and posts the full stack trace
-the program can grep later.
+Each retry emits a `pipeline_event=retry` with the tool name, attempt number,
+and error class. After the retries are exhausted, the orchestrator transitions
+to `FAILED` and posts the full stack trace the program can grep later.

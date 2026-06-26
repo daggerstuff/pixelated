@@ -15,7 +15,9 @@ vi.mock('@/lib/auth-client.ts', () => ({
     signIn: {
       social: vi.fn().mockResolvedValue({ success: true }),
     },
-    useSession: vi.fn().mockReturnValue({ data: null, isPending: false, error: null }),
+    useSession: vi
+      .fn()
+      .mockReturnValue({ data: null, isPending: false, error: null }),
   },
 }))
 

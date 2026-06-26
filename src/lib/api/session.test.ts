@@ -17,10 +17,16 @@ vi.mock('@/config/mongodb.config', () => {
           updateOne: vi.fn(
             async (
               filter: { sessionId: string },
-              update: { $set: Record<string, unknown>; $setOnInsert?: Record<string, unknown> },
+              update: {
+                $set: Record<string, unknown>
+                $setOnInsert?: Record<string, unknown>
+              },
               _opts: { upsert: boolean },
             ) => {
-              store.set(filter.sessionId, update.$set as Record<string, unknown>)
+              store.set(
+                filter.sessionId,
+                update.$set as Record<string, unknown>,
+              )
               return { upsertedCount: 1 }
             },
           ),

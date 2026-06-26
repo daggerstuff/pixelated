@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+
 import { RateLimiter } from './rate-limiter'
 
 vi.mock('@upstash/redis', () => {
@@ -10,7 +11,9 @@ vi.mock('@upstash/redis', () => {
     expire: vi.fn(),
   }
   return {
-    Redis: vi.fn().mockImplementation(function() { return mockRedis }),
+    Redis: vi.fn().mockImplementation(function () {
+      return mockRedis
+    }),
   }
 })
 
