@@ -174,4 +174,3 @@ jobs:
             echo "Trivy strict gate is enabled and critical/high findings were detected."
             exit 1
           fi
-

@@ -80,7 +80,7 @@ test('login form shows validation errors', async ({ page }) => {
         passwordError?.textContent?.trim().length > 0
       )
     },
-    { timeout: 10000 }
+    { timeout: 10000 },
   )
 
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })

@@ -528,7 +528,7 @@ export class FeedbackService implements FeedbackServiceInterface {
     const extractedEmotions = [
       { type: 'energy', confidence: 0.8, intensity: energy },
       { type: 'valence', confidence: 0.7, intensity: valence },
-      { type: 'dominance', confidence: 0.6, intensity: dominance }
+      { type: 'dominance', confidence: 0.6, intensity: dominance },
     ]
     this.updateEmotionState(extractedEmotions, Date.now())
 

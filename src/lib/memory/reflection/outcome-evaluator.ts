@@ -8,11 +8,14 @@
  * PIX-3898 — Sprint 4: Reflection & Learning
  */
 
-import type { ReflectionContext, ReflectionOutcome } from "@pixelated/memory-schema";
+import type {
+  ReflectionContext,
+  ReflectionOutcome,
+} from '@pixelated/memory-schema'
 
 // Re-export the canonical outcome type so consumers don't need a direct
 // dependency on the schema package for this one type.
-export type { ReflectionOutcome } from "@pixelated/memory-schema";
+export type { ReflectionOutcome } from '@pixelated/memory-schema'
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -21,19 +24,19 @@ export type { ReflectionOutcome } from "@pixelated/memory-schema";
 /** Result of evaluating a single reflection context. */
 export interface EvaluationResult {
   /** Classified outcome. */
-  outcome: ReflectionOutcome;
+  outcome: ReflectionOutcome
   /** Human-readable rationale for the classification. */
-  rationale: string;
+  rationale: string
   /** Confidence in the classification [0, 1]. */
-  confidence: number;
+  confidence: number
 }
 
 /** Optional ground-truth signal that overrides / adjusts the evaluation. */
 export interface GroundTruthSignal {
   /** Whether the downstream action is known to have succeeded. */
-  success?: boolean;
+  success?: boolean
   /** Direct user correction of the outcome (overrides all other signals). */
-  userOverride?: ReflectionOutcome;
+  userOverride?: ReflectionOutcome
 }
 
 /**
@@ -43,7 +46,7 @@ export interface GroundTruthSignal {
 export type OutcomeEvaluator = (
   context: ReflectionContext,
   groundTruth?: GroundTruthSignal,
-) => EvaluationResult;
+) => EvaluationResult
 
 // ---------------------------------------------------------------------------
 // Default (rule-based) evaluator
@@ -72,27 +75,28 @@ export function evaluateReflectionOutcome(
       outcome: groundTruth.userOverride,
       rationale: `Outcome overridden by user to '${groundTruth.userOverride}'.`,
       confidence: 1.0,
-    };
+    }
   }
 
   if (groundTruth?.success === true) {
     return {
-      outcome: "success",
-      rationale: "Ground-truth signal indicates the downstream action succeeded.",
+      outcome: 'success',
+      rationale:
+        'Ground-truth signal indicates the downstream action succeeded.',
       confidence: 0.95,
-    };
+    }
   }
 
   if (groundTruth?.success === false) {
     return {
-      outcome: "failure",
-      rationale: "Ground-truth signal indicates the downstream action failed.",
+      outcome: 'failure',
+      rationale: 'Ground-truth signal indicates the downstream action failed.',
       confidence: 0.95,
-    };
+    }
   }
 
   // --- Rule-based classification ---
-  return classifyFromContext(context);
+  return classifyFromContext(context)
 }
 
 /**
@@ -101,7 +105,7 @@ export function evaluateReflectionOutcome(
  */
 export function createRuleBasedEvaluator(): OutcomeEvaluator {
   return (context: ReflectionContext, groundTruth?: GroundTruthSignal) =>
-    evaluateReflectionOutcome(context, groundTruth);
+    evaluateReflectionOutcome(context, groundTruth)
 }
 
 // ---------------------------------------------------------------------------
@@ -109,105 +113,115 @@ export function createRuleBasedEvaluator(): OutcomeEvaluator {
 // ---------------------------------------------------------------------------
 
 const NEGATIVE_KEYWORDS = [
-  "error",
-  "fail",
-  "incorrect",
-  "wrong",
-  "bad",
-  "unable",
-  "could not",
+  'error',
+  'fail',
+  'incorrect',
+  'wrong',
+  'bad',
+  'unable',
+  'could not',
   "didn't work",
-  "not working",
-  "timeout",
-  "exception",
-];
+  'not working',
+  'timeout',
+  'exception',
+]
 
 const POSITIVE_KEYWORDS = [
-  "success",
-  "completed",
-  "ok",
-  "done",
-  "correct",
-  "good",
-  "passed",
-  "verified",
-];
+  'success',
+  'completed',
+  'ok',
+  'done',
+  'correct',
+  'good',
+  'passed',
+  'verified',
+]
 
 function classifyFromContext(context: ReflectionContext): EvaluationResult {
-  const { outcome, userFeedback, cognitivePatterns } = context;
+  const { outcome, userFeedback, cognitivePatterns } = context
 
   // --- If the context already has a definitive non-neutral outcome, trust it
   //     (but still provide a rationale). ---
-  if (outcome === "success") {
+  if (outcome === 'success') {
     return {
-      outcome: "success",
-      rationale: userFeedback || "Action outcome recorded as success in the reflection context.",
+      outcome: 'success',
+      rationale:
+        userFeedback ||
+        'Action outcome recorded as success in the reflection context.',
       confidence: 0.8,
-    };
+    }
   }
 
-  if (outcome === "failure") {
+  if (outcome === 'failure') {
     return {
-      outcome: "failure",
-      rationale: userFeedback || "Action outcome recorded as failure in the reflection context.",
+      outcome: 'failure',
+      rationale:
+        userFeedback ||
+        'Action outcome recorded as failure in the reflection context.',
       confidence: 0.8,
-    };
+    }
   }
 
-  if (outcome === "partial") {
+  if (outcome === 'partial') {
     return {
-      outcome: "partial",
-      rationale: userFeedback || "Action outcome recorded as partial in the reflection context.",
+      outcome: 'partial',
+      rationale:
+        userFeedback ||
+        'Action outcome recorded as partial in the reflection context.',
       confidence: 0.7,
-    };
+    }
   }
 
   // --- Neutral / ambiguous context — probe user feedback text ---
-  const feedback = userFeedback.toLowerCase();
+  const feedback = userFeedback.toLowerCase()
 
   // Check for strong negative signals
-  const hasNegativeKeyword = NEGATIVE_KEYWORDS.some((kw) => feedback.includes(kw));
+  const hasNegativeKeyword = NEGATIVE_KEYWORDS.some((kw) =>
+    feedback.includes(kw),
+  )
   if (hasNegativeKeyword) {
     return {
-      outcome: "failure",
+      outcome: 'failure',
       rationale: `User feedback contains negative signal: "${userFeedback}".`,
       confidence: 0.65,
-    };
+    }
   }
 
   // Check for strong positive signals
-  const hasPositiveKeyword = POSITIVE_KEYWORDS.some((kw) => feedback.includes(kw));
+  const hasPositiveKeyword = POSITIVE_KEYWORDS.some((kw) =>
+    feedback.includes(kw),
+  )
   if (hasPositiveKeyword) {
     return {
-      outcome: "success",
+      outcome: 'success',
       rationale: `User feedback contains positive signal: "${userFeedback}".`,
       confidence: 0.65,
-    };
+    }
   }
 
   // --- Check cognitive patterns for risk signals ---
   const hasRiskPattern = cognitivePatterns.some(
     (p) =>
-      p.toLowerCase().includes("error") ||
-      p.toLowerCase().includes("regression") ||
-      p.toLowerCase().includes("failure"),
-  );
+      p.toLowerCase().includes('error') ||
+      p.toLowerCase().includes('regression') ||
+      p.toLowerCase().includes('failure'),
+  )
   if (hasRiskPattern) {
     return {
-      outcome: "partial",
-      rationale: `Cognitive patterns indicate risk: ${cognitivePatterns.filter((p) => p.toLowerCase().includes("error") || p.toLowerCase().includes("regression") || p.toLowerCase().includes("failure")).join(", ")}.`,
+      outcome: 'partial',
+      rationale: `Cognitive patterns indicate risk: ${cognitivePatterns.filter((p) => p.toLowerCase().includes('error') || p.toLowerCase().includes('regression') || p.toLowerCase().includes('failure')).join(', ')}.`,
       confidence: 0.6,
-    };
+    }
   }
 
   // --- Insufficient signal ---
   return {
-    outcome: "neutral",
+    outcome: 'neutral',
     rationale: userFeedback
       ? `No clear success or failure signal in feedback: "${userFeedback}".`
-      : "No user feedback available and outcome is neutral. Cannot determine success or failure.",
+      : 'No user feedback available and outcome is neutral. Cannot determine success or failure.',
     confidence: 0.4,
-  };
+  }
 }
 
-export const DEFAULT_EVALUATOR: OutcomeEvaluator = evaluateReflectionOutcome;
+export const DEFAULT_EVALUATOR: OutcomeEvaluator = evaluateReflectionOutcome
