@@ -6696,13 +6696,13 @@ data sources:
 **Count data files in each source directory**
 
 $ echo "=== YouTube JSONL ===" && find
-/home/vivi/pixelated/ai/training/youtube_jsonl/ -name "_.jsonl" -size +0c
+/home/vivi/pixelated/ai/training/youtube*jsonl/ -name "*.jsonl" -size +0c
 2>/dev/null | wc -l && echo "=== YouTube output ===" && find
 /home/vivi/pixelated/ai/training/output/youtube/ -name "_.jsonl" -size +0c
 2>/dev/null | wc -l && echo "=== Books ===" && find
 /home/vivi/pixelated/ai/training/data/books/ -name "_.jsonl" -size +0c
 2>/dev/null | wc -l && echo "=== Generated ===" && find
-/home/vivi/pixelated/ai/training/data/generated/ -name "_.jsonl" -size +0c
+/home/vivi/pixelated/ai/training/data/generated/ -name "\_.jsonl" -size +0c
 2>/dev/null | wc -l && echo "=== Normalized ===" && find
 /home/vivi/pixelated/ai/training/data/normalized/ -name "\*.jsonl" -size +0c
 2>/dev/null | wc -l
@@ -7305,9 +7305,9 @@ committing to local-only.
 
 **Search for S3 and gnasty references in training code**
 
-$ grep -rn "gnasty\|s3://\|S3_BUCKET\|AWS_BUCKET\|BUCKET_NAME"
-/home/vivi/pixelated/ai/training/ --include="_.py" --include="_.json"
---include="_.yaml" --include="_.yml" --include="_.md" --include="_.sh"
+$ grep -rn "gnasty\|s3://\|S3*BUCKET\|AWS_BUCKET\|BUCKET_NAME"
+/home/vivi/pixelated/ai/training/ --include="*.py" --include="_.json"
+--include="_.yaml" --include="_.yml" --include="_.md" --include="\_.sh"
 --include="\*.env" 2>/dev/null | grep -v **pycache** | head -30
 
 <details>
@@ -7588,8 +7588,8 @@ $ ssh gnasty "find / -maxdepth 3 -name '_.jsonl' -o -name '_.json' -o -name
 **Find S3 credentials and endpoint config**
 
 $ grep -rn
-"HETZNER_S3\|S3_ENDPOINT\|hel1.your-objectstorage\|AWS_ACCESS_KEY\|S3_KEY\|S3_SECRET"
-/home/vivi/pixelated/ --include="_.env_" --include="_.sh" --include="_.py"
+"HETZNER*S3\|S3_ENDPOINT\|hel1.your-objectstorage\|AWS_ACCESS_KEY\|S3_KEY\|S3_SECRET"
+/home/vivi/pixelated/ --include="*.env*" --include="*.sh" --include="\_.py"
 --include="\*.json" 2>/dev/null | grep -v **pycache** | grep -v node_modules |
 grep -v .git/ | head -20
 
@@ -16582,13 +16582,13 @@ saved.
 
 **Find output directory for current training run**
 
-$ grep -i "output_dir\|save_path\|final_model\|sft_run"
+$ grep -i "output*dir\|save_path\|final_model\|sft_run"
 /tmp/copilot-tool-output-1782184729912-t8e5v3.txt 2>/dev/null | head -10; echo
 "==="; find /home/vivi/pixelated/ -maxdepth 4 -name "adapter_config.json" -newer
 /home/vivi/pixelated/ai/training/pixelated_production_pilot.py 2>/dev/null; echo
-"==="; find /home/vivi/pixelated/ -maxdepth 4 -type d -name "checkpoint-_"
+"==="; find /home/vivi/pixelated/ -maxdepth 4 -type d -name "checkpoint-*"
 2>/dev/null; echo "==="; find /home/vivi/pixelated/ -maxdepth 4 -type d -name
-"sft_" -newer /home/vivi/pixelated/ai/training/pixelated_production_pilot.py
+"sft\_" -newer /home/vivi/pixelated/ai/training/pixelated_production_pilot.py
 2>/dev/null
 
 ```
@@ -24203,7 +24203,7 @@ script that loads a checkpoint, generates responses, then runs eval.
 
 **Check for eval dataset**
 
-$ ls /home/vivi/pixelated/ai/training/data/s3*training_data/eval**.jsonl
+$ ls /home/vivi/pixelated/ai/training/data/s3*training_data/eval\*\*.jsonl
 2>/dev/null; ls /home/vivi/pixelated/ai/training/data/s3_training_data/*eval\*
 2>/dev/null
 
