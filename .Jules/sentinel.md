@@ -1,1 +1,0 @@
-[File deleted - use: git rm --cached .Jules/sentinel.md]

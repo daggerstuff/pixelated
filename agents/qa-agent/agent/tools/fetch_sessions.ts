@@ -12,7 +12,7 @@ interface FetchSessionsInput {
 
 export default defineTool({
   description:
-    'List rehearsDated rehearsal sessions since the last successful QA ' +
+    'List rehearsed rehearsal sessions since the last successful QA ' +
     'review. Returns the session IDs, trainee IDs, scenario IDs, and ' +
     'closing timestamps. Pagination is cursor-based on `cursor`.',
   inputSchema: z.object({
