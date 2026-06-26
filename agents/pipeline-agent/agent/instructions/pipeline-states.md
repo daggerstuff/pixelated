@@ -21,7 +21,7 @@
 ## State machine invariants
 
 - A state transition emits exactly one Linear-compatible event with the
-  `pipeline_event` shape defined in agent/connections/*, regardless of tool
+  `pipeline_event` shape defined in agent/connections/\*, regardless of tool
   success.
 - Approval gates (`Gate 1` ... `Gate 4`) only resolve via the linked Slack
   button, Linked Linear reaction, or scheduler-timeout auto-decline. The
