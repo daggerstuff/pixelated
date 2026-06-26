@@ -157,7 +157,9 @@ process.on('unhandledRejection', (reason: unknown) => {
     reason instanceof Error ? reason.message : String(reason),
   )
   if (!hasSentryErrorHandler) {
-    Sentry.captureException(reason instanceof Error ? reason : new Error(String(reason)))
+    Sentry.captureException(
+      reason instanceof Error ? reason : new Error(String(reason)),
+    )
   }
 })
 

@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import { requireMemoryUser } from '../_shared'
+
 import { getCurrentUser } from '@/lib/auth'
+
+import { requireMemoryUser } from '../_shared'
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(),
