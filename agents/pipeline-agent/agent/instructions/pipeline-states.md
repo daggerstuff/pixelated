@@ -16,7 +16,7 @@
 | (any)               | `FAILED`         | tool error after retries exhausted     |
 | `FAILED`            | (previous state) | `fail` — only on operator confirmation |
 | (any post-_Gate N_) | (one step prior) | `rollback` from any post-gate state    |
-| Production Deploy   | `[Closed]`       | monitoring window expires              |
+| Monitor             | `[Closed]`       | monitoring window expires              |
 
 ## State machine invariants
 
