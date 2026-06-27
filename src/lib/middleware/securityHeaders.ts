@@ -13,9 +13,12 @@ export const securityHeaders: MiddlewareHandler = async (
   const response = await next()
 
   const nonce = context.locals.cspNonce
+  // Astro dev sets NODE_ENV=production for SSR; import.meta.env.DEV is the real dev signal.
+  // Without this check the prod CSP (nonce-based script-src-elem) blocks island scripts.
   const isRelaxedScriptEnv =
     process.env['NODE_ENV'] === 'development' ||
-    process.env['NODE_ENV'] === 'test'
+    process.env['NODE_ENV'] === 'test' ||
+    import.meta.env?.DEV
   const scriptSourceList = [
     "'self'",
     "'unsafe-inline'",
