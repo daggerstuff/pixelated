@@ -3,7 +3,7 @@
 ## Runtime & Local Services
 
 ### Product Overview
-Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeScript) for the frontend/SSR, and Express/FastAPI/Flask backend services.
+Pixelated Empathy is clinical AI platform built w/ Astro 6 + React 19 (TypeScript) for frontend/SSR, and Express/FastAPI/Flask backend services.
 
 ### Runtime Versions
 - **Node.js**: 24.16.0 (see `.nvmrc`)
@@ -12,13 +12,13 @@ Pixelated Empathy is a clinical AI platform built with Astro 6 + React 19 (TypeS
 - **uv**: Python package and environment manager (always prefer `uv run` for execution)
 
 ### Required Services
-Start databases with Docker before running local services:
+Start databases w/ Docker before running local services:
 - **Astro dev**: port `5173` (run `pnpm dev`)
 - **MongoDB**: port `27017` (run container `mongo:6`)
 - **Redis**: port `6379` (run container `redis:7`)
 - **PostgreSQL**: port `5432` (run container `postgres:15`)
 
-For local integration tests, override environment variables if running with external databases to avoid hanging on remote connections:
+For local integration tests, override environment variables if running w/ external databases to avoid hanging on remote connections:
 ```bash
 REDIS_URL=redis://localhost:6379/0 \
 UPSTASH_REDIS_REST_URL=redis://localhost:6379/0 \
@@ -38,12 +38,12 @@ pnpm vitest run -c config/vitest.config.ts
 ## Core Developer Rules
 
 ### ✅ Always
-- **Global Configuration Hygiene**: Keep agent-specific dotfiles at `~/.<agent_name>`. Never create or commit agent-specific folders or configuration files at the project level.
+- **Global config Hygiene**: Keep agent-specific dotfiles at `~/.<agent_name>`. Never create or commit agent-specific folders or config files at project level.
 - **Continuity First**: Respect guidelines in this root `AGENTS.md` followed by any subdirectory-specific instruction files.
 - **Surgical Edits**: Keep changes minimal, safe, and tightly scoped. Remove only imports, variables, or assets made completely obsolete by your edits.
 - **Assumptions-First & Simplicity**: Never assume undocumented behaviors. Write clear, readable, self-documenting code.
 - **Privacy & Safety Gating**: Strongly preserve therapeutic, privacy, and HIPAA-compliant boundaries for client/patient-facing workflows. Isolated clinical health data is paramount.
-- **Verify Explicitly**: Validate edits with concrete commands (e.g. tests or lint targets) before completion.
+- **Verify Explicitly**: Validate edits w/ concrete commands (e.g. tests or lint targets) before completion.
 
 ### ⚠️ Ask First
 - Modifying authentication, security controls, or clinical gating.
@@ -54,16 +54,16 @@ pnpm vitest run -c config/vitest.config.ts
 > **No suppression.** Never mask linter errors, TypeScript errors, compile warnings, or test failures. Fix the issue—never hide it.
 
 **Strictly forbidden suppressions and bypasses:**
-- **TypeScript**: `@ts-ignore`, `@ts-nocheck`, `@ts-expect-error` (unless strictly required in pre-existing test mock files).
-- **Python**: `# noqa`, `# type: ignore` (do not bypass linting or pyright checks).
+- **TypeScript**: `@ts-ignore` `@ts-nocheck` `@ts-expect-error` (unless strictly required in pre-existing test mock files).
+- **Python**: `# noqa` `# type: ignore` (do not bypass linting or pyright checks).
 - **JavaScript / ESLint**: `/* eslint-disable */` or file-level/block-level rule exclusions to cover up new warning flags.
-- **Configuration Bypasses**: Modifying `tsconfig.json`, `.eslintrc`, `.oxlintrc`, or test configs to lower strictness or hide failures.
-- **Secrets & PHI**: Hardcoding credentials, API tokens, passwords, or patient-identifiable details in the codebase, fixtures, or test environments.
+- **config Bypasses**: Modifying `tsconfig.json` `.eslintrc` `.oxlintrc`or test configs to lower strictness or hide failures.
+- **Secrets & PHI**: Hardcoding credentials, API tokens, passwords, or patient-identifiable details in codebase, fixtures, or test environments.
 
 ---
 
 ## Coding Standards
-Follow the conventions documented in:
+Follow conventions documented in:
 - `.factory/rules/typescript.md` - TypeScript and React patterns
 - `.factory/rules/astro.md` - Astro 6 component, routing, and SSR rules
 - `.factory/rules/python.md` - Python/uv toolchain and ruff/pyright conventions
@@ -77,7 +77,7 @@ Refer to `~/.factory/memories.md` for personal coding preferences and past decis
 
 ## Foresight Memory & Continuity System
 
-**Foresight is the persistent brain for AI agents.** AI sessions are stateless—without Foresight, each session starts fresh, repeating mistakes and forgetting decisions.
+**Foresight is persistent brain for AI agents.** AI sessions are stateless—w/o Foresight, each session starts fresh, repeating mistakes and forgetting decisions.
 
 ### Quick Summary
 
@@ -87,10 +87,10 @@ Foresight provides two continuity layers:
 
 ### Task Start Workflow (Mandatory)
 
-Before substantial work, execute the continuity handshake:
+Before substantial work, execute continuity handshake:
 
 1. **Query**: `manage_context_blocks` → get `project_context` + `pending_items`
-2. **Search**: `query_memories` with keywords related to your task
+2. **Search**: `query_memories` w/ keywords related to your task
 3. **Inject**: Use findings to inform your approach
 4. **Update**: Store lessons, mark completed items, update guidance
 
@@ -114,63 +114,63 @@ Before substantial work, execute the continuity handshake:
 ## Droid Workflow: Spec Mode & Missions
 
 For non-trivial work, prefer Droid's two structured workflows. Treat them as
-the default shape of any multi-step change rather than ad-hoc prompting.
+ default shape of any multi-step change rather than ad-hoc prompting.
 
 ### Specification Mode (single-feature planning)
 
-Use when a feature is well-scoped but still benefits from explicit approval
+Use when feature is well-scoped but still benefits from explicit approval
 before code lands.
 
 - **Trigger**: complex/single-feature work (touching ≥1 framework surface area
-  or any change spanning a feature boundary).
-- **How**: press **Shift+Tab** before sending the prompt, or invoke `/spec`.
-  Droid produces a plan, you approve it, then it executes.
-- **Output**: an in-repo `IMPLEMENTATION_PLAN.md` (or scoped filename) for
+  or any change spanning feature boundary).
+- **How**: press **Shift+Tab** before sending prompt, or invoke `/spec`.
+  Droid produces plan, you approve it, then it executes.
+- **Output**: in-repo `IMPLEMENTATION_PLAN.md` (or scoped filename) for
   auditability.
-- **Prompt shape**: state the goal in one sentence, list constraints and
-  related files, name the verification command (`pnpm test:unit`,
-  `pnpm lint`, targeted Playwright spec, etc.).
+- **Prompt shape**: state goal in one sentence, list constraints
+  related files, name verification command (`pnpm test:unit`
+  `pnpm lint`targeted Playwright spec, etc.).
 - **Best practice**: keep phases to 1-2 days of work each; one behavior per
   phase; one concrete verification per phase. ([Implementing Large
   Features guide](https://docs.factory.ai/cli/user-guides/implementing-large-features))
 
 ### Missions (multi-feature orchestration)
 
-Use when work decomposes into multiple features, multiple milestones, or
+Use when work decomposes into multiple features, multiple milestones,
 multiple subagents working in parallel.
 
 - **Trigger**: large refactors (50+ files), component migrations, big
-  multi-feature implementations (10+ files), or anything where the planning
-  phase is the actual value.
-- **How**: invoke `/missions`. Droid collaborates on the plan, derives
+  multi-feature implementations (10+ files), or anything where planning
+  phase is actual value.
+- **How**: invoke `/missions`. Droid collaborates on plan, derives
   features + milestones, leverages existing skills (and develops new ones if
-  needed), then hands the approved plan to Mission Control for orchestration.
-- **Inheritance**: your MCPs, skills, hooks, custom droids, and `AGENTS.md`
+  needed), then hands approved plan to Mission Control for orchestration.
+- **Inheritance**: your MCPs, skills, hooks, custom droids, `AGENTS.md`
   carry into missions automatically.
-- **Stay engaged**: treat yourself as the PM. Pause and redirect when:
-  - a worker is stuck ("mark this complete and move to the next feature");
-  - a milestone is blocked ("re-assess and tell me what's blocking");
-  - the plan needs to change ("drop X, add Y, re-plan remaining milestones").
-  See `~/.factory/missions/README.md` for the full recovery playbook.
+- **Stay engaged**: treat yourself as PM. Pause and redirect when:
+  - worker is stuck ("mark this complete and move to next feature");
+  - milestone is blocked ("re-assess and tell me what's blocking");
+  - plan needs to change ("drop X, add Y, re-plan remaining milestones").
+  See `~/.factory/missions/README.md` for full recovery playbook.
 - **Heuristic for cost**: roughly `#features + 2 × #milestones` worker runs.
   Plan validation upfront is cheaper than rework after.
 - **Headless mode**: `droid exec --mission -f mission.md` for CI / scheduled
-  missions. Tunes via `--worker-model`, `--validator-model`,
-  `--worker-reasoning-effort`, `--validator-reasoning-effort`.
+  missions. Tunes via `--worker-model` `--validator-model`
+  `--worker-reasoning-effort` `--validator-reasoning-effort`.
 
 ### How to Talk to a Droid (always-on principles)
 
 Apply these to every prompt — Spec Mode, Missions, or direct work. Pulled
-from the [How to Talk to a Droid guide](https://docs.factory.ai/cli/getting-started/how-to-talk-to-a-droid).
+from [How to Talk to Droid guide](https://docs.factory.ai/cli/getting-started/how-to-talk-to-a-droid).
 
-- **Be explicit about the goal.** State the outcome up front.
+- **Be explicit about goal.** State outcome up front.
 - **Provide context.** Include file paths, error messages, ticket links.
-- **Choose the approach.** Spec for complex single features, Missions for
+- **Choose approach.** Spec for complex single features, Missions for
   multi-feature work, direct for routine fixes.
-- **Define success.** Name the verification command, the expected output,
-  and the surface to check.
+- **Define success.** Name verification command, expected output,
+  and surface to check.
 - **Reference files directly.** Use `@file.ts` or full paths.
-- **Set boundaries.** "Only modify files in the auth directory" contained the
+- **Set boundaries.** "Only modify files in auth dir" contained
   scope.
 - **Reference external resources by URL.** Droid fetches them.
 - **Break large projects up.** New sessions per phase or feature.
@@ -178,7 +178,7 @@ from the [How to Talk to a Droid guide](https://docs.factory.ai/cli/getting-star
 ### Soft recommendation
 
 Spec Mode and Missions are *recommended* workflows — not hard gates. Small,
-clarified, well-scoped tasks can be completed directly. Treat the bar as
+clarified, well-scoped tasks can be completed directly. Treat bar as
 "would I benefit from writing this down before code lands?" If yes, use Spec
 or Mission.
 
@@ -194,12 +194,12 @@ export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
 (`~/.bashrc` in this environment is configured to do this in interactive shells.)
 
 ### Docker
-- Cloud VMs may not have Docker preinstalled. If `docker info` fails, install Docker CE and start `dockerd` manually (systemd often cannot start the service here):
+- Cloud VMs may not have Docker preinstalled. If `docker info` fails, install Docker CE and start `dockerd` manually (systemd often cannot start service here):
   ```bash
   sudo dockerd >/tmp/dockerd.log 2>&1 &
   ```
-  Use `sudo docker` / `sudo -E docker compose` unless your user is in the `docker` group.
-- Compose files require secrets on the command line (not only in `.env`):
+  Use `sudo docker` / `sudo -E docker compose` unless your user is in `docker` group.
+- Compose files require secrets on command line (not only in `.env`):
   ```bash
   export POSTGRES_PASSWORD=dev_password_change_in_prod
   export REDIS_PASSWORD=dev_redis_password
@@ -208,10 +208,10 @@ export PATH="$HOME/.nvm/versions/node/v24.16.0/bin:$PATH"
   sudo docker network create docker_web 2>/dev/null || true
   sudo docker compose -f docker/docker-compose.local-mongo.yml up -d
   ```
-- Redis binds to `127.0.0.1:6379` with `--requirepass`; use `redis://:dev_redis_password@127.0.0.1:6379/0` in `.env` and test overrides.
+- Redis binds to `127.0.0.1:6379` w/ `--requirepass`use `redis://:dev_redis_password@127.0.0.1:6379/0` in `.env` and test overrides.
 
 ### Local `.env` bootstrap
-If `.env` is missing, derive Postgres user/db from the running container and write local URLs (see `WALKTHROUGH.md`). Do not commit `.env`.
+If `.env` is missing, derive Postgres user/db from running container and write local URLs (see `WALKTHROUGH.md`). Do not commit `.env`.
 
 ### E2E against an already-running dev server
 Install browsers once per VM: `pnpm exec playwright install chromium`
@@ -223,13 +223,13 @@ DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
 ```
 
 ### Submodules
-After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
+After clone or when `.gitmodules` changes, run these **before** `pnpm install`
 ```bash
 git submodule init
 git submodule update
 pnpm install --no-frozen-lockfile
 ```
-Use `--no-frozen-lockfile` for local and CI installs to avoid frozen-lockfile retry/failover loops when the lockfile drifts.
+Use `--no-frozen-lockfile` for local and CI installs to avoid frozen-lockfile retry/failover loops when lockfile drifts.
 
 For CI/auth-aware shallow clones, use `bash scripts/devops/init-submodules.sh` instead of plain `git submodule` commands.
 
@@ -240,8 +240,8 @@ Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
 
 ## Delivery Checks (Task Completion Contract)
 
-Before ending a turn and finishing a task, perform the following checks:
-1. **Restate the Goal**: Briefly describe what was requested and what was achieved.
+Before ending turn and finishing task, perform following checks:
+1. **Restate Goal**: Briefly describe what was requested and what was achieved.
 2. **Review Diffs**: Ensure edits are minimal, clean, safe, and do not contain suppression comments.
-3. **Execute Verification Command**: Run a target check (e.g. `pnpm lint`, `pnpm typecheck`, or targeted tests).
-4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose the next steps.
+3. **Execute Verification Command**: Run target check (e.g. `pnpm lint` `pnpm typecheck`or targeted tests).
+4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose next steps.
