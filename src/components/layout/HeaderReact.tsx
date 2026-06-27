@@ -160,7 +160,9 @@ export function Header({
           <div className="bg-card border-border w-full max-w-lg rounded-lg border shadow-lg">
             <div className="p-4">
               <div className="mb-4 flex items-center justify-between">
-                <h3 id="search-modal-title" className="text-lg font-medium">Search</h3>
+                <h3 id="search-modal-title" className="text-lg font-medium">
+                  Search
+                </h3>
                 <button
                   type="button"
                   className="text-muted-foreground bg-transparent hover:bg-accent ml-auto inline-flex items-center rounded-lg p-1.5 text-sm hover:text-foreground"

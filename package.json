@@ -393,6 +393,7 @@
     "globby": "latest",
     "gray-matter": "latest",
     "hastscript": "latest",
+    "headroom-ai": "^0.22.4",
     "hono": "^4.12.26",
     "html-entities": "latest",
     "ioredis-mock": "latest",
@@ -460,7 +461,10 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "path-to-regexp": "8.4.2"
+    "path-to-regexp": "8.4.2",
+    "brace-expansion": "5.0.6",
+    "form-data": "4.0.6",
+    "js-yaml": "4.1.2"
   },
   "engines": {
     "node": ">=24"

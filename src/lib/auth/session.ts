@@ -12,9 +12,9 @@
  */
 
 import { userManager } from '../db'
+import { getFromCache, setInCache, removeFromCache } from '../redis'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import { getFromCache, setInCache, removeFromCache } from '../redis'
 
 /**
  * Lightweight session shape returned by getSession and consumed by middleware

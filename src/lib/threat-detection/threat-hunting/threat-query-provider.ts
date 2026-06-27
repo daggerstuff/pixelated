@@ -46,7 +46,10 @@ export class ThreatQueryProvider {
   ): Promise<HuntFinding[]> {
     try {
       const findings: HuntFinding[] = []
-      const rawPattern = typeof query['patternMatch'] === 'string' ? query['patternMatch'] : 'rate_limit:*'
+      const rawPattern =
+        typeof query['patternMatch'] === 'string'
+          ? query['patternMatch']
+          : 'rate_limit:*'
       const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
       const cleanSuffix = sanitizedSuffix.replace(/^rate_limit:/, '')
       const pattern = `rate_limit:${cleanSuffix}`
@@ -113,7 +116,10 @@ export class ThreatQueryProvider {
     const skip = (page - 1) * limit
 
     // P3.1 SECURITY FIX: Sanitize input and strictly prefix with 'threat:'.
-    const rawPattern = typeof searchData['patternMatch'] === 'string' ? searchData['patternMatch'] : '*'
+    const rawPattern =
+      typeof searchData['patternMatch'] === 'string'
+        ? searchData['patternMatch']
+        : '*'
     const sanitizedSuffix = rawPattern.replace(/[^a-zA-Z0-9:*_-]/g, '')
     const cleanSuffix = sanitizedSuffix.replace(/^threat:/, '')
     const pattern = `threat:${cleanSuffix}`

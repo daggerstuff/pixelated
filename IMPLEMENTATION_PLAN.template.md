@@ -6,22 +6,23 @@
 
 ## Goal
 
-One paragraph. What outcome does this plan deliver? For whom? On which
-surface?
+One paragraph. What outcome does this plan deliver? For whom? On which surface?
 
 ## Scope
 
 ### In scope
+
 - ...
 
 ### Out of scope
+
 - ...
 
 ## Constraints & Guardrails
 
 - Stack: Astro 6 + React 19 + TypeScript (`pnpm`), Python 3.13 (`uv`).
-- Privacy: clinical/HIPAA context applies — read
-  `.factory/rules/security.md` before touching PHI paths.
+- Privacy: clinical/HIPAA context applies — read `.factory/rules/security.md`
+  before touching PHI paths.
 - AGENTS.md rules: surgical edits, no suppression comments, no project-level
   dotfile commits.
 
@@ -34,13 +35,14 @@ Each phase is 1-2 days of work and ends with a concrete verification step.
 **Goal**: ...
 
 **Changes**:
+
 - `path/to/file.ts`: ...
 - `path/to/other.ts`: ...
 
 **Verify**: `pnpm test:unit -- <scope>` or equivalent concrete command.
 
-**Rollback**: `git revert <commit>` / feature flag `OPT_PHASE_1` flips back
-the behavior.
+**Rollback**: `git revert <commit>` / feature flag `OPT_PHASE_1` flips back the
+behavior.
 
 **Status**: [ ] not started · [ ] in progress · [ ] complete
 
@@ -51,6 +53,7 @@ the behavior.
 **Goal**: ...
 
 **Changes**:
+
 - ...
 
 **Verify**: ...
@@ -77,9 +80,9 @@ the behavior.
 
 ## Risks & Rollback
 
-| Risk | Likelihood | Mitigation | Recovery |
-| ---- | ---------- | ---------- | -------- |
-| ... | low/med/high | ... | ... |
+| Risk | Likelihood   | Mitigation | Recovery |
+| ---- | ------------ | ---------- | -------- |
+| ...  | low/med/high | ...        | ...      |
 
 ## Definition of Done
 

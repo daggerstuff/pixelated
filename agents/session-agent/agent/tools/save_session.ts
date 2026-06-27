@@ -1,5 +1,5 @@
-import { defineTool } from "eve/tools";
-import { z } from "zod";
+import { defineTool } from 'eve/tools'
+import { z } from 'zod'
 
 // Persist a durable session artifact: the final transcript, a summary
 // record, and the latest emotion rollups. Conforms to the requirement that
@@ -10,11 +10,11 @@ const SCHEMA = z.object({
   session_id: z.string().uuid(),
   trainee_id: z.string().min(1),
   scenario_id: z.string().min(1),
-  state: z.enum(["ACTIVE", "CLOSING", "CLOSED"]),
+  state: z.enum(['ACTIVE', 'CLOSING', 'CLOSED']),
   transcripts: z
     .array(
       z.object({
-        role: z.enum(["trainee", "participant", "supervisor"]),
+        role: z.enum(['trainee', 'participant', 'supervisor']),
         text: z.string(),
         timestamp: z.string().datetime(),
       }),
@@ -32,14 +32,14 @@ const SCHEMA = z.object({
     )
     .default([]),
   summary: z.string().max(2000).optional(),
-});
+})
 
 export default defineTool({
   description:
-    "Persist the current session transcript, summary, and emotion rollups " +
-    "into both Foresight (semantic, queryable) and MongoDB (durable). " +
-    "Called automatically at session boundary and also on supervisor " +
-    "demand.",
+    'Persist the current session transcript, summary, and emotion rollups ' +
+    'into both Foresight (semantic, queryable) and MongoDB (durable). ' +
+    'Called automatically at session boundary and also on supervisor ' +
+    'demand.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
     return {
@@ -49,22 +49,22 @@ export default defineTool({
       emotion_rollup_count: input.emotion_rollups.length,
       pii_scrubber_stub: {
         note:
-          "The text redaction pass is not yet wired from " +
-          "ai-services/security/pii_scrubber.py. Persisted text MUST be " +
-          "scrubbed before reaching either backend.",
+          'The text redaction pass is not yet wired from ' +
+          'ai-services/security/pii_scrubber.py. Persisted text MUST be ' +
+          'scrubbed before reaching either backend.',
       },
       foresight_stub: {
         memory_id: null,
         note:
-          "Foresight store call via connection__foresight__store_memory is " +
-          "not yet wired in this slice.",
+          'Foresight store call via connection__foresight__store_memory is ' +
+          'not yet wired in this slice.',
       },
       mongo_stub: {
-        collection: "sessions",
+        collection: 'sessions',
         document_id: input.session_id,
-        note: "Mongo upsert via the session-mcp (TODO) is not yet wired.",
+        note: 'Mongo upsert via the session-mcp (TODO) is not yet wired.',
       },
       summary_written: input.summary ? true : false,
-    };
+    }
   },
-});
+})

@@ -1,7 +1,7 @@
 # Session flow
 
-State machine for a rehearsal session. The agent's turns must always be in one of these
-states. Transitions are decided by the model, executed by tools.
+State machine for a rehearsal session. The agent's turns must always be in one
+of these states. Transitions are decided by the model, executed by tools.
 
 ```
 [NEW]
@@ -33,35 +33,38 @@ states. Transitions are decided by the model, executed by tools.
 
 ## Allowed tool calls per state
 
-| State                 | Allowed tools                                             |
-| --------------------- | --------------------------------------------------------- |
-| NEW                   | start_session                                             |
-| RECOVERING            | (internal: hydrate_transcript)                            |
-| ACTIVE                | process_message, analyze_emotion, check_clinical_boundary |
-| AWAITING_SUPERVISOR   | check_clinical_boundary (resolve only)                    |
-| CLOSING               | conclude_session                                          |
-| CLOSED                | none                                                      |
+| State               | Allowed tools                                             |
+| ------------------- | --------------------------------------------------------- |
+| NEW                 | start_session                                             |
+| RECOVERING          | (internal: hydrate_transcript)                            |
+| ACTIVE              | process_message, analyze_emotion, check_clinical_boundary |
+| AWAITING_SUPERVISOR | check_clinical_boundary (resolve only)                    |
+| CLOSING             | conclude_session                                          |
+| CLOSED              | none                                                      |
 
 ## Compaction
 
-The agent compacts framing (state transitions, tool summaries) but never dialogue
-content. Default compaction threshold: 0.75 of the configured context window, set in
-`agent.ts`. Transcript turns are stored in Foresight and replayed into the emerging
-session on recovery.
+The agent compacts framing (state transitions, tool summaries) but never
+dialogue content. Default compaction threshold: 0.75 of the configured context
+window, set in `agent.ts`. Transcript turns are stored in Foresight and replayed
+into the emerging session on recovery.
 
 ## Recovery
 
 When `start_session` is called with `resume=true` and an existing `session_id`:
 
-1. Look up the session in the durable store (stubbed via Foresight search in this slice).
+1. Look up the session in the durable store (stubbed via Foresight search in
+   this slice).
 2. Replay the most recent N transcript turns before the first new turn.
 3. Continue with state whatever the last persisted state said.
 
-This slice does not implement the replay loop. `start_session` returns a stub recovery
-record so the surrounding infra can verify the connection is wired correctly.
+This slice does not implement the replay loop. `start_session` returns a stub
+recovery record so the surrounding infra can verify the connection is wired
+correctly.
 
 ## Still TODO
 
-- Final cause-of-state machine implementation in `state-machine.ts` (not authored here).
+- Final cause-of-state machine implementation in `state-machine.ts` (not
+  authored here).
 - Compaction summarizer prompt (separate file when authored).
 - Supervisor escalation webhook (channel implementation pending).

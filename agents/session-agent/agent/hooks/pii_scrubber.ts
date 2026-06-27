@@ -1,4 +1,4 @@
-import { defineHook } from "eve/hooks";
+import { defineHook } from 'eve/hooks'
 
 // PII redaction pass on every assistant reply. Will route through
 // ai-services/security/pii_scrubber.py once the sidecar is wired. For now
@@ -7,13 +7,13 @@ import { defineHook } from "eve/hooks";
 
 export default defineHook({
   events: {
-    "message.completed"(event) {
-      const text = event.data?.message ?? "";
-      if (typeof text === "string") {
+    'message.completed'(event) {
+      const text = event.data?.message ?? ''
+      if (typeof text === 'string') {
         // TODO(disable-no-console): replace with structured logger
         // eslint-disable-next-line no-console
-        console.info("[pii-scrubber-hook] would scan", text.length, "chars");
+        console.info('[pii-scrubber-hook] would scan', text.length, 'chars')
       }
     },
   },
-});
+})

@@ -50,7 +50,9 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     // Validate required fields
     if (typeof body.reviewer_score !== 'number') {
       return new Response(
-        JSON.stringify({ error: 'reviewer_score is required and must be a number' }),
+        JSON.stringify({
+          error: 'reviewer_score is required and must be a number',
+        }),
         {
           status: 400,
           headers: { 'Content-Type': 'application/json' },
@@ -79,18 +81,21 @@ export const PATCH: APIRoute = async ({ params, request }) => {
     }
 
     // Forward to FastAPI annotation API
-    const apiResponse = await fetch(`http://localhost:3102/queue/${itemId}/review`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
+    const apiResponse = await fetch(
+      `http://localhost:3102/queue/${itemId}/review`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          reviewer_score: body.reviewer_score,
+          notes: body.notes || '',
+          reviewer_id: body.reviewer_id,
+        }),
       },
-      body: JSON.stringify({
-        reviewer_score: body.reviewer_score,
-        notes: body.notes || '',
-        reviewer_id: body.reviewer_id,
-      }),
-    })
+    )
 
     if (apiResponse.ok) {
       const data = await apiResponse.json()
@@ -106,7 +111,9 @@ export const PATCH: APIRoute = async ({ params, request }) => {
         headers: { 'Content-Type': 'application/json' },
       })
     } else {
-      console.error(`Annotation API error: ${apiResponse.status} ${apiResponse.statusText}`)
+      console.error(
+        `Annotation API error: ${apiResponse.status} ${apiResponse.statusText}`,
+      )
       return new Response(
         JSON.stringify({ error: 'Failed to update annotation review' }),
         {

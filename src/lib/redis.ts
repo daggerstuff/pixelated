@@ -3,130 +3,135 @@
  * This module provides a consistent interface for Redis operations with proper error handling
  */
 
-import Redis from "ioredis";
+import Redis from 'ioredis'
 
-import { asRedisOps } from "./redis-ops";
+import { asRedisOps } from './redis-ops'
 
-type RedisCommand = (...args: any[]) => any;
-type RedisClient = Record<string, RedisCommand> & { status?: string };
+type RedisCommand = (...args: any[]) => any
+type RedisClient = Record<string, RedisCommand> & { status?: string }
 
 // Get Redis configuration from environment variables directly
 const getRedisConfig = () => {
   return {
     // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
-    connectionUrl: process.env["REDIS_URL"] ?? process.env["UPSTASH_REDIS_REST_URL"],
-    restToken: process.env["UPSTASH_REDIS_REST_TOKEN"],
-  };
-};
+    connectionUrl:
+      process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'],
+    restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
+  }
+}
 
 // Determine if we're in a production environment
 const isProduction = () => {
-  return process.env["NODE_ENV"] === "production";
-};
+  return process.env['NODE_ENV'] === 'production'
+}
 
 const isTestEnvironment = () => {
-  const nodeEnv = process.env["NODE_ENV"];
+  const nodeEnv = process.env['NODE_ENV']
   return (
-    nodeEnv === "test" ||
-    nodeEnv === "ci" ||
+    nodeEnv === 'test' ||
+    nodeEnv === 'ci' ||
     nodeEnv === undefined ||
-    process.env["VITEST"] === "1" ||
-    process.env["VITEST"] === "true" ||
-    process.argv.some((arg) => arg.includes("vitest")) ||
-    process.env["JEST_WORKER_ID"] !== undefined
-  );
-};
+    process.env['VITEST'] === '1' ||
+    process.env['VITEST'] === 'true' ||
+    process.argv.some((arg) => arg.includes('vitest')) ||
+    process.env['JEST_WORKER_ID'] !== undefined
+  )
+}
 
 // Create a mock Redis client for development
 function createMockRedisClient(): RedisClient {
   const message = isProduction()
-    ? "CRITICAL: Using mock Redis client in production. This should never happen."
-    : "Using mock Redis client for development. Redis operations will be mocked.";
+    ? 'CRITICAL: Using mock Redis client in production. This should never happen.'
+    : 'Using mock Redis client for development. Redis operations will be mocked.'
 
-  console.warn(message);
+  console.warn(message)
 
-  const mockStore = new Map<string, string>();
+  const mockStore = new Map<string, string>()
 
   function patternToRegex(pattern: string): RegExp {
     // Helper: convert glob-style pattern (supports '*') into a safe RegExp
     // Escapes regex metacharacters except '*' then replaces all '*' with '.*'
-    if (pattern === "*" || pattern === "") return /^.*$/;
+    if (pattern === '*' || pattern === '') return /^.*$/
     // Escape regex special chars except '*'
-    const escaped = pattern.replace(/[-[\]{}()+?.,\\^$|#\s]/g, "\\$&");
-    const regexStr = "^" + escaped.replace(/\*/g, ".*") + "$";
-    return new RegExp(regexStr);
+    const escaped = pattern.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&')
+    const regexStr = '^' + escaped.replace(/\*/g, '.*') + '$'
+    return new RegExp(regexStr)
   }
 
   function parseJsonArray(value: string): string[] {
-    let parsed: unknown;
+    let parsed: unknown
     try {
-      parsed = JSON.parse(value);
+      parsed = JSON.parse(value)
     } catch {
-      return [];
+      return []
     }
-    return Array.isArray(parsed) && parsed.every((item) => typeof item === "string") ? parsed : [];
+    return Array.isArray(parsed) &&
+      parsed.every((item) => typeof item === 'string')
+      ? parsed
+      : []
   }
 
   function parseNumberRecord(value: string): Record<string, number> {
-    let parsed: unknown;
+    let parsed: unknown
     try {
-      parsed = JSON.parse(value);
+      parsed = JSON.parse(value)
     } catch {
-      return {};
+      return {}
     }
-    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-      const result: Record<string, number> = {};
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const result: Record<string, number> = {}
       for (const [key, rawValue] of Object.entries(parsed)) {
-        if (typeof rawValue === "number") {
-          result[key] = rawValue;
+        if (typeof rawValue === 'number') {
+          result[key] = rawValue
         }
       }
-      return result;
+      return result
     }
-    return {};
+    return {}
   }
 
   // Return a mock client with all Redis operations needed by the threat detection system
   return {
     // Basic operations
-    get: async (key: string) => mockStore["get"](key) ?? null,
+    get: async (key: string) => mockStore['get'](key) ?? null,
     set: async (key: string, value: string, ..._args: (string | number)[]) => {
-      mockStore["set"](key, value);
-      return "OK";
+      mockStore['set'](key, value)
+      return 'OK'
     },
     del: async (key: string) => {
-      const existed = mockStore.has(key);
-      mockStore["delete"](key);
-      return existed ? 1 : 0;
+      const existed = mockStore.has(key)
+      mockStore['delete'](key)
+      return existed ? 1 : 0
     },
     exists: async (key: string) => (mockStore.has(key) ? 1 : 0),
-    expire: async (key: string, _seconds: number) => (mockStore.has(key) ? 1 : 0),
+    expire: async (key: string, _seconds: number) =>
+      mockStore.has(key) ? 1 : 0,
 
     // Advanced operations needed by rate limiter
     setex: async (key: string, _seconds: number, value: string) => {
-      mockStore["set"](key, value);
-      return "OK";
+      mockStore['set'](key, value)
+      return 'OK'
     },
     hincrby: async (key: string, field: string, increment: number) => {
-      const hashKey = `${key}:${field}`;
-      const current = parseInt(mockStore["get"](hashKey) ?? "0");
-      const newValue = current + increment;
-      mockStore["set"](hashKey, newValue.toString());
-      return newValue;
+      const hashKey = `${key}:${field}`
+      const current = parseInt(mockStore['get'](hashKey) ?? '0')
+      const newValue = current + increment
+      mockStore['set'](hashKey, newValue.toString())
+      return newValue
     },
     hgetall: async (key: string) => {
-      const result: Record<string, string> = {};
+      const result: Record<string, string> = {}
       for (const [k, v] of Array.from(mockStore.entries())) {
         if (k.startsWith(`${key}:`)) {
-          const field = k.substring(key.length + 1);
-          result[field] = v;
+          const field = k.substring(key.length + 1)
+          result[field] = v
         }
       }
-      return result;
+      return result
     },
     hset: async (key: string, field: string, value: string) => {
-      mockStore["set"](`${key}:${field}`, value);
-      return 1;
+      mockStore['set'](`${key}:${field}`, value)
+      return 1
     },
 
     // Pipeline operations
@@ -146,93 +151,98 @@ function createMockRedisClient(): RedisClient {
       hset: (key: string, field: string, value: string | number) => ({
         hset: [key, field, value],
       }),
-      exec: async () => [["OK"], [1]], // Mock successful pipeline execution
+      exec: async () => [['OK'], [1]], // Mock successful pipeline execution
     }),
 
     // Connection operations
-    ping: async () => "PONG",
-    quit: async () => "OK",
+    ping: async () => 'PONG',
+    quit: async () => 'OK',
     disconnect: () => {},
 
     // List operations
     lpush: async (key: string, ...values: string[]) => {
-      const listKey = `list:${key}`;
-      const list = parseJsonArray(mockStore["get"](listKey) ?? "[]");
-      list.unshift(...values);
-      mockStore["set"](listKey, JSON.stringify(list));
-      return list.length;
+      const listKey = `list:${key}`
+      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
+      list.unshift(...values)
+      mockStore['set'](listKey, JSON.stringify(list))
+      return list.length
     },
     lRange: async (key: string, start: number, stop: number) => {
-      const listKey = `list:${key}`;
-      return parseJsonArray(mockStore["get"](listKey) ?? "[]").slice(start, stop + 1);
+      const listKey = `list:${key}`
+      return parseJsonArray(mockStore['get'](listKey) ?? '[]').slice(
+        start,
+        stop + 1,
+      )
     },
     lrem: async (key: string, _count: number, value: string) => {
-      const listKey = `list:${key}`;
-      const list = parseJsonArray(mockStore["get"](listKey) ?? "[]");
-      const filtered = list.filter((item: string) => item !== value);
-      mockStore["set"](listKey, JSON.stringify(filtered));
-      return list.length - filtered.length;
+      const listKey = `list:${key}`
+      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
+      const filtered = list.filter((item: string) => item !== value)
+      mockStore['set'](listKey, JSON.stringify(filtered))
+      return list.length - filtered.length
     },
     rpoplpush: async (source: string, destination: string) => {
-      const sourceKey = `list:${source}`;
-      const destinationKey = `list:${destination}`;
-      const sourceList = parseJsonArray(mockStore["get"](sourceKey) ?? "[]");
+      const sourceKey = `list:${source}`
+      const destinationKey = `list:${destination}`
+      const sourceList = parseJsonArray(mockStore['get'](sourceKey) ?? '[]')
       if (sourceList.length === 0) {
-        return null;
+        return null
       }
-      const value = sourceList.pop();
+      const value = sourceList.pop()
       if (value === undefined) {
-        return null;
+        return null
       }
-      mockStore["set"](sourceKey, JSON.stringify(sourceList));
-      const destinationList = parseJsonArray(mockStore["get"](destinationKey) ?? "[]");
-      destinationList.unshift(value);
-      mockStore["set"](destinationKey, JSON.stringify(destinationList));
-      return value;
+      mockStore['set'](sourceKey, JSON.stringify(sourceList))
+      const destinationList = parseJsonArray(
+        mockStore['get'](destinationKey) ?? '[]',
+      )
+      destinationList.unshift(value)
+      mockStore['set'](destinationKey, JSON.stringify(destinationList))
+      return value
     },
     llen: async (key: string) => {
-      const listKey = `list:${key}`;
-      const list = parseJsonArray(mockStore["get"](listKey) ?? "[]");
-      return list.length;
+      const listKey = `list:${key}`
+      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
+      return list.length
     },
 
     // Sorted set operations
     zadd: async (key: string, score: number, member: string) => {
-      const zsetKey = `zset:${key}`;
-      const zset = parseNumberRecord(mockStore["get"](zsetKey) ?? "{}");
-      zset[member] = score;
-      mockStore["set"](zsetKey, JSON.stringify(zset));
-      return 1;
+      const zsetKey = `zset:${key}`
+      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
+      zset[member] = score
+      mockStore['set'](zsetKey, JSON.stringify(zset))
+      return 1
     },
     zrangebyscore: async (key: string, min: number, max: number) => {
-      const zsetKey = `zset:${key}`;
-      const zset = parseNumberRecord(mockStore["get"](zsetKey) ?? "{}");
+      const zsetKey = `zset:${key}`
+      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
       return Object.entries(zset)
         .filter(([, score]) => score >= min && score <= max)
-        .map(([member]) => member);
+        .map(([member]) => member)
     },
     zremrangebyscore: async (key: string, min: number, max: number) => {
-      const zsetKey = `zset:${key}`;
-      const zset = parseNumberRecord(mockStore["get"](zsetKey) ?? "{}");
-      let removed = 0;
+      const zsetKey = `zset:${key}`
+      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
+      let removed = 0
       for (const [member, score] of Object.entries(zset)) {
         if (score >= min && score <= max) {
-          delete zset[member];
-          removed++;
+          delete zset[member]
+          removed++
         }
       }
-      mockStore["set"](zsetKey, JSON.stringify(zset));
-      return removed;
+      mockStore['set'](zsetKey, JSON.stringify(zset))
+      return removed
     },
 
     // Additional operations
     keys: async (pattern: string) => {
-      const re = patternToRegex(pattern);
-      return Array.from(mockStore.keys()).filter((k) => re.test(k));
+      const re = patternToRegex(pattern)
+      return Array.from(mockStore.keys()).filter((k) => re.test(k))
     },
     flushall: async () => {
-      mockStore.clear();
-      return "OK";
+      mockStore.clear()
+      return 'OK'
     },
     ttl: async (key: string) => (mockStore.has(key) ? -1 : -2),
 
@@ -240,7 +250,7 @@ function createMockRedisClient(): RedisClient {
     on: () => {},
     off: () => {},
     emit: () => false,
-  } as RedisClient;
+  } as RedisClient
 }
 
 /**
@@ -248,90 +258,97 @@ function createMockRedisClient(): RedisClient {
  * Returns a real Redis client if credentials are present, otherwise a mock client.
  */
 function createRedisClient(): RedisClient {
-  const { connectionUrl, restToken } = getRedisConfig();
+  const { connectionUrl, restToken } = getRedisConfig()
 
-  if (connectionUrl?.startsWith("redis")) {
+  if (connectionUrl?.startsWith('redis')) {
     try {
-      const parsed = new URL(connectionUrl);
+      const parsed = new URL(connectionUrl)
       if (!parsed.hostname) {
-        throw new Error("Missing Redis host");
+        throw new Error('Missing Redis host')
       }
       // Initialize ioredis client with credentials
       const client = new Redis(connectionUrl, {
         password: restToken,
         // Add any additional options here if needed
-      });
-      return client as RedisClient;
+      })
+      return client as RedisClient
     } catch (error: unknown) {
       if (isTestEnvironment()) {
-        console.warn("Invalid REDIS_URL; using mock Redis client for tests.");
-        return createMockRedisClient();
+        console.warn('Invalid REDIS_URL; using mock Redis client for tests.')
+        return createMockRedisClient()
       }
-      console.error("Invalid REDIS_URL configuration in non-test environment:", error);
-      throw error;
+      console.error(
+        'Invalid REDIS_URL configuration in non-test environment:',
+        error,
+      )
+      throw error
     }
   }
 
   if (isTestEnvironment()) {
-    return createMockRedisClient();
+    return createMockRedisClient()
   }
 
   // Log appropriate warnings in production
   if (isProduction()) {
-    console.error("CRITICAL: Missing Redis credentials in production environment");
+    console.error(
+      'CRITICAL: Missing Redis credentials in production environment',
+    )
   }
-  return createMockRedisClient();
+  return createMockRedisClient()
 }
 
-export const redis: RedisClient = createRedisClient();
-if (typeof asRedisOps(redis).on === "function") {
-  asRedisOps(redis).on("error", (error: unknown) => {
-    console.warn("Redis connection warning:", error);
-  });
+export const redis: RedisClient = createRedisClient()
+if (typeof asRedisOps(redis).on === 'function') {
+  asRedisOps(redis).on('error', (error: unknown) => {
+    console.warn('Redis connection warning:', error)
+  })
 }
 
 // Backward-compatible helper for modules expecting a getter
 export function getRedisClient() {
-  return redis;
+  return redis
 }
 
 interface StrictRedisClient {
-  get(key: string): Promise<string | null>;
-  set(key: string, value: string, ...args: any[]): Promise<unknown>;
-  del(key: string): Promise<number>;
-  ping(): Promise<string>;
+  get(key: string): Promise<string | null>
+  set(key: string, value: string, ...args: any[]): Promise<unknown>
+  del(key: string): Promise<number>
+  ping(): Promise<string>
 }
 
 /**
  * Wrapper function for Redis get with error handling
  */
-export async function getFromCache<T = unknown>(key: string): Promise<T | null> {
+export async function getFromCache<T = unknown>(
+  key: string,
+): Promise<T | null> {
   try {
-    const client = redis as unknown as StrictRedisClient;
-    const raw: string | null = await client.get(key);
+    const client = redis as unknown as StrictRedisClient
+    const raw: string | null = await client.get(key)
     if (raw === null) {
-      return null;
+      return null
     }
     try {
-      const parsed: unknown = JSON.parse(raw);
+      const parsed: unknown = JSON.parse(raw)
       if (
-        typeof parsed === "string" ||
-        typeof parsed === "number" ||
-        typeof parsed === "boolean" ||
+        typeof parsed === 'string' ||
+        typeof parsed === 'number' ||
+        typeof parsed === 'boolean' ||
         parsed === null ||
         Array.isArray(parsed) ||
-        typeof parsed === "object"
+        typeof parsed === 'object'
       ) {
-        return parsed as T;
+        return parsed as T
       }
-      return null as unknown as T;
+      return null as unknown as T
     } catch {
       // If not JSON, return as-is
-      return raw as unknown as T;
+      return raw as unknown as T
     }
   } catch (error: unknown) {
-    console.error(`Error getting key ${key} from Redis:`, error);
-    return null;
+    console.error(`Error getting key ${key} from Redis:`, error)
+    return null
   }
 }
 
@@ -344,17 +361,17 @@ export async function setInCache(
   expirationSeconds?: number,
 ): Promise<boolean> {
   try {
-    const serialized = typeof value === "string" ? value : JSON.stringify(value);
-    const client = redis as unknown as StrictRedisClient;
+    const serialized = typeof value === 'string' ? value : JSON.stringify(value)
+    const client = redis as unknown as StrictRedisClient
     if (expirationSeconds) {
-      await client.set(key, serialized, "EX", expirationSeconds);
+      await client.set(key, serialized, 'EX', expirationSeconds)
     } else {
-      await client.set(key, serialized);
+      await client.set(key, serialized)
     }
-    return true;
+    return true
   } catch (error: unknown) {
-    console.error(`Error setting key ${key} in Redis:`, error);
-    return false;
+    console.error(`Error setting key ${key} in Redis:`, error)
+    return false
   }
 }
 
@@ -363,12 +380,12 @@ export async function setInCache(
  */
 export async function removeFromCache(key: string): Promise<boolean> {
   try {
-    const client = redis as unknown as StrictRedisClient;
-    const deletedCount = await client.del(key);
-    return deletedCount > 0;
+    const client = redis as unknown as StrictRedisClient
+    const deletedCount = await client.del(key)
+    return deletedCount > 0
   } catch (error: unknown) {
-    console.error(`Error removing key ${key} from Redis:`, error);
-    return false;
+    console.error(`Error removing key ${key} from Redis:`, error)
+    return false
   }
 }
 
@@ -378,29 +395,29 @@ export async function removeFromCache(key: string): Promise<boolean> {
 function attachRedisErrorHandling() {
   const redisWithEvents = redis as
     | {
-        on: (event: string, handler: (...args: unknown[]) => void) => void;
+        on: (event: string, handler: (...args: unknown[]) => void) => void
       }
-    | undefined;
-  if (typeof redisWithEvents?.["on"] === "function") {
-    redisWithEvents["on"]("error", (err: unknown) => {
-      console.warn("Redis connection warning:", err);
-    });
+    | undefined
+  if (typeof redisWithEvents?.['on'] === 'function') {
+    redisWithEvents['on']('error', (err: unknown) => {
+      console.warn('Redis connection warning:', err)
+    })
   }
 }
 
-attachRedisErrorHandling();
+attachRedisErrorHandling()
 
 /**
  * Check Redis connectivity
  */
 export async function checkRedisConnection(): Promise<boolean> {
   try {
-    const client = redis as unknown as StrictRedisClient;
-    const pingResult = await client.ping();
-    return pingResult === "PONG";
+    const client = redis as unknown as StrictRedisClient
+    const pingResult = await client.ping()
+    return pingResult === 'PONG'
   } catch (error: unknown) {
-    console.error("Redis connectivity check failed:", error);
-    return false;
+    console.error('Redis connectivity check failed:', error)
+    return false
   }
 }
 
@@ -408,26 +425,26 @@ export async function checkRedisConnection(): Promise<boolean> {
  * Health check for Redis service
  */
 export async function getRedisHealth(): Promise<{
-  status: "healthy" | "degraded" | "unhealthy";
-  details?: unknown;
+  status: 'healthy' | 'degraded' | 'unhealthy'
+  details?: unknown
 }> {
   try {
-    const isConnected = await checkRedisConnection();
+    const isConnected = await checkRedisConnection()
     if (isConnected) {
-      return { status: "healthy" };
+      return { status: 'healthy' }
     } else {
       return {
-        status: "unhealthy",
-        details: { message: "Could not connect to Redis" },
-      };
+        status: 'unhealthy',
+        details: { message: 'Could not connect to Redis' },
+      }
     }
   } catch (error: unknown) {
     return {
-      status: "unhealthy",
+      status: 'unhealthy',
       details: {
-        message: "Redis health check failed",
+        message: 'Redis health check failed',
         error: error instanceof Error ? String(error) : String(error),
       },
-    };
+    }
   }
 }

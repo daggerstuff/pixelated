@@ -80,10 +80,7 @@ function isOriginAllowed(
   return config.allowedOrigins.some((allowedOrigin) => {
     if (allowedOrigin.includes('*')) {
       const pattern = new RegExp(
-        `^${allowedOrigin
-          .split('*')
-          .map(escapeRegExp)
-          .join('[a-zA-Z0-9-]+')}$`,
+        `^${allowedOrigin.split('*').map(escapeRegExp).join('[a-zA-Z0-9-]+')}$`,
       )
       return pattern.test(origin)
     }

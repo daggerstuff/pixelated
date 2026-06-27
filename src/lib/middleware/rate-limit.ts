@@ -6,10 +6,7 @@ import { createBuildSafeLogger } from '../logging/build-safe-logger'
 // Initialize logger
 const logger = createBuildSafeLogger('rate-limit')
 
-function safeParseInt(
-  value: string | undefined,
-  fallback: number,
-): number {
+function safeParseInt(value: string | undefined, fallback: number): number {
   if (value === undefined || value === '') return fallback
   const parsed = parseInt(value, 10)
   return Number.isFinite(parsed) ? parsed : fallback
