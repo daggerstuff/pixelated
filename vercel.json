@@ -1,7 +1,6 @@
 {
-  "buildCommand": "pnpm exec astro build",
+  "buildCommand": "NODE_ENV=production pnpm exec astro build",
   "outputDirectory": "dist",
-  "installCommand": "pnpm install --no-frozen-lockfile",
   "framework": "astro",
   "regions": ["iad1"]
 }

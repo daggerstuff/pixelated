@@ -41,7 +41,8 @@
   - **Spec Mode** (`Shift+Tab` or `/spec`) for single features; produces an
     `IMPLEMENTATION_PLAN.md` for auditability.
   - **Missions** (`/missions`) for multi-feature refactors or 50+ file work.
-  - See "Droid Workflow" section in root `AGENTS.md` for triggers and the PM playbook.
+  - See "Droid Workflow" section in root `AGENTS.md` for triggers and the PM
+    playbook.
 
 ### ⚠️ Ask first
 

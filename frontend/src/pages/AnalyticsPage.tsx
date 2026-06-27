@@ -1,21 +1,32 @@
-import { useState } from 'react'
 import { Download, Activity, PieChart, Shield } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+
+import { ClinicalCompetencyModule } from '@/components/analytics/ClinicalCompetencyModule'
+import { ComplianceModule } from '@/components/analytics/ComplianceModule'
+import { ConsumptionModule } from '@/components/analytics/ConsumptionModule'
+import { EducatorTable } from '@/components/analytics/EducatorTable'
 import { MetricCardsRow } from '@/components/analytics/MetricCardsRow'
+import { QualityScoreGauge } from '@/components/analytics/QualityScoreGauge'
 import { TimeSeriesChart } from '@/components/analytics/TimeSeriesChart'
 import { UsageBreakdown } from '@/components/analytics/UsageBreakdown'
-import { QualityScoreGauge } from '@/components/analytics/QualityScoreGauge'
-import { EducatorTable } from '@/components/analytics/EducatorTable'
-import { ClinicalCompetencyModule } from '@/components/analytics/ClinicalCompetencyModule'
-import { ConsumptionModule } from '@/components/analytics/ConsumptionModule'
-import { ComplianceModule } from '@/components/analytics/ComplianceModule'
+import { Button } from '@/components/ui/button'
 
 const DEMO_TIMESERIES = [
-  { date: 'Jun 1', value: 28 }, { date: 'Jun 2', value: 32 }, { date: 'Jun 3', value: 25 },
-  { date: 'Jun 4', value: 38 }, { date: 'Jun 5', value: 41 }, { date: 'Jun 6', value: 35 },
-  { date: 'Jun 7', value: 29 }, { date: 'Jun 8', value: 36 }, { date: 'Jun 9', value: 42 },
-  { date: 'Jun 10', value: 38 }, { date: 'Jun 11', value: 44 }, { date: 'Jun 12', value: 39 },
-  { date: 'Jun 13', value: 33 }, { date: 'Jun 14', value: 37 }, { date: 'Jun 15', value: 41 },
+  { date: 'Jun 1', value: 28 },
+  { date: 'Jun 2', value: 32 },
+  { date: 'Jun 3', value: 25 },
+  { date: 'Jun 4', value: 38 },
+  { date: 'Jun 5', value: 41 },
+  { date: 'Jun 6', value: 35 },
+  { date: 'Jun 7', value: 29 },
+  { date: 'Jun 8', value: 36 },
+  { date: 'Jun 9', value: 42 },
+  { date: 'Jun 10', value: 38 },
+  { date: 'Jun 11', value: 44 },
+  { date: 'Jun 12', value: 39 },
+  { date: 'Jun 13', value: 33 },
+  { date: 'Jun 14', value: 37 },
+  { date: 'Jun 15', value: 41 },
 ]
 
 const DEMO_BREAKDOWN = [
@@ -30,10 +41,26 @@ const DEMO_BREAKDOWN = [
 type TabId = 'overview' | 'clinical' | 'consumption' | 'compliance'
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: 'overview', label: 'Overview', icon: <Activity className="h-3.5 w-3.5" /> },
-  { id: 'clinical', label: 'Clinical Competency', icon: <Activity className="h-3.5 w-3.5" /> },
-  { id: 'consumption', label: 'Consumption', icon: <PieChart className="h-3.5 w-3.5" /> },
-  { id: 'compliance', label: 'Compliance', icon: <Shield className="h-3.5 w-3.5" /> },
+  {
+    id: 'overview',
+    label: 'Overview',
+    icon: <Activity className="h-3.5 w-3.5" />,
+  },
+  {
+    id: 'clinical',
+    label: 'Clinical Competency',
+    icon: <Activity className="h-3.5 w-3.5" />,
+  },
+  {
+    id: 'consumption',
+    label: 'Consumption',
+    icon: <PieChart className="h-3.5 w-3.5" />,
+  },
+  {
+    id: 'compliance',
+    label: 'Compliance',
+    icon: <Shield className="h-3.5 w-3.5" />,
+  },
 ]
 
 export function AnalyticsPage() {
@@ -46,7 +73,8 @@ export function AnalyticsPage() {
         <div>
           <h1 className="text-2xl font-bold">Analytics</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Institutional analytics across clinical, consumption, and compliance dimensions
+            Institutional analytics across clinical, consumption, and compliance
+            dimensions
           </p>
         </div>
         <Button variant="outline" size="sm">
@@ -79,7 +107,11 @@ export function AnalyticsPage() {
           <MetricCardsRow />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <TimeSeriesChart data={DEMO_TIMESERIES} title="Simulation Hours Over Time" color="#2563EB" />
+              <TimeSeriesChart
+                data={DEMO_TIMESERIES}
+                title="Simulation Hours Over Time"
+                color="#2563EB"
+              />
             </div>
             <div className="lg:col-span-1">
               <QualityScoreGauge passRate={94.2} />

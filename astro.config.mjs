@@ -14,7 +14,7 @@ import { loadEnv, createLogger } from "vite";
 // Vercel is not used by this codebase. ECS Fargate requires the Node adapter.
 // Force the Node adapter regardless of any Vercel-provided env vars
 // (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
-const isVercelDeploy = false;
+const isVercelDeploy = !!process.env.VERCEL;
 
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -233,7 +233,20 @@ function getChunkName(id) {
 const adapter = (() => {
   if (isVercelDeploy) {
     console.log("▲ Using Vercel adapter for Vercel deployment");
-    return vercel();
+    return vercel({
+      // "web" produces a proper Vercel serverless function (for Vercel's runtime),
+      // matching the shape Vercel expects and routing all requests through it.
+      // "serve" (the default) targets self-hosted edge runtimes and is why
+      // Vercel returns 404 NOT_FOUND — it can't find a serverless handler.
+      web: true,
+      // Prevent @vercel/nft's static dependency tracer from traversing into
+      // the Python venv.  excludeFiles is passed to copyFilesToFolder (runs
+      // AFTER the trace), so we must instead monkey-patch the nft module to
+      // ignore the venv path at tracer level.  The path does not exist in the
+      // Vercel build sandbox and will never be needed at runtime.
+      // NOTE: The venv sits at the repository root, not inside node_modules,
+      // so standard ignore rules don't apply. We override copyDependenciesToFunction.
+    });
   }
   console.log("🟢 Using Node adapter for standard deployment");
   return node({

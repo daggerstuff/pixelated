@@ -5,9 +5,9 @@
   "compatibility_date": "2026-06-18",
   "compatibility_flags": ["nodejs_compat"],
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
   },
   "vars": {
-    "ENVIRONMENT": "production"
-  }
+    "ENVIRONMENT": "production",
+  },
 }

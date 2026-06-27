@@ -231,6 +231,33 @@ services:
           cpus: '0.1'
           memory: 128M
 
+  # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: pixelated-ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_ORIGINS=*
+    volumes:
+      - ollama_data:/root/.ollama
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.ollama.rule=Host(`ollama.pixelatedempathy.com`)'
+      - 'traefik.http.routers.ollama.entrypoints=websecure'
+      - 'traefik.http.routers.ollama.tls.certresolver=letsencrypt'
+      - 'traefik.http.routers.ollama.service=ollama'
+      - 'traefik.http.services.ollama.loadbalancer.server.port=11434'
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+        reservations:
+          cpus: '2'
+          memory: 4G
+
   # Therapeutic AI API
   ai-api:
     build:
@@ -269,6 +296,8 @@ volumes:
   loki_data:
     driver: local
   ssl_certs:
+    driver: local
+  ollama_data:
     driver: local
 
 secrets:

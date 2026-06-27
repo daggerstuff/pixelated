@@ -94,15 +94,14 @@ export const crypto = {
   },
 
   // Add subtle crypto API for modern browsers
-  subtle:
-    (typeof window !== 'undefined' ? window.crypto?.subtle : undefined) ?? {
-      digest: async (_algorithm: string, _data: BufferSource) => {
-        console.warn(
-          'crypto.subtle.digest fallback used - limited functionality',
-        )
-        return new Uint8Array(32) // Return dummy hash
-      },
+  subtle: (typeof window !== 'undefined'
+    ? window.crypto?.subtle
+    : undefined) ?? {
+    digest: async (_algorithm: string, _data: BufferSource) => {
+      console.warn('crypto.subtle.digest fallback used - limited functionality')
+      return new Uint8Array(32) // Return dummy hash
     },
+  },
 
   // Add randomBytes implementation
   randomBytes: (size: number) => {
