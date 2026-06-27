@@ -16,7 +16,7 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 
 # Install pnpm
-RUN npm install -g pnpm@11.7.0
+RUN npm install -g pnpm@11.5.2
 
 # Install dependencies
 COPY scripts/devops/pnpm-install-with-fallback.sh /tmp/pnpm-install-with-fallback.sh

@@ -21,7 +21,7 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   PNPM_CONFIG_TRUST_LOCKFILE: 'true'
   NODE_VERSION: 24.16.0
-  PNPM_VERSION: 11.9.0
+  PNPM_VERSION: 11.7.0
   LHCI_PORT: 4323
 
 jobs:
@@ -46,7 +46,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
-          version: 11.9.0
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
