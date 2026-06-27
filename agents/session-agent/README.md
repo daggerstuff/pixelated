@@ -1,7 +1,7 @@
 # session-agent (PIX-3957)
 
-Conversation Rehearsal **Session Orchestrator** agent. The user-facing agent
-in Pixelated Empathy's Eve workflow.
+Conversation Rehearsal **Session Orchestrator** agent. The user-facing agent in
+Pixelated Empathy's Eve workflow.
 
 ## What's in this slice
 
@@ -26,8 +26,8 @@ either a placeholder URL or an env-gated URL. They build cleanly but only the
 
 - Foresight MCP over HTTP/SSE (current server is stdio).
 - Mongo-backed session-mcp.
-- Express middleware integration in the existing Express backend (referenced
-  by ticket PIX-3969).
+- Express middleware integration in the existing Express backend (referenced by
+  ticket PIX-3969).
 - K8s deploy manifest (ticket PIX-3984 not authored here).
 - The remaining 9 tools from the ticket list.
 

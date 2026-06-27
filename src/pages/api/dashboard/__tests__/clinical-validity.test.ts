@@ -1,37 +1,44 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { GET } from '../clinical-validity'
 
 // Mock child_process
 vi.mock('child_process', () => ({
   spawn: vi.fn(() => {
     const mockProcess = {
-      stdout: { 
+      stdout: {
         on: vi.fn((event, callback) => {
           if (event === 'data') {
             // Simulate benchmark output
-            setTimeout(() => callback(JSON.stringify({
-              scorer_version: "3.0.0",
-              total_sample_count: 691,
-              scored_sample_count: 133,
-              missing_transcript_count: 1,
-              csv_checksums: {},
-              overall: {
-                pearson_correlation: 0.078,
-                spearman_correlation: 0.0397,
-                mae: 0.75
-              },
-              per_dimension: {
-                technique: { pearson: 0.4273 },
-                alliance: { pearson: 0.6532 },
-                structure: { pearson: 0.3809 },
-                cultural: { pearson: 0.0 },
-                ebp: { pearson: 0.8546 },
-                dsm5: { pearson: 0.5 }
-              },
-              per_channel: {}
-            })), 0)
+            setTimeout(
+              () =>
+                callback(
+                  JSON.stringify({
+                    scorer_version: '3.0.0',
+                    total_sample_count: 691,
+                    scored_sample_count: 133,
+                    missing_transcript_count: 1,
+                    csv_checksums: {},
+                    overall: {
+                      pearson_correlation: 0.078,
+                      spearman_correlation: 0.0397,
+                      mae: 0.75,
+                    },
+                    per_dimension: {
+                      technique: { pearson: 0.4273 },
+                      alliance: { pearson: 0.6532 },
+                      structure: { pearson: 0.3809 },
+                      cultural: { pearson: 0.0 },
+                      ebp: { pearson: 0.8546 },
+                      dsm5: { pearson: 0.5 },
+                    },
+                    per_channel: {},
+                  }),
+                ),
+              0,
+            )
           }
-        })
+        }),
       },
       stderr: { on: vi.fn() },
       on: vi.fn((event, callback) => {
@@ -55,7 +62,7 @@ global.fetch = vi.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ pending: 15 }),
-  } as Response)
+  } as Response),
 )
 
 describe('Clinical Validity API', () => {
@@ -86,19 +93,19 @@ describe('Clinical Validity API', () => {
 
   it('returns valid JSON structure', async () => {
     const url = new URL('http://localhost/api/dashboard/clinical-validity')
-    
+
     const request = new Request(url.toString())
     const response = await GET({ url: url } as any)
     const data = await response.json()
 
     expect(response.status).toBe(200)
     expect(response.headers.get('Content-Type')).toBe('application/json')
-    
+
     // Check required fields
     expect(typeof data.passRate).toBe('number')
     expect(data.passRate).toBeGreaterThanOrEqual(0)
     expect(data.passRate).toBeLessThanOrEqual(1)
-    
+
     expect(typeof data.scoreDistribution).toBe('object')
     expect(Object.keys(data.scoreDistribution)).toContain('technique')
     expect(Object.keys(data.scoreDistribution)).toContain('alliance')
@@ -106,12 +113,12 @@ describe('Clinical Validity API', () => {
     expect(Object.keys(data.scoreDistribution)).toContain('cultural')
     expect(Object.keys(data.scoreDistribution)).toContain('ebp')
     expect(Object.keys(data.scoreDistribution)).toContain('dsm5')
-    
+
     expect(typeof data.queueDepth).toBe('number')
     expect(data.queueDepth).toBeGreaterThanOrEqual(0)
-    
+
     expect(Array.isArray(data.weeklyTrend)).toBe(true)
-    
+
     expect(typeof data.metadata).toBe('object')
     expect(typeof data.metadata.generatedAt).toBe('string')
     expect(typeof data.metadata.dataSource).toBe('string')

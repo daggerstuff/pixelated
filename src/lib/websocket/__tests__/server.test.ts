@@ -7,14 +7,14 @@ import TherapyChatWebSocketServer from '../server'
 type MockFn = ReturnType<typeof vi.fn>
 
 // Mock FHE module with proper implementation
-vi.mock("../../fhe", () => ({
+vi.mock('../../fhe', () => ({
   fheService: {
     initialize: vi.fn().mockResolvedValue(undefined),
-    processEncrypted: vi.fn().mockResolvedValue({ content: "decrypted" }),
+    processEncrypted: vi.fn().mockResolvedValue({ content: 'decrypted' }),
   },
-}));
+}))
 
-vi.mock("../../logging");
+vi.mock('../../logging')
 
 // Define WebSocket event handler types
 type WSMessageHandler = (data: string) => void
@@ -149,9 +149,9 @@ describe('therapyChatWebSocketServer', () => {
         sessionId: '123',
       }
 
-messageHandler(JSON.stringify(chatMessage));
-      expect(mockWebSocket.send).toHaveBeenCalled();
-    });
+      messageHandler(JSON.stringify(chatMessage))
+      expect(mockWebSocket.send).toHaveBeenCalled()
+    })
     // Note: FHE encrypted message tests removed - require native FHE libraries not available in test environment
     // Tests 'should handle encrypted messages with FHE' and 'should handle FHE initialization errors'
     // would need proper FHE mock setup with native module mocking
@@ -256,7 +256,7 @@ messageHandler(JSON.stringify(chatMessage));
     })
   })
 
-  describe("error handling", () => {
+  describe('error handling', () => {
     // Note: 'should handle FHE initialization errors' test removed - requires native FHE libraries
 
     it('should handle missing session ID', async () => {
