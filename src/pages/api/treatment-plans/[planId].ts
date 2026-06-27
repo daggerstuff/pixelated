@@ -1,4 +1,6 @@
-import type { APIRoute, APIContext } from 'astro'
+
+import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
@@ -50,15 +52,9 @@ const updateTreatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET: APIRoute = async ({ params, locals }: APIContext) => {
+export const GET = protectRoute()(async ({ params, locals }: AuthAPIContext) => {
   try {
-    // TODO: Replace with actual authentication check
     const { user } = locals
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
-        status: 401,
-      })
-    }
 
     const { planId } = params
     if (!planId) {
@@ -154,21 +150,15 @@ export const GET: APIRoute = async ({ params, locals }: APIContext) => {
       { status: 500 },
     )
   }
-}
+})
 
-export const PUT: APIRoute = async ({
+export const PUT = protectRoute()(async ({
   params,
   request,
   locals,
-}: APIContext) => {
+}: AuthAPIContext) => {
   try {
-    // TODO: Replace with actual authentication check
     const { user } = locals
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
-        status: 401,
-      })
-    }
 
     const { planId } = params
     if (!planId) {
@@ -274,4 +264,4 @@ export const PUT: APIRoute = async ({
       { status: 500 },
     )
   }
-}
+})
