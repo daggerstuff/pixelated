@@ -13,10 +13,11 @@ import type {
   VerbalReflection,
 } from './reflection'
 
-type AssertEqual<A, B> =
-  (() => unknown extends A ? 1 : 2) extends () => unknown extends B ? 1 : 2
-    ? true
-    : false
+type AssertEqual<A, B> = (() => unknown extends A
+  ? 1
+  : 2) extends () => unknown extends B ? 1 : 2
+  ? true
+  : false
 
 export type ReflexionResultCompat = AssertEqual<
   LocalReflexionResult,

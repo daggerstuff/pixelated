@@ -79,9 +79,7 @@ describe('DeveloperApiKeyManager', () => {
     })
 
     it('should return invalid for non-existent key', async () => {
-      mockQuery.mockResolvedValueOnce(
-        createMockQueryResult([], 0),
-      )
+      mockQuery.mockResolvedValueOnce(createMockQueryResult([], 0))
 
       const result = await manager.validateApiKey('dev_invalid')
 

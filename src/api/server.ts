@@ -226,7 +226,9 @@ process.on('unhandledRejection', (reason: unknown) => {
     reason instanceof Error ? reason.message : String(reason),
   )
   if (captureException) {
-    captureException(reason instanceof Error ? reason : new Error(String(reason)))
+    captureException(
+      reason instanceof Error ? reason : new Error(String(reason)),
+    )
   }
 })
 

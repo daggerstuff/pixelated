@@ -8,7 +8,7 @@
  * PIX-3899 — Sprint 4: Reflection & Learning
  */
 
-import type { ReflectionInsight } from "@pixelated/memory-schema";
+import type { ReflectionInsight } from '@pixelated/memory-schema'
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -22,9 +22,9 @@ import type { ReflectionInsight } from "@pixelated/memory-schema";
  */
 export interface GuidanceWriter {
   /** Write a single line of guidance text to the default block(s). */
-  writeGuidance(text: string): Promise<void>;
+  writeGuidance(text: string): Promise<void>
   /** Write content to a specific named block (e.g. "guidance", "self_improvement"). */
-  writeGuidanceToBlock(label: string, content: string): Promise<void>;
+  writeGuidanceToBlock(label: string, content: string): Promise<void>
 }
 
 /** Options for {@link proposeGuidanceUpdate}. */
@@ -33,35 +33,35 @@ export interface ProposeGuidanceOptions {
    * Minimum confidence to promote an insight to the guidance block.
    * @default 0.8
    */
-  confidenceThreshold?: number;
+  confidenceThreshold?: number
   /**
    * Writer instance to use for block writes.
    * @default NoopGuidanceWriter
    */
-  writer?: GuidanceWriter;
+  writer?: GuidanceWriter
   /**
    * Context block labels to update.
    * @default ["guidance", "self_improvement"]
    */
-  targetLabels?: string[];
+  targetLabels?: string[]
 }
 
 /** Result of a single `proposeGuidanceUpdate` call. */
 export interface ProposeGuidanceResult {
   /** Whether the insight met the confidence threshold and was promoted. */
-  promoted: boolean;
+  promoted: boolean
   /** The formatted guidance text (written or not). */
-  guidanceText: string;
+  guidanceText: string
   /** Labels the text was (or would have been) written to. */
-  targetLabels: string[];
+  targetLabels: string[]
 }
 
 // ---------------------------------------------------------------------------
 // Defaults
 // ---------------------------------------------------------------------------
 
-const DEFAULT_CONFIDENCE_THRESHOLD = 0.8;
-const DEFAULT_TARGET_LABELS: string[] = ["guidance", "self_improvement"];
+const DEFAULT_CONFIDENCE_THRESHOLD = 0.8
+const DEFAULT_TARGET_LABELS: string[] = ['guidance', 'self_improvement']
 
 // ---------------------------------------------------------------------------
 // NoopGuidanceWriter — default writer (safe for tests and no-connect setups)
@@ -107,29 +107,32 @@ export class NoopGuidanceWriter implements GuidanceWriter {
  * ```
  */
 export function proposeGuidanceUpdate(
-  insight: Pick<ReflectionInsight, "summary" | "insightType" | "confidence" | "recommendedAction">,
+  insight: Pick<
+    ReflectionInsight,
+    'summary' | 'insightType' | 'confidence' | 'recommendedAction'
+  >,
   options: ProposeGuidanceOptions = {},
 ): ProposeGuidanceResult {
   const {
     confidenceThreshold = DEFAULT_CONFIDENCE_THRESHOLD,
     writer = new NoopGuidanceWriter(),
     targetLabels = DEFAULT_TARGET_LABELS,
-  } = options;
+  } = options
 
-  const guidanceText = formatGuidanceText(insight);
+  const guidanceText = formatGuidanceText(insight)
 
   if (insight.confidence < confidenceThreshold) {
-    return { promoted: false, guidanceText, targetLabels };
+    return { promoted: false, guidanceText, targetLabels }
   }
 
   // Schedule an async write to all target blocks.
   // The write is deferred so the caller is not blocked (fulfilling the
   // "within 5 seconds" AC — even a microtask completes well within that).
   queueMicrotask(() => {
-    void writeToAllBlocks(guidanceText, targetLabels, writer);
-  });
+    void writeToAllBlocks(guidanceText, targetLabels, writer)
+  })
 
-  return { promoted: true, guidanceText, targetLabels };
+  return { promoted: true, guidanceText, targetLabels }
 }
 
 // ---------------------------------------------------------------------------
@@ -150,13 +153,18 @@ export function proposeGuidanceUpdate(
  * ```
  */
 function formatGuidanceText(
-  insight: Pick<ReflectionInsight, "summary" | "insightType" | "confidence" | "recommendedAction">,
+  insight: Pick<
+    ReflectionInsight,
+    'summary' | 'insightType' | 'confidence' | 'recommendedAction'
+  >,
 ): string {
-  const today = new Date().toISOString().slice(0, 10);
-  const confidencePct = Math.round(insight.confidence * 100);
-  const action = insight.recommendedAction ? ` | Recommended: ${insight.recommendedAction}` : "";
+  const today = new Date().toISOString().slice(0, 10)
+  const confidencePct = Math.round(insight.confidence * 100)
+  const action = insight.recommendedAction
+    ? ` | Recommended: ${insight.recommendedAction}`
+    : ''
 
-  return `[${today}] (${insight.insightType}, ${confidencePct}% confidence) ${insight.summary}.${action}`;
+  return `[${today}] (${insight.insightType}, ${confidencePct}% confidence) ${insight.summary}.${action}`
 }
 
 /**
@@ -172,7 +180,7 @@ async function writeToAllBlocks(
 ): Promise<void> {
   for (const label of labels) {
     try {
-      await writer.writeGuidanceToBlock(label, text);
+      await writer.writeGuidanceToBlock(label, text)
     } catch {
       // Guidance writes are best-effort; do not propagate.
     }

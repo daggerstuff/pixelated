@@ -1,6 +1,8 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { GET } from '../routes/[memoryId]'
+
 import { getCurrentUser } from '@/lib/auth'
+
+import { GET } from '../routes/[memoryId]'
 
 const mockGetMemory = vi.fn()
 
@@ -18,8 +20,10 @@ describe('Memory ID Endpoints', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(getCurrentUser).mockResolvedValue({
-      id: 'test-user-id', accountId: 'test-account-id',
-      workspaceId: 'test-workspace-id', role: 'user',
+      id: 'test-user-id',
+      accountId: 'test-account-id',
+      workspaceId: 'test-workspace-id',
+      role: 'user',
     } as any)
   })
 

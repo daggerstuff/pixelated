@@ -308,7 +308,6 @@ function generateFeedbackMessage(
     default:
       return `Thank you for your response. Continue practicing different techniques to develop your skills.`
   }
-
 }
 
 /**
@@ -392,5 +391,4 @@ function generateAlternativeResponses(
         'Thank you for sharing that with me. What would be most helpful for us to focus on today regarding this concern?',
       ]
   }
-
 }
