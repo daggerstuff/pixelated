@@ -21,6 +21,7 @@
 .oxlintignore/
 .superpowers/
 .ralph-tui
+hackathon/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -382,5 +383,4 @@ agents.lock
 .agents/.gitignore
 
 scripts/hetzner
-hackathon/
 .Jules/
