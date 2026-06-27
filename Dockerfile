@@ -5,7 +5,7 @@ FROM node:24.16.0-bookworm-slim AS base
 # Builder stage: install deps and run the static build
 FROM base AS builder
 ENV NODE_ENV=production
-ARG PNPM_VERSION=11.5.2
+ARG PNPM_VERSION=11.9.0
 WORKDIR /app
 
 # Install build-time tools and enable pnpm
