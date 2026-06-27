@@ -283,6 +283,25 @@ export class AIRepository {
   }
 
   /**
+   * Store particle interaction data for analytics
+   */
+  async saveParticleInteraction(
+    userId: string,
+    sessionId: string | undefined,
+    data: Record<string, unknown>
+  ): Promise<string> {
+    const collection = await this.getCollection<Record<string, unknown>>("ai_particle_interactions");
+    const documentToInsert = {
+      userId,
+      sessionId,
+      data,
+      createdAt: new Date(),
+    };
+    const { insertedId } = await collection.insertOne(documentToInsert);
+    return insertedId.toHexString();
+  }
+
+  /**
    * Store a sentiment analysis result
    */
   async storeSentimentAnalysis(
