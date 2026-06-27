@@ -72,10 +72,10 @@ test('login form shows validation errors', async ({ page }) => {
     () => {
       const emailError = document.getElementById('email-error')
       const passwordError = document.getElementById('password-error')
-      return emailError && passwordError && (
-        emailError?.textContent?.trim().length > 0 &&
-        passwordError?.textContent?.trim().length > 0
-      )
+      if (!emailError || !passwordError) return false;
+      const eText = emailError.textContent || '';
+      const pText = passwordError.textContent || '';
+      return eText.trim().length > 0 && pText.trim().length > 0;
     },
     { timeout: 10000 },
   )
