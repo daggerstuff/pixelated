@@ -748,10 +748,6 @@ export function getAllowedOrigin(origin: string | undefined): string {
 
   const allowedOrigins = allowedOriginsEnv.split(',').map((o) => o.trim())
 
-  if (allowedOrigins.includes('*')) {
-    return '*'
-  }
-
   if (origin && allowedOrigins.includes(origin)) {
     return origin
   }
