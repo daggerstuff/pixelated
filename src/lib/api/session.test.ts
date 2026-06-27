@@ -1,8 +1,49 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import { GET, POST } from './session'
 
+vi.mock('@/config/mongodb.config', () => {
+  const store = new Map<string, Record<string, unknown>>()
+
+  return {
+    mongodb: {
+      connect: vi.fn(async () => ({
+        collection: <T>() => ({
+          createIndexes: vi.fn(),
+          findOne: vi.fn(async (filter: { sessionId: string }) => {
+            const doc = store.get(filter.sessionId)
+            return doc ?? null
+          }),
+          updateOne: vi.fn(
+            async (
+              filter: { sessionId: string },
+              update: {
+                $set: Record<string, unknown>
+                $setOnInsert?: Record<string, unknown>
+              },
+              _opts: { upsert: boolean },
+            ) => {
+              store.set(
+                filter.sessionId,
+                update.$set as Record<string, unknown>,
+              )
+              return { upsertedCount: 1 }
+            },
+          ),
+          deleteOne: vi.fn(async (filter: { sessionId: string }) => {
+            store.delete(filter.sessionId)
+          }),
+        }),
+      })),
+    },
+  }
+})
+
 describe('API /session', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   it('returns 404 for missing session', async () => {
     const request = new Request('http://localhost/api/session?id=missing')
     const response = await GET({ request })
