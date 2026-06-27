@@ -287,4 +287,9 @@ python scripts/clean_chronology.py 2025-08
 7. **Use `uv` for all Python** — per AGENTS.md.
 8. **Never skip Colab auth** — authenticate properly each session.
 9. **`ALLOW_LIVE_INJECT=1` required** for Gmail/Chat push scripts.
-10. **Never push bundle files** (`monthly_work/`) — gitignored for a reason.
+10. **Never add a fresh `monthly_work/<month>/` to the index**. Existing months
+    are tracked and retroactive cleanup diffs on those files are fine to commit
+    and push. `monthly_work/` is gitignored only as a forward-looking guard — it
+    prevents adding a new month, but does not untrack already-tracked bundles.
+    **Before pushing, double-check there's no accidental new month directory in
+    the staged diff.**
