@@ -113,6 +113,9 @@ overrides:
   solid-js: 1.9.12
   ws: '>=8.21.0'
 
+patchedDependencies:
+  '@astrojs/vercel@10.0.8': 3024931da36e7c786e742a24104028b1df4f4e510e89b7be41ad6fedc1dbabcb
+
 importers:
 
   .:
@@ -134,7 +137,7 @@ importers:
         version: 5.0.7(@types/node@26.0.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4)
       '@astrojs/vercel':
         specifier: '>=10.0.2'
-        version: 10.0.8(@aws-sdk/credential-provider-web-identity@3.972.54)(astro@6.4.8(@azure/storage-blob@12.32.0)(@types/node@26.0.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.54)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
+        version: 10.0.8(patch_hash=3024931da36e7c786e742a24104028b1df4f4e510e89b7be41ad6fedc1dbabcb)(@aws-sdk/credential-provider-web-identity@3.972.54)(astro@6.4.8(@azure/storage-blob@12.32.0)(@types/node@26.0.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.54)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.19.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -13417,7 +13420,7 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.8(@aws-sdk/credential-provider-web-identity@3.972.54)(astro@6.4.8(@azure/storage-blob@12.32.0)(@types/node@26.0.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.54)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
+  '@astrojs/vercel@10.0.8(patch_hash=3024931da36e7c786e742a24104028b1df4f4e510e89b7be41ad6fedc1dbabcb)(@aws-sdk/credential-provider-web-identity@3.972.54)(astro@6.4.8(@azure/storage-blob@12.32.0)(@types/node@26.0.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.1(@aws-sdk/credential-provider-web-identity@3.972.54)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(lightningcss@1.32.0)(rollup@4.62.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.0)(vue@3.5.38(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@vercel/analytics': 1.6.1(react@19.2.7)(vue@3.5.38(typescript@6.0.3))
