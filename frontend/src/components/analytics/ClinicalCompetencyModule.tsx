@@ -1,6 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Avatar } from '@/components/ui/avatar'
+import { AlertTriangle, Activity } from 'lucide-react'
 import {
   LineChart,
   Line,
@@ -11,15 +9,18 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts'
+import { BarChart, Bar } from 'recharts'
+
+import { Avatar } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DEMO_COMPETENCY } from '@/services/analyticsV2Service'
 import type {
   StateVelocityDataPoint,
   InterventionRate,
   DeEscalationDataPoint,
   OSCEScoreRow,
 } from '@/types/analytics'
-import { DEMO_COMPETENCY } from '@/services/analyticsV2Service'
-import { BarChart, Bar } from 'recharts'
-import { AlertTriangle, Activity } from 'lucide-react'
 // Static color palette for state velocity chart
 const STATE_COLORS = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
 

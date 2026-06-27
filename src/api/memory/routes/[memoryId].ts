@@ -121,6 +121,10 @@ export const PATCH = withAuthenticatedMemoryRoute(
         memoryId,
       })
 
+      if (!existing) {
+        return jsonError(404, 'Not Found', 'Memory not found')
+      }
+
       // Update memory using the gateway
       const result = await getGateway().updateMemory({
         ...toMemoryScope(user.id, user.accountId, user.workspaceId),
@@ -160,10 +164,7 @@ export const PATCH = withAuthenticatedMemoryRoute(
         return jsonError(
           400,
           'Validation Error',
-          'Invalid request body: ' +
-            error.issues
-              .map((e) => `${e.path.join('.')}: ${e.message}`)
-              .join(', '),
+          'Invalid request body format or content',
         )
       }
 

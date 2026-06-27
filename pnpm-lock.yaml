@@ -775,6 +775,9 @@ importers:
       hastscript:
         specifier: latest
         version: 9.0.1
+      headroom-ai:
+        specifier: ^0.22.4
+        version: 0.22.4(@ai-sdk/provider@3.0.10)(ai@6.0.208(zod@4.4.3))(openai@6.37.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3))
       hono:
         specifier: ^4.12.14
         version: 4.12.26
@@ -8872,6 +8875,24 @@ packages:
 
   headers-polyfill@5.0.1:
     resolution: {integrity: sha512-1TJ6Fih/b8h5TIcv+1+Hw0PDQWJTKDKzFZzcKOiW1wJza3XoAQlkCuXLbymPYB8+ZQyw8mHvdw560e8zVFIWyA==}
+
+  headroom-ai@0.22.4:
+    resolution: {integrity: sha512-9a0rgB/jsWe8gs/ggyUwe6E8DYwKAuBvlUml2ApwlUjb5EfJ611X6X+WG0SiXw3nO6sdyV1/+Ah5uw9P7ecnjw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@ai-sdk/provider': '>=1.0.0'
+      '@anthropic-ai/sdk': '>=0.30.0'
+      ai: '>=6.0.0'
+      openai: '>=4.0.0'
+    peerDependenciesMeta:
+      '@ai-sdk/provider':
+        optional: true
+      '@anthropic-ai/sdk':
+        optional: true
+      ai:
+        optional: true
+      openai:
+        optional: true
 
   helmet@8.2.0:
     resolution: {integrity: sha512-DRgTIUgnWcJ62KyarxxziuqYxKGnR6Rgg19BlbucN/dpmJbl1XOit6qvoOX0ZT+HhWe5OUVhU/a1zpGyc1xA0Q==}
@@ -21840,6 +21861,12 @@ snapshots:
     dependencies:
       '@types/set-cookie-parser': 2.4.10
       set-cookie-parser: 3.1.0
+
+  headroom-ai@0.22.4(@ai-sdk/provider@3.0.10)(ai@6.0.208(zod@4.4.3))(openai@6.37.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)):
+    optionalDependencies:
+      '@ai-sdk/provider': 3.0.10
+      ai: 6.0.208(zod@4.4.3)
+      openai: 6.37.0(ws@8.21.0(utf-8-validate@6.0.6))(zod@4.4.3)
 
   helmet@8.2.0: {}
 

@@ -15,7 +15,7 @@
 }
 
 # Ollama API Subdomain
-https://ollama.pixelatedempathy.tech {
+https://ollama.pixelatedempathy.tech, https://ollama.pixelatedempathy.com {
     # Security: Enforce OLLAMA API key
     @unauthorized {
         not header Authorization "Bearer {$OLLAMA_API_KEY}"

@@ -1,3 +1,4 @@
+import { ConsolidationPipeline } from '@/lib/memory/consolidation/consolidation-pipeline'
 /**
  * @file src/pages/api/v1/memory/consolidate.ts
  *
@@ -12,16 +13,18 @@
  * their own memories. Intended for explicit triggers (cron, admin action) —
  * not called automatically on every memory write.
  */
-import { jsonResponse } from "@/lib/memory/contract/route-helpers";
-import { ConsolidationPipeline } from "@/lib/memory/consolidation/consolidation-pipeline";
-import { getProductMemoryGateway } from "@/lib/services/product-memory-gateway";
-import { withV1Contract } from "@/lib/middleware/with-v1-contract";
+import { jsonResponse } from '@/lib/memory/contract/route-helpers'
+import { withV1Contract } from '@/lib/middleware/with-v1-contract'
+import { getProductMemoryGateway } from '@/lib/services/product-memory-gateway'
 
-export const POST = withV1Contract("consolidateMemory", async (context, caller) => {
-  const gateway = getProductMemoryGateway();
-  const pipeline = new ConsolidationPipeline();
+export const POST = withV1Contract(
+  'consolidateMemory',
+  async (context, caller) => {
+    const gateway = getProductMemoryGateway()
+    const pipeline = new ConsolidationPipeline()
 
-  const report = await pipeline.run(gateway, caller.scope.userId);
+    const report = await pipeline.run(gateway, caller.scope.userId)
 
-  return jsonResponse({ data: { report } });
-});
+    return jsonResponse({ data: { report } })
+  },
+)

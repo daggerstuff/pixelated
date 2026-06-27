@@ -12,49 +12,54 @@
  * Falls back to empty result when Workers AI credentials are missing.
  */
 
-import { defineTool } from "eve/tools";
-import { z } from "zod";
-import { generateText } from "ai";
-import { getModel } from "./workers-ai.js";
+import { generateText } from 'ai'
+import { defineTool } from 'eve/tools'
+import { z } from 'zod'
+
+import { getModel } from './workers-ai.js'
 
 export interface PaceSignal {
-  stuck: boolean;
-  pattern: "reflection_loop" | "topic_avoidance" | "rapid_fire" | "normal";
-  consecutive_same_technique: number;
-  suggestion: string;
-  conversation_flow: string;
+  stuck: boolean
+  pattern: 'reflection_loop' | 'topic_avoidance' | 'rapid_fire' | 'normal'
+  consecutive_same_technique: number
+  suggestion: string
+  conversation_flow: string
 }
 
 interface TurnInput {
-  role: "trainee" | "participant" | "supervisor";
-  text: string;
-  timestamp?: string;
+  role: 'trainee' | 'participant' | 'supervisor'
+  text: string
+  timestamp?: string
 }
 
 interface PaceInput {
-  session_id: string;
-  recent_turns: TurnInput[];
-  session_duration_minutes: number;
+  session_id: string
+  recent_turns: TurnInput[]
+  session_duration_minutes: number
 }
 
 export interface PaceResult {
-  session_id: string;
-  analyzed_at: string;
-  stuck: boolean;
-  pattern: PaceSignal["pattern"];
-  consecutive_same_technique: number;
-  suggestion: string;
-  conversation_flow: string;
-  model: string;
-  [key: string]: unknown;
+  session_id: string
+  analyzed_at: string
+  stuck: boolean
+  pattern: PaceSignal['pattern']
+  consecutive_same_technique: number
+  suggestion: string
+  conversation_flow: string
+  model: string
+  [key: string]: unknown
 }
 
 /** Direct async pace analysis, importable by other tools. */
-export async function analyzePace(input: PaceInput): Promise<PaceResult | null> {
-  const model = getModel();
-  if (!model) return null;
+export async function analyzePace(
+  input: PaceInput,
+): Promise<PaceResult | null> {
+  const model = getModel()
+  if (!model) return null
 
-  const turnsText = input.recent_turns.map((t) => `[${t.role}] ${t.text}`).join("\n---\n");
+  const turnsText = input.recent_turns
+    .map((t) => `[${t.role}] ${t.text}`)
+    .join('\n---\n')
 
   const prompt =
     `You are a clinical training supervisor monitoring a therapy rehearsal session.\n` +
@@ -64,51 +69,59 @@ export async function analyzePace(input: PaceInput): Promise<PaceResult | null> 
     `Return ONLY valid JSON with NO markdown fences, NO extra text:\n` +
     `{"stuck":true/false,"pattern":"reflection_loop|topic_avoidance|rapid_fire|normal",` +
     `"consecutive_same_technique":0,"suggestion":"max 160 chars","conversation_flow":"max 200 chars"}\n\n` +
-    `RECENT TURNS:\n"""\n${turnsText}\n"""`;
+    `RECENT TURNS:\n"""\n${turnsText}\n"""`
 
-  const { text } = await generateText({ model, prompt });
-  const parsed = parsePaceJson(text);
+  const { text } = await generateText({ model, prompt })
+  const parsed = parsePaceJson(text)
 
   return {
     session_id: input.session_id,
     analyzed_at: new Date().toISOString(),
     ...parsed,
-    model: "@cf/meta/llama-3.2-3b-instruct",
-  };
+    model: '@cf/meta/llama-3.2-3b-instruct',
+  }
 }
 
 function parsePaceJson(raw: string) {
   interface PaceJson {
-    stuck?: unknown;
-    pattern?: unknown;
-    consecutive_same_technique?: unknown;
-    suggestion?: unknown;
-    conversation_flow?: unknown;
+    stuck?: unknown
+    pattern?: unknown
+    consecutive_same_technique?: unknown
+    suggestion?: unknown
+    conversation_flow?: unknown
   }
 
   try {
-    const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0];
-    const parsed = JSON.parse(cleaned) as PaceJson;
-    const patterns = ["reflection_loop", "topic_avoidance", "rapid_fire", "normal"] as const;
+    const cleaned = (raw.match(/\{[\s\S]*\}/) ?? [raw])[0]
+    const parsed = JSON.parse(cleaned) as PaceJson
+    const patterns = [
+      'reflection_loop',
+      'topic_avoidance',
+      'rapid_fire',
+      'normal',
+    ] as const
     return {
-      stuck: typeof parsed.stuck === "boolean" ? parsed.stuck : false,
+      stuck: typeof parsed.stuck === 'boolean' ? parsed.stuck : false,
       pattern: (patterns as readonly string[]).includes(
-        typeof parsed.pattern === "string" ? parsed.pattern : "",
+        typeof parsed.pattern === 'string' ? parsed.pattern : '',
       )
-        ? (parsed.pattern as PaceResult["pattern"])
-        : "normal",
+        ? (parsed.pattern as PaceResult['pattern'])
+        : 'normal',
       consecutive_same_technique:
-        typeof parsed.consecutive_same_technique === "number"
+        typeof parsed.consecutive_same_technique === 'number'
           ? Math.max(0, parsed.consecutive_same_technique)
           : 0,
-      suggestion: (typeof parsed.suggestion === "string" ? parsed.suggestion : "").slice(0, 160),
-      conversation_flow: (typeof parsed.conversation_flow === "string"
+      suggestion: (typeof parsed.suggestion === 'string'
+        ? parsed.suggestion
+        : ''
+      ).slice(0, 160),
+      conversation_flow: (typeof parsed.conversation_flow === 'string'
         ? parsed.conversation_flow
-        : ""
+        : ''
       ).slice(0, 200),
-    };
+    }
   } catch {
-    return emptyPace("unknown", "@cf/meta/llama-3.2-3b-instruct");
+    return emptyPace('unknown', '@cf/meta/llama-3.2-3b-instruct')
   }
 }
 
@@ -117,55 +130,55 @@ function emptyPace(sessionId: string, model: string): PaceResult {
     session_id: sessionId,
     analyzed_at: new Date().toISOString(),
     stuck: false,
-    pattern: "normal",
+    pattern: 'normal',
     consecutive_same_technique: 0,
-    suggestion: "",
-    conversation_flow: "",
+    suggestion: '',
+    conversation_flow: '',
     model,
-  };
+  }
 }
 
 function emptyResult(sessionId: string): PaceResult {
-  return emptyPace(sessionId, "none");
+  return emptyPace(sessionId, 'none')
 }
 
 // ── Eve tool definition ─────────────────────────────────────────────
 
 const PaceTurnSchema = z.object({
-  role: z.enum(["trainee", "participant", "supervisor"]),
+  role: z.enum(['trainee', 'participant', 'supervisor']),
   text: z.string().min(1),
   timestamp: z.string().datetime().optional(),
-});
+})
 
 const SCHEMA = z.object({
   session_id: z.string().uuid(),
   recent_turns: z.array(PaceTurnSchema).min(3).max(10),
   session_duration_minutes: z.number().min(0).max(120),
-});
+})
 
 export default defineTool({
   description:
-    "Analyze trainee conversational rhythm for pacing patterns using " +
-    "Workers AI. Returns a structured signal (stuck, pattern type, " +
-    "suggestion, conversation flow summary). The agent should attach " +
-    "non-trivial suggestions to persistent_notes for longitudinal tracking. " +
-    "Call this after generating the reply -- the result is supervisory " +
-    "metadata that does not gate the response.",
+    'Analyze trainee conversational rhythm for pacing patterns using ' +
+    'Workers AI. Returns a structured signal (stuck, pattern type, ' +
+    'suggestion, conversation flow summary). The agent should attach ' +
+    'non-trivial suggestions to persistent_notes for longitudinal tracking. ' +
+    'Call this after generating the reply -- the result is supervisory ' +
+    'metadata that does not gate the response.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
-    const result = await analyzePace(input);
+    const result = await analyzePace(input)
     if (!result) {
       return {
         session_id: input.session_id,
         analyzed_at: new Date().toISOString(),
         stuck: false,
-        pattern: "normal" as const,
+        pattern: 'normal' as const,
         consecutive_same_technique: 0,
-        suggestion: "",
-        conversation_flow: "",
-        model: "none",
-      };
+        suggestion: '',
+        conversation_flow: '',
+        model: 'none',
+      }
     }
-    return result satisfies PaceResult;
+    return result satisfies PaceResult
   },
-});
+})

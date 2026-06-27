@@ -4,7 +4,8 @@
 
 - Governs Claude Code sessions for `Pixelated Empathy`.
 - Main source of truth: root `AGENTS.md`.
-- Stack: Astro, React 19, TypeScript, Express, Python AI pipelines (`pnpm`, `uv`).
+- Stack: Astro, React 19, TypeScript, Express, Python AI pipelines (`pnpm`,
+  `uv`).
 - Keep this file concise and high-signal (shorter files improve adherence).
 
 ## Commands (run first)
@@ -22,12 +23,15 @@
 
 ### ✅ Always
 
-- **No Project-level Littering**: Keep all agent-specific configurations, skills, and dotfiles
-  at the global level (`~/.claude`). Never commit project-level configuration folders
-  (e.g. `.claude` at the repository root).
-- Follow root `AGENTS.md` exactly, then this file and scoped `AGENTS.md` under touched directories.
-- Apply root behavioral defaults: assumptions-first, simplicity, surgical edits, and explicit success criteria.
-- Quick examples: ask before coding if scope is unclear; remove only imports/files your change made obsolete; verify with one concrete check.
+- **No Project-level Littering**: Keep all agent-specific configurations,
+  skills, and dotfiles at the global level (`~/.claude`). Never commit
+  project-level configuration folders (e.g. `.claude` at the repository root).
+- Follow root `AGENTS.md` exactly, then this file and scoped `AGENTS.md` under
+  touched directories.
+- Apply root behavioral defaults: assumptions-first, simplicity, surgical edits,
+  and explicit success criteria.
+- Quick examples: ask before coding if scope is unclear; remove only
+  imports/files your change made obsolete; verify with one concrete check.
 - Preserve privacy/safety context for mental health workflows.
 - Use explicit directives instead of implied conventions; avoid vague guidance.
 - Use `uv run` for Python execution where possible.
@@ -35,23 +39,27 @@
 - Start every task by running Foresight continuity calls before edits:
   `manage_subconscious` (`list`, `get` for `pending_items` and
   `project_context`) and `search_memories` for active/upcoming work.
-  - If these calls are unavailable, pause edits and switch to the local continuity fallback.
+  - If these calls are unavailable, pause edits and switch to the local
+    continuity fallback.
 - **Prefer Droid's structured workflows** for non-trivial code:
-  - **Spec Mode** (`Shift+Tab` or `/spec`) for well-scoped single features — produces an
-    `IMPLEMENTATION_PLAN.md` for auditability.
-  - **Missions** (`/missions`) for multi-feature refactors or 50+ file work — produces a
-    milestones-backed plan and orchestration via Mission Control.
-  - See "Droid Workflow" section in root `AGENTS.md` for triggers and the PM playbook.
+  - **Spec Mode** (`Shift+Tab` or `/spec`) for well-scoped single features —
+    produces an `IMPLEMENTATION_PLAN.md` for auditability.
+  - **Missions** (`/missions`) for multi-feature refactors or 50+ file work —
+    produces a milestones-backed plan and orchestration via Mission Control.
+  - See "Droid Workflow" section in root `AGENTS.md` for triggers and the PM
+    playbook.
 
 ### ⚠️ Ask first
 
-- Edits to deployment routes, auth middleware, or public-facing behavior contracts.
+- Edits to deployment routes, auth middleware, or public-facing behavior
+  contracts.
 - Removing or broadening scope guards (security/privacy checks, gating logic).
 - Command-policy changes that affect CI/release safety.
 
 ### 🚫 Never
 
-- Use suppression comments to mask issues (`@ts-ignore`, `# noqa`, `# type: ignore`, `/* eslint-disable */`).
+- Use suppression comments to mask issues (`@ts-ignore`, `# noqa`,
+  `# type: ignore`, `/* eslint-disable */`).
 - Include secrets, tokens, patient details, or credentials in examples/fixtures.
 - Run raw `python`/`pip` in this repo unless explicitly requested.
 
@@ -68,4 +76,5 @@
   for `pending_items` + `project_context`), `search_memories` (`active tasks`,
   `upcoming work`, owner/team scope), then `manage_memories` as needed.
 - Root `AGENTS.md` is the main source of truth.
-- For scoped rules, prefer nested instruction files (`AGENTS.md` under touched directories).
+- For scoped rules, prefer nested instruction files (`AGENTS.md` under touched
+  directories).
