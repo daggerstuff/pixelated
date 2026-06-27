@@ -23,13 +23,20 @@ Status:
 
 **Immediate next action (one line):**
 ```bash
-# Inside hackathon/:
+# From /home/vivi/pixelated for Colab launch/download; only `cd hackathon`
+# for local audit/commit:
 colab new -s pixelated-solar --gpu G4
-colab exec -s pixelated-solar -- "python3 /content/colab_run_month.py 2025-09"
-# Poll with: colab exec -s pixelated-solar -- cat /content/colab_run_status.json
-# Download with: colab download -s pixelated-solar /content/hackathon/monthly_work/2025-09/ hackathon/monthly_work/
-# Stop GPU: colab stop -s pixelated-solar
-# Audit locally:
+uv run python hackathon/build_colab_month_bundle.py 2025-09 \
+  --output /tmp/pixelated_monthly_bundle.tar.gz
+colab upload -s pixelated-solar \
+  /tmp/pixelated_monthly_bundle.tar.gz \
+  /content/pixelated_monthly_bundle.tar.gz
+# Run/poll through script files; this Colab CLI does not accept raw shell tails.
+colab exec -s pixelated-solar -f /tmp/pixelated_colab_probe.py
+colab exec -s pixelated-solar -f /tmp/pixelated_colab_start_month.py
+colab download -s pixelated-solar /content/colab_run_status.json /tmp/colab_run_status.json
+colab download -s pixelated-solar /content/hackathon/monthly_work/2025-09/ hackathon/monthly_work/
+colab stop -s pixelated-solar
 cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-09
 # Must show: status=passed, finding_count=0
 ```
@@ -50,6 +57,41 @@ cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-09
 ---
 
 ## Current State (after G5/G6 + Phase 7 hardening)
+
+### Verified progress boundary on 2026-06-27
+- **Accepted months:** `monthly_accepted/2025-07` and `monthly_accepted/2025-08`
+  are the only completed months.
+- **Active work surface:** `monthly_work/` now contains only `2025-07` and
+  `2025-08`. This is intentional.
+- **September is next.** `2025-09` has **not** been LLM-generated yet.
+- **Sep launch packaging is now truthful.** `build_colab_month_bundle.py`
+  no longer depends on a pre-existing `monthly_work/2025-09/` scaffold. It
+  synthesizes `month_bible.json`, `gate_report.json`, and
+  `month_enrichment.json` into the bundle from source data when the month dir
+  is absent, so the cleaned active surface can stay clean.
+- **Stale scaffold quarantine:** old Sep 2025 through Jun 2026 scaffold
+  leftovers were moved out of the active surface to
+  `hackathon/archive/stale_scaffold_monthly_work_2026-06-27/` so status and
+  audits cannot mistake them for real month output.
+- **Status fix in progress:** `monthly_llm_jobs status <month>` is being
+  hardened so completed LLM months without a saved job file still report as
+  complete, while scaffold-only leftovers fail loudly instead of looking like
+  valid generation progress.
+- **Current Sep baseline:** `uv run python -m hackathon.monthly_llm_jobs status
+  2025-09` should still fail with `missing LLM job file`. That is the correct
+  pre-launch state.
+- **Live Sep run status:** the current `pixelated-solar` Colab G4 session is
+  actively generating `2025-09`. The truthful live progress marker is the
+  growing checkpoint set under `hackathon/monthly_work/2025-09/llm_batches/`,
+  not the coarse top-level status file. As of the latest verification poll,
+  the VM had 86 checkpoint files, with later batches present through `088` and
+  normal parallel gaps, which is consistent with an in-flight 112-batch run
+  across 8 local Ollama daemons.
+- **Remote upload safety net:** `~/.config/rclone/rclone.conf` was uploaded
+  directly onto the live Colab VM after launch because the runner started
+  without `RCLONE_HETZNER_*` in its environment. That should allow the
+  uploader path to authenticate even though the initial launcher warning
+  remains in `colab_launcher.log`.
 
 ### What was built (G5/G6, Phases 1–7)
 - **`pinned_models.toml`** + **`monthly_llm_models.py`**: Ollama model pins enforced at preflight. Unknown model names refused; digest drift rejected.
@@ -126,12 +168,13 @@ for f in hackathon/colab_run_month.py \
 done
 
 # ── 4. Run generation (backgrounded) ──
-/home/vivi/.local/bin/colab exec -s pixelated-solar -- \
-  "python3 /content/colab_run_month.py 2025-09"
+# This CLI requires file-based exec; raw shell tails do not work.
+/home/vivi/.local/bin/colab exec -s pixelated-solar \
+  -f /tmp/pixelated_colab_start_month.py
 
 # ── 5. Poll progress ──
-/home/vivi/.local/bin/colab exec -s pixelated-solar -- \
-  cat /content/colab_run_status.json
+/home/vivi/.local/bin/colab exec -s pixelated-solar \
+  -f /tmp/pixelated_colab_poll_month.py
 
 # ── 6. When generation_done: DOWNLOAD IMMEDIATELY ──
 /home/vivi/.local/bin/colab download -s pixelated-solar \
@@ -162,18 +205,18 @@ git push origin master
 
 | Month | Emails | Chat Bursts | Status |
 |-------|--------|-------------|--------|
-| 2025-07 | 350 | 420 | Done |
-| 2025-08 | 450 | 560 | Done |
+| 2025-07 | 350 | 420 | Accepted |
+| 2025-08 | 450 | 560 | Accepted |
 | 2025-09 | 550 | 680 | Next |
-| 2025-10 | 650 | 800 | |
-| 2025-11 | 700 | 900 | |
-| 2025-12 | 500 | 620 | |
-| 2026-01 | 550 | 700 | |
-| 2026-02 | 600 | 780 | |
-| 2026-03 | 850 | 1,050 | |
-| 2026-04 | 900 | 1,150 | |
-| 2026-05 | 950 | 1,170 | |
-| 2026-06 | 950 | 1,170 | Last month |
+| 2025-10 | 650 | 800 | Pending |
+| 2025-11 | 700 | 900 | Pending |
+| 2025-12 | 500 | 620 | Pending |
+| 2026-01 | 550 | 700 | Pending |
+| 2026-02 | 600 | 780 | Pending |
+| 2026-03 | 850 | 1,050 | Pending |
+| 2026-04 | 900 | 1,150 | Pending |
+| 2026-05 | 950 | 1,170 | Pending |
+| 2026-06 | 950 | 1,170 | Pending (last month) |
 
 ---
 
@@ -287,6 +330,11 @@ python scripts/clean_chronology.py 2025-08
 - PIX-4022 / PIX-4023 / etc. (the quarter issue) with status
 - PIX-4027 (epic) with completion notes
 - This HANDOFF.md — update the status table and "Current State" section, then push
+
+**Current tracker truth:** as of 2026-06-27, only Jul 2025 and Aug 2025 are
+accepted. Sep 2025 is the next real LLM run. Any Sep-Jun artifacts older than
+that in `archive/stale_scaffold_monthly_work_2026-06-27/` are quarantined
+scaffold leftovers, not accepted month output.
 
 ---
 
