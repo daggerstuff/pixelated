@@ -4,68 +4,68 @@ import {
   memoryInputDefaults,
   type CreateMemoryInput,
   type UnifiedMemory,
-} from "@pixelated/memory-schema";
+} from '@pixelated/memory-schema'
 
+import type { ConsolidationPipeline } from '../memory/consolidation/consolidation-pipeline'
 import {
   InternalMemoryServiceError,
   type InternalMemoryMetadata,
   type InternalMemoryRecord,
   type InternalMemoryScopeInput,
-} from "../server/internal-memory-service-client";
-import { createMemoryTransport } from "../server/memory-transport-factory";
-import { AuditLogger, NoOpAuditLogger } from "./product-memory-audit";
-import { assertOwnedMemoryAccessible } from "./product-memory-ownership";
-import type { ConsolidationPipeline } from "../memory/consolidation/consolidation-pipeline";
+} from '../server/internal-memory-service-client'
+import { createMemoryTransport } from '../server/memory-transport-factory'
+import { AuditLogger, NoOpAuditLogger } from './product-memory-audit'
+import { assertOwnedMemoryAccessible } from './product-memory-ownership'
 
-export type ProductMemoryRecord = UnifiedMemory;
+export type ProductMemoryRecord = UnifiedMemory
 
 export interface ProductMemoryScope {
-  userId: string;
-  accountId?: string;
-  workspaceId?: string;
-  orgId?: string;
-  projectId?: string;
-  sessionId?: string;
-  agentId?: string;
-  runId?: string;
-  includeShared?: boolean;
+  userId: string
+  accountId?: string
+  workspaceId?: string
+  orgId?: string
+  projectId?: string
+  sessionId?: string
+  agentId?: string
+  runId?: string
+  includeShared?: boolean
 }
 
 export interface ProductMemoryListOptions extends ProductMemoryScope {
-  limit?: number;
-  offset?: number;
-  category?: string;
-  tags?: string[];
-  scope?: string;
-  retention?: string;
+  limit?: number
+  offset?: number
+  category?: string
+  tags?: string[]
+  scope?: string
+  retention?: string
 }
 
 export interface ProductMemorySearchOptions extends ProductMemoryListOptions {
-  query: string;
+  query: string
 }
 
 export interface ProductMemoryCreateInput extends ProductMemoryScope {
-  content: string;
-  metadata?: Record<string, unknown>;
+  content: string
+  metadata?: Record<string, unknown>
 }
 
 export interface ProductMemoryUpdateInput extends ProductMemoryScope {
-  memoryId: string;
-  content: string;
-  metadata?: Record<string, unknown>;
+  memoryId: string
+  content: string
+  metadata?: Record<string, unknown>
 }
 
 export interface ProductMemoryDeleteInput extends ProductMemoryScope {
-  memoryId: string;
+  memoryId: string
 }
 
 export interface ProductMemoryGetInput extends ProductMemoryScope {
-  memoryId: string;
+  memoryId: string
 }
 
 export interface ProductMemoryStats {
-  totalMemories: number;
-  categoryCounts: Record<string, number>;
+  totalMemories: number
+  categoryCounts: Record<string, number>
 }
 
 export class ProductMemoryGatewayError extends Error {
@@ -74,32 +74,36 @@ export class ProductMemoryGatewayError extends Error {
     readonly status: number,
     readonly details?: unknown,
   ) {
-    super(message);
-    this.name = "ProductMemoryGatewayError";
+    super(message)
+    this.name = 'ProductMemoryGatewayError'
   }
 }
 
-type Caller = { userId: string; tenantId?: string };
+type Caller = { userId: string; tenantId?: string }
 
 type InternalMemoryServiceClientLike = {
-  addMemory: (input: any) => Promise<{ memory_id: string }>;
-  listMemories: (input: any) => Promise<{ memories: UnifiedMemory[]; count: number }>;
-  searchMemories: (input: any) => Promise<{ memories: UnifiedMemory[]; count: number }>;
-  updateMemory: (input: any) => Promise<void>;
-  getMemory: (input: any) => Promise<UnifiedMemory | null>;
-  deleteMemory: (input: any) => Promise<void>;
+  addMemory: (input: any) => Promise<{ memory_id: string }>
+  listMemories: (
+    input: any,
+  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
+  searchMemories: (
+    input: any,
+  ) => Promise<{ memories: UnifiedMemory[]; count: number }>
+  updateMemory: (input: any) => Promise<void>
+  getMemory: (input: any) => Promise<UnifiedMemory | null>
+  deleteMemory: (input: any) => Promise<void>
   getMemoryStats: (input: any) => Promise<{
-    totalMemories: number;
-    categoryCounts: Record<string, number>;
-  }>;
-};
+    totalMemories: number
+    categoryCounts: Record<string, number>
+  }>
+}
 
 type CallContext = {
-  correlationId: string;
-  operation: string;
-  userId: string;
-  startTime: number;
-};
+  correlationId: string
+  operation: string
+  userId: string
+  startTime: number
+}
 
 export class ProductMemoryGateway {
   constructor(
@@ -109,40 +113,45 @@ export class ProductMemoryGateway {
     private readonly consolidationPipeline: ConsolidationPipeline | null = null,
   ) {}
 
-  async createMemory(input: ProductMemoryCreateInput): Promise<ProductMemoryRecord> {
-    const ctx = this.beginCall("createMemory", input.userId);
-    const metadata = normalizeMetadata(input.metadata);
+  async createMemory(
+    input: ProductMemoryCreateInput,
+  ): Promise<ProductMemoryRecord> {
+    const ctx = this.beginCall('createMemory', input.userId)
+    const metadata = normalizeMetadata(input.metadata)
     const response = await this.runCall(ctx, () =>
       this.client.addMemory({
         ...toInternalScope(input),
         content: input.content,
-        category: typeof metadata["category"] === "string" ? metadata["category"] : undefined,
+        category:
+          typeof metadata['category'] === 'string'
+            ? metadata['category']
+            : undefined,
         metadata,
       }),
-    );
+    )
     const record = buildProductMemoryRecord({
       memoryId: response.memory_id,
       content: input.content,
       userId: input.userId,
       tenantId: this.caller?.tenantId,
       metadata,
-    });
+    })
 
     // Best-effort post-store dedup — fires async, never blocks the response.
     // In serverless environments the dedup may not complete; use
     // POST /api/v1/memory/consolidate for guaranteed execution.
     if (this.consolidationPipeline && record.userId) {
-      this.scheduleDedup(record.userId);
+      this.scheduleDedup(record.userId)
     }
 
-    return record;
+    return record
   }
 
   async listMemories(
     options: ProductMemoryListOptions,
   ): Promise<{ memories: ProductMemoryRecord[]; total: number }> {
-    const ctx = this.beginCall("listMemories", options.userId);
-    const pagination = normalizePagination(options);
+    const ctx = this.beginCall('listMemories', options.userId)
+    const pagination = normalizePagination(options)
     const response = await this.runCall(ctx, () =>
       this.client.listMemories({
         ...toInternalScope(options),
@@ -153,18 +162,20 @@ export class ProductMemoryGateway {
         scope: options.scope,
         retention: options.retention,
       }),
-    );
+    )
     return {
-      memories: response.memories.map((memory) => mapProductMemoryRecord(memory, options.userId)),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
-    };
+    }
   }
 
   async searchMemories(
     options: ProductMemorySearchOptions,
   ): Promise<{ memories: ProductMemoryRecord[]; total: number }> {
-    const ctx = this.beginCall("searchMemories", options.userId);
-    const pagination = normalizePagination(options);
+    const ctx = this.beginCall('searchMemories', options.userId)
+    const pagination = normalizePagination(options)
     const response = await this.runCall(ctx, () =>
       this.client.searchMemories({
         ...toInternalScope(options),
@@ -176,17 +187,21 @@ export class ProductMemoryGateway {
         scope: options.scope,
         retention: options.retention,
       }),
-    );
+    )
     return {
-      memories: response.memories.map((memory) => mapProductMemoryRecord(memory, options.userId)),
+      memories: response.memories.map((memory) =>
+        mapProductMemoryRecord(memory, options.userId),
+      ),
       total: response.count,
-    };
+    }
   }
 
-  async updateMemory(input: ProductMemoryUpdateInput): Promise<ProductMemoryRecord> {
-    const ctx = this.beginCall("updateMemory", input.userId);
-    const metadata = normalizeMetadata(input.metadata);
-    await assertOwnedMemoryAccessible(this.client, input);
+  async updateMemory(
+    input: ProductMemoryUpdateInput,
+  ): Promise<ProductMemoryRecord> {
+    const ctx = this.beginCall('updateMemory', input.userId)
+    const metadata = normalizeMetadata(input.metadata)
+    await assertOwnedMemoryAccessible(this.client, input)
     await this.runCall(ctx, () =>
       this.client.updateMemory({
         memoryId: input.memoryId,
@@ -194,7 +209,7 @@ export class ProductMemoryGateway {
         content: input.content,
         metadata,
       }),
-    );
+    )
     return buildProductMemoryRecord({
       memoryId: input.memoryId,
       content: input.content,
@@ -202,99 +217,111 @@ export class ProductMemoryGateway {
       tenantId: this.caller?.tenantId,
       metadata,
       updatedAt: new Date().toISOString(),
-    });
+    })
   }
 
-  async getMemory(input: ProductMemoryGetInput): Promise<ProductMemoryRecord | null> {
-    const ctx = this.beginCall("getMemory", input.userId);
+  async getMemory(
+    input: ProductMemoryGetInput,
+  ): Promise<ProductMemoryRecord | null> {
+    const ctx = this.beginCall('getMemory', input.userId)
     try {
       const memory = await this.runCall(ctx, () =>
         this.client.getMemory({
           memoryId: input.memoryId,
           ...toInternalScope(input),
         }),
-      );
-      return memory ? mapProductMemoryRecord(memory, input.userId) : null;
+      )
+      return memory ? mapProductMemoryRecord(memory, input.userId) : null
     } catch (err) {
       if (
         err instanceof ProductMemoryGatewayError &&
-        (err.status === 404 || err.message.toLowerCase().includes("not found"))
+        (err.status === 404 || err.message.toLowerCase().includes('not found'))
       ) {
-        return null;
+        return null
       }
-      throw err;
+      throw err
     }
   }
 
   async deleteMemory(input: ProductMemoryDeleteInput): Promise<void> {
-    const ctx = this.beginCall("deleteMemory", input.userId);
-    await assertOwnedMemoryAccessible(this.client, input);
+    const ctx = this.beginCall('deleteMemory', input.userId)
+    await assertOwnedMemoryAccessible(this.client, input)
     await this.runCall(ctx, () =>
       this.client.deleteMemory({
         memoryId: input.memoryId,
         ...toInternalScope(input),
       }),
-    );
+    )
   }
 
-  async getMemoryStats(scope: ProductMemoryListOptions): Promise<ProductMemoryStats> {
-    const ctx = this.beginCall("getMemoryStats", scope.userId);
-    return this.runCall(ctx, () => this.client.getMemoryStats(toInternalScope(scope)));
+  async getMemoryStats(
+    scope: ProductMemoryListOptions,
+  ): Promise<ProductMemoryStats> {
+    const ctx = this.beginCall('getMemoryStats', scope.userId)
+    return this.runCall(ctx, () =>
+      this.client.getMemoryStats(toInternalScope(scope)),
+    )
   }
 
   private beginCall(operation: string, userId: string): CallContext {
-    const correlationId = `${operation}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
-    const startTime = Date.now();
-    const actorId = this.caller?.userId ?? "system";
+    const correlationId = `${operation}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+    const startTime = Date.now()
+    const actorId = this.caller?.userId ?? 'system'
 
     this.audit.log({
-      type: "auth.success",
+      type: 'auth.success',
       actorId,
       userId,
       operation,
       correlationId,
       timestamp: Date.now(),
-    });
+    })
 
     if (this.caller && userId !== this.caller.userId) {
       this.audit.log({
-        type: "scope.rejected",
+        type: 'scope.rejected',
         actorId: this.caller.userId,
         userId,
         operation,
         correlationId,
-        details: { reason: "User scope mismatch" },
+        details: { reason: 'User scope mismatch' },
         timestamp: Date.now(),
-      });
-      throw new ProductMemoryGatewayError("User scope mismatch: cannot act on another user", 403);
+      })
+      throw new ProductMemoryGatewayError(
+        'User scope mismatch: cannot act on another user',
+        403,
+      )
     }
 
     if (this.caller) {
       this.audit.log({
-        type: "scope.validated",
+        type: 'scope.validated',
         actorId: this.caller.userId,
         userId,
         operation,
         correlationId,
         timestamp: Date.now(),
-      });
+      })
     }
 
-    return { correlationId, operation, userId, startTime };
+    return { correlationId, operation, userId, startTime }
   }
 
-  private async runCall<T>(_ctx: CallContext, call: () => Promise<T>): Promise<T> {
+  private async runCall<T>(
+    _ctx: CallContext,
+    call: () => Promise<T>,
+  ): Promise<T> {
     try {
-      return await call();
+      return await call()
     } catch (err) {
       if (err instanceof InternalMemoryServiceError) {
         throw new ProductMemoryGatewayError(
-          err.message || "Unknown error",
+          err.message || 'Unknown error',
           err.status,
           err.details,
-        );
+        )
       }
-      throw err;
+      throw err
     }
   }
 
@@ -307,86 +334,100 @@ export class ProductMemoryGateway {
    * execution.
    */
   private scheduleDedup(userId: string): void {
-    const pipeline = this.consolidationPipeline;
-    if (!pipeline) return;
+    const pipeline = this.consolidationPipeline
+    if (!pipeline) return
 
-    const timeoutMs = 5_000;
+    const timeoutMs = 5_000
     Promise.race([
       pipeline.runDedupOnly(this, userId),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("dedup timed out")), timeoutMs)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('dedup timed out')), timeoutMs),
+      ),
     ]).catch((err) => {
       this.audit.log({
-        type: "downstream.failure",
-        actorId: this.caller?.userId ?? "system",
+        type: 'downstream.failure',
+        actorId: this.caller?.userId ?? 'system',
         userId,
-        operation: "scheduleDedup",
+        operation: 'scheduleDedup',
         correlationId: `dedup-${Date.now()}`,
         details: { error: String(err) },
         timestamp: Date.now(),
-      });
-    });
+      })
+    })
   }
 }
 
-type JsonPrimitive = string | number | boolean | null;
-type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+type JsonPrimitive = string | number | boolean | null
+type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue }
 
-function normalizeMetadata(metadata?: Record<string, unknown>): InternalMemoryMetadata {
-  const result: InternalMemoryMetadata = {};
+function normalizeMetadata(
+  metadata?: Record<string, unknown>,
+): InternalMemoryMetadata {
+  const result: InternalMemoryMetadata = {}
   for (const [key, value] of Object.entries(metadata ?? {})) {
-    const normalized = toJsonValue(value);
+    const normalized = toJsonValue(value)
     if (normalized !== undefined) {
-      result[key] = normalized;
+      result[key] = normalized
     }
   }
-  return result;
+  return result
 }
 
 function toJsonValue(value: unknown): JsonValue | undefined {
   if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean" ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean' ||
     value === null
   ) {
-    return value;
+    return value
   }
 
   if (Array.isArray(value)) {
     const mapped = value
       .map((entry) => toJsonValue(entry))
-      .filter((entry): entry is JsonValue => entry !== undefined);
-    return mapped;
+      .filter((entry): entry is JsonValue => entry !== undefined)
+    return mapped
   }
 
-  if (typeof value === "object") {
-    const output: { [key: string]: JsonValue } = {};
+  if (typeof value === 'object') {
+    const output: { [key: string]: JsonValue } = {}
     for (const [entryKey, entryValue] of Object.entries(value)) {
-      const normalized = toJsonValue(entryValue);
+      const normalized = toJsonValue(entryValue)
       if (normalized !== undefined) {
-        output[entryKey] = normalized;
+        output[entryKey] = normalized
       }
     }
-    return output;
+    return output
   }
 
-  return undefined;
+  return undefined
 }
 
-function metadataCategory(metadata: InternalMemoryMetadata): string | undefined {
-  return typeof metadata["category"] === "string" ? metadata["category"] : undefined;
+function metadataCategory(
+  metadata: InternalMemoryMetadata,
+): string | undefined {
+  return typeof metadata['category'] === 'string'
+    ? metadata['category']
+    : undefined
 }
 
 function metadataTags(metadata: InternalMemoryMetadata): string[] | undefined {
-  if (!Array.isArray(metadata["tags"])) {
-    return undefined;
+  if (!Array.isArray(metadata['tags'])) {
+    return undefined
   }
-  const tags = metadata["tags"].filter((tag): tag is string => typeof tag === "string");
-  return tags.length > 0 ? tags : undefined;
+  const tags = metadata['tags'].filter(
+    (tag): tag is string => typeof tag === 'string',
+  )
+  return tags.length > 0 ? tags : undefined
 }
 
-function metadataImportance(metadata: InternalMemoryMetadata): number | undefined {
-  return typeof metadata["importance"] === "number" ? metadata["importance"] : undefined;
+function metadataImportance(
+  metadata: InternalMemoryMetadata,
+): number | undefined {
+  return typeof metadata['importance'] === 'number'
+    ? metadata['importance']
+    : undefined
 }
 
 function createMemoryInputFromMetadata(
@@ -396,34 +437,34 @@ function createMemoryInputFromMetadata(
   const input: CreateMemoryInput = {
     content: base.content,
     userId: base.userId,
-  };
+  }
   if (base.tenantId) {
-    input.tenantId = base.tenantId;
+    input.tenantId = base.tenantId
   }
-  const category = metadataCategory(metadata);
+  const category = metadataCategory(metadata)
   if (category) {
-    input.category = category;
+    input.category = category
   }
-  const tags = metadataTags(metadata);
+  const tags = metadataTags(metadata)
   if (tags) {
-    input.tags = tags;
+    input.tags = tags
   }
-  const importance = metadataImportance(metadata);
+  const importance = metadataImportance(metadata)
   if (importance !== undefined) {
-    input.importance = importance;
+    input.importance = importance
   }
-  return input;
+  return input
 }
 
 function buildProductMemoryRecord(input: {
-  memoryId: string;
-  content: string;
-  userId: string;
-  tenantId?: string;
-  metadata?: InternalMemoryMetadata;
-  updatedAt?: string;
+  memoryId: string
+  content: string
+  userId: string
+  tenantId?: string
+  metadata?: InternalMemoryMetadata
+  updatedAt?: string
 }): ProductMemoryRecord {
-  const metadata = input.metadata ?? {};
+  const metadata = input.metadata ?? {}
   return buildMemorySkeleton(
     memoryInputDefaults(
       createMemoryInputFromMetadata(
@@ -437,22 +478,22 @@ function buildProductMemoryRecord(input: {
     ),
     {
       id: input.memoryId,
-      sourceService: "astro-frontend",
+      sourceService: 'astro-frontend',
       updatedAt: input.updatedAt ?? null,
     },
-  );
+  )
 }
 
 function legacyInternalRecordToUnifiedMemory(
   memory: InternalMemoryRecord,
   userId: string,
 ): UnifiedMemory {
-  const metadata = memory.metadata ?? {};
+  const metadata = memory.metadata ?? {}
   return buildMemorySkeleton(
     memoryInputDefaults(
       createMemoryInputFromMetadata(
         {
-          content: memory.content ?? memory.memory ?? "",
+          content: memory.content ?? memory.memory ?? '',
           userId,
         },
         metadata,
@@ -460,11 +501,12 @@ function legacyInternalRecordToUnifiedMemory(
     ),
     {
       id: memory.id,
-      sourceService: "foresight",
-      createdAt: memory.createdAt ?? memory.created_at ?? new Date().toISOString(),
+      sourceService: 'foresight',
+      createdAt:
+        memory.createdAt ?? memory.created_at ?? new Date().toISOString(),
       updatedAt: memory.updatedAt ?? memory.updated_at ?? null,
     },
-  );
+  )
 }
 
 function mapProductMemoryRecord(
@@ -472,12 +514,12 @@ function mapProductMemoryRecord(
   userId: string,
 ): ProductMemoryRecord {
   if (isUnifiedMemory(memory)) {
-    return memory;
+    return memory
   }
-  return legacyInternalRecordToUnifiedMemory(memory, userId);
+  return legacyInternalRecordToUnifiedMemory(memory, userId)
 }
 
-let gatewaySingleton: ProductMemoryGateway | null = null;
+let gatewaySingleton: ProductMemoryGateway | null = null
 
 /**
  * Backward-compatible singleton accessor.
@@ -486,8 +528,8 @@ let gatewaySingleton: ProductMemoryGateway | null = null;
  * has a caller context for tenant isolation and audit logging.
  */
 export function getProductMemoryGateway(): ProductMemoryGateway {
-  gatewaySingleton ??= new ProductMemoryGateway(createMemoryTransport());
-  return gatewaySingleton;
+  gatewaySingleton ??= new ProductMemoryGateway(createMemoryTransport())
+  return gatewaySingleton
 }
 
 /**
@@ -501,10 +543,16 @@ export function getProductMemoryGatewayFor(
   caller: Caller,
   audit?: AuditLogger,
 ): ProductMemoryGateway {
-  return new ProductMemoryGateway(createMemoryTransport(), caller, audit ?? new NoOpAuditLogger());
+  return new ProductMemoryGateway(
+    createMemoryTransport(),
+    caller,
+    audit ?? new NoOpAuditLogger(),
+  )
 }
 
-export function toInternalScope(input: ProductMemoryScope): InternalMemoryScopeInput {
+export function toInternalScope(
+  input: ProductMemoryScope,
+): InternalMemoryScopeInput {
   const {
     userId,
     accountId,
@@ -515,7 +563,7 @@ export function toInternalScope(input: ProductMemoryScope): InternalMemoryScopeI
     agentId,
     runId,
     includeShared,
-  } = input;
+  } = input
   return {
     userId,
     accountId,
@@ -526,11 +574,11 @@ export function toInternalScope(input: ProductMemoryScope): InternalMemoryScopeI
     agentId,
     runId,
     includeShared,
-  };
+  }
 }
 
 function normalizePagination(options: ProductMemoryListOptions) {
-  const offset = options.offset ?? 0;
-  const limit = options.limit ?? 10;
-  return { offset, limit };
+  const offset = options.offset ?? 0
+  const limit = options.limit ?? 10
+  return { offset, limit }
 }

@@ -483,7 +483,10 @@ export class ObjectiveMetricsEngine {
         }
         break
       case ContextType.SUPPORT:
-        if (objective.id === 'empathy' || objective.id === 'therapeutic_rapport') {
+        if (
+          objective.id === 'empathy' ||
+          objective.id === 'therapeutic_rapport'
+        ) {
           fit += 0.4
         }
         break

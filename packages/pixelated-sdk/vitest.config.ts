@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from 'vitest/config'
 
 /**
  * Package-local vitest config for @pixelated-empathy/sdk.
@@ -10,9 +10,9 @@ import { defineConfig } from "vitest/config";
  */
 export default defineConfig({
   test: {
-    include: ["src/**/*.test.ts"],
-    environment: "node",
-    pool: "forks",
+    include: ['src/**/*.test.ts'],
+    environment: 'node',
+    pool: 'forks',
     isolate: true,
   },
-});
+})
