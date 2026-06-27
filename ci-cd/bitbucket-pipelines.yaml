@@ -41,7 +41,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.5.2
+        - npm install -g pnpm@11.9.0
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
         - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
           scripts/devops/pnpm-install-with-fallback.sh
@@ -53,7 +53,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.5.2
+        - npm install -g pnpm@11.9.0
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
         - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
           scripts/devops/pnpm-install-with-fallback.sh
@@ -64,7 +64,7 @@ definitions:
       caches:
         - pnpm
       script:
-        - npm install -g pnpm@11.5.2
+        - npm install -g pnpm@11.9.0
         - chmod +x scripts/devops/pnpm-install-with-fallback.sh
         - NODE_OPTIONS="--no-deprecation" PNPM_INSTALL_ARGS=""
           scripts/devops/pnpm-install-with-fallback.sh
@@ -79,7 +79,7 @@ definitions:
         - docker
       script:
         - echo "Installing dependencies"
-        - npm install -g pnpm@11.5.2
+        - npm install -g pnpm@11.9.0
         - NODE_OPTIONS="--no-deprecation" pnpm install --no-frozen-lockfile
         - echo "Run tests and build"
         - pnpm test --silent
