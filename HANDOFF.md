@@ -34,6 +34,19 @@ cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-09
 # Must show: status=passed, finding_count=0
 ```
 
+**Pre-flight for fresh agents (read before launching):**
+
+- **Google auth.** The `colab` CLI requires OAuth. If untouched: `colab auth login`
+  once. Tokens live in `~/.colab-cli-oauth-config.json`. A cold shell without
+  auth will fail on `colab new`.
+- **Read on.** The block above is **launch-only**. The full 10-step run
+  (build bundle tarball → upload 13 dependent files → poll → download → kill
+  GPU → local CI → commit) is in `## How to run any month (seamless)` below.
+  Read that section first.
+- **G4 fallback.** Hard rule 1 forbids T4. If `colab new --gpu G4` reports
+  "G4 unavailable" or quota exhausted, **stop and report**. Do not silently
+  switch to T4 or any other tier.
+
 ---
 
 ## Current State (after G5/G6 + Phase 7 hardening)
