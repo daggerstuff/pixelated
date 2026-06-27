@@ -12,7 +12,8 @@ async function enableOptimalPerformance(client: Cloudflare, zoneId: string) {
 ```
 
 **Flow:** Visitor → Edge (Lower-Tier) → [Cache Miss] → Upper-Tier → [Cache Miss
-+ Argo] → Origin
+
+- Argo] → Origin
 
 **Impact:** Argo ~30% latency reduction + Tiered Cache 50-80% origin offload
 

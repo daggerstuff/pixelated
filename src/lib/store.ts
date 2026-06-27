@@ -235,7 +235,10 @@ export const useStore = create<StoreState>()(
       persist(
         (_set, _get): StoreState => {
           const set = _set as unknown as (
-            partial: StoreState | Partial<StoreState> | ((state: StoreState) => StoreState | Partial<StoreState>),
+            partial:
+              | StoreState
+              | Partial<StoreState>
+              | ((state: StoreState) => StoreState | Partial<StoreState>),
             replace?: false,
           ) => void
           const get = _get as unknown as () => StoreState

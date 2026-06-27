@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { secureRandomHex } from './secure-random'
 
 const HEX_PATTERN = /^[0-9a-f]+$/
