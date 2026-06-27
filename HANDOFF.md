@@ -60,10 +60,11 @@ cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-09
 - **`RUNBOOK_V1_LEGACY.md`**: deprecated runbook replaced by `Makefile` targets.
 - **`CONTRIBUTING.md`**: source-of-truth ordering, no-suppression policy, PR checklist.
 - **`archive/audit_rounds/`**: 14 deprecated rotation/audit scripts archived with `README.md`.
-- **`tests/`**: 69 tests, all passing. New: `test_pinned_models.py` (7),
-  `test_persona_loader.py` (9), `test_chronology_guard.py` (11),
-  `test_anchors_layer.py` (6), `test_normalise_chronology.py` (5),
-  `test_colab_watchdog.py` (5, rewired for modern `sync_to_s3` API).
+- **`tests/`**: 69 tests, all passing (8 files, 57 `test_*` defs + parametrize
+  expansions). New: `test_pinned_models.py` (7), `test_persona_loader.py` (9),
+  `test_chronology_guard.py` (11), `test_anchors_layer.py` (6),
+  `test_normalise_chronology.py` (5), `test_push_to_gmail.py` (3),
+  `test_fidelity.py` (6), `test_fidelity_post.py` (10).
 
 ### Repo
 - **Hackathon remote**: `git@github.com:daggerstuff/hackathon.git` (master branch)
