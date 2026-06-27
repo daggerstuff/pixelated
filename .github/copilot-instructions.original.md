@@ -1,6 +1,6 @@
 # Copilot Instructions — Pixelated
 
-Concise repo guidance for GitHub Copilot in this project.
+Concise repository guidance for GitHub Copilot in this project.
 
 ## 1) Project identity
 
@@ -13,19 +13,19 @@ Concise repo guidance for GitHub Copilot in this project.
 ## 2) Non-negotiables
 
 - Do not ship suppression comments to hide issues.
-  - `// @ts-ignore` `# noqa` `# type: ignore` `/* eslint-disable */`
+  - `// @ts-ignore`, `# noqa`, `# type: ignore`, `/* eslint-disable */`
 - Allowed exception only: `# type: ignore[import-untyped]` for missing
-  third-party stubs, w/ reason in comment.
+  third-party stubs, with reason in comment.
 - Never include credentials, patient data, or sensitive info in code, logs,
   tests, or commits.
 - Preserve therapeutic and privacy context in user-facing output.
-- Do not use `context-mode`  `context-mode_*` workflows.
+- Do not use `context-mode` or `context-mode_*` workflows.
 - Verify behavior before declaring completion.
 
 ## 3) NVIDIA NIM Setup
 
 This project is pre-configured to use NVIDIA NIM (NVIDIA Inference
-Microservices) as custom model provider for GitHub Copilot CLI.
+Microservices) as a custom model provider for GitHub Copilot CLI.
 
 ### Quick Start
 
@@ -35,7 +35,7 @@ To configure your environment for NVIDIA NIM:
 source .github/copilot/nim-byok.sh
 ```
 
-This script sets following environment variables:
+This script sets the following environment variables:
 
 - `COPILOT_PROVIDER_BASE_URL="https://integrate.api.nvidia.com/v1"`
 - `COPILOT_PROVIDER_API_KEY="${NVIDIA_API_KEY}"` (requires NVIDIA_API_KEY to be
@@ -43,11 +43,11 @@ This script sets following environment variables:
 - `COPILOT_PROVIDER_TYPE="openai"`
 - `COPILOT_MODEL="openai/gpt-oss-120b"` (default)
 - `COPILOT_PROVIDER_MODEL_ID="openai/gpt-oss-120b"` (default)
-- Token limits tuned for selected NIM model
+- Token limits tuned for the selected NIM model
 
 ### Available NIM Models
 
-You can switch btw different NVIDIA NIM models by setting
+You can switch between different NVIDIA NIM models by setting the
 `COPILOT_MODEL` environment variable:
 
 | Model ID                                   | Context Length | Best For                                 |
@@ -61,7 +61,7 @@ You can switch btw different NVIDIA NIM models by setting
 
 ### Switching Models
 
-To temporarily use different model for session:
+To temporarily use a different model for a session:
 
 ```bash
 export COPILOT_MODEL="openai/gpt-oss-120b"
@@ -76,7 +76,7 @@ echo 'export COPILOT_MODEL="openai/gpt-oss-120b"' >> ~/.bashrc
 
 ### Rate Limit Handling
 
- project includes `copilot-safe-run.sh` script that provides automatic
+The project includes a `copilot-safe-run.sh` script that provides automatic
 fallback and retry logic for handling rate limits:
 
 ```bash
@@ -86,7 +86,7 @@ scripts/devops/copilot-safe-run.sh copilot <args>
 
 This script will:
 
-1. Try primary model w/ retry logic
+1. Try the primary model with retry logic
 2. Automatically fall back to alternative models on rate limit errors
 3. Use exponential backoff for retries
 
@@ -106,25 +106,25 @@ scripts/devops/copilot-safe-run.sh copilot --version
 
 ### Persistent GitHub auth
 
-To avoid re-authenticating in every new terminal, set your GitHub token in
-shell startup file such as `~/.bashrc`  `~/.zshrc`
+To avoid re-authenticating in every new terminal, set your GitHub token in a
+shell startup file such as `~/.bashrc` or `~/.zshrc`:
 
 ```bash
 export GH_TOKEN="ghp_your_token_here"
 export GITHUB_TOKEN="$GH_TOKEN"
 ```
 
-Copilot CLI accepts either variable, w/ `GH_TOKEN` taking precedence. If you
-already use `gh auth login`you can also rely on that session instead of
-hardcoding token in your shell profile.
+Copilot CLI accepts either variable, with `GH_TOKEN` taking precedence. If you
+already use `gh auth login`, you can also rely on that session instead of
+hardcoding a token in your shell profile.
 
 ## 4) Structure and conventions
 
-- `src/`Astro + React app, routes, shared TypeScript libraries.
-- `ai/`Python AI code (own commit discipline).
-- `scripts/`launcher and deployment helpers.
-- `tests/`integration, browser, security, and API tests.
-- `.agent/internal/`durable private docs, plans, and runbooks.
+- `src/`: Astro + React app, routes, shared TypeScript libraries.
+- `ai/`: Python AI code (own commit discipline).
+- `scripts/`: launcher and deployment helpers.
+- `tests/`: integration, browser, security, and API tests.
+- `.agent/internal/`: durable private docs, plans, and runbooks.
 
 ## 5) Core commands
 
@@ -140,17 +140,17 @@ hardcoding token in your shell profile.
 
 ### Validation
 
-- `pnpm test` `pnpm test:unit` `pnpm test:integration`
-- `pnpm test:evals` `pnpm test:bias-detection`
-- `pnpm e2e` `pnpm e2e:ui` `pnpm e2e:debug`
-- `pnpm lint` `pnpm lint:fix` `pnpm format` `pnpm format:check`
+- `pnpm test`, `pnpm test:unit`, `pnpm test:integration`
+- `pnpm test:evals`, `pnpm test:bias-detection`
+- `pnpm e2e`, `pnpm e2e:ui`, `pnpm e2e:debug`
+- `pnpm lint`, `pnpm lint:fix`, `pnpm format`, `pnpm format:check`,
   `pnpm typecheck`
 - `pnpm security:check` for security-relevant changes.
 
 ### Release
 
-- `pnpm build` `pnpm build:analyze`
-- `pnpm deploy` `pnpm deploy:prod`
+- `pnpm build`, `pnpm build:analyze`
+- `pnpm deploy`, `pnpm deploy:prod`
 
 ## 6) Memory continuity
 
@@ -170,15 +170,15 @@ For active work and cross-session context, use **Foresight MCP**.
   - `process_session_transcript`
   - `inject_context`
   - `query_memories_temporal`
-  - `manage_entities` `query_entities`
+  - `manage_entities`, `query_entities`
   - `analyze_memories`
   - `get_system_status`
 
 Orientation flow:
 
 1. `manage_subconscious` (`action: list`)
-2. `manage_subconscious` (`action: get`label `pending_items`)
-3. `manage_subconscious` (`action: get`label `project_context`)
+2. `manage_subconscious` (`action: get`, label `pending_items`)
+3. `manage_subconscious` (`action: get`, label `project_context`)
 4. `query_memories` for active and upcoming work signals
 5. `manage_entities` (`action: extract`) when semantic context is useful
 
@@ -192,8 +192,7 @@ Orientation flow:
 
 ## 8) MCP and model nuance
 
-- `context7` is available for docs lookup when needed.
-- Enabled: `context7` `linear` `brave-search` `firecrawl`.
-- Disabled: `github` `playwright` `sentry` `e2b-sandbox`.
+- `context7` is available for documentation lookup when needed.
+- Enabled: `context7`, `linear`, `brave-search`, `firecrawl`.
+- Disabled: `github`, `playwright`, `sentry`, `e2b-sandbox`.
 - Use standard tooling when those are unavailable.
-
