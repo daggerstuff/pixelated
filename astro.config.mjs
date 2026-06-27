@@ -16,6 +16,44 @@ import { loadEnv, createLogger } from "vite";
 // (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
 const isVercelDeploy = !!process.env.VERCEL;
 
+if (isVercelDeploy) {
+  // Patch @vercel/nft BEFORE it runs to prevent "URI malformed" errors
+  // from pnpm store paths containing unencoded "+" characters.
+  // e.g. "@astrojs+internal-helpers@0.10.0" contains a literal "+" that
+  // decodeURIComponent misinterprets as a space in "file://" URIs.
+  try {
+    const nftPath = require.resolve("@vercel/nft");
+    const nft = require(nftPath);
+    if (nft?.tracing) {
+      const origTrace = nft.tracing.trace;
+      nft.tracing.trace = async function tracePatched(...args) {
+        try {
+          return await origTrace.apply(this, args);
+        } catch (err) {
+          if (err.message?.includes("URI malformed")) {
+            console.warn("[vercel-patch] Ignoring URI malformed in NFT trace:", err.message);
+            return null;
+          }
+          throw err;
+        }
+      };
+    }
+    // Also patch fileURLToPath globally to handle "+" in paths
+    const { fileURLToPath: origFUTP } = require("node:url");
+    require("node:url").fileURLToPath = function patchedFileURLToPath(url) {
+      if (typeof url === "string" && url.includes("node_modules/.pnpm/")) {
+        // Replace unencoded "+" in pnpm store paths with encoded version
+        const fixed = url.replace(/([^:/?#=+])\+/g, "$1%2B");
+        if (fixed !== url) return origFUTP(fixed);
+      }
+      return origFUTP(url);
+    };
+    console.log("[vercel-patch] NFT and fileURLToPath patched successfully");
+  } catch (e) {
+    console.warn("[vercel-patch] Could not apply NFT patch:", e.message);
+  }
+}
+
 const isProduction = process.env.NODE_ENV === "production";
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -239,13 +277,9 @@ const adapter = (() => {
       // "serve" (the default) targets self-hosted edge runtimes and is why
       // Vercel returns 404 NOT_FOUND — it can't find a serverless handler.
       web: true,
-      // Prevent @vercel/nft's static dependency tracer from traversing into
-      // the Python venv.  excludeFiles is passed to copyFilesToFolder (runs
-      // AFTER the trace), so we must instead monkey-patch the nft module to
-      // ignore the venv path at tracer level.  The path does not exist in the
-      // Vercel build sandbox and will never be needed at runtime.
-      // NOTE: The venv sits at the repository root, not inside node_modules,
-      // so standard ignore rules don't apply. We override copyDependenciesToFunction.
+      // Disable NFT tracing to avoid "URI malformed" errors from pnpm store
+      // paths containing "+" characters that decodeURIComponent misinterprets.
+      nft: false,
     });
   }
   console.log("🟢 Using Node adapter for standard deployment");

@@ -67,18 +67,15 @@ test('login form shows validation errors', async ({ page }) => {
     await submitButton.click({ force: true, timeout: 5000 })
   }
 
-  // Wait for React to flush state updates - wait for error text content to appear
-  // Use a more explicit wait that checks for actual text content
-
   // Wait for error text content to appear (elements exist as hidden empty divs initially)
   await page.waitForFunction(
     () => {
       const emailError = document.getElementById('email-error')
       const passwordError = document.getElementById('password-error')
-      return (
-        emailError?.textContent?.trim().length > 0 &&
-        passwordError?.textContent?.trim().length > 0
-      )
+      if (!emailError || !passwordError) return false;
+      const eText = emailError.textContent || '';
+      const pText = passwordError.textContent || '';
+      return eText.trim().length > 0 && pText.trim().length > 0;
     },
     { timeout: 10000 },
   )
@@ -168,7 +165,7 @@ test('login page has proper transitions', async ({ page }) => {
       const heading = document.querySelector(
         '[data-testid="reset-password-heading"]',
       )
-      return heading !== null && heading.textContent?.includes('Reset Password')
+      return heading !== null && heading?.textContent?.includes('Reset Password')
     },
     { timeout: 15000 },
   )

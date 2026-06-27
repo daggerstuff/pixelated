@@ -1,10 +1,9 @@
-import re
-with open("hackathon/db_runner.py", "r") as f:
+with open("hackathon/db_runner.py") as f:
     content = f.read()
 
 content = content.replace(
-    'from hackathon.db_pipeline import build_event_context, record_thread_in_db, get_events_for_month',
-    'from hackathon.db_pipeline import build_event_context, record_thread_in_db, get_events_for_month, SessionLocal'
+    "from hackathon.db_pipeline import build_event_context, record_thread_in_db, get_events_for_month",
+    "from hackathon.db_pipeline import build_event_context, record_thread_in_db, get_events_for_month, SessionLocal",
 )
 
 # Update generate_month
@@ -49,18 +48,18 @@ new_gen = """def generate_month(month: str):
 content = content.replace(old_gen, new_gen)
 
 content = content.replace(
-    'record_thread_in_db(space_name, context[\'date\'], f"Discussion on: {context[\'title\']}", messages, event_id=event_id)',
-    'record_thread_in_db(space_name, context[\'date\'], f"Discussion on: {context[\'title\']}", messages, event_id=event_id, session=session)'
+    "record_thread_in_db(space_name, context['date'], f\"Discussion on: {context['title']}\", messages, event_id=event_id)",
+    "record_thread_in_db(space_name, context['date'], f\"Discussion on: {context['title']}\", messages, event_id=event_id, session=session)",
 )
 
 content = content.replace(
-    'record_thread_in_db(space_name, context[\'date\'], context[\'title\'], messages, event_id=event_id)',
-    'record_thread_in_db(space_name, context[\'date\'], context[\'title\'], messages, event_id=event_id, session=session)'
+    "record_thread_in_db(space_name, context['date'], context['title'], messages, event_id=event_id)",
+    "record_thread_in_db(space_name, context['date'], context['title'], messages, event_id=event_id, session=session)",
 )
 
 content = content.replace(
     '    print("Month generation complete.")',
-    '    print("Month generation complete.")\n    finally:\n        session.close()'
+    '    print("Month generation complete.")\n    finally:\n        session.close()',
 )
 
 with open("hackathon/db_runner.py", "w") as f:

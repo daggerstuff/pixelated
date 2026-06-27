@@ -48,7 +48,103 @@ describe('successResponse', () => {
     expect(data).toEqual({
       success: true,
       data: payload,
-      message: 'Success'
+      message: 'Success',
+    })
+  })
+})
+
+describe('errorResponse', () => {
+  it('creates a Response with error payload, message, status, and details', async () => {
+    const { errorResponse } = await import('../_shared')
+    const response = errorResponse(400, 'Bad Request', 'Invalid input', {
+      field: 'name',
+    })
+
+    expect(response.status).toBe(400)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+
+    const data = await response.json()
+    expect(data).toEqual({
+      success: false,
+      error: 'Bad Request',
+      message: 'Invalid input',
+      details: { field: 'name' },
+    })
+  })
+
+  it('omits the details key when details is undefined', async () => {
+    const { errorResponse } = await import('../_shared')
+    const response = errorResponse(404, 'Not Found', 'Memory not found')
+
+    expect(response.status).toBe(404)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+
+    const data = await response.json()
+    expect(data).toEqual({
+      success: false,
+      error: 'Not Found',
+      message: 'Memory not found',
+    })
+    expect('details' in data).toBe(false)
+  })
+
+  it('omits the details key when details is an empty object (falsy)', async () => {
+    const { errorResponse } = await import('../_shared')
+    const response = errorResponse(400, 'Bad Request', 'Invalid input', {})
+
+    const data = await response.json()
+    expect(data).toEqual({
+      success: false,
+      error: 'Bad Request',
+      message: 'Invalid input',
+    })
+    expect('details' in data).toBe(false)
+  })
+
+  it('includes details verbatim when present (object, array, string)', async () => {
+    const { errorResponse } = await import('../_shared')
+
+    const objectRes = errorResponse(400, 'Bad Request', 'Invalid', {
+      reason: 'too long',
+    })
+    const objectData = await objectRes.json()
+    expect(objectData['details']).toEqual({ reason: 'too long' })
+
+    const arrayRes = errorResponse(400, 'Bad Request', 'Invalid', [
+      'field-a',
+      'field-b',
+    ])
+    const arrayData = await arrayRes.json()
+    expect(arrayData['details']).toEqual(['field-a', 'field-b'])
+
+    const stringRes = errorResponse(
+      400,
+      'Bad Request',
+      'Invalid',
+      'single-line detail',
+    )
+    const stringData = await stringRes.json()
+    expect(stringData['details']).toBe('single-line detail')
+  })
+
+  it('preserves HTTP status codes 404 and 500 end-to-end', async () => {
+    const { errorResponse } = await import('../_shared')
+
+    const notFound = errorResponse(404, 'Not Found', 'Memory not found')
+    expect(notFound.status).toBe(404)
+
+    const serverError = errorResponse(
+      500,
+      'Internal Server Error',
+      'Unexpected failure',
+    )
+    expect(serverError.status).toBe(500)
+
+    const serverData = await serverError.json()
+    expect(serverData).toEqual({
+      success: false,
+      error: 'Internal Server Error',
+      message: 'Unexpected failure',
     })
   })
 })

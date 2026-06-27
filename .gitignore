@@ -20,6 +20,7 @@
 .kiro_tmp/
 .oxlintignore/
 .superpowers/
+.ralph-tui
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
