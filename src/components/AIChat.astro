@@ -21,7 +21,7 @@ const {
 } = Astro.props
 ---
 
-<div class="w-full max-w-2xl mx-auto transition-colors duration-300">
+<div class="w-full max-w-2xl mx-auto transition-colors duration-300" role="region" aria-label={title || 'AI Chat'}>
   {
     title && (
       <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">

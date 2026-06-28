@@ -1,0 +1,1 @@
+## 2026-06-28 - Added landmark region to AI Chat | Learning: Astro files often serve as structural wrappers for interactive client components. Adding ARIA region roles to these wrappers improves screen reader navigation without affecting the inner React component. | Action: Added role='region' and aria-labelledby to the main chat wrapper div.
