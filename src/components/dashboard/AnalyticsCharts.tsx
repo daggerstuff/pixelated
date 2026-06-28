@@ -49,7 +49,7 @@ const ErrorDisplay: FC<ErrorDisplayProps> = ({ error, onRetry }) => (
       </div>
       <button
         onClick={onRetry}
-        className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900"
+        className="bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-500 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       >
         Retry
       </button>
@@ -88,7 +88,7 @@ const TimeRangeSelector: FC<TimeRangeSelectorProps> = memo(
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={value === option.value}
-            className={`rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 focus-visible:ring-blue-500 ${
+            className={`focus-visible:ring-offset-white dark:focus-visible:ring-offset-slate-900 focus-visible:ring-blue-500 rounded px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
               value === option.value
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

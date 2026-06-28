@@ -1,5 +1,6 @@
-// import type { APIRoute } from 'astro'
 import { z } from 'zod'
+import { protectRoute } from '@/lib/auth/serverAuth'
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
 
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
