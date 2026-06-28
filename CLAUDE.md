@@ -24,8 +24,8 @@
 ### ✅ Always
 
 - **No Project-level Littering**: Keep all agent-specific configurations,
-  skills, and dotfiles at global level (`~/.claude`). Never commit
-  project-level config folders (e.g. `.claude` at repo root).
+  skills, and dotfiles at global level (`~/.claude`). Never commit project-level
+  config folders (e.g. `.claude` at repo root).
 - Follow root `AGENTS.md` exactly, then this file and scoped `AGENTS.md` under
   touched directories.
 - Apply root behavioral defaults: assumptions-first, simplicity, surgical edits,
@@ -37,12 +37,12 @@
 - Use `uv run` for Python execution where possible.
 - Keep context scoped: prefer root-level defaults w/ path-specific overrides.
 - Start every task by running Foresight continuity calls before edits:
-  `manage_subconscious` (`list` `get` for `pending_items`
-  `project_context`) `search_memories` for active/upcoming work.
-  - If these calls are unavailable, pause edits and switch to local
-    continuity fallback.
+  `manage_subconscious` (`list` `get` for `pending_items` `project_context`)
+  `search_memories` for active/upcoming work.
+  - If these calls are unavailable, pause edits and switch to local continuity
+    fallback.
 - **Prefer Droid's structured workflows** for non-trivial code:
-  - **Spec Mode** (`Shift+Tab`  `/spec`) for well-scoped single features —
+  - **Spec Mode** (`Shift+Tab` `/spec`) for well-scoped single features —
     produces `IMPLEMENTATION_PLAN.md` for auditability.
   - **Missions** (`/missions`) for multi-feature refactors or 50+ file work —
     produces milestones-backed plan and orchestration via Mission Control.
@@ -72,8 +72,8 @@
 
 ## Context tooling
 
-- Foresight MCP first for active state: `manage_subconscious` (`list`  `get`
-  for `pending_items` + `project_context`), `search_memories` (`active tasks`
+- Foresight MCP first for active state: `manage_subconscious` (`list` `get` for
+  `pending_items` + `project_context`), `search_memories` (`active tasks`
   `upcoming work`owner/team scope), then `manage_memories` as needed.
 - Root `AGENTS.md` is main source of truth.
 - For scoped rules, prefer nested instruction files (`AGENTS.md` under touched
