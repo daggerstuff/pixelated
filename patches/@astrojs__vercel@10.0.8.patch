@@ -1,0 +1,13 @@
+diff --git a/dist/lib/nft.js b/dist/lib/nft.js
+index 27147c99ad52f891317d9ab4e428e5f71c7ced65..304f6af41a1cf99e1d9dd0307b5464376c0c89c1 100644
+--- a/dist/lib/nft.js
++++ b/dist/lib/nft.js
+@@ -40,7 +40,7 @@ async function copyDependenciesToFunction({
+     }
+   }
+   const commonAncestor = await copyFilesToFolder(
+-    [...result.fileList].map((file) => new URL(file, base)).concat(includeFiles),
++    [...result.fileList].map((file) => new URL(file.replace(/%/g, '%25').replace(/#/g, '%23'), base)).concat(includeFiles),
+     outDir,
+     excludeFiles
+   );
