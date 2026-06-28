@@ -37,7 +37,10 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
     sessionId: 'placeholder-session', // Placeholder session ID
     onMessage: (message) => {
       try {
-        const data = JSON.parse(message.content) as { type: string; data: unknown }
+        const data = JSON.parse(message.content) as {
+          type: string
+          data: unknown
+        }
 
         switch (data.type) {
           case 'notifications':
@@ -49,8 +52,9 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
             setNotifications(notifications)
             setUnreadCount(
               notifications.filter(
-                (n: NotificationItem) => n.status === NotificationStatus.PENDING
-              ).length
+                (n: NotificationItem) =>
+                  n.status === NotificationStatus.PENDING,
+              ).length,
             )
             break
           case 'notification':
