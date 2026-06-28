@@ -840,7 +840,7 @@ importers:
         specifier: latest
         version: 1.70.0(oxlint-tsgolint@0.23.0)
       oxlint-tsgolint:
-        specifier: latest
+        specifier: 0.23.0
         version: 0.23.0
       path-to-regexp:
         specifier: 6.3.0

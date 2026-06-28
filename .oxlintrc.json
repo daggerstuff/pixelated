@@ -36,7 +36,8 @@
     "test": "readonly"
   },
   "options": {
-    "typeAware": true
+    "typeAware": true,
+    "typeCheck": true
   },
   "plugins": ["import", "typescript", "react", "vitest"],
   "categories": {
