@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - OPENAI_API_BASE_URL=http://172.17.0.1:12434/v1
+      - OPENAI_API_KEY=dummy
+    networks:
+      - default
+      - proxy
+    volumes:
+      - open-webui:/app/backend/data
+    restart: always
+
+volumes:
+  open-webui:
+
+networks:
+  proxy:
+    external: true

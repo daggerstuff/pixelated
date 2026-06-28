@@ -1,0 +1,14 @@
+# ML training data - not needed at runtime
+ai/training/
+ai/training_corpus/
+ai/core/
+ai/sourcing/
+ai/scripts/
+ai/tests/
+
+# Local dev artifacts
+.env
+.env.local
+scratch/
+tmp/
+tests/results/
