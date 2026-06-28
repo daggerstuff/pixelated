@@ -1,1 +1,50 @@
-{"data":{"team":{"states":{"nodes":[{"id":"7a9b3cbc-c26b-4b8f-91f3-b9ae26022c01","name":"Triage","type":"triage"},{"id":"1870403e-4e86-4702-938b-6a8d60827499","name":"In Review","type":"started"},{"id":"d47f8fab-abb9-474e-879b-9c581a9852ed","name":"Todo","type":"unstarted"},{"id":"7a263ba2-7184-4a62-8882-0dbc56f7822b","name":"In Progress","type":"started"},{"id":"74b11563-2856-45f3-bcb7-e813702cd73f","name":"Backlog","type":"backlog"},{"id":"6024760d-da33-4bf4-b3bf-463546bbef4a","name":"Done","type":"completed"},{"id":"1a98745d-dd54-4796-bc6d-12fc794f8cea","name":"Canceled","type":"canceled"},{"id":"0b40a450-946c-48b0-9e85-d0676c800b76","name":"Duplicate","type":"duplicate"}]}}}}
+{
+  "data": {
+    "team": {
+      "states": {
+        "nodes": [
+          {
+            "id": "7a9b3cbc-c26b-4b8f-91f3-b9ae26022c01",
+            "name": "Triage",
+            "type": "triage"
+          },
+          {
+            "id": "1870403e-4e86-4702-938b-6a8d60827499",
+            "name": "In Review",
+            "type": "started"
+          },
+          {
+            "id": "d47f8fab-abb9-474e-879b-9c581a9852ed",
+            "name": "Todo",
+            "type": "unstarted"
+          },
+          {
+            "id": "7a263ba2-7184-4a62-8882-0dbc56f7822b",
+            "name": "In Progress",
+            "type": "started"
+          },
+          {
+            "id": "74b11563-2856-45f3-bcb7-e813702cd73f",
+            "name": "Backlog",
+            "type": "backlog"
+          },
+          {
+            "id": "6024760d-da33-4bf4-b3bf-463546bbef4a",
+            "name": "Done",
+            "type": "completed"
+          },
+          {
+            "id": "1a98745d-dd54-4796-bc6d-12fc794f8cea",
+            "name": "Canceled",
+            "type": "canceled"
+          },
+          {
+            "id": "0b40a450-946c-48b0-9e85-d0676c800b76",
+            "name": "Duplicate",
+            "type": "duplicate"
+          }
+        ]
+      }
+    }
+  }
+}
