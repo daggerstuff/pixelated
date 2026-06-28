@@ -72,10 +72,10 @@ test('login form shows validation errors', async ({ page }) => {
     () => {
       const emailError = document.getElementById('email-error')
       const passwordError = document.getElementById('password-error')
-      if (!emailError || !passwordError) return false;
-      const eText = emailError.textContent || '';
-      const pText = passwordError.textContent || '';
-      return eText.trim().length > 0 && pText.trim().length > 0;
+      if (!emailError || !passwordError) return false
+      const eText = emailError.textContent || ''
+      const pText = passwordError.textContent || ''
+      return eText.trim().length > 0 && pText.trim().length > 0
     },
     { timeout: 10000 },
   )
@@ -165,7 +165,9 @@ test('login page has proper transitions', async ({ page }) => {
       const heading = document.querySelector(
         '[data-testid="reset-password-heading"]',
       )
-      return heading !== null && heading?.textContent?.includes('Reset Password')
+      return (
+        heading !== null && heading?.textContent?.includes('Reset Password')
+      )
     },
     { timeout: 15000 },
   )
