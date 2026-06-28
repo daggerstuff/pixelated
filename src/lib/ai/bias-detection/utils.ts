@@ -748,13 +748,87 @@ export function getAllowedOrigin(origin: string | undefined): string {
 
   const allowedOrigins = allowedOriginsEnv.split(',').map((o) => o.trim())
 
-  if (allowedOrigins.includes('*')) {
-    return '*'
-  }
-
   if (origin && allowedOrigins.includes(origin)) {
     return origin
   }
 
   return ''
 }
+
+// Unit tests for getAllowedOrigin function
+describe('getAllowedOrigin', () => {
+  const originalEnv = process.env['ALLOWED_ORIGINS']
+
+  afterEach(() => {
+    // Restore original environment
+    if (originalEnv === undefined) {
+      delete process.env['ALLOWED_ORIGINS']
+    } else {
+      process.env['ALLOWED_ORIGINS'] = originalEnv
+    }
+  })
+
+  describe('when ALLOWED_ORIGINS is not set', () => {
+    it('should return empty string for undefined origin', () => {
+      delete process.env['ALLOWED_ORIGINS']
+      const result = getAllowedOrigin(undefined)
+      expect(result).toBe('')
+    })
+
+    it('should return empty string for any origin', () => {
+      delete process.env['ALLOWED_ORIGINS']
+      const result = getAllowedOrigin('https://example.com')
+      expect(result).toBe('')
+    })
+  })
+
+  describe('when ALLOWED_ORIGINS is set', () => {
+    it('should return empty string when origin is not in allowed list', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://allowed1.com,https://allowed2.com'
+      const result = getAllowedOrigin('https://disallowed.com')
+      expect(result).toBe('')
+    })
+
+    it('should return the origin when it is in the allowed list', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://allowed1.com,https://allowed2.com'
+      const result = getAllowedOrigin('https://allowed1.com')
+      expect(result).toBe('https://allowed1.com')
+    })
+
+    it('should handle origins with extra whitespace', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://allowed1.com , https://allowed2.com'
+      const result = getAllowedOrigin('https://allowed2.com')
+      expect(result).toBe('https://allowed2.com')
+    })
+
+    it('should return empty string for undefined origin even when allowed list exists', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://allowed1.com'
+      const result = getAllowedOrigin(undefined)
+      expect(result).toBe('')
+    })
+
+    it('should be case-sensitive when matching origins', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://Allowed.COM'
+      const result = getAllowedOrigin('https://allowed.com')
+      expect(result).toBe('')
+    })
+
+    it('should handle single allowed origin', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://only-allowed.com'
+      const result = getAllowedOrigin('https://only-allowed.com')
+      expect(result).toBe('https://only-allowed.com')
+    })
+
+    it('should handle origins with ports', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://example.com:8080'
+      const result = getAllowedOrigin('https://example.com:8080')
+      expect(result).toBe('https://example.com:8080')
+    })
+
+    it('should return empty string when origin has different port', () => {
+      process.env['ALLOWED_ORIGINS'] = 'https://example.com:8080'
+      const result = getAllowedOrigin('https://example.com:3000')
+      expect(result).toBe('')
+    })
+  })
+})
