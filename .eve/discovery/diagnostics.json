@@ -32,8 +32,6 @@
     },
     {
       "code": "discover/unsupported-directory",
-      "message": "Ignoring unsupported directory \".codegraph/\" in the agent root.",
-      "sourcePath": "/home/vivi/pixelated/.codegraph",
       "severity": "warning"
     },
     {
