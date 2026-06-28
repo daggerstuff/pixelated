@@ -145,6 +145,7 @@ wandb/
 wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
+unsloth_compiled_cache/
 
 # === SECRETS & ENVIRONMENT ===
 !.env.example
