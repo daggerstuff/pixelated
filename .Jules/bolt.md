@@ -1,1 +1,0 @@
-## 2024-05-18 - [Optimization] | Technique: [Deferred Hydration] | Learning: [Deferring hydration of heavy interactive components using client:visible improves initial page load without sacrificing functionality.]
