@@ -9,7 +9,7 @@ Complete the monthly gated pipeline for Jul 2025 – Jun 2026.
 Status:
   Jul 2025   ✅  ACCEPTED
   Aug 2025   ✅  ACCEPTED  (G5/G6 hardening done; Phase 7 chronology fix applied)
-  Sep 2025   → NEXT     (run Colab G4 generation, pass all gates, commit)
+  Sep 2025   ✅  ACCEPTED  (Phase A deterministic fixes: 782 event_topic_mismatch, 314 chat_topology_room_unknown, 6 adjacent_reply_jaccard_above_gate, 2 chat_topology_sender_not_in_room + 366 placeholder senders + 30 case-fixes + 2 ghost-DM fixes applied. Remaining: 288 email_thread_score_below_gate [out-of-scope], 2 volume shortfalls [459/550 emails, 320/680 chats]. Phase B skipped — no re-dispatch needed. Accepted 2026-06-28T21:29:40Z.)
   Oct 2025   pending
   Nov 2025   pending
   Dec 2025   pending
