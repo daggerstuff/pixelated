@@ -461,15 +461,15 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "path-to-regexp": "8.4.2",
     "brace-expansion": "5.0.6",
     "form-data": "4.0.6",
-    "js-yaml": "4.1.2"
+    "js-yaml": "4.1.2",
+    "path-to-regexp": "8.4.2"
   },
   "engines": {
     "node": ">=24"
   },
-  "packageManager": "pnpm@11.9.0",
+  "packageManager": "pnpm@11.7.0",
   "allowScripts": {
     "file:../../protobufjs@7.6.1/node_modules/protobufjs": true,
     "file:../protobufjs@7.6.1/node_modules/protobufjs": true
