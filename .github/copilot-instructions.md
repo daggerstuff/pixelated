@@ -19,7 +19,7 @@ Concise repo guidance for GitHub Copilot in this project.
 - Never include credentials, patient data, or sensitive info in code, logs,
   tests, or commits.
 - Preserve therapeutic and privacy context in user-facing output.
-- Do not use `context-mode`  `context-mode_*` workflows.
+- Do not use `context-mode` `context-mode_*` workflows.
 - Verify behavior before declaring completion.
 
 ## 3) NVIDIA NIM Setup
@@ -47,8 +47,8 @@ This script sets following environment variables:
 
 ### Available NIM Models
 
-You can switch btw different NVIDIA NIM models by setting
-`COPILOT_MODEL` environment variable:
+You can switch btw different NVIDIA NIM models by setting `COPILOT_MODEL`
+environment variable:
 
 | Model ID                                   | Context Length | Best For                                 |
 | ------------------------------------------ | -------------- | ---------------------------------------- |
@@ -76,8 +76,8 @@ echo 'export COPILOT_MODEL="openai/gpt-oss-120b"' >> ~/.bashrc
 
 ### Rate Limit Handling
 
- project includes `copilot-safe-run.sh` script that provides automatic
-fallback and retry logic for handling rate limits:
+project includes `copilot-safe-run.sh` script that provides automatic fallback
+and retry logic for handling rate limits:
 
 ```bash
 # Instead of running copilot directly, use:
@@ -106,8 +106,8 @@ scripts/devops/copilot-safe-run.sh copilot --version
 
 ### Persistent GitHub auth
 
-To avoid re-authenticating in every new terminal, set your GitHub token in
-shell startup file such as `~/.bashrc`  `~/.zshrc`
+To avoid re-authenticating in every new terminal, set your GitHub token in shell
+startup file such as `~/.bashrc` `~/.zshrc`
 
 ```bash
 export GH_TOKEN="ghp_your_token_here"
@@ -143,8 +143,7 @@ hardcoding token in your shell profile.
 - `pnpm test` `pnpm test:unit` `pnpm test:integration`
 - `pnpm test:evals` `pnpm test:bias-detection`
 - `pnpm e2e` `pnpm e2e:ui` `pnpm e2e:debug`
-- `pnpm lint` `pnpm lint:fix` `pnpm format` `pnpm format:check`
-  `pnpm typecheck`
+- `pnpm lint` `pnpm lint:fix` `pnpm format` `pnpm format:check` `pnpm typecheck`
 - `pnpm security:check` for security-relevant changes.
 
 ### Release
@@ -196,4 +195,3 @@ Orientation flow:
 - Enabled: `context7` `linear` `brave-search` `firecrawl`.
 - Disabled: `github` `playwright` `sentry` `e2b-sandbox`.
 - Use standard tooling when those are unavailable.
-
