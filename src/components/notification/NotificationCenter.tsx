@@ -13,6 +13,20 @@ interface NotificationCenterProps {
   className?: string
 }
 
+function isValidNotificationItem(item: unknown): item is NotificationItem {
+  if (typeof item !== 'object' || item === null) {
+    return false
+  }
+  const obj = item as Record<string, unknown>
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.title === 'string' &&
+    typeof obj.body === 'string' &&
+    typeof obj.status === 'number' &&
+    typeof obj.createdAt === 'number'
+  )
+}
+
 export function NotificationCenter({ className }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
@@ -27,16 +41,26 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
 
         switch (data.type) {
           case 'notifications':
-            setNotifications((data.data as NotificationItem[]) || [])
+            // Validate that data.data is an array before casting
+            if (!Array.isArray(data.data)) {
+              return
+            }
+            const notifications = data.data as NotificationItem[]
+            setNotifications(notifications)
             setUnreadCount(
-              ((data.data as NotificationItem[]) || []).filter(
+              notifications.filter(
                 (n: NotificationItem) => n.status === NotificationStatus.PENDING
               ).length
             )
             break
           case 'notification':
-            setNotifications((prev) => [(data.data as NotificationItem), ...prev])
-            if ((data.data as NotificationItem).status === NotificationStatus.PENDING) {
+            // Validate that data.data is a valid NotificationItem before casting
+            if (!isValidNotificationItem(data.data)) {
+              return
+            }
+            const notification = data.data as NotificationItem
+            setNotifications((prev) => [notification, ...prev])
+            if (notification.status === NotificationStatus.PENDING) {
               setUnreadCount((prev) => prev + 1)
             }
             break
