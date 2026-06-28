@@ -40,7 +40,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
-          version: 11.7.0
+          version: 11.9.0
 
       - name: Setup pnpm cache
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae

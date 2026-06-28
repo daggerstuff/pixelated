@@ -325,3 +325,5 @@ overrides:
   zod: ^4.3.2
   solid-js: 1.9.12
   ws: '>=8.21.0'
+patchedDependencies:
+  '@astrojs/vercel@10.0.8': patches/@astrojs__vercel@10.0.8.patch
