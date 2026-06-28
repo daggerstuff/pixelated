@@ -244,6 +244,70 @@ interface BiasReport {
 }
 
 /**
+ * Fields allowed in particle interaction analytics data to prevent PII leakage
+ */
+const ALLOWED_PARTICLE_INTERACTION_FIELDS = new Set([
+  // Interaction metadata
+  "interactionType",
+  "action",
+  "component",
+  "elementId",
+  "elementType",
+  // Timing metrics
+  "duration",
+  "latency",
+  "responseTime",
+  "loadTime",
+  // UI/UX metrics
+  "scrollDepth",
+  "clickCount",
+  "hoverDuration",
+  "viewportVisible",
+  // Feature flags
+  "featureEnabled",
+  "variant",
+  "experimentId",
+  // Performance metrics
+  "fps",
+  "memoryUsage",
+  "networkLatency",
+  // Session context (non-PII)
+  "pageUrl",
+  "referrer",
+  "deviceType",
+  "browserType",
+  "osType",
+  // Analytics counts
+  "count",
+  "value",
+  "score",
+  "rating",
+  // Error tracking (non-sensitive)
+  "errorType",
+  "errorCode",
+  "severity",
+]);
+
+/**
+ * Sanitize particle interaction data to only include analytics-relevant fields.
+ * This prevents PII or sensitive data from being stored in the database.
+ */
+function sanitizeParticleInteractionData(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    // Only include fields that are in the allowed list
+    if (ALLOWED_PARTICLE_INTERACTION_FIELDS.has(key)) {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+}
+
+/**
  * Repository for AI analysis results
  */
 export class AIRepository {
@@ -280,6 +344,25 @@ export class AIRepository {
       await mongodb.connect();
       return mongodb.getDb();
     }
+  }
+
+  /**
+   * Store particle interaction data for analytics
+   */
+  async saveParticleInteraction(
+    userId: string,
+    sessionId: string | undefined,
+    data: Record<string, unknown>
+  ): Promise<string> {
+    const collection = await this.getCollection<Record<string, unknown>>("ai_particle_interactions");
+    const documentToInsert = {
+      userId,
+      sessionId,
+      data: sanitizeParticleInteractionData(data),
+      createdAt: new Date(),
+    };
+    const { insertedId } = await collection.insertOne(documentToInsert);
+    return insertedId.toHexString();
   }
 
   /**
