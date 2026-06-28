@@ -1,8 +1,8 @@
 import { z } from 'zod'
+import type { APIRoute } from 'astro'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { protectRoute } from '@/lib/auth/serverAuth'
 import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
-
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { treatmentPlanDAO } from '@/services/mongodb.dao'
 
 import type { TreatmentPlan } from '../../../types/treatment'
@@ -47,7 +47,7 @@ const treatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = protectRoute()(async ({ locals }: AuthAPIContext) => {
+export const GET: APIRoute = protectRoute()(async ({ locals }: AuthAPIContext) => {
   try {
     const { user } = locals
 
@@ -69,7 +69,7 @@ export const GET = protectRoute()(async ({ locals }: AuthAPIContext) => {
   }
 })
 
-export const POST = protectRoute()(async ({ request, locals }: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async ({ request, locals }: AuthAPIContext) => {
   try {
     const { user } = locals
 
