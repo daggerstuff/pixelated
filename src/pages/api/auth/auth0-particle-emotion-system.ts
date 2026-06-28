@@ -346,9 +346,9 @@ export const POST: APIRoute = async ({ request }) => {
       },
     )
 
-    // TODO: Save particle interaction data for analytics
-    // const repository = new AIRepository()
-    // await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
+    // Save particle interaction data for analytics
+    const repository = new AIRepository()
+    await repository.saveParticleInteraction(user.id, sessionId, updateResponse)
 
     logger.info('Processed particle system update', {
       emotion,
@@ -406,7 +406,7 @@ function calculateEmotionProfile(sessionEmotions: any[]) {
     { count: number; totalIntensity: number }
   >()
   let totalIntensity = 0
-  let intensityValues: number[] = []
+  const intensityValues: number[] = []
 
   sessionEmotions.forEach((emotion) => {
     const emotionName = emotion.primaryEmotion ?? emotion.emotion ?? 'neutral'
