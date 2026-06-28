@@ -7,7 +7,7 @@ index 27147c99ad52f891317d9ab4e428e5f71c7ced65..304f6af41a1cf99e1d9dd0307b546437
    }
    const commonAncestor = await copyFilesToFolder(
 -    [...result.fileList].map((file) => new URL(file, base)).concat(includeFiles),
-+    [...result.fileList].map((file) => new URL(file.replace(/%/g, '%25'), base)).concat(includeFiles),
++    [...result.fileList].map((file) => new URL(file.replace(/%/g, '%25').replace(/#/g, '%23'), base)).concat(includeFiles),
      outDir,
      excludeFiles
    );
