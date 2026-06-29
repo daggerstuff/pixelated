@@ -5,6 +5,7 @@ import { parse } from 'url'
 // IMPORTANT: Import Sentry instrumentation before constructing the service.
 import { Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('server')
 import { BiasDetectionEngine } from './BiasDetectionEngine'
 import type { TherapeuticSession } from './types'
 import { getAllowedOrigin } from './utils'
@@ -411,16 +412,16 @@ class BiasDetectionServer {
         appLogger.info(
           `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
         )
-        console.log(
+        appLogger.info(
           `Bias Detection Service started on port ${BIAS_DETECTION_PORT}`,
         )
-        console.log('Available endpoints:')
-        console.log('  GET /health - Health check')
-        console.log('  POST /analyze - Single session bias analysis')
-        console.log('  POST /analyze/batch - Batch session bias analysis')
-        console.log('  GET /dashboard - Dashboard data')
-        console.log('  GET /performance - Performance statistics')
-        console.log(
+        appLogger.info('Available endpoints:')
+        appLogger.info('  GET /health - Health check')
+        appLogger.info('  POST /analyze - Single session bias analysis')
+        appLogger.info('  POST /analyze/batch - Batch session bias analysis')
+        appLogger.info('  GET /dashboard - Dashboard data')
+        appLogger.info('  GET /performance - Performance statistics')
+        appLogger.info(
           '  GET /session/{sessionId} - Get analysis result for specific session',
         )
 
@@ -453,7 +454,7 @@ class BiasDetectionServer {
         this.server!.close(() => {
           this.isRunning = false
           appLogger.info('Bias Detection Service stopped')
-          console.log('Bias Detection Service stopped')
+          appLogger.info('Bias Detection Service stopped')
           resolve()
         })
       })
@@ -474,7 +475,7 @@ process.on('SIGINT',  async () =>
 
 // Start server
 biasDetectionServer.start().catch((error) => {
-  console.error('Failed to start Bias Detection service:', error)
+  appLogger.error('Failed to start Bias Detection service:', error)
   Sentry.captureException(error)
   process.exit(1)
 })

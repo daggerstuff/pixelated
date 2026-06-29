@@ -76,7 +76,7 @@ export class RedisService extends EventEmitter implements IRedisService {
 
             // ALWAYS use the file password if available, as it's the source of truth
             this.config['password'] = password
-            console.log(
+            logger.info(
               `[RedisService] Password loaded from ${redisPasswordFile}`,
             )
 

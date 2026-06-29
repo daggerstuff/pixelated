@@ -48,9 +48,9 @@ export async function initializeSecurityTables(): Promise<void> {
     await securityEventsCollection.createIndex({ created_at: 1 })
     await securityEventsCollection.createIndex({ ip_address: 1 })
 
-    console.warn('Security collections and indexes initialized successfully')
+    logger.warn('Security collections and indexes initialized successfully')
   } catch (error: unknown) {
-    console.error(
+    logger.error(
       'Failed to initialize security collections:',
       error instanceof Error ? error : new Error(String(error)),
     )
@@ -65,7 +65,7 @@ export async function initializeSecurityDatabase(): Promise<void> {
   try {
     await initializeSecurityTables()
   } catch (error: unknown) {
-    console.error(
+    logger.error(
       'Failed to initialize security database:',
       error instanceof Error ? error : new Error(String(error)),
     )

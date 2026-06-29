@@ -5,6 +5,8 @@ import Redis from 'ioredis'
 import mongoose from 'mongoose'
 import type { Connection } from 'mongoose'
 import { Pool, PoolClient } from 'pg'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('connection')
 
 // ============================================================================
 // CONNECTION INSTANCES
@@ -42,20 +44,20 @@ export async function connectMongoDB(): Promise<MongoConnection> {
 
     // Event listeners
     mongoose.connection.on('connected', () => {
-      console.log('MongoDB connected event')
+      logger.info('MongoDB connected event')
     })
 
     mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err)
+      logger.error('MongoDB connection error:', err)
     })
 
     mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected')
+      logger.info('MongoDB disconnected')
     })
 
     return mongoConnection
   } catch (error: unknown) {
-    console.error('MongoDB connection failed:', error)
+    logger.error('MongoDB connection failed:', error)
     throw error
   }
 }
@@ -85,17 +87,17 @@ export async function connectPostgreSQL(): Promise<Pool> {
     // Test connection
     const client = await postgresPool.connect()
     const result = await client.query('SELECT NOW()')
-    console.log('PostgreSQL connection test:', result.rows[0])
+    logger.info('PostgreSQL connection test:', result.rows[0])
     client.release()
 
     // Event listeners
     postgresPool.on('error', (err) => {
-      console.error('Unexpected error on idle client', err)
+      logger.error('Unexpected error on idle client', err)
     })
 
     return postgresPool
   } catch (error: unknown) {
-    console.error('PostgreSQL connection failed:', error)
+    logger.error('PostgreSQL connection failed:', error)
     throw error
   }
 }
@@ -123,20 +125,20 @@ export async function connectRedis(): Promise<Redis> {
     })
 
     redisClient.on('connect', () => {
-      console.log('Redis connected')
+      logger.info('Redis connected')
     })
 
     redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err)
+      logger.error('Redis connection error:', err)
     })
 
     // Test connection
     await redisClient.ping()
-    console.log('Redis connection test: PONG')
+    logger.info('Redis connection test: PONG')
 
     return redisClient
   } catch (error: unknown) {
-    console.error('Redis connection failed:', error)
+    logger.error('Redis connection failed:', error)
     throw error
   }
 }
@@ -188,7 +190,7 @@ export async function disconnectMongoDB(): Promise<void> {
   if (mongoConnection) {
     await mongoose.disconnect()
     mongoConnection = null
-    console.log('MongoDB disconnected')
+    logger.info('MongoDB disconnected')
   }
 }
 
@@ -196,7 +198,7 @@ export async function disconnectPostgreSQL(): Promise<void> {
   if (postgresPool) {
     await postgresPool.end()
     postgresPool = null
-    console.log('PostgreSQL pool closed')
+    logger.info('PostgreSQL pool closed')
   }
 }
 
@@ -204,7 +206,7 @@ export async function disconnectRedis(): Promise<void> {
   if (redisClient) {
     await redisClient.quit()
     redisClient = null
-    console.log('Redis disconnected')
+    logger.info('Redis disconnected')
   }
 }
 

@@ -4,53 +4,49 @@
  * support for different environments and log levels
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error'
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 interface LoggerOptions {
-  level: LogLevel
-  prefix?: string
-  enabled: boolean
-  environment?: 'development' | 'test' | 'production'
-  redact?: string[]
+  level: LogLevel;
+  prefix?: string;
+  enabled: boolean;
+  environment?: "development" | "test" | "production";
+  redact?: string[];
 }
 
-let baseLoggerInstance: Logger | null = null
+let baseLoggerInstance: Logger | null = null;
 
 class Logger {
-  private options: LoggerOptions
+  private options: LoggerOptions;
 
   constructor(options?: Partial<LoggerOptions>) {
-    const nodeEnv = process.env['NODE_ENV']
+    const nodeEnv = process.env["NODE_ENV"];
     this.options = {
-      level: 'info',
+      level: "info",
       enabled: true,
       environment:
-        nodeEnv === 'development' ||
-        nodeEnv === 'test' ||
-        nodeEnv === 'production'
+        nodeEnv === "development" || nodeEnv === "test" || nodeEnv === "production"
           ? nodeEnv
-          : 'development',
+          : "development",
       ...options,
-    }
+    };
   }
 
   /**
    * Redact sensitive keys from an object
    */
   private redact(obj: unknown, keys: string[]): unknown {
-    if (!obj || typeof obj !== 'object') {
-      return obj
+    if (!obj || typeof obj !== "object") {
+      return obj;
     }
 
-    const newObj = Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => [key, value]),
-    )
+    const newObj = Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, value]));
     for (const key of keys) {
       if (key in newObj) {
-        newObj[key] = '[REDACTED]'
+        newObj[key] = "[REDACTED]";
       }
     }
-    return newObj
+    return newObj;
   }
 
   /**
@@ -60,28 +56,28 @@ class Logger {
     this.options = {
       ...this.options,
       ...options,
-    }
+    };
   }
 
   /**
    * Log a debug message
    */
   debug(message: string, ...args: unknown[]): void {
-    this.log('debug', message, ...args)
+    this.log("debug", message, ...args);
   }
 
   /**
    * Log an info message
    */
   info(message: string, ...args: unknown[]): void {
-    this.log('info', message, ...args)
+    this.log("info", message, ...args);
   }
 
   /**
    * Log a warning message
    */
   warn(message: string, ...args: unknown[]): void {
-    this.log('warn', message, ...args)
+    this.log("warn", message, ...args);
   }
 
   /**
@@ -89,14 +85,9 @@ class Logger {
    */
   error(message: string | Error, ...args: unknown[]): void {
     if (message instanceof Error) {
-      this.log(
-        'error',
-        message.message,
-        { error: message, stack: message.stack },
-        ...args,
-      )
+      this.log("error", message.message, { error: message, stack: message.stack }, ...args);
     } else {
-      this.log('error', message, ...args)
+      this.log("error", message, ...args);
     }
   }
 
@@ -107,7 +98,7 @@ class Logger {
     return new Logger({
       ...this.options,
       prefix: this.options.prefix ? `${this.options.prefix}:${prefix}` : prefix,
-    })
+    });
   }
 
   /**
@@ -115,68 +106,60 @@ class Logger {
    */
   private log(level: LogLevel, message: string, ...args: unknown[]): void {
     if (!this.isLevelEnabled(level) || !this.options.enabled) {
-      return
+      return;
     }
 
     // Skip debug logs in production
-    if (level === 'debug' && this.options.environment === 'production') {
-      return
+    if (level === "debug" && this.options.environment === "production") {
+      return;
     }
 
-    const timestamp = new Date().toISOString()
-    const prefix = this.options.prefix ? `[${this.options.prefix}]` : ''
-    const formattedMessage = `${timestamp} ${level.toUpperCase()} ${prefix} ${message}`
+    const timestamp = new Date().toISOString();
+    const prefix = this.options.prefix ? `[${this.options.prefix}]` : "";
+    const formattedMessage = `${timestamp} ${level.toUpperCase()} ${prefix} ${message}`;
 
     // Redact sensitive data if needed
     const redactedArgs = this.options.redact
       ? args.map((arg) => this.redact(arg, this.options.redact!))
-      : args
+      : args;
 
     // Browser or server logging
-    if (typeof window !== 'undefined') {
-      this.browserLog(level, formattedMessage, ...redactedArgs)
+    if (typeof window !== "undefined") {
+      this.browserLog(level, formattedMessage, ...redactedArgs);
     } else {
-      this.serverLog(level, formattedMessage, ...redactedArgs)
+      this.serverLog(level, formattedMessage, ...redactedArgs);
     }
   }
 
   /**
    * Browser-specific logging
    */
-  private browserLog(
-    level: LogLevel,
-    message: string,
-    ...args: unknown[]
-  ): void {
+  private browserLog(level: LogLevel, message: string, ...args: unknown[]): void {
     switch (level) {
-      case 'debug':
-        console.debug(message, ...args)
-        break
-      case 'info':
-        console.info(message, ...args)
-        break
-      case 'warn':
-        console.warn(message, ...args)
-        break
-      case 'error':
-        console.error(message, ...args)
-        break
+      case "debug":
+        console.debug(message, ...args);
+        break;
+      case "info":
+        console.info(message, ...args);
+        break;
+      case "warn":
+        console.warn(message, ...args);
+        break;
+      case "error":
+        console.error(message, ...args);
+        break;
       default:
-        console.log(message, ...args)
+        console.info(message, ...args);
     }
   }
 
   /**
    * Server-specific logging
    */
-  private serverLog(
-    level: LogLevel,
-    message: string,
-    ...args: unknown[]
-  ): void {
+  private serverLog(level: LogLevel, message: string, ...args: unknown[]): void {
     // On the server side, we could integrate with more advanced
     // logging systems like Winston or Pino, but for now we use console
-    this.browserLog(level, message, ...args)
+    this.browserLog(level, message, ...args);
   }
 
   /**
@@ -188,9 +171,9 @@ class Logger {
       info: 1,
       warn: 2,
       error: 3,
-    }
+    };
 
-    return logLevels[level] >= logLevels[this.options.level]
+    return logLevels[level] >= logLevels[this.options.level];
   }
 }
 
@@ -200,13 +183,13 @@ class Logger {
  * Refactored to avoid TDZ/circular import issues.
  */
 export function getLogger(prefix?: string): Logger {
-  baseLoggerInstance ??= new Logger()
-  const baseLogger: Logger = baseLoggerInstance
-  return prefix ? baseLogger.child(prefix) : baseLogger
+  baseLoggerInstance ??= new Logger();
+  const baseLogger: Logger = baseLoggerInstance;
+  return prefix ? baseLogger.child(prefix) : baseLogger;
 }
 
 // Export the Logger class
-export { Logger }
+export { Logger };
 
 // DO NOT export a top-level logger instance to avoid circular import issues
 // If you need a default logger, use createBuildSafeLogger("default") directly in your code.

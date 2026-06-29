@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { journalResearchApiClient } from '@/lib/api/journal-research'
 import storageManager from '@/utils/storage/storageManager'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('useWebSocket')
 
 const getAuthToken = () => {
   if (typeof window === 'undefined') {
@@ -18,7 +20,7 @@ const getAuthToken = () => {
     }
     return token.startsWith('Bearer ') ? token.slice(7) : token
   } catch (error: unknown) {
-    console.warn('Failed to read auth token for WebSocket connection', error)
+    logger.warn('Failed to read auth token for WebSocket connection', error)
     return null
   }
 }
@@ -141,7 +143,7 @@ export const useJournalResearchWebSocket = ({
           onMessage?.(data as WebSocketMessage)
         }
       } catch (error: unknown) {
-        console.warn('Failed to parse WebSocket message', error)
+        logger.warn('Failed to parse WebSocket message', error)
         onError?.(error as Error)
       }
     },

@@ -236,7 +236,7 @@ export function clientSideDLP() {
           metadata: context.metadata,
         })
       } catch (e) {
-        console.error('Error in client-side DLP', e)
+        logger.error('Error in client-side DLP', e)
         // Return a DLPResult compatible object in case of an error
         return {
           allowed: true,
@@ -256,7 +256,7 @@ export function clientSideDLP() {
         })
 
         if (!result.allowed) {
-          console.warn(
+          logger.warn(
             'Clipboard copy blocked by DLP policy:',
             result.reason ?? 'Policy Violation',
           )
@@ -267,7 +267,7 @@ export function clientSideDLP() {
         await navigator.clipboard.writeText(contentToCopy)
         return true
       } catch (e) {
-        console.error('Error in clipboard DLP', e)
+        logger.error('Error in clipboard DLP', e)
         return false
       }
     },
@@ -283,7 +283,7 @@ export function clientSideDLP() {
         })
 
         if (!result.allowed) {
-          console.warn(
+          logger.warn(
             'File download blocked by DLP policy:',
             result.reason ?? 'Policy Violation',
           )
@@ -307,7 +307,7 @@ export function clientSideDLP() {
 
         return true
       } catch (e) {
-        console.error('Error in download DLP', e)
+        logger.error('Error in download DLP', e)
         return false
       }
     },
@@ -334,7 +334,7 @@ export function shouldApplyDLPToRoute(route: string): boolean {
  * Setup guide for DLP integration
  */
 export function printDLPIntegrationGuide() {
-  console.log(`
+  logger.info(`
 DLP Integration Guide
 ====================
 

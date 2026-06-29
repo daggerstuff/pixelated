@@ -1,6 +1,16 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, type Page } from '@playwright/test'
 
 import { getLoginFormLocator } from '../helpers/test-utils'
+
+async function waitForLoginFormHydration(page: Page) {
+  await expect(getLoginFormLocator(page)).toHaveAttribute(
+    'data-hydrated',
+    'true',
+    {
+      timeout: 30000,
+    },
+  )
+}
 
 // Test for login page structure
 test('login page has correct form elements', async ({ page }) => {
@@ -40,9 +50,7 @@ test('login form shows validation errors', async ({ page }) => {
   await expect(page.locator('input[type="password"]')).toBeVisible({
     timeout: 30000,
   })
-
-  // Additional wait to ensure React hydration is complete
-  await page.waitForTimeout(1000)
+  await waitForLoginFormHydration(page)
 
   // Wait for error elements to exist (they should be in DOM even if hidden)
   const emailError = page.locator('#email-error')
@@ -66,19 +74,6 @@ test('login form shows validation errors', async ({ page }) => {
     // If normal click fails (e.g., element intercepted), use force
     await submitButton.click({ force: true, timeout: 5000 })
   }
-
-  // Wait for error text content to appear (elements exist as hidden empty divs initially)
-  await page.waitForFunction(
-    () => {
-      const emailError = document.getElementById('email-error')
-      const passwordError = document.getElementById('password-error')
-      if (!emailError || !passwordError) return false
-      const eText = emailError.textContent || ''
-      const pText = passwordError.textContent || ''
-      return eText.trim().length > 0 && pText.trim().length > 0
-    },
-    { timeout: 10000 },
-  )
 
   await expect(emailError).toContainText(/required|email/i, { timeout: 5000 })
   await expect(passwordError).toContainText(/required|password/i, {
@@ -137,9 +132,7 @@ test('login page has proper transitions', async ({ page }) => {
   await expect(page.locator('input[type="email"]')).toBeVisible({
     timeout: 30000,
   })
-
-  // Additional wait to ensure React hydration is complete
-  await page.waitForTimeout(1000)
+  await waitForLoginFormHydration(page)
 
   // Look for the forgot password button using data-testid or text matching
   // The button has data-testid="forgot-password-button" according to LoginForm.tsx
@@ -158,21 +151,6 @@ test('login page has proper transitions', async ({ page }) => {
   // Click the button - this should trigger the onClick handler that sets mode to 'reset'
   await passwordResetButton.click({ timeout: 10000 })
 
-  // Wait for React to process the state update and render the reset password heading
-  // Use waitForFunction to explicitly wait for the heading element to appear in the DOM
-  await page.waitForFunction(
-    () => {
-      const heading = document.querySelector(
-        '[data-testid="reset-password-heading"]',
-      )
-      return (
-        heading !== null && heading?.textContent?.includes('Reset Password')
-      )
-    },
-    { timeout: 30000 },
-  )
-
-  // Now verify the heading is visible
   const resetPasswordHeading = page
     .locator('[data-testid="reset-password-heading"]')
     .first()

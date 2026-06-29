@@ -9,6 +9,8 @@
  */
 
 import type { ReflectionInsight } from '@pixelated/memory-schema'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('guidance-writer')
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -102,7 +104,7 @@ export class NoopGuidanceWriter implements GuidanceWriter {
  * ```ts
  * const result = proposeGuidanceUpdate(insight, { writer: myMcpWriter })
  * if (result.promoted) {
- *   console.log(`Promoted: ${result.guidanceText}`)
+ *   logger.info(`Promoted: ${result.guidanceText}`)
  * }
  * ```
  */

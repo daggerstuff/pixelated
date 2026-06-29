@@ -8,6 +8,8 @@ import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 
 import { Pool, PoolClient } from 'pg'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('index')
 
 // pg does not export these types; define locally
 export type QueryResultRow = Record<string, any>
@@ -76,7 +78,7 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
 
   // Handle pool errors
   pool.on('error', (err: unknown) => {
-    console.error('Unexpected error on idle client', err)
+    logger.error('Unexpected error on idle client', err)
     void process.exit(-1)
   })
 
@@ -84,11 +86,11 @@ export function initializeDatabase(config: Partial<DatabaseConfig> = {}): Pool {
   ;(pool as unknown as PoolWithConnectEvent).on(
     'connect',
     (_client: PoolClient) => {
-      console.log('New client connected to database')
+      logger.info('New client connected to database')
     },
   )
 
-  console.log(
+  logger.info(
     `Database pool initialized with ${finalConfig.max} max connections`,
   )
   return pool
@@ -190,7 +192,7 @@ export async function closeDatabase(): Promise<void> {
   if (pool) {
     await pool.end()
     pool = null
-    console.log('Database connection pool closed')
+    logger.info('Database connection pool closed')
   }
 }
 
@@ -253,12 +255,12 @@ export class DatabaseMigration {
    */
   async runMigrations(): Promise<void> {
     for (const [name, sql] of this.migrations) {
-      console.log(`Running migration: ${name}`)
+      logger.info(`Running migration: ${name}`)
       try {
         await query(sql)
-        console.log(`✅ Migration ${name} completed`)
+        logger.info(`✅ Migration ${name} completed`)
       } catch (error: unknown) {
-        console.error(`❌ Migration ${name} failed:`, error)
+        logger.error(`❌ Migration ${name} failed:`, error)
         throw error
       }
     }
@@ -775,13 +777,13 @@ export const biasAnalysisManager = new BiasAnalysisManager()
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('Received SIGINT, closing database connections...')
+  logger.info('Received SIGINT, closing database connections...')
   await closeDatabase()
   process.exit(0)
 })
 
 process.on('SIGTERM', async () => {
-  console.log('Received SIGTERM, closing database connections...')
+  logger.info('Received SIGTERM, closing database connections...')
   await closeDatabase()
   process.exit(0)
 })

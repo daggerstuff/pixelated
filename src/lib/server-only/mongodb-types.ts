@@ -23,6 +23,10 @@ export const ObjectIdMock = {
 }
 
 // Provide a function to get a server ObjectId if available
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+
+const mongoLogger = createBuildSafeLogger('mongodb-types')
+
 export async function getServerMongoExports() {
   if (typeof window !== 'undefined') {
     return {
@@ -47,7 +51,7 @@ export async function getServerMongoExports() {
   try {
     return await import('mongodb')
   } catch (err) {
-    console.warn('MongoDB not available, using mock ObjectId')
+    mongoLogger.warn('MongoDB not available, using mock ObjectId')
     return {
       ObjectId: class MockObjectId {
         public id: string

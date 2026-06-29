@@ -13,6 +13,8 @@ import {
 } from './auth0-rbac-service'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-middleware')
 
 export type { AuthStrategy }
 
@@ -163,7 +165,7 @@ export async function verifyAdmin(
     // Admin access verified - return null to continue
     return null
   } catch (error: unknown) {
-    console.error('Admin verification error:', error)
+    logger.error('Admin verification error:', error)
     return new Response(
       JSON.stringify({
         error: 'Internal server error during admin verification',
@@ -935,7 +937,7 @@ export async function authenticateRequest(
           }
         }
       } catch (error: unknown) {
-        console.warn('Failed to perform adaptive MFA check:', error)
+        logger.warn('Failed to perform adaptive MFA check:', error)
       }
     }
 

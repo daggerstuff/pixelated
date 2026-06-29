@@ -1,5 +1,7 @@
 import { createHash, randomBytes, scrypt, timingSafeEqual } from 'crypto'
 import { promisify } from 'util'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('hash')
 
 const scryptAsync = promisify<string, Buffer, number, Buffer>(scrypt)
 
@@ -130,7 +132,7 @@ export async function generateHash(data: string): Promise<string> {
       .join('')
   } catch (error: unknown) {
     // Fallback to simple hash if crypto not available
-    console.warn(
+    logger.warn(
       'Web Crypto API not available, using fallback hash method',
       error,
     )

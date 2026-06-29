@@ -13,6 +13,8 @@ import {
   type AnonymizedRecord,
 } from './AnonymizationPipelineService'
 import { consentManagementService } from './ConsentManagementService'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('ResearchQueryEngineService')
 
 export interface ResearchQuery {
   id: string
@@ -162,7 +164,7 @@ export class ResearchQueryEngineService {
 
       return query
     } catch (error: unknown) {
-      console.error('Error translating natural language query:', error)
+      logger.error('Error translating natural language query:', error)
       throw new Error(
         `Query translation failed: ${(error as any)?.message ?? 'Unknown error'}`,
         { cause: error },
@@ -276,7 +278,7 @@ export class ResearchQueryEngineService {
 
       return result
     } catch (error: unknown) {
-      console.error('Error executing research query:', error)
+      logger.error('Error executing research query:', error)
       throw new Error(
         `Query execution failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
         { cause: error },
@@ -317,7 +319,7 @@ export class ResearchQueryEngineService {
     this.pendingApprovals.set(query.id, approvalRequest)
 
     // Notify reviewers (simulated)
-    console.log(`Query approval requested for ${query.id}`, approvalRequest)
+    logger.info(`Query approval requested for ${query.id}`, approvalRequest)
 
     return approvalRequest
   }

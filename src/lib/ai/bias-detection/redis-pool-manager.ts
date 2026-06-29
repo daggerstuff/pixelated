@@ -377,7 +377,7 @@ export class RedisConnectionPool {
       })
 
       // Emit metrics event (using console for now - could be replaced with EventEmitter)
-      console.log('redis-pool-metrics', {
+      logger.info('redis-pool-metrics', {
         pool: this.name,
         stats: this.stats,
       })

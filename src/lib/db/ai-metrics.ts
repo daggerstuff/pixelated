@@ -1,4 +1,5 @@
-// Supabase import removed - migrate to MongoDB
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('ai-metrics') // Supabase import removed - migrate to MongoDB
 
 /**
  * Insert AI metrics into the database
@@ -22,6 +23,6 @@ export async function insertAIPerformanceMetric(_data: {
     // Example: await mongoClient.db().collection('ai_metrics').insertOne({...})
     return
   } catch (error: unknown) {
-    console.error('Error inserting AI performance metric:', error)
+    logger.error('Error inserting AI performance metric:', error)
   }
 }

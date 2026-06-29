@@ -41,7 +41,7 @@ export class DistributedRateLimiter {
 
     try {
       // Get current count
-      const current = (await redis['get'](windowKey)) as string | null
+      const current = await redis['get'](windowKey)
       const count = current ? parseInt(current) : 0
 
       // Check if limit exceeded
@@ -78,7 +78,7 @@ export class DistributedRateLimiter {
         retryAfter: null,
       }
     } catch (error: unknown) {
-      console.error('DEBUG RATE LIMITER ERROR:', error)
+      logger.error('DEBUG RATE LIMITER ERROR:', error)
       logger.error('Rate limit check failed:', {
         error: error instanceof Error ? error.message : String(error),
         identifier,

@@ -1,4 +1,6 @@
-// Simple in-memory job queue and worker for background batch analysis
+
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('job-queue')// Simple in-memory job queue and worker for background batch analysis
 // Extendable to Redis-backed queue for production
 
 export type JobStatus = 'pending' | 'in_progress' | 'completed' | 'failed'
@@ -93,7 +95,7 @@ export class JobQueue<T = any, R = any> {
     try {
       // Job processing logic would go here
     } catch {
-      console.error(`[JobQueue] Job failed`, {
+      logger.error(`[JobQueue] Job failed`, {
         jobId: job.id,
         error: job.error,
         finishedAt: Date.now(),

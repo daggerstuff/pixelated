@@ -31,6 +31,7 @@ export function LoginForm({
   const [focusedInput, setFocusedInput] = useState<string | null>(null)
   const [rememberMe, setRememberMe] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isHydrated, setIsHydrated] = useState<boolean>(false)
 
   // Validation errors
   const [errors, setErrors] = useState<{
@@ -39,6 +40,10 @@ export function LoginForm({
   }>({})
 
   // Load remembered email from localStorage
+  useEffect(() => {
+    setIsHydrated(true)
+  }, [])
+
   useEffect(() => {
     try {
       const rememberedEmail = localStorage.getItem(STORAGE_KEY_EMAIL)
@@ -318,6 +323,7 @@ export function LoginForm({
         onSubmit={handleSubmit}
         className="auth-form form-responsive"
         data-testid="login-form"
+        data-hydrated={isHydrated ? 'true' : 'false'}
       >
         <div className="form-group form-group-responsive">
           <label htmlFor="email" className="form-label text-responsive--small">

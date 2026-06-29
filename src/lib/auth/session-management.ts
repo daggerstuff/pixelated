@@ -8,6 +8,8 @@
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent } from '../security'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('session-management')
 
 export interface DeviceInfo {
   deviceId: string
@@ -290,5 +292,5 @@ export async function getUserSessions(userId: string): Promise<SessionData[]> {
 export async function cleanupExpiredSessions(): Promise<void> {
   // This would typically be run by a cron job or background process
   // For now, we'll just log that it's been called
-  console.log('Session cleanup initiated')
+  logger.info('Session cleanup initiated')
 }

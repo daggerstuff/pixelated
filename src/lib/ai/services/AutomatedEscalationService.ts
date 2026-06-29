@@ -1,6 +1,8 @@
 import type { RiskAssessment } from '@/hooks/useRiskAssessment'
 
 import type { CrisisPrediction } from './PredictiveCrisisModelingService'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('AutomatedEscalationService')
 
 export interface EscalationProtocol {
   level: 'low' | 'medium' | 'high' | 'critical' | 'emergency'
@@ -133,7 +135,7 @@ export class AutomatedEscalationService {
 
       return escalationEvent
     } catch (error: unknown) {
-      console.error('Error triggering escalation:', error)
+      logger.error('Error triggering escalation:', error)
 
       // Emergency fallback protocol
       return this.triggerEmergencyFallback(
@@ -171,7 +173,7 @@ export class AutomatedEscalationService {
           await this.queueManualAction(action, escalationEvent)
         }
       } catch (error: unknown) {
-        console.error(`Error executing action ${action.type}:`, error)
+        logger.error(`Error executing action ${action.type}:`, error)
 
         // Log failed action but continue with others
         escalationEvent.actionsExecuted.push({
@@ -216,7 +218,7 @@ export class AutomatedEscalationService {
         break
 
       default:
-        console.warn(`Unknown action type: ${action.type}`)
+        logger.warn(`Unknown action type: ${action.type}`)
     }
   }
 
@@ -246,7 +248,7 @@ export class AutomatedEscalationService {
           escalationEvent.outcomes.contactsReached.push(contact.contact)
         }
       } catch (error: unknown) {
-        console.error(`Failed to contact ${contact.contact}:`, error)
+        logger.error(`Failed to contact ${contact.contact}:`, error)
       }
     }
   }
@@ -288,7 +290,7 @@ export class AutomatedEscalationService {
         break
 
       default:
-        console.warn(`Unknown contact method: ${contact.method}`)
+        logger.warn(`Unknown contact method: ${contact.method}`)
     }
   }
 
@@ -317,7 +319,7 @@ export class AutomatedEscalationService {
     }
 
     // Store documentation (implementation would depend on storage system)
-    console.log('Crisis escalation documented:', documentation)
+    logger.info('Crisis escalation documented:', documentation)
   }
 
   /**
@@ -341,7 +343,7 @@ export class AutomatedEscalationService {
     }
 
     // Initialize monitoring (implementation would integrate with monitoring system)
-    console.log('Crisis monitoring initiated:', monitoringConfig)
+    logger.info('Crisis monitoring initiated:', monitoringConfig)
   }
 
   /**
@@ -365,7 +367,7 @@ export class AutomatedEscalationService {
     escalationEvent.outcomes.interventionsImplemented.push(interventionType)
 
     // Execute intervention (implementation would depend on intervention system)
-    console.log('Intervention triggered:', intervention)
+    logger.info('Intervention triggered:', intervention)
   }
 
   /**
@@ -653,7 +655,7 @@ export class AutomatedEscalationService {
     _prediction: CrisisPrediction,
     _assessment: RiskAssessment,
   ): Promise<EscalationEvent> {
-    console.error('Emergency fallback protocol activated')
+    logger.error('Emergency fallback protocol activated')
 
     return {
       id: this.generateEscalationId(userId, 'fallback'),
@@ -678,15 +680,15 @@ export class AutomatedEscalationService {
     subject: string,
     body: string,
   ): Promise<void> {
-    console.log(`EMAIL: ${to} - ${subject}: ${body}`)
+    logger.info(`EMAIL: ${to} - ${subject}: ${body}`)
   }
 
   private async sendSMS(to: string, message: string): Promise<void> {
-    console.log(`SMS: ${to} - ${message}`)
+    logger.info(`SMS: ${to} - ${message}`)
   }
 
   private async initiatePhoneCall(to: string, message: string): Promise<void> {
-    console.log(`CALL: ${to} - ${message}`)
+    logger.info(`CALL: ${to} - ${message}`)
   }
 
   private async sendAppNotification(
@@ -694,11 +696,11 @@ export class AutomatedEscalationService {
     title: string,
     body: string,
   ): Promise<void> {
-    console.log(`APP: ${to} - ${title}: ${body}`)
+    logger.info(`APP: ${to} - ${title}: ${body}`)
   }
 
   private async sendPagerAlert(to: string, message: string): Promise<void> {
-    console.log(`PAGER: ${to} - ${message}`)
+    logger.info(`PAGER: ${to} - ${message}`)
   }
 
   // Helper methods
@@ -749,7 +751,7 @@ export class AutomatedEscalationService {
     action: EscalationAction,
     escalationEvent: EscalationEvent,
   ): Promise<void> {
-    console.log(
+    logger.info(
       `MANUAL ACTION QUEUED: ${action.description} for escalation ${escalationEvent.id}`,
     )
   }

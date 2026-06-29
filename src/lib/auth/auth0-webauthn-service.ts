@@ -9,6 +9,8 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-webauthn-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -54,7 +56,7 @@ function initializeAuth0Clients() {
     !auth0Config.clientSecret
   ) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -157,7 +159,7 @@ export class Auth0WebAuthnService {
   constructor() {
     if (!auth0Config.domain) {
       if (shouldWarnAuth0Configuration) {
-        console.warn('Auth0 is not properly configured')
+        logger.warn('Auth0 is not properly configured')
       }
     }
 
@@ -216,7 +218,7 @@ export class Auth0WebAuthnService {
 
       return options
     } catch (error: unknown) {
-      console.error('Failed to generate WebAuthn registration options:', error)
+      logger.error('Failed to generate WebAuthn registration options:', error)
       throw new Error(
         `Failed to generate WebAuthn registration options: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -267,7 +269,7 @@ export class Auth0WebAuthnService {
 
       return newCredential
     } catch (error: unknown) {
-      console.error('Failed to verify WebAuthn registration:', error)
+      logger.error('Failed to verify WebAuthn registration:', error)
 
       // Log failed registration
       logSecurityEvent(SecurityEventType.WEBAUTHN_REGISTRATION_FAILED, null, {
@@ -332,10 +334,7 @@ export class Auth0WebAuthnService {
 
       return options
     } catch (error: unknown) {
-      console.error(
-        'Failed to generate WebAuthn authentication options:',
-        error,
-      )
+      logger.error('Failed to generate WebAuthn authentication options:', error)
       throw new Error(
         `Failed to generate WebAuthn authentication options: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -375,7 +374,7 @@ export class Auth0WebAuthnService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to verify WebAuthn authentication:', error)
+      logger.error('Failed to verify WebAuthn authentication:', error)
 
       // Log failed authentication
       logSecurityEvent(SecurityEventType.WEBAUTHN_AUTHENTICATION_FAILED, null, {
@@ -440,7 +439,7 @@ export class Auth0WebAuthnService {
 
       return credentials
     } catch (error: unknown) {
-      console.error('Failed to get user WebAuthn credentials:', error)
+      logger.error('Failed to get user WebAuthn credentials:', error)
       return []
     }
   }
@@ -470,7 +469,7 @@ export class Auth0WebAuthnService {
         `webauthn_credential_deleted_${credentialId}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to delete WebAuthn credential ${credentialId} for user ${userId}:`,
         error,
       )
@@ -506,7 +505,7 @@ export class Auth0WebAuthnService {
         `webauthn_credential_renamed_${credentialId}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to rename WebAuthn credential ${credentialId} for user ${userId}:`,
         error,
       )
@@ -573,7 +572,7 @@ export class Auth0WebAuthnService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to validate WebAuthn credential response:', error)
+      logger.error('Failed to validate WebAuthn credential response:', error)
 
       // Log validation failure
       logSecurityEvent(

@@ -1,5 +1,7 @@
 import type { EmotionAnalysis } from '@/hooks/useEmotionDetection'
 import type { RiskAssessment } from '@/hooks/useRiskAssessment'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('PredictiveCrisisModelingService')
 
 export interface CrisisRiskFactors {
   emotional: {
@@ -147,7 +149,7 @@ export class PredictiveCrisisModelingService {
         escalationTriggers,
       }
     } catch (error: unknown) {
-      console.error('Error in predictive crisis modeling:', error)
+      logger.error('Error in predictive crisis modeling:', error)
 
       // Fallback to conservative prediction
       return {

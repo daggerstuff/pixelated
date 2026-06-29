@@ -1,30 +1,31 @@
-// Analytics Service Placeholder
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('server') // Analytics Service Placeholder
 // TODO: Implement full analytics service after pulling changes from other branch
 
 const ANALYTICS_PORT = process.env['PORT'] ?? 8003
 
 const analyticsServer = {
   async start() {
-    console.log(
+    logger.info(
       `Analytics Service (placeholder) starting on port ${ANALYTICS_PORT}`,
     )
 
     // Simple health check
-    console.log('Available endpoints:')
-    console.log('  GET /health - Health check')
-    console.log('  GET /metrics - Placeholder metrics endpoint')
-    console.log('  GET /dashboard - Placeholder dashboard endpoint')
+    logger.info('Available endpoints:')
+    logger.info('  GET /health - Health check')
+    logger.info('  GET /metrics - Placeholder metrics endpoint')
+    logger.info('  GET /dashboard - Placeholder dashboard endpoint')
 
     // Simple keep-alive
     setInterval(() => {
-      console.log('Analytics Service (placeholder) is running...')
+      logger.info('Analytics Service (placeholder) is running...')
     }, 30000)
 
     return { status: 'placeholder' }
   },
 
   async stop() {
-    console.log('Analytics Service shutting down...')
+    logger.info('Analytics Service shutting down...')
     process.exit(0)
   },
 }
@@ -35,6 +36,6 @@ process.on('SIGINT', analyticsServer.stop)
 
 // Start server
 analyticsServer.start().catch((error) => {
-  console.error('Failed to start analytics service:', error)
+  logger.error('Failed to start analytics service:', error)
   process.exit(1)
 })

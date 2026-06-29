@@ -9,6 +9,8 @@ import type { Collection } from 'mongodb'
 
 import { getDatabaseConfig } from '../config/database'
 import type { AuditLog, UserId } from '../types'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('audit')
 
 export interface AuditEventInput {
   userId?: UserId
@@ -68,7 +70,7 @@ export class AuditService {
       await this.auditCollection.insertOne(auditLog)
     } catch (error: unknown) {
       // Don't throw on audit failures to avoid breaking main operations
-      console.error('Failed to log audit event:', error)
+      logger.error('Failed to log audit event:', error)
     }
   }
 

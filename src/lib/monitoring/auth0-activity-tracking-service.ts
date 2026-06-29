@@ -9,6 +9,8 @@ import { Db } from 'mongodb'
 import { mongodb } from '../../config/mongodb.config'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-activity-tracking-service')
 
 // Extended Auth0 management client interface (since some methods aren't typed)
 interface Auth0ManagementExtended {
@@ -183,7 +185,7 @@ export class Auth0ActivityTrackingService {
     // Periodically clean up old logs
     setInterval(() => {
       this.cleanupOldLogs().catch((error) => {
-        console.error('Error during log cleanup:', error)
+        logger.error('Error during log cleanup:', error)
       })
     }, 86400000) // Every 24 hours
   }
@@ -206,11 +208,11 @@ export class Auth0ActivityTrackingService {
 
     this.pollingInterval = setInterval(() => {
       this.fetchAndStoreRecentActivities().catch((error) => {
-        console.error('Error fetching recent activities:', error)
+        logger.error('Error fetching recent activities:', error)
       })
     }, this.config.pollInterval)
 
-    console.log('Started real-time activity tracking')
+    logger.info('Started real-time activity tracking')
   }
 
   /**
@@ -220,7 +222,7 @@ export class Auth0ActivityTrackingService {
     if (this.pollingInterval) {
       clearInterval(this.pollingInterval)
       this.pollingInterval = null
-      console.log('Stopped real-time activity tracking')
+      logger.info('Stopped real-time activity tracking')
     }
   }
 
@@ -290,7 +292,7 @@ export class Auth0ActivityTrackingService {
       // Process security events
       await this.processSecurityEvents(logs as unknown as Auth0Log[])
     } catch (error: unknown) {
-      console.error('Failed to fetch and store recent activities:', error)
+      logger.error('Failed to fetch and store recent activities:', error)
     }
   }
 
@@ -308,7 +310,7 @@ export class Auth0ActivityTrackingService {
         await collection.insertMany(activities)
       }
     } catch (error: unknown) {
-      console.error('Failed to store activities:', error)
+      logger.error('Failed to store activities:', error)
     }
   }
 
@@ -446,7 +448,7 @@ export class Auth0ActivityTrackingService {
         }
       }
     } catch (error: unknown) {
-      console.error('Failed to process security events:', error)
+      logger.error('Failed to process security events:', error)
     }
   }
 
@@ -501,7 +503,7 @@ export class Auth0ActivityTrackingService {
       const activities = await collection.find(query, options).toArray()
       return activities
     } catch (error: unknown) {
-      console.error('Failed to get user activities:', error)
+      logger.error('Failed to get user activities:', error)
       return []
     }
   }
@@ -556,7 +558,7 @@ export class Auth0ActivityTrackingService {
         ipAddressCount: ipAddresses.length,
       }
     } catch (error: unknown) {
-      console.error('Failed to get user activity summary:', error)
+      logger.error('Failed to get user activity summary:', error)
       return null
     }
   }
@@ -591,7 +593,7 @@ export class Auth0ActivityTrackingService {
 
       return events
     } catch (error: unknown) {
-      console.error('Failed to get security events:', error)
+      logger.error('Failed to get security events:', error)
       return []
     }
   }
@@ -614,7 +616,7 @@ export class Auth0ActivityTrackingService {
 
       return activities
     } catch (error: unknown) {
-      console.error('Failed to get real-time activity stream:', error)
+      logger.error('Failed to get real-time activity stream:', error)
       return []
     }
   }
@@ -651,7 +653,7 @@ export class Auth0ActivityTrackingService {
         }),
       )
     } catch (error: unknown) {
-      console.error('Failed to get user sessions:', error)
+      logger.error('Failed to get user sessions:', error)
       return []
     }
   }
@@ -690,7 +692,7 @@ export class Auth0ActivityTrackingService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to terminate user session:', error)
+      logger.error('Failed to terminate user session:', error)
 
       // Log session termination error
       logSecurityEvent(SecurityEventType.SESSION_TERMINATION_ERROR, userId, {
@@ -728,7 +730,7 @@ export class Auth0ActivityTrackingService {
       timestamp: new Date().toISOString(),
     })
 
-    console.log('Activity tracking configuration updated:', this.config)
+    logger.info('Activity tracking configuration updated:', this.config)
   }
 
   /**
@@ -756,9 +758,9 @@ export class Auth0ActivityTrackingService {
         timestamp: { $lt: cutoffDate },
       })
 
-      console.log(`Cleaned up ${result.deletedCount} old activity logs`)
+      logger.info(`Cleaned up ${result.deletedCount} old activity logs`)
     } catch (error: unknown) {
-      console.error('Failed to cleanup old logs:', error)
+      logger.error('Failed to cleanup old logs:', error)
     }
   }
 
@@ -799,7 +801,7 @@ export class Auth0ActivityTrackingService {
         securityEvents,
       }
     } catch (error: unknown) {
-      console.error('Failed to get activity statistics:', error)
+      logger.error('Failed to get activity statistics:', error)
       return {
         totalActivities: 0,
         activeUsers: 0,
@@ -836,7 +838,7 @@ export class Auth0ActivityTrackingService {
 
       return activities
     } catch (error: unknown) {
-      console.error('Failed to search activities:', error)
+      logger.error('Failed to search activities:', error)
       return []
     }
   }

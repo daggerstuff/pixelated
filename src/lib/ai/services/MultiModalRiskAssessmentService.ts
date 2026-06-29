@@ -1,4 +1,6 @@
 import type { EmotionAnalysis } from '@/hooks/useEmotionDetection'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('MultiModalRiskAssessmentService')
 
 export interface BiometricData {
   heartRate?: number[]
@@ -263,7 +265,7 @@ export class MultiModalRiskAssessmentService {
         monitoringFocus,
       }
     } catch (error: unknown) {
-      console.error('Error in multi-modal risk assessment:', error)
+      logger.error('Error in multi-modal risk assessment:', error)
 
       // Fallback assessment
       return this.generateFallbackAssessment(emotionalData)

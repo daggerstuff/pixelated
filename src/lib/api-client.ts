@@ -5,6 +5,8 @@ import type {
 
 // Enhanced API Client with retry logic and type-safe error handling
 import { parseApiResponse, ValidationResult } from './utils/json-validator'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger('api-client')
 
 export class EnterpriseAPIClient {
   private readonly baseURL: string
@@ -31,7 +33,7 @@ export class EnterpriseAPIClient {
       }
 
       const delay = this.retryDelay * Math.pow(2, attempt - 1) // Exponential backoff
-      console.warn(
+      logger.warn(
         `API request failed (attempt ${attempt}/${this.maxRetries}), retrying in ${delay}ms...`,
         error,
       )

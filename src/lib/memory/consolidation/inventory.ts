@@ -1,5 +1,7 @@
 // Enterprise‑grade in‑memory inventory engine (TypeScript)
 import { v4 as uuidv4 } from 'uuid'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('inventory')
 
 /**
  * Represents a single inventory entry.
@@ -49,7 +51,7 @@ export class InventoryEngine {
         this.items.set(item.id, item)
       })
     } catch (e) {
-      console.error('Failed to load inventory from', this.storagePath, e)
+      logger.error('Failed to load inventory from', this.storagePath, e)
     }
   }
 
@@ -62,7 +64,7 @@ export class InventoryEngine {
         JSON.stringify(data, null, 2),
       )
     } catch (e) {
-      console.error('Failed to save inventory to', this.storagePath, e)
+      logger.error('Failed to save inventory to', this.storagePath, e)
     }
   }
 

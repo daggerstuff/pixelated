@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('module-checker') /**
  * Module Checker
  *
  * Utility to safely check for and import Node.js modules in a way that's
@@ -54,7 +55,7 @@ export async function safeImport<T = unknown>(
     const module = await import(moduleName)
     return module.default ?? module
   } catch (error: unknown) {
-    console.warn(`Module ${moduleName} is not available:`, error)
+    logger.warn(`Module ${moduleName} is not available:`, error)
     return null
   }
 }
