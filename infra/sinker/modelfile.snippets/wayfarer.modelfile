@@ -1,0 +1,19 @@
+# Wayfarer model modelfile for sinker ollama facility
+# Model: bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS
+# GPU: V100S 32GB (sinker has 21GB free VRAM available)
+# Pulled: 2026-06-29T11:40:00Z
+
+FROM hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS
+
+# Runtime parameters for V100 32GB configuration
+# Based on model_digest.lock v100_32gb preset
+PARAMETER num_parallel 2
+PARAMETER num_ctx 8192
+PARAMETER flash_attention 1
+
+# Model metadata
+# Digest: sha256-2227af939b938774b267e9677c898a60c33224e7ba6f85236dc386878c9e548b
+# Size: 6.7 GB
+# Quantization: IQ4_XS (4-bit integer, extra small)
+# Expected parameter count: ~12.2B
+# Min VRAM required: 10240 MiB
