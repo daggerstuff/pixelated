@@ -8,6 +8,8 @@ import type { DatabaseConfig } from '../config/database'
 import { getDatabaseConfig } from '../config/database'
 import type { UserId } from '../types/common'
 import { AuditService } from './audit'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('base-service')
 
 export abstract class BaseService {
   protected db: DatabaseConfig
@@ -112,7 +114,7 @@ export abstract class BaseService {
    * Handle service errors consistently
    */
   protected handleError(error: unknown, context: string): never {
-    console.error(`Error in ${context}:`, error)
+    logger.error(`Error in ${context}:`, error)
 
     if (error instanceof Error) {
       throw error

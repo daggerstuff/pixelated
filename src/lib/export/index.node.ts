@@ -384,7 +384,7 @@ export class ExportService {
       // Set up error handling for PDF generation
       doc.on('error', (...args: unknown[]) => {
         const err = args[0] as Error | undefined
-        console.error(`PDF generation error: ${err?.message || String(err)}`)
+        logger.error(`PDF generation error: ${err?.message || String(err)}`)
       })
 
       // Create a buffer to store the PDF with timeout
@@ -412,7 +412,7 @@ export class ExportService {
           doc.restore()
         } catch (err: unknown) {
           const error = err as Error
-          console.error('Error adding watermark:', String(error))
+          logger.error('Error adding watermark:', String(error))
           // Continue without watermark rather than failing the export
         }
       })
@@ -499,7 +499,7 @@ export class ExportService {
               .moveDown()
           }
         } catch (err: unknown) {
-          console.error(`Error processing message ${index}:`, err)
+          logger.error(`Error processing message ${index}:`, err)
           // Add error notice in the document
           doc
             .font('Helvetica')

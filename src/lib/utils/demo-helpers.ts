@@ -11,6 +11,8 @@ import type {
   Demographics,
 } from '../types/bias-detection'
 import { tryRequireNode } from './index'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('demo-helpers')
 
 /**
  * Comprehensive preset scenarios with realistic bias patterns
@@ -509,7 +511,7 @@ export function downloadExportData(exportData: ExportData): void {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   } catch (error: unknown) {
-    console.error('Export failed:', error)
+    logger.error('Export failed:', error)
     throw new Error('Failed to export analysis results. Please try again.', {
       cause: error,
     })

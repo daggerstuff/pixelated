@@ -4,6 +4,8 @@
  */
 
 import type { PatientData, ModelUpdate, PrivacyMetrics } from '@/types/ai'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('privacyEngine')
 
 export interface FederatedLearningConfig {
   minClients: number
@@ -74,7 +76,7 @@ class PrivacyEngine {
     // Distribute clients across model shards for privacy
     const clientAssignments = this.distributeClientsToShards(clients)
 
-    console.log(
+    logger.info(
       `Federated learning session ${sessionId} initialized with ${clients.length} clients`,
     )
 
@@ -502,7 +504,7 @@ class PrivacyEngine {
     // Simplified zero-knowledge proof system
     // In production, this would use libraries like ZoKrates or Bulletproofs
 
-    console.log(`Processing zero-knowledge computation: ${computation}`)
+    logger.info(`Processing zero-knowledge computation: ${computation}`)
 
     // Simulate zero-knowledge computation
     const result = await this.performComputation(computation, inputs)

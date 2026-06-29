@@ -35,7 +35,7 @@ if (
   ;(mockFHEService.scheme as { version?: string }).version = '1.0.0'
 } else {
   // Optionally log a warning or handle the case where scheme is not as expected
-  console.warn(
+  logger.warn(
     '[fhe-factory] mockFHEService.scheme is not an object, cannot set version.',
   )
 }

@@ -1,4 +1,5 @@
-// Define search document structure
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger('search-browser') // Define search document structure
 export interface SearchDocument {
   id: string | number
   title: string
@@ -109,7 +110,7 @@ const DEFAULT_CONFIG: SearchConfig = {
 
 // Fallback search client when flexsearch fails to load
 function createFallbackClient(): ISearchClient {
-  console.warn('Using fallback search implementation')
+  logger.warn('Using fallback search implementation')
   return {
     search: () => [],
     importDocuments: () => {},
@@ -200,7 +201,7 @@ class BrowserSearchClient implements ISearchClient {
 
       return searchResults
     } catch (error: unknown) {
-      console.error('Search failed:', error)
+      logger.error('Search failed:', error)
       return []
     }
   }
@@ -216,7 +217,7 @@ class BrowserSearchClient implements ISearchClient {
       try {
         this.index.add(doc)
       } catch (error: unknown) {
-        console.error(`Failed to add document ${doc.id} to index:`, error)
+        logger.error(`Failed to add document ${doc.id} to index:`, error)
       }
     }
   }
@@ -247,7 +248,7 @@ export async function initBrowserSearch(
       Document = (flexsearch.default?.Document ??
         flexsearch.Document) as FlexSearchDocumentConstructor
     } catch (err: unknown) {
-      console.warn(
+      logger.warn(
         'Failed to load flexsearch directly, trying alternative path:',
         err,
       )
@@ -260,7 +261,7 @@ export async function initBrowserSearch(
         // Use default export as the Document class
         Document = documentModule.default
       } catch (docErr) {
-        console.error(
+        logger.error(
           'Failed to load flexsearch Document from alternate path:',
           docErr,
         )
@@ -276,13 +277,13 @@ export async function initBrowserSearch(
     if (Document) {
       return new BrowserSearchClient(Document, config)
     } else {
-      console.error(
+      logger.error(
         'Failed to load flexsearch Document class - module loaded but Document not found',
       )
       return createFallbackClient()
     }
   } catch (error: unknown) {
-    console.error('Error loading flexsearch:', error)
+    logger.error('Error loading flexsearch:', error)
     return createFallbackClient()
   }
 }

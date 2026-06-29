@@ -6,6 +6,8 @@ import sampleCognitiveModels from '@/data/sample-cognitive-models'
 
 import { PatientModelService } from '../ai/services/PatientModelService'
 import { KVStore } from '../db/KVStore'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('load-sample-models')
 
 /**
  * Load sample cognitive models into the KV store
@@ -13,7 +15,7 @@ import { KVStore } from '../db/KVStore'
  */
 export async function loadSampleModels(): Promise<boolean> {
   try {
-    console.log('Loading sample cognitive models into KV store...')
+    logger.info('Loading sample cognitive models into KV store...')
 
     // Create KV store and patient model service
     const kvStore = new KVStore('cognitive_models_', true)
@@ -23,7 +25,7 @@ export async function loadSampleModels(): Promise<boolean> {
     const existingModels = await patientService.getAvailableModels()
 
     if (existingModels && existingModels.length > 0) {
-      console.log(
+      logger.info(
         `Found ${existingModels.length} existing models. Skipping load.`,
       )
       return true
@@ -31,16 +33,16 @@ export async function loadSampleModels(): Promise<boolean> {
 
     // Load each sample model
     for (const model of sampleCognitiveModels) {
-      console.log(`Loading model: ${model.name} (${model.id})`)
+      logger.info(`Loading model: ${model.name} (${model.id})`)
       await patientService.saveModel(model)
     }
 
-    console.log(
+    logger.info(
       `Successfully loaded ${sampleCognitiveModels.length} sample cognitive models.`,
     )
     return true
   } catch (error: unknown) {
-    console.error('Failed to load sample cognitive models:', error)
+    logger.error('Failed to load sample cognitive models:', error)
     return false
   }
 }
@@ -51,7 +53,7 @@ export async function loadSampleModels(): Promise<boolean> {
  */
 export async function resetModelStore(): Promise<boolean> {
   try {
-    console.log('Resetting cognitive model store...')
+    logger.info('Resetting cognitive model store...')
 
     // Create KV store and patient model service
     const kvStore = new KVStore('cognitive_models_', true)
@@ -64,10 +66,10 @@ export async function resetModelStore(): Promise<boolean> {
       await kvStore.delete(key)
     }
 
-    console.log('Successfully reset cognitive model store.')
+    logger.info('Successfully reset cognitive model store.')
     return true
   } catch (error: unknown) {
-    console.error('Failed to reset cognitive model store:', error)
+    logger.error('Failed to reset cognitive model store:', error)
     return false
   }
 }
@@ -84,7 +86,7 @@ export async function areSampleModelsLoaded(): Promise<boolean> {
     const existingModels = await patientService.getAvailableModels()
     return existingModels && existingModels.length > 0
   } catch (error: unknown) {
-    console.error('Failed to check if sample models are loaded:', error)
+    logger.error('Failed to check if sample models are loaded:', error)
     return false
   }
 }
