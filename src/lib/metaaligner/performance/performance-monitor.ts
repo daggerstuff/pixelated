@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('performance-monitor') /**
  * @module performance-monitor
  * @description This module provides a performance monitoring system for the MetaAligner pipeline.
  */
@@ -35,7 +36,7 @@ export class PerformanceMonitor implements IPerformanceMonitor {
       if (task) {
         task.end = endTime
         task.duration = endTime - task.start
-        console.log(`Task '${taskName}' took ${task.duration} ms`)
+        logger.info(`Task '${taskName}' took ${task.duration} ms`)
       }
     }
   }

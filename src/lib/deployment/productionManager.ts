@@ -4,6 +4,8 @@
  */
 
 import type { DeploymentConfig, RollbackPlan } from '@/types/deployment'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('productionManager')
 
 export interface EnvironmentConfig {
   name: string
@@ -168,7 +170,7 @@ class ProductionManager {
     const deploymentId = `deploy_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
     const startTime = Date.now()
 
-    console.log(
+    logger.info(
       `Starting deployment to ${environment} with strategy: ${strategy}`,
     )
 
@@ -199,7 +201,7 @@ class ProductionManager {
       const duration = Date.now() - startTime
       this.deployments.set(deploymentId, artifact)
 
-      console.log(
+      logger.info(
         `Deployment to ${environment} completed successfully in ${duration}ms`,
       )
 
@@ -209,7 +211,7 @@ class ProductionManager {
         duration,
       }
     } catch (error: unknown) {
-      console.error(`Deployment to ${environment} failed:`, error)
+      logger.error(`Deployment to ${environment} failed:`, error)
 
       // Auto-rollback if enabled
       if ((this.config as any).enableAutoRollback) {
@@ -227,7 +229,7 @@ class ProductionManager {
             rollbackPlan,
           }
         } catch (rollbackError) {
-          console.error('Rollback failed:', rollbackError)
+          logger.error('Rollback failed:', rollbackError)
         }
       }
 
@@ -243,7 +245,7 @@ class ProductionManager {
     environment: string,
     artifact: DeploymentArtifact,
   ): Promise<void> {
-    console.log(`Running pre-deployment checks for ${environment}...`)
+    logger.info(`Running pre-deployment checks for ${environment}...`)
 
     // Check artifact integrity
     const checksumValid = await this.validateArtifactChecksum(artifact)
@@ -286,21 +288,21 @@ class ProductionManager {
     _artifact: DeploymentArtifact,
   ): Promise<void> {
     // Validate that database migrations are compatible
-    console.log('Database migrations validated')
+    logger.info('Database migrations validated')
   }
 
   private async validateDependencies(
     _artifact: DeploymentArtifact,
   ): Promise<void> {
     // Validate dependency versions and compatibility
-    console.log('Dependencies validated')
+    logger.info('Dependencies validated')
   }
 
   private async deployBlueGreen(
     environment: string,
     artifact: DeploymentArtifact,
   ): Promise<void> {
-    console.log(`Deploying ${artifact.version} to ${environment} (blue-green)`)
+    logger.info(`Deploying ${artifact.version} to ${environment} (blue-green)`)
 
     // Switch traffic to new version
     await this.switchTraffic(environment, 'green')
@@ -319,7 +321,7 @@ class ProductionManager {
     environment: string,
     artifact: DeploymentArtifact,
   ): Promise<void> {
-    console.log(`Deploying ${artifact.version} to ${environment} (canary)`)
+    logger.info(`Deploying ${artifact.version} to ${environment} (canary)`)
 
     // Deploy to canary (10% of traffic)
     await this.deployToCanary(artifact)
@@ -339,7 +341,7 @@ class ProductionManager {
     environment: string,
     artifact: DeploymentArtifact,
   ): Promise<void> {
-    console.log(`Deploying ${artifact.version} to ${environment} (rolling)`)
+    logger.info(`Deploying ${artifact.version} to ${environment} (rolling)`)
 
     // Deploy to instances one by one
     const instances = await this.getEnvironmentInstances(environment)
@@ -359,12 +361,12 @@ class ProductionManager {
     environment: string,
     target: 'blue' | 'green',
   ): Promise<void> {
-    console.log(`Switching traffic to ${target} environment`)
+    logger.info(`Switching traffic to ${target} environment`)
     // In real implementation, would update load balancer configuration
   }
 
   private async deployToCanary(_artifact: DeploymentArtifact): Promise<void> {
-    console.log('Deploying to canary environment')
+    logger.info('Deploying to canary environment')
     // Mock canary deployment
   }
 
@@ -389,7 +391,7 @@ class ProductionManager {
     percentages: number[],
   ): Promise<void> {
     for (const percentage of percentages) {
-      console.log(`Increasing canary traffic to ${percentage}%`)
+      logger.info(`Increasing canary traffic to ${percentage}%`)
       await new Promise((resolve) => setTimeout(resolve, 5000)) // Wait 5 seconds between increases
     }
   }
@@ -411,12 +413,12 @@ class ProductionManager {
     instances: string[],
     _artifact: DeploymentArtifact,
   ): Promise<void> {
-    console.log(`Deploying to instances: ${instances.join(', ')}`)
+    logger.info(`Deploying to instances: ${instances.join(', ')}`)
     // Mock instance deployment
   }
 
   private async validateBatchDeployment(instances: string[]): Promise<void> {
-    console.log(`Validating deployment for instances: ${instances.join(', ')}`)
+    logger.info(`Validating deployment for instances: ${instances.join(', ')}`)
     // Mock validation
   }
 
@@ -575,21 +577,21 @@ class ProductionManager {
   }> {
     const startTime = Date.now()
 
-    console.log(`Starting rollback for ${environment}: ${rollbackPlan.id}`)
+    logger.info(`Starting rollback for ${environment}: ${rollbackPlan.id}`)
 
     try {
       // Execute rollback steps
       for (const step of rollbackPlan.steps) {
-        console.log(`Executing rollback step: ${step}`)
+        logger.info(`Executing rollback step: ${step}`)
         await this.executeRollbackStep(step as any, environment)
       }
 
       const duration = Date.now() - startTime
-      console.log(`Rollback completed successfully in ${duration}ms`)
+      logger.info(`Rollback completed successfully in ${duration}ms`)
 
       return { success: true, duration }
     } catch (error: unknown) {
-      console.error('Rollback failed:', error)
+      logger.error('Rollback failed:', error)
       return {
         success: false,
         duration: Date.now() - startTime,
@@ -674,7 +676,7 @@ class ProductionManager {
   }> {
     const scheduledDeploymentId = `scheduled_${Date.now()}`
 
-    console.log(
+    logger.info(
       `Deployment scheduled for ${scheduledTime.toISOString()} in ${environment}`,
     )
 
@@ -683,7 +685,7 @@ class ProductionManager {
       try {
         await this.deploy(environment, artifact, strategy)
       } catch (error: unknown) {
-        console.error('Scheduled deployment failed:', error)
+        logger.error('Scheduled deployment failed:', error)
       }
     }, scheduledTime.getTime() - Date.now())
 
@@ -797,7 +799,7 @@ class ProductionManager {
     affectedUsers: number
     notificationSent: boolean
   }> {
-    console.log(`Emergency stop initiated for ${environment}: ${reason}`)
+    logger.info(`Emergency stop initiated for ${environment}: ${reason}`)
 
     // In real implementation, would immediately stop traffic and notify users
     const affectedUsers = Math.floor(Math.random() * 1000) + 100

@@ -154,7 +154,7 @@ export class ThreatDetectionMiddleware {
           error,
           path: req.path,
         })
-        console.error('Threat detection middleware error:', error)
+        logger.error('Threat detection middleware error:', error)
 
         // Fail open - allow request if middleware fails
         next()

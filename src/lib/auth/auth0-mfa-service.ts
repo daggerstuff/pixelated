@@ -37,6 +37,8 @@ type ExtendedAuthenticationClient = AuthenticationClient
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-mfa-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -60,7 +62,7 @@ function initializeAuth0Clients() {
     !auth0Config.clientSecret
   ) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -185,7 +187,7 @@ export class Auth0MFAService {
   constructor() {
     if (!auth0Config.domain) {
       if (shouldWarnAuth0Configuration) {
-        console.warn('Auth0 is not properly configured')
+        logger.warn('Auth0 is not properly configured')
       }
     }
   }
@@ -221,7 +223,7 @@ export class Auth0MFAService {
 
       return availableFactorTypes
     } catch (error: unknown) {
-      console.error('Failed to get available MFA factors:', error)
+      logger.error('Failed to get available MFA factors:', error)
       throw new Error(
         `Failed to get available MFA factors: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -302,7 +304,7 @@ export class Auth0MFAService {
 
       return challenge
     } catch (error: unknown) {
-      console.error('Failed to start MFA enrollment:', error)
+      logger.error('Failed to start MFA enrollment:', error)
       throw new Error(
         `Failed to start MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -347,7 +349,7 @@ export class Auth0MFAService {
 
       return enrolledFactor
     } catch (error: unknown) {
-      console.error('Failed to complete MFA enrollment:', error)
+      logger.error('Failed to complete MFA enrollment:', error)
       throw new Error(
         `Failed to complete MFA enrollment: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -382,7 +384,7 @@ export class Auth0MFAService {
 
       return factors
     } catch (error: unknown) {
-      console.error('Failed to get user MFA factors:', error)
+      logger.error('Failed to get user MFA factors:', error)
       return []
     }
   }
@@ -411,7 +413,7 @@ export class Auth0MFAService {
         `mfa_factor_deleted_${factorId}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to delete MFA factor ${factorId} for user ${userId}:`,
         error,
       )
@@ -458,7 +460,7 @@ export class Auth0MFAService {
 
       return challenge
     } catch (error: unknown) {
-      console.error('Failed to challenge user for MFA:', error)
+      logger.error('Failed to challenge user for MFA:', error)
       throw new Error(
         `Failed to challenge user for MFA: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -496,7 +498,7 @@ export class Auth0MFAService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to verify MFA challenge:', error)
+      logger.error('Failed to verify MFA challenge:', error)
 
       // Log failed verification event
       logSecurityEvent(SecurityEventType.MFA_VERIFICATION_FAILED, null, {

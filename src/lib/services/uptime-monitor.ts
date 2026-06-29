@@ -1,6 +1,8 @@
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { performance } from 'node:perf_hooks'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('uptime-monitor')
 
 export interface UptimeRecord {
   timestamp: string
@@ -165,7 +167,7 @@ export class UptimeMonitor {
         this.records = JSON.parse(data) as UptimeRecord[]
       }
     } catch (error: unknown) {
-      console.warn('Failed to load uptime records:', error)
+      logger.warn('Failed to load uptime records:', error)
       this.records = []
     }
   }
@@ -181,7 +183,7 @@ export class UptimeMonitor {
 
       writeFileSync(this.dataFile, JSON.stringify(this.records, null, 2))
     } catch (error: unknown) {
-      console.error('Failed to save uptime records:', error)
+      logger.error('Failed to save uptime records:', error)
     }
   }
 

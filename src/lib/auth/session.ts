@@ -15,6 +15,8 @@ import { userManager } from '../db'
 import { getFromCache, setInCache, removeFromCache } from '../redis'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('session')
 
 /**
  * Lightweight session shape returned by getSession and consumed by middleware
@@ -271,7 +273,7 @@ export async function getUserProfile(userId: string) {
     const user = await userManager.getUserById(userId)
 
     if (!user) {
-      console.error('User not found:', userId)
+      logger.error('User not found:', userId)
       return null
     }
 
@@ -283,7 +285,7 @@ export async function getUserProfile(userId: string) {
       role: user.role,
     }
   } catch (error: unknown) {
-    console.error('Error in getUserProfile:', error)
+    logger.error('Error in getUserProfile:', error)
     return null
   }
 }

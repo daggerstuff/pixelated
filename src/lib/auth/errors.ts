@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('errors') /**
  * Authentication and Token Error Classes
  * Custom error types for JWT authentication system with HIPAA compliance
  */
@@ -337,14 +338,14 @@ export class AuthenticationErrorLogger {
       error instanceof TokenExpiredError ||
       error instanceof TokenRevokedError
     ) {
-      console.warn('Authentication warning:', logData)
+      logger.warn('Authentication warning:', logData)
     } else if (
       error instanceof RateLimitError ||
       error instanceof PermissionDeniedError
     ) {
-      console.warn('Security warning:', logData)
+      logger.warn('Security warning:', logData)
     } else {
-      console.error('Authentication error:', logData)
+      logger.error('Authentication error:', logData)
     }
   }
 

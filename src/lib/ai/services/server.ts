@@ -7,6 +7,7 @@ import { parse } from 'url'
 
 import { closeSentry, Sentry } from '../../../../config/instrument.mjs'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('server')
 import { safeJsonParse } from '../../utils/json-extraction'
 import { apiMetrics, emotionMetrics } from '../../sentry/utils'
 import { getAllowedOrigin } from '../bias-detection/utils'
@@ -660,12 +661,12 @@ Respond in JSON format with the following structure:
         this.server.listen(AI_SERVICE_PORT, () => {
           this.isRunning = true
           appLogger.info(`AI Service started on port ${AI_SERVICE_PORT}`)
-          console.log(`AI Service started on port ${AI_SERVICE_PORT}`)
-          console.log('Available endpoints:')
-          console.log('  GET /health - Health check')
-          console.log('  POST /chat - Chat completion')
-          console.log('  POST /chat/stream - Streaming chat completion')
-          console.log('  POST /analyze-emotion - Emotion analysis')
+          appLogger.info(`AI Service started on port ${AI_SERVICE_PORT}`)
+          appLogger.info('Available endpoints:')
+          appLogger.info('  GET /health - Health check')
+          appLogger.info('  POST /chat - Chat completion')
+          appLogger.info('  POST /chat/stream - Streaming chat completion')
+          appLogger.info('  POST /analyze-emotion - Emotion analysis')
 
           // Keep-alive logging
           setInterval(() => {
@@ -692,7 +693,7 @@ Respond in JSON format with the following structure:
         this.server!.close(() => {
           this.isRunning = false
           appLogger.info('AI Service stopped')
-          console.log('AI Service stopped')
+          appLogger.info('AI Service stopped')
           resolve()
         })
       })
@@ -725,7 +726,7 @@ process.on('SIGINT', () => {
 
 // Start server
 aiServer.start().catch((error) => {
-  console.error('Failed to start AI service:', error)
+  appLogger.error('Failed to start AI service:', error)
   Sentry.captureException(error)
   void closeSentry()
   process.exit(1)
