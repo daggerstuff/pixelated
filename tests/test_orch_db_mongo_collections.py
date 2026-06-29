@@ -10,6 +10,8 @@ Test cases:
     idempotent_recreate        -- calling setup_collections twice is safe
 """
 
+import contextlib
+
 import pymongo
 import pytest
 
@@ -199,10 +201,8 @@ def test_setup_collections_idempotent_against_preexisting_gridfs(mongo_db):
 
     # Create the GridFS collections first (simulating partial GridFS init)
     for coll_name in ("dispatch_chunk_content.files", "dispatch_chunk_content.chunks"):
-        try:
+        with contextlib.suppress(CollectionInvalid):
             mongo_db.create_collection(coll_name)
-        except CollectionInvalid:
-            pass
 
     # Create indexes with auto-generated names (as GridFS would)
     mongo_db["dispatch_chunk_content.files"].create_index(

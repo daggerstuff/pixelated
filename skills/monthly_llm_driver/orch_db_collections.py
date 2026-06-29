@@ -262,7 +262,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
 
     # Check for compound unique index on (month, chunk_index)
     month_chunk_idx = None
-    for idx_name, idx_info in indexes.items():
+    for _idx_name, idx_info in indexes.items():
         key = idx_info.get("key", [])
         if key == [("month", 1), ("chunk_index", 1)]:
             month_chunk_idx = idx_info
@@ -281,7 +281,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
 
     # Check for sparse index on heartbeat_at
     heartbeat_idx = None
-    for idx_name, idx_info in indexes.items():
+    for _idx_name, idx_info in indexes.items():
         key = idx_info.get("key", [])
         if key == [("heartbeat_at", 1)]:
             heartbeat_idx = idx_info
@@ -303,7 +303,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
     indexes = audit_findings.index_information()
     result["audit_findings"] = []
     month_finding_idx = None
-    for idx_name, idx_info in indexes.items():
+    for _idx_name, idx_info in indexes.items():
         key = idx_info.get("key", [])
         if key == [("month", 1), ("finding_code", 1)]:
             month_finding_idx = idx_info
@@ -325,7 +325,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
     indexes = postfix_enrichment.index_information()
     result["postfix_enrichment"] = []
     month_email_idx = None
-    for idx_name, idx_info in indexes.items():
+    for _idx_name, idx_info in indexes.items():
         key = idx_info.get("key", [])
         if key == [("month", 1), ("email_id", 1)]:
             month_email_idx = idx_info
@@ -347,7 +347,7 @@ def verify_collections(db: Database) -> dict[str, list[dict]]:
     indexes = cross_month_invariants.index_information()
     result["cross_month_invariants"] = []
     invariant_idx = None
-    for idx_name, idx_info in indexes.items():
+    for _idx_name, idx_info in indexes.items():
         key = idx_info.get("key", [])
         if key == [("invariant_code", 1)]:
             invariant_idx = idx_info

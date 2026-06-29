@@ -5,19 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 import numpy as np
-
 from bias_detection.services.placeholder_service import placeholder_service
 
 
 class PlaceholderAdapters:
     """Proxy helpers for placeholder analysis outputs."""
 
-    def fairlearn_placeholder_predictions(
-        self, y_true: np.ndarray, sensitive_features: np.ndarray
-    ) -> np.ndarray:
-        return placeholder_service.fairlearn_placeholder_predictions(
-            y_true, sensitive_features
-        )
+    def fairlearn_placeholder_predictions(self, y_true: np.ndarray, sensitive_features: np.ndarray) -> np.ndarray:
+        return placeholder_service.fairlearn_placeholder_predictions(y_true, sensitive_features)
 
     def interpretability_placeholder_analysis(self) -> dict[str, Any]:
         return placeholder_service.interpretability_placeholder_analysis()

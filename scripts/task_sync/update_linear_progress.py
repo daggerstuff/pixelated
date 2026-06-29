@@ -26,7 +26,6 @@ import json
 import os
 import re
 import subprocess
-import sys
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -227,7 +226,6 @@ def main(argv: list[str] | None = None) -> int:
 
     api_key = os.getenv("LINEAR_API_KEY", "").strip()
     if not api_key:
-        print("ERROR: LINEAR_API_KEY environment variable is not set.", file=sys.stderr)
         return 1
 
     repo_name = os.path.basename(os.getcwd())
@@ -235,41 +233,26 @@ def main(argv: list[str] | None = None) -> int:
     issue_map = _extract_issue_keys(commits)
 
     if not issue_map:
-        print("No Linear-style issue keys found in recent commit messages.")
         return 0
 
-    print(f"Found {len(issue_map)} unique issue key(s) in last {len(commits)} commits.")
-
     for key, related_commits in issue_map.items():
-        print(f"- Resolving {key} ...", end="", flush=True)
         issue = _find_issue_by_key(api_key, key)
         if not issue:
-            print(" not found in Linear, skipping.")
             continue
 
         if args.dry_run:
-            print(
-                f" would move to '{args.target_status}' and add comment "
-                f"(current state: {issue.get('state', {}).get('name')!r}).",
-            )
             continue
 
         updated = _update_issue_state(api_key, issue, args.target_status)
         if not updated:
-            print(
-                f" could not find state '{args.target_status}' for team "
-                f"{issue.get('team', {}).get('key')!r}, skipping state change.",
-            )
+            pass
         else:
-            print(
-                f" moved state to '{updated.get('state', {}).get('name')}'.",
-                end="",
-            )
+            pass
 
         comment_body = _build_comment_body(repo_name, args.branch, related_commits)
         _create_comment(api_key, issue["id"], comment_body)
         if not args.dry_run:
-            print(" Comment added.")
+            pass
 
     return 0
 

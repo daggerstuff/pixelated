@@ -119,7 +119,7 @@ def verify_postgres_tables(pg_conn: psycopg2.extensions.connection) -> dict[str,
         }
 
         col_names = {row[0] for row in audit_findings_cols}
-        for col_name, (expected_type, expected_nullable) in expected_cols.items():
+        for col_name, (_expected_type, _expected_nullable) in expected_cols.items():
             if col_name not in col_names:
                 raise RuntimeError(f"Missing column: orch.audit_findings_table.{col_name}")
 
@@ -173,7 +173,7 @@ def verify_postgres_tables(pg_conn: psycopg2.extensions.connection) -> dict[str,
         }
 
         col_names = {row[0] for row in cross_month_cols}
-        for col_name, (expected_type, expected_nullable) in expected_cols.items():
+        for col_name, (_expected_type, _expected_nullable) in expected_cols.items():
             if col_name not in col_names:
                 raise RuntimeError(f"Missing column: orch.cross_month_aggregates.{col_name}")
 

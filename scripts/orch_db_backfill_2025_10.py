@@ -109,7 +109,6 @@ def backfill_m02_chunks() -> dict:
 
     # Run dispatch_resume_gate scan to classify chunks
     report = scan(MONTH, CHUNKS_DIR)
-    print(f"Dispatch resume gate scan: {report.to_dict()}")
 
     # Verify classification matches expectations (all 27 should be 'ok')
     if len(report.ok) != EXPECTED_CHUNKS:
@@ -190,14 +189,6 @@ def backfill_m02_chunks() -> dict:
         final_count = dispatch_chunks.count_documents({"month": MONTH})
         gridfs_count = db["dispatch_chunk_content.files"].count_documents({})
 
-        print("\nBackfill complete:")
-        print(f"  Chunks processed: {stats['chunks_processed']}")
-        print(f"  Chunks upserted: {stats['chunks_upserted']}")
-        print(f"  Already present (skipped): {stats['already_present']}")
-        print(f"  GridFS files written: {stats['gridfs_files_written']}")
-        print(f"  Final dispatch_chunks count: {final_count}")
-        print(f"  Final GridFS files count: {gridfs_count}")
-
         # Verify acceptance criteria
         if final_count != EXPECTED_CHUNKS:
             raise RuntimeError(
@@ -228,25 +219,16 @@ def backfill_m02_chunks() -> dict:
                 f"got {status_counts}. Aggregate: {aggregate}"
             )
 
-        print(f"  Aggregate shape: {aggregate}")
-        print("  ✓ All acceptance criteria met")
-
         return stats
 
 
 def main() -> int:
     """Main entry point."""
-    print("Starting M02 (2025-10) backfill...")
-    print(f"Chunks directory: {CHUNKS_DIR}")
-    print(f"Expected chunks: {EXPECTED_CHUNKS}")
-    print()
 
     try:
-        stats = backfill_m02_chunks()
-        print("\n✓ Backfill successful")
+        backfill_m02_chunks()
         return 0
-    except Exception as e:
-        print(f"\n✗ Backfill failed: {e}", file=sys.stderr)
+    except Exception:
         import traceback
 
         traceback.print_exc()
