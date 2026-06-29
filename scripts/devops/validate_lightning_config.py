@@ -6,8 +6,7 @@ from pathlib import Path
 def validate_config(config_path):
     try:
         config = json.loads(Path(config_path).read_text())
-    except Exception as e:
-        print(f"FAIL::config_read::{e!s}")
+    except Exception:
         return
 
     required_keys = [
@@ -19,23 +18,22 @@ def validate_config(config_path):
         "precision",
     ]
 
-    for key in required_keys:
-        print(f"KEY::{key}::{key in config}")
+    for _key in required_keys:
+        pass
 
     if "run_name" in config:
-        print(f"VALUE::run_name::{config['run_name']}")
+        pass
     if "train_data_path" in config:
-        print(f"VALUE::train_data_path::{config['train_data_path']}")
+        pass
     if "resume_from_checkpoint" in config:
-        print(f"VALUE::resume_from_checkpoint::{config['resume_from_checkpoint']}")
+        pass
     if "dataloader_num_workers" in config:
-        print(f"VALUE::dataloader_num_workers::{config['dataloader_num_workers']}")
+        pass
     if "precision" in config:
-        print(f"VALUE::precision::{config['precision']}")
+        pass
 
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("FAIL::args::Missing config path")
         sys.exit(1)
     validate_config(sys.argv[1])

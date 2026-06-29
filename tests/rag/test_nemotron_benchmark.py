@@ -29,6 +29,7 @@ def _is_nvidia_api_unreachable() -> bool:
     if not os.environ.get("NVIDIA_API_KEY"):
         return True
     import socket
+
     try:
         socket.setdefaulttimeout(0.5)
         # Attempt to connect to Google DNS IP to check if internet egress is active at all
@@ -103,7 +104,7 @@ class TestBenchmarkDataset:
 
     def test_dataset_prompt_schema(self):
         """Test that prompts have required fields."""
-        for task_type, prompts in THERAPEUTIC_BENCHMARK_DATASET.items():
+        for _task_type, prompts in THERAPEUTIC_BENCHMARK_DATASET.items():
             for prompt_data in prompts:
                 assert "prompt" in prompt_data
                 assert "complexity" in prompt_data
@@ -294,7 +295,7 @@ class TestBenchmarkIntegration:
             )
 
             assert len(results) > 0
-            for task_type, result in results.items():
+            for _task_type, result in results.items():
                 assert result.total_requests > 0
                 assert result.success_rate >= 0
 

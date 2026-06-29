@@ -219,9 +219,9 @@ def clean_jsonl_file(
 
         try:
             sample = json.loads(line)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             if verbose:
-                print(f"  [Warning] Line {i + 1}: Invalid JSON - {e}")
+                pass
             continue
 
         analysis = analyze_sample(sample)
@@ -230,7 +230,7 @@ def clean_jsonl_file(
             removed.append(sample)
             removed_samples.append({"line": i + 1, "preview": analysis["sample_preview"], "issues": analysis["issues"]})
             if verbose:
-                print(f"  [Removed] Line {i + 1}: {analysis['issues']}")
+                pass
         else:
             cleaned.append(sample)
 
@@ -267,28 +267,17 @@ def main():
 
     args = parser.parse_args()
 
-    print("=" * 60)
-    print("Training Data Repetition Cleaner")
-    print("=" * 60)
-    print(f"Input:  {args.input}")
-    print(f"Output: {args.output}")
-    print(f"Verbose: {args.verbose}")
-    print("=" * 60)
-
     if args.analyze_only:
         # Just analyze and report
         input_file = Path(args.input)
         if not input_file.exists():
-            print(f"Error: Input file not found: {args.input}")
             sys.exit(1)
 
         with open(input_file) as f:
             lines = f.readlines()
 
-        print(f"\nAnalyzing {len(lines)} samples...")
-
         issues_found = 0
-        for i, line in enumerate(lines):
+        for _i, line in enumerate(lines):
             if not line.strip():
                 continue
             try:
@@ -296,42 +285,24 @@ def main():
                 analysis = analyze_sample(sample)
                 if analysis["has_repetitions"]:
                     issues_found += 1
-                    print(f"\n[Issue] Line {i + 1}:")
-                    print(f"  Preview: {analysis['sample_preview'][:100]}...")
-                    for issue in analysis["issues"]:
-                        print(f"  Issue: {issue}")
+                    for _issue in analysis["issues"]:
+                        pass
             except json.JSONDecodeError:
                 pass
 
-        print(f"\n{'=' * 60}")
-        print(f"Total samples: {len(lines)}")
-        print(f"Samples with issues: {issues_found}")
-        print(f"Clean samples: {len(lines) - issues_found}")
-        print("=" * 60)
         return
 
     # Clean the file
-    print("\nProcessing...")
-    kept, removed_count, removed = clean_jsonl_file(args.input, args.output, verbose=args.verbose, dry_run=args.dry_run)
-
-    print(f"\n{'=' * 60}")
-    print("RESULTS")
-    print("=" * 60)
-    print(f"Total samples processed: {kept + removed_count}")
-    print(f"Kept (clean): {kept}")
-    print(f"Removed (repetitions): {removed_count}")
-    print(f"Removal rate: {removed_count / (kept + removed_count) * 100:.1f}%")
+    _kept, _removed_count, removed = clean_jsonl_file(
+        args.input, args.output, verbose=args.verbose, dry_run=args.dry_run
+    )
 
     if not args.dry_run:
-        print(f"\nOutput file: {args.output}")
-        print(f"Removed report: {Path(args.output).with_suffix('.removed.json')}")
+        pass
 
     if removed and args.verbose:
-        print("\nRemoved samples preview:")
-        for r in removed[:5]:
-            print(f"  - Line {r['line']}: {r['issues']}")
-
-    print("=" * 60)
+        for _r in removed[:5]:
+            pass
 
 
 if __name__ == "__main__":

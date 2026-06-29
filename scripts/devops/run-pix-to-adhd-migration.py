@@ -116,7 +116,6 @@ def main() -> None:
     args = parser.parse_args()
 
     if not args.email or not args.token:
-        print("ATLASSIAN_EMAIL and ATLASSIAN_API_TOKEN required", file=sys.stderr)
         sys.exit(1)
 
     site = args.site.rstrip("/")
@@ -127,9 +126,8 @@ def main() -> None:
 
     mapping: dict[str, str] = {}
     if args.dry_run:
-        print(f"DRY RUN: would create {len(issues)} issues on {site}")
         for issue in issues[:5]:
-            print(" -", issue["summary"][:80])
+            pass
         return
 
     assignee_id: str | None = None
@@ -162,14 +160,12 @@ def main() -> None:
         )
         dest_key = response["key"]
         mapping[source_key] = dest_key
-        print(f"[{index}/{len(issues)}] {source_key} -> {dest_key}")
         time.sleep(0.15)
 
     args.mapping_out.parent.mkdir(parents=True, exist_ok=True)
     with args.mapping_out.open("w", encoding="utf-8") as handle:
         json.dump(mapping, handle, indent=2)
         handle.write("\n")
-    print(f"Wrote mapping: {args.mapping_out}")
 
 
 if __name__ == "__main__":
