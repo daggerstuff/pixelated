@@ -21,10 +21,12 @@ AGENTS.md § Dispatch Resume Gate (mandatory) for the worker contract.
 from __future__ import annotations
 
 import contextlib
+import datetime
 import json
 import os
 import re
 import signal
+import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -364,11 +366,28 @@ def kill_stale_dispatch(month: str) -> list[int]:
     Logs each kill to ``/tmp/dispatch_resume_gate_kills.log`` with
     pid + epoch + source (disk|redis|both).
 
+    **Log-line completeness guarantee (Chaos Monkey #2a fix):**
+    This function MUST always write at least one line to the kills log.
+    When both registries are empty (e.g. after ``rm /tmp/wayfarer_smoke/*``),
+    the function writes a ``registry_empty`` line with ``level=warn`` instead
+    of returning silently.  Additionally, when the registries are empty, a
+    paranoid ``ps -ef`` sanity check scans for active python processes whose
+    argv matches ``dispatch_<month>``; if any are found, a
+    ``registry_empty_but_ps_alive`` line is written with the PID and argv
+    snippet (but the process is NOT killed — we only kill by exact PID from
+    the registries).
+
+    **Absence of any log line from this function is now an error.**  If
+    monitoring sees no log line for a dispatch gate invocation, it means
+    the function was never called or the log write was suppressed — both
+    are bugs.
+
     Returns list of PIDs killed.  Idempotent: returns [] if no PIDs are
     registered or if all registered PIDs have already exited.
     """
     killed: list[int] = []
     now_epoch = int(time.time())
+    now_iso = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
 
     # Read PIDs from both registries.
     disk_pids = set(_read_pids_from_disk(month))
@@ -376,6 +395,33 @@ def kill_stale_dispatch(month: str) -> list[int]:
 
     # Union of both sets.
     all_pids = disk_pids | redis_pids
+
+    # ------------------------------------------------------------------
+    # Empty-registry guard (Chaos Monkey #2a): always write a log line
+    # even when there is nothing to kill.  Without this, a worker that
+    # wipes /tmp/wayfarer_smoke/* (rm -rf) would see an empty registry
+    # and return [] silently — the worst-case scenario where a real live
+    # stale dispatch keeps holding a GPU slot + GridFS write handle while
+    # the next worker launches fresh chunks, double-writing GridFS for
+    # hours.
+    # ------------------------------------------------------------------
+    if not all_pids:
+        # Paranoid ps -ef sanity check: scan for active python processes
+        # whose argv matches dispatch_<month>.  This is WARN-ONLY — we
+        # do NOT kill because kill is by exact PID from registries.
+        ps_alive_pids = _ps_find_dispatch_processes(month)
+        for pid, argv_snippet in ps_alive_pids:
+            log_line = f"[{now_iso} registry_empty_but_ps_alive pid={pid} argv={argv_snippet}]\n"
+            with open(_KILLS_LOG, "a") as fh:
+                fh.write(log_line)
+
+        # Always write at least one registry_empty line so monitoring
+        # knows this function ran.
+        log_line = f"[{now_iso} registry_empty level=warn month={month}]\n"
+        with open(_KILLS_LOG, "a") as fh:
+            fh.write(log_line)
+
+        return killed
 
     for pid in all_pids:
         # Determine source for logging.
@@ -389,7 +435,7 @@ def kill_stale_dispatch(month: str) -> list[int]:
         try:
             os.kill(pid, signal.SIGTERM)
             killed.append(pid)
-            log_line = f"pid={pid} epoch={now_epoch} source={source}\n"
+            log_line = f"[{now_iso} kill pid={pid} epoch={now_epoch} source={source}]\n"
             with open(_KILLS_LOG, "a") as fh:
                 fh.write(log_line)
         except ProcessLookupError:
@@ -400,6 +446,58 @@ def kill_stale_dispatch(month: str) -> list[int]:
             pass
 
     return killed
+
+
+def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
+    """Scan ``ps -ef`` for active python processes whose argv contains
+    ``dispatch_<month>`` (the per-month dispatch script name pattern).
+
+    Returns a list of ``(pid, argv_snippet)`` tuples.  The argv_snippet
+    is truncated to 120 chars for log-line readability.
+
+    This is a paranoid sanity check used by ``kill_stale_dispatch`` when
+    both registries are empty — it warns but does NOT kill.
+    """
+    results: list[tuple[int, str]] = []
+    try:
+        proc = subprocess.run(
+            ["ps", "-ef"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        if proc.returncode != 0:
+            return results
+    except (subprocess.TimeoutExpired, OSError):
+        return results
+
+    # Pattern: python + dispatch_<month> in argv.
+    # ps -ef columns: UID PID PPID C STIME TTY TIME CMD...
+    dispatch_pattern = re.compile(rf"dispatch_{re.escape(month)}", re.IGNORECASE)
+    python_pattern = re.compile(r"\bpython[23]?\b", re.IGNORECASE)
+
+    for line in proc.stdout.splitlines():
+        # Skip header line.
+        if line.startswith(("UID", "USER")):
+            continue
+        parts = line.split(None, 7)  # Split into at most 8 fields.
+        if len(parts) < 8:
+            continue
+        pid_str = parts[1]
+        argv_full = parts[7]  # The CMD column.
+
+        # Must be a python process AND match dispatch_<month>.
+        if python_pattern.search(argv_full) and dispatch_pattern.search(argv_full):
+            try:
+                pid = int(pid_str)
+            except ValueError:
+                continue
+            # Truncate argv for log readability.
+            argv_snippet = argv_full[:120].replace("\n", " ")
+            results.append((pid, argv_snippet))
+
+    return results
 
 
 # ---------------------------------------------------------------------------
