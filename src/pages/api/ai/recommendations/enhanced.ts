@@ -6,8 +6,7 @@ import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 
 import { createProductionEnhancedRecommendationService } from '../../../../lib/ai/services/EnhancedRecommendationFactory'
 import { getSession } from '../../../../lib/auth/session'
-import { validateRequestBody } from '../../../../lib/validation'
-import type { ValidationErrorDetails } from '../../../../lib/validation'
+import { type ValidationErrorDetails, validateRequestBody } from '../../../../lib/validation/index'
 
 const logger = createBuildSafeLogger('enhanced-recommendation-api')
 

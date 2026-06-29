@@ -328,7 +328,7 @@ async def verify_audit_chain(
                 break
             prev_hash = row.get("row_hash")
 
-        last_row = rows[-1] if rows else {}
+        rows[-1] if rows else {}
 
         return {
             "chain_valid": chain_valid,

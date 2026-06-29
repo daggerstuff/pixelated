@@ -159,7 +159,7 @@ def test_redis_roundtrip() -> None:
 
         # GET the key (should return "1")
         value = redis_client.get(key)
-        assert value == b"1" or value == "1", f"Expected '1', got {value!r}"
+        assert value in {b"1", "1"}, f"Expected '1', got {value!r}"
 
         # Check TTL (should be <= 5, and we allow up to 6s for clock skew)
         ttl = redis_client.ttl(key)

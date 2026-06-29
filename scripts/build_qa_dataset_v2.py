@@ -30,11 +30,7 @@ def extract_transcript_text(content: str) -> str:
             continue
 
         # Skip metadata lines
-        if (
-            stripped.startswith("**Channel:**")
-            or stripped.startswith("**Source:**")
-            or stripped.startswith("**Date:**")
-        ):
+        if stripped.startswith(("**Channel:**", "**Source:**", "**Date:**")):
             continue
 
         # Skip bold markers
@@ -45,7 +41,7 @@ def extract_transcript_text(content: str) -> str:
             continue
 
         # Skip lines that are just URLs or file paths
-        if stripped.startswith("local://") or stripped.startswith("http"):
+        if stripped.startswith(("local://", "http")):
             continue
 
         transcript_lines.append(stripped)
@@ -70,8 +66,7 @@ def load_and_clean_transcript(file_path: Path) -> dict | None:
         clean_text = extract_transcript_text(content)
 
         return {"title": title, "channel": channel, "content": clean_text, "source_file": str(file_path)}
-    except Exception as e:
-        print(f"Error loading {file_path}: {e}")
+    except Exception:
         return None
 
 
@@ -117,7 +112,7 @@ def generate_qa_pair(passage: str, transcript: dict) -> dict | None:
 
     # Extract key themes from first few sentences
     sentences = re.split(r"(?<=[.!?])\s+", passage)
-    first_sentences = " ".join(sentences[:3]) if len(sentences) >= 3 else passage
+    " ".join(sentences[:3]) if len(sentences) >= 3 else passage
 
     # Create instruction based on content
     instruction = f"Based on insights from {transcript['channel']}, reflect on the following therapeutic perspective:"
@@ -143,7 +138,6 @@ def main():
     args = parser.parse_args()
 
     transcript_files = list(args.transcript_dir.glob("*.md"))
-    print(f"Found {len(transcript_files)} transcript files")
 
     if args.max_files:
         transcript_files = transcript_files[: args.max_files]
@@ -160,25 +154,17 @@ def main():
             if pair:
                 all_pairs.append(pair)
 
-        if (i + 1) % 10 == 0 or args.sample:
-            print(f"Processed {i + 1}/{len(transcript_files)} files, {len(all_pairs)} pairs")
-            if args.sample:
-                break
+        if ((i + 1) % 10 == 0 or args.sample) and args.sample:
+            break
 
     # Write output
     with open(args.output, "w") as f:
         for pair in all_pairs:
             f.write(json.dumps(pair) + "\n")
 
-    print(f"\nGenerated {len(all_pairs)} QA pairs")
-    print(f"Saved to {args.output}")
-
     if args.sample and all_pairs:
-        print("\n=== SAMPLE ===")
         for i, pair in enumerate(all_pairs[:2], 1):
-            print(f"\nPair {i}:")
-            print(f"  Instruction: {pair['instruction']}")
-            print(f"  Output (first 300 chars): {pair['output'][:300]}")
+            pass
 
 
 if __name__ == "__main__":

@@ -32,13 +32,11 @@ def scale_adapter_weights(model: PeftModel, scale: float) -> PeftModel:
     Returns:
         PeftModel with scaled weights
     """
-    print(f"Scaling adapter weights by factor: {scale}")
 
     with torch.no_grad():
         for name, param in model.named_parameters():
             if "lora_" in name and param.requires_grad:
                 param.data.mul_(scale)
-                print(f"  Scaled: {name}")
 
     return model
 
@@ -62,14 +60,6 @@ def merge_with_custom_weight(
         torch_dtype: Data type for model
         device: Device map
     """
-    print("=" * 60)
-    print("LoRA Re-Merge with Custom Weight")
-    print("=" * 60)
-    print(f"Base model: {base_model_name}")
-    print(f"Adapter: {adapter_path}")
-    print(f"Output: {output_path}")
-    print(f"Scale factor: {scale}")
-    print("=" * 60)
 
     output_path = Path(output_path)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -77,7 +67,6 @@ def merge_with_custom_weight(
     dtype = getattr(torch, torch_dtype)
 
     # Load base model
-    print("\n[1/5] Loading base model...")
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_name,
         torch_dtype=dtype,
@@ -85,15 +74,11 @@ def merge_with_custom_weight(
         trust_remote_code=True,
         low_cpu_mem_usage=True,
     )
-    print("✅ Base model loaded")
 
     # Load tokenizer
-    print("\n[2/5] Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=True)
-    print(f"✅ Tokenizer loaded. Vocab size: {len(tokenizer)}")
 
     # Load adapter
-    print("\n[3/5] Loading LoRA adapter...")
     model = PeftModel.from_pretrained(
         base_model,
         adapter_path,
@@ -103,21 +88,15 @@ def merge_with_custom_weight(
     # Print original scale
     adapter_config = model.peft_config["default"]
     original_scale = adapter_config.lora_alpha / adapter_config.r
-    print(f"  Original lora_alpha: {adapter_config.lora_alpha}")
-    print(f"  Original lora_r: {adapter_config.r}")
-    print(f"  Original effective scale: {original_scale:.2f}x")
 
     # Scale weights if needed
     if scale != 1.0:
-        print(f"\n[4/5] Scaling adapter weights by {scale}...")
         model = scale_adapter_weights(model, scale)
-        new_effective_scale = original_scale * scale
-        print(f"  New effective scale: {new_effective_scale:.2f}x")
+        original_scale * scale
     else:
-        print("\n[4/5] No scaling applied (scale=1.0)")
+        pass
 
     # Merge and unload
-    print("\n[5/5] Merging and saving...")
     merged_model = model.merge_and_unload(safe_merge=True)
 
     merged_model.save_pretrained(
@@ -127,16 +106,9 @@ def merge_with_custom_weight(
     )
     tokenizer.save_pretrained(str(output_path))
 
-    print("\n" + "=" * 60)
-    print("MERGE COMPLETE")
-    print("=" * 60)
-    print(f"Output directory: {output_path}")
-    print("Model files:")
     for file in sorted(output_path.glob("*")):
         if file.is_file():
-            size_gb = file.stat().st_size / (1024**3)
-            print(f"  - {file.name}: {size_gb:.2f} GB")
-    print("=" * 60)
+            file.stat().st_size / (1024**3)
 
 
 def main():

@@ -26,7 +26,6 @@ SOURCE_ID_RE = re.compile(r"^source-id:\s*(PIX-\d+)\s*$", re.MULTILINE)
 
 def run_bd(args: list[str], *, dry_run: bool) -> bool:
     if dry_run:
-        print(f"  [dry-run] bd {' '.join(args)}")
         return True
     completed = subprocess.run(
         ["bd", *args],
@@ -35,7 +34,7 @@ def run_bd(args: list[str], *, dry_run: bool) -> bool:
         text=True,
     )
     if completed.returncode != 0:
-        print(completed.stderr or completed.stdout, file=sys.stderr)
+        pass
     return completed.returncode == 0
 
 
@@ -220,21 +219,17 @@ def apply_jsonl_batch(
     migration_closed = 0
     sync_closed = 0
     ref_updated = 0
-    jira_import_closed = 0
-    jira_linked = 0
 
     for issue in issue_rows:
         issue_id = issue["id"]
 
-        if not skip_migration_close and issue_id in migration_ids:
-            if issue.get("status") != "closed":
-                issue["status"] = "closed"
-                migration_closed += 1
+        if not skip_migration_close and issue_id in migration_ids and issue.get("status") != "closed":
+            issue["status"] = "closed"
+            migration_closed += 1
 
-        if not skip_synckey_close and issue_id in sync_close:
-            if issue.get("status") != "closed":
-                issue["status"] = "closed"
-                sync_closed += 1
+        if not skip_synckey_close and issue_id in sync_close and issue.get("status") != "closed":
+            issue["status"] = "closed"
+            sync_closed += 1
 
         if not skip_jira_ref_update and issue.get("status") != "closed":
             body = issue.get("description") or ""
@@ -244,13 +239,8 @@ def apply_jsonl_batch(
                 ref_updated += 1
 
     if merge_jira_imports:
-        issue_rows, jira_import_closed, jira_linked = merge_jira_import_dupes(issue_rows, key_map)
+        issue_rows, _jira_import_closed, _jira_linked = merge_jira_import_dupes(issue_rows, key_map)
 
-    print(
-        f"JSONL batch: migration_closed={migration_closed}, "
-        f"sync_closed={sync_closed}, ref_updated={ref_updated}, "
-        f"jira_import_closed={jira_import_closed}, jira_linked={jira_linked}"
-    )
     if dry_run:
         return 0
 
@@ -263,9 +253,7 @@ def apply_jsonl_batch(
         text=True,
     )
     if completed.returncode != 0:
-        print(completed.stderr or completed.stdout, file=sys.stderr)
         return 1
-    print(completed.stdout.strip())
     return 0
 
 
@@ -290,17 +278,12 @@ def main() -> int:
     dry_run = not args.apply
 
     if not GUSHER_JSON.is_file():
-        print(f"Missing {GUSHER_JSON}", file=sys.stderr)
         return 1
     if not KEY_MAP.is_file():
-        print(f"Missing {KEY_MAP}", file=sys.stderr)
         return 1
 
-    gusher_count = len(json.loads(GUSHER_JSON.read_text()))
+    len(json.loads(GUSHER_JSON.read_text()))
     key_map: dict[str, str] = json.loads(KEY_MAP.read_text())
-    print(f"gusher-pix.json: {gusher_count} issues")
-    print(f"pix-to-adhd-key-map.json: {len(key_map)} mappings")
-    print("mode:", "DRY-RUN" if dry_run else "APPLY")
 
     if args.jsonl_batch:
         return apply_jsonl_batch(
@@ -316,10 +299,9 @@ def main() -> int:
 
     if not args.skip_migration_close:
         migration_dupes = load_migration_dupes()
-        print(f"\n1. Close slimshadyme migration duplicates: {len(migration_dupes)}")
         for index, (issue_id, source_pix) in enumerate(migration_dupes, start=1):
             if index % args.batch_size == 1:
-                print(f"  batch {index}-{min(index + args.batch_size - 1, len(migration_dupes))}")
+                pass
             if not run_bd(
                 ["close", issue_id, "--reason", f"Duplicate of gusher {source_pix or 'PIX'} → ADHD migration"],
                 dry_run=dry_run,
@@ -331,10 +313,9 @@ def main() -> int:
         # Skip IDs already closed in step 1
         migration_ids = {i for i, _ in load_migration_dupes()}
         sync_dupes = [(c, s) for c, s in sync_dupes if s not in migration_ids]
-        print(f"\n2. Close sync-key stale duplicates: {len(sync_dupes)}")
         for index, (_canonical, stale_id) in enumerate(sync_dupes, start=1):
             if index % args.batch_size == 1:
-                print(f"  batch {index}-{min(index + args.batch_size - 1, len(sync_dupes))}")
+                pass
             if not run_bd(["close", stale_id, "--reason", "sync-key duplicate"], dry_run=dry_run):
                 failed += 1
             if not dry_run:
@@ -345,16 +326,14 @@ def main() -> int:
 
     if not args.skip_jira_ref_update:
         ref_updates = load_jira_ref_updates(key_map)
-        print(f"\n3. Rewrite jira:/source-id to ADHD-*: {len(ref_updates)} issues")
         for index, (issue_id, new_body) in enumerate(ref_updates, start=1):
             if index % args.batch_size == 1:
-                print(f"  batch {index}-{min(index + args.batch_size - 1, len(ref_updates))}")
+                pass
             if not run_bd(["update", issue_id, "--description", new_body], dry_run=dry_run):
                 failed += 1
 
-    print(f"\nDone. failures={failed}")
     if dry_run:
-        print("Re-run with --apply to execute.")
+        pass
     return 1 if failed else 0
 
 

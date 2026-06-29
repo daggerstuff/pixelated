@@ -60,7 +60,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
             if (!isValidNotificationItem(data.data)) {
               return;
             }
-            const notification = data.data as NotificationItem;
+            const notification = data.data;
             setNotifications((prev) => [notification, ...prev]);
             if (notification.status === NotificationStatus.PENDING) {
               setUnreadCount((prev) => prev + 1);

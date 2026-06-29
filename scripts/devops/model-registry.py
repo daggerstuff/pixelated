@@ -48,18 +48,10 @@ def cmd_list(args: argparse.Namespace) -> None:
     active = manifest.get("active_run_id")
 
     if not checkpoints:
-        print("No checkpoints registered.")
         return
 
-    print(f"{'Active':<7} {'Run ID':<30} {'Base Model':<35} {'Dataset':<12} {'Clinical Validity':<18} {'Timestamp'}")
-    print("-" * 120)
     for cp in sorted(checkpoints, key=lambda x: x.get("timestamp", ""), reverse=True):
-        marker = "*" if cp["run_id"] == active else ""
-        print(
-            f"{marker:<7} {cp['run_id']:<30} {cp.get('base_model', '?'):<35} "
-            f"{cp.get('dataset_version', '?'):<12} {cp.get('clinical_validity_score', '?'):<18} "
-            f"{cp.get('timestamp', '?'):<26}"
-        )
+        "*" if cp["run_id"] == active else ""
 
 
 def cmd_tag(args: argparse.Namespace) -> None:
@@ -98,7 +90,6 @@ def cmd_tag(args: argparse.Namespace) -> None:
         manifest["active_run_id"] = args.run_id
 
     _save_manifest(manifest)
-    print(f"Tagged checkpoint {args.run_id}" + (" (active)" if args.set_active else ""))
 
 
 def cmd_rollback(args: argparse.Namespace) -> None:
@@ -119,7 +110,6 @@ def cmd_rollback(args: argparse.Namespace) -> None:
         if dest.exists():
             shutil.rmtree(dest)
         shutil.copytree(checkpoint_dir, dest)
-        print(f"Rolled back to {run_id}. Active model at {dest}")
     else:
         logger.warning(
             "Manifest updated but checkpoint directory %s not found locally. Pull from S3 first.",
@@ -135,8 +125,6 @@ def cmd_show(args: argparse.Namespace) -> None:
     if not matching:
         logger.error("Run ID %r not found in registry.", run_id)
         sys.exit(1)
-
-    print(json.dumps(matching[0], indent=2))
 
 
 def build_parser() -> argparse.ArgumentParser:

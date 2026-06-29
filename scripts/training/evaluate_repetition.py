@@ -223,17 +223,15 @@ def main() -> int:
         prompts = prompts[: args.limit]
 
     device = infer_device()
-    print(f"[INFO] Device: {device}")
-    print(f"[INFO] Loading model: {args.model_path}")
     if args.adapter_path:
-        print(f"[INFO] Loading adapter: {args.adapter_path}")
+        pass
 
     model, tokenizer = load_model_and_tokenizer(args.model_path, args.adapter_path, device)
 
     results: list[dict[str, Any]] = []
     degenerate_count = 0
 
-    for index, item in enumerate(prompts, start=1):
+    for _index, item in enumerate(prompts, start=1):
         prompt = item["prompt"]
         response = generate_response(
             model,
@@ -263,13 +261,6 @@ def main() -> int:
                 "response": response,
                 "metrics": asdict(metrics),
             }
-        )
-
-        print(
-            f"[INFO] {index}/{len(prompts)} {item.get('id', 'N/A')} "
-            f"degenerate={metrics.is_degenerate} "
-            f"consecutive_max={metrics.consecutive_repeat_max} "
-            f"ngram_ratio={metrics.repeated_ngram_ratio:.3f}"
         )
 
     total = len(results)
@@ -303,10 +294,6 @@ def main() -> int:
     output_path = Path(args.output_file)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
-
-    print("\n=== REPETITION EVALUATION SUMMARY ===")
-    print(json.dumps(summary, indent=2))
-    print(f"[INFO] Report written to: {output_path}")
 
     return 0 if summary["passes_target"] else 2
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
 import json
 import os
@@ -158,7 +159,7 @@ def test_bootstrap_storage_plan_writes_plan_before_materialization(tmp_path: Pat
 
     module.materialize_storage_plan = fail_materialize
     try:
-        try:
+        with contextlib.suppress(PermissionError):
             module.bootstrap_storage_plan(
                 manifest_path=manifest_path,
                 volume_root=tmp_path / "volume",
@@ -166,8 +167,6 @@ def test_bootstrap_storage_plan_writes_plan_before_materialization(tmp_path: Pat
                 output_path=output_path,
                 materialize=True,
             )
-        except PermissionError:
-            pass
     finally:
         module.materialize_storage_plan = original_materialize
 

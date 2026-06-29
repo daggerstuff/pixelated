@@ -28,5 +28,3 @@ prd = {
 
 with open("audit-prd.json", "w") as f:
     json.dump(prd, f, indent=2)
-
-print("Created audit-prd.json with 30 rounds.")

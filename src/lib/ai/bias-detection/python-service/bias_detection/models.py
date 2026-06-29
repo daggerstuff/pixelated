@@ -1,14 +1,14 @@
 """Data models for bias detection service"""
 
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class BiasType(str, Enum):
+class BiasType(StrEnum):
     """Types of bias that can be detected"""
 
     GENDER = "gender"
@@ -30,7 +30,7 @@ class BiasType(str, Enum):
     CRIMINAL_HISTORY = "criminal_history"
 
 
-class AnalysisStatus(str, Enum):
+class AnalysisStatus(StrEnum):
     """Status of bias analysis"""
 
     PENDING = "pending"
@@ -40,7 +40,7 @@ class AnalysisStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ConfidenceLevel(str, Enum):
+class ConfidenceLevel(StrEnum):
     """Confidence levels for bias detection"""
 
     LOW = "low"

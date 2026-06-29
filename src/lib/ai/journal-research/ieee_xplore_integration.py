@@ -357,7 +357,7 @@ class IEEEXploreClient:
         if criteria.keywords:
             title_keywords = set(paper.title.lower().split())
             abstract_keywords = set(paper.abstract.lower().split())
-            search_keywords = set(k.lower() for k in criteria.keywords)
+            search_keywords = {k.lower() for k in criteria.keywords}
 
             title_matches = len(title_keywords.intersection(search_keywords))
             abstract_matches = len(abstract_keywords.intersection(search_keywords))
@@ -587,7 +587,7 @@ class IEEEResearchPipeline:
             )
 
             # Create ResearchPaper
-            research_paper = ResearchPaper(
+            return ResearchPaper(
                 paper_id=f"ieee_{ieee_paper.paper_id}",
                 metadata=metadata,
                 content={
@@ -613,8 +613,6 @@ class IEEEResearchPipeline:
                 extraction_date=datetime.now(timezone.utc),
                 processing_status="completed",
             )
-
-            return research_paper
 
         except Exception as e:
             logger.error(f"Failed to convert IEEE paper: {e}")
@@ -832,14 +830,8 @@ if __name__ == "__main__":
             min_citations=5,
         )
 
-        print(f"Found {len(results)} bias-related papers from IEEE Xplore")
-
-        for paper in results[:3]:  # Show first 3 results
-            print(f"\nTitle: {paper.metadata.title}")
-            print(f"Authors: {', '.join(paper.metadata.authors)}")
-            print(f"Year: {paper.metadata.year}")
-            print(f"Relevance Score: {paper.quality_score}")
-            print(f"Bias Relevance: {paper.bias_analysis.get('relevance_score', 0)}")
+        for _paper in results[:3]:  # Show first 3 results
+            pass
 
         # Shutdown
         if ieee_client:

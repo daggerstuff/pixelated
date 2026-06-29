@@ -110,18 +110,14 @@ def main():
     parser.add_argument("--sample", action="store_true", help="Generate a small sample for review")
     args = parser.parse_args()
 
-    print(f"Loading transcript data from {args.input_dir}...")
     channel_data = load_transcript_data(args.input_dir)
-    print(f"Loaded data from {len(channel_data)} channels")
 
-    total_records = sum(len(records) for records in channel_data.values())
-    print(f"Total records: {total_records}")
+    sum(len(records) for records in channel_data.values())
 
     if args.sample:
         # Generate a small sample for review
         sample_pairs = []
         for channel_name, records in list(channel_data.items())[:3]:
-            print(f"\nProcessing {channel_name} ({len(records)} records)...")
             passages = reconstruct_passages(records[:100])  # Limit for sample
             for passage in passages[:5]:  # 5 passages per channel
                 pair = generate_qa_pair(passage, channel_name)
@@ -133,15 +129,10 @@ def main():
             for pair in sample_pairs:
                 f.write(json.dumps(pair) + "\n")
 
-        print(f"\nGenerated {len(sample_pairs)} sample pairs")
-        print(f"Saved to {output_path}")
-        print("\nPlease review these samples before full generation.")
-
     else:
         # Full generation
         all_pairs = []
         for channel_name, records in channel_data.items():
-            print(f"Processing {channel_name} ({len(records)} records)...")
             passages = reconstruct_passages(records)
             for passage in passages:
                 pair = generate_qa_pair(passage, channel_name)
@@ -157,9 +148,6 @@ def main():
         with open(args.output, "w") as f:
             for pair in all_pairs:
                 f.write(json.dumps(pair) + "\n")
-
-        print(f"\nGenerated {len(all_pairs)} QA pairs")
-        print(f"Saved to {args.output}")
 
 
 if __name__ == "__main__":

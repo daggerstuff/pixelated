@@ -83,7 +83,7 @@ class TestCrisisDetector:
     def test_negation_suppression(self):
         text = "I would never hurt myself."
         result = self.detector.detect(text)
-        assert result.tier == CrisisTier.NONE or result.tier == CrisisTier.MODERATE
+        assert result.tier in (CrisisTier.NONE, CrisisTier.MODERATE)
 
     def test_temporal_suppression(self):
         text = "Last year I felt suicidal, but I am much better now."

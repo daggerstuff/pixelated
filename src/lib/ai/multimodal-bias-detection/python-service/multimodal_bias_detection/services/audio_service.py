@@ -356,9 +356,7 @@ class AudioBiasDetector:
         # Simplified genre classification
         # In production, this would use a trained classifier
 
-        genres = [("classical", 0.3), ("jazz", 0.2), ("pop", 0.2), ("rock", 0.1), ("electronic", 0.1), ("world", 0.1)]
-
-        return genres
+        return [("classical", 0.3), ("jazz", 0.2), ("pop", 0.2), ("rock", 0.1), ("electronic", 0.1), ("world", 0.1)]
 
     async def _analyze_speakers(self, audio_array: np.ndarray, sample_rate: int) -> dict[str, Any]:
         """Analyze speaker characteristics"""
@@ -416,7 +414,7 @@ class AudioBiasDetector:
 
         # Check for speaking rate diversity
         speaking_rates = [s["characteristics"]["speaking_rate"] for s in speakers]
-        if len(set([round(rate, -1) for rate in speaking_rates])) > 1:
+        if len({round(rate, -1) for rate in speaking_rates}) > 1:
             diversity_score += 0.3
 
         # Check for energy diversity

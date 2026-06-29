@@ -6,6 +6,7 @@ Validates all components are properly deployed and functioning
 
 import asyncio
 import logging
+import sys
 from datetime import datetime
 from typing import Any
 
@@ -436,7 +437,7 @@ class DeploymentValidator:
 ## Test Results
 """
 
-        for test_name, test_result in results["tests"].items():
+        for _test_name, test_result in results["tests"].items():
             status_icon = "✅" if test_result["status"] == "pass" else "❌" if test_result["status"] == "fail" else "⚠️"
             report += f"\n### {status_icon} {test_result['description']}\n"
             report += f"- **Status:** {test_result['status'].title()}\n"
@@ -468,9 +469,6 @@ async def main():
     """Main validation function"""
     validator = DeploymentValidator()
 
-    print("🔍 Starting Enhanced Bias Detection System Deployment Validation")
-    print("=" * 60)
-
     # Run validation suite
     results = await validator.run_validation_suite()
 
@@ -482,18 +480,11 @@ async def main():
     with open(report_file, "w") as f:
         f.write(report)
 
-    print("\n" + "=" * 60)
-    print(f"📊 Validation Report Generated: {report_file}")
-    print(f"🎯 Overall Status: {results['overall_status'].upper()}")
-    print(f"📈 Success Rate: {results['summary']['success_rate']:.2%}")
-
     if results["overall_status"] == "fail":
-        print("\n⚠️  Some tests failed. Please review the report and address issues.")
         return 1
-    print("\n✅ All tests passed! System is ready for production.")
     return 0
 
 
 if __name__ == "__main__":
     exit_code = asyncio.run(main())
-    exit(exit_code)
+    sys.exit(exit_code)

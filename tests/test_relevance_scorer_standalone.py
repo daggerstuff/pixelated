@@ -39,18 +39,6 @@ def test_relevance_scorer_structure():
                 missing_components.append(component)
 
         # Check for advanced features
-        advanced_features = [
-            "TF_IDF",
-            "BM25",
-            "COSINE_SIMILARITY",
-            "CLINICAL_WEIGHTED",
-            "HYBRID",
-            "CONTEXT_ADAPTIVE",
-            "DIVERSITY_AWARE",
-            "authority_score",
-            "recency_score",
-            "confidence",
-        ]
 
     except Exception:
         # Silently handle file reading errors

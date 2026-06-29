@@ -5,11 +5,11 @@ HIPAA-compliant PII redaction for therapeutic transcripts
 
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 
-class PIICategory(str, Enum):
+class PIICategory(StrEnum):
     NAMES = "names"
     EMAILS = "emails"
     PHONES = "phones"

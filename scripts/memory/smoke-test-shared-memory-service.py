@@ -5,7 +5,6 @@ import hashlib
 import hmac
 import json
 import os
-import sys
 import time
 import urllib.error
 import urllib.request
@@ -226,7 +225,6 @@ def main() -> int:
     args = build_parser().parse_args()
 
     if not args.actor_id or not args.actor_secret:
-        print("Error: --actor-id and --actor-secret are required", file=sys.stderr)
         return 1
 
     diagnostic_client = DiagnosticClient(
@@ -244,18 +242,10 @@ def main() -> int:
         user_id=args.user_id,
     )
 
-    print(f"Smoke testing memory service at {args.base_url}")
-    print(f"Bank: {args.bank_id}, User: {args.user_id}")
-    print("-" * 50)
-
-    print("\n[1/4] Testing health endpoint...")
     status, response = diagnostic_client.health_check()
     if status != 200:
-        print(f"  ✗ Health check failed: HTTP {status}", file=sys.stderr)
         return 1
-    print(f"  ✓ Health check passed: {response}")
 
-    print("\n[2/4] Testing memory retention...")
     test_content = f"Smoke test memory created at {time.strftime('%Y-%m-%d %H:%M:%S')}"
     status, response = memory_repo.retain(
         content=test_content,
@@ -263,9 +253,7 @@ def main() -> int:
         tags=["test", "smoke-test", "automated"],
     )
     if status not in (200, 201):
-        print(f"  ✗ Memory retention failed: HTTP {status}", file=sys.stderr)
         return 1
-    print("  ✓ Memory retained successfully")
 
     document_id = None
     if isinstance(response, dict):
@@ -277,10 +265,8 @@ def main() -> int:
             document_id = response["items"][0].get("id")
 
     if not document_id:
-        print("  ✗ Failed to extract document ID from retention response", file=sys.stderr)
         return 1
 
-    print("\n[3/4] Testing memory recall...")
     status, response = memory_repo.recall(
         query="smoke-test",
         limit=10,
@@ -288,24 +274,17 @@ def main() -> int:
         tags_match="any",
     )
     if status != 200:
-        print(f"  ✗ Memory recall failed: HTTP {status}", file=sys.stderr)
         return 1
-    print("  ✓ Memory recall successful")
     if isinstance(response, dict) and "items" in response:
-        print(f"  Found {len(response['items'])} matching memories")
+        pass
 
     if document_id:
-        print("\n[4/4] Testing document deletion...")
         status, response = memory_repo.delete_document(document_id)
         if status not in (200, 204):
-            print(f"  ✗ Document deletion failed: HTTP {status}", file=sys.stderr)
             return 1
-        print("  ✓ Document deleted successfully")
     else:
-        print("\n[4/4] Skipping deletion (no document ID received)")
+        pass
 
-    print("\n" + "=" * 50)
-    print("All smoke tests passed!")
     return 0
 
 

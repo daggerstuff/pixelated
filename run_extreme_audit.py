@@ -174,7 +174,6 @@ if not os.path.exists(progress_file):
     with open(progress_file, "w") as f:
         f.write("# Progress Log\n\n")
 
-print("Starting Extreme 20-Round Audit Loop...")
 
 for i, fix in enumerate(fixes):
     round_num = 81 + i
@@ -192,7 +191,6 @@ for i, fix in enumerate(fixes):
     status = "PASS" if result.returncode == 0 else "FAIL"
 
     if status == "FAIL":
-        print(f"FAILED on round {round_num}:\n{result.stdout}\n{result.stderr}")
         break
 
     log_entry = f"## Round {round_num} — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} — [Team: {persona}]\n"
@@ -202,7 +200,3 @@ for i, fix in enumerate(fixes):
 
     with open(progress_file, "a") as f:
         f.write(log_entry)
-
-    print(f"Round {round_num} completed successfully.")
-
-print("All 20 rounds completed. Audit finished.")

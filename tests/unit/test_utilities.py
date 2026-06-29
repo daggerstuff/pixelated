@@ -79,10 +79,10 @@ class TestUtilities:
         invalid_emails = ["invalid", "no@domain", "missing.com"]
 
         for email in valid_emails:
-            assert validate_email(email) == True
+            assert validate_email(email)
 
         for email in invalid_emails:
-            assert validate_email(email) == False
+            assert not validate_email(email)
 
     @patch("os.path.exists")
     def test_path_validation(self, mock_exists):
@@ -93,5 +93,5 @@ class TestUtilities:
             return os.path.exists(path)
 
         result = check_path_exists("/fake/path")
-        assert result == True
+        assert result
         mock_exists.assert_called_once_with("/fake/path")

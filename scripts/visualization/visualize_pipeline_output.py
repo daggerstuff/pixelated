@@ -43,7 +43,6 @@ def visualize_latest_run():
     output_dir.mkdir(exist_ok=True)
 
     if not log_file.exists():
-        print(f"Log file not found at {log_file}")
         # Create a dummy log file for demonstration purposes
         dummy_data = {
             "output": {
@@ -70,9 +69,8 @@ def visualize_latest_run():
         # Plot 2: Meta Intelligence
         plot_meta_intelligence(output_data["meta_intelligence"], output_dir)
 
-        print(f"Visualizations saved to {output_dir}")
     else:
-        print("Could not read log file data")
+        pass
 
 
 if __name__ == "__main__":

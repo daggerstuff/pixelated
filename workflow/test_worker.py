@@ -21,11 +21,11 @@ class TestWorker(unittest.TestCase):
         worker.log_event("evt_123", "test message")
         with open(self.temp_path) as f:
             lines = f.readlines()
-        self.assertEqual(len(lines), 1)
+        assert len(lines) == 1
         data = json.loads(lines[0])
-        self.assertEqual(data["event_id"], "evt_123")
-        self.assertEqual(data["message"], "test message")
-        self.assertIn("timestamp", data)
+        assert data["event_id"] == "evt_123"
+        assert data["message"] == "test message"
+        assert "timestamp" in data
 
 
 if __name__ == "__main__":
