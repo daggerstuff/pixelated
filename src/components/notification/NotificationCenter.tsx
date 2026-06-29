@@ -1,137 +1,133 @@
-import { Bell, Check, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Bell, Check, X } from "lucide-react";
+import { useEffect, useState } from "react";
 
-import { useWebSocket } from '../../hooks/useWebSocket'
-import type { NotificationItem } from '../../lib/services/notification/NotificationService'
-import { NotificationStatus } from '../../lib/services/notification/NotificationService'
-import { cn } from '../../lib/utils'
-import { Badge } from '../ui/badge/index'
-import { Button } from '../ui/button/index'
-import { Card } from '../ui/card/index'
+import { useWebSocket } from "../../hooks/useWebSocket";
+import type { NotificationItem } from "../../lib/services/notification/NotificationService";
+import { NotificationStatus } from "../../lib/services/notification/NotificationService";
+import { cn } from "../../lib/utils";
+import { Badge } from "../ui/badge/index";
+import { Button } from "../ui/button/index";
+import { Card } from "../ui/card/index";
 
 interface NotificationCenterProps {
-  className?: string
+  className?: string;
 }
 
 function isValidNotificationItem(item: unknown): item is NotificationItem {
-  if (typeof item !== 'object' || item === null) {
-    return false
+  if (typeof item !== "object" || item === null) {
+    return false;
   }
-  const obj = item as Record<string, unknown>
+  const obj = item as Record<string, unknown>;
   return (
-    typeof obj.id === 'string' &&
-    typeof obj.title === 'string' &&
-    typeof obj.body === 'string' &&
-    typeof obj.status === 'number' &&
-    typeof obj.createdAt === 'number'
-  )
+    typeof obj["id"] === "string" &&
+    typeof obj["title"] === "string" &&
+    typeof obj["body"] === "string" &&
+    typeof obj["status"] === "number" &&
+    typeof obj["createdAt"] === "number"
+  );
 }
 
 export function NotificationCenter({ className }: NotificationCenterProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [notifications, setNotifications] = useState<NotificationItem[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
+  const [isOpen, setIsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const { sendMessage } = useWebSocket({
-    url: 'ws://localhost:8080', // Placeholder URL
-    sessionId: 'placeholder-session', // Placeholder session ID
+    url: "ws://localhost:8080", // Placeholder URL
+    sessionId: "placeholder-session", // Placeholder session ID
     onMessage: (message) => {
       try {
         const data = JSON.parse(message.content) as {
-          type: string
-          data: unknown
-        }
+          type: string;
+          data: unknown;
+        };
 
         switch (data.type) {
-          case 'notifications':
+          case "notifications":
             // Validate that data.data is an array before casting
             if (!Array.isArray(data.data)) {
-              return
+              return;
             }
-            const notifications = data.data as NotificationItem[]
-            setNotifications(notifications)
+            const notifications = data.data as NotificationItem[];
+            setNotifications(notifications);
             setUnreadCount(
-              notifications.filter(
-                (n: NotificationItem) =>
-                  n.status === NotificationStatus.PENDING,
-              ).length,
-            )
-            break
-          case 'notification':
+              notifications.filter((n: NotificationItem) => n.status === NotificationStatus.PENDING)
+                .length,
+            );
+            break;
+          case "notification":
             // Validate that data.data is a valid NotificationItem before casting
             if (!isValidNotificationItem(data.data)) {
-              return
+              return;
             }
-            const notification = data.data as NotificationItem
-            setNotifications((prev) => [notification, ...prev])
+            const notification = data.data as NotificationItem;
+            setNotifications((prev) => [notification, ...prev]);
             if (notification.status === NotificationStatus.PENDING) {
-              setUnreadCount((prev) => prev + 1)
+              setUnreadCount((prev) => prev + 1);
             }
-            break
+            break;
         }
       } catch (_err) {
         // Silently ignore parse errors or handle appropriately
       }
     },
-  })
+  });
 
   useEffect(() => {
     // Request initial notifications
     sendMessage({
-      id: 'init-notifications', // Placeholder ID
-      role: 'system', // Placeholder role
+      id: "init-notifications", // Placeholder ID
+      role: "system", // Placeholder role
       content: JSON.stringify({
-        type: 'get_notifications',
+        type: "get_notifications",
         limit: 20,
         offset: 0,
       }), // Stringify custom payload
       // type: 'get_notifications',
       // limit: 20,
       // offset: 0,
-    })
-  }, [sendMessage])
+    });
+  }, [sendMessage]);
 
   const handleMarkAsRead = async (notificationId: string) => {
     sendMessage({
       id: `mark-read-${notificationId}`,
-      role: 'system',
-      content: JSON.stringify({ type: 'mark_read', notificationId }),
+      role: "system",
+      content: JSON.stringify({ type: "mark_read", notificationId }),
       // type: 'mark_read',
       // notificationId,
-    })
+    });
 
     setNotifications((prev: NotificationItem[]) =>
       prev.map((n: NotificationItem) =>
-        n.id === notificationId
-          ? { ...n, status: NotificationStatus.READ, readAt: Date.now() }
-          : n,
+        n.id === notificationId ? { ...n, status: NotificationStatus.READ, readAt: Date.now() } : n,
       ),
-    )
-    setUnreadCount((prev: number) => Math.max(0, prev - 1))
-  }
+    );
+    setUnreadCount((prev: number) => Math.max(0, prev - 1));
+  };
 
   const handleDismiss = async (notificationId: string) => {
     sendMessage({
       id: `dismiss-${notificationId}`,
-      role: 'system',
-      content: JSON.stringify({ type: 'dismiss', notificationId }),
+      role: "system",
+      content: JSON.stringify({ type: "dismiss", notificationId }),
       // type: 'dismiss',
       // notificationId,
-    })
+    });
 
     setNotifications((prev: NotificationItem[]) =>
       prev.filter((n: NotificationItem) => n.id !== notificationId),
-    )
+    );
     if (
-      notifications.find((n: NotificationItem) => n.id === notificationId)
-        ?.status === NotificationStatus.PENDING
+      notifications.find((n: NotificationItem) => n.id === notificationId)?.status ===
+      NotificationStatus.PENDING
     ) {
-      setUnreadCount((prev: number) => Math.max(0, prev - 1))
+      setUnreadCount((prev: number) => Math.max(0, prev - 1));
     }
-  }
+  };
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn("relative", className)}>
       <Button
         variant="ghost"
         size="icon"
@@ -175,16 +171,13 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                   <div
                     key={notification.id}
                     className={cn(
-                      'flex items-start gap-4 p-4 transition-colors',
-                      notification.status === NotificationStatus.PENDING &&
-                        'bg-muted/50',
+                      "flex items-start gap-4 p-4 transition-colors",
+                      notification.status === NotificationStatus.PENDING && "bg-muted/50",
                     )}
                   >
                     <div className="flex-1">
                       <h3 className="font-medium">{notification.title}</h3>
-                      <p className="text-muted-foreground text-sm">
-                        {notification.body}
-                      </p>
+                      <p className="text-muted-foreground text-sm">{notification.body}</p>
                       <div className="text-muted-foreground mt-1 text-xs">
                         {new Date(notification.createdAt).toLocaleString()}
                       </div>
@@ -195,9 +188,7 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={async () =>
-                            handleMarkAsRead(notification.id)
-                          }
+                          onClick={async () => handleMarkAsRead(notification.id)}
                           aria-label="Mark as read"
                         >
                           <Check className="h-4 w-4" />
@@ -220,5 +211,5 @@ export function NotificationCenter({ className }: NotificationCenterProps) {
         </Card>
       )}
     </div>
-  )
+  );
 }
