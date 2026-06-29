@@ -10,6 +10,8 @@ import {
 import { BiasMetricsCollector } from "./metrics-collector";
 import { getPerformanceOptimizer, type PerformanceOptimizer } from "./performance-optimizer";
 import { PythonBiasDetectionBridge } from "./python-bridge";
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
+
 import type {
   AlertLevel,
   BiasDetectionConfig,
@@ -20,7 +22,10 @@ import type {
   ModelLevelAnalysisResult,
   PreprocessingAnalysisResult,
   TherapeuticSession as SessionData,
-  UserContext } from "./types";
+  UserContext,
+} from "./types";
+
+const logger = createBuildSafeLogger("BiasDetectionEngine");
 
 type LayerResults = import("./types").LayerResults;
 
@@ -67,10 +72,10 @@ type DemographicsSnapshot = {
 
 function toDemographics(demographics: Record<string, unknown> | undefined): DemographicsSnapshot {
   return {
-    age: toStringValue(demographics?.['age']),
-    gender: toStringValue(demographics?.['gender']),
-    ethnicity: toStringValue(demographics?.['ethnicity']),
-    primaryLanguage: toStringValue(demographics?.['primaryLanguage']),
+    age: toStringValue(demographics?.["age"]),
+    gender: toStringValue(demographics?.["gender"]),
+    ethnicity: toStringValue(demographics?.["ethnicity"]),
+    primaryLanguage: toStringValue(demographics?.["primaryLanguage"]),
   };
 }
 
@@ -86,7 +91,9 @@ function toAlertLevel(value: string): AlertLevel {
 }
 
 function isSessionData(value: unknown): value is SessionData {
-  return isRecordValue(value) && typeof value["sessionId"] === "string" && value["sessionId"] !== "";
+  return (
+    isRecordValue(value) && typeof value["sessionId"] === "string" && value["sessionId"] !== ""
+  );
 }
 
 function validateWeights(w: BiasLayerWeights): void {
@@ -219,7 +226,7 @@ export class BiasDetectionEngine {
     } catch (error: unknown) {
       // Fallback to null if performance optimizer fails to initialize
       this.performanceOptimizer = null;
-      console.warn("Performance optimizer initialization failed, using fallback mode:", error);
+      auditLogger.warn("Performance optimizer initialization failed, using fallback mode:", error);
     }
   }
 
@@ -229,8 +236,7 @@ export class BiasDetectionEngine {
     // Handle both new and legacy property names for backward compatibility
     validated.warning = thresholds.warning;
     validated.high = thresholds.high;
-    validated.critical =
-      thresholds.critical;
+    validated.critical = thresholds.critical;
 
     // Ensure thresholds are in valid range and properly ordered
     const warning = validated.warning;
@@ -460,17 +466,14 @@ export class BiasDetectionEngine {
       return result.value;
     }
     // Log the rejection reason with layer context (sanitized)
-    console.warn(`Layer ${layerName} analysis failed:`, result.reason);
+    auditLogger.warn(`Layer ${layerName} analysis failed:`, result.reason);
     recommendations.push(`${layerName} analysis unavailable; using fallback results`);
     return fallbackGetter();
   }
 
   async analyzeSession(session: SessionData): Promise<AnalysisResult> {
     this.ensureInitialized();
-    if (
-      typeof session.sessionId !== "string" ||
-      session.sessionId.trim() === ""
-    ) {
+    if (typeof session.sessionId !== "string" || session.sessionId.trim() === "") {
       throw new Error("Session ID is required");
     }
 
@@ -523,21 +526,22 @@ export class BiasDetectionEngine {
     const confidence = Math.max(0.1, baseConfidence - confidencePenalty);
 
     const maskedDemo = this.maskDemographics(
-      isRecordValue(session.participantDemographics)
-        ? session.participantDemographics
-        : undefined,
+      isRecordValue(session.participantDemographics) ? session.participantDemographics : undefined,
     );
 
     // If any tool returned an explicit fallback flag, note limited analysis
-    const anyFallback = [layerResults.preprocessing, layerResults.modelLevel, layerResults.interactive, layerResults.evaluation].some(
-      (r): boolean => {
-        if (isRecordValue(r)) {
-          const fallbackVal = (r as Record<string, unknown>)["fallback"]
-          return fallbackVal === true
-        }
-        return false
-      },
-    );
+    const anyFallback = [
+      layerResults.preprocessing,
+      layerResults.modelLevel,
+      layerResults.interactive,
+      layerResults.evaluation,
+    ].some((r): boolean => {
+      if (isRecordValue(r)) {
+        const fallbackVal = (r as Record<string, unknown>)["fallback"];
+        return fallbackVal === true;
+      }
+      return false;
+    });
 
     // Enhanced fallback messages for error scenarios to satisfy various tests
     let recommendations: string[];
@@ -583,7 +587,7 @@ export class BiasDetectionEngine {
     try {
       await this.metricsCollector.storeAnalysisResult(result);
     } catch (err) {
-      console.warn("storeAnalysisResult failed:", err);
+      auditLogger.warn("storeAnalysisResult failed:", err);
     }
 
     // Store result in distributed cache for future retrieval
@@ -593,28 +597,30 @@ export class BiasDetectionEngine {
     if (this.config.auditLogging) {
       const auditLogger = getAuditLogger();
       const sessionRecord = session as Record<string, unknown>;
-      const roleRecord = isRecordValue(sessionRecord['userRole']) ? sessionRecord['userRole'] : {};
-      const roleName = toStringValue(roleRecord['name']);
-      const roleLevel = toNumberValue(roleRecord['level']);
-      const institution = toStringValue(sessionRecord['userInstitution']);
-      const department = toStringValue(sessionRecord['userDepartment']);
+      const roleRecord = isRecordValue(sessionRecord["userRole"]) ? sessionRecord["userRole"] : {};
+      const roleName = toStringValue(roleRecord["name"]);
+      const roleLevel = toNumberValue(roleRecord["level"]);
+      const institution = toStringValue(sessionRecord["userInstitution"]);
+      const department = toStringValue(sessionRecord["userDepartment"]);
       const user: UserContext = {
-        userId: toStringValue(sessionRecord['userId']),
-        email: toStringValue(sessionRecord['userEmail']),
+        userId: toStringValue(sessionRecord["userId"]),
+        email: toStringValue(sessionRecord["userEmail"]),
         role: {
-          id: toStringValue(roleRecord['id']),
+          id: toStringValue(roleRecord["id"]),
           name: roleName === "" ? "analyst" : roleName,
-          description: toStringValue(roleRecord['description']),
+          description: toStringValue(roleRecord["description"]),
           level: roleLevel === 0 ? 1 : roleLevel,
         },
-        permissions: toStringArrayValue(sessionRecord['userPermissions']),
+        permissions: toStringArrayValue(sessionRecord["userPermissions"]),
         institution: institution === "" ? undefined : institution,
         department: department === "" ? undefined : department,
       };
-      const requestMeta = isRecordValue(sessionRecord['requestMeta']) ? sessionRecord['requestMeta'] : {};
+      const requestMeta = isRecordValue(sessionRecord["requestMeta"])
+        ? sessionRecord["requestMeta"]
+        : {};
       const request = {
-        ipAddress: toStringValue(requestMeta['ipAddress']),
-        userAgent: toStringValue(requestMeta['userAgent']),
+        ipAddress: toStringValue(requestMeta["ipAddress"]),
+        userAgent: toStringValue(requestMeta["userAgent"]),
       };
       const demographics = toDemographics(maskedDemo);
       await auditLogger.logBiasAnalysis(
@@ -652,7 +658,7 @@ export class BiasDetectionEngine {
         high: dashboardMetrics.overall_stats.alert_distribution.high,
         critical: dashboardMetrics.overall_stats.alert_distribution.critical,
       },
-    }
+    };
   }
 
   // Fast cached lookup used by performance tests
@@ -683,8 +689,7 @@ export class BiasDetectionEngine {
           return {
             layer: name,
             biasScore:
-              layerRecord !== undefined &&
-              typeof layerRecord["biasScore"] === "number"
+              layerRecord !== undefined && typeof layerRecord["biasScore"] === "number"
                 ? layerRecord["biasScore"]
                 : 0,
           };
@@ -759,15 +764,13 @@ export class BiasDetectionEngine {
         averageBiasScore: averageBias,
       },
       performance: perf,
-      alerts: results
-        .filter(Boolean)
-        .reduce(
-          (acc: Record<string, number>, r) => ({
-            ...acc,
-            [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1,
-          }),
-          {},
-        ),
+      alerts: results.filter(Boolean).reduce(
+        (acc: Record<string, number>, r) => ({
+          ...acc,
+          [r.alertLevel]: (acc[r.alertLevel] ?? 0) + 1,
+        }),
+        {},
+      ),
     };
     // Derive fairness from analysis: 1 - averageBias (bias in [0,1], so fairness = 1 - bias)
     const overallFairnessScore = Math.max(0, Math.min(1, 1 - averageBias));
@@ -985,7 +988,7 @@ export class BiasDetectionEngine {
       overall: performanceHealth.healthy && pythonServiceHealth.status === "healthy",
       components: {
         ...performanceHealth.components,
-      pythonService: pythonServiceHealth.status === "healthy",
+        pythonService: pythonServiceHealth.status === "healthy",
         engine: this.initialized,
         monitoring: this.monitoringActive,
         performanceOptimizer: this.performanceOptimizer !== null,
@@ -1111,17 +1114,19 @@ export class BiasDetectionEngine {
 
     // Log performance metrics
     if (options.logProgress !== false) {
-      console.log(
+      auditLogger.info(
         `[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`,
       );
-      console.log(
+      auditLogger.info(
         `[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`,
       );
     }
 
     if (options.logErrors !== false && errors.length > 0) {
       errors.forEach(({ session, error }) => {
-        console.error(`[BatchError] Session ${session.sessionId}: ${(error instanceof Error ? error.message : "Unknown error")}`);
+        auditLogger.error(
+          `[BatchError] Session ${session.sessionId}: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
       });
     }
 
