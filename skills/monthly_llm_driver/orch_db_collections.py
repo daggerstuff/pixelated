@@ -36,11 +36,99 @@ Usage::
 from __future__ import annotations
 
 from pymongo.database import Database
+from pymongo.errors import OperationFailure
 
 # Wall budget: 5 minutes for all index creations (MongoDB default
 # serverSelectionTimeoutMS is 30s per operation; we don't override
 # because index creation is fast on empty collections).
 _WALL_BUDGET_MINUTES = 5
+
+
+def _index_exists_by_signature(
+    db: Database, collection_name: str, keys: list, unique: bool = False, sparse: bool = False
+) -> bool:
+    """Check if an index exists matching the given key signature and flags.
+
+    Matches by (key_signature, unique, sparse) rather than by name.
+    This handles the case where GridFS auto-creates indexes with
+    auto-generated names (e.g., ``filename_1_uploadDate_1``) that differ
+    from the names we would use (e.g., ``filename_uploadDate_idx``).
+
+    Args:
+        db: MongoDB database.
+        collection_name: Name of the collection.
+        keys: List of (field, direction) tuples.
+        unique: Whether the index should be unique.
+        sparse: Whether the index should be sparse.
+
+    Returns:
+        True if a matching index exists, False otherwise.
+    """
+    try:
+        indexes = db[collection_name].index_information()
+    except OperationFailure:
+        # Collection doesn't exist yet
+        return False
+
+    for _idx_name, idx_info in indexes.items():
+        idx_key = idx_info.get("key", [])
+        idx_unique = idx_info.get("unique", False)
+        idx_sparse = idx_info.get("sparse", False)
+
+        # Match by key signature
+        if idx_key == keys:
+            # Match by flags
+            if unique == idx_unique and sparse == idx_sparse:
+                return True
+
+    return False
+
+
+def _ensure_index(
+    db: Database, collection_name: str, keys: list, name: str, unique: bool = False, sparse: bool = False
+) -> None:
+    """Ensure an index exists with the given key signature and flags.
+
+    If an index with matching (key_signature, unique, sparse) already exists,
+    this is a no-op (the existing index is kept, regardless of its name).
+
+    If no matching index exists, creates the index with the given name.
+    If an index with the same keys but different flags exists, drops it
+    and recreates with the canonical spec.
+
+    Args:
+        db: MongoDB database.
+        collection_name: Name of the collection.
+        keys: List of (field, direction) tuples.
+        name: Name for the index.
+        unique: Whether the index should be unique.
+        sparse: Whether the index should be sparse.
+    """
+    if _index_exists_by_signature(db, collection_name, keys, unique=unique, sparse=sparse):
+        # Matching index exists; no-op
+        return
+
+    # No matching index; create it.
+    # If an index with the same keys but different flags exists, drop it first
+    # to avoid IndexOptionsConflict (code 85).
+    try:
+        indexes = db[collection_name].index_information()
+        for idx_name, idx_info in indexes.items():
+            idx_key = idx_info.get("key", [])
+            if idx_key == keys:
+                # Same keys but different flags; drop and recreate
+                db[collection_name].drop_index(idx_name)
+                break
+    except OperationFailure:
+        # Collection doesn't exist yet; that's fine
+        pass
+
+    db[collection_name].create_index(
+        keys,
+        unique=unique,
+        sparse=sparse,
+        name=name,
+    )
 
 
 def setup_collections(db: Database) -> None:
@@ -90,15 +178,22 @@ def setup_collections(db: Database) -> None:
 
     # Create standard GridFS indexes explicitly.  GridFS is lazy about
     # index creation (only on first write), so we create them here to
-    # ensure they exist from the start.  ``create_index`` is idempotent.
-    db["dispatch_chunk_content.files"].create_index(
+    # ensure they exist from the start.  Use _ensure_index which matches
+    # by (key_signature, unique, sparse) rather than by name, so it is
+    # idempotent against DBs where GridFS auto-created indexes with
+    # auto-generated names (e.g. ``filename_1_uploadDate_1``).
+    _ensure_index(
+        db,
+        "dispatch_chunk_content.files",
         [("filename", 1), ("uploadDate", 1)],
         name="filename_uploadDate_idx",
     )
-    db["dispatch_chunk_content.chunks"].create_index(
+    _ensure_index(
+        db,
+        "dispatch_chunk_content.chunks",
         [("files_id", 1), ("n", 1)],
-        unique=True,
         name="files_id_n_unique_idx",
+        unique=True,
     )
 
     # -- audit_findings ----------------------------------------------------

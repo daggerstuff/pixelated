@@ -173,3 +173,77 @@ def test_verify_collections_raises_on_missing(mongo_db):
     # Don't call setup_collections; collections don't exist yet
     with pytest.raises(RuntimeError, match="Missing collection"):
         verify_collections(mongo_db)
+
+
+# ---------------------------------------------------------------------------
+# Test 5: setup_collections is idempotent against pre-existing GridFS indexes
+# ---------------------------------------------------------------------------
+
+
+def test_setup_collections_idempotent_against_preexisting_gridfs(mongo_db):
+    """setup_collections must not raise IndexOptionsConflict (code 85) when
+    GridFS indexes already exist with auto-generated names.
+
+    Simulates the case where a partial GridFS initialization has already
+    created indexes with names like ``filename_1_uploadDate_1`` and
+    ``files_id_1_n_1``, which differ from the names we would use
+    (``filename_uploadDate_idx``, ``files_id_n_unique_idx``).
+
+    The fix matches existing indexes by (key_signature, unique, sparse)
+    rather than by name, so setup_collections is a no-op when the matching
+    index already exists.
+    """
+    # Simulate pre-existing GridFS indexes with auto-generated names
+    # (as if GridFS was partially initialized before setup_collections ran)
+    from pymongo.errors import CollectionInvalid
+
+    # Create the GridFS collections first (simulating partial GridFS init)
+    for coll_name in ("dispatch_chunk_content.files", "dispatch_chunk_content.chunks"):
+        try:
+            mongo_db.create_collection(coll_name)
+        except CollectionInvalid:
+            pass
+
+    # Create indexes with auto-generated names (as GridFS would)
+    mongo_db["dispatch_chunk_content.files"].create_index(
+        [("filename", 1), ("uploadDate", 1)],
+        name="filename_1_uploadDate_1",  # auto-generated name
+    )
+    mongo_db["dispatch_chunk_content.chunks"].create_index(
+        [("files_id", 1), ("n", 1)],
+        unique=True,
+        name="files_id_1_n_1",  # auto-generated name
+    )
+
+    # Now call setup_collections; it must NOT raise IndexOptionsConflict
+    # because it matches by (key_signature, unique, sparse) and finds
+    # the pre-existing indexes.
+    setup_collections(mongo_db)
+
+    # Verify collections are set up correctly
+    result = verify_collections(mongo_db)
+    assert result is not None
+
+    # Verify the indexes still exist (either the pre-existing ones or
+    # newly created ones with our names)
+    fs_files_indexes = mongo_db["dispatch_chunk_content.files"].index_information()
+    fs_chunks_indexes = mongo_db["dispatch_chunk_content.chunks"].index_information()
+
+    # Check that an index with the correct key signature exists
+    files_key_found = False
+    for _name, info in fs_files_indexes.items():
+        if info.get("key") == [("filename", 1), ("uploadDate", 1)]:
+            files_key_found = True
+            break
+    assert files_key_found, "Missing index on dispatch_chunk_content.files(filename, uploadDate)"
+
+    chunks_key_found = False
+    for _name, info in fs_chunks_indexes.items():
+        if info.get("key") == [("files_id", 1), ("n", 1)]:
+            assert info.get("unique") is True, "Index on chunks(files_id, n) must be unique"
+            chunks_key_found = True
+            break
+    assert chunks_key_found, "Missing index on dispatch_chunk_content.chunks(files_id, n)"
+
+    # Call setup_collections again to verify idempotency
+    setup_collections(mongo_db)
