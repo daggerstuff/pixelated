@@ -30,7 +30,7 @@ from __future__ import annotations
 
 import contextlib
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -97,11 +97,34 @@ class ConnectionBundle:
         redis_client: ``redis.Redis`` instance (db 0).
         mongo_db:     ``pymongo.database.Database`` for db ``hackathon``.
         pg_conn:      ``psycopg2.extensions.connection`` instance.
+        _open_pg_cursors: Registry of PG cursors to close before pg_conn.
     """
 
     redis_client: redis.Redis
     mongo_db: pymongo.database.Database
     pg_conn: Any  # psycopg2.extensions.connection (avoid import-time type resolution)
+    _open_pg_cursors: set[Any] = field(default_factory=set, repr=False)
+
+    def __post_init__(self) -> None:
+        """Ensure _open_pg_cursors is initialized for backward compatibility."""
+        if not hasattr(self, "_open_pg_cursors"):
+            object.__setattr__(self, "_open_pg_cursors", set())
+
+    def register_pg_cursor(self, cursor: Any) -> None:
+        """Register a PG cursor to be closed before pg_conn.
+
+        Args:
+            cursor: A psycopg2 cursor instance to track for cleanup.
+        """
+        self._open_pg_cursors.add(cursor)
+
+    def unregister_pg_cursor(self, cursor: Any) -> None:
+        """Unregister a PG cursor (typically called after cursor.close()).
+
+        Args:
+            cursor: The cursor to remove from the registry.
+        """
+        self._open_pg_cursors.discard(cursor)
 
     # -- factory ----------------------------------------------------------
 
@@ -152,17 +175,38 @@ class ConnectionBundle:
     def close(self) -> None:
         """Flush and close all three connections.
 
+        Close order (per Chaos Monkey #3c fix):
+        1. Close registered PG cursors first (they have real close() methods)
+        2. Close pg_conn (PostgreSQL connection)
+        3. Close mongo_client (PyMongo client)
+
+        This order ensures PyMongo iterators find their next batch returning
+        empty rather than raising StopIteration indistinguishable from a
+        real driver bug when a worker iterates a Mongo cursor inside __exit__.
+
         Idempotent: safe to call multiple times.  Exceptions during
         close are swallowed so that a partial close does not prevent
         the remaining connections from being cleaned up.
         """
-        with contextlib.suppress(Exception):
-            self.redis_client.close()
-        with contextlib.suppress(Exception):
-            self.mongo_db.client.close()
+        # 1. Close registered PG cursors FIRST
+        for cursor in list(self._open_pg_cursors):
+            with contextlib.suppress(Exception):
+                if not cursor.closed:
+                    cursor.close()
+            self._open_pg_cursors.discard(cursor)
+
+        # 2. Close PG connection
         with contextlib.suppress(Exception):
             if not self.pg_conn.closed:
                 self.pg_conn.close()
+
+        # 3. Close Redis
+        with contextlib.suppress(Exception):
+            self.redis_client.close()
+
+        # 4. Close MongoDB LAST
+        with contextlib.suppress(Exception):
+            self.mongo_db.client.close()
 
     def __enter__(self) -> ConnectionBundle:
         return self
