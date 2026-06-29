@@ -105,23 +105,97 @@ def _expected_chunk_count(chunks_dir: Path, month: str) -> int:
     return 0
 
 
-def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
-    """Pure function: classify every chunk in *chunks_dir* for *month*.
+def _classify_chunk_doc(status: str, emails: list, chat_bursts: list) -> str:
+    """Classify a chunk document (from Mongo or flat file) into one of
+    'ok', 'ok_empty', or 'partial'.
 
-    Classification rules:
-    - 'ok'        : file exists, status='ok', AND at least one of
-                    emails / chat_bursts arrays is non-empty.
-    - 'ok_empty'  : file exists, status='ok', BUT both emails and
-                    chat_bursts arrays are empty (content_len may be >0
-                    but the JSON recovery yielded 0 parseable records).
-    - 'partial'   : file exists, status='partial'.
-    - 'missing'   : chunk index in [1..n_chunks_expected] with no file.
+    Rules:
+    - 'partial'  : status == 'partial'.
+    - 'ok'       : status == 'ok' AND at least one of emails / chat_bursts
+                   arrays is non-empty.
+    - 'ok_empty' : status == 'ok' BUT both emails and chat_bursts are empty.
+    - 'partial'  : any other status (defensive fallback).
+    """
+    has_records = len(emails) > 0 or len(chat_bursts) > 0
+    if status == "partial":
+        return "partial"
+    if status == "ok" and has_records:
+        return "ok"
+    if status == "ok" and not has_records:
+        return "ok_empty"
+    # Defensive: treat unknown status as partial so it surfaces for review.
+    return "partial"
 
-    The expected set size is read from {month}_manifest.json if present,
-    otherwise inferred from the highest chunk index on disk.
+
+def _scan_from_mongo(month: str, n_expected: int) -> ResumeGateReport | None:
+    """Read chunk state from Mongo ``dispatch_chunks`` collection.
+
+    Returns a ResumeGateReport if Mongo has any documents for this month,
+    otherwise returns None (caller should fall back to flat files).
+
+    Raises only on unexpected Mongo errors; connection failures are
+    swallowed (returns None) so the caller can fall back.
+    """
+    try:
+        bundle = ConnectionBundle.from_env()
+    except Exception:
+        # Mongo URL unset or connection failed; fall back to flat files.
+        return None
+
+    try:
+        coll = bundle.mongo_db["dispatch_chunks"]
+        # Check if Mongo has ANY documents for this month.
+        doc_count = coll.count_documents({"month": month})
+        if doc_count == 0:
+            # Mongo has no data for this month; fall back to flat files.
+            return None
+
+        # Fetch all documents for this month.
+        docs = list(coll.find({"month": month}))
+
+        report = ResumeGateReport(month=month, n_chunks_expected=n_expected)
+
+        # Build a set of chunk indices found in Mongo.
+        found_indices: set[int] = set()
+        for doc in docs:
+            idx = int(doc.get("chunk_index", 0))
+            if idx < 1 or idx > n_expected:
+                continue
+            found_indices.add(idx)
+
+            status = doc.get("status", "")
+            emails = doc.get("emails", [])
+            chat_bursts = doc.get("chat_bursts", [])
+            classification = _classify_chunk_doc(status, emails, chat_bursts)
+
+            if classification == "ok":
+                report.ok.append(idx)
+            elif classification == "ok_empty":
+                report.ok_empty.append(idx)
+            else:
+                report.partial.append(idx)
+
+        # Mark missing chunks.
+        for idx in range(1, n_expected + 1):
+            if idx not in found_indices:
+                report.missing.append(idx)
+
+        return report
+    except Exception:
+        # Unexpected Mongo error; fall back to flat files.
+        return None
+    finally:
+        with contextlib.suppress(Exception):
+            bundle.close()
+
+
+def _scan_from_flat_files(month: str, chunks_dir: Path, n_expected: int) -> ResumeGateReport:
+    """Read chunk state from flat ``/tmp/wayfarer_smoke/chunks/*.json`` files.
+
+    This is the fallback path used when Mongo is unavailable or has no
+    documents for the target month.
     """
     chunks_dir = Path(chunks_dir)
-    n_expected = _expected_chunk_count(chunks_dir, month)
     pattern = re.compile(_CHUNK_RE_TEMPLATE.format(month=re.escape(month)))
 
     # Collect files on disk, keyed by chunk index.
@@ -148,17 +222,55 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
         status = data.get("status", "")
         emails = data.get("emails", [])
         chat_bursts = data.get("chat_bursts", [])
-        has_records = len(emails) > 0 or len(chat_bursts) > 0
+        classification = _classify_chunk_doc(status, emails, chat_bursts)
 
-        if status == "partial":
-            report.partial.append(idx)
-        elif status == "ok" and has_records:
+        if classification == "ok":
             report.ok.append(idx)
-        else:
-            # status='ok' but 0 records parsed, or any other edge case
+        elif classification == "ok_empty":
             report.ok_empty.append(idx)
+        else:
+            report.partial.append(idx)
 
     return report
+
+
+def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
+    """Classify every chunk for *month* using a Mongo-first strategy.
+
+    **Primary source:** Mongo ``dispatch_chunks.find({month: month})``.
+    If Mongo has any documents for this month, the report is built from
+    Mongo and flat files are ignored.
+
+    **Fallback:** Flat ``/tmp/wayfarer_smoke/chunks/<month>_chunk_*.json``
+    files are read ONLY when:
+    - ``MONGO_URL`` is unset (``ConnectionBundle.from_env()`` raises), OR
+    - Mongo has zero documents for this month.
+
+    This avoids the race condition where a worker reads stale on-disk
+    state after a previous dispatch attempt cleaned up ``/tmp`` files.
+
+    Classification rules:
+    - 'ok'        : status='ok' AND at least one of emails / chat_bursts
+                    arrays is non-empty.
+    - 'ok_empty'  : status='ok' BUT both emails and chat_bursts arrays
+                    are empty (content_len may be >0 but the JSON
+                    recovery yielded 0 parseable records).
+    - 'partial'   : status='partial' (or unknown status).
+    - 'missing'   : chunk index in [1..n_chunks_expected] with no document.
+
+    The expected set size is read from {month}_manifest.json if present,
+    otherwise inferred from the highest chunk index on disk.
+    """
+    chunks_dir = Path(chunks_dir)
+    n_expected = _expected_chunk_count(chunks_dir, month)
+
+    # Try Mongo first.
+    mongo_report = _scan_from_mongo(month, n_expected)
+    if mongo_report is not None:
+        return mongo_report
+
+    # Fall back to flat files.
+    return _scan_from_flat_files(month, chunks_dir, n_expected)
 
 
 # ---------------------------------------------------------------------------
