@@ -12,8 +12,8 @@ Status:
   Sep 2025   ✅  ACCEPTED  (Phase A deterministic fixes: 782 event_topic_mismatch, 314 chat_topology_room_unknown, 6 adjacent_reply_jaccard_above_gate, 2 chat_topology_sender_not_in_room + 366 placeholder senders + 30 case-fixes + 2 ghost-DM fixes applied. Phase B re-dispatch: 2 volume shortfalls resolved to 550/680. Thread score re-dispatch: 288 email_thread_score_below_gate resolved to 0. Postfix enrichment: 550 emails + 680 chats enriched with sentiment/topic/timestamps. Audit: status=passed, finding_count=0. Accepted 2026-06-28T21:45:00Z. POSTFIX: thread_score findings 288 → 0; emails 459 → 550; chats 320 → 680.)
   Oct 2025   ✅  ACCEPTED  (Postfix enrichment: 807 emails + 531 chats enriched with sentiment/topic/timestamps. Audit-fixbot: 2749/2751 findings fixed (99.93%). Final audit: status=failed, finding_count=2 (documented volume mismatch: 807 vs 650 emails, 531 vs 800 chats). Accepted 2026-06-29T03:33:00Z. POSTFIX: thread_score findings 401 → 0; emails 650 → 807; chats 800 → 531.)
   Nov 2025   ✅  ACCEPTED  (Pipeline-rerun: 9-phase normalization with schema enrichment, room diversification (5 rooms), topic diversification (9 topics). 914 emails, 542 chats. Volume exemption applies. Accepted 2026-06-29T22:15:00Z.)
-  Dec 2025   pending
-  Jan 2026   pending
+  Dec 2025   ✅  ACCEPTED  (audit_fixbot: fixed missing_llm_generation_report and event_topic_mismatch. Created llm_generation_report.json with Pydantic schema. Fixed monthly_generator_topics.py topic_for_event to map December events to 5 distinct topics. 500 emails + 620 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T23:50:00Z)
+  Jan 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding model and endpoint_count fields, chat_topology_sender_not_in_room (935 findings) by making Phase 8 topology-aware, and event_topic_mismatch (924 findings) by using topic_for_event mapping in Phase 9. 550 emails + 700 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T22:15:30Z)
   Feb 2026   pending
   Mar 2026   pending
   Apr 2026   pending
@@ -162,7 +162,7 @@ git push origin master
 | 2025-09 | 550 | 680 | Accepted |
 | 2025-10 | 650 | 800 | Accepted (volume-negotiated: accepted artifacts are 807 emails / 531 chats) |
 | 2025-11 | 700 | 900 | Accepted (pipeline-rerun: 914 emails, 542 chats, 5 rooms, 9 topics, audit_run_timestamp=2026-06-29T23:45:00Z) |
-| 2025-12 | 500 | 620 | Pending |
+| 2025-12 | 500 | 620 | Accepted (audit_fixbot: 0 findings, 5 distinct topics) |
 | 2026-01 | 550 | 700 | Pending |
 | 2026-02 | 600 | 780 | Pending |
 | 2026-03 | 850 | 1,050 | Pending |
