@@ -13,6 +13,7 @@ Test cases:
 from __future__ import annotations
 
 import json
+import re
 import tempfile
 from pathlib import Path
 from unittest import mock
@@ -305,3 +306,100 @@ def test_scan_mongo_first_when_both_populated() -> None:
             # Verify Mongo was queried
             mock_collection.count_documents.assert_called_once_with({"month": month})
             mock_collection.find.assert_called_once_with({"month": month})
+
+
+# ---------------------------------------------------------------------------
+# Test 8: registry_empty log line when both registries are empty
+# ---------------------------------------------------------------------------
+
+
+def test_writes_registry_empty_log_line() -> None:
+    """kill_stale_dispatch must write a registry_empty log line to
+    /tmp/dispatch_resume_gate_kills.log when both registries are empty."""
+    month = "2025-10-test8"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        kills_log = Path(tmpdir) / "dispatch_resume_gate_kills.log"
+
+        with (
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+                return_value=[],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+                return_value=[],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
+                return_value=[],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
+                kills_log,
+            ),
+        ):
+            result = kill_stale_dispatch(month)
+
+            # Verify: no PIDs killed.
+            assert result == []
+
+            # Verify: log file was created with registry_empty line.
+            assert kills_log.exists()
+            log_content = kills_log.read_text()
+            assert "registry_empty" in log_content
+            assert "level=warn" in log_content
+            assert f"month={month}" in log_content
+            # Verify timestamp format is present (ISO 8601).
+            assert re.search(r"\[\d{4}-\d{2}-\d{2}T", log_content)
+
+
+# ---------------------------------------------------------------------------
+# Test 9: registry_empty_but_ps_alive when ps -ef finds dispatch processes
+# ---------------------------------------------------------------------------
+
+
+def test_warns_when_ps_alive_but_registry_empty() -> None:
+    """kill_stale_dispatch must write registry_empty_but_ps_alive log lines
+    when both registries are empty AND ps -ef finds python processes matching
+    dispatch_<month> argv pattern."""
+    month = "2025-10-test9"
+    fake_pid = 123456
+    fake_argv = "/usr/bin/python /home/vivi/pixelated/skills/monthly_llm_driver/dispatch_2025-10.py 2025-10 650 800"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        kills_log = Path(tmpdir) / "dispatch_resume_gate_kills.log"
+
+        with (
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_disk",
+                return_value=[],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._read_pids_from_redis",
+                return_value=[],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._ps_find_dispatch_processes",
+                return_value=[(fake_pid, fake_argv[:120])],
+            ),
+            mock.patch(
+                "skills.monthly_llm_driver.dispatch_resume_gate._KILLS_LOG",
+                kills_log,
+            ),
+        ):
+            result = kill_stale_dispatch(month)
+
+            # Verify: no PIDs killed (we only warn, not kill).
+            assert result == []
+
+            # Verify: log file contains registry_empty_but_ps_alive line.
+            assert kills_log.exists()
+            log_content = kills_log.read_text()
+            assert "registry_empty_but_ps_alive" in log_content
+            assert f"pid={fake_pid}" in log_content
+            assert "dispatch_2025-10" in log_content
+
+            # Verify: registry_empty line is ALSO present (always written).
+            assert "registry_empty" in log_content
+            assert "level=warn" in log_content
