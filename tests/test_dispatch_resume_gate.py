@@ -219,3 +219,89 @@ def test_kill_stale_dispatch_handles_process_lookup_error() -> None:
 
             # Verify: only the PID that did not raise was killed.
             assert result == [22222]
+
+
+# ---------------------------------------------------------------------------
+# Test 7: scan() Mongo-first when both sources populated
+# ---------------------------------------------------------------------------
+
+
+def test_scan_mongo_first_when_both_populated() -> None:
+    """scan() must use Mongo as primary source when both Mongo and flat files
+    contain data for the same month."""
+    from skills.monthly_llm_driver.dispatch_resume_gate import scan
+    from skills.monthly_llm_driver.orch_db import ConnectionBundle
+
+    month = "2025-11"  # Use a month not in _MONTH_CHUNK_OVERRIDES to test dynamic detection
+
+    # Create a temporary directory with flat files
+    with tempfile.TemporaryDirectory() as tmpdir:
+        chunks_dir = Path(tmpdir)
+
+        # Create flat files for chunks 1-3 with status='ok'
+        for i in [1, 2, 3]:
+            chunk_file = chunks_dir / f"{month}_chunk_{i:02d}_wayfarer.json"
+            chunk_data = {
+                "chunk_index": i,
+                "transport": "wayfarer",
+                "status": "ok",
+                "emails": [{"id": f"email-{i}"}],
+                "chat_bursts": [{"id": f"chat-{i}"}],
+            }
+            chunk_file.write_text(json.dumps(chunk_data))
+
+        # Mock ConnectionBundle to return a mock MongoDB client
+        mock_mongo_db = mock.MagicMock()
+        mock_collection = mock.MagicMock()
+        mock_mongo_db.__getitem__ = mock.MagicMock(return_value=mock_collection)
+
+        # Mock the find() result to return chunks 1-2 with status='ok'
+        # Note: Mongo has chunk 2 as 'ok_empty' to test that we use Mongo, not flat files
+        mock_docs = [
+            {"chunk_index": 1, "status": "ok", "emails": [{"id": "email-1"}], "chat_bursts": [{"id": "chat-1"}]},
+            {"chunk_index": 2, "status": "ok", "emails": [], "chat_bursts": []},  # ok_empty
+        ]
+        mock_collection.find.return_value = mock_docs
+
+        # Mock count_documents to return 2 (Mongo has data)
+        mock_collection.count_documents.return_value = 2
+
+        mock_bundle = mock.MagicMock(spec=ConnectionBundle)
+        mock_bundle.mongo_db = mock_mongo_db
+        mock_bundle.__enter__ = mock.MagicMock(return_value=mock_bundle)
+        mock_bundle.__exit__ = mock.MagicMock(return_value=None)
+
+        # Patch ConnectionBundle.from_env to return our mock
+        with mock.patch(
+            "skills.monthly_llm_driver.dispatch_resume_gate.ConnectionBundle.from_env",
+            return_value=mock_bundle,
+        ):
+            result = scan(month, chunks_dir)
+
+            # Verify: scan used Mongo (2 documents), not flat files (3 documents)
+            assert result is not None
+            assert result.month == month
+            # n_chunks_expected is derived from the highest chunk_index in flat files (3)
+            # when the month is not in _MONTH_CHUNK_OVERRIDES
+            assert result.n_chunks_expected == 3
+
+            # Chunk 1: ok (from Mongo)
+            assert 1 in result.ok
+
+            # Chunk 2: ok_empty (from Mongo, even though flat file says ok)
+            assert 2 in result.ok_empty
+
+            # Chunk 3: missing (not in Mongo, even though flat file exists)
+            assert 3 in result.missing
+
+            # Verify no partial chunks (all handled correctly)
+            assert len(result.partial) == 0
+
+            # Verify totals
+            assert len(result.ok) == 1
+            assert len(result.ok_empty) == 1
+            assert len(result.missing) == 1
+
+            # Verify Mongo was queried
+            mock_collection.count_documents.assert_called_once_with({"month": month})
+            mock_collection.find.assert_called_once_with({"month": month})
