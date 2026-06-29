@@ -13,17 +13,22 @@ Test cases:
 from __future__ import annotations
 
 import json
+import os
 import re
 import tempfile
+import time
 from pathlib import Path
 from unittest import mock
 
 from skills.monthly_llm_driver.dispatch_resume_gate import (
     _read_pids_from_disk,
     _read_pids_from_redis,
+    heartbeat_age_seconds,
     kill_stale_dispatch,
     register_dispatch_pid,
+    scan,
 )
+from skills.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Test 1: mock_pid_kills_match
@@ -230,9 +235,6 @@ def test_kill_stale_dispatch_handles_process_lookup_error() -> None:
 def test_scan_mongo_first_when_both_populated() -> None:
     """scan() must use Mongo as primary source when both Mongo and flat files
     contain data for the same month."""
-    from skills.monthly_llm_driver.dispatch_resume_gate import scan
-    from skills.monthly_llm_driver.orch_db import ConnectionBundle
-
     month = "2025-11"  # Use a month not in _MONTH_CHUNK_OVERRIDES to test dynamic detection
 
     # Create a temporary directory with flat files
@@ -403,3 +405,152 @@ def test_warns_when_ps_alive_but_registry_empty() -> None:
             # Verify: registry_empty line is ALSO present (always written).
             assert "registry_empty" in log_content
             assert "level=warn" in log_content
+
+
+# ---------------------------------------------------------------------------
+# Test 10: test_stall_when_heartbeat_alive_but_bytes_zero
+# ---------------------------------------------------------------------------
+
+
+def test_stall_when_heartbeat_alive_but_bytes_zero() -> None:
+    """heartbeat_age_seconds must detect stall when heartbeat writer is alive
+    (writing timestamps) but chunk completion thread has stalled (zero bytes emitted).
+
+    This is Chaos Monkey #6a source-fix #8: the writer thread can keep the
+    heartbeat fresh while the actual chunk processing stalls. The triage dict
+    must report state='stalled' when:
+    - heartbeat_age > STREAM_CHUNK_IDLE_S (default 90s)
+    - content_chars (bytes emitted) < expected_chunk_size (5300 chars)
+    - no terminal tag set (stream not completed/failed)
+    """
+    month = "2025-10-test10"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        heartbeat_file = Path(tmpdir) / f"heartbeat_{month}.json"
+        chunks_dir = Path(tmpdir) / "chunks"
+        chunks_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create a heartbeat file with:
+        # - now_epoch = 120 seconds ago (stale, > STREAM_CHUNK_IDLE_S=90)
+        # - content_chars = 0 (zero bytes emitted — stall condition)
+        # - chunk_idx = 15 (mid-dispatch)
+        # - NO terminal tag (stream not completed)
+        stale_epoch = int(time.time()) - 120
+        heartbeat_data = {
+            "now_epoch": stale_epoch,
+            "content_chars": 0,
+            "chunk_idx": 15,
+            "elapsed_s": 120.0,
+            "feature_id": "test-feature",
+            "transport": "wayfarer",
+            "model": "LatitudeGames/Wayfarer-2-12B-GGUF:IQ4_XS",
+            "pid": 123456,
+        }
+        heartbeat_file.write_text(json.dumps(heartbeat_data))
+
+        # Create a chunk file with old mtime (so heartbeat appears stale)
+        chunk_file = chunks_dir / f"{month}_chunk_15_wayfarer.json"
+        chunk_data = {
+            "chunk_index": 15,
+            "status": "partial",
+            "emails": [],
+            "chat_bursts": [],
+        }
+        chunk_file.write_text(json.dumps(chunk_data))
+        # Set chunk mtime to 150 seconds ago (older than heartbeat)
+        old_mtime = time.time() - 150
+        os.utime(chunk_file, (old_mtime, old_mtime))
+
+        # Call heartbeat_age_seconds
+        result = heartbeat_age_seconds(heartbeat_file)
+
+        # Verify: result is a dict with the expected keys
+        assert isinstance(result, dict)
+        assert "heartbeat_age_seconds" in result
+        assert "bytes_age_ratio" in result
+        assert "state" in result
+
+        # Verify: state is 'stalled' (age > 90s AND bytes=0 AND no terminal)
+        assert result["state"] == "stalled"
+
+        # Verify: heartbeat_age_seconds is approximately 120 seconds
+        assert result["heartbeat_age_seconds"] is not None
+        assert 115 <= result["heartbeat_age_seconds"] <= 125  # allow 5s tolerance
+
+        # Verify: bytes_age_ratio is 0.0 (0 bytes / 5300 expected)
+        assert result["bytes_age_ratio"] == 0.0
+
+
+# ---------------------------------------------------------------------------
+# Test 11: test_terminal_tag_returns_dead_state
+# ---------------------------------------------------------------------------
+
+
+def test_terminal_tag_returns_dead_state() -> None:
+    """heartbeat_age_seconds must return state='terminal' when heartbeat has
+    a terminal tag set, regardless of heartbeat age or byte count.
+
+    Terminal tags are written when the stream completes (successfully or with
+    an error like stream_hard_timeout, stream_content_stall, etc.). The triage
+    dict must report state='terminal' so the worker can dispatch on it.
+    """
+    import time
+
+    from skills.monthly_llm_driver.dispatch_resume_gate import heartbeat_age_seconds
+
+    month = "2025-10-test11"
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        heartbeat_file = Path(tmpdir) / f"heartbeat_{month}.json"
+        chunks_dir = Path(tmpdir) / "chunks"
+        chunks_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create a heartbeat file with:
+        # - now_epoch = 5 seconds ago (fresh)
+        # - content_chars = 5300 (chunk completed)
+        # - terminal = "stream_hard_timeout" (stream failed)
+        recent_epoch = int(time.time()) - 5
+        heartbeat_data = {
+            "now_epoch": recent_epoch,
+            "content_chars": 5300,
+            "chunk_idx": 15,
+            "elapsed_s": 1100.0,
+            "feature_id": "test-feature",
+            "transport": "wayfarer",
+            "model": "LatitudeGames/Wayfarer-2-12B-GGUF:IQ4_XS",
+            "pid": 123456,
+            "terminal": "stream_hard_timeout",
+        }
+        heartbeat_file.write_text(json.dumps(heartbeat_data))
+
+        # Create a chunk file with recent mtime
+        chunk_file = chunks_dir / f"{month}_chunk_15_wayfarer.json"
+        chunk_data = {
+            "chunk_index": 15,
+            "status": "partial",
+            "emails": [],
+            "chat_bursts": [],
+        }
+        chunk_file.write_text(json.dumps(chunk_data))
+        import os
+
+        os.utime(chunk_file, (time.time(), time.time()))
+
+        # Call heartbeat_age_seconds
+        result = heartbeat_age_seconds(heartbeat_file)
+
+        # Verify: result is a dict with the expected keys
+        assert isinstance(result, dict)
+        assert "heartbeat_age_seconds" in result
+        assert "bytes_age_ratio" in result
+        assert "state" in result
+
+        # Verify: state is 'terminal' (terminal tag is set)
+        assert result["state"] == "terminal"
+
+        # Verify: heartbeat_age_seconds is approximately 5 seconds
+        assert result["heartbeat_age_seconds"] is not None
+        assert 0 <= result["heartbeat_age_seconds"] <= 10  # allow 10s tolerance
+
+        # Verify: bytes_age_ratio is 0.0 (terminal state, no ongoing progress)
+        assert result["bytes_age_ratio"] == 0.0

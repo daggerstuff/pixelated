@@ -505,32 +505,73 @@ def _ps_find_dispatch_processes(month: str) -> list[tuple[int, str]]:
 # ---------------------------------------------------------------------------
 
 
-def heartbeat_age_seconds(heartbeat_path: Path) -> float | None:
-    """Read the heartbeat JSON and return the age in seconds
-    (now - last_heartbeat_at) if the heartbeat file mtime differs from
-    the most recent successful chunk write's mtime (indicating the
-    dispatch process has died).
+def heartbeat_age_seconds(heartbeat_path: Path) -> dict:
+    """Read the heartbeat JSON and return a triage dict with state detection.
 
-    Returns None when the heartbeat mtime matches the most recent chunk
-    file mtime, indicating the dispatch may still be alive.
+    Returns a dict with:
+        - ``heartbeat_age_seconds``: float|None — age in seconds (now - last_heartbeat_at)
+        - ``bytes_age_ratio``: float — ratio of emitted bytes to expected chunk_size
+        - ``state``: str — one of 'alive', 'stalled', 'dead', 'terminal'
 
-    The heartbeat JSON is expected to contain a ``now_epoch`` field
-    (written by the dispatch loop's heartbeat writer).
+    State logic:
+        - ``terminal``: heartbeat has a ``terminal`` field set (stream completed or failed)
+        - ``dead``: heartbeat file doesn't exist or can't be parsed
+        - ``stalled``: age > stream_chunk_idle_s AND last_byte_count < expected_chunk_size
+                       AND no terminal tag (writer thread alive but chunk completion stalled)
+        - ``alive``: otherwise (dispatch is making progress)
+
+    The heartbeat JSON is expected to contain:
+        - ``now_epoch``: float — timestamp of last heartbeat write
+        - ``content_chars``: int — bytes emitted so far in current chunk
+        - ``chunk_idx``: int|str — current chunk index being processed
+        - ``terminal``: str|None — optional terminal tag (e.g., 'stream_hard_timeout')
     """
     heartbeat_path = Path(heartbeat_path)
+
+    # Constants for stall detection (lowercase per ruff N806)
+    stream_chunk_idle_s = int(os.getenv("STREAM_IDLE_TIMEOUT_S", "90"))
+    expected_chunk_size = 5300  # chars (30*110 + 30*60 + 200 envelope)
+
+    # Default result for dead state
+    dead_result = {
+        "heartbeat_age_seconds": None,
+        "bytes_age_ratio": 0.0,
+        "state": "dead",
+    }
+
     if not heartbeat_path.exists():
-        return None
+        return dead_result
 
     try:
         hb_data = json.loads(heartbeat_path.read_text())
     except Exception:
-        return None
+        return dead_result
 
     last_heartbeat_at = hb_data.get("now_epoch")
     if last_heartbeat_at is None:
-        return None
+        return dead_result
 
-    # Find the most recent chunk file for the same month.
+    # Calculate heartbeat age
+    age_s = time.time() - float(last_heartbeat_at)
+
+    # Check for terminal tag first (stream completed or failed)
+    terminal_tag = hb_data.get("terminal")
+    if terminal_tag:
+        return {
+            "heartbeat_age_seconds": age_s,
+            "bytes_age_ratio": 0.0,  # Terminal state, no ongoing progress
+            "state": "terminal",
+        }
+
+    # Get current byte count from heartbeat (SKILL.md uses 'content_chars')
+    # Also support 'last_byte_count' for forward compatibility
+    current_bytes = hb_data.get("content_chars") or hb_data.get("last_byte_count", 0)
+
+    # Calculate bytes_age_ratio: progress ratio (current_bytes / expected_chunk_size)
+    # Ratio < 1.0 means we're behind schedule; ratio >= 1.0 means on track
+    bytes_age_ratio = current_bytes / expected_chunk_size if expected_chunk_size > 0 else 0.0
+
+    # Find the most recent chunk file for the same month to compare mtimes.
     # The heartbeat file lives in /tmp/wayfarer_smoke/ and chunks are
     # in /tmp/wayfarer_smoke/chunks/.  We use the heartbeat_path's
     # parent's chunks/ sibling directory.
@@ -552,8 +593,21 @@ def heartbeat_age_seconds(heartbeat_path: Path) -> float | None:
     if most_recent_chunk_mtime is not None and abs(heartbeat_mtime - most_recent_chunk_mtime) <= 2.0:
         # Heartbeat and most-recent chunk were written at the same time
         # — dispatch may still be alive
-        return None
+        return {
+            "heartbeat_age_seconds": None,
+            "bytes_age_ratio": bytes_age_ratio,
+            "state": "alive",
+        }
 
-    # Heartbeat is stale relative to the most recent chunk write
-    # (or dispatch died after the last chunk write, or no chunks exist)
-    return time.time() - float(last_heartbeat_at)
+    # Heartbeat is stale relative to the most recent chunk write.
+    # Check for stall condition: age > stream_chunk_idle_s AND
+    # last_byte_count < expected_chunk_size AND no terminal tag.
+    # Stall detected: writer thread is alive (heartbeat is being written)
+    # but chunk completion thread has stalled (bytes not progressing).
+    state = "stalled" if age_s > stream_chunk_idle_s and current_bytes < expected_chunk_size else "alive"
+
+    return {
+        "heartbeat_age_seconds": age_s,
+        "bytes_age_ratio": bytes_age_ratio,
+        "state": state,
+    }
