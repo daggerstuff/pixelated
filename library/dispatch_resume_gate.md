@@ -157,14 +157,14 @@ The next dispatch loop reads this file and starts from `fresh_dispatch_list`,
 not from chunk 1. The stitcher's `chunks_manifest.json` records
 `resume_indicators: original | re_dispatched | fresh` per chunk.
 
-## Contrast: M01 (2025-09) — Clean Run
+## Contrast: M01 (2025-09) — On-Disk State
 
 ```python
 report_09 = scan("2025-09", Path("/tmp/wayfarer_smoke/chunks"))
 print(report_09.to_dict())
 ```
 
-**Output (verified 2026-06-29):**
+**Output (verified 2026-06-29 via uv run --frozen):**
 
 ```json
 {
@@ -179,13 +179,58 @@ print(report_09.to_dict())
 ```
 
 **Interpretation:**
-- 17 chunks completed with content
-- 1 chunk completed but empty (chunk 18)
-- 5 chunks partial (chunks 2, 5, 20, 21, 23)
+- 17 chunks completed with content (chunks 1, 3, 4, 6-17, 19, 22)
+- 1 chunk completed but empty (chunk 18 — status=ok but 0 records)
+- 5 chunks partial (chunks 2, 5, 20, 21, 23 — status=partial, 0 records)
 - 0 chunks missing (all 23 chunks on disk)
 - Total `missing_or_partial_count` = 5
 
-M01 had no silent mid-dispatch failure — all 23 chunks were written to disk (some partial, but no missing). The gate correctly identifies the partial-run state.
+Note: M01 was already accepted (monthly_accepted/2025-09/month_summary.json
+exists with audit_status=passed, accepted_email_count=550, accepted_chat_count=680).
+The residual chunk files on /tmp are the original dispatch artifacts from the
+M01 run. The stitcher's recovery logic (retry + transport swap) compensated for
+the 5 partial chunks at the time, producing the full 550/680 volume. The gate
+faithfully reports what is on disk; it does not know whether a prior stitcher
+already compensated.
+
+## Heartbeat Age Verification
+
+```python
+from dispatch_resume_gate import heartbeat_age_seconds
+
+age = heartbeat_age_seconds(Path("/tmp/wayfarer_smoke/heartbeat_2025-10.json"))
+print(f"heartbeat_age_seconds = {age}")
+```
+
+**Output (verified 2026-06-29 via uv run --frozen):**
+
+```
+heartbeat_age_seconds = 7692.448740005493
+```
+
+**Interpretation:** The heartbeat file was last written ~2.1 hours ago. The
+dispatch process (PID 1295219) died silently without writing a terminal-tagged
+heartbeat. The heartbeat mtime differs from the most-recent chunk mtime, so the
+function returns the age as a float (not None). This confirms the dispatch is
+dead — there is no alive indicator.
+
+## kill_stale_dispatch Verification
+
+```python
+from dispatch_resume_gate import kill_stale_dispatch
+
+killed = kill_stale_dispatch("2025-10")
+print(f"Killed PIDs: {killed}")
+```
+
+**Output (verified 2026-06-29):**
+
+```
+Killed PIDs: []
+```
+
+**Interpretation:** No live dispatch process found (PID 1295219 already dead).
+`kill_stale_dispatch` is idempotent — returns [] if no match.
 
 ## Failure Mode This Section Exists to Prevent
 
