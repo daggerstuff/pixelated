@@ -240,7 +240,7 @@ Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
 
 ## Dispatch Resume Gate (mandatory)
 
-Every monthly-llm-driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE the first chat_completion POST.
+Every monthly_llm_driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE the first chat_completion POST.
 
 If `scan` returns `missing_or_partial > 0` AND `stale_dispatch_pid` is alive, worker MUST:
 1. Call `kill_stale_dispatch(month)` first
@@ -255,7 +255,7 @@ unless `kill_stale_dispatch` and `scan` both report zero on-disk state.
 
 Workers MUST NOT bypass the gate for short halving loops. The gate runs in <5 s on the chunks tree and protects against every future silent-failure pattern.
 
-**Reference**: `skills/monthly-llm-driver/dispatch_resume_gate.py` (spec + implementation), `library/dispatch_resume_gate.md` (worked M02 example).
+**Reference**: `skills/monthly_llm_driver/dispatch_resume_gate.py` (spec + implementation), `library/dispatch_resume_gate.md` (worked M02 example).
 
 ---
 
