@@ -2,13 +2,33 @@
 # Managed by infra-sinker milestone.
 #
 # Defines:
+#   - Router: ollama-oauth2-direct (higher priority, /oauth2/* passthrough)
 #   - Router: ollama-pixelated-love (Host + websecure + TLS certresolver)
 #   - Service: ollama-pixelated-love (loadbalancer → pixelated-ollama:11434)
+#   - Service: oauth2-proxy-direct (loadbalancer → pixelated-oauth2-proxy:4180)
 #   - Middleware: oauth-forwardauth (oauth2-proxy sidecar)
 #   - Middleware: security-headers (HSTS, X-Frame-Options, etc.)
+#
+# NOTE: The /oauth2/* paths MUST bypass forwardAuth; otherwise the sign-in,
+# callback, and static asset endpoints would be blocked by the auth check
+# they themselves are supposed to serve.  Priority 100 > default 29 ensures
+# the /oauth2/ router wins first.
 
 http:
   routers:
+    # Higher-priority router: /oauth2/* paths go directly to oauth2-proxy
+    # without forwardAuth (oauth2-proxy handles its own auth flow).
+    ollama-oauth2-direct:
+      rule: "Host(`ollama.pixelated.love`) && PathPrefix(`/oauth2`)"
+      entryPoints:
+        - websecure
+      service: oauth2-proxy-direct
+      middlewares:
+        - security-headers
+      priority: 100
+      tls:
+        certResolver: letsencrypt-dns
+
     ollama-pixelated-love:
       rule: "Host(`ollama.pixelated.love`)"
       entryPoints:
@@ -29,6 +49,11 @@ http:
           path: /api/version
           interval: 30s
           timeout: 5s
+
+    oauth2-proxy-direct:
+      loadBalancer:
+        servers:
+          - url: "http://pixelated-oauth2-proxy:4180"
 
   middlewares:
     oauth-forwardauth:
