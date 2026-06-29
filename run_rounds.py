@@ -9,7 +9,6 @@ def replace_in_file(filepath, old, new):
     with open(filepath) as f:
         content = f.read()
     if old not in content:
-        print(f"Failed to find target string in {filepath}:\n{old}")
         sys.exit(1)
     content = content.replace(old, new, 1)
     with open(filepath, "w") as f:
@@ -19,8 +18,6 @@ def replace_in_file(filepath, old, new):
 def run_tests():
     res = subprocess.run(["uv", "run", "pytest", "hackathon/", "-q", "--tb=short"], capture_output=True, text=True)
     if res.returncode != 0:
-        print("Tests failed!")
-        print(res.stdout)
         sys.exit(1)
     return res.stdout
 
@@ -198,8 +195,6 @@ rounds = [
 ]
 
 for r in rounds:
-    print(f"Executing Round {r['round']}...")
     replace_in_file(r["file"], r["old"], r["new"])
     run_tests()
     append_log(r["round"], r["persona"], r["teardown"])
-    print(f"Round {r['round']} complete.")

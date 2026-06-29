@@ -547,7 +547,7 @@ class TestErrorHandling:
     async def test_sdk_import_error(self):
         """Test handling when SDK not available."""
         config = LettaCodeConfig(api_key="test-key")
-        client = LettaCodeClient(config)
+        LettaCodeClient(config)
 
         # Simulate import error
         with patch.dict("sys.modules", {"letta": None}):
