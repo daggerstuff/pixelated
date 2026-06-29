@@ -9,9 +9,11 @@ Test cases:
     from_env_returns_3_clients   -- factory connects to all three DBs
     from_env_close_idempotent    -- close() can be called multiple times
     from_env_uses_override_uri   -- env vars override defaults
+    close_order_is_pg_first      -- close() closes pg cursors, pg_conn, then mongo
 """
 
 import os
+from unittest.mock import MagicMock
 
 import pymongo
 import redis
@@ -126,7 +128,103 @@ def test_from_env_uses_override_uri() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Test 4 (bonus): context manager works
+# Test 4: close() order is pg cursors → pg_conn → mongo
+# ---------------------------------------------------------------------------
+
+
+def test_close_order_is_pg_first() -> None:
+    """close() must close in order: pg cursors → pg_conn → redis → mongo_db.
+
+    This verifies the fix for Chaos Monkey #3c where iterating a Mongo cursor
+    inside ConnectionBundle.__exit__ triggered StopIteration indistinguishable
+    from a real driver bug. The fix ensures PG cursors and pg_conn close first,
+    then mongo_db.client closes last.
+    """
+    # Create a bundle with mock clients
+    mock_redis = MagicMock()
+    mock_redis.ping.return_value = True
+
+    mock_mongo_client = MagicMock()
+    mock_mongo_db = MagicMock()
+    mock_mongo_db.client = mock_mongo_client
+    mock_mongo_db.name = "hackathon"
+
+    mock_pg_conn = MagicMock()
+    mock_pg_conn.closed = False
+
+    bundle = ConnectionBundle(
+        redis_client=mock_redis,
+        mongo_db=mock_mongo_db,
+        pg_conn=mock_pg_conn,
+    )
+
+    # Register two mock cursors
+    mock_cursor1 = MagicMock()
+    mock_cursor1.closed = False
+    mock_cursor2 = MagicMock()
+    mock_cursor2.closed = False
+
+    bundle.register_pg_cursor(mock_cursor1)
+    bundle.register_pg_cursor(mock_cursor2)
+
+    # Track close call order
+    close_order = []
+
+    def track_cursor1_close():
+        close_order.append("cursor1")
+
+    def track_cursor2_close():
+        close_order.append("cursor2")
+
+    def track_pg_conn_close():
+        close_order.append("pg_conn")
+
+    def track_redis_close():
+        close_order.append("redis")
+
+    def track_mongo_close():
+        close_order.append("mongo")
+
+    mock_cursor1.close.side_effect = track_cursor1_close
+    mock_cursor2.close.side_effect = track_cursor2_close
+    mock_pg_conn.close.side_effect = track_pg_conn_close
+    mock_redis.close.side_effect = track_redis_close
+    mock_mongo_client.close.side_effect = track_mongo_close
+
+    # Call close
+    bundle.close()
+
+    # Verify order: cursors first (any order), then pg_conn, then redis, then mongo
+    # The set iteration order is non-deterministic, so we check relative ordering
+    cursor_indices = [i for i, name in enumerate(close_order) if name.startswith("cursor")]
+    pg_conn_idx = close_order.index("pg_conn")
+    redis_idx = close_order.index("redis")
+    mongo_idx = close_order.index("mongo")
+
+    # All cursors must close before pg_conn
+    assert all(idx < pg_conn_idx for idx in cursor_indices), (
+        f"Cursors must close before pg_conn, got order: {close_order}"
+    )
+
+    # pg_conn must close before redis
+    assert pg_conn_idx < redis_idx, f"pg_conn must close before redis, got order: {close_order}"
+
+    # redis must close before mongo
+    assert redis_idx < mongo_idx, f"redis must close before mongo, got order: {close_order}"
+
+    # Verify all close methods were called
+    mock_cursor1.close.assert_called_once()
+    mock_cursor2.close.assert_called_once()
+    mock_pg_conn.close.assert_called_once()
+    mock_redis.close.assert_called_once()
+    mock_mongo_client.close.assert_called_once()
+
+    # Verify cursors are unregistered after close
+    assert len(bundle._open_pg_cursors) == 0
+
+
+# ---------------------------------------------------------------------------
+# Test 5: context manager works
 # ---------------------------------------------------------------------------
 
 
