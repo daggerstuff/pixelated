@@ -494,10 +494,6 @@ def test_terminal_tag_returns_dead_state() -> None:
     an error like stream_hard_timeout, stream_content_stall, etc.). The triage
     dict must report state='terminal' so the worker can dispatch on it.
     """
-    import time
-
-    from skills.monthly_llm_driver.dispatch_resume_gate import heartbeat_age_seconds
-
     month = "2025-10-test11"
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -532,8 +528,6 @@ def test_terminal_tag_returns_dead_state() -> None:
             "chat_bursts": [],
         }
         chunk_file.write_text(json.dumps(chunk_data))
-        import os
-
         os.utime(chunk_file, (time.time(), time.time()))
 
         # Call heartbeat_age_seconds
