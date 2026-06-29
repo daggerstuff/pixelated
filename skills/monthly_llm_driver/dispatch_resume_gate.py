@@ -2,10 +2,17 @@
 mid-dispatch failure (2026-06-28T23:00Z, worker session
 9b86edcc-6cfa-48bc-9e44-14442e8abf3c, dispatch PID 1295219).
 
-Three callables:
+Four callables:
     scan(month, chunks_dir) -> ResumeGateReport
+    register_dispatch_pid(month, pid) -> None
     kill_stale_dispatch(month)
     heartbeat_age_seconds(heartbeat_path) -> Optional[float]
+
+The ``register_dispatch_pid`` callable writes the dispatch PID to both
+on-disk (``/tmp/wayfarer_smoke/dispatch_pids_<month>.json``) and to a
+Redis SET (``orch:dispatch:pids:<month>``) with NX-EX 86400 TTL. The
+``kill_stale_dispatch`` callable reads both registries and SIGTERMs
+each PID exactly, replacing the prior argv-substring matching.
 
 See library/dispatch_resume_gate.md for the worked M02 example and
 AGENTS.md § Dispatch Resume Gate (mandatory) for the worker contract.
@@ -13,14 +20,16 @@ AGENTS.md § Dispatch Resume Gate (mandatory) for the worker contract.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import os
 import re
 import signal
-import subprocess
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
+
+from skills.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -153,75 +162,129 @@ def scan(month: str, chunks_dir: Path) -> ResumeGateReport:
 
 
 # ---------------------------------------------------------------------------
-# (A2) kill_stale_dispatch
+# (A2) register_dispatch_pid + kill_stale_dispatch
 # ---------------------------------------------------------------------------
 
+_PIDS_FILE_TEMPLATE = "/tmp/wayfarer_smoke/dispatch_pids_{month}.json"
 _KILLS_LOG = Path("/tmp/dispatch_resume_gate_kills.log")
 
 
-def kill_stale_dispatch(month: str) -> list[int]:
-    """Find and SIGTERM any python process whose argv contains
-    ``/tmp/wayfarer_smoke/chunks/{month}_heartbeat.json``.
+def register_dispatch_pid(month: str, pid: int) -> None:
+    """Register a dispatch PID in both on-disk JSON and Redis SET.
 
-    Implementation: runs ``ps -ef`` and greps for ``dispatch_{month}``
-    in the command line, then filters to python processes whose full
-    argv includes the heartbeat path for this month.
+    On-disk: writes PID to ``/tmp/wayfarer_smoke/dispatch_pids_<month>.json``
+    (a JSON array of PIDs).  The file is created if it does not exist.
+
+    Redis: adds PID to SET ``orch:dispatch:pids:<month>`` with NX-EX 86400
+    (24-hour TTL, set only if the key does not already exist).
+
+    Idempotent: adding the same PID twice is safe.
+    """
+    # -- On-disk registry --------------------------------------------------
+    pids_file = Path(_PIDS_FILE_TEMPLATE.format(month=month))
+    pids_file.parent.mkdir(parents=True, exist_ok=True)
+
+    existing_pids: list[int] = []
+    if pids_file.exists():
+        try:
+            existing_pids = json.loads(pids_file.read_text())
+            if not isinstance(existing_pids, list):
+                existing_pids = []
+        except Exception:
+            existing_pids = []
+
+    if pid not in existing_pids:
+        existing_pids.append(pid)
+        pids_file.write_text(json.dumps(existing_pids, indent=2))
+
+    # -- Redis registry (best-effort; do not fail if Redis is unreachable) --
+    with contextlib.suppress(Exception):
+        bundle = ConnectionBundle.from_env()
+        try:
+            redis_key = f"orch:dispatch:pids:{month}"
+            bundle.redis_client.sadd(redis_key, pid)
+            # Set TTL to 86400 seconds (24 hours) if the key was just created
+            # (NX semantics).  If the key already existed, we still refresh the
+            # TTL to ensure it does not expire mid-dispatch.
+            bundle.redis_client.expire(redis_key, 86400)
+        finally:
+            bundle.close()
+
+
+def _read_pids_from_disk(month: str) -> list[int]:
+    """Read dispatch PIDs from the on-disk JSON registry."""
+    pids_file = Path(_PIDS_FILE_TEMPLATE.format(month=month))
+    if not pids_file.exists():
+        return []
+    try:
+        data = json.loads(pids_file.read_text())
+        if isinstance(data, list):
+            return [int(p) for p in data if isinstance(p, (int, float, str))]
+    except Exception:
+        pass
+    return []
+
+
+def _read_pids_from_redis(month: str) -> list[int]:
+    """Read dispatch PIDs from the Redis SET (best-effort)."""
+    pids: list[int] = []
+    with contextlib.suppress(Exception):
+        bundle = ConnectionBundle.from_env()
+        try:
+            redis_key = f"orch:dispatch:pids:{month}"
+            members = bundle.redis_client.smembers(redis_key)
+            pids = [int(m) for m in members if m is not None]
+        finally:
+            bundle.close()
+    return pids
+
+
+def kill_stale_dispatch(month: str) -> list[int]:
+    """SIGTERM every PID registered for this month in both the on-disk
+    JSON registry and the Redis SET.
+
+    Implementation: reads PIDs from both registries, deduplicates, and
+    sends SIGTERM to each PID exactly once.  This replaces the prior
+    argv-substring matching (which could not kill real dispatch processes
+    because the heartbeat path is set via HEARTBEAT_PATH env var and never
+    appears on the dispatch argv).
 
     Logs each kill to ``/tmp/dispatch_resume_gate_kills.log`` with
-    pid + epoch + matched_argv.
+    pid + epoch + source (disk|redis|both).
 
-    Returns list of PIDs killed.  Idempotent: returns [] if no match.
+    Returns list of PIDs killed.  Idempotent: returns [] if no PIDs are
+    registered or if all registered PIDs have already exited.
     """
     killed: list[int] = []
-    heartbeat_marker = f"/tmp/wayfarer_smoke/chunks/{month}_heartbeat"
-    dispatch_marker = f"dispatch_{month}"
-
-    try:
-        result = subprocess.run(
-            ["ps", "-ef"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-        )
-        lines = result.stdout.splitlines()
-    except Exception:
-        return killed
-
     now_epoch = int(time.time())
 
-    for line in lines:
-        # Skip the grep process itself and header lines
-        if "grep" in line.split():
-            continue
-        # Must match dispatch_<month> somewhere in argv
-        if dispatch_marker not in line:
-            continue
-        # Must be a python process
-        parts = line.split()
-        if len(parts) < 8:
-            continue
-        # ps -ef columns: UID PID PPID C STIME TTY TIME CMD...
-        try:
-            pid = int(parts[1])
-        except (ValueError, IndexError):
-            continue
-        cmd = " ".join(parts[7:])
-        # Must reference the heartbeat path for this month
-        if heartbeat_marker not in cmd:
-            continue
-        # Must be a python process
-        if "python" not in cmd.lower():
-            continue
+    # Read PIDs from both registries.
+    disk_pids = set(_read_pids_from_disk(month))
+    redis_pids = set(_read_pids_from_redis(month))
+
+    # Union of both sets.
+    all_pids = disk_pids | redis_pids
+
+    for pid in all_pids:
+        # Determine source for logging.
+        if pid in disk_pids and pid in redis_pids:
+            source = "both"
+        elif pid in disk_pids:
+            source = "disk"
+        else:
+            source = "redis"
 
         try:
             os.kill(pid, signal.SIGTERM)
             killed.append(pid)
-            log_line = f"pid={pid} epoch={now_epoch} matched_argv={cmd!r}\n"
+            log_line = f"pid={pid} epoch={now_epoch} source={source}\n"
             with open(_KILLS_LOG, "a") as fh:
                 fh.write(log_line)
         except ProcessLookupError:
+            # PID already exited; not an error.
             pass
         except PermissionError:
+            # Cannot kill this PID; skip.
             pass
 
     return killed
@@ -262,28 +325,25 @@ def heartbeat_age_seconds(heartbeat_path: Path) -> float | None:
     # in /tmp/wayfarer_smoke/chunks/.  We use the heartbeat_path's
     # parent's chunks/ sibling directory.
     chunks_dir = heartbeat_path.parent / "chunks"
-    if not chunks_dir.exists():
-        # No chunks directory at all — heartbeat is stale by definition
-        return time.time() - float(last_heartbeat_at)
+    most_recent_chunk_mtime: float | None = None
+    if chunks_dir.exists():
+        # Find the most recent chunk file by mtime
+        chunk_files = sorted(
+            chunks_dir.glob("*_chunk_*.json"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        if chunk_files:
+            most_recent_chunk_mtime = chunk_files[0].stat().st_mtime
 
-    # Find the most recent chunk file by mtime
-    chunk_files = sorted(
-        chunks_dir.glob("*_chunk_*.json"),
-        key=lambda p: p.stat().st_mtime,
-        reverse=True,
-    )
-    if not chunk_files:
-        return time.time() - float(last_heartbeat_at)
-
-    most_recent_chunk_mtime = chunk_files[0].stat().st_mtime
     heartbeat_mtime = heartbeat_path.stat().st_mtime
 
     # Compare mtimes with 2-second tolerance (filesystem granularity)
-    if abs(heartbeat_mtime - most_recent_chunk_mtime) <= 2.0:
+    if most_recent_chunk_mtime is not None and abs(heartbeat_mtime - most_recent_chunk_mtime) <= 2.0:
         # Heartbeat and most-recent chunk were written at the same time
         # — dispatch may still be alive
         return None
 
     # Heartbeat is stale relative to the most recent chunk write
-    # (or dispatch died after the last chunk write)
+    # (or dispatch died after the last chunk write, or no chunks exist)
     return time.time() - float(last_heartbeat_at)
