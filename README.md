@@ -11,8 +11,30 @@
 
 Pixelated Empathy builds tooling for teams that operate in high-stakes,
 human-centered environments. The platform combines simulated conversation
-practice, emotional signal analysis, and review workflows so organizations can
+practice, emotional
+signal analysis, and review workflows so organizations can
 improve communication before real-world harm occurs.
+
+## Goal Alignment
+
+The project's operational /goal: ship the **9-digit pre-2026 monthly LLM
+corpus** to the clinician training pipeline, while continuing to grow the
+production platform artefacts above. The corpus pipeline delivers
+`monthly_accepted/<YYYY-MM>/month_summary.json` rows in `ACCEPTED` status
+across 10 months (Sep 2025 → Jun 2026) and the cross-month
+`finalize-corpus-validation` aggregate (≥ 8 000 emails + ≥ 10 000 chats
+total, monotonic timestamps, no event-ID regression). The
+production platform — Astro 6 + React 19, the model-inference layer, and
+the bias-detection / websocket / training-server modules — continues to
+evolve alongside the corpus work.
+
+The infrastructure pivot effective 2026-06-29 routes chat-completion
+transport through the **sinker ollama facility** behind
+`https://ollama.pixelated.love`, with Auth0 OIDC bearer auth via
+oauth2-proxy and Cloudflare DNS-01 ACME. See
+[`infra/sinker/`](infra/sinker/) for the per-feature rebars and the
+canonical runbook; the live carrier is read-only through this README
+and is owned by the `infra-sinker` worker skill.
 
 ## Overview
 

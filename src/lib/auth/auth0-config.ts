@@ -1,4 +1,6 @@
 import fs from 'node:fs'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-config')
 /**
  * Auth0 Central Configuration Utility
  * Handles secrets from both environment variables and Docker secrets files.
@@ -26,7 +28,7 @@ function getSecret(envVar: string, fileEnvVar: string): string {
     try {
       return fs.readFileSync(filePath, 'utf8').trim()
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `[Auth0Config] Failed to read secret from ${filePath}:`,
         error,
       )
@@ -91,16 +93,16 @@ export function logAuth0Status(): void {
     managementClientSecret: !!auth0Config.managementClientSecret,
   }
 
-  console.log('[Auth0Config] Status:', status)
+  logger.info('[Auth0Config] Status:', status)
 
   if (!isAuth0Configured()) {
-    console.warn(
+    logger.warn(
       '[Auth0Config] Standard authentication features may not work due to missing config.',
     )
   }
 
   if (!isAuth0ManagementConfigured()) {
-    console.warn(
+    logger.warn(
       '[Auth0Config] Management API features (RBAC, user management) may not work due to missing config.',
     )
   }

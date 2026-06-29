@@ -123,7 +123,7 @@ async function piiMiddleware(
 export const onRequest = defineMiddleware(
   async (context: APIContext, next: MiddlewareNext) => {
     try {
-      console.log('onRequest context:', context)
+      logger.info('onRequest context:', context)
       // Add PII detection logic here
       return await next()
     } catch (error: unknown) {

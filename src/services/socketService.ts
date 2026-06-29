@@ -9,6 +9,10 @@ type RedisLike = {
   quit: () => Promise<unknown>
 }
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
+const socketLogger = createBuildSafeLogger('socket-service')
+
 export class SocketService {
   private readonly io: SocketIOServer
   private readonly _redis: RedisLike
@@ -20,7 +24,7 @@ export class SocketService {
 
     // Wire up redis error handling
     this._redis.on('error', (err: unknown) => {
-      console.error('Socket service redis error:', err)
+      socketLogger.error('Socket service redis error', err)
     })
 
     // Initialize Socket.IO
@@ -51,10 +55,10 @@ export class SocketService {
 
   private setupSocketHandlers() {
     this.io.on('connection', (socket: Socket) => {
-      console.log(`Client connected: ${socket.id}`)
+      socketLogger.info(`Client connected: ${socket.id}`)
 
       socket.on('disconnect', () => {
-        console.log(`Client disconnected: ${socket.id}`)
+        socketLogger.info(`Client disconnected: ${socket.id}`)
       })
 
       // Basic health check for socket

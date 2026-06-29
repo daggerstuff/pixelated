@@ -17,7 +17,7 @@ class AuditLoggingService {
     userId?: string
     details: Record<string, unknown>
   }): void {
-    console.log(`[AUDIT:${this.context}]`, entry)
+    auditLogger.info(`[AUDIT:${this.context}]`, entry)
   }
 }
 

@@ -1,4 +1,6 @@
 import { getSystemMetrics, type SystemMetrics } from '@/lib/api/admin'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('dashboard-updater')
 
 export class DashboardUpdater {
   private updateInterval: number | null = null
@@ -91,7 +93,7 @@ export class DashboardUpdater {
 
       this.hideError()
     } catch (err: unknown) {
-      console.error('Error updating metrics:', err)
+      logger.error('Error updating metrics:', err)
       this.showError(
         err instanceof Error ? err?.message || String(err) : String(err),
       )

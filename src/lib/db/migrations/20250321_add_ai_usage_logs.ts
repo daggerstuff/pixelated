@@ -1,4 +1,6 @@
 import { Db, MongoClient } from 'mongodb'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('add_ai_usage_logs')
 
 // Initialize MongoDB client
 const client = new MongoClient(
@@ -19,9 +21,9 @@ export async function up(): Promise<void> {
     await collection.createIndex({ model: 1 })
     await collection.createIndex({ user_id: 1, created_at: -1 })
 
-    console.log('✅ Created ai_usage_logs collection with indexes')
+    logger.info('✅ Created ai_usage_logs collection with indexes')
   } catch (error: unknown) {
-    console.error('❌ Migration failed:', error)
+    logger.error('❌ Migration failed:', error)
     throw error
   } finally {
     await client.close()
@@ -36,9 +38,9 @@ export async function down(): Promise<void> {
     // Drop the collection
     await db.collection('ai_usage_logs').drop()
 
-    console.log('✅ Dropped ai_usage_logs collection')
+    logger.info('✅ Dropped ai_usage_logs collection')
   } catch (error: unknown) {
-    console.error('❌ Rollback failed:', error)
+    logger.error('❌ Rollback failed:', error)
     throw error
   } finally {
     await client.close()

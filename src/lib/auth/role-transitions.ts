@@ -17,6 +17,8 @@ import {
 } from './roles'
 import type { SessionData } from './session-management'
 import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('role-transitions')
 
 // Configuration
 const ROLE_TRANSITION_CONFIG = {
@@ -576,7 +578,7 @@ export async function getUserRoleTransitionRequests(
 
     return requests
   } catch (error: unknown) {
-    console.error('Error getting user role transition requests:', error)
+    logger.error('Error getting user role transition requests:', error)
     return []
   }
 }
@@ -612,7 +614,7 @@ export async function getPendingRoleTransitionRequests(
 
     return eligibleRequests
   } catch (error: unknown) {
-    console.error('Error getting pending role transition requests:', error)
+    logger.error('Error getting pending role transition requests:', error)
     return []
   }
 }
@@ -665,7 +667,7 @@ async function addUserPendingRequest(
 
     await setInCache(pendingKey, pendingRequests, 7 * 24 * 60 * 60) // 7 days
   } catch (error: unknown) {
-    console.error('Error adding user pending request:', error)
+    logger.error('Error adding user pending request:', error)
   }
 }
 
@@ -688,7 +690,7 @@ async function removeUserPendingRequest(
       await removeFromCache(pendingKey)
     }
   } catch (error: unknown) {
-    console.error('Error removing user pending request:', error)
+    logger.error('Error removing user pending request:', error)
   }
 }
 
@@ -715,7 +717,7 @@ async function getPendingRoleRequests(
 
     return requests
   } catch (error: unknown) {
-    console.error('Error getting pending role requests:', error)
+    logger.error('Error getting pending role requests:', error)
     return []
   }
 }
@@ -758,7 +760,7 @@ async function expireRoleTransitionRequest(requestId: string): Promise<void> {
       sessionId: 'system',
     })
   } catch (error: unknown) {
-    console.error('Error expiring role transition request:', error)
+    logger.error('Error expiring role transition request:', error)
   }
 }
 
@@ -803,7 +805,7 @@ async function logRoleTransitionAudit(
       actorRole: auditLog.actorRole,
     })
   } catch (error: unknown) {
-    console.error('Error logging role transition audit:', error)
+    logger.error('Error logging role transition audit:', error)
   }
 }
 
@@ -814,7 +816,7 @@ async function notifyRoleTransitionRequest(
   request: RoleTransitionRequest,
 ): Promise<void> {
   // Implement notification logic
-  console.log(
+  logger.info(
     `Role transition requested: ${request.userId} from ${request.currentRole} to ${request.requestedRole}`,
   )
 }
@@ -825,14 +827,14 @@ async function notifyRoleTransitionDecision(
   decision: 'approve' | 'reject',
 ): Promise<void> {
   // Implement notification logic
-  console.log(`Role transition ${decision}: ${request.userId} by ${approverId}`)
+  logger.info(`Role transition ${decision}: ${request.userId} by ${approverId}`)
 }
 
 async function notifyRoleTransitionSuccess(
   request: RoleTransitionRequest,
 ): Promise<void> {
   // Implement notification logic
-  console.log(
+  logger.info(
     `Role transition completed: ${request.userId} is now ${request.requestedRole}`,
   )
 }
@@ -843,7 +845,7 @@ async function notifyRoleTransitionCancellation(
   _reason: string,
 ): Promise<void> {
   // Implement notification logic
-  console.log(`Role transition cancelled: ${request.userId} by ${cancellerId}`)
+  logger.info(`Role transition cancelled: ${request.userId} by ${cancellerId}`)
 }
 
 /**
@@ -876,7 +878,7 @@ export async function getRoleTransitionAuditTrail(
 
     return auditLogs
   } catch (error: unknown) {
-    console.error('Error getting role transition audit trail:', error)
+    logger.error('Error getting role transition audit trail:', error)
     return []
   }
 }
@@ -980,7 +982,7 @@ export async function validateRoleAssignment(
     validation.canTransition = validation.restrictions.length === 0
     return validation
   } catch (error: unknown) {
-    console.error('Error validating role assignment:', error)
+    logger.error('Error validating role assignment:', error)
     validation.restrictions.push('Validation failed due to system error')
     return validation
   }
