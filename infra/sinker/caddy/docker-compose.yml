@@ -10,7 +10,7 @@
 
 services:
   oauth2-proxy:
-    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0-alpine
     container_name: pixelated-oauth2-proxy
     restart: unless-stopped
     ports:
@@ -20,7 +20,7 @@ services:
     networks:
       - sinker-ollama_default
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q http://localhost:4180/ping || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4180/ping || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
