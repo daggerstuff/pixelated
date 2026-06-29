@@ -1,0 +1,51 @@
+# infra/sinker/traefik/dynamic/traefik-dynamic.yml — dynamic config
+# Managed by infra-sinker milestone.
+#
+# Defines:
+#   - Router: ollama-pixelated-love (Host + websecure + TLS certresolver)
+#   - Service: ollama-pixelated-love (loadbalancer → pixelated-ollama:11434)
+#   - Middleware: oauth-forwardauth (oauth2-proxy sidecar)
+#   - Middleware: security-headers (HSTS, X-Frame-Options, etc.)
+
+http:
+  routers:
+    ollama-pixelated-love:
+      rule: "Host(`ollama.pixelated.love`)"
+      entryPoints:
+        - websecure
+      service: ollama-pixelated-love
+      middlewares:
+        - oauth-forwardauth
+        - security-headers
+      tls:
+        certResolver: letsencrypt-dns
+
+  services:
+    ollama-pixelated-love:
+      loadBalancer:
+        servers:
+          - url: "http://pixelated-ollama:11434"
+        healthCheck:
+          path: /api/version
+          interval: 30s
+          timeout: 5s
+
+  middlewares:
+    oauth-forwardauth:
+      forwardAuth:
+        address: "http://pixelated-oauth2-proxy:4180"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - X-Auth-Request-Email
+          - X-Auth-Request-User
+
+    security-headers:
+      headers:
+        sslRedirect: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
