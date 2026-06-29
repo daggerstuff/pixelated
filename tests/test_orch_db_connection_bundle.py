@@ -1,4 +1,4 @@
-"""Tests for ``skills.monthly-llm-driver.orch_db.ConnectionBundle``.
+"""Tests for ``skills.monthly_llm_driver.orch_db.ConnectionBundle``.
 
 Verifies the three-DB connection helper used by the monthly LLM pipeline
 orchestrator.  All tests require the three database services to be
@@ -11,19 +11,15 @@ Test cases:
     from_env_uses_override_uri   -- env vars override defaults
 """
 
-import importlib
 import os
 
 import pymongo
 import redis
 
 # ---------------------------------------------------------------------------
-# Import the module (hyphenated name requires importlib)
+# Import the module (now snake_case — direct from-import works)
 # ---------------------------------------------------------------------------
-
-_ORCH_DB = importlib.import_module("skills.monthly-llm-driver.orch_db")
-ConnectionBundle = _ORCH_DB.ConnectionBundle
-
+from skills.monthly_llm_driver.orch_db import ConnectionBundle
 
 # ---------------------------------------------------------------------------
 # Test 1: from_env() returns 3 connected clients

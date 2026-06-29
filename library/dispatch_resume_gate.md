@@ -37,7 +37,7 @@ age = heartbeat_age_seconds(Path("/tmp/wayfarer_smoke/heartbeat_2025-10.json"))
 ## AGENTS.md Mandate Cross-Reference
 
 See `/home/vivi/pixelated/AGENTS.md` § "Dispatch Resume Gate (mandatory)" for the worker contract:
-- Every monthly-llm-driver worker MUST call `scan` BEFORE the first chat_completion POST
+- Every monthly_llm_driver worker MUST call `scan` BEFORE the first chat_completion POST
 - If `missing_or_partial > 0` AND `kill_stale_dispatch` finds a live process, worker MUST kill first then write resume plan
 - Workers MUST NOT bypass the gate for short halving loops
 
