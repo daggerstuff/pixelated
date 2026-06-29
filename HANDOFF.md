@@ -18,7 +18,7 @@ Status:
   Mar 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding 9 missing Pydantic fields. 850 emails + 870 chats, audit finding_count=1 (chat_burst_count_mismatch). Volume exemption applied per VAL-Mxx-006 bullet 3. Accepted 2026-06-29T22:50:00Z)
   Apr 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json, ran 9-phase normalization pipeline. 897 emails + 867 chats. Volume exemption applied per validation-contract.md §Hard rule #2 bullet 3. Accepted 2026-06-29T22:58:45Z)
   May 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json with 39 chunks (20 Wayfarer + 19 Granite), ran 9-phase normalization pipeline. 950 emails + 1170 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T23:15:00Z)
-  Jun 2026   pending (last month — corpus complete)
+  Jun 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json with LlmGenerationReport schema (model, endpoint_count, gpu_required, local_gpu_check_required, output_paths), 950 emails + 1170 chats, 6 event_ids (EVT-2026-033..EVT-2026-038), audit status=passed, finding_count=0. Accepted 2026-06-29T23:32:41.756190Z)
 ```
 
 **Immediate next action (one line):**
@@ -168,7 +168,7 @@ git push origin master
 | 2026-03 | 850 | 1,050 | Pending |
 | 2026-04 | 900 | 1,150 | Pending |
 | 2026-05 | 950 | 1,170 | Accepted (audit_fixbot: 950 emails + 1170 chats, audit status=passed, finding_count=0, audit_run_timestamp=2026-06-29T23:15:00Z) |
-| 2026-06 | 950 | 1,170 | Pending (last month) |
+| 2026-06 | 950 | 1,170 | Accepted (audit_fixbot: 950 emails + 1170 chats, 6 event_ids, audit status=passed, finding_count=0, audit_run_timestamp=2026-06-29T23:32:41.756190Z) |
 
 ---
 
@@ -283,10 +283,8 @@ python scripts/clean_chronology.py 2025-08
 - PIX-4027 (epic) with completion notes
 - This HANDOFF.md — update the status table and "Current State" section, then push
 
-**Current repo truth:** as of 2026-06-29, Jul 2025 through May 2026 are the
-accepted months. The next real LLM run is Jun 2026. Treat
-`monthly_work/2026-06` as scaffold placeholders until they have both real LLM artifacts and an acceptance summary under
-`monthly_accepted/<month>/month_summary.json`.
+**Current repo truth:** as of 2026-06-29, Jul 2025 through Jun 2026 are the
+accepted months. All 10 months of the corpus pipeline (Jul 2025 – Jun 2026) are complete. The corpus is production-ready for database seeding.
 
 ---
 
