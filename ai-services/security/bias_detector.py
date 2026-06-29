@@ -5,7 +5,7 @@ Analyzes therapeutic sessions for demographic bias using Fairlearn
 
 import logging
 import re
-from enum import Enum
+from enum import StrEnum
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
-class BiasLevel(str, Enum):
+class BiasLevel(StrEnum):
     NONE = "none"
     LOW = "low"
     MODERATE = "moderate"

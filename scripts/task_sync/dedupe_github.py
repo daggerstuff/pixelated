@@ -46,7 +46,7 @@ def fetch_all_issues(repo: str) -> list[dict]:
     page = 0
     while True:
         page += 1
-        offset = (page - 1) * limit
+        (page - 1) * limit
         result = subprocess.run(
             [
                 "gh",
@@ -61,14 +61,13 @@ def fetch_all_issues(repo: str) -> list[dict]:
                 "--json",
                 "number,title,state,body,createdAt",
                 "-S",
-                f"updated:<=2099-12-31 sort:created-asc",
+                "updated:<=2099-12-31 sort:created-asc",
             ],
             capture_output=True,
             text=True,
             timeout=60,
         )
         if result.returncode != 0:
-            print(f"Error fetching page {page}: {result.stderr[:200]}", file=sys.stderr)
             break
 
         data = json.loads(result.stdout)
@@ -80,7 +79,6 @@ def fetch_all_issues(repo: str) -> list[dict]:
         # creation-asc. However, this approach hits issues with large repos.
         # Instead, use the REST API directly here.
         all_issues.extend(data)
-        print(f"  Fetched {len(data)} issues (page {page}, total {len(all_issues)})", file=sys.stderr)
         if len(data) < limit:
             break
 
@@ -111,16 +109,14 @@ def fetch_all_issues_via_api(repo: str, token: str) -> list[dict]:
             resp = urllib.request.urlopen(req)
             raw = resp.read()
             data = json.loads(raw.decode())
-        except Exception as e:
-            print(f"  API error on page {page}: {e}", file=sys.stderr)
+        except Exception:
             # Try to recover with retry
             time.sleep(5)
             try:
                 resp = urllib.request.urlopen(req)
                 raw = resp.read()
                 data = json.loads(raw.decode())
-            except Exception as e2:
-                print(f"  Retry failed: {e2}", file=sys.stderr)
+            except Exception:
                 break
 
         if not isinstance(data, list) or not data:
@@ -138,7 +134,6 @@ def fetch_all_issues_via_api(repo: str, token: str) -> list[dict]:
                     }
                 )
 
-        print(f"  Page {page}: {len(data)} items ({len(all_issues)} total issues)", file=sys.stderr)
         if len(data) < 100:
             break
         page += 1
@@ -150,7 +145,7 @@ def close_issue(repo: str, issue_number: int) -> bool:
     """Close an issue with 'not planned' reason."""
     wait = RATE_LIMIT_DELAY
 
-    for attempt in range(3):
+    for _attempt in range(3):
         result = subprocess.run(
             ["gh", "issue", "close", str(issue_number), "--repo", repo, "--reason", CLOSE_REASON],
             capture_output=True,
@@ -163,12 +158,10 @@ def close_issue(repo: str, issue_number: int) -> bool:
         err = result.stderr.lower()
 
         if "was submitted too quickly" in err or "rate limit" in err:
-            print(f"  Rate limited on #{issue_number}, retrying in {wait:.1f}s...", file=sys.stderr)
             time.sleep(wait)
             wait *= 2
             continue
 
-            print(f"  Failed to close #{issue_number}: {result.stderr[:120]}", file=sys.stderr)
         return False
 
     return False
@@ -189,7 +182,7 @@ def classify_and_plan(issues: list[dict]) -> dict:
     collision_groups = 0
     collision_closes: list[tuple[int, int]] = []  # (close_num, keep_num)
 
-    for title, group in by_title.items():
+    for _title, group in by_title.items():
         if len(group) == 1:
             singles += 1
             continue
@@ -261,13 +254,13 @@ def plan_summary(plan: dict) -> str:
         f"  Single-issue titles:       {plan['singles']}",
         f"  Title collision groups:     {plan['collision_groups']}",
         f"  Title collision issues → close: {len(plan['collision_closes'])}",
-        f"",
+        "",
         f"  True duplicate groups:      {plan['true_dup_groups']}",
         f"  True duplicate issues → close: {len(plan['true_dup_closes'])}",
-        f"",
+        "",
         f"  No-metadata duplicate groups: {plan['no_meta_groups']}",
         f"  No-metadata issues → close:    {len(plan['no_meta_closes'])}",
-        f"",
+        "",
         f"  TOTAL TO CLOSE:            {total}",
     ]
     return "\n".join(lines)
@@ -279,7 +272,6 @@ def main():
     token = os.environ.get("GITHUB_TOKEN", "")
 
     if not repo or not owner:
-        print("GITHUB_OWNER and GITHUB_REPO must be set")
         return 1
 
     full_repo = f"{owner}/{repo}"
@@ -287,27 +279,18 @@ def main():
     # Load cached issues if available, else fetch fresh
     cached_path = Path("/tmp/gh_issues_for_dedup.json")
     if cached_path.exists():
-        print(f"Loading {cached_path.stat().st_size} bytes from cache...", file=sys.stderr)
         issues = json.loads(cached_path.read_text())
     else:
-        print("Fetching all GitHub issues via API...", file=sys.stderr)
         issues = fetch_all_issues_via_api(full_repo, token)
         cached_path.write_text(json.dumps(issues, indent=2))
-        print(f"Cached to {cached_path}", file=sys.stderr)
-
-    print(f"\nLoaded {len(issues)} issues total.", file=sys.stderr)
 
     plan = classify_and_plan(issues)
-    print(f"\n=== CLEANUP PLAN ===", file=sys.stderr)
-    print(plan_summary(plan), file=sys.stderr)
 
     total_to_close = len(plan["true_dup_closes"]) + len(plan["no_meta_closes"]) + len(plan["collision_closes"])
     if total_to_close == 0:
-        print("\nNothing to close. Exiting.", file=sys.stderr)
         return 0
 
     # Execute close plan
-    print(f"\n=== CLOSING {total_to_close} ISSUES ===", file=sys.stderr)
     all_closes = []
 
     for close_num, keep_num, lid in plan["true_dup_closes"]:
@@ -349,7 +332,6 @@ def main():
 
         if i % BATCH_SIZE == 0:
             batch_num += 1
-            print(f"\nBatch {batch_num} (issues {i + 1}-{min(i + BATCH_SIZE, len(all_closes))})...")
 
         success = close_issue(full_repo, issue_num)
         if success:
@@ -362,14 +344,10 @@ def main():
         sys.stdout.flush()
         time.sleep(RATE_LIMIT_DELAY)
 
-    print(f"\n=== RESULTS ===", file=sys.stderr)
-    print(f"  Closed:  {results['closed']}", file=sys.stderr)
-    print(f"  Failed:  {results['failed']}", file=sys.stderr)
     if results["failed"] > 0:
-        print(f"  Failed issues: {results['skipped']}", file=sys.stderr)
+        pass
 
     # Summary JSON to stdout for parsing
-    print(json.dumps(results))
     return 0 if results["failed"] == 0 else 1
 
 

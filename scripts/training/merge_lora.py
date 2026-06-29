@@ -30,23 +30,11 @@ def main():
     parser.add_argument("--skip-verification", action="store_true", help="Skip verification load after merging")
     args = parser.parse_args()
 
-    print("=" * 60)
-    print("LoRA Merge Configuration")
-    print("=" * 60)
-    print(f"Base model: {args.base}")
-    print(f"Adapter: {args.adapter}")
-    print(f"Output: {args.output}")
-    print(f"Device: {args.device}")
-    print(f"Torch dtype: {args.torch_dtype}")
-    print(f"Trust remote code: {args.trust_remote_code}")
-    print("=" * 60)
-
     # Create output directory
     output_path = Path(args.output)
     output_path.mkdir(parents=True, exist_ok=True)
 
     # Load base model
-    print(f"\n[1/4] Loading base model '{args.base}'...")
     torch_dtype = getattr(torch, args.torch_dtype)
 
     base_model = AutoModelForCausalLM.from_pretrained(
@@ -57,53 +45,37 @@ def main():
         low_cpu_mem_usage=True,  # Load in stages to save RAM
     )
     # Handle device map display
-    device_map = getattr(base_model, "hf_device_map", {"": str(base_model.device)})
-    print(f"✅ Base model loaded. Device map: {device_map}")
+    getattr(base_model, "hf_device_map", {"": str(base_model.device)})
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.base, trust_remote_code=args.trust_remote_code)
-    print(f"✅ Tokenizer loaded. Vocab size: {len(tokenizer)}")
 
     # Load adapter
-    print(f"\n[2/4] Loading LoRA adapter '{args.adapter}'...")
     model_with_adapter = PeftModel.from_pretrained(
         base_model,
         args.adapter,
         device_map=args.device,
         is_trainable=False,  # We're merging, not training
     )
-    print("✅ Adapter loaded and applied to base model")
 
     # Merge weights
-    print("\n[3/4] Merging LoRA weights into base...")
     merged_model = model_with_adapter.merge_and_unload()
-    print("✅ Merge complete")
 
     # Save merged model
-    print(f"\n[4/4] Saving merged model to '{args.output}'...")
     merged_model.save_pretrained(
         args.output,
         safe_serialization=True,  # Save as safetensors (recommended)
         max_shard_size="10GB",  # Split into 10GB chunks
     )
     tokenizer.save_pretrained(args.output)
-    print("✅ Model and tokenizer saved")
 
     # Summary
-    print("\n" + "=" * 60)
-    print("MERGE COMPLETE")
-    print("=" * 60)
-    print(f"Output directory: {args.output}")
-    print("Model files:")
     for file in sorted(output_path.glob("*")):
         if file.is_file():
-            size_gb = file.stat().st_size / (1024**3)
-            print(f"  - {file.name}: {size_gb:.2f} GB")
-    print("=" * 60)
+            file.stat().st_size / (1024**3)
 
     # Verification (Optional but recommended in the guide)
     if not args.skip_verification:
-        print("\n[Verification] Testing load of merged model...")
         try:
             AutoModelForCausalLM.from_pretrained(
                 args.output,
@@ -112,11 +84,10 @@ def main():
                 low_cpu_mem_usage=True,
                 trust_remote_code=args.trust_remote_code,
             )
-            print("✅ Verification successful - merged model loads correctly")
-        except Exception as e:
-            print(f"❌ Verification failed: {e}")
+        except Exception:
+            pass
     else:
-        print("\n[Verification] Skipped as requested")
+        pass
 
 
 if __name__ == "__main__":
