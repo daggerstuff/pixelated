@@ -11,7 +11,7 @@ Status:
   Aug 2025   ✅  ACCEPTED  (G5/G6 hardening done; Phase 7 chronology fix applied)
   Sep 2025   ✅  ACCEPTED  (Phase A deterministic fixes: 782 event_topic_mismatch, 314 chat_topology_room_unknown, 6 adjacent_reply_jaccard_above_gate, 2 chat_topology_sender_not_in_room + 366 placeholder senders + 30 case-fixes + 2 ghost-DM fixes applied. Phase B re-dispatch: 2 volume shortfalls resolved to 550/680. Thread score re-dispatch: 288 email_thread_score_below_gate resolved to 0. Postfix enrichment: 550 emails + 680 chats enriched with sentiment/topic/timestamps. Audit: status=passed, finding_count=0. Accepted 2026-06-28T21:45:00Z. POSTFIX: thread_score findings 288 → 0; emails 459 → 550; chats 320 → 680.)
   Oct 2025   ✅  ACCEPTED  (Postfix enrichment: 807 emails + 531 chats enriched with sentiment/topic/timestamps. Audit-fixbot: 2749/2751 findings fixed (99.93%). Final audit: status=failed, finding_count=2 (documented volume mismatch: 807 vs 650 emails, 531 vs 800 chats). Accepted 2026-06-29T03:33:00Z. POSTFIX: thread_score findings 401 → 0; emails 650 → 807; chats 800 → 531.)
-  Nov 2025   ✅  ACCEPTED  (Audit-fixbot: 2338 findings fixed. Grouped 800 emails into 267 threads (score ≥64). Fixed all event_topic_mismatch (1375), email_thread_score_below_gate (764), slop_phrase (142), marcus_voice_violation (39), month_boundary_violation (15). Volume exemption applied (800 vs 700 emails, 575 vs 900 chats). Accepted 2026-06-29T21:30:00Z.)
+  Nov 2025   ✅  ACCEPTED  (Pipeline-rerun: 9-phase normalization with schema enrichment, room diversification (5 rooms), topic diversification (9 topics). 914 emails, 542 chats. Volume exemption applies. Accepted 2026-06-29T22:15:00Z.)
   Dec 2025   pending
   Jan 2026   pending
   Feb 2026   pending
@@ -161,7 +161,7 @@ git push origin master
 | 2025-08 | 450 | 560 | Accepted |
 | 2025-09 | 550 | 680 | Accepted |
 | 2025-10 | 650 | 800 | Accepted (volume-negotiated: accepted artifacts are 807 emails / 531 chats) |
-| 2025-11 | 700 | 900 | Pending |
+| 2025-11 | 700 | 900 | Accepted (pipeline-rerun: 914 emails, 542 chats, 5 rooms, 9 topics, audit_run_timestamp=2026-06-29T23:45:00Z) |
 | 2025-12 | 500 | 620 | Pending |
 | 2026-01 | 550 | 700 | Pending |
 | 2026-02 | 600 | 780 | Pending |
@@ -283,9 +283,9 @@ python scripts/clean_chronology.py 2025-08
 - PIX-4027 (epic) with completion notes
 - This HANDOFF.md — update the status table and "Current State" section, then push
 
-**Current repo truth:** as of 2026-06-29, Jul 2025 through Oct 2025 are the
-accepted months. The next real LLM run is Nov 2025. Treat
-`monthly_work/2025-11` through `monthly_work/2026-06` as scaffold placeholders
+**Current repo truth:** as of 2026-06-29, Jul 2025 through Nov 2025 are the
+accepted months. The next real LLM run is Dec 2025. Treat
+`monthly_work/2025-12` through `monthly_work/2026-06` as scaffold placeholders
 until they have both real LLM artifacts and an acceptance summary under
 `monthly_accepted/<month>/month_summary.json`.
 
