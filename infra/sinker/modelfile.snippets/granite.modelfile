@@ -1,0 +1,22 @@
+# Granite 4.1-N model modelfile for sinker ollama facility
+# Model: granite4.1:3b (equivalent to granite4.1-n-4b)
+# GPU: V100S 32GB (sinker has 21GB free VRAM available)
+# Pulled: 2026-06-29T11:40:00Z
+
+FROM granite4.1:3b
+
+# Runtime parameters for V100 32GB configuration
+# Granite 4.1-N is a smaller model (3B params, 2.1GB)
+# Can handle higher parallelism and context
+PARAMETER num_parallel 4
+PARAMETER num_ctx 8192
+PARAMETER flash_attention 1
+
+# Model metadata
+# Digest: sha256-662b0626cd58f443baea23559b469df6576a81d349649c59413b36a9fb32eb29
+# Size: 2.1 GB
+# Quantization: Q4_K_M (4-bit quantization)
+# Expected parameter count: ~3B
+# Min VRAM required: 4096 MiB
+# Note: granite4.1-n-4b was not available in ollama registry;
+#       granite4.1:3b is the canonical 3B variant per IBM Granite 4.1 family
