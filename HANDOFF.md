@@ -16,7 +16,7 @@ Status:
   Jan 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding model and endpoint_count fields, chat_topology_sender_not_in_room (935 findings) by making Phase 8 topology-aware, and event_topic_mismatch (924 findings) by using topic_for_event mapping in Phase 9. 550 emails + 700 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T22:15:30Z)
   Feb 2026   pending
   Mar 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding 9 missing Pydantic fields. 850 emails + 870 chats, audit finding_count=1 (chat_burst_count_mismatch). Volume exemption applied per VAL-Mxx-006 bullet 3. Accepted 2026-06-29T22:50:00Z)
-  Apr 2026   pending
+  Apr 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json, ran 9-phase normalization pipeline. 897 emails + 867 chats. Volume exemption applied per validation-contract.md §Hard rule #2 bullet 3. Accepted 2026-06-29T22:58:45Z)
   May 2026   pending
   Jun 2026   pending (last month — corpus complete)
 ```
