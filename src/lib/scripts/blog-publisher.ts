@@ -81,8 +81,8 @@ const command = args[0] ?? 'status'
         break
 
       default:
-        console.log('Unknown command. Available commands:')
-        console.log(
+        logger.info('Unknown command. Available commands:')
+        logger.info(
           '  init, status, report, series, upcoming, overdue, generate, publish',
         )
         break
@@ -103,28 +103,28 @@ async function showStatus(): Promise<void> {
   const publishedPosts = service.getPostsByStatus(PostStatus.PUBLISHED)
   const overduePosts = service.getPostsByStatus(PostStatus.OVERDUE)
 
-  console.log('Blog Post Status:')
-  console.log('----------------')
-  console.log(`Total Posts: ${allPosts.length}`)
-  console.log(`Published: ${publishedPosts.length}`)
-  console.log(`Scheduled: ${scheduledPosts.length}`)
-  console.log(`Draft: ${draftPosts.length}`)
-  console.log(`Overdue: ${overduePosts.length}`)
-  console.log('')
+  logger.info('Blog Post Status:')
+  logger.info('----------------')
+  logger.info(`Total Posts: ${allPosts.length}`)
+  logger.info(`Published: ${publishedPosts.length}`)
+  logger.info(`Scheduled: ${scheduledPosts.length}`)
+  logger.info(`Draft: ${draftPosts.length}`)
+  logger.info(`Overdue: ${overduePosts.length}`)
+  logger.info('')
 
   if (overduePosts.length > 0) {
-    console.log('⚠️ Overdue posts:')
+    logger.info('⚠️ Overdue posts:')
     for (const post of overduePosts) {
-      console.log(`  - ${post.metadata.title}`)
+      logger.info(`  - ${post.metadata.title}`)
     }
-    console.log('')
+    logger.info('')
   }
 
   if (scheduledPosts.length > 0) {
-    console.log('⏳ Upcoming publications:')
+    logger.info('⏳ Upcoming publications:')
     for (const post of scheduledPosts) {
       const pubDate = new Date(post.metadata.pubDate)
-      console.log(`  - ${post.metadata.title} (${pubDate.toDateString()})`)
+      logger.info(`  - ${post.metadata.title} (${pubDate.toDateString()})`)
     }
   }
 }
@@ -136,7 +136,7 @@ async function generateReport(): Promise<void> {
   const report = service.generateContentReport()
 
   // Output to console
-  console.log(report)
+  logger.info(report)
 
   // Save to file
   const reportDir = safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, 'reports')
@@ -177,15 +177,15 @@ async function listSeries(): Promise<void> {
   }
 
   if (seriesMap.size === 0) {
-    console.log('No series found.')
+    logger.info('No series found.')
     return
   }
 
-  console.log('Blog Series:')
-  console.log('-----------')
+  logger.info('Blog Series:')
+  logger.info('-----------')
 
   for (const [seriesName, posts] of seriesMap.entries()) {
-    console.log(`\n${seriesName}:`)
+    logger.info(`\n${seriesName}:`)
 
     // Sort posts by seriesOrder
     posts.sort((a, b) => {
@@ -202,7 +202,7 @@ async function listSeries(): Promise<void> {
         ? `[${post.metadata.seriesOrder}]`
         : ''
 
-      console.log(
+      logger.info(
         `  ${status} ${order} ${post.metadata.title} (${pubDate.toDateString()})`,
       )
     }
@@ -216,12 +216,12 @@ async function showUpcoming(): Promise<void> {
   const scheduledPosts = service.getUpcomingPosts()
 
   if (scheduledPosts.length === 0) {
-    console.log('No upcoming publications.')
+    logger.info('No upcoming publications.')
     return
   }
 
-  console.log('Upcoming Publications:')
-  console.log('---------------------')
+  logger.info('Upcoming Publications:')
+  logger.info('---------------------')
 
   const now = new Date()
 
@@ -231,18 +231,18 @@ async function showUpcoming(): Promise<void> {
       (pubDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
     )
 
-    console.log(`${pubDate.toDateString()} (in ${daysUntil} days):`)
-    console.log(`  Title: ${post.metadata.title}`)
-    console.log(`  Author: ${post.metadata.author}`)
+    logger.info(`${pubDate.toDateString()} (in ${daysUntil} days):`)
+    logger.info(`  Title: ${post.metadata.title}`)
+    logger.info(`  Author: ${post.metadata.author}`)
 
     if (post.metadata.series) {
       const seriesInfo = post.metadata.seriesOrder
         ? `[Part ${post.metadata.seriesOrder}]`
         : ''
-      console.log(`  Series: ${post.metadata.series} ${seriesInfo}`)
+      logger.info(`  Series: ${post.metadata.series} ${seriesInfo}`)
     }
 
-    console.log('')
+    logger.info('')
   }
 }
 
@@ -253,12 +253,12 @@ async function showOverdue(): Promise<void> {
   const overduePosts = service.getOverduePosts()
 
   if (overduePosts.length === 0) {
-    console.log('No overdue publications.')
+    logger.info('No overdue publications.')
     return
   }
 
-  console.log('⚠️ Overdue Publications:')
-  console.log('----------------------')
+  logger.info('⚠️ Overdue Publications:')
+  logger.info('----------------------')
 
   const now = new Date()
 
@@ -268,10 +268,10 @@ async function showOverdue(): Promise<void> {
       (now.getTime() - pubDate.getTime()) / (1000 * 60 * 60 * 24),
     )
 
-    console.log(`${pubDate.toDateString()} (${daysOverdue} days overdue):`)
-    console.log(`  Title: ${post.metadata.title}`)
-    console.log(`  File: ${post.filePath}`)
-    console.log('')
+    logger.info(`${pubDate.toDateString()} (${daysOverdue} days overdue):`)
+    logger.info(`  Title: ${post.metadata.title}`)
+    logger.info(`  File: ${post.filePath}`)
+    logger.info('')
   }
 }
 
@@ -283,8 +283,8 @@ async function generatePost(
   postTitle?: string,
 ): Promise<void> {
   if (!postTitle) {
-    console.log('Error: Post title is required.')
-    console.log(
+    logger.info('Error: Post title is required.')
+    logger.info(
       'Usage: npm run blog-publisher -- generate [series] "Post Title"',
     )
     return
@@ -317,7 +317,7 @@ async function generatePost(
   // Check if file already exists
   try {
     await fs.access(filePath)
-    console.log(`Error: File already exists: ${filePath}`)
+    logger.info(`Error: File already exists: ${filePath}`)
     return
   } catch {
     // File doesn't exist, proceed
@@ -383,7 +383,7 @@ Your conclusion here...
   // Write the file
   await fs.writeFile(filePath, frontmatter, 'utf8')
 
-  console.log(`Created new blog post: ${filePath}`)
+  logger.info(`Created new blog post: ${filePath}`)
 }
 
 /**
@@ -391,8 +391,8 @@ Your conclusion here...
  */
 async function publishPost(postPath?: string): Promise<void> {
   if (!postPath) {
-    console.log('Error: Post path is required.')
-    console.log('Usage: npm run blog-publisher -- publish path/to/post.mdx')
+    logger.info('Error: Post path is required.')
+    logger.info('Usage: npm run blog-publisher -- publish path/to/post.mdx')
     return
   }
 
@@ -400,7 +400,7 @@ async function publishPost(postPath?: string): Promise<void> {
   const targetPost = allPosts.find((post) => post.filePath.includes(postPath))
 
   if (!targetPost) {
-    console.log(`Error: Post not found: ${postPath}`)
+    logger.info(`Error: Post not found: ${postPath}`)
     return
   }
 
@@ -418,7 +418,7 @@ async function publishPost(postPath?: string): Promise<void> {
     // Write back to the file
     await fs.writeFile(validatedFilePath, updatedContent, 'utf8')
 
-    console.log(`Published post: ${targetPost.metadata.title}`)
+    logger.info(`Published post: ${targetPost.metadata.title}`)
   } catch (error: unknown) {
     logger.error('Error publishing post', { error })
   }

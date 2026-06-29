@@ -23,36 +23,26 @@ Status:
 
 **Immediate next action (one line):**
 ```bash
-# From /home/vivi/pixelated for Colab launch/download; only `cd hackathon`
-# for local audit/commit:
-colab new -s pixelated-solar --gpu G4
-uv run python hackathon/build_colab_month_bundle.py 2025-11 \
-  --output /tmp/pixelated_monthly_bundle.tar.gz
-colab upload -s pixelated-solar \
-  /tmp/pixelated_monthly_bundle.tar.gz \
-  /content/pixelated_monthly_bundle.tar.gz
-# Run/poll through script files; this Colab CLI does not accept raw shell tails.
-colab exec -s pixelated-solar -f /tmp/pixelated_colab_probe.py
-colab exec -s pixelated-solar -f /tmp/pixelated_colab_start_month.py
-colab download -s pixelated-solar /content/colab_run_status.json /tmp/colab_run_status.json
-colab download -s pixelated-solar /content/hackathon/monthly_work/2025-11/ hackathon/monthly_work/
-colab stop -s pixelated-solar
-cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-11
+cd /home/vivi/pixelated
+export OLLAMA_URL="${OLLAMA_URL:-https://ollama.pixelated.love}"
+export OLLAMA_API_KEY="${OLLAMA_API_KEY:-}"
+export EMAIL_MODEL="${EMAIL_MODEL:-granite4.1:3b}"
+uv run --project hackathon python -m hackathon.monthly_llm_jobs status 2025-11
+uv run --project hackathon python -m hackathon.monthly_llm_jobs resume 2025-11
+uv run --project hackathon python -m hackathon.monthly_auditor audit 2025-11
 # Must show: status=passed, finding_count=0
 ```
 
 **Pre-flight for fresh agents (read before launching):**
 
-- **Google auth.** The `colab` CLI requires OAuth. If untouched: `colab auth login`
-  once. Tokens live in `~/.colab-cli-oauth-config.json`. A cold shell without
-  auth will fail on `colab new`.
-- **Read on.** The block above is **launch-only**. The full 10-step run
-  (build bundle tarball → upload 13 dependent files → poll → download → kill
-  GPU → local CI → commit) is in `## How to run any month (seamless)` below.
-  Read that section first.
-- **G4 fallback.** Hard rule 1 forbids T4. If `colab new --gpu G4` reports
-  "G4 unavailable" or quota exhausted, **stop and report**. Do not silently
-  switch to T4 or any other tier.
+- **Remote Ollama first.** The active month-gated path is a directly
+  reachable Ollama endpoint, not Colab orchestration. Use
+  `https://ollama.pixelated.love` unless you intentionally override it.
+- **Model pinning still matters.** `EMAIL_MODEL=granite4.1:3b` must resolve to the
+  pinned digest in `pinned_models.toml`. If `monthly_llm_generator probe` or
+  `monthly_llm_jobs preflight` complains, fix the local model state before
+  launching.
+- **Read on.** The block above is the quick-start form. The fuller local operator flow is in `## How to run any month (seamless)` below.
 
 ---
 
@@ -120,69 +110,44 @@ cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-11
 ## How to run any month (seamless)
 
 ```bash
-# ── 1. Build the upload bundle (from parent repo root) ──
+# ── 1. Work from the parent repo root ──
 cd /home/vivi/pixelated
-uv run python hackathon/build_colab_month_bundle.py 2025-11 \
-  --output /tmp/pixelated_monthly_bundle.tar.gz
 
-# ── 2. Launch Colab G4 (NEVER T4) ──
-/home/vivi/.local/bin/colab new -s pixelated-solar --gpu G4
+# ── 2. Point the pipeline at Ollama ──
+export OLLAMA_URL="${OLLAMA_URL:-https://ollama.pixelated.love}"
+export OLLAMA_API_KEY="${OLLAMA_API_KEY:-}"
+export EMAIL_MODEL="${EMAIL_MODEL:-granite4.1:3b}"
 
-# ── 3. Upload everything ──
-/home/vivi/.local/bin/colab upload -s pixelated-solar \
-  /tmp/pixelated_monthly_bundle.tar.gz \
-  /content/pixelated_monthly_bundle.tar.gz
+# ── 3. Sync the project env ──
+uv sync --project hackathon
 
-for f in hackathon/colab_run_month.py \
-         hackathon/colab_artifact_uploader.py \
-         hackathon/colab_gpu_watchdog.py \
-         hackathon/colab_solar_ollama_setup.py \
-         hackathon/monthly_llm_generator.py \
-         hackathon/monthly_llm_models.py \
-         hackathon/monthly_llm_prompt/ \
-         hackathon/monthly_chronology_guard.py \
-         hackathon/monthly_pipeline.py \
-         hackathon/monthly_gate.py \
-         hackathon/monthly_enrichment.py \
-         hackathon/monthly_generator_types.py \
-         hackathon/personas.py \
-         hackathon/personas/ \
-         hackathon/company_events.py \
-         hackathon/timeline.json \
-         hackathon/pyproject.toml; do
-  /home/vivi/.local/bin/colab upload -s pixelated-solar \
-    "$f" "/content/$f"
-done
+# ── 4. Preflight the endpoint and loaded model ──
+uv run --project hackathon python -m hackathon.monthly_llm_generator probe
 
-# ── 4. Run generation (backgrounded) ──
-# This CLI requires file-based exec; raw shell tails do not work.
-/home/vivi/.local/bin/colab exec -s pixelated-solar \
-  -f /tmp/pixelated_colab_start_month.py
+# ── 5. Check saved state for the month ──
+uv run --project hackathon python -m hackathon.monthly_llm_jobs status 2025-11
 
-# ── 5. Poll progress ──
-/home/vivi/.local/bin/colab exec -s pixelated-solar \
-  -f /tmp/pixelated_colab_poll_month.py
+# ── 6. Launch or resume generation ──
+uv run --project hackathon python -m hackathon.monthly_llm_jobs resume 2025-11
 
-# ── 6. When generation_done: DOWNLOAD IMMEDIATELY ──
-/home/vivi/.local/bin/colab download -s pixelated-solar \
-  /content/hackathon/monthly_work/2025-11/ \
-  hackathon/monthly_work/
-
-# ── 7. KILL GPU (non-negotiable) ──
-/home/vivi/.local/bin/colab stop -s pixelated-solar
+# ── 7. Poll the saved job artifacts ──
+cat hackathon/monthly_work/2025-11/llm_preflight_report.json
+cat hackathon/monthly_work/2025-11/llm_generation_job.json
+tail -n 40 hackathon/monthly_work/2025-11/llm_generation_job.log
 
 # ── 8. Local CI check ──
-cd hackathon && uv run ruff check . && uv run python -m pytest -q
+uv run --project hackathon ruff check hackathon
+uv run --project hackathon python -m pytest hackathon -q
 
 # ── 9. Audit ──
-cd hackathon && uv run python -m hackathon.monthly_auditor audit 2025-11
+uv run --project hackathon python -m hackathon.monthly_auditor audit 2025-11
 
 # Must show: {"status": "passed", "finding_count": 0}
 # If fails: read audit_report.json, fix at SOURCE (not band-aids),
 #   then re-run generation or apply: uv run python scripts/clean_chronology.py 2025-11
 
 # ── 10. If passed: commit ──
-cd hackathon && git add -A && git commit -m "chore(monthly-work): record 2025-11 LLM generation artifacts"
+git add -A && git commit -m "chore(monthly-work): record 2025-11 LLM generation artifacts"
 git push origin master
 ```
 
@@ -222,21 +187,21 @@ git push origin master
 
 ---
 
-## Colab scripts — what each does
+## Legacy Colab scripts (not the active path)
 
 | Script | Purpose |
 |--------|---------|
-| `colab_run_month.py` | Orchestrator: launches watchdog + Ollama setup + generation in background; writes `/content/colab_run_status.json`. |
+| `colab_run_month.py` | Legacy orchestrator for bundled Colab runs; writes `/content/colab_run_status.json`. |
 | `colab_gpu_watchdog.py` | Dead-man's switch: polls `nvidia-smi` every 10s; if GPU util < 5% for 240s → rclone sync → kill session. |
 | `colab_artifact_uploader.py` | `once` or `watch` mode: syncs `monthly_work/` to `HetznerS3:pixeldata/monthly_work/` via rclone. |
-| `colab_solar_ollama_setup.py` | Starts Ollama daemons and pulls the `solar` model. Writes `/content/pixelated_solar_endpoint.json`. |
+| `colab_solar_ollama_setup.py` | Legacy Colab-only Ollama bootstrap from the old `solar` flow. Do not use for the current remote-endpoint workflow. |
 | `build_colab_month_bundle.py` | Packages the repo into a tarball for Colab upload. |
 | `push_to_gmail.py` | Writes emails to Gmail via Gmail API. `ALLOW_LIVE_INJECT=1` gated. |
 | `push_to_chat.py` | Writes chats to Google Chat. `ALLOW_LIVE_INJECT=1` gated. |
 | `init_chat_spaces.py` | Creates Google Chat import-mode spaces. `ALLOW_LIVE_INJECT=1` gated. |
 | `finalize_chat_import.py` | Locks the Chat import-mode spaces. `ALLOW_LIVE_INJECT=1` gated. |
 
-**Upload all of these** with each Colab session — the orchestrator imports `upload_path_to_s3()` from `colab_artifact_uploader.py`, so both must be present.
+These files remain in the repo for historical recovery only. The active monthly path uses `https://ollama.pixelated.love` directly and does not require a Colab upload cycle.
 
 ---
 
@@ -245,17 +210,17 @@ git push origin master
 ```
 hackathon/
   monthly_llm_generator.py         # LLM generation driver
-  monthly_auditor.py              # Final audit gate (run locally after Colab)
+  monthly_auditor.py              # Final audit gate
   monthly_chronology_guard.py     # Ghost-DM + Clairvoyant-Event checks
   monthly_llm_prompt/             # Prompt layers (anchors, voice, timeline, salvage)
   monthly_llm_models.py           # Pinned model registry
   pinned_models.toml              # Ollama model pins
   personas/                      # Per-persona TOML profiles
   company_events.py               # Canonical 9-persona roster + milestone events
-  colab_run_month.py              # Colab orchestrator (upload with every session)
-  colab_artifact_uploader.py       # rclone S3 sync (upload with every session)
-  colab_gpu_watchdog.py           # GPU dead-man's switch (upload with every session)
-  colab_solar_ollama_setup.py     # Ollama setup (upload with every session)
+  colab_run_month.py              # Legacy Colab orchestrator
+  colab_artifact_uploader.py      # Legacy Colab/S3 uploader
+  colab_gpu_watchdog.py           # Legacy Colab GPU watchdog
+  colab_solar_ollama_setup.py     # Legacy Colab-only Ollama bootstrap
   monthly_work/                   # Bundle artifacts (gitignored, local-only)
     <month>/
       audit_report.json           # Auditor output — must show status=passed, finding_count=0
@@ -292,7 +257,7 @@ uv run ruff check .
 uv run --project hackathon python -m hackathon.monthly_llm_generator plan 2025-11
 
 # Audit a bundle locally
-uv run python -m hackathon.monthly_auditor audit 2025-08
+uv run --project hackathon python -m hackathon.monthly_auditor audit 2025-08
 
 # Retroactive chronology clean on any bundle
 python scripts/clean_chronology.py 2025-08
@@ -328,16 +293,13 @@ until they have both real LLM artifacts and an acceptance summary under
 
 ## Hard rules (never violate)
 
-1. **ALWAYS G4 GPU** — never T4.
-2. **KILL GPU when not generating** — every idle minute costs money.
-3. **Fix at the SOURCE** — no band-aids over artifact files.
-4. **All LLM generation on Colab** — never local.
-5. **No month begins until previous passes ALL gates.**
-6. **Background the process** — poll `colab_run_status.json`, do not just wait.
-7. **Use `uv` for all Python** — per AGENTS.md.
-8. **Never skip Colab auth** — authenticate properly each session.
-9. **`ALLOW_LIVE_INJECT=1` required** for Gmail/Chat push scripts.
-10. **Never add a fresh `monthly_work/<month>/` to the index**. Existing months
+1. **Fix at the SOURCE** — no band-aids over artifact files.
+2. **Use the remote Ollama endpoint by default** — `https://ollama.pixelated.love`, unless you are intentionally overriding it.
+3. **No month begins until previous passes ALL gates.**
+4. **Background the process** — poll the saved month artifacts and job log, do not just wait.
+5. **Use `uv` for all Python** — per AGENTS.md.
+6. **`ALLOW_LIVE_INJECT=1` required** for Gmail/Chat push scripts.
+7. **Never add a fresh `monthly_work/<month>/` to the index**. Existing months
     are tracked and retroactive cleanup diffs on those files are fine to commit
     and push. `monthly_work/` is gitignored only as a forward-looking guard — it
     prevents adding a new month, but does not untrack already-tracked bundles.

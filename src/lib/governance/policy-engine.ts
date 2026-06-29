@@ -7,7 +7,7 @@ import type {
 } from './types'
 
 const logger = {
-  info: (msg: string) => console.log(`[policy-engine] ${msg}`),
+  info: (msg: string) => logger.info(`[policy-engine] ${msg}`),
 }
 
 // Validate regex pattern for safety (prevents catastrophic backtracking)

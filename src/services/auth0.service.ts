@@ -68,6 +68,7 @@ function isExtendedAuthenticationClient(
 type ExtendedUserInfoClient = Omit<UserInfoClient, 'getUserInfo'> & {
   getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import type {
   MFAFactor,
@@ -185,7 +186,7 @@ function initializeAuth0Clients() {
     })
   } else {
     if (shouldWarnAuth0Configuration) {
-      console.warn(
+      authLogger.warn(
         'Auth0 Management configuration is incomplete. User management features may not work.',
       )
     }
@@ -209,7 +210,7 @@ function initializeAuth0Clients() {
     }) as ExtendedUserInfoClient
   } else {
     if (shouldWarnAuth0Configuration) {
-      console.warn(
+      authLogger.warn(
         'Auth0 Authentication configuration is incomplete. Login features will not work.',
       )
     }
@@ -217,6 +218,8 @@ function initializeAuth0Clients() {
 
   return config
 }
+
+const authLogger = createBuildSafeLogger('auth0-service')
 
 /**
  * Auth0 User Service Class
@@ -266,7 +269,7 @@ export class Auth0UserService {
           user_id: userResponse.user_id ?? userResponse.sub,
         }
       } catch (e) {
-        console.warn(
+        authLogger.warn(
           'Failed to fetch user info, falling back to token decode if possible or error',
           e,
         )
@@ -287,7 +290,7 @@ export class Auth0UserService {
         refreshToken: tokenResponse.refresh_token,
       }
     } catch (error: unknown) {
-      console.error('Auth0 sign in error:', error)
+      authLogger.error('Auth0 sign in error', error)
       throw new Error('Invalid credentials')
     }
   }
@@ -324,7 +327,7 @@ export class Auth0UserService {
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
-      console.error('Auth0 create user error:', error)
+      authLogger.error('Auth0 create user error', error)
       throw new Error('Failed to create user')
     }
   }
@@ -345,7 +348,7 @@ export class Auth0UserService {
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
-      console.error('Auth0 get user error:', error)
+      authLogger.error('Auth0 get user error', error)
       return null
     }
   }
@@ -366,7 +369,7 @@ export class Auth0UserService {
         .map((user) => this.toAuthenticatedUser(user))
         .filter((user) => Boolean(user.id))
     } catch (error: unknown) {
-      console.error('Auth0 get all users error:', error)
+      authLogger.error('Auth0 get all users error', error)
       return []
     }
   }
@@ -397,7 +400,7 @@ export class Auth0UserService {
       }
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
-      console.error('Auth0 find user error:', error)
+      authLogger.error('Auth0 find user error', error)
       return null
     }
   }
@@ -461,7 +464,7 @@ export class Auth0UserService {
 
       return this.toAuthenticatedUser(auth0User)
     } catch (error: unknown) {
-      console.error('Auth0 update user error:', error)
+      authLogger.error('Auth0 update user error', error)
       return null
     }
   }
@@ -479,7 +482,7 @@ export class Auth0UserService {
     try {
       await auth0Management.users.update(userId, { password: newPassword })
     } catch (error: unknown) {
-      console.error('Auth0 change password error:', error)
+      authLogger.error('Auth0 change password error', error)
       throw new Error('Failed to change password')
     }
   }
@@ -499,7 +502,7 @@ export class Auth0UserService {
         token: refreshToken,
       })
     } catch (error: unknown) {
-      console.error('Auth0 sign out error:', error)
+      authLogger.error('Auth0 sign out error', error)
       // Don't throw error for sign out - it's not critical
     }
   }
@@ -546,7 +549,7 @@ export class Auth0UserService {
         accessToken: tokenResponse.access_token,
       }
     } catch (error: unknown) {
-      console.error('Auth0 refresh session error:', error)
+      authLogger.error('Auth0 refresh session error', error)
       throw new Error('Failed to refresh session')
     }
   }
@@ -579,7 +582,7 @@ export class Auth0UserService {
         role: this.extractRoleFromUser(decodedToken),
       }
     } catch (error: unknown) {
-      console.error('Auth0 verify token error:', error)
+      authLogger.error('Auth0 verify token error', error)
       throw new Error('Invalid token')
     }
   }
@@ -606,7 +609,7 @@ export class Auth0UserService {
         ? (this.toStringOrUndefined(ticket['ticket']) ?? null)
         : null
     } catch (error: unknown) {
-      console.error('Auth0 create password reset ticket error:', error)
+      authLogger.error('Auth0 create password reset ticket error', error)
       throw new Error('Failed to create password reset ticket')
     }
   }

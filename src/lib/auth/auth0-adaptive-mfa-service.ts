@@ -18,6 +18,8 @@ import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-adaptive-mfa-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -34,7 +36,7 @@ function initializeAuth0Management() {
     !auth0Config.managementClientSecret
   ) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -128,7 +130,7 @@ export class Auth0AdaptiveMFAService {
   constructor() {
     if (!auth0Config.domain) {
       if (shouldWarnAuth0Configuration) {
-        console.warn('Auth0 is not properly configured')
+        logger.warn('Auth0 is not properly configured')
       }
     }
 
@@ -256,7 +258,7 @@ export class Auth0AdaptiveMFAService {
         recommendedAction,
       }
     } catch (error: unknown) {
-      console.error('Failed to calculate risk score:', error)
+      logger.error('Failed to calculate risk score:', error)
 
       // In case of error, default to medium risk requiring MFA
       return {
@@ -311,7 +313,7 @@ export class Auth0AdaptiveMFAService {
         }
       }
     } catch (error: unknown) {
-      console.warn('Failed to analyze IP address:', error)
+      logger.warn('Failed to analyze IP address:', error)
     }
 
     return {
@@ -359,7 +361,7 @@ export class Auth0AdaptiveMFAService {
         value = { currentCountry: location.country, previousCountry: 'US' } // Simulated
       }
     } catch (error: unknown) {
-      console.warn('Failed to analyze geolocation:', error)
+      logger.warn('Failed to analyze geolocation:', error)
     }
 
     return {
@@ -412,7 +414,7 @@ export class Auth0AdaptiveMFAService {
         }
       }
     } catch (error: unknown) {
-      console.warn('Failed to analyze time context:', error)
+      logger.warn('Failed to analyze time context:', error)
     }
 
     return {
@@ -473,7 +475,7 @@ export class Auth0AdaptiveMFAService {
         }
       }
     } catch (error: unknown) {
-      console.warn('Failed to analyze user behavior:', error)
+      logger.warn('Failed to analyze user behavior:', error)
     }
 
     return {
@@ -531,7 +533,7 @@ export class Auth0AdaptiveMFAService {
         }
       }
     } catch (error: unknown) {
-      console.warn('Failed to analyze device:', error)
+      logger.warn('Failed to analyze device:', error)
     }
 
     return {
@@ -558,7 +560,7 @@ export class Auth0AdaptiveMFAService {
       timestamp: new Date().toISOString(),
     })
 
-    console.log('Adaptive MFA configuration updated:', this.config)
+    logger.info('Adaptive MFA configuration updated:', this.config)
   }
 
   /**

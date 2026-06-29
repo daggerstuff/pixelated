@@ -6,6 +6,8 @@
  */
 import { BiasDetectionEngine } from './BiasDetectionEngine'
 import { getAllowedOrigin } from './utils'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('serverless-handlers')
 
 /**
  * Creates a serverless-compatible handler wrapper
@@ -37,7 +39,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         body: response.body ?? JSON.stringify({ message: 'OK' }),
       }
     } catch (error: unknown) {
-      console.error('Serverless handler error:', error)
+      logger.error('Serverless handler error:', error)
 
       return {
         statusCode: 500,
@@ -102,7 +104,7 @@ export const detectBiasServerlessHandler = createServerlessHandler(
         body: JSON.stringify({ success: true, data: analysis }),
       }
     } catch (error: unknown) {
-      console.error('Bias detection error:', error)
+      logger.error('Bias detection error:', error)
       return {
         statusCode: 500,
         body: JSON.stringify({

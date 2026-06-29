@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react'
 
 import type { DimensionalMap as DimensionalEmotionMap } from '@/lib/ai/emotions/types'
 import type { MultidimensionalPattern } from '@/lib/ai/temporal/types'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('useMultidimensionalEmotions')
 
 interface UseMultidimensionalEmotionsOptions {
   clientId?: string
@@ -98,7 +100,7 @@ export function useMultidimensionalEmotions(
       const errorObj =
         err instanceof Error ? err : new Error('An unknown error occurred')
       setError(errorObj)
-      console.error('Error fetching multidimensional emotions:', err)
+      logger.error('Error fetching multidimensional emotions:', err)
     } finally {
       setIsLoading(false)
     }

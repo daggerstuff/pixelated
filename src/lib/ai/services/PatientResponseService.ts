@@ -210,7 +210,7 @@ export class PatientResponseService {
     const profile = await this.profileService.getProfileById(profileId)
 
     if (!profile) {
-      console.warn(
+      logger.warn(
         `Profile not found for ID: ${profileId} when creating response context.`,
       )
       return null
@@ -399,7 +399,7 @@ export class PatientResponseService {
       })
 
       if (!synthesisResult.success) {
-        console.warn(`Emotion synthesis failed: ${synthesisResult.message}`)
+        logger.warn(`Emotion synthesis failed: ${synthesisResult.message}`)
         return `Feeling ${baseEmotion} with moderate intensity.`
       }
 
@@ -422,7 +422,7 @@ export class PatientResponseService {
           return `Experiencing a complex mix of ${dominantEmotions.join(', ')}.`
       }
     } catch (error: unknown) {
-      console.error('Error synthesizing emotional context:', error)
+      logger.error('Error synthesizing emotional context:', error)
       return `Feeling ${baseEmotion} with typical intensity.`
     }
   }
@@ -589,7 +589,7 @@ export class PatientResponseService {
     const candidateResponse = await getCandidateResponse()
 
     if (!context.profile) {
-      console.error('Invalid context provided to generateConsistentResponse.')
+      logger.error('Invalid context provided to generateConsistentResponse.')
       return candidateResponse // Fallback or throw error
     }
 
@@ -618,7 +618,7 @@ export class PatientResponseService {
       }
       therapeuticResponse += `It feels a bit conflicting, doesn't it?`
 
-      console.warn(
+      logger.warn(
         `Consistency issue detected for profile ${context.profile.id}:
         Candidate: "${candidateResponse}"
         Conflict: "${firstContradiction.conflictingText}" (type: ${firstContradiction.type})

@@ -9,6 +9,8 @@ import { authConfig } from '../../config/auth.config'
 import { getUserById as getAuth0UserById } from '../../services/auth0.service'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('index')
 
 export type { SessionData } from './session'
 // Re-export session for compatibility
@@ -175,11 +177,11 @@ export async function initializeAuthSystem(): Promise<void> {
     const { startTokenCleanupScheduler } = await import('./auth0-jwt-service')
     startTokenCleanupScheduler()
 
-    console.log(
+    logger.info(
       '✅ Authentication system initialized successfully (Auth0-native)',
     )
   } catch (error: unknown) {
-    console.error('❌ Failed to initialize authentication system:', error)
+    logger.error('❌ Failed to initialize authentication system:', error)
     throw error
   }
 }
@@ -207,7 +209,7 @@ export async function getUserById(
       name: user.fullName,
     }
   } catch (error: unknown) {
-    console.error('Failed to look up Auth0 user:', error)
+    logger.error('Failed to look up Auth0 user:', error)
     return null
   }
 }

@@ -1,7 +1,9 @@
-// Browser-compatible stub for Python bridge
+
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('browser-stub')// Browser-compatible stub for Python bridge
 export const MentalLLaMAPythonBridge = class {
   constructor() {
-    console.warn('Python bridge not available in browser environment')
+    logger.warn('Python bridge not available in browser environment')
   }
 
   async initialize() {

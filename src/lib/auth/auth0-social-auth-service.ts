@@ -8,6 +8,8 @@ import { AuthenticationClient, ManagementClient, UserInfoClient } from 'auth0'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-social-auth-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -72,7 +74,7 @@ function initializeAuth0Clients() {
     !AUTH0_CONFIG.clientSecret
   ) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -140,7 +142,7 @@ export class Auth0SocialAuthService {
 
     if (!this.domain || !this.clientId) {
       if (shouldWarnAuth0Configuration) {
-        console.warn('Auth0 is not properly configured')
+        logger.warn('Auth0 is not properly configured')
       }
     }
     initializeAuth0Clients()
@@ -217,7 +219,7 @@ export class Auth0SocialAuthService {
         tokenType: data.token_type,
       }
     } catch (error: unknown) {
-      console.error('Token exchange failed:', error)
+      logger.error('Token exchange failed:', error)
       throw new Error(
         `Token exchange failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -248,7 +250,7 @@ export class Auth0SocialAuthService {
         createdAt: new Date().toISOString(),
       }
     } catch (error: unknown) {
-      console.error('Failed to get user info:', error)
+      logger.error('Failed to get user info:', error)
       throw new Error(
         `Failed to get user info: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -277,7 +279,7 @@ export class Auth0SocialAuthService {
         tokenType: data.token_type,
       }
     } catch (error: unknown) {
-      console.error('Token refresh failed:', error)
+      logger.error('Token refresh failed:', error)
       throw new Error(
         `Token refresh failed: ${error instanceof Error ? (error instanceof Error ? error.message : 'Unknown error') : 'Unknown error'}`,
       )
@@ -342,7 +344,7 @@ export class Auth0SocialAuthService {
     // Update Phase 6 MCP server with authentication progress
     await updatePhase6AuthenticationProgress(user.id, 'login_success')
 
-    console.log('Social authentication successful', {
+    logger.info('Social authentication successful', {
       userId: user.id,
       email: user.email,
       provider: user.provider,
@@ -392,7 +394,7 @@ export class Auth0SocialAuthService {
         `social_account_linked_${connection}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to link social account ${connection} to user ${userId}:`,
         error,
       )
@@ -434,7 +436,7 @@ export class Auth0SocialAuthService {
         `social_account_unlinked_${connection}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to unlink social account ${connection} from user ${userId}:`,
         error,
       )
@@ -464,7 +466,7 @@ export class Auth0SocialAuthService {
       }
       return []
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to get social connections for user ${userId}:`,
         error,
       )

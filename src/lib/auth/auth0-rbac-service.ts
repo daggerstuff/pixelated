@@ -8,6 +8,8 @@ import { ManagementClient } from 'auth0'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth0-rbac-service')
 
 // Type alias for auth0 v5+ compatibility
 export type ManagementClientOptionsWithClientCredentials = {
@@ -115,7 +117,7 @@ function initializeAuth0Management() {
     getAuth0ManagementConfig()
 
   if (!domain || !managementClientId || !managementClientSecret) {
-    console.warn(
+    logger.warn(
       'Auth0 management configuration is incomplete. RBAC features may not work.',
     )
     return
@@ -496,10 +498,10 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
 
   try {
     // Create permissions first (Note: Auth0 v5 manages permissions as scopes on Resource Servers)
-    console.log('Creating permissions in Auth0...')
+    logger.info('Creating permissions in Auth0...')
 
     // Create roles and assign permissions
-    console.log('Creating roles in Auth0...')
+    logger.info('Creating roles in Auth0...')
     for (const [roleName, roleDef] of Object.entries(AUTH0_ROLE_DEFINITIONS)) {
       try {
         // Check if role already exists
@@ -523,18 +525,18 @@ export async function initializeAuth0RolesAndPermissions(): Promise<void> {
             name: roleName,
             description: roleDef.description,
           })
-          console.log(`Created role: ${roleName}`)
+          logger.info(`Created role: ${roleName}`)
         } else {
-          console.log(`Role already exists: ${roleName}`)
+          logger.info(`Role already exists: ${roleName}`)
         }
       } catch (error: unknown) {
-        console.warn(`Failed to create role ${roleName}:`, error)
+        logger.warn(`Failed to create role ${roleName}:`, error)
       }
     }
 
-    console.log('Auth0 roles initialization completed')
+    logger.info('Auth0 roles initialization completed')
   } catch (error: unknown) {
-    console.error('Failed to initialize Auth0 roles and permissions:', error)
+    logger.error('Failed to initialize Auth0 roles and permissions:', error)
     throw error
   }
 }
@@ -580,7 +582,7 @@ export async function assignRoleToUser(
       `role_assigned_${roleName}`,
     )
   } catch (error: unknown) {
-    console.error(`Failed to assign role ${roleName} to user ${userId}:`, error)
+    logger.error(`Failed to assign role ${roleName} to user ${userId}:`, error)
     throw error
   }
 }
@@ -623,7 +625,7 @@ export async function removeRoleFromUser(
     // Update Phase 6 MCP server with role removal progress
     await updatePhase6AuthenticationProgress(userId, `role_removed_${roleName}`)
   } catch (error: unknown) {
-    console.error(
+    logger.error(
       `Failed to remove role ${roleName} from user ${userId}:`,
       error,
     )
@@ -645,7 +647,7 @@ export async function getUserRoles(userId: string): Promise<UserRole[]> {
       .map((role) => (typeof role.name === 'string' ? role.name : undefined))
       .filter((roleName): roleName is UserRole => isUserRole(roleName))
   } catch (error: unknown) {
-    console.error(`Failed to get roles for user ${userId}:`, error)
+    logger.error(`Failed to get roles for user ${userId}:`, error)
     return []
   }
 }
@@ -692,7 +694,7 @@ export async function userHasPermission(
 
     return false
   } catch (error: unknown) {
-    console.error(
+    logger.error(
       `Failed to check permission ${permission} for user ${userId}:`,
       error,
     )
@@ -732,7 +734,7 @@ export async function getUserPermissions(userId: string): Promise<string[]> {
 
     return Array.from(permissions)
   } catch (error: unknown) {
-    console.error(`Failed to get permissions for user ${userId}:`, error)
+    logger.error(`Failed to get permissions for user ${userId}:`, error)
     return []
   }
 }

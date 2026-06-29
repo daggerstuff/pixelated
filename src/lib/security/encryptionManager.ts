@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('encryptionManager') /**
  * Advanced Encryption Manager for Pixelated Empathy
  * Handles key rotation, perfect forward secrecy, and HSM integration
  */
@@ -87,7 +88,7 @@ class EncryptionManager {
     }
 
     // Initialize HSM connection (mock implementation)
-    console.log('Initializing HSM connection...', this.config.hsmConfig)
+    logger.info('Initializing HSM connection...', this.config.hsmConfig)
 
     // In real implementation, this would connect to HSM
     const hsmKeyId = `hsm_${Date.now()}`
@@ -369,9 +370,9 @@ class EncryptionManager {
     setInterval(async () => {
       try {
         await this.rotateKeys()
-        console.log('Encryption keys rotated successfully')
+        logger.info('Encryption keys rotated successfully')
       } catch (error: unknown) {
-        console.error('Key rotation failed:', error)
+        logger.error('Key rotation failed:', error)
       }
     }, rotationInterval)
   }
@@ -399,7 +400,7 @@ class EncryptionManager {
     if (!metadata) return false
 
     metadata.status = 'compromised'
-    console.warn(`Key ${keyId} revoked: ${reason}`)
+    logger.warn(`Key ${keyId} revoked: ${reason}`)
 
     // If this was the current key, rotate immediately
     if (keyId === this.currentKeyId) {
