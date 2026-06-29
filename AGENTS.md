@@ -238,6 +238,27 @@ Use tmux (not one-shot background shells) for `pnpm dev` on port `5173`.
 
 ---
 
+## Dispatch Resume Gate (mandatory)
+
+Every monthly-llm-driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE the first chat_completion POST.
+
+If `scan` returns `missing_or_partial > 0` AND `stale_dispatch_pid` is alive, worker MUST:
+1. Call `kill_stale_dispatch(month)` first
+2. Wait 30 seconds
+3. Write `/tmp/wayfarer_smoke/resume_<month>.json` with the resume plan (skip_list, re_dispatch_list, fresh_dispatch_list, rollover_wall_seconds)
+4. Only then launch new chunks from `fresh_dispatch_list`
+
+The `resume_<month>.json` file is a durable contract: if the worker dies before
+completing all chunks, the next worker resumes from `fresh_dispatch_list` and
+writes a new `resume_<month>.json` next attempt, never restarting from chunk 1
+unless `kill_stale_dispatch` and `scan` both report zero on-disk state.
+
+Workers MUST NOT bypass the gate for short halving loops. The gate runs in <5 s on the chunks tree and protects against every future silent-failure pattern.
+
+**Reference**: `skills/monthly-llm-driver/dispatch_resume_gate.py` (spec + implementation), `library/dispatch_resume_gate.md` (worked M02 example).
+
+---
+
 ## Delivery Checks (Task Completion Contract)
 
 Before ending turn and finishing task, perform following checks:
