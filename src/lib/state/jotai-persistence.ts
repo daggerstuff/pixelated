@@ -11,7 +11,7 @@
 
 import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
-import { createCryptoSystem } from '@/lib/crypto'
+import { createCryptoSystem } from '@/lib/crypto/index'
 import { logger } from '@/lib/logger'
 
 const { encrypt, decrypt } = createCryptoSystem({ namespace: 'jotai' })
