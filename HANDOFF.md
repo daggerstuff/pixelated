@@ -14,7 +14,7 @@ Status:
   Nov 2025   ✅  ACCEPTED  (Pipeline-rerun: 9-phase normalization with schema enrichment, room diversification (5 rooms), topic diversification (9 topics). 914 emails, 542 chats. Volume exemption applies. Accepted 2026-06-29T22:15:00Z.)
   Dec 2025   ✅  ACCEPTED  (audit_fixbot: fixed missing_llm_generation_report and event_topic_mismatch. Created llm_generation_report.json with Pydantic schema. Fixed monthly_generator_topics.py topic_for_event to map December events to 5 distinct topics. 500 emails + 620 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T23:50:00Z)
   Jan 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding model and endpoint_count fields, chat_topology_sender_not_in_room (935 findings) by making Phase 8 topology-aware, and event_topic_mismatch (924 findings) by using topic_for_event mapping in Phase 9. 550 emails + 700 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T22:15:30Z)
-  Feb 2026   pending
+  Feb 2026   ✅  ACCEPTED  (audit_fixbot: applied deterministic topic re-stamp using monthly_generator_topics.topic_for_event() to fix 230 event_topic_mismatch findings. 600 emails + 780 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T23:48:18Z)
   Mar 2026   ✅  ACCEPTED  (audit_fixbot: fixed invalid_llm_generation_report by adding 9 missing Pydantic fields. 850 emails + 870 chats, audit finding_count=1 (chat_burst_count_mismatch). Volume exemption applied per VAL-Mxx-006 bullet 3. Accepted 2026-06-29T22:50:00Z)
   Apr 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json, ran 9-phase normalization pipeline. 897 emails + 867 chats. Volume exemption applied per validation-contract.md §Hard rule #2 bullet 3. Accepted 2026-06-29T22:58:45Z)
   May 2026   ✅  ACCEPTED  (audit_fixbot: created llm_generation_report.json with 39 chunks (20 Wayfarer + 19 Granite), ran 9-phase normalization pipeline. 950 emails + 1170 chats, audit status=passed, finding_count=0. Accepted 2026-06-29T23:15:00Z)
@@ -164,7 +164,7 @@ git push origin master
 | 2025-11 | 700 | 900 | Accepted (pipeline-rerun: 914 emails, 542 chats, 5 rooms, 9 topics, audit_run_timestamp=2026-06-29T23:45:00Z) |
 | 2025-12 | 500 | 620 | Accepted (audit_fixbot: 0 findings, 5 distinct topics) |
 | 2026-01 | 550 | 700 | Pending |
-| 2026-02 | 600 | 780 | Pending |
+| 2026-02 | 600 | 780 | Accepted (audit_fixbot: 600 emails + 780 chats, audit status=passed, finding_count=0, audit_run_timestamp=2026-06-29T23:48:18Z) |
 | 2026-03 | 850 | 1,050 | Pending |
 | 2026-04 | 900 | 1,150 | Pending |
 | 2026-05 | 950 | 1,170 | Accepted (audit_fixbot: 950 emails + 1170 chats, audit status=passed, finding_count=0, audit_run_timestamp=2026-06-29T23:15:00Z) |
