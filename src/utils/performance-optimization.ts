@@ -85,7 +85,7 @@ function reportLCP() {
   try {
     const entryTypes = 'largest-contentful-paint'
 
-    const observer = new PerformanceObserver((entryList) => {
+    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
       const entries = entryList.getEntries()
       const lastEntry = entries[
         entries.length - 1
@@ -120,10 +120,10 @@ function reportCLS() {
     let clsValue = 0
     const clsEntries: LayoutShiftEntry[] = []
 
-    const observer = new PerformanceObserver((entryList) => {
+    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
       const entries = entryList.getEntries()
 
-      entries.forEach((entry) => {
+      entries.forEach((entry: PerformanceEntry) => {
         if (!(entry as LayoutShiftEntry).hadRecentInput) {
           const { value } = entry as LayoutShiftEntry
           clsValue += value
@@ -151,7 +151,7 @@ function reportCLS() {
  */
 function reportFID() {
   try {
-    const observer = new PerformanceObserver((entryList) => {
+    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
       const entries = entryList.getEntries()
       const firstEntry = entries[0] as FirstInputEntry
 
@@ -179,7 +179,7 @@ function reportFID() {
  */
 function reportFCP() {
   try {
-    const observer = new PerformanceObserver((entryList) => {
+    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
       const entries = entryList.getEntries()
       const firstEntry = entries[0]
 

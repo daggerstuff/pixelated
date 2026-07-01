@@ -13,14 +13,14 @@ const logger = createBuildSafeLogger('utils') /**
  */
 
 const IS_DEV =
-  typeof import.meta !== 'undefined' && import.meta.env
-    ? !!import.meta.env.DEV
+  import.meta?.env
+    ? import.meta.env.DEV
     : typeof process !== 'undefined' &&
       process.env?.['NODE_ENV'] === 'development'
 const ENV_MODE =
-  typeof import.meta !== 'undefined' && import.meta.env
+  import.meta?.env
     ? import.meta.env.MODE
-    : (typeof process !== 'undefined' && process.env?.['NODE_ENV']) ||
+    : (typeof process !== 'undefined' && process.env?.['NODE_ENV']) ??
       'production'
 
 type SentryShim = {

@@ -7,11 +7,7 @@
  */
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import {
-  FHEEmotionClassifier,
-  createEmotionClassifierFHEService as createEmotionClassifierService,
-} from './fhe-emotion-classifier'
-import { mockFHEService } from './mock/mock-fhe-service'
+import { getMockFHEService } from './mock/mock-fhe-service'
 import { SealOperations } from './seal-operations'
 import { SealScheme } from './seal-scheme'
 import { SealService } from './seal-service'
@@ -30,17 +26,13 @@ import type {
 } from './types'
 
 // Add version to mock scheme
+const mockFHE = getMockFHEService()
 if (
-  mockFHEService &&
-  typeof mockFHEService.scheme === 'object' &&
-  mockFHEService.scheme !== null
+  mockFHE.scheme &&
+  typeof mockFHE.scheme === 'object' &&
+  mockFHE.scheme !== null
 ) {
-  ;(mockFHEService.scheme as { version?: string }).version = '1.0.0'
-} else {
-  // Optionally log a warning or handle the case where scheme is not as expected
-  logger.warn(
-    '[fhe-factory] mockFHEService.scheme is not an object, cannot set version.',
-  )
+  ;(mockFHE.scheme as { version?: string }).version = '1.0.0'
 }
 
 // Initialize SEAL service singleton
@@ -505,7 +497,7 @@ export async function getFHEService(
       if (requiredOperations.length > 0) {
         // Check if mock supports all required operations
         const unsupportedOps = requiredOperations.filter(
-          (op) => !mockFHEService.supportsOperation(op),
+          (op) => !getMockFHEService().supportsOperation(op),
         )
         if (unsupportedOps.length > 0) {
           logger.warn(
@@ -514,7 +506,7 @@ export async function getFHEService(
         }
       }
       // Use type assertion to ensure compatibility with FHEService interface
-      return mockFHEService as FHEService
+      return getMockFHEService() as unknown as FHEService
 
     case FHEImplementation.SEAL:
       logger.info('Using SEAL FHE service')
@@ -684,8 +676,9 @@ export async function initializeFHEServices(): Promise<void> {
     logger.info('Initializing FHE services')
 
     // Initialize mock service
-    if (!mockFHEService.isInitialized()) {
-      await mockFHEService.initialize()
+    const mf = getMockFHEService()
+    if (!mf.isInitialized()) {
+      await mf.initialize()
       logger.info('Mock FHE service initialized successfully')
     }
 

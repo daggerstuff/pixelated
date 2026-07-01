@@ -31,7 +31,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         statusCode: response.statusCode ?? 200,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
+          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin ?? event.headers?.Origin),
           'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
           ...response.headers,
@@ -45,7 +45,7 @@ export function createServerlessHandler(handler: (req: any) => Promise<any>) {
         statusCode: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
+          'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin ?? event.headers?.Origin),
         },
         body: JSON.stringify({
           error: 'Internal server error',
@@ -124,7 +124,7 @@ export function createCorsResponse(event: any) {
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin || event.headers?.Origin),
+      'Access-Control-Allow-Origin': getAllowedOrigin(event.headers?.origin ?? event.headers?.Origin),
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       'Access-Control-Max-Age': '86400',

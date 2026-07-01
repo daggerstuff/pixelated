@@ -130,7 +130,7 @@ export class MonitoringService {
     // Performance Observer for Core Web Vitals
     if (typeof window !== 'undefined' && "PerformanceObserver" in window) {
       // Largest Contentful Paint
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
         const entries = entryList.getEntries();
         const lastEntry = entries[entries.length - 1];
         if (lastEntry) {
@@ -139,17 +139,17 @@ export class MonitoringService {
       }).observe({ entryTypes: ["largest-contentful-paint"] });
 
       // First Input Delay
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
         const entries = entryList.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach((entry: PerformanceEntry) => {
           this.reportWebVital("FID", entry);
         });
       }).observe({ entryTypes: ["first-input"] });
 
       // Cumulative Layout Shift
-      new PerformanceObserver((entryList) => {
+      new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
         const entries = entryList.getEntries();
-        entries.forEach((entry) => {
+        entries.forEach((entry: PerformanceEntry) => {
           this.reportWebVital("CLS", entry);
         });
       }).observe({ entryTypes: ["layout-shift"] });

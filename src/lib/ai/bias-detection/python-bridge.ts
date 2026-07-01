@@ -148,7 +148,7 @@ export class PythonBiasDetectionBridge {
     priority: number = 1,
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      const id = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      const id = `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
       this.requestQueue.push({
         id,
         request: requestFn as () => Promise<unknown>,

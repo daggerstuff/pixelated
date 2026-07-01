@@ -176,8 +176,8 @@ export class AdvancedPredictiveThreatIntelligence
   private noveltyDetector!: NoveltyDetector
   private propagationModeler!: PropagationModeler
   seasonalAnalyzer!: SeasonalAnalyzer
-  private riskAssessor!: ProbabilisticRiskAssessor
-  private modelRegistry!: ThreatModelRegistry
+  private _riskAssessor!: ProbabilisticRiskAssessor
+  private _modelRegistry!: ThreatModelRegistry
 
   constructor(
     private readonly config: {
@@ -208,8 +208,8 @@ export class AdvancedPredictiveThreatIntelligence
       this.config.propagationConfig,
     )
     this.seasonalAnalyzer = new StatisticalSeasonalAnalyzer()
-    this.riskAssessor = new ProbabilisticRiskAssessor()
-    this.modelRegistry = new ThreatModelRegistry(this.mongoClient)
+    this._riskAssessor = new ProbabilisticRiskAssessor()
+    this._modelRegistry = new ThreatModelRegistry(this.mongoClient)
 
     await this.mongoClient.connect()
     this.emit('services_initialized')
@@ -742,7 +742,7 @@ export class AdvancedPredictiveThreatIntelligence
 
   private async calculateNoveltyScores(
     novelThreats: NovelThreat[],
-    currentFeatures: ThreatFeatures,
+    _currentFeatures: ThreatFeatures,
     baselineFeatures: ThreatFeatures,
   ): Promise<NovelThreat[]> {
     const scoredThreats: NovelThreat[] = []
@@ -862,8 +862,8 @@ export class AdvancedPredictiveThreatIntelligence
   }
 
   private async quantifyUncertainty(
-    threats: Threat[],
-    context: SecurityContext,
+    _threats: Threat[],
+    _context: SecurityContext,
     riskScore: number,
   ): Promise<UncertaintyQuantification> {
     // Use Bayesian methods or other uncertainty quantification techniques
@@ -1329,7 +1329,9 @@ interface ModelRegistry {
 }
 
 class ThreatModelRegistry implements ModelRegistry {
-  constructor(private readonly _mongoClient: MongoClient) {}
+  constructor(private readonly _mongoClient: MongoClient) {
+    void this._mongoClient
+  }
 
   async registerModel(_id: string, _model: unknown): Promise<void> {
     // Implementation placeholder
@@ -1649,7 +1651,7 @@ abstract class RiskAssessor {
 
 // Concrete implementations
 class MLNoveltyDetector extends NoveltyDetector {
-  constructor(private readonly config: NoveltyConfig) {
+  constructor(private readonly _config: NoveltyConfig) {
     super()
   }
 
@@ -1844,7 +1846,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
 }
 
 class GraphPropagationModeler extends PropagationModeler {
-  constructor(private readonly config: PropagationConfig) {
+  constructor(private readonly _config: PropagationConfig) {
     super()
   }
 

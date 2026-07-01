@@ -324,7 +324,7 @@ export class ClinicalValidator {
    */
   private determineImmediateActions(
     level: 'low' | 'medium' | 'high' | 'critical',
-    riskFactors: string[],
+    _riskFactors: string[],
   ): string[] {
     const actions: string[] = []
 

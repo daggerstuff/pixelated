@@ -320,7 +320,7 @@ export class InterventionAnalysisService {
    * Calculate stability indicator
    */
   private calculateStabilityIndicator(
-    currentEmotion: EmotionAnalysis,
+    _currentEmotion: EmotionAnalysis,
     sessionHistory?: EmotionAnalysis[],
   ): number {
     if (!sessionHistory || sessionHistory.length < 2) {

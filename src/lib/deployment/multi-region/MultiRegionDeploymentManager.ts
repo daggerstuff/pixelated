@@ -124,7 +124,6 @@ export class MultiRegionDeploymentManager extends EventEmitter {
   private readonly configurationManager: ConfigurationManager
   private readonly cloudProviderManager: CloudProviderManager
   private readonly healthMonitor: HealthMonitor
-  private readonly deploymentOrchestrator: DeploymentOrchestrator
   private readonly deploymentStatuses: Map<string, DeploymentStatus> = new Map()
   private isInitialized = false
 
@@ -136,7 +135,7 @@ export class MultiRegionDeploymentManager extends EventEmitter {
     )
     this.cloudProviderManager = new CloudProviderManager()
     this.healthMonitor = new HealthMonitor(this.createHealthCheckConfig())
-    this.deploymentOrchestrator = new DeploymentOrchestrator(
+    void new DeploymentOrchestrator(
       this.createDeploymentOrchestratorConfig(),
       this.cloudProviderManager,
     )
