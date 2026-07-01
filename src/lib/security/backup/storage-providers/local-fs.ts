@@ -7,8 +7,8 @@
 
 import type { Dirent } from 'fs'
 
-import type { StorageProviderConfig } from '../backup-types'
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import type { StorageProviderConfig } from '../backup-types'
 const logger = createBuildSafeLogger('local-fs')
 
 interface FileSystem {

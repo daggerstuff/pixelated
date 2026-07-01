@@ -4,6 +4,7 @@
  */
 
 import type { TestResult, CoverageReport } from '@/types/testing'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('comprehensiveTestSuite')
 

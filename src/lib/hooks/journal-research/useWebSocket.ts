@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 
 import { journalResearchApiClient } from '@/lib/api/journal-research'
 import storageManager from '@/utils/storage/storageManager'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('useWebSocket')
 
