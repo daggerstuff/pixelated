@@ -37,8 +37,8 @@
 - Use `uv run` for Python execution where possible.
 - Keep context scoped: prefer root-level defaults w/ path-specific overrides.
 - Start every task by running Foresight continuity calls before edits:
-  `manage_subconscious` (`list` `get` for `pending_items` `project_context`)
-  `search_memories` for active/upcoming work.
+  `manage_context_blocks` (`list` `get` for `pending_items`
+  `project_context`) and `search_memories` for active/upcoming work.
   - If these calls are unavailable, pause edits and switch to local continuity
     fallback.
 - **Prefer Droid's structured workflows** for non-trivial code:
@@ -72,9 +72,12 @@
 
 ## Context tooling
 
-- Foresight MCP first for active state: `manage_subconscious` (`list` `get` for
-  `pending_items` + `project_context`), `search_memories` (`active tasks`
-  `upcoming work`owner/team scope), then `manage_memories` as needed.
+- Foresight MCP first for active state: `manage_context_blocks` (`list` `get`
+  for `pending_items` + `project_context`), `search_memories` (`active tasks`
+  `upcoming work` owner/team scope), then `manage_memories` as needed.
+- The MCP server exposes only the reduced core surface documented in
+  `.agents/skills/foresight/SKILL.md`; use the `foresight` CLI for expert or
+  maintenance commands.
 - Root `AGENTS.md` is main source of truth.
 - For scoped rules, prefer nested instruction files (`AGENTS.md` under touched
   directories).
