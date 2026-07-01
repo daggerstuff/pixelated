@@ -8,7 +8,7 @@
 import { nanoid } from 'nanoid'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
-import { mockFHEService } from './mock/mock-fhe-service'
+import { getMockFHEService } from './mock/mock-fhe-service'
 import type {
   PatternRecognitionOps,
   TrendPattern,
@@ -136,11 +136,12 @@ export async function createPatternRecognitionFHEService(
       logger.info('Using mock FHE service for pattern recognition')
 
       // Initialize the mock FHE service
-      await mockFHEService.initialize()
+      const mockFHE = getMockFHEService()
+      await mockFHE.initialize()
 
       // Generate keys if needed
-      if (!mockFHEService.isInitialized()) {
-        await mockFHEService.generateKeys()
+      if (!mockFHE.isInitialized()) {
+        await mockFHE.generateKeys()
       }
 
       // Return our adapter that implements PatternRecognitionOps

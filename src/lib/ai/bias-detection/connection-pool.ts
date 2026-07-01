@@ -111,7 +111,7 @@ export class ConnectionPool {
       throw new Error('Connection pool disposed')
     }
 
-    const id = `conn_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const id = `conn_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
     return {
       id,
       inUse: true,

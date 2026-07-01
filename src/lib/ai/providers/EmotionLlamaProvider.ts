@@ -256,7 +256,7 @@ export class EmotionLlamaProvider {
    */
   private convertToEmotionAnalysis(
     result: EmotionDetectionResult,
-    originalText: string,
+    _originalText: string,
     startTime: number,
   ): EmotionAnalysis {
     const processingTime = Date.now() - startTime
@@ -536,6 +536,6 @@ export class EmotionLlamaProvider {
    */
   private generateSessionId(): string {
     // In a real implementation, this would come from the session context
-    return `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `session_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
   }
 }

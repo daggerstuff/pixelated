@@ -3,10 +3,8 @@
  * Tests sub-250ms performance and generates visualization data
  */
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { DynamicWeightingEngine } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
-const logger = createBuildSafeLogger('dynamic-weighting-benchmark')
 
 export interface BenchmarkResult {
   testName: string
@@ -75,7 +73,7 @@ export async function runBenchmarkSuite(): Promise<BenchmarkSuite> {
     },
   }
 
-  logger.info('\n🚀 Starting Dynamic Weighting Benchmark Suite\n')
+  console.log('\n🚀 Starting Dynamic Weighting Benchmark Suite\n')
 
   // Benchmark 1: Single context calculations
   suite.results.push(await benchmarkSingleContext())
@@ -397,43 +395,43 @@ function calculatePerformanceDistribution(
 }
 
 function printBenchmarkSummary(suite: BenchmarkSuite): void {
-  logger.info('\n📊 Benchmark Results Summary')
-  logger.info('═'.repeat(80))
-  logger.info(
+  console.log('\n📊 Benchmark Results Summary')
+  console.log('═'.repeat(80))
+  console.log(
     `${'Test Name'.padEnd(30)} | ${'Avg (ms)'.padEnd(10)} | ${'P50'.padEnd(8)} | ${'P95'.padEnd(8)} | ${'P99'.padEnd(8)} | Pass`,
   )
-  logger.info('─'.repeat(80))
+  console.log('─'.repeat(80))
 
   for (const result of suite.results) {
     const passIcon = result.passedThreshold ? '✅' : '❌'
-    logger.info(
+    console.log(
       `${result.testName.padEnd(30)} | ${result.avgTimeMs.toFixed(2).padEnd(10)} | ${result.p50TimeMs.toFixed(2).padEnd(8)} | ${result.p95TimeMs.toFixed(2).padEnd(8)} | ${result.p99TimeMs.toFixed(2).padEnd(8)} | ${passIcon}`,
     )
   }
 
-  logger.info('═'.repeat(80))
+  console.log('═'.repeat(80))
 
   const allPassed = suite.results.every((r) => r.passedThreshold)
-  logger.info(
+  console.log(
     `\n${allPassed ? '✅ All tests passed 250ms threshold!' : '⚠️  Some tests exceeded 250ms threshold'}`,
   )
 
-  logger.info('\n📈 Performance Distribution:')
+  console.log('\n📈 Performance Distribution:')
   const dist = suite.visualizationData.performanceDistribution
-  logger.info(`  Mean: ${dist.mean.toFixed(2)}ms`)
-  logger.info(`  Std Dev: ${dist.stdDev.toFixed(2)}ms`)
-  logger.info('\n  Distribution:')
+  console.log(`  Mean: ${dist.mean.toFixed(2)}ms`)
+  console.log(`  Std Dev: ${dist.stdDev.toFixed(2)}ms`)
+  console.log('\n  Distribution:')
   for (const bucket of dist.buckets) {
     const percentage =
       (bucket.count / (suite?.results[0]?.iterations ?? 1)) * 100
     const barLength = Math.floor(percentage / 2)
     const bar = '█'.repeat(barLength)
-    logger.info(
+    console.log(
       `    ${bucket.min}-${bucket.max === Infinity ? '250+' : bucket.max}ms: ${bar} ${percentage.toFixed(1)}%`,
     )
   }
 
-  logger.info('\n')
+  console.log('\n')
 }
 
 /**
@@ -464,16 +462,16 @@ export function exportVisualizationDataForGraphing(
 const isMainModule = (require('module') as { main: unknown })['main'] === module
 if (isMainModule) {
   runBenchmarkSuite()
-    .then((suite) => {
-      logger.info('\n📁 Visualization data available (JSON):')
-      logger.info(
+    .then((_suite) => {
+      console.log('\n📁 Visualization data available (JSON):')
+      console.log(
         '   Save to file for graphing with tools like Python/matplotlib or Chart.js',
       )
       // Optionally write to file
       // fs.writeFileSync('benchmark-results.json', jsonData)
     })
     .catch((error) => {
-      logger.error('Benchmark failed:', error)
+      console.error('Benchmark failed:', error)
       process.exit(1)
     })
 }
