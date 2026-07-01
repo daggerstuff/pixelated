@@ -1,5 +1,5 @@
-import { KeyStorage } from './keyStorage'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
+import { KeyStorage } from './keyStorage'
 const logger = createBuildSafeLogger('scheduledRotation')
 
 /**

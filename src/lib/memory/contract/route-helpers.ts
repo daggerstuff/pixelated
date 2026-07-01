@@ -14,9 +14,9 @@ import {
   type ProductMemoryScope,
 } from '@/lib/services/product-memory-gateway'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { errorBody, mapGatewayError } from './errors'
 import { MEMORY_API_CONTRACT_VERSION, PublicMemory } from './v1'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('route-helpers')
 
 // ---------------------------------------------------------------------------

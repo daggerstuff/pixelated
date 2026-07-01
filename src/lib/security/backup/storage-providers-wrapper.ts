@@ -5,15 +5,15 @@
  * It ensures server-only modules are not bundled in client code by using dynamic imports.
  */
 
-import { isBrowser } from "../../browser/is-browser";
-import { createBuildSafeLogger as getLogger } from "../../logging/build-safe-logger";
-import type { StorageProvider, StorageProviderConfig } from "./types";
+import { isBrowser } from '../../browser/is-browser'
+import { createBuildSafeLogger as getLogger } from '../../logging/build-safe-logger'
+import type { StorageProvider, StorageProviderConfig } from './types'
 
 interface ProviderModule {
-  [name: string]: new (...args: unknown[]) => StorageProvider;
+  [name: string]: new (...args: unknown[]) => StorageProvider
 }
 
-const logger = getLogger("storage-providers-wrapper");
+const logger = getLogger('storage-providers-wrapper')
 
 /**
  * Get storage provider instance based on provider name
@@ -25,40 +25,46 @@ export async function getStorageProvider(
   // In browser environments, return dummy provider that throws errors
   // This prevents Node.js modules from being bundled in client code
   if (isBrowser) {
-    return createBrowserStubProvider();
+    return createBrowserStubProvider()
   }
 
   // Server-side implementation - dynamically load based on provider name
   try {
     switch (providerName) {
-      case "google-cloud-storage": {
-        const providerModule = (await import("./storage-providers/google-cloud")) as ProviderModule;
-        return new providerModule["GoogleCloudStorageProvider"](config);
+      case 'google-cloud-storage': {
+        const providerModule =
+          (await import('./storage-providers/google-cloud')) as ProviderModule
+        return new providerModule['GoogleCloudStorageProvider'](config)
       }
-      case "aws-s3": {
-        const providerModule = (await import("./storage-providers/aws-s3")) as ProviderModule;
-        return new providerModule["S3StorageProvider"](config);
+      case 'aws-s3': {
+        const providerModule =
+          (await import('./storage-providers/aws-s3')) as ProviderModule
+        return new providerModule['S3StorageProvider'](config)
       }
-      case "local-fs": {
-        const providerModule = (await import("./storage-providers/local-fs")) as ProviderModule;
-        return new providerModule["LocalFileSystemProvider"](config);
+      case 'local-fs': {
+        const providerModule =
+          (await import('./storage-providers/local-fs')) as ProviderModule
+        return new providerModule['LocalFileSystemProvider'](config)
       }
-      case "memory": {
-        const providerModule = (await import("./storage-providers/memory")) as ProviderModule;
-        return new providerModule["InMemoryStorageProvider"](config);
+      case 'memory': {
+        const providerModule =
+          (await import('./storage-providers/memory')) as ProviderModule
+        return new providerModule['InMemoryStorageProvider'](config)
       }
-      case "default":
+      case 'default':
       default: {
-        const providerModule = (await import("./storage-providers/memory")) as ProviderModule;
-        return new providerModule["InMemoryStorageProvider"](config);
+        const providerModule =
+          (await import('./storage-providers/memory')) as ProviderModule
+        return new providerModule['InMemoryStorageProvider'](config)
       }
     }
   } catch (error: unknown) {
-    logger.error(`Error loading storage provider '${providerName}':`, error);
+    logger.error(`Error loading storage provider '${providerName}':`, error)
 
     // Fallback to in-memory provider for safety
-    const providerModule = (await import("./storage-providers/memory")) as ProviderModule;
-    return new providerModule["InMemoryStorageProvider"](config);
+    const providerModule =
+      (await import('./storage-providers/memory')) as ProviderModule
+    return new providerModule['InMemoryStorageProvider'](config)
   }
 }
 
@@ -69,23 +75,23 @@ export async function getStorageProvider(
 function createBrowserStubProvider(): StorageProvider {
   return {
     initialize: async () => {
-      logger.warn("Storage providers are not available in browser environments");
+      logger.warn('Storage providers are not available in browser environments')
     },
     listFiles: async () => {
-      logger.warn("Storage providers are not available in browser environments");
-      return [];
+      logger.warn('Storage providers are not available in browser environments')
+      return []
     },
     storeFile: async () => {
-      logger.warn("Storage providers are not available in browser environments");
+      logger.warn('Storage providers are not available in browser environments')
     },
     getFile: async () => {
-      logger.warn("Storage providers are not available in browser environments");
-      return new Uint8Array();
+      logger.warn('Storage providers are not available in browser environments')
+      return new Uint8Array()
     },
     deleteFile: async () => {
-      logger.warn("Storage providers are not available in browser environments");
+      logger.warn('Storage providers are not available in browser environments')
     },
-  };
+  }
 }
 
 /**
@@ -93,34 +99,34 @@ function createBrowserStubProvider(): StorageProvider {
  */
 export function createMockStorageProvider(): StorageProvider {
   // Logger prefix
-  const prefix = `mock-storage:default`;
-  const logger = getLogger(prefix);
+  const prefix = `mock-storage:default`
+  const logger = getLogger(prefix)
 
-  logger.info("Creating mock storage provider");
+  logger.info('Creating mock storage provider')
 
   // Return a provider that just logs operations
   return {
     initialize: async () => {
-      logger.info("Initializing mock storage provider");
+      logger.info('Initializing mock storage provider')
     },
 
     listFiles: async (pattern: string) => {
-      logger.info(`Listing files with pattern: ${pattern}`);
-      return [];
+      logger.info(`Listing files with pattern: ${pattern}`)
+      return []
     },
 
     storeFile: async (_key: string, _data: Uint8Array) => {
-      logger.info(`Storing file: ${_key} (size: ${_data.byteLength} bytes)`);
+      logger.info(`Storing file: ${_key} (size: ${_data.byteLength} bytes)`)
     },
 
     getFile: async (_key: string) => {
-      logger.info(`Getting file: ${_key}`);
+      logger.info(`Getting file: ${_key}`)
       // Return mock data
-      return new Uint8Array(new TextEncoder().encode("mock data"));
+      return new Uint8Array(new TextEncoder().encode('mock data'))
     },
 
     deleteFile: async (_key: string) => {
-      logger.info(`Deleting file: ${_key}`);
+      logger.info(`Deleting file: ${_key}`)
     },
-  };
+  }
 }
