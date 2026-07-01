@@ -80,7 +80,9 @@ describe('LoginForm', () => {
       expect(screen.getByText('Password is required')).toBeVisible()
     })
 
-    expect(toastErrorMock).toHaveBeenCalledWith('Please correct the form errors')
+    expect(toastErrorMock).toHaveBeenCalledWith(
+      'Please correct the form errors',
+    )
   })
 
   it('switches to reset mode when the forgot-password button is clicked', async () => {

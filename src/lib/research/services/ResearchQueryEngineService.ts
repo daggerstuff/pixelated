@@ -8,12 +8,12 @@
  * Performance: Optimized for sub-5 second response times
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import {
   anonymizationPipelineService,
   type AnonymizedRecord,
 } from './AnonymizationPipelineService'
 import { consentManagementService } from './ConsentManagementService'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('ResearchQueryEngineService')
 
 export interface ResearchQuery {

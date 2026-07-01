@@ -5,6 +5,7 @@
  */
 
 import React from 'react'
+
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth-client')
 

@@ -1,5 +1,6 @@
 // Utility functions for bias detection demo data generation and export
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import type {
   PresetScenario,
   SessionData,
@@ -11,7 +12,6 @@ import type {
   Demographics,
 } from '../types/bias-detection'
 import { tryRequireNode } from './index'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('demo-helpers')
 
 /**

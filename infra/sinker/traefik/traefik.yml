@@ -4,7 +4,7 @@
 # ─── Entry points ───────────────────────────────────────────────
 entryPoints:
   web:
-    address: ":80"
+    address: ':80'
     http:
       redirections:
         entryPoint:
@@ -12,14 +12,14 @@ entryPoints:
           scheme: https
           permanent: true
   websecure:
-    address: ":443"
+    address: ':443'
   traefik:
-    address: ":8080"
+    address: ':8080'
 
 # ─── API + Dashboard (localhost-only via 127.0.0.1:8082 mapping) ─
 api:
   dashboard: false
-  insecure: true   # bound to :8080 which maps only to 127.0.0.1:8082
+  insecure: true # bound to :8080 which maps only to 127.0.0.1:8082
 
 # ─── Ping (healthcheck) ─────────────────────────────────────────
 ping:
@@ -33,7 +33,7 @@ accessLog: {}
 # ─── Providers ──────────────────────────────────────────────────
 providers:
   docker:
-    endpoint: "unix:///var/run/docker.sock"
+    endpoint: 'unix:///var/run/docker.sock'
     exposedByDefault: false
     network: sinker-ollama_default
     watch: true
@@ -51,5 +51,5 @@ certificatesResolvers:
         provider: cloudflare
         delayBeforeCheck: 10
         resolvers:
-          - "1.1.1.1:53"
-          - "8.8.8.8:53"
+          - '1.1.1.1:53'
+          - '8.8.8.8:53'

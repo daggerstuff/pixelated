@@ -13,6 +13,7 @@ import type { Pool } from 'pg'
 import { getMongoClient } from '@/lib/database/mongodb'
 import { getPostgresPool } from '@/lib/database/postgres'
 import { getRedisClient } from '@/lib/database/redis'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('database')
 

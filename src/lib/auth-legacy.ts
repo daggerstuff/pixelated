@@ -1,5 +1,7 @@
 import type { AstroCookies } from 'astro'
 
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import type { AuthRole } from '../config/auth.config'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
 import {
@@ -10,7 +12,6 @@ import {
 } from './audit'
 import type { AuditMetadata } from './audit/types'
 import { getIdentityProvider } from './auth/identity-provider'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth-legacy')
 
 let warnedAboutDeprecation = false

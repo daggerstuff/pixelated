@@ -68,7 +68,6 @@ function isExtendedAuthenticationClient(
 type ExtendedUserInfoClient = Omit<UserInfoClient, 'getUserInfo'> & {
   getUserInfo: (token: string) => Promise<{ data: unknown }>
 }
-import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 import { auth0MFAService } from '../lib/auth/auth0-mfa-service'
 import type {
   MFAFactor,
@@ -84,6 +83,7 @@ import type {
   WebAuthnCredentialCreationOptions,
   WebAuthnCredentialRequestOptions,
 } from '../lib/auth/auth0-webauthn-service'
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
 import { logSecurityEvent, SecurityEventType } from '../lib/security/index'
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'

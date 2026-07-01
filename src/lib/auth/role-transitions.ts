@@ -5,6 +5,7 @@
 
 import { nanoid } from 'nanoid'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security'
@@ -17,7 +18,6 @@ import {
 } from './roles'
 import type { SessionData } from './session-management'
 import { isTwoFactorRequired, verifyTwoFactorToken } from './two-factor-auth'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('role-transitions')
 
 // Configuration

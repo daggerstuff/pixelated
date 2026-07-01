@@ -9,6 +9,7 @@
  */
 
 import type { ReflectionInsight } from '@pixelated/memory-schema'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('guidance-writer')
 

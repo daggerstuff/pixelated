@@ -16,11 +16,11 @@ interface JwtPayload {
   sid?: string
 }
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth0-jwt-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'

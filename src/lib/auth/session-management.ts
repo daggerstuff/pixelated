@@ -5,10 +5,10 @@
  * It handles session creation, validation, and cleanup.
  */
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache, getFromCache, removeFromCache } from '../redis'
 import { logSecurityEvent } from '../security'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('session-management')
 
 export interface DeviceInfo {

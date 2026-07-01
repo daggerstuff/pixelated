@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth0-config')
 /**
