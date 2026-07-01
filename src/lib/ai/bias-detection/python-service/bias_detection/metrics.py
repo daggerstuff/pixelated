@@ -17,8 +17,12 @@ class _NoopMetric:
 try:
     from prometheus_client import Counter, Histogram
 except Exception:
-    Counter = lambda *_, **__: _NoopMetric()
-    Histogram = lambda *_, **__: _NoopMetric()
+
+    def Counter(*_, **__):
+        return _NoopMetric()
+
+    def Histogram(*_, **__):
+        return _NoopMetric()
 
 
 request_count = Counter(

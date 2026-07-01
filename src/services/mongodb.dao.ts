@@ -5,6 +5,8 @@ import type {
   Db,
 } from 'mongodb'
 
+import type { ExportFile } from '../types/mongodb.types'
+
 // Runtime shape of our MongoDB wrapper (from src/config/mongodb.config.ts)
 type MongoRuntime = {
   connect: () => Promise<Db>
@@ -92,7 +94,7 @@ export class DataExportDAO {
   async findById(id: string): Promise<DataExport | null> {
     const collection = await this.getCollection()
     // Query by custom 'id' field (UUID) used in the service
-    const request = await collection.findOne({ id: id } as any)
+    const request = await collection.findOne({ id: id } as { id: string })
 
     // Don't overwrite UUID 'id' with MongoDB _id
     return request
@@ -101,7 +103,7 @@ export class DataExportDAO {
   async findByPatientId(patientId: string): Promise<DataExport[]> {
     const collection = await this.getCollection()
     const requests = await collection
-      .find({ patientId: patientId } as any)
+      .find({ patientId: patientId } as { patientId: string })
       .sort({ createdAt: -1 })
       .toArray()
 
@@ -109,7 +111,7 @@ export class DataExportDAO {
     return requests
   }
 
-  async findAll(filter: any = {}): Promise<DataExport[]> {
+  async findAll(filter: Record<string, unknown> = {}): Promise<DataExport[]> {
     const collection = await this.getCollection()
     const requests = await collection
       .find(filter)
@@ -130,7 +132,7 @@ export class DataExportDAO {
     const { _id, ...safeUpdates } = updates
 
     const result = await collection.findOneAndUpdate(
-      { id: id } as any,
+      { id: id } as { id: string },
       { $set: safeUpdates },
       { returnDocument: 'after' },
     )
@@ -139,11 +141,12 @@ export class DataExportDAO {
     return result
   }
 
-  async addFile(exportId: string, file: any): Promise<void> {
+  async addFile(exportId: string, file: ExportFile): Promise<void> {
     const collection = await this.getCollection()
-    await collection.updateOne({ id: exportId } as any, {
-      $push: { files: file } as any,
-    })
+    await collection.updateOne(
+      { id: exportId } as { id: string },
+      { $push: { files: file } } as Record<string, unknown>,
+    )
   }
 }
 
@@ -216,21 +219,25 @@ export class TodoDAO {
   }
 }
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
+const mongoLogger = createBuildSafeLogger('mongodb-dao')
+
 export class AIMetricsDAO {
   private async getCollection(): Promise<MongoCollection<AIMetrics>> {
-    console.log('Initializing dependencies for AI Metrics DAO...')
+    mongoLogger.info('Initializing dependencies for AI Metrics DAO...')
     await initializeDependencies()
-    console.log(
-      'Dependencies initialized. MongoDB client status:',
-      mongodb ? 'defined' : 'undefined',
+    mongoLogger.info(
+      'Dependencies initialized. MongoDB client status: ' +
+        (mongodb ? 'defined' : 'undefined'),
     )
     if (!mongodb) {
-      console.error('MongoDB client not initialized in AI Metrics DAO')
+      mongoLogger.error('MongoDB client not initialized in AI Metrics DAO')
       throw new Error('MongoDB client not initialized')
     }
-    console.log('Attempting to connect to MongoDB for AI Metrics...')
+    mongoLogger.info('Attempting to connect to MongoDB for AI Metrics...')
     const db = await mongodb.connect()
-    console.log('MongoDB connected successfully for AI Metrics DAO')
+    mongoLogger.info('MongoDB connected successfully for AI Metrics DAO')
     return db.collection<AIMetrics>('ai_metrics')
   }
 
@@ -566,7 +573,7 @@ export class CrisisSessionFlagDAO {
       resolved: false,
     }
     if (userId) {
-      filter.userId = new ObjectId!(userId) as any
+      filter.userId = new (ObjectId as typeof MongoObjectId)(userId)
     }
 
     const flags = await collection
@@ -711,7 +718,7 @@ export class AgentActivityDAO {
     turnId: string,
   ): Promise<AgentActivityRecord | null> {
     const collection = await this.getCollection()
-    return collection.findOne({ turnId } as any)
+    return collection.findOne({ turnId } as { turnId: string })
   }
 }
 

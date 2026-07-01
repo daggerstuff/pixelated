@@ -206,11 +206,11 @@ function simulateAdaptiveOptimization() {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   demonstrateParameterOptimization()
     .then(() => {
-      console.log('Demonstration completed successfully')
+      logger.info('Demonstration completed successfully')
       process.exit(0)
     })
     .catch((error) => {
-      console.error('Demonstration failed:', error)
+      logger.error('Demonstration failed:', error)
       process.exit(1)
     })
 }

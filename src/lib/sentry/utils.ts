@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('utils') /**
  * Sentry Utilities for Manual Error Reporting and Metrics
  *
  * This file provides utilities for manually capturing errors,
@@ -61,12 +62,12 @@ type SentryShim = {
 
 function getSentry(): SentryShim | null {
   try {
-    if (typeof window !== 'undefined' && (window as any)?.Sentry) {
+    if ((window as any)?.Sentry) {
       return (window as any).Sentry as SentryShim
     }
   } catch (error: unknown) {
     if (IS_DEV) {
-      console.warn('[Sentry] Failed to access global Sentry object:', error)
+      logger.warn('[Sentry] Failed to access global Sentry object:', error)
     }
   }
   return null
@@ -160,7 +161,7 @@ export function startTransaction(
   // Sentry Astro does not support manual transactions.
   // This function is a no-op for compatibility.
   if (IS_DEV) {
-    console.warn(
+    logger.warn(
       '[Sentry] startTransaction is not supported in @sentry/astro and will be ignored.',
     )
   }
@@ -209,7 +210,7 @@ export const performance = {
     _pageName: string,
   ): { setData: () => void; finish: () => void } => {
     if (IS_DEV) {
-      console.warn(
+      logger.warn(
         '[Sentry] measurePageLoad is not supported in @sentry/astro and will be ignored.',
       )
     }
@@ -227,7 +228,7 @@ export const performance = {
     _method: string = 'GET',
   ): { setData: () => void; finish: () => void } => {
     if (IS_DEV) {
-      console.warn(
+      logger.warn(
         '[Sentry] measureApiCall is not supported in @sentry/astro and will be ignored.',
       )
     }
@@ -280,7 +281,7 @@ export function countMetric(
     Sentry.metrics.count(name, value, { attributes })
   } catch (error: unknown) {
     if (IS_DEV) {
-      console.warn('[Sentry Metrics] Failed to emit count metric:', error)
+      logger.warn('[Sentry Metrics] Failed to emit count metric:', error)
     }
   }
 }
@@ -313,7 +314,7 @@ export function gaugeMetric(
     Sentry.metrics.gauge(name, value, { attributes, unit })
   } catch (error: unknown) {
     if (IS_DEV) {
-      console.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
+      logger.warn('[Sentry Metrics] Failed to emit gauge metric:', error)
     }
   }
 }
@@ -359,10 +360,7 @@ export function distributionMetric(
     })
   } catch (error: unknown) {
     if (IS_DEV) {
-      console.warn(
-        '[Sentry Metrics] Failed to emit distribution metric:',
-        error,
-      )
+      logger.warn('[Sentry Metrics] Failed to emit distribution metric:', error)
     }
   }
 }
@@ -534,7 +532,7 @@ export async function flushMetrics(): Promise<void> {
     }
   } catch (error: unknown) {
     if (IS_DEV) {
-      console.warn('[Sentry Metrics] Failed to flush metrics:', error)
+      logger.warn('[Sentry Metrics] Failed to flush metrics:', error)
     }
   }
 }

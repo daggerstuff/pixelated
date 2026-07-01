@@ -13,6 +13,10 @@ export type ProfileIdentifier = {
 /**
  * Service for managing patient profiles (CRUD operations and history).
  */
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+
+const patientLogger = createBuildSafeLogger('patient-profile-service')
+
 export class PatientProfileService {
   private readonly kvStore: KVStore
   private readonly PROFILE_PREFIX = 'profile_'
@@ -44,7 +48,7 @@ export class PatientProfileService {
       }
       return profiles
     } catch (error: unknown) {
-      console.error('Failed to get available profiles:', error)
+      patientLogger.error('Failed to get available profiles', error)
       // In a real app, consider more specific error handling or re-throwing
       return []
     }
@@ -61,7 +65,7 @@ export class PatientProfileService {
         `${this.PROFILE_PREFIX}${id}`,
       )
     } catch (error: unknown) {
-      console.error(`Failed to get profile with ID ${id}:`, error)
+      patientLogger.error(`Failed to get profile with ID ${id}`, error)
       return null
     }
   }
@@ -84,7 +88,7 @@ export class PatientProfileService {
       )
       return true
     } catch (error: unknown) {
-      console.error(`Failed to save profile ${profile.id}:`, error)
+      patientLogger.error(`Failed to save profile ${profile.id}`, error)
       return false
     }
   }
@@ -99,7 +103,7 @@ export class PatientProfileService {
       await this.kvStore.delete(`${this.PROFILE_PREFIX}${id}`)
       return true
     } catch (error: unknown) {
-      console.error(`Failed to delete profile ${id}:`, error)
+      patientLogger.error(`Failed to delete profile ${id}`, error)
       return false
     }
   }
@@ -122,9 +126,7 @@ export class PatientProfileService {
   ): Promise<PatientProfile | null> {
     const profile = await this.getProfileById(profileId)
     if (!profile) {
-      console.error(
-        `Profile with ID ${profileId} not found when trying to add message.`,
-      )
+      patientLogger.error(`Profile with ID ${profileId} not found when trying to add message.`)
       return null
     }
 

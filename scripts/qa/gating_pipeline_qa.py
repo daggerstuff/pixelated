@@ -31,8 +31,6 @@ def test_pii_gate():
     eval_result = gate.evaluate("My SSN is 123-45-6789")
     assert eval_result.decision == GateDecision.BLOCK, f"SSN should block, got {eval_result.decision}"
 
-    print("  PII Gate: PASS")
-
 
 def test_crisis_gate():
     """Gate 1: Crisis Detection"""
@@ -51,8 +49,6 @@ def test_crisis_gate():
     assert result.tier.value in ("none", "moderate"), f"Negated self-harm should be suppressed, got {result.tier.value}"
     assert result.confidence < 0.5, f"Negated content should have low confidence, got {result.confidence}"
 
-    print("  Crisis Gate: PASS")
-
 
 def test_trauma_gate():
     """Gate 2: Trauma Filter"""
@@ -65,8 +61,6 @@ def test_trauma_gate():
     # Trauma lexicon should match
     result = gate.filter("I was abused and felt helpless.")
     assert len(result.indicators) > 0, "Trauma lexicon should match"
-
-    print("  Trauma Gate: PASS")
 
 
 def test_consent_gate():
@@ -83,8 +77,6 @@ def test_consent_gate():
     result = gate.check_consent("user-qa")
     assert not result.allowed, "Revoked consent should block"
 
-    print("  Consent Gate: PASS")
-
 
 def test_gating_report():
     """GatingReport integration"""
@@ -94,19 +86,14 @@ def test_gating_report():
     report.gate0_pii = type("GateResult", (), {"decision": GateDecision.BLOCK, "reason": "PII found"})()
     assert report.blocked, "Report should be blocked when PII blocks"
 
-    print("  GatingReport: PASS")
-
 
 def main():
-    print("=== Manual QA: 5-Gate Memory Ingestion Pipeline ===\n")
 
     test_pii_gate()
     test_crisis_gate()
     test_trauma_gate()
     test_consent_gate()
     test_gating_report()
-
-    print("\n=== ALL MANUAL QA CHECKS PASSED ===")
 
 
 if __name__ == "__main__":

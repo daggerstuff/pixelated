@@ -425,7 +425,7 @@ export class AnalyticsDataService {
       return null
     }
 
-    return entry.data as unknown
+    return entry.data
   }
 
   private setCachedData(key: string, data: unknown, ttl: number): void {

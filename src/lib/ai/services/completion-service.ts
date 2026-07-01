@@ -1,6 +1,8 @@
 import { createLLMService } from './llm-provider'
 import type { AIMessage, AIUsage } from '@/lib/ai/models/ai-types'
 import { createAuditLog, AuditEventType, AuditEventStatus } from '@/lib/audit'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('completion-service')
 
 /**
  * Service for handling AI completion requests.
@@ -102,7 +104,7 @@ export class CompletionService {
             controller.enqueue(encoder.encode('data: [DONE]\n\n'))
             controller.close()
           } catch (streamError) {
-            console.error('Stream processing error:', streamError)
+            logger.error('Stream processing error:', streamError)
             controller.error(streamError)
 
             await createAuditLog(
@@ -120,7 +122,7 @@ export class CompletionService {
             )
           }
         } catch (error: unknown) {
-          console.error('Error creating streaming completion:', error)
+          logger.error('Error creating streaming completion:', error)
           controller.error(error)
 
           await createAuditLog(
@@ -137,7 +139,7 @@ export class CompletionService {
       },
 
       cancel() {
-        console.log('Stream cancelled by client')
+        logger.info('Stream cancelled by client')
       },
     })
   }

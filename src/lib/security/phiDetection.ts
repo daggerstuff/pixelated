@@ -17,7 +17,7 @@ class Analyzer {
     options: { language: string },
   ): Promise<AnalyzeResult[]> {
     // Use text and options parameters to avoid unused variable warnings
-    console.log(
+    logger.info(
       `Analyzing text with length ${text.length} in language ${options.language}`,
     )
     return Promise.resolve([] as AnalyzeResult[])
@@ -64,11 +64,11 @@ function createLogger(name: string): {
   error: (message: string, meta?: unknown) => void
 } {
   return {
-    info: (message: string) => console.log(`[INFO] ${name}: ${message}`),
+    info: (message: string) => logger.info(`[INFO] ${name}: ${message}`),
     warn: (message: string, meta?: unknown) =>
-      console.warn(`[WARN] ${name}: ${message}`, meta),
+      logger.warn(`[WARN] ${name}: ${message}`, meta),
     error: (message: string, meta?: unknown) =>
-      console.error(`[ERROR] ${name}: ${message}`, meta),
+      logger.error(`[ERROR] ${name}: ${message}`, meta),
   }
 }
 
@@ -457,11 +457,11 @@ export const phiDetector = PresidioPHIDetector.getInstance()
 if (require.main === module) {
   const sample =
     'Patient John Doe (john.doe@email.com, 555-123-4567, SSN: 123-45-6789) visited the clinic.'
-  console.log('Original:', sample)
+  logger.info('Original:', sample)
 
   // Use the phiDetector directly since detectAndRedactPHI doesn't exist
   phiDetector.detectPHI(sample).then((result) => {
-    console.log('Redacted:', result.redactedText)
+    logger.info('Redacted:', result.redactedText)
   })
 }
 */

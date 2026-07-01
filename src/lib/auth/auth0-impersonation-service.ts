@@ -6,10 +6,12 @@
 import { ManagementClient } from 'auth0'
 
 import { auth0UserService } from '../../services/auth0.service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
+const logger = createBuildSafeLogger('auth0-impersonation-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -26,7 +28,7 @@ function initializeAuth0Management() {
     !auth0Config.managementClientSecret
   ) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -87,7 +89,7 @@ export class Auth0ImpersonationService {
   constructor() {
     if (!auth0Config.domain) {
       if (shouldWarnAuth0Configuration) {
-        console.warn('Auth0 is not properly configured')
+        logger.warn('Auth0 is not properly configured')
       }
     }
 
@@ -235,7 +237,7 @@ export class Auth0ImpersonationService {
 
       return sessionId
     } catch (error: unknown) {
-      console.error('Failed to request impersonation:', error)
+      logger.error('Failed to request impersonation:', error)
 
       // Log impersonation error
       logSecurityEvent(
@@ -320,7 +322,7 @@ export class Auth0ImpersonationService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to end impersonation:', error)
+      logger.error('Failed to end impersonation:', error)
 
       // Log impersonation error
       logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
@@ -452,7 +454,7 @@ export class Auth0ImpersonationService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to extend impersonation:', error)
+      logger.error('Failed to extend impersonation:', error)
 
       // Log impersonation error
       logSecurityEvent(SecurityEventType.IMPERSONATION_ERROR, adminUserId, {
@@ -491,7 +493,7 @@ export class Auth0ImpersonationService {
       const session = this.activeSessions.get(sessionId)
       if (session) {
         this.endImpersonation(sessionId, session.adminUserId).catch((error) => {
-          console.error('Failed to end expired impersonation session:', error)
+          logger.error('Failed to end expired impersonation session:', error)
         })
       }
     }
@@ -514,7 +516,7 @@ export class Auth0ImpersonationService {
 
       return true
     } catch (error: unknown) {
-      console.error('Failed to validate impersonation session:', error)
+      logger.error('Failed to validate impersonation session:', error)
       return false
     }
   }

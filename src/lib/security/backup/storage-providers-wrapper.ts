@@ -9,6 +9,12 @@ import { isBrowser } from '../../browser/is-browser'
 import { createBuildSafeLogger as getLogger } from '../../logging/build-safe-logger'
 import type { StorageProvider, StorageProviderConfig } from './types'
 
+interface ProviderModule {
+  [name: string]: new (...args: unknown[]) => StorageProvider
+}
+
+const logger = getLogger('storage-providers-wrapper')
+
 /**
  * Get storage provider instance based on provider name
  */
@@ -23,37 +29,42 @@ export async function getStorageProvider(
   }
 
   // Server-side implementation - dynamically load based on provider name
-  let providerModule: any
   try {
     switch (providerName) {
       case 'google-cloud-storage': {
-        providerModule = await import('./storage-providers/google-cloud')
-        return new providerModule.GoogleCloudStorageProvider(config)
+        const providerModule =
+          (await import('./storage-providers/google-cloud')) as ProviderModule
+        return new providerModule['GoogleCloudStorageProvider'](config)
       }
       case 'aws-s3': {
-        providerModule = await import('./storage-providers/aws-s3')
-        return new providerModule.S3StorageProvider(config)
+        const providerModule =
+          (await import('./storage-providers/aws-s3')) as ProviderModule
+        return new providerModule['S3StorageProvider'](config)
       }
       case 'local-fs': {
-        providerModule = await import('./storage-providers/local-fs')
-        return new providerModule.LocalFileSystemProvider(config)
+        const providerModule =
+          (await import('./storage-providers/local-fs')) as ProviderModule
+        return new providerModule['LocalFileSystemProvider'](config)
       }
       case 'memory': {
-        providerModule = await import('./storage-providers/memory')
-        return new providerModule.InMemoryStorageProvider(config)
+        const providerModule =
+          (await import('./storage-providers/memory')) as ProviderModule
+        return new providerModule['InMemoryStorageProvider'](config)
       }
       case 'default':
       default: {
-        providerModule = await import('./storage-providers/memory')
-        return new providerModule.InMemoryStorageProvider(config)
+        const providerModule =
+          (await import('./storage-providers/memory')) as ProviderModule
+        return new providerModule['InMemoryStorageProvider'](config)
       }
     }
   } catch (error: unknown) {
-    console.error(`Error loading storage provider '${providerName}':`, error)
+    logger.error(`Error loading storage provider '${providerName}':`, error)
 
     // Fallback to in-memory provider for safety
-    providerModule = await import('./storage-providers/memory')
-    return new providerModule.InMemoryStorageProvider(config)
+    const providerModule =
+      (await import('./storage-providers/memory')) as ProviderModule
+    return new providerModule['InMemoryStorageProvider'](config)
   }
 }
 
@@ -64,31 +75,21 @@ export async function getStorageProvider(
 function createBrowserStubProvider(): StorageProvider {
   return {
     initialize: async () => {
-      console.warn(
-        'Storage providers are not available in browser environments',
-      )
+      logger.warn('Storage providers are not available in browser environments')
     },
     listFiles: async () => {
-      console.warn(
-        'Storage providers are not available in browser environments',
-      )
+      logger.warn('Storage providers are not available in browser environments')
       return []
     },
     storeFile: async () => {
-      console.warn(
-        'Storage providers are not available in browser environments',
-      )
+      logger.warn('Storage providers are not available in browser environments')
     },
     getFile: async () => {
-      console.warn(
-        'Storage providers are not available in browser environments',
-      )
+      logger.warn('Storage providers are not available in browser environments')
       return new Uint8Array()
     },
     deleteFile: async () => {
-      console.warn(
-        'Storage providers are not available in browser environments',
-      )
+      logger.warn('Storage providers are not available in browser environments')
     },
   }
 }

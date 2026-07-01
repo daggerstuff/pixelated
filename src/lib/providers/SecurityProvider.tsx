@@ -52,6 +52,10 @@ function generateEncryptionKey(level: SecurityLevel): EncryptionKey {
   }
 }
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+
+const securityLogger = createBuildSafeLogger('security-provider')
+
 export function SecurityProvider({
   children,
   level = 'hipaa',
@@ -96,7 +100,7 @@ export function SecurityProvider({
           isEncrypted: level !== 'standard',
         }))
       } catch (error: unknown) {
-        console.error('Failed to initialize security:', error)
+        securityLogger.error('Failed to initialize security', error)
         // Fallback to standard security on initialization failure
         setSecurityState((prev) => ({
           ...prev,
@@ -160,7 +164,7 @@ export function SecurityProvider({
         }))
       }
     } catch (error: unknown) {
-      console.error('Failed to change security level:', error)
+      securityLogger.error('Failed to change security level', error)
       throw new Error('Security level change failed', { cause: error })
     }
   }
@@ -180,7 +184,7 @@ export function SecurityProvider({
         isKeyRotationNeeded: false,
       }))
     } catch (error: unknown) {
-      console.error('Key rotation failed:', error)
+      securityLogger.error('Key rotation failed', error)
       throw new Error('Key rotation failed', { cause: error })
     }
   }
@@ -205,7 +209,7 @@ export function SecurityProvider({
           timestamp: Date.now(),
         })) as unknown as string
     } catch (error: unknown) {
-      console.error('Encryption failed:', error)
+      securityLogger.error('Encryption failed', error)
       // Fallback to simple encryption
       return JSON.stringify({
         data: JSON.stringify(data),
@@ -236,7 +240,7 @@ export function SecurityProvider({
       }
       return result
     } catch (error: unknown) {
-      console.error('Decryption failed:', error)
+      securityLogger.error('Decryption failed', error)
       // Attempt to parse as JSON
       try {
         const parsed = JSON.parse(data) as unknown

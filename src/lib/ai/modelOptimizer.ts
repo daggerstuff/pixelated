@@ -4,6 +4,8 @@
  */
 
 import type { ModelMetrics, TrainingConfig } from "@/types/ai";
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('modelOptimizer')
 
 export interface OptimizationTarget {
   metric: keyof ModelMetrics;
@@ -250,7 +252,7 @@ class ModelOptimizer {
       throw new Error("Baseline metrics not set");
     }
 
-    console.log(`Applying optimization strategy: ${strategy.name}`);
+    logger.info(`Applying optimization strategy: ${strategy.name}`);
 
     // Simulate optimization process
     const improvements = this.calculateExpectedImprovements(strategy);

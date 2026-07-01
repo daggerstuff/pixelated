@@ -4,6 +4,8 @@
  */
 
 import type { RealTimeMetrics, ProcessingConfig } from '@/types/ai'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('realTimeProcessor')
 
 export interface StreamingSession {
   sessionId: string
@@ -121,7 +123,7 @@ class RealTimeProcessor {
 
     this.activeSessions.set(sessionId, session)
 
-    console.log(`Started real-time processing for session ${sessionId}`)
+    logger.info(`Started real-time processing for session ${sessionId}`)
 
     return session
   }
@@ -165,17 +167,17 @@ class RealTimeProcessor {
         // Route data to appropriate processors
         this.routeDataToProcessors(session, data)
       } catch (error: unknown) {
-        console.error('WebSocket message parsing error:', error)
+        logger.error('WebSocket message parsing error:', error)
       }
     }
 
     session.dataStream.onerror = (error) => {
-      console.error('WebSocket error:', error)
+      logger.error('WebSocket error:', error)
       void this.handleSessionError(session.sessionId, error)
     }
 
     session.dataStream.onclose = () => {
-      console.log(`Session ${session.sessionId} WebSocket closed`)
+      logger.info(`Session ${session.sessionId} WebSocket closed`)
       void this.endSession(session.sessionId)
     }
   }
@@ -215,7 +217,7 @@ class RealTimeProcessor {
   }
 
   private async handleSessionError(sessionId: string, error: any): Promise<void> {
-    console.error(`Session ${sessionId} error:`, error)
+    logger.error(`Session ${sessionId} error:`, error)
 
     // Attempt to restart session or mark for manual intervention
     const session = this.activeSessions.get(sessionId)
@@ -237,7 +239,7 @@ class RealTimeProcessor {
         this.setupWebSocketHandlers(session)
       }, 2000) // 2 second delay
     } catch (error: unknown) {
-      console.error('Reconnection failed:', error)
+      logger.error('Reconnection failed:', error)
     }
   }
 
@@ -250,7 +252,7 @@ class RealTimeProcessor {
       try {
         await this.processQueue()
       } catch (error: unknown) {
-        console.error('Processing loop error:', error)
+        logger.error('Processing loop error:', error)
       } finally {
         this.isProcessing = false
       }
@@ -326,7 +328,7 @@ class RealTimeProcessor {
       // Clear processed data from buffer
       stage.buffer = []
     } catch (error: unknown) {
-      console.error(`Processing error for stage ${stage.name}:`, error)
+      logger.error(`Processing error for stage ${stage.name}:`, error)
 
       // Update error metrics
       const metrics = stage.processor.getMetrics()
@@ -337,7 +339,7 @@ class RealTimeProcessor {
       // Adaptive error handling
       if (metrics.errorRate > 0.1) {
         // 10% error rate
-        console.warn(
+        logger.warn(
           `High error rate for ${stage.name}, considering stage reconfiguration`,
         )
       }
@@ -362,7 +364,7 @@ class RealTimeProcessor {
       insights: data.insights,
     }
 
-    console.log('Real-time update:', event)
+    logger.info('Real-time update:', event)
   }
 
   private getCurrentResourceUsage(): {
@@ -396,7 +398,7 @@ class RealTimeProcessor {
     // Clean up session data
     this.activeSessions.delete(sessionId)
 
-    console.log(`Ended real-time processing for session ${sessionId}`)
+    logger.info(`Ended real-time processing for session ${sessionId}`)
 
     return metrics
   }
