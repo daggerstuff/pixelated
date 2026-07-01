@@ -57,8 +57,8 @@ class AudioBiasDetector:
             self.audio_classifier.to(self.device)
 
             # Load speaker diarization pipeline
-            self.speaker_diarization = pipeline(
-                "speaker-diarization",
+            self.speaker_diarization = pipeline(  # type: ignore
+                "speaker-diarization",  # type: ignore
                 model="pyannote/speaker-diarization",
                 device=0 if torch.cuda.is_available() else -1,
             )

@@ -107,7 +107,6 @@ export function mountSessionAgentRouter(
     while (true) {
       const { done, value } = await reader.read()
       if (done) break
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       res.write(Buffer.from(value))
     }
     res.end()

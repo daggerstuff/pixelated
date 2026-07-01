@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training_corpus.compose import (
     load_package_entry_snapshot,
@@ -15,7 +16,7 @@ def _write_package(
     *,
     name: str,
     version: str,
-    entries: list[dict[str, object]],
+    entries: list[dict[str, Any]],
     verified: bool = True,
 ) -> None:
     root.mkdir(parents=True, exist_ok=True)

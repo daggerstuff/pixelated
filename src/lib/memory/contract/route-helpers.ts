@@ -8,16 +8,17 @@
 import { z } from 'zod'
 
 import { getCurrentUser } from '@/lib/auth'
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import {
   ProductMemoryGatewayError,
   type ProductMemoryRecord,
   type ProductMemoryScope,
 } from '@/lib/services/product-memory-gateway'
 
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { errorBody, mapGatewayError } from './errors'
 import { MEMORY_API_CONTRACT_VERSION, PublicMemory } from './v1'
-const logger = createBuildSafeLogger('route-helpers')
+
+const logger = createBuildSafeLogger('memory-api-v1')
 
 // ---------------------------------------------------------------------------
 // Response helpers — every v1 route returns one of these two shapes.
@@ -160,15 +161,14 @@ export async function requireAuthenticatedMemoryCaller(
 // ---------------------------------------------------------------------------
 
 /**
- * Lightweight structured logger for the v1 memory routes. Falls back to
- * console to avoid coupling to the build-safe logger (which is heavy and
- * pulls in the wider logging stack).
+ * Emit a structured error record for a failed v1 memory route call. The
+ * caller has already decided to surface a public error response, so this
+ * is purely for telemetry and the run trace — it must never throw.
  */
 function logRouteError(action: string, error: unknown): void {
   const message = error instanceof Error ? error.message : String(error)
   const name = error instanceof Error ? error.name : 'UnknownError'
-  // eslint-disable-next-line no-console
-  logger.error(`[memory-api-v1] ${action} failed: ${name}: ${message}`)
+  logger.error(`${action} failed`, { name, message })
 }
 
 export function handleGatewayError(action: string, error: unknown): Response {

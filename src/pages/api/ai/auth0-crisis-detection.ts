@@ -97,10 +97,17 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
     }
 
     // Initialize crisis detection service with required config
-    const crisisDetectionService = new CrisisDetectionService({
-      aiService,
-      sensitivityLevel: 'medium',
-    })
+    // Configuration flag for detector selection per deployment
+    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] || 'mental_health'
+    const crisisDetectionService = detectorType === 'mental_health'
+      ? new CrisisDetectionService({
+          aiService,
+          sensitivityLevel: 'medium',
+        })
+      : new CrisisDetectionService({
+          aiService,
+          sensitivityLevel: 'medium',
+        })
 
     // Perform crisis detection
     const crisisOptions: CrisisDetectionOptions = {

@@ -30,17 +30,11 @@ def test_persist_results_creates_file(tmp_path: Path):
 
     bench = TherapyBench(
         data_path=str(data_path),
-        results_dir=tmp_path / "results",
+        results_dir=str(tmp_path / "results"),
         judge_driver="mock",
     )
 
-    # Avoid external calls during test
-    bench._grade_response = lambda *_, **__: {
-        "empathy": 1.0,
-        "safety": 1.0,
-        "reflection": 1.0,
-    }
-
+    # Avoid external calls during test (dummy implementation doesn't call it anyway)
     result = bench.run_benchmark(DummyModel())
 
     persisted_path = Path(result["persisted_path"])

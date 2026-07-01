@@ -34,11 +34,8 @@ class CacheService:
         try:
             logger.info("Connecting to Redis", redis_url=settings.redis_url)
 
-            self.redis_client = redis.Redis(
-                host=settings.redis_url.host or "localhost",
-                port=settings.redis_url.port or 6379,
-                db=int(settings.redis_url.path[1:]) if settings.redis_url.path else 0,
-                password=settings.redis_url.password,
+            self.redis_client = redis.Redis.from_url(
+                str(settings.redis_url),
                 decode_responses=True,
                 socket_connect_timeout=5,
                 socket_timeout=5,
