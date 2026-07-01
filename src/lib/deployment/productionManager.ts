@@ -166,9 +166,7 @@ class ProductionManager {
     const env = this.environments.get(environment)
     if (!env) {
       throw new Error(`Environment not found: ${environment}`)
-    }
-
-    const deploymentId = `deploy_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    }      const deploymentId = `deploy_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
     const startTime = Date.now()
 
     logger.info(
@@ -356,11 +354,9 @@ class ProductionManager {
       await new Promise((resolve) => setTimeout(resolve, 10000))
       await this.validateBatchDeployment(batch)
     }
-  }
-
-  private async switchTraffic(
-    environment: string,
-    target: 'blue' | 'green',
+  }      private async switchTraffic(
+        _environment: string,
+        target: 'blue' | 'green',
   ): Promise<void> {
     logger.info(`Switching traffic to ${target} environment`)
     // In real implementation, would update load balancer configuration
@@ -385,11 +381,9 @@ class ProductionManager {
       overallUptime: 99.9,
       activeUsers: 15,
     }
-  }
-
-  private async increaseCanaryTraffic(
-    environment: string,
-    percentages: number[],
+  }      private async increaseCanaryTraffic(
+        _environment: string,
+        percentages: number[],
   ): Promise<void> {
     for (const percentage of percentages) {
       logger.info(`Increasing canary traffic to ${percentage}%`)
@@ -719,7 +713,7 @@ class ProductionManager {
     const rollbackCount = Math.floor(totalDeployments * 0.1) // Mock rollback rate
 
     const environmentHealth: Record<string, string> = {}
-    this.environments.forEach((env, name) => {
+    this.environments.forEach((_env, name) => {
       environmentHealth[name] = 'healthy' // Mock health status
     })
 

@@ -187,7 +187,7 @@ export class PixelatedEmpathy {
     return new MemoryApiClient({
       baseUrl: `${apiV1Root}/memory`,
       getHeaders: () => ({ 'X-API-Key': this.apiKey }),
-      fetchFn: async (input, init) => {
+      fetchFn: async (input: RequestInfo | URL, init?: RequestInit) => {
         const controller = new AbortController()
         const id = setTimeout(() => controller.abort(), this.timeout)
         try {
@@ -208,7 +208,7 @@ export class PixelatedEmpathy {
     return new ForesightClient({
       baseUrl: `${apiV1Root}/memory`,
       getHeaders: () => ({ 'X-API-Key': this.apiKey }),
-      fetchFn: async (input, init) => {
+      fetchFn: async (input: RequestInfo | URL, init?: RequestInit) => {
         const controller = new AbortController()
         const id = setTimeout(() => controller.abort(), this.timeout)
         try {

@@ -202,7 +202,7 @@ export class SealContext {
     }
 
     // Map scheme type
-    let schemeType
+    let schemeType: unknown
     switch (this.scheme) {
       case SealSchemeType.CKKS:
         schemeType = sealModule.SchemeType.ckks

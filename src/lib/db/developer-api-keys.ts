@@ -295,7 +295,7 @@ export class DeveloperApiKeyManager {
 
   private async handleFailedAttempt(
     apiKeyId: string,
-    reason: string,
+    _reason: string,
   ): Promise<void> {
     const attempts = this.failedAttempts.get(apiKeyId) ?? 0
     const newAttempts = attempts + 1

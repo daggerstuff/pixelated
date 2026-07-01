@@ -44,7 +44,7 @@ export interface IndexingPlan {
 class IndexingStrategy {
   private queryPatterns: QueryPattern[] = []
 
-  constructor(config: DatabaseConfig) {
+  constructor(_config: DatabaseConfig) {
     this.queryPatterns = []
     this.initializeQueryPatterns()
   }

@@ -53,7 +53,7 @@ class InterventionEngine {
         id: 'crisis_detection',
         name: 'Crisis Detection',
         description: 'Immediate intervention for crisis situations',
-        condition: (session, _patient) => {
+        condition: (_session, _patient) => {
           const crisisKeywords = [
             'suicide',
             'kill myself',
@@ -61,7 +61,7 @@ class InterventionEngine {
             'hurt myself',
             'die',
           ]
-          const transcript = session.transcript?.toLowerCase() ?? ''
+          const transcript = _session.transcript?.toLowerCase() ?? ''
           return crisisKeywords.some((keyword) => transcript.includes(keyword))
         },
         suggestions: [

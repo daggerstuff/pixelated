@@ -49,9 +49,13 @@ jobs:
       - name: Install dependencies
         run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
-      - name: Lint code and markdown
+      - name: Lint code
         continue-on-error: true
-        run: pnpm lint:ci:with-markdown
+        run: pnpm lint:ci
+
+      - name: Lint markdown
+        continue-on-error: true
+        run: pnpm lint:markdown:ci
 
       - name: Format check (Prettier)
         run: pnpm exec prettier --check . || true

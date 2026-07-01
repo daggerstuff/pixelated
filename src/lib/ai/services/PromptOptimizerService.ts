@@ -346,7 +346,7 @@ export class PromptOptimizerService {
    * Identify what triggered an emotional transition
    */
   private identifyTransitionTrigger(
-    prevMessage: ConversationContext['messages'][0],
+    _prevMessage: ConversationContext['messages'][0],
     currMessage: ConversationContext['messages'][0],
   ): string {
     // Analyze the content between messages to identify triggers
