@@ -1827,16 +1827,16 @@ name = "fastembed"
 version = "0.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "huggingface-hub" },
-    { name = "loguru" },
-    { name = "mmh3" },
-    { name = "numpy" },
-    { name = "onnxruntime" },
-    { name = "pillow" },
-    { name = "py-rust-stemmers" },
-    { name = "requests" },
-    { name = "tokenizers" },
-    { name = "tqdm" },
+    { name = "huggingface-hub", marker = "python_full_version < '3.14'" },
+    { name = "loguru", marker = "python_full_version < '3.14'" },
+    { name = "mmh3", marker = "python_full_version < '3.14'" },
+    { name = "numpy", marker = "python_full_version < '3.14'" },
+    { name = "onnxruntime", marker = "python_full_version < '3.14'" },
+    { name = "pillow", marker = "python_full_version < '3.14'" },
+    { name = "py-rust-stemmers", marker = "python_full_version < '3.14'" },
+    { name = "requests", marker = "python_full_version < '3.14'" },
+    { name = "tokenizers", marker = "python_full_version < '3.14'" },
+    { name = "tqdm", marker = "python_full_version < '3.14'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/26/25/58865e36b6e8a9a0d0ff905b5601aa30db97956327c0df42ec4ed6accc21/fastembed-0.8.0.tar.gz", hash = "sha256:75966edfa8b006ee78514c726bd7f6a50721dadc89305279052be9db72fd53e8", size = 75115, upload-time = "2026-03-23T16:34:41.699Z" }
 wheels = [
@@ -3762,8 +3762,8 @@ name = "loguru"
 version = "0.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32'" },
-    { name = "win32-setctime", marker = "sys_platform == 'win32'" },
+    { name = "colorama", marker = "python_full_version < '3.14' and sys_platform == 'win32'" },
+    { name = "win32-setctime", marker = "python_full_version < '3.14' and sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3a/05/a1dae3dffd1116099471c643b8924f5aa6524411dc6c63fdae648c4f1aca/loguru-0.7.3.tar.gz", hash = "sha256:19480589e77d47b8d85b2c827ad95d49bf31b0dcde16593892eb51dd18706eb6", size = 63559, upload-time = "2024-12-06T11:20:56.608Z" }
 wheels = [
@@ -5532,8 +5532,8 @@ requires-dist = [
     { name = "clickhouse-driver", specifier = ">=0.2.10" },
     { name = "coverage", marker = "extra == 'dev'" },
     { name = "coverage", marker = "extra == 'test'" },
-    { name = "cryptography", specifier = ">=46.0.6" },
-    { name = "data-designer", specifier = ">=0.6.1" },
+    { name = "cryptography", specifier = ">=46.0.6,<47" },
+    { name = "data-designer", specifier = ">=0.6.1,<0.8" },
     { name = "datasets", specifier = ">=2.19.0" },
     { name = "e2b", specifier = ">=2.6.1" },
     { name = "einops", specifier = ">=0.8.0" },
@@ -5600,7 +5600,7 @@ requires-dist = [
     { name = "plotly", specifier = ">=6.2.0" },
     { name = "protobuf", specifier = ">=6.33.5" },
     { name = "psutil", specifier = ">=7.0.0" },
-    { name = "pyarrow", specifier = ">=22.0.0" },
+    { name = "pyarrow", specifier = ">=22.0.0,<23" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pydub", specifier = ">=0.25.1" },
     { name = "pygments", specifier = ">=2.20.0" },
@@ -7223,8 +7223,8 @@ name = "secretstorage"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography" },
-    { name = "jeepney" },
+    { name = "cryptography", marker = "(python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "jeepney", marker = "(python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [
@@ -8053,13 +8053,13 @@ resolution-markers = [
     "python_full_version < '3.14' and platform_machine != 's390x' and sys_platform == 'darwin'",
 ]
 dependencies = [
-    { name = "filelock" },
-    { name = "fsspec" },
-    { name = "jinja2" },
-    { name = "networkx" },
-    { name = "setuptools" },
-    { name = "sympy" },
-    { name = "typing-extensions" },
+    { name = "filelock", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "fsspec", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "jinja2", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "networkx", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "setuptools", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "sympy", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
+    { name = "typing-extensions", marker = "(python_full_version < '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64' and sys_platform == 'darwin') or (python_full_version < '3.14' and platform_machine == 'x86_64' and sys_platform == 'darwin')" },
 ]
 wheels = [
     { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.12.1-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:c75e93173c700bccd6bfcc4a9d19ce242ab6dacd1f1781483027a16239b9e650", upload-time = "2026-06-17T15:44:09Z" },
@@ -8082,13 +8082,13 @@ resolution-markers = [
     "python_full_version < '3.14' and platform_machine == 's390x'",
 ]
 dependencies = [
-    { name = "filelock" },
-    { name = "fsspec" },
-    { name = "jinja2" },
-    { name = "networkx" },
-    { name = "setuptools" },
-    { name = "sympy" },
-    { name = "typing-extensions" },
+    { name = "filelock", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "fsspec", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "jinja2", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "networkx", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "setuptools", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "sympy", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
+    { name = "typing-extensions", marker = "(python_full_version >= '3.14' and platform_machine == 'x86_64') or (python_full_version >= '3.15' and platform_machine != 's390x' and platform_machine != 'x86_64') or platform_machine == 's390x' or sys_platform != 'darwin'" },
 ]
 wheels = [
     { url = "https://download-r2.pytorch.org/whl/cpu/torch-2.12.1%2Bcpu-cp313-cp313-linux_s390x.whl", hash = "sha256:4ca206a35f2aeba7da944a69ef857103358e8d4bc6b06b49b9e554dcfa57777d", upload-time = "2026-06-18T01:57:47Z" },
