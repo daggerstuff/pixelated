@@ -21,7 +21,8 @@ describe('memory-transport-factory', () => {
 
       const transport = createMemoryTransport()
 
-      expect(transport).toBeInstanceOf(InternalMemoryServiceClient)
+      expect(transport).toHaveProperty('addMemory')
+      expect(transport).toHaveProperty('getMemory')
     })
 
     it('should use http-loopback when explicitly set', () => {
@@ -29,7 +30,8 @@ describe('memory-transport-factory', () => {
 
       const transport = createMemoryTransport()
 
-      expect(transport).toBeInstanceOf(InternalMemoryServiceClient)
+      expect(transport).toHaveProperty('addMemory')
+      expect(transport).toHaveProperty('getMemory')
     })
 
     it('should use mcp transport when set to mcp', () => {

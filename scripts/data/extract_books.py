@@ -613,7 +613,7 @@ class BooksExtractor:
 
         # Apply classification
         if self.classifier and self.config.apply_classification:
-            record = {"messages": [{"role": "user", "content": segment.content_text}]}
+            record: dict[str, object] = {"messages": [{"role": "user", "content": segment.content_text}]}
             classification = self.classifier.classify_record(record)
             segment.therapeutic_category = classification.category.value
 

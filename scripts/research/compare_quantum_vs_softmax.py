@@ -20,7 +20,7 @@ def run_softmax_simulation():
     results = []
     for _ in range(NUM_SIMULATIONS):
         # Sample from the distribution
-        sampled_index = torch.multinomial(probabilities, 1).item()
+        sampled_index = int(torch.multinomial(probabilities, 1).item())
         results.append(EMOTIONS[sampled_index])
 
     end_time = time.time()

@@ -43,7 +43,13 @@ def remerge_with_scale(scale: float = 0.5):
     base_model_name = "LatitudeGames/Wayfarer-2-12B"
     output_name = f"merged-scale-{scale}"
 
+    print(f"🚀 Re-merging with scale factor: {scale}")
+    print(f"Base: {base_model_name}")
+    print("Adapter: /root/adapter")
+    print(f"Output: {output_name}")
+
     # Load base model
+    print("📥 Loading base model...")
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_name,
         torch_dtype=torch.float16,
@@ -52,9 +58,11 @@ def remerge_with_scale(scale: float = 0.5):
     )
 
     # Load tokenizer
+    print("📥 Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=True)
 
     # Load adapter
+    print("📥 Applying LoRA adapter...")
     model = PeftModel.from_pretrained(
         base_model,
         "/root/adapter",
@@ -65,32 +73,42 @@ def remerge_with_scale(scale: float = 0.5):
     config = model.peft_config["default"]
     orig_alpha = getattr(config, "lora_alpha", 32)
     orig_r = getattr(config, "r", 16)
-    orig_alpha / orig_r
+    orig_scale = orig_alpha / orig_r
+    print(f"  Original scale: {orig_scale:.2f}x (alpha={orig_alpha}, r={orig_r})")
 
     # Scale weights
     if scale != 1.0:
+        print(f"🔧 Scaling adapter weights by {scale}...")
         with torch.no_grad():
             for name, param in model.named_parameters():
                 if "lora_" in name:
                     param.data.mul_(scale)
+        print(f"  New effective scale: {orig_scale * scale:.2f}x")
 
     # Merge
-    merged = model.merge_and_unload(safe_merge=True)
+    print("🔄 Merging...")
+    merged = model.merge_and_unload(safe_merge=True)  # type: ignore
 
     # Save to volume
     output_path = Path(f"/root/models/{output_name}")
     output_path.mkdir(parents=True, exist_ok=True)
 
+    print(f"💾 Saving to {output_path}...")
     merged.save_pretrained(str(output_path), safe_serialization=True)
     tokenizer.save_pretrained(str(output_path))
 
     # Commit volume
     volume.commit()
 
+    print(f"✅ DONE! Merged model at: {output_path}")
     return str(output_path)
 
 
 @app.local_entrypoint()
 def main(scale: float = 0.5):
     """Run re-merge with specified scale factor."""
-    remerge_with_scale.remote(scale)
+    print(f"📡 Triggering Modal re-merge with scale={scale}...")
+    result = remerge_with_scale.remote(scale)
+    print(f"🎉 Complete: {result}")
+    print("To use the new model, update modal_app.py:")
+    print(f'  model_path = "/models/{result.split("/")[-1]}"')

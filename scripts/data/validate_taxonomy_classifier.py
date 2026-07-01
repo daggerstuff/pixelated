@@ -183,7 +183,10 @@ class TaxonomyValidation:
 
                 try:
                     record = json.loads(line)
-                    pred_cat, confidence, reasoning = predictions.get(str(i), ("unknown", 0.0, ""))
+                    pred_data = predictions.get(str(i), ("unknown", 0.0))
+                    pred_cat = pred_data[0]
+                    confidence = pred_data[1]
+                    reasoning = ""
 
                     outfile.write(f"## Record {i}\n\n")
                     outfile.write(f"**Predicted Category:** {pred_cat} (confidence: {confidence:.2f})\n")

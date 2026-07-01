@@ -1,4 +1,7 @@
-import { describe, expect, it, vi } from 'vitest'
+/**
+ * @vitest-environment node
+ */
+import { describe, expect, it, vi, beforeEach } from 'vitest'
 
 import { getCurrentUser } from '@/lib/auth'
 

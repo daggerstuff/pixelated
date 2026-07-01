@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training_corpus.compare import (
     compare_package_snapshots,
@@ -12,7 +13,7 @@ from ai.training_corpus.compare import (
 
 def _write_package_fixture(
     root: Path,
-    payload: dict[str, object],
+    payload: dict[str, Any],
 ) -> None:
     root.mkdir(parents=True, exist_ok=True)
     name = str(payload["name"])

@@ -1,5 +1,5 @@
 import { createBuildSafeLogger } from '../../logging/build-safe-logger';
-import { CrisisDetectionService } from '../services/crisis-detection';
+import { AnomalyDetector } from '../services/anomaly-detector';
 import type { MemoryObject } from './types';
 
 const appLogger = createBuildSafeLogger('memory-tagger');
@@ -9,10 +9,10 @@ const appLogger = createBuildSafeLogger('memory-tagger');
  * Combines high-performance keyword scanning with deep AI analysis.
  */
 export class MemoryCrisisTagger {
-  private readonly crisisService: CrisisDetectionService;
+  private readonly anomalyDetector: AnomalyDetector;
 
-  constructor(crisisService: CrisisDetectionService) {
-    this.crisisService = crisisService;
+  constructor(anomalyDetector: AnomalyDetector) {
+    this.anomalyDetector = anomalyDetector;
   }
 
   /**
@@ -24,14 +24,14 @@ export class MemoryCrisisTagger {
     const tags: string[] = [];
 
     try {
-      // Use existing CrisisDetectionService for analysis
-      const result = await this.crisisService.detectCrisis(memory.content, {
+      // Use AnomalyDetector for analysis
+      const result = await this.anomalyDetector.detect(memory.content, {
         sensitivityLevel: 'high',
         userId,
         source: 'memory_tagger',
       });
 
-      if (result.isCrisis) {
+      if (result.isAnomaly) {
         tags.push('CRISIS_SIGNAL');
         tags.push(`CRISIS_TYPE_${result.category.toUpperCase()}`);
         tags.push(`RISK_${result.riskLevel.toUpperCase()}`);

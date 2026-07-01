@@ -32,11 +32,13 @@ def scale_adapter_weights(model: PeftModel, scale: float) -> PeftModel:
     Returns:
         PeftModel with scaled weights
     """
+    print(f"Scaling adapter weights by factor: {scale}")
 
     with torch.no_grad():
         for name, param in model.named_parameters():
             if "lora_" in name and param.requires_grad:
                 param.data.mul_(scale)
+                print(f"  Scaled: {name}")
 
     return model
 
@@ -60,13 +62,22 @@ def merge_with_custom_weight(
         torch_dtype: Data type for model
         device: Device map
     """
+    print("=" * 60)
+    print("LoRA Re-Merge with Custom Weight")
+    print("=" * 60)
+    print(f"Base model: {base_model_name}")
+    print(f"Adapter: {adapter_path}")
+    print(f"Output: {output_path}")
+    print(f"Scale factor: {scale}")
+    print("=" * 60)
 
-    output_path = Path(output_path)
-    output_path.mkdir(parents=True, exist_ok=True)
+    out_path = Path(output_path)
+    out_path.mkdir(parents=True, exist_ok=True)
 
     dtype = getattr(torch, torch_dtype)
 
     # Load base model
+    print("[1/5] Loading base model...")
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_name,
         torch_dtype=dtype,
@@ -74,11 +85,15 @@ def merge_with_custom_weight(
         trust_remote_code=True,
         low_cpu_mem_usage=True,
     )
+    print("✅ Base model loaded")
 
     # Load tokenizer
+    print("[2/5] Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=True)
+    print(f"✅ Tokenizer loaded. Vocab size: {len(tokenizer)}")
 
     # Load adapter
+    print("[3/5] Loading LoRA adapter...")
     model = PeftModel.from_pretrained(
         base_model,
         adapter_path,
@@ -87,28 +102,41 @@ def merge_with_custom_weight(
 
     # Print original scale
     adapter_config = model.peft_config["default"]
-    original_scale = adapter_config.lora_alpha / adapter_config.r
+    original_scale = getattr(adapter_config, "lora_alpha", 0) / getattr(adapter_config, "r", 1)
+    print(f"  Original lora_alpha: {getattr(adapter_config, 'lora_alpha', 0)}")
+    print(f"  Original lora_r: {getattr(adapter_config, 'r', 0)}")
+    print(f"  Original effective scale: {original_scale:.2f}x")
 
     # Scale weights if needed
     if scale != 1.0:
+        print(f"[4/5] Scaling adapter weights by {scale}...")
         model = scale_adapter_weights(model, scale)
-        original_scale * scale
+        new_effective_scale = original_scale * scale
+        print(f"  New effective scale: {new_effective_scale:.2f}x")
     else:
-        pass
+        print("[4/5] No scaling applied (scale=1.0)")
 
     # Merge and unload
-    merged_model = model.merge_and_unload(safe_merge=True)
+    print("[5/5] Merging and saving...")
+    merged_model = model.merge_and_unload(safe_merge=True)  # type: ignore
 
     merged_model.save_pretrained(
-        str(output_path),
+        str(out_path),
         safe_serialization=True,
         max_shard_size="10GB",
     )
-    tokenizer.save_pretrained(str(output_path))
+    tokenizer.save_pretrained(str(out_path))
 
-    for file in sorted(output_path.glob("*")):
+    print("\n" + "=" * 60)
+    print("MERGE COMPLETE")
+    print("=" * 60)
+    print(f"Output directory: {out_path}")
+    print("Model files:")
+    for file in sorted(out_path.glob("*")):
         if file.is_file():
-            file.stat().st_size / (1024**3)
+            size_gb = file.stat().st_size / (1024**3)
+            print(f"  - {file.name}: {size_gb:.2f} GB")
+    print("=" * 60)
 
 
 def main():

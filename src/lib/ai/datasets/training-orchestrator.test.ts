@@ -138,7 +138,7 @@ describe("FineTuningOrchestrator", () => {
           { openai: null, huggingface: null },
           { model: "gpt-4o-mini", nEpochs: 3, backend: "openai" },
         ),
-      ).rejects.toThrow("OpenAI dataset path not set");
+      ).rejects.toThrow("No dataset path available for OpenAI backend");
     });
   });
 
@@ -163,14 +163,14 @@ describe("FineTuningOrchestrator", () => {
       ).rejects.toThrow(/HuggingFace backend script not found/);
     });
 
-    test("local backend throws", async () => {
+    test("local backend returns failed job when unreachable", async () => {
       const orch = new FineTuningOrchestrator();
-      await expect(
-        orch.startFromPrepared(
-          { openai: openaiPath, huggingface: huggingfacePath },
-          { model: "local-model", nEpochs: 3, backend: "local" },
-        ),
-      ).rejects.toThrow("Local fine-tuning backend not yet implemented");
+      const job = await orch.startFromPrepared(
+        { openai: openaiPath, huggingface: huggingfacePath },
+        { model: "local-model", nEpochs: 3, backend: "local" },
+      );
+      expect(job.status).toBe("failed");
+      expect(job.error).toContain("returned 404");
     });
   });
 });

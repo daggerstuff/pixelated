@@ -14,8 +14,8 @@ class TestComparativeProgressService extends ComparativeProgressService {
   public mockUserSnapshots: ProgressSnapshot[] = []
   public mockBenchmark: Benchmark | null = null
 
-  constructor() {
-    super({ info: () => {}, error: () => {} } as any)
+  constructor(logger: any) {
+    super(logger)
   }
 
   override async fetchUserProgressData(
@@ -40,7 +40,7 @@ describe('ComparativeProgressService', () => {
       info: vi.fn(),
       error: vi.fn(),
     }
-    service = new TestComparativeProgressService()
+    service = new TestComparativeProgressService(mockLogger)
   })
 
   afterEach(() => {

@@ -29,6 +29,12 @@ vi.mock("@/lib/security", () => ({
   logSecurityEvent: vi.fn(),
 }));
 
+vi.mock("@/lib/ai/datasets/merge-datasets", () => ({
+  mergeAllDatasets: vi.fn().mockResolvedValue({ format: "jsonl", path: "/mock/path" }),
+  mergedDatasetExists: vi.fn().mockResolvedValue(false),
+  getMergedDatasetPath: vi.fn().mockReturnValue("/mock/path"),
+}));
+
 // ---------------------------------------------------------------
 // Module imports (after mocks)
 // ---------------------------------------------------------------

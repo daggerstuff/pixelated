@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import re
+import sys
 import time
 import urllib.error
 import urllib.request
@@ -93,7 +94,7 @@ def main() -> int:
 
     api_key = os.environ.get("LINEAR_API_KEY")
     if not api_key:
-        print("LINEAR_API_KEY required", file=os.sys.stderr)
+        print("LINEAR_API_KEY required", file=sys.stderr)
         return 1
     key_map: dict[str, str] = json.loads(KEY_MAP_PATH.read_text())
 
