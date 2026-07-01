@@ -54,8 +54,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-        with:
-          version: 11.7.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -90,6 +88,9 @@ jobs:
       - name: Lint code and markdown
         continue-on-error: true
         run: pnpm lint:ci:with-markdown
+
+      - name: Check for forbidden suppression tokens
+        run: pnpm lint:no-suppressions
 
       - name: Format check
         continue-on-error: true
