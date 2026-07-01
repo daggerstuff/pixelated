@@ -16,6 +16,9 @@
 
 import type { Event } from '@sentry/astro'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('config')
+
 /**
  * Resolve a Sentry release identifier in a deployment-provider-agnostic way.
  *
@@ -98,7 +101,7 @@ export function resolveSentryDsn(): string | undefined {
     process.env['NODE_ENV'] !== 'production' ||
     process.env['SENTRY_DEBUG']
   ) {
-    console.log(
+    logger.info(
       `[Sentry Config] Resolved DSN: ${dsn ? dsn.substring(0, 20) + '...' : 'MISSING'}`,
     )
   }
@@ -144,7 +147,7 @@ export const SENTRY_CONFIG = {
 
 export function beforeSend(event: Event): Event | null {
   if (import.meta.env.DEV) {
-    console.log('Sentry event:', event)
+    logger.info('Sentry event:', event)
   }
 
   // Drop events originating from a local Vite dev server (localhost / 127.0.0.1)

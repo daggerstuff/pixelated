@@ -23,7 +23,6 @@ class MockProtocol:
 def test_gate(name, fn, expected):
     result = fn()
     status = "PASS" if result == expected else "FAIL"
-    print(f"  [{status}] {name}: expected={expected}, got={result}")
     return status == "PASS"
 
 
@@ -37,7 +36,6 @@ def main():
     )
 
     # Test 1: Clean content passes all gates
-    print("\n=== Test 1: Clean content passes all gates ===")
     doc_id, report = service.gated_add_memory(
         content="I had a productive therapy session today.",
         user_id="user-1",
@@ -52,7 +50,6 @@ def main():
         failed += 1
 
     # Test 2: Crisis content blocks
-    print("\n=== Test 2: Crisis content blocks ===")
     doc_id, report = service.gated_add_memory(
         content="I want to kill myself right now.",
         user_id="user-1",
@@ -67,7 +64,6 @@ def main():
         failed += 1
 
     # Test 3: PII content with SSN blocks
-    print("\n=== Test 3: PII content with SSN blocks ===")
     doc_id, report = service.gated_add_memory(
         content="My SSN is 123-45-6789 and I need help.",
         user_id="user-1",
@@ -78,7 +74,6 @@ def main():
         failed += 1
 
     # Test 4: Consent gate blocks when revoked
-    print("\n=== Test 4: Consent gate blocks when revoked ===")
     service.consent_gate.grant_consent("user-no-consent", "open")
     service.consent_gate.revoke_consent("user-no-consent")
     doc_id, report = service.gated_add_memory(
@@ -91,7 +86,6 @@ def main():
         failed += 1
 
     # Test 5: GatingReport serializes
-    print("\n=== Test 5: GatingReport serializes ===")
     report_dict = report.to_dict()
     if test_gate("Report has source_id", "source_id" in report_dict, True):
         passed += 1
@@ -103,7 +97,6 @@ def main():
         failed += 1
 
     # Test 6: PII redaction scrubs content
-    print("\n=== Test 6: PII redaction scrubs content ===")
     result = service.pii_redactor.redact("Contact me at test@example.com please.")
     if test_gate("Email redacted", "[EMAIL]" in result.scrubbed_text, True):
         passed += 1
@@ -115,7 +108,6 @@ def main():
         failed += 1
 
     # Test 7: Crisis detector tiers
-    print("\n=== Test 7: Crisis detector tiers ===")
     crisis_none = service.crisis_detector.detect("Everything is fine.")
     if test_gate("No crisis tier", crisis_none.tier.value, "none"):
         passed += 1
@@ -129,7 +121,6 @@ def main():
         failed += 1
 
     # Test 8: Trauma filter detects lexicon
-    print("\n=== Test 8: Trauma filter detects lexicon ===")
     trauma_result = service.trauma_filter.filter("I was abused and felt helpless.")
     if test_gate("Trauma indicators found", len(trauma_result.indicators) > 0, True):
         passed += 1
@@ -137,7 +128,6 @@ def main():
         failed += 1
 
     # Test 9: evaluate_gates returns full report
-    print("\n=== Test 9: evaluate_gates returns full report ===")
     report = service.evaluate_gates(content="I feel anxious about work.", user_id="user-1")
     if test_gate("Report is GatingReport", isinstance(report, GatingReport), True):
         passed += 1
@@ -161,19 +151,16 @@ def main():
         failed += 1
 
     # Test 10: Negation suppression in crisis detector
-    print("\n=== Test 10: Negation suppression in crisis detector ===")
     negated = service.crisis_detector.detect("I would never hurt myself.")
     if test_gate("Negated crisis suppressed", negated.tier.value, "none"):
         passed += 1
     else:
         failed += 1
 
-    print(f"\n{'=' * 50}")
-    print(f"Manual QA Results: {passed} passed, {failed} failed out of {passed + failed} tests")
     if failed == 0:
-        print("ALL TESTS PASSED - Gating pipeline is functional.")
+        pass
     else:
-        print("SOME TESTS FAILED - Review above output.")
+        pass
     return failed == 0
 
 

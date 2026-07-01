@@ -31,8 +31,8 @@ if [ ! -f ".env" ]; then
 fi
 
 # 3. Configure pnpm and Install Node dependencies
-echo "🟢 Configuring pnpm..."
-npm install -g pnpm@11.5.2
+  echo "🟢 Configuring pnpm..."
+  npm install -g pnpm@11.9.0
 chmod +x scripts/devops/pnpm-install-with-fallback.sh
 scripts/devops/pnpm-install-with-fallback.sh
 bash scripts/devops/install-git-hooks.sh

@@ -1,5 +1,8 @@
 import postgres from 'postgres'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('add_ai_performance_metrics')
+
 // Initialize client
 const sql = postgres(process.env['DATABASE_URL'] ?? '')
 
@@ -28,7 +31,7 @@ export async function up() {
     CREATE INDEX IF NOT EXISTS idx_ai_perf_success ON ai_performance_metrics(success);
   `)
 
-  console.log('Created ai_performance_metrics table')
+  logger.info('Created ai_performance_metrics table')
 }
 
 export async function down() {
@@ -36,5 +39,5 @@ export async function down() {
     DROP TABLE IF EXISTS ai_performance_metrics;
   `)
 
-  console.log('Dropped ai_performance_metrics table')
+  logger.info('Dropped ai_performance_metrics table')
 }

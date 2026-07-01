@@ -51,27 +51,29 @@ async function loadNodeModules() {
     nodeModulesLoaded = true
   } catch {
     // Modules not available, will use fallbacks
-    console.warn('Node.js modules not available, using fallbacks')
+    logger.warn('Node.js modules not available, using fallbacks')
   }
 }
 
 // Helper to synchronously require Node modules in Node-only environments without
 // triggering static bundlers or TypeScript/ESLint `no-require-imports` errors.
-function tryRequireNode(moduleName: string): any | null {
+function tryRequireNode(moduleName: string): any {
   try {
     if (!isBrowser && typeof process !== 'undefined') {
       // Use eval to avoid bundlers rewriting/including the require call.
-      const globalRequire = (globalThis as any).require
+      const globalRequire = (globalThis as Record<string, unknown>)[
+        'require'
+      ] as (name: string) => unknown
       if (typeof globalRequire === 'function') {
         return globalRequire(moduleName)
       }
 
       // Try to access via global scope
-      const module = (globalThis as any)[moduleName]
-      if (module) return module
+      const mod = (globalThis as Record<string, unknown>)[moduleName]
+      if (mod) return mod
     }
   } catch (e) {
-    console.debug(`Failed to require ${moduleName}:`, e)
+    logger.debug(`Failed to require ${moduleName}:`, e)
     // return null to trigger fallback logic
   }
   return null
@@ -96,7 +98,9 @@ function generateUUID(): string {
     try {
       if (!isBrowser) {
         // Use guarded require helper to avoid bundler inclusion
-        const nodeCrypto = tryRequireNode('crypto')
+        const nodeCrypto = tryRequireNode('crypto') as {
+          randomBytes: (size: number) => Uint8Array
+        } | null
         if (nodeCrypto) {
           r = nodeCrypto.randomBytes(1)[0] & 0xf
         } else {
@@ -700,7 +704,7 @@ export class RecoveryTestingManager {
             step: step.id,
             passed: false,
             details: {
-              error: `Unsupported verification method: ${step.type}`,
+              error: `Unsupported verification method: ${step.type as string}`,
             },
           })
           break
@@ -1008,7 +1012,9 @@ class SandboxTestEnvironment implements TestEnvironment {
         return {
           step: step.id,
           passed: false,
-          details: { error: `Unsupported verification method: ${step.type}` },
+          details: {
+            error: `Unsupported verification method: ${step.type as string}`,
+          },
         }
     }
   }

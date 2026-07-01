@@ -1,4 +1,6 @@
 import type { DimensionalEmotion } from '../ai/emotions/dimensionalTypes'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('emotionsRepository')
 
 // Interface for dimensional emotion query parameters
 export interface DimensionalEmotionsQuery {
@@ -21,7 +23,7 @@ class EmotionsRepositoryImpl implements EmotionsRepository {
     query: DimensionalEmotionsQuery,
   ): Promise<DimensionalEmotion[]> {
     // Implement actual database query here
-    console.log(`Querying emotions for client: ${query.clientId}`)
+    logger.info(`Querying emotions for client: ${query.clientId}`)
     // This is a placeholder implementation
     return []
   }

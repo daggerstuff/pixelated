@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger('search') /**
  * This module provides a unified search interface for both server and client environments.
  * It uses dynamic imports to prevent SSR issues with browser-only dependencies.
  */
@@ -240,7 +241,7 @@ if (typeof window !== 'undefined') {
       // Update the instance
       searchClientInstance = realClient
     } catch (error: unknown) {
-      console.error('Failed to load search implementation:', error)
+      logger.error('Failed to load search implementation:', error)
     }
   })()
 

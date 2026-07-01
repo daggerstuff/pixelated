@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { MonitoringService } from './service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('hooks')
 
 // Extend Window type to include faro
 declare global {
@@ -23,7 +25,7 @@ export function useMonitoring() {
   useEffect(() => {
     const monitoringService = MonitoringService.getInstance()
     monitoringService.initialize().catch((error) => {
-      console.error('Failed to initialize monitoring service:', error)
+      logger.error('Failed to initialize monitoring service:', error)
     })
   }, [])
 
@@ -143,7 +145,7 @@ export function useRUMData() {
 
       setLastUpdated(new Date())
     } catch (error: unknown) {
-      console.error('Failed to fetch RUM data:', error)
+      logger.error('Failed to fetch RUM data:', error)
     } finally {
       setIsLoading(false)
     }

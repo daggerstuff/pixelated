@@ -6,6 +6,8 @@
  */
 
 import type { RedisClientType } from 'redis'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('metrics-utils')
 
 export interface MetricData {
   name: string
@@ -155,7 +157,7 @@ export async function detectMetricAnomalies(
       }))
       .filter((result) => result.isAnomaly)
   } catch (error: unknown) {
-    console.error('Error detecting anomalies:', error)
+    logger.error('Error detecting anomalies:', error)
 
     // Fallback to simple statistical method
     return detectAnomaliesStatistical(metrics)
@@ -216,7 +218,7 @@ export async function getPerformanceMetrics(
       },
     }
   } catch (error: unknown) {
-    console.error('Error getting performance metrics:', error)
+    logger.error('Error getting performance metrics:', error)
 
     // Return default metrics
     return {
@@ -266,7 +268,7 @@ export async function storePerformanceMetrics(
 
     await pipeline.exec()
   } catch (error: unknown) {
-    console.error('Error storing performance metrics:', error)
+    logger.error('Error storing performance metrics:', error)
   }
 }
 

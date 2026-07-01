@@ -104,8 +104,6 @@ def main() -> None:
         json.dump(payload, handle, indent=2)
         handle.write("\n")
 
-    print(f"Wrote {len(issues)} issues to {args.out}")
-
 
 if __name__ == "__main__":
     main()

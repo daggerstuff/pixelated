@@ -8,6 +8,8 @@
 // The full implementation exists in src/lib/auth/phase6-integration.ts but needs to be migrated
 
 import { secureRandomUUID } from '../crypto/secure-random'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('phase6-integration')
 
 export type AuthenticationEvent =
   | 'user_created'
@@ -91,7 +93,7 @@ export async function updatePhase6AuthenticationProgress(
     const eventId = secureRandomUUID()
 
     // Log the event for debugging (now includes secure eventId)
-    console.debug('[Phase6] Authentication progress:', {
+    logger.debug('[Phase6] Authentication progress:', {
       eventId,
       userId,
       event,
@@ -108,6 +110,6 @@ export async function updatePhase6AuthenticationProgress(
     return Promise.resolve()
   } catch (error: unknown) {
     // Don't throw errors - Phase 6 integration is optional
-    console.warn('[Phase6] Failed to update authentication progress:', error)
+    logger.warn('[Phase6] Failed to update authentication progress:', error)
   }
 }
