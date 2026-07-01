@@ -8,7 +8,7 @@ vi.mock('@/config/mongodb.config', () => {
   return {
     mongodb: {
       connect: vi.fn(async () => ({
-        collection: <T>() => ({
+        collection: () => ({
           createIndexes: vi.fn(),
           findOne: vi.fn(async (filter: { sessionId: string }) => {
             const doc = store.get(filter.sessionId)
@@ -23,7 +23,10 @@ vi.mock('@/config/mongodb.config', () => {
               },
               _opts: { upsert: boolean },
             ) => {
-              store.set(filter.sessionId, update.$set)
+              store.set(
+                filter.sessionId,
+                update.$set,
+              )
               return { upsertedCount: 1 }
             },
           ),

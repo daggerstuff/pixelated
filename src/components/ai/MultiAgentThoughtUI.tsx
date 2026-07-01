@@ -149,7 +149,7 @@ export const MultiAgentThoughtUI: React.FC<MultiAgentThoughtUIProps> = ({
       </div>
 
       <div className="space-y-4 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-white/10">
-        {activities.map((activity, index) => (
+        {activities.map((activity, _index) => (
           <div key={activity.id} className="relative pl-8 group">
             {/* Timeline dot */}
             <div className={cn(

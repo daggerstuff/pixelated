@@ -20,7 +20,7 @@ const logger = createBuildSafeLogger('mental-llama-client')
 export interface ClientMentalLLaMAAdapter {
   analyzeMentalHealth(
     content: string,
-    route: string,
+    _route: string,
     context: RoutingContext,
   ): Promise<MentalHealthAnalysisResult>
 }
@@ -31,7 +31,7 @@ export interface ClientMentalLLaMAAdapter {
 class ApiMentalLLaMAAdapter implements ClientMentalLLaMAAdapter {
   async analyzeMentalHealth(
     content: string,
-    route: string,
+    _route: string,
     context: RoutingContext,
   ): Promise<MentalHealthAnalysisResult> {
     try {

@@ -611,7 +611,7 @@ export class PatternDiscoveryService {
     const usedIndices = new Set<number>()
 
     for (let i = 0; i < k; i++) {
-      let index
+      let index: number
       do {
         index = Math.floor(Math.random() * vectors.length)
       } while (usedIndices.has(index))

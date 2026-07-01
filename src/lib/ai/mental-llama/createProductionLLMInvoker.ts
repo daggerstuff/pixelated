@@ -285,7 +285,7 @@ export async function createProductionLLMInvoker(
     options?: LLMInvocationOptions,
   ): Promise<LLMResponse> {
     const startTime = Date.now()
-    const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
     logger.debug('Production LLM invocation started', {
       requestId,
