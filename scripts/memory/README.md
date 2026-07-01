@@ -48,10 +48,14 @@ After installing foresight-mcp package:
 
 ## Tools
 
-- `store_memory` - Store memory
-- `query_memories` - Search memories
-- `list_memories` - List memories
-- `get_memory` - Get specific memory
-- `update_memory` - Update memory
-- `delete_memory` - Delete memory
-- `memory_status` - System status
+- `manage_memories` - Store, update, delete, or archive memories
+- `search_memories` - Search or retrieve memories
+- `manage_context_blocks` - Manage continuity blocks
+- `process_session_transcript` - Extract memories from a transcript
+- `manage_curation_runs` - Manage reviewable curation runs
+- `inject_context` - Inject relevant context
+- `query_memories_temporal` - Query memory trends by time window
+- `get_system_status` - System status
+
+Use the nested `foresight-mcp` CLI or Python API for expert and maintenance
+workflows that are not exposed through MCP.

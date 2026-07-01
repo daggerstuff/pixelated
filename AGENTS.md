@@ -84,13 +84,17 @@ Foresight is persistent brain for AI agents. Without it, each session starts fre
 ### Task Start Workflow (Mandatory)
 Before substantial work:
 1. `manage_context_blocks` → get `project_context` + `pending_items`
-2. `query_memories` w/ keywords related to your task
+2. `search_memories` w/ keywords related to your task
 3. Use findings to inform your approach
-4. Store lessons, mark completed items, update guidance
+4. Use `manage_memories` to store lessons or update durable memory when needed
 
 ### Key Tools
-- Context: `manage_context_blocks` / `get_context_whisper` / `get_context_snapshot`
-- Memory: `store_memory` / `query_memories` / `list_memories` | Curation: `manage_curation_runs`
+- MCP surface: `manage_memories`, `search_memories`, `manage_context_blocks`,
+  `process_session_transcript`, `manage_curation_runs`, `inject_context`,
+  `query_memories_temporal`, `get_system_status`
+- Expert/maintenance workflows: use the nested `foresight-mcp` CLI or Python
+  API; direct aliases such as `store_memory`, `query_memories`, and
+  `list_memories` are not exposed as MCP tools
 
 **Full reference**: `.agents/skills/foresight/SKILL.md` | **Fallback**: `.cursor/memory/scripts/bootstrap-memory-session.sh`
 

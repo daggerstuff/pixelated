@@ -164,22 +164,24 @@ For active work and cross-session context, use **Foresight MCP**.
 - Config: `scripts/memory/mcp-config.json`
 - Core tools:
   - `manage_memories`
-  - `search_memories` / `query_memories`
-  - `manage_subconscious`
+  - `search_memories`
+  - `manage_context_blocks`
   - `process_session_transcript`
+  - `manage_curation_runs`
   - `inject_context`
   - `query_memories_temporal`
-  - `manage_entities` `query_entities`
-  - `analyze_memories`
   - `get_system_status`
+
+Expert and maintenance workflows belong in the nested `foresight-mcp` CLI or
+Python API, not the MCP tool surface.
 
 Orientation flow:
 
-1. `manage_subconscious` (`action: list`)
-2. `manage_subconscious` (`action: get`label `pending_items`)
-3. `manage_subconscious` (`action: get`label `project_context`)
-4. `query_memories` for active and upcoming work signals
-5. `manage_entities` (`action: extract`) when semantic context is useful
+1. `manage_context_blocks` (`action: list`)
+2. `manage_context_blocks` (`action: get`, label `pending_items`)
+3. `manage_context_blocks` (`action: get`, label `project_context`)
+4. `search_memories` for active and upcoming work signals
+5. `manage_memories` only when memory writes or lifecycle updates are needed
 
 ## 7) `.agent/internal` references
 
