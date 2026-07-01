@@ -1,33 +1,44 @@
 /* @vitest-environment node */
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 
 import { HuggingFaceTrainingBackend } from "../backends/HuggingFaceTrainingBackend";
 import { LocalTrainingBackend } from "../backends/LocalBackend";
 
 describe("LocalTrainingBackend", () => {
-  test("submitJob throws descriptive error for not-yet-implemented", async () => {
+  beforeEach(() => {
+    vi.stubGlobal('fetch', vi.fn())
+  })
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  test("submitJob returns failed status when server is unreachable", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"))
     const backend = new LocalTrainingBackend();
-    await expect(
-      backend.submitJob("/tmp/no.jsonl", {
-        model: "any",
-        nEpochs: 1,
-        backend: "local",
-      }),
-    ).rejects.toThrow("Local fine-tuning backend not yet implemented");
+    const result = await backend.submitJob("/tmp/no.jsonl", {
+      model: "any",
+      nEpochs: 1,
+      backend: "local",
+    });
+    expect(result.status).toBe("failed");
+    expect(result.error).toContain("Connection refused");
   });
 
-  test("getJobStatus returns null", async () => {
+  test("getJobStatus returns null on network error", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"))
     const backend = new LocalTrainingBackend();
     expect(await backend.getJobStatus("x")).toBeNull();
   });
 
-  test("cancelJob returns null", async () => {
+  test("cancelJob returns null on network error", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"))
     const backend = new LocalTrainingBackend();
     expect(await backend.cancelJob("x")).toBeNull();
   });
 
-  test("listModels returns the local-gguf-base entry", async () => {
-    const backend = new LocalTrainingBackend();
+  test("listModels falls back to default model when server is unreachable", async () => {
+    vi.mocked(fetch).mockRejectedValueOnce(new Error("Connection refused"))
+    const backend = new LocalTrainingBackend({ model: "local-gguf-base" });
     const models = await backend.listModels();
     expect(models).toEqual([
       { id: "local-gguf-base", ownedBy: "local", fineTunable: true },

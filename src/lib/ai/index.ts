@@ -143,11 +143,13 @@ export function createMockAIService(): AIService {
 let aiServiceInstance: AIService | null = null
 
 function shouldUseMockByDefault(): boolean {
-  // Tests run under NODE_ENV=test; the explicit flag wins for ad-hoc dev.
-  return (
-    process.env['PIX_AI_USE_MOCK'] === '1' ||
-    process.env['NODE_ENV'] === 'test'
-  )
+  if (process.env['PRODUCTION_AI_SERVICE'] === 'true') {
+    return false;
+  }
+  if (process.env['PIX_AI_USE_MOCK'] === '1') {
+    return true;
+  }
+  return process.env['NODE_ENV'] === 'test' || process.env['VITEST'] === 'true'
 }
 
 /**

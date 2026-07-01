@@ -11,7 +11,7 @@ from pathlib import Path
 # Add ai submodule to path
 sys.path.append(str(Path(__file__).parents[2]))
 
-from ai.utils.s3_dataset_loader import load_dataset_from_s3
+from utils.s3_dataset_loader import load_dataset_from_s3
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("s3_loader_test")
@@ -20,7 +20,7 @@ logger = logging.getLogger("s3_loader_test")
 def attempt_load(name, stage=None, category=None):
     logger.info(f"Testing load: {name} (Stage: {stage})")
     try:
-        data = load_dataset_from_s3(name, stage=stage, category=category)
+        data = load_dataset_from_s3(name)
         if isinstance(data, dict):
             keys = list(data.keys())
             logger.info(f"  [OK] Loaded dict with keys: {keys[:3]}...")

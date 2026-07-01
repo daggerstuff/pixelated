@@ -881,11 +881,12 @@ def jira_create_payload(
         "summary": action.title,
         "description": jira_adf_document(action.body),
     }
-    priority_label = action.priority_label
+    priority_label = getattr(action, "priority_label", None)
     if priority_label and priority_label in PRIORITY_TO_JIRA:
         fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
-    if action.labels:
-        fields["labels"] = list(action.labels)
+    labels = getattr(action, "labels", None)
+    if labels:
+        fields["labels"] = list(labels)
     return {"fields": fields}
 
 
@@ -894,11 +895,12 @@ def jira_update_payload(action: Any) -> dict[str, Any]:
         "summary": action.title,
         "description": jira_adf_document(action.body),
     }
-    priority_label = action.priority_label
+    priority_label = getattr(action, "priority_label", None)
     if priority_label and priority_label in PRIORITY_TO_JIRA:
         fields["priority"] = {"name": PRIORITY_TO_JIRA[priority_label]}
-    if action.labels:
-        fields["labels"] = list(action.labels)
+    labels = getattr(action, "labels", None)
+    if labels:
+        fields["labels"] = list(labels)
     return {"fields": fields}
 
 

@@ -51,10 +51,10 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Reprioritizer Service", version="0.1.0")
 
     # Install authentication middleware – it will populate request.state.authenticated_user
-    app.add_middleware(FastAPIAuthenticationMiddleware, auth_system=_auth_system)
+    app.add_middleware(FastAPIAuthenticationMiddleware, auth_system=_auth_system)  # type: ignore
 
     # Dependency helper instance (not strictly required for the endpoint but kept for parity)
-    auth_deps = AuthenticationDependencies(_auth_system)
+    auth_deps = AuthenticationDependencies(_auth_system)  # type: ignore
 
     @app.post("/api/prioritization/adjust")
     async def adjust_prioritization(request: Request, user: Any = Depends(auth_deps.get_current_user)):

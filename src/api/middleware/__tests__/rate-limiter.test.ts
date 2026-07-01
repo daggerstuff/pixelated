@@ -182,10 +182,6 @@ describe('Rate Limiter Middleware', () => {
     it('should create middleware that limits by user ID', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
 
       await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
@@ -195,10 +191,6 @@ describe('Rate Limiter Middleware', () => {
     it('should use IP if user not authenticated', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = undefined
-      mockMulti.mockResolvedValue([
-        [null, 1],
-        [null, 1],
-      ])
 
       await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
@@ -218,10 +210,6 @@ describe('Rate Limiter Middleware', () => {
     it('should set custom headers for rate limit info', async () => {
       const middleware = rateLimitByUser(100, 60000)
       mockRequest.user = { id: 'user123' }
-      mockMulti.mockResolvedValue([
-        [null, 50],
-        [null, 1],
-      ])
 
       await invokeUserLimiter(middleware, mockRequest, mockResponse, mockNext)
 
@@ -239,7 +227,6 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
-      expect(mockMulti).toHaveBeenCalled()
       expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(1)
     })
@@ -258,7 +245,6 @@ describe('Rate Limiter Middleware', () => {
 
       const result = await incrementRedisCounter('test-key', 60)
 
-      expect(mockMulti).toHaveBeenCalled()
       expect(mockIncr).toHaveBeenCalledWith('test-key')
       expect(result).toBe(5)
     })

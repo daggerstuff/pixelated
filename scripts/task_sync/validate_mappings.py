@@ -433,7 +433,7 @@ def main() -> int:
             project_filter = args[i + 1]
 
     if not args or args[0] in ("--help", "-h"):
-        print_out(__doc__)
+        print_out(__doc__ or "")
         return 0
 
     if args[0] == "fetch":
@@ -442,7 +442,7 @@ def main() -> int:
     if args[0] == "check":
         return cmd_check(verbose=verbose, project_filter=project_filter)
     print_out(f"Unknown command: {args[0]}", file=sys.stderr)
-    print_out(__doc__)
+    print_out(__doc__ or "")
     return 1
 
 

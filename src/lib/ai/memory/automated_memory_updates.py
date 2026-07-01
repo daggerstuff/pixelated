@@ -609,8 +609,8 @@ class AutomatedMemoryUpdater:
 
         self.file_handler = FileChangeHandler(self._handle_memory_event)
         self.file_observer = Observer()
-        self.file_observer.schedule(self.file_handler, path=str(Path.cwd() / "src"), recursive=True)
-        self.file_observer.start()
+        self.file_observer.schedule(self.file_handler, path=str(Path.cwd() / "src"), recursive=True)  # type: ignore
+        self.file_observer.start()  # type: ignore
 
         logger.info("File monitoring started")
 
@@ -659,7 +659,7 @@ class AutomatedMemoryUpdater:
         loop = asyncio.get_running_loop()
         while not self._worker_stop_event.is_set():
             try:
-                event = await loop.run_in_executor(None, self._event_queue.get, 1.0)
+                event = await loop.run_in_executor(None, self._event_queue.get, True, 1.0)  # type: ignore
                 if event is None:  # Exit signal
                     break
 
@@ -1066,7 +1066,9 @@ async def get_memory_updater() -> AutomatedMemoryUpdater:
     """Get global memory updater instance"""
     if memory_updater is None:
         await initialize_memory_updater()
-    return memory_updater
+    from typing import cast
+
+    return cast(AutomatedMemoryUpdater, memory_updater)
 
 
 # API endpoints for memory updates

@@ -97,7 +97,7 @@ class SessionCache:
         if not self.access_times:
             return
 
-        oldest_key = min(self.access_times, key=self.access_times.get)
+        oldest_key = min(self.access_times, key=lambda k: self.access_times[k])
         del self.cache[oldest_key]
         del self.access_times[oldest_key]
 
@@ -265,7 +265,7 @@ class ParallelProcessor:
         processing_time = time.time() - start_time
 
         # Track metrics
-        service_metrics.parallel_efficiency(
+        service_metrics.parallel_efficiency(  # type: ignore
             len(valid_results),
             processing_time,
             "process" if use_processes else "thread",
@@ -532,7 +532,9 @@ class PerformanceOptimizedBiasDetector:
             total_time = time.time() - start_time
 
             # Final metrics
-            self.performance_metrics.parallel_efficiency = processed_count / total_time
+            self.performance_metrics.parallel_efficiency = (lambda x, y: x / y if y > 0 else 0)(
+                processed_count, total_time
+            )  # type: ignore
 
             logger.info(
                 f"Large dataset processing completed: {processed_count}/{total_sessions} sessions in {total_time:.2f}s"
@@ -614,7 +616,9 @@ async def get_performance_optimizer() -> PerformanceOptimizedBiasDetector:
     """Get global performance optimizer instance"""
     if performance_optimizer is None:
         await initialize_performance_optimizer()
-    return performance_optimizer
+    from typing import cast
+
+    return cast(PerformanceOptimizedBiasDetector, performance_optimizer)
 
 
 # API endpoints for performance optimization

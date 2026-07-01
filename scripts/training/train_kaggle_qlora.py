@@ -73,6 +73,8 @@ CONFIG = {
 def load_model_and_tokenizer():
     """Load model with 4-bit quantization for QLoRA"""
 
+    print(f"Loading base model: {CONFIG['base_model']}")
+
     # BitsAndBytes config for 4-bit
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -115,23 +117,26 @@ def load_model_and_tokenizer():
 def load_training_data(data_path: str):
     """Load and prepare training data with validation"""
 
+    print(f"Loading training data from: {data_path}")
+
     all_data = []
-    data_path = Path(data_path)
+    data_p = Path(data_path)
 
     # Validate path exists
-    if not data_path.exists():
-        raise FileNotFoundError(f"Data path does not exist: {data_path}")
+    if not data_p.exists():
+        raise FileNotFoundError(f"Data path does not exist: {data_p}")
 
     # Handle directory with multiple jsonl files
-    if data_path.is_dir():
-        jsonl_files = list(data_path.glob("*.jsonl"))
+    if data_p.is_dir():
+        jsonl_files = list(data_p.glob("*.jsonl"))
         if not jsonl_files:
-            raise ValueError(f"No .jsonl files found in {data_path}")
+            raise ValueError(f"No .jsonl files found in {data_p}")
+        print(f"Found {len(jsonl_files)} JSONL files")
     else:
         # Single file
-        if not data_path.suffix == ".jsonl":
-            raise ValueError(f"Expected .jsonl file, got {data_path.suffix}")
-        jsonl_files = [data_path]
+        if not data_p.suffix == ".jsonl":
+            raise ValueError(f"Expected .jsonl file, got {data_p.suffix}")
+        jsonl_files = [data_p]
 
     # Load data from files
     total_lines = 0
@@ -139,23 +144,25 @@ def load_training_data(data_path: str):
     for jsonl_file in jsonl_files:
         try:
             with open(jsonl_file) as f:
-                for _line_num, line in enumerate(f, 1):
+                for line_num, line in enumerate(f, 1):
                     if not line.strip():
                         continue
                     try:
                         data = json.loads(line)
                         all_data.append(data)
                         total_lines += 1
-                    except json.JSONDecodeError:
+                    except json.JSONDecodeError as e:
                         errors += 1
                         if errors <= 5:  # Show first 5 errors only
-                            pass
-        except Exception:
+                            print(f"  ⚠️  Line {line_num} in {jsonl_file.name}: {e}")
+        except Exception as e:
+            print(f"  ❌ Error reading {jsonl_file}: {e}")
             raise
 
     if errors > 5:
-        pass
+        print(f"  ... and {errors - 5} more JSON parsing errors")
 
+    print(f"✅ Loaded {total_lines} training samples (from {len(jsonl_files)} files)")
     if not all_data:
         raise ValueError("No valid training data loaded")
 
@@ -168,6 +175,7 @@ def tokenize_data(examples, tokenizer, max_length=2048):
     texts = []
     for item in examples:
         if not isinstance(item, dict):
+            print(f"⚠️  Skipping non-dict item: {type(item)}")
             continue
 
         text = None
@@ -228,16 +236,28 @@ def tokenize_data(examples, tokenizer, max_length=2048):
 def main():
     """Main training function"""
 
+    print("=" * 60)
+    print("PIXELATED V2 - QLORA ANTI-REPETITION TRAINING")
+    print("=" * 60)
+    print(f"Base model: {CONFIG['base_model']}")
+    print(f"LoRA r={CONFIG['lora']['r']}, alpha={CONFIG['lora']['lora_alpha']}")
+    print(f"Learning rate: {CONFIG['training']['learning_rate']}")
+    print(f"Weight decay: {CONFIG['training']['weight_decay']}")
+    print("=" * 60)
+
     try:
         # Load model
+        print("[1/5] Loading model and tokenizer...")
         model, tokenizer = load_model_and_tokenizer()
 
         # Load data with error handling
+        print("[2/5] Loading training data...")
         raw_data = load_training_data(CONFIG["data_path"])
         if not raw_data:
             raise ValueError("No training data loaded successfully")
 
         # Create dataset
+        print(f"[3/5] Preparing dataset ({len(raw_data)} samples)...")
         dataset = Dataset.from_list(raw_data)
 
         # Tokenize
@@ -252,6 +272,7 @@ def main():
 
         # Split for validation
         if len(tokenized_dataset) < 2:
+            print("⚠️  Dataset too small for proper train/eval split, using single split")
             train_dataset = tokenized_dataset
             eval_dataset = tokenized_dataset
         else:
@@ -259,7 +280,10 @@ def main():
             train_dataset = split_dataset["train"]
             eval_dataset = split_dataset["test"]
 
+        print(f"✅ Train: {len(train_dataset)}, Eval: {len(eval_dataset)}")
+
         # Training arguments
+        print("[4/5] Setting up training...")
         training_args = TrainingArguments(
             output_dir=CONFIG["output_dir"],
             num_train_epochs=CONFIG["training"]["num_train_epochs"],
@@ -295,9 +319,11 @@ def main():
         )
 
         # Train
-        trainer.train()
+        print("[5/5] Starting training...")
+        train_result = trainer.train()
 
         # Save LoRA adapter (not full model)
+        print("[Final] Saving LoRA adapter...")
         output_dir = Path(CONFIG["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -308,9 +334,23 @@ def main():
         with open(output_dir / "training_config_used.json", "w") as f:
             json.dump(CONFIG, f, indent=2)
 
-        # Print next steps
+        print(f"{'=' * 60}")
+        print("TRAINING COMPLETE")
+        print(f"{'=' * 60}")
+        print(f"Final loss: {train_result.training_loss}")
+        print(f"Adapter saved to: {output_dir}")
 
-    except Exception:
+        # Print next steps
+        print(f"{'=' * 60}")
+        print("NEXT STEPS")
+        print(f"{'=' * 60}")
+        print("1. Download the adapter from:", output_dir)
+        print("2. Merge with base model using scripts/training/merge_lora.py")
+        print("3. Run evaluation with modal run ai/deployment/modal_app.py")
+        print("4. Verify repetition rate < 5%")
+
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
         import traceback
 
         traceback.print_exc()

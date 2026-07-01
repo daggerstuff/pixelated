@@ -156,11 +156,11 @@ class TestTherapeuticRAGPipeline:
     @pytest.fixture
     def mock_config(self):
         """Create mock configuration."""
-        from ai.rag.nemotron_rag import NemotronRAGConfig
+        from ai.rag.nemotron_rag import IndexType, NemotronRAGConfig
 
         return NemotronRAGConfig(
             api_key="test-key",
-            index_type="flat",  # Use flat for simpler testing
+            index_type=IndexType.FLAT,  # Use flat for simpler testing
         )
 
     @pytest.fixture
@@ -286,9 +286,9 @@ class TestQueryComplexity:
     @pytest.fixture
     def mock_config(self):
         """Create mock config for testing."""
-        from ai.rag.nemotron_rag import NemotronRAGConfig
+        from ai.rag.nemotron_rag import IndexType, NemotronRAGConfig
 
-        return NemotronRAGConfig(api_key="test-key", index_type="flat")
+        return NemotronRAGConfig(api_key="test-key", index_type=IndexType.FLAT)
 
     def test_simple_query_classification(self, mock_config):
         """Test simple query detection."""
@@ -472,9 +472,9 @@ class TestSystemPrompt:
     @pytest.fixture
     def mock_config(self):
         """Create mock config for testing."""
-        from ai.rag.nemotron_rag import NemotronRAGConfig
+        from ai.rag.nemotron_rag import IndexType, NemotronRAGConfig
 
-        return NemotronRAGConfig(api_key="test-key", index_type="flat")
+        return NemotronRAGConfig(api_key="test-key", index_type=IndexType.FLAT)
 
     def test_rag_system_prompt(self, mock_config):
         """Test RAG system prompt content."""
@@ -499,9 +499,9 @@ class TestRAGPipelineIntegration:
     @pytest.fixture
     def live_config(self):
         """Create config with live API key."""
-        from ai.rag.nemotron_rag import NemotronRAGConfig
+        from ai.rag.nemotron_rag import IndexType, NemotronRAGConfig
 
-        return NemotronRAGConfig(api_key=os.environ.get("NVIDIA_API_KEY"), index_type="flat")
+        return NemotronRAGConfig(api_key=os.environ.get("NVIDIA_API_KEY", ""), index_type=IndexType.FLAT)
 
     @pytest.mark.asyncio
     async def test_live_ingestion_and_retrieval(self, live_config):

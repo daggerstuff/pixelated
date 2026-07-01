@@ -412,7 +412,9 @@ def main():
     issues = export_linear_issues()
     logging.info("Loaded %d issues from Linear.", len(issues))
 
-    issue_key_to_uuid = {i.get("identifier"): i.get("id") for i in issues if i.get("identifier") and i.get("id")}
+    issue_key_to_uuid: dict[str, str] = {
+        str(i.get("identifier")): str(i.get("id")) for i in issues if i.get("identifier") and i.get("id")
+    }
 
     updates_count = 0
     for issue in sorted(issues, key=lambda x: x.get("identifier", "")):

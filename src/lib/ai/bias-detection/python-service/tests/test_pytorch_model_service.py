@@ -101,11 +101,11 @@ def test_save_model_persists_state_dict_checkpoint(tmp_path: Path) -> None:
     require_true((tmp_path / "model.pt").exists())
     require_true(not (tmp_path / "model.pt.tmp").exists())
     require_equal(
-        fake_torch.saved_checkpoint["format"],
+        fake_torch.saved_checkpoint["format"],  # type: ignore
         PYTORCH_CHECKPOINT_FORMAT,
     )
     require_equal(
-        fake_torch.saved_checkpoint["state_dict"],
+        fake_torch.saved_checkpoint["state_dict"],  # type: ignore
         model.state_dict(),
     )
     require_is_not(fake_torch.saved_checkpoint, model)
@@ -116,7 +116,7 @@ def test_load_saved_model_restores_state_dict_checkpoint(tmp_path: Path) -> None
     fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": state_dict}])
     service = create_service(fake_torch, tmp_path)
     model = FakeModel()
-    service._create_basic_model = basic_model_factory(model)
+    service._create_basic_model = basic_model_factory(model)  # type: ignore
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
@@ -129,7 +129,7 @@ def test_load_saved_model_regenerates_invalid_safe_checkpoint(tmp_path: Path) ->
     fake_torch = FakeTorch([{"format": PYTORCH_CHECKPOINT_FORMAT, "state_dict": {"bad": "state"}}])
     service = create_service(fake_torch, tmp_path)
     model = RejectingModel()
-    service._create_basic_model = basic_model_factory(model)
+    service._create_basic_model = basic_model_factory(model)  # type: ignore
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
@@ -137,7 +137,7 @@ def test_load_saved_model_regenerates_invalid_safe_checkpoint(tmp_path: Path) ->
     require_equal(len(fake_torch.load_calls), 1)
     require_true(fake_torch.load_calls[0]["weights_only"])
     require_equal(
-        fake_torch.saved_checkpoint["state_dict"],
+        fake_torch.saved_checkpoint["state_dict"],  # type: ignore
         model.state_dict(),
     )
 
@@ -152,7 +152,7 @@ def test_load_saved_model_regenerates_when_safe_checkpoint_load_fails(
     )
     service = create_service(fake_torch, tmp_path)
     model = FakeModel()
-    service._create_basic_model = basic_model_factory(model)
+    service._create_basic_model = basic_model_factory(model)  # type: ignore
 
     loaded_model = service._load_saved_model(tmp_path / "model.pt")
 
@@ -160,6 +160,6 @@ def test_load_saved_model_regenerates_when_safe_checkpoint_load_fails(
     require_equal(len(fake_torch.load_calls), 1)
     require_true(fake_torch.load_calls[0]["weights_only"])
     require_equal(
-        fake_torch.saved_checkpoint["state_dict"],
+        fake_torch.saved_checkpoint["state_dict"],  # type: ignore
         model.state_dict(),
     )

@@ -44,8 +44,8 @@ class VisionBiasDetector:
             self.clip_model.to(self.device)
 
             # Load face detection model
-            self.face_detector = pipeline(
-                "face-detection", model="facebook/detr-resnet-50", device=0 if torch.cuda.is_available() else -1
+            self.face_detector = pipeline(  # type: ignore
+                "object-detection", model="facebook/detr-resnet-50", device=0 if torch.cuda.is_available() else -1
             )
 
             # Load object detection model
@@ -54,8 +54,10 @@ class VisionBiasDetector:
             )
 
             # Load OCR pipeline
-            self.ocr_pipeline = pipeline(
-                "ocr", model="kha-white/manga-ocr-base", device=0 if torch.cuda.is_available() else -1
+            self.ocr_pipeline = pipeline(  # type: ignore
+                "document-question-answering",
+                model="impira/layoutlm-document-qa",
+                device=0 if torch.cuda.is_available() else -1,
             )
 
             self.is_loaded = True
@@ -160,7 +162,7 @@ class VisionBiasDetector:
             image_array = np.array(image)
 
             # Detect faces
-            faces = self.face_detector(image_array)
+            faces = self.face_detector(image_array)  # type: ignore
 
             face_detections = []
             bias_indicators = []
@@ -195,7 +197,7 @@ class VisionBiasDetector:
             image_array = np.array(image)
 
             # Detect objects
-            objects = self.object_detector(image_array)
+            objects = self.object_detector(image_array)  # type: ignore
 
             detected_objects = []
             bias_indicators = []
@@ -222,14 +224,14 @@ class VisionBiasDetector:
             logger.warning(f"Object analysis failed: {e!s}", error=str(e))
             return {"objects": [], "bias_indicators": [], "total_objects": 0}
 
-    async def _analyze_text(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_text(self, image: Image.Image) -> dict[str, Any]:
         """Extract and analyze text from image"""
         if self.ocr_pipeline is None:
             raise RuntimeError("OCR pipeline not loaded. Call load_models() first.")
 
         try:
             # Perform OCR
-            ocr_results = self.ocr_pipeline(image)
+            ocr_results = self.ocr_pipeline(image)  # type: ignore
 
             extracted_texts = []
             for result in ocr_results:
@@ -251,7 +253,7 @@ class VisionBiasDetector:
             logger.warning(f"Text analysis failed: {e!s}", error=str(e))
             return {"texts": [], "full_text": "", "total_texts": 0}
 
-    async def _analyze_semantics(self, image: Image.Image) -> Dict[str, Any]:
+    async def _analyze_semantics(self, image: Image.Image) -> dict[str, Any]:
         """Analyze image semantics using CLIP"""
         if self.clip_processor is None or self.clip_model is None:
             raise RuntimeError("CLIP model not loaded. Call load_models() first.")
@@ -272,7 +274,7 @@ class VisionBiasDetector:
             ]
 
             # Process image and text prompts
-            inputs = self.clip_processor(text=bias_prompts, images=image, return_tensors="pt", padding=True).to(
+            inputs = self.clip_processor(text=bias_prompts, images=image, return_tensors="pt", padding=True).to(  # type: ignore
                 self.device
             )
 
@@ -300,7 +302,7 @@ class VisionBiasDetector:
             logger.warning(f"Semantic analysis failed: {e!s}", error=str(e))
             return {"semantic_scores": {}, "top_matches": [], "overall_sentiment": "neutral"}
 
-    def _extract_demographics(self, face_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_demographics(self, face_data: dict[str, Any]) -> dict[str, Any]:
         """Extract demographic information from face data"""
         demographics = {}
 
@@ -314,7 +316,7 @@ class VisionBiasDetector:
 
         return demographics
 
-    def _extract_emotions(self, face_data: Dict[str, Any]) -> Dict[str, float]:
+    def _extract_emotions(self, face_data: dict[str, Any]) -> dict[str, float]:
         """Extract emotion information from face data"""
         emotions = {}
 
@@ -325,7 +327,7 @@ class VisionBiasDetector:
 
         return emotions
 
-    def _extract_object_attributes(self, obj_data: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_object_attributes(self, obj_data: dict[str, Any]) -> dict[str, Any]:
         """Extract object attributes"""
         attributes = {}
 
@@ -335,7 +337,7 @@ class VisionBiasDetector:
 
         return attributes
 
-    def _check_face_bias(self, face_detection: FaceDetection) -> List[str]:
+    def _check_face_bias(self, face_detection: FaceDetection) -> list[str]:
         """Check for bias in face detection"""
         bias_indicators = []
 
@@ -360,7 +362,7 @@ class VisionBiasDetector:
 
         return bias_indicators
 
-    def _check_object_bias(self, detected_obj: DetectedObject) -> List[str]:
+    def _check_object_bias(self, detected_obj: DetectedObject) -> list[str]:
         """Check for bias in object detection"""
         bias_indicators = []
 
@@ -381,7 +383,7 @@ class VisionBiasDetector:
 
         return bias_indicators
 
-    def _get_bias_type_mappings(self) -> Dict[str, BiasType]:
+    def _get_bias_type_mappings(self) -> dict[str, BiasType]:
         """Get bias type keyword mappings"""
         return {
             "gender_representation": BiasType.GENDER_STEREOTYPES,
@@ -395,7 +397,7 @@ class VisionBiasDetector:
         }
 
     def _find_matching_bias_type(
-        self, text: str, bias_mappings: Dict[str, BiasType], bias_types: List[BiasType] | None
+        self, text: str, bias_mappings: dict[str, BiasType], bias_types: list[BiasType] | None
     ) -> BiasType | None:
         """Find matching bias type from text"""
         text_lower = text.lower()
@@ -408,10 +410,10 @@ class VisionBiasDetector:
         self,
         bias_type: BiasType,
         confidence: float,
-        evidence: List[str],
+        evidence: list[str],
         explanation: str,
-        objects_involved: List | None = None,
-        affected_regions: List | None = None,
+        objects_involved: list | None = None,
+        affected_regions: list | None = None,
     ) -> VisualBiasScore:
         """Create a VisualBiasScore object"""
         confidence_level = self._get_confidence_level(confidence)
@@ -428,13 +430,13 @@ class VisionBiasDetector:
 
     def _process_bias_indicators(
         self,
-        bias_indicators: List[str],
-        bias_mappings: Dict[str, BiasType],
-        bias_types: List[BiasType] | None,
+        bias_indicators: list[str],
+        bias_mappings: dict[str, BiasType],
+        bias_types: list[BiasType] | None,
         sensitivity: str,
         explanation_template: str,
-        objects_involved: List | None = None,
-    ) -> List[VisualBiasScore]:
+        objects_involved: list | None = None,
+    ) -> list[VisualBiasScore]:
         """Process bias indicators and create scores"""
         bias_scores = []
         for bias_indicator in bias_indicators:
@@ -456,11 +458,11 @@ class VisionBiasDetector:
 
     def _process_semantic_matches(
         self,
-        top_matches: List[tuple],
-        bias_mappings: Dict[str, BiasType],
-        bias_types: List[BiasType] | None,
+        top_matches: list[tuple],
+        bias_mappings: dict[str, BiasType],
+        bias_types: list[BiasType] | None,
         threshold: float = 0.5,
-    ) -> List[VisualBiasScore]:
+    ) -> list[VisualBiasScore]:
         """Process semantic analysis matches"""
         bias_scores = []
         for prompt, score in top_matches:
@@ -480,8 +482,8 @@ class VisionBiasDetector:
         return bias_scores
 
     async def _generate_bias_scores(
-        self, analysis_results: Dict[str, Any], bias_types: List[BiasType] | None, sensitivity: str
-    ) -> List[VisualBiasScore]:
+        self, analysis_results: dict[str, Any], bias_types: list[BiasType] | None, sensitivity: str
+    ) -> list[VisualBiasScore]:
         """Generate bias scores from analysis results"""
         bias_scores = []
         bias_mappings = self._get_bias_type_mappings()
@@ -557,7 +559,7 @@ class VisionBiasDetector:
             return ConfidenceLevel.MEDIUM
         return ConfidenceLevel.LOW
 
-    def _categorize_score(self, prompt: str, positive_words: List[str], negative_words: List[str]) -> str | None:
+    def _categorize_score(self, prompt: str, positive_words: list[str], negative_words: list[str]) -> str | None:
         """Categorize a prompt as positive, negative, or None"""
         prompt_lower = prompt.lower()
         if any(word in prompt_lower for word in positive_words):
@@ -566,7 +568,7 @@ class VisionBiasDetector:
             return "negative"
         return None
 
-    def _calculate_average_score(self, scores: List[float]) -> float:
+    def _calculate_average_score(self, scores: list[float]) -> float:
         """Calculate average of scores"""
         return sum(scores) / len(scores) if scores else 0.0
 
@@ -578,7 +580,7 @@ class VisionBiasDetector:
             return "negative"
         return "neutral"
 
-    def _calculate_overall_sentiment(self, semantic_scores: Dict[str, float]) -> str:
+    def _calculate_overall_sentiment(self, semantic_scores: dict[str, float]) -> str:
         """Calculate overall sentiment from semantic scores"""
         positive_words = ["neutral", "unbiased", "inclusive", "respectful"]
         negative_words = ["bias", "stereotypes", "harmful"]
@@ -601,7 +603,7 @@ class VisionBiasDetector:
 
         return self._determine_sentiment(avg_positive, avg_negative)
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """Get vision model information"""
         return {
             "name": "vision_bias_detector",

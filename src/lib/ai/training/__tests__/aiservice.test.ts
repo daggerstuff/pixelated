@@ -264,8 +264,15 @@ describe("getAIService wiring", () => {
   test("returns FineTuningAIService by default in non-test environments", () => {
     process.env["NODE_ENV"] = "production";
     delete process.env["PIX_AI_USE_MOCK"];
-    const svc = getAIService();
-    expect(svc).toBeInstanceOf(FineTuningAIService);
+    const prevVitest = process.env["VITEST"];
+    delete process.env["VITEST"];
+    
+    try {
+      const svc = getAIService();
+      expect(svc).toBeInstanceOf(FineTuningAIService);
+    } finally {
+      if (prevVitest !== undefined) process.env["VITEST"] = prevVitest;
+    }
   });
 
   test("createMockAIService returns a fresh mock instance", async () => {

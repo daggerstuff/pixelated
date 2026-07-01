@@ -17,6 +17,8 @@ scripts_dir = Path(__file__).resolve().parents[3] / "scripts" / "ci"
 script_path = scripts_dir / "release-readiness-aggregator.py"
 
 spec = importlib.util.spec_from_file_location("release_readiness_aggregator", script_path)
+assert spec is not None
+assert spec.loader is not None
 aggregator = importlib.util.module_from_spec(spec)
 sys.modules["release_readiness_aggregator"] = aggregator
 spec.loader.exec_module(aggregator)
@@ -31,6 +33,8 @@ devops_scripts_dir = Path(__file__).resolve().parents[3] / "scripts" / "devops"
 devops_script_path = devops_scripts_dir / "aggregate-readiness.py"
 
 devops_spec = importlib.util.spec_from_file_location("aggregate_readiness", devops_script_path)
+assert devops_spec is not None
+assert devops_spec.loader is not None
 devops_aggregator = importlib.util.module_from_spec(devops_spec)
 sys.modules["aggregate_readiness"] = devops_aggregator
 devops_spec.loader.exec_module(devops_aggregator)
@@ -100,17 +104,18 @@ def test_devops_aggregate_readiness_dry_run(tmp_path):
         data = json.load(f)
 
     assert "releaseId" in data
-    assert "commit" in data
-    assert "branch" in data
-    assert "overallStatus" in data
-    assert "overallScore" in data
+    assert "commit" in data["git"]
+    assert "branch" in data["git"]
+    assert "readiness" in data
+    assert "status" in data["readiness"]
+    assert "score" in data["readiness"]
     assert "summary" in data
     assert "validationLanes" in data
-    assert data["overallStatus"] == "ready"
-    assert data["overallScore"] == 100.0
-    assert data["summary"]["total"] == 4
-    assert data["summary"]["passed"] == 4
-    assert data["summary"]["failed"] == 0
+    assert data["readiness"]["status"] == "ready"
+    assert data["readiness"]["score"] == 100.0
+    assert data["summary"]["totalLanes"] == 4
+    assert data["summary"]["passedLanes"] == 4
+    assert data["summary"]["failedLanes"] == 0
     assert "lint" in data["validationLanes"]
     assert "typecheck" in data["validationLanes"]
     assert "tests" in data["validationLanes"]

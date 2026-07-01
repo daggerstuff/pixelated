@@ -9,6 +9,7 @@ const logger = createBuildSafeLogger("default");
 export interface DatasetPaths {
   openai: string | null;
   huggingface: string | null;
+  pal?: string | null;
 }
 
 export interface PreparedDatasetStatus {
@@ -251,8 +252,12 @@ export async function prepareAllFormats(
   const openaiPath = await prepareForOpenAI(sourceDir, outputDir, parentMergeRunId);
   const huggingfacePath = await prepareForHuggingFace(sourceDir, outputDir, parentMergeRunId);
 
+  const outDir = outputDir ?? safeJoin(ALLOWED_DIRECTORIES.PROJECT_ROOT, "data", "prepared");
+  const palPath = safeJoin(outDir, "pal_dataset.jsonl");
+
   return {
     openai: openaiPath,
     huggingface: huggingfacePath,
+    pal: existsSync(palPath) ? palPath : null,
   };
 }

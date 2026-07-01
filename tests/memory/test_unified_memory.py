@@ -133,7 +133,9 @@ class MockMemoryProvider(MemoryProvider):
         return memory_id
 
     async def get_memory(self, memory_id: str) -> Memory:
-        return self._memories.get(memory_id)
+        mem = self._memories.get(memory_id)
+        assert mem is not None
+        return mem
 
     async def update_memory(
         self,

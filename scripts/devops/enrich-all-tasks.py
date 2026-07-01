@@ -1034,7 +1034,9 @@ def main() -> int:
 
     logging.info("Loaded %d issues from Linear.", len(issues))
 
-    issue_key_to_uuid = {i.get("identifier"): i.get("id") for i in issues if i.get("identifier") and i.get("id")}
+    issue_key_to_uuid: dict[str, str] = {
+        str(i.get("identifier")): str(i.get("id")) for i in issues if i.get("identifier") and i.get("id")
+    }
 
     active_statuses = {"Todo", "In Progress", "Triage", "Backlog"}
     active_issues = [i for i in issues if (i.get("state") or {}).get("name") in active_statuses]

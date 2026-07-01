@@ -45,7 +45,7 @@ async_session_factory = async_sessionmaker(
 )
 
 
-@asynccontextmanager
+@asynccontextmanager  # type: ignore
 async def check_connection() -> dict:
     """Verify database connectivity and return server info.
 

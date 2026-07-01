@@ -458,7 +458,7 @@ def group_records_by_key(
     for provider, records in normalized_by_provider.items():
         for record in records:
             rec_id = (provider, record.external_id)
-            canonical_key = id_to_key.get(rec_id, record.sync_key)
+            canonical_key = str(id_to_key.get(rec_id, record.sync_key) or "")
             updated_record = TaskRecord(
                 provider=record.provider,
                 external_id=record.external_id,
@@ -523,14 +523,14 @@ def _build_id_to_key_map(
 ) -> dict[tuple[str, str], str]:
     id_to_key: dict[tuple[str, str], str] = {}
     for record in _iter_all_records(normalized_by_provider):
-        key = record.sync_key
+        key = str(record.sync_key or "")
         id_to_key[(record.provider, record.external_id)] = key
         for other_provider, other_id in record.provider_ids.items():
             if other_id:
                 id_to_key[(other_provider, other_id)] = key
     for record in _iter_all_records(normalized_by_provider):
         if (record.provider, record.external_id) not in id_to_key:
-            id_to_key[(record.provider, record.external_id)] = record.sync_key
+            id_to_key[(record.provider, record.external_id)] = str(record.sync_key or "")
     return id_to_key
 
 

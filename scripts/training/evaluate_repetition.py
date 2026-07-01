@@ -142,7 +142,7 @@ def load_model_and_tokenizer(model_path: str, adapter_path: str | None, device: 
 
     model.eval()
     if device != "cuda":
-        model.to(device)
+        model.to(torch.device(device))  # type: ignore
 
     return model, tokenizer
 

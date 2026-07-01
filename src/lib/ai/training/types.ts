@@ -28,6 +28,12 @@ export interface FineTuningConfig {
   batchSize?: number;
   learningRateMultiplier?: number;
   backend: FineTuningBackend;
+  /**
+   * Optional methodology or stage for this training run.
+   * e.g., 'sft' (Supervised Fine-Tuning) or 'dpo' (Direct Preference Optimization).
+   * Used for PAL (Persona-Aware Alignment).
+   */
+  jobType?: "sft" | "dpo" | "standard";
 }
 
 export interface FineTuningJob {
@@ -60,6 +66,8 @@ export interface TrainingDatasetReference {
   openai: string | null;
   /** Path or URI for the HuggingFace-formatted JSONL. */
   huggingface: string | null;
+  /** Path or URI for the PAL (Persona-Aware Alignment) DPO/SFT formatted JSONL. */
+  pal?: string | null;
 }
 
 /** Cost / usage counter incremented by each successful submit. */

@@ -6,7 +6,6 @@ import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
-import pytest
 from bias_detection.services.nvidia_api_service import (
     NvidiaAPIService,
     kimi_chat_completion,
@@ -48,8 +47,8 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         service = NvidiaAPIService()
 
         # Verify configuration was loaded
-        assert service.api_key == self.mock_api_key
-        assert service.api_base_url == "https://test.api.nvidia.com/v1/chat/completions"
+        self.assertEqual(service.api_key, self.mock_api_key)
+        self.assertEqual(service.api_base_url, "https://test.api.nvidia.com/v1/chat/completions")
 
     @patch("bias_detection.services.nvidia_api_service.os.path.exists")
     @patch.dict(
@@ -65,7 +64,7 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         service = NvidiaAPIService()
 
         # Verify API key was loaded from environment
-        assert service.api_key == "env-api-key"
+        self.assertEqual(service.api_key, "env-api-key")
 
     @patch("bias_detection.services.nvidia_api_service.os.path.exists")
     def test_init_without_config_raises_error(self, mock_exists):
@@ -76,7 +75,7 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         # Mock environment variable not set
         with (
             patch.dict("bias_detection.services.nvidia_api_service.os.environ", {}, clear=True),
-            pytest.raises(ValueError),
+            self.assertRaises(ValueError),
         ):
             NvidiaAPIService()
 
@@ -103,7 +102,7 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         result = await service.chat_completion(self.mock_messages)
 
         # Verify results
-        assert "choices" in result
+        self.assertIn("choices", result)  # type: ignore
         mock_client_instance.post.assert_called_once()
 
     @patch("bias_detection.services.nvidia_api_service.httpx.AsyncClient")
@@ -128,7 +127,7 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         service.api_key = self.mock_api_key
 
         # Call method and expect exception
-        with pytest.raises(httpx.HTTPStatusError):
+        with self.assertRaises(httpx.HTTPStatusError):
             await service.chat_completion(self.mock_messages)
 
     @patch("bias_detection.services.nvidia_api_service.httpx.AsyncClient")
@@ -150,8 +149,8 @@ class TestNvidiaAPIService(unittest.IsolatedAsyncioTestCase):
         result = await service.health_check()
 
         # Verify results
-        assert result["status"] == "healthy"
-        assert result["provider"] == "nvidia"
+        self.assertEqual(result["status"], "healthy")
+        self.assertEqual(result["provider"], "nvidia")
 
     async def test_convenience_functions(self):
         """Test convenience functions"""

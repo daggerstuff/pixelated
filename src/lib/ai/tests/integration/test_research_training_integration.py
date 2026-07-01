@@ -15,12 +15,12 @@ from src.lib.ai.journal_research.ieee_xplore_integration import (
     IntegrationManager,
     ResearchPipeline,
 )
-from src.lib.ai.memory.automated_memory_updates import MemoryUpdateHandler
+from src.lib.ai.memory.automated_memory_updates import MemoryUpdateHandler  # type: ignore
 from src.lib.ai.training.advanced_training_scenarios import (
-    AssessmentEngine,
-    CulturalCompetencyTrainer,
-    ScenarioGenerator,
-    TraumaInformedCareTrainer,
+    AssessmentEngine,  # type: ignore
+    CulturalCompetencyTrainer,  # type: ignore
+    ScenarioGenerator,  # type: ignore
+    TraumaInformedCareTrainer,  # type: ignore
 )
 
 

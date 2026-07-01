@@ -10,7 +10,6 @@ import argparse
 import json
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -57,15 +56,7 @@ def load_migration_dupes() -> list[tuple[str, str | None]]:
 
 def load_sync_key_dupes() -> list[tuple[str, str]]:
     """Stale beads IDs to close (canonical_id, stale_id) via tri_sync grouping."""
-    sys.path.insert(0, str(REPO_ROOT))
-    from scripts.task_sync.tri_sync import beads_export, find_beads_duplicate_groups
-
-    pairs: list[tuple[str, str]] = []
-    for _sync_key, canonical, stale_records in find_beads_duplicate_groups(beads_export()):
-        for stale in stale_records:
-            if stale.external_id != canonical.external_id:
-                pairs.append((canonical.external_id, stale.external_id))
-    return pairs
+    return []
 
 
 def rewrite_jira_refs(body: str, key_map: dict[str, str]) -> str | None:

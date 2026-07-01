@@ -1,3 +1,6 @@
+from typing import Any, cast
+
+from ai.memory.local_foresight_manager import LocalForesightMemoryManager
 from ai.memory.reflection_memory import LocalReflectionMemoryClient
 from ai.memory.reflection_types import MemoryCategory, MemoryMetadata
 
@@ -7,7 +10,7 @@ class MockMemoryManager:
         self.stored_memories = []
         self.next_id = 1
 
-    def add_memory(self, content: str, user_id: str, metadata: any, category: str) -> str | None:
+    def add_memory(self, content: str, user_id: str, metadata: Any, category: str) -> str | None:
         # Simulate gating: block crisis, PII, and empty content
         crisis_keywords = ["end my life", "suicide", "kill myself", "plan to do it tonight"]
         pii_patterns = ["SSN", "123-45-6789", "social security"]
@@ -35,7 +38,7 @@ class MockMemoryManager:
                 return mem
         return None
 
-    def update_memory(self, memory_id: str, new_content: str, metadata: any, user_id: str | None = None) -> bool:
+    def update_memory(self, memory_id: str, new_content: str, metadata: Any, user_id: str | None = None) -> bool:
         for mem in self.stored_memories:
             if mem["id"] == memory_id:
                 mem["content"] = new_content
@@ -82,7 +85,7 @@ class MockMemoryManager:
 
 def test_add_memory_passes_through_when_content_is_safe():
     manager = MockMemoryManager()
-    client = LocalReflectionMemoryClient(manager)
+    client = LocalReflectionMemoryClient(cast(LocalForesightMemoryManager, manager))
     import asyncio
 
     content = "This is a normal therapeutic conversation about coping strategies."
@@ -96,7 +99,7 @@ def test_add_memory_passes_through_when_content_is_safe():
 
 def test_add_memory_blocks_when_content_is_crisis():
     manager = MockMemoryManager()
-    client = LocalReflectionMemoryClient(manager)
+    client = LocalReflectionMemoryClient(cast(LocalForesightMemoryManager, manager))
     import asyncio
 
     content = "I want to end my life. I have a plan to do it tonight."
@@ -109,7 +112,7 @@ def test_add_memory_blocks_when_content_is_crisis():
 
 def test_add_memory_blocks_when_content_contains_pii():
     manager = MockMemoryManager()
-    client = LocalReflectionMemoryClient(manager)
+    client = LocalReflectionMemoryClient(cast(LocalForesightMemoryManager, manager))
     import asyncio
 
     content = "My name is John Doe and my SSN is 123-45-6789."
@@ -122,7 +125,7 @@ def test_add_memory_blocks_when_content_contains_pii():
 
 def test_add_memory_handles_empty_content():
     manager = MockMemoryManager()
-    client = LocalReflectionMemoryClient(manager)
+    client = LocalReflectionMemoryClient(cast(LocalForesightMemoryManager, manager))
     import asyncio
 
     content = ""
@@ -135,7 +138,7 @@ def test_add_memory_handles_empty_content():
 
 def test_add_memory_preserves_metadata_for_stored_content():
     manager = MockMemoryManager()
-    client = LocalReflectionMemoryClient(manager)
+    client = LocalReflectionMemoryClient(cast(LocalForesightMemoryManager, manager))
     import asyncio
 
     content = "Today I felt anxious but used my breathing exercises to cope."

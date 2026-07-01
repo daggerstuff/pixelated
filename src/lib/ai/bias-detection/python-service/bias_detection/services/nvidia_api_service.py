@@ -281,7 +281,7 @@ async def example_usage():
         # Streaming example
         stream_response = await service.chat_completion(messages, stream=True)
         if hasattr(stream_response, "__aiter__"):
-            async for chunk in stream_response:
+            async for chunk in stream_response:  # type: ignore
                 if isinstance(chunk, dict) and "choices" in chunk:
                     content = chunk["choices"][0].get("delta", {}).get("content", "")
                     if content:

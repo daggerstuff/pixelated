@@ -2,6 +2,7 @@
 Tests for reflection subagent, prompts, and consolidation rules.
 """
 
+from typing import cast
 from unittest.mock import Mock
 
 import pytest
@@ -11,6 +12,7 @@ from ai.memory.consolidation_rules import (
     ConsolidationRule,
     ConsolidationRules,
 )
+from ai.memory.reflection_memory import LocalReflectionMemoryClient
 from ai.memory.reflection_prompts import (
     CRISIS_AWARE_REFLECTION,
     CRISIS_DETECTION_PROMPT,
@@ -121,13 +123,15 @@ class MockMemoryProvider:
         return memory_id
 
     async def get_memory(self, memory_id: str) -> Memory:
-        return self._memories.get(memory_id)
+        mem = self._memories.get(memory_id)
+        assert mem is not None
+        return mem
 
     async def update_memory(
         self,
         memory_id: str,
         content: str | None = None,
-        metadata: MemoryMetadata = None,
+        metadata: MemoryMetadata | None = None,
     ) -> None:
         if memory_id in self._memories:
             if content:
@@ -226,7 +230,7 @@ class TestReflectionSubagent:
         async def mock_llm(prompt: str) -> str:
             return llm_response
 
-        subagent = ReflectionSubagent(mock_provider, llm_callback=mock_llm)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), llm_callback=mock_llm)
 
         conversation = "Normal therapeutic conversation about daily life."
         result = await subagent.analyze_conversation(conversation, "user123")
@@ -258,7 +262,7 @@ class TestReflectionSubagent:
                     "recommendations": ["Preserve all crisis content"]
                 }"""
 
-        subagent = ReflectionSubagent(mock_provider, llm_callback=mock_llm)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), llm_callback=mock_llm)
 
         conversation = "User expresses suicidal thoughts."
         result = await subagent.analyze_conversation(conversation, "user123")
@@ -272,7 +276,7 @@ class TestReflectionSubagent:
         """Test consolidation skips when crisis detected."""
         mock_provider = MockMemoryProvider()
         config = ReflectionConfig(auto_consolidate=False)
-        subagent = ReflectionSubagent(mock_provider, config)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), config)
 
         result = ReflectionResult(
             crisis_detected=True,
@@ -291,7 +295,7 @@ class TestReflectionSubagent:
         """Test consolidation proceeds when no crisis."""
         mock_provider = MockMemoryProvider()
         config = ReflectionConfig(auto_consolidate=True)
-        subagent = ReflectionSubagent(mock_provider, config)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), config)
 
         result = ReflectionResult(
             crisis_detected=False,
@@ -311,7 +315,7 @@ class TestReflectionSubagent:
             trigger=ReflectionTrigger.STEP_COUNT,
             step_threshold=5,
         )
-        subagent = ReflectionSubagent(mock_provider, config)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), config)
 
         # Initially should not reflect
         assert subagent.should_reflect() is False
@@ -330,7 +334,7 @@ class TestReflectionSubagent:
         """Test manual trigger mode."""
         mock_provider = MockMemoryProvider()
         config = ReflectionConfig(trigger=ReflectionTrigger.MANUAL)
-        subagent = ReflectionSubagent(mock_provider, config)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), config)
 
         # Manual trigger should never auto-reflect
         assert subagent.should_reflect() is False
@@ -598,7 +602,7 @@ class TestReflectionIntegration:
                 return llm_responses["crisis"]
             return llm_responses["analysis"]
 
-        subagent = ReflectionSubagent(mock_provider, llm_callback=mock_llm)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), llm_callback=mock_llm)
 
         # Analyze conversation
         result = await subagent.analyze_conversation(
@@ -614,7 +618,7 @@ class TestReflectionIntegration:
         """Test that crisis content is preserved."""
         mock_provider = MockMemoryProvider()
         config = ReflectionConfig(auto_consolidate=False)
-        subagent = ReflectionSubagent(mock_provider, config)
+        subagent = ReflectionSubagent(cast(LocalReflectionMemoryClient, mock_provider), config)
 
         # Simulate crisis result
         result = ReflectionResult(

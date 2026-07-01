@@ -66,7 +66,13 @@ export class FineTuningOrchestrator {
   resolveDatasetPath(
     paths: TrainingDatasetReference,
     backend: FineTuningBackend,
+    jobType?: string,
   ): string {
+    // For PAL methodology, always prefer the PAL-formatted dataset
+    if ((jobType === "sft" || jobType === "dpo") && paths.pal) {
+      return paths.pal;
+    }
+
     // Determine the appropriate dataset path for the backend
     if (backend === "openai") {
       // For OpenAI flows, check OpenAI path first
@@ -75,14 +81,14 @@ export class FineTuningOrchestrator {
       if (paths.huggingface) return paths.huggingface;
       throw new Error("No dataset path available for OpenAI backend");
     }
-if (backend === "huggingface") {
+    if (backend === "huggingface") {
       // For HuggingFace flows, check HuggingFace path first
       if (paths.huggingface) return paths.huggingface;
       // Fall back to OpenAI path if HuggingFace not available
       if (paths.openai) return paths.openai;
       throw new Error("No dataset path available for HuggingFace backend");
     }
-// For local and dry-run backends, prefer HuggingFace over OpenAI
+    // For local and dry-run backends, prefer HuggingFace over OpenAI
     // (arbitrary choice - could be configured or based on other factors)
     if (paths.huggingface) return paths.huggingface;
     if (paths.openai) return paths.openai;
@@ -119,7 +125,7 @@ if (backend === "huggingface") {
     paths: TrainingDatasetReference,
     config: FineTuningConfig,
   ): Promise<FineTuningJob> {
-    const filePath = this.resolveDatasetPath(paths, config.backend);
+    const filePath = this.resolveDatasetPath(paths, config.backend, config.jobType);
     if (config.backend !== "openai") {
       this.validateDataset(filePath);
     }

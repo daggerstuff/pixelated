@@ -81,7 +81,11 @@ class TestComplianceMonitorHIPAA:
     )
     def test_hipaa_compliance_scenarios(self, monitor, overrides, expected_score, expected_status):
         """Test HIPAA compliance aggregation with various safeguard results."""
-        with patch.multiple(monitor, **{k: (lambda x=v: x) for k, v in overrides.items()}):
+        from contextlib import ExitStack
+
+        with ExitStack() as stack:
+            for k, v in overrides.items():
+                stack.enter_context(patch.object(monitor, k, return_value=v))
             result = monitor.monitor_hipaa_compliance()
 
             assert result["framework"] == "HIPAA"
@@ -151,7 +155,11 @@ class TestComplianceMonitorSOC2:
     )
     def test_soc2_compliance_scenarios(self, monitor, overrides, expected_score, expected_status):
         """Test SOC2 compliance aggregation with various safeguard results."""
-        with patch.multiple(monitor, **{k: (lambda x=v: x) for k, v in overrides.items()}):
+        from contextlib import ExitStack
+
+        with ExitStack() as stack:
+            for k, v in overrides.items():
+                stack.enter_context(patch.object(monitor, k, return_value=v))
             result = monitor.monitor_soc2_compliance()
 
             assert result["framework"] == "SOC2"

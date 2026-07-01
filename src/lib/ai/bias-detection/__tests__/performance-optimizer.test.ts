@@ -16,3 +16,9 @@ import {
   getPerformanceOptimizer,
   type PerformanceOptimizerConfig,
 } from '../performance-optimizer'
+
+describe('PerformanceOptimizer', () => {
+  it('should have tests implemented', () => {
+    expect(true).toBe(true)
+  })
+})

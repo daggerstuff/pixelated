@@ -58,7 +58,7 @@ describe('mcpMemoryManager URL isolation', () => {
         'utf8',
       ),
     )
-    expect(source).toContain('"/api/ingestion/gate"')
+    expect(source).toContain("'/api/ingestion/gate'")
     expect(source).not.toContain('127.0.0.1:8100')
   })
 })

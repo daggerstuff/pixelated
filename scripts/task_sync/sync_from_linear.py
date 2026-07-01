@@ -130,7 +130,7 @@ def _gql(query: str, variables: dict | None = None) -> dict:
     req = urllib.request.Request(
         LINEAR_API,
         data=payload,
-        headers={"Authorization": LINEAR_TOKEN, "Content-Type": "application/json"},
+        headers={"Authorization": LINEAR_TOKEN or "", "Content-Type": "application/json"},
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         return json.loads(resp.read())
@@ -407,8 +407,8 @@ def main():  # noqa: PLR0912, PLR0915
                 for t in normalized_list:
                     # Only match by title if it doesn't already point to another Linear ID
                     if not t["metadata"].get("linear") and clean_title(t["title"]) == li_clean and len(li_clean) > 5:
-                            match = t
-                            break
+                        match = t
+                        break
             if match:
                 provider_matches[prov] = match
 
@@ -500,22 +500,26 @@ def main():  # noqa: PLR0912, PLR0915
 
         for t in normalized_list:
             mapped_lid = t["metadata"].get("linear")
-            if mapped_lid and mapped_lid not in linear_by_id and t["state"].lower() not in ("closed", "done", "canceled"):
-                    actions.append(
-                        {
-                            "provider": prov,
-                            "action": "update",
-                            "target_id": t["target_id"],
-                            "sync_key": t["metadata"].get("key", slugify(t["title"])),
-                            "title": t["title"],
-                            "body": t["body"],
-                            "status": "closed",
-                            "priority_label": "none",
-                            "labels": [],
-                            "linear_id": mapped_lid,
-                            "is_orphan": True,
-                        }
-                    )
+            if (
+                mapped_lid
+                and mapped_lid not in linear_by_id
+                and t["state"].lower() not in ("closed", "done", "canceled")
+            ):
+                actions.append(
+                    {
+                        "provider": prov,
+                        "action": "update",
+                        "target_id": t["target_id"],
+                        "sync_key": t["metadata"].get("key", slugify(t["title"])),
+                        "title": t["title"],
+                        "body": t["body"],
+                        "status": "closed",
+                        "priority_label": "none",
+                        "labels": [],
+                        "linear_id": mapped_lid,
+                        "is_orphan": True,
+                    }
+                )
 
     # Summary
     print("\nSync plan summary:")

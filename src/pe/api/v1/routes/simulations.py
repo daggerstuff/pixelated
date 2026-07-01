@@ -205,6 +205,7 @@ async def create_simulation(
         {"id": sim_id},
     )
     sim = result.fetchone()
+    assert sim is not None
 
     return SimulationResponse(
         id=str(sim[0]),
@@ -538,11 +539,10 @@ async def simulation_websocket(  # noqa: PLR0912, PLR0915
                     await db_session.commit()
 
                 # Trigger Celery chain (async)
-                task_id = await trigger_celery_chain(
-                    session_id=session_id,
-                    user_input=user_text,
-                    tenant_id=tenant_id,
-                    user_id=user_id,
+                assert tenant_id is not None
+                assert user_id is not None
+                task_id = await trigger_celery_chain(  # type: ignore
+                    session_id, user_text, tenant_id, user_id
                 )
 
                 # If no Celery, echo back a stub response

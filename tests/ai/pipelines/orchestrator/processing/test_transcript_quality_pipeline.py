@@ -48,19 +48,20 @@ def test_process_audio_flow(mock_dependencies):
     pipeline = TranscriptQualityPipeline()
     audio_path = Path("test.wav")
 
-    # Mock return values - Success case
+    from typing import cast
+
     mock_result = MagicMock()
     mock_result.success = True
     mock_result.full_text = "I feel anxious."
     mock_result.confidence_score = 0.95
     mock_result.model_used = "base"
-    pipeline.transcriber.transcribe_audio.return_value = mock_result
+    cast(MagicMock, pipeline.transcriber.transcribe_audio).return_value = mock_result
 
-    pipeline.curator.detect_crisis_narratives.return_value = []
+    cast(MagicMock, pipeline.curator.detect_crisis_narratives).return_value = []
 
-    pipeline.corrector.correct_transcript.return_value = "I feel anxious (corrected)."
+    cast(MagicMock, pipeline.corrector.correct_transcript).return_value = "I feel anxious (corrected)."
 
-    pipeline.evaluator.evaluate_therapeutic_alignment.return_value = {
+    cast(MagicMock, pipeline.evaluator.evaluate_therapeutic_alignment).return_value = {
         "score": 0.8,
         "status": "aligned",
     }

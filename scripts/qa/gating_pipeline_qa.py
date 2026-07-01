@@ -7,11 +7,12 @@ import sys
 
 sys.path.insert(0, "/home/vivi/pixelated")
 
-from ai.memory.gates import GateDecision, GatingReport
+from ai.memory.gates import GateDecision, GateResult, GatingReport
 from ai.memory.gates.consent_gate import ConsentGateChecker
 from ai.memory.gates.crisis_detector import CrisisDetector
 from ai.memory.gates.pii_redactor import PiiRedactor
 from ai.memory.gates.trauma_filter import TraumaFilter
+from ai.memory.schema import ConsentGate
 
 
 def test_pii_gate():
@@ -68,7 +69,7 @@ def test_consent_gate():
     gate = ConsentGateChecker()
 
     # Grant and check consent
-    gate.grant_consent("user-qa", "open")
+    gate.grant_consent("user-qa", ConsentGate.OPEN)
     result = gate.check_consent("user-qa")
     assert result.allowed, "Consent should be allowed"
 
@@ -83,7 +84,7 @@ def test_gating_report():
     report = GatingReport(source_id="qa-test", content="Test content")
     assert not report.blocked, "Empty report should not be blocked"
 
-    report.gate0_pii = type("GateResult", (), {"decision": GateDecision.BLOCK, "reason": "PII found"})()
+    report.gate0_pii = GateResult(gate="PII", decision=GateDecision.BLOCK, reason="PII found")
     assert report.blocked, "Report should be blocked when PII blocks"
 
 
