@@ -248,9 +248,7 @@ export class BackupVerificationService extends EventEmitter {
       typeof (data as Record<string, unknown>)['version'] === 'string' &&
       typeof (data as Record<string, unknown>)['environment'] === 'string'
     )
-  }
-
-  private async verifyBackupContents(backupPath: string): Promise<void> {
+  }    private async _verifyBackupContents(backupPath: string): Promise<void> {
     try {
       // Read backup file
       const backupFileData = await fs.readFile(backupPath)

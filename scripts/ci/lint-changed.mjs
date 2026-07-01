@@ -19,6 +19,26 @@ const ALLOWED_EXTENSIONS_BY_MODE = {
     ".astro",
   ]),
   markdown: new Set([".md", ".mdx"]),
+  imports: new Set([
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".mts",
+    ".cts",
+  ]),
+  "unused-exports": new Set([
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".mts",
+    ".cts",
+  ]),
 };
 
 const DIFF_PATTERNS_BY_MODE = {
@@ -34,26 +54,51 @@ const DIFF_PATTERNS_BY_MODE = {
     "*.astro",
   ],
   markdown: ["*.md", "*.mdx"],
+  imports: [
+    "*.ts",
+    "*.tsx",
+    "*.js",
+    "*.jsx",
+    "*.mjs",
+    "*.cjs",
+    "*.mts",
+    "*.cts",
+  ],
+  "unused-exports": [
+    "*.ts",
+    "*.tsx",
+    "*.js",
+    "*.jsx",
+    "*.mjs",
+    "*.cjs",
+    "*.mts",
+    "*.cts",
+  ],
 };
 
 const args = process.argv.slice(2);
 const isTypeAware = args.includes("--type-aware");
 const isMarkdown = args.includes("--markdown");
+const isImports = args.includes("--imports");
+const isUnusedExports = args.includes("--unused-exports");
 
-if (isTypeAware && isMarkdown) {
+const conflictingFlags = [isTypeAware, isMarkdown, isImports, isUnusedExports].filter(Boolean).length > 1;
+if (conflictingFlags) {
   console.error(
-    "Invalid lint mode: --type-aware and --markdown cannot be combined.",
+    "Error: --type-aware, --markdown, --imports, and --unused-exports are mutually exclusive.",
   );
   process.exit(2);
 }
 
-const mode = isMarkdown ? 'markdown' : 'standard'
+const mode = isUnusedExports ? 'unused-exports' : isImports ? 'imports' : isMarkdown ? 'markdown' : 'standard'
 const allowedExtensions = ALLOWED_EXTENSIONS_BY_MODE[mode]
 const diffPatterns = DIFF_PATTERNS_BY_MODE[mode]
 
 /** @returns {string} */
 function getAllLintCommand() {
   if (mode === 'markdown') return 'lint:markdown:ci:all'
+  if (mode === 'imports') return 'lint:imports'
+  if (mode === 'unused-exports') return 'lint:unused-exports'
   return isTypeAware ? 'lint:ci:type-aware:all' : 'lint:ci:all'
 }
 
@@ -73,6 +118,14 @@ function getLintArgs(files) {
     return args
   }
 
+  if (mode === 'imports') {
+    return ['scripts/ci/check-unresolved-imports.mjs', ...files]
+  }
+
+  if (mode === 'unused-exports') {
+    return ['scripts/ci/check-unused-exports.mjs', ...files]
+  }
+
   args.push('exec')
   args.push('oxlint')
   if (isTypeAware) {
@@ -89,6 +142,8 @@ function getLintArgs(files) {
 /** @returns {string} */
 function logMode() {
   if (mode === 'markdown') return `Running markdownlint on ${changedFiles.length} changed files`
+  if (mode === 'imports') return `Checking imports on ${changedFiles.length} changed files`
+  if (mode === 'unused-exports') return `Checking unused exports on ${changedFiles.length} changed files`
   const lintMode = isTypeAware ? 'type-aware' : 'standard'
   return `Running oxlint (${lintMode}) on ${changedFiles.length} changed files`
 }
@@ -177,6 +232,16 @@ function runGeneratedMarkdownLintFix(files) {
 
 /** @param {string[]} files */
 function runLint(files) {
+  if (mode === 'imports' || mode === 'unused-exports') {
+    /** @type {SpawnSyncTextResult} */
+    const result = spawnSync('node', getLintArgs(files), {
+      stdio: 'inherit',
+    })
+    const { status } = result
+    if (status !== 0) process.exit(status)
+    return
+  }
+
   /** @type {SpawnSyncTextResult} */
   const result = spawnSync('pnpm', getLintArgs(files), {
     stdio: 'inherit',

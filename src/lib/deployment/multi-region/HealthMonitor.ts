@@ -85,7 +85,6 @@ export class HealthMonitor extends EventEmitter {
   > = new Map()
   private healthCheckInterval: NodeJS.Timeout | null = null
   private metricsRetentionInterval: NodeJS.Timeout | null = null
-  private isInitialized = false
 
   constructor(config: HealthCheckConfig) {
     super()
@@ -110,7 +109,6 @@ export class HealthMonitor extends EventEmitter {
       // Start metrics retention cleanup
       this.startMetricsRetention()
 
-      this.isInitialized = true
       logger.info('Health Monitor initialized successfully')
 
       this.emit('initialized', { regions: regions.length })
@@ -969,8 +967,6 @@ export class HealthMonitor extends EventEmitter {
       this.healthMetrics.clear()
       this.healthScores.clear()
       this.activeAlerts.clear()
-      this.isInitialized = false
-
       logger.info('Health Monitor cleanup completed')
     } catch (error: unknown) {
       logger.error('Health Monitor cleanup failed', { error })

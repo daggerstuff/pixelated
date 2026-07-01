@@ -162,7 +162,7 @@ export class AnonymizationPipelineService {
    */
   private async applyKAnonymity(
     data: Record<string, unknown>[],
-    k: number,
+    _k: number,
   ): Promise<Record<string, unknown>[]> {
     // Identify quasi-identifiers (age, location, demographic info)
     const quasiIdentifiers = [
@@ -475,7 +475,7 @@ export class AnonymizationPipelineService {
   private async mergeOrSuppressGroup(
     smallGroup: Record<string, unknown>[],
     allGroups: Map<string, Record<string, unknown>[]>,
-    k: number,
+    _k: number,
     quasiIdentifiers: string[],
   ): Promise<Record<string, unknown>[]> {
     // Try to find similar groups to merge with

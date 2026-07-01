@@ -1,19 +1,9 @@
-// Sprint 3 Analytics — Demo Data & API Client
+// Sprint 3 Analytics — Demo Data
 // Used as fallback when backend is unavailable
 import type {
   CompetencyData,
   ConsumptionData,
   ComplianceData,
-  StateVelocityDataPoint,
-  InterventionRate,
-  DeEscalationDataPoint,
-  OSCEScoreRow,
-  BurnRateData,
-  SeatActivationData,
-  TokenExpenditureCategory,
-  PHIInterceptionData,
-  AuditChainStatus,
-  InferenceLatencyPoint,
 } from '@/types/analytics'
 
 export const DEMO_COMPETENCY: CompetencyData = {
@@ -173,18 +163,4 @@ export const DEMO_COMPLIANCE: ComplianceData = {
     { timestamp: 'Jun 14', avgMs: 990, p95Ms: 1720 },
     { timestamp: 'Jun 15', avgMs: 1060, p95Ms: 1850 },
   ],
-}
-
-// API Client — will call real backend endpoints when available
-import { api } from './apiClient'
-
-export const analyticsApi = {
-  getCompetency: () => api.get<CompetencyData>('/admin/analytics/competency'),
-  getConsumption: () =>
-    api.get<ConsumptionData>('/admin/analytics/consumption'),
-  getCompliance: () => api.get<ComplianceData>('/admin/analytics/compliance'),
-  verifyAuditChain: () =>
-    api.get<{ chain_valid: boolean; last_verified_at: string }>(
-      '/admin/analytics/audit-chain/verify',
-    ),
 }

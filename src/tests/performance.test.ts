@@ -176,7 +176,8 @@ describe('performance Tests', () => {
 
         // Collect performance metrics
         const metrics = await page.evaluate<EvaluatedMetrics>(() => {
-          const timing = performance.timing
+          const navEntry = performance.getEntriesByType('navigation')[0]
+          const timing = navEntry as PerformanceNavigationTiming
           const paintEntries = performance.getEntriesByType('paint')
           const lcpEntries = performance.getEntriesByType(
             'largest-contentful-paint',
@@ -498,7 +499,7 @@ export async function simulateUserInteraction(page: Page): Promise<void> {
   // Type in an input if available
   const input = await page.$('input:not([disabled])')
   if (input) {
-    await input.type('Test input')
+    await input.fill('Test input')
     await page.waitForTimeout(200)
   }
 }

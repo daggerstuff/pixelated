@@ -1,6 +1,6 @@
 // Supabase client wrapper (stub)
 export const supabase = {
-  from<T>(table: string) {
+  from<T>(_table: string) {
     return {
       select() {
         return {

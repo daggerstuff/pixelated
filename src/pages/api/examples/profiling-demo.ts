@@ -17,7 +17,7 @@ async function simulateDatabaseQuery(): Promise<Record<string, unknown>> {
   return { id: 1, name: 'Example Record', value: Math.random() * 100 }
 }
 
-export const GET = async (_) => {
+export const GET = async (_context: unknown) => {
   try {
     // Directly call the computation function
     const computationResult = await performHeavyComputation()

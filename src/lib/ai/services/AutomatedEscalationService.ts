@@ -351,7 +351,7 @@ export class AutomatedEscalationService {
    */
   private async triggerIntervention(
     escalationEvent: EscalationEvent,
-    action: EscalationAction,
+    _action: EscalationAction,
     context?: any,
   ): Promise<void> {
     const interventionType = this.getInterventionType(escalationEvent.riskLevel)

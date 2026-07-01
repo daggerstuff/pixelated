@@ -37,8 +37,8 @@ export class UserManagementService extends BaseService {
    */
   async hasPermission(
     userId: UserId,
-    resource: string,
-    action: string,
+    _resource: string,
+    _action: string,
   ): Promise<boolean> {
     // Implementation for checking permissions in PostgreSQL or Redis cache
     // For now, return a basic check

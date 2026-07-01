@@ -5,7 +5,11 @@
     "bash scripts/ci/oxlint-staged.sh -c .oxlintrc.json --ignore-pattern 'src/scripts/**'",
     "bash scripts/ci/check-no-suppressions.sh"
   ],
-  "*.{ts,tsx}": ["node scripts/ci/check-zod-deprecations.mjs"],
+  "*.{ts,tsx}": [
+    "node scripts/ci/check-zod-deprecations.mjs",
+    "node scripts/ci/check-unresolved-imports.mjs",
+    "node scripts/ci/check-unused-exports.mjs --changed-files"
+  ],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""
   ],

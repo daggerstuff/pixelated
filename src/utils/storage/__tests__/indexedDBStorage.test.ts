@@ -96,7 +96,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -121,7 +121,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -151,7 +151,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -216,7 +216,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -256,7 +256,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -299,7 +299,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -346,7 +346,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -395,7 +395,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()
@@ -439,7 +439,7 @@ describe('IndexedDBStorage', () => {
         onupgradeneeded: null,
       } as unknown as IDBOpenDBRequest
 
-      mockIndexedDB.open.mockImplementation((dbName, version) => {
+      mockIndexedDB.open.mockImplementation((_dbName, _version) => {
         // Immediately trigger success
         setTimeout(() => {
           ;(openRequest.onsuccess as () => void)?.()

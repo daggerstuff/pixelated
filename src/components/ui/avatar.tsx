@@ -13,7 +13,7 @@ export function Avatar({
   src,
   initials,
   alt = '',
-  size = 'md',
+  size: _size = 'md',
 }: AvatarProps) {
   return (
     <div

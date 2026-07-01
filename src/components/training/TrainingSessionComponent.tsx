@@ -235,7 +235,7 @@ export function TrainingSessionComponent() {
     (
       msg: WebSocketMessage,
       locallyAddedMessages: React.MutableRefObject<Set<string>>,
-      currentRole: 'trainee' | 'observer',
+      _currentRole: 'trainee' | 'observer',
       setConversation: React.Dispatch<
         React.SetStateAction<ConversationEntry[]>
       >,

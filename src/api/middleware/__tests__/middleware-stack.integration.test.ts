@@ -118,19 +118,19 @@ describe('Middleware Stack Integration', () => {
 
     const callOrder: string[] = []
     mockRequestLogger.mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
+      (_req: TestRequest, _res: MockResponse, next: NextFunction) => {
         callOrder.push('logger')
         next()
       },
     )
     mockRateLimiter.mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
+      (_req: TestRequest, _res: MockResponse, next: NextFunction) => {
         callOrder.push('rateLimiter')
         next()
       },
     )
     mockAuthMiddleware.mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
+      (_req: TestRequest, _res: MockResponse, next: NextFunction) => {
         callOrder.push('auth')
         next()
       },
@@ -167,7 +167,7 @@ describe('Middleware Stack Integration', () => {
   it('should handle rate limit before auth', async () => {
     mockRedis.get.mockResolvedValue('1001')
     mockRateLimiter.mockImplementation(
-      (req: TestRequest, res: MockResponse, next: NextFunction) => {
+      (_req: TestRequest, res: MockResponse, _next: NextFunction) => {
         res.status(429).json({ error: 'Too Many Requests' })
       },
     )
@@ -197,8 +197,8 @@ describe('Middleware Stack Integration', () => {
     const callOrder: string[] = []
 
     const middleware1 = async (
-      req: TestRequest,
-      res: MockResponse,
+      _req: TestRequest,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       callOrder.push('middleware1-start')
@@ -206,8 +206,8 @@ describe('Middleware Stack Integration', () => {
     }
 
     const middleware2 = async (
-      req: TestRequest,
-      res: MockResponse,
+      _req: TestRequest,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       callOrder.push('middleware2-start')
@@ -237,8 +237,8 @@ describe('Middleware Stack Integration', () => {
 
   it('should handle async middleware correctly', async () => {
     const asyncMiddleware = async (
-      req: TestRequest,
-      res: MockResponse,
+      _req: TestRequest,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       await new Promise((resolve) => setTimeout(resolve, 10))
@@ -362,7 +362,7 @@ describe('Middleware Context Preservation', () => {
 
     const contextMiddleware = async (
       _req: TestRequest,
-      res: MockResponse,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       context.startTime = Date.now()
@@ -371,7 +371,7 @@ describe('Middleware Context Preservation', () => {
 
     const authMiddleware = async (
       req: TestRequest,
-      res: MockResponse,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       req.user = { id: 'user123' }
@@ -380,8 +380,8 @@ describe('Middleware Context Preservation', () => {
     }
 
     const loggingMiddleware = async (
-      req: TestRequest,
-      res: MockResponse,
+      _req: TestRequest,
+      _res: MockResponse,
       next: NextFunction,
     ) => {
       const duration = Date.now() - context.startTime

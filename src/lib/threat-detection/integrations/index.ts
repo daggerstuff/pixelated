@@ -280,7 +280,7 @@ export const usageExamples = {
    * Basic Express middleware setup
    */
   expressSetup: `
-import { createThreatDetectionIntegration } from './integrations'
+import { createThreatDetectionIntegration } from './index'
 import { AdvancedResponseOrchestrator } from '../response-orchestration'
 import { DistributedRateLimiter } from '../../rate-limiting/rate-limiter'
 
@@ -300,7 +300,7 @@ app.use(middleware.middleware())
    * Manual threat analysis
    */
   manualAnalysis: `
-import { createThreatDetectionIntegration } from './integrations'
+import { createThreatDetectionIntegration } from './index'
 
 const { service } = createThreatDetectionIntegration(
   orchestrator,
@@ -325,7 +325,7 @@ const response = await service.analyzeThreat(threatData)
    * Request checking with rate limiting
    */
   requestChecking: `
-import { createThreatDetectionIntegration } from './integrations'
+import { createThreatDetectionIntegration } from './index'
 
 const { checkRequest } = createThreatDetectionIntegration(
   orchestrator,
@@ -350,7 +350,7 @@ if (!result.allowed) {
    * Custom configuration
    */
   customConfig: `
-import { createThreatDetectionIntegration } from './integrations'
+import { createThreatDetectionIntegration } from './index'
 
 const customConfig = {
   enabled: true,
