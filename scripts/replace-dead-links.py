@@ -116,21 +116,15 @@ def main() -> None:
     mapping_path = Path(args.mapping)
     archived_paths = load_mapping(mapping_path)
 
-    print(f"Loaded {len(archived_paths)} archived path(s) from mapping.")
-    print(f"Scanning markdown files under: {root}")
     if args.dry_run:
-        print("[DRY RUN] No files will be modified.\n")
+        pass
 
     total_files = total_replacements = 0
     for md_file in find_markdown_files(root):
         count = replace_in_file(md_file, archived_paths, args.dry_run)
         if count:
-            verb = "Would replace" if args.dry_run else "Replaced"
-            print(f"  {verb} {count} link(s) in: {md_file}")
             total_files += 1
             total_replacements += count
-
-    print(f"\nDone. {total_replacements} link(s) across {total_files} file(s).")
 
 
 if __name__ == "__main__":

@@ -25,7 +25,7 @@ vi.mock('@/config/mongodb.config', () => {
             ) => {
               store.set(
                 filter.sessionId,
-                update.$set as Record<string, unknown>,
+                update.$set,
               )
               return { upsertedCount: 1 }
             },

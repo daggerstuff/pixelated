@@ -126,7 +126,7 @@ class MockMemoryProvider:
     async def update_memory(
         self,
         memory_id: str,
-        content: str = None,
+        content: str | None = None,
         metadata: MemoryMetadata = None,
     ) -> None:
         if memory_id in self._memories:

@@ -400,9 +400,8 @@ class VisionBiasDetector:
         """Find matching bias type from text"""
         text_lower = text.lower()
         for keyword, bias_type in bias_mappings.items():
-            if keyword in text_lower:
-                if bias_types is None or bias_type in bias_types:
-                    return bias_type
+            if keyword in text_lower and (bias_types is None or bias_type in bias_types):
+                return bias_type
         return None
 
     def _create_bias_score(

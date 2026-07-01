@@ -5,7 +5,6 @@ import argparse
 import base64
 import json
 import re
-import sys
 from dataclasses import dataclass
 from urllib.request import Request, urlopen
 
@@ -145,28 +144,12 @@ def main() -> None:
     args = parser.parse_args()
 
     try:
-        context = resolve_lightning_context(
-            args.creds_path, require_studio=args.require_studio, preferred_machine=args.machine
-        )
-        values = {
-            "username": context.username,
-            "teamspace": context.teamspace,
-            "project_id": context.project_id,
-            "studio": context.studio,
-            "owner_type": context.owner_type,
-        }
+        resolve_lightning_context(args.creds_path, require_studio=args.require_studio, preferred_machine=args.machine)
         if args.format == "json":
-            print(json.dumps(values))
+            pass
         else:
-            print(
-                f"{values['username']}\n"
-                f"{values['teamspace']}\n"
-                f"{values['project_id']}\n"
-                f"{values['studio']}\n"
-                f"{values['owner_type']}"
-            )
-    except Exception as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+            pass
+    except Exception:
         raise SystemExit(1)
 
 

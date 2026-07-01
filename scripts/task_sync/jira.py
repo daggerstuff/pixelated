@@ -298,7 +298,7 @@ def export_jira_issues() -> list[dict[str, Any]]:
         }
         if next_page_token:
             query["nextPageToken"] = next_page_token
-            
+
         url = f"{site_url}/rest/api/3/search/jql?{parse.urlencode(query)}"
         payload = _json_request("GET", url, headers=headers)
         batch = payload.get("issues", [])
@@ -320,8 +320,7 @@ def apply_jira_action(action: Mapping[str, Any]) -> dict[str, Any]:
     view = _object_view(action)
     if not view.target_id:
         payload = jira_create_payload(view, project_key, issue_type)
-        response = _json_request("POST", f"{site_url}/rest/api/3/issue", headers=headers, payload=payload)
-        return response
+        return _json_request("POST", f"{site_url}/rest/api/3/issue", headers=headers, payload=payload)
     payload = jira_update_payload(view)
     _json_request(
         "PUT",
