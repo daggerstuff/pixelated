@@ -24,7 +24,7 @@
       "memory_free_mib": 21119
     },
     "gpu_floor_met": true,
-    "api_version_response": {"version": "0.30.11"},
+    "api_version_response": { "version": "0.30.11" },
     "compose_env": {
       "OLLAMA_NUM_PARALLEL": "2",
       "OLLAMA_NUM_CTX": "8192",

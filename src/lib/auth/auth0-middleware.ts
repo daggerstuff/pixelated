@@ -5,6 +5,7 @@
 
 import { auth0UserService } from '../../services/auth0.service'
 import { developerApiKeyManager } from '../db/developer-api-keys'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { validateToken } from './auth0-jwt-service'
 import {
@@ -13,7 +14,6 @@ import {
 } from './auth0-rbac-service'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth0-middleware')
 
 export type { AuthStrategy }

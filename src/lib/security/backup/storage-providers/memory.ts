@@ -5,8 +5,8 @@
  * This is useful for testing or as a fallback when other providers are unavailable
  */
 
-import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 const logger = createBuildSafeLogger('memory')
 
 export class InMemoryStorageProvider implements StorageProvider {

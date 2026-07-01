@@ -1,7 +1,7 @@
 import { createClient } from 'redis'
 
-import type { StorageAPI } from '../types'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { StorageAPI } from '../types'
 const logger = createBuildSafeLogger('redis.storage')
 
 export class RedisStorageAPI implements StorageAPI {

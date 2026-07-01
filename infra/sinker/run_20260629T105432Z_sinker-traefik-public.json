@@ -38,9 +38,13 @@
       {
         "name": "ollama-pixelated-love@file",
         "type": "loadbalancer",
-        "servers": [{"url": "http://pixelated-ollama:11434"}],
-        "serverStatus": {"http://pixelated-ollama:11434": "UP"},
-        "healthCheck": {"path": "/api/version", "interval": "30s", "timeout": "5s"}
+        "servers": [{ "url": "http://pixelated-ollama:11434" }],
+        "serverStatus": { "http://pixelated-ollama:11434": "UP" },
+        "healthCheck": {
+          "path": "/api/version",
+          "interval": "30s",
+          "timeout": "5s"
+        }
       }
     ],
     "tls_resolver": "letsencrypt-dns",

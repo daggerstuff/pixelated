@@ -19,7 +19,7 @@ http:
     # Higher-priority router: /oauth2/* paths go directly to oauth2-proxy
     # without forwardAuth (oauth2-proxy handles its own auth flow).
     ollama-oauth2-direct:
-      rule: "Host(`ollama.pixelated.love`) && PathPrefix(`/oauth2`)"
+      rule: 'Host(`ollama.pixelated.love`) && PathPrefix(`/oauth2`)'
       entryPoints:
         - websecure
       service: oauth2-proxy-direct
@@ -30,7 +30,7 @@ http:
         certResolver: letsencrypt-dns
 
     ollama-pixelated-love:
-      rule: "Host(`ollama.pixelated.love`)"
+      rule: 'Host(`ollama.pixelated.love`)'
       entryPoints:
         - websecure
       service: ollama-pixelated-love
@@ -44,7 +44,7 @@ http:
     ollama-pixelated-love:
       loadBalancer:
         servers:
-          - url: "http://pixelated-ollama:11434"
+          - url: 'http://pixelated-ollama:11434'
         healthCheck:
           path: /api/version
           interval: 30s
@@ -53,12 +53,12 @@ http:
     oauth2-proxy-direct:
       loadBalancer:
         servers:
-          - url: "http://pixelated-oauth2-proxy:4180"
+          - url: 'http://pixelated-oauth2-proxy:4180'
 
   middlewares:
     oauth-forwardauth:
       forwardAuth:
-        address: "http://pixelated-oauth2-proxy:4180"
+        address: 'http://pixelated-oauth2-proxy:4180'
         trustForwardHeader: true
         authResponseHeaders:
           - X-Auth-Request-Email
@@ -73,4 +73,4 @@ http:
         frameDeny: true
         contentTypeNosniff: true
         browserXssFilter: true
-        referrerPolicy: "strict-origin-when-cross-origin"
+        referrerPolicy: 'strict-origin-when-cross-origin'

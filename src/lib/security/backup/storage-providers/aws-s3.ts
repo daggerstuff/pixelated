@@ -5,8 +5,8 @@
  * It uses dynamic imports to prevent bundling Node.js modules with client code
  */
 
-import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import type { StorageProvider, StorageProviderConfig } from '../backup-types'
 const logger = createBuildSafeLogger('aws-s3')
 
 interface S3Credentials {

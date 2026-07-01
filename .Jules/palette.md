@@ -1,0 +1,1 @@
+## 2026-06-30 - Add semantic region and ARIA label to AIChat container | Learning: Using aria-label with a fallback on container elements ensures screen reader users can identify and navigate to reusable components even when the title prop is conditionally rendered. | Action: Replaced div with semantic section tag and added aria-label with fallback value.

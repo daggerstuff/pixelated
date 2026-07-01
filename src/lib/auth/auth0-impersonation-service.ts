@@ -6,11 +6,11 @@
 import { ManagementClient } from 'auth0'
 
 import { auth0UserService } from '../../services/auth0.service'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 // Auth0 Configuration
 import { auth0Config } from './auth0-config'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('auth0-impersonation-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'

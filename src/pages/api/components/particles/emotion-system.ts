@@ -253,7 +253,11 @@ export const POST: APIRoute = protectRoute()(
 
       // Save particle interaction data for analytics
       const repository = new AIRepository()
-      await repository.saveParticleInteraction(user.id, sessionId as string | undefined, updateResponse)
+      await repository.saveParticleInteraction(
+        user.id,
+        sessionId as string | undefined,
+        updateResponse,
+      )
 
       logger.info('Processed particle system update', {
         emotion,

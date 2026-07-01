@@ -10,9 +10,9 @@
 import * as crypto from 'crypto'
 
 import { createPrivacyHash } from '../../simulator/utils/privacy'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { phiDetector, detectAndRedactPHIAsync } from './phiDetection'
 import { piiDetectionService } from './pii'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('anonymizationPipeline')
 
 // Types

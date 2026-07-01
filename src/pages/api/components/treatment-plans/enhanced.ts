@@ -1,4 +1,4 @@
-import type { APIRoute } from 'astro';
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 export const prerender = false
@@ -260,7 +260,9 @@ export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for creating/updating treatment plans
  */
-export const POST: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async (
+  context: AuthAPIContext,
+) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -468,4 +470,3 @@ export const PATCH = protectRoute()(async (context: AuthAPIContext) => {
     )
   }
 })
-
