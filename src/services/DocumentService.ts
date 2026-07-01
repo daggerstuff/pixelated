@@ -35,6 +35,10 @@ interface DocumentRow {
   is_public: boolean
 }
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
+const docLogger = createBuildSafeLogger('document-service')
+
 interface DocumentChangeRow {
   id: string
   document_id: string
@@ -345,7 +349,7 @@ function parseSession(sessionData: string): CollaborationSession | null {
           : new Date(value.lastActivity),
     }
   } catch (error: unknown) {
-    console.error('Failed to parse collaboration session', error)
+    docLogger.error('Failed to parse collaboration session', error)
   }
 
   return null

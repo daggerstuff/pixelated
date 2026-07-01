@@ -283,12 +283,12 @@ class TestPerformanceOptimizationIntegration:
 
         # First run - cache miss
         start_time = time.time()
-        results_1 = await performance_optimizer.process_with_caching(test_queries, cache_manager)
+        await performance_optimizer.process_with_caching(test_queries, cache_manager)
         first_run_time = time.time() - start_time
 
         # Second run - cache hit for duplicate
         start_time = time.time()
-        results_2 = await performance_optimizer.process_with_caching(test_queries, cache_manager)
+        await performance_optimizer.process_with_caching(test_queries, cache_manager)
         second_run_time = time.time() - start_time
 
         # Verify caching improved performance
@@ -445,7 +445,7 @@ class TestBiasDetectionMetricsIntegration:
         alert_thresholds = {"detection_rate": 0.8, "false_positive_rate": 0.2, "accuracy": 0.7}
 
         # Simulate high bias detection scenario
-        for i in range(100):
+        for _i in range(100):
             bias_metrics.track_event(
                 {
                     "event_type": "bias_detected",

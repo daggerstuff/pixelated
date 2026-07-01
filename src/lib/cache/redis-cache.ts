@@ -1,5 +1,8 @@
 import { createClient, RedisClientType } from 'redis'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('redis-cache')
+
 export interface CacheConfig {
   host: string
   port: number
@@ -39,17 +42,17 @@ export class RedisCache {
 
   private setupEventHandlers(): void {
     this.client.on('connect', () => {
-      console.log('✅ Redis cache connected')
+      logger.info('✅ Redis cache connected')
       this.connected = true
     })
 
     this.client.on('error', (err) => {
-      console.error('❌ Redis cache error:', err)
+      logger.error('❌ Redis cache error:', err)
       this.connected = false
     })
 
     this.client.on('disconnect', () => {
-      console.log('📡 Redis cache disconnected')
+      logger.info('📡 Redis cache disconnected')
       this.connected = false
     })
   }
@@ -84,7 +87,7 @@ export class RedisCache {
 
       return JSON.parse(cached) as T
     } catch (error: unknown) {
-      console.warn('Redis cache get error:', error)
+      logger.warn('Redis cache get error:', error)
       return null
     }
   }
@@ -100,7 +103,7 @@ export class RedisCache {
 
       await this.client.setEx(this.generateKey(key), finalTtl, serializedValue)
     } catch (error: unknown) {
-      console.warn('Redis cache set error:', error)
+      logger.warn('Redis cache set error:', error)
     }
   }
 
@@ -112,7 +115,7 @@ export class RedisCache {
 
       await this.client.del(this.generateKey(key))
     } catch (error: unknown) {
-      console.warn('Redis cache delete error:', error)
+      logger.warn('Redis cache delete error:', error)
     }
   }
 
@@ -125,7 +128,7 @@ export class RedisCache {
       const result = await this.client.exists(this.generateKey(key))
       return result === 1
     } catch (error: unknown) {
-      console.warn('Redis cache exists error:', error)
+      logger.warn('Redis cache exists error:', error)
       return false
     }
   }
@@ -161,7 +164,7 @@ export class RedisCache {
         await this.client.del(keys)
       }
     } catch (error: unknown) {
-      console.warn('Redis cache invalidate pattern error:', error)
+      logger.warn('Redis cache invalidate pattern error:', error)
     }
   }
 
@@ -176,7 +179,7 @@ export class RedisCache {
         await this.client.del(keys)
       }
     } catch (error: unknown) {
-      console.warn('Redis cache clear error:', error)
+      logger.warn('Redis cache clear error:', error)
     }
   }
 
@@ -199,7 +202,7 @@ export class RedisCache {
         memory: this.parseRedisInfo(info),
       }
     } catch (error: unknown) {
-      console.warn('Redis cache stats error:', error)
+      logger.warn('Redis cache stats error:', error)
       return {
         connected: false,
         keys: 0,

@@ -7,6 +7,10 @@ import type { CognitiveModel } from '../types/CognitiveModel'
 
 export type ModelIdentifier = string
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+
+const modelLogger = createBuildSafeLogger('patient-model-service')
+
 export class PatientModelService {
   constructor(private readonly kvStore: KVStore) {}
 
@@ -27,7 +31,7 @@ export class PatientModelService {
 
       return models
     } catch (error: unknown) {
-      console.error('Failed to get available models:', error)
+      modelLogger.error('Failed to get available models', error)
       return []
     }
   }
@@ -39,7 +43,7 @@ export class PatientModelService {
     try {
       await this.kvStore.set(model.id, model)
     } catch (error: unknown) {
-      console.error('Failed to save model:', error)
+      modelLogger.error('Failed to save model', error)
       throw error
     }
   }
@@ -51,7 +55,7 @@ export class PatientModelService {
     try {
       return await this.kvStore.get<CognitiveModel>(id)
     } catch (error: unknown) {
-      console.error('Failed to get model:', error)
+      modelLogger.error('Failed to get model', error)
       return null
     }
   }
@@ -63,7 +67,7 @@ export class PatientModelService {
     try {
       await this.kvStore.delete(id)
     } catch (error: unknown) {
-      console.error('Failed to delete model:', error)
+      modelLogger.error('Failed to delete model', error)
       throw error
     }
   }

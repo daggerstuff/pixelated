@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('EducationalContextRecognizer') /**
  * Simplified EducationalContextRecognizer
  * Focuses on reliable pattern matching with optional AI enhancement
  */
@@ -164,7 +165,7 @@ export class EducationalContextRecognizer {
         }
       } catch (error: unknown) {
         // Continue with pattern-based result if AI fails
-        console.warn('AI analysis failed, using pattern-based result:', error)
+        logger.warn('AI analysis failed, using pattern-based result:', error)
       }
     }
 

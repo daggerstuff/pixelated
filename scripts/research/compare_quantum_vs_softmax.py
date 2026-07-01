@@ -1,5 +1,4 @@
 import time
-from collections import Counter
 
 import numpy as np
 import torch
@@ -12,7 +11,6 @@ NUM_SIMULATIONS = 10000
 
 def run_softmax_simulation():
     """Simulates emotion measurement using a standard softmax probability distribution."""
-    print("--- Running Softmax Simulation ---")
     start_time = time.time()
 
     # Create a random logit tensor
@@ -26,17 +24,11 @@ def run_softmax_simulation():
         results.append(EMOTIONS[sampled_index])
 
     end_time = time.time()
-    duration = end_time - start_time
-
-    print(f"Probabilities: {probabilities.numpy()}")
-    print(f"Result Distribution: {Counter(results)}")
-    print(f"Duration: {duration:.4f} seconds")
-    return duration
+    return end_time - start_time
 
 
 def run_quantum_simulation():
     """Simulates emotion measurement using the QuantumEmotionState class."""
-    print("\n--- Running Quantum-Inspired Simulation ---")
     start_time = time.time()
 
     # Create a quantum state with random complex amplitudes
@@ -52,10 +44,7 @@ def run_quantum_simulation():
     end_time = time.time()
     duration = end_time - start_time
 
-    probabilities = np.abs(q_state.amplitudes) ** 2
-    print(f"Probabilities: {probabilities}")
-    print(f"Result Distribution: {Counter(results)}")
-    print(f"Duration: {duration:.4f} seconds")
+    np.abs(q_state.amplitudes) ** 2
     return duration
 
 
@@ -63,8 +52,7 @@ if __name__ == "__main__":
     softmax_time = run_softmax_simulation()
     quantum_time = run_quantum_simulation()
 
-    print("\n--- Comparison ---")
     if softmax_time < quantum_time:
-        print(f"Softmax was {quantum_time / softmax_time:.2f}x faster.")
+        pass
     else:
-        print(f"Quantum-inspired was {softmax_time / quantum_time:.2f}x faster.")
+        pass

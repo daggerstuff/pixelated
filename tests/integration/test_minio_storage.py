@@ -79,13 +79,16 @@ class MockObject:
         self.content_type = content_type or "application/octet-stream"
         self.metadata = metadata or {}
 
+
 class MockResponse(BytesIO):
     def release_conn(self) -> None:
         pass
 
+
 class MockBucket:
     def __init__(self, name: str):
         self.name = name
+
 
 class MockMinio:
     def __init__(self, *args, **kwargs):
@@ -95,7 +98,14 @@ class MockMinio:
         if len(bucket_name) < 3 or len(bucket_name) > 63:
             raise S3Error("InvalidBucketName", "The specified bucket name is not valid.", None, None, None, None)
         if bucket_name in self.buckets:
-            raise S3Error("BucketAlreadyOwnedByYou", "Your previous request to create the named bucket succeeded and you already own it.", None, None, None, None)
+            raise S3Error(
+                "BucketAlreadyOwnedByYou",
+                "Your previous request to create the named bucket succeeded and you already own it.",
+                None,
+                None,
+                None,
+                None,
+            )
         self.buckets[bucket_name] = {}
 
     def list_buckets(self, *args, **kwargs) -> list[MockBucket]:
@@ -120,7 +130,7 @@ class MockMinio:
         content_type: str | None = None,
         metadata: dict | None = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> str:
         if bucket_name not in self.buckets:
             raise S3Error("NoSuchBucket", "The specified bucket does not exist.", None, None, None, None)
@@ -136,7 +146,7 @@ class MockMinio:
         content_type: str | None = None,
         metadata: dict | None = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> str:
         if bucket_name not in self.buckets:
             raise S3Error("NoSuchBucket", "The specified bucket does not exist.", None, None, None, None)
@@ -167,7 +177,9 @@ class MockMinio:
             raise S3Error("NoSuchKey", "The specified key does not exist.", None, None, None, None)
         return self.buckets[bucket_name][object_name]
 
-    def list_objects(self, bucket_name: str, prefix: str | None = None, recursive: bool = False, *args, **kwargs) -> list[MockObject]:
+    def list_objects(
+        self, bucket_name: str, prefix: str | None = None, recursive: bool = False, *args, **kwargs
+    ) -> list[MockObject]:
         if bucket_name not in self.buckets:
             raise S3Error("NoSuchBucket", "The specified bucket does not exist.", None, None, None, None)
         objects = []
@@ -183,10 +195,14 @@ class MockMinio:
         if object_name in self.buckets[bucket_name]:
             del self.buckets[bucket_name][object_name]
 
-    def presigned_get_object(self, bucket_name: str, object_name: str, expires: timedelta | None = None, *args, **kwargs) -> str:
+    def presigned_get_object(
+        self, bucket_name: str, object_name: str, expires: timedelta | None = None, *args, **kwargs
+    ) -> str:
         return f"http://localhost:9000/{bucket_name}/{object_name}?token=presigned"
 
-    def presigned_put_object(self, bucket_name: str, object_name: str, expires: timedelta | None = None, *args, **kwargs) -> str:
+    def presigned_put_object(
+        self, bucket_name: str, object_name: str, expires: timedelta | None = None, *args, **kwargs
+    ) -> str:
         return f"http://localhost:9000/{bucket_name}/{object_name}?token=presigned"
 
 
@@ -214,8 +230,7 @@ def minio_client() -> Generator[Minio | MockMinio]:
     try:
         client.list_buckets()
         yield client
-    except Exception as e:
-        print(f"MinIO not available at {MINIO_ENDPOINT}: {e}. Falling back to in-memory MockMinio.")
+    except Exception:
         yield MockMinio()
 
 

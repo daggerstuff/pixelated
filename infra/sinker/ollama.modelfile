@@ -1,0 +1,10 @@
+# infra/sinker/ollama.modelfile — runtime modelfile for Wayfarer IQ4_XS
+# V100S 32GB preset: num_parallel=2, num_ctx=8192, flash_attention=1
+# This file is scp'd to sinker:/etc/ollama/Modelfile-runtime
+# Managed by infra-sinker milestone; do NOT edit without updating model_digest.lock
+
+FROM bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS
+
+PARAMETER num_ctx 8192
+PARAMETER num_parallel 2
+PARAMETER flash_attention true

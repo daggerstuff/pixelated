@@ -93,8 +93,8 @@ export class RateLimitingBridge {
     try {
       // Determine appropriate rule based on context
       // Check for bypass rules
-      // console.log('TRACE: Bridge start', identifier)
-      // console.log('TRACE: rateLimiter keys', Object.keys(this.rateLimiter))
+      // logger.info('TRACE: Bridge start', identifier)
+      // logger.info('TRACE: rateLimiter keys', Object.keys(this.rateLimiter))
 
       const rule = this.selectRateLimitRule(context)
 

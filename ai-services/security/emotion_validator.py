@@ -5,14 +5,14 @@ Validates emotion detection results with bias detection integration
 
 import logging
 import re
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 
-class EmotionCategory(str, Enum):
+class EmotionCategory(StrEnum):
     HAPPY = "happy"
     SAD = "sad"
     ANGRY = "angry"

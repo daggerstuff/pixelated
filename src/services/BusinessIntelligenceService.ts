@@ -141,6 +141,10 @@ type MarketForecast = {
   confidence: number
 }
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
+const biLogger = createBuildSafeLogger('business-intelligence')
+
 export class BusinessIntelligenceService {
   private readonly db: Pool
   private readonly alphaVantageApiKey: string
@@ -187,7 +191,7 @@ export class BusinessIntelligenceService {
         timestamp,
       }
     } catch (error: unknown) {
-      console.error('Error fetching market data:', error)
+      biLogger.error('Error fetching market data', error)
       // Return demo data if API fails
       return this.getDemoMarketData(symbol)
     }
@@ -200,7 +204,7 @@ export class BusinessIntelligenceService {
       const promises = symbols.map(async (symbol) => this.getMarketData(symbol))
       return Promise.all(promises)
     } catch (error: unknown) {
-      console.error('Error fetching market trends:', error)
+      biLogger.error('Error fetching market trends', error)
       return this.getDemoMarketTrends(industry)
     }
   }
@@ -234,7 +238,7 @@ export class BusinessIntelligenceService {
             : row.last_updated,
       }))
     } catch (error: unknown) {
-      console.error('Error fetching competitor analysis:', error)
+      biLogger.error('Error fetching competitor analysis', error)
       return this.getDemoCompetitorAnalysis(industry)
     }
   }
@@ -265,7 +269,7 @@ export class BusinessIntelligenceService {
         estimatedROI: row.estimated_roi,
       }))
     } catch (error: unknown) {
-      console.error('Error fetching market opportunities:', error)
+      biLogger.error('Error fetching market opportunities', error)
       return this.getDemoMarketOpportunities(industry)
     }
   }
@@ -303,7 +307,7 @@ export class BusinessIntelligenceService {
       // Return demo data if no real data
       return this.getDemoBusinessMetrics(userId, quarter, year)
     } catch (error: unknown) {
-      console.error('Error fetching business metrics:', error)
+      biLogger.error('Error fetching business metrics', error)
       return this.getDemoBusinessMetrics(userId, quarter, year)
     }
   }
@@ -370,7 +374,7 @@ export class BusinessIntelligenceService {
         actionUrl: row.action_url,
       }))
     } catch (error: unknown) {
-      console.error('Error fetching business alerts:', error)
+      biLogger.error('Error fetching business alerts', error)
       return this.getDemoBusinessAlerts(userId, limit)
     }
   }
@@ -415,7 +419,7 @@ export class BusinessIntelligenceService {
       // Process and return forecast data
       return this.generateMarketForecast(response.data, days)
     } catch (error: unknown) {
-      console.error('Error generating market forecast:', error)
+      biLogger.error('Error generating market forecast', error)
       return this.getDemoMarketForecast(symbol, days)
     }
   }
@@ -449,7 +453,7 @@ export class BusinessIntelligenceService {
         risks: ['Regulatory changes', 'Market volatility', 'Competition'],
       }
     } catch (error: unknown) {
-      console.error('Error generating industry analysis:', error)
+      biLogger.error('Error generating industry analysis', error)
       return this.getDemoIndustryAnalysis(industry)
     }
   }

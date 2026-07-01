@@ -979,7 +979,7 @@ class AutomatedMemoryUpdater:
         if not self.config.backup_enabled:
             return
 
-        backup_data = {
+        {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "memory_count": len(self.memory_cache),
             "memories": [
@@ -1003,7 +1003,7 @@ class AutomatedMemoryUpdater:
         }
 
         # Save backup (in real implementation, this would save to persistent storage)
-        backup_file = f"memory_backup_{int(time.time())}.json"
+        f"memory_backup_{int(time.time())}.json"
 
         logger.info(f"Memory backup completed: {len(self.memory_cache)} memories backed up")
 
@@ -1117,12 +1117,10 @@ if __name__ == "__main__":
             },
         }
 
-        result = await updater.handle_training_completion(training_data)
-        print(f"Training completion handled: {result}")
+        await updater.handle_training_completion(training_data)
 
         # Get stats
-        stats = updater.get_memory_stats()
-        print(f"Memory stats: {stats}")
+        updater.get_memory_stats()
 
         # Stop updater
         await updater.stop()

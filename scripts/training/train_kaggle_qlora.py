@@ -73,8 +73,6 @@ CONFIG = {
 def load_model_and_tokenizer():
     """Load model with 4-bit quantization for QLoRA"""
 
-    print(f"Loading base model: {CONFIG['base_model']}")
-
     # BitsAndBytes config for 4-bit
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -117,8 +115,6 @@ def load_model_and_tokenizer():
 def load_training_data(data_path: str):
     """Load and prepare training data with validation"""
 
-    print(f"Loading training data from: {data_path}")
-
     all_data = []
     data_path = Path(data_path)
 
@@ -131,7 +127,6 @@ def load_training_data(data_path: str):
         jsonl_files = list(data_path.glob("*.jsonl"))
         if not jsonl_files:
             raise ValueError(f"No .jsonl files found in {data_path}")
-        print(f"Found {len(jsonl_files)} JSONL files")
     else:
         # Single file
         if not data_path.suffix == ".jsonl":
@@ -144,25 +139,23 @@ def load_training_data(data_path: str):
     for jsonl_file in jsonl_files:
         try:
             with open(jsonl_file) as f:
-                for line_num, line in enumerate(f, 1):
+                for _line_num, line in enumerate(f, 1):
                     if not line.strip():
                         continue
                     try:
                         data = json.loads(line)
                         all_data.append(data)
                         total_lines += 1
-                    except json.JSONDecodeError as e:
+                    except json.JSONDecodeError:
                         errors += 1
                         if errors <= 5:  # Show first 5 errors only
-                            print(f"  ⚠️  Line {line_num} in {jsonl_file.name}: {e}")
-        except Exception as e:
-            print(f"  ❌ Error reading {jsonl_file}: {e}")
+                            pass
+        except Exception:
             raise
 
     if errors > 5:
-        print(f"  ... and {errors - 5} more JSON parsing errors")
+        pass
 
-    print(f"✅ Loaded {total_lines} training samples (from {len(jsonl_files)} files)")
     if not all_data:
         raise ValueError("No valid training data loaded")
 
@@ -175,7 +168,6 @@ def tokenize_data(examples, tokenizer, max_length=2048):
     texts = []
     for item in examples:
         if not isinstance(item, dict):
-            print(f"⚠️  Skipping non-dict item: {type(item)}")
             continue
 
         text = None
@@ -236,28 +228,16 @@ def tokenize_data(examples, tokenizer, max_length=2048):
 def main():
     """Main training function"""
 
-    print("=" * 60)
-    print("PIXELATED V2 - QLORA ANTI-REPETITION TRAINING")
-    print("=" * 60)
-    print(f"Base model: {CONFIG['base_model']}")
-    print(f"LoRA r={CONFIG['lora']['r']}, alpha={CONFIG['lora']['lora_alpha']}")
-    print(f"Learning rate: {CONFIG['training']['learning_rate']}")
-    print(f"Weight decay: {CONFIG['training']['weight_decay']}")
-    print("=" * 60)
-
     try:
         # Load model
-        print("\n[1/5] Loading model and tokenizer...")
         model, tokenizer = load_model_and_tokenizer()
 
         # Load data with error handling
-        print("\n[2/5] Loading training data...")
         raw_data = load_training_data(CONFIG["data_path"])
         if not raw_data:
             raise ValueError("No training data loaded successfully")
 
         # Create dataset
-        print(f"\n[3/5] Preparing dataset ({len(raw_data)} samples)...")
         dataset = Dataset.from_list(raw_data)
 
         # Tokenize
@@ -272,7 +252,6 @@ def main():
 
         # Split for validation
         if len(tokenized_dataset) < 2:
-            print("⚠️  Dataset too small for proper train/eval split, using single split")
             train_dataset = tokenized_dataset
             eval_dataset = tokenized_dataset
         else:
@@ -280,10 +259,7 @@ def main():
             train_dataset = split_dataset["train"]
             eval_dataset = split_dataset["test"]
 
-        print(f"✅ Train: {len(train_dataset)}, Eval: {len(eval_dataset)}")
-
         # Training arguments
-        print("\n[4/5] Setting up training...")
         training_args = TrainingArguments(
             output_dir=CONFIG["output_dir"],
             num_train_epochs=CONFIG["training"]["num_train_epochs"],
@@ -319,11 +295,9 @@ def main():
         )
 
         # Train
-        print("\n[5/5] Starting training...")
-        train_result = trainer.train()
+        trainer.train()
 
         # Save LoRA adapter (not full model)
-        print("\n[Final] Saving LoRA adapter...")
         output_dir = Path(CONFIG["output_dir"])
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -334,23 +308,9 @@ def main():
         with open(output_dir / "training_config_used.json", "w") as f:
             json.dump(CONFIG, f, indent=2)
 
-        print(f"\n{'=' * 60}")
-        print("TRAINING COMPLETE")
-        print(f"{'=' * 60}")
-        print(f"Final loss: {train_result.training_loss}")
-        print(f"Adapter saved to: {output_dir}")
-
         # Print next steps
-        print(f"\n{'=' * 60}")
-        print("NEXT STEPS")
-        print(f"{'=' * 60}")
-        print("1. Download the adapter from:", output_dir)
-        print("2. Merge with base model using scripts/training/merge_lora.py")
-        print("3. Run evaluation with modal run ai/deployment/modal_app.py")
-        print("4. Verify repetition rate < 5%")
 
-    except Exception as e:
-        print(f"\n❌ ERROR: {e}")
+    except Exception:
         import traceback
 
         traceback.print_exc()

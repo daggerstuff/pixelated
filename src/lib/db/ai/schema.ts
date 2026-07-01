@@ -3,6 +3,8 @@
 import type { Db } from 'mongodb'
 
 import { mongodb } from '@/config/mongodb.config'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('schema')
 
 /** AI collection names in MongoDB Atlas */
 export const AI_COLLECTIONS = {
@@ -31,10 +33,10 @@ export async function initializeAICollections(): Promise<boolean> {
         ]),
       ),
     )
-    console.log('✅ AI collections initialized with indexes')
+    logger.info('✅ AI collections initialized with indexes')
     return true
   } catch (error: unknown) {
-    console.error('❌ Failed to initialize AI collections:', error)
+    logger.error('❌ Failed to initialize AI collections:', error)
     throw error
   }
 }

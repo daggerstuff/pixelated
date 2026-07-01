@@ -9,9 +9,9 @@
     "astro": "astro",
     "sync": "astro sync",
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' astro dev --host 0.0.0.0 --port 5173",
-    "start": "astro preview --host 0.0.0.0 --port ${WEBSITES_PORT:-4321}",
+    "start": "node scripts/utils/start-server.mjs",
     "start:sentry": "node scripts/utils/start-server.mjs",
-    "preview": "astro preview",
+    "preview": "PIXELATED_PREVIEW=true node scripts/utils/start-server.mjs",
     "dev:bias-detection": "PORT=8001 tsx src/lib/ai/bias-detection/server.ts",
     "dev:ai-service": "PORT=8002 tsx src/lib/ai/services/server.ts",
     "dev:analytics": "tsx src/lib/analytics/server.ts",
@@ -38,6 +38,7 @@
     "format:check:changed": "node scripts/ci/format-changed.mjs",
     "format:jules-markdown": "tsx scripts/ci/format-jules-markdown.ts",
     "lint": "oxlint -c .oxlintrc.json .",
+    "lint:full": "oxlint --type-aware -c .oxlintrc.json .",
     "lint:markdown": "pnpm exec markdownlint --config .markdownlint.json --ignore node_modules --ignore '**/node_modules/**' \"**/*.md\" \"**/*.mdx\"",
     "lint:markdown:staged": "git diff --cached --name-only --diff-filter=ACM -- '*.md' '*.mdx' | xargs -r pnpm exec markdownlint --config .markdownlint.json",
     "lint:ci": "node scripts/ci/lint-changed.mjs",
@@ -413,7 +414,7 @@
     "oxc-resolver": "latest",
     "oxfmt": "latest",
     "oxlint": "latest",
-    "oxlint-tsgolint": "latest",
+    "oxlint-tsgolint": "0.23.0",
     "path-to-regexp": "6.3.0",
     "postcss": "^8.5.15",
     "postcss-import": "latest",
@@ -461,10 +462,10 @@
     "hono": "^4.12.14"
   },
   "resolutions": {
-    "path-to-regexp": "8.4.2",
     "brace-expansion": "5.0.6",
     "form-data": "4.0.6",
-    "js-yaml": "4.1.2"
+    "js-yaml": "4.1.2",
+    "path-to-regexp": "8.4.2"
   },
   "engines": {
     "node": ">=24"

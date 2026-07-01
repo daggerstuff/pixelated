@@ -53,6 +53,10 @@ export interface SystemHealth {
 /**
  * Advanced Performance Monitoring System
  */
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+
+const perfLogger = createBuildSafeLogger('performance-monitor')
+
 class PerformanceMonitor {
   private readonly config: PerformanceConfig
   private metrics: PerformanceMetrics[] = []
@@ -93,7 +97,7 @@ class PerformanceMonitor {
       this.checkAlerts()
     }, this.config.monitoringInterval)
 
-    console.log('Performance monitoring started')
+    perfLogger.info('Performance monitoring started')
   }
 
   /**
@@ -104,7 +108,7 @@ class PerformanceMonitor {
       clearInterval(this.monitoringInterval)
       this.monitoringInterval = null
     }
-    console.log('Performance monitoring stopped')
+    perfLogger.info('Performance monitoring stopped')
   }
 
   private async collectMetrics(): Promise<void> {
@@ -350,7 +354,7 @@ class PerformanceMonitor {
     const callbacks = this.alertCallbacks.get(type) ?? []
     callbacks.forEach((callback) => callback(alert))
 
-    console.log(`Performance alert [${type.toUpperCase()}]: ${message}`)
+    perfLogger.info(`Performance alert [${type.toUpperCase()}]: ${message}`)
   }
 
   /**

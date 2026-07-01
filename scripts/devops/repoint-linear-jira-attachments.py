@@ -98,7 +98,6 @@ def main() -> int:
     key_map: dict[str, str] = json.loads(KEY_MAP_PATH.read_text())
 
     issues = fetch_all_issues(api_key)
-    print(f"Loaded {len(issues)} Linear issues")
 
     by_title: dict[str, list[dict]] = defaultdict(list)
     for issue in issues:
@@ -131,12 +130,7 @@ def main() -> int:
                 if adhd and not is_migration(issue):
                     repoint.append((issue, adhd, pix))
 
-    print(f"slimshadyme attachments to delete: {len(slim_deletes)}")
-    print(f"migration issues to mark Duplicate: {len(migration_cancel)}")
-    print(f"canonical issues to link ADHD: {len(repoint)}")
-
     if not args.apply:
-        print("Dry run only. Re-run with --apply.")
         return 0
 
     delete_mut = "mutation($id: String!) { attachmentDelete(id: $id) { success } }"
@@ -166,7 +160,7 @@ def main() -> int:
             deleted += 1
         except RuntimeError as exc:
             if "Entity not found" not in str(exc):
-                print(f"delete failed {ident} {att_id}: {exc}")
+                pass
         time.sleep(args.sleep)
 
     canceled = 0
@@ -174,8 +168,8 @@ def main() -> int:
         try:
             gql(api_key, cancel_mut, {"id": issue_id, "stateId": DUPLICATE_STATE_ID})
             canceled += 1
-        except RuntimeError as exc:
-            print(f"cancel failed {issue_id}: {exc}")
+        except RuntimeError:
+            pass
         time.sleep(args.sleep)
 
     linked = 0
@@ -206,13 +200,9 @@ def main() -> int:
                         {"id": issue["id"], "description": body + link_line},
                     )
             else:
-                print(f"link failed {ident} -> {adhd}: {exc}")
+                pass
         time.sleep(args.sleep)
 
-    print(
-        f"Done: deleted={deleted}, canceled_migration={canceled}, "
-        f"jira_linked={linked}, description_fallback={described}"
-    )
     return 0
 
 

@@ -16,10 +16,12 @@ interface JwtPayload {
   sid?: string
 }
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { updatePhase6AuthenticationProgress } from '../mcp/phase6-integration'
 import { setInCache } from '../redis'
 import { logSecurityEvent, SecurityEventType } from '../security/index'
 import { auth0Config } from './auth0-config'
+const logger = createBuildSafeLogger('auth0-jwt-service')
 
 const shouldWarnAuth0Configuration = process.env['NODE_ENV'] !== 'test'
 
@@ -78,7 +80,7 @@ function initializeAuth0Client() {
   const runtimeConfig = getRuntimeAuth0Config()
   if (!isRuntimeAuth0Configured(runtimeConfig)) {
     if (shouldWarnAuth0Configuration) {
-      console.warn('Auth0 configuration incomplete')
+      logger.warn('Auth0 configuration incomplete')
     }
     return
   }
@@ -466,9 +468,7 @@ export async function validateToken(
     // Validate Audience
     const expectedAudience = currentConfig.audience.trim()
     if (expectedAudience === '') {
-      console.warn(
-        'AUTH0_AUDIENCE not configured - audience validation skipped',
-      )
+      logger.warn('AUTH0_AUDIENCE not configured - audience validation skipped')
     } else {
       const { aud } = payload
       if (typeof aud === 'string') {
@@ -729,11 +729,11 @@ export function startTokenCleanupScheduler(): void {
     async () => {
       try {
         const result = await cleanupExpiredTokens()
-        console.log(
+        logger.info(
           `[Auth0-JWT] Cleanup completed: ${result.cleanedTokens} tokens removed`,
         )
       } catch (error: unknown) {
-        console.error('[Auth0-JWT] Cleanup failed:', error)
+        logger.error('[Auth0-JWT] Cleanup failed:', error)
       }
     },
     60 * 60 * 1000,
@@ -741,7 +741,7 @@ export function startTokenCleanupScheduler(): void {
 
   // Also run immediately
   cleanupExpiredTokens().catch((err) =>
-    console.error('[Auth0-JWT] Initial cleanup failed:', err),
+    logger.error('[Auth0-JWT] Initial cleanup failed:', err),
   )
 }
 
@@ -770,7 +770,7 @@ export async function measureTokenOperation<T>(
 
     // Log performance metrics
     if (duration > 100) {
-      console.warn(
+      logger.warn(
         `Token operation ${operationName} took ${duration.toFixed(2)}ms`,
       )
     }
@@ -778,7 +778,7 @@ export async function measureTokenOperation<T>(
     return result
   } catch (error: unknown) {
     const duration = performance.now() - start
-    console.error(
+    logger.error(
       `Token operation ${operationName} failed after ${duration.toFixed(2)}ms:`,
       error,
     )

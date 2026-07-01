@@ -21,7 +21,7 @@ old_gen = """def generate_month(month: str):
         pre_flight_context = build_event_context(event_id)
         if not pre_flight_context:
             continue
-            
+
         space_name = determine_space(pre_flight_context)
         context = build_event_context(event_id, target_space=space_name)"""
 
@@ -41,7 +41,7 @@ new_gen = """def generate_month(month: str):
             pre_flight_context = build_event_context(event_id, session=session)
             if not pre_flight_context:
                 continue
-                
+
             space_name = determine_space(pre_flight_context)
             context = build_event_context(event_id, target_space=space_name, session=session)"""
 

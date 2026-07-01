@@ -1,4 +1,6 @@
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { TrainingWebSocketServer } from './TrainingWebSocketServer.ts'
+const logger = createBuildSafeLogger('server')
 
 const PORT = process.env['TRAINING_WS_PORT']
   ? parseInt(process.env['TRAINING_WS_PORT'])
@@ -11,4 +13,4 @@ process.on('SIGTERM', () => {
   process.exit(0)
 })
 
-console.log(`Training WebSocket Server running on port ${PORT}`)
+logger.info(`Training WebSocket Server running on port ${PORT}`)

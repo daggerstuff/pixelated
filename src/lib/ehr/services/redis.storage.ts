@@ -1,6 +1,8 @@
 import { createClient } from 'redis'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { StorageAPI } from '../types'
+const logger = createBuildSafeLogger('redis.storage')
 
 export class RedisStorageAPI implements StorageAPI {
   private readonly client: ReturnType<typeof createClient>
@@ -12,7 +14,7 @@ export class RedisStorageAPI implements StorageAPI {
     })
 
     this.client.on('error', (err: unknown) => {
-      console.error('Redis Client Error:', err)
+      logger.error('Redis Client Error:', err)
     })
 
     this.client.on('connect', () => {

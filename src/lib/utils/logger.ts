@@ -162,7 +162,7 @@ class Logger {
         console.error(message, ...args)
         break
       default:
-        console.log(message, ...args)
+        console.info(message, ...args)
     }
   }
 

@@ -2,7 +2,7 @@
 import AIChatReact from './AIChatReact'
 
 export interface Props {
-  availableModels?: any[]
+  availableModels?: import('../lib/ai/models/types').AIModel[]
   showModelSelector?: boolean
   title?: string
   description?: string
@@ -21,10 +21,17 @@ const {
 } = Astro.props
 ---
 
-<div class="w-full max-w-2xl mx-auto transition-colors duration-300">
+<section
+  class="w-full max-w-2xl mx-auto transition-colors duration-300"
+  aria-labelledby={title ? 'ai-chat-title' : undefined}
+  aria-label={title ? undefined : 'AI Chat interface'}
+>
   {
     title && (
-      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+      <h2
+        id="ai-chat-title"
+        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white"
+      >
         {title}
       </h2>
     )
@@ -35,12 +42,13 @@ const {
     )
   }
 
+  {/* ⚡ Bolt: Changed client:load to client:visible to defer hydration until the component enters the viewport, improving initial page load performance. */}
   <AIChatReact
-    client:load
+    client:visible
     availableModels={availableModels as import('../lib/ai/models/types').AIModel[]}
     {showModelSelector}
   />
-</div>
+</section>
 
 <style>
   /* Ensure smooth dark mode transitions */

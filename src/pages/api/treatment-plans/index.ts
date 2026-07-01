@@ -1,6 +1,8 @@
-// import type { APIRoute } from 'astro'
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
+import type { AuthAPIContext } from '@/lib/auth/apiRouteTypes'
+import { protectRoute } from '@/lib/auth/serverAuth'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import { treatmentPlanDAO } from '@/services/mongodb.dao'
 
@@ -46,15 +48,11 @@ const treatmentPlanClientSchema = z.object({
   generalNotes: z.string().optional().nullable(),
 })
 
-export const GET = async ({ locals }) => {
+export const GET: APIRoute = protectRoute()(async ({
+  locals,
+}: AuthAPIContext) => {
   try {
-    // TODO: Replace with actual authentication check
     const { user } = locals
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
-        status: 401,
-      })
-    }
 
     logger.info('Fetching treatment plans', { userId: user.id })
 
@@ -72,17 +70,14 @@ export const GET = async ({ locals }) => {
       { status: 500 },
     )
   }
-}
+})
 
-export const POST = async ({ request, locals }) => {
+export const POST: APIRoute = protectRoute()(async ({
+  request,
+  locals,
+}: AuthAPIContext) => {
   try {
-    // TODO: Replace with actual authentication check
     const { user } = locals
-    if (!user) {
-      return new Response(JSON.stringify({ error: 'Not authenticated' }), {
-        status: 401,
-      })
-    }
 
     const body = await request.json()
 
@@ -223,4 +218,4 @@ export const POST = async ({ request, locals }) => {
       { status: 500 },
     )
   }
-}
+})

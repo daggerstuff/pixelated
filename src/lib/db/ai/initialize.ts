@@ -1,5 +1,7 @@
 import { createAuditLog, AuditEventType } from '../../audit'
 import { initializeAICollections } from './schema'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('initialize')
 
 /**
  * Initialize the AI database tables
@@ -7,7 +9,7 @@ import { initializeAICollections } from './schema'
  */
 export async function initializeAIDatabase() {
   try {
-    console.log('Initializing AI database tables...')
+    logger.info('Initializing AI database tables...')
 
     // Initialize tables
     await initializeAICollections()
@@ -21,10 +23,10 @@ export async function initializeAIDatabase() {
       { timestamp: new Date().toISOString() },
     )
 
-    console.log('AI database tables initialized successfully')
+    logger.info('AI database tables initialized successfully')
     return true
   } catch (error: unknown) {
-    console.error(
+    logger.error(
       'Failed to initialize AI database:',
       error instanceof Error ? error : new Error(String(error)),
     )

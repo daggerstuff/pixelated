@@ -10,6 +10,9 @@ import * as tf from '@tensorflow/tfjs'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('model-server')
+
 export interface ModelConfig {
   modelId: string
   modelPath: string
@@ -474,7 +477,7 @@ export class ModelServingServer extends EventEmitter {
           )
           break
         default:
-          console.warn(`Unknown feature engineering technique: ${technique}`)
+          logger.warn(`Unknown feature engineering technique: ${technique}`)
       }
     }
 

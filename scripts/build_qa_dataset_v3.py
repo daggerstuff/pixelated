@@ -52,7 +52,7 @@ def parse_transcript_file(file_path: Path) -> dict | None:
             if not stripped:
                 continue
             # Skip remaining markdown
-            if stripped.startswith("#") or stripped.startswith("**Source:") or stripped.startswith("**Date:"):
+            if stripped.startswith(("#", "**Source:", "**Date:")):
                 continue
             transcript_lines.append(stripped)
 
@@ -61,8 +61,7 @@ def parse_transcript_file(file_path: Path) -> dict | None:
         transcript_text = re.sub(r"\s+", " ", transcript_text)
 
         return {"title": title, "channel": channel, "content": transcript_text, "source_file": str(file_path)}
-    except Exception as e:
-        print(f"Error loading {file_path}: {e}")
+    except Exception:
         return None
 
 
@@ -123,7 +122,6 @@ def main():
     args = parser.parse_args()
 
     transcript_files = list(args.transcript_dir.glob("*.md"))
-    print(f"Found {len(transcript_files)} transcript files")
 
     if args.max_files:
         transcript_files = transcript_files[: args.max_files]
@@ -132,7 +130,6 @@ def main():
     for i, file_path in enumerate(transcript_files):
         transcript = parse_transcript_file(file_path)
         if not transcript or not transcript["content"].strip():
-            print(f"Skipping {file_path.name} - no content")
             continue
 
         passages = create_passages(transcript["content"])
@@ -141,26 +138,17 @@ def main():
             if pair:
                 all_pairs.append(pair)
 
-        if (i + 1) % 10 == 0 or (args.sample and i < 5):
-            print(f"Processed {i + 1}/{len(transcript_files)} files, {len(all_pairs)} pairs")
-            if args.sample and i >= 4:
-                break
+        if ((i + 1) % 10 == 0 or (args.sample and i < 5)) and args.sample and i >= 4:
+            break
 
     # Write output
     with open(args.output, "w") as f:
         for pair in all_pairs:
             f.write(json.dumps(pair) + "\n")
 
-    print(f"\nGenerated {len(all_pairs)} QA pairs")
-    print(f"Saved to {args.output}")
-
     if args.sample and all_pairs:
-        print("\n=== SAMPLE ===")
         for i, pair in enumerate(all_pairs[:3], 1):
-            print(f"\nPair {i}:")
-            print(f"  Channel: {pair['source']['channel']}")
-            print(f"  Instruction: {pair['instruction']}")
-            print(f"  Output (first 300 chars): {pair['output'][:300]}")
+            pass
 
 
 if __name__ == "__main__":

@@ -7,7 +7,9 @@
 
 import type { Dirent } from 'fs'
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { StorageProviderConfig } from '../backup-types'
+const logger = createBuildSafeLogger('local-fs')
 
 interface FileSystem {
   mkdir: (
@@ -74,7 +76,7 @@ export class LocalFileSystemProvider implements StorageProvider {
         `Local filesystem storage provider initialized with base path: ${this.basePath}`,
       )
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         'Failed to initialize local filesystem storage provider:',
         error,
       )
@@ -110,7 +112,7 @@ export class LocalFileSystemProvider implements StorageProvider {
 
       return relativeFiles
     } catch (error: unknown) {
-      console.error('Failed to list files from local filesystem:', error)
+      logger.error('Failed to list files from local filesystem:', error)
       throw new Error(
         `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -132,7 +134,7 @@ export class LocalFileSystemProvider implements StorageProvider {
       // Write file
       await this.fs!.writeFile(fullPath, data)
     } catch (error: unknown) {
-      console.error(`Failed to store file ${key} to local filesystem:`, error)
+      logger.error(`Failed to store file ${key} to local filesystem:`, error)
       throw new Error(
         `Failed to store file: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -155,7 +157,7 @@ export class LocalFileSystemProvider implements StorageProvider {
 
       return new Uint8Array(data)
     } catch (error: unknown) {
-      console.error(`Failed to get file ${key} from local filesystem:`, error)
+      logger.error(`Failed to get file ${key} from local filesystem:`, error)
       throw new Error(
         `Failed to get file: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -174,17 +176,14 @@ export class LocalFileSystemProvider implements StorageProvider {
       try {
         await this.fs!.access(fullPath)
       } catch {
-        console.warn(`File not found for deletion: ${key}`)
+        logger.warn(`File not found for deletion: ${key}`)
         return
       }
 
       // Delete file
       await this.fs!.unlink(fullPath)
     } catch (error: unknown) {
-      console.error(
-        `Failed to delete file ${key} from local filesystem:`,
-        error,
-      )
+      logger.error(`Failed to delete file ${key} from local filesystem:`, error)
       throw new Error(
         `Failed to delete file: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },

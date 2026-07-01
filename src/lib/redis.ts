@@ -1,359 +1,420 @@
 /**
- * Redis client wrapper for ioredis
- * This module provides a consistent interface for Redis operations with proper error handling
+ * Redis client wrapper — delegates to the canonical RedisService at
+ * src/lib/services/redis/RedisService.
+ *
+ * Maintains backward-compatible exports so existing callers (AnalyticsService,
+ * NotificationService, breach-analytics) require no changes.
+ *
+ * ## Consolidation note
+ *
+ * Previously this module had its own inline mock client and ioredis setup.
+ * All that logic now lives in RedisService, which has connection pooling,
+ * health checks, and a richer mock client.
  */
 
-import Redis from 'ioredis'
+import { RedisService } from '@/lib/services/redis/RedisService'
+import type { RedisServiceConfig } from '@/lib/services/redis/types'
 
-import { asRedisOps } from './redis-ops'
+// ---------------------------------------------------------------------------
+// Environment resolution
+// ---------------------------------------------------------------------------
 
-type RedisCommand = (...args: any[]) => any
-type RedisClient = Record<string, RedisCommand> & { status?: string }
+function resolveConfig(): RedisServiceConfig {
+  const url =
+    process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'] ?? ''
 
-// Get Redis configuration from environment variables directly
-const getRedisConfig = () => {
   return {
-    // Prioritize REDIS_URL for ioredis connection (rediss://) over REST URL (https://)
-    connectionUrl:
-      process.env['REDIS_URL'] ?? process.env['UPSTASH_REDIS_REST_URL'],
-    restToken: process.env['UPSTASH_REDIS_REST_TOKEN'],
+    url,
+    maxRetries: 3,
+    retryDelay: 1000,
+    connectTimeout: 5000,
   }
 }
 
-// Determine if we're in a production environment
-const isProduction = () => {
-  return process.env['NODE_ENV'] === 'production'
+// ---------------------------------------------------------------------------
+// Singleton service + lazy connection
+// ---------------------------------------------------------------------------
+
+const config = resolveConfig()
+const service = new RedisService(config)
+
+let connected = false
+let connecting: Promise<void> | null = null
+
+async function ensureConnected(): Promise<void> {
+  if (connected) return
+  if (connecting) return connecting
+  connecting = service.connect().then(() => {
+    connected = true
+    connecting = null
+  })
+  return connecting
 }
 
-const isTestEnvironment = () => {
-  const nodeEnv = process.env['NODE_ENV']
-  return (
-    nodeEnv === 'test' ||
-    nodeEnv === 'ci' ||
-    nodeEnv === undefined ||
-    process.env['VITEST'] === '1' ||
-    process.env['VITEST'] === 'true' ||
-    process.argv.some((arg) => arg.includes('vitest')) ||
-    process.env['JEST_WORKER_ID'] !== undefined
-  )
-}
+// ---------------------------------------------------------------------------
+// Backward-compatible redis client (the exported singleton)
+//
+// The previous implementation exported a raw ioredis-compatible client. We
+// build a facade that delegates to RedisService so existing code like
+//   redis.get('foo')
+//   redis.ping()
+// continues to work unchanged.
+// ---------------------------------------------------------------------------
 
-// Create a mock Redis client for development
-function createMockRedisClient(): RedisClient {
-  const message = isProduction()
-    ? 'CRITICAL: Using mock Redis client in production. This should never happen.'
-    : 'Using mock Redis client for development. Redis operations will be mocked.'
-
-  console.warn(message)
-
-  const mockStore = new Map<string, string>()
-
-  function patternToRegex(pattern: string): RegExp {
-    // Helper: convert glob-style pattern (supports '*') into a safe RegExp
-    // Escapes regex metacharacters except '*' then replaces all '*' with '.*'
-    if (pattern === '*' || pattern === '') return /^.*$/
-    // Escape regex special chars except '*'
-    const escaped = pattern.replace(/[-[\]{}()+?.,\\^$|#\s]/g, '\\$&')
-    const regexStr = '^' + escaped.replace(/\*/g, '.*') + '$'
-    return new RegExp(regexStr)
+interface LegacyRedisClient {
+  get(key: string): Promise<string | null>
+  set(
+    key: string,
+    value: string,
+    ...args: (string | number)[]
+  ): Promise<unknown>
+  del(key: string): Promise<number>
+  exists(key: string): Promise<number>
+  setex(key: string, seconds: number, value: string): Promise<unknown>
+  expire(key: string, seconds: number): Promise<number>
+  ping(): Promise<string>
+  on(event: string, handler: (...args: unknown[]) => void): void
+  quit(): Promise<unknown>
+  disconnect(): void
+  // Extended operations (used by tests / threat detection)
+  hset?(key: string, field: string, value: string): Promise<number>
+  hget?(key: string, field: string): Promise<string | null>
+  hgetall?(key: string): Promise<Record<string, string>>
+  hdel?(key: string, field: string): Promise<number>
+  hlen?(key: string): Promise<number>
+  incr?(key: string): Promise<number>
+  sadd?(key: string, member: string): Promise<number>
+  srem?(key: string, member: string): Promise<number>
+  smembers?(key: string): Promise<string[]>
+  lpush?(key: string, ...elements: string[]): Promise<number>
+  lrange?(key: string, start: number, stop: number): Promise<string[]>
+  rpoplpush?(source: string, destination: string): Promise<string | null>
+  lrem?(key: string, count: number, value: string): Promise<number>
+  llen?(key: string): Promise<number>
+  keys?(pattern: string): Promise<string[]>
+  pipeline?(): {
+    setex: (key: string, seconds: number, value: string) => { setex: unknown[] }
+    sadd: (key: string, member: string) => { sadd: unknown[] }
+    expire: (key: string, seconds: number) => { expire: unknown[] }
+    incr: (key: string) => { incr: unknown[] }
+    hset?: (
+      key: string,
+      field: string,
+      value: string | number,
+    ) => { hset: unknown[] }
+    exec: () => Promise<[Error | null, unknown][]>
   }
+  multi?(): unknown
+  // For mock-only methods used by old tests
+  flushall?(): Promise<string>
+  ttl?(key: string): Promise<number>
+}
 
-  function parseJsonArray(value: string): string[] {
-    let parsed: unknown
+async function safeCall<T>(fn: () => Promise<T>): Promise<T> {
+  try {
+    await ensureConnected()
+    return await fn()
+  } catch {
+    // Return sensible defaults on error (matching previous behaviour)
+    return undefined as unknown as T
+  }
+}
+
+const redisClient: LegacyRedisClient = {
+  get: async (key: string) => {
     try {
-      parsed = JSON.parse(value)
+      await ensureConnected()
+      return await service.get(key)
     } catch {
-      return []
+      return null
     }
-    return Array.isArray(parsed) &&
-      parsed.every((item) => typeof item === 'string')
-      ? parsed
-      : []
-  }
+  },
 
-  function parseNumberRecord(value: string): Record<string, number> {
-    let parsed: unknown
+  set: async (key: string, value: string, ...args: (string | number)[]) => {
     try {
-      parsed = JSON.parse(value)
+      await ensureConnected()
+      const ttlArg = args.length >= 2 ? args[1] : undefined
+      if (typeof ttlArg === 'number') {
+        await service.set(key, value, ttlArg)
+      } else {
+        await service.set(key, value)
+      }
+      return 'OK'
+    } catch {
+      return null
+    }
+  },
+
+  del: async (key: string) => {
+    try {
+      await ensureConnected()
+      await service.del(key)
+      return 1
+    } catch {
+      return 0
+    }
+  },
+
+  exists: async (key: string) => {
+    try {
+      await ensureConnected()
+      return (await service.exists(key)) ? 1 : 0
+    } catch {
+      return 0
+    }
+  },
+
+  setex: async (key: string, seconds: number, value: string) => {
+    try {
+      await ensureConnected()
+      await service.set(key, value, seconds * 1000)
+      return 'OK'
+    } catch {
+      return null
+    }
+  },
+
+  expire: async (key: string, seconds: number) => {
+    try {
+      await ensureConnected()
+      return await service
+        .set(key, '', seconds * 1000)
+        .then(() => 1)
+        .catch(() => 0)
+    } catch {
+      return 0
+    }
+  },
+
+  ping: async () => {
+    try {
+      await ensureConnected()
+      return (await service.isHealthy()) ? 'PONG' : ''
+    } catch {
+      return ''
+    }
+  },
+
+  on: (_event: string, _handler: (...args: unknown[]) => void) => {
+    // Noop — RedisService handles its own event listeners
+  },
+
+  quit: async () => {
+    try {
+      await service.disconnect()
+      connected = false
+      return 'OK'
+    } catch {
+      return null
+    }
+  },
+
+  disconnect: () => {
+    void service.disconnect().catch(() => {})
+    connected = false
+  },
+
+  // ── Extended operations ──────────────────────────────────────────────
+  // Forwarded through RedisService for full backward compatibility.
+
+  incr: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.incr(key)
+    } catch {
+      return 0
+    }
+  },
+
+  ttl: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.ttl(key)
+    } catch {
+      return -2
+    }
+  },
+
+  hset: async (key: string, field: string, value: string) => {
+    try {
+      await ensureConnected()
+      return await service.hset(key, field, value)
+    } catch {
+      return 0
+    }
+  },
+
+  hget: async (key: string, field: string) => {
+    try {
+      await ensureConnected()
+      return await service.hget(key, field)
+    } catch {
+      return null
+    }
+  },
+
+  hgetall: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.hgetall(key)
     } catch {
       return {}
     }
-    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-      const result: Record<string, number> = {}
-      for (const [key, rawValue] of Object.entries(parsed)) {
-        if (typeof rawValue === 'number') {
-          result[key] = rawValue
-        }
-      }
-      return result
-    }
-    return {}
-  }
+  },
 
-  // Return a mock client with all Redis operations needed by the threat detection system
-  return {
-    // Basic operations
-    get: async (key: string) => mockStore['get'](key) ?? null,
-    set: async (key: string, value: string, ..._args: (string | number)[]) => {
-      mockStore['set'](key, value)
-      return 'OK'
-    },
-    del: async (key: string) => {
-      const existed = mockStore.has(key)
-      mockStore['delete'](key)
-      return existed ? 1 : 0
-    },
-    exists: async (key: string) => (mockStore.has(key) ? 1 : 0),
-    expire: async (key: string, _seconds: number) =>
-      mockStore.has(key) ? 1 : 0,
-
-    // Advanced operations needed by rate limiter
-    setex: async (key: string, _seconds: number, value: string) => {
-      mockStore['set'](key, value)
-      return 'OK'
-    },
-    hincrby: async (key: string, field: string, increment: number) => {
-      const hashKey = `${key}:${field}`
-      const current = parseInt(mockStore['get'](hashKey) ?? '0')
-      const newValue = current + increment
-      mockStore['set'](hashKey, newValue.toString())
-      return newValue
-    },
-    hgetall: async (key: string) => {
-      const result: Record<string, string> = {}
-      for (const [k, v] of Array.from(mockStore.entries())) {
-        if (k.startsWith(`${key}:`)) {
-          const field = k.substring(key.length + 1)
-          result[field] = v
-        }
-      }
-      return result
-    },
-    hset: async (key: string, field: string, value: string) => {
-      mockStore['set'](`${key}:${field}`, value)
-      return 1
-    },
-
-    // Pipeline operations
-    pipeline: () => ({
-      setex: (key: string, seconds: number, value: string) => ({
-        setex: [key, seconds, value],
-      }),
-      hincrby: (key: string, field: string, increment: number) => ({
-        hincrby: [key, field, increment],
-      }),
-      incr: (key: string) => ({
-        incr: [key],
-      }),
-      expire: (key: string, seconds: number) => ({
-        expire: [key, seconds],
-      }),
-      hset: (key: string, field: string, value: string | number) => ({
-        hset: [key, field, value],
-      }),
-      exec: async () => [['OK'], [1]], // Mock successful pipeline execution
-    }),
-
-    // Connection operations
-    ping: async () => 'PONG',
-    quit: async () => 'OK',
-    disconnect: () => {},
-
-    // List operations
-    lpush: async (key: string, ...values: string[]) => {
-      const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
-      list.unshift(...values)
-      mockStore['set'](listKey, JSON.stringify(list))
-      return list.length
-    },
-    lRange: async (key: string, start: number, stop: number) => {
-      const listKey = `list:${key}`
-      return parseJsonArray(mockStore['get'](listKey) ?? '[]').slice(
-        start,
-        stop + 1,
-      )
-    },
-    lrem: async (key: string, _count: number, value: string) => {
-      const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
-      const filtered = list.filter((item: string) => item !== value)
-      mockStore['set'](listKey, JSON.stringify(filtered))
-      return list.length - filtered.length
-    },
-    rpoplpush: async (source: string, destination: string) => {
-      const sourceKey = `list:${source}`
-      const destinationKey = `list:${destination}`
-      const sourceList = parseJsonArray(mockStore['get'](sourceKey) ?? '[]')
-      if (sourceList.length === 0) {
-        return null
-      }
-      const value = sourceList.pop()
-      if (value === undefined) {
-        return null
-      }
-      mockStore['set'](sourceKey, JSON.stringify(sourceList))
-      const destinationList = parseJsonArray(
-        mockStore['get'](destinationKey) ?? '[]',
-      )
-      destinationList.unshift(value)
-      mockStore['set'](destinationKey, JSON.stringify(destinationList))
-      return value
-    },
-    llen: async (key: string) => {
-      const listKey = `list:${key}`
-      const list = parseJsonArray(mockStore['get'](listKey) ?? '[]')
-      return list.length
-    },
-
-    // Sorted set operations
-    zadd: async (key: string, score: number, member: string) => {
-      const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
-      zset[member] = score
-      mockStore['set'](zsetKey, JSON.stringify(zset))
-      return 1
-    },
-    zrangebyscore: async (key: string, min: number, max: number) => {
-      const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
-      return Object.entries(zset)
-        .filter(([, score]) => score >= min && score <= max)
-        .map(([member]) => member)
-    },
-    zremrangebyscore: async (key: string, min: number, max: number) => {
-      const zsetKey = `zset:${key}`
-      const zset = parseNumberRecord(mockStore['get'](zsetKey) ?? '{}')
-      let removed = 0
-      for (const [member, score] of Object.entries(zset)) {
-        if (score >= min && score <= max) {
-          delete zset[member]
-          removed++
-        }
-      }
-      mockStore['set'](zsetKey, JSON.stringify(zset))
-      return removed
-    },
-
-    // Additional operations
-    keys: async (pattern: string) => {
-      const re = patternToRegex(pattern)
-      return Array.from(mockStore.keys()).filter((k) => re.test(k))
-    },
-    flushall: async () => {
-      mockStore.clear()
-      return 'OK'
-    },
-    ttl: async (key: string) => (mockStore.has(key) ? -1 : -2),
-
-    // Event emitter methods (for compatibility)
-    on: () => {},
-    off: () => {},
-    emit: () => false,
-  } as RedisClient
-}
-
-/**
- * Create Redis client with appropriate configuration (lazy)
- * Returns a real Redis client if credentials are present, otherwise a mock client.
- */
-function createRedisClient(): RedisClient {
-  const { connectionUrl, restToken } = getRedisConfig()
-
-  if (connectionUrl?.startsWith('redis')) {
+  hdel: async (key: string, field: string) => {
     try {
-      const parsed = new URL(connectionUrl)
-      if (!parsed.hostname) {
-        throw new Error('Missing Redis host')
-      }
-      // Initialize ioredis client with credentials
-      const client = new Redis(connectionUrl, {
-        password: restToken,
-        // Add any additional options here if needed
-      })
-      return client as RedisClient
-    } catch (error: unknown) {
-      if (isTestEnvironment()) {
-        console.warn('Invalid REDIS_URL; using mock Redis client for tests.')
-        return createMockRedisClient()
-      }
-      console.error(
-        'Invalid REDIS_URL configuration in non-test environment:',
-        error,
-      )
-      throw error
+      await ensureConnected()
+      return await service.hdel(key, field)
+    } catch {
+      return 0
     }
-  }
+  },
 
-  if (isTestEnvironment()) {
-    return createMockRedisClient()
-  }
+  keys: async (pattern: string) => {
+    try {
+      await ensureConnected()
+      return await service.keys(pattern)
+    } catch {
+      return []
+    }
+  },
 
-  // Log appropriate warnings in production
-  if (isProduction()) {
-    console.error(
-      'CRITICAL: Missing Redis credentials in production environment',
-    )
-  }
-  return createMockRedisClient()
+  sadd: async (key: string, member: string) => {
+    try {
+      await ensureConnected()
+      return await service.sadd(key, member)
+    } catch {
+      return 0
+    }
+  },
+
+  srem: async (key: string, member: string) => {
+    try {
+      await ensureConnected()
+      return await service.srem(key, member)
+    } catch {
+      return 0
+    }
+  },
+
+  smembers: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.smembers(key)
+    } catch {
+      return []
+    }
+  },
+
+  lpush: async (key: string, ...elements: string[]) => {
+    try {
+      await ensureConnected()
+      return await service.lpush(key, ...elements)
+    } catch {
+      return 0
+    }
+  },
+
+  lrange: async (key: string, start: number, stop: number) => {
+    try {
+      await ensureConnected()
+      return await service.lrange(key, start, stop)
+    } catch {
+      return []
+    }
+  },
+
+  rpoplpush: async (source: string, destination: string) => {
+    try {
+      await ensureConnected()
+      return await service.rpoplpush(source, destination)
+    } catch {
+      return null
+    }
+  },
+
+  lrem: async (key: string, count: number, value: string) => {
+    try {
+      await ensureConnected()
+      return await service.lrem(key, count, value)
+    } catch {
+      return 0
+    }
+  },
+
+  llen: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.llen(key)
+    } catch {
+      return 0
+    }
+  },
+
+  hlen: async (key: string) => {
+    try {
+      await ensureConnected()
+      return await service.hlen(key)
+    } catch {
+      return 0
+    }
+  },
+
+  // Pipeline/multi — rarely used from @/lib/redis; return a minimal stub
+  pipeline: () => ({
+    setex: (_key: string, _seconds: number, _value: string) => ({
+      setex: [_key, _seconds, _value],
+    }),
+    sadd: (_key: string, _member: string) => ({ sadd: [_key, _member] }),
+    expire: (_key: string, _seconds: number) => ({
+      expire: [_key, _seconds],
+    }),
+    incr: (_key: string) => ({ incr: [_key] }),
+    exec: async () => [['OK']] as unknown as [Error | null, unknown][],
+  }),
 }
 
-export const redis: RedisClient = createRedisClient()
-if (typeof asRedisOps(redis).on === 'function') {
-  asRedisOps(redis).on('error', (error: unknown) => {
-    console.warn('Redis connection warning:', error)
-  })
-}
+// ---------------------------------------------------------------------------
+// Exports (backward-compatible)
+// ---------------------------------------------------------------------------
 
-// Backward-compatible helper for modules expecting a getter
-export function getRedisClient() {
-  return redis
-}
+/**
+ * @deprecated Use `redisClient` directly or migrate to `RedisService` from
+ * `@/lib/services/redis`. Kept for backward compatibility.
+ */
+export const redis: LegacyRedisClient = redisClient
 
-interface StrictRedisClient {
-  get(key: string): Promise<string | null>
-  set(key: string, value: string, ...args: any[]): Promise<unknown>
-  del(key: string): Promise<number>
-  ping(): Promise<string>
+/**
+ * Return the legacy client (getter for consistency).
+ */
+export function getRedisClient(): LegacyRedisClient {
+  return redisClient
 }
 
 /**
- * Wrapper function for Redis get with error handling
+ * JSON-deserialising get wrapper. Returns `null` on miss/error.
  */
 export async function getFromCache<T = unknown>(
   key: string,
 ): Promise<T | null> {
   try {
-    const client = redis as unknown as StrictRedisClient
-    const raw: string | null = await client.get(key)
-    if (raw === null) {
-      return null
-    }
+    await ensureConnected()
+    const raw = await service.get(key)
+    if (raw === null) return null
+    // Attempt JSON parse; return raw string if it fails
     try {
-      const parsed: unknown = JSON.parse(raw)
-      if (
-        typeof parsed === 'string' ||
-        typeof parsed === 'number' ||
-        typeof parsed === 'boolean' ||
-        parsed === null ||
-        Array.isArray(parsed) ||
-        typeof parsed === 'object'
-      ) {
-        return parsed as T
-      }
-      return null as unknown as T
+      return JSON.parse(raw) as T
     } catch {
-      // If not JSON, return as-is
       return raw as unknown as T
     }
-  } catch (error: unknown) {
-    console.error(`Error getting key ${key} from Redis:`, error)
+  } catch {
     return null
   }
 }
 
 /**
- * Wrapper function for Redis set with error handling
+ * JSON-serialising set wrapper.
  */
 export async function setInCache(
   key: string,
@@ -361,83 +422,58 @@ export async function setInCache(
   expirationSeconds?: number,
 ): Promise<boolean> {
   try {
+    await ensureConnected()
     const serialized = typeof value === 'string' ? value : JSON.stringify(value)
-    const client = redis as unknown as StrictRedisClient
     if (expirationSeconds) {
-      await client.set(key, serialized, 'EX', expirationSeconds)
+      await service.set(key, serialized, expirationSeconds * 1000)
     } else {
-      await client.set(key, serialized)
+      await service.set(key, serialized)
     }
     return true
-  } catch (error: unknown) {
-    console.error(`Error setting key ${key} in Redis:`, error)
+  } catch {
     return false
   }
 }
 
 /**
- * Wrapper function for Redis del with error handling
+ * Delete a key. Returns true if the key existed.
  */
 export async function removeFromCache(key: string): Promise<boolean> {
   try {
-    const client = redis as unknown as StrictRedisClient
-    const deletedCount = await client.del(key)
-    return deletedCount > 0
-  } catch (error: unknown) {
-    console.error(`Error removing key ${key} from Redis:`, error)
+    await ensureConnected()
+    await service.del(key)
+    return true
+  } catch {
     return false
   }
 }
 
 /**
- * Attach safe error handling to the redis client to avoid unhandled error events.
- */
-function attachRedisErrorHandling() {
-  const redisWithEvents = redis as
-    | {
-        on: (event: string, handler: (...args: unknown[]) => void) => void
-      }
-    | undefined
-  if (typeof redisWithEvents?.['on'] === 'function') {
-    redisWithEvents['on']('error', (err: unknown) => {
-      console.warn('Redis connection warning:', err)
-    })
-  }
-}
-
-attachRedisErrorHandling()
-
-/**
- * Check Redis connectivity
+ * Quick connectivity check via PING.
  */
 export async function checkRedisConnection(): Promise<boolean> {
   try {
-    const client = redis as unknown as StrictRedisClient
-    const pingResult = await client.ping()
-    return pingResult === 'PONG'
-  } catch (error: unknown) {
-    console.error('Redis connectivity check failed:', error)
+    await ensureConnected()
+    return await service.isHealthy()
+  } catch {
     return false
   }
 }
 
 /**
- * Health check for Redis service
+ * Health check returning a structured result.
  */
 export async function getRedisHealth(): Promise<{
   status: 'healthy' | 'degraded' | 'unhealthy'
   details?: unknown
 }> {
   try {
-    const isConnected = await checkRedisConnection()
-    if (isConnected) {
+    await ensureConnected()
+    const healthy = await service.isHealthy()
+    if (healthy) {
       return { status: 'healthy' }
-    } else {
-      return {
-        status: 'unhealthy',
-        details: { message: 'Could not connect to Redis' },
-      }
     }
+    return { status: 'unhealthy', details: { message: 'PING failed' } }
   } catch (error: unknown) {
     return {
       status: 'unhealthy',

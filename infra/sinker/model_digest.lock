@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "effective": "2026-06-29T08:02Z",
+  "models": [
+    {
+      "name": "bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS",
+      "digest": "<resolved-by-worker-at-first-pull>",
+      "quant_level": "IQ4_XS",
+      "estimated_size_bytes": 7100000000,
+      "expected_param_count": 12200000000,
+      "min_vram_required_mib": 10240,
+      "kv_cache_type": "q8_0",
+      "flash_attention_required": true
+    },
+    {
+      "name": "granite4.1:3b",
+      "digest": "",
+      "quant_level": "Q4_K_M",
+      "estimated_size_bytes": 2700000000,
+      "expected_param_count": 4000000000,
+      "min_vram_required_mib": 3500,
+      "kv_cache_type": "q8_0",
+      "flash_attention_required": false,
+      "candidate_alt_tags": []
+    }
+  ],
+  "gpu_floor": {
+    "num_gpus_required": 1,
+    "memory_free_mib_per_gpu": 10240,
+    "driver_minimum": "nvidia-driver-535"
+  },
+  "vram_tune_presets": {
+    "v100_16gb": {
+      "OLLAMA_NUM_PARALLEL": "1",
+      "OLLAMA_NUM_CTX": "4096",
+      "OLLAMA_FLASH_ATTENTION": "1"
+    },
+    "v100_32gb": {
+      "OLLAMA_NUM_PARALLEL": "2",
+      "OLLAMA_NUM_CTX": "8192",
+      "OLLAMA_FLASH_ATTENTION": "1"
+    }
+  },
+  "license_note": "Both models are open-weight (Apache 2.0 / IBM Granite). Public redeployment via ollama.pixelated.love is fine provided the bearer cookie identifies a known therapist/staff email domain (oauth2-proxy email_domains=pixelated.love)."
+}

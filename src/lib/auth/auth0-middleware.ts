@@ -5,6 +5,7 @@
 
 import { auth0UserService } from '../../services/auth0.service'
 import { developerApiKeyManager } from '../db/developer-api-keys'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { auth0AdaptiveMFAService } from './auth0-adaptive-mfa-service'
 import { validateToken } from './auth0-jwt-service'
 import {
@@ -13,6 +14,7 @@ import {
 } from './auth0-rbac-service'
 import { type AuthStrategy } from './route-config'
 import type { ApiKeyScope } from './scopes'
+const logger = createBuildSafeLogger('auth0-middleware')
 
 export type { AuthStrategy }
 
@@ -163,7 +165,7 @@ export async function verifyAdmin(
     // Admin access verified - return null to continue
     return null
   } catch (error: unknown) {
-    console.error('Admin verification error:', error)
+    logger.error('Admin verification error:', error)
     return new Response(
       JSON.stringify({
         error: 'Internal server error during admin verification',
@@ -935,7 +937,7 @@ export async function authenticateRequest(
           }
         }
       } catch (error: unknown) {
-        console.warn('Failed to perform adaptive MFA check:', error)
+        logger.warn('Failed to perform adaptive MFA check:', error)
       }
     }
 

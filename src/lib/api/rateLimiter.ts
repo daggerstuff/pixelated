@@ -5,6 +5,9 @@
 
 import type { Redis } from '@upstash/redis'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('rateLimiter')
+
 export interface RateLimitRule {
   windowMs: number // Time window in milliseconds
   maxRequests: number // Max requests per window
@@ -157,7 +160,7 @@ class RateLimiter {
         resetTime,
       }
     } catch (error: unknown) {
-      console.warn('Rate limiter error:', error)
+      logger.warn('Rate limiter error:', error)
 
       // On Redis error, allow request but log the issue
       return {
@@ -202,7 +205,7 @@ class RateLimiter {
 
       return false
     } catch (error: unknown) {
-      console.warn('Failed to reset rate limit:', error)
+      logger.warn('Failed to reset rate limit:', error)
       return false
     }
   }
@@ -265,7 +268,7 @@ class RateLimiter {
 
       return cleanedCount
     } catch (error: unknown) {
-      console.warn('Rate limiter cleanup error:', error)
+      logger.warn('Rate limiter cleanup error:', error)
       return 0
     }
   }

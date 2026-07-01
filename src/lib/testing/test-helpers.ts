@@ -1,5 +1,8 @@
 import { vi } from 'vitest'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('test-helpers')
+
 // Type definitions for better TypeScript support (currently unused - defined for future testing features)
 // interface TestResult {
 //   success: boolean
@@ -191,20 +194,24 @@ export class TestUtils {
   static async setupTestDatabase() {
     // This would typically set up a test database
     // For now, we'll use in-memory mocks
-    console.log('Setting up test database...')
+    logger.info('Setting up test database...')
   }
 
   static async teardownTestDatabase() {
     // Clean up test database
-    console.log('Tearing down test database...')
+    logger.info('Tearing down test database...')
   }
 
   static async clearTestData() {
     // Clear all test data
-    console.log('Clearing test data...')
+    logger.info('Clearing test data...')
   }
 
-  static createMockRequest(body: any = {}, query: any = {}, params: any = {}) {
+  static createMockRequest(
+    body: Record<string, unknown> = {},
+    query: Record<string, unknown> = {},
+    params: Record<string, unknown> = {},
+  ) {
     return {
       body,
       query,
@@ -216,7 +223,7 @@ export class TestUtils {
   }
 
   static createMockResponse() {
-    const res: any = {
+    const res = {
       status: vi.fn().mockReturnThis(),
       json: vi.fn().mockReturnThis(),
       send: vi.fn().mockReturnThis(),
@@ -292,10 +299,13 @@ export class PerformanceTestUtils {
     const startTime = Date.now()
 
     // Run concurrent requests
-    const promises: any[] = []
+    const promises: Promise<{
+      result: { success: boolean; error?: unknown }
+      executionTime: number
+    }>[] = []
     for (let i = 0; i < totalRequests; i++) {
       promises.push(
-        (this as any).measureExecutionTime(async () => {
+        PerformanceTestUtils.measureExecutionTime(async () => {
           try {
             await testFn()
             return { success: true }
@@ -305,7 +315,6 @@ export class PerformanceTestUtils {
         }),
       )
     }
-
     // Execute in batches to simulate concurrent users
     const batchSize = concurrentUsers
     for (let i = 0; i < promises.length; i += batchSize) {
@@ -337,7 +346,13 @@ export class PerformanceTestUtils {
     }
   }
 
-  static generatePerformanceReport(results: any): string {
+  static generatePerformanceReport(results: {
+    totalTime: number
+    averageResponseTime: number
+    requestsPerSecond: number
+    successRate: number
+    errors: number
+  }): string {
     return `
 Performance Test Results:
 ========================
@@ -442,17 +457,17 @@ export class SecurityTestUtils {
 export class IntegrationTestUtils {
   static async startTestServices() {
     // Start test database, Redis, etc.
-    console.log('Starting test services...')
+    logger.info('Starting test services...')
   }
 
   static async stopTestServices() {
     // Stop test services
-    console.log('Stopping test services...')
+    logger.info('Stopping test services...')
   }
 
   static async resetTestServices() {
     // Reset test services to clean state
-    console.log('Resetting test services...')
+    logger.info('Resetting test services...')
   }
 
   static async waitForService(
@@ -466,7 +481,7 @@ export class IntegrationTestUtils {
       try {
         const response = await fetch(url)
         if (response.ok) {
-          console.log(`${serviceName} is ready`)
+          logger.info(`${serviceName} is ready`)
           return
         }
       } catch (error: unknown) {

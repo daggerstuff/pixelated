@@ -1,4 +1,6 @@
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import {} from './test-helpers.ts'
+const logger = createBuildSafeLogger('performance-benchmarks')
 
 // Performance Benchmark Configuration
 export const benchmarkConfig = {
@@ -70,15 +72,21 @@ export class MemoryMonitor {
   private readonly samples: number[] = []
 
   start(): void {
-    if ((performance as any)?.memory) {
-      this.initialMemory = (performance as any).memory.usedJSHeapSize
+    const mem = (
+      performance as Performance & { memory?: { usedJSHeapSize: number } }
+    ).memory
+    if (mem) {
+      this.initialMemory = mem.usedJSHeapSize
       this.peakMemory = this.initialMemory
     }
   }
 
   sample(): void {
-    if ((performance as any)?.memory) {
-      const currentMemory = (performance as any).memory.usedJSHeapSize
+    const mem = (
+      performance as Performance & { memory?: { usedJSHeapSize: number } }
+    ).memory
+    if (mem) {
+      const currentMemory = mem.usedJSHeapSize
       this.samples.push(currentMemory)
       this.peakMemory = Math.max(this.peakMemory, currentMemory)
     }
@@ -112,17 +120,17 @@ export class PerformanceBenchmarkRunner {
   private readonly memoryMonitor = new MemoryMonitor()
 
   async runFullBenchmark(): Promise<PerformanceResults[]> {
-    console.log('🚀 Starting Performance Benchmarks for Bias Analysis API')
-    console.log('='.repeat(60))
+    logger.info('🚀 Starting Performance Benchmarks for Bias Analysis API')
+    logger.info('='.repeat(60))
 
     this.memoryMonitor.start()
 
     for (const [_key, scenario] of Object.entries(performanceScenarios)) {
-      console.log(`\n📊 Testing Scenario: ${scenario.name}`)
-      console.log('-'.repeat(40))
+      logger.info(`\n📊 Testing Scenario: ${scenario.name}`)
+      logger.info('-'.repeat(40))
 
       for (const concurrentUsers of benchmarkConfig.concurrentUsers) {
-        console.log(`\n👥 Concurrent Users: ${concurrentUsers}`)
+        logger.info(`\n👥 Concurrent Users: ${concurrentUsers}`)
 
         const result = await this.runScenarioBenchmark(
           scenario,
@@ -130,43 +138,43 @@ export class PerformanceBenchmarkRunner {
         )
         this.results.push(result)
 
-        console.log(
+        logger.info(
           `   ✅ Success Rate: ${(result.errorRate * 100).toFixed(2)}%`,
         )
-        console.log(
+        logger.info(
           `   ⚡ Avg Response Time: ${result.averageResponseTime.toFixed(2)}ms`,
         )
-        console.log(
+        logger.info(
           `   📈 Requests/sec: ${result.requestsPerSecond.toFixed(2)}`,
         )
 
         // Check against targets
         if (result.averageResponseTime > benchmarkConfig.targetResponseTime) {
-          console.log(
+          logger.info(
             `   ⚠️  WARNING: Response time exceeds target (${benchmarkConfig.targetResponseTime}ms)`,
           )
         }
         if (result.requestsPerSecond < benchmarkConfig.targetThroughput) {
-          console.log(
+          logger.info(
             `   ⚠️  WARNING: Throughput below target (${benchmarkConfig.targetThroughput} req/sec)`,
           )
         }
         if (result.errorRate > benchmarkConfig.targetErrorRate) {
-          console.log(
+          logger.info(
             `   ❌ ERROR: Error rate exceeds target (${(benchmarkConfig.targetErrorRate * 100).toFixed(1)}%)`,
           )
         }
       }
     }
 
-    console.log('\n🎯 Performance Benchmark Complete!')
-    console.log('='.repeat(60))
+    logger.info('\n🎯 Performance Benchmark Complete!')
+    logger.info('='.repeat(60))
 
     return this.results
   }
 
   private async runScenarioBenchmark(
-    scenario: any,
+    scenario: { name: string; text: string; context: string },
     concurrentUsers: number,
   ): Promise<PerformanceResults> {
     const startTime = Date.now()
@@ -180,7 +188,10 @@ export class PerformanceBenchmarkRunner {
     const batches = Math.ceil(totalRequests / requestsPerBatch)
 
     for (let batch = 0; batch < batches; batch++) {
-      const batchPromises: any[] = []
+      const batchPromises: Promise<{
+        success: boolean
+        responseTime: number
+      }>[] = []
 
       for (
         let i = 0;
@@ -188,7 +199,7 @@ export class PerformanceBenchmarkRunner {
         i++
       ) {
         const requestPromise = this.makeTestRequest(scenario)
-        batchPromises.push(requestPromise as any)
+        batchPromises.push(requestPromise)
       }
 
       try {
@@ -203,7 +214,7 @@ export class PerformanceBenchmarkRunner {
           }
         })
       } catch (error: unknown) {
-        console.error(`Batch ${batch} failed:`, error)
+        logger.error(`Batch ${batch} failed:`, error)
         failedRequests += requestsPerBatch
       }
 
@@ -255,9 +266,11 @@ export class PerformanceBenchmarkRunner {
     }
   }
 
-  private async makeTestRequest(
-    _scenario: any,
-  ): Promise<{ success: boolean; responseTime: number }> {
+  private async makeTestRequest(_scenario: {
+    name: string
+    text: string
+    context: string
+  }): Promise<{ success: boolean; responseTime: number }> {
     const startTime = performance.now()
 
     try {
@@ -430,7 +443,7 @@ export class PerformanceBenchmarkRunner {
     memoryIncrease: number
     leakDetected: boolean
   }> {
-    console.log('🧠 Running Memory Leak Detection Test...')
+    logger.info('🧠 Running Memory Leak Detection Test...')
 
     const initialMemory = this.memoryMonitor.getResults().initial
 
@@ -440,7 +453,7 @@ export class PerformanceBenchmarkRunner {
       this.memoryMonitor.sample()
 
       if (i % 20 === 0) {
-        console.log(`   Memory sample ${i + 1}/100 taken`)
+        logger.info(`   Memory sample ${i + 1}/100 taken`)
       }
     }
 
@@ -448,18 +461,18 @@ export class PerformanceBenchmarkRunner {
     const memoryIncrease = finalMemory - initialMemory
     const leakDetected = memoryIncrease > 50 * 1024 * 1024 // 50MB threshold
 
-    console.log(
+    logger.info(
       `   Initial Memory: ${(initialMemory / 1024 / 1024).toFixed(2)} MB`,
     )
-    console.log(`   Final Memory: ${(finalMemory / 1024 / 1024).toFixed(2)} MB`)
-    console.log(
+    logger.info(`   Final Memory: ${(finalMemory / 1024 / 1024).toFixed(2)} MB`)
+    logger.info(
       `   Memory Increase: ${(memoryIncrease / 1024 / 1024).toFixed(2)} MB`,
     )
 
     if (leakDetected) {
-      console.log('   ❌ POTENTIAL MEMORY LEAK DETECTED!')
+      logger.info('   ❌ POTENTIAL MEMORY LEAK DETECTED!')
     } else {
-      console.log('   ✅ No significant memory leaks detected')
+      logger.info('   ✅ No significant memory leaks detected')
     }
 
     return {
@@ -475,29 +488,29 @@ export class PerformanceBenchmarkRunner {
 if ((require as NodeRequire).main === module) {
   const runner = new PerformanceBenchmarkRunner()
 
-  console.log('🚀 Starting Bias Analysis API Performance Benchmarks...\n')
+  logger.info('🚀 Starting Bias Analysis API Performance Benchmarks...\n')
 
   runner
     .runFullBenchmark()
     .then(async (results) => {
       const report = runner.generateReport(results)
-      console.log('\n' + report)
+      logger.info('\n' + report)
 
       return runner.runMemoryLeakTest()
     })
     .then((memoryResults) => {
-      console.log('\n🧠 Memory Leak Test Results:')
-      console.log(
+      logger.info('\n🧠 Memory Leak Test Results:')
+      logger.info(
         `   Memory Increase: ${(memoryResults.memoryIncrease / 1024 / 1024).toFixed(2)} MB`,
       )
-      console.log(
+      logger.info(
         `   Leak Detected: ${memoryResults.leakDetected ? 'YES' : 'NO'}`,
       )
 
       process.exit(0)
     })
     .catch((error) => {
-      console.error('❌ Benchmark failed:', error)
+      logger.error('❌ Benchmark failed:', error)
       process.exit(1)
     })
 }

@@ -1,0 +1,38 @@
+# infra/sinker/traefik/docker-compose.yml — pixelated-traefik-sinker
+# Traefik v3.1 public TLS terminator for ollama.pixelated.love
+# Managed by infra-sinker milestone; do NOT edit without updating rebar schema.
+#
+# Network: joins sinker-ollama_default so Traefik can reach pixelated-ollama
+# by container name. CF_API_TOKEN is env-sourced (never hard-coded).
+
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: pixelated-traefik-sinker
+    restart: unless-stopped
+    ports:
+      - '80:80' # web (redirect → websecure)
+      - '443:443' # websecure (TLS)
+      - '127.0.0.1:8082:8080' # Traefik API + dashboard (localhost only)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /srv/sinker-traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - /srv/sinker-traefik/dynamic:/etc/traefik/dynamic:ro
+      - /srv/sinker-traefik/acme.json:/acme.json
+    environment:
+      - CF_API_TOKEN=${CF_API_TOKEN}
+    networks:
+      - sinker-ollama_default
+    labels:
+      # Global redirect HTTP → HTTPS
+      - 'traefik.enable=true'
+    healthcheck:
+      test: ['CMD-SHELL', 'traefik healthcheck --ping || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  sinker-ollama_default:
+    external: true

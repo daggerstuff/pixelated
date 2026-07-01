@@ -1,5 +1,8 @@
 import crypto from 'crypto'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('AnonymizationPipelineService')
+
 export interface AnonymizationConfig {
   kAnonymity: number // k-anonymity level (minimum 5)
   differentialPrivacy: {
@@ -144,7 +147,7 @@ export class AnonymizationPipelineService {
         auditReport,
       }
     } catch (error: unknown) {
-      console.error('Anonymization pipeline error:', error)
+      logger.error('Anonymization pipeline error:', error)
       throw new Error(
         `Anonymization failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
         {
@@ -494,7 +497,7 @@ export class AnonymizationPipelineService {
     }
 
     // If no similar groups found, suppress (remove) the records
-    console.warn(
+    logger.warn(
       `Suppressing ${smallGroup.length} records that couldn't achieve k-anonymity`,
     )
     return []
@@ -744,7 +747,7 @@ export class AnonymizationPipelineService {
     audit: AnonymizationAudit,
   ): Promise<void> {
     // Store audit trail (implementation would use actual database)
-    console.log('Anonymization audit stored:', { processId, audit })
+    logger.info('Anonymization audit stored:', { processId, audit })
   }
 
   private generateProcessId(): string {

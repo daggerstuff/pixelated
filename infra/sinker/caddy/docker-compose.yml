@@ -1,0 +1,35 @@
+# infra/sinker/caddy/docker-compose.yml — pixelated-oauth2-proxy
+# oauth2-proxy v7.6.0 sidecar for ollama.pixelated.love
+# Managed by infra-sinker milestone; do NOT edit without updating rebar schema.
+#
+# Provider: OIDC (Auth0 — pivoted from Google by infra-prep-auth0-credentials-emission)
+# Network: joins sinker-ollama_default so oauth2-proxy can reach pixelated-ollama
+# by container name. All secrets from /etc/oauth2-proxy/oauth2-proxy-cfg.env.
+# HTTP_ADDRESS=0.0.0.0:4180 set in env_file (oauth2-proxy defaults to 127.0.0.1
+# inside the container, which is unreachable via docker-proxy port mapping).
+
+services:
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0-alpine
+    container_name: pixelated-oauth2-proxy
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:4180:4180' # localhost-only (traefik forwardauth)
+    env_file:
+      - /etc/oauth2-proxy/oauth2-proxy-cfg.env
+    networks:
+      - sinker-ollama_default
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'wget -q -O /dev/null http://127.0.0.1:4180/ping || exit 1',
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+networks:
+  sinker-ollama_default:
+    external: true

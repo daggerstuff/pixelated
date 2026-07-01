@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('KVStore') /**
  * Key-Value Store Implementation
  * Used for storing and retrieving cognitive models and other structured data
  */
@@ -43,7 +44,7 @@ export class KVStore {
         try {
           localStorage.setItem(prefixedKey, JSON.stringify(value))
         } catch (error: unknown) {
-          console.warn('Failed to store in localStorage:', error)
+          logger.warn('Failed to store in localStorage:', error)
         }
       }
 
@@ -54,10 +55,10 @@ export class KVStore {
 
       // For now, we'll just log that we would store the value
       if (process.env['NODE_ENV'] === 'development') {
-        console.log(`[KVStore] Would store value for key: ${key}`)
+        logger.info(`[KVStore] Would store value for key: ${key}`)
       }
     } catch (error: unknown) {
-      console.error(`Failed to store value for key ${key}:`, error)
+      logger.error(`Failed to store value for key ${key}:`, error)
       throw error
     }
   }
@@ -83,7 +84,7 @@ export class KVStore {
             this.cache.set(prefixedKey, parsedValue)
             return parsedValue
           } catch (error: unknown) {
-            console.warn('Failed to parse value from localStorage:', error)
+            logger.warn('Failed to parse value from localStorage:', error)
           }
         }
       }
@@ -91,12 +92,12 @@ export class KVStore {
       // Here we would implement actual database retrieval
       // For now, we'll just return null
       if (process.env['NODE_ENV'] === 'development') {
-        console.log(`[KVStore] Would retrieve value for key: ${key}`)
+        logger.info(`[KVStore] Would retrieve value for key: ${key}`)
       }
 
       return null
     } catch (error: unknown) {
-      console.error(`Failed to retrieve value for key ${key}:`, error)
+      logger.error(`Failed to retrieve value for key ${key}:`, error)
       return null
     }
   }
@@ -116,18 +117,18 @@ export class KVStore {
         try {
           localStorage.removeItem(prefixedKey)
         } catch (error: unknown) {
-          console.warn('Failed to remove from localStorage:', error)
+          logger.warn('Failed to remove from localStorage:', error)
         }
       }
 
       // Here we would implement actual database deletion
       if (process.env['NODE_ENV'] === 'development') {
-        console.log(`[KVStore] Would delete value for key: ${key}`)
+        logger.info(`[KVStore] Would delete value for key: ${key}`)
       }
 
       return true
     } catch (error: unknown) {
-      console.error(`Failed to delete value for key ${key}:`, error)
+      logger.error(`Failed to delete value for key ${key}:`, error)
       return false
     }
   }
@@ -148,7 +149,7 @@ export class KVStore {
       try {
         return localStorage.getItem(prefixedKey) !== null
       } catch (error: unknown) {
-        console.warn('Failed to check localStorage:', error)
+        logger.warn('Failed to check localStorage:', error)
       }
     }
 
@@ -184,7 +185,7 @@ export class KVStore {
           }
         }
       } catch (error: unknown) {
-        console.warn('Failed to list keys from localStorage:', error)
+        logger.warn('Failed to list keys from localStorage:', error)
       }
     }
 
@@ -215,18 +216,18 @@ export class KVStore {
 
           keysToRemove.forEach((key) => localStorage.removeItem(key))
         } catch (error: unknown) {
-          console.warn('Failed to clear localStorage:', error)
+          logger.warn('Failed to clear localStorage:', error)
         }
       }
 
       // Here we would implement actual database clearing logic
       if (process.env['NODE_ENV'] === 'development') {
-        console.log(
+        logger.info(
           `[KVStore] Would clear all values with prefix: ${this.storagePrefix}`,
         )
       }
     } catch (error: unknown) {
-      console.error('Failed to clear KV store:', error)
+      logger.error('Failed to clear KV store:', error)
       throw error
     }
   }

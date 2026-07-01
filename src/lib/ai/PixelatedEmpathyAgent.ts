@@ -3,6 +3,8 @@ import { SpanStatusCode } from '@opentelemetry/api'
 import { getArizeTracer } from './tracing/arize-setup'
 import { recordAgentActivity } from '../agent-note-collab/integration'
 import { AgentRole, TurnPhase, RequestedAction } from '../agent-note-collab/turn-log'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('PixelatedEmpathyAgent')
 
 /**
  * Azure AI Agent Service for Pixelated Empathy
@@ -162,7 +164,7 @@ export class PixelatedEmpathyAgent {
           code: SpanStatusCode.ERROR,
           message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
         })
-        console.error('Azure AI Agent error:', error)
+        logger.error('Azure AI Agent error:', error)
         return {
           success: false,
           error: error instanceof Error ? String(error) : 'Unknown error',
@@ -241,7 +243,7 @@ export class PixelatedEmpathyAgent {
         code: SpanStatusCode.ERROR,
         message: error instanceof Error ? (error instanceof Error ? error.message : "Unknown error") : String(error),
       })
-      console.error('Stream error:', error)
+      logger.error('Stream error:', error)
       yield { error: error instanceof Error ? String(error) : 'Stream error' }
     } finally {
       span.end()

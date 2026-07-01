@@ -1,4 +1,5 @@
 import { AlertTriangle, Activity } from 'lucide-react'
+import { useMemo } from 'react'
 import {
   LineChart,
   Line,
@@ -26,26 +27,33 @@ const STATE_COLORS = ['#2563EB', '#059669', '#D97706', '#8B5CF6']
 
 // State Transition Velocity Chart
 function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
-  // Group by cohort
-  const states = [...new Set(data.map((d) => d.state))]
-  const cohorts = [...new Set(data.map((d) => d.cohort).filter(Boolean))]
+  // Memoize the data transformation to avoid expensive O(n) recalculations on every render
+  const { chartData, cohorts } = useMemo(() => {
+    // Group by cohort, normalizing nullish cohorts to 'All' so the lookup map
+    // and the chart series reference a consistent bucket.
+    const states = [...new Set(data.map((d) => d.state))]
+    const cohorts = [...new Set(data.map((d) => d.cohort ?? 'All'))]
 
-  // Build O(1) lookup map for O(n) chart construction
-  const dataByKey = new Map<string, StateVelocityDataPoint>()
-  data.forEach((d) => {
-    dataByKey.set(`${d.state}::${d.cohort}`, d)
-  })
-
-  const chartData = states.map((state) => {
-    const point: Record<string, string | number> = {
-      state: state.split('→')[0].trim(),
-    }
-    cohorts.forEach((cohort) => {
-      const match = dataByKey.get(`${state}::${cohort}`)
-      if (match) point[cohort ?? 'All'] = match.medianTimeSeconds
+    // Build O(1) lookup map for O(n) chart construction
+    const dataByKey = new Map<string, StateVelocityDataPoint>()
+    data.forEach((d) => {
+      const cohort = d.cohort ?? 'All'
+      dataByKey.set(`${d.state}::${cohort}`, d)
     })
-    return point
-  })
+
+    const chartData = states.map((state) => {
+      const point: Record<string, string | number> = {
+        state: state.split('→')[0].trim(),
+      }
+      cohorts.forEach((cohort) => {
+        const match = dataByKey.get(`${state}::${cohort}`)
+        if (match) point[cohort] = match.medianTimeSeconds
+      })
+      return point
+    })
+    return { chartData, cohorts }
+  }, [data])
+
   return (
     <Card>
       <CardHeader>
@@ -90,7 +98,7 @@ function StateVelocityChart({ data }: { data: StateVelocityDataPoint[] }) {
                   key={cohort}
                   type="monotone"
                   dataKey={cohort ?? 'All'}
-                  stroke={colors[i]}
+                  stroke={STATE_COLORS[i % STATE_COLORS.length]}
                   strokeWidth={2}
                   dot={{ r: 3 }}
                 />
@@ -109,7 +117,7 @@ function InterventionRateCard({ data }: { data: InterventionRate }) {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle className="text-sm">Intervention Rate</CardTitle>
-        <AlertTriangle className="h-4 w-4 text-amber-500" />
+        <AlertTriangle className="text-amber-500 h-4 w-4" />
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
@@ -119,11 +127,11 @@ function InterventionRateCard({ data }: { data: InterventionRate }) {
             >
               {data.rate}%
             </span>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-muted-foreground text-xs">
               Of all learner turns triggered InputGuard
             </p>
           </div>
-          <div className="flex justify-between text-xs text-muted-foreground border-t pt-2">
+          <div className="text-muted-foreground flex justify-between border-t pt-2 text-xs">
             <span>{data.totalTurns.toLocaleString()} total turns</span>
             <span>{data.inputGuardTriggers} interventions</span>
           </div>
@@ -201,7 +209,7 @@ function OSCETable({ data }: { data: OSCEScoreRow[] }) {
       </CardHeader>
       <CardContent className="p-0">
         <div className="divide-y">
-          <div className="grid grid-cols-6 gap-2 px-4 py-2 text-[10px] font-medium text-muted-foreground uppercase tracking-wider">
+          <div className="text-muted-foreground grid grid-cols-6 gap-2 px-4 py-2 text-[10px] font-medium uppercase tracking-wider">
             <div className="col-span-2">Learner</div>
             <div className="col-span-1">Info Extr.</div>
             <div className="col-span-1">Comms</div>
@@ -211,7 +219,7 @@ function OSCETable({ data }: { data: OSCEScoreRow[] }) {
           {data.map((row) => (
             <div
               key={row.learnerName}
-              className="grid grid-cols-6 gap-2 px-4 py-2.5 items-center hover:bg-muted/50 text-xs"
+              className="hover:bg-muted/50 grid grid-cols-6 items-center gap-2 px-4 py-2.5 text-xs"
             >
               <div className="col-span-2 flex items-center gap-2">
                 <Avatar
@@ -222,7 +230,7 @@ function OSCETable({ data }: { data: OSCEScoreRow[] }) {
                     .map((n) => n[0])
                     .join('')}
                 />
-                <span className="font-medium truncate">{row.learnerName}</span>
+                <span className="truncate font-medium">{row.learnerName}</span>
               </div>
               <div className="col-span-1">
                 <Badge
@@ -257,7 +265,7 @@ export function ClinicalCompetencyModule() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <StateVelocityChart data={data.stateVelocities} />
         </div>
@@ -265,7 +273,7 @@ export function ClinicalCompetencyModule() {
           <InterventionRateCard data={data.interventionRate} />
         </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <DeEscalationChart data={data.deEscalationEfficacy} />
         <OSCETable data={data.osceScores} />
       </div>

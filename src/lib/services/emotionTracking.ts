@@ -1,5 +1,8 @@
 import { useState, useEffect, useMemo } from 'react'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('emotionTracking')
+
 // Types
 export type EmotionDimensions = {
   valence: number // Positive/negative dimension (0-10)
@@ -67,9 +70,9 @@ export async function fetchSessionEmotionData(
         `Failed to fetch emotion data: ${response.status} - ${errorText}`,
       )
     }
-    return await response.json()
+    return (await response.json()) as EmotionDataPoint[]
   } catch (error: unknown) {
-    console.error('Error fetching emotion data:', error)
+    logger.error('Error fetching emotion data:', error)
     return []
   }
 }
@@ -199,7 +202,7 @@ export function useSessionEmotions(
           setIsLoading(false)
         }
       } catch (error: unknown) {
-        console.error('Error loading emotion data:', error)
+        logger.error('Error loading emotion data:', error)
         if (isMounted) {
           setIsLoading(false)
         }

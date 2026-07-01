@@ -6,6 +6,8 @@
  */
 
 import type { RedisClientType } from 'redis'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('alert-utils')
 
 export interface AlertData {
   title: string
@@ -180,7 +182,7 @@ export async function getAlertStatistics(
       avgResolutionTime: parseInt(stats['avgResolutionTime'] ?? '0', 10),
     }
   } catch (error: unknown) {
-    console.error('Error getting alert statistics:', error)
+    logger.error('Error getting alert statistics:', error)
     return {
       total: 0,
       active: 0,
@@ -337,6 +339,6 @@ export async function updateAlertStatistics(
     // Update source counters
     await redis.hIncrBy('alert:statistics', alert.source, 1)
   } catch (error: unknown) {
-    console.error('Error updating alert statistics:', error)
+    logger.error('Error updating alert statistics:', error)
   }
 }

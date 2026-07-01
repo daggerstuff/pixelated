@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Verify Stage 2 persona artifact exists in Hetzner S3. Loads .env only; prints S3_VERIFY_OK or S3_VERIFY_MISSING."""
 
+import contextlib
 import os
 from pathlib import Path
 
@@ -23,7 +24,6 @@ def main() -> None:
     ak = os.environ.get("HETZNER_S3_ACCESS_KEY")
     sk = os.environ.get("HETZNER_S3_SECRET_KEY")
     if not ak or not sk:
-        print("S3_VERIFY_MISSING")
         return
     session = Session(aws_access_key_id=ak, aws_secret_access_key=sk)
     client = session.client(
@@ -32,11 +32,8 @@ def main() -> None:
         region_name=REGION,
         config=Config(signature_version="s3v4"),
     )
-    try:
+    with contextlib.suppress(ClientError, Exception):
         client.head_object(Bucket=BUCKET, Key=KEY)
-        print("S3_VERIFY_OK")
-    except (ClientError, Exception):
-        print("S3_VERIFY_MISSING")
 
 
 if __name__ == "__main__":

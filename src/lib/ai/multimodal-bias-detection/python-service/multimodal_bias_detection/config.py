@@ -92,7 +92,7 @@ class Settings(BaseSettings):
     enable_gpu_acceleration: bool = Field(default=True, env="ENABLE_GPU_ACCELERATION")
 
     @validator("environment")
-    def validate_environment(cls, v: str) -> str:
+    def validate_environment(self, v: str) -> str:
         """Validate environment setting"""
         valid_environments = {"development", "staging", "production"}
         if v not in valid_environments:
@@ -100,7 +100,7 @@ class Settings(BaseSettings):
         return v
 
     @validator("log_level")
-    def validate_log_level(cls, v: str) -> str:
+    def validate_log_level(self, v: str) -> str:
         """Validate log level setting"""
         valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
         if v.upper() not in valid_levels:
@@ -108,7 +108,7 @@ class Settings(BaseSettings):
         return v.upper()
 
     @validator("log_format")
-    def validate_log_format(cls, v: str) -> str:
+    def validate_log_format(self, v: str) -> str:
         """Validate log format setting"""
         valid_formats = {"json", "text"}
         if v.lower() not in valid_formats:

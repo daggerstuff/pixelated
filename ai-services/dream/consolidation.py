@@ -353,7 +353,7 @@ def trigger_consolidation():
         # Lock exists, check if we have an existing dream for this user
         existing_dream = _get_user_latest_dream(user_id)
         if existing_dream:
-            dream_id, existing_result = existing_dream
+            dream_id, _existing_result = existing_dream
             return jsonify(
                 {
                     "success": False,
@@ -361,15 +361,14 @@ def trigger_consolidation():
                     "dream_id": dream_id,
                 }
             ), 409
-        else:
-            # No existing dream found, but lock exists - this shouldn't happen
-            # but we'll treat it as a conflict
-            return jsonify(
-                {
-                    "success": False,
-                    "error": "Dream consolidation already in progress",
-                }
-            ), 409
+        # No existing dream found, but lock exists - this shouldn't happen
+        # but we'll treat it as a conflict
+        return jsonify(
+            {
+                "success": False,
+                "error": "Dream consolidation already in progress",
+            }
+        ), 409
 
     try:
         import httpx  # lazy import — not in base requirements.txt
@@ -459,17 +458,16 @@ def trigger_consolidation():
                     "result": data,
                 }
             )
-        else:
-            logger.error(
-                "Dream consolidation succeeded but no dream_id returned for user %s",
-                user_id,
-            )
-            return jsonify(
-                {
-                    "success": False,
-                    "error": "Dream consolidation succeeded but no dream_id returned",
-                }
-            ), 502
+        logger.error(
+            "Dream consolidation succeeded but no dream_id returned for user %s",
+            user_id,
+        )
+        return jsonify(
+            {
+                "success": False,
+                "error": "Dream consolidation succeeded but no dream_id returned",
+            }
+        ), 502
 
     except Exception as exc:
         logger.error(

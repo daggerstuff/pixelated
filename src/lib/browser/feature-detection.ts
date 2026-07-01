@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('feature-detection') /**
  * Feature detection system for browser capabilities
  * This module provides utilities for detecting browser feature support
  * and conditionally loading polyfills or alternative implementations.
@@ -218,7 +219,7 @@ export function initializeFeatureDetection() {
       const isSupported = feature.detectionFn()
       registerFeature(featureKey, isSupported)
     } catch (error: unknown) {
-      console.error(`Error detecting feature ${featureKey}:`, error)
+      logger.error(`Error detecting feature ${featureKey}:`, error)
       registerFeature(featureKey, false) // Assume not supported on error
     }
   }

@@ -11,8 +11,8 @@ import numpy as np
 import structlog
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from ..config import settings
-from ..models import (
+from bias_detection.config import settings
+from bias_detection.models import (
     AnalysisStatus,
     BiasAnalysisRequest,
     BiasAnalysisResponse,
@@ -21,6 +21,7 @@ from ..models import (
     CounterfactualScenario,
     Recommendation,
 )
+
 from .cache_service import cache_service
 from .database_service import DatabaseService
 from .diagnostic_service import DiagnosticService

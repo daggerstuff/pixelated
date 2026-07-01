@@ -3,14 +3,14 @@ Data models for multi-modal bias detection service
 """
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, validator
 
 
-class MediaType(str, Enum):
+class MediaType(StrEnum):
     """Types of media that can be analyzed"""
 
     IMAGE = "image"
@@ -19,7 +19,7 @@ class MediaType(str, Enum):
     MULTIMODAL = "multimodal"
 
 
-class BiasType(str, Enum):
+class BiasType(StrEnum):
     """Types of bias that can be detected in multimedia"""
 
     VISUAL_REPRESENTATION = "visual_representation"
@@ -40,7 +40,7 @@ class BiasType(str, Enum):
     EMOTIONAL_MANIPULATION = "emotional_manipulation"
 
 
-class AnalysisStatus(str, Enum):
+class AnalysisStatus(StrEnum):
     """Status of multi-modal bias analysis"""
 
     PENDING = "pending"
@@ -52,7 +52,7 @@ class AnalysisStatus(str, Enum):
     CANCELLED = "cancelled"
 
 
-class ConfidenceLevel(str, Enum):
+class ConfidenceLevel(StrEnum):
     """Confidence levels for bias detection"""
 
     LOW = "low"
@@ -80,7 +80,7 @@ class ImageAnalysisRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
-    def validate_sensitivity(cls, v: str) -> str:
+    def validate_sensitivity(self, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
@@ -88,7 +88,7 @@ class ImageAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("analysis_type")
-    def validate_analysis_type(cls, v: str) -> str:
+    def validate_analysis_type(self, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"faces", "objects", "text", "comprehensive"}
         if v.lower() not in valid_types:
@@ -120,7 +120,7 @@ class AudioAnalysisRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
-    def validate_sensitivity(cls, v: str) -> str:
+    def validate_sensitivity(self, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
@@ -128,7 +128,7 @@ class AudioAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("analysis_type")
-    def validate_analysis_type(cls, v: str) -> str:
+    def validate_analysis_type(self, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"speech", "music", "comprehensive"}
         if v.lower() not in valid_types:
@@ -136,7 +136,7 @@ class AudioAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("language")
-    def validate_language(cls, v: str) -> str:
+    def validate_language(self, v: str) -> str:
         """Validate language code"""
         if len(v) != 2 and v != "auto":
             raise ValueError("Language must be a 2-letter ISO 639-1 code or 'auto'")
@@ -168,7 +168,7 @@ class VideoAnalysisRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
-    def validate_sensitivity(cls, v: str) -> str:
+    def validate_sensitivity(self, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
@@ -176,7 +176,7 @@ class VideoAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("analysis_type")
-    def validate_analysis_type(cls, v: str) -> str:
+    def validate_analysis_type(self, v: str) -> str:
         """Validate analysis type"""
         valid_types = {"visual", "audio", "text", "comprehensive"}
         if v.lower() not in valid_types:
@@ -184,7 +184,7 @@ class VideoAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("frame_extraction_rate")
-    def validate_frame_rate(cls, v: int) -> int:
+    def validate_frame_rate(self, v: int) -> int:
         """Validate frame extraction rate"""
         if v < 1 or v > 10:
             raise ValueError("Frame extraction rate must be between 1 and 10")
@@ -219,7 +219,7 @@ class MultimodalAnalysisRequest(BaseModel):
     session_id: str | None = Field(default=None, description="Session ID for request correlation")
 
     @validator("sensitivity")
-    def validate_sensitivity(cls, v: str) -> str:
+    def validate_sensitivity(self, v: str) -> str:
         """Validate sensitivity level"""
         valid_levels = {"low", "medium", "high"}
         if v.lower() not in valid_levels:
@@ -227,7 +227,7 @@ class MultimodalAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("analysis_priority")
-    def validate_priority(cls, v: str) -> str:
+    def validate_priority(self, v: str) -> str:
         """Validate analysis priority"""
         valid_priorities = {"text", "visual", "audio", "balanced"}
         if v.lower() not in valid_priorities:
@@ -235,7 +235,7 @@ class MultimodalAnalysisRequest(BaseModel):
         return v.lower()
 
     @validator("text_content")
-    def validate_text_content(cls, v: str | None) -> str | None:
+    def validate_text_content(self, v: str | None) -> str | None:
         """Validate text content if provided"""
         if v and len(v.strip()) == 0:
             raise ValueError("Text content cannot be empty or whitespace only")
@@ -407,7 +407,7 @@ class MultimodalAnalysisResponse(BaseModel):
         use_enum_values = True
         json_encoders = {
             datetime: lambda v: v.isoformat(),
-            UUID: lambda v: str(v),
+            UUID: str,
         }
 
 

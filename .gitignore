@@ -21,6 +21,7 @@
 .oxlintignore/
 .superpowers/
 .ralph-tui
+hackathon/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -144,6 +145,7 @@ wandb/
 wandb_hist.csv
 wandb_ver.txt
 zthgquiz_history.json
+unsloth_compiled_cache/
 
 # === SECRETS & ENVIRONMENT ===
 !.env.example
@@ -382,5 +384,7 @@ agents.lock
 .agents/.gitignore
 
 scripts/hetzner
-hackathon/
 .Jules/
+.vercel
+HANDOFF.md
+infra/sinker/caddy/oauth2-proxy-cfg.env

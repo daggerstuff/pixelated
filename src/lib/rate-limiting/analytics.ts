@@ -482,7 +482,7 @@ export class RateLimitAnalyticsService {
         return []
       }
       const alertKeys = await redisClient['keys'](`${this.alertPrefix}*`)
-      const recentKeys = (alertKeys as string[])
+      const recentKeys = alertKeys
         .map((key: string) => ({
           key,
           timestamp: parseInt(key.split(':')[1] ?? '0'),

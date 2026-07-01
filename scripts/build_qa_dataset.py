@@ -69,8 +69,7 @@ def load_transcript(file_path: Path) -> Transcript | None:
         clean_text = clean_transcript(content)
 
         return Transcript(title=title, channel=channel, content=clean_text, source_file=str(file_path))
-    except Exception as e:
-        print(f"Error loading {file_path}: {e}")
+    except Exception:
         return None
 
 
@@ -172,11 +171,9 @@ def main():
 
     # Find all transcript files
     transcript_files = list(args.transcript_dir.glob("*.md"))
-    print(f"Found {len(transcript_files)} transcript files")
 
     if args.max_files:
         transcript_files = transcript_files[: args.max_files]
-        print(f"Processing first {len(transcript_files)} files")
 
     # Process transcripts
     all_pairs = []
@@ -192,22 +189,16 @@ def main():
                 all_pairs.append(pair)
 
         if (i + 1) % 10 == 0:
-            print(f"Processed {i + 1}/{len(transcript_files)} files, {len(all_pairs)} pairs generated")
+            pass
 
     # Write output
     with open(args.output, "w") as f:
         for pair in all_pairs:
             f.write(json.dumps(pair) + "\n")
 
-    print(f"\nGenerated {len(all_pairs)} QA pairs")
-    print(f"Saved to {args.output}")
-
     if args.sample and all_pairs:
-        print("\n=== SAMPLE PAIRS ===")
         for i, pair in enumerate(all_pairs[:3], 1):
-            print(f"\nPair {i}:")
-            print(f"  Instruction: {pair['instruction'][:150]}...")
-            print(f"  Output: {pair['output'][:200]}...")
+            pass
 
 
 if __name__ == "__main__":

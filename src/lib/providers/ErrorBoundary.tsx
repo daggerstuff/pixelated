@@ -40,6 +40,10 @@ const getSentryClient = (): SentryClient | null => {
     : null
 }
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+
+const errorLogger = createBuildSafeLogger('error-boundary')
+
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -73,12 +77,12 @@ export class ErrorBoundary extends Component<Props, State> {
           },
         })
       } catch (sentryError: unknown) {
-        console.error('Failed to forward error to Sentry:', sentryError)
+        errorLogger.error('Failed to forward error to Sentry', sentryError)
       }
     }
 
     // Log error to console for development
-    console.error('Error caught by boundary:', error, errorInfo)
+    errorLogger.error('Error caught by boundary', error)
 
     // Show error toast
     toast.error('An error occurred. Please try again.')

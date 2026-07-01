@@ -5,7 +5,9 @@
  * It uses dynamic imports to prevent bundling Node.js modules with client code
  */
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { StorageProvider, StorageProviderConfig } from '../backup-types'
+const logger = createBuildSafeLogger('google-cloud')
 
 interface GoogleCloudCredentials {
   project_id: string
@@ -91,10 +93,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         `Google Cloud Storage provider initialized for bucket: ${this.bucketName}`,
       )
     } catch (error: unknown) {
-      console.error(
-        'Failed to initialize Google Cloud Storage provider:',
-        error,
-      )
+      logger.error('Failed to initialize Google Cloud Storage provider:', error)
       throw new Error(
         `Google Cloud Storage initialization failed: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -135,7 +134,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
 
       return fileNames
     } catch (error: unknown) {
-      console.error('Failed to list files from Google Cloud Storage:', error)
+      logger.error('Failed to list files from Google Cloud Storage:', error)
       throw new Error(
         `Failed to list files: ${error instanceof Error ? String(error) : String(error)}`,
         { cause: error },
@@ -170,7 +169,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
         stream.end(nodeBuffer)
       })
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to store file ${key} to Google Cloud Storage:`,
         error,
       )
@@ -199,7 +198,7 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       // Convert Buffer to Uint8Array
       return new Uint8Array(fileContent)
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to get file ${key} from Google Cloud Storage:`,
         error,
       )
@@ -219,14 +218,14 @@ export class GoogleCloudStorageProvider implements StorageProvider {
       // Check if file exists
       const [exists] = await file.exists()
       if (!exists) {
-        console.warn(`File not found for deletion: ${key}`)
+        logger.warn(`File not found for deletion: ${key}`)
         return
       }
 
       // Delete the file
       await file.delete()
     } catch (error: unknown) {
-      console.error(
+      logger.error(
         `Failed to delete file ${key} from Google Cloud Storage:`,
         error,
       )

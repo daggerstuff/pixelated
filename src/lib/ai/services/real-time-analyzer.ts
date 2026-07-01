@@ -1,5 +1,7 @@
 import { SessionContext, TherapeuticProgress } from '../types/context'
 import { EmotionState } from '../types/emotional'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('real-time-analyzer')
 
 export class RealTimeAnalyzer {
   /**
@@ -26,7 +28,7 @@ export class RealTimeAnalyzer {
         goals: sessionContext.patientProfile.therapeuticGoals || [],
       }
     } catch (error: unknown) {
-      console.error('Progress analysis failed:', error)
+      logger.error('Progress analysis failed:', error)
       throw new Error(`Failed to analyze progress: ${error}`)
     }
   }

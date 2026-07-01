@@ -200,7 +200,7 @@ def clean_sample(sample: dict[str, Any]) -> tuple[bool, list[str]]:
     return len(reasons) > 0, reasons
 
 
-def clean_file(input_path: str, output_path: str, report_path: str = None) -> dict:
+def clean_file(input_path: str, output_path: str, report_path: str | None = None) -> dict:
     """
     Clean a training data file.
 
@@ -210,16 +210,10 @@ def clean_file(input_path: str, output_path: str, report_path: str = None) -> di
         - kept: Samples kept
         - reasons: Counter of removal reasons
     """
-    print(f"\nProcessing: {input_path}")
 
     # Load data
     with open(input_path) as f:
-        if input_path.endswith(".jsonl"):
-            data = [json.loads(line) for line in f if line.strip()]
-        else:
-            data = json.load(f)
-
-    print(f"  Loaded {len(data)} samples")
+        data = [json.loads(line) for line in f if line.strip()] if input_path.endswith(".jsonl") else json.load(f)
 
     # Clean
     cleaned = []
@@ -266,10 +260,8 @@ def clean_file(input_path: str, output_path: str, report_path: str = None) -> di
         "reasons": dict(reason_counter),
     }
 
-    print(f"  Removed: {stats['removed']} ({stats['removed'] / stats['total'] * 100:.1f}%)")
-    print(f"  Kept: {stats['kept']}")
     if stats["reasons"]:
-        print(f"  Top reasons: {stats['reasons']}")
+        pass
 
     return stats
 
@@ -300,11 +292,6 @@ def main():
             total_stats["total"] += stats["total"]
             total_stats["removed"] += stats["removed"]
             total_stats["kept"] += stats["kept"]
-
-        print(f"\n{'=' * 60}")
-        print(f"TOTAL: {total_stats['total']} samples")
-        print(f"Removed: {total_stats['removed']} ({total_stats['removed'] / total_stats['total'] * 100:.1f}%)")
-        print(f"Kept: {total_stats['kept']}")
 
     else:
         # Process single file

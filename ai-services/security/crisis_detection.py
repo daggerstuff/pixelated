@@ -6,12 +6,12 @@ Detects psychiatric emergencies and distress signals in therapeutic conversation
 import logging
 import re
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 logger = logging.getLogger(__name__)
 
 
-class CrisisRiskLevel(str, Enum):
+class CrisisRiskLevel(StrEnum):
     MINIMAL = "minimal"
     LOW = "low"
     MODERATE = "moderate"
@@ -19,7 +19,7 @@ class CrisisRiskLevel(str, Enum):
     IMMINENT = "imminent"
 
 
-class CrisisCategory(str, Enum):
+class CrisisCategory(StrEnum):
     SELF_HARM = "self_harm"
     VIOLENCE = "violence"
     DESPAIR = "despair"

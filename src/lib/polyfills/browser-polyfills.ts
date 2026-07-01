@@ -1,4 +1,5 @@
-/**
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('browser-polyfills') /**
  * Browser-compatible polyfills for Node.js modules
  * This file provides browser-friendly versions of Node.js modules
  * that are being used in browser code.
@@ -45,19 +46,19 @@ export const mongodb = {
   },
   MongoClient: class MockMongoClient {
     static connect() {
-      console.warn('MongoDB is not supported in browser environment')
+      logger.warn('MongoDB is not supported in browser environment')
       throw new Error('MongoDB is not supported in browser environment')
     }
     connect() {
-      console.warn('MongoDB is not supported in browser environment')
+      logger.warn('MongoDB is not supported in browser environment')
       throw new Error('MongoDB is not supported in browser environment')
     }
   },
   Collection: function MockCollection() {
-    console.warn('MongoDB Collection is not supported in browser environment')
+    logger.warn('MongoDB Collection is not supported in browser environment')
   },
   Db: function MockDb() {
-    console.warn('MongoDB Db is not supported in browser environment')
+    logger.warn('MongoDB Db is not supported in browser environment')
   },
 }
 
@@ -82,7 +83,7 @@ export const crypto = {
 
   // Add other crypto methods as needed
   createHash: (_algorithm: string) => {
-    console.warn(
+    logger.warn(
       'crypto.createHash is not fully supported in browser environment',
     )
     return {
@@ -98,7 +99,7 @@ export const crypto = {
     ? window.crypto?.subtle
     : undefined) ?? {
     digest: async (_algorithm: string, _data: BufferSource) => {
-      console.warn('crypto.subtle.digest fallback used - limited functionality')
+      logger.warn('crypto.subtle.digest fallback used - limited functionality')
       return new Uint8Array(32) // Return dummy hash
     },
   },
@@ -181,7 +182,7 @@ export const path = {
 export const fs = {
   promises: {
     readFile: async (path: string, _options?: unknown) => {
-      console.warn(
+      logger.warn(
         `fs.promises.readFile called with path: ${path} - not supported in browser`,
       )
       throw new Error(
@@ -189,7 +190,7 @@ export const fs = {
       )
     },
     writeFile: async (path: string, _data: unknown, _options?: unknown) => {
-      console.warn(
+      logger.warn(
         `fs.promises.writeFile called with path: ${path} - not supported in browser`,
       )
       throw new Error(
@@ -197,7 +198,7 @@ export const fs = {
       )
     },
     mkdir: async (path: string, _options?: unknown) => {
-      console.warn(
+      logger.warn(
         `fs.promises.mkdir called with path: ${path} - not supported in browser`,
       )
       throw new Error(
@@ -205,7 +206,7 @@ export const fs = {
       )
     },
     stat: async (path: string) => {
-      console.warn(
+      logger.warn(
         `fs.promises.stat called with path: ${path} - not supported in browser`,
       )
       throw new Error(
@@ -213,7 +214,7 @@ export const fs = {
       )
     },
     access: async (path: string, _mode?: number) => {
-      console.warn(
+      logger.warn(
         `fs.promises.access called with path: ${path} - not supported in browser`,
       )
       throw new Error(
@@ -222,13 +223,13 @@ export const fs = {
     },
   },
   readFileSync: (path: string, _options?: unknown) => {
-    console.warn(
+    logger.warn(
       `fs.readFileSync called with path: ${path} - not supported in browser`,
     )
     throw new Error('fs.readFileSync is not supported in browser environment')
   },
   existsSync: (path: string) => {
-    console.warn(
+    logger.warn(
       `fs.existsSync called with path: ${path} - not supported in browser`,
     )
     return false
@@ -238,7 +239,7 @@ export const fs = {
 // Child process polyfill (stub implementation)
 export const child_process = {
   spawn: (command: string, _args?: string[], _options?: unknown) => {
-    console.warn(
+    logger.warn(
       `child_process.spawn called with command: ${command} - not supported in browser`,
     )
     return {
@@ -259,7 +260,7 @@ export const child_process = {
     _options?: unknown,
     callback?: (...args: unknown[]) => void,
   ) => {
-    console.warn(
+    logger.warn(
       `child_process.exec called with command: ${command} - not supported in browser`,
     )
     if (callback) {
@@ -274,7 +275,7 @@ export const child_process = {
     )
   },
   execSync: (command: string, _options?: unknown) => {
-    console.warn(
+    logger.warn(
       `child_process.execSync called with command: ${command} - not supported in browser`,
     )
     throw new Error(
@@ -398,14 +399,14 @@ export const os = {
 // HTTP polyfill (minimal implementation)
 export const http = {
   createServer: () => {
-    console.warn('http.createServer is not supported in browser environment')
+    logger.warn('http.createServer is not supported in browser environment')
     return {
       listen: () => {},
       on: () => {},
     }
   },
   request: (_options: unknown, callback?: (...args: unknown[]) => void) => {
-    console.warn('http.request is not supported in browser environment')
+    logger.warn('http.request is not supported in browser environment')
     if (callback) {
       callback(new Error('http.request not supported'))
     }
@@ -422,14 +423,14 @@ export const http = {
 // HTTPS polyfill (minimal implementation)
 export const https = {
   createServer: () => {
-    console.warn('https.createServer is not supported in browser environment')
+    logger.warn('https.createServer is not supported in browser environment')
     return {
       listen: () => {},
       on: () => {},
     }
   },
   request: (_options: unknown, callback?: (...args: unknown[]) => void) => {
-    console.warn('https.request is not supported in browser environment')
+    logger.warn('https.request is not supported in browser environment')
     if (callback) {
       callback(new Error('https.request not supported'))
     }

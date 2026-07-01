@@ -2500,7 +2500,7 @@ export default {
     // Bias detection for AI responses
     const biasCheck = await this.detectBias(request, ai);
     if (biasCheck.hasBias) {
-      console.warn('Bias detected in request:', biasCheck.details);
+      logger.warn('Bias detected in request:', biasCheck.details);
     }
 
     // Cache lookup
@@ -2549,7 +2549,7 @@ export default {
         reason: response.reason || 'No threat detected'
       };
     } catch (error: unknown) {
-      console.error('Threat detection error:', error);
+      logger.error('Threat detection error:', error);
       return { blocked: false, score: 0, reason: 'Detection failed' };
     }
   },
@@ -2573,7 +2573,7 @@ export default {
         details: result.categories || []
       };
     } catch (error: unknown) {
-      console.error('Bias detection error:', error);
+      logger.error('Bias detection error:', error);
       return { hasBias: false, score: 0, details: [] };
     }
   }
@@ -2615,7 +2615,7 @@ exports.handler = async (event, context) => {
     // Bias detection
     const biasCheck = await detectBias(userAgent, country);
     if (biasCheck.hasBias) {
-      console.warn('Bias detected:', biasCheck.details);
+      logger.warn('Bias detected:', biasCheck.details);
     }
 
     // Cache key generation
@@ -2637,7 +2637,7 @@ exports.handler = async (event, context) => {
 
     return addEdgeHeaders(originResponse, location, threatCheck, biasCheck, 'MISS');
   } catch (error: unknown) {
-    console.error('Edge processing error:', error);
+    logger.error('Edge processing error:', error);
     return {
       status: '500',
       statusDescription: 'Internal Server Error',
@@ -2659,7 +2659,7 @@ async function detectThreats(userAgent, country) {
       reason: threatScore > 0.8 ? 'Suspicious user agent pattern' : 'Clean'
     };
   } catch (error: unknown) {
-    console.error('Threat detection error:', error);
+    logger.error('Threat detection error:', error);
     return { blocked: false, score: 0, reason: 'Detection failed' };
   }
 }
@@ -2674,7 +2674,7 @@ async function detectBias(userAgent, country) {
       details: biasScore > 0.8 ? ['potential_bias'] : []
     };
   } catch (error: unknown) {
-    console.error('Bias detection error:', error);
+    logger.error('Bias detection error:', error);
     return { hasBias: false, score: 0, details: [] };
   }
 }
@@ -2864,7 +2864,7 @@ const axios = require('axios');
 
 // Register HTTP function
 functions.http('edgeFunction_${location.id}', async (req, res) => {
-  console.log(\`Processing edge request for location: ${location.name}\`);
+  logger.info(\`Processing edge request for location: ${location.name}\`);
 
   try {
     const userAgent = req.get('User-Agent');
@@ -2879,7 +2879,7 @@ functions.http('edgeFunction_${location.id}', async (req, res) => {
     // Bias detection
     const biasCheck = await detectBias(userAgent, country);
     if (biasCheck.hasBias) {
-      console.warn('Bias detected:', biasCheck.details);
+      logger.warn('Bias detected:', biasCheck.details);
     }
 
     // Process request
@@ -2892,7 +2892,7 @@ functions.http('edgeFunction_${location.id}', async (req, res) => {
 
     res.status(200).json(result);
   } catch (error: unknown) {
-    console.error('Edge processing error:', error);
+    logger.error('Edge processing error:', error);
     res.status(500).json({ error: 'Edge processing failed' });
   }
 });
@@ -2907,7 +2907,7 @@ async function detectThreats(userAgent, country) {
       reason: threatScore > 0.8 ? 'Suspicious pattern detected' : 'Clean'
     };
   } catch (error: unknown) {
-    console.error('Threat detection error:', error);
+    logger.error('Threat detection error:', error);
     return { blocked: false, score: 0, reason: 'Detection failed' };
   }
 }
@@ -2922,7 +2922,7 @@ async function detectBias(userAgent, country) {
       details: biasScore > 0.8 ? ['potential_bias'] : []
     };
   } catch (error: unknown) {
-    console.error('Bias detection error:', error);
+    logger.error('Bias detection error:', error);
     return { hasBias: false, score: 0, details: [] };
   }
 }

@@ -10,6 +10,9 @@ import * as tf from '@tensorflow/tfjs'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('response-orchestration')
+
 export interface ThreatResponse {
   responseId: string
   threatId: string
@@ -300,7 +303,7 @@ export class AdvancedResponseOrchestrator
 
       return true
     } catch (error: unknown) {
-      console.error('Action validation error:', error)
+      logger.error('Action validation error:', error)
       return false
     }
   }
@@ -769,7 +772,7 @@ export class AdvancedResponseOrchestrator
     results: ExecutionResult[],
   ): Promise<void> {
     // Implement execution logging
-    console.log(
+    logger.info(
       `Response ${response.responseId} executed with ${results.length} actions`,
     )
   }
@@ -791,7 +794,7 @@ export class AdvancedResponseOrchestrator
 
       return true
     } catch (error: unknown) {
-      console.error('Orchestrator health check failed:', error)
+      logger.error('Orchestrator health check failed:', error)
       return false
     }
   }
@@ -1159,7 +1162,7 @@ class MultiSystemIntegrationManager extends IntegrationManager {
     data: unknown,
   ): Promise<void> {
     // Implement HTTP request with proper authentication and retry logic
-    console.log(`Sending integration request to ${endpoint.name}:`, data)
+    logger.info(`Sending integration request to ${endpoint.name}:`, data)
   }
 }
 
@@ -1228,7 +1231,7 @@ class MultiChannelNotificationManager extends NotificationManager {
     _success: boolean,
   ): Promise<void> {
     // Implement email notification
-    console.log(
+    logger.info(
       `Sending email notification for response ${response.responseId}`,
     )
   }
@@ -1239,7 +1242,7 @@ class MultiChannelNotificationManager extends NotificationManager {
     _success: boolean,
   ): Promise<void> {
     // Implement Slack notification
-    console.log(
+    logger.info(
       `Sending Slack notification for response ${response.responseId}`,
     )
   }
@@ -1250,7 +1253,7 @@ class MultiChannelNotificationManager extends NotificationManager {
     _success: boolean,
   ): Promise<void> {
     // Implement webhook notification
-    console.log(
+    logger.info(
       `Sending webhook notification for response ${response.responseId}`,
     )
   }
@@ -1261,7 +1264,7 @@ class MultiChannelNotificationManager extends NotificationManager {
     _success: boolean,
   ): Promise<void> {
     // Implement SMS notification
-    console.log(`Sending SMS notification for response ${response.responseId}`)
+    logger.info(`Sending SMS notification for response ${response.responseId}`)
   }
 }
 

@@ -5,6 +5,9 @@
 
 import type { TestResult, CoverageReport } from '@/types/testing'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('comprehensiveTestSuite')
+
 export interface TestSuiteConfig {
   layers: ('unit' | 'integration' | 'e2e' | 'performance' | 'security')[]
   coverage: {
@@ -96,7 +99,7 @@ class TestSuiteManager {
     const startTime = Date.now()
 
     try {
-      console.log('🚀 Starting comprehensive test suite...')
+      logger.info('🚀 Starting comprehensive test suite...')
 
       const results = await Promise.allSettled([
         this.runUnitTests(),
@@ -126,7 +129,7 @@ class TestSuiteManager {
   }
 
   private async runUnitTests(): Promise<TestResult[]> {
-    console.log('🧪 Running unit tests...')
+    logger.info('🧪 Running unit tests...')
 
     // Simulate unit test execution
     const unitTests = [
@@ -166,7 +169,7 @@ class TestSuiteManager {
   }
 
   private async runIntegrationTests(): Promise<TestResult[]> {
-    console.log('🔗 Running integration tests...')
+    logger.info('🔗 Running integration tests...')
 
     const integrationTests = [
       'apiIntegration.test.ts',
@@ -203,7 +206,7 @@ class TestSuiteManager {
   }
 
   private async runE2ETests(): Promise<TestResult[]> {
-    console.log('🌐 Running end-to-end tests...')
+    logger.info('🌐 Running end-to-end tests...')
 
     const e2eTests = [
       'patientJourney.test.ts',
@@ -240,7 +243,7 @@ class TestSuiteManager {
   }
 
   private async runPerformanceTests(): Promise<TestResult[]> {
-    console.log('⚡ Running performance tests...')
+    logger.info('⚡ Running performance tests...')
 
     const performanceTests = [
       'apiResponseTime.test.ts',
@@ -281,7 +284,7 @@ class TestSuiteManager {
   }
 
   private async runSecurityTests(): Promise<TestResult[]> {
-    console.log('🔒 Running security tests...')
+    logger.info('🔒 Running security tests...')
 
     const securityTests = [
       'authentication.test.ts',
@@ -458,7 +461,7 @@ class TestSuiteManager {
       recommendations: this.generateRecommendations(metrics, meetsRequirements),
     }
 
-    console.log('📊 Test Report Generated:', report)
+    logger.info('📊 Test Report Generated:', report)
 
     // In real implementation, save to file or send to monitoring system
     if (this.config.enableCI) {
@@ -526,7 +529,7 @@ class TestSuiteManager {
     recommendations: string[]
   }): Promise<void> {
     // Export test results to CI/CD system
-    console.log('📤 Exporting results to CI/CD system...')
+    logger.info('📤 Exporting results to CI/CD system...')
 
     // Mock CI export - in real implementation would send to GitHub Actions, Jenkins, etc.
     const ciExport = {
@@ -548,7 +551,7 @@ class TestSuiteManager {
       ],
     }
 
-    console.log('CI Export:', ciExport)
+    logger.info('CI Export:', ciExport)
   }
 
   /**

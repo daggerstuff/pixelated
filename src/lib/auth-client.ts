@@ -6,6 +6,9 @@
 
 import React from 'react'
 
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+const logger = createBuildSafeLogger('auth-client')
+
 export interface User {
   id: string
   email: string
@@ -207,7 +210,7 @@ class AuthClient {
       this._session = null
       window.location.href = '/'
     } catch (error: unknown) {
-      console.error('Sign out failed:', error)
+      logger.error('Sign out failed:', error)
     }
   }
 
@@ -225,7 +228,7 @@ class AuthClient {
         callbackURL?: string
       }) => {
         // Implementation for social login using server-side flow
-        console.log(`Social login with ${provider} initiated`)
+        logger.info(`Social login with ${provider} initiated`)
         const returnTo = callbackURL ?? window.location.pathname
         window.location.href = `/api/auth/login?connection=${provider === 'google' ? 'google-oauth2' : provider}&returnTo=${encodeURIComponent(returnTo)}`
       },
@@ -249,7 +252,7 @@ class AuthClient {
     email: string
     redirectTo?: string
   }): Promise<{ success: boolean }> {
-    console.log(
+    logger.info(
       `Password reset for ${email} requested, redirect to ${redirectTo}`,
     )
     // This would Normally hit another endpoint, e.g., /api/auth/forgot-password

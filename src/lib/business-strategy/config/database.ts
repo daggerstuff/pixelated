@@ -14,6 +14,9 @@ import { getMongoClient } from '@/lib/database/mongodb'
 import { getPostgresPool } from '@/lib/database/postgres'
 import { getRedisClient } from '@/lib/database/redis'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('database')
+
 export interface DatabaseConfig {
   mongodb: {
     client: MongoClient
@@ -129,7 +132,7 @@ export async function initializeDatabases(): Promise<DatabaseConfig> {
 
     return databaseConfig
   } catch (error: unknown) {
-    console.error('Failed to initialize business strategy databases:', error)
+    logger.error('Failed to initialize business strategy databases:', error)
     throw new Error('Database initialization failed')
   }
 }
@@ -321,7 +324,7 @@ export async function checkDatabaseHealth(): Promise<{
     await config.mongodb.client.db('admin').command({ ping: 1 })
     results.mongodb = true
   } catch (error: unknown) {
-    console.error('MongoDB health check failed:', error)
+    logger.error('MongoDB health check failed:', error)
   }
 
   try {
@@ -331,7 +334,7 @@ export async function checkDatabaseHealth(): Promise<{
     client.release()
     results.postgresql = true
   } catch (error: unknown) {
-    console.error('PostgreSQL health check failed:', error)
+    logger.error('PostgreSQL health check failed:', error)
   }
 
   try {
@@ -339,7 +342,7 @@ export async function checkDatabaseHealth(): Promise<{
     await config.redis.client.ping()
     results.redis = true
   } catch (error: unknown) {
-    console.error('Redis health check failed:', error)
+    logger.error('Redis health check failed:', error)
   }
 
   return results
