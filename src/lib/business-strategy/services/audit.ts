@@ -7,9 +7,9 @@
 
 import type { Collection } from 'mongodb'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { getDatabaseConfig } from '../config/database'
 import type { AuditLog, UserId } from '../types'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('audit')
 
 export interface AuditEventInput {

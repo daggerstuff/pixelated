@@ -4,11 +4,11 @@
  * Provides common functionality for all business strategy services
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import type { DatabaseConfig } from '../config/database'
 import { getDatabaseConfig } from '../config/database'
 import type { UserId } from '../types/common'
 import { AuditService } from './audit'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('base-service')
 
 export abstract class BaseService {
