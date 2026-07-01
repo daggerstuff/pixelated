@@ -99,14 +99,13 @@ def detect_synonym_sequence(text: str) -> tuple[bool, str]:
 def detect_character_repetition(text: str) -> tuple[bool, str]:
     """Detect character repetition patterns (e.g., 'ssss ssss')."""
 
-    # Single character repeated 4+ times
-    if re.search(r"\b(\w)\1{3,}\b", text):
-        match = re.search(r"\b(\w)\1{3,}\b", text)
+    match = re.search(r"\b(\w)\1{3,}\b", text)
+    if match:
         return True, f"Character repetition: '{match.group()}'"
 
     # Same character sequence repeated
-    if re.search(r"\b(\w{2,4})\s+\1\s+\1\b", text):
-        match = re.search(r"\b(\w{2,4})\s+\1\s+\1\b", text)
+    match = re.search(r"\b(\w{2,4})\s+\1\s+\1\b", text)
+    if match:
         return True, f"Sequence repetition: '{match.group()}'"
 
     return False, ""
@@ -153,8 +152,8 @@ def detect_generated_artifacts(text: str) -> tuple[bool, str]:
     ]
 
     for pattern, message in artifacts:
-        if re.search(pattern, text):
-            match = re.search(pattern, text)
+        match = re.search(pattern, text)
+        if match:
             return True, f"{message}: '{match.group()}'"
 
     return False, ""
@@ -287,7 +286,7 @@ def main():
             out_file = output_path / f"{file.stem}_cleaned{file.suffix}"
             report_file = output_path / f"{file.stem}_report.json" if args.report else None
 
-            stats = clean_file(str(file), str(out_file), report_file)
+            stats = clean_file(str(file), str(out_file), str(report_file) if report_file else None)
 
             total_stats["total"] += stats["total"]
             total_stats["removed"] += stats["removed"]

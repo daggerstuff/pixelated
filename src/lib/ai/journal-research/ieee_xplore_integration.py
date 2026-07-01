@@ -198,7 +198,7 @@ class IEEEXploreClient:
         params["api_key"] = self.config.api_key
 
         try:
-            async with self.session.get(url, params=params) as response:
+            async with self.session.get(url, params=params) as response:  # type: ignore
                 self.request_count += 1
 
                 if response.status == 200:

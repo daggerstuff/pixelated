@@ -241,7 +241,7 @@ async def refresh_token(
         {"id": user_id},
     )
     role = result.scalar()
-
+    assert role is not None
     # Issue new tokens (rotation)
     new_access = create_access_token(
         user_id=str(user_id),
@@ -315,6 +315,7 @@ async def create_user(
         },
     )
     user = result.fetchone()
+    assert user is not None
 
     return UserResponse(
         id=str(user[0]),
@@ -412,6 +413,7 @@ async def create_institution(
         },
     )
     inst = result.fetchone()
+    assert inst is not None
 
     return InstitutionResponse(
         id=str(inst[0]),
@@ -488,6 +490,7 @@ async def create_api_key(
         },
     )
     key = result.fetchone()
+    assert key is not None
 
     return ApiKeyResponse(
         id=str(key[0]),
@@ -541,5 +544,5 @@ async def revoke_api_key(
         text("UPDATE pe.api_keys SET is_active = FALSE WHERE id = :id AND institution_id = :tenant"),
         {"id": key_id, "tenant": current_user["tenant_id"]},
     )
-    if result.rowcount == 0:
+    if getattr(result, "rowcount", 0) == 0:
         raise HTTPException(status_code=404, detail="API key not found")

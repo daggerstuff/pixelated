@@ -777,7 +777,7 @@ class AdvancedTrainingEngine:
         scenario = session_data["scenario"]
 
         # Analyze response
-        analysis = await self._analyze_training_response(user_response, scenario, session_data)
+        analysis = await self._analyze_training_response(user_response, scenario)
 
         # Update session data
         session_data["responses"].append(
@@ -829,11 +829,11 @@ class AdvancedTrainingEngine:
 
         # Analyze based on scenario type
         if scenario.training_type == TrainingType.CULTURAL_COMPETENCY:
-            analysis.update(await self._analyze_cultural_response(user_response, scenario))
+            analysis.update(await self._analyze_cultural_response(user_response))
         elif scenario.training_type == TrainingType.TRAUMA_INFORMED:
-            analysis.update(await self._analyze_trauma_response(user_response, scenario))
+            analysis.update(await self._analyze_trauma_response(user_response))
         elif scenario.training_type == TrainingType.LGBTQ_INCLUSIVE:
-            analysis.update(await self._analyze_lgbtq_response(user_response, scenario))
+            analysis.update(await self._analyze_lgbtq_response(user_response))
 
         # Calculate overall scores
         analysis["appropriateness_score"] = (
@@ -844,7 +844,7 @@ class AdvancedTrainingEngine:
         )
 
         # Generate feedback
-        analysis["feedback"] = self._generate_feedback(analysis, scenario)
+        analysis["feedback"] = self._generate_feedback(analysis, scenario)  # type: ignore
 
         return analysis
 
@@ -853,7 +853,7 @@ class AdvancedTrainingEngine:
 
         response_lower = response.lower()
 
-        scores = {
+        scores: dict[str, Any] = {
             "cultural_competency_score": 0.0,
             "bias_awareness_score": 0.0,
             "communication_effectiveness": 0.0,
@@ -924,7 +924,7 @@ class AdvancedTrainingEngine:
 
         response_lower = response.lower()
 
-        scores = {
+        scores: dict[str, Any] = {
             "trauma_informed_score": 0.0,
             "cultural_competency_score": 0.0,
             "bias_awareness_score": 0.0,
@@ -987,7 +987,7 @@ class AdvancedTrainingEngine:
 
         response_lower = response.lower()
 
-        scores = {
+        scores: dict[str, Any] = {
             "cultural_competency_score": 0.0,
             "trauma_informed_score": 0.0,
             "bias_awareness_score": 0.0,
@@ -1068,7 +1068,7 @@ class AdvancedTrainingEngine:
 
         # Check if scenario should branch
         for branch in scenario.branching_paths:
-            if self._evaluate_branch_condition(branch.condition, analysis, session_data):
+            if self._evaluate_branch_condition(branch.condition, analysis, session_data):  # type: ignore
                 return {
                     "action": "branch",
                     "branch_id": branch.branch_id,
@@ -1335,7 +1335,9 @@ async def get_advanced_training_engine() -> AdvancedTrainingEngine:
     """Get the module-local advanced training engine instance."""
     if _EngineHolder.engine is None:
         await initialize_advanced_training_engine()
-    return _EngineHolder.engine
+    from typing import cast
+
+    return cast(AdvancedTrainingEngine, _EngineHolder.engine)
 
 
 def reset_advanced_training_engine() -> None:

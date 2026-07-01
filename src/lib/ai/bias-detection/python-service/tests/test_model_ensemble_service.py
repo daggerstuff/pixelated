@@ -51,7 +51,7 @@ def test_ensemble_continues_when_optional_model_fails_to_load() -> None:
         ensemble = ModelEnsembleService.__new__(ModelEnsembleService)
         ensemble.services = [FailingModelService(), fallback]
         ensemble.tf_service = None
-        ensemble.pt_service = fallback
+        ensemble.pt_service = fallback  # type: ignore
         ensemble.nvidia_service = None
         ensemble.keyword_service = fallback
 

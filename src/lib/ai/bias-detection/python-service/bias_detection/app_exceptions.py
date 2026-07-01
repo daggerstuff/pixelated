@@ -14,14 +14,12 @@ logger = structlog.get_logger(__name__)
 
 def register_exception_handlers(app: FastAPI) -> None:
     """Register all global exception handlers on the app."""
-    app.add_exception_handler(ValidationError, validation_exception_handler)
-    app.add_exception_handler(HTTPException, http_exception_handler)
+    app.add_exception_handler(ValidationError, validation_exception_handler)  # type: ignore
+    app.add_exception_handler(HTTPException, http_exception_handler)  # type: ignore
     app.add_exception_handler(Exception, general_exception_handler)
 
 
-async def validation_exception_handler(
-    request: Request, exc: ValidationError
-) -> JSONResponse:
+async def validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
     """Handle Pydantic validation errors."""
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

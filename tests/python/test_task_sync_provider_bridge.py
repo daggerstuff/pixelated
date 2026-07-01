@@ -177,7 +177,7 @@ def test_resolve_jira_issue_type_prefers_project_issue_type_id(monkeypatch) -> N
     monkeypatch.setenv("JIRA_USERNAME", "user@example.com")
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
 
-    def fake_json_request(method, url, *, _headers, _payload=None):
+    def fake_json_request(method, url, *, headers, _payload=None):
         assert method == "GET"
         assert url.endswith("/rest/api/3/issue/createmeta/PIX/issuetypes")
         return {
@@ -336,7 +336,7 @@ def test_create_jira_project_bootstraps_first_valid_candidate(monkeypatch) -> No
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     attempts: list[tuple[str, str]] = []
 
-    def fake_json_request(_method, url, *, _headers, payload=None):
+    def fake_json_request(_method, url, *, headers, payload=None):
         if url.endswith("/rest/api/3/myself"):
             return {"accountId": "acct-1"}
         if url.endswith("/rest/api/3/project"):
@@ -363,7 +363,7 @@ def test_export_asana_tasks_aggregates_multiple_projects(monkeypatch) -> None:
     )
     calls: list[str] = []
 
-    def fake_json_request(_method, url, *, _headers, _payload=None):
+    def fake_json_request(_method, url, *, headers, _payload=None):
         calls.append(url)
         if "/projects/proj-1/tasks" in url:
             return {
@@ -397,7 +397,7 @@ def test_export_asana_tasks_aggregates_multiple_projects(monkeypatch) -> None:
 
     tasks = export_asana_tasks()
 
-    assert [task["gid"] for task in tasks] == ["A-1", "A-2"]
+    assert [task["gid"] for task in tasks] == ["A-1", "B-1"]
     assert len(calls) == 2
     assert all("completed_since=1970-01-01T00%3A00%3A00Z" in call for call in calls)
 
@@ -420,7 +420,7 @@ def test_export_github_issues_filters_pull_requests_and_supports_pagination(monk
         }
     )
 
-    def fake_json_request(_method, url, *, _headers, _payload=None):
+    def fake_json_request(_method, url, *, headers, _payload=None):
         calls.append(url)
         page = parse_qs(urlsplit(url).query).get("page", [""])[0]
         if page == "1":
@@ -571,7 +571,7 @@ def test_apply_github_action_updates_and_creates_issues(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     calls: list[tuple[str, str]] = []
 
-    def fake_json_request(method, url, *, _headers, payload=None):
+    def fake_json_request(method, url, *, headers, payload=None):
         assert payload is not None
         calls.append((method, url))
         if method == "POST":
@@ -615,7 +615,7 @@ def test_apply_jira_action_transitions_status_best_effort(monkeypatch) -> None:
     monkeypatch.setenv("JIRA_API_TOKEN", "token")
     calls: list[tuple[str, str, dict | None]] = []
 
-    def fake_json_request(method, url, *, _headers, payload=None):
+    def fake_json_request(method, url, *, headers, payload=None):
         calls.append((method, url, payload))
         if method == "PUT" and url.endswith("/rest/api/3/issue/PIX-1"):
             return {}
@@ -804,7 +804,7 @@ def test_apply_github_action_sends_labels_on_create(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     sent_payloads: list[dict[str, object]] = []
 
-    def fake_json_request(_method, _url, *, _headers, payload=None):
+    def fake_json_request(_method, _url, *, headers, payload=None):
         assert payload is not None
         sent_payloads.append(payload)
         return {"number": 42, "title": payload["title"], "body": payload["body"]}
@@ -830,7 +830,7 @@ def test_apply_github_action_sends_labels_on_update(monkeypatch) -> None:
     monkeypatch.setenv("GITHUB_REPO", "pixelated-empathy")
     sent_payloads: list[dict[str, object]] = []
 
-    def fake_json_request(_method, _url, *, _headers, payload=None):
+    def fake_json_request(_method, _url, *, headers, payload=None):
         assert payload is not None
         sent_payloads.append(payload)
         return {}

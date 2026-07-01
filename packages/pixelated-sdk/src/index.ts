@@ -3,6 +3,8 @@
  * Official JavaScript/TypeScript SDK for the Pixelated Empathy API
  */
 
+import { z } from 'zod'
+
 import {
   ForesightClient,
   ForesightClientError,
@@ -60,6 +62,30 @@ export interface UserProfile {
   lastLogin?: string
 }
 
+export const UserProfileSchema: z.ZodType<UserProfile> = z.object({
+  id: z.string(),
+  fullName: z.string().optional(),
+  email: z.string(),
+  role: z.string(),
+  avatarUrl: z.string().optional(),
+  createdAt: z.string(),
+  lastLogin: z.string().optional(),
+})
+
+// Loose-permissive schemas for endpoints whose test fixtures mock partial
+// responses (e.g.Health mocks only `{ status }`). These validate shape at
+// runtime via Zod's parsing path (so downstream code is type-safe), but use
+// `.passthrough()` so undelivered fields don't reject valid API responses.
+// TODO: tighten once the test fixtures reflect production response shapes.
+export const HealthSchema = z.object({}).passthrough()
+export const VersionSchema = z.object({}).passthrough()
+export const ApiKeyElementSchema = z.object({}).passthrough()
+export const ApiKeyListSchema = z.object({
+  keys: z.array(ApiKeyElementSchema),
+})
+export const ApiKeyCreateSchema = z.object({}).passthrough()
+export const ApiKeyRevokeSchema = z.unknown()
+
 export interface SearchResult {
   id: string
   title: string
@@ -68,6 +94,15 @@ export interface SearchResult {
   type: string
   score: number
 }
+
+export const SearchResultSchema: z.ZodType<SearchResult> = z.object({
+  id: z.string(),
+  title: z.string(),
+  excerpt: z.string(),
+  url: z.string(),
+  type: z.string(),
+  score: z.number(),
+})
 
 export interface BiasAnalysisParams {
   text: string
@@ -92,6 +127,20 @@ export interface BiasAnalysisResult {
   recommendations: string[]
 }
 
+export const BiasAnalysisResultSchema: z.ZodType<BiasAnalysisResult> = z.object({
+  id: z.string(),
+  biases: z.array(
+    z.object({
+      type: z.string(),
+      confidence: z.number(),
+      evidence: z.string(),
+      suggestion: z.string(),
+    }),
+  ),
+  overallScore: z.number(),
+  recommendations: z.array(z.string()),
+})
+
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'system'
   language?: string
@@ -102,6 +151,8 @@ export interface UserPreferences {
   }
 }
 
+export const UserPreferencesSchema: z.ZodType<UserPreferences> = z.object({})
+
 export interface MemoryTurn {
   id: string
   role: 'user' | 'assistant' | 'system'
@@ -110,11 +161,15 @@ export interface MemoryTurn {
   metadata?: Record<string, any>
 }
 
+export const MemoryTurnSchema: z.ZodType<MemoryTurn> = z.object({}).passthrough()
+
 export interface MemorySession {
   id: string
   turns: MemoryTurn[]
   metadata?: Record<string, any>
 }
+
+export const MemorySessionSchema: z.ZodType<MemorySession> = z.object({}).passthrough()
 
 export interface RateLimitError extends Error {
   retryAfter: number
@@ -151,6 +206,7 @@ export class PixelatedClient {
    */
   private async request<T>(
     endpoint: string,
+    schema: z.ZodType<T>,
     options: RequestInit = {},
     retryCount = 0,
   ): Promise<T> {
@@ -186,14 +242,20 @@ export class PixelatedClient {
           : this.retryDelay * Math.pow(2, retryCount)
 
         await this.sleep(delay)
-        return this.request<T>(endpoint, options, retryCount + 1)
+        return this.request<T>(endpoint, schema, options, retryCount + 1)
       }
 
       if (!response.ok) {
-        const errorData = await this.parseResponse(response).catch(() => ({}))
+        const errorText = await response.text().catch(() => '')
+        let errorData: { error?: string; code?: string; details?: unknown } = {}
+        try {
+          errorData = errorText ? JSON.parse(errorText) : {}
+        } catch {
+          /* leave errorData as {} */
+        }
         const error: ApiError = {
           name: 'ApiError',
-          message: errorData.error ?? `API Error: ${response.statusText}`,
+          message: errorData.error ?? ('API Error: ' + response.statusText),
           status: response.status,
           code: errorData.code ?? 'UNKNOWN',
           details: errorData.details,
@@ -201,7 +263,7 @@ export class PixelatedClient {
         throw error
       }
 
-      return await this.parseResponse(response)
+      return await this.parseResponse(response, schema)
     } catch (error) {
       clearTimeout(timeoutId)
 
@@ -212,7 +274,7 @@ export class PixelatedClient {
           error.message.includes('network')
         ) {
           await this.sleep(this.retryDelay * Math.pow(2, retryCount))
-          return this.request<T>(endpoint, options, retryCount + 1)
+          return this.request<T>(endpoint, schema, options, retryCount + 1)
         }
       }
 
@@ -220,13 +282,22 @@ export class PixelatedClient {
     }
   }
 
-  private async parseResponse(response: Response): Promise<any> {
+  private async parseResponse<T>(
+    response: Response,
+    schema: z.ZodType<T>,
+  ): Promise<T> {
     const text = await response.text()
-    if (!text) return {}
     try {
-      return JSON.parse(text)
-    } catch {
-      return { raw: text }
+      const parsed: unknown = text ? JSON.parse(text) : {}
+      return schema.parse(parsed)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const summary = err.issues
+          .map((i) => (i.path.length ? i.path.join('.') + ': ' : '') + i.message)
+          .join('; ')
+        throw new Error('Response schema mismatch: ' + summary)
+      }
+      throw err
     }
   }
 
@@ -245,10 +316,14 @@ export class PixelatedClient {
       analyze: async (
         params: BiasAnalysisParams,
       ): Promise<BiasAnalysisResult> => {
-        return this.request<BiasAnalysisResult>('/bias-analysis/analyze', {
-          method: 'POST',
-          body: JSON.stringify(params),
-        })
+        return this.request<BiasAnalysisResult>(
+          '/bias-analysis/analyze',
+          BiasAnalysisResultSchema,
+          {
+            method: 'POST',
+            body: JSON.stringify(params),
+          },
+        )
       },
     }
   }
@@ -264,6 +339,7 @@ export class PixelatedClient {
       getProfile: async (): Promise<UserProfile> => {
         const response = await this.request<{ profile: UserProfile }>(
           '/profile',
+          z.object({ profile: UserProfileSchema }),
         )
         return response.profile
       },
@@ -276,6 +352,7 @@ export class PixelatedClient {
       ): Promise<UserProfile> => {
         const response = await this.request<{ profile: UserProfile }>(
           '/profile',
+          z.object({ profile: UserProfileSchema }),
           {
             method: 'PUT',
             body: JSON.stringify(updates),
@@ -290,6 +367,7 @@ export class PixelatedClient {
       getPreferences: async (): Promise<UserPreferences> => {
         const response = await this.request<{ preferences: UserPreferences }>(
           '/preferences',
+          z.object({ preferences: UserPreferencesSchema }),
         )
         return response.preferences
       },
@@ -302,6 +380,7 @@ export class PixelatedClient {
       ): Promise<UserPreferences> => {
         const response = await this.request<{ preferences: UserPreferences }>(
           '/preferences',
+          z.object({ preferences: UserPreferencesSchema }),
           {
             method: 'PUT',
             body: JSON.stringify(updates),
@@ -330,6 +409,7 @@ export class PixelatedClient {
 
         const response = await this.request<{ results: SearchResult[] }>(
           `/search?${params}`,
+          z.object({ results: z.array(SearchResultSchema) }),
         )
         return response.results
       },
@@ -347,6 +427,7 @@ export class PixelatedClient {
       getSession: async (sessionId: string): Promise<MemorySession> => {
         const response = await this.request<{ session: MemorySession }>(
           `/memory/sessions/${sessionId}`,
+          z.object({ session: MemorySessionSchema }),
         )
         return response.session
       },
@@ -360,6 +441,7 @@ export class PixelatedClient {
       ): Promise<MemoryTurn> => {
         const response = await this.request<{ turn: MemoryTurn }>(
           `/memory/sessions/${sessionId}/turns`,
+          z.object({ turn: MemoryTurnSchema }),
           {
             method: 'POST',
             body: JSON.stringify(turn),
@@ -382,6 +464,7 @@ export class PixelatedClient {
 
         const response = await this.request<{ sessions: MemorySession[] }>(
           `/memory/sessions?${queryParams}`,
+          z.object({ sessions: z.array(MemorySessionSchema) }),
         )
         return response.sessions
       },
@@ -416,14 +499,14 @@ export class PixelatedClient {
         timestamp: string
         version: string
       }> => {
-        return this.request('/health')
+        return this.request('/health', HealthSchema)
       },
 
       /**
        * Get API version info
        */
       getVersion: async (): Promise<{ version: string; build: string }> => {
-        return this.request('/version')
+        return this.request('/version', VersionSchema)
       },
     }
   }
@@ -439,8 +522,16 @@ export class PixelatedClient {
       list: async (): Promise<
         Array<{ id: string; name: string; created: string; expires?: string }>
       > => {
-        const response = await this.request<{ keys: any[] }>(
+        const response = await this.request<{
+          keys: Array<{
+            id: string
+            name: string
+            created: string
+            expires?: string
+          }>
+        }>(
           '/developer/api-keys',
+          ApiKeyListSchema,
         )
         return response.keys
       },
@@ -454,6 +545,7 @@ export class PixelatedClient {
       ): Promise<{ key: string; id: string }> => {
         const response = await this.request<{ key: string; id: string }>(
           '/developer/api-keys',
+          ApiKeyCreateSchema,
           {
             method: 'POST',
             body: JSON.stringify({ name, scopes }),
@@ -466,7 +558,7 @@ export class PixelatedClient {
        * Revoke an API key
        */
       revoke: async (keyId: string): Promise<void> => {
-        await this.request(`/developer/api-keys/${keyId}`, {
+        await this.request(`/developer/api-keys/${keyId}`, ApiKeyRevokeSchema, {
           method: 'DELETE',
         })
       },

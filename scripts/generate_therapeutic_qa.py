@@ -96,7 +96,7 @@ def detect_theme(text: str) -> str:
             theme_scores[theme] = score
 
     if theme_scores:
-        return max(theme_scores, key=theme_scores.get)
+        return max(theme_scores.items(), key=lambda x: x[1])[0]
     return "general"
 
 

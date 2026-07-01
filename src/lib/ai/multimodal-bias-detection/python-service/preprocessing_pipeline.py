@@ -8,13 +8,13 @@ used in bias detection analysis.
 import asyncio
 import base64
 import io
-import logging
 import tempfile
 from pathlib import Path
 from typing import Any
 
 import librosa
 import numpy as np
+import structlog
 from PIL import Image
 from transformers import (
     VideoMAEImageProcessor,
@@ -25,7 +25,7 @@ from transformers import (
 
 from .config import settings
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 def _load_torch():
@@ -136,7 +136,7 @@ class AudioPreprocessingPipeline:
             # Clean up temp file
             Path(tmp_path).unlink()
 
-            return audio_array, sample_rate
+            return audio_array, int(sample_rate)
 
         if isinstance(audio_data, bytes):
             # Direct audio bytes
@@ -147,7 +147,7 @@ class AudioPreprocessingPipeline:
             audio_array, sample_rate = librosa.load(tmp_path, sr=settings.sample_rate)
             Path(tmp_path).unlink()
 
-            return audio_array, sample_rate
+            return audio_array, int(sample_rate)
 
         raise ValueError(f"Unsupported audio data type: {type(audio_data)}")
 
@@ -192,11 +192,14 @@ class AudioPreprocessingPipeline:
         """Prepare audio data for model input"""
         try:
             # Prepare for Whisper (speech-to-text)
-            whisper_inputs = self.whisper_processor(audio_array, sampling_rate=sample_rate, return_tensors="pt")
+            whisper_inputs = self.whisper_processor(audio_array, sampling_rate=sample_rate, return_tensors="pt")  # type: ignore
 
             # Prepare for Wav2Vec2 (audio classification)
-            wav2vec_inputs = self.wav2vec_processor(
-                audio_array, sampling_rate=sample_rate, return_tensors="pt", padding="longest"
+            wav2vec_inputs = self.wav2vec_processor(  # type: ignore
+                audio_array,
+                sampling_rate=sample_rate,
+                return_tensors="pt",
+                padding="longest",  # type: ignore
             )
 
             return {"whisper_inputs": whisper_inputs, "wav2vec_inputs": wav2vec_inputs}
@@ -300,16 +303,16 @@ class VisionPreprocessingPipeline:
 
         return image.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
-    async def _prepare_model_inputs(self, image: Image.Image) -> Dict[str, Any]:
+    async def _prepare_model_inputs(self, image: Image.Image) -> dict[str, Any]:
         """Prepare image data for model input"""
         try:
             # Prepare for ViT
-            vit_inputs = self.image_processor(images=image, return_tensors="pt")
+            vit_inputs = self.image_processor(images=image, return_tensors="pt")  # type: ignore
 
             return {"vit_inputs": vit_inputs}
 
         except Exception as e:
-            logger.warning(f"Model input preparation failed: {e!s}")
+            logger.warning("Model input preparation failed", error=str(e))
             return {}
 
 
@@ -333,7 +336,7 @@ class VideoPreprocessingPipeline:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to load video processor: {e!s}")
+            logger.error("Failed to load video processor", error=str(e))
             return False
 
     async def preprocess_video(
@@ -365,7 +368,7 @@ class VideoPreprocessingPipeline:
             }
 
         except Exception as e:
-            logger.error(f"Video preprocessing failed: {e!s}")
+            logger.error("Video preprocessing failed", error=str(e))
             raise
 
     async def _save_video(self, video_data: str | bytes) -> str:
@@ -425,7 +428,7 @@ class VideoPreprocessingPipeline:
             Path(video_path).unlink()
             return []
         except Exception as e:
-            logger.warning(f"Frame extraction failed: {e!s}")
+            logger.warning("Frame extraction failed", error=str(e))
             Path(video_path).unlink()
             return []
 
@@ -436,12 +439,12 @@ class VideoPreprocessingPipeline:
                 return {}
 
             # Prepare for VideoMAE
-            videomae_inputs = self.video_processor(images=frames, return_tensors="pt")
+            videomae_inputs = self.video_processor(list(frames), return_tensors="pt")  # type: ignore
 
             return {"videomae_inputs": videomae_inputs}
 
         except Exception as e:
-            logger.warning(f"Model input preparation failed: {e!s}")
+            logger.warning("Model input preparation failed", error=str(e))
             return {}
 
 
@@ -453,7 +456,7 @@ class MultimodalPreprocessingPipeline:
         self.vision_pipeline = VisionPreprocessingPipeline()
         self.video_pipeline = VideoPreprocessingPipeline()
 
-    async def preprocess_multimodal_data(self, data: Dict[str, Any]) -> dict[str, Any]:
+    async def preprocess_multimodal_data(self, data: dict[str, Any]) -> dict[str, Any]:
         """Preprocess multimodal data (audio, vision, video)"""
         try:
             results = {}
@@ -548,7 +551,7 @@ class PreprocessingMetrics:
             return sum(self.metrics[operation]) / len(self.metrics[operation])
         return 0.0
 
-    def get_metrics_summary(self) -> Dict[str, Any]:
+    def get_metrics_summary(self) -> dict[str, Any]:
         """Get summary of all metrics"""
         summary = {}
         for operation, times in self.metrics.items():

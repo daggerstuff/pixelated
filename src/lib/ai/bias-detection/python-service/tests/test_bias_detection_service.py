@@ -6,6 +6,7 @@ import json
 import os
 import tempfile
 import unittest
+import uuid
 from datetime import datetime
 from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
@@ -414,7 +415,7 @@ class TestFastAPIEndpoints(unittest.TestCase):
             model_version="1.0.0-ensemble",
             language_detected="en",
             word_count=4,
-            id="11111111-1111-1111-1111-111111111111",
+            id=uuid.UUID("11111111-1111-1111-1111-111111111111"),
         )
         fake_orchestrator = MagicMock()
         fake_orchestrator.run_analysis = AsyncMock(return_value=response)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import contextlib
 import importlib.util
 import json
 import os
@@ -152,14 +151,13 @@ def test_bootstrap_storage_plan_writes_plan_before_materialization(tmp_path: Pat
         encoding="utf-8",
     )
 
-    original_materialize = module.materialize_storage_plan
+    from unittest.mock import patch
 
     def fail_materialize(_plan):
         raise PermissionError("no write access")
 
-    module.materialize_storage_plan = fail_materialize
-    try:
-        with contextlib.suppress(PermissionError):
+    with patch.object(module, "materialize_storage_plan", side_effect=fail_materialize):
+        try:
             module.bootstrap_storage_plan(
                 manifest_path=manifest_path,
                 volume_root=tmp_path / "volume",
@@ -167,8 +165,8 @@ def test_bootstrap_storage_plan_writes_plan_before_materialization(tmp_path: Pat
                 output_path=output_path,
                 materialize=True,
             )
-    finally:
-        module.materialize_storage_plan = original_materialize
+        except PermissionError:
+            pass
 
     assert output_path.exists()
     written = json.loads(output_path.read_text(encoding="utf-8"))

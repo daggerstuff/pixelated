@@ -21,14 +21,16 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import argparse
+from typing import Any
 
 from ai.data.sourcing import (
-    EdgeCaseSource,
     HuggingFaceSource,
-    JournalSource,
     PromptCorpusSource,
-    VoiceSource,
 )
+
+EdgeCaseSource: Any = None
+JournalSource: Any = None
+VoiceSource: Any = None
 
 
 def cmd_discover(args):

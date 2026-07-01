@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from ai.training_corpus.delta_package import (
     ReleaseCandidateDeltaPackageConfig,
@@ -13,7 +14,7 @@ from ai.training_corpus.experiments import (
 )
 
 
-def _write_report(path: Path, *, wave1_variant_id: str = "I1.3") -> dict[str, object]:
+def _write_report(path: Path, *, wave1_variant_id: str = "I1.3") -> dict[str, Any]:
     report = {
         "families": {
             "A": {"winner": {"variant_id": "A1.1"}},

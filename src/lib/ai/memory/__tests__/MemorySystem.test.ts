@@ -76,14 +76,14 @@ describe('MemorySystem', () => {
 
   beforeEach(() => {
     mockCrisisService = {
-      detectCrisis: vi.fn(),
+      detect: vi.fn(),
     };
     memorySystem = new MemorySystem(mockCrisisService as unknown as CrisisDetectionService);
   });
 
   it('should ingest normal content and return "auto" decision', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
-      isCrisis: false,
+    mockCrisisService.detect.mockResolvedValue({
+      isAnomaly: false,
       confidence: 0.1,
       category: 'general_concern',
       riskLevel: 'low',
@@ -100,8 +100,8 @@ describe('MemorySystem', () => {
   });
 
   it('should detect crisis and return "active" decision', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
-      isCrisis: true,
+    mockCrisisService.detect.mockResolvedValue({
+      isAnomaly: true,
       confidence: 0.9,
       category: 'suicide',
       riskLevel: 'high',
@@ -119,8 +119,8 @@ describe('MemorySystem', () => {
   });
 
   it('should flag "trait" scope memories for "active" confirmation', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
-      isCrisis: false,
+    mockCrisisService.detect.mockResolvedValue({
+      isAnomaly: false,
       confidence: 0.1,
       category: 'general_concern',
       riskLevel: 'low',
@@ -136,8 +136,8 @@ describe('MemorySystem', () => {
   });
 
   it('should flag large content for "passive" confirmation', async () => {
-    mockCrisisService.detectCrisis.mockResolvedValue({
-      isCrisis: false,
+    mockCrisisService.detect.mockResolvedValue({
+      isAnomaly: false,
       confidence: 0.1,
       category: 'general_concern',
       riskLevel: 'low',

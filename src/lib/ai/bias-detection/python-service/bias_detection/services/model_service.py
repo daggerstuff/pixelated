@@ -446,15 +446,15 @@ except ImportError:
     _Module = object  # type: ignore[assignment]
 
 
-class BiasDetectionModel(_Module):
+class BiasDetectionModel(_Module):  # type: ignore
     def __init__(self, num_labels: int = 17):
         super().__init__()
         if BertModel is not None:
             self.bert = BertModel.from_pretrained("bert-base-uncased")
         else:
             raise ImportError("BertModel is not available from transformers")
-        self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)
-        self.dropout = torch.nn.Dropout(0.1)
+        self.classifier = torch.nn.Linear(self.bert.config.hidden_size, num_labels)  # type: ignore
+        self.dropout = torch.nn.Dropout(0.1)  # type: ignore
 
     def forward(self, input_ids, attention_mask):
         outputs = self.bert(input_ids=input_ids, attention_mask=attention_mask)
@@ -569,7 +569,7 @@ class PyTorchModelService(ModelService):
 
         logger.info("Pretrained model downloaded and saved")
 
-    def _load_saved_model(self, model_file: Path) -> torch.nn.Module:
+    def _load_saved_model(self, model_file: Path) -> Any:
         """Load a persisted PyTorch model, replacing unreadable legacy pickles."""
         try:
             checkpoint = self._load_torch_checkpoint(model_file)
@@ -586,13 +586,13 @@ class PyTorchModelService(ModelService):
 
     def _load_torch_checkpoint(self, model_file: Path) -> Any:
         torch = self._torch
-        return torch.load(
+        return torch.load(  # type: ignore
             model_file,
             map_location=self.device,
             weights_only=True,
         )
 
-    def _restore_model_from_checkpoint(self, checkpoint: Any) -> torch.nn.Module:
+    def _restore_model_from_checkpoint(self, checkpoint: Any) -> Any:
         if not isinstance(checkpoint, dict):
             raise TypeError(f"Unexpected checkpoint type {type(checkpoint)!r}; expected a state-dict dict")
 
@@ -605,7 +605,7 @@ class PyTorchModelService(ModelService):
         model.load_state_dict(state_dict)
         return model
 
-    def _save_model(self, model: torch.nn.Module) -> None:
+    def _save_model(self, model: Any) -> None:
         checkpoint = {
             "format": PYTORCH_CHECKPOINT_FORMAT,
             "format_version": PYTORCH_CHECKPOINT_VERSION,
@@ -616,10 +616,10 @@ class PyTorchModelService(ModelService):
         # Save atomically: write to temp then rename so a crash never leaves a corrupt file
         tmp_path = self.model_path / "model.pt.tmp"
         final_path = self.model_path / "model.pt"
-        torch.save(checkpoint, str(tmp_path))
+        torch.save(checkpoint, str(tmp_path))  # type: ignore
         tmp_path.rename(final_path)
 
-    def _create_basic_model(self, num_labels: int | None = None) -> torch.nn.Module:
+    def _create_basic_model(self, num_labels: int | None = None) -> Any:
         """Create a basic bias detection model"""
         # Simple BERT-based model for bias detection using top-level BertModel
         _load_transformers()
@@ -717,7 +717,7 @@ class PyTorchModelService(ModelService):
             )
             raise
 
-    def _process_predictions(self, probabilities: torch.Tensor, text: str) -> list[dict[str, Any]]:
+    def _process_predictions(self, probabilities: Any, text: str) -> list[dict[str, Any]]:
         """Process model predictions into bias scores"""
         # Convert to numpy
         probs = probabilities.cpu().numpy()
@@ -940,7 +940,7 @@ class ModelEnsembleService:
 
         # NVIDIA API service for Kimi-k2.5 (optional)
         try:
-            self.nvidia_service = NvidiaAPIService()
+            self.nvidia_service = NvidiaAPIService()  # type: ignore
         except Exception as e:
             logger.warning(f"NVIDIA API service not available: {e}")
             self.nvidia_service = None

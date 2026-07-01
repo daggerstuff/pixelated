@@ -5,7 +5,7 @@ import { NotificationService } from '../../lib/services/notification/Notificatio
 // Extend the WebSocketServer interface for testing
 declare module '../../lib/services/notification/WebSocketServer' {
   interface WebSocketServer {
-    close: () => void
+    shutdown: () => void
     emit: (event: string, ...args: any[]) => void
   }
 }
@@ -22,7 +22,7 @@ const {
   const closeMock = vi.fn()
   const mockWsServerInstance = {
     on: onMock,
-    close: closeMock,
+    shutdown: closeMock,
     emit: vi.fn(),
   }
   return {

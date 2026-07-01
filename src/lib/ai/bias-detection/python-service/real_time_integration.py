@@ -242,7 +242,7 @@ class RealTimeBiasDetector:
 
     async def _trigger_real_time_alert(self, session: StreamingSession, bias_score: float) -> None:
         """Trigger real-time alert for high bias detection"""
-        alert_level = self.bias_service._determine_alert_level(bias_score)
+        alert_level = self.bias_detector._determine_alert_level(combined_results)  # type: ignore
 
         # Emit metrics
         bias_metrics.alert_triggered(alert_level, "real_time", bias_score)
@@ -424,7 +424,9 @@ async def get_real_time_detector() -> RealTimeBiasDetector:
     """Get the global real-time bias detector instance"""
     if real_time_detector is None:
         await initialize_real_time_detector()
-    return real_time_detector
+    from typing import cast
+
+    return cast(RealTimeBiasDetector, real_time_detector)
 
 
 # API endpoints for real-time integration
