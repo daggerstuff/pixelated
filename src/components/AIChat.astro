@@ -21,10 +21,17 @@ const {
 } = Astro.props
 ---
 
-<section class="w-full max-w-2xl mx-auto transition-colors duration-300" aria-label={title || 'AI Chat interface'}>
+<section
+  class="w-full max-w-2xl mx-auto transition-colors duration-300"
+  aria-labelledby={title ? 'ai-chat-title' : undefined}
+  aria-label={title ? undefined : 'AI Chat interface'}
+>
   {
     title && (
-      <h2 class="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+      <h2
+        id="ai-chat-title"
+        class="text-2xl font-bold mb-4 text-gray-900 dark:text-white"
+      >
         {title}
       </h2>
     )
