@@ -1,4 +1,5 @@
 import { Db, MongoClient } from 'mongodb'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('add_ai_usage_logs')
 

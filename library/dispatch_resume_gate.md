@@ -1,8 +1,8 @@
 # Dispatch Resume Gate — Worked Example (M02 / 2025-10 partial-run)
 
-> **Ground truth from the 2026-06-28T23:00Z silent mid-dispatch failure on
-> M02 attempt-1 (worker session `9b86edcc-6cfa-48bc-9e44-14442e8abf3c`,
-> dispatch PID `1295219`).**
+> **Ground truth from the 2026-06-28T23:00Z silent mid-dispatch failure on M02
+> attempt-1 (worker session `9b86edcc-6cfa-48bc-9e44-14442e8abf3c`, dispatch PID
+> `1295219`).**
 
 ## Callable Specification
 
@@ -36,9 +36,13 @@ age = heartbeat_age_seconds(Path("/tmp/wayfarer_smoke/heartbeat_2025-10.json"))
 
 ## AGENTS.md Mandate Cross-Reference
 
-See `/home/vivi/pixelated/AGENTS.md` § "Dispatch Resume Gate (mandatory)" for the worker contract:
-- Every monthly_llm_driver worker MUST call `scan` BEFORE the first chat_completion POST
-- If `missing_or_partial > 0` AND `kill_stale_dispatch` finds a live process, worker MUST kill first then write resume plan
+See `/home/vivi/pixelated/AGENTS.md` § "Dispatch Resume Gate (mandatory)" for
+the worker contract:
+
+- Every monthly_llm_driver worker MUST call `scan` BEFORE the first
+  chat_completion POST
+- If `missing_or_partial > 0` AND `kill_stale_dispatch` finds a live process,
+  worker MUST kill first then write resume plan
 - Workers MUST NOT bypass the gate for short halving loops
 
 ## Worked Example: M02 (2025-10) Partial-Run
@@ -68,8 +72,10 @@ print(report.to_dict())
 ```
 
 **Interpretation:**
+
 - 11 chunks completed with content (chunks 2-10, 13, 14)
-- 1 chunk completed but empty (chunk 15 — Granite transport, 70097 content_chars but JSON recovery yielded 0 parseable emails/chats)
+- 1 chunk completed but empty (chunk 15 — Granite transport, 70097 content_chars
+  but JSON recovery yielded 0 parseable emails/chats)
 - 3 chunks partial (chunks 1, 11, 12 — status=partial, 0 records)
 - 12 chunks missing (chunks 16-27 — dispatch died before reaching these)
 - Total `missing_or_partial_count` = 15
@@ -89,10 +95,10 @@ print(f"Heartbeat age: {age} seconds")
 Heartbeat age: 7565.9 seconds
 ```
 
-**Interpretation:** The heartbeat file was last written ~2.1 hours ago (7565.9 seconds).
-The dispatch process (PID 1295219) died silently without writing a terminal-tagged
-heartbeat. The heartbeat mtime differs from the most-recent chunk mtime, indicating
-the dispatch is no longer alive.
+**Interpretation:** The heartbeat file was last written ~2.1 hours ago (7565.9
+seconds). The dispatch process (PID 1295219) died silently without writing a
+terminal-tagged heartbeat. The heartbeat mtime differs from the most-recent
+chunk mtime, indicating the dispatch is no longer alive.
 
 ### Step 3: Kill stale dispatch (if alive)
 
@@ -109,7 +115,8 @@ print(f"Killed PIDs: {killed}")
 Killed PIDs: []
 ```
 
-**Interpretation:** No live dispatch process found (PID 1295219 already dead). `kill_stale_dispatch` is idempotent — returns [] if no match.
+**Interpretation:** No live dispatch process found (PID 1295219 already dead).
+`kill_stale_dispatch` is idempotent — returns [] if no match.
 
 ### Step 4: Write resume plan
 
@@ -148,7 +155,9 @@ Path("/tmp/wayfarer_smoke/resume_2025-10.json").write_text(
 ```
 
 **Interpretation:**
-- Skip 12 chunks (11 ok + 1 ok_empty) — already on disk with content or status=ok
+
+- Skip 12 chunks (11 ok + 1 ok_empty) — already on disk with content or
+  status=ok
 - Re-dispatch 3 partial chunks (1, 11, 12) — status=partial, need fresh attempt
 - Fresh dispatch 12 chunks (16-27) — never started
 - Rollover wall seconds = 645.69 s (sum of wall_seconds from chunks 1, 11, 12)
@@ -179,6 +188,7 @@ print(report_09.to_dict())
 ```
 
 **Interpretation:**
+
 - 17 chunks completed with content (chunks 1, 3, 4, 6-17, 19, 22)
 - 1 chunk completed but empty (chunk 18 — status=ok but 0 records)
 - 5 chunks partial (chunks 2, 5, 20, 21, 23 — status=partial, 0 records)
@@ -186,12 +196,12 @@ print(report_09.to_dict())
 - Total `missing_or_partial_count` = 5
 
 Note: M01 was already accepted (monthly_accepted/2025-09/month_summary.json
-exists with audit_status=passed, accepted_email_count=550, accepted_chat_count=680).
-The residual chunk files on /tmp are the original dispatch artifacts from the
-M01 run. The stitcher's recovery logic (retry + transport swap) compensated for
-the 5 partial chunks at the time, producing the full 550/680 volume. The gate
-faithfully reports what is on disk; it does not know whether a prior stitcher
-already compensated.
+exists with audit_status=passed, accepted_email_count=550,
+accepted_chat_count=680). The residual chunk files on /tmp are the original
+dispatch artifacts from the M01 run. The stitcher's recovery logic (retry +
+transport swap) compensated for the 5 partial chunks at the time, producing the
+full 550/680 volume. The gate faithfully reports what is on disk; it does not
+know whether a prior stitcher already compensated.
 
 ## Heartbeat Age Verification
 
@@ -237,8 +247,9 @@ Killed PIDs: []
 A dispatch process can die mid-batch (OOM kill, terminal process death, factoryd
 session dropping) WITHOUT writing a heartbeat terminal tag. That is exactly what
 happened on M02 attempt-1 chunks 16-27. Without the gate, the orchestrator-side
-resume cycle would re-call `start_mission_run` blindly, and the next worker would
-either:
+resume cycle would re-call `start_mission_run` blindly, and the next worker
+would either:
+
 1. Re-run all 27 chunks (wasting wall-budget), or
 2. Skip the missing ones silently (missing evidence at audit).
 

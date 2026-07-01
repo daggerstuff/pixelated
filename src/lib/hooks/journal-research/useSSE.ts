@@ -3,8 +3,8 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { journalResearchApiClient } from '@/lib/api/journal-research'
 import storageManager from '@/utils/storage/storageManager'
 
-import type { WebSocketMessage } from './useWebSocket'
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import type { WebSocketMessage } from './useWebSocket'
 const logger = createBuildSafeLogger('useSSE')
 
 export type SSEConnectionState =

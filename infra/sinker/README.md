@@ -1,8 +1,8 @@
 # `infra/sinker/` — Sinker-server (135.148.101.170) ollama facility
 
 This directory holds the local-only committed artifacts of the
-`infra-sinker-ollama` milestone. Workers write to it; orchestrator
-performs control-of-record in `~/.factory/missions/98c15371-.../features.json`.
+`infra-sinker-ollama` milestone. Workers write to it; orchestrator performs
+control-of-record in `~/.factory/missions/98c15371-.../features.json`.
 
 ## Layout
 
@@ -30,5 +30,6 @@ infra/sinker/
 ## Committed but never pushed
 
 Per orchestrator policy, the Droid-Shield push-block on Postgres connection
-strings applies here too — workers commit locally and return `successState:
-partial` if push-block fires. The artifact commits are local-only.
+strings applies here too — workers commit locally and return
+`successState: partial` if push-block fires. The artifact commits are
+local-only.

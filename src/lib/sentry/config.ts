@@ -15,6 +15,7 @@
  */
 
 import type { Event } from '@sentry/astro'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('config')
 
