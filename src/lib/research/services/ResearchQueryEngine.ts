@@ -37,7 +37,8 @@ export interface QueryPerformanceMetrics {
 export class ResearchQueryEngine {
   private readonly config: QueryEngineConfig
   private readonly anonymizationService: AnonymizationService
-  private readonly consentService: ConsentManagementService    private readonly _hipaaService: HIPAADataService
+  private readonly consentService: ConsentManagementService
+  private readonly _hipaaService: HIPAADataService
   private readonly queryCache: Map<
     string,
     { result: QueryResult; timestamp: Date }

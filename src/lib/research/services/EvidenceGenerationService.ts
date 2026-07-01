@@ -36,8 +36,10 @@ export interface EvidenceRequest {
 }
 
 export class EvidenceGenerationService {
-  private readonly config: EvidenceConfig    private readonly _patternService: PatternDiscoveryService | null = null
-    private readonly _queryEngine: ResearchQueryEngine | null = null
+  private readonly config: EvidenceConfig
+
+  private readonly _patternService: PatternDiscoveryService | null = null
+  private readonly _queryEngine: ResearchQueryEngine | null = null
 
   constructor(
     config: EvidenceConfig = {
