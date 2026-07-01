@@ -65,7 +65,6 @@ jobs:
         if: matrix.language == 'javascript'
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         with:
-          version: 11.9.0
           run_install: false
 
       - name: Get pnpm store directory
@@ -124,8 +123,7 @@ jobs:
         env:
           # Point uv at the venv that prepare-uv-venv created so it doesn't
           # fall back to the system interpreter when USE_SYSTEM is empty.
-          VIRTUAL_ENV:
-            ${{ github.workspace
+          VIRTUAL_ENV: ${{ github.workspace
             }}/src/lib/ai/bias-detection/python-service/.venv
         run: |
           # Install Python dependencies for CodeQL analysis

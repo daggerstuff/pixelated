@@ -54,8 +54,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
-        with:
-          version: 11.9.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -77,8 +75,7 @@ jobs:
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
         with:
           path: ${{ steps.pnpm-store.outputs.path }}
-          key:
-            ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
+          key: ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{
             hashFiles('**/pnpm-lock.yaml') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-${{ env.PNPM_CACHE_VERSION }}-${{ hashFiles('**/pnpm-lock.yaml') }}-
@@ -92,11 +89,13 @@ jobs:
         continue-on-error: true
         run: pnpm lint:ci:with-markdown
 
+      - name: Check for forbidden suppression tokens
+        run: pnpm lint:no-suppressions
+
       - name: Format check
         continue-on-error: true
         env:
-          PR_BASE_SHA:
-            ${{ github.event_name == 'pull_request' &&
+          PR_BASE_SHA: ${{ github.event_name == 'pull_request' &&
             github.event.pull_request.base.sha || '' }}
         run: |
           bash scripts/ci/get-changed-files.sh /tmp/changed_files.txt
@@ -129,8 +128,7 @@ jobs:
             || '--no-deprecation' }}
         continue-on-error: true
         with:
-          image-ref:
-            pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
+          image-ref: pixelatedempathy/api:${{ steps.build-image.outputs.image_tag }}
           format: 'sarif'
           output: 'trivy-results.sarif'
           exit-code: '1'
