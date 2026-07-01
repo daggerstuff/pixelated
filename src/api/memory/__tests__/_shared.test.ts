@@ -88,7 +88,7 @@ describe('errorResponse', () => {
     expect('details' in data).toBe(false)
   })
 
-  it('includes the details key when details is an empty object (truthy in JS)', async () => {
+  it('includes the details key when details is an empty object', async () => {
     const { errorResponse } = await import('../_shared')
     const response = errorResponse(400, 'Bad Request', 'Invalid input', {})
 
