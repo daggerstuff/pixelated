@@ -14,13 +14,17 @@ services:
     container_name: pixelated-oauth2-proxy
     restart: unless-stopped
     ports:
-      - "127.0.0.1:4180:4180"  # localhost-only (traefik forwardauth)
+      - '127.0.0.1:4180:4180' # localhost-only (traefik forwardauth)
     env_file:
       - /etc/oauth2-proxy/oauth2-proxy-cfg.env
     networks:
       - sinker-ollama_default
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4180/ping || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'wget -q -O /dev/null http://127.0.0.1:4180/ping || exit 1',
+        ]
       interval: 30s
       timeout: 5s
       retries: 3

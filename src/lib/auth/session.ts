@@ -12,10 +12,10 @@
  */
 
 import { userManager } from '../db'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { getFromCache, setInCache, removeFromCache } from '../redis'
 import { validateToken } from './auth0-jwt-service'
 import { extractTokenFromRequest } from './auth0-middleware'
-import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('session')
 
 /**

@@ -8,7 +8,7 @@ services:
     container_name: pixelated-ollama
     restart: unless-stopped
     ports:
-      - "127.0.0.1:11434:11434"
+      - '127.0.0.1:11434:11434'
     volumes:
       - /srv/sinker-ollama/data:/root/.ollama
     environment:
@@ -24,7 +24,8 @@ services:
               count: all
               capabilities: [gpu]
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:11434/api/version || exit 1"]
+      test:
+        ['CMD-SHELL', 'curl -fsS http://localhost:11434/api/version || exit 1']
       interval: 30s
       timeout: 10s
       retries: 5

@@ -3,9 +3,9 @@
  * Tests sub-250ms performance and generates visualization data
  */
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { DynamicWeightingEngine } from './dynamic-weighting'
 import { ContextType, type AlignmentContext } from './objectives'
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('dynamic-weighting-benchmark')
 
 export interface BenchmarkResult {

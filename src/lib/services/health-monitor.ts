@@ -1,5 +1,6 @@
 import os from 'os'
 import { performance } from 'perf_hooks'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('health-monitor')
 

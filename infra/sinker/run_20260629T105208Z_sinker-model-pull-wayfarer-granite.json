@@ -49,10 +49,7 @@
     },
     "gpu_floor_met": true,
     "vram_tune_preset": "v100_32gb",
-    "modelfile_snippets_written": [
-      "wayfarer.modelfile",
-      "granite.modelfile"
-    ],
+    "modelfile_snippets_written": ["wayfarer.modelfile", "granite.modelfile"],
     "model_pull_notes": {
       "wayfarer_registry_path": "hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS",
       "wayfarer_original_path": "bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS",
