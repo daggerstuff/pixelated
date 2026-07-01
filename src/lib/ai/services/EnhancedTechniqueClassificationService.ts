@@ -519,7 +519,7 @@ void this.trainAdvancedClassificationModel()
 
   private async generateAlternativeTechniques(
     primary: any,
-    emotion: EmotionAnalysis,
+    _emotion: EmotionAnalysis,
     context: any,
   ): Promise<TechniqueClassificationResult['alternativeTechniques']> {
     const alternatives: TechniqueClassificationResult['alternativeTechniques'] =
@@ -542,7 +542,7 @@ void this.trainAdvancedClassificationModel()
   }
 
   private assessContraindications(
-    primary: any,
+    _primary: any,
     emotion: EmotionAnalysis,
     _context: any,
   ): string[] {
@@ -580,8 +580,8 @@ void this.trainAdvancedClassificationModel()
   }
 
   private generateImplementationGuidance(
-    primary: any,
-    context: any,
+    _primary: any,
+    _context: any,
     emotion: EmotionAnalysis,
   ): TechniqueClassificationResult['implementationGuidance'] {
     return {
@@ -634,7 +634,7 @@ void this.trainAdvancedClassificationModel()
   }
 
   private getFallbackClassification(
-    emotion: EmotionAnalysis,
+    _emotion: EmotionAnalysis,
     context: any,
   ): TechniqueClassificationResult {
     return {

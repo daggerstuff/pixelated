@@ -56,8 +56,8 @@ export const POST = async ({ request }) => {
     // Validate request body against schema
     const validationResult = exportRequestSchema.safeParse(requestBody)
     if (!validationResult.success) {
-      const errorMessage = (validationResult.error as any).errors
-        .map((e) => e.message)
+      const errorMessage = validationResult.error.issues
+        .map((issue) => issue.message)
         .join(', ')
 
       return new Response(

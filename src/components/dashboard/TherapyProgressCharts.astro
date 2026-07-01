@@ -5,7 +5,6 @@ interface Props {
 }
 
 const { sessions = [], metrics = {} } = Astro.props
-const timeRange: '7d' | '30d' | '90d' | 'all' = '30d'
 
 const filteredSessions = sessions.filter((session: any) => {
   const date = new Date(session.timestamp)
@@ -24,7 +23,7 @@ const moodData = filteredSessions.map((session: any) => ({
   value: session.mood || 0,
 }))
 
-const engagementData = filteredSessions.map((session: any) => ({
+const _engagementData = filteredSessions.map((session: any) => ({
   date: new Date(session.timestamp).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -32,13 +31,13 @@ const engagementData = filteredSessions.map((session: any) => ({
   value: session.engagement || 0,
 }))
 
-const pieData = [
+const _pieData = [
   { name: 'Completed', value: metrics.completedSessions || 0 },
   { name: 'In Progress', value: metrics.inProgressSessions || 0 },
   { name: 'Cancelled', value: metrics.cancelledSessions || 0 },
 ]
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
+const _COLORS = ['#0088FE', '#00C49F', '#FFBB28']
 ---
 
 <div class="space-y-6">

@@ -388,3 +388,13 @@ scripts/hetzner
 .vercel
 HANDOFF.md
 infra/sinker/caddy/oauth2-proxy-cfg.env
+
+# === GENERATED CI BASELINES ===
+.baselines/
+
+# === AGENT LOGS ===
+.codex/logs/
+
+# === DOWNLOADED CLI TOOLS ===
+ngc-cli.md5
+ngc-cli/
