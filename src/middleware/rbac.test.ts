@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+
 import { checkPermission, UserPermissions } from './rbac'
 
 describe('checkPermission', () => {
@@ -8,8 +9,8 @@ describe('checkPermission', () => {
       roles: ['user'],
       permissions: [
         { resource: 'article', action: 'read' },
-        { resource: 'profile', action: 'update' }
-      ]
+        { resource: 'profile', action: 'update' },
+      ],
     }
     expect(checkPermission(user, 'article', 'read')).toBe(true)
   })
@@ -18,9 +19,7 @@ describe('checkPermission', () => {
     const user: UserPermissions = {
       userId: 'user-1',
       roles: ['user'],
-      permissions: [
-        { resource: 'article', action: 'read' }
-      ]
+      permissions: [{ resource: 'article', action: 'read' }],
     }
     expect(checkPermission(user, 'article', 'update')).toBe(false)
   })
@@ -29,9 +28,7 @@ describe('checkPermission', () => {
     const user: UserPermissions = {
       userId: 'user-1',
       roles: ['user'],
-      permissions: [
-        { resource: 'article', action: 'read' }
-      ]
+      permissions: [{ resource: 'article', action: 'read' }],
     }
     expect(checkPermission(user, 'profile', 'read')).toBe(false)
   })
@@ -40,7 +37,7 @@ describe('checkPermission', () => {
     const user: UserPermissions = {
       userId: 'user-1',
       roles: ['user'],
-      permissions: []
+      permissions: [],
     }
     expect(checkPermission(user, 'article', 'read')).toBe(false)
   })
@@ -49,12 +46,14 @@ describe('checkPermission', () => {
     const user: UserPermissions = {
       userId: 'user-1',
       roles: ['user'],
-      permissions: [
-        { resource: 'article', action: 'read' }
-      ]
+      permissions: [{ resource: 'article', action: 'read' }],
     }
     // Technically typescript would prevent passing undefined unless we use any/as string
-    expect(checkPermission(user, undefined as unknown as string, 'read')).toBe(false)
-    expect(checkPermission(user, 'article', undefined as unknown as string)).toBe(false)
+    expect(checkPermission(user, undefined as unknown as string, 'read')).toBe(
+      false,
+    )
+    expect(
+      checkPermission(user, 'article', undefined as unknown as string),
+    ).toBe(false)
   })
 })
