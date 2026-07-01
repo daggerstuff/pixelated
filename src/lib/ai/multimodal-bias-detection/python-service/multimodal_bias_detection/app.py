@@ -21,8 +21,9 @@ from .models import (
     MultimodalAnalysisRequest,
     MultimodalAnalysisResponse,
 )
-from .services import AudioBiasDetector, VisionBiasDetector
+from .services.audio_service import AudioBiasDetector
 from .services.multimodal_service import MultimodalBiasDetector
+from .services.vision_service import VisionBiasDetector
 
 # Prometheus metrics
 request_count = Counter(
@@ -76,7 +77,7 @@ structlog.configure(
 logger = structlog.get_logger(__name__)
 
 
-def _calculate_overall_score(bias_scores: List) -> float:
+def _calculate_overall_score(bias_scores: list) -> float:
     """Calculate overall bias score"""
     if not bias_scores:
         return 0.0
@@ -289,19 +290,19 @@ def create_app() -> FastAPI:
             # Perform analysis
             analysis_start = time.time()
             result = await vision_detector.analyze_image(
-                image_data=None,  # Will be handled by the service
+                image_data=b"",  # type: ignore
                 analysis_type=request.analysis_type,
                 bias_types=request.bias_types,
                 sensitivity=request.sensitivity,
             )
-            analysis_duration = time.time() - analysis_start
+            duration = time.time() - analysis_start
 
             # Record metrics
             analysis_count.labels(
                 status="success", media_type="image", bias_types=len(result.get("bias_scores", []))
             ).inc()
 
-            analysis_duration.labels(media_type="image", model_framework="transformers").observe(analysis_duration)
+            analysis_duration.labels(media_type="image", model_framework="transformers").observe(duration)
 
             # Update rate limiting
             if request.user_id:
@@ -309,12 +310,14 @@ def create_app() -> FastAPI:
 
             return MultimodalAnalysisResponse(
                 request_id=request_id,
-                status="completed",
+                status="completed",  # type: ignore
+                content_hash="mock",
+                dominant_bias_types=[],
                 media_type=MediaType.IMAGE,
                 overall_bias_score=_calculate_overall_score(result.get("bias_scores", [])),
                 bias_scores=result.get("bias_scores", []),
                 visual_analysis=result,
-                processing_time_ms=int(analysis_duration * 1000),
+                processing_time_ms=int(duration * 1000),
                 model_versions={"vision": "clip-vit-base-patch32"},
                 modalities_analyzed=["visual"],
             )
@@ -391,20 +394,20 @@ def create_app() -> FastAPI:
             # Perform analysis
             analysis_start = time.time()
             result = await audio_detector.analyze_audio(
-                audio_data=None,  # Will be handled by the service
+                audio_data=b"",  # type: ignore
                 analysis_type=request.analysis_type,
                 language=request.language,
                 bias_types=request.bias_types,
                 sensitivity=request.sensitivity,
             )
-            analysis_duration = time.time() - analysis_start
+            duration = time.time() - analysis_start
 
             # Record metrics
             analysis_count.labels(
                 status="success", media_type="audio", bias_types=len(result.get("bias_scores", []))
             ).inc()
 
-            analysis_duration.labels(media_type="audio", model_framework="transformers").observe(analysis_duration)
+            analysis_duration.labels(media_type="audio", model_framework="transformers").observe(duration)
 
             # Update rate limiting
             if request.user_id:
@@ -412,12 +415,14 @@ def create_app() -> FastAPI:
 
             return MultimodalAnalysisResponse(
                 request_id=request_id,
-                status="completed",
+                status="completed",  # type: ignore
+                content_hash="mock",
+                dominant_bias_types=[],
                 media_type=MediaType.AUDIO,
                 overall_bias_score=_calculate_overall_score(result.get("bias_scores", [])),
                 bias_scores=result.get("bias_scores", []),
                 audio_analysis=result,
-                processing_time_ms=int(analysis_duration * 1000),
+                processing_time_ms=int(duration * 1000),
                 model_versions={"audio": "whisper-base"},
                 modalities_analyzed=["audio"],
             )
@@ -494,12 +499,12 @@ def create_app() -> FastAPI:
             # Perform multimodal analysis
             analysis_start = time.time()
             result = await multimodal_detector.analyze_multimodal(request, request_id)
-            analysis_duration = time.time() - analysis_start
+            duration = time.time() - analysis_start
 
             # Record metrics
             analysis_count.labels(status="success", media_type="multimodal", bias_types=len(result.bias_scores)).inc()
 
-            analysis_duration.labels(media_type="multimodal", model_framework="ensemble").observe(analysis_duration)
+            analysis_duration.labels(media_type="multimodal", model_framework="ensemble").observe(duration)
 
             # Update rate limiting
             if request.user_id:

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { z } from 'zod'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'

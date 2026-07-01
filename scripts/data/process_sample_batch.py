@@ -86,14 +86,16 @@ def print_results(stats: dict[str, Any], processing_stats: dict[str, Any]):
     """Print formatted results."""
 
     for _method, count in stats["method_distribution"].items():
-        count / stats["total_records"] * 100
+        print(f"Method {_method}: {count / stats['total_records'] * 100:.2f}%")
 
     for category, count in stats["category_distribution"].most_common():
-        count / stats["total_records"] * 100
-        stats["confidence_by_category"][category]
+        pct = count / stats["total_records"] * 100
+        conf = stats["confidence_by_category"][category]
+        print(f"Category {category}: {pct:.2f}% (conf: {conf:.2f})")
 
     if processing_stats.get("estimated_cost"):
-        processing_stats["estimated_cost"] * (132801 / stats["total_records"])
+        cost = processing_stats["estimated_cost"] * (132801 / stats["total_records"])
+        print(f"Estimated cost: {cost:.2f}")
 
 
 def save_detailed_results(results: list[Any], output_path: str):

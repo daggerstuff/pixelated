@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from bias_detection.utils.model_utils import _download_pretrained_with_retry  # type: ignore
+
 """Tests covering graceful-degradation and Hub-outage handling in
 ``bias_detection.services.model_service``.
 
@@ -8,15 +12,13 @@ the local cache and HuggingFace Hub unreachable).  These tests assert that
 ``_download_pretrained_with_retry`` bounds retries when the Hub is down.
 """
 
-from __future__ import annotations
-
+# pyright: ignore[reportAttributeAccessIssue]
 import asyncio
 import importlib
 
 import pytest
 from bias_detection.services.model_service import (
     ModelEnsembleService,
-    _download_pretrained_with_retry,
 )
 
 

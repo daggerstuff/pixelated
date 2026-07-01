@@ -18,6 +18,7 @@ Requires: Local MinIO instance running (see docker-compose.milvus.yml or docker-
 import contextlib
 import os
 import tempfile
+import typing
 import uuid
 from collections.abc import Generator
 from datetime import timedelta
@@ -125,7 +126,7 @@ class MockMinio:
         self,
         bucket_name: str,
         object_name: str,
-        data: object,
+        data: typing.Any,
         length: int,
         content_type: str | None = None,
         metadata: dict | None = None,

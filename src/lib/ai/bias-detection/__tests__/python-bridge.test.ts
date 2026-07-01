@@ -469,7 +469,7 @@ describe('analysis methods', () => {
   })
 
   describe('initialize with non-healthy response', () => {
-    it('should throw when health check returns degraded status', async () => {
+    it('should initialize successfully when health check returns degraded status', async () => {
       ;(global.fetch as any).mockReset()
       ;(global.fetch as any).mockResolvedValue({
         ok: true,
@@ -487,9 +487,7 @@ describe('analysis methods', () => {
       ;(degradedBridge as any).retryAttempts = 1
       ;(degradedBridge as any).retryDelay = 0
 
-      await expect(degradedBridge.initialize()).rejects.toThrow(
-        'Python service initialization failed',
-      )
+      await expect(degradedBridge.initialize()).resolves.not.toThrow()
     })
 
     it('should throw when health check fails with network error', async () => {

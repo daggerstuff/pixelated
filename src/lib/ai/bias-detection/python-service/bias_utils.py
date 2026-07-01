@@ -34,7 +34,7 @@ def create_test_session_data() -> SessionData:
             {"id": "response_5", "text": "Response E", "score": 0.90},
             {"id": "response_6", "text": "Response F", "score": 0.47},
         ],
-        expected_outcomes=[0, 1, 0, 1, 1, 0],
+        expected_outcomes=[{"value": 0}, {"value": 1}, {"value": 0}, {"value": 1}, {"value": 1}, {"value": 0}],
         transcripts=[
             {"turn": 1, "speaker": "bot", "message": "Welcome"},
             {"turn": 2, "speaker": "trainee", "message": "I understand"},

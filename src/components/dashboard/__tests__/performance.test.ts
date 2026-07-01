@@ -377,7 +377,7 @@ describe('Dashboard Performance Tests', () => {
     // Error state should render quickly
     expect(renderTime).toBeLessThan(10)
     expect(
-      screen.getByText('Unable to load analytics data'),
+      screen.getAllByText('Unable to load analytics data')[0],
     ).toBeInTheDocument()
   })
 
