@@ -76,8 +76,7 @@ class CollaborationManager {
       CollaborationSession,
       'id' | 'createdAt' | 'participants' | 'status'
     >,
-  ): Promise<CollaborationSession> {
-    const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+  ): Promise<CollaborationSession> {      const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const participant: Participant = {
       id: creator.id,
@@ -120,7 +119,7 @@ class CollaborationManager {
       )
     }
 
-    const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const inviteId = `invite_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const invitation: CollaborationInvite = {
       id: inviteId,
@@ -252,7 +251,7 @@ class CollaborationManager {
       throw new Error('User not participant in session')
     }
 
-    const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`
+    const messageId = `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     let processedContent = content
 

@@ -535,9 +535,9 @@ export class BiasDetectionCache {
             : null
           if (!cached) continue
 
-          let cacheData
+          let cacheData: { tags?: string[] }
           try {
-            cacheData = JSON.parse(cached)
+            cacheData = JSON.parse(cached) as { tags?: string[] }
           } catch {
             continue
           }
@@ -898,16 +898,15 @@ export class BiasAnalysisCache {
           if (!cached) {
             continue
           }
-          let cacheData
+          let cacheData: { tags?: string[] }
           try {
-            cacheData = JSON.parse(cached) as unknown
+            cacheData = JSON.parse(cached) as { tags?: string[] }
           } catch {
             continue
           }
-          const dataWithTags = cacheData as { tags?: string[] }
-          if (dataWithTags.tags) {
+          if (cacheData.tags) {
             let shouldInvalidate = false
-            for (const tag of dataWithTags.tags) {
+            for (const tag of cacheData.tags) {
               if (tag.startsWith('participant:')) {
                 const parts = tag.split(':')
                 if (parts.length >= 2) {

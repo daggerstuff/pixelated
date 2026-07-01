@@ -99,11 +99,10 @@ export class GlobalThreatIntelligenceNetworkCore
   private validationSystem!: ThreatValidationSystem
 
   private readonly existingResponseOrchestrator?: AdvancedResponseOrchestrator
-  private readonly existingIntelligenceService?: ExternalThreatIntelligenceService
-  private readonly existingPredictiveService?: AdvancedPredictiveThreatIntelligence
+  private readonly _existingIntelligenceService?: ExternalThreatIntelligenceService
+  private readonly _existingPredictiveService?: AdvancedPredictiveThreatIntelligence
 
   private isInitialized = false
-  private db: any = null
 
   private healthCheckInterval: NodeJS.Timeout | null = null
   private readonly threatProcessingQueue: string[] = []
@@ -119,8 +118,8 @@ export class GlobalThreatIntelligenceNetworkCore
   ) {
     super()
     this.existingResponseOrchestrator = existingServices?.responseOrchestrator
-    this.existingIntelligenceService = existingServices?.intelligenceService
-    this.existingPredictiveService = existingServices?.predictiveService
+    void existingServices?.intelligenceService
+    void existingServices?.predictiveService
   }
 
   async initialize(): Promise<void> {
@@ -174,7 +173,7 @@ export class GlobalThreatIntelligenceNetworkCore
           'mongodb://localhost:27017/global_threat_intelligence',
       )
       await this.mongoClient.connect()
-      this.db = this.mongoClient.db('global_threat_intelligence')
+      void this.mongoClient.db('global_threat_intelligence')
       logger.info('MongoDB connection established')
     } catch (error: unknown) {
       logger.error('Failed to connect to MongoDB:', { error })

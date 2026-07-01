@@ -123,7 +123,7 @@ export function detectCrisisSignals(text: string): CrisisAnalysisResult {
 }
 
 function calculateSeverity(
-  category: CrisisSignal['category'],
+  _category: CrisisSignal['category'],
   text: string,
 ): number {
   let score = 0.5
