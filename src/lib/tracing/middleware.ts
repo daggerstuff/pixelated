@@ -12,14 +12,15 @@ import {
   SpanKind,
 } from '@opentelemetry/api'
 import {
-  ATTR_HTTP_METHOD,
-  ATTR_HTTP_URL,
-  ATTR_HTTP_SCHEME,
-  ATTR_HTTP_TARGET,
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_URL_FULL,
+  ATTR_URL_SCHEME,
+  ATTR_URL_PATH,
+  ATTR_URL_QUERY,
   ATTR_HTTP_ROUTE,
-  ATTR_HTTP_STATUS_CODE,
-  ATTR_HTTP_RESPONSE_SIZE,
-} from '@opentelemetry/semantic-conventions/incubating'
+  ATTR_HTTP_RESPONSE_STATUS_CODE,
+} from '@opentelemetry/semantic-conventions'
+import { ATTR_HTTP_RESPONSE_SIZE } from '@opentelemetry/semantic-conventions/incubating'
 import type { MiddlewareHandler } from 'astro'
 
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
@@ -81,10 +82,11 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
   const span = tracer.startSpan(`${method} ${url.pathname}`, {
     kind: SpanKind.SERVER,
     attributes: {
-      [ATTR_HTTP_METHOD]: method,
-      [ATTR_HTTP_URL]: url.toString(),
-      [ATTR_HTTP_SCHEME]: url.protocol.replace(':', ''),
-      [ATTR_HTTP_TARGET]: url.pathname + url.search,
+      [ATTR_HTTP_REQUEST_METHOD]: method,
+      [ATTR_URL_FULL]: url.toString(),
+      [ATTR_URL_SCHEME]: url.protocol.replace(':', ''),
+      [ATTR_URL_PATH]: url.pathname,
+      [ATTR_URL_QUERY]: url.search,
       [ATTR_HTTP_ROUTE]: url.pathname,
       'http.user_agent': canAccessHeaders
         ? (req.headers.get('user-agent') ?? '')
@@ -119,7 +121,7 @@ export const tracingMiddleware: MiddlewareHandler = async (context, next) => {
 
     // Update span with response information
     span.setAttributes({
-      [ATTR_HTTP_STATUS_CODE]: response.status,
+      [ATTR_HTTP_RESPONSE_STATUS_CODE]: response.status,
       [ATTR_HTTP_RESPONSE_SIZE]: Number(
         response.headers.get('content-length') ?? 0,
       ),
