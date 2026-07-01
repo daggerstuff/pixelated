@@ -5,6 +5,7 @@ import path from 'node:path'
 
 import { RedisService } from '@/lib/services/redis/RedisService'
 import { getEnv } from '@/lib/utils/env'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('verify')
 

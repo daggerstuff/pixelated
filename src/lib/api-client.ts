@@ -1,3 +1,4 @@
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 import type {
   CrisisDetectionRequest,
   CrisisDetectionResponse,
@@ -5,7 +6,6 @@ import type {
 
 // Enhanced API Client with retry logic and type-safe error handling
 import { parseApiResponse, ValidationResult } from './utils/json-validator'
-import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
 const logger = createBuildSafeLogger('api-client')
 
 export class EnterpriseAPIClient {

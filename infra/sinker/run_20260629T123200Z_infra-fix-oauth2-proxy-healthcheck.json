@@ -52,7 +52,10 @@
     "direct_ollama_v1_models": {
       "url": "http://127.0.0.1:11434/v1/models",
       "http_status": 200,
-      "models": ["granite4.1:3b", "hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS"]
+      "models": [
+        "granite4.1:3b",
+        "hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS"
+      ]
     },
     "val_infra_011_layer_c_status": "PASS — https://ollama.pixelated.love/oauth2/sign_in returns HTTP 200 with Auth0 OIDC sign-in HTML"
   },
