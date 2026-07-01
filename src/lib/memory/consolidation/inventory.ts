@@ -1,5 +1,6 @@
 // Enterprise‑grade in‑memory inventory engine (TypeScript)
 import { v4 as uuidv4 } from 'uuid'
+
 import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 const logger = createBuildSafeLogger('inventory')
 

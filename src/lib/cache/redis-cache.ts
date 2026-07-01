@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from 'redis'
+
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 const logger = createBuildSafeLogger('redis-cache')
 
