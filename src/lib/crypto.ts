@@ -225,3 +225,8 @@ export function generateShortId(length = 8): string {
   }
   return result
 }
+
+// Re-export higher-level crypto system from the refactored directory module
+export type { CryptoSystem } from './crypto/types'
+export type { CryptoSystemOptions } from './crypto/index'
+export { createCryptoSystem } from './crypto/index'
