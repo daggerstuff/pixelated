@@ -54,7 +54,7 @@ function BurnRateGauge({ data }: { data: BurnRateData }) {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-xl font-bold">{pct}%</span>
-              <span className="text-[10px] text-muted-foreground">used</span>
+              <span className="text-muted-foreground text-[10px]">used</span>
             </div>
           </div>
           <div className="space-y-2 text-xs">
@@ -86,8 +86,8 @@ function SeatActivationCard({ data }: { data: SeatActivationData }) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4">
-          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-            <div className="flex items-center gap-2 text-muted-foreground text-xs">
+          <div className="bg-muted/50 space-y-1 rounded-lg p-3">
+            <div className="text-muted-foreground flex items-center gap-2 text-xs">
               <Users className="h-3.5 w-3.5" />
               Licenses
             </div>
@@ -95,22 +95,22 @@ function SeatActivationCard({ data }: { data: SeatActivationData }) {
               {data.licensesProvisioned}
             </span>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-            <div className="flex items-center gap-2 text-muted-foreground text-xs">
+          <div className="bg-muted/50 space-y-1 rounded-lg p-3">
+            <div className="text-muted-foreground flex items-center gap-2 text-xs">
               <Users className="h-3.5 w-3.5" />
               Active
             </div>
             <span className="text-xl font-bold">{data.activeMonthlyUsers}</span>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-            <div className="flex items-center gap-2 text-muted-foreground text-xs">
+          <div className="bg-muted/50 space-y-1 rounded-lg p-3">
+            <div className="text-muted-foreground flex items-center gap-2 text-xs">
               <Zap className="h-3.5 w-3.5" />
               Peak Concurrent
             </div>
             <span className="text-xl font-bold">{data.peakConcurrent}</span>
           </div>
-          <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-            <div className="flex items-center gap-2 text-muted-foreground text-xs">
+          <div className="bg-muted/50 space-y-1 rounded-lg p-3">
+            <div className="text-muted-foreground flex items-center gap-2 text-xs">
               Utilization
             </div>
             <span
@@ -174,16 +174,16 @@ function TokenDonut({ data }: { data: TokenExpenditureCategory[] }) {
             {data.map((item, idx) => (
               <div key={item.category} className="flex items-center gap-2">
                 <span
-                  className="h-2.5 w-2.5 rounded-full shrink-0"
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{ backgroundColor: DONUT_COLORS[idx] }}
                 />
-                <span className="truncate max-w-[120px]">{item.category}</span>
-                <span className="font-medium ml-auto">
+                <span className="max-w-[120px] truncate">{item.category}</span>
+                <span className="ml-auto font-medium">
                   {(item.tokens / 1000000).toFixed(1)}M
                 </span>
               </div>
             ))}
-            <div className="flex items-center gap-2 pt-1 border-t font-medium">
+            <div className="flex items-center gap-2 border-t pt-1 font-medium">
               <span>Total</span>
               <span className="ml-auto">{(total / 1000000).toFixed(2)}M</span>
             </div>
@@ -198,7 +198,7 @@ function TokenDonut({ data }: { data: TokenExpenditureCategory[] }) {
 export function ConsumptionModule() {
   const data = DEMO_CONSUMPTION
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <div className="lg:col-span-1">
         <BurnRateGauge data={data.burnRate} />
       </div>

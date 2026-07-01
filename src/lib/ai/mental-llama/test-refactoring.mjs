@@ -4,22 +4,24 @@
 // Test imports work correctly
 
 import { ExpertGuidanceOrchestrator } from './ExpertGuidanceOrchestrator'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('test-refactoring')
 
 // Verify classes can be instantiated (basic structure test)
-console.log('Testing refactored modules...')
+logger.info('Testing refactored modules...')
 
 try {
-  console.log('✓ ClinicalKnowledgeBase instantiated successfully')
+  logger.info('✓ ClinicalKnowledgeBase instantiated successfully')
 
-  console.log('✓ ClinicalAnalysisHelpers instantiated successfully')
+  logger.info('✓ ClinicalAnalysisHelpers instantiated successfully')
 
   // Note: ExpertGuidanceOrchestrator requires parameters, so we'll just check the class exists
-  console.log(
+  logger.info(
     '✓ ExpertGuidanceOrchestrator class available:',
     typeof ExpertGuidanceOrchestrator,
   )
 
-  console.log('All refactored modules are properly structured!')
+  logger.info('All refactored modules are properly structured!')
 } catch (error) {
-  console.error('Error testing modules:', error)
+  logger.error('Error testing modules:', error)
 }

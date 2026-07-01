@@ -39,7 +39,7 @@ def monitor(compliance_module):
 
 class TestComplianceMonitorHIPAA:
     @pytest.mark.parametrize(
-        "overrides, expected_score, expected_status",
+        ("overrides", "expected_score", "expected_status"),
         [
             # All pass
             (
@@ -97,7 +97,7 @@ class TestComplianceMonitorHIPAA:
 
 class TestComplianceMonitorSOC2:
     @pytest.mark.parametrize(
-        "overrides, expected_score, expected_status",
+        ("overrides", "expected_score", "expected_status"),
         [
             # All pass
             (

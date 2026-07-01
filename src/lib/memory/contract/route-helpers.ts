@@ -14,8 +14,10 @@ import {
   type ProductMemoryScope,
 } from '@/lib/services/product-memory-gateway'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 import { errorBody, mapGatewayError } from './errors'
 import { MEMORY_API_CONTRACT_VERSION, PublicMemory } from './v1'
+const logger = createBuildSafeLogger('route-helpers')
 
 // ---------------------------------------------------------------------------
 // Response helpers — every v1 route returns one of these two shapes.
@@ -166,7 +168,7 @@ function logRouteError(action: string, error: unknown): void {
   const message = error instanceof Error ? error.message : String(error)
   const name = error instanceof Error ? error.name : 'UnknownError'
   // eslint-disable-next-line no-console
-  console.error(`[memory-api-v1] ${action} failed: ${name}: ${message}`)
+  logger.error(`[memory-api-v1] ${action} failed: ${name}: ${message}`)
 }
 
 export function handleGatewayError(action: string, error: unknown): Response {

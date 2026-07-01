@@ -460,7 +460,7 @@ export class BiasDetectionCache {
     if (this.memoryCache.has(key)) {
       this.memoryCache.delete(key)
       deleted = true
-      console.log('[DEBUG] delete: deleted from memory', { key })
+      logger.info('[DEBUG] delete: deleted from memory', { key })
     }
 
     // Delete from Redis
@@ -471,7 +471,7 @@ export class BiasDetectionCache {
           await this.cacheService.delete(redisKey)
         }
         deleted = true
-        console.log('[DEBUG] delete: deleted from Redis cache', { redisKey })
+        logger.info('[DEBUG] delete: deleted from Redis cache', { redisKey })
       } catch (error: unknown) {
         logger.warn('Failed to delete from Redis cache', { key, error })
       }

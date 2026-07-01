@@ -1,4 +1,6 @@
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { KeyStorage } from './keyStorage'
+const logger = createBuildSafeLogger('scheduledRotation')
 
 /**
  * Options for scheduled key rotation
@@ -52,7 +54,7 @@ export class ScheduledKeyRotation {
       if (this.onError) {
         this.onError(error)
       } else {
-        console.error('Error during key rotation:', error)
+        logger.error('Error during key rotation:', error)
       }
     })
 
@@ -62,7 +64,7 @@ export class ScheduledKeyRotation {
         if (this.onError) {
           this.onError(error)
         } else {
-          console.error('Error during key rotation:', error)
+          logger.error('Error during key rotation:', error)
         }
       })
     }, this.checkInterval)
@@ -112,7 +114,7 @@ export class ScheduledKeyRotation {
       if (this.onError) {
         this.onError(errorObj)
       } else {
-        console.error(`Error rotating key ${keyId}:`, error)
+        logger.error(`Error rotating key ${keyId}:`, error)
       }
       return null
     }
@@ -165,7 +167,7 @@ export class ScheduledKeyRotation {
       if (this.onError) {
         this.onError(error instanceof Error ? error : new Error(String(error)))
       } else {
-        console.error(`Error rotating key ${keyId}:`, error)
+        logger.error(`Error rotating key ${keyId}:`, error)
       }
 
       return null

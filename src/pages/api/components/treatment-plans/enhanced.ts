@@ -1,3 +1,4 @@
+import type { APIRoute } from 'astro'
 import { z } from 'zod'
 
 export const prerender = false
@@ -164,7 +165,7 @@ function toEnhancedResponse(plan: TreatmentPlanDB): TreatmentPlanEnhanced {
  *
  * Provides comprehensive treatment plan data for the TreatmentPlanManager component
  */
-export const GET = protectRoute()(async (context: AuthAPIContext) => {
+export const GET: APIRoute = protectRoute()(async (context: AuthAPIContext) => {
   try {
     const { locals, request } = context
     const { user } = locals
@@ -259,7 +260,9 @@ export const GET = protectRoute()(async (context: AuthAPIContext) => {
 /**
  * POST endpoint for creating/updating treatment plans
  */
-export const POST = protectRoute()(async (context: AuthAPIContext) => {
+export const POST: APIRoute = protectRoute()(async (
+  context: AuthAPIContext,
+) => {
   try {
     const { locals, request } = context
     const { user } = locals
