@@ -66,7 +66,7 @@ export function createFHESystem(options: FHEOptions = {}): FHESystem {
     },
 
     async processEncrypted(
-      data: string,
+      _data: string,
       operation: string,
     ): Promise<{
       success: boolean

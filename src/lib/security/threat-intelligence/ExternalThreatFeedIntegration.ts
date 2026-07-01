@@ -417,7 +417,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       await subscriber.connect()
 
       // Subscribe to sync requests
-      await subscriber.subscribe('feed:sync', async (message) => {
+      await subscriber.subscribe('feed:sync', async (message: string) => {
         try {
           if (typeof message !== 'string') return
 
@@ -437,7 +437,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
       })
 
       // Subscribe to feed status updates
-      await subscriber.subscribe('feed:status', async (message) => {
+      await subscriber.subscribe('feed:status', async (message: string) => {
         try {
           if (typeof message !== 'string') return
 
@@ -1818,7 +1818,7 @@ export class ExternalThreatFeedIntegration extends EventEmitter {
    * Process XML data
    */
   private async processXMLData(
-    data: string,
+    _data: string,
     feed: ThreatFeed,
   ): Promise<ThreatIndicator[]> {
     // Implement XML parsing

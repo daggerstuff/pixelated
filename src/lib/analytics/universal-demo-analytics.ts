@@ -231,7 +231,7 @@ export class UniversalDemoAnalytics {
     document
       .querySelectorAll('[data-event="cta_click"], button, a[href]')
       .forEach((element) => {
-        element.addEventListener('click', (e) => {
+        element.addEventListener('click', (e: Event) => {
           const target = e.target as HTMLElement
           const location = target.getAttribute('data-location') ?? 'unknown'
           const text = target.textContent?.trim() || 'unknown'
@@ -265,7 +265,7 @@ export class UniversalDemoAnalytics {
     })
 
     // Track input focus in demos
-    document.addEventListener('focusin', (e) => {
+    document.addEventListener('focusin', (e: FocusEvent) => {
       const target = e.target as HTMLElement
       if (target.matches('input, textarea, select')) {
         void this.trackEvent(ANALYTICS_EVENTS.DEMO_INTERACTION, {

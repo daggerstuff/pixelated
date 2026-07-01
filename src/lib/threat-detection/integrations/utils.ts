@@ -57,7 +57,7 @@ function _secureId(prefix = ''): string {
     // Log at debug level to avoid swallowing errors silently
     logger.debug('_secureId: crypto fallback failed', { error: String(err) })
   }
-  return `${prefix}${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+  return `${prefix}${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 }
 
 /**
@@ -170,7 +170,7 @@ export async function calculateThreatScore(
     // Add points for suspicious patterns
     if (
       threatData.riskFactors['ip'] &&
-      isSuspiciousIPSync(threatData.riskFactors['ip'])
+      await isSuspiciousIP(threatData.riskFactors['ip'] as string)
     ) {
       score += 15
     }
@@ -296,7 +296,7 @@ export async function checkSuspiciousIPWithIntelligence(
   },
 ): Promise<boolean> {
   if (!config?.enabled) {
-    return isSuspiciousIPSync(ip)
+    return (isSuspiciousIPSync as (ip: string) => boolean)(ip)
   }
 
   try {
@@ -325,7 +325,7 @@ export async function checkSuspiciousIPWithIntelligence(
         error: String(error),
       },
     )
-    return isSuspiciousIPSync(ip)
+    return (isSuspiciousIPSync as (ip: string) => boolean)(ip)
   }
 }
 
@@ -611,7 +611,7 @@ export function calculateRateLimitMaxRequests(severity: string): number {
  * Check if an identifier is allowed to bypass rate limiting
  */
 export function isRateLimitBypassAllowed(
-  identifier: string,
+  _identifier: string,
   bypassRules: {
     allowedRoles?: string[]
     allowedIPRanges?: string[]

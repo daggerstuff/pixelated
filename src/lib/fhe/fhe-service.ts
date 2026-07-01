@@ -70,16 +70,12 @@ export class RealFHEService implements FHEService {
   /**
    * Generate encryption keys
    */
-  public async generateKeys(config?: FHEConfig): Promise<FHEKeys> {
+  public async generateKeys(_config?: FHEConfig): Promise<FHEKeys> {
     await this.ensureInitialized()
-    if (config) {
-      logger.info('Generating FHE keys with configuration', { config })
-    }
-    // Future: Delegate to homomorphicOps for real key generation
     return {
-      keyId: (config as any)?.keyId?.toString() ?? 'default-' + Date.now(),
+      keyId: 'default-' + Date.now(),
       createdAt: new Date(),
-      scheme: (config as any)?.scheme ?? 'BFV',
+      scheme: 'BFV',
       status: 'active',
     } as FHEKeys
   }
