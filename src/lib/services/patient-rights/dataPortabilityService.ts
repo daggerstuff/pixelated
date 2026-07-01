@@ -17,7 +17,11 @@ class AuditLoggingService {
     userId?: string
     details: Record<string, unknown>
   }): void {
-    auditLogger.info(`[AUDIT:${this.context}]`, entry)
+    this.info(`[AUDIT:${this.context}]`, entry)
+  }
+
+  info(message: string, meta?: Record<string, unknown>): void {
+    console.log(`[${this.context}] ${message}`, meta ?? '')
   }
 }
 
@@ -83,12 +87,7 @@ export interface PatientProfile {
 
 // Define the export status types
 export type ExportStatus =
-  | 'pending'
-  | 'processing'
-  | 'completed'
-  | 'failed'
-  | 'expired'
-  | 'cancelled'
+  'pending' | 'processing' | 'completed' | 'failed' | 'expired' | 'cancelled'
 
 // Define the export formats
 export type ExportFormat = 'json' | 'csv' | 'pdf' | 'xml'
@@ -149,11 +148,7 @@ export interface ExportDownloadSuccessResponse {
 export interface ExportDownloadErrorResponse {
   success: false
   error:
-    | 'not_found'
-    | 'unauthorized'
-    | 'not_ready'
-    | 'expired'
-    | 'internal_error'
+    'not_found' | 'unauthorized' | 'not_ready' | 'expired' | 'internal_error'
   message?: string
   status?: ExportStatus
   progress?: number
@@ -163,8 +158,7 @@ export interface ExportDownloadErrorResponse {
 
 // Combined type for download responses
 export type ExportDownloadResponse =
-  | ExportDownloadSuccessResponse
-  | ExportDownloadErrorResponse
+  ExportDownloadSuccessResponse | ExportDownloadErrorResponse
 
 export type ExportPriority = 'normal' | 'high'
 
@@ -668,16 +662,16 @@ export async function getAllDataExportRequests(filters?: {
   dateRange?: { start: string; end: string }
 }): Promise<DataExportRequest[]> {
   try {
-    const dbFilters: any = {}
+    const dbFilters: Record<string, unknown> = {}
     if (filters) {
       if (filters.status) {
-        dbFilters.status = filters.status
+        dbFilters['status'] = filters.status
       }
       if (filters.patientId) {
-        dbFilters.patientId = filters.patientId
+        dbFilters['patientId'] = filters.patientId
       }
       if (filters.dateRange) {
-        dbFilters.createdAt = {
+        dbFilters['createdAt'] = {
           $gte: new Date(filters.dateRange.start),
           $lte: new Date(filters.dateRange.end),
         }
@@ -1061,8 +1055,7 @@ interface MockDbFindParams {
 }
 
 // Extend the db object with mock implementations
-const mockDb = {
-  ...db,
+const mockDb = Object.assign(Object.create(db), {
   // Add mock implementations for missing models
   patient: {
     findUnique: async (_params: MockDbFindParams): Promise<Patient | null> => {
@@ -1095,4 +1088,4 @@ const mockDb = {
       })
     },
   },
-}
+})
