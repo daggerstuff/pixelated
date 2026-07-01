@@ -27,7 +27,10 @@
     "curl_public_status": 403,
     "curl_public_note": "oauth2-proxy sign-in page (expected behavior for protected endpoint)",
     "curl_sinker_direct_status": 200,
-    "curl_sinker_direct_models": ["granite4.1:3b", "hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS"],
+    "curl_sinker_direct_models": [
+      "granite4.1:3b",
+      "hf.co/bartowski/LatitudeGames_Wayfarer-2-12B-GGUF:IQ4_XS"
+    ],
     "cf_api_calls": 2
   }
 }
