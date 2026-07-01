@@ -339,7 +339,7 @@
   "devDependencies": {
     "@aaif/goose": "^0.20.1",
     "@astrojs/check": "latest",
-    "@astrojs/markdoc": "latest",
+    "@astrojs/markdoc": "^1.0.6",
     "@astrojs/rss": "latest",
     "@axe-core/playwright": "^4.11.3",
     "@eslint/css": "latest",
