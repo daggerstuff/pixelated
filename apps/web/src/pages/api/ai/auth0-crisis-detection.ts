@@ -16,7 +16,7 @@ import {
 import { validateToken } from '@/lib/auth/auth0-jwt-service'
 import { extractTokenFromRequest } from '@/lib/auth/auth0-middleware'
 import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
-import { getUserById } from '@/lib/services/auth0.service'
+import { getUserById } from '@/services/auth0.service'
 
 // Initialize scoped logger for this module
 const logger = createBuildSafeLogger('crisis-detection')
@@ -34,7 +34,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
   try {
     // Extract token from request
-    const token = extractTokenFromRequest(request)
+    const token = extractTokenFromRequest(request as unknown as Request)
 
     if (!token) {
       return new Response(
@@ -98,7 +98,7 @@ export const POST: APIRoute = async ({ request }: APIContext) => {
 
     // Initialize crisis detection service with required config
     // Configuration flag for detector selection per deployment
-    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] ?? 'mental_health'
+    const detectorType = process.env['ANOMALY_DETECTOR_TYPE'] || 'mental_health'
     const crisisDetectionService = detectorType === 'mental_health'
       ? new CrisisDetectionService({
           aiService,
