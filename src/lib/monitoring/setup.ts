@@ -72,8 +72,8 @@ export class MonitoringService extends EventEmitter {
   private setupWebVitals() {
     // Setup performance observers
     if (typeof window !== 'undefined') {
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
+      const observer = new PerformanceObserver((list: PerformanceObserverEntryList) => {
+        list.getEntries().forEach((entry: PerformanceEntry) => {
           this.recordMetric({
             name: entry.name,
             value: entry.startTime,

@@ -2,6 +2,7 @@ packages:
   - 'packages/*'
   - 'business-strategy-cms'
   - 'package'
+  - 'tests/integration'
   # Committed lockfile is the trusted source of truth;
   # skips re-verifying minimumReleaseAge on every install.
 trustLockfile: true

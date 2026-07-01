@@ -37,8 +37,7 @@ export interface QueryPerformanceMetrics {
 export class ResearchQueryEngine {
   private readonly config: QueryEngineConfig
   private readonly anonymizationService: AnonymizationService
-  private readonly consentService: ConsentManagementService
-  private readonly hipaaService: HIPAADataService
+  private readonly consentService: ConsentManagementService    private readonly _hipaaService: HIPAADataService
   private readonly queryCache: Map<
     string,
     { result: QueryResult; timestamp: Date }
@@ -492,11 +491,9 @@ export class ResearchQueryEngine {
     score += Object.keys(query.parameters || {}).length * 2
 
     return score
-  }
-
-  private async checkUserPermissions(
-    userId: string,
-    userRole: string,
+  }    private async checkUserPermissions(
+      _userId: string,
+      userRole: string,
     queryType: string,
   ): Promise<boolean> {
     const permissions = {

@@ -101,8 +101,8 @@ export class Encryption {
       const encryptedBuffer = Buffer.from(encrypted.encryptedData, 'base64')
 
       // Split the encrypted data and auth tag
-      const authTag = encryptedBuffer.slice(encryptedBuffer.length - 16)
-      const encryptedData = encryptedBuffer.slice(
+      const authTag = encryptedBuffer.subarray(encryptedBuffer.length - 16)
+      const encryptedData = encryptedBuffer.subarray(
         0,
         encryptedBuffer.length - 16,
       )

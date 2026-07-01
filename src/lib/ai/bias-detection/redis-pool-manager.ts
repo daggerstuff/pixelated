@@ -265,7 +265,7 @@ export class RedisConnectionPool {
   }
 
   private async createConnection(): Promise<RedisConnection> {
-    const id = `${this.name}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const id = `${this.name}_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
 
     const service = new RedisService(this.redisConfig)
     await service.connect()

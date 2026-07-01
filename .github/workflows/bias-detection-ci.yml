@@ -183,9 +183,13 @@ jobs:
       - name: Install dependencies
         run: PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
 
-      - name: Run ESLint and markdown lint
+      - name: Lint code
         continue-on-error: true
-        run: pnpm lint:ci:with-markdown
+        run: pnpm lint:ci
+
+      - name: Lint markdown
+        continue-on-error: true
+        run: pnpm lint:markdown:ci
 
       - name: Run oxlint type-aware
         continue-on-error: true

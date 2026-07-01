@@ -100,7 +100,7 @@ export class DistributedRateLimiter {
    */
   private async detectAttackPattern(
     identifier: string,
-    rule: RateLimitRule,
+    _rule: RateLimitRule,
     context?: Record<string, unknown>,
   ): Promise<void> {
     const attackKey = `${this.attackPrefix}${identifier}`
@@ -250,7 +250,7 @@ export class DistributedRateLimiter {
    * Record analytics data
    */
   private async recordAnalytics(
-    identifier: string,
+    _identifier: string,
     rule: RateLimitRule,
     _currentCount: number,
   ): Promise<void> {

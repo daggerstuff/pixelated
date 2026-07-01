@@ -229,7 +229,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
    */
   async routeTraffic(
     userLocation: { latitude: number; longitude: number },
-    requestType: string = 'api',
+    _requestType: string = 'api',
     complianceRequirements: string[] = [],
   ): Promise<RoutingDecision> {
     if (!this.isInitialized) {
@@ -239,7 +239,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
     try {
       const cacheKey = this.generateCacheKey(
         userLocation,
-        requestType,
+        _requestType,
         complianceRequirements,
       )
 
@@ -253,7 +253,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       // Make routing decision
       const decision = await this.makeRoutingDecision(
         userLocation,
-        requestType,
+        _requestType,
         complianceRequirements,
       )
 
@@ -274,7 +274,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       logger.error('Traffic routing failed', {
         error,
         userLocation,
-        requestType,
+        _requestType,
       })
 
       // Fallback to default region
@@ -353,7 +353,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
    */
   private async makeLatencyBasedDecision(
     userLocation: { latitude: number; longitude: number },
-    requestType: string,
+    _requestType: string,
     complianceRequirements: string[],
   ): Promise<RoutingDecision> {
     const eligibleTargets = this.getEligibleTargets(complianceRequirements)
@@ -411,7 +411,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
    */
   private async makeHealthBasedDecision(
     userLocation: { latitude: number; longitude: number },
-    requestType: string,
+    _requestType: string,
     complianceRequirements: string[],
   ): Promise<RoutingDecision> {
     const eligibleTargets = this.getEligibleTargets(complianceRequirements)
@@ -468,7 +468,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
    */
   private async makeComplianceBasedDecision(
     userLocation: { latitude: number; longitude: number },
-    requestType: string,
+    _requestType: string,
     complianceRequirements: string[],
   ): Promise<RoutingDecision> {
     const eligibleTargets = this.getEligibleTargets(complianceRequirements)
@@ -486,7 +486,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
       // Fall back to latency-based selection
       return this.makeLatencyBasedDecision(
         userLocation,
-        requestType,
+        _requestType,
         complianceRequirements,
       )
     }
@@ -518,7 +518,7 @@ export class GlobalTrafficRoutingManager extends EventEmitter {
    */
   private async makeWeightedRoundRobinDecision(
     userLocation: { latitude: number; longitude: number },
-    requestType: string,
+    _requestType: string,
     complianceRequirements: string[],
   ): Promise<RoutingDecision> {
     const eligibleTargets = this.getEligibleTargets(complianceRequirements)

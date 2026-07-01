@@ -117,7 +117,8 @@ jobs:
         run: |
           echo "Testing post-execution commands (dry-run)..."
           pnpm format --check 2>&1 | head -10 || true
-          pnpm lint:ci:with-markdown 2>&1 | head -10 || true
+          pnpm lint:ci 2>&1 | head -10 || true
+          pnpm lint:markdown:ci 2>&1 | head -10 || true
           pnpm typecheck 2>&1 | head -10 || true
           echo "Post-execution commands validated"
 

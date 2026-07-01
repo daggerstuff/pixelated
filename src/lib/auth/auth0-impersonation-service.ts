@@ -187,7 +187,7 @@ export class Auth0ImpersonationService {
       }
 
       // Create impersonation session
-      const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      const sessionId = `impersonation-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
       const session: ImpersonationSession = {
         id: sessionId,
         adminUserId: request.adminUserId,
@@ -218,7 +218,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'START',
         adminUserId: request.adminUserId,
@@ -303,7 +303,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'END',
         adminUserId: adminUserId,
@@ -436,7 +436,7 @@ export class Auth0ImpersonationService {
 
       // Log to impersonation logs
       this.impersonationLogs.push({
-        id: `log-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `log-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
         timestamp: new Date(),
         eventType: 'EXTEND',
         adminUserId: adminUserId,

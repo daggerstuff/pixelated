@@ -456,10 +456,9 @@ export class ServiceDiscoveryManager extends EventEmitter {
 
   /**
    * Initialize etcd client
-   */
-  private async initializeEtcd(
-    region: string,
-    config: NonNullable<ServiceDiscoveryConfig['etcd']>,
+   */      private async initializeEtcd(
+        region: string,
+        _config: NonNullable<ServiceDiscoveryConfig['etcd']>,
   ): Promise<void> {
     try {
       const etcd = new Etcd3()

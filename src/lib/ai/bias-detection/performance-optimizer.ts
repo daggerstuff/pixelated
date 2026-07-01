@@ -534,7 +534,7 @@ export class BackgroundJobQueue {
     }
 
     const job: BackgroundJob = {
-      id: `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: `job_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
       type,
       data,
       priority: options.priority ?? 1,

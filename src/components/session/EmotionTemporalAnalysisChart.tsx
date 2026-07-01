@@ -280,7 +280,7 @@ export default function EmotionTemporalAnalysisChart({
           <XAxis dataKey="name" />
           <YAxis domain={[-1, 1]} />
           <Tooltip
-            formatter={(value, name) => {
+            formatter={(value: any, name: any) => {
               if (name === 'slope') {
                 const numericValue = toNumber(value)
                 return [
@@ -351,7 +351,7 @@ export default function EmotionTemporalAnalysisChart({
 
           <Tooltip
             cursor={{ strokeDasharray: '3 3' }}
-            formatter={(value, name) => {
+            formatter={(value: any, name: any) => {
               if (name === 'Intensity') {
                 return [value, name]
               }
@@ -423,7 +423,7 @@ export default function EmotionTemporalAnalysisChart({
           />
 
           <Tooltip
-            formatter={(value, name, _props) => {
+            formatter={(value: any, name: any, _props: any) => {
               if (name === 'frequency') {
                 return [value, 'Frequency']
               }
@@ -467,7 +467,7 @@ export default function EmotionTemporalAnalysisChart({
         <XAxis dataKey="name" />
         <YAxis domain={[-1, 1]} />
         <Tooltip
-          formatter={(value, name) => {
+          formatter={(value: any, name: any) => {
             if (name === 'correlation') {
               return [formatNumber(value, 2), 'Correlation']
             }

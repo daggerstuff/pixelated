@@ -34,13 +34,13 @@ import '../env.d.ts'
 // ---------------------------------------------------------------------------
 
 // `requestId` is `string` (not `unknown`).
-const requestId: App.Locals['requestId'] = 'req-123'
+const _requestId: App.Locals['requestId'] = 'req-123'
 
 // `timestamp` is `string`.
-const timestamp: App.Locals['timestamp'] = '2026-06-11T00:00:00Z'
+const _timestamp: App.Locals['timestamp'] = '2026-06-11T00:00:00Z'
 
 // `user` is nullable with a specific shape.
-const user: App.Locals['user'] = {
+const _user: App.Locals['user'] = {
   id: 'u-1',
   email: 'a@b.c',
   emailVerified: true,
@@ -48,33 +48,33 @@ const user: App.Locals['user'] = {
 }
 
 // `session` is nullable with `expiresAt: Date`.
-const session: App.Locals['session'] = {
+const _session: App.Locals['session'] = {
   id: 's-1',
   userId: 'u-1',
   expiresAt: new Date(),
 }
 
 // `cspNonce` is optional `string`.
-const cspNonce: App.Locals['cspNonce'] = 'nonce-abc'
-const cspNonceAbsent: App.Locals['cspNonce'] = undefined
+const _cspNonce: App.Locals['cspNonce'] = 'nonce-abc'
+const _cspNonceAbsent: App.Locals['cspNonce'] = undefined
 
 // `isSSR` is optional `boolean`.
-const isSSR: App.Locals['isSSR'] = true
-const isSSRAbsent: App.Locals['isSSR'] = undefined
+const _isSSR: App.Locals['isSSR'] = true
+const _isSSRAbsent: App.Locals['isSSR'] = undefined
 
 // `vercelEdge` is optional with geo/UA fields.
-const vercelEdge: App.Locals['vercelEdge'] = {
+const _vercelEdge: App.Locals['vercelEdge'] = {
   country: 'US',
   region: 'CA',
   ip: '127.0.0.1',
   isAuthPage: false,
   userAgent: 'Mozilla/5.0',
 }
-const vercelEdgeAbsent: App.Locals['vercelEdge'] = undefined
+const _vercelEdgeAbsent: App.Locals['vercelEdge'] = undefined
 
 // `headers` is optional `Record<string, string>`.
-const headers: App.Locals['headers'] = { 'x-custom': 'value' }
-const headersAbsent: App.Locals['headers'] = undefined
+const _headers: App.Locals['headers'] = { 'x-custom': 'value' }
+const _headersAbsent: App.Locals['headers'] = undefined
 
 // `userPreferences` is optional with theme/UA/device fields. Extracted to
 // a shared base so the positive (valid assignment) and the negative
@@ -89,8 +89,8 @@ const userPreferencesBase = {
   isAndroid: false,
   ip: '127.0.0.1',
 }
-const userPreferences: App.Locals['userPreferences'] = userPreferencesBase
-const userPreferencesAbsent: App.Locals['userPreferences'] = undefined
+const _userPreferences: App.Locals['userPreferences'] = userPreferencesBase
+const _userPreferencesAbsent: App.Locals['userPreferences'] = undefined
 
 // Negative: `requestId` is NOT `number`. If someone changes the type,
 // the conditional flips to `true` and the const assignment fails — that's
@@ -98,7 +98,7 @@ const userPreferencesAbsent: App.Locals['userPreferences'] = undefined
 type IsWrongRequestIdAssignable = [number] extends [App.Locals['requestId']]
   ? true
   : false
-const isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
+const _isWrongRequestIdAssignable: IsWrongRequestIdAssignable = false
 
 // Negative: `user` requires `id`, `email`, `emailVerified`, `role`. A
 // partial object (only `id`) is not assignable to the full user shape.
@@ -109,7 +109,7 @@ type IsPartialUserAssignable = [{ id: string }] extends [
 ]
   ? true
   : false
-const isPartialUserAssignable: IsPartialUserAssignable = false
+const _isPartialUserAssignable: IsPartialUserAssignable = false
 
 // Negative: `vercelEdge` requires all 5 fields including `ip`. The
 // shape without `ip` is not assignable to the full shape. If `ip`
@@ -120,7 +120,7 @@ type IsVercelEdgeWithoutIpAssignable = [
 ] extends [App.Locals['vercelEdge']]
   ? true
   : false
-const isVercelEdgeWithoutIpAssignable: IsVercelEdgeWithoutIpAssignable = false
+const _isVercelEdgeWithoutIpAssignable: IsVercelEdgeWithoutIpAssignable = false
 
 // Negative: `headers` is `Record<string, string>`, not `Record<string, number>`.
 // If the value type changes, the conditional flips to `true` and the
@@ -130,7 +130,7 @@ type IsWrongHeadersValueTypeAssignable = [Record<string, number>] extends [
 ]
   ? true
   : false
-const isWrongHeadersValueTypeAssignable: IsWrongHeadersValueTypeAssignable = false
+const _isWrongHeadersValueTypeAssignable: IsWrongHeadersValueTypeAssignable = false
 
 // Negative: `userPreferences.darkMode` is `boolean`, not `string`.
 // Type-level assertion (no `@ts-expect-error` needed, so no directive-
@@ -143,7 +143,7 @@ type IsWrongDarkModeAssignable = [
 ] extends [App.Locals['userPreferences']]
   ? true
   : false
-const isWrongDarkModeAssignable: IsWrongDarkModeAssignable = false
+const _isWrongDarkModeAssignable: IsWrongDarkModeAssignable = false
 
 // ---------------------------------------------------------------------------
 // 2. Index signature accepts bracket access for ad-hoc keys
@@ -152,8 +152,8 @@ const isWrongDarkModeAssignable: IsWrongDarkModeAssignable = false
 // Ad-hoc keys (not declared in `App.Locals`) are accessible via bracket
 // notation and typed as `unknown` (the index signature's value type).
 declare const someLocals: App.Locals
-const adHocKey: unknown = someLocals['arbitraryAdHocKey']
-const adHocKeyNonExistent: unknown = someLocals['doesNotExist']
+const _adHocKey: unknown = someLocals['arbitraryAdHocKey']
+const _adHocKeyNonExistent: unknown = someLocals['doesNotExist']
 
 // Negative: the index signature is `unknown`, not `any` or `string`.
 // Type-level assertion: a bracket read is not assignable to `string`
@@ -165,7 +165,7 @@ type AdHocKeyRead = (typeof someLocals)['arbitraryAdHocKey']
 type IsAdHocKeyAssignableToString = [AdHocKeyRead] extends [string]
   ? true
   : false
-const isAdHocKeyAssignableToString: IsAdHocKeyAssignableToString = false
+const _isAdHocKeyAssignableToString: IsAdHocKeyAssignableToString = false
 
 // ---------------------------------------------------------------------------
 // 3. Middleware ad-hoc writes typecheck
@@ -186,7 +186,7 @@ type IsWrongRequestIdValueAssignable = [number] extends [
 ]
   ? true
   : false
-const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
+const _isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
 
 // Negative: assigning `null` to a non-nullable known prop should fail.
 // `user` is `T | null` so `null` IS allowed; we use `timestamp` instead.
@@ -195,7 +195,7 @@ const isWrongRequestIdValueAssignable: IsWrongRequestIdValueAssignable = false
 type IsNullAssignableToTimestamp = [null] extends [App.Locals['timestamp']]
   ? true
   : false
-const isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
+const _isNullAssignableToTimestamp: IsNullAssignableToTimestamp = false
 
 // ---------------------------------------------------------------------------
 // 4. Lock in: adding a new shared key requires updating this contract

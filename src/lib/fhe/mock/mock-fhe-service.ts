@@ -225,7 +225,7 @@ export class MockFHEService implements FHEService {
   public async processEncrypted(
     encryptedData: string,
     operation: FHEOperation | string,
-    params?: Record<string, unknown>,
+    _params?: Record<string, unknown>,
   ): Promise<FHEOperationResult<string>> {
     this.checkInitialized()
     this.auditLog('processEncrypted.start', { operation })
@@ -245,13 +245,13 @@ export class MockFHEService implements FHEService {
         return this.mockSentimentAnalysis(data)
 
       case FHEOperation.CATEGORIZE:
-        return this.mockCategorization(data, params)
+        return this.mockCategorization(data, _params)
 
       case FHEOperation.ANALYZE:
-        return this.mockPIIDetection(data, params)
+        return this.mockPIIDetection(data, _params)
 
       case FHEOperation.EMOTION_CLASSIFY:
-        return this.mockEmotionClassification(data, params)
+        return this.mockEmotionClassification(data, _params)
 
       case FHEOperation.Addition:
       case FHEOperation.Subtraction:
@@ -277,7 +277,6 @@ export class MockFHEService implements FHEService {
     return undefined as unknown as FHEOperationResult<string>
   }
 
-  /**
   /**
    * Mock emotion classification (EMOTION_CLASSIFY operation)
    */

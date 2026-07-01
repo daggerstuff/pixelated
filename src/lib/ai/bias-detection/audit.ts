@@ -461,7 +461,7 @@ export class BiasDetectionAuditLogger {
   // =============================================================================
 
   private generateAuditId(): string {
-    return `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    return `audit_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
   }
 
   private sanitizeDetails(

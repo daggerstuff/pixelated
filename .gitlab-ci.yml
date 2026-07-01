@@ -69,11 +69,16 @@ validate:lint:
   script:
     - echo "Running lint validation..."
     - PNPM_CONFIG_TRUST_LOCKFILE=true pnpm install --no-frozen-lockfile
+    - pnpm lint:ci:imports
     - pnpm lint:ci
+    - pnpm lint:markdown:ci
+    - pnpm lint:ci:unused-exports
+    - echo "Checking astro hints against baseline..."
+    - node scripts/ci/check-astro-hints.mjs
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 10m
+  timeout: 5m
   retry:
     max: 2
     when:
@@ -110,7 +115,7 @@ validate:typecheck:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  timeout: 20m
+  timeout: 10m
   retry:
     max: 2
     when:

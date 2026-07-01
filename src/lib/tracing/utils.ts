@@ -5,7 +5,8 @@
  */
 
 import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
-import { SemanticAttributes } from '@opentelemetry/semantic-conventions'
+import { ATTR_HTTP_REQUEST_METHOD, ATTR_URL_FULL } from '@opentelemetry/semantic-conventions'
+import { ATTR_DB_OPERATION_NAME, ATTR_DB_SQL_TABLE, ATTR_DB_SYSTEM } from '@opentelemetry/semantic-conventions/incubating'
 import * as Sentry from '@sentry/astro'
 
 const tracer = trace.getTracer('pixelated-empathy')
@@ -151,14 +152,14 @@ export async function withDatabaseSpan<T>(
     `db.${operation}`,
     async (span) => {
       span.setAttributes({
-        [SemanticAttributes.DB_OPERATION]: operation,
-        [SemanticAttributes.DB_SQL_TABLE]: table,
+        [ATTR_DB_OPERATION_NAME]: operation,
+        [ATTR_DB_SQL_TABLE]: table,
         ...attributes,
       })
       return fn()
     },
     {
-      [SemanticAttributes.DB_SYSTEM]: 'postgresql',
+      [ATTR_DB_SYSTEM]: 'postgresql',
       ...attributes,
     },
   )
@@ -177,15 +178,15 @@ export async function withHttpClientSpan<T>(
     `http.${method}`,
     async (span) => {
       span.setAttributes({
-        [SemanticAttributes.HTTP_METHOD]: method,
-        [SemanticAttributes.HTTP_URL]: url,
+        [ATTR_HTTP_REQUEST_METHOD]: method,
+        [ATTR_URL_FULL]: url,
         ...attributes,
       })
       return fn()
     },
     {
-      [SemanticAttributes.HTTP_METHOD]: method,
-      [SemanticAttributes.HTTP_URL]: url,
+      [ATTR_HTTP_REQUEST_METHOD]: method,
+      [ATTR_URL_FULL]: url,
       ...attributes,
     },
   )

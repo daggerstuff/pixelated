@@ -7,7 +7,7 @@ interface ResetPasswordFormProps {
   email: string
 }
 
-export function ResetPasswordForm({ token, email }: ResetPasswordFormProps) {
+export function ResetPasswordForm({ token, email: _email }: ResetPasswordFormProps) {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)

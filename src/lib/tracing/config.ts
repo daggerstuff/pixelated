@@ -8,11 +8,11 @@
 
 import { resourceFromAttributes, type Resource } from '@opentelemetry/resources'
 import {
-  SEMRESATTRS_SERVICE_NAME,
-  SEMRESATTRS_SERVICE_VERSION,
-  SEMRESATTRS_DEPLOYMENT_ENVIRONMENT,
-  SEMRESATTRS_SERVICE_INSTANCE_ID,
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_VERSION,
+  ATTR_SERVICE_INSTANCE_ID,
 } from '@opentelemetry/semantic-conventions'
+import { ATTR_DEPLOYMENT_ENVIRONMENT } from '@opentelemetry/semantic-conventions/incubating'
 
 export interface TracingConfig {
   enabled: boolean
@@ -85,10 +85,10 @@ export function getTracingConfig(): TracingConfig {
  */
 export function createResource(config: TracingConfig): Resource {
   return resourceFromAttributes({
-    [SEMRESATTRS_SERVICE_NAME]: config.serviceName,
-    [SEMRESATTRS_SERVICE_VERSION]: config.serviceVersion,
-    [SEMRESATTRS_DEPLOYMENT_ENVIRONMENT]: config.environment,
-    [SEMRESATTRS_SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
+    [ATTR_SERVICE_NAME]: config.serviceName,
+    [ATTR_SERVICE_VERSION]: config.serviceVersion,
+    [ATTR_DEPLOYMENT_ENVIRONMENT]: config.environment,
+    [ATTR_SERVICE_INSTANCE_ID]: `${config.serviceName}-${Date.now()}`,
   })
 }
 

@@ -138,7 +138,7 @@ export class PixelCrisisDetector {
    * Convert Pixel response to MentalHealthAnalysis format
    */
   private convertToMentalHealthAnalysis(
-    text: string,
+    _text: string,
     pixelResponse: PixelInferenceResponse,
   ): MentalHealthAnalysis {
     const indicators: HealthIndicator[] = [];

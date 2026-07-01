@@ -212,7 +212,7 @@ class EncryptedJotaiStorage<Value> {
 
   // Subscribe to cross-tab changes
   subscribe(
-    key: string,
+    _key: string,
     callback: (value: Value) => void,
     initialValue: Value,
   ): () => void {

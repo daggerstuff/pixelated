@@ -23,7 +23,7 @@ import { GestaltClient } from '../ai/GestaltClient'
 import { AuditLog, type AuditLogEntry } from './audit-log'
 import { isOriginAllowed, parseAllowedOrigins } from './origin'
 import { RateLimiter } from './ratelimit'
-import { SessionStore, type TrainingSessionDocument } from './session-store'
+import { SessionStore } from './session-store'
 
 const logger = createBuildSafeLogger('TrainingWebSocketServer')
 
@@ -563,7 +563,7 @@ export class TrainingWebSocketServer {
     // Persist session state on join
     if (this.sessionStore) {
       try {
-        const { session, resumeFrom } = await this.sessionStore.reconnect(
+        const { resumeFrom } = await this.sessionStore.reconnect(
           payload.sessionId,
           client.userId,
         )
