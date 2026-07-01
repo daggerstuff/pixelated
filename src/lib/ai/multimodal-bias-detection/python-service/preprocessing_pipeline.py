@@ -280,14 +280,11 @@ class VisionPreprocessingPipeline:
                 image_data = image_data.split(",")[1]
 
             image_bytes = base64.b64decode(image_data)
-            image = Image.open(io.BytesIO(image_bytes))
-
-            return image
+            return Image.open(io.BytesIO(image_bytes))
 
         if isinstance(image_data, bytes):
             # Direct image bytes
-            image = Image.open(io.BytesIO(image_data))
-            return image
+            return Image.open(io.BytesIO(image_data))
 
         raise ValueError(f"Unsupported image data type: {type(image_data)}")
 
@@ -391,9 +388,7 @@ class VideoPreprocessingPipeline:
         # Save to temporary file
         with tempfile.NamedTemporaryFile(suffix=".mp4", delete=False) as tmp_file:
             tmp_file.write(video_bytes)
-            tmp_path = tmp_file.name
-
-        return tmp_path
+            return tmp_file.name
 
     async def _extract_frames(self, video_path: str) -> list[Image.Image]:
         """Extract key frames from video"""
@@ -588,8 +583,6 @@ async def main():
     #     "image": image_bytes
     # }
     # multimodal_result = await multimodal_pipeline.preprocess_multimodal_data(multimodal_data)
-
-    print("Preprocessing pipeline initialized successfully")
 
 
 if __name__ == "__main__":

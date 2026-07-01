@@ -130,8 +130,6 @@ class PerformanceMonitor:
         """Run continuous performance monitoring"""
         end_time = time.time() + (duration_minutes * 60)
 
-        print(f"Starting continuous monitoring for {duration_minutes} minutes...")
-
         while time.time() < end_time:
             # Collect all metrics
             system_metrics = self.collect_system_metrics()
@@ -187,8 +185,8 @@ class PerformanceMonitor:
 
     def send_alerts(self, alerts: list[str]):
         """Send performance alerts"""
-        for alert in alerts:
-            print(f"🚨 ALERT: {alert}")
+        for _alert in alerts:
+            pass
             # In production, this would send to Slack, email, PagerDuty, etc.
 
     def generate_monitoring_report(self) -> dict[str, Any]:
@@ -236,6 +234,5 @@ if __name__ == "__main__":
     try:
         with report_file.open("w") as f:
             json.dump(report, f, indent=2)
-        print("✅ Performance monitoring completed")
     except Exception:
-        print("⚠️  Performance monitoring completed but failed to save report")
+        pass

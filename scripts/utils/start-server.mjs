@@ -103,7 +103,8 @@ const ssrHandler = ssrModule.handler;
 // SSR handler — it does NOT serve dist/client/ static files.  We need to
 // check dist/client/ for matching files before falling through to SSR.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const clientDist = path.resolve(__dirname, "dist/client");
+const repoRoot = path.resolve(__dirname, "../..");
+const clientDist = path.resolve(repoRoot, "dist/client");
 
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",

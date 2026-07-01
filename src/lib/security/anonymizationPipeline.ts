@@ -10,8 +10,10 @@
 import * as crypto from 'crypto'
 
 import { createPrivacyHash } from '../../simulator/utils/privacy'
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
 import { phiDetector, detectAndRedactPHIAsync } from './phiDetection'
 import { piiDetectionService } from './pii'
+const logger = createBuildSafeLogger('anonymizationPipeline')
 
 // Types
 export interface AnonymizationResult<T = Record<string, unknown> | string> {
@@ -121,13 +123,13 @@ export async function anonymizeData<T extends Record<string, unknown> | string>(
     // Log anonymization failure (do not log sensitive input)
     if (typeof window !== 'undefined') {
       // Browser context
-      console.error('Anonymization pipeline error', {
+      logger.error('Anonymization pipeline error', {
         auditId,
         error: summary.errors[0],
       })
     } else {
       // Node/server context
-      console.error('Anonymization pipeline error', {
+      logger.error('Anonymization pipeline error', {
         auditId,
         error: summary.errors[0],
       })

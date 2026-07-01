@@ -92,9 +92,13 @@ let secretKey: string | undefined = undefined
  * Must be called before any signing operations in server-side entry points.
  * @param key - The secret key to use for HMAC operations
  */
+import { createBuildSafeLogger } from './logging/build-safe-logger'
+
+const securityLogger = createBuildSafeLogger('security')
+
 export function setSecretKey(key: string): void {
   if (typeof window !== 'undefined') {
-    console.warn(
+    securityLogger.warn(
       'Security Error: Attempted to set secret key in browser environment.',
     )
     return

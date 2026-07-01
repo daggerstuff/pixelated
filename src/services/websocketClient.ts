@@ -44,6 +44,10 @@ interface DocumentSavedEvent {
   updatedAt: string
 }
 
+import { createBuildSafeLogger } from '../lib/logging/build-safe-logger'
+
+const wsLogger = createBuildSafeLogger('websocket-client')
+
 export class WebSocketClient {
   private socket: Socket | null = null
   private readonly token: string
@@ -64,17 +68,17 @@ export class WebSocketClient {
     })
 
     this.socket.on('connect', () => {
-      console.log('Connected to WebSocket server')
+      wsLogger.info('Connected to WebSocket server')
     })
 
     this.socket.on('disconnect', () => {
-      console.log('Disconnected from WebSocket server')
+      wsLogger.info('Disconnected from WebSocket server')
     })
 
     this.socket.on('error', (error: { message: string }) => {
-      console.error(
-        'WebSocket error:',
-        error instanceof Error ? error.message : 'Unknown error',
+      wsLogger.error(
+        'WebSocket error',
+        error instanceof Error ? error : new Error('Unknown error'),
       )
     })
   }
@@ -110,7 +114,7 @@ export class WebSocketClient {
 
   sendDocumentChange(change: DocumentChangeEvent, version: number): void {
     if (!this.socket || !this.documentId) {
-      console.warn('Cannot send change: not connected or no document joined')
+      wsLogger.warn('Cannot send change: not connected or no document joined')
       return
     }
 

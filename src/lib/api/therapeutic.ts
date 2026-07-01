@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { z } from 'zod'
 
+import { createBuildSafeLogger } from '../logging/build-safe-logger'
+const logger = createBuildSafeLogger('therapeutic')
+
 // Zod schemas for validation and type inference
 export const ParticipantDemographicsSchema = z.object({
   age: z.string().optional(),
@@ -102,7 +105,7 @@ export class TherapeuticClient {
 
       return await response.json()
     } catch (error: unknown) {
-      console.error(`Therapeutic API Request Failed: ${endpoint}`, error)
+      logger.error(`Therapeutic API Request Failed: ${endpoint}`, error)
       throw error
     }
   }
@@ -138,7 +141,7 @@ export class TherapeuticClient {
       const response = await fetch(`${this.baseUrl}/health`)
       return await response.json()
     } catch (error: unknown) {
-      console.error('Health check failed', error)
+      logger.error('Health check failed', error)
       throw error
     }
   }

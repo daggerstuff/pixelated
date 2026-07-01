@@ -5,14 +5,16 @@
  * This is useful for testing or as a fallback when other providers are unavailable
  */
 
+import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
 import type { StorageProvider, StorageProviderConfig } from '../backup-types'
+const logger = createBuildSafeLogger('memory')
 
 export class InMemoryStorageProvider implements StorageProvider {
   private readonly storage: Map<string, Uint8Array> = new Map()
   private initialized = false
 
   constructor(config: StorageProviderConfig) {
-    console.log('InMemoryStorageProvider config:', config)
+    logger.info('InMemoryStorageProvider config:', config)
   }
 
   async initialize(): Promise<void> {
@@ -63,7 +65,7 @@ export class InMemoryStorageProvider implements StorageProvider {
     this.checkInitialized()
 
     if (!this.storage.has(key)) {
-      console.warn(`File not found for deletion: ${key}`)
+      logger.warn(`File not found for deletion: ${key}`)
       return
     }
 

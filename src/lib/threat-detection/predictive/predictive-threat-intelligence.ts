@@ -9,6 +9,9 @@ import * as tf from '@tensorflow/tfjs'
 import Redis from 'ioredis'
 import { MongoClient } from 'mongodb'
 
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+const logger = createBuildSafeLogger('predictive-threat-intelligence')
+
 export interface ThreatData {
   threatId: string
   threatType: string
@@ -1727,7 +1730,7 @@ class LSTMTimeSeriesForecaster extends TimeSeriesForecaster {
         validationSplit: 0.2,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            console.log(`Epoch ${epoch}: loss = ${logs?.['loss']}`)
+            logger.info(`Epoch ${epoch}: loss = ${logs?.['loss']}`)
           },
         },
       })

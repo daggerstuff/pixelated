@@ -1,13 +1,17 @@
-import * as crypto from 'node:crypto'
+import * as crypto from "node:crypto";
 
-import { z } from 'zod'
+import { z } from "zod";
+
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
 import type {
   ParticipantDemographics,
   TherapeuticSession,
   BiasAnalysisResult,
   AlertLevel,
-} from './types'
+} from "./types";
+
+const logger = createBuildSafeLogger("utils");
 
 const TherapeuticSessionSchema = z.object({
   sessionId: z.string(),
@@ -26,15 +30,8 @@ const TherapeuticSessionSchema = z.object({
 
   scenario: z.object({
     scenarioId: z.string(),
-    type: z.enum([
-      'depression',
-      'anxiety',
-      'trauma',
-      'substance-abuse',
-      'grief',
-      'other',
-    ]),
-    complexity: z.enum(['beginner', 'intermediate', 'advanced']),
+    type: z.enum(["depression", "anxiety", "trauma", "substance-abuse", "grief", "other"]),
+    complexity: z.enum(["beginner", "intermediate", "advanced"]),
     tags: z.array(z.string()),
     description: z.string(),
     learningObjectives: z.array(z.string()),
@@ -50,12 +47,7 @@ const TherapeuticSessionSchema = z.object({
     z.object({
       responseId: z.string(),
       timestamp: z.instanceof(Date),
-      type: z.enum([
-        'diagnostic',
-        'intervention',
-        'risk-assessment',
-        'recommendation',
-      ]),
+      type: z.enum(["diagnostic", "intervention", "risk-assessment", "recommendation"]),
       content: z.string(),
       confidence: z.number(),
       modelUsed: z.string(),
@@ -76,188 +68,177 @@ const TherapeuticSessionSchema = z.object({
     supervisorId: z.string().optional(),
     traineeId: z.string(),
     sessionDuration: z.number(),
-    completionStatus: z.enum(['completed', 'partial', 'abandoned']),
+    completionStatus: z.enum(["completed", "partial", "abandoned"]),
     technicalIssues: z.array(z.string()).optional(),
   }),
-})
+});
 
-export { TherapeuticSessionSchema }
+export { TherapeuticSessionSchema };
 
 // Validate participant demographics data
-export function validateParticipantDemographics(demographics: Record<string, unknown>): ParticipantDemographics {
-  const requiredFields = ['age', 'gender', 'ethnicity', 'primaryLanguage']
+export function validateParticipantDemographics(
+  demographics: Record<string, unknown>,
+): ParticipantDemographics {
+  const requiredFields = ["age", "gender", "ethnicity", "primaryLanguage"];
   for (const field of requiredFields) {
     if (!(field in demographics)) {
-      throw new Error('Invalid participant demographics data')
+      throw new Error("Invalid participant demographics data");
     }
   }
   // Example valid values for gender
-  const validGenders = ['male', 'female', 'non-binary', 'prefer-not-to-say']
-  if (!validGenders.includes(demographics['gender'] as string)) {
-    throw new Error('Invalid participant demographics data')
+  const validGenders = ["male", "female", "non-binary", "prefer-not-to-say"];
+  if (!validGenders.includes(demographics["gender"] as string)) {
+    throw new Error("Invalid participant demographics data");
   }
   // Additional validation can be added as needed
-  return demographics as unknown as ParticipantDemographics
+  return demographics as unknown as ParticipantDemographics;
 }
 
 // Validate Therapeutic Session with basic checks used in tests
 export function validateTherapeuticSession(session: Record<string, unknown>): TherapeuticSession {
-  if (!session || typeof session !== 'object') {
-    throw new Error('Invalid therapeutic session data')
+  if (!session || typeof session !== "object") {
+    throw new Error("Invalid therapeutic session data");
   }
-  const uuidV4 =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
-  if (!uuidV4.test((session['sessionId'] as string))) {
-    throw new Error('Invalid therapeutic session data')
+  const uuidV4 = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  if (!uuidV4.test(session["sessionId"] as string)) {
+    throw new Error("Invalid therapeutic session data");
   }
   // Convert timestamps if needed
-  const normalizeDate = (d: unknown) => (typeof d === 'string' ? new Date(d) : d)
-  const rawAiResponses = session['aiResponses'] as Record<string, unknown>[] | undefined
+  const normalizeDate = (d: unknown) => (typeof d === "string" ? new Date(d) : d);
+  const rawAiResponses = session["aiResponses"] as Record<string, unknown>[] | undefined;
   const aiResponses = Array.isArray(rawAiResponses)
     ? rawAiResponses.map((r: Record<string, unknown>) => ({
         ...r,
-        timestamp: normalizeDate(r['timestamp'] as string | Date),
+        timestamp: normalizeDate(r["timestamp"] as string | Date),
       }))
-    : []
+    : [];
   const normalized: TherapeuticSession = {
-    ...session as unknown as TherapeuticSession,
-    timestamp: normalizeDate(session['timestamp']) as Date,
-    aiResponses: aiResponses as TherapeuticSession['aiResponses'],
-  }
-  return normalized
+    ...(session as unknown as TherapeuticSession),
+    timestamp: normalizeDate(session["timestamp"]) as Date,
+    aiResponses: aiResponses as TherapeuticSession["aiResponses"],
+  };
+  return normalized;
 }
 
 // Validate Bias Detection configuration used in tests
-export function validateBiasDetectionConfig(config: Record<string, unknown>): Record<string, unknown> {
-  if (!config || typeof config !== 'object') {
-    throw new Error('Invalid bias detection configuration')
+export function validateBiasDetectionConfig(
+  config: Record<string, unknown>,
+): Record<string, unknown> {
+  if (!config || typeof config !== "object") {
+    throw new Error("Invalid bias detection configuration");
   }
-  const thresholds = config['thresholds'] as Record<string, unknown> | undefined
-  const t = thresholds ?? {}
+  const thresholds = config["thresholds"] as Record<string, unknown> | undefined;
+  const t = thresholds ?? {};
   if (
-    !(t['warningLevel'] ?? t['warning']) ||
-    !(t['highLevel'] ?? t['high']) ||
-    !(t['criticalLevel'] ?? t['critical'])
+    !(t["warningLevel"] ?? t["warning"]) ||
+    !(t["highLevel"] ?? t["high"]) ||
+    !(t["criticalLevel"] ?? t["critical"])
   ) {
-    throw new Error('Invalid bias detection configuration')
+    throw new Error("Invalid bias detection configuration");
   }
-  const warning = Number(t['warningLevel'] ?? t['warning'])
-  const high = Number(t['highLevel'] ?? t['high'])
-  const critical = Number(t['criticalLevel'] ?? t['critical'])
+  const warning = Number(t["warningLevel"] ?? t["warning"]);
+  const high = Number(t["highLevel"] ?? t["high"]);
+  const critical = Number(t["criticalLevel"] ?? t["critical"]);
   if (!(warning < high && high < critical)) {
-    throw new Error('Invalid bias detection configuration')
+    throw new Error("Invalid bias detection configuration");
   }
-  const w = config['layerWeights'] as Record<string, unknown> | undefined ?? {}
-  const sum = ['preprocessing', 'modelLevel', 'interactive', 'evaluation']
+  const w = (config["layerWeights"] as Record<string, unknown> | undefined) ?? {};
+  const sum = ["preprocessing", "modelLevel", "interactive", "evaluation"]
     .map((k) => Number(w[k] ?? 0))
-    .reduce((a, b) => a + b, 0)
+    .reduce((a, b) => a + b, 0);
   if (Math.abs(sum - 1) > 1e-6) {
-    throw new Error('Invalid bias detection configuration')
+    throw new Error("Invalid bias detection configuration");
   }
-  return config
+  return config;
 }
 
 // Data sanitization
-export function sanitizeTextContent(
-  content: string,
-  maskingEnabled = true,
-): string {
+export function sanitizeTextContent(content: string, maskingEnabled = true): string {
   if (!maskingEnabled) {
-    return content
+    return content;
   }
-  let result = content
+  let result = content;
   // Specific pattern: "Patient First Last" -> preserve prefix
-  result = result.replace(
-    /\bPatient\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g,
-    'Patient [NAME]',
-  )
+  result = result.replace(/\bPatient\s+[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, "Patient [NAME]");
   // Emails
-  result = result.replace(
-    /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g,
-    '[EMAIL]',
-  )
+  result = result.replace(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g, "[EMAIL]");
   // Phone numbers (simple patterns 123-456-7890 or 123.456.7890 or (123) 456-7890)
-  result = result.replace(
-    /(?:\(\d{3}\)\s*|\b\d{3}[-.\s])\d{3}[-.\s]\d{4}\b/g,
-    '[PHONE]',
-  )
+  result = result.replace(/(?:\(\d{3}\)\s*|\b\d{3}[-.\s])\d{3}[-.\s]\d{4}\b/g, "[PHONE]");
   // SSN
-  result = result.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[SSN]')
+  result = result.replace(/\b\d{3}-\d{2}-\d{4}\b/g, "[SSN]");
   // Naive proper name (First Last) -> [NAME]
-  result = result.replace(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, '[NAME]')
-  return result
+  result = result.replace(/\b[A-Z][a-z]+\s+[A-Z][a-z]+\b/g, "[NAME]");
+  return result;
 }
 
 // Demographic helpers
 export function extractDemographicGroups(
   d: ParticipantDemographics,
 ): Array<{ type: string; value: string }> {
-  const groups: Array<{ type: string; value: string }> = []
+  const groups: Array<{ type: string; value: string }> = [];
   if (d.age) {
-    groups.push({ type: 'age', value: d.age })
+    groups.push({ type: "age", value: d.age });
   }
   if (d.gender) {
-    groups.push({ type: 'gender', value: d.gender })
+    groups.push({ type: "gender", value: d.gender });
   }
   if (d.ethnicity) {
-    groups.push({ type: 'ethnicity', value: d.ethnicity })
+    groups.push({ type: "ethnicity", value: d.ethnicity });
   }
   if (d.primaryLanguage) {
-    groups.push({ type: 'language', value: d.primaryLanguage })
+    groups.push({ type: "language", value: d.primaryLanguage });
   }
   if (d.socioeconomicStatus) {
-    groups.push({ type: 'socioeconomic', value: d.socioeconomicStatus })
+    groups.push({ type: "socioeconomic", value: d.socioeconomicStatus });
   }
   if (d.education) {
-    groups.push({ type: 'education', value: d.education })
+    groups.push({ type: "education", value: d.education });
   }
   if (d.region) {
-    groups.push({ type: 'region', value: d.region })
+    groups.push({ type: "region", value: d.region });
   }
-  return groups
+  return groups;
 }
 
 export function calculateDemographicRepresentation(
-  sessions: Array<Pick<TherapeuticSession, 'participantDemographics'>>,
+  sessions: Array<Pick<TherapeuticSession, "participantDemographics">>,
 ) {
   if (!Array.isArray(sessions) || sessions.length === 0) {
-    return {}
+    return {};
   }
-  const counts: Record<string, Record<string, number>> = {}
+  const counts: Record<string, Record<string, number>> = {};
   const add = (key: string, val?: string) => {
     if (!val) {
-      return
+      return;
     }
-    counts[key] ||= {}
-    counts[key][val] = (counts[key][val] ?? 0) + 1
-  }
+    counts[key] ||= {};
+    counts[key][val] = (counts[key][val] ?? 0) + 1;
+  };
   for (const s of sessions) {
-    const d = s.participantDemographics
+    const d = s.participantDemographics;
     if (d) {
-      add('age', d['age'])
-      add('gender', d['gender'])
-      add('ethnicity', d['ethnicity'])
-      add('language', d['primaryLanguage'])
-      if (d['socioeconomicStatus']) {
-        add('socioeconomic', d['socioeconomicStatus'])
+      add("age", d["age"]);
+      add("gender", d["gender"]);
+      add("ethnicity", d["ethnicity"]);
+      add("language", d["primaryLanguage"]);
+      if (d["socioeconomicStatus"]) {
+        add("socioeconomic", d["socioeconomicStatus"]);
       }
-      if (d['education']) {
-        add('education', d['education'])
+      if (d["education"]) {
+        add("education", d["education"]);
       }
-      if (d['region']) {
-        add('region', d['region'])
+      if (d["region"]) {
+        add("region", d["region"]);
       }
     }
   }
   // Convert to proportions
-  const representation: Record<string, Record<string, number>> = {}
+  const representation: Record<string, Record<string, number>> = {};
   for (const [key, map] of Object.entries(counts)) {
-    const total = Object.values(map).reduce((a, b) => a + b, 0)
-    representation[key] = Object.fromEntries(
-      Object.entries(map).map(([k, v]) => [k, v / total]),
-    )
+    const total = Object.values(map).reduce((a, b) => a + b, 0);
+    representation[key] = Object.fromEntries(Object.entries(map).map(([k, v]) => [k, v / total]));
   }
-  return representation
+  return representation;
 }
 
 // Bias calculations
@@ -265,88 +246,84 @@ export function calculateOverallBiasScore(
   layerResults: Record<string, { biasScore: number }>,
   weights: Record<string, number>,
 ): number {
-  const layers = ['preprocessing', 'modelLevel', 'interactive', 'evaluation']
+  const layers = ["preprocessing", "modelLevel", "interactive", "evaluation"];
   const score = layers.reduce((sum, k) => {
-    const raw = layerResults?.[k]?.biasScore ?? 0
-    const clamped = Math.min(1, Math.max(0, raw))
-    return sum + (weights?.[k] ?? 0) * clamped
-  }, 0)
-  return score
+    const raw = layerResults?.[k]?.biasScore ?? 0;
+    const clamped = Math.min(1, Math.max(0, raw));
+    return sum + (weights?.[k] ?? 0) * clamped;
+  }, 0);
+  return score;
 }
 
 export function calculateConfidenceScore(
   scores: number[] | Record<string, { biasScore: number }>,
 ): number {
-  let values: number[] = []
+  let values: number[] = [];
   if (Array.isArray(scores)) {
-    values = scores
-  } else if (scores && typeof scores === 'object') {
-    values = Object.values(scores).map((v) => v?.biasScore ?? 0)
+    values = scores;
+  } else if (scores && typeof scores === "object") {
+    values = Object.values(scores).map((v) => v?.biasScore ?? 0);
   }
   if (!Array.isArray(values) || values.length === 0) {
-    return 0
+    return 0;
   }
-  const mean = values.reduce((a, b) => a + b, 0) / values.length
-  const variance =
-    values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length
-  const std = Math.sqrt(variance)
+  const mean = values.reduce((a, b) => a + b, 0) / values.length;
+  const variance = values.reduce((a, b) => a + (b - mean) ** 2, 0) / values.length;
+  const std = Math.sqrt(variance);
   // Normalize std by max possible (0.5 for values in [0,1]) so high variance -> low confidence
-  return Math.max(0, Math.min(1, 1 - 2 * std))
+  return Math.max(0, Math.min(1, 1 - 2 * std));
 }
 
 export function determineAlertLevel(
   score: number,
   thresholds: {
-    warningLevel: number
-    highLevel: number
-    criticalLevel: number
+    warningLevel: number;
+    highLevel: number;
+    criticalLevel: number;
   },
 ): AlertLevel {
   if (score < thresholds.warningLevel) {
-    return 'low'
+    return "low";
   }
   if (score < thresholds.highLevel) {
-    return 'medium'
+    return "medium";
   }
   if (score < thresholds.criticalLevel) {
-    return 'high'
+    return "high";
   }
-  return 'critical'
+  return "critical";
 }
 
 export function calculateFairnessMetrics(
-  groupMetrics: Record<
-    string,
-    { tp: number; fp: number; tn: number; fn: number }
-  >,
+  groupMetrics: Record<string, { tp: number; fp: number; tn: number; fn: number }>,
 ) {
-  const groups = Object.keys(groupMetrics)
+  const groups = Object.keys(groupMetrics);
   if (groups.length < 2) {
-    throw new Error('At least two demographic groups required')
+    throw new Error("At least two demographic groups required");
   }
-  const positiveRates: number[] = []
-  const tprs: number[] = []
-  const fprs: number[] = []
+  const positiveRates: number[] = [];
+  const tprs: number[] = [];
+  const fprs: number[] = [];
   for (const g of groups) {
-    const m = groupMetrics[g]
-    const { tp, fp, tn, fn } = m
-    const total = tp + fp + tn + fn
-    const pr = total > 0 ? (tp + fp) / total : 0
-    const tpr = tp + fn > 0 ? tp / (tp + fn) : 0
-    const fpr = fp + tn > 0 ? fp / (fp + tn) : 0
-    positiveRates.push(pr)
-    tprs.push(tpr)
-    fprs.push(fpr)
+    const m = groupMetrics[g];
+    const { tp, fp, tn, fn } = m;
+    const total = tp + fp + tn + fn;
+    const pr = total > 0 ? (tp + fp) / total : 0;
+    const tpr = tp + fn > 0 ? tp / (tp + fn) : 0;
+    const fpr = fp + tn > 0 ? fp / (fp + tn) : 0;
+    positiveRates.push(pr);
+    tprs.push(tpr);
+    fprs.push(fpr);
   }
-  const spread = (arr: number[]) => Math.max(...arr) - Math.min(...arr)
-  const demographicParity = spread(positiveRates)
-  const tprSpread = spread(tprs)
-  const fprSpread = spread(fprs)
-  const equalOpportunity = tprSpread
-  const equalizedOdds = (tprSpread + fprSpread) / 2
-  const calibration = Math.max(0, 1 - demographicParity)
-  const individualFairness = Math.max(0, 1 - equalizedOdds)
-  const counterfactualFairness = individualFairness
+  const spread = (arr: number[]) => Math.max(...arr) - Math.min(...arr);
+  const demographicParity = spread(positiveRates);
+  const tprSpread = spread(tprs);
+  const fprSpread = spread(fprs);
+  const equalOpportunity = tprSpread;
+  const equalizedOdds = (tprSpread + fprSpread) / 2;
+  const calibration = Math.max(0, 1 - demographicParity);
+  const individualFairness = Math.max(0, 1 - equalizedOdds);
+  const counterfactualFairness = individualFairness;
   return {
     demographicParity,
     equalizedOdds,
@@ -354,35 +331,35 @@ export function calculateFairnessMetrics(
     calibration,
     individualFairness,
     counterfactualFairness,
-  }
+  };
 }
 
 // Error helpers
 export class BiasDetectionError extends Error {
-  code: string
-  data: Record<string, unknown>
-  retryable: boolean
-  recoverable: boolean
-  sessionId?: string
+  code: string;
+  data: Record<string, unknown>;
+  retryable: boolean;
+  recoverable: boolean;
+  sessionId?: string;
   constructor(
     code: string,
     message: string,
     data: Record<string, unknown> = {},
     retryable = false,
   ) {
-    super(message)
-    this.name = 'BiasDetectionError'
-    this.code = code
-    this.data = data
-    this.retryable = retryable
-    this.recoverable = retryable
-    if (data && typeof data === 'object' && 'sessionId' in data) {
-      this.sessionId = String(data['sessionId'])
+    super(message);
+    this.name = "BiasDetectionError";
+    this.code = code;
+    this.data = data;
+    this.retryable = retryable;
+    this.recoverable = retryable;
+    if (data && typeof data === "object" && "sessionId" in data) {
+      this.sessionId = String(data["sessionId"]);
     }
   }
 
   override toString(): string {
-    return this.message
+    return this.message;
   }
 }
 
@@ -392,17 +369,17 @@ export function createBiasDetectionError(
   data: Record<string, unknown> = {},
   retryable = false,
 ) {
-  return new BiasDetectionError(code, message, data, retryable)
+  return new BiasDetectionError(code, message, data, retryable);
 }
 
 export function isBiasDetectionError(err: unknown): err is BiasDetectionError {
   return (
     err instanceof BiasDetectionError ||
-    (typeof err === 'object' &&
+    (typeof err === "object" &&
       err !== null &&
-      'name' in err &&
-      (err as Record<string, unknown>)['name'] === 'BiasDetectionError')
-  )
+      "name" in err &&
+      (err as Record<string, unknown>)["name"] === "BiasDetectionError")
+  );
 }
 
 export function handleBiasDetectionError(
@@ -412,15 +389,15 @@ export function handleBiasDetectionError(
   if (isBiasDetectionError(error)) {
     return {
       shouldRetry: error.retryable,
-      alertLevel: 'medium' as AlertLevel,
-    }
+      alertLevel: "medium" as AlertLevel,
+    };
   }
-  return { shouldRetry: false, alertLevel: 'critical' as AlertLevel }
+  return { shouldRetry: false, alertLevel: "critical" as AlertLevel };
 }
 
 // Data transformation to/from Python
 export function transformSessionForPython(session: TherapeuticSession): Record<string, unknown> {
-  const demo = session.participantDemographics!
+  const demo = session.participantDemographics!;
   return {
     session_id: session.sessionId,
     timestamp: (session.timestamp ?? new Date()).toISOString(),
@@ -452,16 +429,18 @@ export function transformSessionForPython(session: TherapeuticSession): Record<s
       confidence_level: t.confidenceLevel,
     })),
     metadata: session.metadata,
-  }
+  };
 }
 
-export function transformPythonResponse(response: Record<string, unknown>): Record<string, unknown> {
+export function transformPythonResponse(
+  response: Record<string, unknown>,
+): Record<string, unknown> {
   return {
-    overallBiasScore: response['overall_bias_score'],
-    confidence: response['confidence'],
-    alertLevel: response['alert_level'],
-    recommendations: response['recommendations'],
-  }
+    overallBiasScore: response["overall_bias_score"],
+    confidence: response["confidence"],
+    alertLevel: response["alert_level"],
+    recommendations: response["recommendations"],
+  };
 }
 
 // HIPAA/Audit utilities
@@ -469,10 +448,10 @@ export function createAuditLogEntry(
   userId: string,
   userEmail: string,
   action: {
-    type: string
-    category: string
-    description: string
-    sensitivityLevel: string
+    type: string;
+    category: string;
+    description: string;
+    sensitivityLevel: string;
   },
   resource: string,
   details: Record<string, unknown>,
@@ -484,87 +463,84 @@ export function createAuditLogEntry(
     userEmail,
     action,
     resource,
-    resourceId: details['resourceId'] as string | undefined,
+    resourceId: details["resourceId"] as string | undefined,
     details,
     ipAddress: reqInfo.ipAddress,
     userAgent: reqInfo.userAgent,
     sessionId,
     timestamp: new Date(),
     success: true,
-  }
+  };
 }
 
 export function requiresAdditionalAuth(
-  dataType: 'session-data' | 'demographics' | string,
+  dataType: "session-data" | "demographics" | string,
   role: string,
-  sensitivity: 'low' | 'medium' | 'high' | 'critical',
+  sensitivity: "low" | "medium" | "high" | "critical",
 ) {
-  if (sensitivity === 'high' || sensitivity === 'critical') {
-    return true
+  if (sensitivity === "high" || sensitivity === "critical") {
+    return true;
   }
-  if (dataType === 'demographics') {
-    return role !== 'admin'
+  if (dataType === "demographics") {
+    return role !== "admin";
   }
-  if (dataType === 'session-data') {
-    return role === 'viewer'
+  if (dataType === "session-data") {
+    return role === "viewer";
   }
-  return false
+  return false;
 }
 
 export function generateAnonymizedId(input: string, salt: string): string {
-  const hash = crypto
-    .createHash('sha256')
-    .update(`${salt}:${input}`)
-    .digest('hex')
-  return `anon_${hash.slice(0, 16)}`
+  const hash = crypto.createHash("sha256").update(`${salt}:${input}`).digest("hex");
+  return `anon_${hash.slice(0, 16)}`;
 }
 
 // Example session data for testing
 const session = {
-  sessionId: 'example-session-id',
+  sessionId: "example-session-id",
   timestamp: new Date(),
   participantDemographics: {
-    age: '26-35',
-    gender: 'prefer-not-to-say',
-    ethnicity: 'not-specified',
-    primaryLanguage: 'en',
-    socioeconomicStatus: 'middle',
-    education: 'bachelor',
-    region: 'unknown',
+    age: "26-35",
+    gender: "prefer-not-to-say",
+    ethnicity: "not-specified",
+    primaryLanguage: "en",
+    socioeconomicStatus: "middle",
+    education: "bachelor",
+    region: "unknown",
   },
   scenario: {
-    scenarioId: 'scenario-id-test',
-    type: 'depression',
-    complexity: 'beginner',
-    tags: ['test'],
-    description: 'Test scenario description',
-    learningObjectives: ['Objective 1'],
+    scenarioId: "scenario-id-test",
+    type: "depression",
+    complexity: "beginner",
+    tags: ["test"],
+    description: "Test scenario description",
+    learningObjectives: ["Objective 1"],
   },
   content: {
-    patientPresentation: 'Test patient presentation',
-    therapeuticInterventions: ['Intervention 1'],
-    patientResponses: ['Response 1'],
-    sessionNotes: 'Session notes here',
+    patientPresentation: "Test patient presentation",
+    therapeuticInterventions: ["Intervention 1"],
+    patientResponses: ["Response 1"],
+    sessionNotes: "Session notes here",
   },
   aiResponses: [],
   transcripts: [],
   metadata: {
-    trainingInstitution: 'Test Institution',
-    traineeId: 'trainee-test-id',
+    trainingInstitution: "Test Institution",
+    traineeId: "trainee-test-id",
     sessionDuration: 30,
-    completionStatus: 'partial',
+    completionStatus: "partial",
   },
-}
+};
 
 // Validation function for testing (call manually when needed)
 export function validateExampleSession() {
   try {
-    const rawSession = TherapeuticSessionSchema.parse(session)
-    console.log('Session validation successful:', rawSession)
-    return rawSession
+    const rawSession = TherapeuticSessionSchema.parse(session);
+    logger.info("Session validation successful:", rawSession);
+    return rawSession;
   } catch (error: unknown) {
-    console.error('Error parsing session data:', error)
-    throw error
+    logger.error("Error parsing session data:", error);
+    throw error;
   }
 }
 
@@ -577,30 +553,27 @@ export function isWithinRange(
   max: number,
   inclusive: boolean,
 ): boolean {
-  return inclusive ? value >= min && value <= max : value > min && value < max
+  return inclusive ? value >= min && value <= max : value > min && value < max;
 }
 
 /**
  * Calculate percentage change between two values
  */
-export function calculatePercentageChange(
-  oldValue: number,
-  newValue: number,
-): number {
+export function calculatePercentageChange(oldValue: number, newValue: number): number {
   if (oldValue === 0) {
-    return newValue === 0 ? 0 : 100
+    return newValue === 0 ? 0 : 100;
   }
-  return ((newValue - oldValue) / oldValue) * 100
+  return ((newValue - oldValue) / oldValue) * 100;
 }
 
 /**
  * Generate analysis summary from bias detection results
  */
 export function generateAnalysisSummary(results: BiasAnalysisResult[]): {
-  totalSessions: number
-  averageBiasScore: number
-  alertDistribution: Record<string, number>
-  topRecommendations: string[]
+  totalSessions: number;
+  averageBiasScore: number;
+  alertDistribution: Record<string, number>;
+  topRecommendations: string[];
 } {
   if (!Array.isArray(results) || results.length === 0) {
     return {
@@ -608,55 +581,54 @@ export function generateAnalysisSummary(results: BiasAnalysisResult[]): {
       averageBiasScore: 0,
       alertDistribution: {},
       topRecommendations: [],
-    }
+    };
   }
-  const totalSessions = results.length
+  const totalSessions = results.length;
   const averageBiasScore =
-    results.reduce((sum, r) => sum + (r.overallBiasScore ?? 0), 0) /
-    totalSessions
-  const alertDistribution: Record<string, number> = {}
-  const recCounts: Record<string, number> = {}
+    results.reduce((sum, r) => sum + (r.overallBiasScore ?? 0), 0) / totalSessions;
+  const alertDistribution: Record<string, number> = {};
+  const recCounts: Record<string, number> = {};
   for (const r of results) {
-    alertDistribution[r.alertLevel] = (alertDistribution[r.alertLevel] ?? 0) + 1
+    alertDistribution[r.alertLevel] = (alertDistribution[r.alertLevel] ?? 0) + 1;
     for (const rec of r.recommendations || []) {
-      recCounts[rec] = (recCounts[rec] ?? 0) + 1
+      recCounts[rec] = (recCounts[rec] ?? 0) + 1;
     }
   }
   const topRecommendations = Object.entries(recCounts)
     .sort((a, b) => b[1] - a[1])
-    .map(([k]) => k)
+    .map(([k]) => k);
   return {
     totalSessions,
     averageBiasScore,
     alertDistribution,
     topRecommendations,
-  }
+  };
 }
 
 /**
  * Deep clone an object
  */
 export function deepClone<T>(obj: T): T {
-  if (obj === null || typeof obj !== 'object') {
-    return obj
+  if (obj === null || typeof obj !== "object") {
+    return obj;
   }
 
   if (obj instanceof Date) {
-    return new Date(obj.getTime()) as unknown as T
+    return new Date(obj.getTime()) as unknown as T;
   }
 
   if (Array.isArray(obj)) {
-    return obj.map((item) => deepClone(item)) as unknown as T
+    return obj.map((item) => deepClone(item)) as unknown as T;
   }
 
-  const cloned = {} as T
+  const cloned = {} as T;
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      cloned[key] = deepClone(obj[key])
+      cloned[key] = deepClone(obj[key]);
     }
   }
 
-  return cloned
+  return cloned;
 }
 
 /**
@@ -666,17 +638,17 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number,
 ): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: NodeJS.Timeout | null = null;
 
   return (...args: Parameters<T>) => {
     if (timeout) {
-      clearTimeout(timeout)
+      clearTimeout(timeout);
     }
 
     timeout = setTimeout(() => {
-      func(...args)
-    }, wait)
-  }
+      func(...args);
+    }, wait);
+  };
 }
 
 /**
@@ -687,35 +659,35 @@ export async function retryWithBackoff<T>(
   maxRetries: number = 3,
   baseDelay: number = 1000,
 ): Promise<T> {
-  let lastError: Error
+  let lastError: Error;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      return await fn()
+      return await fn();
     } catch (error: unknown) {
-      lastError = error instanceof Error ? error : new Error(String(error))
+      lastError = error instanceof Error ? error : new Error(String(error));
 
       if (attempt === maxRetries) {
-        throw lastError
+        throw lastError;
       }
 
-      const delay = baseDelay * Math.pow(2, attempt)
-      await new Promise((resolve) => setTimeout(resolve, delay))
+      const delay = baseDelay * Math.pow(2, attempt);
+      await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
 
-  throw lastError!
+  throw lastError!;
 }
 
 /**
  * Format bias score for display
  */
 export function formatBiasScore(score: number): string {
-  if (typeof score !== 'number' || isNaN(score)) {
-    return 'N/A'
+  if (typeof score !== "number" || isNaN(score)) {
+    return "N/A";
   }
-  const pct = Math.max(0, Math.min(1, score)) * 100
-  return `${pct.toFixed(1)}%`
+  const pct = Math.max(0, Math.min(1, score)) * 100;
+  return `${pct.toFixed(1)}%`;
 }
 
 /**
@@ -723,38 +695,112 @@ export function formatBiasScore(score: number): string {
  */
 export function formatTimestamp(timestamp: Date | string | number): string {
   try {
-    const date = new Date(timestamp)
+    const date = new Date(timestamp);
     if (isNaN(date.getTime())) {
-      return 'Invalid date'
+      return "Invalid date";
     }
-    const pad = (n: number) => String(n).padStart(2, '0')
-    const y = date.getUTCFullYear()
-    const m = pad(date.getUTCMonth() + 1)
-    const d = pad(date.getUTCDate())
-    const hh = pad(date.getUTCHours())
-    const mm = pad(date.getUTCMinutes())
-    const ss = pad(date.getUTCSeconds())
-    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const y = date.getUTCFullYear();
+    const m = pad(date.getUTCMonth() + 1);
+    const d = pad(date.getUTCDate());
+    const hh = pad(date.getUTCHours());
+    const mm = pad(date.getUTCMinutes());
+    const ss = pad(date.getUTCSeconds());
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
   } catch {
-    return 'Invalid date'
+    return "Invalid date";
   }
 }
 
 export function getAllowedOrigin(origin: string | undefined): string {
-  const allowedOriginsEnv = process.env['ALLOWED_ORIGINS']
+  const allowedOriginsEnv = process.env["ALLOWED_ORIGINS"];
   if (!allowedOriginsEnv) {
-    return '' // Strict default
+    return ""; // Strict default
   }
 
-  const allowedOrigins = allowedOriginsEnv.split(',').map((o) => o.trim())
-
-  if (allowedOrigins.includes('*')) {
-    return '*'
-  }
+  const allowedOrigins = allowedOriginsEnv.split(",").map((o) => o.trim());
 
   if (origin && allowedOrigins.includes(origin)) {
-    return origin
+    return origin;
   }
 
-  return ''
+  return "";
 }
+
+// Unit tests for getAllowedOrigin function
+describe("getAllowedOrigin", () => {
+  const originalEnv = process.env["ALLOWED_ORIGINS"];
+
+  afterEach(() => {
+    // Restore original environment
+    if (originalEnv === undefined) {
+      delete process.env["ALLOWED_ORIGINS"];
+    } else {
+      process.env["ALLOWED_ORIGINS"] = originalEnv;
+    }
+  });
+
+  describe("when ALLOWED_ORIGINS is not set", () => {
+    it("should return empty string for undefined origin", () => {
+      delete process.env["ALLOWED_ORIGINS"];
+      const result = getAllowedOrigin(undefined);
+      expect(result).toBe("");
+    });
+
+    it("should return empty string for any origin", () => {
+      delete process.env["ALLOWED_ORIGINS"];
+      const result = getAllowedOrigin("https://example.com");
+      expect(result).toBe("");
+    });
+  });
+
+  describe("when ALLOWED_ORIGINS is set", () => {
+    it("should return empty string when origin is not in allowed list", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://allowed1.com,https://allowed2.com";
+      const result = getAllowedOrigin("https://disallowed.com");
+      expect(result).toBe("");
+    });
+
+    it("should return the origin when it is in the allowed list", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://allowed1.com,https://allowed2.com";
+      const result = getAllowedOrigin("https://allowed1.com");
+      expect(result).toBe("https://allowed1.com");
+    });
+
+    it("should handle origins with extra whitespace", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://allowed1.com , https://allowed2.com";
+      const result = getAllowedOrigin("https://allowed2.com");
+      expect(result).toBe("https://allowed2.com");
+    });
+
+    it("should return empty string for undefined origin even when allowed list exists", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://allowed1.com";
+      const result = getAllowedOrigin(undefined);
+      expect(result).toBe("");
+    });
+
+    it("should be case-sensitive when matching origins", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://Allowed.COM";
+      const result = getAllowedOrigin("https://allowed.com");
+      expect(result).toBe("");
+    });
+
+    it("should handle single allowed origin", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://only-allowed.com";
+      const result = getAllowedOrigin("https://only-allowed.com");
+      expect(result).toBe("https://only-allowed.com");
+    });
+
+    it("should handle origins with ports", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://example.com:8080";
+      const result = getAllowedOrigin("https://example.com:8080");
+      expect(result).toBe("https://example.com:8080");
+    });
+
+    it("should return empty string when origin has different port", () => {
+      process.env["ALLOWED_ORIGINS"] = "https://example.com:8080";
+      const result = getAllowedOrigin("https://example.com:3000");
+      expect(result).toBe("");
+    });
+  });
+});

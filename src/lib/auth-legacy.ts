@@ -1,5 +1,7 @@
 import type { AstroCookies } from 'astro'
 
+import { createBuildSafeLogger } from '@/lib/logging/build-safe-logger'
+
 import type { AuthRole } from '../config/auth.config'
 import { authConfig, hasRolePrivilege } from '../config/auth.config'
 import {
@@ -10,12 +12,13 @@ import {
 } from './audit'
 import type { AuditMetadata } from './audit/types'
 import { getIdentityProvider } from './auth/identity-provider'
+const logger = createBuildSafeLogger('auth-legacy')
 
 let warnedAboutDeprecation = false
 
 if (process.env['NODE_ENV'] !== 'test' && !warnedAboutDeprecation) {
   warnedAboutDeprecation = true
-  console.warn(
+  logger.warn(
     '[auth-legacy] This module is the final thin shim before removal. ' +
       'All new code should use src/lib/auth/identity-provider.ts directly. ' +
       'Run `pnpm tsx scripts/auth-cutover-check.ts <user-ids>` with ' +
@@ -113,7 +116,7 @@ export async function getCurrentUser(
       metadata: toMetadataRecord(user.userMetadata),
     }
   } catch (error: unknown) {
-    console.error('Error getting current user:', error)
+    logger.error('Error getting current user:', error)
     return null
   }
 }
@@ -140,7 +143,7 @@ export async function isAuthenticated(cookies: AstroCookies): Promise<boolean> {
     )
     return !!decoded
   } catch (error: unknown) {
-    console.error('Error checking authentication:', error)
+    logger.error('Error checking authentication:', error)
     return false
   }
 }
@@ -181,7 +184,7 @@ export async function createAuthAuditLog(entry: {
       status: AuditEventStatus.SUCCESS,
     })
   } catch (error: unknown) {
-    console.error('Error logging auth audit event:', error)
+    logger.error('Error logging auth audit event:', error)
   }
 }
 
