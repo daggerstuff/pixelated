@@ -400,3 +400,7 @@ infra/sinker/caddy/oauth2-proxy-cfg.env
 # === DOWNLOADED CLI TOOLS ===
 ngc-cli.md5
 ngc-cli/
+
+aws/dist
+cf-workers/workers-ai-mcp
+notebooks
