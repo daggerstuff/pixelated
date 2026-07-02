@@ -271,6 +271,8 @@ export default defineConfig({
   adapter,
   trailingSlash: 'ignore',
   build: {
+    // Node adapter handler lands in entry2.mjs because Astro middleware keeps entry.mjs.
+    serverEntry: 'entry2.mjs',
     format: 'directory',
     // Enable hidden source maps in production for Sentry upload.
     // "hidden" generates .map files but omits the //# sourceMappingURL comment
@@ -327,6 +329,26 @@ export default defineConfig({
     },
     plugins: [
       {
+        name: 'fix-vite-client-input',
+        buildApp: {
+          order: 'pre',
+          async handler(builder) {
+            const originalBuild = builder.build.bind(builder)
+            builder.build = async (environment) => {
+              if (environment.name === 'client') {
+                const rolldownInput = environment.config.build?.rolldownOptions?.input
+                if (rolldownInput) {
+                  environment.config.build.rollupOptions =
+                    environment.config.build.rollupOptions || {}
+                  environment.config.build.rollupOptions.input = rolldownInput
+                }
+              }
+              return originalBuild(environment)
+            }
+          },
+        },
+      },
+      {
         name: 'fix-vite-ssr-input',
         enforce: 'post',
         resolveId(id) {
@@ -345,11 +367,14 @@ export default defineConfig({
 
             for (const [name, env] of Object.entries(config.environments)) {
               if (env.build?.rolldownOptions) {
-                // Ensure rollupOptions exists
-                env.build.rollupOptions = env.build.rollupOptions || {}
-
-                // Copy properties
+                // Only mirror rolldown options for server-side build environments.
+                // Touching client creates empty rollupOptions and Rollup falls back to
+                // index.html, producing an empty client chunk (blank Vercel page).
                 if (name === 'ssr' || name === 'server') {
+                  // Ensure rollupOptions exists
+                  env.build.rollupOptions = env.build.rollupOptions || {}
+
+                  // Copy properties
                   if (env.build.rolldownOptions.input) {
                     // Copy as an object to match what Astro/Vercel expects
                     if (typeof env.build.rolldownOptions.input === 'string') {
