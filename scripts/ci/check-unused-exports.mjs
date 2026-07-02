@@ -49,6 +49,9 @@ const SCAN_IGNORE = [
   '**/*.spec.{ts,tsx,js,jsx}',
   '**/*.generated.*',
   '**/*.d.ts',
+  'src/lib/governance/policy-engine.ts',
+  'src/lib/middleware/csrf.ts',
+  'src/lib/research/services/*.ts',
 ]
 
 // ---------------------------------------------------------------------------

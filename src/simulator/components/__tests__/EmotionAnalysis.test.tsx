@@ -4,6 +4,7 @@ import { SimulatorProvider } from '../../context/SimulatorContext'
 import { EmotionAnalysis } from '../EmotionAnalysis'
 
 // Mock the child components
+import React, { useEffect } from 'react'
 vi.mock('../EmotionDetector', () => ({
   EmotionDetector: vi.fn(
     ({
@@ -15,14 +16,16 @@ vi.mock('../EmotionDetector', () => ({
         dominance: number
       }) => void
     }) => {
-      // Simulate analysis completion after a delay
-      setTimeout(() => {
-        onAnalysisComplete({
-          valence: 0.8,
-          energy: 0.6,
-          dominance: 0.7,
-        })
-      }, 100)
+      useEffect(() => {
+        const timer = setTimeout(() => {
+          onAnalysisComplete({
+            valence: 0.8,
+            energy: 0.6,
+            dominance: 0.7,
+          })
+        }, 10)
+        return () => clearTimeout(timer)
+      }, [onAnalysisComplete])
       return <div data-testid="emotion-detector">Emotion Detector</div>
     },
   ),

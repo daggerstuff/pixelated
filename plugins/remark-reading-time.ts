@@ -11,7 +11,7 @@ import type { VFile } from 'vfile'
 function remarkReadingTime() {
   //
   return (tree: Root, file: VFile) => {
-    const frontmatter = file.data.astro?.frontmatter
+    const frontmatter = (file.data as any).astro?.frontmatter
     if (
       !frontmatter ||
       frontmatter['minutesRead'] ||

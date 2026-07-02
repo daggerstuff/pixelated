@@ -6,12 +6,32 @@ import { PythonBiasDetectionBridge } from '../python-bridge'
 // Mock fetch globally
 global.fetch = vi.fn()
 
+// Track intervals to clean them up after each test
+const activeIntervals = new Set<NodeJS.Timeout>()
+const originalSetInterval = global.setInterval
+global.setInterval = function (callback: any, ms?: number) {
+  const id = originalSetInterval(callback, ms)
+  activeIntervals.add(id)
+  return id
+} as any
+
+const originalClearInterval = global.clearInterval
+global.clearInterval = function (id: NodeJS.Timeout) {
+  activeIntervals.delete(id)
+  return originalClearInterval(id)
+} as any
+
 describe('analysis methods', () => {
   let bridge: PythonBiasDetectionBridge
   const mockConfig = {
     pythonServiceUrl: 'http://localhost:5000',
     pythonServiceTimeout: 30000,
   }
+
+  afterEach(() => {
+    activeIntervals.forEach(clearInterval)
+    activeIntervals.clear()
+  })
 
   beforeEach(() => {
     // Reset all mocks
@@ -29,6 +49,10 @@ describe('analysis methods', () => {
       mockConfig.pythonServiceUrl,
       mockConfig.pythonServiceTimeout,
     )
+  })
+
+  afterEach(() => {
+    bridge.stopHealthMonitoring()
   })
 
   describe('initialization', () => {
@@ -142,6 +166,8 @@ describe('analysis methods', () => {
 
       // Should return fallback result for timeout
       expect(result.fallbackMode).toBe(true)
+
+      timeoutBridge.stopHealthMonitoring()
     })
   })
 
