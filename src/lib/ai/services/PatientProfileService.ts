@@ -1,14 +1,5 @@
 import { KVStore } from "../../db/KVStore";
 import type { PatientProfile, ConversationMessage } from "../models/patient"; // Assuming createPatientProfile might be used or relevant
-// For ProfileIdentifier name
-
-/**
- * Profile identifier type
- */
-export type ProfileIdentifier = {
-  id: string; // Profile ID, likely same as CognitiveModel ID
-  name: string; // Patient's name from CognitiveModel
-};
 
 /**
  * Service for managing patient profiles (CRUD operations and history).
