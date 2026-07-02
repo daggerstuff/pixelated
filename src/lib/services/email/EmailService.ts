@@ -66,14 +66,14 @@ export class EmailService {      private readonly _resend: Resend | undefined
     if (!apiKey) {
       // Do not throw; run in disabled mode so upstream APIs don't 500
       this.isEnabled = false
-      this.resend = undefined
+      this._resend = undefined
       logger.warn(
         'Email service is disabled: missing RESEND_API_KEY. Emails will be skipped.',
       )
       return
     }
     this.isEnabled = true
-    this.resend = new Resend(apiKey)
+    this._resend = new Resend(apiKey)
   }
 
   /**
@@ -189,7 +189,7 @@ export class EmailService {      private readonly _resend: Resend | undefined
         }
 
         // Send email using Resend
-        const { data, error } = await (this as any).resend.emails.send(
+        const { data, error } = await this._resend!.emails.send(
           emailOptions,
         )
 

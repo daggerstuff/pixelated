@@ -250,9 +250,9 @@ const adapter = (() => {
       // "serve" (the default) targets self-hosted edge runtimes and is why
       // Vercel returns 404 NOT_FOUND — it can't find a serverless handler.
       web: true,
-      // Disable NFT tracing to avoid "URI malformed" errors from pnpm store
       // paths containing "+" characters that decodeURIComponent misinterprets.
       nft: false,
+      excludeFiles: ['./ai/**/*'],
     })
   }
   console.log('🟢 Using Node adapter for standard deployment')
@@ -279,16 +279,6 @@ export default defineConfig({
         to: 'templates/email',
       },
     ],
-    rollupOptions: {
-      output: {
-        // Manual chunk splitting for better caching
-        manualChunks: getChunkName,
-        // Optimized chunk naming for better caching
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-      },
-    },
   },
   vite: {
     server: {
@@ -331,61 +321,47 @@ export default defineConfig({
             },
           }
         : {},
-      rollupOptions: {
-        // Limit parallel file operations to prevent resource exhaustion
-        maxParallelFileOps: 2,
-        external: [
-          '@google-cloud/storage',
-          '@aws-sdk/client-s3',
-          '@aws-sdk/client-dynamodb',
-          '@aws-sdk/client-kms',
-          'redis',
-          'ioredis',
-          'pg',
-          'mysql2',
-          'sqlite3',
-          'better-sqlite3',
-          'axios',
-          'bcryptjs',
-          'jsonwebtoken',
-          'pdfkit',
-          '@tensorflow/tfjs',
-          '@tensorflow/tfjs-layers',
-          'mongodb',
-          'recharts',
-          'chart.js',
-          '@opentelemetry/api',
-          '@opentelemetry/otlp-exporter-base',
-          '@opentelemetry/exporter-trace-otlp-http',
-          '@opentelemetry/exporter-metrics-otlp-http',
-          '@opentelemetry/otlp-transformer',
-        ],
-        /** @param {RollupLog} warning */
-        /** @param {(warning: RollupLog) => void} warn */
-        onwarn(warning, warn) {
-          if (
-            warning.code === 'SOURCEMAP_ERROR' ||
-            warning.message.includes("didn't generate a sourcemap")
-          ) {
-            return
-          }
-          if (
-            warning.message.includes(
-              'externalized for browser compatibility',
-            ) ||
-            warning.message.includes('experimentalDisableStreaming') ||
-            (warning.message.includes('dynamically imported') &&
-              warning.message.includes('statically imported')) ||
-            warning.message.includes('icon "-"') ||
-            warning.message.includes("failed to load icon '-'")
-          ) {
-            return
-          }
-          warn(warning)
-        },
-      },
     },
     plugins: [
+      {
+        name: 'fix-vite-rollup-options',
+        enforce: 'post',
+        resolveId(id) {
+          if (id === 'virtual:dummy-client-entry') {
+            return '\0virtual:dummy-client-entry'
+          }
+        },
+        load(id) {
+          if (id === '\0virtual:dummy-client-entry') {
+            return 'export default {}'
+          }
+        },
+        config(config) {
+          if (config.build?.rolldownOptions) {
+            config.build.rollupOptions = {
+              ...(config.build.rollupOptions || {}),
+              ...config.build.rolldownOptions,
+            }
+          }
+          if (config.environments) {
+            for (const env of Object.values(config.environments)) {
+              if (env.build?.rolldownOptions) {
+                env.build.rollupOptions = {
+                  ...(env.build.rollupOptions || {}),
+                  ...env.build.rolldownOptions,
+                }
+              }
+              const input = env.build?.rollupOptions?.input
+              if (!input || (Array.isArray(input) && input.length === 0) || (typeof input === 'object' && Object.keys(input).length === 0)) {
+                if (env.build) {
+                  env.build.rollupOptions = env.build.rollupOptions || {}
+                  env.build.rollupOptions.input = 'virtual:dummy-client-entry'
+                }
+              }
+            }
+          }
+        },
+      },
       // Bundle analyzer for production builds
       shouldAnalyzeBundle &&
         visualizer({
