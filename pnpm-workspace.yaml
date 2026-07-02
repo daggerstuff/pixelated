@@ -330,4 +330,3 @@ overrides:
   ws: '>=8.21.0'
 patchedDependencies:
   '@astrojs/internal-helpers@0.10.0': patches/@astrojs__internal-helpers@0.10.0.patch
-  '@astrojs/vercel@10.0.8': patches/@astrojs__vercel@10.0.8.patch
