@@ -13,7 +13,7 @@ export type ProfileIdentifier = {
 /**
  * Service for managing patient profiles (CRUD operations and history).
  */
-import { createBuildSafeLogger } from '../../../logging/build-safe-logger'
+import { createBuildSafeLogger } from '../../logging/build-safe-logger'
 
 const patientLogger = createBuildSafeLogger('patient-profile-service')
 

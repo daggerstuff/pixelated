@@ -110,6 +110,15 @@ vi.mock('ws', () => {
   }
 })
 
+// Typed mock redis: avoids unbound-method lint on vi.mocked(redis.method!) / expect(redis.method!)
+const mockRedis = redis as unknown as {
+  lpush: ReturnType<typeof vi.fn>
+  rpoplpush: ReturnType<typeof vi.fn>
+  hset: ReturnType<typeof vi.fn>
+  hget: ReturnType<typeof vi.fn>
+  hgetall: ReturnType<typeof vi.fn>
+}
+
 describe('notificationService', () => {
   let notificationService: NotificationService
 
@@ -194,7 +203,7 @@ describe('notificationService', () => {
       const id = await notificationService.queueNotification(mockNotification)
 
       expect(id).toBeDefined()
-      expect(redis['lpush']).toHaveBeenCalledWith(
+      expect(mockRedis.lpush).toHaveBeenCalledWith(
         'notification_queue',
         expect.stringContaining(mockNotification.userId),
       )
@@ -250,17 +259,17 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return one item then null
-      vi?.mocked(redis['rpoplpush'])
+      mockRedis.rpoplpush
         .mockResolvedValueOnce(JSON.stringify(queueItem))
         .mockResolvedValueOnce(null as unknown as string)
 
       await notificationService.processQueue()
 
-      expect(redis['rpoplpush']).toHaveBeenCalledWith(
+      expect(mockRedis.rpoplpush).toHaveBeenCalledWith(
         'notification_queue',
         'notification_processing',
       )
-      expect(redis['hset']).toHaveBeenCalledWith(
+      expect(mockRedis.hset).toHaveBeenCalledWith(
         `notifications:${queueItem.userId}`,
         queueItem.id,
         expect.stringContaining(NotificationStatus.DELIVERED),
@@ -286,7 +295,7 @@ describe('notificationService', () => {
       }
 
       // Mock redis.rpoplpush to return the item
-      vi?.mocked(redis['rpoplpush']).mockResolvedValueOnce(
+      mockRedis.rpoplpush.mockResolvedValueOnce(
         JSON.stringify(queueItem),
       )
       vi.spyOn(
@@ -296,7 +305,7 @@ describe('notificationService', () => {
 
       await notificationService.processQueue()
 
-      expect(redis['hset']).toHaveBeenCalledWith(
+      expect(mockRedis.hset).toHaveBeenCalledWith(
         `notifications:${queueItem.userId}`,
         queueItem.id,
         expect.stringContaining(NotificationStatus.FAILED),
@@ -322,13 +331,13 @@ describe('notificationService', () => {
         error: null,
       }
 
-      vi?.mocked(redis['hget']).mockResolvedValueOnce(
+      mockRedis.hget.mockResolvedValueOnce(
         JSON.stringify(notification),
       )
 
       await notificationService.markAsRead('test-user', 'test-id')
 
-      expect(redis['hset']).toHaveBeenCalledWith(
+      expect(mockRedis.hset).toHaveBeenCalledWith(
         'notifications:test-user',
         'test-id',
         expect.stringContaining(NotificationStatus.READ),
@@ -336,7 +345,7 @@ describe('notificationService', () => {
     })
 
     it('should throw error for non-existent notification', async () => {
-      vi?.mocked(redis['hget']).mockResolvedValueOnce(null)
+      mockRedis.hget.mockResolvedValueOnce(null)
 
       await expect(
         notificationService.markAsRead('test-user', 'test-id'),
@@ -379,7 +388,7 @@ describe('notificationService', () => {
         }),
       }
 
-      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
+      mockRedis.hgetall.mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications('test-user')
 
@@ -409,7 +418,7 @@ describe('notificationService', () => {
         ]),
       )
 
-      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
+      mockRedis.hgetall.mockResolvedValueOnce(notifications)
 
       const result = await notificationService.getNotifications(
         'test-user',
@@ -472,7 +481,7 @@ describe('notificationService', () => {
         }),
       }
 
-      vi?.mocked(redis['hgetall']).mockResolvedValueOnce(notifications)
+      mockRedis.hgetall.mockResolvedValueOnce(notifications)
 
       const count = await notificationService.getUnreadCount('test-user')
 
