@@ -12,7 +12,6 @@ import { pathToFileURL } from 'node:url'
 
 const serverDir = path.resolve(process.cwd(), 'dist/server')
 const targetName = 'entry2.mjs'
-const targetPath = path.join(serverDir, targetName)
 
 /** @param {string} fileName */
 async function moduleExports(fileName) {
