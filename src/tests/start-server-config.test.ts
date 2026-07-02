@@ -43,18 +43,18 @@ describe('start-server port fallback policy', () => {
     expect(policy.reasons).toContain('FORCE_EXIT_ON_EADDRINUSE is set')
   })
 
-  it('resolves the SSR entry from the current working directory by default', () => {
+  it('resolves the SSR entry from the current working directory by default', async () => {
     const cwd = '/workspace/pixelated'
 
-    const moduleUrl = resolveSsrEntryModuleUrl({ cwd, env: {} })
+    const moduleUrl = await resolveSsrEntryModuleUrl({ cwd, env: {} })
 
     expect(moduleUrl).toBe(
       pathToFileURL(path.resolve(cwd, 'dist/server/entry.mjs')).href,
     )
   })
 
-  it('uses SSR_ENTRY_FILE when an explicit entry path is provided', () => {
-    const moduleUrl = resolveSsrEntryModuleUrl({
+  it('uses SSR_ENTRY_FILE when an explicit entry path is provided', async () => {
+    const moduleUrl = await resolveSsrEntryModuleUrl({
       cwd: '/workspace/pixelated',
       env: {
         SSR_ENTRY_FILE: '/tmp/releases/current/dist/server/entry.mjs',

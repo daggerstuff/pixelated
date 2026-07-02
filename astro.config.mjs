@@ -348,10 +348,15 @@ export default defineConfig({
                 // Ensure rollupOptions exists
                 env.build.rollupOptions = env.build.rollupOptions || {}
                 
-                // Copy properties
+                // Copy rolldown input into rollupOptions for SSR/server builds.
+                // Do not override entryFileNames — Astro names the adapter bundle
+                // serverEntry (entry.mjs) and keeps middleware in a separate chunk.
                 if (name === 'ssr' || name === 'server') {
                   if (env.build.rolldownOptions.input) {
-                    // Copy as an object to match what Astro/Vercel expects
+                    // Copy as an object to match what Astro/Vercel expects.
+                    // Preserve adapter input keys (e.g. `index`) — renaming to `entry`
+                    // breaks Astro's isRolldownInput() matching and misnames the
+                    // server bundle (entry.js / entry2.mjs collisions).
                     if (typeof env.build.rolldownOptions.input === 'string') {
                       env.build.rollupOptions.input = { entry: env.build.rolldownOptions.input }
                     } else if (Array.isArray(env.build.rolldownOptions.input)) {
@@ -359,25 +364,10 @@ export default defineConfig({
                         env.build.rolldownOptions.input.map((v, i) => [i === 0 ? 'entry' : `entry_${i}`, v])
                       )
                     } else if (typeof env.build.rolldownOptions.input === 'object' && env.build.rolldownOptions.input !== null) {
-                      const inputObj = { ...env.build.rolldownOptions.input }
-                      if (inputObj.index && !inputObj.entry) {
-                        inputObj.entry = inputObj.index
-                        delete inputObj.index
-                      }
-                      env.build.rollupOptions.input = inputObj
+                      env.build.rollupOptions.input = { ...env.build.rolldownOptions.input }
                     } else {
                       env.build.rollupOptions.input = env.build.rolldownOptions.input
                     }
-                  }
-                  
-                  if (env.build.rolldownOptions.output) {
-                    env.build.rollupOptions.output = env.build.rollupOptions.output || {}
-                    Object.assign(env.build.rollupOptions.output, env.build.rolldownOptions.output)
-                    if (!Array.isArray(env.build.rollupOptions.output)) {
-                      env.build.rollupOptions.output.entryFileNames = 'entry.mjs'
-                    }
-                  } else {
-                    env.build.rollupOptions.output = { entryFileNames: 'entry.mjs' }
                   }
                 } else if (name === 'prerender') {
                   // For prerender env, do a normal spread without forcing entry.mjs
