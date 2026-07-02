@@ -12,6 +12,8 @@ import { getPerformanceOptimizer, type PerformanceOptimizer } from "./performanc
 import { PythonBiasDetectionBridge } from "./python-bridge";
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
+const biasLogger = createBuildSafeLogger("bias-detection");
+
 import type {
   AlertLevel,
   BiasDetectionConfig,
@@ -28,8 +30,6 @@ import type {
 const logger = createBuildSafeLogger("BiasDetectionEngine");
 
 type LayerResults = import("./types").LayerResults;
-
-export type AnalysisResult = import("./types").AnalysisResult;
 
 const DEFAULT_THRESHOLDS: BiasThresholdsConfig = {
   warning: 0.3,
@@ -226,7 +226,7 @@ export class BiasDetectionEngine {
     } catch (error: unknown) {
       // Fallback to null if performance optimizer fails to initialize
       this.performanceOptimizer = null;
-      auditLogger.warn("Performance optimizer initialization failed, using fallback mode:", error);
+      biasLogger.warn("Performance optimizer initialization failed, using fallback mode:", error);
     }
   }
 
@@ -466,7 +466,7 @@ export class BiasDetectionEngine {
       return result.value;
     }
     // Log the rejection reason with layer context (sanitized)
-    auditLogger.warn(`Layer ${layerName} analysis failed:`, result.reason);
+    biasLogger.warn(`Layer ${layerName} analysis failed:`, result.reason);
     recommendations.push(`${layerName} analysis unavailable; using fallback results`);
     return fallbackGetter();
   }
@@ -587,7 +587,7 @@ export class BiasDetectionEngine {
     try {
       await this.metricsCollector.storeAnalysisResult(result);
     } catch (err) {
-      auditLogger.warn("storeAnalysisResult failed:", err);
+      biasLogger.warn("storeAnalysisResult failed:", err);
     }
 
     // Store result in distributed cache for future retrieval
@@ -1114,17 +1114,17 @@ export class BiasDetectionEngine {
 
     // Log performance metrics
     if (options.logProgress !== false) {
-      auditLogger.info(
+      biasLogger.info(
         `[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`,
       );
-      auditLogger.info(
+      biasLogger.info(
         `[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`,
       );
     }
 
     if (options.logErrors !== false && errors.length > 0) {
       errors.forEach(({ session, error }) => {
-        auditLogger.error(
+        biasLogger.error(
           `[BatchError] Session ${session.sessionId}: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
       });
