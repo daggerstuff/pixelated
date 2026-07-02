@@ -13,6 +13,9 @@ import { SealScheme } from './seal-scheme'
 import { SealService } from './seal-service'
 import { SealSchemeType } from './seal-types'
 import type { FHEOperation } from './types'
+
+const logger = createBuildSafeLogger('fhe-factory')
+
 import type {
   FHEConfig,
   FHEService,
@@ -31,9 +34,6 @@ if (
 ) {
   ;(mockFHE.scheme as { version?: string }).version = '1.0.0'
 }
-
-// Initialize logger
-const logger = createBuildSafeLogger('fhe-factory')
 
 // Initialize SEAL service singleton
 const sealService = SealService.getInstance()
