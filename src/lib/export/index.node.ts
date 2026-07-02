@@ -13,8 +13,8 @@ import archiver from 'archiver'
 import PDFDocument from 'pdfkit'
 
 // Augment PDFKit types for methods used in this file
-interface PDFDocumentWithMethods extends PDFDocument {
-  on(event: string, callback: (...args: unknown[]) => void): this
+interface PDFDocumentWithMethods extends InstanceType<typeof PDFDocument> {
+  on(event: string, callback: (...args: unknown[]) => any): this
   save(): this
   restore(): this
   rotate(angle: number, options?: { origin?: [number, number] }): this
@@ -32,10 +32,10 @@ interface PDFDocumentWithMethods extends PDFDocument {
   lineTo(x: number, y: number): this
   stroke(): this
   moveDown(lines?: number): this
-  page: { width: number; height: number; y?: number }
   y: number
-  bufferedPageRange(): { count: number }
-  switchToPage(pageNumber: number): this
+  bufferedPageRange(): { start: number; count: number }
+  switchToPage(pageNumber: number): any
+  end(): void
 }
 
 import type { ChatMessage } from '../../types/chat'

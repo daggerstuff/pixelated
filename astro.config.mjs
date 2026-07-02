@@ -236,6 +236,9 @@ function getChunkName(id) {
     return 'mongoose-vendor'
   }
   if (normalizedId.includes('/node_modules/')) {
+    if (normalizedId.includes('node_modules/astro/')) {
+      return null
+    }
     return 'vendor'
   }
   return null
@@ -250,9 +253,9 @@ const adapter = (() => {
       // "serve" (the default) targets self-hosted edge runtimes and is why
       // Vercel returns 404 NOT_FOUND — it can't find a serverless handler.
       web: true,
-      // Disable NFT tracing to avoid "URI malformed" errors from pnpm store
       // paths containing "+" characters that decodeURIComponent misinterprets.
       nft: false,
+      excludeFiles: ['./ai/**/*'],
     })
   }
   console.log('🟢 Using Node adapter for standard deployment')
@@ -268,6 +271,8 @@ export default defineConfig({
   adapter,
   trailingSlash: 'ignore',
   build: {
+    // Node adapter handler lands in entry2.mjs because Astro middleware keeps entry.mjs.
+    serverEntry: isVercelDeploy ? 'index.js' : 'entry2.mjs',
     format: 'directory',
     // Enable hidden source maps in production for Sentry upload.
     // "hidden" generates .map files but omits the //# sourceMappingURL comment
@@ -279,16 +284,6 @@ export default defineConfig({
         to: 'templates/email',
       },
     ],
-    rollupOptions: {
-      output: {
-        // Manual chunk splitting for better caching
-        manualChunks: getChunkName,
-        // Optimized chunk naming for better caching
-        chunkFileNames: 'assets/[name]-[hash].js',
-        entryFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash].[ext]',
-      },
-    },
   },
   vite: {
     server: {
@@ -331,62 +326,136 @@ export default defineConfig({
             },
           }
         : {},
-      rollupOptions: {
-        // Limit parallel file operations to prevent resource exhaustion
-        maxParallelFileOps: 2,
-        external: [
-          '@google-cloud/storage',
-          '@aws-sdk/client-s3',
-          '@aws-sdk/client-dynamodb',
-          '@aws-sdk/client-kms',
-          'redis',
-          'ioredis',
-          'pg',
-          'mysql2',
-          'sqlite3',
-          'better-sqlite3',
-          'axios',
-          'bcryptjs',
-          'jsonwebtoken',
-          'pdfkit',
-          '@tensorflow/tfjs',
-          '@tensorflow/tfjs-layers',
-          'mongodb',
-          'recharts',
-          'chart.js',
-          '@opentelemetry/api',
-          '@opentelemetry/otlp-exporter-base',
-          '@opentelemetry/exporter-trace-otlp-http',
-          '@opentelemetry/exporter-metrics-otlp-http',
-          '@opentelemetry/otlp-transformer',
-        ],
-        /** @param {RollupLog} warning */
-        /** @param {(warning: RollupLog) => void} warn */
-        onwarn(warning, warn) {
-          if (
-            warning.code === 'SOURCEMAP_ERROR' ||
-            warning.message.includes("didn't generate a sourcemap")
-          ) {
-            return
-          }
-          if (
-            warning.message.includes(
-              'externalized for browser compatibility',
-            ) ||
-            warning.message.includes('experimentalDisableStreaming') ||
-            (warning.message.includes('dynamically imported') &&
-              warning.message.includes('statically imported')) ||
-            warning.message.includes('icon "-"') ||
-            warning.message.includes("failed to load icon '-'")
-          ) {
-            return
-          }
-          warn(warning)
-        },
-      },
     },
     plugins: [
-      // Bundle analyzer for production builds
+      {
+        name: 'fix-vite-client-input',
+        buildApp: {
+          order: 'pre',
+          async handler(builder) {
+            const originalBuild = builder.build.bind(builder)
+            builder.build = async (environment) => {
+              if (environment.name === 'client') {
+                const rolldownOptions =
+                  environment.config.build?.rolldownOptions
+                if (rolldownOptions) {
+                  const { checks: _checks, ...rollupCompatibleOptions } =
+                    rolldownOptions
+                  environment.config.build.rollupOptions = {
+                    ...(environment.config.build.rollupOptions || {}),
+                    ...rollupCompatibleOptions,
+                  }
+                }
+              }
+              return originalBuild(environment)
+            }
+          },
+        },
+      },
+      {
+        name: 'fix-vite-ssr-input',
+        enforce: 'post',
+        resolveId(id) {
+          if (id === 'virtual:dummy-ssr-entry') {
+            return '\0virtual:dummy-ssr-entry'
+          }
+        },
+        load(id) {
+          if (id === '\0virtual:dummy-ssr-entry') {
+            return 'export default {}'
+          }
+        },
+        config(config) {
+          if (config.environments) {
+            const ASTRO_MANAGED_ENVS = new Set(['client', 'server', 'ssr'])
+
+            for (const [name, env] of Object.entries(config.environments)) {
+              if (env.build?.rolldownOptions) {
+                // Ensure rollupOptions exists
+                env.build.rollupOptions = env.build.rollupOptions || {}
+
+                // Copy rolldown input into rollupOptions for SSR/server builds.
+                // Do not override entryFileNames — Astro names the adapter bundle
+                // serverEntry (entry.mjs) and keeps middleware in a separate chunk.
+                if (name === 'ssr' || name === 'server') {
+                  // Ensure rollupOptions exists
+                  env.build.rollupOptions = env.build.rollupOptions || {}
+
+                  // Copy properties
+                  if (env.build.rolldownOptions.input) {
+                    // Copy as an object to match what Astro/Vercel expects.
+                    // Preserve adapter input keys (e.g. `index`) — renaming to `entry`
+                    // breaks Astro's isRolldownInput() matching and misnames the
+                    // server bundle (entry.js / entry2.mjs collisions).
+                    if (typeof env.build.rolldownOptions.input === 'string') {
+                      env.build.rollupOptions.input = {
+                        entry: env.build.rolldownOptions.input,
+                      }
+                    } else if (Array.isArray(env.build.rolldownOptions.input)) {
+                      env.build.rollupOptions.input = Object.fromEntries(
+                        env.build.rolldownOptions.input.map((v, i) => [
+                          i === 0 ? 'entry' : `entry_${i}`,
+                          v,
+                        ]),
+                      )
+                    } else if (
+                      typeof env.build.rolldownOptions.input === 'object' &&
+                      env.build.rolldownOptions.input !== null
+                    ) {
+                      env.build.rollupOptions.input = {
+                        ...env.build.rolldownOptions.input,
+                      }
+                    } else {
+                      env.build.rollupOptions.input =
+                        env.build.rolldownOptions.input
+                    }
+                  }
+                } else if (name === 'prerender') {
+                  // For prerender env, do a normal spread without forcing entry.mjs
+                  env.build.rollupOptions = {
+                    ...env.build.rollupOptions,
+                    ...env.build.rolldownOptions,
+                  }
+                }
+              }
+
+              // Astro-managed environment names — their inputs are set by Astro
+              // during the build and must not be overridden with a dummy entry.
+              // Injecting a dummy input here causes the SSR manifest to contain a
+              // script entry with an undefined file path, which crashes
+              // splitAssetPath() at runtime (PIXEL-FAST-14).
+              if (ASTRO_MANAGED_ENVS.has(name)) continue
+
+              const input = env.build?.rollupOptions?.input
+              const inputIsEmpty =
+                !input ||
+                (Array.isArray(input) && input.length === 0) ||
+                (typeof input === 'object' &&
+                  !Array.isArray(input) &&
+                  Object.keys(input).length === 0)
+
+              if (inputIsEmpty && env.build) {
+                env.build.rollupOptions = env.build.rollupOptions || {}
+                env.build.rollupOptions.input = 'virtual:dummy-ssr-entry'
+              }
+            }
+          }
+        },
+      },
+      {
+        name: 'trace-mongodb',
+        enforce: 'pre',
+        resolveId(source, importer) {
+          if (
+            this.environment?.name === 'client' &&
+            (source.includes('mongodb') || source.includes('zstd'))
+          ) {
+            console.error(
+              `\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`,
+            )
+          }
+        },
+      },
       shouldAnalyzeBundle &&
         visualizer({
           filename: 'dist/bundle-analysis.html',

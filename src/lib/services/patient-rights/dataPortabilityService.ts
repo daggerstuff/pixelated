@@ -17,7 +17,11 @@ class AuditLoggingService {
     userId?: string
     details: Record<string, unknown>
   }): void {
-    logger.info(`[AUDIT:${this.context}]`, entry)
+    this.info(`[AUDIT:${this.context}]`, entry)
+  }
+
+  info(message: string, meta?: Record<string, unknown>): void {
+    console.log(`[${this.context}] ${message}`, meta ?? '')
   }
 }
 
@@ -39,7 +43,7 @@ const logger = createBuildSafeLogger('data-portability-service')
 const auditLogger = getAuditLogger('data-transfer')
 
 // Types for data portability and export
-export interface DataExportRequest {
+interface DataExportRequest {
   id: string
   patientId: string
   formats: ExportFormat[]
@@ -55,10 +59,24 @@ export interface DataExportRequest {
   error?: string
 }
 
+interface CreateDataExportParams {
+  patientId: string
+  initiatedBy: string
+  recipientType: 'provider' | 'patient' | 'research'
+  recipientName: string
+  recipientEmail: string
+  dataFormat: 'json' | 'csv' | 'fhir' | 'ccd' | 'hl7'
+  dataSections: string[]
+}
 
+interface DataExportResult {
+  exportRequest: DataExportRequest
+  message: string
+  success: boolean
+}
 
 // Define the PatientProfile interface
-export interface PatientProfile {
+interface PatientProfile {
   patient_id?: string
   last_name?: string
   first_name?: string
@@ -68,7 +86,7 @@ export interface PatientProfile {
 }
 
 // Define the export status types
-export type ExportStatus =
+type ExportStatus =
   | 'pending'
   | 'processing'
   | 'completed'
@@ -80,8 +98,18 @@ export type ExportStatus =
 export type ExportFormat = 'json' | 'csv' | 'pdf' | 'xml'
 
 // Export request interface
+interface ExportRequest {
+  patientId: string
+  format: ExportFormat
+  initiatedBy: string
+  includeCategories?: string[]
+  dateRange?: {
+    start?: string
+    end?: string
+  }
+}
 
-export interface ExportResult {
+interface ExportResult {
   success: boolean
   exportId?: string
   status?: ExportStatus
@@ -93,10 +121,58 @@ export interface ExportResult {
 }
 
 // Export status response
+interface ExportStatusResponse {
+  success: boolean
+  exportId: string
+  status: ExportStatus
+  progress: number
+  createdAt: Date
+  updatedAt: Date
+  completedAt?: Date
+  expiresAt?: Date
+  downloadUrl?: string
+  format: ExportFormat
+  dataTypes: string[]
+  estimatedCompletionTime?: Date
+  error?: string
+  message?: string
+}
 
-export type ExportPriority = 'normal' | 'high'
+// Export download response for successful operations
+interface ExportDownloadSuccessResponse {
+  success: true
+  exportId: string
+  format: ExportFormat
+  filename?: string
+  fileData?: Uint8Array | string
+  downloadUrl?: string
+  expiresAt?: Date
+}
 
-export type ExportFile = {
+// Export download response for errors
+interface ExportDownloadErrorResponse {
+  success: false
+  error:
+    | 'not_found'
+    | 'unauthorized'
+    | 'not_ready'
+    | 'expired'
+    | 'internal_error'
+  message?: string
+  status?: ExportStatus
+  progress?: number
+  estimatedCompletionTime?: Date
+  expiredAt?: Date
+}
+
+// Combined type for download responses
+type ExportDownloadResponse =
+  | ExportDownloadSuccessResponse
+  | ExportDownloadErrorResponse
+
+type ExportPriority = 'normal' | 'high'
+
+type ExportFile = {
   id: string
   exportId: string
   format: ExportFormat
@@ -106,7 +182,7 @@ export type ExportFile = {
   createdAt: Date
 }
 
-export type ExportRequestInput = {
+type ExportRequestInput = {
   patientId: string
   formats: ExportFormat[]
   dataTypes: string[]
@@ -115,7 +191,7 @@ export type ExportRequestInput = {
   requestedBy: string
 }
 
-export type ExportResponse = {
+type ExportResponse = {
   success: boolean
   exportId?: string
   status?: ExportStatus
@@ -596,16 +672,16 @@ export async function getAllDataExportRequests(filters?: {
   dateRange?: { start: string; end: string }
 }): Promise<DataExportRequest[]> {
   try {
-    const dbFilters: any = {}
+    const dbFilters: Record<string, unknown> = {}
     if (filters) {
       if (filters.status) {
-        dbFilters.status = filters.status
+        dbFilters['status'] = filters.status
       }
       if (filters.patientId) {
-        dbFilters.patientId = filters.patientId
+        dbFilters['patientId'] = filters.patientId
       }
       if (filters.dateRange) {
-        dbFilters.createdAt = {
+        dbFilters['createdAt'] = {
           $gte: new Date(filters.dateRange.start),
           $lte: new Date(filters.dateRange.end),
         }
@@ -626,7 +702,7 @@ export async function getAllDataExportRequests(filters?: {
 /**
  * Interface for the parameters required to cancel an export request
  */
-export interface CancelExportParams {
+interface CancelExportParams {
   exportId: string
   cancelledBy: string
   reason?: string
@@ -635,7 +711,7 @@ export interface CancelExportParams {
 /**
  * Interface for the result of a cancel export operation
  */
-export interface CancelExportResult {
+interface CancelExportResult {
   success: boolean
   message: string
   status?: string
@@ -756,7 +832,7 @@ export async function cancelDataExportRequest(
 /**
  * Interface for the result of a get export status operation
  */
-export interface ExportStatusResult {
+interface ExportStatusResult {
   success: boolean
   error?: string
   message?: string
@@ -779,7 +855,7 @@ export interface ExportStatusResult {
 /**
  * Interface for the result of a download data export operation
  */
-export interface DownloadExportResult {
+interface DownloadExportResult {
   success: boolean
   error?: string
   message?: string
@@ -988,39 +1064,63 @@ interface MockDbFindParams {
   include?: Record<string, unknown>
 }
 
-// Extend the db object with mock implementations
-const mockDb = {
-  ...db,
-  // Add mock implementations for missing models
+// Mock db shape used by the service functions below — gives the override
+// methods concrete return types so callers don't degrade to `any` (db is
+// `any`-typed upstream via mongoClient).
+interface MockDb {
   patient: {
-    findUnique: async (_params: MockDbFindParams): Promise<Patient | null> => {
-      return Promise.resolve({
-        id: _params.where['id'] as string,
-        name: 'Test Patient',
-      })
-    },
-  },
-  // dataExport and exportFile removed - now using dataExportDAO
+    findUnique: (params: MockDbFindParams) => Promise<Patient | null>
+  }
   patientUser: {
-    findFirst: async (_params: {
-      where: unknown
-    }): Promise<PatientUser | null> => {
-      return Promise.resolve(null)
-    },
-  },
+    findFirst: (params: { where: unknown }) => Promise<PatientUser | null>
+  }
   providerPatientAccess: {
-    findFirst: async (_params: {
+    findFirst: (params: {
       where: unknown
-    }): Promise<ProviderPatientAccess | null> => {
-      return Promise.resolve(null)
-    },
-  },
+    }) => Promise<ProviderPatientAccess | null>
+  }
   user: {
-    findUnique: async (_params: MockDbFindParams): Promise<User | null> => {
-      return Promise.resolve({
-        id: _params.where['id'] as string,
-        roles: [{ name: 'user' }],
-      })
+    findUnique: (params: MockDbFindParams) => Promise<User | null>
+  }
+}
+
+// Extend the db object with mock implementations
+const mockDb: MockDb = Object.assign(
+  Object.create(db) as Record<string, unknown>,
+  {
+    // Add mock implementations for missing models
+    patient: {
+      findUnique: async (
+        _params: MockDbFindParams,
+      ): Promise<Patient | null> => {
+        return Promise.resolve({
+          id: _params.where['id'] as string,
+          name: 'Test Patient',
+        })
+      },
+    },
+    // dataExport and exportFile removed - now using dataExportDAO
+    patientUser: {
+      findFirst: async (_params: {
+        where: unknown
+      }): Promise<PatientUser | null> => {
+        return Promise.resolve(null)
+      },
+    },
+    providerPatientAccess: {
+      findFirst: async (_params: {
+        where: unknown
+      }): Promise<ProviderPatientAccess | null> => {
+        return Promise.resolve(null)
+      },
+    },
+    user: {
+      findUnique: async (_params: MockDbFindParams): Promise<User | null> => {
+        return Promise.resolve({
+          id: _params.where['id'] as string,
+          roles: [{ name: 'user' }],
+        })
+      },
     },
   },
-}
+)
