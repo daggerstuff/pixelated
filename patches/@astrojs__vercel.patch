@@ -1,5 +1,5 @@
 diff --git a/dist/lib/nft.js b/dist/lib/nft.js
-index 27147c99ad52f891317d9ab4e428e5f71c7ced65..90b56f29d8e069cf4dbe238c217fd5d664864553 100644
+index 27147c99ad52f891317d9ab4e428e5f71c7ced65..b2f8f8e7fa3caee1beec25e5f71dc1d039df537c 100644
 --- a/dist/lib/nft.js
 +++ b/dist/lib/nft.js
 @@ -17,7 +17,8 @@ async function copyDependenciesToFunction({
@@ -8,7 +8,7 @@ index 27147c99ad52f891317d9ab4e428e5f71c7ced65..90b56f29d8e069cf4dbe238c217fd5d6
      base: fileURLToPath(base),
 -    cache
 +    cache,
-+    ignore: (file) => file.startsWith('ai/') || file.includes('/ai/')
++    ignore: (file) => file.match(/(?:^|\/|\\)ai(?:$|\/|\\)/) !== null && !file.includes('node_modules')
    });
    for (const error of result.warnings) {
      if (error.message.startsWith("Failed to resolve dependency")) {
