@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 /**
- * Ensure dist/server/<serverEntry> exists and exports the Node adapter handler.
+ * Ensure dist/server/entry2.mjs exists and exports the Node adapter handler.
  *
- * Astro preview and @astrojs/node expect build.serverEntry (entry2.mjs). Custom
+ * Astro preview and @astrojs/node use build.serverEntry (entry2.mjs). Custom
  * Vite rolldown bridging can leave the adapter bundle at index.js while
- * middleware occupies entry.mjs — this script normalizes the layout without
- * overwriting middleware-only entry.mjs.
+ * middleware occupies entry.mjs — this script normalizes the layout.
  */
 import { existsSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
