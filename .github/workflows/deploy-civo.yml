@@ -115,15 +115,17 @@ jobs:
           KUSTOMIZE_VERSION=5.6.0
           KUSTOMIZE_BASE_URL="https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}"
           KUSTOMIZE_ARCHIVE="kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          # NOTE: Keep this checksum pinned in-repo to avoid trusting a remote .sha256 file.
+          # Update this value when bumping KUSTOMIZE_VERSION.
+          EXPECTED_KUSTOMIZE_SHA256="REPLACE_WITH_REAL_SHA256_FOR_${KUSTOMIZE_ARCHIVE}"
 
           curl -sSfL "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}" -o "${KUSTOMIZE_ARCHIVE}"
-          curl -sSfL "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}.sha256" -o "${KUSTOMIZE_ARCHIVE}.sha256"
 
-          sha256sum --check "${KUSTOMIZE_ARCHIVE}.sha256"
+          echo "${EXPECTED_KUSTOMIZE_SHA256}  ${KUSTOMIZE_ARCHIVE}" | sha256sum -c -
 
           tar xzf "${KUSTOMIZE_ARCHIVE}"
           sudo mv kustomize /usr/local/bin/
-          rm "${KUSTOMIZE_ARCHIVE}" "${KUSTOMIZE_ARCHIVE}.sha256"
+          rm "${KUSTOMIZE_ARCHIVE}"
 
       - name: Deploy to Civo
         run: |
