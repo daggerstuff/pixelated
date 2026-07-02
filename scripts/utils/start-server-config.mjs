@@ -63,8 +63,8 @@ export async function resolveSsrEntryModuleUrl({ cwd = process.cwd(), env = proc
     return pathToFileURL(path.resolve(String(env.SSR_ENTRY_FILE))).href;
   }
 
-  const serverDir = path.resolve(cwd, "dist/server");
-  const defaultEntry = path.join(serverDir, "entry.mjs");
+  const serverDir = path.resolve(cwd, 'dist/server')
+  const defaultEntry = path.join(serverDir, 'entry2.mjs')
 
   if (existsSync(defaultEntry)) {
     try {
