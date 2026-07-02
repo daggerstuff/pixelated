@@ -1418,18 +1418,8 @@ export class RedisService extends EventEmitter implements IRedisService {
       const client = await this.ensureConnection()
       // ioredis returns [member, score] or [] if empty
       const result = await client.zpopmin(key)
-      if (
-        Array.isArray(result) &&
-        result.length === 2 &&
-        typeof result[0] === 'string' &&
-        typeof result[1] !== 'undefined'
-      ) {
-        return [{ value: result[0], score: Number(result[1]) }]
-      } else {
-        logger.debug(
-          `[RedisService] zpopmin: Unexpected result format for key ${key}:`,
-          result,
-        )
+      if (Array.isArray(result)) {
+        return result as RedisZSetMember[]
       }
       return []
     } catch (error: unknown) {
