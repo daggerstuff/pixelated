@@ -52,7 +52,8 @@ const EmailQueueItemSchema = z.object({
 
 type EmailQueueItem = z.infer<typeof EmailQueueItemSchema>
 
-export class EmailService {      private readonly _resend: Resend | undefined
+export class EmailService {
+  private readonly _resend: Resend | undefined
   private readonly isEnabled: boolean = false
   private readonly queueKey = 'email:queue'
   private readonly processingKey = 'email:processing'
@@ -189,9 +190,7 @@ export class EmailService {      private readonly _resend: Resend | undefined
         }
 
         // Send email using Resend
-        const { data, error } = await this._resend!.emails.send(
-          emailOptions,
-        )
+        const { data, error } = await this._resend!.emails.send(emailOptions)
 
         if (error) {
           throw error

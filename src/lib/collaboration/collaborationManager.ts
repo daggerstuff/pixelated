@@ -76,7 +76,8 @@ class CollaborationManager {
       CollaborationSession,
       'id' | 'createdAt' | 'participants' | 'status'
     >,
-  ): Promise<CollaborationSession> {      const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
+  ): Promise<CollaborationSession> {
+    const sessionId = `collab_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`
 
     const participant: Participant = {
       id: creator.id,

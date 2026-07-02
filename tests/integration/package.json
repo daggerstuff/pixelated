@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "Integration tests for Pixelated bias detection system",
   "type": "module",
-  "packageManager": "pnpm@11.9.0",
-  "engines": {
-    "node": ">=24"
-  },
   "scripts": {
     "test": "node integration-test-runner.ts",
     "test:watch": "node integration-test-runner.ts --watch",
@@ -24,5 +20,9 @@
     "@types/node": "^26.1.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9"
-  }
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.9.0"
 }

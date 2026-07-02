@@ -23,10 +23,7 @@ vi.mock('@/config/mongodb.config', () => {
               },
               _opts: { upsert: boolean },
             ) => {
-              store.set(
-                filter.sessionId,
-                update.$set,
-              )
+              store.set(filter.sessionId, update.$set)
               return { upsertedCount: 1 }
             },
           ),

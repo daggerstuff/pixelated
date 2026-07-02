@@ -1,5 +1,7 @@
 ---
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 import { FEATURES } from '@/config'
 
 export interface Props {
@@ -8,6 +10,7 @@ export interface Props {
 const { title = 'Chat' } = Astro.props
 const { cspNonce } = Astro.locals
 const { nprogress, mediumZoom } = FEATURES
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <html lang="en" class="dark scroll-smooth">
@@ -52,5 +55,15 @@ const { nprogress, mediumZoom } = FEATURES
     <main id="main-content" class="min-h-screen">
       <slot />
     </main>
+
+    <!-- Vercel Speed Insights and Analytics -->
+    {
+      shouldRenderAnalytics && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )
+    }
   </body>
 </html>

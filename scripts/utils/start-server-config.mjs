@@ -1,3 +1,4 @@
+import fs from 'node:fs'
 import process from 'process'
 import path from 'path'
 import { pathToFileURL } from 'url'
@@ -35,13 +36,27 @@ export function getPortFallbackPolicy(env = process.env) {
   }
 }
 
+const DEFAULT_SERVER_ENTRY_CANDIDATES = ['entry2.mjs', 'entry.mjs']
+
+/** @param {string} serverDir */
+function resolveDefaultServerEntryPath(serverDir) {
+  for (const candidate of DEFAULT_SERVER_ENTRY_CANDIDATES) {
+    const entryPath = path.join(serverDir, candidate)
+    if (fs.existsSync(entryPath)) {
+      return entryPath
+    }
+  }
+
+  return path.join(serverDir, DEFAULT_SERVER_ENTRY_CANDIDATES[0])
+}
+
 export function resolveSsrEntryModuleUrl({
   cwd = process.cwd(),
   env = process.env,
 } = {}) {
   const entryPath = hasConfiguredValue(env.SSR_ENTRY_FILE)
     ? path.resolve(String(env.SSR_ENTRY_FILE))
-    : path.resolve(cwd, 'dist/server/entry.mjs')
+    : resolveDefaultServerEntryPath(path.resolve(cwd, 'dist/server'))
 
   return pathToFileURL(entryPath).href
 }

@@ -22,7 +22,11 @@ const mockRedis = vi.hoisted(() => ({
   quit: vi.fn(),
   disconnect: vi.fn(),
   connect: vi.fn().mockResolvedValue(undefined),
-  call: vi.fn().mockImplementation(function(this: any, cmd: string, ...args: any[]) {
+  call: vi.fn().mockImplementation(function (
+    this: any,
+    cmd: string,
+    ...args: any[]
+  ) {
     if (this[cmd] && typeof this[cmd] === 'function') {
       return this[cmd](...args)
     }
@@ -121,7 +125,12 @@ describe('Redis Module', () => {
       mockRedis.set.mockResolvedValueOnce('OK')
       const result = await setInCache('test', { foo: 'bar' }, 3600)
       expect(result).toBe(true)
-      expect(mockRedis.set).toHaveBeenCalledWith('test', '{"foo":"bar"}', 'PX', 3600000)
+      expect(mockRedis.set).toHaveBeenCalledWith(
+        'test',
+        '{"foo":"bar"}',
+        'PX',
+        3600000,
+      )
     })
 
     it('should set key without expiration and return true', async () => {

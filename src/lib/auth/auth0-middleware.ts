@@ -891,16 +891,17 @@ export async function authenticateRequest(
     if (!hasMFA) {
       try {
         const clientInfo = getClientInfo(request)
+        const ip = clientInfo.ip ?? 'unknown'
         const loginContext = {
           userId: identity.internalId,
-          ipAddress: clientInfo.ip,
+          ipAddress: ip,
           userAgent: clientInfo.userAgent,
           timestamp: new Date(),
           location: {
             country:
-              clientInfo.ip.startsWith('192.168.') ||
-              clientInfo.ip.startsWith('10.') ||
-              clientInfo.ip.startsWith('172.')
+              ip.startsWith('192.168.') ||
+              ip.startsWith('10.') ||
+              ip.startsWith('172.')
                 ? 'LOCAL'
                 : 'US',
           },

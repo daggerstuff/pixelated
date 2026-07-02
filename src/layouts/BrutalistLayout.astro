@@ -6,6 +6,8 @@
 import BrutalistHeader from '@/components/BrutalistHeader.astro'
 import BrutalistFooter from '@/components/BrutalistFooter.astro'
 import RybbitAnalytics from '@/components/analytics/RybbitAnalytics.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 import '@/styles/brutalist-minimal.css'
 
 export interface Props {
@@ -21,6 +23,7 @@ const {
 } = Astro.props
 
 const cspNonce = Astro.locals?.cspNonce ?? ''
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
@@ -94,6 +97,16 @@ const cspNonce = Astro.locals?.cspNonce ?? ''
 
     <!-- Scroll Progress -->
     <div class="scroll-progress" aria-hidden="true"></div>
+
+    <!-- Vercel Speed Insights and Analytics -->
+    {
+      shouldRenderAnalytics && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )
+    }
   </body>
 </html>
 

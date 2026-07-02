@@ -1,10 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react'
+// Mock the child components
+import React, { useEffect } from 'react'
 
 import { SimulatorProvider } from '../../context/SimulatorContext'
 import { EmotionAnalysis } from '../EmotionAnalysis'
-
-// Mock the child components
-import React, { useEffect } from 'react'
 vi.mock('../EmotionDetector', () => ({
   EmotionDetector: vi.fn(
     ({
