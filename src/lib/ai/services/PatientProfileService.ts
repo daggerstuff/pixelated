@@ -8,6 +8,11 @@ import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
 const patientLogger = createBuildSafeLogger("patient-profile-service");
 
+export interface ProfileIdentifier {
+  id: string;
+  name: string;
+}
+
 export class PatientProfileService {
   private readonly kvStore: KVStore;
   private readonly PROFILE_PREFIX = "profile_";

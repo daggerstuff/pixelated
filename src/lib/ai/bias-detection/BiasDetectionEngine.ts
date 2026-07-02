@@ -16,6 +16,7 @@ const biasLogger = createBuildSafeLogger("bias-detection");
 
 import type {
   AlertLevel,
+  AnalysisResult,
   BiasDetectionConfig,
   BiasLayerWeights,
   BiasThresholdsConfig,
@@ -1145,3 +1146,5 @@ export class BiasDetectionEngine {
     };
   }
 }
+
+export type { AnalysisResult } from "./types";
