@@ -11,4 +11,9 @@ const serverConfig = initSentry({
   release: resolveSentryRelease(),
 })
 
-initServer(serverConfig)
+// Cloudflare Workers use sentry.server.cloudflare.ts with @sentry/cloudflare wrapper
+// via Sentry.withSentry(). Skip the @sentry/astro (Node-based) init to avoid
+// importing Node-incompatible runtime modules in the Workers bundle.
+if (import.meta.env['DEPLOY_TARGET'] !== 'cloudflare') {
+  initServer(serverConfig)
+}

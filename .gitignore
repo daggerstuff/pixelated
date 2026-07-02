@@ -219,7 +219,8 @@ security-scan-artifacts
 tmp/
 
 # === PROJECT SPECIFIC & MISC ===
-.agent/internal/
+.agent/
+.agents/
 .brv
 .endgame
 .memory/
@@ -227,6 +228,7 @@ tmp/
 .scrapy
 .sisyphus/
 .windsurf
+.eve/
 /*.DS_Store*
 /.astro
 /.bin
@@ -393,8 +395,12 @@ infra/sinker/caddy/oauth2-proxy-cfg.env
 .baselines/
 
 # === AGENT LOGS ===
-.codex/logs/
+.codex/
 
 # === DOWNLOADED CLI TOOLS ===
 ngc-cli.md5
 ngc-cli/
+
+aws/dist
+cf-workers/workers-ai-mcp
+notebooks
