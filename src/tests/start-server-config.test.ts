@@ -49,7 +49,7 @@ describe('start-server port fallback policy', () => {
     const moduleUrl = resolveSsrEntryModuleUrl({ cwd, env: {} })
 
     expect(moduleUrl).toBe(
-      pathToFileURL(path.resolve(cwd, 'dist/server/entry.mjs')).href,
+      pathToFileURL(path.resolve(cwd, 'dist/server/entry2.mjs')).href,
     )
   })
 
