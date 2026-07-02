@@ -349,7 +349,7 @@ export default defineConfig({
                 env.build.rollupOptions = env.build.rollupOptions || {}
                 
                 // Copy properties
-                if (name === 'ssr' || name === 'prerender' || name === 'server') {
+                if (name === 'ssr' || name === 'server') {
                   if (env.build.rolldownOptions.input) {
                     // Copy as an object to match what Astro/Vercel expects
                     if (typeof env.build.rolldownOptions.input === 'string') {
