@@ -22,7 +22,10 @@
     "src/hello.js",
     "src/sentry.client.config.ts",
     "src/sentry.server.config.ts",
-    "collections/**/*.json"
+    "collections/**/*.json",
+    "src/lib/governance/policy-engine.ts",
+    "src/lib/middleware/csrf.ts",
+    "src/lib/research/services/*.ts"
   ],
   "project": [
     "src/**/*.{ts,tsx,js,jsx,astro}",
@@ -43,7 +46,10 @@
     "scripts/**",
     "docker/**",
     "k8s/**",
-    "collections/**"
+    "collections/**",
+    "src/lib/governance/policy-engine.ts",
+    "src/lib/middleware/csrf.ts",
+    "src/lib/research/services/*.ts"
   ],
 
 }
