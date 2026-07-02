@@ -2,5 +2,7 @@
   "buildCommand": "NODE_ENV=production pnpm exec astro build",
   "outputDirectory": "dist",
   "framework": "astro",
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "ignore": ["ai/.venv"],
+  "excludeFiles": ["**/.venv/**", "**/ai/.venv/**"]
 }
