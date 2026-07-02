@@ -96,7 +96,8 @@ export function removeWhitespace(str: string): string {
 // URL utilities
 // ============================================================================
 
-import { isBrowserEnvironment } from './crypto'
+const isBrowserEnvironment = () =>
+  typeof window !== 'undefined' && typeof document !== 'undefined'
 
 /**
  * Builds a URL with query parameters
