@@ -1,6 +1,6 @@
-import * as Sentry from "@sentry/cloudflare";
-import type { CloudflareOptions } from "@sentry/cloudflare";
-import handler from "@astrojs/cloudflare/entrypoints/server";
+import handler from '@astrojs/cloudflare/entrypoints/server'
+import * as Sentry from '@sentry/cloudflare'
+import type { CloudflareOptions } from '@sentry/cloudflare'
 
 export default Sentry.withSentry(
   (env): CloudflareOptions =>
@@ -11,4 +11,4 @@ export default Sentry.withSentry(
       tracesSampleRate: 1.0,
     }) as CloudflareOptions,
   handler,
-);
+)
