@@ -5,4 +5,3 @@
 // Re-export higher-level crypto system from the refactored directory module
 export type { CryptoSystem } from './crypto/types'
 export type { CryptoSystemOptions } from './crypto/index'
-

@@ -23,7 +23,6 @@ export function secureRandomIntRange(min: number, max: number): number {
   return min + secureRandomInt(max - min + 1)
 }
 
-
 /**
  * Generates a cryptographically secure random string for IDs
  * @param length - Length of the string (default: 8)

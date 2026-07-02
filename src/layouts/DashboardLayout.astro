@@ -10,6 +10,8 @@ import '@/styles/page.css'
 // Astro components
 import Head from '@/components/base/Head.astro'
 import ErrorBoundary from '@/components/base/ErrorBoundary.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 
 // Layout components
 import Header from '@/components/layout/Header.astro'
@@ -52,6 +54,7 @@ const {
 
 const { cspNonce } = Astro.locals
 const { nprogress, mediumZoom } = FEATURES
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
@@ -198,6 +201,16 @@ const { nprogress, mediumZoom } = FEATURES
           }
         })
     </script>
+
+    <!-- Vercel Speed Insights and Analytics -->
+    {
+      shouldRenderAnalytics && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )
+    }
   </body>
 </html>
 
