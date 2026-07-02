@@ -272,7 +272,7 @@ export default defineConfig({
   trailingSlash: 'ignore',
   build: {
     // Node adapter handler lands in entry2.mjs because Astro middleware keeps entry.mjs.
-    serverEntry: 'entry2.mjs',
+    serverEntry: isVercelDeploy ? 'index.js' : 'entry2.mjs',
     format: 'directory',
     // Enable hidden source maps in production for Sentry upload.
     // "hidden" generates .map files but omits the //# sourceMappingURL comment
