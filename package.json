@@ -13,6 +13,7 @@
     "preview": "PIXELATED_PREVIEW=true node scripts/utils/start-server.mjs",
     "dev:bias-detection": "PORT=8001 tsx src/lib/ai/bias-detection/server.ts",
     "dev:ai-service": "PORT=8002 tsx src/lib/ai/services/server.ts",
+    "postinstall": "node scripts/fix-astro-vercel-nft.mjs",
     "dev:analytics": "tsx src/lib/analytics/server.ts",
     "dev:worker": "NODE_ENV=development tsx src/lib/jobs/worker.ts",
     "dev:training-server": "NODE_ENV=development tsx src/lib/services/training/server.ts",
@@ -474,15 +475,15 @@
   "peerDependencies": {
     "hono": "^4.12.14"
   },
-  "overrides": {
-    "cookie": "^0.7.2",
-    "@vercel/oidc": "3.7.1"
-  },
   "resolutions": {
     "brace-expansion": "5.0.6",
+    "cookie": "^0.7.2",
     "form-data": "4.0.6",
     "js-yaml": "4.1.2",
-    "path-to-regexp": "8.4.2",
+    "path-to-regexp": "8.4.2"
+  },
+  "overrides": {
+    "@vercel/oidc": "3.7.1",
     "cookie": "^0.7.2"
   },
   "engines": {
