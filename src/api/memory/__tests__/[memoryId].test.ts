@@ -31,6 +31,18 @@ describe('Memory ID Endpoints', () => {
   })
 
   describe('GET', () => {
+    it('returns a 400 if memoryId parameter is missing', async () => {
+      const request = new Request('http://localhost/api/memory')
+      const response = await GET({ request, params: {} })
+
+      expect(response.status).toBe(400)
+      const data = await response.json()
+      expect(data).toMatchObject({
+        error: 'Bad Request',
+        message: 'memoryId parameter is required',
+      })
+    })
+
     it('returns a 404 if the memory is not found', async () => {
       mockGetMemory.mockResolvedValueOnce(null)
 

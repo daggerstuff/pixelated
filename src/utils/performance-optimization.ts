@@ -85,25 +85,27 @@ function reportLCP() {
   try {
     const entryTypes = 'largest-contentful-paint'
 
-    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
-      const entries = entryList.getEntries()
-      const lastEntry = entries[
-        entries.length - 1
-      ] as LargestContentfulPaintEntry
+    const observer = new PerformanceObserver(
+      (entryList: PerformanceObserverEntryList) => {
+        const entries = entryList.getEntries()
+        const lastEntry = entries[
+          entries.length - 1
+        ] as LargestContentfulPaintEntry
 
-      if (lastEntry) {
-        const lcp = lastEntry.startTime
-        const lcpElement = lastEntry.element?.tagName ?? 'unknown'
-        const lcpSize = lastEntry.size || 0
+        if (lastEntry) {
+          const lcp = lastEntry.startTime
+          const lcpElement = lastEntry.element?.tagName ?? 'unknown'
+          const lcpSize = lastEntry.size || 0
 
-        console.log('LCP:', {
-          value: Math.round(lcp),
-          rating: lcpRating(lcp),
-          element: lcpElement,
-          size: lcpSize,
-        })
-      }
-    })
+          console.log('LCP:', {
+            value: Math.round(lcp),
+            rating: lcpRating(lcp),
+            element: lcpElement,
+            size: lcpSize,
+          })
+        }
+      },
+    )
 
     observer.observe({ type: entryTypes, buffered: true })
   } catch {
@@ -120,23 +122,25 @@ function reportCLS() {
     let clsValue = 0
     const clsEntries: LayoutShiftEntry[] = []
 
-    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
-      const entries = entryList.getEntries()
+    const observer = new PerformanceObserver(
+      (entryList: PerformanceObserverEntryList) => {
+        const entries = entryList.getEntries()
 
-      entries.forEach((entry: PerformanceEntry) => {
-        if (!(entry as LayoutShiftEntry).hadRecentInput) {
-          const { value } = entry as LayoutShiftEntry
-          clsValue += value
-          clsEntries.push(entry as LayoutShiftEntry)
-        }
-      })
+        entries.forEach((entry: PerformanceEntry) => {
+          if (!(entry as LayoutShiftEntry).hadRecentInput) {
+            const { value } = entry as LayoutShiftEntry
+            clsValue += value
+            clsEntries.push(entry as LayoutShiftEntry)
+          }
+        })
 
-      console.log('CLS:', {
-        value: clsValue,
-        rating: clsRating(clsValue),
-        entries: clsEntries.length,
-      })
-    })
+        console.log('CLS:', {
+          value: clsValue,
+          rating: clsRating(clsValue),
+          entries: clsEntries.length,
+        })
+      },
+    )
 
     observer.observe({ type: 'layout-shift', buffered: true })
   } catch {
@@ -151,20 +155,22 @@ function reportCLS() {
  */
 function reportFID() {
   try {
-    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
-      const entries = entryList.getEntries()
-      const firstEntry = entries[0] as FirstInputEntry
+    const observer = new PerformanceObserver(
+      (entryList: PerformanceObserverEntryList) => {
+        const entries = entryList.getEntries()
+        const firstEntry = entries[0] as FirstInputEntry
 
-      if (firstEntry) {
-        const fid = firstEntry.processingStart - firstEntry.startTime
+        if (firstEntry) {
+          const fid = firstEntry.processingStart - firstEntry.startTime
 
-        console.log('FID (Legacy):', {
-          value: Math.round(fid),
-          rating: fidRating(fid),
-          type: firstEntry.name,
-        })
-      }
-    })
+          console.log('FID (Legacy):', {
+            value: Math.round(fid),
+            rating: fidRating(fid),
+            type: firstEntry.name,
+          })
+        }
+      },
+    )
 
     observer.observe({ type: 'first-input', buffered: true })
   } catch {
@@ -179,19 +185,21 @@ function reportFID() {
  */
 function reportFCP() {
   try {
-    const observer = new PerformanceObserver((entryList: PerformanceObserverEntryList) => {
-      const entries = entryList.getEntries()
-      const firstEntry = entries[0]
+    const observer = new PerformanceObserver(
+      (entryList: PerformanceObserverEntryList) => {
+        const entries = entryList.getEntries()
+        const firstEntry = entries[0]
 
-      if (firstEntry) {
-        const fcp = firstEntry.startTime
+        if (firstEntry) {
+          const fcp = firstEntry.startTime
 
-        console.log('FCP:', {
-          value: Math.round(fcp),
-          rating: fcpRating(fcp),
-        })
-      }
-    })
+          console.log('FCP:', {
+            value: Math.round(fcp),
+            rating: fcpRating(fcp),
+          })
+        }
+      },
+    )
 
     observer.observe({ type: 'paint', buffered: true })
   } catch {

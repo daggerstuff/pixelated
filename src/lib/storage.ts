@@ -2,7 +2,8 @@
  * Browser storage utilities for safely interacting with localStorage
  */
 
-const isBrowserEnvironment = () => typeof window !== 'undefined' && typeof document !== 'undefined'
+const isBrowserEnvironment = () =>
+  typeof window !== 'undefined' && typeof document !== 'undefined'
 
 /**
  * Safely gets an item from localStorage
