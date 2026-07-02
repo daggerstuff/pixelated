@@ -379,8 +379,8 @@ export default defineConfig({
                   } else {
                     env.build.rollupOptions.output = { entryFileNames: 'entry.mjs' }
                   }
-                } else {
-                  // For non-server envs, just do a normal spread
+                } else if (name === 'prerender') {
+                  // For prerender env, do a normal spread without forcing entry.mjs
                   env.build.rollupOptions = {
                     ...env.build.rollupOptions,
                     ...env.build.rolldownOptions,
