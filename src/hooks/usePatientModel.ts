@@ -1,116 +1,125 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from 'react'
 
-import { PatientModelService } from "@/lib/ai/services/PatientModelService";
-import type { CognitiveModel, PatientResponseStyleConfig } from "@/lib/ai/types/CognitiveModel";
-import { KVStore } from "@/lib/db/KVStore";
+import { PatientModelService } from '@/lib/ai/services/PatientModelService'
+import type {
+  CognitiveModel,
+  PatientResponseStyleConfig,
+} from '@/lib/ai/types/CognitiveModel'
+import { KVStore } from '@/lib/db/KVStore'
 
 export function usePatientModel() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [patientService, setPatientService] = useState<PatientModelService | null>(null);
-  const [availableModels, setAvailableModels] = useState<string[]>([]);
-  const [currentModelId, setCurrentModelId] = useState<string | null>(null);
-  const [currentModel, setCurrentModel] = useState<CognitiveModel | null>(null);
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [patientService, setPatientService] =
+    useState<PatientModelService | null>(null)
+  const [availableModels, setAvailableModels] = useState<string[]>([])
+  const [currentModelId, setCurrentModelId] = useState<string | null>(null)
+  const [currentModel, setCurrentModel] = useState<CognitiveModel | null>(null)
   const [styleConfig, setStyleConfig] = useState<PatientResponseStyleConfig>({
     openness: 5,
     coherence: 7,
     defenseLevel: 5,
-    disclosureStyle: "selective",
-    challengeResponses: "curious",
-  });
+    disclosureStyle: 'selective',
+    challengeResponses: 'curious',
+  })
 
   // Initialize the patient model service
   useEffect(() => {
-    const kvStore = new KVStore("cognitive_models_", true);
-    const service = new PatientModelService(kvStore);
-    setPatientService(service);
+    const kvStore = new KVStore('cognitive_models_', true)
+    const service = new PatientModelService(kvStore)
+    setPatientService(service)
 
     // Load available models
     const loadModels = async () => {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
 
       try {
-        const models = await service.getAvailableModels();
+        const models = await service.getAvailableModels()
         const modelIds = models
           .map((model) => model.id)
-          .filter((id): id is string => typeof id === "string" && id.length > 0);
-        setAvailableModels(modelIds);
+          .filter((id): id is string => typeof id === 'string' && id.length > 0)
+        setAvailableModels(modelIds)
 
         // If models exist and no current model selected, select the first one
         if (modelIds.length > 0 && !currentModelId) {
-          const firstId = modelIds[0];
+          const firstId = modelIds[0]
           if (firstId) {
-            setCurrentModelId(firstId);
+            setCurrentModelId(firstId)
           }
         }
       } catch (err: unknown) {
-        console.error("Failed to load patient models:", err);
-        setError("Failed to load available patient models");
+        console.error('Failed to load patient models:', err)
+        setError('Failed to load available patient models')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    void loadModels();
-  }, [currentModelId]);
+    void loadModels()
+  }, [currentModelId])
 
   // Load the selected model when currentModelId changes
   useEffect(() => {
     if (!patientService || !currentModelId) {
-      return;
+      return
     }
 
     const loadModel = async () => {
-      setIsLoading(true);
-      setError(null);
+      setIsLoading(true)
+      setError(null)
 
       try {
-        const model = await patientService.getModel(currentModelId);
+        const model = await patientService.getModel(currentModelId)
 
         if (model) {
-          setCurrentModel(model);
+          setCurrentModel(model)
         } else {
-          setError(`Could not load patient model with ID: ${currentModelId}`);
+          setError(`Could not load patient model with ID: ${currentModelId}`)
         }
       } catch (err: unknown) {
-        console.error(`Failed to load patient model ${currentModelId}:`, err);
+        console.error(`Failed to load patient model ${currentModelId}:`, err)
         setError(
           `Error loading patient model: ${err instanceof Error ? err?.message || String(err) : String(err)}`,
-        );
+        )
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    void loadModel();
-  }, [patientService, currentModelId]);
+    void loadModel()
+  }, [patientService, currentModelId])
 
   // Select a different patient model
   const selectModel = useCallback((modelId: string) => {
-    setCurrentModelId(modelId);
-  }, []);
+    setCurrentModelId(modelId)
+  }, [])
 
   // Update the style configuration
-  const updateStyleConfig = useCallback((newConfig: Partial<PatientResponseStyleConfig>) => {
-    setStyleConfig((prevConfig) => ({
-      ...prevConfig,
-      ...newConfig,
-    }));
-  }, []);
+  const updateStyleConfig = useCallback(
+    (newConfig: Partial<PatientResponseStyleConfig>) => {
+      setStyleConfig((prevConfig) => ({
+        ...prevConfig,
+        ...newConfig,
+      }))
+    },
+    [],
+  )
 
   // Generate a patient response
   const generatePatientResponse = useCallback(
     async (
       conversationHistory: Array<{
-        role: "therapist" | "patient";
-        content: string;
+        role: 'therapist' | 'patient'
+        content: string
       }>,
       currentTherapeuticFocus?: string[],
       sessionNumber: number = 1,
     ) => {
       if (!patientService || !currentModelId || !currentModel) {
-        throw new Error("Patient model service not initialized or no model selected");
+        throw new Error(
+          'Patient model service not initialized or no model selected',
+        )
       }
 
       try {
@@ -121,28 +130,28 @@ export function usePatientModel() {
           styleConfig,
           currentTherapeuticFocus,
           sessionNumber,
-        );
+        )
 
         if (!responseContext) {
-          throw new Error("Failed to create response context");
+          throw new Error('Failed to create response context')
         }
 
         // Generate prompt for LLM
-        const prompt = patientService.generatePatientPrompt(responseContext);
+        const prompt = patientService.generatePatientPrompt(responseContext)
 
         // At this point, you would send this prompt to your LLM service
         // For now, we'll just return the prompt
         return {
           prompt,
           context: responseContext,
-        };
+        }
       } catch (err: unknown) {
-        console.error("Failed to generate patient response:", err);
-        throw err;
+        console.error('Failed to generate patient response:', err)
+        throw err
       }
     },
     [patientService, currentModelId, currentModel, styleConfig],
-  );
+  )
 
   return {
     isLoading,
@@ -154,5 +163,5 @@ export function usePatientModel() {
     selectModel,
     updateStyleConfig,
     generatePatientResponse,
-  };
+  }
 }
