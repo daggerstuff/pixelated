@@ -108,7 +108,9 @@ export async function createMentalLLaMAFromEnvSafe(): Promise<{
     // Server side - dynamically import the real implementation
     logger.info('Server-side detected, using real MentalLLaMA adapter')
     try {
-      const { createMentalLLaMAFromEnv } = await import('./index.js')
+      // Hide from Vite's static analysis to prevent mongodb bundling in client build
+      const modulePath = './index.ts'
+      const { createMentalLLaMAFromEnv } = await import(/* @vite-ignore */ modulePath)
       return await createMentalLLaMAFromEnv()
     } catch (error: unknown) {
       logger.error('Failed to load server-side MentalLLaMA adapter', { error })
