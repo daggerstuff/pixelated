@@ -127,19 +127,21 @@ export interface BiasAnalysisResult {
   recommendations: string[]
 }
 
-export const BiasAnalysisResultSchema: z.ZodType<BiasAnalysisResult> = z.object({
-  id: z.string(),
-  biases: z.array(
-    z.object({
-      type: z.string(),
-      confidence: z.number(),
-      evidence: z.string(),
-      suggestion: z.string(),
-    }),
-  ),
-  overallScore: z.number(),
-  recommendations: z.array(z.string()),
-})
+export const BiasAnalysisResultSchema: z.ZodType<BiasAnalysisResult> = z.object(
+  {
+    id: z.string(),
+    biases: z.array(
+      z.object({
+        type: z.string(),
+        confidence: z.number(),
+        evidence: z.string(),
+        suggestion: z.string(),
+      }),
+    ),
+    overallScore: z.number(),
+    recommendations: z.array(z.string()),
+  },
+)
 
 export interface UserPreferences {
   theme?: 'light' | 'dark' | 'system'
@@ -161,7 +163,9 @@ export interface MemoryTurn {
   metadata?: Record<string, any>
 }
 
-export const MemoryTurnSchema: z.ZodType<MemoryTurn> = z.object({}).passthrough()
+export const MemoryTurnSchema: z.ZodType<MemoryTurn> = z
+  .object({})
+  .passthrough()
 
 export interface MemorySession {
   id: string
@@ -169,7 +173,9 @@ export interface MemorySession {
   metadata?: Record<string, any>
 }
 
-export const MemorySessionSchema: z.ZodType<MemorySession> = z.object({}).passthrough()
+export const MemorySessionSchema: z.ZodType<MemorySession> = z
+  .object({})
+  .passthrough()
 
 export interface RateLimitError extends Error {
   retryAfter: number
@@ -255,7 +261,7 @@ export class PixelatedClient {
         }
         const error: ApiError = {
           name: 'ApiError',
-          message: errorData.error ?? ('API Error: ' + response.statusText),
+          message: errorData.error ?? 'API Error: ' + response.statusText,
           status: response.status,
           code: errorData.code ?? 'UNKNOWN',
           details: errorData.details,
@@ -293,7 +299,9 @@ export class PixelatedClient {
     } catch (err) {
       if (err instanceof z.ZodError) {
         const summary = err.issues
-          .map((i) => (i.path.length ? i.path.join('.') + ': ' : '') + i.message)
+          .map(
+            (i) => (i.path.length ? i.path.join('.') + ': ' : '') + i.message,
+          )
           .join('; ')
         throw new Error('Response schema mismatch: ' + summary)
       }
@@ -529,10 +537,7 @@ export class PixelatedClient {
             created: string
             expires?: string
           }>
-        }>(
-          '/developer/api-keys',
-          ApiKeyListSchema,
-        )
+        }>('/developer/api-keys', ApiKeyListSchema)
         return response.keys
       },
 
