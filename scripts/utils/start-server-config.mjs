@@ -67,7 +67,7 @@ export async function resolveSsrEntryModuleUrl({
   }
 
   const serverDir = path.resolve(cwd, 'dist/server')
-  const defaultEntry = path.join(serverDir, 'entry.mjs')
+  const defaultEntry = path.join(serverDir, 'entry2.mjs')
 
   if (existsSync(defaultEntry)) {
     try {
