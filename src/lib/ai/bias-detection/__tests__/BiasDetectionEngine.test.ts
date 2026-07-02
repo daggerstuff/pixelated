@@ -1735,7 +1735,7 @@ describe("BiasDetectionEngine", () => {
       });
 
       it("should log progress during fallback batch processing when logProgress is not explicitly disabled", async () => {
-        const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        const consoleInfoSpy = vi.spyOn(console, 'info').mockImplementation(() => {});
         (engine as unknown as { performanceOptimizer: unknown }).performanceOptimizer = null;
         const sessions = [1, 2].map((i) =>
           sessionDataToTherapeuticSession({ ...mockSessionData, sessionId: `progress-log-${i}` }),
@@ -1749,13 +1749,13 @@ describe("BiasDetectionEngine", () => {
         expect(result.results).toHaveLength(2);
         expect(result.errors).toHaveLength(0);
         // Should have logged progress lines
-        expect(consoleLogSpy).toHaveBeenCalledWith(
-          expect.stringContaining('[BatchAnalysis] Completed'),
+        expect(consoleInfoSpy.mock.calls.flat().join(' ')).toContain(
+          '[BatchAnalysis] Completed',
         );
-        expect(consoleLogSpy).toHaveBeenCalledWith(
-          expect.stringContaining('[BatchAnalysis] Average time per session'),
+        expect(consoleInfoSpy.mock.calls.flat().join(' ')).toContain(
+          '[BatchAnalysis] Average time per session',
         );
-        consoleLogSpy.mockRestore();
+        consoleInfoSpy.mockRestore();
       });
 
       it("should log errors during fallback batch processing when errors occur", async () => {
@@ -1797,8 +1797,8 @@ describe("BiasDetectionEngine", () => {
         expect(result.errors).toHaveLength(1);
         expect(result.errors[0].error.message).toBe('Session processing failed');
         // Should have logged the error
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          expect.stringContaining('[BatchError]'),
+        expect(consoleErrorSpy.mock.calls.flat().join(' ')).toContain(
+          '[BatchError]',
         );
         consoleErrorSpy.mockRestore();
         analyzeSpy.mockRestore();

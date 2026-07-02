@@ -162,7 +162,7 @@ export class AnonymizationPipelineService {
    */
   private async applyKAnonymity(
     data: Record<string, unknown>[],
-    _k: number,
+    k: number,
   ): Promise<Record<string, unknown>[]> {
     // Identify quasi-identifiers (age, location, demographic info)
     const quasiIdentifiers = [
