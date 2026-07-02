@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import process from 'process'
+import { existsSync, readdirSync } from 'node:fs'
 import path from 'path'
 import { pathToFileURL } from 'url'
 
@@ -36,27 +37,53 @@ export function getPortFallbackPolicy(env = process.env) {
   }
 }
 
-const DEFAULT_SERVER_ENTRY_CANDIDATES = ['entry2.mjs', 'entry.mjs']
+/** @returns {Promise<string | null>} */
+async function findHandlerEntryPath(serverDir) {
+  if (!existsSync(serverDir)) {
+    return null
+  }
 
-/** @param {string} serverDir */
-function resolveDefaultServerEntryPath(serverDir) {
-  for (const candidate of DEFAULT_SERVER_ENTRY_CANDIDATES) {
-    const entryPath = path.join(serverDir, candidate)
-    if (fs.existsSync(entryPath)) {
-      return entryPath
+  const candidates = readdirSync(serverDir).filter(
+    (file) => file.endsWith('.mjs') || file.endsWith('.js'),
+  )
+
+  for (const file of candidates) {
+    const moduleUrl = pathToFileURL(path.join(serverDir, file)).href
+    const exports = await import(moduleUrl)
+    if (typeof exports.handler === 'function') {
+      return path.join(serverDir, file)
     }
   }
 
-  return path.join(serverDir, DEFAULT_SERVER_ENTRY_CANDIDATES[0])
+  return null
 }
 
-export function resolveSsrEntryModuleUrl({
+export async function resolveSsrEntryModuleUrl({
   cwd = process.cwd(),
   env = process.env,
 } = {}) {
-  const entryPath = hasConfiguredValue(env.SSR_ENTRY_FILE)
-    ? path.resolve(String(env.SSR_ENTRY_FILE))
-    : resolveDefaultServerEntryPath(path.resolve(cwd, 'dist/server'))
+  if (hasConfiguredValue(env.SSR_ENTRY_FILE)) {
+    return pathToFileURL(path.resolve(String(env.SSR_ENTRY_FILE))).href
+  }
 
-  return pathToFileURL(entryPath).href
+  const serverDir = path.resolve(cwd, 'dist/server')
+  const defaultEntry = path.join(serverDir, 'entry.mjs')
+
+  if (existsSync(defaultEntry)) {
+    try {
+      const exports = await import(pathToFileURL(defaultEntry).href)
+      if (typeof exports.handler === 'function') {
+        return pathToFileURL(defaultEntry).href
+      }
+    } catch {
+      // Fall through to handler discovery.
+    }
+  }
+
+  const handlerEntry = await findHandlerEntryPath(serverDir)
+  if (handlerEntry) {
+    return pathToFileURL(handlerEntry).href
+  }
+
+  return pathToFileURL(defaultEntry).href
 }
