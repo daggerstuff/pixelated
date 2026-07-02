@@ -88,7 +88,14 @@ build.on('exit', (code, signal) => {
   if (signal) {
     process.exit(1)
   }
-  process.exit(code ?? 0)
+  if (code !== 0) {
+    process.exit(code ?? 1)
+  }
+
+  const ensure = spawnSync('node', ['scripts/ci/ensure-server-entry.mjs'], {
+    stdio: 'inherit',
+  })
+  process.exit(ensure.status ?? 0)
 })
 
 // Handle parent process termination gracefully

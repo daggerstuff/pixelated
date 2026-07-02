@@ -215,6 +215,7 @@ scripts/*
 !scripts/build-*.sh
 !scripts/ci/
 !scripts/ci/build-with-pipe-handling.mjs
+!scripts/ci/ensure-server-entry.mjs
 !scripts/devops/install-git-hooks.sh
 !scripts/create-prod-package.js
 !scripts/utils/
