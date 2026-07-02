@@ -70,7 +70,7 @@ allowBuilds:
   '@sentry/node-cpu-profiler': true
   '@mongodb-js/zstd': true
   core-js-pure: true
-  node-liblzma: true
+  node-liblzma: false
   '@schpet/linear-cli': set this to true or false
 minimumReleaseAge: 0
 minimumReleaseAgeExclude:
@@ -329,4 +329,3 @@ overrides:
   ws: '>=8.21.0'
 patchedDependencies:
   '@astrojs/internal-helpers@0.10.0': patches/@astrojs__internal-helpers@0.10.0.patch
-  '@astrojs/vercel@10.0.8': patches/@astrojs__vercel@10.0.8.patch
