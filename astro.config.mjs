@@ -336,11 +336,14 @@ export default defineConfig({
             const originalBuild = builder.build.bind(builder)
             builder.build = async (environment) => {
               if (environment.name === 'client') {
-                const rolldownInput = environment.config.build?.rolldownOptions?.input
-                if (rolldownInput) {
-                  environment.config.build.rollupOptions =
-                    environment.config.build.rollupOptions || {}
-                  environment.config.build.rollupOptions.input = rolldownInput
+                const rolldownOptions = environment.config.build?.rolldownOptions
+                if (rolldownOptions) {
+                  const { checks: _checks, ...rollupCompatibleOptions } =
+                    rolldownOptions
+                  environment.config.build.rollupOptions = {
+                    ...(environment.config.build.rollupOptions || {}),
+                    ...rollupCompatibleOptions,
+                  }
                 }
               }
               return originalBuild(environment)
