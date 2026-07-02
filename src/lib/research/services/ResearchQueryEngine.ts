@@ -492,9 +492,10 @@ export class ResearchQueryEngine {
     score += Object.keys(query.parameters || {}).length * 2
 
     return score
-  }    private async checkUserPermissions(
-      _userId: string,
-      userRole: string,
+  }
+  private async checkUserPermissions(
+    _userId: string,
+    userRole: string,
     queryType: string,
   ): Promise<boolean> {
     const permissions = {

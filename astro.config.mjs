@@ -237,7 +237,7 @@ function getChunkName(id) {
   }
   if (normalizedId.includes('/node_modules/')) {
     if (normalizedId.includes('node_modules/astro/')) {
-      return null;
+      return null
     }
     return 'vendor'
   }
@@ -364,7 +364,7 @@ export default defineConfig({
         config(config) {
           if (config.environments) {
             const ASTRO_MANAGED_ENVS = new Set(['client', 'server', 'ssr'])
-            
+
             for (const [name, env] of Object.entries(config.environments)) {
               if (env.build?.rolldownOptions) {
                 // Only mirror rolldown options for server-side build environments.
@@ -378,12 +378,20 @@ export default defineConfig({
                   if (env.build.rolldownOptions.input) {
                     // Copy as an object to match what Astro/Vercel expects
                     if (typeof env.build.rolldownOptions.input === 'string') {
-                      env.build.rollupOptions.input = { entry: env.build.rolldownOptions.input }
+                      env.build.rollupOptions.input = {
+                        entry: env.build.rolldownOptions.input,
+                      }
                     } else if (Array.isArray(env.build.rolldownOptions.input)) {
                       env.build.rollupOptions.input = Object.fromEntries(
-                        env.build.rolldownOptions.input.map((v, i) => [i === 0 ? 'entry' : `entry_${i}`, v])
+                        env.build.rolldownOptions.input.map((v, i) => [
+                          i === 0 ? 'entry' : `entry_${i}`,
+                          v,
+                        ]),
                       )
-                    } else if (typeof env.build.rolldownOptions.input === 'object' && env.build.rolldownOptions.input !== null) {
+                    } else if (
+                      typeof env.build.rolldownOptions.input === 'object' &&
+                      env.build.rolldownOptions.input !== null
+                    ) {
                       const inputObj = { ...env.build.rolldownOptions.input }
                       if (inputObj.index && !inputObj.entry) {
                         inputObj.entry = inputObj.index
@@ -391,18 +399,26 @@ export default defineConfig({
                       }
                       env.build.rollupOptions.input = inputObj
                     } else {
-                      env.build.rollupOptions.input = env.build.rolldownOptions.input
+                      env.build.rollupOptions.input =
+                        env.build.rolldownOptions.input
                     }
                   }
-                  
+
                   if (env.build.rolldownOptions.output) {
-                    env.build.rollupOptions.output = env.build.rollupOptions.output || {}
-                    Object.assign(env.build.rollupOptions.output, env.build.rolldownOptions.output)
+                    env.build.rollupOptions.output =
+                      env.build.rollupOptions.output || {}
+                    Object.assign(
+                      env.build.rollupOptions.output,
+                      env.build.rolldownOptions.output,
+                    )
                     if (!Array.isArray(env.build.rollupOptions.output)) {
-                      env.build.rollupOptions.output.entryFileNames = 'entry.mjs'
+                      env.build.rollupOptions.output.entryFileNames =
+                        'entry.mjs'
                     }
                   } else {
-                    env.build.rollupOptions.output = { entryFileNames: 'entry.mjs' }
+                    env.build.rollupOptions.output = {
+                      entryFileNames: 'entry.mjs',
+                    }
                   }
                 } else if (name === 'prerender') {
                   // For prerender env, do a normal spread without forcing entry.mjs
@@ -424,24 +440,31 @@ export default defineConfig({
               const inputIsEmpty =
                 !input ||
                 (Array.isArray(input) && input.length === 0) ||
-                (typeof input === 'object' && !Array.isArray(input) && Object.keys(input).length === 0)
-              
+                (typeof input === 'object' &&
+                  !Array.isArray(input) &&
+                  Object.keys(input).length === 0)
+
               if (inputIsEmpty && env.build) {
                 env.build.rollupOptions = env.build.rollupOptions || {}
                 env.build.rollupOptions.input = 'virtual:dummy-ssr-entry'
               }
             }
           }
-        }
+        },
       },
       {
         name: 'trace-mongodb',
         enforce: 'pre',
         resolveId(source, importer) {
-          if (this.environment?.name === 'client' && (source.includes('mongodb') || source.includes('zstd'))) {
-            console.error(`\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`)
+          if (
+            this.environment?.name === 'client' &&
+            (source.includes('mongodb') || source.includes('zstd'))
+          ) {
+            console.error(
+              `\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`,
+            )
           }
-        }
+        },
       },
       shouldAnalyzeBundle &&
         visualizer({
