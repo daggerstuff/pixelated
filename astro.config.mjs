@@ -14,7 +14,7 @@ import { loadEnv, createLogger } from 'vite'
 // ECS Fargate requires the Node adapter.
 // Force the Node adapter regardless of any Vercel-provided env vars
 // (VERCEL, DEPLOY_TARGET) that the Vercel build sandbox injects automatically.
-const isVercelDeploy = false
+const isVercelDeploy = !!process.env.VERCEL
 
 const isProduction = process.env.NODE_ENV === 'production'
 const isDevelopment = process.env.NODE_ENV === 'development'
