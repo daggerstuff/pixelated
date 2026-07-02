@@ -3,6 +3,5 @@
   "outputDirectory": "dist",
   "framework": "astro",
   "regions": ["iad1"],
-  "ignore": ["ai/.venv"],
   "excludeFiles": ["**/.venv/**", "**/ai/.venv/**"]
 }
