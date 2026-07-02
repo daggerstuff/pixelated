@@ -1054,8 +1054,28 @@ interface MockDbFindParams {
   include?: Record<string, unknown>
 }
 
+// Mock db shape used by the service functions below — gives the override
+// methods concrete return types so callers don't degrade to `any` (db is
+// `any`-typed upstream via mongoClient).
+interface MockDb {
+  patient: {
+    findUnique: (params: MockDbFindParams) => Promise<Patient | null>
+  }
+  patientUser: {
+    findFirst: (params: { where: unknown }) => Promise<PatientUser | null>
+  }
+  providerPatientAccess: {
+    findFirst: (params: {
+      where: unknown
+    }) => Promise<ProviderPatientAccess | null>
+  }
+  user: {
+    findUnique: (params: MockDbFindParams) => Promise<User | null>
+  }
+}
+
 // Extend the db object with mock implementations
-const mockDb = Object.assign(Object.create(db), {
+const mockDb: MockDb = Object.assign(Object.create(db) as object, {
   // Add mock implementations for missing models
   patient: {
     findUnique: async (_params: MockDbFindParams): Promise<Patient | null> => {
