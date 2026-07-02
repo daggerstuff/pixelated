@@ -237,7 +237,7 @@ function getChunkName(id) {
   }
   if (normalizedId.includes('/node_modules/')) {
     if (normalizedId.includes('node_modules/astro/')) {
-      return null;
+      return null
     }
     return 'vendor'
   }
@@ -271,6 +271,8 @@ export default defineConfig({
   adapter,
   trailingSlash: 'ignore',
   build: {
+    // Node adapter handler lands in entry2.mjs because Astro middleware keeps entry.mjs.
+    serverEntry: 'entry2.mjs',
     format: 'directory',
     // Enable hidden source maps in production for Sentry upload.
     // "hidden" generates .map files but omits the //# sourceMappingURL comment
@@ -327,6 +329,27 @@ export default defineConfig({
     },
     plugins: [
       {
+        name: 'fix-vite-client-input',
+        buildApp: {
+          order: 'pre',
+          async handler(builder) {
+            const originalBuild = builder.build.bind(builder)
+            builder.build = async (environment) => {
+              if (environment.name === 'client') {
+                const rolldownInput =
+                  environment.config.build?.rolldownOptions?.input
+                if (rolldownInput) {
+                  environment.config.build.rollupOptions =
+                    environment.config.build.rollupOptions || {}
+                  environment.config.build.rollupOptions.input = rolldownInput
+                }
+              }
+              return originalBuild(environment)
+            }
+          },
+        },
+      },
+      {
         name: 'fix-vite-ssr-input',
         enforce: 'post',
         resolveId(id) {
@@ -342,7 +365,7 @@ export default defineConfig({
         config(config) {
           if (config.environments) {
             const ASTRO_MANAGED_ENVS = new Set(['client', 'server', 'ssr'])
-            
+
             for (const [name, env] of Object.entries(config.environments)) {
               if (env.build?.rolldownOptions) {
                 // Ensure rollupOptions exists
@@ -352,21 +375,31 @@ export default defineConfig({
                 // Do not override entryFileNames — Astro names the adapter bundle
                 // serverEntry (entry.mjs) and keeps middleware in a separate chunk.
                 if (name === 'ssr' || name === 'server') {
+                  // Ensure rollupOptions exists
+                  env.build.rollupOptions = env.build.rollupOptions || {}
+
+                  // Copy properties
                   if (env.build.rolldownOptions.input) {
                     // Copy as an object to match what Astro/Vercel expects.
                     // Preserve adapter input keys (e.g. `index`) — renaming to `entry`
                     // breaks Astro's isRolldownInput() matching and misnames the
                     // server bundle (entry.js / entry2.mjs collisions).
                     if (typeof env.build.rolldownOptions.input === 'string') {
-                      env.build.rollupOptions.input = { entry: env.build.rolldownOptions.input }
+                      env.build.rollupOptions.input = {
+                        entry: env.build.rolldownOptions.input,
+                      }
                     } else if (Array.isArray(env.build.rolldownOptions.input)) {
                       env.build.rollupOptions.input = Object.fromEntries(
-                        env.build.rolldownOptions.input.map((v, i) => [i === 0 ? 'entry' : `entry_${i}`, v])
+                        env.build.rolldownOptions.input.map((v, i) => [
+                          i === 0 ? 'entry' : `entry_${i}`,
+                          v,
+                        ]),
                       )
                     } else if (typeof env.build.rolldownOptions.input === 'object' && env.build.rolldownOptions.input !== null) {
                       env.build.rollupOptions.input = { ...env.build.rolldownOptions.input }
                     } else {
-                      env.build.rollupOptions.input = env.build.rolldownOptions.input
+                      env.build.rollupOptions.input =
+                        env.build.rolldownOptions.input
                     }
                   }
                 } else if (name === 'prerender') {
@@ -389,24 +422,31 @@ export default defineConfig({
               const inputIsEmpty =
                 !input ||
                 (Array.isArray(input) && input.length === 0) ||
-                (typeof input === 'object' && !Array.isArray(input) && Object.keys(input).length === 0)
-              
+                (typeof input === 'object' &&
+                  !Array.isArray(input) &&
+                  Object.keys(input).length === 0)
+
               if (inputIsEmpty && env.build) {
                 env.build.rollupOptions = env.build.rollupOptions || {}
                 env.build.rollupOptions.input = 'virtual:dummy-ssr-entry'
               }
             }
           }
-        }
+        },
       },
       {
         name: 'trace-mongodb',
         enforce: 'pre',
         resolveId(source, importer) {
-          if (this.environment?.name === 'client' && (source.includes('mongodb') || source.includes('zstd'))) {
-            console.error(`\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`)
+          if (
+            this.environment?.name === 'client' &&
+            (source.includes('mongodb') || source.includes('zstd'))
+          ) {
+            console.error(
+              `\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`,
+            )
           }
-        }
+        },
       },
       shouldAnalyzeBundle &&
         visualizer({
