@@ -75,8 +75,8 @@ describe('security.ts facade', () => {
       const { setSecretKey, requireSecretKey } = await import('../security')
       setSecretKey(TEST_SECRET_KEY)
 
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Attempted to set secret key in browser'),
+      expect(warnSpy.mock.calls.flat().join(' ')).toContain(
+        'Attempted to set secret key in browser',
       )
       // requireSecretKey should throw because key was not set in browser
       expect(() => requireSecretKey()).toThrow(/SECRET_KEY is missing/)

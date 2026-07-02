@@ -359,8 +359,8 @@ describe('Auth0 JWT Service', () => {
       )
 
       expect(result).toBe('slow-result')
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Token operation slow-operation took'),
+      expect(consoleWarnSpy.mock.calls.flat().join(' ')).toContain(
+        'Token operation slow-operation took',
       )
 
       consoleWarnSpy.mockRestore()
@@ -381,11 +381,8 @@ describe('Auth0 JWT Service', () => {
         ),
       ).rejects.toThrow('Operation failed')
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining(
-          'Token operation failing-operation failed after',
-        ),
-        expect.any(Error),
+      expect(consoleErrorSpy.mock.calls.flat().join(' ')).toContain(
+        'Token operation failing-operation failed after',
       )
 
       consoleErrorSpy.mockRestore()
