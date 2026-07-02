@@ -2,7 +2,7 @@
  * Browser storage utilities for safely interacting with localStorage
  */
 
-import { isBrowserEnvironment } from './crypto'
+const isBrowserEnvironment = () => typeof window !== 'undefined' && typeof document !== 'undefined'
 
 /**
  * Safely gets an item from localStorage

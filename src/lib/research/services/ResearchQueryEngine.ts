@@ -60,7 +60,7 @@ export class ResearchQueryEngine {
     this.config = config
     this.anonymizationService = anonymizationService
     this.consentService = consentService
-    this.hipaaService = hipaaService
+    this._hipaaService = hipaaService
   }
 
   /**

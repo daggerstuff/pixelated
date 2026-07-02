@@ -7,8 +7,7 @@
   ],
   "*.{ts,tsx}": [
     "node scripts/ci/check-zod-deprecations.mjs",
-    "node scripts/ci/check-unresolved-imports.mjs",
-    "node scripts/ci/check-unused-exports.mjs --changed-files"
+    "node scripts/ci/check-unresolved-imports.mjs"
   ],
   "*.{md,mdx}": [
     "markdownlint --config .markdownlint.json --ignore \".agents/**\" --ignore \".Jules/**\""

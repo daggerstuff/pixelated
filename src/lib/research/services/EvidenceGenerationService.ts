@@ -53,8 +53,8 @@ export class EvidenceGenerationService {
     queryEngine?: ResearchQueryEngine,
   ) {
     this.config = config
-    if (patternService) this.patternService = patternService
-    if (queryEngine) this.queryEngine = queryEngine
+    if (patternService) this._patternService = patternService
+    if (queryEngine) this._queryEngine = queryEngine
   }
 
   /**

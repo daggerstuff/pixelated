@@ -34,7 +34,7 @@ function toDataType(value: unknown): EncryptedData["dataType"] {
 /**
  * Real implementation of FHEService that uses the SEAL-based homomorphic operations
  */
-class RealFHEService implements FHEService {
+export class RealFHEService implements FHEService {
   private initialized = false;
   private initPromise: Promise<void> | null = null;
   public readonly scheme: FHEScheme = {

@@ -224,7 +224,7 @@ overrides:
   '@astrojs/react>rollup': ^4.59.0
   '@astrojs/react>svgo': ^4.0.1
   '@astrojs/react>undici': ^7.25.0
-  '@astrojs/vercel': '>=10.0.2'
+  '@astrojs/vercel': '10.0.8'
   '@astrojs/vercel>@vercel/routing-utils': npm:@vercel/routing-utils@6.2.0
   '@astrojs/vercel>@vercel/routing-utils@5.3.3': npm:@vercel/routing-utils@6.2.0
   '@astrojs/vercel>path-to-regexp': 6.3.0
@@ -261,7 +261,8 @@ overrides:
   astro>devalue: '>=5.8.1'
   axios: '>=1.15.1'
   brace-expansion: '>=5.0.5'
-  cookie: '>=1.0.3'
+  cookie: '^0.7.2'
+  '@vercel/oidc': '3.7.1'
   devalue: '>=5.8.1'
   devalue@<5.8.1: ^5.8.1
   diff: ^5.2.2
@@ -329,3 +330,4 @@ overrides:
   ws: '>=8.21.0'
 patchedDependencies:
   '@astrojs/internal-helpers@0.10.0': patches/@astrojs__internal-helpers@0.10.0.patch
+  '@astrojs/vercel': patches/@astrojs__vercel.patch

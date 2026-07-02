@@ -1007,7 +1007,13 @@ export class RedisService extends EventEmitter implements IRedisService {
   async isHealthy(): Promise<boolean> {
     try {
       const client = await this.ensureConnection()
-      await client.ping()
+      const result = await client.ping()
+      if (result !== 'PONG' && result !== true) {
+        throw new RedisServiceError(
+          RedisErrorCode.OPERATION_FAILED,
+          'Ping failed or returned unexpected response',
+        )
+      }
       return true
     } catch (error: unknown) {
       logger.error('Redis health check failed:', {
