@@ -271,7 +271,7 @@
     "clsx": "latest",
     "commander": "latest",
     "compression": "latest",
-    "cookie": "^2.0.1",
+    "cookie": "^0.7.2",
     "cors": "latest",
     "crypto-js": "^4.2.0",
     "date-fns": "latest",
