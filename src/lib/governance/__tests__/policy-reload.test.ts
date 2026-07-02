@@ -34,12 +34,12 @@ describe('PolicyEngine hot reload', () => {
   })
 
   it('logs when reloadPolicies is called without store', async () => {
-    const consoleSpy = vi.spyOn(console, 'log')
+    const consoleSpy = vi.spyOn(console, 'info')
 
     await engine.reloadPolicies()
 
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining('No policy store configured'),
+    expect(consoleSpy.mock.calls.flat().join(' ')).toContain(
+      'No policy store configured',
     )
 
     consoleSpy.mockRestore()
