@@ -103,6 +103,13 @@ if [ -n "$NVM_SH" ]; then
     nvm use --silent >/dev/null 2>&1 || true
 fi
 
+# Vercel may be pinned to Node 22. Standard oxlint works on Node 22.
+if [ "${VERCEL:-}" = "1" ] && [ "$MIN_MAJOR" -gt 22 ]; then
+    MIN_MAJOR=22
+    MIN_SOURCE="vercel-override"
+    SOURCE_SUFFIX=""
+fi
+
 ACTUAL_MAJOR="$(node -p "parseInt(process.versions.node.split('.')[0], 10)")"
 
 if [ "$ACTUAL_MAJOR" -lt "$MIN_MAJOR" ]; then

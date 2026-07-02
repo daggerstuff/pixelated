@@ -6,11 +6,22 @@
  * random selection, and cryptographic operations.
  */
 
-import {
-  getRandomBytes,
-  secureRandomInt,
-  randomInt as secureRandomIntRange,
-} from '../utils.js'
+import { secureRandomInt } from '../crypto/secure-random'
+
+export function getRandomBytes(length: number): Uint8Array {
+  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+    return crypto.getRandomValues(new Uint8Array(length))
+  }
+  const bytes = new Uint8Array(length)
+  for (let i = 0; i < length; i++) {
+    bytes[i] = Math.floor(Math.random() * 256)
+  }
+  return bytes
+}
+
+export function secureRandomIntRange(min: number, max: number): number {
+  return min + secureRandomInt(max - min + 1)
+}
 
 /**
  * Generates a cryptographically secure random string for IDs

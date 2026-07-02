@@ -22,6 +22,16 @@ import type {
 const logger = createBuildSafeLogger('fhe-service')
 
 /**
+ * Maps typeof result to the EncryptedData.dataType union.
+ */
+function toDataType(value: unknown): EncryptedData['dataType'] {
+  const t = typeof value
+  if (t === 'number' || t === 'string' || t === 'boolean') return t
+  if (Array.isArray(value)) return 'array'
+  return 'object'
+}
+
+/**
  * Real implementation of FHEService that uses the SEAL-based homomorphic operations
  */
 export class RealFHEService implements FHEService {
@@ -41,7 +51,14 @@ export class RealFHEService implements FHEService {
   /**
    * Initialize the FHE service
    */
-  public async initialize(options?: any): Promise<void> {
+  public async initialize(options?: {
+    mode?: string
+    keySize?: number
+    securityLevel?: string
+    enableClientSide?: boolean
+    enableServerSide?: boolean
+    enableDebug?: boolean
+  }): Promise<void> {
     if (this.initialized) return
     if (this.initPromise) return this.initPromise
 
@@ -99,12 +116,12 @@ export class RealFHEService implements FHEService {
       const ciphertext = scope.track(await sealService.encrypt(dataToEncrypt))
 
       // 3. Serialize
-      const serialized = (ciphertext as any).save()
+      const serialized = ciphertext.save()
 
       return {
         id: 'enc-' + Date.now(),
         data: serialized,
-        dataType: typeof value as any,
+        dataType: toDataType(value),
         metadata: {
           encryptedAt: Date.now(),
           mode: EncryptionMode.FHE,
@@ -139,8 +156,8 @@ export class RealFHEService implements FHEService {
       const seal = sealService.getSeal()
       const context = sealService.getContext()
 
-      const ciphertext = scope.track(seal.CipherText()) as any
-      ciphertext.load(context, encryptedData.data)
+      const ciphertext = scope.track(seal.CipherText())
+      ciphertext.load(context, encryptedData.data as string)
 
       // 2. Decrypt
       const decryptedNumbers = await sealService.decrypt(ciphertext)

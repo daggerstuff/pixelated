@@ -1,28 +1,24 @@
-import { KVStore } from '../../db/KVStore'
-import type { PatientProfile, ConversationMessage } from '../models/patient' // Assuming createPatientProfile might be used or relevant
-// For ProfileIdentifier name
-
-/**
- * Profile identifier type
- */
-export type ProfileIdentifier = {
-  id: string // Profile ID, likely same as CognitiveModel ID
-  name: string // Patient's name from CognitiveModel
-}
+import { KVStore } from "../../db/KVStore";
+import type { PatientProfile, ConversationMessage } from "../models/patient"; // Assuming createPatientProfile might be used or relevant
 
 /**
  * Service for managing patient profiles (CRUD operations and history).
  */
-import { createBuildSafeLogger } from '../../logging/build-safe-logger'
+import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
-const patientLogger = createBuildSafeLogger('patient-profile-service')
+const patientLogger = createBuildSafeLogger("patient-profile-service");
+
+export interface ProfileIdentifier {
+  id: string;
+  name: string;
+}
 
 export class PatientProfileService {
-  private readonly kvStore: KVStore
-  private readonly PROFILE_PREFIX = 'profile_'
+  private readonly kvStore: KVStore;
+  private readonly PROFILE_PREFIX = "profile_";
 
   constructor(kvStore: KVStore) {
-    this.kvStore = kvStore
+    this.kvStore = kvStore;
   }
 
   /**
@@ -31,26 +27,24 @@ export class PatientProfileService {
    */
   async getAvailableProfiles(): Promise<ProfileIdentifier[]> {
     try {
-      const keys = await this.kvStore.keys()
-      const profileKeys = keys.filter((key) =>
-        key.startsWith(this.PROFILE_PREFIX),
-      )
-      const profiles: ProfileIdentifier[] = []
+      const keys = await this.kvStore.keys();
+      const profileKeys = keys.filter((key) => key.startsWith(this.PROFILE_PREFIX));
+      const profiles: ProfileIdentifier[] = [];
 
       for (const key of profileKeys) {
-        const profile = await this.kvStore.get<PatientProfile>(key)
+        const profile = await this.kvStore.get<PatientProfile>(key);
         if (profile) {
           profiles.push({
             id: profile.id,
             name: profile.cognitiveModel.name,
-          })
+          });
         }
       }
-      return profiles
+      return profiles;
     } catch (error: unknown) {
-      patientLogger.error('Failed to get available profiles', error)
+      patientLogger.error("Failed to get available profiles", error);
       // In a real app, consider more specific error handling or re-throwing
-      return []
+      return [];
     }
   }
 
@@ -61,12 +55,10 @@ export class PatientProfileService {
    */
   async getProfileById(id: string): Promise<PatientProfile | null> {
     try {
-      return await this.kvStore.get<PatientProfile>(
-        `${this.PROFILE_PREFIX}${id}`,
-      )
+      return await this.kvStore.get<PatientProfile>(`${this.PROFILE_PREFIX}${id}`);
     } catch (error: unknown) {
-      patientLogger.error(`Failed to get profile with ID ${id}`, error)
-      return null
+      patientLogger.error(`Failed to get profile with ID ${id}`, error);
+      return null;
     }
   }
 
@@ -81,15 +73,12 @@ export class PatientProfileService {
       const profileToSave: PatientProfile = {
         ...profile,
         lastUpdatedAt: new Date().toISOString(), // Ensure lastUpdatedAt is current
-      }
-      await this.kvStore.set(
-        `${this.PROFILE_PREFIX}${profile.id}`,
-        profileToSave,
-      )
-      return true
+      };
+      await this.kvStore.set(`${this.PROFILE_PREFIX}${profile.id}`, profileToSave);
+      return true;
     } catch (error: unknown) {
-      patientLogger.error(`Failed to save profile ${profile.id}`, error)
-      return false
+      patientLogger.error(`Failed to save profile ${profile.id}`, error);
+      return false;
     }
   }
 
@@ -100,11 +89,11 @@ export class PatientProfileService {
    */
   async deleteProfile(id: string): Promise<boolean> {
     try {
-      await this.kvStore.delete(`${this.PROFILE_PREFIX}${id}`)
-      return true
+      await this.kvStore.delete(`${this.PROFILE_PREFIX}${id}`);
+      return true;
     } catch (error: unknown) {
-      patientLogger.error(`Failed to delete profile ${id}`, error)
-      return false
+      patientLogger.error(`Failed to delete profile ${id}`, error);
+      return false;
     }
   }
 
@@ -120,14 +109,14 @@ export class PatientProfileService {
   async addMessageToPatientHistory(
     profileId: string,
     messageContent: string,
-    role: 'therapist' | 'patient' | 'system',
+    role: "therapist" | "patient" | "system",
     sessionId?: string,
     metadata?: Record<string, unknown>,
   ): Promise<PatientProfile | null> {
-    const profile = await this.getProfileById(profileId)
+    const profile = await this.getProfileById(profileId);
     if (!profile) {
-      patientLogger.error(`Profile with ID ${profileId} not found when trying to add message.`)
-      return null
+      patientLogger.error(`Profile with ID ${profileId} not found when trying to add message.`);
+      return null;
     }
 
     const newMessage: ConversationMessage = {
@@ -136,16 +125,16 @@ export class PatientProfileService {
       timestamp: new Date().toISOString(),
       sessionId,
       metadata,
-    }
+    };
 
     // Create a new profile object with the updated history to ensure immutability
     const updatedProfile: PatientProfile = {
       ...profile,
       conversationHistory: [...profile.conversationHistory, newMessage],
       // lastUpdatedAt will be updated by saveProfile
-    }
+    };
 
-    const success = await this.saveProfile(updatedProfile)
-    return success ? updatedProfile : null
+    const success = await this.saveProfile(updatedProfile);
+    return success ? updatedProfile : null;
   }
 }

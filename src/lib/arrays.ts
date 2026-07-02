@@ -2,7 +2,7 @@
  * Array utilities including chunk, unique, groupBy, shuffle, and range
  */
 
-import { secureRandomInt } from './crypto'
+import { secureRandomInt } from './crypto/secure-random'
 
 // ============================================================================
 // Error messages

@@ -18,6 +18,9 @@ function userIdFromSessionUser(user: SessionUserWithLegacyId): string | null {
  * Utility to verify auth tokens using Auth0 service.
  */
 export async function verifyAuthToken(token: string) {
+  if (!token || typeof token !== 'string') {
+    throw new Error('Token is required for verification')
+  }
   const cleanToken = token.startsWith('Bearer ') ? token.substring(7) : token
   return await auth0VerifyToken(cleanToken)
 }

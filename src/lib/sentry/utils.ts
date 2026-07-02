@@ -12,16 +12,14 @@ const logger = createBuildSafeLogger('utils') /**
  * bare module specifiers. We instead use a safe global shim when available.
  */
 
-const IS_DEV =
-  import.meta?.env
-    ? import.meta.env.DEV
-    : typeof process !== 'undefined' &&
-      process.env?.['NODE_ENV'] === 'development'
-const ENV_MODE =
-  import.meta?.env
-    ? import.meta.env.MODE
-    : (typeof process !== 'undefined' && process.env?.['NODE_ENV']) ??
-      'production'
+const IS_DEV = import.meta?.env
+  ? import.meta.env.DEV
+  : typeof process !== 'undefined' &&
+    process.env?.['NODE_ENV'] === 'development'
+const ENV_MODE = import.meta?.env
+  ? import.meta.env.MODE
+  : ((typeof process !== 'undefined' && process.env?.['NODE_ENV']) ??
+    'production')
 
 type SentryShim = {
   captureException: (error: unknown) => void

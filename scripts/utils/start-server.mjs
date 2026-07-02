@@ -91,7 +91,7 @@ function resolveSentryDsn() {
 }
 
 /** @type {unknown} */
-const ssrModuleCandidate = await import(resolveSsrEntryModuleUrl());
+const ssrModuleCandidate = await import(await resolveSsrEntryModuleUrl());
 if (!isSSRModule(ssrModuleCandidate)) {
   throw new Error("Failed to import SSR module with expected handler export.");
 }
