@@ -31,8 +31,6 @@ const logger = createBuildSafeLogger("BiasDetectionEngine");
 
 type LayerResults = import("./types").LayerResults;
 
-export type AnalysisResult = import("./types").AnalysisResult;
-
 const DEFAULT_THRESHOLDS: BiasThresholdsConfig = {
   warning: 0.3,
   high: 0.6,

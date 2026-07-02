@@ -5,8 +5,6 @@
 import type { KVStore } from "../../db/KVStore";
 import type { CognitiveModel } from "../types/CognitiveModel";
 
-export type ModelIdentifier = string;
-
 import { createBuildSafeLogger } from "../../logging/build-safe-logger";
 
 const modelLogger = createBuildSafeLogger("patient-model-service");
