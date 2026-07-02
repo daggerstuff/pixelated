@@ -112,10 +112,17 @@ jobs:
           sudo mv kubectl /usr/local/bin/
 
           KUSTOMIZE_VERSION=5.6.0
-          curl -sLO "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
-          tar xzf "kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          KUSTOMIZE_BASE_URL="https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}"
+          KUSTOMIZE_ARCHIVE="kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+
+          curl -sSfL "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}" -o "${KUSTOMIZE_ARCHIVE}"
+          curl -sSfL "${KUSTOMIZE_BASE_URL}/${KUSTOMIZE_ARCHIVE}.sha256" -o "${KUSTOMIZE_ARCHIVE}.sha256"
+
+          sha256sum --check "${KUSTOMIZE_ARCHIVE}.sha256"
+
+          tar xzf "${KUSTOMIZE_ARCHIVE}"
           sudo mv kustomize /usr/local/bin/
-          rm "kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
+          rm "${KUSTOMIZE_ARCHIVE}" "${KUSTOMIZE_ARCHIVE}.sha256"
 
       - name: Deploy to Civo
         run: |
