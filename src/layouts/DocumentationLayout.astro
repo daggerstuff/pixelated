@@ -4,6 +4,8 @@ import Navbar from '@/components/mizu/Navbar.astro'
 import Footer from '@/components/mizu/Footer.astro'
 import ToTopButton from '@/components/widgets/ToTopButton.astro'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+import SpeedInsights from '@vercel/speed-insights/astro'
+import Analytics from '@vercel/analytics/astro'
 import '@/styles/docs-prose.css'
 import { FEATURES } from '@/config'
 
@@ -35,6 +37,7 @@ const description = frontmatter?.description || propDescription
 const image = frontmatter?.image || propImage
 const { cspNonce } = Astro.locals
 const { nprogress, mediumZoom } = FEATURES
+const shouldRenderAnalytics = process.env['NODE_ENV'] !== 'test'
 ---
 
 <!doctype html>
@@ -260,5 +263,15 @@ const { nprogress, mediumZoom } = FEATURES
         }
       })
     </script>
+
+    <!-- Vercel Speed Insights and Analytics -->
+    {
+      shouldRenderAnalytics && (
+        <>
+          <SpeedInsights />
+          <Analytics />
+        </>
+      )
+    }
   </body>
 </html>

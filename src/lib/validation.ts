@@ -2,7 +2,8 @@
  * Validation utilities including type guards, number helpers, object utilities, and error handling
  */
 
-import { isNonNullObject } from './crypto'
+const isNonNullObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
 
 // ============================================================================
 // Type Guards

@@ -250,8 +250,12 @@ export class FHEParameterOptimizer {
     const complexity = OPERATION_COMPLEXITY[operation] || 5
 
     // Determine base preset based on scheme
-    const basePreset = scheme === SealSchemeType.CKKS ? 'ckks-default' :
-      scheme === SealSchemeType.BGV ? 'bgv-default' : 'bfv-default'
+    const basePreset =
+      scheme === SealSchemeType.CKKS
+        ? 'ckks-default'
+        : scheme === SealSchemeType.BGV
+          ? 'bgv-default'
+          : 'bfv-default'
 
     // Apply strategy-based modifications
     switch (this.strategy) {
@@ -293,8 +297,12 @@ export class FHEParameterOptimizer {
     )
 
     // Base parameters on the scheme
-    const basePreset = scheme === SealSchemeType.CKKS ? 'ckks-default' :
-      scheme === SealSchemeType.BGV ? 'bgv-default' : 'bfv-default'
+    const basePreset =
+      scheme === SealSchemeType.CKKS
+        ? 'ckks-default'
+        : scheme === SealSchemeType.BGV
+          ? 'bgv-default'
+          : 'bfv-default'
 
     // Create a customized parameter set based on operation needs
     const params = this.createCustomParameters(
@@ -352,8 +360,12 @@ export class FHEParameterOptimizer {
     )
 
     // Determine base preset based on scheme
-    const basePreset = scheme === SealSchemeType.CKKS ? 'ckks-default' :
-      scheme === SealSchemeType.BGV ? 'bgv-default' : 'bfv-default'
+    const basePreset =
+      scheme === SealSchemeType.CKKS
+        ? 'ckks-default'
+        : scheme === SealSchemeType.BGV
+          ? 'bgv-default'
+          : 'bfv-default'
 
     // Create context-specific parameters
     return this.createCustomParameters(basePreset, adjustedComplexity, scheme)

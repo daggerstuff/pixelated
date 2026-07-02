@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-import {
-  PatientModelService,
-  type ModelIdentifier,
-} from '@/lib/ai/services/PatientModelService'
+import { PatientModelService } from '@/lib/ai/services/PatientModelService'
 import type {
   CognitiveModel,
   PatientResponseStyleConfig,
@@ -15,7 +12,7 @@ export function usePatientModel() {
   const [error, setError] = useState<string | null>(null)
   const [patientService, setPatientService] =
     useState<PatientModelService | null>(null)
-  const [availableModels, setAvailableModels] = useState<ModelIdentifier[]>([])
+  const [availableModels, setAvailableModels] = useState<string[]>([])
   const [currentModelId, setCurrentModelId] = useState<string | null>(null)
   const [currentModel, setCurrentModel] = useState<CognitiveModel | null>(null)
   const [styleConfig, setStyleConfig] = useState<PatientResponseStyleConfig>({
