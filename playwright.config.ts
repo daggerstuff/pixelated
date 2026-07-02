@@ -59,7 +59,7 @@ export default defineConfig({
       ? undefined
       : isCi
         ? {
-            command: `NODE_ENV=test pnpm run build && NODE_ENV=test pnpm run preview`,
+            command: `NODE_ENV=test pnpm run build && NODE_ENV=test ./node_modules/.bin/astro preview --host 0.0.0.0 --port ${webServerPort ?? 4321}`,
             url: webServerUrl ?? 'http://127.0.0.1:4321',
             reuseExistingServer: false,
             timeout: 10 * 60 * 1000,
