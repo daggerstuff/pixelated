@@ -236,6 +236,9 @@ function getChunkName(id) {
     return 'mongoose-vendor'
   }
   if (normalizedId.includes('/node_modules/')) {
+    if (normalizedId.includes('node_modules/astro/')) {
+      return null;
+    }
     return 'vendor'
   }
   return null
@@ -324,45 +327,97 @@ export default defineConfig({
     },
     plugins: [
       {
-        name: 'fix-vite-rollup-options',
+        name: 'fix-vite-ssr-input',
         enforce: 'post',
         resolveId(id) {
-          if (id === 'virtual:dummy-client-entry') {
-            return '\0virtual:dummy-client-entry'
+          if (id === 'virtual:dummy-ssr-entry') {
+            return '\0virtual:dummy-ssr-entry'
           }
         },
         load(id) {
-          if (id === '\0virtual:dummy-client-entry') {
+          if (id === '\0virtual:dummy-ssr-entry') {
             return 'export default {}'
           }
         },
         config(config) {
-          if (config.build?.rolldownOptions) {
-            config.build.rollupOptions = {
-              ...(config.build.rollupOptions || {}),
-              ...config.build.rolldownOptions,
-            }
-          }
           if (config.environments) {
-            for (const env of Object.values(config.environments)) {
+            const ASTRO_MANAGED_ENVS = new Set(['client', 'server', 'ssr'])
+            
+            for (const [name, env] of Object.entries(config.environments)) {
               if (env.build?.rolldownOptions) {
-                env.build.rollupOptions = {
-                  ...(env.build.rollupOptions || {}),
-                  ...env.build.rolldownOptions,
+                // Ensure rollupOptions exists
+                env.build.rollupOptions = env.build.rollupOptions || {}
+                
+                // Copy properties
+                if (name === 'ssr' || name === 'prerender' || name === 'server') {
+                  if (env.build.rolldownOptions.input) {
+                    // Copy as an object to match what Astro/Vercel expects
+                    if (typeof env.build.rolldownOptions.input === 'string') {
+                      env.build.rollupOptions.input = { entry: env.build.rolldownOptions.input }
+                    } else if (Array.isArray(env.build.rolldownOptions.input)) {
+                      env.build.rollupOptions.input = Object.fromEntries(
+                        env.build.rolldownOptions.input.map((v, i) => [i === 0 ? 'entry' : `entry_${i}`, v])
+                      )
+                    } else if (typeof env.build.rolldownOptions.input === 'object' && env.build.rolldownOptions.input !== null) {
+                      const inputObj = { ...env.build.rolldownOptions.input }
+                      if (inputObj.index && !inputObj.entry) {
+                        inputObj.entry = inputObj.index
+                        delete inputObj.index
+                      }
+                      env.build.rollupOptions.input = inputObj
+                    } else {
+                      env.build.rollupOptions.input = env.build.rolldownOptions.input
+                    }
+                  }
+                  
+                  if (env.build.rolldownOptions.output) {
+                    env.build.rollupOptions.output = env.build.rollupOptions.output || {}
+                    Object.assign(env.build.rollupOptions.output, env.build.rolldownOptions.output)
+                    if (!Array.isArray(env.build.rollupOptions.output)) {
+                      env.build.rollupOptions.output.entryFileNames = 'entry.mjs'
+                    }
+                  } else {
+                    env.build.rollupOptions.output = { entryFileNames: 'entry.mjs' }
+                  }
+                } else {
+                  // For non-server envs, just do a normal spread
+                  env.build.rollupOptions = {
+                    ...env.build.rollupOptions,
+                    ...env.build.rolldownOptions,
+                  }
                 }
               }
+
+              // Astro-managed environment names — their inputs are set by Astro
+              // during the build and must not be overridden with a dummy entry.
+              // Injecting a dummy input here causes the SSR manifest to contain a
+              // script entry with an undefined file path, which crashes
+              // splitAssetPath() at runtime (PIXEL-FAST-14).
+              if (ASTRO_MANAGED_ENVS.has(name)) continue
+
               const input = env.build?.rollupOptions?.input
-              if (!input || (Array.isArray(input) && input.length === 0) || (typeof input === 'object' && Object.keys(input).length === 0)) {
-                if (env.build) {
-                  env.build.rollupOptions = env.build.rollupOptions || {}
-                  env.build.rollupOptions.input = 'virtual:dummy-client-entry'
-                }
+              const inputIsEmpty =
+                !input ||
+                (Array.isArray(input) && input.length === 0) ||
+                (typeof input === 'object' && !Array.isArray(input) && Object.keys(input).length === 0)
+              
+              if (inputIsEmpty && env.build) {
+                env.build.rollupOptions = env.build.rollupOptions || {}
+                env.build.rollupOptions.input = 'virtual:dummy-ssr-entry'
               }
             }
           }
-        },
+        }
       },
-      // Bundle analyzer for production builds
+      {
+        name: 'trace-mongodb',
+        enforce: 'pre',
+        resolveId(source, importer) {
+          if (this.environment?.name === 'client' && (source.includes('mongodb') || source.includes('zstd'))) {
+            console.error(`\n\n[CLIENT TRACE] ${importer} IMPORTS ${source}\n\n`)
+          }
+        }
+      },
       shouldAnalyzeBundle &&
         visualizer({
           filename: 'dist/bundle-analysis.html',
