@@ -250,9 +250,9 @@ const adapter = (() => {
       // "serve" (the default) targets self-hosted edge runtimes and is why
       // Vercel returns 404 NOT_FOUND — it can't find a serverless handler.
       web: true,
-      // Disable NFT tracing to avoid "URI malformed" errors from pnpm store
       // paths containing "+" characters that decodeURIComponent misinterprets.
       nft: false,
+      excludeFiles: ['./ai/**/*'],
     })
   }
   console.log('🟢 Using Node adapter for standard deployment')
