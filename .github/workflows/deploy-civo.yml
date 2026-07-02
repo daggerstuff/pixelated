@@ -50,8 +50,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags:
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
             steps.vars.outputs.image_tag }}, ${{ env.REGISTRY }}/${{
             env.IMAGE_NAME }}:latest
           cache-from: type=gha
@@ -116,6 +115,7 @@ jobs:
           curl -sLO "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
           tar xzf "kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
           sudo mv kustomize /usr/local/bin/
+          rm "kustomize_${KUSTOMIZE_VERSION}_linux_amd64.tar.gz"
 
       - name: Deploy to Civo
         run: |

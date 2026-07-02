@@ -40,7 +40,32 @@ async function findHandlerEntryFile() {
   return null
 }
 
+/** @returns {Promise<string>} */
+async function resolveServerEntryName() {
+  if (process.env.SSR_SERVER_ENTRY?.trim()) {
+    return process.env.SSR_SERVER_ENTRY.trim()
+  }
+
+  try {
+    const configUrl = pathToFileURL(path.resolve(process.cwd(), 'astro.config.mjs')).href
+    const astroConfig = await import(configUrl)
+    const serverEntry = astroConfig.default?.build?.serverEntry
+    if (typeof serverEntry === 'string' && serverEntry.trim().length > 0) {
+      return serverEntry.trim()
+    }
+  } catch (error) {
+    console.warn(
+      '[ensure-server-entry] Could not read astro.config.mjs serverEntry:',
+      error instanceof Error ? error.message : error,
+    )
+  }
+
+  return 'entry2.mjs'
+}
+
 async function main() {
+  const targetName = await resolveServerEntryName()
+  const targetPath = path.join(serverDir, targetName)
   const handlerFile = await findHandlerEntryFile()
   if (!handlerFile) {
     throw new Error('No SSR handler module found under dist/server')
@@ -51,6 +76,7 @@ async function main() {
     if (typeof exports.handler !== 'function') {
       throw new Error(`${targetName} exists but does not export handler`)
     }
+    console.log(`[ensure-server-entry] ${targetName} already exports handler`)
     return
   }
 
