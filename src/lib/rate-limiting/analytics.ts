@@ -150,9 +150,9 @@ export class RateLimitAnalyticsService {
         if (Object.keys(dailyData).length > 0) {
           const analyticsEntry: RateLimitAnalytics = {
             date: dateStr,
-            totalRequests: parseInt(dailyData.request_total ?? '0'),
-            blockedRequests: parseInt(dailyData.blocked_total ?? '0'),
-            uniqueIdentifiers: parseInt(dailyData.unique_identifiers ?? '0'),
+            totalRequests: parseInt(dailyData['request_total'] ?? '0'),
+            blockedRequests: parseInt(dailyData['blocked_total'] ?? '0'),
+            uniqueIdentifiers: parseInt(dailyData['unique_identifiers'] ?? '0'),
             topBlocked: [],
             attackPatterns: [],
           }
@@ -212,10 +212,10 @@ export class RateLimitAnalyticsService {
       if (Object.keys(data).length > 0) {
         hourlyData.push({
           hour,
-          totalRequests: parseInt(data.request_total ?? '0'),
-          blockedRequests: parseInt(data.blocked_total ?? '0'),
-          attackDetections: parseInt(data.attack_detected_total ?? '0'),
-          errors: parseInt(data.error_total ?? '0'),
+          totalRequests: parseInt(data['request_total'] ?? '0'),
+          blockedRequests: parseInt(data['blocked_total'] ?? '0'),
+          attackDetections: parseInt(data['attack_detected_total'] ?? '0'),
+          errors: parseInt(data['error_total'] ?? '0'),
         })
       }
     }
@@ -257,10 +257,10 @@ export class RateLimitAnalyticsService {
         const data = (await redisClient['hgetall'](key)) ?? {}
         const ruleName = key.split(':')[1] ?? 'unknown'
 
-        const requests = parseInt(data.request_total ?? '0')
-        const blocked = parseInt(data.blocked_total ?? '0')
-        const attacks = parseInt(data.attack_detected_total ?? '0')
-        const errorCount = parseInt(data.error_total ?? '0')
+        const requests = parseInt(data['request_total'] ?? '0')
+        const blocked = parseInt(data['blocked_total'] ?? '0')
+        const attacks = parseInt(data['attack_detected_total'] ?? '0')
+        const errorCount = parseInt(data['error_total'] ?? '0')
 
         totalRequests += requests
         blockedRequests += blocked

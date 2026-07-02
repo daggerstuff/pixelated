@@ -77,34 +77,39 @@ interface LegacyRedisClient {
   quit(): Promise<unknown>
   disconnect(): void
   // Extended operations (used by tests / threat detection)
-  hset?(key: string, field: string, value: string): Promise<number>
-  hget?(key: string, field: string): Promise<string | null>
-  hgetall?(key: string): Promise<Record<string, string>>
-  hdel?(key: string, field: string): Promise<number>
-  hlen?(key: string): Promise<number>
-  incr?(key: string): Promise<number>
-  sadd?(key: string, member: string): Promise<number>
-  srem?(key: string, member: string): Promise<number>
-  smembers?(key: string): Promise<string[]>
-  lpush?(key: string, ...elements: string[]): Promise<number>
-  lrange?(key: string, start: number, stop: number): Promise<string[]>
-  rpoplpush?(source: string, destination: string): Promise<string | null>
-  lrem?(key: string, count: number, value: string): Promise<number>
-  llen?(key: string): Promise<number>
-  keys?(pattern: string): Promise<string[]>
-  pipeline?(): {
+  hset(key: string, field: string, value: string): Promise<number>
+  hget(key: string, field: string): Promise<string | null>
+  hgetall(key: string): Promise<Record<string, string>>
+  hdel(key: string, field: string): Promise<number>
+  hlen(key: string): Promise<number>
+  incr(key: string): Promise<number>
+  sadd(key: string, member: string): Promise<number>
+  srem(key: string, member: string): Promise<number>
+  smembers(key: string): Promise<string[]>
+  lpush(key: string, ...elements: string[]): Promise<number>
+  lrange(key: string, start: number, stop: number): Promise<string[]>
+  rpoplpush(source: string, destination: string): Promise<string | null>
+  lrem(key: string, count: number, value: string): Promise<number>
+  llen(key: string): Promise<number>
+  keys(pattern: string): Promise<string[]>
+  pipeline(): {
     setex: (key: string, seconds: number, value: string) => { setex: unknown[] }
     sadd: (key: string, member: string) => { sadd: unknown[] }
     expire: (key: string, seconds: number) => { expire: unknown[] }
     incr: (key: string) => { incr: unknown[] }
-    hset?: (
+    hincrby: (
+      key: string,
+      field: string,
+      increment: number,
+    ) => { hincrby: unknown[] }
+    hset: (
       key: string,
       field: string,
       value: string | number,
     ) => { hset: unknown[] }
     exec: () => Promise<[Error | null, unknown][]>
   }
-  multi?(): unknown
+  multi(): unknown
   // For mock-only methods used by old tests
   flushall?(): Promise<string>
   ttl?(key: string): Promise<number>
@@ -361,7 +366,6 @@ const redisClient: LegacyRedisClient = {
     }
   },
 
-  // Pipeline/multi — rarely used from @/lib/redis; return a minimal stub
   pipeline: () => ({
     setex: (_key: string, _seconds: number, _value: string) => ({
       setex: [_key, _seconds, _value],
@@ -371,6 +375,29 @@ const redisClient: LegacyRedisClient = {
       expire: [_key, _seconds],
     }),
     incr: (_key: string) => ({ incr: [_key] }),
+    hincrby: (_key: string, _field: string, _increment: number) => ({
+      hincrby: [_key, _field, _increment],
+    }),
+    hset: (_key: string, _field: string, _value: string | number) => ({
+      hset: [_key, _field, _value],
+    }),
+    exec: async () => [['OK']] as unknown as [Error | null, unknown][],
+  }),
+  multi: () => ({
+    setex: (_key: string, _seconds: number, _value: string) => ({
+      setex: [_key, _seconds, _value],
+    }),
+    sadd: (_key: string, _member: string) => ({ sadd: [_key, _member] }),
+    expire: (_key: string, _seconds: number) => ({
+      expire: [_key, _seconds],
+    }),
+    incr: (_key: string) => ({ incr: [_key] }),
+    hincrby: (_key: string, _field: string, _increment: number) => ({
+      hincrby: [_key, _field, _increment],
+    }),
+    hset: (_key: string, _field: string, _value: string | number) => ({
+      hset: [_key, _field, _value],
+    }),
     exec: async () => [['OK']] as unknown as [Error | null, unknown][],
   }),
 }
@@ -384,13 +411,6 @@ const redisClient: LegacyRedisClient = {
  * `@/lib/services/redis`. Kept for backward compatibility.
  */
 export const redis: LegacyRedisClient = redisClient
-
-/**
- * Return the legacy client (getter for consistency).
- */
-export function getRedisClient(): LegacyRedisClient {
-  return redisClient
-}
 
 /**
  * JSON-deserialising get wrapper. Returns `null` on miss/error.
