@@ -33,7 +33,7 @@ dependencies = [
   "psutil>=7.0.0",
   "chardet>=5.2.0,<8.0.0",
   "pydub>=0.25.1",
-  "pyarrow>=22.0.0,<23", # Upper bound <23 required by data-designer-config 0.6.x/0.7.x
+  "pyarrow>=22.0.0,<25", # Upper bound <23 required by data-designer-config 0.6.x/0.7.x
   "hatch>=1.14.1",
   # Security: Fixes GHSA-5239-wwwm-4pmq (ReDoS)
   "Pygments>=2.20.0",
