@@ -1,6 +1,4 @@
 import { EventEmitter } from 'events'
-import * as fs from 'fs'
-
 import Redis from 'ioredis'
 
 import { getHipaaCompliantLogger } from '../../logging/standardized-logger'
@@ -61,37 +59,6 @@ export class RedisService extends EventEmitter implements IRedisService {
       this.config.url = upstashRedisUrl ?? ''
     } else if (hasRedisUrl) {
       this.config.url = redisUrl ?? ''
-
-      // Support for Docker Secrets (/run/secrets/*) or any *_FILE env var
-      const redisPasswordFile = process.env['REDIS_PASSWORD_FILE']
-      if (redisPasswordFile && fs.existsSync(redisPasswordFile)) {
-        try {
-          const password = fs.readFileSync(redisPasswordFile, 'utf8').trim()
-          if (password) {
-            logger.info(
-              `[RedisService] Loaded password from file: ${redisPasswordFile} (len=${password.length})`,
-            )
-            // Reconstruct URL with password if it doesn't already have one
-            const urlObj = new URL(this.config.url)
-
-            // ALWAYS use the file password if available, as it's the source of truth
-            this.config['password'] = password
-            logger.info(
-              `[RedisService] Password loaded from ${redisPasswordFile}`,
-            )
-
-            if (!urlObj.password) {
-              urlObj.password = password
-              this.config.url = urlObj.toString()
-            }
-          }
-        } catch (error: unknown) {
-          logger.error('Failed to read Redis password file:', {
-            file: redisPasswordFile,
-            error: String(error),
-          })
-        }
-      }
     }
 
     // After all resolution, if we still don't have a URL and we're not in development
