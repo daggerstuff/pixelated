@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
- * Ensure dist/server/entry.mjs exists and exports the Node adapter handler.
+ * Ensure dist/server/entry2.mjs exists and exports the Node adapter handler.
  *
- * Astro preview and @astrojs/node expect build.serverEntry (entry.mjs). Custom
- * Vite rolldown bridging can leave the adapter bundle at index.js/entry2.mjs
- * while middleware occupies entry.mjs — this script normalizes the layout.
+ * Astro preview and @astrojs/node use build.serverEntry (entry2.mjs). Custom
+ * Vite rolldown bridging can leave the adapter bundle at index.js while
+ * middleware occupies entry.mjs — this script normalizes the layout.
  */
 import { existsSync, readdirSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const serverDir = path.resolve(process.cwd(), 'dist/server')
-const targetName = 'entry.mjs'
+const targetName = 'entry2.mjs'
 const targetPath = path.join(serverDir, targetName)
 
 /** @param {string} fileName */
