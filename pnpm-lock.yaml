@@ -116,7 +116,6 @@ overrides:
 
 patchedDependencies:
   '@astrojs/internal-helpers@0.10.0': 585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3
-  '@astrojs/vercel@10.0.8': aa2044a9ec6cf69f323659d4010822ce38cd9fc161baa1a193dab0c33569d095
 
 importers:
 

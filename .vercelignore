@@ -6,6 +6,9 @@ ai/sourcing/
 ai/scripts/
 ai/tests/
 
+# Python venv - not needed for Node.js deployment
+ai/.venv/
+
 # Local dev artifacts
 .env
 .env.local
