@@ -115,16 +115,6 @@ interface LegacyRedisClient {
   ttl?(key: string): Promise<number>
 }
 
-async function safeCall<T>(fn: () => Promise<T>): Promise<T> {
-  try {
-    await ensureConnected()
-    return await fn()
-  } catch {
-    // Return sensible defaults on error (matching previous behaviour)
-    return undefined as unknown as T
-  }
-}
-
 const redisClient: LegacyRedisClient = {
   get: async (key: string) => {
     try {
