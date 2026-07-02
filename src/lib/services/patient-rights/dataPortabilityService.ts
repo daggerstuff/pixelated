@@ -17,7 +17,7 @@ class AuditLoggingService {
     userId?: string
     details: Record<string, unknown>
   }): void {
-    auditLogger.info(`[AUDIT:${this.context}]`, entry)
+    logger.info(`[AUDIT:${this.context}]`, entry)
   }
 }
 
@@ -55,21 +55,7 @@ export interface DataExportRequest {
   error?: string
 }
 
-export interface CreateDataExportParams {
-  patientId: string
-  initiatedBy: string
-  recipientType: 'provider' | 'patient' | 'research'
-  recipientName: string
-  recipientEmail: string
-  dataFormat: 'json' | 'csv' | 'fhir' | 'ccd' | 'hl7'
-  dataSections: string[]
-}
 
-export interface DataExportResult {
-  exportRequest: DataExportRequest
-  message: string
-  success: boolean
-}
 
 // Define the PatientProfile interface
 export interface PatientProfile {
@@ -94,16 +80,6 @@ export type ExportStatus =
 export type ExportFormat = 'json' | 'csv' | 'pdf' | 'xml'
 
 // Export request interface
-export interface ExportRequest {
-  patientId: string
-  format: ExportFormat
-  initiatedBy: string
-  includeCategories?: string[]
-  dateRange?: {
-    start?: string
-    end?: string
-  }
-}
 
 export interface ExportResult {
   success: boolean
@@ -117,54 +93,6 @@ export interface ExportResult {
 }
 
 // Export status response
-export interface ExportStatusResponse {
-  success: boolean
-  exportId: string
-  status: ExportStatus
-  progress: number
-  createdAt: Date
-  updatedAt: Date
-  completedAt?: Date
-  expiresAt?: Date
-  downloadUrl?: string
-  format: ExportFormat
-  dataTypes: string[]
-  estimatedCompletionTime?: Date
-  error?: string
-  message?: string
-}
-
-// Export download response for successful operations
-export interface ExportDownloadSuccessResponse {
-  success: true
-  exportId: string
-  format: ExportFormat
-  filename?: string
-  fileData?: Uint8Array | string
-  downloadUrl?: string
-  expiresAt?: Date
-}
-
-// Export download response for errors
-export interface ExportDownloadErrorResponse {
-  success: false
-  error:
-    | 'not_found'
-    | 'unauthorized'
-    | 'not_ready'
-    | 'expired'
-    | 'internal_error'
-  message?: string
-  status?: ExportStatus
-  progress?: number
-  estimatedCompletionTime?: Date
-  expiredAt?: Date
-}
-
-// Combined type for download responses
-export type ExportDownloadResponse =
-  | ExportDownloadSuccessResponse
-  | ExportDownloadErrorResponse
 
 export type ExportPriority = 'normal' | 'high'
 
