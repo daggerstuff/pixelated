@@ -413,13 +413,6 @@ const redisClient: LegacyRedisClient = {
 export const redis: LegacyRedisClient = redisClient
 
 /**
- * Return the legacy client (getter for consistency).
- */
-export function getRedisClient(): LegacyRedisClient {
-  return redisClient
-}
-
-/**
  * JSON-deserialising get wrapper. Returns `null` on miss/error.
  */
 export async function getFromCache<T = unknown>(

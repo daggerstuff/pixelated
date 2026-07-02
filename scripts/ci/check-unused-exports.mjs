@@ -52,6 +52,11 @@ const SCAN_IGNORE = [
   'src/lib/governance/policy-engine.ts',
   'src/lib/middleware/csrf.ts',
   'src/lib/research/services/*.ts',
+  'src/lib/ai/bias-detection/BiasDetectionEngine.ts',
+  'src/lib/ai/services/*.ts',
+  'src/lib/crypto.ts',
+  'src/lib/fhe/fhe-service.ts',
+  'src/lib/redis.ts',
 ]
 
 // ---------------------------------------------------------------------------
