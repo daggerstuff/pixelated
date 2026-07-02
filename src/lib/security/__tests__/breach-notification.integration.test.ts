@@ -11,10 +11,17 @@ vi.mock('../../redis', () => ({
     keys: vi.fn(),
     hset: vi.fn(),
     expire: vi.fn(),
-    // Add any other redis functions that are used directly or indirectly by the code under test
   },
-  // Mock other exports from '@/lib/redis' if any are used
 }))
+
+// Typed mock redis: avoids unbound-method + no-unnecessary-type-assertion lint
+const mockRedis = redis as unknown as {
+  set: ReturnType<typeof vi.fn>
+  get: ReturnType<typeof vi.fn>
+  keys: ReturnType<typeof vi.fn>
+  hset: ReturnType<typeof vi.fn>
+  expire: ReturnType<typeof vi.fn>
+}
 vi.mock('../../email', () => ({
   sendEmail: mockSendEmail,
 }))
@@ -29,9 +36,13 @@ vi.mock('../../auth', () => ({
 vi.mock('../../fhe', () => ({
   fheService: {
     encrypt: vi.fn(),
-    // Add other methods of fheService if they are used
   },
 }))
+
+// Typed mock fheService: avoids unbound-method lint
+const mockFheService = fheService as unknown as {
+  encrypt: ReturnType<typeof vi.fn>
+}
 vi.mock('../../logger', () => ({
   logger: {
     info: vi.fn(),
@@ -87,8 +98,8 @@ describe('breachNotificationSystem Integration Tests', () => {
     vi.clearAllMocks()
 
     // Setup redis mock
-    vi?.mocked(redis['set']).mockResolvedValue('OK')
-    vi?.mocked(redis['get']).mockResolvedValue(
+    mockRedis.set.mockResolvedValue('OK')
+    mockRedis.get.mockResolvedValue(
       JSON.stringify({
         ...mockBreach,
         id: 'test_breach_id',
@@ -96,17 +107,17 @@ describe('breachNotificationSystem Integration Tests', () => {
         notificationStatus: 'pending',
       }),
     )
-    vi?.mocked(redis['keys']).mockResolvedValue(['breach:test_breach_id'])
-    vi?.mocked(redis['hset']).mockResolvedValue(1)
-    vi?.mocked(redis['expire']).mockResolvedValue(1)
-    vi?.mocked(redis['hset']).mockResolvedValue(1)
-    vi?.mocked(redis['expire']).mockResolvedValue(1)
+    mockRedis.keys.mockResolvedValue(['breach:test_breach_id'])
+    mockRedis.hset.mockResolvedValue(1)
+    mockRedis.expire.mockResolvedValue(1)
+    mockRedis.hset.mockResolvedValue(1)
+    mockRedis.expire.mockResolvedValue(1)
 
     // Setup auth mock
     mockGetUserById.mockResolvedValue(mockUser)
 
     // Setup FHE mock
-    vi.mocked(fheService.encrypt).mockResolvedValue({
+    mockFheService.encrypt.mockResolvedValue({
       id: 'enc-1',
       data: 'encrypted_data',
       dataType: 'string',
@@ -125,7 +136,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       const breachId = await reportBreach(mockBreach)
 
       expect(breachId).toBeDefined()
-      expect(redis['set']).toHaveBeenCalled()
+      expect(mockRedis.set).toHaveBeenCalled()
       expect(mockSendEmail).toHaveBeenCalled()
       expect(logger.error).toHaveBeenCalledWith(
         'Security breach detected:',
@@ -233,7 +244,7 @@ describe('breachNotificationSystem Integration Tests', () => {
       const breachId = await runTestScenario(scenario)
 
       expect(breachId).toBeDefined()
-      expect(redis['set']).toHaveBeenCalledWith(
+      expect(mockRedis.set).toHaveBeenCalledWith(
         expect.stringContaining('breach:test:'),
         expect.any(String),
         'EX',
@@ -268,14 +279,14 @@ describe('breachNotificationSystem Integration Tests', () => {
 
       await updateMetrics(breach)
 
-      expect(redis['hset']).toHaveBeenCalled()
-      expect(redis['expire']).toHaveBeenCalled()
+      expect(mockRedis.hset).toHaveBeenCalled()
+      expect(mockRedis.expire).toHaveBeenCalled()
     })
   })
 
   describe('error Handling', () => {
     it('should handle redis errors gracefully', async () => {
-      vi?.mocked(redis['set']).mockRejectedValue(new Error('Redis error'))
+      mockRedis.set.mockRejectedValue(new Error('Redis error'))
 
       await expect(reportBreach(mockBreach)).rejects.toThrow('Redis error')
       expect(vi.mocked(logger).error).toHaveBeenCalledWith(

@@ -161,8 +161,7 @@ export class AnonymizationPipelineService {
    * Apply k-anonymity to ensure minimum group sizes
    */
   private async applyKAnonymity(
-    data: Record<string, unknown>[],
-    _k: number,
+    data: Record<string, unknown>[],          _k2: number,
   ): Promise<Record<string, unknown>[]> {
     // Identify quasi-identifiers (age, location, demographic info)
     const quasiIdentifiers = [
@@ -190,7 +189,7 @@ export class AnonymizationPipelineService {
     const kAnonymizedData: Record<string, unknown>[] = []
 
     for (const [groupKey, groupRecords] of groups) {
-      if (groupRecords.length >= k) {
+      if (groupRecords.length >= _k2) {
         // Group is already k-anonymous
         kAnonymizedData.push(
           ...groupRecords.map((record) => ({
@@ -204,7 +203,7 @@ export class AnonymizationPipelineService {
         const mergedGroup = await this.mergeOrSuppressGroup(
           groupRecords,
           groups,
-          k,
+          _k2,
           quasiIdentifiers,
         )
         kAnonymizedData.push(...mergedGroup)
@@ -474,8 +473,7 @@ export class AnonymizationPipelineService {
 
   private async mergeOrSuppressGroup(
     smallGroup: Record<string, unknown>[],
-    allGroups: Map<string, Record<string, unknown>[]>,
-    _k: number,
+    allGroups: Map<string, Record<string, unknown>[]>,          _k2: number,
     quasiIdentifiers: string[],
   ): Promise<Record<string, unknown>[]> {
     // Try to find similar groups to merge with
