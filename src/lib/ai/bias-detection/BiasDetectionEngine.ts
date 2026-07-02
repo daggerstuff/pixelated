@@ -226,7 +226,7 @@ export class BiasDetectionEngine {
     } catch (error: unknown) {
       // Fallback to null if performance optimizer fails to initialize
       this.performanceOptimizer = null;
-      auditLogger.warn("Performance optimizer initialization failed, using fallback mode:", error);
+      logger.warn("Performance optimizer initialization failed, using fallback mode:", error);
     }
   }
 
@@ -466,7 +466,7 @@ export class BiasDetectionEngine {
       return result.value;
     }
     // Log the rejection reason with layer context (sanitized)
-    auditLogger.warn(`Layer ${layerName} analysis failed:`, result.reason);
+    logger.warn(`Layer ${layerName} analysis failed:`, result.reason);
     recommendations.push(`${layerName} analysis unavailable; using fallback results`);
     return fallbackGetter();
   }
@@ -587,7 +587,7 @@ export class BiasDetectionEngine {
     try {
       await this.metricsCollector.storeAnalysisResult(result);
     } catch (err) {
-      auditLogger.warn("storeAnalysisResult failed:", err);
+      logger.warn("storeAnalysisResult failed:", err);
     }
 
     // Store result in distributed cache for future retrieval
@@ -1114,17 +1114,17 @@ export class BiasDetectionEngine {
 
     // Log performance metrics
     if (options.logProgress !== false) {
-      auditLogger.info(
+      logger.info(
         `[BatchAnalysis] Completed ${analysisResults.length}/${sessions.length} sessions in ${processingTime}ms`,
       );
-      auditLogger.info(
+      logger.info(
         `[BatchAnalysis] Average time per session: ${Math.round(processingTime / sessions.length)}ms`,
       );
     }
 
     if (options.logErrors !== false && errors.length > 0) {
       errors.forEach(({ session, error }) => {
-        auditLogger.error(
+        logger.error(
           `[BatchError] Session ${session.sessionId}: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
       });
