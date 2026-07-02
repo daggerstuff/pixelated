@@ -1,11 +1,12 @@
-import * as Sentry from "@sentry/astro";
+import * as Sentry from '@sentry/astro'
 
-const env = import.meta.env as Record<string, string | undefined>;
+const env = import.meta.env as Record<string, string | undefined>
 
 Sentry.init({
-  dsn: env["PUBLIC_SENTRY_DSN"] ?? env["SENTRY_PUBLIC_DSN"] ?? env["SENTRY_DSN"],
+  dsn:
+    env['PUBLIC_SENTRY_DSN'] ?? env['SENTRY_PUBLIC_DSN'] ?? env['SENTRY_DSN'],
 
-  environment: import.meta.env.DEV ? "development" : import.meta.env.MODE,
+  environment: import.meta.env.DEV ? 'development' : import.meta.env.MODE,
 
   // Define how likely traces are sampled. Adjust this value in production,
   // or use tracesSampler for greater control.
@@ -18,7 +19,7 @@ Sentry.init({
     Sentry.replayIntegration(),
     // User feedback widget
     Sentry.feedbackIntegration({
-      colorScheme: "system",
+      colorScheme: 'system',
     }),
   ],
 
@@ -31,5 +32,5 @@ Sentry.init({
   enableLogs: true,
 
   // Use import.meta.env.DEV as authoritative dev check
-  debug: env["PUBLIC_SENTRY_DEBUG"] === "1",
-});
+  debug: env['PUBLIC_SENTRY_DEBUG'] === '1',
+})
