@@ -1,0 +1,1 @@
+## 2026-07-02 - Prevent Duplicate IDs in Astro Components | Learning: Fallback aria-labels are better than aria-labelledby for reusable components. | Action: Replaced aria-labelledby with aria-label in AIChat.astro.

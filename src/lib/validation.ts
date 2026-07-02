@@ -2,7 +2,8 @@
  * Validation utilities including type guards, number helpers, object utilities, and error handling
  */
 
-const isNonNullObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null
+const isNonNullObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null
 
 // ============================================================================
 // Type Guards

@@ -5,8 +5,15 @@
  */
 
 import { trace, Span, SpanStatusCode, SpanKind } from '@opentelemetry/api'
-import { ATTR_HTTP_REQUEST_METHOD, ATTR_URL_FULL } from '@opentelemetry/semantic-conventions'
-import { ATTR_DB_OPERATION_NAME, ATTR_DB_SQL_TABLE, ATTR_DB_SYSTEM } from '@opentelemetry/semantic-conventions/incubating'
+import {
+  ATTR_HTTP_REQUEST_METHOD,
+  ATTR_URL_FULL,
+} from '@opentelemetry/semantic-conventions'
+import {
+  ATTR_DB_OPERATION_NAME,
+  ATTR_DB_SQL_TABLE,
+  ATTR_DB_SYSTEM,
+} from '@opentelemetry/semantic-conventions/incubating'
 import * as Sentry from '@sentry/astro'
 
 const tracer = trace.getTracer('pixelated-empathy')
