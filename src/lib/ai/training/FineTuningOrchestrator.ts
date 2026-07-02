@@ -244,10 +244,11 @@ export class FineTuningOrchestrator {
    * for now, model names let us pick (HF models contain `/`).
    */
   private guessBackendFromJob(job: FineTuningJob): FineTuningBackend {
+    if (!job.id) return "openai";
     if (job.id.startsWith("hf-")) return "huggingface";
     if (job.id.startsWith("local-")) return "local";
     if (job.id.startsWith("ft-")) return "openai";
-    if (job.model.includes("/")) return "huggingface";
+    if (job.model?.includes("/")) return "huggingface";
     return "openai";
   }
 }
