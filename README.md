@@ -28,6 +28,22 @@ We are here to bridge that gap in a highly positive and beneficial way. By mergi
 advanced, carefully aligned AI, we create environments where high-stakes, human-centered teams can
 practice, analyze, and evolve their emotional intelligence before stepping into real-world scenarios.
 
+<br />
+
+<div align="center">
+  <img src="public/platform_banner.jpg" alt="Pixelated Empathy Cognitive Engine" width="100%" style="border-radius: 8px; margin: 20px 0;" />
+</div>
+
+<br />
+
+### ✦ Core Selling Points
+
+| 🛡️ FHE-Based Security | 🌪️ Nightmare Fuel Simulation | ⚖️ Real-Time Bias Detection | 🧠 Foresight Continuity |
+| :--- | :--- | :--- | :--- |
+| **Strict HIPAA Compliance** powered by Fully Homomorphic Encryption. Patient data remains encrypted even during active model inference and emotional evaluation. | **Edge Case Engine** designed to train clinicians against extreme, high-stress conversational scenarios safely before real-world harm occurs. | **Equitable AI** guardrails that continuously monitor interactions, ensuring emotional responses are fair, unbiased, and clinically sound. | **Longitudinal Memory** using our advanced MCP architecture to remember patient history, adapting over multi-session therapeutic arcs. |
+
+<br />
+
 Our goal moving forward is to scale deep, genuine empathy through digital platforms without losing the
 profoundly human essence of care. We believe that by thoughtfully bringing therapeutic principles into
 the digital realm, we can unlock new paradigms for training, healing, and connection.
