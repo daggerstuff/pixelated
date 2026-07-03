@@ -1,28 +1,23 @@
-import { defineMcpClientConnection } from 'eve/connections'
+import { defineMcpClientConnection } from "eve/connections";
 
 // Foresight stores session memory: per-session transcripts, per-trainee
-// longitudinal trends, and emotional signal rollups. The src server runs as a
-// stdio MCP from `foresight-mcp`. Until it's exposed over HTTP/SSE we ship
-// this connection as a placeholder so the surrounding wire-up is captured.
+// longitudinal trends, and emotional signal rollups. The server now supports
+// SSE transport (launch with `foresight-mcp --port 8764`) exposing the MCP
+// protocol at the `/sse` endpoint.
 //
-// TODO:
-//   1. Run the local foresight server behind an HTTP/SSE transport. The CLI
-//      lives at scripts/memory/foresight-mcp-server.sh.
-//   2. Replace `url` with the deployed transport URL.
-//   3. Wire `auth` to whatever token the deployer chooses. The current
-//      "health" health probe below is safe because eve still has to attempt
-//      every tool call before it can return an answer.
+// Set FORESIGHT_MCP_URL to point at a deployed instance, or run locally:
+//   FORESIGHT_MCP_PORT=8764 scripts/memory/foresight-mcp-server.sh
 
 export default defineMcpClientConnection({
-  url: process.env.FORESIGHT_MCP_URL ?? 'http://127.0.0.1:8765/mcp',
+  url: process.env.FORESIGHT_MCP_URL ?? "http://127.0.0.1:8764/sse",
   description:
-    'Foresight memory:MCP for conversation-rehearsal session context. Stores ' +
-    'transcripts, per-session state, and per-trainee longitudinal signals.',
+    "Foresight memory:MCP for conversation-rehearsal session context. Stores " +
+    "transcripts, per-session state, and per-trainee longitudinal signals.",
   auth: process.env.FORESIGHT_MCP_URL
     ? {
         getToken: async () => ({
-          token: process.env.FORESIGHT_MCP_TOKEN ?? '',
+          token: process.env.FORESIGHT_MCP_TOKEN ?? "",
         }),
       }
     : undefined,
-})
+});
