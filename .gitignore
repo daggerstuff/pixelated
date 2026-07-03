@@ -404,3 +404,6 @@ ngc-cli/
 aws/dist
 cf-workers/workers-ai-mcp
 notebooks
+
+# Stray foresight_mcp/ dir (artifact, not source — submodule is foresight-mcp/)
+/foresight_mcp/
