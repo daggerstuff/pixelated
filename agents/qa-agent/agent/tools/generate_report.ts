@@ -2,7 +2,8 @@ import { generateText } from 'ai'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { getModel } from './workers-ai.js'
+import { storeMemory } from '../foresight-client.js'
+import { getModel } from '../lib/workers-ai.js'
 
 interface GenerateReportInput {
   cohort_id: string
@@ -74,6 +75,27 @@ export default defineTool({
         `---\n\n_Sessions reviewed: ${input.scoring_session_ids.length}_\n`
       : '# Daily QA Digest\n\n_No pacing data available yet._\n'
 
+    const digestContent = JSON.stringify({
+      cohort_id: input.cohort_id,
+      rubric_version: input.rubric_version,
+      session_count: input.scoring_session_ids.length,
+      ticket_count: input.linear_ticket_references.length,
+      rendered_at: new Date().toISOString(),
+      digest_markdown: markdown,
+      pacing_profile: pacingProfile,
+      completed_with: pacingProfile
+        ? 'qa-agent.tools.generate_report:workers-ai:v1'
+        : 'qa-agent.subagents.report-writer:v0',
+    })
+    const stored = await storeMemory({
+      content: digestContent,
+      category: 'qa_digest',
+      scope: 'arc',
+      retention: 'long_term',
+      importance: 0.8,
+      tags: ['qa', 'digest', input.cohort_id, input.rubric_version],
+    })
+
     return {
       cohort_id: input.cohort_id,
       rubric_version: input.rubric_version,
@@ -86,6 +108,7 @@ export default defineTool({
       completed_with: pacingProfile
         ? 'qa-agent.tools.generate_report:workers-ai:v1'
         : 'qa-agent.subagents.report-writer:v0',
+      qa_digest_id: stored?.memory_id ?? null,
       slack_stub: {
         note:
           'Slack channel `slack-supervisor-digest` is not yet wired. Once ' +
