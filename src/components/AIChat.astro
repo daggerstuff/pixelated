@@ -45,7 +45,19 @@ const {
     client:visible
     availableModels={availableModels as import('../lib/ai/models/types').AIModel[]}
     {showModelSelector}
-  />
+  >
+    <div
+      slot="fallback"
+      class="border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex h-[500px] items-center justify-center rounded-lg border shadow-lg"
+      role="status"
+      aria-label="Loading chat interface..."
+    >
+      <div class="flex flex-col items-center gap-3">
+        <div class="border-blue-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" aria-hidden="true"></div>
+        <p class="text-gray-500 dark:text-gray-400 font-medium">Loading chat interface...</p>
+      </div>
+    </div>
+  </AIChatReact>
 </section>
 
 <style>
