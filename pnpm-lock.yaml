@@ -135,13 +135,13 @@ importers:
         version: 3.0.80(zod@4.4.3)
       '@astrojs/node':
         specifier: ^10.1.4
-        version: 10.1.4(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))
+        version: 10.1.4(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))
       '@astrojs/react':
         specifier: latest
         version: 6.0.1(@types/node@26.1.0)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(jiti@2.7.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
       '@astrojs/vercel':
         specifier: 10.0.8
-        version: 10.0.8(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.58)(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.2)(vue@3.5.39(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
+        version: 10.0.8(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.58)(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.2)(vue@3.5.39(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))
       '@auth0/auth0-react':
         specifier: latest
         version: 2.20.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -279,7 +279,7 @@ importers:
         version: 1.2.11(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@sentry/astro':
         specifier: latest
-        version: 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)
+        version: 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)
       '@sentry/node':
         specifier: latest
         version: 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.220.0(@opentelemetry/api@1.9.1))
@@ -297,7 +297,7 @@ importers:
         version: 5.3.0(rollup@4.62.2)
       '@spotlightjs/astro':
         specifier: latest
-        version: 3.2.6(@cfworker/json-schema@4.1.1)(@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))
+        version: 3.2.6(@cfworker/json-schema@4.1.1)(@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))
       '@tanstack/react-query':
         specifier: latest
         version: 5.101.2(react@19.2.7)
@@ -607,7 +607,7 @@ importers:
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.9.4)(typescript@6.0.3)
       '@astrojs/markdoc':
         specifier: ^1.0.6
-        version: 1.0.6(@types/react@19.2.17)(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)
+        version: 1.0.6(@types/react@19.2.17)(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)
       '@astrojs/rss':
         specifier: latest
         version: 4.0.19
@@ -714,8 +714,8 @@ importers:
         specifier: latest
         version: 1.6.20(@typescript-eslint/eslint-plugin@8.62.1(@typescript-eslint/parser@8.62.1(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3))(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3)(vitest@4.1.9)
       astro:
-        specifier: ^7.0.5
-        version: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+        specifier: ^7.0.6
+        version: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
       astro-eslint-parser:
         specifier: latest
         version: 2.1.0
@@ -807,8 +807,8 @@ importers:
         specifier: latest
         version: 29.1.1(@noble/hashes@1.8.0)
       knip:
-        specifier: ^6.24.0
-        version: 6.24.0
+        specifier: ^6.23.0
+        version: 6.23.0
       lint-staged:
         specifier: latest
         version: 17.0.8
@@ -1102,8 +1102,8 @@ importers:
         specifier: ^1.8.17
         version: 1.8.17
       tsx:
-        specifier: ^4.21.0
-        version: 4.22.4
+        specifier: ^4.22.5
+        version: 4.22.5
       typescript:
         specifier: ^6.0.3
         version: 6.0.3
@@ -1442,8 +1442,8 @@ packages:
     peerDependencies:
       astro: ^6.0.0
 
-  '@astrojs/markdown-satteri@0.3.2':
-    resolution: {integrity: sha512-feXuUPy41gVfeM7EHT1ciUim8ozGr+YHXab9uUBc1Hk8y60DQosO8ldL+AoPXnCAoGj1OChwHfvXmmJ6XVnY9A==}
+  '@astrojs/markdown-satteri@0.3.3':
+    resolution: {integrity: sha512-Lje33Ittd8UQGgbIIWQvhPkj5X5c4b1sZnZWX3JQV/AWpfbuQGxVi2ONt6+ScydcwfR4egilslEWyczMclrJ1g==}
 
   '@astrojs/node@10.1.4':
     resolution: {integrity: sha512-itV568ttlrpwNsutO+KPziqKfzTPlAIXMADlpBi3VeQ3liivRKKKG+jm+IjLMKvYGkxd0QnClKVCBP4i3gpwQQ==}
@@ -7447,12 +7447,12 @@ packages:
   astro-robots-txt@1.0.0:
     resolution: {integrity: sha512-6JQSLid4gMhoWjOm85UHLkgrw0+hHIjnJVIUqxjU2D6feKlVyYukMNYjH44ZDZBK1P8hNxd33PgWlHzCASvedA==}
 
-  astro@7.0.5:
-    resolution: {integrity: sha512-KR/zBBgU6I+F5vDoTsuTbXbBmI565CToDOgPr0pPiL2Hgrvx4CV8Cg2wtT6VqqyOS7BIfBkdagKD+40SojGl7w==}
+  astro@7.0.6:
+    resolution: {integrity: sha512-Myw0sFia+zs/Y0yqfZEsUYXfDPh3ELcLf1f0Q/qQzVXBh/af1qO62WNT+P89DCcfGVV51nMoQhEfkBYqJmoUOQ==}
     engines: {node: '>=22.12.0', npm: '>=9.6.5', pnpm: '>=7.1.0'}
     hasBin: true
     peerDependencies:
-      '@astrojs/markdown-remark': 7.2.0
+      '@astrojs/markdown-remark': 7.2.1
     peerDependenciesMeta:
       '@astrojs/markdown-remark':
         optional: true
@@ -10130,8 +10130,8 @@ packages:
     resolution: {integrity: sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ==}
     engines: {node: '>=6'}
 
-  knip@6.24.0:
-    resolution: {integrity: sha512-PokLlgeEjLh1rAsB7ts+52wZ37HBr1nDhE6NNONwEaXdeZGCJOkP7ZlIAI2Gtu8xohquzTWy75bc/1diI9shQw==}
+  knip@6.23.0:
+    resolution: {integrity: sha512-2DvAOX2pZWiG4SLvRRxOAU0aWGEn1ZoVblI541xIoXFdHqq2THMZXy66/qcY5WGuW3TXhb9T1x1zd/Hd1u+yqg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
 
@@ -12631,8 +12631,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.22.4:
-    resolution: {integrity: sha512-X8EX+XV4QR5xCsrgxaED954zTDfY8KqlDtskKEL0cHhyS/P8b4IFOvGDQpsC9Q1XnLq915wEfwwY/zzskCtmhg==}
+  tsx@4.22.5:
+    resolution: {integrity: sha512-F7JnSfPl5ASt6LqwWyUQ3T8BwN3q0eQEbFMYa2iRWaVQmmudo0d7fRmwM4O002gsvW1bs0yBYioutsAjqLJMvQ==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -13785,9 +13785,9 @@ snapshots:
   '@astrojs/compiler-binding-linux-x64-musl@0.3.0':
     optional: true
 
-  '@astrojs/compiler-binding-wasm32-wasi@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
+  '@astrojs/compiler-binding-wasm32-wasi@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
     dependencies:
-      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
+      '@napi-rs/wasm-runtime': 1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -13799,7 +13799,7 @@ snapshots:
   '@astrojs/compiler-binding-win32-x64-msvc@0.3.0':
     optional: true
 
-  '@astrojs/compiler-binding@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
+  '@astrojs/compiler-binding@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
     optionalDependencies:
       '@astrojs/compiler-binding-darwin-arm64': 0.3.0
       '@astrojs/compiler-binding-darwin-x64': 0.3.0
@@ -13807,16 +13807,16 @@ snapshots:
       '@astrojs/compiler-binding-linux-arm64-musl': 0.3.0
       '@astrojs/compiler-binding-linux-x64-gnu': 0.3.0
       '@astrojs/compiler-binding-linux-x64-musl': 0.3.0
-      '@astrojs/compiler-binding-wasm32-wasi': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
+      '@astrojs/compiler-binding-wasm32-wasi': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
       '@astrojs/compiler-binding-win32-arm64-msvc': 0.3.0
       '@astrojs/compiler-binding-win32-x64-msvc': 0.3.0
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
 
-  '@astrojs/compiler-rs@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)':
+  '@astrojs/compiler-rs@0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
     dependencies:
-      '@astrojs/compiler-binding': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
+      '@astrojs/compiler-binding': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
     transitivePeerDependencies:
       - '@emnapi/core'
       - '@emnapi/runtime'
@@ -13873,12 +13873,12 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  '@astrojs/markdoc@1.0.6(@types/react@19.2.17)(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)':
+  '@astrojs/markdoc@1.0.6(@types/react@19.2.17)(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
       '@astrojs/prism': 4.0.2
       '@markdoc/markdoc': 0.5.7(@types/react@19.2.17)(react@19.2.7)
-      astro: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+      astro: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
       esbuild: 0.28.1
       github-slugger: 2.0.0
       htmlparser2: 10.1.0
@@ -13886,17 +13886,17 @@ snapshots:
       - '@types/react'
       - react
 
-  '@astrojs/markdown-satteri@0.3.2':
+  '@astrojs/markdown-satteri@0.3.3':
     dependencies:
-      '@astrojs/internal-helpers': 0.10.0(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
+      '@astrojs/internal-helpers': 0.10.1
       '@astrojs/prism': 4.0.2
       github-slugger: 2.0.0
       satteri: 0.9.4
 
-  '@astrojs/node@10.1.4(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))':
+  '@astrojs/node@10.1.4(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
-      astro: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+      astro: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
       send: 1.2.1
       server-destroy: 1.0.1
     transitivePeerDependencies:
@@ -13945,14 +13945,14 @@ snapshots:
       is-wsl: 3.1.1
       which-pm-runs: 1.1.0
 
-  '@astrojs/vercel@10.0.8(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.58)(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.2)(vue@3.5.39(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
+  '@astrojs/vercel@10.0.8(patch_hash=6043e8fc593bc7e1a87e580664d6f8bbd29fcd0131752e86df23fc13a1e78869)(@aws-sdk/credential-provider-web-identity@3.972.58)(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(react@19.2.7)(rollup@4.62.2)(vue@3.5.39(typescript@6.0.3))(ws@8.21.0(utf-8-validate@6.0.6))':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
       '@vercel/analytics': 1.6.1(react@19.2.7)(vue@3.5.39(typescript@6.0.3))
       '@vercel/functions': 3.7.5(@aws-sdk/credential-provider-web-identity@3.972.58)(ws@8.21.0(utf-8-validate@6.0.6))
       '@vercel/nft': 1.10.2(rollup@4.62.2)
       '@vercel/routing-utils': 6.2.0
-      astro: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+      astro: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
       esbuild: 0.28.1
       tinyglobby: 0.2.17
     transitivePeerDependencies:
@@ -16269,6 +16269,13 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
+  '@napi-rs/wasm-runtime@1.1.6(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)':
+    dependencies:
+      '@emnapi/core': 1.11.1
+      '@emnapi/runtime': 1.11.2
+      '@tybys/wasm-util': 0.10.3
+    optional: true
+
   '@noble/ciphers@1.3.0': {}
 
   '@noble/hashes@1.8.0': {}
@@ -18520,7 +18527,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.9
       estree-walker: 2.0.2
-      picomatch: 4.0.4
+      picomatch: 4.0.5
     optionalDependencies:
       rollup: 4.62.2
 
@@ -18599,13 +18606,13 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     optional: true
 
-  '@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)':
+  '@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)':
     dependencies:
       '@sentry/browser': 10.63.0
       '@sentry/core': 10.63.0
       '@sentry/node': 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.220.0(@opentelemetry/api@1.9.1))
       '@sentry/vite-plugin': 5.3.0(rollup@4.62.2)
-      astro: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+      astro: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
     transitivePeerDependencies:
       - '@opentelemetry/core'
       - '@opentelemetry/exporter-trace-otlp-http'
@@ -18997,11 +19004,11 @@ snapshots:
 
   '@speed-highlight/core@1.2.17': {}
 
-  '@spotlightjs/astro@3.2.6(@cfworker/json-schema@4.1.1)(@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))':
+  '@spotlightjs/astro@3.2.6(@cfworker/json-schema@4.1.1)(@sentry/astro@10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))':
     dependencies:
-      '@sentry/astro': 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)
+      '@sentry/astro': 10.63.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/exporter-trace-otlp-http@0.219.0(@opentelemetry/api@1.9.1))(astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4))(rollup@4.62.2)
       '@spotlightjs/spotlight': 3.0.2(@cfworker/json-schema@4.1.1)
-      astro: 7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
+      astro: 7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4)
     transitivePeerDependencies:
       - '@cfworker/json-schema'
       - supports-color
@@ -20251,7 +20258,7 @@ snapshots:
   anymatch@3.1.3:
     dependencies:
       normalize-path: 3.0.0
-      picomatch: 4.0.4
+      picomatch: 4.0.5
 
   anynum@1.0.1: {}
 
@@ -20383,11 +20390,11 @@ snapshots:
       valid-filename: 4.0.0
       zod: 4.4.3
 
-  astro@7.0.5(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4):
+  astro@7.0.6(patch_hash=2571b3595777b384012a1cfd2d568be94ddb7fd623364a5f0fcaa8b9ec6c95de)(@azure/storage-blob@12.33.0)(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)(@types/node@26.1.0)(@upstash/redis@1.38.0)(@vercel/functions@3.7.5(@aws-sdk/credential-provider-web-identity@3.972.59)(ws@8.21.0(utf-8-validate@6.0.6)))(ioredis@5.11.1)(jiti@2.7.0)(rollup@4.62.2)(terser@5.48.0)(tsx@4.22.5)(yaml@2.8.4):
     dependencies:
-      '@astrojs/compiler-rs': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.1)
-      '@astrojs/internal-helpers': 0.10.0(patch_hash=585fd724c6a19a4ceb7ea31a82eea4f20061038246a6ac6588387da8699d76a3)
-      '@astrojs/markdown-satteri': 0.3.2
+      '@astrojs/compiler-rs': 0.3.0(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.2)
+      '@astrojs/internal-helpers': 0.10.1
+      '@astrojs/markdown-satteri': 0.3.3
       '@astrojs/telemetry': 3.3.2
       '@capsizecss/unpack': 4.0.1
       '@clack/prompts': 1.6.0
@@ -20422,7 +20429,7 @@ snapshots:
       p-queue: 9.3.0
       package-manager-detector: 1.7.0
       piccolore: 0.1.3
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       semver: 7.8.5
       shiki: 4.3.0
       smol-toml: 1.7.0
@@ -23515,15 +23522,15 @@ snapshots:
 
   kleur@4.1.5: {}
 
-  knip@6.24.0:
+  knip@6.23.0:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.5)
+      fdir: 6.5.0(picomatch@4.0.4)
       formatly: 0.3.0
       get-tsconfig: 4.14.0
       jiti: 2.7.0
       oxc-parser: 0.137.0
       oxc-resolver: 11.21.3
-      picomatch: 4.0.5
+      picomatch: 4.0.4
       smol-toml: 1.7.0
       strip-json-comments: 5.0.3
       tinyglobby: 0.2.17
@@ -26666,7 +26673,7 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsx@4.22.4:
+  tsx@4.22.5:
     dependencies:
       esbuild: 0.28.1
     optionalDependencies:
