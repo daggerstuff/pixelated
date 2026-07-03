@@ -172,14 +172,14 @@ For active work and cross-session context, use **Foresight MCP**.
   - `query_memories_temporal`
   - `get_system_status`
 
-Expert and maintenance workflows belong in the nested `foresight-mcp` CLI or
-Python API, not the MCP tool surface.
+Expert and maintenance workflows belong in nested `foresight-mcp` CLI
+Python API, not MCP tool surface.
 
 Orientation flow:
 
 1. `manage_context_blocks` (`action: list`)
-2. `manage_context_blocks` (`action: get`, label `pending_items`)
-3. `manage_context_blocks` (`action: get`, label `project_context`)
+2. `manage_context_blocks` (`action: get`label `pending_items`)
+3. `manage_context_blocks` (`action: get`label `project_context`)
 4. `search_memories` for active and upcoming work signals
 5. `manage_memories` only when memory writes or lifecycle updates are needed
 
@@ -197,3 +197,4 @@ Orientation flow:
 - Enabled: `context7` `linear` `brave-search` `firecrawl`.
 - Disabled: `github` `playwright` `sentry` `e2b-sandbox`.
 - Use standard tooling when those are unavailable.
+
