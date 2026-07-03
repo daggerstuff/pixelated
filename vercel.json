@@ -18,9 +18,5 @@
         }
       ]
     }
-  ],
-  "sourcemaps": {
-    "ignore": [],
-    "commitRef": false
-  }
+  ]
 }
