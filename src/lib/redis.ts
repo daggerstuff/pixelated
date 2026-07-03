@@ -61,7 +61,7 @@ async function ensureConnected(): Promise<void> {
 // continues to work unchanged.
 // ---------------------------------------------------------------------------
 
-interface LegacyRedisClient {
+export interface LegacyRedisClient {
   get(key: string): Promise<string | null>
   set(
     key: string,

@@ -75,9 +75,9 @@
 - Foresight MCP first for active state: `manage_context_blocks` (`list` `get`
   for `pending_items` + `project_context`), `search_memories` (`active tasks`
   `upcoming work` owner/team scope), then `manage_memories` as needed.
-- MCP server exposes only reduced core surface documented in
-  `.agents/skills/foresight/SKILL.md`use `foresight` CLI for expert maintenance
-  commands.
+- The MCP server exposes only the reduced core surface documented in
+  `.agents/skills/foresight/SKILL.md`; use the `foresight` CLI for expert or
+  maintenance commands.
 - Root `AGENTS.md` is main source of truth.
 - For scoped rules, prefer nested instruction files (`AGENTS.md` under touched
   directories).

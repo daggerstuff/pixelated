@@ -2,7 +2,7 @@ import { generateText } from 'ai'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { getModel } from './workers-ai.js'
+import { getModel } from '../lib/workers-ai.js'
 
 interface ClinicalBoundaryResult {
   session_id: string

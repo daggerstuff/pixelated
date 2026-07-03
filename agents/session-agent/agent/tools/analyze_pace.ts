@@ -16,7 +16,7 @@ import { generateText } from 'ai'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
-import { getModel } from './workers-ai.js'
+import { getModel } from '../lib/workers-ai.js'
 
 export interface PaceSignal {
   stuck: boolean
