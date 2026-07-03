@@ -1,142 +1,95 @@
-# Pixelated Empathy
+<div align="center">
+  <img src="public/android-chrome-512x512.png" alt="Pixelated Empathy Logo" width="140" />
 
-![Pixelated Empathy Logo](public/android-chrome-512x512.png)
+  <br />
 
-[![License](https://img.shields.io/badge/License-Proprietary-red.svg?style=flat-square)](LICENSE)
-[![Focus](https://img.shields.io/badge/Focus-Clinical%20AI-blue.svg?style=flat-square)](https://pixelatedempathy.com)
-[![Status](https://img.shields.io/badge/Status-Early%20Access-green.svg?style=flat-square)](https://pixelatedempathy.com/contact)
+  # Pixelated Empathy
 
-> A clinical AI platform for practicing, analyzing, and improving emotionally
-> complex conversations.
+  **Pioneering the digital frontier of mental health.**
 
-Pixelated Empathy builds tooling for teams that operate in high-stakes,
-human-centered environments. The platform combines simulated conversation
-practice, emotional signal analysis, and review workflows so organizations can
-improve communication before real-world harm occurs.
+  <br />
 
-## Goal Alignment
+  <p align="center">
+    <a href="https://pixelatedempathy.com"><img src="https://img.shields.io/badge/Focus-Clinical%20AI-2E3440?style=for-the-badge" alt="Focus"></a>
+    <a href="https://pixelatedempathy.com/contact"><img src="https://img.shields.io/badge/Status-Early%20Access-A3BE8C?style=for-the-badge" alt="Status"></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-Proprietary-BF616A?style=for-the-badge" alt="License"></a>
+  </p>
+</div>
 
-The project's operational /goal: ship the **9-digit pre-2026 monthly LLM
-corpus** to the clinician training pipeline, while continuing to grow the
-production platform artefacts above. The corpus pipeline delivers
-`monthly_accepted/<YYYY-MM>/month_summary.json` rows in `ACCEPTED` status across
-10 months (Sep 2025 → Jun 2026) and the cross-month `finalize-corpus-validation`
-aggregate (≥ 8 000 emails + ≥ 10 000 chats total, monotonic timestamps, no
-event-ID regression). The production platform — Astro 6 + React 19, the
-model-inference layer, and the bias-detection / websocket / training-server
-modules — continues to evolve alongside the corpus work.
+<br />
 
-The infrastructure pivot effective 2026-06-29 routes chat-completion transport
-through the **sinker ollama facility** behind `https://ollama.pixelated.love`,
-with Auth0 OIDC bearer auth via oauth2-proxy and Cloudflare DNS-01 ACME. See
-[`infra/sinker/`](infra/sinker/) for the per-feature rebars and the canonical
-runbook; the live carrier is read-only through this README and is owned by the
-`infra-sinker` worker skill.
+### ✦ The Vision
 
-## Overview
+Pixelated Empathy is fundamentally reshaping the mental health landscape. Historically, the clinical world
+has pushed back against integrating deeply with the digital realm—often out of valid concerns for safety,
+empathy, and privacy.
 
-- [Repository Scope](#repository-scope)
-- [What the Platform Prioritizes](#what-the-platform-prioritizes)
-- [Journal Dataset Research Workflow](#journal-dataset-research-workflow)
-- [Documentation](#documentation)
-- [Trust Safety and Quality](#trust-safety-and-quality)
-- [External Links](#external-links)
+We are here to bridge that gap in a highly positive and beneficial way. By merging clinical rigor with
+advanced, carefully aligned AI, we create environments where high-stakes, human-centered teams can
+practice, analyze, and evolve their emotional intelligence before stepping into real-world scenarios.
 
-## Repository Scope
+<br />
 
-This repository is the primary product workspace for Pixelated Empathy. It
-brings together application code, AI systems, and internal operational tooling
-in one place.
+<div align="center">
+  <img src="public/platform_banner.jpg" alt="Pixelated Empathy Cognitive Engine" width="100%" style="border-radius: 8px; margin: 20px 0;" />
+</div>
 
-| Area                 | Purpose                                                              |
-| -------------------- | -------------------------------------------------------------------- |
-| [ai/](ai/)           | Model training, inference, evaluation, and research pipelines        |
-| [src/](src/)         | Astro and React application surfaces, APIs, and shared product logic |
-| [public/](public/)   | Brand assets and static media                                        |
-| [scripts/](scripts/) | Repeatable automation and operational utilities                      |
-| [docs/](docs/)       | Product, platform, API, compliance, and knowledge documentation      |
+<br />
 
-If you are looking for blockchain or other on-chain components, those
-integrations live in separate repositories and connect to this platform at the
-service boundary.
+<div align="center">
 
-## What the Platform Prioritizes
+### ✦ Core Capabilities
 
-Pixelated Empathy is designed around a narrow problem: helping people prepare
-for conversations where judgment, timing, and emotional accuracy matter.
+| 🛡️ FHE-Based Security | 🌪️ Nightmare Fuel Simulation | ⚖️ Real-Time Bias Detection | 🧠 Foresight Continuity |
+| :--- | :--- | :--- | :--- |
+| **Strict HIPAA Compliance** powered by Fully Homomorphic Encryption. Patient data remains encrypted even during active model inference and emotional evaluation. | **Edge Case Engine** designed to train clinicians against extreme, high-stress conversational scenarios safely before real-world harm occurs. | **Equitable AI** guardrails that continuously monitor interactions, ensuring emotional responses are fair, unbiased, and clinically sound. | **Longitudinal Memory** using our advanced MCP architecture to remember patient history, adapting over multi-session therapeutic arcs. |
 
-- Simulated rehearsal for therapeutic, support, and other high-impact dialogue
-- Emotional and conversational analysis that makes turning points easier to
-  inspect
-- Coaching and review workflows that translate difficult interactions into
-  measurable improvement
-- Operational visibility that supports iteration without overwhelming teams with
-  noise
-- **Closed-loop clinical validity pipeline** (Mission 3/3): Expert review,
-  staged promotion, pilot scorer integration. See
-  [docs/clinical-validity/feedback-loop.md](docs/clinical-validity/feedback-loop.md).
+</div>
 
-## Core Principles
+<br />
 
-- **Human-centered**: emotional context, relational cues, and timing matter as
-  much as literal wording.
-- **Safe rehearsal**: teams should be able to practice rare or difficult
-  scenarios without exposing real people to risk.
-- **Interpretability**: outputs should support human judgment, not replace it.
-- **Modularity**: research, runtime systems, and product surfaces should evolve
-  independently without fragmenting the underlying intelligence layer.
+Our goal moving forward is to scale deep, genuine empathy through digital platforms without losing the
+profoundly human essence of care. We believe that by thoughtfully bringing therapeutic principles into
+the digital realm, we can unlock new paradigms for training, healing, and connection.
 
-## Journal Dataset Research Workflow
+---
 
-The repository includes a dedicated research workflow for discovering,
-evaluating, and integrating journal datasets that support the platform's
-emotional intelligence systems.
+### ✦ The Ecosystem
 
-- Application entry points live under
-  [src/pages/journal-research/](src/pages/journal-research/).
-- Shared UI and state logic live under
-  [src/components/journal-research/](src/components/journal-research/) and
-  [src/lib/api/journal-research/](src/lib/api/journal-research/).
-- Supporting research assets and process notes live under
-  [ai/sourcing/journal/](ai/sourcing/journal/).
+This platform operates as a cohesive unit across four primary repositories. Together, they form the
+secure, intelligent backbone of our clinical AI engine:
 
-## Documentation
+* **[pixelated](https://github.com/daggerstuff/pixelated) (Main Core):** The primary orchestrator. It
+houses the application surfaces, clinical dashboards, API routes, and shared product logic that bind
+the entire experience together.
+* **[ai](ai/) (Cognitive Engine):** Our dedicated model research and training environment. This submodule
+handles inference, emotional signal analysis, and the clinical validity pipelines that ensure our
+interactions remain safe and effective.
+* **[foresight-mcp](foresight-mcp/) (Continuity & Memory):** The persistent "brain" of our AI agents.
+This submodule manages contextual memory, allowing the system to learn, adapt, and maintain continuity
+across complex, longitudinal therapeutic simulations.
+* **[docs](docs/) (Knowledge Base):** The central nervous system for all our system documentation. Because
+we operate in a highly regulated space, maintaining strict, transparent records of our HIPAA compliance,
+security posture, and clinical feedback loops is non-negotiable.
 
-For product and platform context, start with these repository resources:
+**How They Interact:**
+The **Main Core** drives the user experience and platform routing, calling upon the **Cognitive Engine**
+for real-time emotional analysis and simulation generation. Simultaneously, the core system relies on
+**Foresight MCP** to retrieve and inject deep, contextual memory into those interactions so the AI always
+"remembers" the patient's history. Every architectural boundary, compliance mandate, and operational protocol
+guiding this interplay is strictly codified within our **Knowledge Base**.
 
-- [docs/index.mdx](docs/index.mdx) for the documentation site's landing content
-- [docs/platform/overview.mdx](docs/platform/overview.mdx) for the platform
-  overview
-- [docs/compliance/security.mdx](docs/compliance/security.mdx) for security
-  posture
-- [docs/compliance/hipaa.mdx](docs/compliance/hipaa.mdx) for healthcare
-  compliance context
-- [docs/api-reference/introduction.mdx](docs/api-reference/introduction.mdx) for
-  API documentation entry points
+---
 
-## Trust Safety and Quality
+<br />
 
-This repository supports clinical and emotionally sensitive workflows. That
-shapes how the system is designed and documented.
-
-- Architectural boundaries separate research, runtime, and user-facing product
-  surfaces.
-- Safety, privacy, and reviewability are treated as product requirements, not
-  add-ons.
-- Documentation is maintained as a first-class artifact so collaborators can
-  evaluate intent and system shape quickly.
-- Accessibility and readability improvements are part of the ongoing maintenance
-  standard for both product and documentation surfaces.
-
-## External Links
-
-- [Company website](https://pixelatedempathy.com)
-- [Request enterprise access](https://pixelatedempathy.com/contact)
-- [Case studies](https://pixelatedempathy.com/case-studies)
-- [Team](https://pixelatedempathy.com/team)
-
-## License
-
-Pixelated Empathy is proprietary software. See [LICENSE](LICENSE).
-
-© 2026 Pixelated Empathy.
+<div align="center">
+  <b>Pixelated Empathy is proprietary software.</b><br><br>
+  <a href="https://pixelatedempathy.com">Website</a> •
+  <a href="https://pixelatedempathy.com/contact">Enterprise Access</a> •
+  <a href="https://pixelatedempathy.com/case-studies">Case Studies</a> •
+  <a href="https://pixelatedempathy.com/team">Our Team</a>
+  
+  <br><br>
+  <code>© 2026 Pixelated Empathy. All rights reserved.</code>
+</div>
