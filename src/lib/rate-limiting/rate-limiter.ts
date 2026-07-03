@@ -400,23 +400,23 @@ export class DistributedRateLimiter {
 
   /**
    * Get remaining requests helper
-     */
-    async getRemainingRequests(
-      identifier: string,
-      rule: RateLimitRule,
-    ): Promise<number> {
-      const status = await this.getStatus(identifier, rule)
-      return status.remaining
-    }
+   */
+  async getRemainingRequests(
+    identifier: string,
+    rule: RateLimitRule,
+  ): Promise<number> {
+    const status = await this.getStatus(identifier, rule)
+    return status.remaining
+  }
 
-    /**
-     * Reset counter for identifier
-     */
-    async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
-      const key = `${this.prefix}${rule.name}:${identifier}`
-      const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
-      await this._redis.del(windowKey)
-    }
+  /**
+   * Reset counter for identifier
+   */
+  async resetCounter(identifier: string, rule: RateLimitRule): Promise<void> {
+    const key = `${this.prefix}${rule.name}:${identifier}`
+    const windowKey = `${key}:${Math.floor(Date.now() / rule.windowMs)}`
+    await this._redis.del(windowKey)
+  }
 }
 
 /**

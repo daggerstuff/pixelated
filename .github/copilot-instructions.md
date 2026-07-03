@@ -172,8 +172,8 @@ For active work and cross-session context, use **Foresight MCP**.
   - `query_memories_temporal`
   - `get_system_status`
 
-Expert and maintenance workflows belong in nested `foresight-mcp` CLI
-Python API, not MCP tool surface.
+Expert and maintenance workflows belong in nested `foresight-mcp` CLI Python
+API, not MCP tool surface.
 
 Orientation flow:
 
@@ -197,4 +197,3 @@ Orientation flow:
 - Enabled: `context7` `linear` `brave-search` `firecrawl`.
 - Disabled: `github` `playwright` `sentry` `e2b-sandbox`.
 - Use standard tooling when those are unavailable.
-

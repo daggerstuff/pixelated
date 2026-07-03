@@ -37,8 +37,8 @@
 - Use `uv run` for Python execution where possible.
 - Keep context scoped: prefer root-level defaults w/ path-specific overrides.
 - Start every task by running Foresight continuity calls before edits:
-  `manage_context_blocks` (`list` `get` for `pending_items`
-  `project_context`) and `search_memories` for active/upcoming work.
+  `manage_context_blocks` (`list` `get` for `pending_items` `project_context`)
+  and `search_memories` for active/upcoming work.
   - If these calls are unavailable, pause edits and switch to local continuity
     fallback.
 - **Prefer Droid's structured workflows** for non-trivial code:

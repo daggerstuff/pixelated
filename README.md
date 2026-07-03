@@ -3,9 +3,9 @@
 
   <br />
 
-  # Pixelated Empathy
+# Pixelated Empathy
 
-  **Pioneering the digital frontier of mental health.**
+**Pioneering the digital frontier of mental health.**
 
   <br />
 
@@ -20,13 +20,14 @@
 
 ### ✦ The Vision
 
-Pixelated Empathy is fundamentally reshaping the mental health landscape. Historically, the clinical world
-has pushed back against integrating deeply with the digital realm—often out of valid concerns for safety,
-empathy, and privacy.
+Pixelated Empathy is fundamentally reshaping the mental health landscape.
+Historically, the clinical world has pushed back against integrating deeply with
+the digital realm—often out of valid concerns for safety, empathy, and privacy.
 
-We are here to bridge that gap in a highly positive and beneficial way. By merging clinical rigor with
-advanced, carefully aligned AI, we create environments where high-stakes, human-centered teams can
-practice, analyze, and evolve their emotional intelligence before stepping into real-world scenarios.
+We are here to bridge that gap in a highly positive and beneficial way. By
+merging clinical rigor with advanced, carefully aligned AI, we create
+environments where high-stakes, human-centered teams can practice, analyze, and
+evolve their emotional intelligence before stepping into real-world scenarios.
 
 <br />
 
@@ -40,44 +41,49 @@ practice, analyze, and evolve their emotional intelligence before stepping into 
 
 ### ✦ Core Capabilities
 
-| 🛡️ FHE-Based Security | 🌪️ Nightmare Fuel Simulation | ⚖️ Real-Time Bias Detection | 🧠 Foresight Continuity |
-| :--- | :--- | :--- | :--- |
+| 🛡️ FHE-Based Security                                                                                                                                            | 🌪️ Nightmare Fuel Simulation                                                                                                                  | ⚖️ Real-Time Bias Detection                                                                                                                | 🧠 Foresight Continuity                                                                                                                |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
 | **Strict HIPAA Compliance** powered by Fully Homomorphic Encryption. Patient data remains encrypted even during active model inference and emotional evaluation. | **Edge Case Engine** designed to train clinicians against extreme, high-stress conversational scenarios safely before real-world harm occurs. | **Equitable AI** guardrails that continuously monitor interactions, ensuring emotional responses are fair, unbiased, and clinically sound. | **Longitudinal Memory** using our advanced MCP architecture to remember patient history, adapting over multi-session therapeutic arcs. |
 
 </div>
 
 <br />
 
-Our goal moving forward is to scale deep, genuine empathy through digital platforms without losing the
-profoundly human essence of care. We believe that by thoughtfully bringing therapeutic principles into
-the digital realm, we can unlock new paradigms for training, healing, and connection.
+Our goal moving forward is to scale deep, genuine empathy through digital
+platforms without losing the profoundly human essence of care. We believe that
+by thoughtfully bringing therapeutic principles into the digital realm, we can
+unlock new paradigms for training, healing, and connection.
 
 ---
 
 ### ✦ The Ecosystem
 
-This platform operates as a cohesive unit across four primary repositories. Together, they form the
-secure, intelligent backbone of our clinical AI engine:
+This platform operates as a cohesive unit across four primary repositories.
+Together, they form the secure, intelligent backbone of our clinical AI engine:
 
-* **[pixelated](https://github.com/daggerstuff/pixelated) (Main Core):** The primary orchestrator. It
-houses the application surfaces, clinical dashboards, API routes, and shared product logic that bind
-the entire experience together.
-* **[ai](ai/) (Cognitive Engine):** Our dedicated model research and training environment. This submodule
-handles inference, emotional signal analysis, and the clinical validity pipelines that ensure our
-interactions remain safe and effective.
-* **[foresight-mcp](foresight-mcp/) (Continuity & Memory):** The persistent "brain" of our AI agents.
-This submodule manages contextual memory, allowing the system to learn, adapt, and maintain continuity
-across complex, longitudinal therapeutic simulations.
-* **[docs](docs/) (Knowledge Base):** The central nervous system for all our system documentation. Because
-we operate in a highly regulated space, maintaining strict, transparent records of our HIPAA compliance,
-security posture, and clinical feedback loops is non-negotiable.
+- **[pixelated](https://github.com/daggerstuff/pixelated) (Main Core):** The
+  primary orchestrator. It houses the application surfaces, clinical dashboards,
+  API routes, and shared product logic that bind the entire experience together.
+- **[ai](ai/) (Cognitive Engine):** Our dedicated model research and training
+  environment. This submodule handles inference, emotional signal analysis, and
+  the clinical validity pipelines that ensure our interactions remain safe and
+  effective.
+- **[foresight-mcp](foresight-mcp/) (Continuity & Memory):** The persistent
+  "brain" of our AI agents. This submodule manages contextual memory, allowing
+  the system to learn, adapt, and maintain continuity across complex,
+  longitudinal therapeutic simulations.
+- **[docs](docs/) (Knowledge Base):** The central nervous system for all our
+  system documentation. Because we operate in a highly regulated space,
+  maintaining strict, transparent records of our HIPAA compliance, security
+  posture, and clinical feedback loops is non-negotiable.
 
-**How They Interact:**
-The **Main Core** drives the user experience and platform routing, calling upon the **Cognitive Engine**
-for real-time emotional analysis and simulation generation. Simultaneously, the core system relies on
-**Foresight MCP** to retrieve and inject deep, contextual memory into those interactions so the AI always
-"remembers" the patient's history. Every architectural boundary, compliance mandate, and operational protocol
-guiding this interplay is strictly codified within our **Knowledge Base**.
+**How They Interact:** The **Main Core** drives the user experience and platform
+routing, calling upon the **Cognitive Engine** for real-time emotional analysis
+and simulation generation. Simultaneously, the core system relies on **Foresight
+MCP** to retrieve and inject deep, contextual memory into those interactions so
+the AI always "remembers" the patient's history. Every architectural boundary,
+compliance mandate, and operational protocol guiding this interplay is strictly
+codified within our **Knowledge Base**.
 
 ---
 
