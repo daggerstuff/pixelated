@@ -36,11 +36,15 @@ practice, analyze, and evolve their emotional intelligence before stepping into 
 
 <br />
 
-### ✦ Core Selling Points
+<div align="center">
+
+### ✦ Core Capabilities
 
 | 🛡️ FHE-Based Security | 🌪️ Nightmare Fuel Simulation | ⚖️ Real-Time Bias Detection | 🧠 Foresight Continuity |
 | :--- | :--- | :--- | :--- |
 | **Strict HIPAA Compliance** powered by Fully Homomorphic Encryption. Patient data remains encrypted even during active model inference and emotional evaluation. | **Edge Case Engine** designed to train clinicians against extreme, high-stress conversational scenarios safely before real-world harm occurs. | **Equitable AI** guardrails that continuously monitor interactions, ensuring emotional responses are fair, unbiased, and clinically sound. | **Longitudinal Memory** using our advanced MCP architecture to remember patient history, adapting over multi-session therapeutic arcs. |
+
+</div>
 
 <br />
 
