@@ -7,7 +7,7 @@
  * In production, this should be replaced with a proper FHE library implementation.
  */
 
-import type { CryptoSystem } from '../crypto'
+import type { CryptoSystem } from '../crypto/index'
 import { createBuildSafeLogger } from '../logging/build-safe-logger'
 
 const logger = createBuildSafeLogger('fhe')

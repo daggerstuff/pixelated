@@ -1,7 +1,20 @@
 {
   "buildCommand": "NODE_ENV=production pnpm exec astro build",
   "framework": "astro",
-  "regions": [
-    "iad1"
+  "regions": ["iad1"],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    }
   ]
 }

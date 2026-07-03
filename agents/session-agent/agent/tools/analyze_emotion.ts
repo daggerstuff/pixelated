@@ -2,8 +2,8 @@ import { generateText } from 'ai'
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { getModel } from '../lib/workers-ai.js'
 import { analyzePace, type PaceSignal } from './analyze_pace.js'
-import { getModel } from './workers-ai.js'
 
 interface EmotionSignal {
   primary_emotion: string

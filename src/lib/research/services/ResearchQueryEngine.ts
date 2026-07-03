@@ -55,12 +55,12 @@ export class ResearchQueryEngine {
     },
     anonymizationService: AnonymizationService,
     consentService: ConsentManagementService,
-    hipaaService: HIPAADataService,
+    _hipaaService: HIPAADataService,
   ) {
     this.config = config
     this.anonymizationService = anonymizationService
     this.consentService = consentService
-    this._hipaaService = hipaaService
+    this._hipaaService = _hipaaService
   }
 
   /**

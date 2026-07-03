@@ -1,7 +1,7 @@
 /**
  * @vitest-environment node
  */
-import { describe, expect, it, vi, beforeEach } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { getCurrentUser } from '@/lib/auth'
 
@@ -149,6 +149,22 @@ describe('errorResponse', () => {
       success: false,
       error: 'Internal Server Error',
       message: 'Unexpected failure',
+    })
+  })
+})
+
+describe('jsonError', () => {
+  it('creates a Response with error payload, message, and status', async () => {
+    const { jsonError } = await import('../_shared')
+    const response = jsonError(400, 'Bad Request', 'Invalid input')
+
+    expect(response.status).toBe(400)
+    expect(response.headers.get('Content-Type')).toBe('application/json')
+
+    const data = await response.json()
+    expect(data).toEqual({
+      error: 'Bad Request',
+      message: 'Invalid input',
     })
   })
 })

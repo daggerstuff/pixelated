@@ -76,7 +76,8 @@ describe('DistributedRateLimiter', () => {
 
   beforeEach(() => {
     // Clear redis store for each test
-    ;(redis as any)._store?.clear()
+    // @ts-expect-error - _store is a mock-only property
+    redis._store?.clear()
     rateLimiter = createRateLimiter(defaultRateLimitConfig)
   })
 
@@ -128,7 +129,9 @@ describe('DistributedRateLimiter', () => {
       }
 
       // Setup mock responding to attack pattern checks
-      vi?.mocked(redis['zrangebyscore']).mockResolvedValueOnce(
+      ;(
+        redis as unknown as { zrangebyscore: ReturnType<typeof vi.fn> }
+      ).zrangebyscore.mockResolvedValueOnce(
         Array(15)
           .fill(0)
           .map((_, i) => `${Date.now() + i * 10}:${Math.random()}`),
@@ -140,7 +143,7 @@ describe('DistributedRateLimiter', () => {
 
     it('should fail open on Redis errors', async () => {
       // Mock pipeline to throw error ONCE
-      const pipeline = redis?.['pipeline']()
+      const pipeline = redis.pipeline!()
       vi.mocked(pipeline.exec).mockRejectedValueOnce(
         new Error('Redis connection failed'),
       )
@@ -151,7 +154,9 @@ describe('DistributedRateLimiter', () => {
         ...pipeline,
         exec: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
       }
-      vi?.mocked(redis['pipeline']).mockReturnValueOnce(failingPipeline)
+      ;(
+        redis as unknown as { pipeline: ReturnType<typeof vi.fn> }
+      ).pipeline.mockReturnValueOnce(failingPipeline)
 
       const rule: RateLimitRule = {
         name: 'test_rule',
@@ -170,7 +175,9 @@ describe('DistributedRateLimiter', () => {
 
   describe('isBlocked', () => {
     it('should check if identifier is blocked', async () => {
-      vi?.mocked(redis['get']).mockResolvedValueOnce(
+      ;(
+        redis as unknown as { get: ReturnType<typeof vi.fn> }
+      ).get.mockResolvedValueOnce(
         JSON.stringify({
           pattern: { isSuspicious: true, type: 'rapid_fire' },
           detectedAt: Date.now(),
@@ -182,7 +189,9 @@ describe('DistributedRateLimiter', () => {
     })
 
     it('should return false when not blocked', async () => {
-      vi?.mocked(redis['get']).mockResolvedValueOnce(null)
+      ;(
+        redis as unknown as { get: ReturnType<typeof vi.fn> }
+      ).get.mockResolvedValueOnce(null)
 
       const isBlocked = await rateLimiter.isBlocked('test_user')
       expect(isBlocked).toBe(false)
@@ -191,11 +200,15 @@ describe('DistributedRateLimiter', () => {
 
   describe('getAnalytics', () => {
     it('should return analytics data', async () => {
-      vi?.mocked(redis['hgetall']).mockResolvedValueOnce({
+      ;(
+        redis as unknown as { hgetall: ReturnType<typeof vi.fn> }
+      ).hgetall.mockResolvedValueOnce({
         total_requests: '100',
         total_blocked: '5',
       })
-      vi?.mocked(redis['hgetall']).mockResolvedValueOnce({
+      ;(
+        redis as unknown as { hgetall: ReturnType<typeof vi.fn> }
+      ).hgetall.mockResolvedValueOnce({
         total_blocked: '5',
       })
 

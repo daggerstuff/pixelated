@@ -1,6 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { storeMemory, searchMemories } from '../foresight-client.js'
+
 const SCHEMA = z.object({
   trainee_id: z
     .string()
@@ -24,24 +26,59 @@ export default defineTool({
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
     const sessionId = input.session_id ?? crypto.randomUUID()
-
-    // Persistence wiring lives behind a thin facade so we can swap the
-    // implementation (Foresight vs. local file store) without touching the tool.
     const persistedAt = new Date().toISOString()
+
+    const memoryResult = await storeMemory({
+      content: JSON.stringify({
+        type: 'session_header',
+        session_id: sessionId,
+        trainee_id: input.trainee_id,
+        scenario_id: input.scenario_id,
+        state: input.resume ? 'RECOVERING' : 'NEW',
+        started_at: persistedAt,
+      }),
+      category: 'session',
+      scope: 'session',
+      retention: 'long_term',
+      importance: 0.7,
+      tags: [
+        'session',
+        `trainee:${input.trainee_id}`,
+        `scenario:${input.scenario_id}`,
+      ],
+    })
+
+    // If resuming, try to recover recent context from Foresight
+    let recoveredContext: {
+      recent_turns: unknown[]
+      last_state: string
+    } | null = null
+    if (input.resume && input.session_id) {
+      const memories = await searchMemories({
+        query: `session:${input.session_id}`,
+        limit: 10,
+        tag_filter: [`session:${input.session_id}`],
+      })
+      if (memories && memories.length > 0) {
+        recoveredContext = {
+          recent_turns: memories,
+          last_state: 'ACTIVE',
+        }
+      }
+    }
 
     return {
       session_id: sessionId,
       trainee_id: input.trainee_id,
       scenario_id: input.scenario_id,
-      state: input.resume ? 'RECOVERING' : 'NEW',
+      state: recoveredContext ? 'RECOVERING' : 'NEW',
       persisted_at: persistedAt,
       resume_token: `${sessionId}:${persistedAt}`,
-      // Tool-side stub. Real implementation must call into Foresight MCP
-      // (`connection__foresight__store_memory`) and Mongo via the memory MCP.
-      foresight_stub: {
+      foresight_memory: memoryResult ?? {
         memory_id: null,
-        note: 'Foresight MCP write is not yet wired in this slice. See agent/connections/foresight.ts.',
+        note: 'Foresight MCP write failed or server unreachable on port 8764.',
       },
+      recovered_context: recoveredContext,
       mongo_stub: {
         collection: 'sessions',
         document_id: sessionId,

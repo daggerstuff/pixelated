@@ -475,7 +475,7 @@ export class AnonymizationPipelineService {
   private async mergeOrSuppressGroup(
     smallGroup: Record<string, unknown>[],
     allGroups: Map<string, Record<string, unknown>[]>,
-    _k: number,
+    k: number,
     quasiIdentifiers: string[],
   ): Promise<Record<string, unknown>[]> {
     // Try to find similar groups to merge with
