@@ -413,7 +413,7 @@
     "ioredis-mock": "latest",
     "js-base64": "latest",
     "jsdom": "latest",
-    "knip": "^6.23.0",
+    "knip": "^6.24.0",
     "lint-staged": "latest",
     "markdownlint": "latest",
     "markdownlint-cli": "latest",
