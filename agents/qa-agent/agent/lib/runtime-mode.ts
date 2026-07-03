@@ -10,7 +10,7 @@
  * `/ask-model` is treated as a normal LLM turn (stripped of the prefix).
  */
 
-export const ASK_MODEL_PREFIX = "/ask-model";
+export const ASK_MODEL_PREFIX = '/ask-model'
 
 /**
  * True iff the LLM should be invoked on this turn.
@@ -20,8 +20,8 @@ export const ASK_MODEL_PREFIX = "/ask-model";
  * tools only.
  */
 export function isModelAllowed(message: unknown): boolean {
-  if (typeof message !== "string") return false;
-  return message.trimStart().startsWith(ASK_MODEL_PREFIX);
+  if (typeof message !== 'string') return false
+  return message.trimStart().startsWith(ASK_MODEL_PREFIX)
 }
 
 /**
@@ -29,8 +29,8 @@ export function isModelAllowed(message: unknown): boolean {
  * If the prefix is absent, returns the input unchanged.
  */
 export function stripAskModelPrefix(message: string): string {
-  if (!isModelAllowed(message)) return message;
-  return message.replace(/^\s*\/ask-model\s*/, "").trim();
+  if (!isModelAllowed(message)) return message
+  return message.replace(/^\s*\/ask-model\s*/, '').trim()
 }
 
 /**
@@ -39,7 +39,7 @@ export function stripAskModelPrefix(message: string): string {
  * explain why a turn is being answered Foresight-first.
  */
 export function hasAnthropicCredentials(): boolean {
-  return Boolean(process.env.ANTHROPIC_API_KEY);
+  return Boolean(process.env.ANTHROPIC_API_KEY)
 }
 
 /**
@@ -54,4 +54,4 @@ This agent is configured for Foresight-first mode.
 - To invoke the LLM explicitly, prefix the message with /ask-model.
 
 If you expected a normal LLM reply, prefix your next message with
-${ASK_MODEL_PREFIX} or set ANTHROPIC_API_KEY in the deployment environment.`;
+${ASK_MODEL_PREFIX} or set ANTHROPIC_API_KEY in the deployment environment.`

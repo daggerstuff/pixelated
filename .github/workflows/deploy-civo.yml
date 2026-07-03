@@ -51,7 +51,8 @@ jobs:
           file: ./Dockerfile
           push: true
           tags:
-            - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.image_tag }}
+            - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{
+              steps.vars.outputs.image_tag }}
             - ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max

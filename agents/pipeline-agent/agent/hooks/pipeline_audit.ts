@@ -1,4 +1,4 @@
-import { defineHook } from "eve/hooks";
+import { defineHook } from 'eve/hooks'
 
 // Audit log for every pipeline state transition and tool call result.
 // The hook emits a structured event record so the program leads can
@@ -6,19 +6,21 @@ import { defineHook } from "eve/hooks";
 
 export default defineHook({
   events: {
-    "action.result"(event, _ctx) {
-      const eventData = (event as { data?: unknown }).data;
+    'action.result'(event, _ctx) {
+      const eventData = (event as { data?: unknown }).data
       const status =
-        typeof eventData === "object" && eventData !== null && "status" in eventData
+        typeof eventData === 'object' &&
+        eventData !== null &&
+        'status' in eventData
           ? (eventData as { status?: unknown }).status
-          : eventData;
-      console.log("[pipeline-audit] action result", { status });
+          : eventData
+      console.log('[pipeline-audit] action result', { status })
     },
-    "message.completed"(event, _ctx) {
-      const eventType = (event as { type?: unknown }).type;
-      console.log("[pipeline-audit] message completed", {
-        type: typeof eventType === "string" ? eventType : eventType,
-      });
+    'message.completed'(event, _ctx) {
+      const eventType = (event as { type?: unknown }).type
+      console.log('[pipeline-audit] message completed', {
+        type: typeof eventType === 'string' ? eventType : eventType,
+      })
     },
   },
-});
+})

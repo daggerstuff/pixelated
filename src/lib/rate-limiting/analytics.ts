@@ -232,9 +232,7 @@ export class RateLimitAnalyticsService {
       if (!redis) {
         throw new Error('Redis not available')
       }
-      const ruleKeys = await redis.keys!(
-        `${this.analyticsPrefix}*:${today}`,
-      )
+      const ruleKeys = await redis.keys!(`${this.analyticsPrefix}*:${today}`)
       let totalRequests = 0
       let blockedRequests = 0
       let attackDetections = 0
@@ -370,7 +368,10 @@ export class RateLimitAnalyticsService {
       // Execute monitor handlers
       for (const monitor of this.monitors) {
         try {
-          const shouldTrigger: boolean = await this.shouldTriggerMonitor(monitor, alert)
+          const shouldTrigger: boolean = await this.shouldTriggerMonitor(
+            monitor,
+            alert,
+          )
           if (shouldTrigger) {
             for (const handler of monitor.handlers) {
               try {

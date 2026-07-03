@@ -1,5 +1,5 @@
-import { defineAgent } from "eve";
+import { defineAgent } from 'eve'
 
 export default defineAgent({
-  model: "anthropic/claude-opus-4.8",
-});
+  model: 'anthropic/claude-opus-4.8',
+})
