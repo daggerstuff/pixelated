@@ -89,3 +89,29 @@ wait, the agent parks durably (Eve sessions survive restarts).
 - "hold" pauses the pipeline at the current gate.
 - "fail" enters the recovery procedure for the current stage.
 - "rollback" walks the gateway back to the previous production version.
+
+## Promotion provenance
+
+Every `promote_to_staging` or `promote_to_production` call returns a
+`training_provenance` block in its output. The orchestrator **must** verify
+this block is present before transitioning through Gate 4.
+
+The provenance block contains:
+
+- `training_job_id` — the job this promotion relates to.
+- `model_card_hash` — SHA-256 fingerprint of `model_uri:image_tag` (first 16 hex).
+- `rehearsal_session_ids` — Foresight memory IDs for rehearsal sessions tagged
+  with this `training_job_id`.
+- `qa_digest_id` — Foresight memory ID of the most recent QA scoring digest
+  (nullable; `null` means the QA agent has not persisted a digest for this job).
+- `last_7d_scoring_cohort_size` — count of rehearsal sessions found.
+- `flag_training_gap_reasons` — populated by the orchestrator from
+  `flag_training_gap` output; empty until the QA agent is wired to detect gaps.
+
+The tool also persists a `training_provenance` memory to Foresight with
+`retention: long_term` and `importance: 0.9` for external audit trail.
+
+**Required gate check**: if `training_provenance` is missing from the tool
+output or `qa_digest_id` is null, the orchestrator may still proceed (the QA
+persistence gap is acknowledged) but **must** log the missing field in the
+gate-transition Linear event so the gap is surfaced in the audit trail.
