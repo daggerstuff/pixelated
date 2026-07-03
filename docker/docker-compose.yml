@@ -83,7 +83,7 @@ services:
     restart: unless-stopped
     user: root
     environment:
-      - PIXEL_API_PORT=8000
+      - PORT=8000
     ports:
       - '8000:8000'
     volumes:
