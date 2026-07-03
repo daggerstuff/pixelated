@@ -1,6 +1,8 @@
 import { defineTool } from 'eve/tools'
 import { z } from 'zod'
 
+import { storeMemory } from '../foresight-client.js'
+
 // Persist a durable session artifact: the final transcript, a summary
 // record, and the latest emotion rollups. Conforms to the requirement that
 // "everything emotion tlanalysis results are stored in Foresight memory
@@ -42,22 +44,74 @@ export default defineTool({
     'demand.',
   inputSchema: SCHEMA,
   async execute(input: z.infer<typeof SCHEMA>) {
+    const memoryIds: string[] = []
+
+    // 1. Persist the full transcript as a single Foresight memory so hydrate_session can replay it
+    const transcriptResult = await storeMemory({
+      content: JSON.stringify({
+        type: 'transcript_turn',
+        session_id: input.session_id,
+        turns: input.transcripts,
+      }),
+      category: 'transcript',
+      scope: 'session',
+      retention: 'short_term',
+      importance: 0.6,
+      session_id: input.session_id,
+      tags: [`session_id:${input.session_id}`, 'transcript', 'bulk'],
+    })
+    if (transcriptResult?.memory_id) memoryIds.push(transcriptResult.memory_id)
+
+    // 2. Persist the session summary as a Foresight memory (if provided)
+    if (input.summary) {
+      const result = await storeMemory({
+        content: `Session ${input.session_id} summary: ${input.summary}`,
+        category: 'session',
+        scope: 'session',
+        retention: 'long_term',
+        importance: 0.7,
+        session_id: input.session_id,
+        tags: [`session_id:${input.session_id}`, 'summary'],
+      })
+      if (result?.memory_id) memoryIds.push(result.memory_id)
+    }
+
+    // 2. Store each emotion rollup as an individual memory for longitudinal tracking
+    for (const rollup of input.emotion_rollups) {
+      const result = await storeMemory({
+        content: JSON.stringify({
+          type: 'emotion_rollup',
+          session_id: input.session_id,
+          primary_emotion: rollup.primary_emotion,
+          intensity: rollup.intensity,
+          valence: rollup.valence,
+          risk_flags: rollup.risk_flags,
+        }),
+        category: 'emotion',
+        scope: 'session',
+        retention: 'short_term',
+        importance: 0.5,
+        session_id: input.session_id,
+        tags: [
+          `session_id:${input.session_id}`,
+          'emotion',
+          `emotion:${rollup.primary_emotion}`,
+        ],
+      })
+      if (result?.memory_id) memoryIds.push(result.memory_id)
+    }
+
     return {
       session_id: input.session_id,
       persisted_at: new Date().toISOString(),
       record_count: input.transcripts.length,
       emotion_rollup_count: input.emotion_rollups.length,
+      foresight_memory_ids: memoryIds,
       pii_scrubber_stub: {
         note:
           'The text redaction pass is not yet wired from ' +
           'ai-services/security/pii_scrubber.py. Persisted text MUST be ' +
           'scrubbed before reaching either backend.',
-      },
-      foresight_stub: {
-        memory_id: null,
-        note:
-          'Foresight store call via connection__foresight__store_memory is ' +
-          'not yet wired in this slice.',
       },
       mongo_stub: {
         collection: 'sessions',

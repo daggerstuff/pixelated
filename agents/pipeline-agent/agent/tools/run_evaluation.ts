@@ -1,25 +1,13 @@
 import { generateText } from 'ai'
 import { defineTool } from 'eve/tools'
 import { always } from 'eve/tools/approval'
-import { createWorkersAI } from 'workers-ai-provider'
 import { z } from 'zod'
+
+import { getModel } from '../lib/workers-ai.js'
 
 interface RunEvaluationInput {
   candidate_model_id: string
   benchmark_suite_version: string
-}
-
-const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
-const apiKey = process.env.CLOUDFLARE_AI_API_KEY
-const workersai =
-  accountId && apiKey ? createWorkersAI({ accountId, apiKey }) : null
-
-function getModel() {
-  return (
-    workersai?.(
-      process.env.WORKERS_AI_EVAL_MODEL ?? '@cf/meta/llama-3.2-3b-instruct',
-    ) ?? null
-  )
 }
 
 export default defineTool({
@@ -33,7 +21,7 @@ export default defineTool({
     candidate_model_id: z.string().min(1),
     benchmark_suite_version: z.string().min(1),
   }),
-  needsApproval: always() as unknown as undefined,
+  approval: always() as unknown as () => unknown,
   async execute(input: RunEvaluationInput) {
     const model = getModel()
     let preEvalScore: number | null = null
