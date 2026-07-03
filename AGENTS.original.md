@@ -75,7 +75,7 @@ Refer to `~/.factory/memories.md` for personal coding preferences and past decis
 
 ## Foresight Memory & Continuity System
 
-Foresight is persistent brain for AI agents. w/o it, each session starts fresh.
+Foresight is persistent brain for AI agents. Without it, each session starts fresh.
 
 ### Continuity Layers
 1. **Context Blocks** — Tenant-isolated SQLite-persisted guidance (project_context, pending_items, guidance, user_preferences, session_patterns)
@@ -89,11 +89,11 @@ Before substantial work:
 4. Use `manage_memories` to store lessons or update durable memory when needed
 
 ### Key Tools
-- MCP surface: `manage_memories` `search_memories` `manage_context_blocks`
-  `process_session_transcript` `manage_curation_runs` `inject_context`
-  `query_memories_temporal` `get_system_status`
-- Expert/maintenance workflows: use nested `foresight-mcp` CLI or Python
-  API; direct aliases such as `store_memory` `query_memories`
+- MCP surface: `manage_memories`, `search_memories`, `manage_context_blocks`,
+  `process_session_transcript`, `manage_curation_runs`, `inject_context`,
+  `query_memories_temporal`, `get_system_status`
+- Expert/maintenance workflows: use the nested `foresight-mcp` CLI or Python
+  API; direct aliases such as `store_memory`, `query_memories`, and
   `list_memories` are not exposed as MCP tools
 
 **Full reference**: `.agents/skills/foresight/SKILL.md` | **Fallback**: `.cursor/memory/scripts/bootstrap-memory-session.sh`
@@ -106,7 +106,7 @@ Prefer Droid's structured workflows over ad-hoc prompting for non-trivial work.
 
 ### Spec Mode (single-feature)
 - **Trigger**: ≥1 framework surface or feature-boundary change
-- **How**: Shift+Tab before prompt, `/spec` → Droid produces plan → you approve → Droid executes
+- **How**: Shift+Tab before prompt, or `/spec` → Droid produces plan → you approve → Droid executes
 - **Output**: in-repo `IMPLEMENTATION_PLAN.md`
 - **Prompt**: goal in one sentence, constraints, related files, verification command
 - **Best practice**: 1-2 day phases, one behavior per phase, one verification per phase
@@ -164,7 +164,7 @@ DISABLE_PLAYWRIGHT_WEBSERVER=1 BASE_URL=http://127.0.0.1:5173 \
 ```
 
 ### Submodules
-After clone or when `.gitmodules` changes, run these **before** `pnpm install`
+After clone or when `.gitmodules` changes, run these **before** `pnpm install`:
 ```bash
 git submodule init && git submodule update
 pnpm install --no-frozen-lockfile
@@ -181,17 +181,17 @@ If `.env` is missing, derive Postgres user/db from running container and write l
 
 ## Dispatch Resume Gate (mandatory)
 
-Every monthly_llm_driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE first chat_completion POST.
+Every monthly_llm_driver worker MUST call `dispatch_resume_gate.scan(month, CHUNKS_DIR)` BEFORE the first chat_completion POST.
 
-If `scan` returns `missing_or_partial > 0`  `stale_dispatch_pid` is alive, worker MUST:
+If `scan` returns `missing_or_partial > 0` AND `stale_dispatch_pid` is alive, worker MUST:
 1. Kill stale dispatch
 2. Wait 30 seconds
 3. Write `/tmp/wayfarer_smoke/resume_<month>.json` (skip_list, re_dispatch_list, fresh_dispatch_list, rollover_wall_seconds)
 4. Launch chunks from fresh_dispatch_list
 
- resume file is durable contract: if worker dies, next resume continues from fresh_dispatch_list only.
+The resume file is a durable contract: if worker dies, next resume continues from fresh_dispatch_list only.
 
-Workers MUST NOT bypass gate for short halving loops. gate runs <5 s on chunks tree and prevents silent failures.
+Workers MUST NOT bypass the gate for short halving loops. The gate runs <5 s on the chunks tree and prevents silent failures.
 
 **Reference**: `skills/monthly_llm_driver/dispatch_resume_gate.py` + `library/dispatch_resume_gate.md`
 
@@ -204,4 +204,3 @@ Before ending turn and finishing task, perform following checks:
 2. **Review Diffs**: Ensure edits are minimal, clean, safe, and do not contain suppression comments.
 3. **Execute Verification Command**: Run target check (e.g. `pnpm lint` `pnpm typecheck`or targeted tests).
 4. **Report Outcome & Risk**: Detail test results, highlight any residual risks or assumptions made, and propose next steps.
-
