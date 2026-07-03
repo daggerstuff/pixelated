@@ -22,6 +22,7 @@
 .superpowers/
 .ralph-tui
 hackathon/
+skills/
 
 # === VIRTUAL ENVIRONMENTS ===
 **/.venv/
@@ -407,3 +408,4 @@ notebooks
 
 # Stray foresight_mcp/ dir (artifact, not source — submodule is foresight-mcp/)
 /foresight_mcp/
+.clawhub
