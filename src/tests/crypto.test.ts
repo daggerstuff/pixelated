@@ -309,14 +309,26 @@ class ScheduledKeyRotation {
   }
 }
 
-// Extended CryptoSystem for testing
-interface ExtendedCryptoSystem extends CryptoSystem {
+// Extended CryptoSystem for testing (standalone — avoid extending crypto/index.ts types which have
+// conflicting KeyStorage/KeyRotationManager classes)
+interface ExtendedCryptoSystem {
   encryption: typeof Encryption
   keyStorage: KeyStorage
   keyRotationManager: KeyRotationManager
   scheduledRotation: ScheduledKeyRotation | null
   rotateExpiredKeys: () => Promise<string[]>
   stopScheduledRotation: () => void
+  encrypt: (data: string, key: string) => Promise<string>
+  decrypt: (data: string, key: string) => Promise<string>
+  hash: (data: string) => Promise<string>
+  sign: (data: string) => Promise<string>
+  verify: (data: string, signature: string) => Promise<boolean>
+  generateSecureKey: (purpose: string) => Promise<string>
+  createHash: (data: string) => Promise<string>
+  createHMAC: (data: string, key: string) => Promise<string>
+  encryptWithKeyManagement: (data: string, purpose?: string) => Promise<string>
+  decryptWithKeyManagement: (encryptedData: string) => Promise<string>
+  close: () => Promise<void>
 }
 
 type CryptoSystemTestOptions = CryptoSystemOptions & {
@@ -645,12 +657,11 @@ describe('createCryptoSystem', () => {
     return {
       encryption: Encryption,
       keyStorage: new KeyStorage({
-        namespace: options.namespace ?? 'test',
+        namespace: options.namespace ?? 'default',
       }),
       keyRotationManager: new KeyRotationManager(90),
       scheduledRotation: scheduledRotationEnabled
         ? new ScheduledKeyRotation({
-            namespace: options.namespace ?? 'test',
             checkIntervalMs: 1000,
             onRotation: () => {},
             onError: () => {},
@@ -660,24 +671,35 @@ describe('createCryptoSystem', () => {
       stopScheduledRotation: () => {
         /* Implementation not needed for test */
       },
-      encrypt: async (data: string, context?: string) =>
-        `v1:${context ?? 'default'}:${data}`,
-      decrypt: async (encryptedData: string, _context?: string) => {
+      encrypt: async (_data: string, _key: string) =>
+        `v1:${_key ?? 'default'}:${_data}`,
+      decrypt: async (encryptedData: string, _key: string) => {
         const parts = encryptedData.split(':')
-        return parts[parts.length - 1]
+        return parts[parts.length - 1] ?? ''
       },
       hash: async (data: string) => `hash-${data}`,
       sign: async (data: string) => `sig-${data}`,
       verify: async (data: string, signature: string) =>
         signature === `sig-${data}`,
+      generateSecureKey: async (_purpose: string) => 'test-key',
+      createHash: async (data: string) => `hash-${data}`,
+      createHMAC: async (data: string, _key: string) => `hmac-${data}`,
+      encryptWithKeyManagement: async (data: string, _purpose?: string) =>
+        `enc-${data}`,
+      decryptWithKeyManagement: async (encryptedData: string) =>
+        encryptedData.replace('enc-', ''),
+      close: async () => {},
     }
   }
 
   // Setup mocks before each test
   beforeEach(() => {
-    // vi.spyOn(cryptoModule, "createCryptoSystem").mockImplementation((options: any) =>
-    //   createCryptoSystemMock(options ?? {}),
-    // );
+    vi.spyOn(cryptoModule, 'createCryptoSystem').mockImplementation(
+      (options?: CryptoSystemOptions) =>
+        createCryptoSystemMock(
+          options ?? { namespace: 'test' },
+        ) as unknown as CryptoSystem,
+    )
   })
 
   // Clean up mocks after each test
