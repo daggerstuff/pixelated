@@ -129,7 +129,9 @@ describe('DistributedRateLimiter', () => {
       }
 
       // Setup mock responding to attack pattern checks
-      ;(redis as unknown as { zrangebyscore: ReturnType<typeof vi.fn> }).zrangebyscore.mockResolvedValueOnce(
+      ;(
+        redis as unknown as { zrangebyscore: ReturnType<typeof vi.fn> }
+      ).zrangebyscore.mockResolvedValueOnce(
         Array(15)
           .fill(0)
           .map((_, i) => `${Date.now() + i * 10}:${Math.random()}`),
@@ -152,7 +154,9 @@ describe('DistributedRateLimiter', () => {
         ...pipeline,
         exec: vi.fn().mockRejectedValue(new Error('Redis connection failed')),
       }
-      ;(redis as unknown as { pipeline: ReturnType<typeof vi.fn> }).pipeline.mockReturnValueOnce(failingPipeline)
+      ;(
+        redis as unknown as { pipeline: ReturnType<typeof vi.fn> }
+      ).pipeline.mockReturnValueOnce(failingPipeline)
 
       const rule: RateLimitRule = {
         name: 'test_rule',
@@ -171,7 +175,9 @@ describe('DistributedRateLimiter', () => {
 
   describe('isBlocked', () => {
     it('should check if identifier is blocked', async () => {
-      ;(redis as unknown as { get: ReturnType<typeof vi.fn> }).get.mockResolvedValueOnce(
+      ;(
+        redis as unknown as { get: ReturnType<typeof vi.fn> }
+      ).get.mockResolvedValueOnce(
         JSON.stringify({
           pattern: { isSuspicious: true, type: 'rapid_fire' },
           detectedAt: Date.now(),
@@ -183,7 +189,9 @@ describe('DistributedRateLimiter', () => {
     })
 
     it('should return false when not blocked', async () => {
-      ;(redis as unknown as { get: ReturnType<typeof vi.fn> }).get.mockResolvedValueOnce(null)
+      ;(
+        redis as unknown as { get: ReturnType<typeof vi.fn> }
+      ).get.mockResolvedValueOnce(null)
 
       const isBlocked = await rateLimiter.isBlocked('test_user')
       expect(isBlocked).toBe(false)
@@ -192,11 +200,15 @@ describe('DistributedRateLimiter', () => {
 
   describe('getAnalytics', () => {
     it('should return analytics data', async () => {
-      ;(redis as unknown as { hgetall: ReturnType<typeof vi.fn> }).hgetall.mockResolvedValueOnce({
+      ;(
+        redis as unknown as { hgetall: ReturnType<typeof vi.fn> }
+      ).hgetall.mockResolvedValueOnce({
         total_requests: '100',
         total_blocked: '5',
       })
-      ;(redis as unknown as { hgetall: ReturnType<typeof vi.fn> }).hgetall.mockResolvedValueOnce({
+      ;(
+        redis as unknown as { hgetall: ReturnType<typeof vi.fn> }
+      ).hgetall.mockResolvedValueOnce({
         total_blocked: '5',
       })
 
