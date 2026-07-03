@@ -338,7 +338,7 @@
     "twilio": "latest",
     "uuid": "^14.0.1",
     "vue": "latest",
-    "workers-ai-provider": "^3.3.0",
+    "workers-ai-provider": "^3.3.1",
     "ws": "^8.21.0",
     "zod": "^4.4.3",
     "zustand": "latest"
@@ -413,7 +413,7 @@
     "ioredis-mock": "latest",
     "js-base64": "latest",
     "jsdom": "latest",
-    "knip": "^6.23.0",
+    "knip": "^6.24.0",
     "lint-staged": "latest",
     "markdownlint": "latest",
     "markdownlint-cli": "latest",
