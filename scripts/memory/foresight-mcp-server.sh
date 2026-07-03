@@ -54,10 +54,8 @@ if [[ -z "${FORESIGHT_REQUIRE_API_KEY:-}" && -z "${FORESIGHT_ALLOW_UNAUTHENTICAT
   export FORESIGHT_ALLOW_UNAUTHENTICATED=1
 fi
 
-# Local stdio mode: force SQLite backend. FORESIGHT_DB_URL (from .env) would
-# trigger the PostgreSQL backend which requires psycopg.pool and network access.
-# The config.json already has the SQLite db_path — DB_PATH is all we need.
-unset FORESIGHT_DB_URL
+# Local stdio mode: allow Postgres backend when FORESIGHT_DB_URL is set in .env.
+# The DB_URL now routes through get_db_connection() which handles both backends.
 
 UV_BIN="$(find_uv || true)"
 if [[ -z "${UV_BIN}" ]]; then
