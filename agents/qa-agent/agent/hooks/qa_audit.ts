@@ -1,4 +1,4 @@
-import { defineHook } from "eve/hooks";
+import { defineHook } from 'eve/hooks'
 
 // Emits an audit record for every QA-flag ticket so the program leads
 // can review the flag outcome distribution. Connects to the existing
@@ -6,8 +6,8 @@ import { defineHook } from "eve/hooks";
 
 export default defineHook({
   events: {
-    "action.result"(_event, _ctx) {
-      console.log("[qa-audit] action finished");
+    'action.result'(_event, _ctx) {
+      console.log('[qa-audit] action finished')
     },
   },
-});
+})
