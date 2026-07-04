@@ -100,12 +100,6 @@ MEMORY_PROVIDER='local_foresight'
 ```
 Do **not** use `export` in `.env` — `python-dotenv` loads vars directly into `os.environ`. The systemd unit carries its own `Environment=` block for the SSE server.
 
-### Dead Variables (do not re-add)
-`FORESIGHT_API_URL`, `FORESIGHT_API_KEY`, `FORESIGHT_DB_PATH`,
-`FORESIGHT_MCP_STDIO_TRUST`, `FORESIGHT_COMPAT_*`,
-`LOCAL_MEMORY_ACTOR_TOKENS_JSON`, `LOCAL_MEMORY_ACTOR_POLICIES_JSON`
-— all from the SQLite/stdio era, no longer referenced.
-
 ### Continuity Layers
 1. **Context Blocks** — Tenant-isolated Postgres-persisted guidance (project_context, pending_items, guidance, user_preferences, session_patterns)
 2. **Memory Store** — Semantic storage for observations, preferences, lessons learned
