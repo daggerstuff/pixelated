@@ -75,10 +75,39 @@ Refer to `~/.factory/memories.md` for personal coding preferences and past decis
 
 ## Foresight Memory & Continuity System
 
-Foresight is persistent brain for AI agents. w/o it, each session starts fresh.
+Foresight is the persistent memory layer for AI agents — shared across all machines via Ghost Postgres.
+
+### Architecture
+- **Storage**: Ghost Postgres (managed) — all 3 machines (sinker, billy, gnasty) read/write the same DB
+- **Transport**: SSE on port `8764` — all MCP configs point to `http://127.0.0.1:8764/sse`
+- **Process**: systemd user service `foresight-mcp` — auto-restarts on failure, survives logout/reboot via `loginctl enable-linger`
+- **Config**: `.env` vars auto-loaded via `python-dotenv` at entry points — no `export` needed in `.env`
+
+### Service Management
+```bash
+systemctl --user status foresight-mcp     # Check status
+systemctl --user restart foresight-mcp    # Restart
+journalctl --user -u foresight-mcp -f     # Live logs
+curl -s http://127.0.0.1:8764/health      # Health check (returns memory_count)
+```
+
+### Required `.env` Variables
+```bash
+FORESIGHT_BANK_ID='pixelated'
+FORESIGHT_USER_ID='vivi'
+FORESIGHT_DB_URL='postgresql://tsdbadmin:<password>@<host>:5432/tsdb?sslmode=require'
+MEMORY_PROVIDER='local_foresight'
+```
+Do **not** use `export` in `.env` — `python-dotenv` loads vars directly into `os.environ`. The systemd unit carries its own `Environment=` block for the SSE server.
+
+### Dead Variables (do not re-add)
+`FORESIGHT_API_URL`, `FORESIGHT_API_KEY`, `FORESIGHT_DB_PATH`,
+`FORESIGHT_MCP_STDIO_TRUST`, `FORESIGHT_COMPAT_*`,
+`LOCAL_MEMORY_ACTOR_TOKENS_JSON`, `LOCAL_MEMORY_ACTOR_POLICIES_JSON`
+— all from the SQLite/stdio era, no longer referenced.
 
 ### Continuity Layers
-1. **Context Blocks** — Tenant-isolated SQLite-persisted guidance (project_context, pending_items, guidance, user_preferences, session_patterns)
+1. **Context Blocks** — Tenant-isolated Postgres-persisted guidance (project_context, pending_items, guidance, user_preferences, session_patterns)
 2. **Memory Store** — Semantic storage for observations, preferences, lessons learned
 
 ### Task Start Workflow (Mandatory)
@@ -92,11 +121,16 @@ Before substantial work:
 - MCP surface: `manage_memories` `search_memories` `manage_context_blocks`
   `process_session_transcript` `manage_curation_runs` `inject_context`
   `query_memories_temporal` `get_system_status`
+- CLI: `foresight store "text"`, `foresight list`, `foresight query "search"`, `foresight doctor`
 - Expert/maintenance workflows: use nested `foresight-mcp` CLI or Python
   API; direct aliases such as `store_memory` `query_memories`
   `list_memories` are not exposed as MCP tools
 
-**Full reference**: `.agents/skills/foresight/SKILL.md` | **Fallback**: `.cursor/memory/scripts/bootstrap-memory-session.sh`
+### Troubleshooting
+- **CLI writes to SQLite instead of Postgres**: Check `FORESIGHT_DB_URL` is in `.env` and `python-dotenv` is loading it (`foresight doctor` shows active env overrides)
+- **SSE server down**: `systemctl --user restart foresight-mcp`
+- **MCP client can't connect**: Verify port 8764 is listening (`curl http://127.0.0.1:8764/health`)
+- **Startup warnings**: Use `python -m foresight_mcp` (not `python -m foresight_mcp.server`) to avoid dual-import RuntimeWarning
 
 ---
 
