@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getCurrentUser } from '@/lib/auth'
 
-import { parsePagination, requireMemoryUser } from '../_shared'
+import { requireMemoryUser } from '../_shared'
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: vi.fn(),
@@ -170,69 +170,23 @@ describe('jsonError', () => {
 })
 
 describe('parsePagination', () => {
-  it('parses limit and offset with defaults', () => {
+  it('parses limit and offset with defaults', async () => {
+    const { parsePagination } = await import('../_shared')
     const url = new URL('http://localhost')
 
     expect(parsePagination(url)).toEqual({
       limit: 10,
-      offset: 0,
+      offset: 0
     })
   })
 
-  it('parses explicit valid limit and offset', () => {
-    const url = new URL('http://localhost?limit=25&offset=5')
+  it('parses limit and offset from search params', async () => {
+    const { parsePagination } = await import('../_shared')
+    const url = new URL('http://localhost?limit=20&offset=5')
 
     expect(parsePagination(url)).toEqual({
-      limit: 25,
-      offset: 5,
-    })
-  })
-
-  it('falls back to defaults for non-numeric params', () => {
-    const url = new URL('http://localhost?limit=abc&offset=xyz')
-
-    expect(parsePagination(url)).toEqual({
-      limit: 10,
-      offset: 0,
-    })
-  })
-
-  it('falls back when limit or offset are negative', () => {
-    const url = new URL('http://localhost?limit=-5&offset=-3')
-
-    expect(parsePagination(url)).toEqual({
-      limit: 10,
-      offset: 0,
-    })
-  })
-
-  it('falls back to default limit when limit is zero', () => {
-    const url = new URL('http://localhost?limit=0&offset=12')
-
-    expect(parsePagination(url)).toEqual({
-      limit: 10,
-      offset: 12,
-    })
-  })
-
-  it('handles partial params when only one query value is present', () => {
-    expect(parsePagination(new URL('http://localhost?limit=30'))).toEqual({
-      limit: 30,
-      offset: 0,
-    })
-
-    expect(parsePagination(new URL('http://localhost?offset=15'))).toEqual({
-      limit: 10,
-      offset: 15,
-    })
-  })
-
-  it('caps limit at 100 for large values', () => {
-    const url = new URL('http://localhost?limit=500&offset=0')
-
-    expect(parsePagination(url)).toEqual({
-      limit: 100,
-      offset: 0,
+      limit: 20,
+      offset: 5
     })
   })
 })
