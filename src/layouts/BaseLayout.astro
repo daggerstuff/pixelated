@@ -134,6 +134,27 @@ const currentYear = new Date().getFullYear()
       document.documentElement.dataset['theme'] = theme
       document.documentElement.classList.toggle('dark', theme === 'dark')
     </script>
+    <noscript>
+      <style>
+        @media (prefers-color-scheme: dark) {
+          /* Fallback for UnoCSS dark utility classes when JS is disabled */
+          [class*="dark:bg-"] { background-color: var(--color-surface); }
+          [class*="dark:text-"] { color: var(--color-text); }
+          [class*="dark:border-"] { border-color: var(--color-line); }
+          .prose {
+            --un-prose-body: var(--un-prose-invert-body);
+            --un-prose-headings: var(--un-prose-invert-headings);
+            --un-prose-links: var(--un-prose-invert-links);
+            --un-prose-lists: var(--un-prose-invert-lists);
+            --un-prose-hr: var(--un-prose-invert-hr);
+            --un-prose-captions: var(--un-prose-invert-captions);
+            --un-prose-code: var(--un-prose-invert-code);
+            --un-prose-borders: var(--un-prose-invert-borders);
+            --un-prose-bg-soft: var(--un-prose-invert-bg-soft);
+          }
+        }
+      </style>
+    </noscript>
   </head>
 
   <body
@@ -220,7 +241,6 @@ const currentYear = new Date().getFullYear()
       )
     }
 
-    <script>
     <script>
       document.addEventListener('astro:page-load', () => {
         const toggle = document.querySelector('[data-keel-theme-toggle]')

@@ -56,6 +56,8 @@ export default defineConfig({
           presetWebFonts({
             fonts: {
               sans: 'Public Sans:400,600,700',
+              mono: 'JetBrains Mono Variable',
+              display: 'Fraunces Variable',
             },
           }),
         ]),
