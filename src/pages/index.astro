@@ -1,83 +1,62 @@
 ---
-import Layout from '@/layouts/Layout.astro'
-import ProfessionalHero from '@/components/ProfessionalHero.astro'
-import IntroSection from '@/components/homepage/IntroSection.astro'
-import CoreFeatures from '@/components/mizu/CoreFeatures.astro'
-import CTA from '@/components/mizu/CTA.astro'
+import BaseLayout from '@/layouts/BaseLayout.astro'
 import { homepageContent } from '@/lib/content'
-import '@/styles/homepage.css'
+import { withBasePath } from '@/utils/path'
 
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  'name': 'Pixelated Empathy',
-  'url': 'https://pixelatedempathy.com',
-  'logo': 'https://pixelatedempathy.com/favicon.svg',
-  'description':
-    'Clinical simulation and transcript-based review for therapist training and supervision teams.',
-  'foundingDate': '2025',
-  'address': {
-    '@type': 'PostalAddress',
-    'addressCountry': 'US',
-  },
-  'contactPoint': {
-    '@type': 'ContactPoint',
-    'email': 'info@pixelatedempathy.com',
-    'contactType': 'Customer Service',
-  },
-  'sameAs': [
-    'https://x.com/pixelatedempathy',
-    'https://github.com/nochadisfaction/pixelated',
-  ],
-}
+const { hero, intro } = homepageContent
 ---
 
-<Layout
+<BaseLayout
   title="Pixelated Empathy | Clinical simulation for therapist training and supervision"
   description="Turn difficult therapy sessions into sharper supervision with review-ready transcripts, clearer coaching moments, and one realistic case your team can learn from together."
-  keywords="clinical simulation, therapy training, clinical supervision, mental health"
-  fullWidthMain
 >
-  <div class="pe-homepage">
-    <script
-      is:inline
-      type="application/ld+json"
-      set:html={JSON.stringify(organizationSchema)
-        .replace(/</g, '\\u003c')
-        .replace(/>/g, '\\u003e')}
-    />
+  <section class="hero section">
+    <p class="eyebrow">{hero.kicker}</p>
+    <h1>{hero.title}</h1>
+    <p class="lead">
+      {hero.subtitle}
+    </p>
+    <div class="action-row" aria-label="Primary links">
+      <a class="button" href={withBasePath(hero.primaryCTA.href)}>{hero.primaryCTA.text}</a>
+      <a class="text-link" href={withBasePath(hero.secondaryCTA.href)}>{hero.secondaryCTA.text}</a>
+    </div>
+  </section>
 
-    <ProfessionalHero
-      kicker={homepageContent.hero.kicker}
-      title={homepageContent.hero.title}
-      subtitle={homepageContent.hero.subtitle}
-      helperText={homepageContent.hero.helperText}
-      proofPoints={homepageContent.hero.proofPoints}
-      primaryCTA={homepageContent.hero.primaryCTA}
-      secondaryCTA={homepageContent.hero.secondaryCTA}
-    />
+  <section class="section split-overview" aria-label="Theme overview">
+    <div>
+      <p class="eyebrow">{intro.label}</p>
+      <h2>{intro.title}</h2>
+    </div>
+    <div class="feature-list">
+      {intro.panelItems.map((item) => (
+        <article>
+          <h3>{item.label}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
 
-    <IntroSection content={homepageContent.intro} />
+  <section class="section index-feed" aria-labelledby="latest-works">
+    <div class="section-heading">
+      <p class="eyebrow">The Problem vs The Solution</p>
+      <h2 id="latest-works">Before & After.</h2>
+      <a class="text-link" href={withBasePath('/features')}>All features</a>
+    </div>
 
-    <CoreFeatures
-      title={homepageContent.features.title}
-      copy={homepageContent.features.copy}
-      proofLabel={homepageContent.features.proofLabel}
-      proofItems={homepageContent.features.proofItems}
-      cards={homepageContent.features.cards}
-    />
-
-    <CTA
-      label={homepageContent.cta.label}
-      title={homepageContent.cta.title}
-      intro={homepageContent.cta.intro}
-      verdictCopy={homepageContent.cta.verdictCopy}
-      proofItems={homepageContent.cta.proofItems}
-      decisionTitle={homepageContent.cta.decisionTitle}
-      rubric={homepageContent.cta.rubric}
-      primaryCTA={homepageContent.cta.primaryCTA}
-      secondaryCTA={homepageContent.cta.secondaryCTA}
-      meta={homepageContent.cta.meta}
-    />
-  </div>
-</Layout>
+    <div class="note-list">
+      {intro.evidenceCards.map((card) => (
+        <article class="note-row" style="padding-bottom: 2rem;">
+          <div>
+            <h3>{card.title}</h3>
+            <ul style="margin-top: 1rem; padding-left: 1rem;">
+              {card.items.map(item => (
+                <li style="margin-bottom: 0.5rem; color: var(--color-muted);">{item}</li>
+              ))}
+            </ul>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
