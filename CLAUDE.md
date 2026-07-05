@@ -39,15 +39,6 @@
 - Start every task by running Foresight continuity calls before edits:
   `manage_context_blocks` (`list` `get` for `pending_items` `project_context`)
   and `search_memories` for active/upcoming work.
-  - If these calls are unavailable, pause edits and switch to local continuity
-    fallback.
-- **Prefer Droid's structured workflows** for non-trivial code:
-  - **Spec Mode** (`Shift+Tab` `/spec`) for well-scoped single features —
-    produces `IMPLEMENTATION_PLAN.md` for auditability.
-  - **Missions** (`/missions`) for multi-feature refactors or 50+ file work —
-    produces milestones-backed plan and orchestration via Mission Control.
-  - See "Droid Workflow" section in root `AGENTS.md` for triggers and PM
-    playbook.
 
 ### ⚠️ Ask first
 
