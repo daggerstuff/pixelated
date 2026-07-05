@@ -6,12 +6,12 @@
 
 ### Runtime Versions
 
-| Tool | Version | Config |
-|------|---------|--------|
-| Node.js | 24.16.0 | `.nvmrc` |
-| pnpm | 11.9.0 | `package.json` |
-| Python | 3.13 | `.python-version` |
-| uv | latest | preferred Python manager |
+| Tool    | Version | Config                   |
+|---------|---------|--------------------------|
+| Node.js | 24.16.0 | `.nvmrc`                 |
+| pnpm    | 11.9.0  | `package.json`           |
+| Python  | 3.13    | `.python-version`        |
+| uv      | latest  | preferred Python manager |
 
 ### Required Services
 Start databases w/ Docker before running local services:
@@ -110,16 +110,16 @@ Foresight is the persistent memory layer for AI agents — shared across all mac
 
 ### When to Use Foresight
 
-| Situation | Tool | Example |
-|-----------|------|---------|
-| Starting a substantial task | `manage_context_blocks` | Get `project_context` + `pending_items` before writing code |
-| Remembering a decision or preference | `manage_memories` | Store "user prefers pnpm over npm" as category `preference` |
-| Finding past context on a topic | `search_memories` | Search "Postgres migration" to recall prior decisions |
-| Capturing lessons from a failed approach | `manage_memories` | Store "CLI fell back to SQLite because FORESIGHT_DB_URL wasn't exported" |
-| Tracking active work items | `manage_context_blocks` | Update `pending_items` block with current blockers |
-| Injecting relevant memories into a session | `inject_context` | Auto-surface memories matching current conversation |
-| Reviewing work over a time window | `query_memories_temporal` | Pull memories from last 7 days for weekly reflection |
-| Processing a session transcript | `process_session_transcript` | Extract memories from a completed agent session |
+| Situation                                  | Tool                         | Example                                                                  |
+|--------------------------------------------|------------------------------|--------------------------------------------------------------------------|
+| Starting a substantial task                | `manage_context_blocks`      | Get `project_context` + `pending_items` before writing code              |
+| Remembering a decision or preference       | `manage_memories`            | Store "user prefers pnpm over npm" as category `preference`              |
+| Finding past context on a topic            | `search_memories`            | Search "Postgres migration" to recall prior decisions                    |
+| Capturing lessons from a failed approach   | `manage_memories`            | Store "CLI fell back to SQLite because FORESIGHT_DB_URL wasn't exported" |
+| Tracking active work items                 | `manage_context_blocks`      | Update `pending_items` block with current blockers                       |
+| Injecting relevant memories into a session | `inject_context`             | Auto-surface memories matching current conversation                      |
+| Reviewing work over a time window          | `query_memories_temporal`    | Pull memories from last 7 days for weekly reflection                     |
+| Processing a session transcript            | `process_session_transcript` | Extract memories from a completed agent session                          |
 
 ### Session Startup Workflow
 
@@ -132,30 +132,30 @@ Every session doing real work should start here:
 ### CLI Quick Reference
 
 ```bash
-foresight store "text"                    # Store a memory
-foresight list                             # List all memories (newest first)
-foresight query "search term"              # Keyword + hybrid search
-foresight get <id>                         # Get memory by ID
-foresight doctor                           # Health check — verifies DB + config
-foresight status                           # System health overview
-foresight synthesize                       # Find patterns & contradictions
-foresight profile                          # Build user profile from memories
+foresight store "text"         # Store a memory
+foresight list                 # List all memories (newest first)
+foresight query "search term"  # Keyword + hybrid search
+foresight get <id>             # Get memory by ID
+foresight doctor               # Health check — verifies DB + config
+foresight status               # System health overview
+foresight synthesize           # Find patterns & contradictions
+foresight profile              # Build user profile from memories
 ```
 
 ### MCP Tool Reference
 
-| Tool | Action | What it does |
-|------|--------|-------------|
-| `manage_memories` | `store` | Save a new memory (content, scope, category, tags) |
-| `manage_memories` | `update` | Edit an existing memory by ID |
-| `manage_memories` | `delete` | Remove a memory by ID |
-| `search_memories` | — | Unified search: ID lookup, keyword, or hybrid |
-| `manage_context_blocks` | `list` / `get` / `update` | Read/write context blocks |
-| `inject_context` | — | Surface memories relevant to current conversation |
-| `query_memories_temporal` | — | Retrieve by time window or trend |
-| `process_session_transcript` | — | Extract memories from session transcript |
-| `manage_curation_runs` | — | Bulk reorganize memories (dedupe, rebalance) |
-| `get_system_status` | — | Health check + memory counts |
+| Tool                         | Action                    | What it does                                       |
+|------------------------------|---------------------------|----------------------------------------------------|
+| `manage_memories`            | `store`                   | Save a new memory (content, scope, category, tags) |
+| `manage_memories`            | `update`                  | Edit an existing memory by ID                      |
+| `manage_memories`            | `delete`                  | Remove a memory by ID                              |
+| `search_memories`            | —                         | Unified search: ID lookup, keyword, or hybrid      |
+| `manage_context_blocks`      | `list` / `get` / `update` | Read/write context blocks                          |
+| `inject_context`             | —                         | Surface memories relevant to current conversation  |
+| `query_memories_temporal`    | —                         | Retrieve by time window or trend                   |
+| `process_session_transcript` | —                         | Extract memories from session transcript           |
+| `manage_curation_runs`       | —                         | Bulk reorganize memories (dedupe, rebalance)       |
+| `get_system_status`          | —                         | Health check + memory counts                       |
 
 ### Best Practices
 
