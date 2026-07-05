@@ -168,3 +168,29 @@ describe('jsonError', () => {
     })
   })
 })
+
+describe('parsePagination', () => {
+  it('returns default values when search parameters are missing', async () => {
+    const { parsePagination } = await import('../_shared')
+    const result = parsePagination(new URL('http://localhost'))
+    expect(result).toEqual({ limit: 10, offset: 0 })
+  })
+
+  it('parses valid limit and offset', async () => {
+    const { parsePagination } = await import('../_shared')
+    const result = parsePagination(new URL('http://localhost?limit=20&offset=5'))
+    expect(result).toEqual({ limit: 20, offset: 5 })
+  })
+
+  it('caps the limit to 100', async () => {
+    const { parsePagination } = await import('../_shared')
+    const result = parsePagination(new URL('http://localhost?limit=150'))
+    expect(result).toEqual({ limit: 100, offset: 0 })
+  })
+
+  it('handles invalid limit and offset values', async () => {
+    const { parsePagination } = await import('../_shared')
+    const result = parsePagination(new URL('http://localhost?limit=invalid&offset=-5'))
+    expect(result).toEqual({ limit: 10, offset: 0 })
+  })
+})
