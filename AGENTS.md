@@ -73,6 +73,37 @@ Refer to `~/.factory/memories.md` for personal coding preferences and past decis
 
 ---
 
+## SkillRoute — Skill Discovery & Routing
+
+This workspace uses **SkillRoute** (`erichare/skill-route`) for semantic skill routing when the right skill for a task is not obvious.
+
+### Installation & Setup
+- Installed at: `~/.skillroute/skill-route`
+- CLI: `skillroute` (globally available via `uv tool install`)
+- Catalog: `~/.skillroute/skill-route/.skillroute/catalog.db`
+- Requires `SKILLROUTE_CATALOG_PATH` env var (already added to `.bashrc` / `.zshrc`)
+
+### When to Use
+- When an agent needs to identify the best skill for an ambiguous or multi-domain task.
+- When the task description matches multiple possible skills.
+
+### Key Commands
+```bash
+# Route a request to the best skill
+skillroute route "<task description>"
+
+# Search available skills
+skillroute search "<query>"
+```
+
+### Agent Workflow
+1. If the next step is unclear, run `skillroute route "<task>"`.
+2. Read the returned skill(s) and their confidence scores.
+3. Load the recommended skill(s) via the Skill tool.
+4. Proceed with the recommended workflow.
+
+---
+
 ## Foresight Memory & Continuity System
 
 Foresight is the persistent memory layer for AI agents — shared across all machines via Ghost Postgres.
