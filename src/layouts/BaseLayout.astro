@@ -221,13 +221,16 @@ const currentYear = new Date().getFullYear()
     }
 
     <script>
-      const toggle = document.querySelector('[data-keel-theme-toggle]')
-      toggle?.addEventListener('click', () => {
-        const current = document.documentElement.dataset['theme']
-        const next = current === 'dark' ? 'light' : 'dark'
-        document.documentElement.dataset['theme'] = next
-        document.documentElement.classList.toggle('dark', next === 'dark')
-        localStorage.setItem('keel-theme', next)
+    <script>
+      document.addEventListener('astro:page-load', () => {
+        const toggle = document.querySelector('[data-keel-theme-toggle]')
+        toggle?.addEventListener('click', () => {
+          const current = document.documentElement.dataset['theme']
+          const next = current === 'dark' ? 'light' : 'dark'
+          document.documentElement.dataset['theme'] = next
+          document.documentElement.classList.toggle('dark', next === 'dark')
+          localStorage.setItem('keel-theme', next)
+        })
       })
     </script>
   </body>
