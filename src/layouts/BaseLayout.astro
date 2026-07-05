@@ -97,7 +97,7 @@ const navLinks = [
 
 const isActive = (href: string) => {
   const full = withBasePath(href)
-  return href === '/' ? currentPathname === full : currentPathname.startsWith(full)
+  return href === '/' ? currentPathname === full : (currentPathname === full || currentPathname.startsWith(`${full}/`))
 }
 
 const currentYear = new Date().getFullYear()
